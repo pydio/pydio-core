@@ -23,6 +23,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
@@ -149,7 +150,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $ctx = $requestInterface->getAttribute("ctx");
         $ctxUser = $ctx->getUser();
 
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
         $repoId = $this->accessDriver->repository->getId();
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();

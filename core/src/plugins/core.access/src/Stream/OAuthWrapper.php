@@ -12,6 +12,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
@@ -41,7 +42,7 @@ class OAuthWrapper extends AJXP_SchemeTranslatorWrapper
 
         // Repository information
         $urlParts = Utils::safeParseUrl($url);
-        $repository = ConfService::getRepositoryById($urlParts["host"]);
+        $repository = GuzzleClient::getRepositoryById($urlParts["host"]);
 
         if ($repository == null) {
             throw new Exception("Cannot find repository");

@@ -20,6 +20,7 @@
  */
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -441,7 +442,7 @@ class AjaXplorerUpgrader
      */
     public static function migrateMetaSerialPlugin($ctx, $repositoryId, $dryRun)
     {
-        $repo = ConfService::getRepositoryById($repositoryId);
+        $repo = RepositoryService::getRepositoryById($repositoryId);
         if($repo == null) throw new Exception("Cannot find repository!");
         $sources = $repo->getContextOption($ctx, "META_SOURCES");
         if (!isSet($sources["meta.serial"])) {
@@ -468,7 +469,7 @@ class AjaXplorerUpgrader
         $repo->addOption("META_SOURCES", $sources);
         $log = print_r($sources, true);
         if (!$dryRun) {
-            ConfService::replaceRepository($oldId, $repo);
+            RepositoryService::replaceRepository($oldId, $repo);
         }
         print("Will replace the META_SOURCES options with the following : <br><pre>".($log)."</pre>");
 

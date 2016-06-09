@@ -509,7 +509,7 @@ class Plugin implements \Serializable
     public function getManifestRawContent($xmlNodeName = "", $format = "string", $externalFiles = false)
     {
         if ($externalFiles && !$this->externalFilesAppended) {
-            $this->loadRegistryContributions(Context::fromGlobalServices(), true);
+            $this->loadRegistryContributions(Context::emptyContext(), true);
             $this->externalFilesAppended = true;
         }
         if($this->manifestXML != null) $this->unserializeManifest();

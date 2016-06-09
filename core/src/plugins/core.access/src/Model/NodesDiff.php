@@ -24,6 +24,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -96,7 +97,7 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
      * @param AJXP_Node $ajxpNode
      */
     protected function forceLoadNodeInfo(&$ajxpNode){
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $ajxpNode->loadNodeInfo(false, false, "all");
         if (!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)) {
             $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));

@@ -56,8 +56,11 @@ class BruteForceHelper
      * @param $loginArray
      * @return void
      */
-    public static function setBruteForceLoginArray($loginArray)
+    public static function setBruteForceLoginArray($loginArray, $validCurrent = false)
     {
+        if($validCurrent && isSet($loginArray[$_SERVER["REMOTE_ADDR"]])){
+            unset($loginArray[$_SERVER["REMOTE_ADDR"]]);
+        }
         $failedLog = Utils::getAjxpTmpDir() . "/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }

@@ -28,6 +28,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Tests\AbstractTest;
@@ -340,7 +342,7 @@ class Utils
      */
     public static function parseFileDataErrors($boxData, $throwException=false)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if(is_array($boxData)){
             $userfile_error = $boxData["error"];
             $userfile_tmp_name = $boxData["tmp_name"];
@@ -405,9 +407,9 @@ class Utils
             } else {
                 $repoId = $parameters["repository_id"];
             }
-            $repository = ConfService::getRepositoryById($repoId);
+            $repository = RepositoryService::getRepositoryById($repoId);
             if ($repository == null) {
-                $repository = ConfService::getRepositoryByAlias($repoId);
+                $repository = RepositoryService::getRepositoryByAlias($repoId);
                 if ($repository != null) {
                     $parameters["repository_id"] = $repository->getId();
                 }
@@ -501,7 +503,7 @@ class Utils
      */
     public static function mimetype($fileName, $mode, $isDir)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $fileName = strtolower($fileName);
         $EXTENSIONS = ConfService::getRegisteredExtensions();
         if ($isDir) {
@@ -559,7 +561,7 @@ class Utils
     {
         if ($keyword == "editable") {
             // Gather editors!
-            $pServ = PluginsService::getInstance();
+            $pServ = PluginsService::getInstance(Context::emptyContext());
             $plugs = $pServ->getPluginsByType("editor");
             //$plugin = new Plugin();
             $mimes = array();
@@ -674,7 +676,7 @@ class Utils
     public static function roundSize($filesize, $phpConfig = false)
     {
         if (self::$sizeUnit == null) {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             self::$sizeUnit = $mess["byte_unit_symbol"];
         }
         if ($filesize < 0) {
@@ -1008,7 +1010,7 @@ class Utils
 
             }
         }
-        $registryHooks = PluginsService::getInstance()->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
+        $registryHooks = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//hooks/serverCallback", "xml", false, false, true);
         $regHooks = array();
         foreach ($registryHooks as $xmlHook) {
             $name = $xmlHook->getAttribute("hookName");
@@ -1104,7 +1106,7 @@ class Utils
      */
     public static function extractConfStringsFromManifests()
     {
-        $plugins = PluginsService::getInstance()->getDetectedPlugins();
+        $plugins = PluginsService::getInstance(Context::emptyContext())->getDetectedPlugins();
         /**
          * @var Plugin $plug
          */
@@ -1150,7 +1152,7 @@ class Utils
     public static function updateAllI18nLibraries($createLanguage = "")
     {
         // UPDATE EN => OTHER LANGUAGES
-        $nodes = PluginsService::getInstance()->searchAllManifests("//i18n", "nodes");
+        $nodes = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//i18n", "nodes");
         foreach ($nodes as $node) {
             $nameSpace = $node->getAttribute("namespace");
             $path = AJXP_INSTALL_PATH . "/" . $node->getAttribute("path");
@@ -1178,7 +1180,7 @@ class Utils
             @copy(AJXP_INSTALL_PATH . "/plugins/core.ajaxplorer/i18n-template.php", $baseDir . "/$createLanguage.php");
         }
         if (!$detectLanguages) {
-            $languages = ConfService::listAvailableLanguages();
+            $languages = LocaleService::listAvailableLanguages();
             $filenames = array();
             foreach ($languages as $key => $value) {
                 $filenames[] = $baseDir . "/" . $key . ".php";
@@ -1319,7 +1321,7 @@ class Utils
         //require_once("../classes/class.Repository.php");
         include(AJXP_CONF_PATH . "/bootstrap_repositories.php");
         foreach ($REPOSITORIES as $index => $repo) {
-            $repoList[] = ConfService::createRepositoryFromArray($index, $repo);
+            $repoList[] = RepositoryService::createRepositoryFromArray($index, $repo);
         }
         // Try with the serialized repositories
         if (is_file(AJXP_DATA_PATH . "/plugins/conf.serial/repo.ser")) {

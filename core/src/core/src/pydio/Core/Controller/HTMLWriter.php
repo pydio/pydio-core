@@ -22,6 +22,7 @@ namespace Pydio\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -42,7 +43,7 @@ class HTMLWriter
      */
     public static function displayMessage($logMessage, $errorMessage)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         echo "<div title=\"".$mess[98]."\" id=\"message_div\" onclick=\"closeMessageDiv();\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";
         echo "<script>tempoMessageDivClosing();</script>";
     }

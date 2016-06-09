@@ -22,6 +22,7 @@ namespace Pydio\OCS\Model;
 
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Sabre\DAV;
 use Sabre\DAV\Exception;
 
@@ -142,7 +143,7 @@ class RemoteShare
 
         $remoteHost = $this->getHost();
         $remoteHost = !empty($remoteHost) ? '@' . $remoteHost : ' [remote]';
-        $repo = ConfService::createRepositoryFromArray($repositoryId, $data);
+        $repo = RepositoryService::createRepositoryFromArray($repositoryId, $data);
         $repo->setRepositoryType("remote");
         $repo->setAccessStatus($this->getStatus() == OCS_INVITATION_STATUS_ACCEPTED ? "accepted":"");
         $repo->setWriteable(false);

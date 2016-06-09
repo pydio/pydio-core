@@ -23,14 +23,12 @@ namespace Pydio\Gui\Ajax;
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Services\SessionService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -91,7 +89,7 @@ class AJXP_ClientDriver extends Plugin
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
 
@@ -148,7 +146,7 @@ class AJXP_ClientDriver extends Plugin
 
         // PRECOMPUTE REGISTRY
         if (!isSet($START_PARAMETERS["FORCE_REGISTRY_RELOAD"])) {
-            $clone = $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
+            $clone = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(true, true);
             if(!AJXP_SERVER_DEBUG){
                 $clonePath = new DOMXPath($clone);
                 $serverCallbacks = $clonePath->query("//serverCallback|hooks");
@@ -172,7 +170,7 @@ class AJXP_ClientDriver extends Plugin
         }
         if (ConfService::getConf("JS_DEBUG")) {
             if (!isSet($mess)) {
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
             }
             if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html")) {
                 include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html");
@@ -208,7 +206,7 @@ class AJXP_ClientDriver extends Plugin
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = Utils::securePath($getValue);
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         switch ($action) {
             //------------------------------------
@@ -242,15 +240,15 @@ class AJXP_ClientDriver extends Plugin
 
                 $refresh = false;
                 if (isSet($httpVars["lang"])) {
-                    ConfService::setLanguage($httpVars["lang"]);
+                    LocaleService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
                 if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
                     HTMLWriter::charsetHeader("application/json");
-                    echo json_encode(ConfService::getMessages($refresh));
+                    echo json_encode(LocaleService::getMessages($refresh));
                 }else{
                     HTMLWriter::charsetHeader('text/javascript');
-                    HTMLWriter::writeI18nMessagesClass(ConfService::getMessages($refresh));
+                    HTMLWriter::writeI18nMessagesClass(LocaleService::getMessages($refresh));
                 }
 
             break;
@@ -309,7 +307,7 @@ class AJXP_ClientDriver extends Plugin
         }
         $config["usersEnabled"] = UsersService::usersEnabled();
         $config["loggedUser"] = ($ctx->hasUser());
-        $config["currentLanguage"] = ConfService::getLanguage();
+        $config["currentLanguage"] = LocaleService::getLanguage();
         $config["session_timeout"] = intval(ini_get("session.gc_maxlifetime"));
         $timeoutTime = $this->getContextualOption($ctx, "CLIENT_TIMEOUT_TIME");
         if (empty($timeoutTime)) {
@@ -332,7 +330,7 @@ class AJXP_ClientDriver extends Plugin
                 "event" => 	$this->getContextualOption($ctx, 'GOOGLE_ANALYTICS_EVENT')
             );
         }
-        $config["i18nMessages"] = ConfService::getMessages();
+        $config["i18nMessages"] = LocaleService::getMessages();
         $config["SECURE_TOKEN"] = SecureTokenMiddleware::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];
@@ -393,7 +391,7 @@ class AJXP_ClientDriver extends Plugin
 
     public static function filterXml(&$value)
     {
-        $instance = PluginsService::getInstance()->findPlugin("gui", "ajax");
+        $instance = PluginsService::getInstance(Context::emptyContext())->findPlugin("gui", "ajax");
         if($instance === false) return null;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];

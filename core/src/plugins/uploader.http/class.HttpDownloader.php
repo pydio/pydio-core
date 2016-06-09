@@ -21,10 +21,9 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\UnixProcess;
 use Pydio\Tasks\Task;
@@ -101,7 +100,7 @@ class HttpDownloader extends Plugin
                     unlink($dlFile);
                     Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                 }
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 Controller::applyHook("node.change", array(null, $node, false), true);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, $mess["httpdownloader.8"]);
 

@@ -29,6 +29,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class SessionMiddleware
 {
 
+    private static $sessionHandler;
+
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
         $getParams = $requestInterface->getQueryParams();
@@ -47,6 +49,8 @@ class SessionMiddleware
             if(class_exists(AJXP_SESSION_HANDLER_CLASSNAME, false)){
                 $sessionHandlerClass = AJXP_SESSION_HANDLER_CLASSNAME;
                 $sessionHandler = new $sessionHandlerClass();
+                self::$sessionHandler = $sessionHandler;
+                $sessionHandler->updateContext($requestInterface->getAttribute("ctx"));
                 session_set_save_handler($sessionHandler, false);
             }
         }
@@ -59,5 +63,11 @@ class SessionMiddleware
 
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
+    }
+
+    public static function updateContext($ctx){
+        if(self::$sessionHandler){
+            self::$sessionHandler->updateContext($ctx);
+        }
     }
 }

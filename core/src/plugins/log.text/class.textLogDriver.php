@@ -40,7 +40,7 @@ class textLogDriver extends AbstractLogDriver
     public $USER_GROUP_RIGHTS = 0770;
 
     /**
-     * @var Integer File handle to currently open log file.
+     * @var resource File handle to currently open log file.
      */
     public $fileHandle;
 
@@ -129,7 +129,6 @@ class textLogDriver extends AbstractLogDriver
     {
         parent::init($ctx, $options);
 
-        $this->severityDescription = 0;
         $this->stack = array();
         $this->fileHandle = false;
 
@@ -156,13 +155,14 @@ class textLogDriver extends AbstractLogDriver
      * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
      * @param String $ip The client ip
      * @param String $user The user login
+     * @param String $repositoryId current repository ID
      * @param String $source The source of the message
      * @param String $prefix The prefix of the message
      * @param String $message The message to log
+     * @param array $nodePathes
      * @throws Exception
-     * @return void
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
+    public function write2($level, $ip, $user, $repositoryId, $source, $prefix, $message, $nodePathes = array())
     {
         if(Utils::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
@@ -216,8 +216,7 @@ class textLogDriver extends AbstractLogDriver
      */
     public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
     {
-        $dir = $this->storageDir;
-        if(!is_dir($this->storageDir)) return ;
+        if(!is_dir($this->storageDir)) return "";
         $logs = array();
         $years = array();
         $months = array();
@@ -268,7 +267,6 @@ class textLogDriver extends AbstractLogDriver
 
         if(!is_file($fName) || !is_readable($fName)) return;
 
-        $res = "";
         $lines = file($fName);
         foreach ($lines as $line) {
             $line = Utils::xmlEntities($line);

@@ -33,6 +33,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
@@ -205,7 +206,7 @@ class ftpAccessDriver extends fsAccessDriver
                         }
                         $this->logDebug("Upload : tmp upload folder", array($destCopy));
 
-                        $mess = ConfService::getMessages();
+                        $mess = LocaleService::getMessages();
                         $destName = tempnam($destCopy, "");
                         $boxData["tmp_name"] = $destName;
                         $this->copyUploadedData($uploadedFile, $destName, $mess);

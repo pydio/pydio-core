@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\RegistryMessage;
 use Pydio\Core\Http\Message\ReloadMessage;
@@ -38,7 +39,10 @@ use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -591,7 +595,7 @@ abstract class AbstractConfDriver extends Plugin
             $$getName = Utils::securePath($getValue);
         }
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         switch ($action) {
             //------------------------------------
@@ -602,13 +606,14 @@ abstract class AbstractConfDriver extends Plugin
                 if (!isSet($repository_id)) {
                     break;
                 }
-                $dirList = ConfService::getRepositoriesList();
+                $dirList = UsersService::getRepositoriesForUser($ctx->getUser());
                 /** @var $repository_id string */
                 if (!isSet($dirList[$repository_id])) {
                     throw new PydioException("Trying to switch to an unkown repository!");
                 }
-                ConfService::switchRootDir($repository_id);
-                PluginsService::getInstance();
+                //ConfService::switchRootDir($repository_id);
+                SessionService::switchSessionRepositoriId($repository_id);
+                PluginsService::getInstance($ctx->withRepositoryId($repository_id));
                 if (UsersService::usersEnabled() && $loggedUser !== null) {
                     $loggedUser->setArrayPref("repository_last_connected", $repository_id, time());
                     $loggedUser->save("user");
@@ -625,7 +630,7 @@ abstract class AbstractConfDriver extends Plugin
             case "state" :
                 
                 
-                $clone = PluginsService::getInstance(Context::fromGlobalServices())->getFilteredXMLRegistry(true, true);
+                $clone = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(true, true);
                 $clonePath = new \DOMXPath($clone);
                 if(!AJXP_SERVER_DEBUG){
                     $serverCallbacks = $clonePath->query("//serverCallback|hooks");
@@ -691,16 +696,16 @@ abstract class AbstractConfDriver extends Plugin
                     if ($httpVars["bm_action"] == "add_bookmark") {
                         $title = "";
                         if(isSet($httpVars["bm_title"])) $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
-                        if($title == "" && $bmPath=="/") $title = ConfService::getCurrentRootDirDisplay();
+                        if($title == "" && $bmPath=="/") $title = $ctx->getRepository()->getDisplay();
                         $bmUser->addBookmark($repositoryId, $bmPath, $title);
                         if ($driver) {
-                            $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
+                            $node = new AJXP_Node($ctx->getUrlBase().$bmPath);
                             $node->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked" => "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "delete_bookmark") {
                         $bmUser->removeBookmark($repositoryId, $bmPath);
                         if ($driver) {
-                            $node = new \Pydio\Access\Core\Model\AJXP_Node($driver->getResourceUrl($bmPath));
+                            $node = new AJXP_Node($ctx->getUrlBase().$bmPath);
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {
@@ -717,7 +722,7 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->save("user");
                     }
                 }
-                $doc = new XMLMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx->getRepository(), false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $doc = new XMLMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx, false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
                 $x = new SerializableResponseStream([$doc]);
                 $responseInterface = $responseInterface->withBody($x);
 
@@ -804,7 +809,7 @@ abstract class AbstractConfDriver extends Plugin
                     Utils::parseStandardFormParameters($ctx, $httpVars, $data, "PREFERENCES_");
                 }
 
-                $paramNodes = PluginsService::getInstance()->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
+                $paramNodes = PluginsService::getInstance($ctx)->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
                 if (is_array($paramNodes) && count($paramNodes)) {
                     foreach ($paramNodes as $xmlNode) {
@@ -843,9 +848,9 @@ abstract class AbstractConfDriver extends Plugin
 
                     Controller::applyHook($updating?"user.after_update":"user.after_create", array($loggedUser));
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
-                        $mailer = PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
+                        $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
-                            $mess = ConfService::getMessages();
+                            $mess = LocaleService::getMessages();
                             $link = Utils::detectServerURL();
                             $apptitle = ConfService::getCoreConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
@@ -933,11 +938,11 @@ abstract class AbstractConfDriver extends Plugin
                     $webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true);
                     $passSet = (isSet($davData["PASS"]));
                 }
-                $repoList = ConfService::getRepositoriesList();
+                $repoList = UsersService::getRepositoriesForUser($ctx->getUser());
                 $davRepos = array();
                 foreach ($repoList as $repoIndex => $repoObject) {
                     $accessType = $repoObject->getAccessType();
-                    $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
+                    $driver = PluginsService::getInstance($ctx)->getPluginByTypeName("access", $accessType);
                     if (($driver instanceof IAjxpWrapperProvider) && !$repoObject->getContextOption($ctx, "AJXP_WEBDAV_DISABLED") && ($loggedUser->canRead($repoIndex) || $loggedUser->canWrite($repoIndex))) {
                         $davRepos[$repoIndex] = $webdavBaseUrl . "" . ($repoObject->getSlug() == null ? $repoObject->getId() : $repoObject->getSlug());
                     }
@@ -960,7 +965,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 $tplId = $httpVars["template_id"];
                 $iconFormat = $httpVars["icon_format"];
-                $repo = ConfService::getRepositoryById($tplId);
+                $repo = RepositoryService::getRepositoryById($tplId);
                 $logo = $repo->getContextOption($ctx, "TPL_ICON_".strtoupper($iconFormat));
 
                 $async = new AsyncResponseStream(function() use($logo, $iconFormat){
@@ -991,10 +996,10 @@ abstract class AbstractConfDriver extends Plugin
 
                 $xml = "<repository_templates>";
                 $count = 0;
-                $repositories = ConfService::listRepositoriesWithCriteria(array(
+                $repositories = RepositoryService::listRepositoriesWithCriteria(array(
                     "isTemplate" => 1
                 ), $count);
-                $pServ = PluginsService::getInstance();
+                $pServ = PluginsService::getInstance($ctx);
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate) continue;
                     if(!$repo->getContextOption($ctx, "TPL_USER_CAN_CREATE")) continue;
@@ -1034,7 +1039,7 @@ abstract class AbstractConfDriver extends Plugin
             case "user_create_repository" :
 
                 $tplId = $httpVars["template_id"];
-                $tplRepo = ConfService::getRepositoryById($tplId);
+                $tplRepo = RepositoryService::getRepositoryById($tplId);
                 $options = array();
                 Utils::parseStandardFormParameters($ctx, $httpVars, $options);
                 $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
@@ -1042,7 +1047,7 @@ abstract class AbstractConfDriver extends Plugin
                 if (!empty($gPath)) {
                     $newRep->setGroupPath($gPath);
                 }
-                $res = ConfService::addRepository($newRep);
+                $res = RepositoryService::addRepository($newRep);
                 if ($res == -1) {
                     throw new PydioException($mess[426], 426);
                 }
@@ -1065,11 +1070,11 @@ abstract class AbstractConfDriver extends Plugin
             case "user_delete_repository" :
 
                 $repoId = $httpVars["repository_id"];
-                $repository = ConfService::getRepositoryById($repoId);
+                $repository = RepositoryService::getRepositoryById($repoId);
                 if (!$repository->getUniqueUser()||$repository->getUniqueUser()!= $loggedUser->getId()) {
                     throw new \Exception("You are not allowed to perform this operation!");
                 }
-                $res = ConfService::deleteRepository($repoId);
+                $res = RepositoryService::deleteRepository($repoId);
 
                 if ($res == -1) {
                     throw new PydioException($mess[427]);
@@ -1208,7 +1213,7 @@ abstract class AbstractConfDriver extends Plugin
                 } else if ($existingOnly && !empty($crtValue)) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";
                 }
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 if ($regexp == null && !$usersOnly) {
                     $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".$mess["447"]."\"><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }

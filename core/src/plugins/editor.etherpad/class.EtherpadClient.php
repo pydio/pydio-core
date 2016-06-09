@@ -22,9 +22,9 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -135,7 +135,6 @@ class EtherpadClient extends Plugin
             if($nodeExtension == "pad"){
                 // Create a new file and save the content in it.
                 $origUrl = $selectedNode->getUrl();
-                $mess = ConfService::getMessages();
                 $dateStamp = date(" Y-m-d H:i", time());
                 $startUrl = preg_replace('"\.pad$"', $dateStamp.'.html', $origUrl);
                 $newNode = new AJXP_Node($startUrl);

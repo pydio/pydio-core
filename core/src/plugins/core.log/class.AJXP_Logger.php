@@ -54,6 +54,9 @@ class AJXP_Logger extends Plugin
     protected static $loggerInstance;
     protected static $globalOptions;
 
+    /** @var  ContextInterface */
+    private static $context;
+
     /**
      * @param ContextInterface $ctx
      * @param array $options
@@ -68,11 +71,15 @@ class AJXP_Logger extends Plugin
             $pService->setPluginUniqueActiveForType("log", $this->pluginInstance->getName(), $this->pluginInstance);
         }
         self::$loggerInstance = $this->pluginInstance;
+        self::$context =  $ctx;
     }
 
-    public function getLoggerInstance()
-    {
+    public function getLoggerInstance(){
         return $this->pluginInstance;
+    }
+
+    public static function updateContext($context){
+        self::$context = $context;
     }
 
     /**
@@ -108,9 +115,10 @@ class AJXP_Logger extends Plugin
         $ip = self::getClientAdress();
         $user = self::getLoggedUser();
         $logger = self::getInstance();
+        $repoId = self::$context->hasRepository() ? self::$context->getRepositoryId() : "no-repository";
         if ($logger != null) {
             try {
-                $logger->write2($level, $ip, $user, $source, $prefix, $res, $nodePathes);
+                $logger->write2($level, $ip, $user, $repoId, $source, $prefix, $res, $nodePathes);
                 if ( $level == LOG_LEVEL_ERROR && self::$globalOptions["ERROR_TO_ERROR_LOG"] === true) {
                     error_log("[PYDIO] IP $ip | user $user | $level | $prefix | from $source | ".$res);
                 }
@@ -263,7 +271,7 @@ class AJXP_Logger extends Plugin
     {
         $user = "No User";
         if (UsersService::usersEnabled()) {
-            $logged = AuthService::getLoggedUser();
+            $logged = self::$context->getUser();
             if ($logged != null) {
                 $user = $logged->getId();
             } else {
@@ -321,7 +329,7 @@ class AJXP_Logger extends Plugin
     {
         if (!isset(self::$loggerInstance)) {
             $p = PluginsService::findPlugin("core", "log");
-            if(is_object($p)) $p->init(Context::fromGlobalServices(), array());
+            if(is_object($p)) $p->init(Context::emptyContext(), array());
         }
         return self::$loggerInstance;
     }

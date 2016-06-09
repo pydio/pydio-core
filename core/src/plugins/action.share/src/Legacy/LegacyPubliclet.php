@@ -32,6 +32,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
@@ -75,7 +77,7 @@ class LegacyPubliclet
      */
     public static function publicletToJson(ContextInterface $ctx, $shareId, $shareMeta, $shareStore, $publicAccessManager, $watcher, $node){
 
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
         $elementWatch = false;
 
         $pData = $shareStore->loadShare($shareId);
@@ -170,7 +172,7 @@ class LegacyPubliclet
                                 print("\n--Migrate legacy minisite to new minisite?");
                                 try{
                                     $sharedRepoId = $publiclet["REPOSITORY"];
-                                    $sharedRepo = ConfService::getRepositoryById($sharedRepoId);
+                                    $sharedRepo = RepositoryService::getRepositoryById($sharedRepoId);
                                     if($sharedRepo == null){
                                         print("\n--ERROR: Cannot find repository with id ".$sharedRepoId);
                                         continue;
@@ -188,7 +190,7 @@ class LegacyPubliclet
                                     $shareLink->parseHttpVars(["custom_handle" => $element]);
                                     $shareLink->setParentRepositoryId($sharedRepo->getParentId());
                                     print("\n--Creating the following share object");
-                                    print_r($shareLink->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
+                                    print_r($shareLink->getJsonData($shareCenter->getPublicAccessManager(), LocaleService::getMessages()));
                                     if(!$dryRun){
                                         $shareLink->save();
                                     }
@@ -237,9 +239,9 @@ class LegacyPubliclet
                                     // Smells like dirty hack!
                                     $newRepo->options["PATH"] = TextEncoder::fromStorageEncoding($newRepo->options["PATH"]);
 
-                                    $newRepo->setContentFilter(new ContentFilter([new AJXP_Node("pydio://".$parentRepositoryObject->getId().$filePath)]));
+                                    $newRepo->setContentFilter(new ContentFilter([new AJXP_Node("pydio://".$ctx->getUser()->getId()."@".$parentRepositoryObject->getId().$filePath)]));
                                     if(!$dryRun){
-                                        ConfService::addRepository($newRepo);
+                                        RepositoryService::addRepository($newRepo);
                                     }
 
                                     $hiddenUserEntry = $shareRightManager->prepareSharedUserEntry(
@@ -260,7 +262,7 @@ class LegacyPubliclet
                                     $link->setParentRepositoryId($parentRepositoryObject->getId());
                                     $link->attachToRepository($newRepo->getId());
                                     print("\n-- Should save following LINK: ");
-                                    print_r($link->getJsonData($shareCenter->getPublicAccessManager(), ConfService::getMessages()));
+                                    print_r($link->getJsonData($shareCenter->getPublicAccessManager(), LocaleService::getMessages()));
                                     if(!$dryRun){
                                         $hash = $link->save();
                                     }
@@ -286,7 +288,7 @@ class LegacyPubliclet
                         }
 
 
-                        $repo = ConfService::getRepositoryById($element);
+                        $repo = RepositoryService::getRepositoryById($element);
                         if($repo !== null){
                             print("\n--Shared repository: just metadata");
                             // Shared repo, migrating the meta should be enough

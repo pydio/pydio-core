@@ -20,6 +20,7 @@
  */
 
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
@@ -61,7 +62,7 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
     public function getImplementation($pluginsServiceInstance = null)
     {
         if($pluginsServiceInstance === null){
-            $pluginsServiceInstance = PluginsService::getInstance();
+            $pluginsServiceInstance = PluginsService::getInstance(Context::emptyContext());
         }
         if (!isSet(self::$authStorageImpl)) {
             if (!isSet($this->pluginConf["MASTER_INSTANCE_CONFIG"])) {

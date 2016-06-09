@@ -28,6 +28,7 @@ use Dropbox_OAuth_PEAR;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -64,7 +65,7 @@ class dropboxWrapper implements IAjxpWrapper
     public function initPath($ajxpPath)
     {
         $parts = Utils::safeParseUrl($ajxpPath);
-        $repo = ConfService::getRepositoryById($parts["host"]);
+        $repo = RepositoryService::getRepositoryById($parts["host"]);
         $node = new AJXP_Node($ajxpPath);
         $ctx = $node->getContext();
         if (empty(self::$dropbox)) {

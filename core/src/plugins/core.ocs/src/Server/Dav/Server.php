@@ -27,6 +27,7 @@ require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vend
 use Pydio\Core\Http\Dav\BrowserPlugin;
 use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Share\Store\ShareStore;
 use Sabre;
@@ -53,7 +54,7 @@ class Server extends Sabre\DAV\Server
                 $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
-                    $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
+                    $repo = RepositoryService::getRepositoryById($shareData["REPOSITORY"]);
                     if(!empty($repo) && $repo->hasContentFilter()){
                         return "/".$repo->getContentFilter()->getUniquePath();
                     }

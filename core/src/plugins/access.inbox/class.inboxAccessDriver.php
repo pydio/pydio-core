@@ -25,10 +25,13 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -123,8 +126,9 @@ class inboxAccessDriver extends fsAccessDriver
             return self::$output;
         }
 
-        $mess = ConfService::getMessages();
-        $repos = ConfService::getAccessibleRepositories();
+        $globalContext = Context::fromGlobalServices();
+        $mess = LocaleService::getMessages();
+        $repos = UsersService::getRepositoriesForUser($globalContext->getUser());
 
         $output = array();
         $touchReposIds = array();
@@ -226,7 +230,7 @@ class inboxAccessDriver extends fsAccessDriver
                 $output[$name.$suffix.".".$ext]['stat'] = $stat;
             }
         }
-        ConfService::loadDriverForRepository(ConfService::getRepository());
+        ConfService::loadDriverForRepository($globalContext->getRepository());
         self::$output = $output;
 
         if ($touch) {

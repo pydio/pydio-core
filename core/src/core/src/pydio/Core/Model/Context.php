@@ -22,6 +22,7 @@ namespace Pydio\Core\Model;
 
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -76,8 +77,8 @@ class Context implements ContextInterface
      */
     public static function fromGlobalServices(){
         $ctx = new Context();
-        $ctx->setUserObject(AuthService::getLoggedUser());
-        $ctx->setRepositoryObject(ConfService::getRepository());
+        //$ctx->setUserObject(AuthService::getLoggedUser());
+        //$ctx->setRepositoryObject(ConfService::getRepository());
         return $ctx;
     }
 
@@ -173,7 +174,7 @@ class Context implements ContextInterface
     {
         if(isSet($this->repositoryId)){
             if(!isSet($this->repositoryObject)){
-                $this->repositoryObject = ConfService::getRepositoryById($this->repositoryId);
+                $this->repositoryObject = RepositoryService::getRepositoryById($this->repositoryId);
             }
             return $this->repositoryObject;
         }

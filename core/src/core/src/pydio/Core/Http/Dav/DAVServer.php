@@ -24,6 +24,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Log\Core\AJXP_Logger;
 use Sabre\DAV as DAV;
 
@@ -48,7 +49,7 @@ class DAVServer
             die('You are not allowed to access this service');
         }
 
-        PluginsService::getInstance()->initActivePlugins();
+        PluginsService::getInstance(self::$context)->initActivePlugins();
 
         $baseURI = $baseURI . $davRoute;
         $requestUri = $_SERVER["REQUEST_URI"];
@@ -64,9 +65,9 @@ class DAVServer
             $pathBase = $parts[0];
             $repositoryId = $pathBase;
 
-            $repository = ConfService::getRepositoryById($repositoryId);
+            $repository = RepositoryService::getRepositoryById($repositoryId);
             if ($repository == null) {
-                $repository = ConfService::getRepositoryByAlias($repositoryId);
+                $repository = RepositoryService::getRepositoryByAlias($repositoryId);
                 if ($repository != null) {
                     $repositoryId = $repository->getId();
                 }

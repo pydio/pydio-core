@@ -23,6 +23,9 @@ namespace Pydio\Core\Services;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\FilteredRepositoriesList;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -30,6 +33,83 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class UsersService
 {
+    private static $_instance;
+    private $cache = [];
+    public static function instance(){
+        if(empty(self::$_instance)) self::$_instance = new UsersService();
+        return self::$_instance;
+    }
+
+    /**
+     * @param UserInterface $user
+     * @param bool $includeShared
+     * @param bool $details
+     * @param bool $labelsOnly
+     * @return \Pydio\Core\Model\RepositoryInterface[]
+     */
+    public static function getRepositoriesForUser($user, $includeShared = true, $details = false, $labelsOnly = false){
+
+        $self = self::instance();
+        $repos = $self->getFromCaches($user->getId());
+        if($repos !== null) {
+            $userRepos =  $repos;
+        } else{
+            $list = new FilteredRepositoriesList($user);
+            $repos = $list->load();
+            $self->setInCache($user->getId(), $repos);
+            $userRepos = $repos;
+        }
+        if($includeShared && !$details && !$labelsOnly) {
+            return $userRepos;
+        }
+        $output = [];
+        foreach ($userRepos as $repoId => $repoObject){
+            if(!RepositoryService::repositoryIsAccessible($repoObject, $user, $details, $includeShared)){
+                continue;
+            }
+            if($labelsOnly) $output[$repoId] = $repoObject->getDisplay();
+            else $output[$repoId] = $repoObject;
+        }
+        return $output;
+
+    }
+
+    /**
+     * @param $userId
+     * @return mixed|null|\Pydio\Core\Model\RepositoryInterface[]
+     */
+    private function getFromCaches($userId){
+        $fromSesssion = SessionService::getLoadedRepositories();
+        if($fromSesssion !== null){
+            $this->cache[$userId] = $fromSesssion;
+            return $fromSesssion;
+        }
+        if(isSet($this->cache[$userId])) {
+            $configsNotCorrupted = array_reduce($this->cache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
+            if($configsNotCorrupted){
+                return $this->cache[$userId];
+            }else{
+                $this->cache = [];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param string $userId
+     * @param RepositoryInterface[] $repoList
+     */
+    private function setInCache($userId, $repoList){
+        $this->cache[$userId] = $repoList;
+        SessionService::updateLoadedRepositories($repoList);
+    }
+
+    public static function invalidateCache(){
+        self::instance()->cache = [];
+        SessionService::invalidateLoadedRepositories();
+    }
+
+    
 
     /**
      * Whether the whole users management system is enabled or not.
@@ -156,7 +236,7 @@ class UsersService
     public static function updatePassword($userId, $userPass)
     {
         if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
-            $messages = ConfService::getMessages();
+            $messages = LocaleService::getMessages();
             throw new \Exception($messages[378]);
         }
         $userId = self::filterUserSensitivity($userId);
@@ -188,7 +268,6 @@ class UsersService
      * @param bool $isAdmin
      * @param bool $isHidden
      * @return null
-     * @todo the minlength check is probably causing problem with the bridges
      */
     public static function createUser($userId, $userPass, $isAdmin = false, $isHidden = false)
     {
@@ -197,12 +276,6 @@ class UsersService
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new \Exception("Reserved user id");
         }
-        /*
-        if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth") && $userId != "guest") {
-            $messages = ConfService::getMessages();
-            throw new Exception($messages[378]);
-        }
-        */
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         $authDriver->createUser($userId, $userPass);

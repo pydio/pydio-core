@@ -18,10 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 
@@ -75,8 +77,11 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
         //$this->logDebug(__FUNCTION__, "Replay is ".$replay);
 
         if($replay == $hash){
-            $res = AuthService::logUser($userId, "", true);
-            if($res > 0) return true;
+            try{
+                $loggedUser = AuthService::logUser($userId, "", true);
+                $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+                return true;
+            }catch(\Pydio\Core\Exception\LoginException $l){}
         }
         return false;
 
@@ -154,7 +159,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
             case "keystore_revoke_tokens":
 
                 // Invalidate previous tokens
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 $passedKeyId = "";
                 if(isSet($httpVars["key_id"])) $passedKeyId = $httpVars["key_id"];
                 $keys = $this->storage->simpleStoreList("keystore", null, $passedKeyId, "serial", '%"USER_ID";s:'.strlen($user).':"'.$user.'"%');

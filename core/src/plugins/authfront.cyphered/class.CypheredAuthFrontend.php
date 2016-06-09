@@ -156,14 +156,15 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
                 return false;
             }
         }
-        $res = AuthService::logUser($data["user_id"], $data["user_pwd"], false, false, -1);
-        if($res > 0) {
+        try{
+            $loggedUser = AuthService::logUser($data["user_id"], $data["user_pwd"], false, false, -1);
             $this->logDebug(__FUNCTION__, "Success");
             if($checkNonce){
                 $keys[$userId] = $tokenInc;
                 $this->storeLastKeys($keys);
             }
-            $loggedUser = $ctx->getUser();
+            $ctx->setUserObject($loggedUser);
+            $request = $request->withAttribute("ctx", $ctx);
             $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if (isSet($httpVars["tmp_repository_id"])) {
@@ -171,11 +172,13 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
             } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
                 $passId = $force;
             }
-            ConfService::switchUserToActiveRepository($loggedUser, $passId);
+            //ConfService::switchUserToActiveRepository($loggedUser, $passId);
             return true;
+
+        }catch (\Pydio\Core\Exception\LoginException $l){
+            $this->logDebug(__FUNCTION__, "Wrong result ".$l->getLoginError());
         }
 
-        $this->logDebug(__FUNCTION__, "Wrong result ".$res);
         return false;
 
     }

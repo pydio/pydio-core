@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Http\Dav;
 
+use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Services\UsersService;
 use \Sabre;
 use Pydio\Auth\Core\AJXP_Safe;
@@ -89,13 +90,15 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         }
 
         if ($success) {
-            $res = AuthService::logUser($this->currentUser, null, true);
-            if ($res < 1) {
+
+            try{
+                $loggedUser = AuthService::logUser($this->currentUser, null, true);
+            }catch (LoginException $l){
                 throw new Sabre\DAV\Exception\NotAuthenticated();
             }
-            $this->updateCurrentUserRights(AuthService::getLoggedUser());
+            $this->updateCurrentUserRights($loggedUser);
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
-                $webdavData = AuthService::getLoggedUser()->getPref("AJXP_WEBDAV_DATA");
+                $webdavData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
                 AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
             }
         } else {
@@ -104,12 +107,13 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
           }
           throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
         }
-        ConfService::switchRootDir($this->repositoryId);
+        $repoObject = ConfService::switchRootDir($this->repositoryId);
 
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
-        $this->context->setRepositoryId(ConfService::getCurrentRepositoryId());
-
+        $this->context->setRepositoryObject($repoObject);
+        AJXP_Logger::updateContext($this->context);
+        
         return true;
     }
 

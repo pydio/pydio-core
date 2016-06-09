@@ -77,13 +77,13 @@ class multiAuthDriver extends AbstractAuthDriver
             }
             $this->drivers[$name] = $instance;
         }
-        $multi = PluginsService::getInstance()->findPluginById("authfront.multi");
+        $multi = PluginsService::getInstance($ctx)->getPluginById("authfront.multi");
         $multi->options = $this->options;
         if(!$this->masterSlaveMode){
             // Enable Multiple choice login screen
-            PluginsService::getInstance()->setPluginActive("authfront", "multi", true, $multi);
+            PluginsService::getInstance($ctx)->setPluginActive("authfront", "multi", true, $multi);
         }else{
-            PluginsService::getInstance()->setPluginActive("authfront", "multi", false, $multi);
+            PluginsService::getInstance($ctx)->setPluginActive("authfront", "multi", false, $multi);
         }
         // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
         // WILL BE CALLED LATER, TO BE SURE THAT THE

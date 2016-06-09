@@ -22,10 +22,11 @@ namespace Pydio\Core\Services;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\BruteForceHelper;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -77,47 +78,13 @@ class AuthService
      * @param bool $bypass_pwd Ignore password or not
      * @param bool $cookieLogin Is it a logging from the remember me cookie?
      * @param string $returnSeed The unique seed
-     * @return int
+     * @return UserInterface
+     * @throws LoginException
      */
     public static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
     {
         $user_id = UsersService::filterUserSensitivity($user_id);
-        if ($cookieLogin && !isSet($_COOKIE["AjaXplorer-remember"])) {
-            return -5; // SILENT IGNORE
-        }
-        if ($cookieLogin) {
-            list($user_id, $pwd) = explode(":", $_COOKIE["AjaXplorer-remember"]);
-        }
         $confDriver = ConfService::getConfStorageImpl();
-        if ($user_id == null) {
-            if (self::$useSession) {
-                if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) {
-                    /**
-                     * @var AbstractAjxpUser $u
-                     */
-                    $u = $_SESSION["AJXP_USER"];
-                    if($u->reloadRolesIfRequired()){
-                        ConfService::getInstance()->invalidateLoadedRepositories();
-                        self::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
-                        $_SESSION["AJXP_USER"] = $u;
-                    }
-                    return 1;
-                }
-            } else {
-                if(isSet(self::$currentUser) && is_object(self::$currentUser)) return 1;
-            }
-            if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
-                $authDriver = ConfService::getAuthDriverImpl();
-                if (!$authDriver->userExists("guest")) {
-                    UsersService::createUser("guest", "");
-                    $guest = $confDriver->createUserObject("guest");
-                    $guest->save("superuser");
-                }
-                self::logUser("guest", null);
-                return 1;
-            }
-            return -1;
-        }
         $authDriver = ConfService::getAuthDriverImpl();
         // CHECK USER PASSWORD HERE!
         $loginAttempt = BruteForceHelper::getBruteForceLoginArray();
@@ -127,25 +94,24 @@ class AuthService
         if (!$authDriver->userExists($user_id)) {
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
             if ($bruteForceLogin === FALSE) {
-                return -4;
+                throw new LoginException(-4);
             } else {
-                return -1;
+                throw new LoginException(-1);
             }
         }
         if (!$bypass_pwd) {
             if (!UsersService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
                 AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
                 if ($bruteForceLogin === FALSE) {
-                    return -4;
+                    throw new LoginException(-4);
                 } else {
-                    if($cookieLogin) return -5;
-                    return -1;
+                    if($cookieLogin) throw new LoginException(-5);
+                    throw new LoginException(-1);
                 }
             }
         }
         // Successful login attempt
-        unset($loginAttempt[$_SERVER["REMOTE_ADDR"]]);
-        BruteForceHelper::setBruteForceLoginArray($loginAttempt);
+        BruteForceHelper::setBruteForceLoginArray($loginAttempt, true);
 
         // Setting session credentials if asked in config
         if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
@@ -154,31 +120,28 @@ class AuthService
         }
 
         $user = $confDriver->createUserObject($user_id);
-        if ($user->getLock() == "logout") {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
-            return -1;
-        }
 
-        if(AuthService::$useSession && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
-            ConfService::getInstance()->invalidateLoadedRepositories();
+        if ($user->getLock() === "logout") {
+            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
+            throw new LoginException(-1);
         }
 
         if ($authDriver->isAjxpAdmin($user_id)) {
             $user->setAdmin(true);
         }
-        if(self::$useSession) $_SESSION["AJXP_USER"] = $user;
-        else self::$currentUser = $user;
 
         if ($user->isAdmin()) {
             $user = RolesService::updateAdminRights($user);
-            self::updateUser($user);
         }
 
         if ($authDriver->autoCreateUser() && !$user->storageExists()) {
             $user->save("superuser"); // make sure update rights now
         }
+
+        self::updateUser($user);
+
         AJXP_Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
-        return 1;
+        return $user;
     }
 
     /**

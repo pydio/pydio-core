@@ -39,6 +39,8 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -216,7 +218,7 @@ class ShareCenter extends Plugin
 
             ConfService::init();
             ConfService::start();
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             ShareCenter::loadMinisite([], null, $mess["share_center.166"]);
 
         }
@@ -376,7 +378,7 @@ class ShareCenter extends Plugin
     protected function checkRepoWithSameLabel($label, $editingRepo = null){
         if ( $this->getContextualOption($this->currentContext, "AVOID_SHARED_FOLDER_SAME_LABEL") == true) {
             $count = 0;
-            $similarLabelRepos = ConfService::listRepositoriesWithCriteria(array("display" => $label), $count);
+            $similarLabelRepos = RepositoryService::listRepositoriesWithCriteria(array("display" => $label), $count);
             if($count && !isSet($editingRepo)){
                 return true;
             }
@@ -395,7 +397,7 @@ class ShareCenter extends Plugin
         if ($this->watcher === false || !$this->currentContext->hasUser() == null) {
             return;
         }
-        $rootNode = new AJXP_Node("pydio://".$childRepoId."/");
+        $rootNode = new AJXP_Node("pydio://".$userId."@".$childRepoId."/");
         // Register a watch on the current folder for shared user
         if($parentUserId !== null){
             if ($toggle) {
@@ -489,7 +491,8 @@ class ShareCenter extends Plugin
         $this->currentContext = $ctx = $requestInterface->getAttribute("ctx");
 
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
-            throw new \Exception("Cannot find access driver!");
+            //throw new \Exception("Cannot find access driver!");
+            $this->accessDriver = $ctx->getRepository()->getDriverInstance();
         }
 
 
@@ -545,7 +548,7 @@ class ShareCenter extends Plugin
 
                     $auth = $this->getAuthorization($ctx, "folder", "workspace");
                     if(!$auth){
-                        $mess = ConfService::getMessages();
+                        $mess = LocaleService::getMessages();
                         throw new \Exception($mess["351"]);
                     }
 
@@ -686,7 +689,7 @@ class ShareCenter extends Plugin
                 $folder = false;
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
-                    $selectedNode = new AJXP_Node("pydio://". Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
+                    $selectedNode = new AJXP_Node("pydio://". $ctx->getUser()->getId() ."@". Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
                 }
                 $shares = array();
                 $this->getShareStore()->getMetaManager()->getSharesFromMeta($shareNode, $shares, false);
@@ -732,7 +735,7 @@ class ShareCenter extends Plugin
                         }
                     }
                 }
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 $x = new SerializableResponseStream([new UserMessage($mess["share_center.47"])]);
                 $responseInterface = $responseInterface->withBody($x);
 
@@ -762,7 +765,7 @@ class ShareCenter extends Plugin
                         $node->setUserId(Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS));
                     }
                     if(!file_exists($node->getUrl())){
-                        $mess = ConfService::getMessages();
+                        $mess = LocaleService::getMessages();
                         throw new \Exception(str_replace('%s', "Cannot find file ".$file, $mess["share_center.219"]));
                     }
                     if(isSet($httpVars["tmp_repository_id"]) && $ctx->getUser()->isAdmin()){
@@ -771,7 +774,7 @@ class ShareCenter extends Plugin
                         $compositeShare = $this->getShareStore()->getMetaManager()->getCompositeShareForNode($node);
                     }
                     if(empty($compositeShare)){
-                        $mess = ConfService::getMessages();
+                        $mess = LocaleService::getMessages();
                         throw new \Exception(str_replace('%s', "Cannot find share for node ".$file, $mess["share_center.219"]));
                     }
                     $responseInterface = new JsonResponse($this->compositeShareToJson($ctx, $compositeShare));
@@ -783,7 +786,7 @@ class ShareCenter extends Plugin
 
             case "unshare":
 
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 $userSelection = new UserSelection($this->repository, $httpVars);
                 if(isSet($httpVars["hash"])){
                     $sanitizedHash = Utils::sanitize($httpVars["hash"], AJXP_SANITIZE_ALPHANUM);
@@ -1095,7 +1098,7 @@ class ShareCenter extends Plugin
         if($direction !== "DOWN"){
             if($node->getRepository()->hasParent()){
                 $parentRepoId = $node->getRepository()->getParentId();
-                $parentRepository = ConfService::getRepositoryById($parentRepoId);
+                $parentRepository = RepositoryService::getRepositoryById($parentRepoId);
                 if(!empty($parentRepository) && !$parentRepository->isTemplate){
                     $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                     $newContext = $crtContext->withRepositoryId($parentRepoId);
@@ -1256,11 +1259,11 @@ class ShareCenter extends Plugin
         AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
         PluginsService::getInstance()->initActivePlugins();
         if(isSet($_GET["lang"])){
-            ConfService::setLanguage($_GET["lang"]);
+            LocaleService::setLanguage($_GET["lang"]);
         }
         $shareCenter = self::getShareCenter();
         $data = $shareCenter->getShareStore()->loadShare($hash);
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if($data === false){
             AuthService::disconnect();
             self::loadMinisite([], $hash, $mess["share_center.166"]);
@@ -1377,12 +1380,12 @@ class ShareCenter extends Plugin
     protected function createOrLoadSharedRepository($httpVars, &$update){
 
         if (!isSet($httpVars["repo_label"]) || $httpVars["repo_label"] == "") {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["349"]);
         }
 
         if (isSet($httpVars["repository_id"])) {
-            $editingRepo = ConfService::getRepositoryById($httpVars["repository_id"]);
+            $editingRepo = RepositoryService::getRepositoryById($httpVars["repository_id"]);
             $update = true;
         }
 
@@ -1391,7 +1394,7 @@ class ShareCenter extends Plugin
         $description = Utils::sanitize(Utils::securePath($httpVars["repo_description"]), AJXP_SANITIZE_HTML);
         $exists = $this->checkRepoWithSameLabel($label, isSet($editingRepo)?$editingRepo:null);
         if($exists){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["share_center.352"]);
         }
 
@@ -1415,7 +1418,7 @@ class ShareCenter extends Plugin
             $oldScope = $editingRepo->getSafeOption("SHARE_ACCESS");
             $currentOwner = $editingRepo->getOwner();
             if($newScope != $oldScope && $currentOwner != $loggedUser->getId()){
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 throw new \Exception($mess["share_center.224"]);
             }
             if($newScope !== $oldScope){
@@ -1425,7 +1428,7 @@ class ShareCenter extends Plugin
             if(isSet($httpVars["transfer_owner"])){
                 $newOwner = $httpVars["transfer_owner"];
                 if($newOwner != $currentOwner && $currentOwner != $loggedUser->getId()){
-                    $mess = ConfService::getMessages();
+                    $mess = LocaleService::getMessages();
                     throw new \Exception($mess["share_center.224"]);
                 }
                 $editingRepo->setOwnerData($editingRepo->getParentId(), $newOwner, $editingRepo->getUniqueUser());
@@ -1433,7 +1436,7 @@ class ShareCenter extends Plugin
             }
 
             if($replace) {
-                ConfService::replaceRepository($newRepo->getId(), $newRepo);
+                RepositoryService::replaceRepository($newRepo->getId(), $newRepo);
             }
 
         } else {
@@ -1459,7 +1462,7 @@ class ShareCenter extends Plugin
             if(isSet($httpVars["filter_nodes"])){
                 $newRepo->setContentFilter(new ContentFilter($httpVars["filter_nodes"]));
             }
-            ConfService::addRepository($newRepo);
+            RepositoryService::addRepository($newRepo);
         }
         return $newRepo;
 
@@ -1553,7 +1556,7 @@ class ShareCenter extends Plugin
         $currentRepo = $this->currentContext->getRepository();
         $actRights = $loggedUser->getMergedRole()->listActionsStatesFor($currentRepo);
         if (isSet($actRights["share"]) && $actRights["share"] === false) {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["351"]);
         }
 
@@ -1636,7 +1639,7 @@ class ShareCenter extends Plugin
         $ocsStore = new OCS\Model\SQLStore();
         $ocsClient = new OCS\Client\OCSClient();
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         /**
          * @var ShareLink[] $shareObjects
@@ -1765,7 +1768,7 @@ class ShareCenter extends Plugin
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
-        $parent = ConfService::getRepositoryById($parentRepositoryId);
+        $parent = RepositoryService::getRepositoryById($parentRepositoryId);
 
         foreach($shares as $hash => $shareData){
 
@@ -1783,7 +1786,7 @@ class ShareCenter extends Plugin
             if(!is_object($shareData["REPOSITORY"])){
 
                 $repoId = $shareData["REPOSITORY"];
-                $repoObject = ConfService::getRepositoryById($repoId);
+                $repoObject = RepositoryService::getRepositoryById($repoId);
                 if($repoObject == null){
                     $meta["text"] = "Invalid link";
                     continue;
@@ -1817,7 +1820,7 @@ class ShareCenter extends Plugin
                     $parentPath = $parent->getContextOption($ctx, "PATH");
                     $meta["shared_element_parent_repository_label"] = $parent->getDisplay();
                 }else{
-                    $crtParent = ConfService::getRepositoryById($repoObject->getParentId());
+                    $crtParent = RepositoryService::getRepositoryById($repoObject->getParentId());
                     if(!empty($crtParent)){
                         $ctx = new Context($meta["owner"], $repoObject->getParentId());
                         $parentPath = $crtParent->getContextOption($ctx, "PATH");
@@ -1876,7 +1879,7 @@ class ShareCenter extends Plugin
 
         $repoId = $compositeShare->getRepositoryId();
         $repo = $compositeShare->getRepository();
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
 
         $notExistsData = array(
             "error"         => true,
@@ -1918,7 +1921,7 @@ class ShareCenter extends Plugin
      */
     public function shareToJson(ContextInterface $ctx, $shareId, $shareMeta, $node = null){
 
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
         $jsonData = array();
         $elementWatch = false;
         if($shareMeta["type"] == "file"){
@@ -1958,7 +1961,7 @@ class ShareCenter extends Plugin
                 "repository_url"=> ""
             );
 
-            $repo = ConfService::getRepositoryById($repoId);
+            $repo = RepositoryService::getRepositoryById($repoId);
             if($repoId == null || ($repo == null && $node != null)){
                 if($minisite){
                     $this->getShareStore()->getMetaManager()->removeShareFromMeta($node, $shareId);
@@ -1971,16 +1974,16 @@ class ShareCenter extends Plugin
                 $notExistsData["label"] = $e->getMessage();
                 return $notExistsData;
             }
-
+            $watchNode = new AJXP_Node($ctx->withRepositoryId($repoId)->getUrlBase()."/");
             if ($this->watcher != false && $node != null) {
                 $elementWatch = $this->watcher->hasWatchOnNode(
-                    new AJXP_Node("pydio://".$repoId."/"),
+                    $watchNode,
                     $ctx->hasUser()?$ctx->getUser()->getId():"shared",
                     MetaWatchRegister::$META_WATCH_NAMESPACE
                 );
             }
             if($node != null){
-                $sharedEntries = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, new AJXP_Node("pydio://".$repoId."/"));
+                $sharedEntries = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, $watchNode);
             }else{
                 $sharedEntries = $this->getRightsManager()->computeSharedRepositoryAccessRights($repoId, true, null);
             }

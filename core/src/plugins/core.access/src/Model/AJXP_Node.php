@@ -32,6 +32,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -139,15 +140,14 @@ class AJXP_Node implements \JsonSerializable
     public function getRepository()
     {
         if (!isSet($this->_repository)) {
-            $this->_repository = ConfService::getRepositoryById($this->urlParts["host"]);
+            $this->_repository = RepositoryService::getRepositoryById($this->urlParts["host"]);
         }
         return $this->_repository;
     }
     
     public function getContext(){
-        if(empty($this->_user) && AuthService::getLoggedUser() !== null){
-            $uObject = AuthService::getLoggedUser();
-            $this->_user = $uObject->getId();
+        if(empty($this->_user)){
+            throw new \Exception("Missing user in node URL");
         }
         $ctx = new Context($this->getUserId());
         $ctx->setRepositoryObject($this->getRepository());
@@ -192,7 +192,7 @@ class AJXP_Node implements \JsonSerializable
     {
         if (!isSet($this->_metaStore)) {
             $this->getDriver();
-            $this->_metaStore = PluginsService::getInstance()->getUniqueActivePluginForType("metastore");
+            $this->_metaStore = PluginsService::getInstance($this->getContext())->getUniqueActivePluginForType("metastore");
         }
         return $this->_metaStore;
     }
@@ -451,7 +451,7 @@ class AJXP_Node implements \JsonSerializable
             return;
         }
         if (!empty($this->_wrapperClassName)) {
-            $registered = PluginsService::getInstance()->getRegisteredWrappers();
+            $registered = PluginsService::getInstance($this->getContext())->getRegisteredWrappers();
             if (!isSet($registered[$this->getScheme()])) {
                 $driver = $this->getDriver();
                 if(is_object($driver)) $driver->detectStreamWrapper(true);
@@ -684,15 +684,15 @@ class AJXP_Node implements \JsonSerializable
         } else {
             $this->urlParts = parse_url($this->_url);
         }
+        if(isSet($this->urlParts["user"])){
+            $this->_user = $this->urlParts["user"];
+        }
 
         if (strstr($this->urlParts["scheme"], "ajxp.")!==false) {
-            $pServ = PluginsService::getInstance();
+            $pServ = PluginsService::getInstance($this->getContext());
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
             $this->_wrapperClassName = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
-        }
-        if(isSet($this->urlParts["user"])){
-            $this->_user = $this->urlParts["user"];
         }
     }
 

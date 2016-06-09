@@ -21,12 +21,10 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
@@ -59,12 +57,13 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
 
     protected function excludeFromSync($path){
         $excludedExtensions = array("dlpart");
+        $ctx = AJXP_Node::contextFromUrl($path);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if(!empty($ext) && in_array($ext, $excludedExtensions)){
             return true;
         }
         try{
-            $this->accessDriver->filterUserSelectionToHidden(Context::fromGlobalServices(), array($path));
+            $this->accessDriver->filterUserSelectionToHidden($ctx, array($path));
         }catch(Exception $e){
             return true;
         }
@@ -245,7 +244,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             $meta =  $currentRepo->getContextOption($contextInterface, "META_SOURCES");
             unset($meta["meta.syncable"]["REQUIRES_INDEXATION"]);
             $currentRepo->addOption("META_SOURCES", $meta);
-            ConfService::replaceRepository($currentRepo->getId(), $currentRepo);
+            RepositoryService::replaceRepository($currentRepo->getId(), $currentRepo);
         }
 
         HTMLWriter::charsetHeader('application/json', 'UTF-8');

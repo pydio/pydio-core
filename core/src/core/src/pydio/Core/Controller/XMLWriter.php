@@ -24,7 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
@@ -244,8 +244,8 @@ class XMLWriter
      */
     public static function replaceAjxpXmlKeywords($xml, $stripSpaces = false)
     {
-        $messages = ConfService::getMessages();
-        $confMessages = ConfService::getMessagesConf();
+        $messages = LocaleService::getMessages();
+        $confMessages = LocaleService::getConfigMessages();
         $matches = array();
         if (isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])) {
             //$xml = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_THEME_FOLDER, $xml);
@@ -266,7 +266,7 @@ class XMLWriter
         }
         $xml = str_replace("AJXP_REMOTE_AUTH", "false", $xml);
         $xml = str_replace("AJXP_NOT_REMOTE_AUTH", "true", $xml);
-        $xml = str_replace("AJXP_ALL_MESSAGES", "MessageHash=".json_encode(ConfService::getMessages()).";", $xml);
+        $xml = str_replace("AJXP_ALL_MESSAGES", "MessageHash=".json_encode(LocaleService::getMessages()).";", $xml);
 
         if (preg_match_all("/AJXP_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
@@ -331,7 +331,7 @@ class XMLWriter
         /**
          * @var $ajxpNode \Pydio\Access\Core\Model\AJXP_Node
          */
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $buffer = "<nodes_diff>";
         if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
             $buffer .= "<remove>";
@@ -423,14 +423,15 @@ class XMLWriter
      * List all bookmmarks as XML
      * @static
      * @param $allBookmarks
-     * @param RepositoryInterface $repository
+     * @param ContextInterface $context
      * @param bool $print
      * @param string $format legacy|node_list
      * @return string
      */
-    public static function writeBookmarks($allBookmarks, $repository, $print = true, $format = "legacy")
+    public static function writeBookmarks($allBookmarks, $context, $print = true, $format = "legacy")
     {
         $driver = false;
+        $repository = $context->getRepository();
         if ($format == "node_list") {
             $driver = $repository->getDriverInstance();
             if (!($driver instanceof IAjxpWrapperProvider)) {
@@ -449,7 +450,7 @@ class XMLWriter
             }
             if ($format == "node_list") {
                 if ($driver) {
-                    $node = new AJXP_Node($driver->getResourceUrl($path));
+                    $node = new AJXP_Node($context->getUrlBase().$path);
                     $buffer .= XMLWriter::renderAjxpNode($node, true, false);
                 } else {
                     $buffer .= XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
@@ -564,7 +565,7 @@ class XMLWriter
     {
         $loggedUser = $ctx->getUser();
         $st = "<repositories>";
-        $streams = ConfService::detectRepositoryStreams(false);
+        $streams = ConfService::detectRepositoryStreams($loggedUser, false);
         
         $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", function($nodes){
             $exposedNodes = [];
@@ -577,7 +578,7 @@ class XMLWriter
             return $exposedNodes;
         });
 
-        $accessible = ConfService::getAccessibleRepositories($loggedUser, false, false);
+        $accessible = UsersService::getRepositoriesForUser($loggedUser);
 
         $inboxStatus = 0;
         foreach($accessible as $repoId => $repoObject){

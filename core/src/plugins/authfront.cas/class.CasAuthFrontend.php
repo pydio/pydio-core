@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
@@ -218,8 +219,8 @@ class CasAuthFrontend extends AbstractAuthFrontend
             UsersService::createUser($cas_user, openssl_random_pseudo_bytes(20));
         }
         if (UsersService::userExists($cas_user)) {
-            $res = AuthService::logUser($cas_user, "", true);
-            if ($res > 0) {
+            try{
+                $userObj = AuthService::logUser($cas_user, "", true);
                 AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
 
@@ -227,10 +228,12 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $userObj = ConfService::getConfStorageImpl()->createUserObject($cas_user);
                     $cas_RoleID = $this->cas_additional_role;
                     $userObj->addRole(RolesService::getOrCreateRole($cas_RoleID, $userObj->getGroupPath()));
-                    AuthService::updateUser($userObj);
+                    //AuthService::updateUser($userObj);
                 }
 
                 // try to log to DEFAULT START REPO
+                /*
+                 * WILL BE APPLIED LATER
                 $userObj->recomputeMergedRole();
                 $loggedUser = $userObj;
                 $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
@@ -241,8 +244,12 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     $passId = $force;
                 }
                 ConfService::switchUserToActiveRepository($loggedUser, $passId);
+                */
 
+                $request = $request->withAttribute("ctx", Context::contextWithObjects($userObj, null));
                 return true;
+            }catch (\Pydio\Core\Exception\LoginException $l){
+
             }
         }
 

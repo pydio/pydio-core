@@ -28,6 +28,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
@@ -105,7 +106,7 @@ class PixlrEditor extends Plugin
                     "referrer"   => "Pydio",
                     "method"     => "get",
                     "type"       => $type,
-                    "loc"        => ConfService::getLanguage(),
+                    "loc"        => LocaleService::getLanguage(),
                     "target"     => $saveTarget,
                     "exit"       => $target."/fake_close_pixlr.php",
                     "title"      => urlencode(basename($selectedNodeUrl)),

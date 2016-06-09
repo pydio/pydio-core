@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\UsersService;
@@ -37,9 +38,12 @@ class ServerHttpAuthFrontend extends AbstractAuthFrontend {
         if(!UsersService::userExists($localHttpLogin) && $this->pluginConf["CREATE_USER"] === true){
             UsersService::createUser($localHttpLogin, $localHttpPassw, (isset($this->pluginConf["AJXP_ADMIN"]) && $this->pluginConf["AJXP_ADMIN"] == $localHttpLogin));
         }
-        $res = AuthService::logUser($localHttpLogin, $localHttpPassw, true);
-        if($res > 0) return true;
-
+        try{
+            $logged = AuthService::logUser($localHttpLogin, $localHttpPassw, true);
+            $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
+            return true;
+        }catch (\Pydio\Core\Exception\LoginException $l){
+        }
         return false;
 
     }

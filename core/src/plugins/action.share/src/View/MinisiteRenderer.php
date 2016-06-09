@@ -26,6 +26,8 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -44,7 +46,7 @@ class MinisiteRenderer
     {
         $repository = $data["REPOSITORY"];
         $confs = [];
-        PluginsService::getInstance()->initActivePlugins();
+        PluginsService::getInstance(Context::emptyContext())->initActivePlugins();
         $shareCenter = PluginsService::findPlugin("action", "share");
         if($shareCenter !== false){
             $confs = $shareCenter->getConfigs();
@@ -66,9 +68,9 @@ class MinisiteRenderer
             }
         }
         if(isSet($repository)){
-            $repoObject = ConfService::getRepositoryById($repository);
+            $repoObject = RepositoryService::getRepositoryById($repository);
             if(!is_object($repoObject)){
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 $error = $mess["share_center.166"];
                 $templateName = "ajxp_unique_strip";
                 $repoObject = null;
@@ -94,7 +96,7 @@ class MinisiteRenderer
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
         if(isSet($repository) && isSet($repoObject)){
             $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
-            $html = str_replace("AJXP_REPOSITORY_LABEL", ConfService::getRepositoryById($repository)->getDisplay(), $html);
+            $html = str_replace("AJXP_REPOSITORY_LABEL", RepositoryService::getRepositoryById($repository)->getDisplay(), $html);
         }
         $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
@@ -126,14 +128,14 @@ class MinisiteRenderer
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             ConfService::switchRootDir($repository);
-            PluginsService::getInstance();
+            PluginsService::getInstance(Context::emptyContext());
             $errMessage = null;
             try {
                 $params = $_GET;
                 $ACTION = "download";
                 if(isset($_GET["ct"])){
                     $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = PluginsService::getInstance()->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                    $editors = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
                     if (count($editors)) {
                         foreach ($editors as $editor) {
                             $xPath = new DOMXPath($editor->ownerDocument);

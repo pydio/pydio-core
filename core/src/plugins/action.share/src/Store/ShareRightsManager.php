@@ -31,6 +31,8 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -96,7 +98,7 @@ class ShareRightsManager
                 (isSet($httpVars["create_guest_user"]) && $httpVars["create_guest_user"] == "true" && empty($guestUserPass))
                 || (isSet($httpVars["guest_user_id"]) && isSet($guestUserPass) && strlen($guestUserPass) == 0)
             )){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["share_center.175"]);
         }
 
@@ -116,7 +118,7 @@ class ShareRightsManager
                 $shareObject->setUniqueUser($uniqueUser, false);
             }
             if($update && $forcePassword && !($shareObject instanceof TargettedLink) && !$shareObject->shouldRequirePassword() && empty($guestUserPass)){
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 throw new \Exception($mess["share_center.175"]);
             }
 
@@ -137,7 +139,7 @@ class ShareRightsManager
 
         $hiddenUserEntry = $this->createHiddenUserEntry($httpVars, $uniqueUser, $userPass, $update);
         if(empty($hiddenUserEntry["RIGHT"])){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["share_center.58"]);
         }
         $hiddenUserEntry["DISABLE_DOWNLOAD"] = $shareObject->disableDownload();
@@ -190,7 +192,7 @@ class ShareRightsManager
         $allowSharedUsersCreation = ConfService::getCoreConf("USER_CREATE_USERS", "conf");
         $loggedUser = $this->context->getUser();
         $confDriver = ConfService::getConfStorageImpl();
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         while (isSet($httpVars[PARAM_USER_LOGIN_PREFIX.$index])) {
 
@@ -311,7 +313,7 @@ class ShareRightsManager
     {
         $roles = RolesService::getRolesForRepository($repoId);
         $sharedEntries = $sharedGroups = array();
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         foreach($roles as $rId){
             $role = RolesService::getRole($rId);
             if ($role == null) continue;
@@ -422,7 +424,7 @@ class ShareRightsManager
                     UsersService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
                 }
             } else {
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 $hiddenUserLabel = "[".$mess["share_center.109"]."] ". Utils::sanitize($childRepository->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
                 $userObject = $this->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], isset($userEntry["HIDDEN"]), $hiddenUserLabel);
             }
@@ -445,7 +447,7 @@ class ShareRightsManager
             }
             // ADD "my shared files" REPO OTHERWISE SOME USER CANNOT ACCESS
             if( !isSet($userEntry["HIDDEN"]) && $childRepository->hasContentFilter()){
-                $inboxRepo = ConfService::getRepositoryById("inbox");
+                $inboxRepo = RepositoryService::getRepositoryById("inbox");
                 $currentAcl = $userObject->mergedRole->getAcl("inbox");
                 if($inboxRepo !== null && empty($currentAcl)){
                     $userObject->personalRole->setAcl("inbox", "rw");
@@ -536,7 +538,7 @@ class ShareRightsManager
             if (!empty($limit) && intval($limit) > 0) {
                 $count = count($confDriver->getUserChildren($parentUser->getId()));
                 if ($count >= $limit) {
-                    $mess = ConfService::getMessages();
+                    $mess = LocaleService::getMessages();
                     throw new \Exception($mess['483']);
                 }
             }

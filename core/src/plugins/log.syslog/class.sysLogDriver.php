@@ -94,7 +94,6 @@ class sysLogDriver extends textLogDriver
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        $this->severityDescription = 0;
         $this->stack = array();
         $this->fileHandle = false;
 
@@ -113,12 +112,13 @@ class sysLogDriver extends textLogDriver
      * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
      * @param String $ip The client ip
      * @param String $user The user login
+     * @param String $repositoryId current repository ID
      * @param String $source The source of the message
-     * @param String $prefix  The prefix of the message
+     * @param String $prefix The prefix of the message
      * @param String $message The message to log
-     *
+     * @param array $nodePathes
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
+    public function write2($level, $ip, $user, $repositoryId, $source, $prefix, $message, $nodePathes = array())
     {
         //syslog already take care of timestamp and log severity
         $textMessage = "$ip\t$user\t$source\t$prefix\t$message";
@@ -138,6 +138,9 @@ class sysLogDriver extends textLogDriver
                 break;
             case LOG_LEVEL_ERROR:
                 $sysLevel = LOG_ERR;
+                break;
+            default:
+                $sysLevel = LOG_LEVEL_INFO;
                 break;
         }
 

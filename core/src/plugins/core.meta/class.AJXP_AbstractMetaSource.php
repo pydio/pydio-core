@@ -24,6 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\RepositoryService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -49,7 +50,7 @@ abstract class AJXP_AbstractMetaSource extends Plugin {
         // Override options with parent META SOURCE options
         // Could be refined ?
         if($this->accessDriver->repository->hasParent()){
-            $parentRepo = ConfService::getRepositoryById($this->accessDriver->repository->getParentId());
+            $parentRepo = RepositoryService::getRepositoryById($this->accessDriver->repository->getParentId());
             if($parentRepo != null){
                 $sources = $parentRepo->getContextOption($ctx, "META_SOURCES");
                 $qParent = $sources["meta.quota"];

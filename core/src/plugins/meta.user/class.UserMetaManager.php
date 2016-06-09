@@ -74,8 +74,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         }
         $this->metaStore = $store;
         $this->metaStore->initMeta($ctx, $accessDriver);
-
-        //$messages = ConfService::getMessages();
+        
         $def = $this->getMetaDefinition();
         foreach($def as $k => &$d){
             if(isSet($this->fieldsAdditionalData[$k])) $d["data"] = $this->fieldsAdditionalData[$k];

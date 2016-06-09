@@ -29,6 +29,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
@@ -142,7 +144,7 @@ class ShareStore {
     public function loadShareObject($hash){
         $data = $this->loadShare($hash);
         if($data === false){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception(str_replace('%s', 'Cannot find share with hash '.$hash, $mess["share_center.219"]));
         }
         if(isSet($data["TARGET"]) && $data["TARGET"] == "remote"){
@@ -327,7 +329,7 @@ class ShareStore {
             if(count($storedIds)){
                 $criteria["!uuid"] = $storedIds;
             }
-            $oldRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+            $oldRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
             foreach($oldRepos as $sharedWorkspace){
                 $dbLets['repo-'.$sharedWorkspace->getId()] = array(
                     "SHARE_TYPE"    => "repository",
@@ -353,7 +355,7 @@ class ShareStore {
             return true;
         }
         if(empty($userId)){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception($mess["share_center.160"]);
         }
         $crtUser = $this->context->getUser();
@@ -363,7 +365,7 @@ class ShareStore {
         if($user->hasParent() && $user->getParent() == $crtUser->getId()){
             return true;
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         throw new \Exception($mess["share_center.160"]);
     }
 
@@ -378,17 +380,17 @@ class ShareStore {
      */
     public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false, $ajxpNode = null)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
 
         if ($type == "repository") {
             if(strpos($element, "repo-") === 0) $element = str_replace("repo-", "", $element);
-            $repo = ConfService::getRepositoryById($element);
+            $repo = RepositoryService::getRepositoryById($element);
             $share = $this->loadShare($element);
             if($repo == null) {
                 // Maybe a share has
                 if(is_array($share) && isSet($share["REPOSITORY"])){
-                    $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
+                    $repo = RepositoryService::getRepositoryById($share["REPOSITORY"]);
                 }
                 if($repo == null && !$ignoreRepoNotFound){
                     throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
@@ -396,7 +398,7 @@ class ShareStore {
             }
             if($repo != null){
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
-                $res = ConfService::deleteRepository($element);
+                $res = RepositoryService::deleteRepository($element);
                 if ($res == -1) {
                     throw new \Exception($mess[427]);
                 }
@@ -421,7 +423,7 @@ class ShareStore {
         } else if ($type == "minisite") {
             $minisiteData = $this->loadShare($element);
             $repoId = $minisiteData["REPOSITORY"];
-            $repo = ConfService::getRepositoryById($repoId);
+            $repo = RepositoryService::getRepositoryById($repoId);
             if ($repo == null) {
                 if(!$ignoreRepoNotFound) {
                     throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
@@ -430,7 +432,7 @@ class ShareStore {
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             }
             if(!$keepRepository){
-                $res = ConfService::deleteRepository($repoId);
+                $res = RepositoryService::deleteRepository($repoId);
                 if ($res == -1) {
                     throw new \Exception($mess[427]);
                 }
@@ -572,9 +574,9 @@ class ShareStore {
 
             if($type == "minisite"){
                 $share = $this->loadShare($id);
-                $repo = ConfService::getRepositoryById($share["REPOSITORY"]);
+                $repo = RepositoryService::getRepositoryById($share["REPOSITORY"]);
             }else if($type == "repository"){
-                $repo = ConfService::getRepositoryById($id);
+                $repo = RepositoryService::getRepositoryById($id);
             }else if($type == "file"){
                 $publicLink = $this->loadShare($id);
             }
@@ -608,7 +610,7 @@ class ShareStore {
                 }
                 if($save){
                     //ConfService::getConfStorageImpl()->saveRepository($repo, true);
-                    ConfService::replaceRepository($repo->getId(), $repo);
+                    RepositoryService::replaceRepository($repo->getId(), $repo);
                 }
                 $access = $repo->getSafeOption("SHARE_ACCESS");
                 if(!empty($access) && $access == "PUBLIC"){
@@ -640,7 +642,7 @@ class ShareStore {
     public function shareExists($type, $element)
     {
         if ($type == "repository") {
-            return (ConfService::getRepositoryById($element) != null);
+            return (RepositoryService::getRepositoryById($element) != null);
         } else if($type == "ocs_remote"){
             return true;
         } else if ($type == "file" || $type == "minisite") {
@@ -666,9 +668,9 @@ class ShareStore {
     public function resetDownloadCounter($hash, $userId){
         $share = $this->loadShareObject($hash);
         $repoId = $share->getRepositoryId();
-        $repo = ConfService::getRepositoryById($repoId);
+        $repo = RepositoryService::getRepositoryById($repoId);
         if ($repo == null) {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
         }
         $this->testUserCanEditShare($repo->getOwner(), $repo->options);
@@ -726,7 +728,7 @@ class ShareStore {
         }
         $repoObject = $data["REPOSITORY"];
         if(!($repoObject instanceof Repository)) {
-            $repoObject = ConfService::getRepositoryById($data["REPOSITORY"]);
+            $repoObject = RepositoryService::getRepositoryById($data["REPOSITORY"]);
         }
         $repoLoaded = false;
 

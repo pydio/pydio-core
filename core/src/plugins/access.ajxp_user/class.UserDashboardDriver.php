@@ -31,11 +31,11 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Share\ShareCenter;
 use Zend\Diactoros\Response\EmptyResponse;
@@ -83,7 +83,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $action = $httpVars["sub_action"];
             }
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         $x = new SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
@@ -144,11 +144,11 @@ class UserDashboardDriver extends AbstractAccessDriver
                 $selection = new UserSelection();
                 $selection->initFromHttpVars($httpVars);
                 $files = $selection->getFiles();
-                $minisites = $this->listMinisites();
+                $minisites = $this->listMinisites($ctx);
                 /**
                  * @var ShareCenter $shareCenter
                  */
-                $shareCenter = PluginsService::findPluginById("action.share");
+                $shareCenter = PluginsService::getInstance($ctx)->getPluginById("action.share");
                 foreach ($files as $index => $element) {
                     $element = basename($element);
                     $ar = explode("shared_", $mime);
@@ -185,7 +185,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         /**
          * @var ShareCenter $shareCenter
          */
-        $shareCenter = PluginsService::getInstance()->findPluginById("action.share");
+        $shareCenter = PluginsService::getInstance($ctx)->getPluginById("action.share");
         $publicLets = $shareCenter->listShares($ctx->hasUser() ? $ctx->getUser()->getId() : "shared", null);
         $minisites = array();
         foreach ($publicLets as $hash => $publicletData) {
@@ -252,9 +252,9 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         $loggedUser = $ctx->getUser();
         $users = ConfService::getConfStorageImpl()->getUserChildren($loggedUser->getId()); // AuthService::listUsers();
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $count = 0;
-        $repoList = ConfService::listRepositoriesWithCriteria(array(
+        $repoList = RepositoryService::listRepositoriesWithCriteria(array(
             "owner_user_id" => $loggedUser->getId()
         ), $count);
         $userArray = array();

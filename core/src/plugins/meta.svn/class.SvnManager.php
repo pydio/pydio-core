@@ -27,6 +27,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
@@ -295,7 +296,7 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
         $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         XMLWriter::header();
         XMLWriter::sendMessage($mess["meta.svn.5"], null);
         XMLWriter::reloadDataNode();
@@ -329,7 +330,7 @@ class SvnManager extends AJXP_AbstractMetaSource
         $this->commitChanges($actionName, $httpVars, $filesVars);
         $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         XMLWriter::header();
         XMLWriter::sendMessage($mess["meta.svn.51"], null);
         XMLWriter::reloadDataNode();

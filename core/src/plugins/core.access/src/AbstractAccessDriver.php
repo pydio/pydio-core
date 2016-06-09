@@ -27,6 +27,8 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -149,8 +151,8 @@ abstract class AbstractAccessDriver extends Plugin
             return;
         }
 
-        ConfService::detectRepositoryStreams(true);
-        $mess = ConfService::getMessages();
+        ConfService::detectRepositoryStreams($ctx->getUser(), true);
+        $mess = LocaleService::getMessages();
 
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
@@ -160,7 +162,7 @@ abstract class AbstractAccessDriver extends Plugin
         $origStreamURL = "pydio://$repositoryId";
 
         $destRepoId = $httpVars["dest_repository_id"];
-        $destRepoObject = ConfService::getRepositoryById($destRepoId);
+        $destRepoObject = RepositoryService::getRepositoryById($destRepoId);
         AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
         $destStreamURL = "pydio://$destRepoId";
 
@@ -221,7 +223,7 @@ abstract class AbstractAccessDriver extends Plugin
         $srcRecycle = $srcRepoData['recycle'];
         $destUrlBase = $destRepoData['base_url'];
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         /*
         $bName = basename($srcFile);
         $localName = '';

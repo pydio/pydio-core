@@ -28,6 +28,7 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
@@ -114,7 +115,7 @@ class CoreIndexer extends Plugin {
     public function recursiveIndexation(ContextInterface $ctx, $node, $depth = 0)
     {
         $repository = $node->getRepository();
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
         $user = $ctx->getUser();
         if($depth == 0){
             $this->debug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());

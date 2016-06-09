@@ -22,8 +22,7 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -88,7 +87,7 @@ class GitManager extends AJXP_AbstractMetaSource
                 $res = $this->gitHistory($git, $file);
                 $ic = Utils::mimetype($file, "image", false);
                 $index = count($res);
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 foreach ($res as &$commit) {
                     unset($commit["DETAILS"]);
                     $commit["icon"] = $ic;
@@ -121,9 +120,11 @@ class GitManager extends AJXP_AbstractMetaSource
                 $outputStream = fopen($this->repoBase.$originalFile, "w");
                 $this->executeCommandInStreams($git, $commandLine, $outputStream);
                 fclose($outputStream);
-                $this->commitChanges();
+                /** @var ContextInterface $ctx */
+                $ctx = $requestInterface->getAttribute("ctx");
+                $this->commitChanges($ctx);
                 $diff = new \Pydio\Access\Core\Model\NodesDiff();
-                $diff->update(new AJXP_Node("pydio://".$this->accessDriver->repository->getId().$file));
+                $diff->update(new AJXP_Node($ctx->getUrlBase().$file));
                 $x->addChunk($diff);
 
 

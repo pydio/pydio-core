@@ -25,6 +25,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -38,7 +39,7 @@ class FileMimeSender extends Plugin
 {
     public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
-        $repository = ConfService::getRepositoryById($httpVars["repository_id"]);
+        $repository = RepositoryService::getRepositoryById($httpVars["repository_id"]);
         
         if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();

@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
@@ -38,9 +39,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
         return parent::isEnabled();
     }
 
-    protected function logUserFromSession(&$httpVars){
+    protected function logUserFromSession(\Psr\Http\Message\ServerRequestInterface &$request){
 
-        if(isSet($_SESSION["AJXP_USER"]) && is_object($_SESSION["AJXP_USER"])) {
+        if(isSet($_SESSION["AJXP_USER"]) && !$_SESSION["AJXP_USER"] instanceof __PHP_Incomplete_Class && $_SESSION["AJXP_USER"] instanceof \Pydio\Core\Model\UserInterface) {
             /**
              * @var \Pydio\Conf\Core\AbstractAjxpUser $u
              */
@@ -48,9 +49,10 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             if($u->reloadRolesIfRequired()){
                 ConfService::getInstance()->invalidateLoadedRepositories();
                 AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
-                AuthService::updateUser($u);
+                //AuthService::updateUser($u);
             }
-            ConfService::switchRootDir();
+            $request = $request->withAttribute("ctx", Context::contextWithObjects($u, null));
+            //ConfService::switchRootDir();
             return true;
         }
         if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
@@ -60,8 +62,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 $guest = ConfService::getConfStorageImpl()->createUserObject("guest");
                 $guest->save("superuser");
             }
-            AuthService::logUser("guest", null);
-            ConfService::switchRootDir();
+            $logged = AuthService::logUser("guest", null);
+            $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
+            //ConfService::switchRootDir();
             return true;
         }
         return false;
@@ -72,20 +75,34 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
         $httpVars = $request->getParsedBody();
         if($request->getAttribute("action") != "login"){
-            return $this->logUserFromSession($httpVars);
+            return $this->logUserFromSession($request);
         }
         $rememberLogin = "";
         $rememberPass = "";
         $secureToken = "";
         $loggedUser = null;
+        $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
         if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
+        } else if($cookieLogin && !CookiesHelper::hasRememberCookie()){
+            $loggingResult = -5;
         } else {
-            $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
-            $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
+            if($cookieLogin){
+                list($userId, $userPass) = CookiesHelper::getRememberCookieData();
+            }else{
+                $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
+                $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
+            }
             $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
-            $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
-            $loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
+            $loggingResult = 1;
+
+            try{
+                $loggedUser = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
+                $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+            }catch (\Pydio\Core\Exception\LoginException $l){
+                $loggingResult = $l->getLoginError();
+            }
+
             if ($rememberMe && $loggingResult == 1) {
                 $rememberLogin = "notify";
                 $rememberPass = "notify";
@@ -98,20 +115,25 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 $loggingResult = -4; // Force captcha reload
             }
         }
-        $loggedUser = AuthService::getLoggedUser();
+
         if ($loggedUser != null) {
-            $force = $loggedUser->mergedRole->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
+
+            if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+                ConfService::getInstance()->invalidateLoadedRepositories();
+            }
+
+            $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
             $passId = -1;
             if (isSet($httpVars["tmp_repository_id"])) {
                 $passId = $httpVars["tmp_repository_id"];
             } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
                 $passId = $force;
             }
-            $res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
-            if (!$res) {
-                AuthService::disconnect();
-                $loggingResult = -3;
-            }
+            //$res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
+            //if (!$res) {
+            //    AuthService::disconnect();
+            //    $loggingResult = -3;
+            //}
         }
 
         if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {

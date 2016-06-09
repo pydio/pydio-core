@@ -48,7 +48,7 @@ class fsAccessTest extends AbstractTest
         if(strstr($safePath, "AJXP_USER")!==false) {
             return TRUE;
         } // CANNOT TEST THIS CASE!
-        $ctx = Context::fromGlobalServices();
+        $ctx = Context::emptyContext();
         $path       = $repo->getContextOption($ctx, "PATH");
         $createOpt  = $repo->getContextOption($ctx, "CREATE");
         $create     = (($createOpt=="true"||$createOpt===true)?true:false);

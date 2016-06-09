@@ -22,9 +22,9 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -98,7 +98,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $q = $this->getUsageForContext($node->getContext());
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q + $delta >= $quota) {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new Exception($mess["meta.quota.3"]." (".Utils::roundSize($quota) .")!");
         } else if ( $soft !== false && ($q + $delta) >= $soft && $q <= $soft) {
             $this->sendSoftLimitAlert($node->getContext());
@@ -107,7 +107,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     protected function sendSoftLimitAlert(ContextInterface $ctx)
     {
-        $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+        $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
         if ($mailer !== false && $ctx->hasUser()) {
             $percent = $this->getContextualOption($ctx, "SOFT_QUOTA");
             $quota = $this->getContextualOption($ctx, "DEFAULT_QUOTA");
@@ -189,8 +189,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
     private function getUsageForContext(ContextInterface $ctx){
 
         $ctx = $this->getEffectiveContext($ctx);
-        $rootNode = new AJXP_Node("pydio://".$ctx->getRepositoryId()."/");
-        $rootNode->setUserId($ctx->getUser()->getId());
+        $rootNode = new AJXP_Node($ctx->getUrlBase()."/");
 
         if (!isSet($data["REPO_USAGES"][$ctx->getRepositoryId()]) || $this->options["CACHE_QUOTA"] === false) {
 

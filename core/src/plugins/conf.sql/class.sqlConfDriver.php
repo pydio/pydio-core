@@ -32,6 +32,7 @@ use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpRole;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\SqlTableProvider;
@@ -406,7 +407,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [slug] LIKE '".$slug."%'");
         }
         $existingSlugs = $res->fetchPairs();
-        $configSlugs = ConfService::reservedSlugsFromConfig();
+        $configSlugs = RepositoryService::reservedSlugsFromConfig();
         if(in_array($slug, $configSlugs)){
             $existingSlugs[$slug] = $slug;
         }
@@ -647,7 +648,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @return array|int
      */
     public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
-        $object = ConfService::getRepositoryById($repositoryId);
+        $object = RepositoryService::getRepositoryById($repositoryId);
         if(!$admin){
             if($object->securityScope() == "USER"){
                 if($details) {

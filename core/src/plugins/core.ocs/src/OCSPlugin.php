@@ -20,7 +20,9 @@
  */
 namespace Pydio\OCS;
 
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
@@ -106,26 +108,26 @@ class OCSPlugin extends Plugin{
      * Triggered on repository list loading
      * @param array $wsList
      * @param string $scope
+     * @param UserInterface $userObject
      * @param bool $includeShared
      */
-    public function populateRemotes(&$wsList, $scope = "user", $includeShared = true){
+    public function populateRemotes(&$wsList, $scope = "user", $userObject, $includeShared = true){
         if(!$includeShared || $scope != "user"){
             return;
         }
-        $loggedUser = AuthService::getLoggedUser();
-        if($loggedUser == null){
+        if($userObject == null){
             return;
         }
         $store = new Model\SQLStore();
-        $shares = $store->remoteSharesForUser($loggedUser->getId());
+        $shares = $store->remoteSharesForUser($userObject->getId());
         foreach($shares as $share){
             $repo = $share->buildVirtualRepository();
-            $loggedUser->personalRole->setAcl($repo->getId(), "rw");
+            $userObject->getPersonalRole()->setAcl($repo->getId(), "rw");
             $wsList[$repo->getId()] = $repo;
         }
         if(count($shares)){
-            $loggedUser->recomputeMergedRole();
-            AuthService::updateUser($loggedUser);
+            $userObject->recomputeMergedRole();
+            //AuthService::updateUser($userObject);
         }
     }
 
@@ -150,7 +152,7 @@ class OCSPlugin extends Plugin{
 
     public static function startServer($base, $route){
 
-        $pServ = PluginsService::getInstance();
+        $pServ = PluginsService::getInstance(Context::emptyContext());
         ConfService::$useSession = false;
         AuthService::$useSession = false;
 

@@ -91,7 +91,7 @@ class PluginsService
      */
     public static function initCoreRegistry(){
 
-        $coreInstance = self::getInstance();
+        $coreInstance = self::getInstance(Context::emptyContext());
         $coreInstance->getDetectedPlugins();
 
     }
@@ -131,10 +131,11 @@ class PluginsService
      */
     public static function confPluginSoftLoad()
     {
+        $ctx = Context::emptyContext();
         /** @var AbstractConfDriver $booter */
-        $booter = PluginsService::getInstance()->softLoad("boot.conf", array());
+        $booter = PluginsService::getInstance($ctx)->softLoad("boot.conf", array());
         $coreConfigs = $booter->loadPluginConfig("core", "conf");
-        $corePlug = PluginsService::getInstance()->softLoad("core.conf", array());
+        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.conf", array());
         $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getImplementation();
 
@@ -145,10 +146,11 @@ class PluginsService
      */
     public static function cachePluginSoftLoad()
     {
+        $ctx = Context::emptyContext();
         $coreConfigs = array();
-        $corePlug = PluginsService::getInstance()->softLoad("core.cache", array());
+        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.cache", array());
         /** @var CoreConfLoader $coreConf */
-        $coreConf = PluginsService::getInstance()->softLoad("core.conf", array());
+        $coreConf = PluginsService::getInstance($ctx)->softLoad("core.conf", array());
         $coreConf->loadBootstrapConfForPlugin("core.cache", $coreConfigs);
         if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getImplementation();
@@ -337,7 +339,7 @@ class PluginsService
      * @return mixed
      */
     public static function searchManifestsWithCache($query, $callback, $typeChecker = null){
-        $coreInstance = self::getInstance();
+        $coreInstance = self::getInstance(Context::emptyContext());
         $result = $coreInstance->loadFromPluginQueriesCache($query);
         if(empty($typeChecker)){
             $typeChecker = function($test){
@@ -1067,7 +1069,7 @@ class PluginsService
         while (count($keys) > 0) {
             $test = array_shift($keys);
             $testObject = $this->getPluginById($test);
-            $deps = $testObject->getActiveDependencies(self::getInstance());
+            $deps = $testObject->getActiveDependencies($this);
             if (!count($deps)) {
                 $result[] = $test;
                 continue;

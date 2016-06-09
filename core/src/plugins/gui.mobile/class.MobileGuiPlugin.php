@@ -42,7 +42,7 @@ class MobileGuiPlugin extends Plugin
     public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
 
-        if($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive()){
+        if($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive($ctx)){
             // remove template_part for orbit_content
             $xPath=new DOMXPath($contribNode->ownerDocument);
             $tplNodeList = $xPath->query('template_part[@ajxpId="orbit_content"]', $contribNode);
@@ -52,11 +52,11 @@ class MobileGuiPlugin extends Plugin
 
     }
 
-    private function orbitExtensionActive(){
+    private function orbitExtensionActive(ContextInterface $ctx){
         $confs = ConfService::getConfStorageImpl()->loadPluginConfig("gui", "ajax");
         if(!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
         if($confs["GUI_THEME"] == "orbit"){
-            $pServ = PluginsService::getInstance();
+            $pServ = PluginsService::getInstance($ctx);
             $activePlugs    = $pServ->getActivePlugins();
             $streamWrappers = $pServ->getStreamWrapperPlugins();
             $streamActive   = false;

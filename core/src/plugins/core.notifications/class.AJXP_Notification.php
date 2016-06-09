@@ -21,6 +21,8 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -97,7 +99,7 @@ class AJXP_Notification
     protected function replaceVars($tplString, $mess, $rich = true)
     {
         $repoId = $this->getNode()->getRepositoryId();
-        $repoObject = ConfService::getRepositoryById($repoId);
+        $repoObject = RepositoryService::getRepositoryById($repoId);
         if ($repoObject != null) {
             $repoLabel = $repoObject->getDisplay();
         } else {
@@ -164,7 +166,7 @@ class AJXP_Notification
      */
     public function getDescriptionShort()
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $tpl = $mess["notification.tpl.short.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
         return $this->replaceVars($tpl, $mess, false);
     }
@@ -174,7 +176,7 @@ class AJXP_Notification
      */
     public function getDescriptionBlock()
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $tpl = $mess["notification.tpl.block.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action];
         return $this->replaceVars($tpl, $mess, false);
     }
@@ -184,7 +186,7 @@ class AJXP_Notification
      */
     public function getDescriptionLong($skipLink = false)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $tpl = "";
         if(!$skipLink){
             $tpl = "[".$this->getDescriptionLocation()."] ";
@@ -218,7 +220,7 @@ class AJXP_Notification
     }
 
     public function getDescriptionLocation(){
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if(!isSet($this->locationType)){
             $this->computeLocationType();
         }
@@ -289,7 +291,7 @@ class AJXP_Notification
     }
 
     protected function getPublicAuthorLabel(){
-        $m = ConfService::getMessages();
+        $m = LocaleService::getMessages();
         $label = str_replace("%s", AJXP_Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
         return $label;
     }

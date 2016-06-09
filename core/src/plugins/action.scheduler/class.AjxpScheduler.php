@@ -20,9 +20,10 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Model\Context;
@@ -97,7 +98,7 @@ class AjxpScheduler extends Plugin
         if(!$paramList->length) return;
         $paramNode = $paramList->item(0);
         $sVals = array();
-        $repos = ConfService::getRepositoriesList("all");
+        $repos = RepositoryService::listAllRepositories(true);
         foreach ($repos as $repoId => $repoObject) {
             $sVals[] = $repoId."|". Utils::xmlEntities($repoObject->getDisplay());
         }
@@ -210,7 +211,7 @@ class AjxpScheduler extends Plugin
                 $criteria = array();
                 $criteria["isTemplate"] = false;
                 $count = 0;
-                $listRepos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+                $listRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
                 $data["repository_id"] = implode(",", array_keys($listRepos));
             }
             $process = Controller::applyActionInBackground(
@@ -322,7 +323,7 @@ class AjxpScheduler extends Plugin
 
     public function placeConfigNode(&$configTree)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if (isSet($configTree["parameters"])){
 
             $configTree["parameters"]["CHILDREN"]["scheduler"] = array(
@@ -349,7 +350,7 @@ class AjxpScheduler extends Plugin
 
     public function listTasks($nodeName, $baseDir)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         XMLWriter::renderHeaderNode("/$baseDir/$nodeName", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
         XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
                  <column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>

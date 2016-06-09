@@ -25,6 +25,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -149,7 +150,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         $currentScheme = $parts['scheme'];
         $context = self::actualRepositoryWrapperProtocol($parts['host']);
         $newScheme = self::getNextScheme($url, $context);
-        $repository = ConfService::getRepositoryById(parse_url($url, PHP_URL_HOST));
+        $repository = RepositoryService::getRepositoryById(parse_url($url, PHP_URL_HOST));
         if($currentScheme == "pydio" && $repository->hasContentFilter()){
 
             $contentFilter = $repository->getContentFilter();
@@ -207,7 +208,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         if(isSet(self::$cachedRepositoriesWrappers[$repositoryId])){
             return self::$cachedRepositoriesWrappers[$repositoryId];
         }
-        $repository = ConfService::getRepositoryById($repositoryId);
+        $repository = RepositoryService::getRepositoryById($repositoryId);
         if(!is_a($repository, "Repository")){
             throw new \Exception("Cannot find repository with this id!");
         }

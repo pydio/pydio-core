@@ -22,13 +22,15 @@ namespace Pydio\Core\Services;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('PYDIO_SESSION_NAME', 'AjaXplorer');
 define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
 
-class SessionService
+class SessionService implements RepositoriesCache
 {
     private static $sessionName = PYDIO_SESSION_NAME;
 
@@ -77,4 +79,72 @@ class SessionService
     public static function close(){
         session_write_close();
     }
+
+    /**
+     * @param UserInterface $ctxUser
+     */
+    public static function checkPendingRepository($ctxUser){
+        if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
+            $ctxUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
+            $ctxUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
+            unset($_SESSION["PENDING_REPOSITORY_ID"]);
+            unset($_SESSION["PENDING_FOLDER"]);
+        }
+    }
+
+    public static function getSessionRepositoryId(){
+
+        return isSet($_SESSION["REPO_ID"]) ? $_SESSION["REPO_ID"] : null;
+    }
+
+    public static function saveRepositoryId($repoId){
+        $_SESSION["REPO_ID"] = $repoId;
+    }
+
+    public static function switchSessionRepositoriId($repoId){
+        if(isSet($_SESSION["REPO_ID"])){
+            $_SESSION["PREVIOUS_REPO_ID"] = $_SESSION["REPO_ID"];
+        }
+        $_SESSION["REPO_ID"] = $repoId;
+    }
+
+    public static function getPreviousRepositoryId(){
+        return isSet($_SESSION["PREVIOUS_REPO_ID"]) ? $_SESSION["PREVIOUS_REPO_ID"] : null;
+    }
+
+    /**
+     * @return RepositoryInterface[]|null
+     */
+    public static function getLoadedRepositories()
+    {
+        if (isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])) {
+            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
+            if($sessionNotCorrupted){
+                return $_SESSION["REPOSITORIES"];
+            } else {
+                unset($_SESSION["REPOSITORIES"]);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param RepositoryInterface[] $repositories
+     * @return mixed
+     */
+    public static function updateLoadedRepositories($repositories)
+    {
+        $_SESSION["REPOSITORIES"] = $repositories;
+    }
+
+    /**
+     * @return boolean
+     */
+    public static function invalidateLoadedRepositories()
+    {
+        if(isSet($_SESSION["REPOSITORIES"])){
+            unset($_SESSION["REPOSITORIES"]);
+        }
+    }
+    
 }

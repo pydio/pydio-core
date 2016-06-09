@@ -22,6 +22,7 @@ namespace Pydio\Share\Store;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Share\Model\CompositeShare;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -254,7 +255,7 @@ class ShareMetaManager
                     $additionalData = array();
                 }
                 if($type == "detect"){
-                    if(ConfService::getRepositoryById($hashOrRepoId) != null) $type = "repository";
+                    if(RepositoryService::getRepositoryById($hashOrRepoId) != null) $type = "repository";
                     else $type = "file";
                 }
                 if($this->shareStore->shareExists($type,$hashOrRepoId)){

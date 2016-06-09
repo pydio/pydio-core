@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Core\Utils;
+use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -37,7 +38,7 @@ class JSPacker
     public static function pack()
     {
         // Make sure that the gui.* plugin is loaded
-        PluginsService::getInstance()->getPluginsByType("gui");
+        PluginsService::getInstance(Context::emptyContext())->getPluginsByType("gui");
 
         $sList = glob(CLIENT_RESOURCES_FOLDER."/js/*_list.txt");
         foreach ($sList as $list) {

@@ -20,7 +20,7 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -127,7 +127,7 @@ class UpdateController extends Plugin
 
                 Utils::safeIniSet("output_buffering", "Off");
                 if (AJXP_PACKAGING != "zip") {
-                    $lang = ConfService::getLanguage();
+                    $lang = LocaleService::getLanguage();
                     $file = $this->getBaseDir()."/howto/linux_en.html";
                     if($lang != "en" && is_file($this->getBaseDir()."/howto/linux_$lang.html")){
                         $file = $this->getBaseDir()."/howto/linux_$lang.html";

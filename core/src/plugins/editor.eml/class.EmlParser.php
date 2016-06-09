@@ -26,6 +26,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -73,7 +75,7 @@ class EmlParser extends Plugin
 
         $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId());
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         switch ($action) {
             case "eml_get_xml_structure":
                 $params = array(
@@ -194,7 +196,7 @@ class EmlParser extends Plugin
                             $loggedUser = $ctx->getUser();
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }
-                        $destRepoObject = ConfService::getRepositoryById($destRepoId);
+                        $destRepoObject = RepositoryService::getRepositoryById($destRepoId);
                         AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
                         $destStreamURL = "pydio://$destRepoId";
                     }
@@ -273,7 +275,7 @@ class EmlParser extends Plugin
             'decode_bodies' => false,
             'decode_headers' => 'UTF-8'
         );
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $content = file_get_contents($masterFile);
         $decoder = new Mail_mimeDecode($content);
         $structure = $decoder->decode($params);

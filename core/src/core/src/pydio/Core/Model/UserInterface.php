@@ -142,6 +142,12 @@ interface UserInterface extends AjxpGroupPathProvider
     public function canWrite($repositoryId);
 
     /**
+     * @param RepositoryInterface|string $idOrObject
+     * @return boolean
+     */
+    public function canAccessRepository($idOrObject);
+
+    /**
      * Test if user can switch to this repository
      *
      * @param integer $repositoryId

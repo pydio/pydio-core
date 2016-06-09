@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Share\Store\ShareRightsManager;
@@ -67,7 +68,7 @@ class CompositeShare
      */
     public function getRepository(){
         if(!isSet($this->repository)){
-            $this->repository = ConfService::getRepositoryById($this->repositoryId);
+            $this->repository = RepositoryService::getRepositoryById($this->repositoryId);
         }
         return $this->repository;
     }
@@ -122,7 +123,7 @@ class CompositeShare
      */
     public function toJson(ContextInterface $ctx, $watcher, $rightsManager, $publicAccessManager, $messages){
 
-        $repoRootNode = new AJXP_Node("pydio://".$this->getRepositoryId()."/");
+        $repoRootNode = new AJXP_Node("pydio://".$this->getOwner()."@".$this->getRepositoryId()."/");
         $elementWatch = false;
         if ($watcher != false) {
             $elementWatch = $watcher->hasWatchOnNode(

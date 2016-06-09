@@ -244,7 +244,6 @@ class AJXP_SqlUser extends AbstractAjxpUser
     public function addBookmark($repositoryId, $path, $title)
     {
         if(!isSet($this->bookmarks)) $this->bookmarks = array();
-        if($repositoryId == -1) $repositoryId = ConfService::getCurrentRepositoryId();
         if($title == "") $title = basename($path);
         if(!isSet($this->bookmarks[$repositoryId])) $this->bookmarks[$repositoryId] = array();
         foreach ($this->bookmarks[$repositoryId] as $v) {

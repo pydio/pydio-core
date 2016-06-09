@@ -28,6 +28,7 @@ use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Core\CoreConfLoader;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -114,7 +115,7 @@ class BootConfLoader extends AbstractConfDriver
             $instType = str_replace("plugin_instance:", "", $type);
             $fieldName = $pInstNode->getAttribute("name");
             $pInstNode->setAttribute("type", "group_switch:".$fieldName);
-            $typePlugs = PluginsService::getInstance()->getPluginsByType($instType);
+            $typePlugs = PluginsService::getInstance(Context::emptyContext())->getPluginsByType($instType);
             foreach ($typePlugs as $typePlug) {
                 if($typePlug->getId() == "auth.multi") continue;
                 $checkErrorMessage = "";
@@ -160,7 +161,7 @@ class BootConfLoader extends AbstractConfDriver
     {
         $httpVars = $requestInterface->getParsedBody();
         if(isSet($httpVars["lang"])){
-            ConfService::setLanguage($httpVars["lang"]);
+            LocaleService::setLanguage($httpVars["lang"]);
         }
         $fullManifest = $this->getManifestRawContent("", "xml");
         $xmlString = $this->printFormFromServerSettings($fullManifest);
@@ -308,7 +309,7 @@ class BootConfLoader extends AbstractConfDriver
         $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
-        $registry = PluginsService::getInstance()->getDetectedPlugins();
+        $registry = PluginsService::getInstance(Context::emptyContext())->getDetectedPlugins();
         $driverData = array("SQL_DRIVER" => $data["db_type"]);
         foreach($registry as $type => $plugins){
             foreach($plugins as $plugObject){
@@ -408,7 +409,7 @@ class BootConfLoader extends AbstractConfDriver
             $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
         }
         $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
-        $repos = ConfService::getRepositoriesList("all", false);
+        $repos = \Pydio\Core\Services\RepositoryService::listAllRepositories();
         foreach($repos as $repo){
             $uObj->personalRole->setAcl($repo->getId(), "rw");
         }
@@ -461,7 +462,7 @@ class BootConfLoader extends AbstractConfDriver
 
         } else if ($action == "boot_test_mailer") {
 
-            $mailerPlug = PluginsService::findPluginById("mailer.phpmailer-lite");
+            $mailerPlug = PluginsService::getInstance($ctx)->getPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
                 $ctx, 

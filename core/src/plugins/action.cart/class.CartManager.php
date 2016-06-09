@@ -32,8 +32,8 @@ class CartManager extends Plugin
         }
 
         // Pipe SEARCH + DOWNLOAD actions.
-
-        $indexer = PluginsService::getInstance()->getUniqueActivePluginForType("index");
+        $ctx = $requestInterface->getAttribute("ctx");
+        $indexer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("index");
         if($indexer == false) return;
         $httpVars = $requestInterface->getParsedBody();
         unset($httpVars["get_action"]);

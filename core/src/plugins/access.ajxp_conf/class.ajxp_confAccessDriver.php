@@ -36,6 +36,8 @@ use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\ProgressBarCLI;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -158,14 +160,20 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
     }
 
-    protected function getEditableParameters($currentUserIsGroupAdmin, $withLabel = false){
+    /**
+     * @param ContextInterface $ctx
+     * @param $currentUserIsGroupAdmin
+     * @param bool $withLabel
+     * @return array
+     */
+    protected function getEditableParameters($ctx, $currentUserIsGroupAdmin, $withLabel = false){
 
         $query = "//param|//global_param";
         if($currentUserIsGroupAdmin){
             $query = "//param[@scope]|//global_param[@scope]";
         }
 
-        $nodes = PluginsService::getInstance()->searchAllManifests($query, "node", false, true, true);
+        $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
         $actions = array();
         foreach ($nodes as $node) {
             if($node->parentNode->nodeName != "server_settings") continue;
@@ -218,13 +226,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             //------------------------------------
             case "list_all_repositories_json":
 
-                $repositories = ConfService::getRepositoriesList("all", false);
+                $repositories = RepositoryService::listAllRepositories();
                 $repoOut = array();
                 foreach ($repositories as $repoObject) {
                     $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
                 }
                 HTMLWriter::charsetHeader("application/json");
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 echo json_encode(array("LEGEND" => $mess["ajxp_conf.150"], "LIST" => $repoOut));
 
             break;
@@ -242,7 +250,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $actions = $_SESSION["ALL_ACTIONS_CACHE"];
                 }else{
 
-                    $nodes = PluginsService::getInstance()->searchAllManifests("//action", "node", false, true, true);
+                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//action", "node", false, true, true);
                     $actions = array();
                     foreach ($nodes as $node) {
                         $xPath = new DOMXPath($node->ownerDocument);
@@ -287,7 +295,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $actions = $_SESSION["ALL_PARAMS_CACHE"];
                 }else{
                     $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
-                    $actions = $this->getEditableParameters($currentUserIsGroupAdmin, true);
+                    $actions = $this->getEditableParameters($ctx, $currentUserIsGroupAdmin, true);
                     $_SESSION["ALL_PARAMS_CACHE"] = $actions;
                 }
                 HTMLWriter::charsetHeader("application/json");
@@ -303,7 +311,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     foreach ($pluginsData as $pluginId => $paramData) {
                         foreach ($paramData as $paramId => $paramValue) {
                             $query = "//param[@name='$paramId']|//global_param[@name='$paramId']";
-                            $nodes = PluginsService::getInstance()->searchAllManifests($query, "node", false, true, true);
+                            $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
                             if(!count($nodes)) continue;
                             $n = $nodes[0];
                             if ($n->attributes->getNamedItem("group") != null) {
@@ -500,7 +508,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $action = $httpVars["sub_action"];
             }
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $currentUserIsGroupAdmin = ($loggedUser != null && $loggedUser->getGroupPath() != "/");
         if ($currentUserIsGroupAdmin && ConfService::getAuthDriverImpl()->isAjxpAdmin($loggedUser->getId())) {
             $currentUserIsGroupAdmin = false;
@@ -701,17 +709,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
                     HTMLWriter::charsetHeader("application/json");
                     $roleData = $role->getDataArray(true);
-                    $allReps = ConfService::getRepositoriesList("all", false);
+                    $allReps = RepositoryService::listAllRepositories();
                     $sharedRepos = array();
                     if(isSet($userObject)){
                         // Add User shared Repositories as well
                         $acls = $userObject->mergedRole->listAcls();
                         if(count($acls)) {
-                            $sharedRepos = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria(array(
+                            $sharedRepos = RepositoryService::listRepositoriesWithCriteria(array(
                                 "uuid" => array_keys($acls),
                                 "parent_uuid" => AJXP_FILTER_NOT_EMPTY,
                                 "owner_user_id" => AJXP_FILTER_NOT_EMPTY
-                                ));
+                                ), $count);
                             $allReps = array_merge($allReps, $sharedRepos);
                         }
                     }
@@ -830,7 +838,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                     else if(isSet($userObject)) $scope = "user";
                     $data["SCOPE_PARAMS"] = array();
-                    $nodes = PluginsService::getInstance()->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
+                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
                     foreach ($nodes as $node) {
                         $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
                         $origName = $node->attributes->getNamedItem("name")->nodeValue;
@@ -936,7 +944,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 if($currentUserIsGroupAdmin){
                     // FILTER DATA FOR GROUP ADMINS
-                    $params = $this->getEditableParameters(true, false);
+                    $params = $this->getEditableParameters($ctx, true, false);
                     foreach($roleData["PARAMETERS"] as $scope => &$plugsParameters){
                         foreach($plugsParameters as $paramPlugin => &$parameters){
                             foreach($parameters as $pName => $pValue){
@@ -1438,7 +1446,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case  "get_drivers_definition":
 
                 XMLWriter::header("drivers", array("allowed" => $currentUserIsGroupAdmin ? "false" : "true"));
-                print(XMLWriter::replaceAjxpXmlKeywords(ConfService::availableDriversToXML("param", "", true)));
+                print(XMLWriter::replaceAjxpXmlKeywords(self::availableDriversToXML("param", "", true)));
                 XMLWriter::close("drivers");
 
 
@@ -1448,7 +1456,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 XMLWriter::header("repository_templates");
                 $count = 0;
-                $repositories = ConfService::listRepositoriesWithCriteria(array(
+                $repositories = RepositoryService::listRepositoriesWithCriteria(array(
                     "isTemplate" => '1'
                 ), $count);
                 foreach ($repositories as $repo) {
@@ -1490,7 +1498,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (strstr($repDef["DRIVER"], "ajxp_template_") !== false) {
                     $templateId = substr($repDef["DRIVER"], 14);
-                    $templateRepo = ConfService::getRepositoryById($templateId);
+                    $templateRepo = RepositoryService::getRepositoryById($templateId);
                     $newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"], $loggedUser->getId());
                     if(isSet($repDef["AJXP_SLUG"])){
                         $newRep->setSlug($repDef["AJXP_SLUG"]);
@@ -1499,10 +1507,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if ($currentUserIsGroupAdmin) {
                         throw new \Exception("You are not allowed to create a workspace from a driver. Use a template instead.");
                     }
-                    $pServ = PluginsService::getInstance();
+                    $pServ = PluginsService::getInstance($ctx);
                     $driver = $pServ->getPluginByTypeName("access", $repDef["DRIVER"]);
 
-                    $newRep = ConfService::createRepositoryFromArray(0, $repDef);
+                    $newRep = RepositoryService::createRepositoryFromArray(0, $repDef);
                     $testFile = $driver->getBaseDir()."/test.".$newRep->getAccessType()."Access.php";
                     if (!$isTemplate && is_file($testFile)) {
                         //chdir(AJXP_TESTS_FOLDER."/plugins");
@@ -1555,7 +1563,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $newRep->setGroupPath($value);
                 }
 
-                $res = ConfService::addRepository($newRep);
+                $res = RepositoryService::addRepository($newRep);
                 XMLWriter::header();
                 if ($res == -1) {
                     XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
@@ -1583,14 +1591,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "edit_repository" :
                 $repId = $httpVars["repository_id"];
-                $repository = ConfService::getRepositoryById($repId);
+                $repository = RepositoryService::getRepositoryById($repId);
                 if ($repository == null) {
                     throw new \Exception("Cannot find workspace with id $repId");
                 }
                 if ($ctx->hasUser() && !$ctx->getUser()->canAdministrate($repository)) {
                     throw new \Exception("You are not allowed to edit this workspace!");
                 }
-                $pServ = PluginsService::getInstance();
+                $pServ = PluginsService::getInstance($ctx);
                 $plug = $pServ->getPluginById("access.".$repository->accessType);
                 if ($plug == null) {
                     throw new \Exception("Cannot find access driver (".$repository->accessType.") for workspace!");
@@ -1599,7 +1607,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $slug = $repository->getSlug();
                 if ($slug == "" && $repository->isWriteable()) {
                     $repository->setSlug();
-                    ConfService::replaceRepository($repId, $repository);
+                    RepositoryService::replaceRepository($repId, $repository);
                 }
                 $ctxUser = $ctx->getUser();
                 if ($ctxUser!=null && $ctxUser->getGroupPath() != null) {
@@ -1657,7 +1665,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     print("/>");
                 }
                 if ($repository->hasParent()) {
-                    $parent = ConfService::getRepositoryById($repository->getParentId());
+                    $parent = RepositoryService::getRepositoryById($repository->getParentId());
                     if (isSet($parent) && $parent->isTemplate) {
                         $parentLabel = $parent->getDisplay();
                         $parentType = $parent->getAccessType();
@@ -1708,7 +1716,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "edit_repository_label" :
             case "edit_repository_data" :
                 $repId = $httpVars["repository_id"];
-                $repo = ConfService::getRepositoryById($repId);
+                $repo = RepositoryService::getRepositoryById($repId);
                 $initialDefaultRights = $repo->getDefaultRight();
                 if(!$repo->isWriteable()){
                     if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
@@ -1739,7 +1747,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         return;
                     }
                     $repo->setDisplay($newLabel);
-                    $res = ConfService::replaceRepository($repId, $repo);
+                    $res = RepositoryService::replaceRepository($repId, $repo);
                 } else {
                     $options = array();
                     $existing = $repo->getOptionsDefined();
@@ -1827,7 +1835,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             RolesService::updateRole($rootGroup);
                         }
                     }
-                    ConfService::replaceRepository($repId, $repo);
+                    RepositoryService::replaceRepository($repId, $repo);
                 }
                 XMLWriter::header();
                 if ($res == -1) {
@@ -1845,7 +1853,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "meta_source_add" :
                 $repId = $httpVars["repository_id"];
-                $repo = ConfService::getRepositoryById($repId);
+                $repo = RepositoryService::getRepositoryById($repId);
                 if (!is_object($repo)) {
                     throw new \Exception("Invalid workspace id! $repId");
                 }
@@ -1866,7 +1874,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $repoOptions[$metaSourceType] = $options;
                 uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                 $repo->addOption("META_SOURCES", $repoOptions);
-                ConfService::replaceRepository($repId, $repo);
+                RepositoryService::replaceRepository($repId, $repo);
                 XMLWriter::header();
                 XMLWriter::sendMessage($mess["ajxp_conf.56"],null);
                 XMLWriter::close();
@@ -1875,7 +1883,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "meta_source_delete" :
 
                 $repId = $httpVars["repository_id"];
-                $repo = ConfService::getRepositoryById($repId);
+                $repo = RepositoryService::getRepositoryById($repId);
                 if (!is_object($repo)) {
                     throw new \Exception("Invalid workspace id! $repId");
                 }
@@ -1885,7 +1893,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     unset($repoOptions[$metaSourceId]);
                     uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                     $repo->addOption("META_SOURCES", $repoOptions);
-                    ConfService::replaceRepository($repId, $repo);
+                    RepositoryService::replaceRepository($repId, $repo);
                 }else{
                     throw new \Exception("Cannot find meta source ".$metaSourceId);
                 }
@@ -1897,7 +1905,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "meta_source_edit" :
                 $repId = $httpVars["repository_id"];
-                $repo = ConfService::getRepositoryById($repId);
+                $repo = RepositoryService::getRepositoryById($repId);
                 if (!is_object($repo)) {
                     throw new \Exception("Invalid workspace id! $repId");
                 }
@@ -1943,7 +1951,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                 $repo->addOption("META_SOURCES", $repoOptions);
-                ConfService::replaceRepository($repId, $repo);
+                RepositoryService::replaceRepository($repId, $repo);
                 XMLWriter::header();
                 XMLWriter::sendMessage($mess["ajxp_conf.58"],null);
                 XMLWriter::close();
@@ -1974,11 +1982,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (isSet($httpVars["repository_id"])) {
                     $repId = $httpVars["repository_id"];
-                    $repo = ConfService::getRepositoryById($repId);
+                    $repo = RepositoryService::getRepositoryById($repId);
                     if(!is_object($repo)){
                         $res = -1;
                     }else{
-                        $res = ConfService::deleteRepository($repId);
+                        $res = RepositoryService::deleteRepository($repId);
                     }
                     XMLWriter::header();
                     if ($res == -1) {
@@ -2030,7 +2038,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "get_plugin_manifest" :
 
-                $ajxpPlugin = PluginsService::getInstance()->getPluginById($httpVars["plugin_id"]);
+                $ajxpPlugin = PluginsService::getInstance($ctx)->getPluginById($httpVars["plugin_id"]);
                 XMLWriter::header("admin_data");
 
                 $fullManifest = $ajxpPlugin->getManifestRawContent("", "xml");
@@ -2043,7 +2051,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $instType = str_replace("plugin_instance:", "", $type);
                     $fieldName = $pInstNode->getAttribute("name");
                     $pInstNode->setAttribute("type", "group_switch:".$fieldName);
-                    $typePlugs = PluginsService::getInstance()->getPluginsByType($instType);
+                    $typePlugs = PluginsService::getInstance($ctx)->getPluginsByType($instType);
                     foreach ($typePlugs as $typePlug) {
                         if(!$typePlug->isEnabled()) continue;
                         if($typePlug->getId() == "auth.multi") continue;
@@ -2132,7 +2140,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if (isSet($httpVars["button_key"])) {
                     $options = $options[$httpVars["button_key"]];
                 }
-                $plugin = PluginsService::getInstance()->softLoad($pluginId, $options);
+                $plugin = PluginsService::getInstance($ctx)->softLoad($pluginId, $options);
                 if (method_exists($plugin, $httpVars["action_plugin_method"])) {
                     try {
                         $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
@@ -2202,9 +2210,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
         $allNodes = array();
         $this->logInfo("Listing plugins",""); // make sure that the logger is started!
-        $pServ = PluginsService::getInstance();
+        $pServ = PluginsService::getInstance($this->currentContext);
         $types = $pServ->getDetectedPlugins();
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $uniqTypes = array("core");
         $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
         if ($dir == "/plugins" || $dir == "/core_plugins" || $dir=="/all") {
@@ -2275,7 +2283,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             <column messageId="ajxp_conf.104" attributeName="enabled" sortType="String" defaultWidth="10%"/>
             <column messageId="ajxp_conf.105" attributeName="can_active" sortType="String" defaultWidth="10%"/>
             </columns>');
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             foreach ($types[$type] as $pObject) {
                 $errors = "OK";
                 try {
@@ -2392,7 +2400,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "group",
                 "object_id" => "/"
             );
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             $xml = XMLWriter::renderNode($nodeKey, $mess["ajxp_conf.151"], true, $meta, true, false);
             if(!$returnNodes) print($xml);
             else $allNodes[$nodeKey] = $xml;
@@ -2414,7 +2422,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             else $allNodes[$nodeKey] = $xml;
 
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $loggedUser = $this->currentContext->getUser();
         $userArray = array();
         $logger = AJXP_Logger::getInstance();
@@ -2502,7 +2510,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $currentUserIsGroupAdmin = ($ctxUser != null && $ctxUser->getGroupPath() != "/");
         $roles = RolesService::getRolesList(array(), !$this->listSpecialRoles);
         ksort($roles);
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if(!$this->listSpecialRoles && $this->getName() != "ajxp_admin" && !$currentUserIsGroupAdmin){
             $rootGroupRole = RolesService::getOrCreateRole("AJXP_GRP_/", empty($ctxUser) ? "/" : $ctxUser->getGroupPath());
             if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
@@ -2516,7 +2524,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $r = array();
             if(!empty($ctxUser) && !$ctxUser->canAdministrate($roleObject)) continue;
             $count = 0;
-            $repos = ConfService::listRepositoriesWithCriteria(array("role" => $roleObject), $count);
+            $repos = RepositoryService::listRepositoriesWithCriteria(array("role" => $roleObject), $count);
             foreach ($repos as $repoId => $repository) {
                 if($repository->getAccessType() == "ajxp_shared") continue;
                 if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;
@@ -2546,13 +2554,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function repositoryExists($name)
     {
-        $repos = ConfService::getRepositoriesList();
-        foreach ($repos as $obj)
-            if ($obj->getDisplay() == $name) return true;
-
-        return false;
+        RepositoryService::listRepositoriesWithCriteria(array("display" => $name), $count);
+        return $count > 0;
     }
 
     /**
@@ -2605,7 +2614,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(isSet($httpVars) && is_array($httpVars) && isSet($httpVars["template_children_id"])){
             $criteria["parent_uuid"] = Utils::sanitize($httpVars["template_children_id"], AJXP_SANITIZE_ALPHANUM);
         }
-        $repos = ConfService::listRepositoriesWithCriteria($criteria, $count);
+        $repos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
         if(!$returnNodes){
             XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
             XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
@@ -2662,7 +2671,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             if ($repoObject->isTemplate) {
                 // Now Load children for template repositories
-                $children = ConfService::listRepositoriesWithCriteria(array("parent_uuid" => $repoIndex.""), $count);
+                $children = RepositoryService::listRepositoriesWithCriteria(array("parent_uuid" => $repoIndex . ""), $count);
                 foreach($children as $childId => $childObject){
                     if (!empty($ctxUser) && !$ctxUser->canAdministrate($childObject))continue;
                     if(is_numeric($childId)) $childId = "".$childId;
@@ -2701,7 +2710,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     {
         $allNodes = array();
         $parts = explode("/",$dir);
-        $pServ = PluginsService::getInstance();
+        $pServ = PluginsService::getInstance($this->currentContext);
         //$activePlugins = $pServ->getActivePlugins();
         $types = $pServ->getDetectedPlugins();
         if (count($parts) == 1) {
@@ -2754,7 +2763,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             // list actions
             $type = $parts[1];
             $name = $parts[2];
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="full" template_name="ajxp_conf.plugins_folder">
                 <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
                 <column messageId="ajxp_conf.103" attributeName="parameters" sortType="String" fixedWidth="30%"/>
@@ -2997,6 +3006,39 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
             }
         }
+    }
+
+    /**
+     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
+     * @static
+     * @param string $filterByTagName
+     * @param string $filterByDriverName
+     * @param bool $limitToEnabledPlugins
+     * @return string
+     */
+    public static function availableDriversToXML($filterByTagName = "", $filterByDriverName="", $limitToEnabledPlugins = false)
+    {
+        $nodeList = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
+        $xmlBuffer = "";
+        foreach ($nodeList as $node) {
+            $dName = $node->getAttribute("name");
+            if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
+            if(strpos($dName, "ajxp_") === 0) continue;
+            if ($filterByTagName == "") {
+                $xmlBuffer .= $node->ownerDocument->saveXML($node);
+                continue;
+            }
+            $q = new DOMXPath($node->ownerDocument);
+            $cNodes = $q->query("//".$filterByTagName, $node);
+            $xmlBuffer .= "<ajxpdriver ";
+            foreach($node->attributes as $attr) $xmlBuffer.= " $attr->name=\"$attr->value\" ";
+            $xmlBuffer .=">";
+            foreach ($cNodes as $child) {
+                $xmlBuffer .= $child->ownerDocument->saveXML($child);
+            }
+            $xmlBuffer .= "</ajxpdriver>";
+        }
+        return $xmlBuffer;
     }
 
     /**

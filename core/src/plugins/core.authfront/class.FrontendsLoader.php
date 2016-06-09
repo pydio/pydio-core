@@ -41,8 +41,9 @@ class FrontendsLoader extends Plugin {
 
         if(UsersService::usersEnabled()){
 
-            PluginsService::getInstance()->initActivePlugins();
-            $frontends = PluginsService::getInstance()->getActivePluginsForType("authfront");
+            $ctx = $requestInterface->getAttribute("ctx");
+            PluginsService::getInstance($ctx)->initActivePlugins();
+            $frontends = PluginsService::getInstance($ctx)->getActivePluginsForType("authfront");
             $index = 0;
             /**
              * @var AbstractAuthFrontend $frontendPlugin

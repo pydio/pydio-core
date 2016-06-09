@@ -53,16 +53,24 @@ class remote_ajxpAuthDriver extends serialAuthDriver
         }
         $client->setCookies(array(($this->getOption("REMOTE_SESSION_NAME") ? $this->getOption("REMOTE_SESSION_NAME") : "PHPSESSID") => $sessionId));
         $result = $client->get($this->getOption("REMOTE_URL"), array("session_id"=>$sessionId));
-        if ($result) {
+        if (!$result) {
+            return;
+        }
+        try{
             $user = $client->getContent();
             if ($this->autoCreateUser()) {
-                AuthService::logUser($user, "", true);
+                $logged = AuthService::logUser($user, "", true);
             } else {
                 // If not auto-create but the user exists, log him.
                 if ($this->userExists($user)) {
-                    AuthService::logUser($user, "", true);
+                    $logged = AuthService::logUser($user, "", true);
                 }
             }
+            if(!empty($logged)){
+                // TODO : UPDATE CONTEXT ?
+            }
+        }catch (\Pydio\Core\Exception\LoginException $l){
+
         }
 
     }

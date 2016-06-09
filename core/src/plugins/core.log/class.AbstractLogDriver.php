@@ -63,7 +63,7 @@ abstract class AbstractLogDriver extends Plugin
      * @param String $message The message to log
      *
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message, $nodePathes = array())
+    public function write2($level, $ip, $user, $repoId, $source, $prefix, $message, $nodePathes = array())
     {
         //for backward compatibility
         $this->write($source."\t".$prefix."\t".$message, $level);

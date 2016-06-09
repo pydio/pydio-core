@@ -21,6 +21,7 @@
 namespace Pydio\Share\View;
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -48,8 +49,8 @@ class PublicAccessManager
      */
     public function buildPublicLink($hash)
     {
-        $addLang = ConfService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
-        if($addLang) return $this->buildPublicDlURL()."/".$hash."--".ConfService::getLanguage();
+        $addLang = LocaleService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
+        if($addLang) return $this->buildPublicDlURL()."/".$hash."--". LocaleService::getLanguage();
         else return $this->buildPublicDlURL()."/".$hash;
     }
 

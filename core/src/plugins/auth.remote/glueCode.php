@@ -129,22 +129,23 @@ switch ($plugInAction) {
                 $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
                 UsersService::createUser($login["name"], $login["password"], $isAdmin);
             }
-            if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
-                $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
-            } else {
-                $result = AuthService::logUser($login["name"], $login["password"], true);
-            }
-               // Update default rights (this could go in the trunk...)
-               if ($result == 1) {
-                   $userObject = AuthService::getLoggedUser();
-                   if ($userObject->isAdmin()) {
-                       RolesService::updateAdminRights($userObject);
-                   } else {
+            try{
+                if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
+                    $userObject = AuthService::logUser($login["name"], $login["password"], false, false, -1);
+                } else {
+                    $userObject = AuthService::logUser($login["name"], $login["password"], true);
+                }
+                $userObject = AuthService::getLoggedUser();
+                if ($userObject->isAdmin()) {
+                    RolesService::updateAdminRights($userObject);
+                } else {
                     RolesService::updateDefaultRights($userObject);
-                   }
+                }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
                 $userObject->save("superuser");
-               }
+            }catch (\Pydio\Core\Exception\LoginException $l){
+
+            }
         }
         break;
     case 'logout':

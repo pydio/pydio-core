@@ -175,7 +175,7 @@ class PydioSdkGenerator
                 "apis" => $apis
             );
             file_put_contents($swaggerJsonDir."/".$pluginName, json_encode($swaggerJson, JSON_PRETTY_PRINT));
-            $p = $pServ->findPluginById($pluginName);
+            $p = $pServ->getPluginById($pluginName);
             $apiGroup = self::findApiGroupForPlugin($pluginName);
             if(!isset($allDocs[$apiGroup])) {
                 $allDocs[$apiGroup] = array();

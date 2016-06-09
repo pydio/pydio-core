@@ -25,14 +25,17 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
+use Pydio\Log\Core\AJXP_Logger;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -57,9 +60,9 @@ class AuthCliMiddleware
         $optPass = $options["p"];
         $optRepoId = $options["r"];
 
-        $repository = ConfService::getRepositoryById($optRepoId);
+        $repository = RepositoryService::getRepositoryById($optRepoId);
         if ($repository == null) {
-            $repository = ConfService::getRepositoryByAlias($optRepoId);
+            $repository = RepositoryService::getRepositoryByAlias($optRepoId);
             if ($repository != null) {
                 $optRepoId =($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
             }
@@ -139,14 +142,11 @@ class AuthCliMiddleware
             if ($seed != -1) {
                 $optPass = md5(md5($optPass).$seed);
             }
-            $loggingResult = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
-            if (isset($loggingResult) && $loggingResult != 1) {
+            try{
+                $loggedUser = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
+            }catch (LoginException $l){
                 throw new AuthRequiredException();
             }
-            $loggedUser = AuthService::getLoggedUser();
-            if($loggedUser == null) throw new AuthRequiredException();
-
-
 
         } else {
             throw new AuthRequiredException();
@@ -164,9 +164,7 @@ class AuthCliMiddleware
                 AuthService::disconnect();
                 $responseInterface->getBody()->write("\n--- Impersonating user ".$impersonateUser);
                 try{
-                    AuthService::logUser($impersonateUser, "empty", true, false, "");
-                    $loggedUser = AuthService::getLoggedUser();
-                    if($loggedUser == null) continue;
+                    $loggedUser = AuthService::logUser($impersonateUser, "empty", true, false, "");
                     ConfService::switchRootDir($optRepoId, true);
                     Controller::registryReset();
                     $subResponse = new Response();
@@ -174,6 +172,7 @@ class AuthCliMiddleware
                     $ctx->setUserObject($loggedUser);
                     $ctx->setRepositoryId($optRepoId);
                     $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+                    AJXP_Logger::updateContext($ctx);
 
                     $subResponse = Server::callNextMiddleWareAndRewind(function($middleware){
                         return (is_array($middleware) && $middleware["0"] == "Pydio\\Core\\Http\\Cli\\AuthCliMiddleware" && $middleware[1] == "handleRequest");
@@ -200,6 +199,7 @@ class AuthCliMiddleware
             $ctx->setUserObject($loggedUser);
             $ctx->setRepositoryId($optRepoId);
             $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+            AJXP_Logger::updateContext($ctx);
 
             return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 

@@ -11,6 +11,7 @@ namespace Pydio\Access\Core\Stream;
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -34,7 +35,7 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
 
             // Nothing in cache
             $repositoryId = $parts["host"];
-            $repository = ConfService::getRepositoryById($parts["host"]);
+            $repository = RepositoryService::getRepositoryById($parts["host"]);
             if ($repository == null) {
                 throw new \Exception("Cannot find repository");
             }

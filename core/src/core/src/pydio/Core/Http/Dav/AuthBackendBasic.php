@@ -22,10 +22,12 @@
 namespace Pydio\Core\Http\Dav;
 
 use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\AJXP_Logger;
 use \Sabre;
@@ -105,23 +107,25 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
         $this->currentUser = $userpass[0];
 
-        $res = AuthService::logUser($this->currentUser, $userpass[1], true);
-        if ($res < 1) {
-          throw new Sabre\DAV\Exception\NotAuthenticated();
+        try{
+            $loggedUser = AuthService::logUser($this->currentUser, $userpass[1], true);
+        }catch (LoginException $l){
+            throw new Sabre\DAV\Exception\NotAuthenticated();
         }
-        $this->updateCurrentUserRights(AuthService::getLoggedUser());
+        $this->updateCurrentUserRights($loggedUser);
         if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
             AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
         }
         $repoId = $this->context->getRepositoryId();
-        if(isSet($repoId) && ConfService::getRepositoryById($repoId)->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") === true){
+        if(isSet($repoId) && RepositoryService::getRepositoryById($repoId)->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") === true){
             throw new Sabre\DAV\Exception\NotAuthenticated('You are not allowed to access this workspace');
         }
-        ConfService::switchRootDir($repoId);
-        
+        $repoObject = ConfService::switchRootDir($repoId);
+
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
-        $this->context->setRepositoryId(ConfService::getCurrentRepositoryId());
+        $this->context->setRepositoryObject($repoObject);
+        AJXP_Logger::updateContext($this->context);
 
         // the method used here will invalidate the cached password every minute on the minute
         if (!$cachedPasswordValid) {

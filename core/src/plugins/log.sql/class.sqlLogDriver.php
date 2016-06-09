@@ -20,7 +20,7 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
@@ -103,7 +103,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }
         $pg = ($this->sqlDriver["driver"] == "postgre");
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         $format = 'Y-m-d 00:00:00';
         $endFormat = 'Y-m-d 23:59:59';
@@ -348,12 +348,13 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      * @param String $level Log severity: one of LOG_LEVEL_* (DEBUG,INFO,NOTICE,WARNING,ERROR)
      * @param String $ip The client ip
      * @param String $user The user login
+     * @param String $repositoryId current repository ID
      * @param String $source The source of the message
      * @param String $prefix The prefix of the message
      * @param String $message The message to log
      * @param array $nodesPathes
      */
-    public function write2($level, $ip, $user, $source, $prefix, $message, $nodesPathes = array())
+    public function write2($level, $ip, $user, $repositoryId, $source, $prefix, $message, $nodesPathes = array())
     {
         if($prefix == "Log In" && $message=="context=API"){
             // Limit the number of logs
@@ -389,7 +390,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 'source'        => $source,
                 'message'       => $prefix,
                 'params'        => $message,
-                'repository_id' => ConfService::getInstance()->getContextRepositoryId(),
+                'repository_id' => $repositoryId,
                 'device'        => $_SERVER['HTTP_USER_AGENT'],
                 'dirname'       => $fileDef["dirname"],
                 'basename'      => $fileDef["basename"]
@@ -621,6 +622,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
     public function inet_ptod($ip_address)
     {
         return $ip_address;
+        /*
         // IPv4 address
         if (strpos($ip_address, ':') === false && strpos($ip_address, '.') !== false) {
             $ip_address = '::' . $ip_address;
@@ -651,6 +653,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 
         // Decimal address
         return $ip_address;
+        */
     }
 
     /**
@@ -662,6 +665,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
     public function inet_dtop($decimal)
     {
         return $decimal;
+        /*
         // IPv4 or IPv6 format
         if (strpos($decimal, ':') !== false || strpos($decimal, '.') !== false) {
             return $decimal;
@@ -694,6 +698,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }
 
         return $ip_address;
+        */
     }
 
     public function installSQLTables($param)

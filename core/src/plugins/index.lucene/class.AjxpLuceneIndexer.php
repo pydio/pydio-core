@@ -25,6 +25,7 @@ use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\TextEncoder;
@@ -128,13 +129,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      */
     public function applyAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $messages = ConfService::getMessages();
-        $repoId = $this->accessDriver->repository->getId();
+        $messages = LocaleService::getMessages();
         $actionName = $requestInterface->getAttribute("action");
         $httpVars   = $requestInterface->getParsedBody();
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $ctxUser = $ctx->getUser();
+        $repoId = $ctx->getRepositoryId();
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
@@ -251,7 +252,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
+                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -307,8 +308,16 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
@@ -321,7 +330,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$this->accessDriver->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
+                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -783,7 +792,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
         } else {
             if (!$create) {
-                $messages = ConfService::getMessages();
+                $messages = LocaleService::getMessages();
                 throw new Exception($messages["index.lucene.9"]);
             }
             try{

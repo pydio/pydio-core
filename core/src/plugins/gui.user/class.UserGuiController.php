@@ -24,6 +24,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -113,9 +114,9 @@ class UserGuiController extends Plugin
                     if (!empty($email)) {
                         $uuid = Utils::generateRandomString(48);
                         ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, Utils::decodeSecureMagic($httpVars["email"]), array());
-                        $mailer = PluginsService::getInstance()->getUniqueActivePluginForType("mailer");
+                        $mailer = PluginsService::getInstance($context)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
-                            $mess = ConfService::getMessages();
+                            $mess = LocaleService::getMessages();
                             $link = Utils::detectServerURL()."/user/reset-password/".$uuid;
                             $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
                         } else {

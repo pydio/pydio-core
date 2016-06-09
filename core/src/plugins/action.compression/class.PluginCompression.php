@@ -25,6 +25,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Http\Message\BgActionTrigger;
 use Pydio\Core\PluginFramework\Plugin;
@@ -53,7 +54,7 @@ class PluginCompression extends Plugin
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
-        $messages = ConfService::getMessages();
+        $messages = LocaleService::getMessages();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $repository = $ctx->getRepository();

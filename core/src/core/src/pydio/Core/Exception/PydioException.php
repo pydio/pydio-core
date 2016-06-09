@@ -21,6 +21,7 @@
 namespace Pydio\Core\Exception;
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -35,7 +36,7 @@ class PydioException extends \Exception
     public function __construct($messageString, $messageId = false, $errorCode = null)
     {
         if ($messageId !== false && class_exists("ConfService")) {
-            $messages = ConfService::getMessages();
+            $messages = LocaleService::getMessages();
             if (array_key_exists($messageId, $messages)) {
                 $messageString = $messages[$messageId];
             } else {

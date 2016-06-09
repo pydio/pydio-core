@@ -52,6 +52,14 @@ class CookiesHelper
     }
 
     /**
+     * 
+     * @return array [fakeuser,fakepass]
+     */
+    public static function getRememberCookieData(){
+        return explode(":", $_COOKIE["AjaXplorer-remember"]);
+    }
+
+    /**
      * @static
      * Warning, must be called before sending other headers!
      */

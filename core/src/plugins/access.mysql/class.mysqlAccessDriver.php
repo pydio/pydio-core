@@ -23,8 +23,8 @@ namespace Pydio\Access\Driver\DataProvider;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
@@ -100,7 +100,6 @@ class mysqlAccessDriver extends AbstractAccessDriver
         if (isSet($dest)) {
             $dest = TextEncoder::fromUTF8($dest);
         }
-        $mess = ConfService::getMessages();
 
         // Sanitize all httpVars entries
         foreach($httpVars as $k=>&$value){

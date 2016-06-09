@@ -232,7 +232,7 @@ class RolesService
         $repoList = null;
         foreach ($roles as $roleId => $roleObject) {
             if ($roleObject instanceof AjxpRole) {
-                if ($repoList == null) $repoList = ConfService::getRepositoriesList("all");
+                if ($repoList == null) $repoList = RepositoryService::listAllRepositories(true);
                 $newRole = new AJXP_Role($roleId);
                 $newRole->migrateDeprecated($repoList, $roleObject);
                 $roles[$roleId] = $newRole;
@@ -260,7 +260,7 @@ class RolesService
             $rootRole->setLabel("Root Group");
             //$rootRole->setAutoApplies(array("standard", "admin"));
             //$dashId = "";
-            $allRepos = ConfService::getRepositoriesList("all", false);
+            $allRepos = RepositoryService::listAllRepositories();
             foreach ($allRepos as $repositoryId => $repoObject) {
                 if ($repoObject->isTemplate) continue;
                 //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;

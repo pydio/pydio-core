@@ -45,6 +45,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -93,10 +94,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             // PASS IT TO THE WRAPPER
             ConfService::setConf("PROBE_REAL_SIZE", true);
         }
-        $create = $this->repository->getContextOption($contextInterface, "CREATE");
-        $path = TextEncoder::toStorageEncoding($this->repository->getContextOption($contextInterface, "PATH"));
-        $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
-        $chmod = $this->repository->getContextOption($contextInterface, "CHMOD_VALUE");
+        $repository = $contextInterface->getRepository();
+        $create = $repository->getContextOption($contextInterface, "CREATE");
+        $path = TextEncoder::toStorageEncoding($repository->getContextOption($contextInterface, "PATH"));
+        $recycle = $repository->getContextOption($contextInterface, "RECYCLE_BIN");
+        $chmod = $repository->getContextOption($contextInterface, "CHMOD_VALUE");
         $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
 
@@ -104,7 +106,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if ($create == true) {
             if(!is_dir($path)) @mkdir($path, 0755, true);
             if (!is_dir($path)) {
-                throw new PydioException("Cannot create root path for repository (".$this->repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
+                throw new PydioException("Cannot create root path for repository (".$repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
             }
             if ($recycle!= "" && !is_dir($path."/".$recycle)) {
                 @mkdir($path."/".$recycle);
@@ -114,7 +116,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $this->setHiddenAttribute(new AJXP_Node($contextInterface->getUrlBase() ."/".$recycle));
                 }
             }
-            $dataTemplate = $this->repository->getContextOption($contextInterface, "DATA_TEMPLATE");
+            $dataTemplate = $repository->getContextOption($contextInterface, "DATA_TEMPLATE");
             if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")) {
                 $errs = array();$succ = array();
                 $repoData = array('base_url' => $contextInterface->getUrlBase(), 'chmod' => $chmod, 'recycle' => $recycle);
@@ -309,7 +311,9 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function createResourceAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        $selection = new UserSelection($this->repository);
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $selection = new UserSelection($ctx->getRepository());
         $selection->initFromHttpVars($request->getParsedBody());
         if($selection->isEmpty()){
             throw new PydioException("Empty resource");
@@ -360,12 +364,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         $httpVars = $request->getParsedBody();
         $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
-        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
         $dir = Utils::securePath($dir);
-        /** @var ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
         $selection = UserSelection::fromContext($ctx, $httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getContext(), $selection->getFiles());
@@ -373,7 +377,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $dir = Utils::safeDirname($selection->getUniqueFile());
             }
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         $repoData = array(
             'chmod'     => $ctx->getRepository()->getContextOption($ctx, 'CHMOD_VALUE'),
@@ -686,7 +690,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $this->filterUserSelectionToHidden($ctx, $selection->getFiles());
             RecycleBinManager::filterActions($action, $selection, $httpVars);
         }
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $nodesDiffs = new NodesDiff();
 
         switch ($action) {
@@ -936,7 +940,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $hardPurgeTime = intval($ctx->getRepository()->getContextOption($ctx, "PURGE_AFTER"))*3600*24;
                 $softPurgeTime = intval($ctx->getRepository()->getContextOption($ctx, "PURGE_AFTER_SOFT"))*3600*24;
-                $shareCenter = PluginsService::findPluginById('action.share');
+                $shareCenter = PluginsService::getInstance($ctx)->getPluginById('action.share');
                 if( !($shareCenter && $shareCenter->isEnabled()) ) {
                     //action.share is disabled, don't look at the softPurgeTime
                     $softPurgeTime = 0;
@@ -1116,7 +1120,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }else{
                     $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
                 }
-                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
                     $dir = fsAccessWrapper::patchPathForBaseDir($dir);
                 }
                 $dir = Utils::securePath($dir);
@@ -1135,7 +1139,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $startTime = microtime();
                 $path = $selection->nodeForPath(($dir!= ""?($dir[0]=="/"?"":"/").$dir:""))->getUrl();
                 $nonPatchedPath = $path;
-                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($this->repository->getId()) == "fsAccessWrapper") {
+                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
                 $testPath = @stat($path);
@@ -1477,7 +1481,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
@@ -1767,7 +1771,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if ($result <= 0) {
             $error[] = $archive->errorInfo(true);
         } else {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             $success[] = sprintf($mess[368], basename($zipPath), $destDir);
         }
     }
@@ -1786,7 +1790,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         $selectedFiles = $selection->getFiles();
         $this->logDebug("CopyMove", array("dest"=>$this->addSlugToPath($destDir), "selection" => $this->addSlugToPath($selectedFiles)));
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if (!$this->isWriteable($selection->nodeForPath($destDir))) {
             $error[] = $mess[38]." ".$destDir." ".$mess[99];
             return ;
@@ -1824,7 +1828,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function rename($originalNode, $dest = null, $filename_new = null)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         if(!empty($filename_new)){
             $filename_new=  Utils::sanitize(TextEncoder::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
@@ -1890,7 +1894,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         Controller::applyHook("node.before_change", array(&$parentNode));
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if ($newDirName=="") {
             throw new PydioException($mess[37]);
         }
@@ -1932,7 +1936,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function createEmptyFile(AJXP_Node $node, $content = "", $force = false)
     {
         Controller::applyHook("node.before_change", array($node->getParent()));
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
 
         if (!$force && file_exists($node->getUrl())) {
             throw new PydioException($mess[71], 71);
@@ -1975,7 +1979,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             'chmod'         => $ctx->getRepository()->getContextOption($ctx, 'CHMOD_VALUE'),
             'recycle'       => $ctx->getRepository()->getContextOption($ctx, 'RECYCLE_BIN')
         );
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $selectedNode) {
 

@@ -19,11 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -87,7 +85,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     public function moveMeta($oldFile, $newFile = null, $copy = false)
     {
         if($oldFile == null) return;
-        $feedStore = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        $feedStore = PluginsService::getInstance($oldFile->getContext())->getUniqueActivePluginForType("feed");
         if ($feedStore !== false) {
             $feedStore->updateMetaObject($oldFile->getRepositoryId(), $oldFile->getPath(), ($newFile!=null?$newFile->getPath():null), $copy);
             return;
@@ -118,15 +116,16 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
      */
     public function switchActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
-        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
         $uniqNode = $userSelection->getUniqueNode();
         /** @var AJXP_FeedStore $feedStore */
-        $feedStore = PluginsService::getInstance()->getUniqueActivePluginForType("feed");
+        $feedStore = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {
             $existingFeed = array();
         }
-        $mess = ConfService::getMessages();
+        $this->accessDriver = $ctx->getRepository()->getDriverInstance();
+        $mess = LocaleService::getMessages();
         switch ($actionName) {
 
             case "post_comment":

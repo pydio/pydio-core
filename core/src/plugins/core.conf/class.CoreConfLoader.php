@@ -21,6 +21,7 @@
 
 namespace Pydio\Conf\Core;
 
+use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -47,7 +48,7 @@ class CoreConfLoader extends Plugin implements CoreInstanceProvider
         if (!isSet(self::$confImpl) || (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"]) && self::$confImpl->getId() != $this->pluginConf["UNIQUE_INSTANCE_CONFIG"]["instance_name"])) {
             if (isset($this->pluginConf["UNIQUE_INSTANCE_CONFIG"])) {
                 if($pluginsService === null){
-                    $pluginsService = PluginsService::getInstance();
+                    $pluginsService = PluginsService::getInstance(Context::emptyContext());
                 }
                 self::$confImpl = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Conf\\Core\\AbstractConfDriver", $pluginsService);
             }

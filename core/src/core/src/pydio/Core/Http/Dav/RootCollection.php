@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Http\Dav;
 
+use Pydio\Core\Model\FilteredRepositoriesList;
 use \Sabre;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -57,11 +58,12 @@ class RootCollection extends Sabre\DAV\SimpleCollection
         if($this->context == null || !$this->context->hasUser()){
             return $this->children;
         }
-        $repos = ConfService::getAccessibleRepositories($this->context->getUser());
+        $filteredList = new FilteredRepositoriesList($this->context->getUser());
+        $repos = $filteredList->load();
         // Refilter to make sure the driver is an AjxpWebdavProvider
         foreach ($repos as $repository) {
             $accessType = $repository->getAccessType();
-            $driver = PluginsService::getInstance()->getPluginByTypeName("access", $accessType);
+            $driver = PluginsService::getInstance($this->context)->getPluginByTypeName("access", $accessType);
             if ($driver instanceof \Pydio\Access\Core\IAjxpWrapperProvider && $repository->getContextOption($this->context, "AJXP_WEBDAV_DISABLED") !== true) {
                 $this->children[$repository->getSlug()] = new Sabre\DAV\SimpleCollection($repository->getSlug());
             }

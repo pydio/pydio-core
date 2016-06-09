@@ -25,11 +25,11 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
@@ -165,14 +165,13 @@ class MqManager extends Plugin
 
     public function sendInstantMessage(ContextInterface $ctx, $xmlContent, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
-        $ctx = Context::fromGlobalServices();
         $currentUser = $ctx->getUser();
         $repositoryId = $ctx->getRepositoryId();
 
         if (!$ctx->hasRepository()) {
             $userId = $targetUserId;
         } else {
-            $scope = ConfService::getRepositoryById($repositoryId)->securityScope();
+            $scope = RepositoryService::getRepositoryById($repositoryId)->securityScope();
             if ($scope == "USER") {
                 if($targetUserId) $userId = $targetUserId;
                 else $userId = $currentUser->getId();

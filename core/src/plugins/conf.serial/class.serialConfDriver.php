@@ -26,6 +26,7 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -137,7 +138,7 @@ class serialConfDriver extends AbstractConfDriver
         $all = Utils::loadSerialFile($this->repoSerialFile);
         if ($user != null) {
             foreach ($all as $repoId => $repoObject) {
-                if (!ConfService::repositoryIsAccessible($repoId, $repoObject, $user)) {
+                if (!$user->canAccessRepository($repoObject)) {
                     unset($all[$repoId]);
                 }
             }
@@ -155,7 +156,7 @@ class serialConfDriver extends AbstractConfDriver
 
         $all = Utils::loadSerialFile($this->repoSerialFile);
         if ($criteria != null) {
-            return ConfService::filterRepositoryListWithCriteria($all, $criteria);
+            return RepositoryService::filterRepositoryListWithCriteria($all, $criteria);
         }else{
             return $all;
         }

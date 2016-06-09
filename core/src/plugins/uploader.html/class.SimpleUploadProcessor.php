@@ -21,8 +21,8 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -39,7 +39,7 @@ class SimpleUploadProcessor extends Plugin
 {
     public function getDropBg($action, $httpVars, $fileVars)
     {
-        $lang = ConfService::getLanguage();
+        $lang = LocaleService::getLanguage();
         $img = AJXP_INSTALL_PATH."/plugins/uploader.html/i18n/$lang-dropzone.png";
         if(!is_file($img)) $img = AJXP_INSTALL_PATH."/plugins/uploader.html/i18n/en-dropzone.png";
         header("Content-Type: image/png; name=\"dropzone.png\"");

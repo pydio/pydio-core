@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 
@@ -65,13 +66,18 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend {
             return false;
         }
 
-        $res = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false, "-1");
-        if($res > 0) return true;
-        if($isLast && $res != -4){
-            $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
-            return true;
-        }
+        try{
+            
+            $loggedUser = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false, "-1");
+            $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
 
+            return true;
+        }catch (\Pydio\Core\Exception\LoginException $l){
+            if($isLast && $l->getLoginError() !== -4){
+                $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
+                return true;
+            }
+        }
         return false;
 
     }

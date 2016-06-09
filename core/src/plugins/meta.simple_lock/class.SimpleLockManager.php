@@ -26,6 +26,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
@@ -149,7 +150,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         if(is_array($lock)
             && array_key_exists("lock_user", $lock)
             && $lock["lock_user"] != $node->getUserId()){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new Exception($mess["meta.simple_lock.5"]);
         }
     }

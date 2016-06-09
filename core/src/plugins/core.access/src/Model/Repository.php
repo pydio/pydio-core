@@ -29,6 +29,8 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AjxpGroupPathProvider;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -268,7 +270,7 @@ class Repository implements RepositoryInterface
         $plugin = $this->driverInstance;
         if(!$plugin) return "";
         if (isSet($this->parentId)) {
-            $parentObject = ConfService::getRepositoryById($this->parentId);
+            $parentObject = RepositoryService::getRepositoryById($this->parentId);
             if ($parentObject != null && $parentObject->isTemplate) {
                 $ic = $parentObject->getContextOption($ctx, "TPL_ICON_SMALL");
                 $settings = $plugin->getManifestRawContent("//client_settings", "node");
@@ -302,7 +304,7 @@ class Repository implements RepositoryInterface
             return $value;
         }
         if ($this->inferOptionsFromParent && isSet($this->parentId)) {
-            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            $parentTemplateObject = RepositoryService::getRepositoryById($this->parentId);
             if(empty($parentTemplateObject) || !$parentTemplateObject instanceof RepositoryInterface) {
                 throw new PydioException("Option should be loaded from parent repository, but it was not found");
             }
@@ -319,7 +321,7 @@ class Repository implements RepositoryInterface
      */
     public function getContextOption(ContextInterface $ctx, $oName){
         if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
-            $parentTemplateObject = ConfService::getRepositoryById($this->parentId);
+            $parentTemplateObject = RepositoryService::getRepositoryById($this->parentId);
             if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
                 throw new PydioException("Option should be loaded from parent repository, but it was not found");
             }
@@ -371,12 +373,12 @@ class Repository implements RepositoryInterface
     public function getDisplay()
     {
         if (isSet($this->displayStringId)) {
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             if (isSet($mess[$this->displayStringId])) {
                 return $mess[$this->displayStringId];
             }
         }
-        return VarsFilter::filter($this->display, Context::fromGlobalServices());
+        return VarsFilter::filter($this->display, Context::emptyContext());
     }
 
     public function getId()
@@ -512,7 +514,7 @@ class Repository implements RepositoryInterface
 
     public function getDescription( $public = false, $ownerLabel = null )
     {
-        $m = ConfService::getMessages();
+        $m = LocaleService::getMessages();
         if (isset($this->options["USER_DESCRIPTION"]) && !empty($this->options["USER_DESCRIPTION"])) {
             if (isSet($m[$this->options["USER_DESCRIPTION"]])) {
                 return $m[$this->options["USER_DESCRIPTION"]];
@@ -549,7 +551,7 @@ class Repository implements RepositoryInterface
     public function securityScope()
     {
         if($this->hasParent()){
-            $parentRepo = ConfService::getRepositoryById($this->getParentId());
+            $parentRepo = RepositoryService::getRepositoryById($this->getParentId());
             if(!empty($parentRepo) && $parentRepo->isTemplate){
                 $path = $parentRepo->getSafeOption("PATH");
                 $container = $parentRepo->getSafeOption("CONTAINER");

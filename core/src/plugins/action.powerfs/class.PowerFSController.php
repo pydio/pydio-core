@@ -23,10 +23,10 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\TextEncoder;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Message\BgActionTrigger;
@@ -65,7 +65,7 @@ class PowerFSController extends Plugin
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }
         $urlBase = "pydio://". $repository->getId();
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         if($request->getAttribute("action") != "postcompress_download"){
             $response = $response->withBody($bodyStream);
@@ -138,7 +138,7 @@ class PowerFSController extends Plugin
                 chdir($rootDir);
                 $cmd = $this->getContextualOption($ctx, "ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
-                $fsDriver = PluginsService::getInstance()->getUniqueActivePluginForType("access");
+                $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if ((!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) && stripos(PHP_OS, "win") === false) {
                     $cmd .= " -x .\*";

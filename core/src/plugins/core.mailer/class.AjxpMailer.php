@@ -24,6 +24,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
@@ -70,7 +71,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     public function mailConsumeQueue ($action, $httpVars, $fileVars, ContextInterface $ctx) {
 
         if ($action === "consume_mail_queue") {
-            $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+            
+            $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
             if (!dibi::isConnected()) {
                 dibi::connect($this->getDibiDriver());
             }
@@ -114,7 +116,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
-                $digestTitle = ConfService::getMessages()["core.mailer.9"];
+                $digestTitle = LocaleService::getMessages()["core.mailer.9"];
                 foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
                     $useHtml = $recipientFormats[$recipient];
                     $body = $useHtml ? "<div id='digest'>" : "";
@@ -237,7 +239,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         if ($userExist === true) {
             $userObject = ConfService::getConfStorageImpl()->createUserObject($notification->getTarget());
         } else {
-            $messages = ConfService::getMessages();
+            $messages = LocaleService::getMessages();
             throw new PydioException($messages['core.mailer.2']);
         }
         if($userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true") !== "true"){
@@ -285,7 +287,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                 $this->logError("[mailer]", "Could not determine email frequency from $frequencyType / $frequencyDetail for send email to user ".$userObject->getId());
             }
         } else {
-            $mailer = PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+            $mailer = PluginsService::getInstance($notification->getNode()->getContext())->getActivePluginsForType("mailer", true);
             if ($mailer !== false) {
                 try {
                     $mailer->sendMail(
@@ -323,7 +325,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         if(!empty($append)) $subject .= " ".$append;
         if (!empty($layoutFolder)) {
             $layoutFolder .= "/";
-            $lang = ConfService::getLanguage();
+            $lang = LocaleService::getLanguage();
             if(!$useHtml){
                 if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt")) {
                     $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt"));
@@ -365,8 +367,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
 
     public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $mess = ConfService::getMessages();
-        $mailers = PluginsService::getInstance()->getActivePluginsForType("mailer");
+        $mess = LocaleService::getMessages();
+        $ctx = $requestInterface->getAttribute("ctx");
+        $mailers = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer");
         if (!count($mailers)) {
             throw new Exception($mess["core.mailer.3"]);
         }

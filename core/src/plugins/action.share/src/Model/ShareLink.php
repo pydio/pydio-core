@@ -21,6 +21,8 @@
 namespace Pydio\Share\Model;
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Share\Store\ShareStore;
 use Pydio\Share\View\PublicAccessManager;
@@ -146,9 +148,9 @@ class ShareLink
      */
     public function getRepository(){
         if(isSet($this->internal["REPOSITORY"])){
-            return ConfService::getRepositoryById($this->internal["REPOSITORY"]);
+            return RepositoryService::getRepositoryById($this->internal["REPOSITORY"]);
         }else{
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             throw new \Exception(str_replace('%s', 'No repository attached to link', $mess["share_center.219"]));
         }
     }
@@ -187,11 +189,11 @@ class ShareLink
             $value = Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
             $value = strtolower($value);
             if(strlen($value) < $this->store->getHashMinLength()){
-                $mess = ConfService::getMessages();
+                $mess = LocaleService::getMessages();
                 throw new \Exception(str_replace("%s", $this->store->getHashMinLength(), $mess["share_center.223"]));
             }
             $test = $this->store->loadShare($value);
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             if(!empty($test)) {
                 throw new \Exception($mess["share_center.172"]);
             }

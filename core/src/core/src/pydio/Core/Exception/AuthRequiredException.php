@@ -24,6 +24,7 @@ use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -33,7 +34,7 @@ class AuthRequiredException extends PydioException implements XMLSerializableRes
     public function __construct($messageId = "", $messageString = "")
     {
         if(!empty($messageId)){
-            $mess = ConfService::getMessages();
+            $mess = LocaleService::getMessages();
             if(isSet($mess[$messageId])) $messageString = $mess[$messageId];
         }
         parent::__construct($messageString, $messageId);

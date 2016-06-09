@@ -22,6 +22,7 @@ namespace Pydio\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
@@ -29,7 +30,6 @@ use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
@@ -67,13 +67,13 @@ class Controller
     /**
      * Initialize the queryable xPath object
      * @static
+     * @param ContextInterface $ctx
      * @param bool $useCache Whether to cache the registry version in a memory cache.
      * @return \DOMXPath
      */
-    private static function initXPath($useCache = false)
+    private static function initXPath($ctx, $useCache = false)
     {
         if (!isSet(self::$xPath)) {
-            $ctx = Context::fromGlobalServices();
             $registry = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(false, false, $useCache);
             self::$xPath = new \DOMXPath($registry);
         }
@@ -94,9 +94,10 @@ class Controller
     public static function parseRestParameters(ServerRequestInterface &$request){
         $actionName = $request->getAttribute("action");
         $path = $request->getAttribute("rest_path");
+        $ctx = $request->getAttribute("ctx");
         $reqParameters = $request->getParsedBody();
 
-        $xPath = self::initXPath(true);
+        $xPath = self::initXPath($ctx, true);
         $actions = $xPath->query("actions/action[@name='$actionName']");
         if (!$actions->length) {
             throw new ActionNotFoundException($actionName);
@@ -190,7 +191,8 @@ class Controller
     public static function run(ServerRequestInterface $request, &$actionNode = null)
     {
         $actionName = $request->getAttribute("action");
-        $xPath = self::initXPath(true);
+        $ctx = $request->getAttribute("ctx");
+        $xPath = self::initXPath($ctx, true);
         if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
             if (!$actions->length) {
@@ -199,7 +201,6 @@ class Controller
             $actionNode = $actions->item(0);
         }
         /** @var ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
         //Check Rights
         if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
@@ -211,9 +212,9 @@ class Controller
                     throw new AuthRequiredException("207");
                 }
             if( Controller::actionNeedsRight($actionNode, $xPath, "read") &&
-                ($loggedUser == null || !$loggedUser->canRead(ConfService::getCurrentRepositoryId().""))){
+                ($loggedUser == null || !$loggedUser->canRead($ctx->getRepositoryId().""))){
                     if($actionName == "ls" & $loggedUser!=null
-                        && $loggedUser->canWrite(ConfService::getCurrentRepositoryId()."")){
+                        && $loggedUser->canWrite($ctx->getRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
                         $response = new Response();
                         $response->getBody()->write(XMLWriter::wrapDocument(""));
@@ -223,7 +224,7 @@ class Controller
                     }
                 }
             if( Controller::actionNeedsRight($actionNode, $xPath, "write") &&
-                ($loggedUser == null || !$loggedUser->canWrite(ConfService::getCurrentRepositoryId().""))){
+                ($loggedUser == null || !$loggedUser->canWrite($ctx->getRepositoryId().""))){
                     throw new AuthRequiredException("207");
                 }
         }
@@ -432,13 +433,14 @@ class Controller
     /**
      * Applies a callback node
      * @static
+     * @param ContextInterface $context
      * @param \DOMElement|array $callback The DOM Node or directly an array of attributes
      * @param null $variableArgs
      * @param bool $defer
      * @throws PydioException
      * @return mixed
      */
-    private static function applyCallback($callback, &$variableArgs, $defer = false)
+    private static function applyCallback($context, $callback, &$variableArgs, $defer = false)
     {
         //Processing
         if(is_array($callback)){
@@ -448,7 +450,7 @@ class Controller
             $plugId = $callback->getAttribute("pluginId");
             $methodName = $callback->getAttribute("methodName");
         }
-        $plugInstance = PluginsService::findPluginById($plugId);
+        $plugInstance = PluginsService::getInstance($context)->getPluginById($plugId);
         //return call_user_func(array($plugInstance, $methodName), $actionName, $httpVars, $fileVars);
         // Do not use call_user_func, it cannot pass parameters by reference.
         if (method_exists($plugInstance, $methodName)) {
@@ -532,6 +534,22 @@ class Controller
      */
     public static function applyHook($hookName, $args, $forceNonDefer = false)
     {
+        $findContext = null;
+        foreach ($args as $arg){
+            if($arg instanceof ContextInterface) {
+                $findContext = $arg;
+                break;
+            }else if($arg instanceof AJXP_Node){
+                $findContext = $arg->getContext();
+                break;
+            }
+        }
+        if($findContext == null){
+            $findContext = Context::emptyContext();
+            AJXP_Logger::debug("Controller", "Applying hook $hookName without context");
+            //throw new \Exception("No context found");
+        }
+
         if(isSet(self::$hooksCache[$hookName])){
             $hooks = self::$hooksCache[$hookName];
             foreach($hooks as $hook){
@@ -542,11 +560,11 @@ class Controller
                 }
                 $defer = $hook["defer"];
                 if($defer && $forceNonDefer) $defer = false;
-                self::applyCallback($hook, $args, $defer);
+                self::applyCallback($findContext, $hook, $args, $defer);
             }
             return;
         }
-        $xPath = self::initXPath(true);
+        $xPath = self::initXPath($findContext, true);
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
         self::$hooksCache[$hookName] = array();
@@ -575,12 +593,12 @@ class Controller
             if($defer && $forceNonDefer) $defer = false;
             if($dontBreakOnException){
                 try{
-                    self::applyCallback($hookCallback, $args, $defer);
+                    self::applyCallback($findContext, $hookCallback, $args, $defer);
                 }catch(\Exception $e){
                     AJXP_Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
                 }
             }else{
-                self::applyCallback($hookCallback, $args, $defer);
+                self::applyCallback($findContext, $hookCallback, $args, $defer);
             }
         }
     }

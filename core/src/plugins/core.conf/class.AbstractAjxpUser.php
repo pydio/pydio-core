@@ -20,9 +20,11 @@
  */
 namespace Pydio\Conf\Core;
 
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -254,16 +256,25 @@ abstract class AbstractAjxpUser implements UserInterface
         return $this->mergedRole->canWrite($repositoryId);
     }
 
+    /**
+     * @param RepositoryInterface|string $idOrObject
+     * @return bool
+     */
+    public function canAccessRepository($idOrObject){
+        if($idOrObject instanceof RepositoryInterface){
+            $repository = RepositoryService::getRepositoryById($idOrObject);
+            if(empty($repository)) return false;
+        }else{
+            $repository = $idOrObject;
+        }
+        return RepositoryService::repositoryIsAccessible($repository, $this, false, true);
+    }
+
     public function canSwitchTo($repositoryId)
     {
-        $repositoryObject = ConfService::getRepositoryById($repositoryId);
+        $repositoryObject = RepositoryService::getRepositoryById($repositoryId);
         if($repositoryObject == null) return false;
-        return ConfService::repositoryIsAccessible($repositoryId, $repositoryObject, $this, false, true);
-        /*
-        if($repositoryObject->getAccessType() == "ajxp_conf" && !$this->isAdmin()) return false;
-        if($repositoryObject->getUniqueUser() && $this->id != $repositoryObject->getUniqueUser()) return false;
-        return ($this->mergedRole->canRead($repositoryId) || $this->mergedRole->canWrite($repositoryId)) ;
-        */
+        return RepositoryService::repositoryIsAccessible($repositoryObject, $this, false, true);
     }
 
     public function getPref($prefName)
@@ -517,7 +528,7 @@ abstract class AbstractAjxpUser implements UserInterface
         $wallet = $this->getPref("AJXP_WALLET");
         if (is_array($wallet) && count($wallet)) {
             foreach ($wallet as $repositoryId => $walletData) {
-                $repoObject = ConfService::getRepositoryById($repositoryId);
+                $repoObject = RepositoryService::getRepositoryById($repositoryId);
                 if($repoObject == null) continue;
                 $accessType = "access.".$repoObject->getAccessType();
                 foreach ($walletData as $paramName => $paramValue) {

@@ -90,7 +90,7 @@ class TaskService implements ITasksProvider
             $action = $task->getAction();
             $id = $task->getId();
             if(empty($request)){
-                $ctx = Context::fromGlobalServices();
+                $ctx = $task->getContext();
             }else{
                 $ctx = $request->getAttribute("ctx");
             }

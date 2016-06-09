@@ -19,11 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
@@ -163,7 +163,7 @@ class AJXP_NotificationCenter extends Plugin
         $ctx = $requestInterface->getAttribute("ctx");
         $u = $ctx->getUser();
 
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $nodesList = new \Pydio\Access\Core\Model\NodesList();
         $format = "html";
         if (isSet($httpVars["format"])) {
@@ -194,7 +194,7 @@ class AJXP_NotificationCenter extends Plugin
         } else if (isSet($httpVars["current_repository"])){
             $authRepos[] = $crtRepId;
         } else {
-            $accessibleRepos = ConfService::getAccessibleRepositories($u, false, true, false);
+            $accessibleRepos =  \Pydio\Core\Services\UsersService::getRepositoriesForUser($u, false);
             $authRepos = array_keys($accessibleRepos);
         }
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
@@ -327,7 +327,7 @@ class AJXP_NotificationCenter extends Plugin
 
         $format = $httpVars["format"];
         $fillList = ($nodesList !== null);
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         if (!$fillList) {
             if ($format == "html") {
                 $responseInterface = $responseInterface->withHeader("Content-Type", "text/html");
@@ -340,7 +340,7 @@ class AJXP_NotificationCenter extends Plugin
                 $x->addChunk($nodesList);
             }
         }
-        $parentRepository = ConfService::getRepositoryById($repositoryFilter);
+        $parentRepository = RepositoryService::getRepositoryById($repositoryFilter);
         $parentRoot = $parentRepository->getContextOption($ctx, "PATH");
         $cumulated = array();
         foreach ($res as $notification) {
@@ -371,7 +371,7 @@ class AJXP_NotificationCenter extends Plugin
                         $nodePath = $node->getPath();
                     }
                     $relative = rtrim( substr($currentRoot, strlen($parentRoot)), "/"). rtrim($nodePath, "/");
-                    $parentNodeURL = $node->getScheme()."://".$repositoryFilter.$relative;
+                    $parentNodeURL = $node->getScheme()."://".$node->getUser()->getId()."@".$repositoryFilter.$relative;
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
                     $path = $node->getPath();

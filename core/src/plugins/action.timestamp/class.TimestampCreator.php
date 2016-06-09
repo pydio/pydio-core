@@ -11,6 +11,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -18,7 +19,7 @@ class TimestampCreator extends Plugin
 {
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
     {
-        $mess = ConfService::getMessages();
+        $mess = LocaleService::getMessages();
         $ctx = $requestInterface->getAttribute("ctx");
 
         $timestamp_url      = $this->getContextualOption($ctx, "TIMESTAMP_URL");
