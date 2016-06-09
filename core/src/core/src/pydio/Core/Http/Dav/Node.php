@@ -84,7 +84,12 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
      */
     public function getAccessDriver()
     {
-        return $this->context->getRepository()->getDriverInstance();
+        $driver = $this->context->getRepository()->getDriverInstance();
+        if(empty($driver)){
+            $n = new AJXP_Node($this->getUrl());
+            return $n->getDriver();
+        }
+        throw new \Exception("Cannot find driver instance for current node! ".$this->path);
     }
 
     /**

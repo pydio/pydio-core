@@ -271,9 +271,8 @@ class AJXP_Logger extends Plugin
     {
         $user = "No User";
         if (UsersService::usersEnabled()) {
-            $logged = self::$context->getUser();
-            if ($logged != null) {
-                $user = $logged->getId();
+            if (self::$context !== null && self::$context->hasUser()) {
+                $user = self::$context->getUser()->getId();
             } else {
                 $user = "shared";
             }

@@ -132,7 +132,6 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
         // NOW UPDATE CONTEXT
         $this->context->setUserObject($loggedUser);
-        PluginsService::getInstance($this->context);
         AJXP_Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
 

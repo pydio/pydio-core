@@ -59,7 +59,6 @@ class dropboxAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $this->detectStreamWrapper(true);
         $this->urlBase =$contextInterface->getUrlBase();
 
         if (!Utils::searchIncludePath('HTTP/OAuth/Consumer.php')) {

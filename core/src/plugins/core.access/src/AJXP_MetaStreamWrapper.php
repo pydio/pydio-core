@@ -22,9 +22,10 @@
 namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -78,26 +79,20 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         }
     }
 
+
     /**
      * Check if a repository accessDriver declares a streamWrapper, and eventually register it.
-     * @param RepositoryInterface $repository
+     * @param AJXP_Node $node
      * @param bool $register
      * @param array|null $streams
-     * @param array|false $streamData
+     * @param array|bool  $streamData
      * @return bool
      */
-    public static function detectWrapperForRepository(RepositoryInterface $repository, $register = false, &$streams = null, &$streamData = false){
+    public static function detectWrapperForNode(AJXP_Node $node, $register = false, &$streams = null, &$streamData = false){
 
-        $driverInstance = $repository->getDriverInstance();
-        $accessType = $repository->getAccessType();
-
+        $driverInstance = $node->getDriver();
         if(!empty($driverInstance) && $driverInstance instanceof AbstractAccessDriver){
             $plugin = $driverInstance;
-        }else{
-            $plugin = PluginsService::findPlugin("access", $accessType);
-            if(!empty($plugin) && $plugin instanceof AbstractAccessDriver){
-                $repository->setDriverInstance($plugin);
-            }
         }
         if(empty($plugin)) {
             return false;
@@ -105,6 +100,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
 
         $streamData = $plugin->detectStreamWrapper($register);
         if (!$register && $streamData !== false && is_array($streams)) {
+            $accessType = $node->getRepository()->getAccessType();
             $streams[$accessType] = $accessType;
         }
         return ($streamData !== false);
@@ -134,7 +130,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
             return $metaWrapperKeys[$key + 1];
         }else{
             // Otherwise return repository wrapper
-            $data = self::actualRepositoryWrapperData($parts["host"]);
+            $data = self::actualRepositoryWrapperData(new AJXP_Node($url));
             return $data["protocol"];
         }
     }
@@ -148,7 +144,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
     protected static function translateScheme($url, $crtInstance = null){
         $parts=parse_url($url);
         $currentScheme = $parts['scheme'];
-        $context = self::actualRepositoryWrapperProtocol($parts['host']);
+        $context = self::actualRepositoryWrapperProtocol(new AJXP_Node($url));
         $newScheme = self::getNextScheme($url, $context);
         $repository = RepositoryService::getRepositoryById(parse_url($url, PHP_URL_HOST));
         if($currentScheme == "pydio" && $repository->hasContentFilter()){
@@ -181,14 +177,14 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         return $newUrl;
     }
 
-    protected static function findWrapperClassName($scheme, $context = "core"){
+    protected static function findWrapperClassName(ContextInterface $ctx, $scheme, $context = "core"){
 
         $metaWrappers = self::getMetaWrappers($context);
 
         if(isSet($metaWrappers[$scheme])){
             $wrapper = $metaWrappers[$scheme];
         }else{
-            $wrapper = PluginsService::getInstance()->getWrapperClassName($scheme);
+            $wrapper = PluginsService::getInstance($ctx)->getWrapperClassName($scheme);
         }
         if(empty($wrapper)) {
             throw new \Exception("Cannot find any wrapper for the scheme " . $scheme . " in context " . $context);
@@ -197,14 +193,14 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
     }
 
     protected static function findSubWrapperClassName($url){
-        $repositoryId = parse_url($url, PHP_URL_HOST);
-        $context = self::actualRepositoryWrapperProtocol($repositoryId);
+        $context = self::actualRepositoryWrapperProtocol(new AJXP_Node($url));
         $nextScheme = self::getNextScheme($url, $context);
-
-        return self::findWrapperClassName($nextScheme, $context);
+        return self::findWrapperClassName(AJXP_Node::contextFromUrl($url), $nextScheme, $context);
     }
 
-    protected static function actualRepositoryWrapperData($repositoryId){
+    /** @param $node AJXP_Node */
+    protected static function actualRepositoryWrapperData(AJXP_Node $node){
+        $repositoryId = $node->getRepositoryId();
         if(isSet(self::$cachedRepositoriesWrappers[$repositoryId])){
             return self::$cachedRepositoriesWrappers[$repositoryId];
         }
@@ -212,7 +208,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         if(!is_a($repository, "Repository")){
             throw new \Exception("Cannot find repository with this id!");
         }
-        if(self::detectWrapperForRepository($repository, false, $streams, $streamData)){
+        if(self::detectWrapperForNode($node, false, $streams, $streamData)){
             self::$cachedRepositoriesWrappers[$repositoryId] = $streamData;
             return $streamData;
         }else{
@@ -222,23 +218,23 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
 
     /**
      * Return the final ajxp.XX wrapper class name.
-     * @param $repositoryId
+     * @param $node AJXP_Node
      * @return string mixed
      * @throws \Exception
      */
-    public static function actualRepositoryWrapperClass($repositoryId){
-        $data = self::actualRepositoryWrapperData($repositoryId);
+    public static function actualRepositoryWrapperClass($node){
+        $data = self::actualRepositoryWrapperData($node);
         return $data["classname"];
     }
 
     /**
      * Return the final ajxp.XX wrapper protocol.
-     * @param $repositoryId
+     * @param $node AJXP_Node
      * @return string mixed
      * @throws \Exception
      */
-    public static function actualRepositoryWrapperProtocol($repositoryId){
-        $data = self::actualRepositoryWrapperData($repositoryId);
+    public static function actualRepositoryWrapperProtocol($node){
+        $data = self::actualRepositoryWrapperData($node);
         return $data["protocol"];
     }
 
@@ -251,7 +247,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      */
     public static function applyInitPathHook($path, $context = 'core') {
         $currentScheme = parse_url($path, PHP_URL_SCHEME);
-        $wrapper = self::findWrapperClassName($currentScheme, $context);
+        $wrapper = self::findWrapperClassName(AJXP_Node::contextFromUrl($path), $currentScheme, $context);
 
         if (is_callable(array($wrapper, "applyInitPathHook"))){
             call_user_func(array($wrapper, "applyInitPathHook"), $path);
@@ -324,8 +320,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      * @return boolean
      */
     public static function wrapperIsRemote($url){
-        $repositoryId = parse_url($url, PHP_URL_HOST);
-        return call_user_func(array(self::actualRepositoryWrapperClass($repositoryId), "isRemote"));
+        return call_user_func(array(self::actualRepositoryWrapperClass(new AJXP_Node($url)), "isRemote"));
     }
 
     /**
@@ -333,13 +328,12 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      * @return boolean
      */
     public static function wrapperIsSeekable($url){
-        $repositoryId = parse_url($url, PHP_URL_HOST);
-        return call_user_func(array(self::actualRepositoryWrapperClass($repositoryId), "isSeekable"), $url);
+        return call_user_func(array(self::actualRepositoryWrapperClass(new AJXP_Node($url)), "isSeekable"), $url);
     }
 
     public static function nodesUseSameWrappers($url1, $url2){
-        $w1 = self::actualRepositoryWrapperClass(parse_url($url1, PHP_URL_HOST));
-        $w2 = self::actualRepositoryWrapperClass(parse_url($url2, PHP_URL_HOST));
+        $w1 = self::actualRepositoryWrapperClass(new AJXP_Node($url1));
+        $w2 = self::actualRepositoryWrapperClass(new AJXP_Node($url2));
         return $w1 == $w2;
     }
 
@@ -616,7 +610,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
             return null;
         }
         $bytesize = $stat["size"];
-        $wrapper = self::actualRepositoryWrapperClass(parse_url($path, PHP_URL_HOST));
+        $wrapper = self::actualRepositoryWrapperClass(new AJXP_Node($path));
         if(method_exists($wrapper, "getLastRealSize")){
             $custom = call_user_func(array($wrapper, "getLastRealSize"));
             if ($custom !== false) {

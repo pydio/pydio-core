@@ -58,7 +58,6 @@ class imapAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
 
     }

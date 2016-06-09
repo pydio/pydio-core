@@ -71,7 +71,6 @@ class Driver extends fsAccessDriver
      */
     protected function initRepository(ContextInterface $ctx)
     {
-        $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

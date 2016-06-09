@@ -62,7 +62,6 @@ class s3AccessDriver extends fsAccessDriver
      */
     protected function initRepository(ContextInterface $contextInterface)
     {
-        $this->detectStreamWrapper(true);
 
         if (is_array($this->pluginConf)) {
             $this->driverConf = $this->pluginConf;

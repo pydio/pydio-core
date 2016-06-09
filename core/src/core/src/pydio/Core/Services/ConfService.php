@@ -22,6 +22,7 @@ namespace Pydio\Core\Services;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -309,7 +310,10 @@ class ConfService
         $streams = array();
         $currentRepos = UsersService::getRepositoriesForUser($user);
         foreach ($currentRepos as $repository) {
-            AJXP_MetaStreamWrapper::detectWrapperForRepository($repository,$register, $streams);
+            $ctx = new Context();
+            $ctx->setUserObject($user);
+            $ctx->setRepositoryObject($repository);
+            AJXP_MetaStreamWrapper::detectWrapperForNode(new AJXP_Node($ctx->getUrlBase()),$register, $streams);
         }
         return $streams;
     }
@@ -401,6 +405,7 @@ class ConfService
     {
         return PluginsService::searchManifestsWithCache("//action[@skipSecureToken]", function($nodes){
             $res = array();
+            /** @var \DOMElement $node */
             foreach ($nodes as $node) {
                 $res[] = $node->getAttribute("name");
             }
@@ -521,45 +526,6 @@ class ConfService
         self::$usersParametersCache[$cacheId][$userIdOrObject] = $value;
         return $value;
 
-    }
-    
-
-    /**
-     * @static
-     * @param RepositoryInterface $repository
-     * @return AbstractAccessDriver
-     */
-    public static function loadDriverForRepository(&$repository)
-    {
-        return self::getInstance()->loadRepositoryDriverInst($repository);
-    }
-
-    /**
-     * See static method
-     * @param RepositoryInterface $repository
-     * @throws PydioException|\Exception
-     * @return AbstractAccessDriver
-     */
-    private function loadRepositoryDriverInst(&$repository)
-    {
-        $instance = $repository->getDriverInstance();
-        if (!empty($instance)) {
-            return $instance;
-        }
-
-        /** @var AbstractAccessDriver $plugInstance */
-        $accessType = $repository->getAccessType();
-        $pServ = PluginsService::getInstance();
-        $plugInstance = $pServ->getPluginByTypeName("access", $accessType);
-
-        /*
-        $ctxId = $this->getContextRepositoryId();
-        if ( (!empty($ctxId) || $ctxId === 0) && $ctxId == $repository->getId()) {
-            $this->configs["REPOSITORY"] = $repository;
-            $this->cacheRepository($ctxId, $repository);
-        }
-        */
-        return $plugInstance;
     }
     
     

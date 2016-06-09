@@ -73,7 +73,7 @@ class EmlParser extends Plugin
         $file = $node->getUrl();
         Controller::applyHook("node.read", array($node));
 
-        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId());
+        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node);
 
         $mess = LocaleService::getMessages();
         switch ($action) {
@@ -196,9 +196,9 @@ class EmlParser extends Plugin
                             $loggedUser = $ctx->getUser();
                             if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
                         }
-                        $destRepoObject = RepositoryService::getRepositoryById($destRepoId);
-                        AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
-                        $destStreamURL = "pydio://$destRepoId";
+                        $user = $ctx->getUser()->getId();
+                        $destStreamURL = "pydio://$user@$destRepoId";
+                        AJXP_MetaStreamWrapper::detectWrapperForNode(new AJXP_Node($destStreamURL), true);
                     }
                     $destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];
                     $fp = fopen($destFile, "w");
@@ -228,7 +228,7 @@ class EmlParser extends Plugin
         if($isParent) return;
         $currentNode = $ajxpNode->getUrl();
         $metadata = $ajxpNode->metadata;
-        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode->getRepositoryId());
+        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode);
 
         $noMail = true;
         if ($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))) {

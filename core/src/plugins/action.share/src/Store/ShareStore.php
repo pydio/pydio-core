@@ -732,9 +732,10 @@ class ShareStore {
         }
         $repoLoaded = false;
 
+        $node = new AJXP_Node("pydio://".$data["OWNER_ID"]."@".$repoObject->getId());
         if(!empty($repoObject)){
             try{
-                ConfService::loadDriverForRepository($repoObject)->detectStreamWrapper(true);
+                $node->getDriver()->detectStreamWrapper(true);
                 $repoLoaded = true;
             }catch (\Exception $e){
                 // Cannot load this repository anymore.

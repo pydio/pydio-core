@@ -827,9 +827,18 @@ class PluginsService
      * @param $protocol
      * @return string
      */
-    public function getWrapperClassName($protocol)
+    public function getWrapperClassName($protocol, $register = false)
     {
-        return $this->registeredWrappers[$protocol];
+        if(isSet($this->registeredWrappers[$protocol])){
+            return $this->registeredWrappers[$protocol];
+        }
+        /** @var AbstractAccessDriver $access */
+        $access = $this->getActivePluginsForType("access", true);
+        $data = $access->detectStreamWrapper($register);
+        if($data !== null && $data["protocol"] == $protocol){
+            return $data["classname"];
+        }
+        return null;
     }
 
     /**

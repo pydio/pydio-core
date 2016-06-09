@@ -64,7 +64,7 @@ class JumploaderProcessor extends Plugin
             self::$remote = true;
         }
 
-        $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($repository->getId());
+        $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase()));
         if ($wrapperName == "ajxp.ftp" || $wrapperName == "ajxp.remotefs") {
             $this->logDebug("Skip decoding");
             self::$skipDecoding = true;

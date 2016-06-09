@@ -139,7 +139,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
-        PluginsService::getInstance($this->context);
+        //PluginsService::getInstance($this->context);
         AJXP_Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
 

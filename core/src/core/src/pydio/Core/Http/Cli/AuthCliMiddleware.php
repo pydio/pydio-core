@@ -54,7 +54,7 @@ class AuthCliMiddleware
     public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
         $driverImpl = ConfService::getAuthDriverImpl();
-        PluginsService::getInstance()->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
+        PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
         $options = $requestInterface->getAttribute("cli-options");
         $optUser = $options["u"];

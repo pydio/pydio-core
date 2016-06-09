@@ -47,7 +47,6 @@ class inboxAccessDriver extends fsAccessDriver
      */
     protected function initRepository(ContextInterface $contextInterface)
     {
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
     }
 
@@ -97,8 +96,7 @@ class inboxAccessDriver extends fsAccessDriver
                 $node = new AJXP_Node($nodeData["url"]);
                 $node->getRepository()->driverInstance = null;
                 try{
-                    ConfService::loadDriverForRepository($node->getRepository());
-                    AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
+                    $node->getDriver()->detectStreamWrapper(true);
                     if($node->getRepository()->hasContentFilter()){
                         $node->setLeaf(true);
                     }
@@ -173,12 +171,12 @@ class inboxAccessDriver extends fsAccessDriver
 
                 $node->getRepository()->driverInstance = null;
                 try{
-                    ConfService::loadDriverForRepository($node->getRepository());
+                    $node->getDriver()->detectStreamWrapper(true);
                 }catch (\Exception $e){
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                 }
-                AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
+                AJXP_MetaStreamWrapper::detectWrapperForNode($node, true);
                 $stat = @stat($url);
                 if($stat === false){
                     $ext = "error";
@@ -230,7 +228,7 @@ class inboxAccessDriver extends fsAccessDriver
                 $output[$name.$suffix.".".$ext]['stat'] = $stat;
             }
         }
-        ConfService::loadDriverForRepository($globalContext->getRepository());
+        //ConfService::loadDriverForRepository($globalContext->getRepository());
         self::$output = $output;
 
         if ($touch) {

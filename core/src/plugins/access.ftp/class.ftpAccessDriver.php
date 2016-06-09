@@ -90,7 +90,6 @@ class ftpAccessDriver extends fsAccessDriver
         } else {
             $this->driverConf = array();
         }
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
         $recycle = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
         if ($recycle != "") {

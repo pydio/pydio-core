@@ -145,11 +145,11 @@ class inboxAccessWrapper implements IAjxpWrapper
             $node->setLabel($label);
             $node->getRepository()->driverInstance = null;
             try{
-                ConfService::loadDriverForRepository($node->getRepository());
+                $node->getDriver();
             }catch (\Exception $e){
 
             }
-            AJXP_MetaStreamWrapper::detectWrapperForRepository($node->getRepository(), true);
+            AJXP_MetaStreamWrapper::detectWrapperForNode($node, true);
         }
         return $url;
     }
@@ -173,7 +173,7 @@ class inboxAccessWrapper implements IAjxpWrapper
                 copy($realFilePointer, $tmpname);
                 $realFilePointer = $tmpname;
             }
-            ConfService::loadDriverForRepository(self::$linkNode->getRepository());
+            self::$linkNode->getDriver();
             return $realFilePointer;
         }else{
             $tmpname = tempnam(Utils::getAjxpTmpDir(), "real-file-inbox-pointer");
@@ -200,7 +200,7 @@ class inboxAccessWrapper implements IAjxpWrapper
         call_user_func(array($wrapperClass, "copyFileInStream"), $url, $stream);
         */
         if(self::$linkNode !== null){
-            ConfService::loadDriverForRepository(self::$linkNode->getRepository());
+            self::$linkNode->getDriver();
         }
     }
 
@@ -281,7 +281,7 @@ class inboxAccessWrapper implements IAjxpWrapper
         if($this->fp !== null){
             fclose($this->fp);
             if(self::$linkNode !== null){
-                ConfService::loadDriverForRepository(self::$linkNode->getRepository());
+                self::$linkNode->getDriver();
             }
         }
     }

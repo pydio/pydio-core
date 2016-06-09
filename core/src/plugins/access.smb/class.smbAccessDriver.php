@@ -27,6 +27,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
@@ -73,7 +74,6 @@ class smbAccessDriver extends fsAccessDriver
         //$create = $this->repository->getOption("CREATE");
         $recycle = $this->repository->getContextOption($contextInterface, "RECYCLE_BIN");
 
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
 
         if ($recycle!= "" && !is_dir($contextInterface->getUrlBase()."/".$recycle)) {
@@ -88,12 +88,12 @@ class smbAccessDriver extends fsAccessDriver
 
     }
 
-    public function detectStreamWrapper($register = false)
+    public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if ($register) {
             require_once($this->getBaseDir()."/smb.php");
         }
-        return parent::detectStreamWrapper($register);
+        return parent::detectStreamWrapper($register, $ctx);
     }
 
     /**

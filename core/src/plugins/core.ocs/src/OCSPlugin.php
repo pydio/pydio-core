@@ -127,11 +127,11 @@ class OCSPlugin extends Plugin{
         }
         if(count($shares)){
             $userObject->recomputeMergedRole();
-            //AuthService::updateUser($userObject);
         }
     }
 
     public function remoteRepositoryById($repositoryId, &$repoObject){
+        
         if(strpos($repositoryId, "ocs_remote_share_") !== 0){
             return;
         }
@@ -147,6 +147,7 @@ class OCSPlugin extends Plugin{
                 AuthService::updateUser($loggedUser);
             }
         }
+        
     }
 
 

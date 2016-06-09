@@ -28,6 +28,7 @@ use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Http\Server;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
@@ -59,7 +60,7 @@ class AuthMiddleware
         try{
 
             $driverImpl = ConfService::getAuthDriverImpl();
-            PluginsService::getInstance()->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
+            PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
             $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
             if($response != null){

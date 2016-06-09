@@ -878,7 +878,7 @@ class Plugin implements \Serializable
      * @param bool $register
      * @return array|bool
      */
-    public function detectStreamWrapper($register = false)
+    public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if (isSet($this->streamData)) {
             if($this->streamData === false) return false;
@@ -905,7 +905,7 @@ class Plugin implements \Serializable
             $this->streamData = $streamData;
         }
         if ($register) {
-            $pServ = PluginsService::getInstance();
+            $pServ = PluginsService::getInstance($ctx);
             $wrappers = stream_get_wrappers();
             if (!in_array($streamData["protocol"], $wrappers)) {
                 stream_wrapper_register($streamData["protocol"], $streamData["classname"]);

@@ -68,7 +68,8 @@ class PluploadProcessor extends Plugin
             $dir = Utils::securePath($httpVars["dir"]);
             $destStreamURL = $userSelection->currentBaseUrl().$dir."/";
 
-            $driver = ConfService::loadDriverForRepository($repository);
+            $parentNode = new AJXP_Node($userSelection->currentBaseUrl());
+            $driver = $parentNode->getDriver();
             $remote = false;
             if (method_exists($driver, "storeFileToCopy")) {
                 $remote = true;

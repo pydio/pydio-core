@@ -171,7 +171,8 @@ class AJXP_Node implements \JsonSerializable
         if (!isSet($this->_accessDriver)) {
             $repo = $this->getRepository();
             if ($repo != null) {
-                $this->_accessDriver = ConfService::loadDriverForRepository($repo);
+                $accessType = $repo->getAccessType();
+                $this->_accessDriver = PluginsService::getInstance($this->getContext())->getPluginByTypeName("access", $accessType);
             }
         }
         return $this->_accessDriver;
@@ -454,7 +455,7 @@ class AJXP_Node implements \JsonSerializable
             $registered = PluginsService::getInstance($this->getContext())->getRegisteredWrappers();
             if (!isSet($registered[$this->getScheme()])) {
                 $driver = $this->getDriver();
-                if(is_object($driver)) $driver->detectStreamWrapper(true);
+                if(is_object($driver)) $driver->detectStreamWrapper(true, $this->getContext());
             }
         }
         Controller::applyHook("node.info.start", array(&$this, $contextNode, $details, $forceRefresh));

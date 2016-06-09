@@ -72,7 +72,6 @@ class sftpAccessDriver extends fsAccessDriver
         ConfService::setConf("PROBE_REAL_SIZE", false);
         $path       = $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
         $recycle    = $contextInterface->getRepository()->getContextOption($contextInterface, "RECYCLE_BIN");
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
         restore_error_handler();
         if (!file_exists($contextInterface->getUrlBase())) {

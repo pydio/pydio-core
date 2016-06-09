@@ -99,7 +99,6 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $path = TextEncoder::toStorageEncoding($repository->getContextOption($contextInterface, "PATH"));
         $recycle = $repository->getContextOption($contextInterface, "RECYCLE_BIN");
         $chmod = $repository->getContextOption($contextInterface, "CHMOD_VALUE");
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
 
 
@@ -366,7 +365,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
+        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase())) == "fsAccessWrapper") {
             $dir = fsAccessWrapper::patchPathForBaseDir($dir);
         }
         $dir = Utils::securePath($dir);
@@ -1120,8 +1119,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }else{
                     $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
                 }
-                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
+                $patch = false;
+                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($selection->currentBaseUrl())) == "fsAccessWrapper") {
                     $dir = fsAccessWrapper::patchPathForBaseDir($dir);
+                    $patch = true;
                 }
                 $dir = Utils::securePath($dir);
 
@@ -1139,7 +1140,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $startTime = microtime();
                 $path = $selection->nodeForPath(($dir!= ""?($dir[0]=="/"?"":"/").$dir:""))->getUrl();
                 $nonPatchedPath = $path;
-                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ctx->getRepositoryId()) == "fsAccessWrapper") {
+                if ($patch) {
                     $nonPatchedPath = fsAccessWrapper::unPatchPathForBaseDir($path);
                 }
                 $testPath = @stat($path);
@@ -2193,7 +2194,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function setHiddenAttribute($node){
-        if(AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node->getRepositoryId()) == "fsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
+        if(AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node) == "fsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
             $realPath =  AJXP_MetaStreamWrapper::getRealFSReference($node->getUrl());
             @shell_exec("attrib +H " . escapeshellarg($realPath));
         }

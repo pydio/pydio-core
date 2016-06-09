@@ -68,16 +68,15 @@ class sftpPSLAccessDriver extends fsAccessDriver
 
         require_once($this->getBaseDir()."/SFTPPSL_StreamWrapper.php");
         
-        $this->detectStreamWrapper(true);
         $this->urlBase = $contextInterface->getUrlBase();
     }
 
-    public function detectStreamWrapper($register = false)
+    public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if ($register) {
             require_once($this->getBaseDir()."/SFTPPSL_StreamWrapper.php");
         }
-        return parent::detectStreamWrapper($register);
+        return parent::detectStreamWrapper($register, $ctx);
     }
 
     /**

@@ -67,6 +67,7 @@ abstract class AbstractAccessDriver extends Plugin
             throw new PydioException("Cannot instanciate an access plugin without a valid repository");
         }
         $this->repository = $ctx->getRepository();
+        $this->detectStreamWrapper(true, $ctx);
         $this->initRepository($ctx);
     }
 
@@ -157,14 +158,16 @@ abstract class AbstractAccessDriver extends Plugin
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();
 
+        $crtUser = $ctx->getUser()->getId();
         $repositoryId = $this->repository->getId();
-        AJXP_MetaStreamWrapper::detectWrapperForRepository($this->repository, true);
-        $origStreamURL = "pydio://$repositoryId";
+        $origStreamURL = "pydio://$crtUser@$repositoryId";
+        $origNode = new AJXP_Node($origStreamURL);
+        AJXP_MetaStreamWrapper::detectWrapperForNode($origNode, true);
 
         $destRepoId = $httpVars["dest_repository_id"];
-        $destRepoObject = RepositoryService::getRepositoryById($destRepoId);
-        AJXP_MetaStreamWrapper::detectWrapperForRepository($destRepoObject, true);
-        $destStreamURL = "pydio://$destRepoId";
+        $destStreamURL = "pydio://$crtUser@$destRepoId";
+        $destNode = new AJXP_Node($destStreamURL);
+        AJXP_MetaStreamWrapper::detectWrapperForNode($destNode, true);
 
         // Check rights
         if (UsersService::usersEnabled()) {
