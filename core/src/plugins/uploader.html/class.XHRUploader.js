@@ -745,31 +745,33 @@ Class.create("XHRUploader", {
         return false;
     },
 	
-	initializeXHR : function(item, queryStringParam, forceDir){
+	initializeXHR : function(item, queryStringParam, forceDir, callback){
 
         var currentDir = this.contextNode.getPath();
         if(forceDir) currentDir = forceDir;
 
-        console.log(currentDir);
-
 		var xhr = new XMLHttpRequest();
-        xhr.withCredentials = true;
-		/* var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(currentDir);
-		if(queryStringParam){
-			uri += '&' + queryStringParam;
-		}
+        var uri;
 
-        */uri = 'http://localhost:5000/io/' + pydio.user.activeRepository + currentDir;
+        if (!this.configs.get("UPLOAD_ACTIVE")) {
+            xhr.withCredentials = true;
 
-        var uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;;
+            var uri = ajxpBootstrap.parameters.get('ajxpServerAccess') + "&get_action=upload&xhr_uploader=true&dir=" + encodeURIComponent(currentDir);
 
-        //console.log(queryStringParam);
+            if (queryStringParam) {
+                uri += '&' + queryStringParam;
+            }
+        } else {
+            uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;
+        }
+
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
 			if (!e.lengthComputable) return;
 			item.updateProgress(e);
         	this.updateTotalData();
 		}.bind(this), false);
+
 		xhr.onreadystatechange = function() {  
 			if (xhr.readyState == 4) {
 				item.updateProgress(null, 100);
@@ -787,13 +789,23 @@ Class.create("XHRUploader", {
 			}
 		}.bind(this);        
         
-        upload.onerror = function(){
+        upload.onerror = function() {
+            if (this.configs.get("UPLOAD_ACTIVE")) {
+                this.configs.set("UPLOAD_ACTIVE", false);
+                return this.initializeXHR(item, queryStringParam, forceDir, callback);
+            }
+
 			item.updateStatus('error');
-        };		
+        }.bind(this);
 
 		xhr.open("POST", uri, true);
-        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
-        return xhr;
+
+        try {
+            if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document';
+        } catch(e){
+        }
+
+        return callback(xhr);
 	},
 	
 	sendFileMultipart : function(item){
@@ -863,24 +875,32 @@ Class.create("XHRUploader", {
 		}else{
 			// 'overwrite' : do nothing!
 		}
-		
-		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir);
-		var file = item.file;
+
+		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir, function (item) {
+            return function (xhr) {
+
+                var file = item.file;
+
+                if(window.FormData){
+                    this.sendFileUsingFormData(xhr, file);
+                } else if(window.FileReader) {
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(e){
+                        this.xhrSendAsBinary(xhr, file.name, e.target.result, item)
+                    }.bind(this);
+                    fileReader.readAsBinaryString(file);
+                }else if(file.getAsBinary){
+                    window.testFile = file;
+                    var data = file.getAsBinary();
+                    this.xhrSendAsBinary(xhr, file.name, data, item)
+                }
+
+                return xhr;
+            }
+        }(item).bind(this));
+
         item.updateProgress(null, 0);
-		item.updateStatus('loading');		
-		if(window.FormData){
-			this.sendFileUsingFormData(xhr, file);
-		}else if(window.FileReader){
-			var fileReader = new FileReader();
-			fileReader.onload = function(e){
-				this.xhrSendAsBinary(xhr, file.name, e.target.result, item)
-			}.bind(this);
-			fileReader.readAsBinaryString(file);
-		}else if(file.getAsBinary){
-			window.testFile = file;
-			var data = file.getAsBinary();
-			this.xhrSendAsBinary(xhr, file.name, data, item)
-		}
+        item.updateStatus('loading');
 	},
 	
 	sendFileUsingFormData : function(xhr, file){
