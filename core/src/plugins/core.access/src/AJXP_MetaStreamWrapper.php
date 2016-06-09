@@ -142,11 +142,13 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      * @throws \Exception
      */
     protected static function translateScheme($url, $crtInstance = null){
-        $parts=parse_url($url);
-        $currentScheme = $parts['scheme'];
-        $context = self::actualRepositoryWrapperProtocol(new AJXP_Node($url));
-        $newScheme = self::getNextScheme($url, $context);
-        $repository = RepositoryService::getRepositoryById(parse_url($url, PHP_URL_HOST));
+
+        $node               = new AJXP_Node($url);
+        $currentScheme      = $node->getScheme();
+        $context            = self::actualRepositoryWrapperProtocol($node);
+        $newScheme          = self::getNextScheme($url, $context);
+        $repository         = $node->getRepository();
+
         if($currentScheme == "pydio" && $repository->hasContentFilter()){
 
             $contentFilter = $repository->getContentFilter();
@@ -159,13 +161,15 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
                 }
 
                 if (!empty($baseDir) || $baseDir != "/") {
-                    $crtPath = parse_url($url, PHP_URL_PATH);
+                    $crtPath = $node->getPath();
+                    if(empty($crtPath)){
+                        $crtPath = "/";
+                    }
                     $crtBase = basename($crtPath);
                     if (!empty($crtPath) && $crtPath != "/" && $crtBase != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
                         throw new \Exception("Cannot find file " . $crtBase);
                     }
-                    // Prepend baseDir in path
-                    $url = str_replace($currentScheme . "://" . $repository->getId() . $crtPath, $currentScheme . "://" . $repository->getId() . rtrim($baseDir . $crtPath, "/"), $url);
+                    $url = $node->getContext()->getUrlBase().rtrim($baseDir.$crtPath, "/");
                 }
             }
         }
