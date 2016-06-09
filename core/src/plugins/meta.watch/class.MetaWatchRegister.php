@@ -382,7 +382,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 
-        $us = new UserSelection($this->accessDriver->repository, $httpVars);
+        $us = UserSelection::fromContext($ctx, $httpVars);
         $node = $us->getUniqueNode();
         $node->loadNodeInfo();
         $cmd = $httpVars["watch_action"];

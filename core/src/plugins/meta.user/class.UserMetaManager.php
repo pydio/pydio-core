@@ -250,12 +250,11 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $user = $ctx->getUser();
-        $repo = $this->accessDriver->repository;
-        
-        if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
+
+        if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($ctx->getRepositoryId())) {
             throw new Exception("You have no right on this action.");
         }
-        $selection = new UserSelection($repo, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
 
         $nodes = $selection->buildNodes();
         $nodesDiffs = new \Pydio\Access\Core\Model\NodesDiff();

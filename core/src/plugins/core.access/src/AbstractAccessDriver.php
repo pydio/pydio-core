@@ -84,13 +84,14 @@ abstract class AbstractAccessDriver extends Plugin
     public function accessPreprocess(ServerRequestInterface &$request)
     {
         $actionName = $request->getAttribute("action");
-        $httpVars = $request->getParsedBody();
+        $ctx        = $request->getAttribute("ctx");
+        $httpVars   = $request->getParsedBody();
 
         if ($actionName == "apply_check_hook") {
             if (!in_array($httpVars["hook_name"], array("before_create", "before_path_change", "before_change"))) {
                 return;
             }
-            $selection = new UserSelection($this->repository, $httpVars);
+            $selection = UserSelection::fromContext($ctx, $httpVars);
             Controller::applyHook("node.".$httpVars["hook_name"], array($selection->getUniqueNode(), $httpVars["hook_arg"]));
         }
         if ($actionName == "ls") {

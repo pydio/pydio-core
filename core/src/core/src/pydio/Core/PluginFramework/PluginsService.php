@@ -186,7 +186,7 @@ class PluginsService
     public static function getInstance($ctx = null)
     {
         if(empty($ctx)){
-            $ctx = Context::fromGlobalServices();
+            $ctx = Context::emptyContext();
         }
         $identifier = $ctx->getStringIdentifier();
         if (!isSet(self::$instances[$identifier])) {

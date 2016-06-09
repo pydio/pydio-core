@@ -50,17 +50,16 @@ class PowerFSController extends Plugin
 
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
-
-        $selection = new UserSelection();
-        $httpVars = $request->getParsedBody();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
+
+        $httpVars = $request->getParsedBody();
         $repository = $ctx->getRepository();
 
         $dir = $httpVars["dir"] OR "";
         $dir = Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
-        $selection->initFromHttpVars($httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         if (!$selection->isEmpty()) {
             //$this->filterUserSelectionToHidden($selection->getFiles());
         }

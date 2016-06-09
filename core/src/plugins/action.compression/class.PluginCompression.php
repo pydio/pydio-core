@@ -53,16 +53,17 @@ class PluginCompression extends Plugin
      */
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
-        $messages = LocaleService::getMessages();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
-        $repository = $ctx->getRepository();
-        $userSelection = new UserSelection($repository, $httpVars);
-        $nodes = $userSelection->buildNodes();
+
+        $httpVars       = $requestInterface->getParsedBody();
+        $messages       = LocaleService::getMessages();
+
+        $userSelection  = UserSelection::fromContext($ctx, $httpVars);
+        $nodes          = $userSelection->buildNodes();
         $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
-        $currentDirUrl = $userSelection->currentBaseUrl().$currentDirPath;
+        $currentDirUrl  = $userSelection->currentBaseUrl().$currentDirPath;
         
         $serializableStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($serializableStream);

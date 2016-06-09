@@ -110,10 +110,10 @@ class FileHasher extends AJXP_AbstractMetaSource
         $this->metaStore->initMeta($ctx, $accessDriver);
     }
 
-    public function switchActions($actionName, $httpVars, $fileVars)
+    public function switchActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
-        $repository = $this->accessDriver->repository;
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
+        
         switch ($actionName) {
             case "filehasher_signature":
                 $file = $selection->getUniqueNode();

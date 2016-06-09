@@ -312,8 +312,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        $selection = new UserSelection($ctx->getRepository());
-        $selection->initFromHttpVars($request->getParsedBody());
+        $selection = UserSelection::fromContext($ctx, $request->getParsedBody());
         if($selection->isEmpty()){
             throw new PydioException("Empty resource");
         }

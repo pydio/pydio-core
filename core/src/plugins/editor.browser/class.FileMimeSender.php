@@ -49,7 +49,7 @@ class FileMimeSender extends Plugin
             }
         }
 
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
 
         if ($action == "open_file") {
             $selectedNode = $selection->getUniqueNode();

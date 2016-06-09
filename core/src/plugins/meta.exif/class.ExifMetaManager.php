@@ -120,10 +120,11 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     public function extractExif(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
-        $userSelection = new UserSelection($this->accessDriver->repository, $httpVars);
-        $selectedNode = $userSelection->getUniqueNode();
-        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+        $httpVars       = $requestInterface->getParsedBody();
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $userSelection  = UserSelection::fromContext($ctx, $httpVars);
+        $selectedNode   = $userSelection->getUniqueNode();
+        $realFile       = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
 
         Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);

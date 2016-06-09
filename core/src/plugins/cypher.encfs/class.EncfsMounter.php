@@ -55,13 +55,12 @@ class EncfsMounter extends Plugin
         }
     }
 
-    public function preProcessMove($actionName, &$httpVars, &$fileVars)
+    public function preProcessMove($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)
     {
         $destO = Utils::decodeSecureMagic($httpVars["dest"]);
         $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
         if(empty($dest)) $dest = ltrim($destO, "/");
-        $userSelection = new UserSelection();
-        $userSelection->initFromHttpVars($httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if (!$userSelection->isEmpty()) {
             $testFileO = $userSelection->getUniqueFile();
             $testFile = substr($testFileO, 1, strpos(ltrim($testFileO, "/"), "/"));

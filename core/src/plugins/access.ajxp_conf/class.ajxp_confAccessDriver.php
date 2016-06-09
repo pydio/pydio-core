@@ -1133,8 +1133,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "user_update_group":
 
-                $userSelection = new UserSelection();
-                $userSelection->initFromHttpVars($httpVars);
+                $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 $dir = $httpVars["dir"];
                 $dest = $httpVars["dest"];
                 if (isSet($httpVars["group_path"])) {
@@ -1268,8 +1267,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             case "user_update_role" :
 
                 $confStorage = ConfService::getConfStorageImpl();
-                $selection = new UserSelection();
-                $selection->initFromHttpVars($httpVars);
+                $selection = UserSelection::fromContext($ctx, $httpVars);
                 $files = $selection->getFiles();
                 $detectedRoles = array();
                 $roleId = null;

@@ -85,8 +85,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
         foreach ($httpVars as $getName=>$getValue) {
             $$getName = Utils::securePath($getValue);
         }
-        $selection = new UserSelection();
-        $selection->initFromHttpVars($httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         if (isSet($dir) && $action != "upload") {
             $safeDir = $dir;
             $dir = TextEncoder::fromUTF8($dir);

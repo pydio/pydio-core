@@ -72,8 +72,8 @@ class SvnManager extends AJXP_AbstractMetaSource
 
     protected function initDirAndSelection(ContextInterface $ctx, $httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
-        $repo = $this->accessDriver->repository;
-        $userSelection = new UserSelection($repo, $httpVars);
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
+        $repo = $userSelection->getContext()->getRepository();
         $urlBase = $userSelection->currentBaseUrl();
         $result = array();
 

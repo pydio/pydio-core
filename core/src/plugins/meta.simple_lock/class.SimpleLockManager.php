@@ -81,7 +81,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
             throw new Exception("You have no right on this action.");
         }
-        $selection = new UserSelection($repo, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
 
         $unlock = (isSet($httpVars["unlock"])?true:false);
         if ($unlock) {

@@ -87,7 +87,7 @@ class JumploaderProcessor extends Plugin
             $this->logDebug("Trying Cross-Session Resume request");
 
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-            $context = new UserSelection($repository);
+            $context = UserSelection::fromContext($ctx, $httpVars);
             $destStreamURL = $context->currentBaseUrl().$dir;
             $fileHash = md5($httpVars["fileName"]);
 
@@ -241,7 +241,7 @@ class JumploaderProcessor extends Plugin
 
         if ($httpVars["lastPartition"]) {
             $dir = Utils::decodeSecureMagic($httpVars["dir"]);
-            $context = new UserSelection($repository);
+            $context = UserSelection::fromContext($ctx, $httpVars);
             $destStreamURL = $context->currentBaseUrl().$dir."/";
 
             /* we check if the current file has a relative path (aka we want to upload an entire directory) */

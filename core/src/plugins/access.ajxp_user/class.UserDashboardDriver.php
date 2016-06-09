@@ -140,11 +140,11 @@ class UserDashboardDriver extends AbstractAccessDriver
 
             case "delete" :
                 
-                $mime = $httpVars["ajxp_mime"];
-                $selection = new UserSelection();
-                $selection->initFromHttpVars($httpVars);
-                $files = $selection->getFiles();
-                $minisites = $this->listMinisites($ctx);
+                $mime       = $httpVars["ajxp_mime"];
+                $selection  = UserSelection::fromContext($ctx, $httpVars);
+                $files      = $selection->getFiles();
+                $minisites  = $this->listMinisites($ctx);
+                
                 /**
                  * @var ShareCenter $shareCenter
                  */

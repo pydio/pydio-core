@@ -321,7 +321,7 @@ class AjxpScheduler extends Plugin
 
     }
 
-    public function placeConfigNode(&$configTree)
+    public function placeConfigNode(ContextInterface $ctx, &$configTree)
     {
         $mess = LocaleService::getMessages();
         if (isSet($configTree["parameters"])){

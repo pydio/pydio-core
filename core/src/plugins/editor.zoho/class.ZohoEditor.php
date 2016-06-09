@@ -128,12 +128,12 @@ class ZohoEditor extends Plugin
         $loggedUser = $ctx->getUser();
 
         if($loggedUser != null){
-            $repoWriteable = $loggedUser->canWrite($repository->getId());
+            $repoWriteable = $loggedUser->canWrite($ctx->getRepositoryId());
         }else{
             $repoWriteable = false;
         }
 
-        $selection = new UserSelection($repository, $httpVars);
+        $selection = UserSelection::fromContext($ctx, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
 
         if ($action == "post_to_zohoserver") {
