@@ -56,17 +56,17 @@ class AuthMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, callable $next = null){
 
+        $driverImpl = ConfService::getAuthDriverImpl();
+        PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
+
+        $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
+        if($response != null){
+            return $response;
+        }
 
         try{
 
-            $driverImpl = ConfService::getAuthDriverImpl();
-            PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
-
-            $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
-            if($response != null){
-                return $response;
-            }
-            self::bootSessionServer($requestInterface);
+            return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
         } catch (NoActiveWorkspaceException $ex){
 
@@ -77,21 +77,7 @@ class AuthMiddleware
                 throw new AuthRequiredException();
             }
 
-        } catch (RepositoryLoadException $r){
-
-            $previous = SessionService::getPreviousRepositoryId();
-            if($previous !== null){
-                SessionService::saveRepositoryId($previous);
-            }
-            throw $r;
-            
-        }
-
-        try{
-
-            return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
-
-        }catch(ActionNotFoundException $a){
+        } catch(ActionNotFoundException $a){
 
             /** @var ContextInterface $ctx */
             $ctx = $requestInterface->getAttribute("ctx");
@@ -100,136 +86,9 @@ class AuthMiddleware
             }else{
                 return new EmptyResponse();
             }
-        } catch (RepositoryLoadException $r){
-
-            $previous = SessionService::getPreviousRepositoryId();
-            if($previous !== null){
-                SessionService::saveRepositoryId($previous);
-            }
-            throw $r;
-
         }
 
-    }
-
-    protected static function bootSessionServer(ServerRequestInterface &$request){
-
-        /** @var ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
-        if(!$ctx->hasUser()){
-            SessionMiddleware::updateContext($ctx);
-            return;
-        }
-        $loggedUser = $ctx->getUser();
-        $parameters = $request->getParsedBody();
-
-        $restRepositoryId = isSet($parameters["tmp_repository_id"]) ? $parameters["tmp_repository_id"] : null;
-
-
-        $repoObject = null;
-
-        if($restRepositoryId !== null){
-
-            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $restRepositoryId);
-
-        }else{
-
-            $repoId = SessionService::getSessionRepositoryId();
-            if($repoId !== null){
-                try{
-                    $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repoId);
-                }catch (\Exception $e){
-                    $previous = SessionService::getPreviousRepositoryId();
-                    if($previous !== null){
-                        $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $previous);
-                    }
-                }
-            }else{
-                $userRepositories = UsersService::getRepositoriesForUser($loggedUser);
-                if(empty($userRepositories)){
-                    throw new NoActiveWorkspaceException();
-                }
-                $default = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
-                $lastVisited = $loggedUser->getArrayPref("history", "last_repository");
-                if($default !== -1 && array_key_exists($default, $userRepositories)){
-                    $repoObject = $userRepositories[$default];
-                }else if($lastVisited !== "" && array_key_exists($lastVisited, $userRepositories)){
-                    $repoObject = $userRepositories[$lastVisited];
-                }else{
-                    $repoObject = array_shift($userRepositories);
-                }
-            }
-
-            if($repoObject !== null){
-                SessionService::saveRepositoryId($repoObject->getId());
-                $loggedUser->setArrayPref("history", "last_repository", $repoObject->getId());
-            }
-        }
-
-
-/*
-        if (UsersService::usersEnabled() && $loggedUser !== null && !empty($repoObject)) {
-            $currentRepoId = $repoObject->getId();
-            if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
-                $loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
-                $loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-                AuthService::updateUser($loggedUser);
-                unset($_SESSION["PENDING_REPOSITORY_ID"]);
-                unset($_SESSION["PENDING_FOLDER"]);
-            }
-            $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
-            $defaultRepoId = -1;
-            // Find default ID from ACLS
-            $acls = $loggedUser->getMergedRole()->listAcls(true);
-            foreach($acls as $key => $right){
-                if (!empty($right) && ConfService::getRepositoryById($key) != null) {
-                    $defaultRepoId= $key;
-                    break;
-                }
-            }
-            if ($defaultRepoId == -1) {
-                throw new NoActiveWorkspaceException();
-            } else {
-                if ($lastRepoId !== "" && $lastRepoId!== $currentRepoId && $restRepositoryId == -1 && $loggedUser->canSwitchTo($lastRepoId)) {
-                    $repoObject = ConfService::switchRootDir($lastRepoId);
-                } else if ($restRepositoryId !== -1 && $loggedUser->canSwitchTo($restRepositoryId)) {
-                    $repoObject = ConfService::switchRootDir($restRepositoryId);
-                } else if (!$loggedUser->canSwitchTo($currentRepoId)) {
-                    $repoObject = ConfService::switchRootDir($defaultRepoId);
-                }
-            }
-
-        }
-*/
-
-        if($repoObject !== null){
-
-            $ctx->setRepositoryObject($repoObject);
-            $request = $request->withAttribute("ctx", $ctx);
-
-        }
-
-        SessionMiddleware::updateContext($ctx);
-        AJXP_Logger::updateContext($ctx);
-
-        //Set language
-        if($ctx->hasUser() && $ctx->getUser()->getPref("lang") != "") {
-            LocaleService::setLanguage($ctx->getUser()->getPref("lang"));
-        } else if(isSet($request->getCookieParams()["AJXP_lang"])) {
-            LocaleService::setLanguage($request->getCookieParams()["AJXP_lang"]);
-        }
-
-        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
-            try{
-                RolesService::bootSequence();
-            }catch (PydioException $e){
-                if($request->getAttribute("action") == "get_boot_gui"){
-                    $request = $request->withAttribute("flash", $e->getMessage());
-                }else{
-                    throw $e;
-                }
-            }
-        }
+        return $responseInterface;
 
     }
 

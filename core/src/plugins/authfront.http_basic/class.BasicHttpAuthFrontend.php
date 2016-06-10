@@ -70,8 +70,8 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend {
             
             $loggedUser = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false, "-1");
             $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
-
             return true;
+            
         }catch (\Pydio\Core\Exception\LoginException $l){
             if($isLast && $l->getLoginError() !== -4){
                 $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);

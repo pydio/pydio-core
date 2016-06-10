@@ -165,14 +165,6 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
             }
             $ctx->setUserObject($loggedUser);
             $request = $request->withAttribute("ctx", $ctx);
-            $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
-            $passId = -1;
-            if (isSet($httpVars["tmp_repository_id"])) {
-                $passId = $httpVars["tmp_repository_id"];
-            } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
-                $passId = $force;
-            }
-            //ConfService::switchUserToActiveRepository($loggedUser, $passId);
             return true;
 
         }catch (\Pydio\Core\Exception\LoginException $l){

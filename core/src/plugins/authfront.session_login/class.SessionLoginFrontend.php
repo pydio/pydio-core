@@ -34,11 +34,23 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 class SessionLoginFrontend extends AbstractAuthFrontend {
 
+    /**
+     * Override parent method : disable me if applicationFirstRun ( = installation steps ).
+     * @inheritdoc
+     */
     function isEnabled(){
         if(Utils::detectApplicationFirstRun()) return false;
         return parent::isEnabled();
     }
 
+    /**
+     * Try to get the logged user directly from the session
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @return bool
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\LoginException
+     */
     protected function logUserFromSession(\Psr\Http\Message\ServerRequestInterface &$request){
 
         if(isSet($_SESSION["AJXP_USER"]) && !$_SESSION["AJXP_USER"] instanceof __PHP_Incomplete_Class && $_SESSION["AJXP_USER"] instanceof \Pydio\Core\Model\UserInterface) {
@@ -49,13 +61,13 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             if($u->reloadRolesIfRequired()){
                 ConfService::getInstance()->invalidateLoadedRepositories();
                 AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
-                //AuthService::updateUser($u);
             }
             $request = $request->withAttribute("ctx", Context::contextWithObjects($u, null));
-            //ConfService::switchRootDir();
             return true;
         }
+
         if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
+
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {
                 UsersService::createUser("guest", "");
@@ -64,29 +76,36 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             }
             $logged = AuthService::logUser("guest", null);
             $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
-            //ConfService::switchRootDir();
             return true;
         }
         return false;
 
     }
-    
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
-        $httpVars = $request->getParsedBody();
-        if($request->getAttribute("action") != "login"){
-            return $this->logUserFromSession($request);
-        }
+    /**
+     * Try to log the user from a submitted "login" action.
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @param bool $isLast
+     */
+    function logUserFromLoginAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, $isLast = false){
+
+        $httpVars = $requestInterface->getParsedBody();
         $rememberLogin = "";
         $rememberPass = "";
         $secureToken = "";
         $loggedUser = null;
         $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
         if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
+
             $loggingResult = -4;
+
         } else if($cookieLogin && !CookiesHelper::hasRememberCookie()){
+
             $loggingResult = -5;
+
         } else {
+
             if($cookieLogin){
                 list($userId, $userPass) = CookiesHelper::getRememberCookieData();
             }else{
@@ -97,10 +116,14 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             $loggingResult = 1;
 
             try{
+
                 $loggedUser = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
-                $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+                $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+
             }catch (\Pydio\Core\Exception\LoginException $l){
+
                 $loggingResult = $l->getLoginError();
+
             }
 
             if ($rememberMe && $loggingResult == 1) {
@@ -122,18 +145,6 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 ConfService::getInstance()->invalidateLoadedRepositories();
             }
 
-            $force = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
-            $passId = -1;
-            if (isSet($httpVars["tmp_repository_id"])) {
-                $passId = $httpVars["tmp_repository_id"];
-            } else if ($force != "" && $loggedUser->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
-                $passId = $force;
-            }
-            //$res = ConfService::switchUserToActiveRepository($loggedUser, $passId);
-            //if (!$res) {
-            //    AuthService::disconnect();
-            //    $loggingResult = -3;
-            //}
         }
 
         if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
@@ -142,11 +153,39 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
         $stream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $stream->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
-        $response = $response->withBody($stream);
-        return true;
+        $responseInterface = $responseInterface->withBody($stream);
+
+        return $responseInterface;
 
     }
 
+    /**
+     * Authfront implementation
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param bool $isLast
+     * @return bool
+     */
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+
+        if($request->getAttribute("action") === "login"){
+
+            return $this->logUserFromLoginAction($request, $response, $isLast);
+
+        }else{
+
+            return $this->logUserFromSession($request);
+
+        }
+
+    }
+
+    /**
+     * Action controller method
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return string
+     */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         switch ($requestInterface->getAttribute("action")) {
@@ -167,6 +206,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 break;
 
             case "get_seed" :
+
                 $seed = AuthService::generateSeed();
                 if (BruteForceHelper::suspectBruteForceLogin()) {
                     $responseInterface = new \Zend\Diactoros\Response\JsonResponse(["seed" => $seed, "captcha" => true]);
@@ -177,6 +217,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 break;
 
             case "get_captcha":
+
                 $x = new \Pydio\Core\Http\Response\AsyncResponseStream(function(){
                     restore_error_handler();
                     restore_exception_handler();
@@ -191,8 +232,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
                 break;
 
             case "back":
+
                 $responseInterface = $responseInterface->withHeader("Content-Type", "text/xml");
-                $responseInterface->getBody()->write("<url>". UsersService::getLogoutAddress(false) ."</url>");
+                $responseInterface->getBody()->write("<url>". UsersService::getLogoutAddress() ."</url>");
                 break;
 
             default;
