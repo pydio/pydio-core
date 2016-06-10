@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
@@ -82,7 +83,7 @@ class TaskService implements ITasksProvider
 
         if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
 
-            Controller::applyTaskInBackground($task);
+            CliRunner::applyTaskInBackground($task);
             return $response;
 
         }else{

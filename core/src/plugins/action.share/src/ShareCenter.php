@@ -31,6 +31,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -1087,7 +1088,7 @@ class ShareCenter extends Plugin
                         $sharedNode = $metadata["SOURCE_NODE"];
                         $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
                         $newContext = $crtContext->withRepositoryId($wsId);
-                        $sharedNodeUrl = $newContext->getUrlBase().$sharedPath;// $node->getScheme() . "://".$wsId.$sharedPath;
+                        $sharedNodeUrl = $newContext->getUrlBase().$sharedPath;
                         $result[$wsId] = array(new AJXP_Node($sharedNodeUrl), "DOWN");
                         $this->logDebug('MIRROR NODES', 'Found shared in parent - register node '.$sharedNodeUrl);
                     }
@@ -1171,12 +1172,12 @@ class ShareCenter extends Plugin
 
         $refNode = ($fromNode != null ? $fromNode : $toNode);// cannot be both null
         if(empty($direction) && $this->getContextualOption($refNode->getContext(), "FORK_EVENT_FORWARDING")){
-            Controller::applyActionInBackground(
+            OCS::applyActionInBackground(
                 $refNode->getContext(),
                 "forward_change_event",
                 array(
                     "from" => $fromNode === null ? "" : $fromNode->getUrl(),
-                    "to" =>   $toNode === null ? "" : $toNode->getUrl(),
+                    "to" => $toNode === null ? "" : $toNode->getUrl(),
                     "copy" => $copy ? "true" : "false",
                     "direction" => $direction
                 ));

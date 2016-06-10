@@ -453,7 +453,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             unset($rootNodes["admin"]);
             unset($rootNodes["developer"]);
         }
-        Controller::applyHook("ajxp_conf.list_config_nodes", array(&$rootNodes));
+        Controller::applyHook("ajxp_conf.list_config_nodes", array($ctx, &$rootNodes));
         return $rootNodes;
     }
 

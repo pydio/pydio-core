@@ -90,7 +90,7 @@ class MinisiteRenderer
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
-        Controller::applyHook("tpl.filter_html", array(&$html));
+        Controller::applyHook("tpl.filter_html", array(Context::emptyContext(), &$html));
         $html = XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
@@ -151,7 +151,6 @@ class MinisiteRenderer
                         }
                     }
                 }
-                Controller::registryReset();
                 $ctx = Context::fromGlobalServices();
                 $req =  Controller::executableRequest($ctx, $ACTION, $params);
                 $response = Controller::run($req);

@@ -65,6 +65,9 @@ class AJXP_ClientDriver extends Plugin
         }
     }
 
+    /*******************
+     * ACTIONS METHODS
+     *******************/
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -140,7 +143,7 @@ class AJXP_ClientDriver extends Plugin
         $userAgent = $request->getServerParams()['HTTP_USER_AGENT'];
         if (!preg_match('/MSIE 7/',$userAgent) && !preg_match('/MSIE 8/',$userAgent)) {
             $preloadedBootConf = $this->computeBootConf($ctx);
-            Controller::applyHook("loader.filter_boot_conf", array(&$preloadedBootConf));
+            Controller::applyHook("loader.filter_boot_conf", array($ctx, &$preloadedBootConf));
             $START_PARAMETERS["PRELOADED_BOOT_CONF"] = $preloadedBootConf;
         }
 
@@ -196,42 +199,19 @@ class AJXP_ClientDriver extends Plugin
         }
 
     }
-
-    public function switchAction($action, $httpVars, $fileVars)
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return bool
+     */
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         if (!defined("AJXP_THEME_FOLDER")) {
             define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
         }
-        foreach ($httpVars as $getName=>$getValue) {
-            $$getName = Utils::securePath($getValue);
-        }
-        $mess = LocaleService::getMessages();
 
-        switch ($action) {
-            //------------------------------------
-            //	GET AN HTML TEMPLATE
-            //------------------------------------
-            case "get_template":
-
-                HTMLWriter::charsetHeader();
-                $folder = CLIENT_RESOURCES_FOLDER."/html";
-                if (isSet($httpVars["pluginName"])) {
-                    $folder = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".Utils::securePath($httpVars["pluginName"]);
-                    if (isSet($httpVars["pluginPath"])) {
-                        $folder.= "/".Utils::securePath($httpVars["pluginPath"]);
-                    }
-                }
-                $thFolder = AJXP_THEME_FOLDER."/html";
-                if (isset($template_name)) {
-                    if (is_file($thFolder."/".$template_name)) {
-                        include($thFolder."/".$template_name);
-                    } else if (is_file($folder."/".$template_name)) {
-                        include($folder."/".$template_name);
-                    }
-                }
-
-            break;
+        switch ($requestInterface->getAttribute("action")) {
 
             //------------------------------------
             //	GET I18N MESSAGES
@@ -243,13 +223,8 @@ class AJXP_ClientDriver extends Plugin
                     LocaleService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
-                if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
-                    HTMLWriter::charsetHeader("application/json");
-                    echo json_encode(LocaleService::getMessages($refresh));
-                }else{
-                    HTMLWriter::charsetHeader('text/javascript');
-                    HTMLWriter::writeI18nMessagesClass(LocaleService::getMessages($refresh));
-                }
+                HTMLWriter::charsetHeader("application/json");
+                echo json_encode(LocaleService::getMessages($refresh));
 
             break;
 
@@ -258,8 +233,9 @@ class AJXP_ClientDriver extends Plugin
             //------------------------------------
             case "display_doc":
 
-                HTMLWriter::charsetHeader();
-                echo HTMLWriter::getDocFile(Utils::securePath(htmlentities($httpVars["doc_file"])));
+                $responseInterface = $responseInterface->withHeader("Content-type", "text/plain;charset=UTF-8");
+                $docPath = Utils::securePath(htmlentities($requestInterface->getParsedBody()["doc_file"]));
+                $responseInterface->getBody()->write(HTMLWriter::getDocFile($docPath));
 
             break;
 
@@ -271,11 +247,91 @@ class AJXP_ClientDriver extends Plugin
         return false;
     }
 
+    /************************
+     * HOOKS FOR BOOKMARKS
+     ************************/
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @return void
+     */
+    public function nodeBookmarkMetadata(&$ajxpNode)
+    {
+        $user = $ajxpNode->getContext()->getUser();
+        if(empty($user)) return;
+        $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        if (is_array($metadata) && count($metadata)) {
+            $ajxpNode->mergeMetadata(array(
+                     "ajxp_bookmarked" => "true",
+                     "overlay_icon"  => "bookmark.png",
+                     "overlay_class" => "icon-bookmark-empty"
+                ), true);
+            return;
+        }
+        if (!isSet(self::$loadedBookmarks)) {
+            self::$loadedBookmarks = $user->getBookmarks($ajxpNode->getRepositoryId());
+        }
+        foreach (self::$loadedBookmarks as $bm) {
+            if ($bm["PATH"] == $ajxpNode->getPath()) {
+                $ajxpNode->mergeMetadata(array(
+                         "ajxp_bookmarked" => "true",
+                         "overlay_icon"  => "bookmark.png",
+                        "overlay_class" => "icon-bookmark-empty"
+                    ), true);
+                $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+            }
+        }
+    }
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $fromNode
+     * @param \Pydio\Access\Core\Model\AJXP_Node $toNode
+     * @param bool $copy
+     */
+    public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){
+        if($copy || $fromNode == null) return;
+        $user = $fromNode->getContext()->getUser();
+        if($user == null) return;
+        if (!isSet(self::$loadedBookmarks)) {
+            self::$loadedBookmarks = $user->getBookmarks($fromNode->getRepositoryId());
+        }
+        if($toNode == null) {
+            $fromNode->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        } else {
+            $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
+        }
+        Controller::applyHook("msg.instant", array($fromNode->getContext(), "<reload_bookmarks/>", $user->getId()));
+    }
+
+
+    /************************
+     * XML.FILTER INCLUDE HOOK
+     ************************/
+    public static function filterXml(&$value)
+    {
+        $instance = PluginsService::getInstance(Context::emptyContext())->findPlugin("gui", "ajax");
+        if($instance === false) return null;
+        $confs = $instance->getConfigs();
+        $theme = $confs["GUI_THEME"];
+        if (!defined("AJXP_THEME_FOLDER")) {
+            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
+        }
+        $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
+        if (isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])) {
+            $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
+        } else {
+            $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
+        }
+        return $value;
+    }
+
+    /************************
+     * PRIVATE FUNCTIONS
+     ************************/
     /**
      * @param ContextInterface $ctx
      * @return array
      */
-    public function computeBootConf(ContextInterface $ctx)
+    private function computeBootConf(ContextInterface $ctx)
     {
         if (isSet($_GET["server_prefix_uri"])) {
             $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
@@ -337,76 +393,6 @@ class AJXP_ClientDriver extends Plugin
         return $config;
     }
 
-    /**
-     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
-     * @return void
-     */
-    public function nodeBookmarkMetadata(&$ajxpNode)
-    {
-        $user = $ajxpNode->getContext()->getUser();
-        if(empty($user)) return;
-        $metadata = $ajxpNode->retrieveMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-        if (is_array($metadata) && count($metadata)) {
-            $ajxpNode->mergeMetadata(array(
-                     "ajxp_bookmarked" => "true",
-                     "overlay_icon"  => "bookmark.png",
-                     "overlay_class" => "icon-bookmark-empty"
-                ), true);
-            return;
-        }
-        if (!isSet(self::$loadedBookmarks)) {
-            self::$loadedBookmarks = $user->getBookmarks($ajxpNode->getRepositoryId());
-        }
-        foreach (self::$loadedBookmarks as $bm) {
-            if ($bm["PATH"] == $ajxpNode->getPath()) {
-                $ajxpNode->mergeMetadata(array(
-                         "ajxp_bookmarked" => "true",
-                         "overlay_icon"  => "bookmark.png",
-                        "overlay_class" => "icon-bookmark-empty"
-                    ), true);
-                $ajxpNode->setMetadata("ajxp_bookmarked", array("ajxp_bookmarked"=> "true"), true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-            }
-        }
-    }
-
-    /**
-     * @param \Pydio\Access\Core\Model\AJXP_Node $fromNode
-     * @param \Pydio\Access\Core\Model\AJXP_Node $toNode
-     * @param bool $copy
-     */
-    public function nodeChangeBookmarkMetadata($fromNode=null, $toNode=null, $copy=false){
-        if($copy || $fromNode == null) return;
-        $user = $fromNode->getContext()->getUser();
-        if($user == null) return;
-        if (!isSet(self::$loadedBookmarks)) {
-            self::$loadedBookmarks = $user->getBookmarks($fromNode->getRepositoryId());
-        }
-        if($toNode == null) {
-            $fromNode->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-        } else {
-            $toNode->copyOrMoveMetadataFromNode($fromNode, "ajxp_bookmarked", "move", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
-        }
-        Controller::applyHook("msg.instant", array($fromNode->getContext(), "<reload_bookmarks/>", $user->getId()));
-    }
-
-    public static function filterXml(&$value)
-    {
-        $instance = PluginsService::getInstance(Context::emptyContext())->findPlugin("gui", "ajax");
-        if($instance === false) return null;
-        $confs = $instance->getConfigs();
-        $theme = $confs["GUI_THEME"];
-        if (!defined("AJXP_THEME_FOLDER")) {
-            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
-        }
-        $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
-        if (isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])) {
-            $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
-        } else {
-            $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
-        }
-        return $value;
-    }
 }
 
 Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\Ajax\\AJXP_ClientDriver", "filterXml"));

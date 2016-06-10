@@ -26,6 +26,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
@@ -43,7 +44,7 @@ use Pydio\Metastore\Core\MetaStoreProvider;
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Node implements \JsonSerializable
+class AJXP_Node implements \JsonSerializable, ContextProviderInterface
 {
     /**
      * @var string URL of the node in the form ajxp.protocol://repository_id/path/to/node
@@ -137,6 +138,9 @@ class AJXP_Node implements \JsonSerializable
         $this->parseUrl();
     }
 
+    /**
+     * @return RepositoryInterface
+     */
     public function getRepository()
     {
         if (!isSet($this->_repository)) {
@@ -144,7 +148,11 @@ class AJXP_Node implements \JsonSerializable
         }
         return $this->_repository;
     }
-    
+
+    /**
+     * @return ContextInterface
+     * @throws \Exception
+     */
     public function getContext(){
         if(empty($this->_user)){
             throw new \Exception("Missing user in node URL");
@@ -157,6 +165,10 @@ class AJXP_Node implements \JsonSerializable
         return $ctx;
     }
 
+    /**
+     * @param string $pathSegment
+     * @return AJXP_Node
+     */
     public function createChildNode($pathSegment){
         $n = new AJXP_Node($this->getUrl()."/".$pathSegment);
         $n->setUserId($this->getUserId());

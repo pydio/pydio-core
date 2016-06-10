@@ -321,6 +321,7 @@ div#overlay.form-login_form_dynamic {
   float: none;
   left: 0;
   width: 100%;
+  height: 100%;
 }
 #ajxp_unique_strip #cpane_header {
   padding-bottom: 7px;
@@ -385,6 +386,7 @@ div#overlay.form-login_form_dynamic {
   position: absolute;
   width: 100%;
   top: 0;
+  height: 100%;
   overflow: hidden;
 }
 #ajxp_unique_dl #background_container {
@@ -462,6 +464,7 @@ div#overlay.form-login_form_dynamic {
 #ajxp_film_strip #cpane_container {
   left: 0;
   width: 100%;
+  height: 100%;
   float: none;
 }
 #ajxp_film_strip div#breadcrumb {

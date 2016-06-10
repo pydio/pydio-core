@@ -105,7 +105,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
      * @param integer $limit
      * @param bool $enlargeToOwned
      * @param string $userId
-     * @return An array of stdClass objects with keys hookname, arguments, author, date, repository
+     * @return array An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
     public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId)
     {

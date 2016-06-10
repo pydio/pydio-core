@@ -581,7 +581,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $response = $response->withBody($fileReader);
                 } else {
                     $localName = "";
-                    Controller::applyHook("dl.localname", array($selection->getUniqueNode()->getUrl(), &$localName));
+                    Controller::applyHook("dl.localname", array($selection->getUniqueNode(), &$localName));
                     $fileReader = new FileReaderResponse($selection->getUniqueNode());
                     $fileReader->setLocalName($localName);
                     $response = $response->withBody($fileReader);
@@ -1810,7 +1810,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }else{
                 $bName = basename($selectedFile);
                 $localName = '';
-                Controller::applyHook("dl.localname", array($selectedFile, &$localName));
+                Controller::applyHook("dl.localname", array(new AJXP_Node($selectedFile), &$localName));
                 if(!empty($localName)) $bName = $localName;
                 $destFile = $destDir ."/". $bName;
             }
@@ -2253,7 +2253,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
                 }
             }
-            Controller::applyHook("workspace.share_metasources", array(&$newOptions["META_SOURCES"]));
+            Controller::applyHook("workspace.share_metasources", array($ctx, &$newOptions["META_SOURCES"]));
         }
         return $newOptions;
     }

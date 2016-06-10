@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
@@ -45,7 +46,7 @@ define('AJXP_NOTIF_NODE_MOVE_FROM', "move_from");
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AJXP_Notification
+class AJXP_Notification implements ContextProviderInterface
 {
 
     /**
@@ -366,5 +367,14 @@ class AJXP_Notification
     public function getRelatedNotifications()
     {
         return $this->relatedNotifications;
+    }
+
+    /**
+     * Returns a valid context
+     * @return \Pydio\Core\Model\ContextInterface
+     */
+    public function getContext()
+    {
+        return $this->getNode()->getContext();
     }
 }

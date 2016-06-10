@@ -533,7 +533,7 @@ class ShareRightsManager
         }
         if(!$isHidden){
             // This is an explicit user creation - check possible limits
-            Controller::applyHook("user.before_create", array($userName, null, false, false));
+            Controller::applyHook("user.before_create", array($this->context, $userName, null, false, false));
             $limit = $parentUser->getMergedRole()->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
             if (!empty($limit) && intval($limit) > 0) {
                 $count = count($confDriver->getUserChildren($parentUser->getId()));
@@ -553,7 +553,7 @@ class ShareRightsManager
             $userObject->setHidden(true);
             $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $display);
         }
-        Controller::applyHook("user.after_create", array($userObject));
+        Controller::applyHook("user.after_create", array($this->context, $userObject));
 
         return $userObject;
 

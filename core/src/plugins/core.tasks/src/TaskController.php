@@ -23,6 +23,7 @@ namespace Pydio\Tasks;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
@@ -97,7 +98,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 $this->initTaskFromApi($request, $newTask);
                 $taskService->createTask($newTask, $newTask->getSchedule());
                 if($newTask->getSchedule()->shouldRunNow()){
-                    Controller::applyTaskInBackground($newTask);
+                    CliRunner::applyTaskInBackground($newTask);
                 }
                 $response = new JsonResponse($newTask);
                 break;

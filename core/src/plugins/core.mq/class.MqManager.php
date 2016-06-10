@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -250,7 +251,7 @@ class MqManager extends Plugin
 
     }
 
-    public function appendRefreshInstruction(ResponseInterface &$responseInterface){
+    public function appendRefreshInstruction(ContextInterface $ctx, ResponseInterface &$responseInterface){
         if(! $this->hasPendingMessage ){
             return;
         }
@@ -391,7 +392,7 @@ class MqManager extends Plugin
         }
         $cmd = ConfService::getCoreConf("CLI_PHP")." worker.php";
         chdir(AJXP_INSTALL_PATH);
-        $process = Controller::runCommandInBackground($cmd, AJXP_CACHE_DIR."/cmd_outputs/worker.log");
+        $process = CliRunner::runCommandInBackground($cmd, AJXP_CACHE_DIR . "/cmd_outputs/worker.log");
         if ($process != null) {
             $pId = $process->getPid();
             file_put_contents($pidFile, $pId);
@@ -520,7 +521,7 @@ class MqManager extends Plugin
 
         $cmd = "env TMPDIR=/tmp ". ConfService::getCoreConf("CLI_PYDIO")." -conf ".$caddyFile . " 2>&1 | tee pydio.out";
 
-        $process = Controller::runCommandInBackground($cmd, null);
+        $process = CliRunner::runCommandInBackground($cmd, null);
         if ($process != null) {
             $pId = $process->getPid();
             file_put_contents($pidFile, $pId);

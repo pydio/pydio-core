@@ -418,9 +418,10 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     /**
      * Passes the array of META_SOURCES options before creating the shared workspace.
      * Used here to disable the repository_specific_keywords, as path is in fact already fully resolved.
+     * @param ContextInterface $context
      * @param $metaOptions array
      */
-    public function updateSharedChildOptions(&$metaOptions){
+    public function updateSharedChildOptions($context, &$metaOptions){
         if(isSet($metaOptions["index.lucene"]) && isSet($metaOptions["index.lucene"]["repository_specific_keywords"])){
             unset($metaOptions["index.lucene"]["repository_specific_keywords"]);
         }

@@ -21,6 +21,7 @@
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -200,7 +201,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     public function resyncAction($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
-            Controller::applyActionInBackground($contextInterface, "resync_storage", $httpVars);
+            CliRunner::applyActionInBackground($contextInterface, "resync_storage", $httpVars);
         }else{
             $file = $this->getResyncTimestampFile($contextInterface, true);
             file_put_contents($file, time());
@@ -634,9 +635,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     }
 
     /**
+     * @param ContextInterface $context
      * @param array $metaSourcesOptions
      */
-    public function setIndexationRequiredFlag(&$metaSourcesOptions){
+    public function setIndexationRequiredFlag($context, &$metaSourcesOptions){
         if(isSet($metaSourcesOptions["meta.syncable"]) && (!isSet($metaSourcesOptions["meta.syncable"]["REPO_SYNCABLE"]) || $metaSourcesOptions["meta.syncable"]["REPO_SYNCABLE"] === true )){
             $metaSourcesOptions["meta.syncable"]["REQUIRES_INDEXATION"] = true;
         }

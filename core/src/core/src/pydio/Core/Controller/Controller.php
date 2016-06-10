@@ -20,25 +20,22 @@
  */
 namespace Pydio\Core\Controller;
 
+use Zend\Diactoros\Response;
+use Zend\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\Model\AJXP_Node;
+
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\ContextProviderInterface;
+
+use Pydio\Core\Services;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\UsersService;
+use Pydio\Log\Core\AJXP_Logger;
+
 use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Model\Context;
-use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\UnixProcess;
-use Pydio\Log\Core\AJXP_Logger;
-use Pydio\Tasks\Task;
-use Pydio\Tasks\TaskService;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -50,22 +47,21 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class Controller
 {
     /**
-     * @var \DOMXPath
+     * @var \DOMXPath[]
      */
-    private static $xPath;
-    /**
-     * @var bool
-     */
-    public static $lastActionNeedsAuth = false;
+    private static $xPathes = [];
     /**
      * @var array
      */
-    private static $includeHooks = array();
-
-    private static $hooksCache = array();
+    private static $includeHooks = [];
+    /**
+     * @var array
+     */
+    private static $hooksCaches = [];
 
     /**
-     * Initialize the queryable xPath object
+     * Initialize the queryable xPath object, pointing to the registry associated
+     * with the current context
      * @static
      * @param ContextInterface $ctx
      * @param bool $useCache Whether to cache the registry version in a memory cache.
@@ -73,25 +69,22 @@ class Controller
      */
     private static function initXPath($ctx, $useCache = false)
     {
-        if (!isSet(self::$xPath)) {
+        $ctxId = $ctx->getStringIdentifier();
+        if (!isSet(self::$xPathes[$ctxId])) {
             $registry = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(false, false, $useCache);
-            self::$xPath = new \DOMXPath($registry);
+            self::$xPathes[$ctxId] = new \DOMXPath($registry);
         }
-        return self::$xPath;
+        return self::$xPathes[$ctxId];
     }
-
-    public static function registryReset(){
-        self::$xPath = null;
-        self::$hooksCache = array();
-    }
-
 
     /**
+     * API V1 : parse parameters based on the URL and their definitions in the manifest.
      * @param ServerRequestInterface $request
      * @return bool|\DOMElement
      * @throws ActionNotFoundException
      */
     public static function parseRestParameters(ServerRequestInterface &$request){
+
         $actionName = $request->getAttribute("action");
         $path = $request->getAttribute("rest_path");
         $ctx = $request->getAttribute("ctx");
@@ -126,9 +119,12 @@ class Controller
         $reqParameters = array_merge($reqParameters, array_combine($paramNames, $paramValues));
         $request = $request->withParsedBody($reqParameters);
         return $action;
+
     }
 
     /**
+     * Middleware entry point
+     *
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @param callable|null $nextCallable
@@ -148,6 +144,8 @@ class Controller
     }
 
     /**
+     * Check if mandatory parameters as defined in the manifests are correct.
+     *
      * @static
      * @param array $parameters
      * @param \DOMNode $callbackNode
@@ -182,6 +180,7 @@ class Controller
     /**
      * Main method for querying the XML registry, find an action and all its associated processors,
      * and apply all the callbacks.
+     *
      * @static
      * @param ServerRequestInterface $request
      * @param \DOMNode $actionNode
@@ -191,7 +190,9 @@ class Controller
     public static function run(ServerRequestInterface $request, &$actionNode = null)
     {
         $actionName = $request->getAttribute("action");
+        /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
+
         $xPath = self::initXPath($ctx, true);
         if ($actionNode == null) {
             $actions = $xPath->query("actions/action[@name='$actionName']");
@@ -200,7 +201,6 @@ class Controller
             }
             $actionNode = $actions->item(0);
         }
-        /** @var ContextInterface $ctx */
         //Check Rights
         if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
@@ -248,21 +248,9 @@ class Controller
             }
         }
 
-        self::applyHook("response.send", array(&$response));
+        self::applyHook("response.send", array($ctx, &$response));
 
         return $response;
-    }
-
-    /**
-     * @param Task $task
-     */
-    public static function applyTaskInBackground(Task $task){
-
-        $parameters = $task->getParameters();
-        $task->setStatus(Task::STATUS_RUNNING);
-        TaskService::getInstance()->updateTask($task);
-        self::applyActionInBackground($task->getContext(), $task->getAction(), $parameters, "", $task->getId());
-
     }
 
     /**
@@ -280,103 +268,6 @@ class Controller
         return $request;
     }
 
-    /**
-     * Launch a command-line version of the framework by passing the actionName & parameters as arguments.
-     * @static
-     * @param ContextInterface $ctx
-     * @param String $actionName
-     * @param array $parameters
-     * @param string $statusFile
-     * @param string $taskId
-     * @return null|UnixProcess
-     */
-    public static function applyActionInBackground(ContextInterface $ctx, $actionName, $parameters, $statusFile = "", $taskId = null)
-    {
-        $repositoryId = $ctx->getRepositoryId();
-        $user = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
-
-        $token = md5(time());
-        $logDir = AJXP_CACHE_DIR."/cmd_outputs";
-        if(!is_dir($logDir)) mkdir($logDir, 0755);
-        $logFile = $logDir."/".$token.".out";
-
-        if (UsersService::usersEnabled()) {
-            $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
-            if(empty($cKey)){
-                $cKey = "\1CDAFx¨op#";
-            }
-            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($token.$cKey), $user, MCRYPT_MODE_ECB));
-        }
-        $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
-        $cmd = ConfService::getCoreConf("CLI_PHP")." ".$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
-        /* Inserted next 3 lines to quote the command if in windows - rmeske*/
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            $cmd = ConfService::getCoreConf("CLI_PHP")." ".chr(34).$robustInstallPath.DIRECTORY_SEPARATOR."cmd.php".chr(34)." -u=$user -t=$token -a=$actionName -r=$repositoryId";
-        }
-        if (!empty($statusFile)) {
-            $cmd .= " -s=".$statusFile;
-        }
-        if (!empty($taskId)) {
-            $cmd .= " -k=".$taskId;
-        }
-        foreach ($parameters as $key=>$value) {
-            if($key == "action" || $key == "get_action") continue;
-            if(is_array($value)){
-                $index = 0;
-                foreach($value as $v){
-                    $cmd .= " --file_".$index."=".escapeshellarg($v);
-                    $index++;
-                }
-            }else{
-                $cmd .= " --$key=".escapeshellarg($value);
-            }
-        }
-
-        $repoObject = $ctx->getRepository();
-        $clearEnv = false;
-        if($repoObject->getContextOption($ctx, "USE_SESSION_CREDENTIALS")){
-            $encodedCreds = AJXP_Safe::getEncodedCredentialString();
-            if(!empty($encodedCreds)){
-                putenv("AJXP_SAFE_CREDENTIALS=".$encodedCreds);
-                $clearEnv = "AJXP_SAFE_CREDENTIALS";
-            }
-        }
-
-        $res = self::runCommandInBackground($cmd, $logFile);
-        if(!empty($clearEnv)){
-            putenv($clearEnv);
-        }
-        return $res;
-    }
-
-    /**
-     * @param $cmd
-     * @param $logFile
-     * @return UnixProcess|null
-     */
-    public static function runCommandInBackground($cmd, $logFile)
-    {
-        if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-              if(AJXP_SERVER_DEBUG) $cmd .= " > ".$logFile;
-              if (class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")) {
-                  $WshShell   = new COM("WScript.Shell");
-                  $oExec      = $WshShell->Run("cmd /C $cmd", 0, false);
-              } else {
-                  $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
-                  $tmpBat = implode(DIRECTORY_SEPARATOR, array( $basePath, "data","tmp", md5(time()).".bat"));
-                  $cmd = "@chcp 1252 > nul \r\n".$cmd;
-                  $cmd .= "\n DEL ".chr(34).$tmpBat.chr(34);
-                  AJXP_Logger::debug("Writing file $cmd to $tmpBat");
-                  file_put_contents($tmpBat, $cmd);
-                  pclose(popen('start /b "CLI" "'.$tmpBat.'"', 'r'));
-              }
-            return null;
-        } else {
-            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG?$logFile:null));
-            AJXP_Logger::debug("Starting process and sending output dev null");
-            return $process;
-        }
-    }
 
     /**
      * Find a callback node by its xpath query, filtering with the applyCondition if the xml attribute exists.
@@ -525,12 +416,15 @@ class Controller
     }
 
     /**
-     * Find all callbacks registered for a given hook and apply them
+     * Find all callbacks registered for a given hook and apply them. Caches the hooks locally, on a
+     * per-context basis
+     *
      * @static
      * @param string $hookName
      * @param array $args
      * @param bool $forceNonDefer
-     * @return void
+     * @throws PydioException
+     * @throws \Exception
      */
     public static function applyHook($hookName, $args, $forceNonDefer = false)
     {
@@ -539,19 +433,19 @@ class Controller
             if($arg instanceof ContextInterface) {
                 $findContext = $arg;
                 break;
-            }else if($arg instanceof AJXP_Node){
+            }else if($arg instanceof ContextProviderInterface){
                 $findContext = $arg->getContext();
                 break;
             }
         }
         if($findContext == null){
-            $findContext = Context::emptyContext();
-            AJXP_Logger::debug("Controller", "Applying hook $hookName without context");
-            //throw new \Exception("No context found");
+            AJXP_Logger::error("Controller", "applyHook", "Applying hook $hookName without context");
+            throw new \Exception("No context found for hook $hookName: please make sure to pass at list one ContextInterface or Context Provider object");
         }
 
-        if(isSet(self::$hooksCache[$hookName])){
-            $hooks = self::$hooksCache[$hookName];
+        $contextId = $findContext->getStringIdentifier();
+        if(isSet(self::$hooksCaches[$contextId][$hookName])){
+            $hooks = self::$hooksCaches[$contextId][$hookName];
             foreach($hooks as $hook){
                 if (isSet($hook["applyCondition"]) && $hook["applyCondition"]!="") {
                     $apply = false;
@@ -567,7 +461,10 @@ class Controller
         $xPath = self::initXPath($findContext, true);
         $callbacks = $xPath->query("hooks/serverCallback[@hookName='$hookName']");
         if(!$callbacks->length) return ;
-        self::$hooksCache[$hookName] = array();
+        if(!isSet(self::$hooksCaches[$contextId])){
+            self::$hooksCaches[$contextId] = [];
+        }
+        self::$hooksCaches[$contextId][$hookName] = [];
         /**
          * @var $callback \DOMElement
          */
@@ -584,7 +481,7 @@ class Controller
                 "pluginId"    => $plugId,
                 "methodName"    => $methodName
             );
-            self::$hooksCache[$hookName][] = $hookCallback;
+            self::$hooksCaches[$contextId][$hookName][] = $hookCallback;
             if (!empty($applyCondition)) {
                 $apply = false;
                 eval($applyCondition);
@@ -648,26 +545,9 @@ class Controller
         $rightNode =  $rights->item(0);
         $rightAttr = $xPath->query("@".$right, $rightNode);
         if ($rightAttr->length && $rightAttr->item(0)->value == $expectedValue) {
-            //self::$lastActionNeedsAuth = true;
             return true;
         }
         return false;
     }
 
-    /**
-     * Utilitary used by the postprocesors to forward previously computed data
-     * @static
-     * @param array $postProcessData
-     * @return void
-     */
-    public static function passProcessDataThrough($postProcessData)
-    {
-        if (isSet($postProcessData["pre_processor_results"]) && is_array($postProcessData["pre_processor_results"])) {
-            print(implode("", $postProcessData["pre_processor_results"]));
-        }
-        if (isSet($postProcessData["processor_result"])) {
-            print($postProcessData["processor_result"]);
-        }
-        if(isSet($postProcessData["ob_output"])) print($postProcessData["ob_output"]);
-    }
 }

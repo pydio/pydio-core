@@ -23,6 +23,7 @@ use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\BruteForceHelper;
 use Pydio\Core\Utils\CookiesHelper;
@@ -166,7 +167,7 @@ class AuthService
         if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
             $user = isSet($_SESSION["AJXP_USER"]) ? $_SESSION["AJXP_USER"] : self::$currentUser;
             $userId = $user->id;
-            Controller::applyHook("user.before_disconnect", array($user));
+            Controller::applyHook("user.before_disconnect", array(Context::emptyContext(), $user));
             CookiesHelper::clearRememberCookie($user);
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
@@ -174,7 +175,7 @@ class AuthService
             if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
-            Controller::applyHook("user.after_disconnect", array($userId));
+            Controller::applyHook("user.after_disconnect", array(Context::emptyContext(), $userId));
         }
     }
 

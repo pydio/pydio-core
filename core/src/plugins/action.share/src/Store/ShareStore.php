@@ -500,7 +500,7 @@ class ShareStore {
                 $relativePath = "";
             }
             $modifiedDifferentNodes ++;
-            $changeOldNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$oldPath.$relativePath);
+            $changeOldNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$oldPath.$relativePath);
 
             foreach($metadata as $ownerId => $meta){
                 if(!isSet($meta["shares"])){
@@ -511,7 +511,7 @@ class ShareStore {
                 $changeNewNode = null;
                 if(!$delete){
                     //$newPath = preg_replace('#^'.preg_quote($oldPath, '#').'#', $newPath, $path);
-                    $changeNewNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$newPath.$relativePath);
+                    $changeNewNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$newPath.$relativePath);
                     $changeNewNode->setUserId($ownerId);
                 }
                 $collectedRepositories = array();
@@ -519,7 +519,7 @@ class ShareStore {
 
                 if($basePath == "/"){
                     // Just update target node!
-                    $changeMetaNode = new AJXP_Node("pydio://".$baseNode->getRepositoryId().$relativePath);
+                    $changeMetaNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$relativePath);
                     $changeMetaNode->setUserId($ownerId);
                     $this->getMetaManager()->clearNodeMeta($changeMetaNode);
                     if(count($privateShares)){
@@ -723,7 +723,10 @@ class ShareStore {
      */
     private function deleteExpiredPubliclet($elementId, $data){
 
+        // TODO: REWRITE THIS FUNCTION
+
         if($this->context->hasUser() ||  $this->context->getUser()->getId() != $data["OWNER_ID"]){
+
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
         $repoObject = $data["REPOSITORY"];
@@ -742,7 +745,7 @@ class ShareStore {
             }
         }
         if($repoLoaded && isSet($data["FILE_PATH"])){
-            Controller::registryReset();
+            // @TODO : ADD USER IN URL
             $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
         }
         $this->deleteShare($data['SHARE_TYPE'], $elementId, false, true);

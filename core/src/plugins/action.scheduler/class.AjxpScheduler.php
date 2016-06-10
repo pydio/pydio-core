@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -214,11 +215,11 @@ class AjxpScheduler extends Plugin
                 $listRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
                 $data["repository_id"] = implode(",", array_keys($listRepos));
             }
-            $process = Controller::applyActionInBackground(
+            $process = CliRunner::applyActionInBackground(
                 new Context($data["user_id"], $data["repository_id"]),
                 $data["action_name"],
                 $data["PARAMS"],
-                AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status");
+                AJXP_CACHE_DIR . "/cmd_outputs/task_" . $taskId . ".status");
             if ($process != null &&  ($process instanceof UnixProcess)) {
                 $this->setTaskStatus($taskId, "RUNNING:".$process->getPid());
             } else {

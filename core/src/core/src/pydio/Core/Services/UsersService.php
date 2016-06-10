@@ -22,9 +22,9 @@ namespace Pydio\Core\Services;
 
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\FilteredRepositoriesList;
 use Pydio\Core\Model\RepositoryInterface;
@@ -262,9 +262,10 @@ class UsersService
         }
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
-        Controller::applyHook("user.before_password_change", array($userId));
+        $ctx = Context::emptyContext();
+        Controller::applyHook("user.before_password_change", array($ctx, $userId));
         $authDriver->changePassword($userId, $userPass);
-        Controller::applyHook("user.after_password_change", array($userId));
+        Controller::applyHook("user.after_password_change", array($ctx, $userId));
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
@@ -293,7 +294,8 @@ class UsersService
     public static function createUser($userId, $userPass, $isAdmin = false, $isHidden = false)
     {
         $userId = self::filterUserSensitivity($userId);
-        Controller::applyHook("user.before_create", array($userId, $userPass, $isAdmin, $isHidden));
+        $localContext = new Context($userId, null);
+        Controller::applyHook("user.before_create", array($localContext, $userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new \Exception("Reserved user id");
         }
@@ -318,7 +320,7 @@ class UsersService
             $user->setPref("AJXP_WEBDAV_DATA", $wData);
             $user->save();
         }
-        Controller::applyHook("user.after_create", array($user));
+        Controller::applyHook("user.after_create", array($localContext, $user));
         AJXP_Logger::info(__CLASS__, "Create User", array("user_id" => $userId));
         return null;
     }
@@ -347,7 +349,8 @@ class UsersService
      */
     public static function deleteUser($userId)
     {
-        Controller::applyHook("user.before_delete", array($userId));
+        $ctx = Context::emptyContext();
+        Controller::applyHook("user.before_delete", array($ctx, $userId));
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         $authDriver->deleteUser($userId);
@@ -356,7 +359,7 @@ class UsersService
         foreach ($subUsers as $deletedUser) {
             $authDriver->deleteUser($deletedUser);
         }
-        Controller::applyHook("user.after_delete", array($userId));
+        Controller::applyHook("user.after_delete", array($ctx, $userId));
         AJXP_Logger::info(__CLASS__, "Delete User", array("user_id" => $userId, "sub_user" => implode(",", $subUsers)));
         return true;
     }

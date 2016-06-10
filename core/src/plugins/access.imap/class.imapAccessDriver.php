@@ -23,6 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\Imap;
 use DOMNode;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
@@ -133,9 +134,14 @@ class imapAccessDriver extends fsAccessDriver
         $ajxpNode->metadata = $metadata;
     }
 
+    /**
+     * @param AJXP_Node $currentNode
+     * @param string $localName
+     * @param string $wrapperClassName
+     */
     public function attachmentDLName($currentNode, &$localName, $wrapperClassName)
     {
-        $parsed = parse_url($currentNode);
+        $parsed = parse_url($currentNode->getUrl());
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
             list(, $attachmentId) = explode("/", $parsed["fragment"]);
             $meta = imapAccessWrapper::getCurrentAttachmentsMetadata();

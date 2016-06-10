@@ -846,7 +846,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 if ($action == "user_create_user") {
 
-                    Controller::applyHook($updating?"user.after_update":"user.after_create", array($loggedUser));
+                    Controller::applyHook($updating?"user.after_update":"user.after_create", array($ctx, $loggedUser));
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
                         $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
