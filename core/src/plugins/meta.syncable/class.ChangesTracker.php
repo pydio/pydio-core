@@ -569,8 +569,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                         $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
                             TextEncoder::toUTF8($oldNode->getPath()),
-                            TextEncoder::toUTF8($newNode->getPath())
-                            , "WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                            TextEncoder::toUTF8($newNode->getPath()),
+                            "WHERE ([node_path] = %s OR [node_path] LIKE %like~) AND [repository_identifier] = %s",
+                            TextEncoder::toUTF8($oldNode->getPath()),
+                            rtrim(TextEncoder::toUTF8($oldNode->getPath()), '/') . '/',
+                            $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
