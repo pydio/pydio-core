@@ -52,19 +52,23 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
      */
     public function init(ContextInterface $ctx, $options = [])
     {
-        $this->sqlDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
+        $this->sqlDriver = Utils::cleanDibiDriverParameters(["group_switch_value" => "core"]);
         parent::init($ctx, $options);
     }
 
+    /**
+     * @param string $path
+     * @return bool
+     */
     protected function excludeFromSync($path){
-        $excludedExtensions = array("dlpart");
+        $excludedExtensions = ["dlpart"];
         $ctx = AJXP_Node::contextFromUrl($path);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if(!empty($ext) && in_array($ext, $excludedExtensions)){
             return true;
         }
         try{
-            $this->accessDriver->filterUserSelectionToHidden($ctx, array($path));
+            $this->accessDriver->filterUserSelectionToHidden($ctx, [$path]);
         }catch(Exception $e){
             return true;
         }
@@ -78,14 +82,14 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         // Grab all folders mtime and compare them
         $repoIdentifier = $this->computeIdentifier($ctx);
         $res = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [md5] = %s AND [repository_identifier] = %s", 'directory', $repoIdentifier);
-        $modified = array();
+        $modified = [];
 
         // REGISTER ROOT ANYWAY: WE PROBABLY CAN'T GET A "FILEMTIME" ON IT.
-        $mod = array(
+        $mod = [
             "url"   => $ctx->getUrlBase(),
             "path"  => "/",
-            "children" => array()
-        );
+            "children" => []
+        ];
         $children = dibi::query("SELECT [node_path],[mtime] FROM [ajxp_index] WHERE [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
              $repoIdentifier, "/%", "/%/%");
         foreach($children as $cRow){
@@ -109,16 +113,16 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 // Deleted folder!
                 $this->logDebug(__FUNCTION__, "Folder deleted directly on storage: ".$url);
                 $node = new AJXP_Node($url);
-                Controller::applyHook("node.change", array(&$node, null, false), true);
+                Controller::applyHook("node.change", [&$node, null, false], true);
                 continue;
             }
             if($currentTime > $mtime){
-                $mod = array(
+                $mod = [
                     "url" => $url,
                     "path" => $path,
-                    "children" => array(),
+                    "children" => [],
                     "current_time" => $currentTime
-                );
+                ];
                 $children = dibi::query("SELECT [node_path],[mtime],[md5] FROM [ajxp_index] WHERE [repository_identifier] = %s AND [node_path] LIKE %s AND [node_path] NOT LIKE %s",
                     $repoIdentifier, "$path/%", "$path/%/%");
                 foreach($children as $cRow){
@@ -154,7 +158,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     }
                     // New items detected
                     $this->logDebug(__FUNCTION__, "New item detected on storage: ".$nodeUrl);
-                    Controller::applyHook("node.change", array(null, &$node, false, true), true);
+                    Controller::applyHook("node.change", [null, &$node, false, true], true);
                     continue;
                 }else {
                     if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
@@ -165,7 +169,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                         }
                         // Changed!
                         $this->logDebug(__FUNCTION__, "Item modified directly on storage: ".$nodeUrl);
-                        Controller::applyHook("node.change", array(&$node, &$node, false), true);
+                        Controller::applyHook("node.change", [&$node, &$node, false], true);
                     }
                 }
             }
@@ -179,16 +183,22 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     // Deleted
                     $this->logDebug(__FUNCTION__, "File deleted directly on storage: ".$url."/".$cPath);
                     $node = new AJXP_Node($url."/".$cPath);
-                    Controller::applyHook("node.change", array(&$node, null, false), true);
+                    Controller::applyHook("node.change", [&$node, null, false], true);
                 }
             }
             // Now "touch" parent directory
             if(isSet($current_time)){
-                dibi::query("UPDATE [ajxp_index] SET ", array("mtime" => $current_time), " WHERE [repository_identifier] = %s AND [node_path] = %s", $repoIdentifier, $mod_data["path"]);
+                dibi::query("UPDATE [ajxp_index] SET ", ["mtime" => $current_time], " WHERE [repository_identifier] = %s AND [node_path] = %s", $repoIdentifier, $mod_data["path"]);
             }
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param bool $check
+     * @return string
+     * @throws Exception
+     */
     protected function getResyncTimestampFile(\Pydio\Core\Model\ContextInterface $ctx, $check = false){
         $repo = $ctx->getRepository();
         $sScope = $repo->securityScope();
@@ -198,6 +208,12 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return $file;
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $contextInterface
+     */
     public function resyncAction($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
@@ -209,6 +225,15 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $contextInterface
+     * @return null
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchActions($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if($actionName != "changes" || !isSet($httpVars["seq_id"])) return false;
@@ -216,11 +241,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             dibi::connect($this->sqlDriver);
         }
         $filter = null;
-        $masks = array();
+        $masks = [];
         $currentRepo = $this->accessDriver->repository;
-        Controller::applyHook("role.masks", array($contextInterface, &$masks, AJXP_Permission::READ));
+        Controller::applyHook("role.masks", [$contextInterface, &$masks, AJXP_Permission::READ]);
         if(count($masks) == 1 && $masks[0] == "/"){
-            $masks = array();
+            $masks = [];
         }
         $recycle = $currentRepo->getContextOption($contextInterface, "RECYCLE_BIN");
         $recycle = (!empty($recycle)?$recycle:false);
@@ -235,7 +260,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             $last = 0;
             if(is_file($file)) $last = intval(file_get_contents($file));
             if(time() - $last >  $minutes * 60){
-                $this->resyncAction("resync_storage", array(), array(), $contextInterface);
+                $this->resyncAction("resync_storage", [], [], $contextInterface);
             }
         }
         if($this->options["REQUIRES_INDEXATION"]){
@@ -257,30 +282,30 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         $seqId = intval(Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
         if($veryLastSeq > 0 && $seqId > $veryLastSeq){
             // This is not normal! Send a signal reload all changes from start.
-            if(!$stream) echo json_encode(array('changes'=>array(), 'last_seq'=>1));
+            if(!$stream) echo json_encode(['changes'=> [], 'last_seq'=>1]);
             else echo 'LAST_SEQ:1';
             return null;
         }
 
 
-        $ands = array();
-        $ands[] = array("[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($contextInterface));
-        $ands[]= array("[seq] > %i", $seqId);
+        $ands = [];
+        $ands[] = ["[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($contextInterface)];
+        $ands[]= ["[seq] > %i", $seqId];
         if(isSet($httpVars["filter"])) {
             $filter = Utils::decodeSecureMagic($httpVars["filter"]);
             $filterLike = rtrim($filter, "/") . "/";
-            $ands[] = array("[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike);
+            $ands[] = ["[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike];
         }
         if(count($masks)){
-            $ors = array();
+            $ors = [];
             foreach($masks as $mask){
                 $trimmedMask = rtrim($mask, "/") ;
                 $filterLike = $trimmedMask . "/";
-                $ors[] = array("[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike);
-                $ors[] = array("[source] = %s OR [target] = %s", $trimmedMask, $trimmedMask);
+                $ors[] = ["[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike];
+                $ors[] = ["[source] = %s OR [target] = %s", $trimmedMask, $trimmedMask];
             }
             if(count($ors)){
-                $ands[] = array("%or", $ors);
+                $ands[] = ["%or", $ors];
             }
         }
         $res = dibi::query("SELECT
@@ -295,11 +320,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         if(!$stream) echo '{"changes":[';
         $previousNodeId = -1;
         $previousRow = null;
-        $order = array("path"=>0, "content"=>1, "create"=>2, "delete"=>3);
-        $relocateAttrs = array("bytesize", "md5", "mtime", "node_path", "repository_identifier");
+        $order = ["path"=>0, "content"=>1, "create"=>2, "delete"=>3];
+        $relocateAttrs = ["bytesize", "md5", "mtime", "node_path", "repository_identifier"];
         $valuesSent = false;
         foreach ($res as $row) {
-            $row->node = array();
+            $row->node = [];
             foreach ($relocateAttrs as $att) {
                 $row->node[$att] = $row->$att;
                 unset($row->$att);
@@ -382,6 +407,10 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return null;
     }
 
+    /**
+     * @param $row
+     * @param $recycle
+     */
     protected function cancelRecycleNodes(&$row, $recycle){
         if($row->type != 'path') return;
         if(strpos($row->source, '/'.$recycle) === 0){
@@ -393,6 +422,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $previousRow
+     * @param null $filter
+     * @return bool
+     */
     protected function filterRow(&$previousRow, $filter = null){
         if($filter == null) return false;
         $srcInFilter = strpos($previousRow->source, $filter."/") === 0;
@@ -423,9 +457,14 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return false;
     }
 
-    protected function pathOutOfMask($testPath, $masks = array()){
+    /**
+     * @param $testPath
+     * @param array $masks
+     * @return bool
+     */
+    protected function pathOutOfMask($testPath, $masks = []){
         if(!count($masks)) return false;
-        $regexps = array();
+        $regexps = [];
         foreach($masks as $path){
             $regexps[] = '^'.preg_quote($path.'/', '/');
         }
@@ -434,7 +473,12 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         return !$inMask;
     }
 
-    protected function filterMasks(&$previousRow, $masks = array()){
+    /**
+     * @param $previousRow
+     * @param array $masks
+     * @return bool
+     */
+    protected function filterMasks(&$previousRow, $masks = []){
         if(!count($masks)) return false;
 
         $srcInFilter = !$this->pathOutOfMask($previousRow->source, $masks);
@@ -461,7 +505,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
      */
     protected function computeIdentifier(ContextInterface $ctx)
     {
-        $parts = array($ctx->getRepositoryId());
+        $parts = [$ctx->getRepositoryId()];
         $repository = $ctx->getRepository();
         if ($repository->securityScope() == 'USER') {
             $parts[] = $ctx->getUser()->getId();
@@ -515,13 +559,13 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                 $stat = stat($newNode->getUrl());
                 $newNode->setLeaf(!($stat['mode'] & 040000));
                 $this->logDebug('INSERT', $newNode->getUrl());
-                dibi::query("INSERT INTO [ajxp_index]", array(
+                dibi::query("INSERT INTO [ajxp_index]", [
                     "node_path" => TextEncoder::toUTF8($newNode->getPath()),
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
                     "repository_identifier" => $repoId = $this->computeIdentifier($refNode->getContext())
-                ));
+                ]);
                 if($copy && !$newNode->isLeaf()){
                     // Make sure to index the content of this folder
                     $this->logInfo("Core.index", "Should reindex folder ".$newNode->getPath());
@@ -537,11 +581,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     $stat = stat($newNode->getUrl());
                     $this->logDebug("Content changed", "current stat size is : " . $stat["size"]);
                     $this->logDebug('UPDATE CONTENT', $newNode->getUrl());
-                    dibi::query("UPDATE [ajxp_index] SET ", array(
+                    dibi::query("UPDATE [ajxp_index] SET ", [
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],
                         "md5"       => md5_file($newNode->getUrl())
-                    ), "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                    ], "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
                     try{
                         $rowCount = dibi::getAffectedRows();
                         if($rowCount === 0){
@@ -555,9 +599,9 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     $newNode->loadNodeInfo();
                     if ($newNode->isLeaf()) {
                         $this->logDebug('UPDATE LEAF PATH', $newNode->getUrl());
-                        dibi::query("UPDATE [ajxp_index] SET ", array(
+                        dibi::query("UPDATE [ajxp_index] SET ", [
                             "node_path"  => TextEncoder::toUTF8($newNode->getPath()),
-                        ), "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                        ], "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
@@ -647,6 +691,11 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
     }
 
+    /**
+     * @param array $param
+     * @return string
+     * @throws Exception
+     */
     public function installSQLTables($param)
     {
         $p = Utils::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"])?$param["SQL_DRIVER"]:$this->sqlDriver);
