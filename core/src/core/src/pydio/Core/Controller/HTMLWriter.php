@@ -22,7 +22,6 @@ namespace Pydio\Core\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -34,19 +33,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class HTMLWriter
 {
-    /**
-     * Write an HTML block message
-     * @static
-     * @param string $logMessage
-     * @param string $errorMessage
-     * @return void
-     */
-    public static function displayMessage($logMessage, $errorMessage)
-    {
-        $mess = LocaleService::getMessages();
-        echo "<div title=\"".$mess[98]."\" id=\"message_div\" onclick=\"closeMessageDiv();\" class=\"messageBox ".(isset($logMessage)?"logMessage":"errorMessage")."\"><table width=\"100%\"><tr><td style=\"width: 66%;\">".(isset($logMessage)?$logMessage:$errorMessage)."</td><td style=\"color: #999; text-align: right;padding-right: 10px; width: 30%;\"><i>".$mess[98]."</i></tr></table></div>";
-        echo "<script>tempoMessageDivClosing();</script>";
-    }
 
     /**
      * Replace the doc files keywords
@@ -67,29 +53,6 @@ class HTMLWriter
             return $content;
         }
         return "File not found : ".$docFileName;
-    }
-    /**
-     * Write the messages as Javascript
-     * @static
-     * @param array $mess
-     * @return void
-     */
-    public static function writeI18nMessagesClass($mess)
-    {
-        echo "<script language=\"javascript\">\n";
-        echo "if(!MessageHash) window.MessageHash = new Hash();\n";
-        foreach ($mess as $index => $message) {
-            // Make sure \n are double antislashed (\\n).
-            $message = preg_replace("/\n/", "\\\\n", $message);
-            if (is_numeric($index)) {
-                echo "MessageHash[$index]='".str_replace("'", "\'", $message)."';\n";
-            } else {
-                echo "MessageHash['$index']='".str_replace("'", "\'", $message)."';\n";
-            }
-
-        }
-        echo "MessageHash;";
-        echo "</script>\n";
     }
 
     /**
@@ -127,15 +90,6 @@ class HTMLWriter
     {
         header("Content-type:$type; charset=$charset");
     }
-    /**
-     * Write a closing </body></html> sequence
-     * @static
-     * @return void
-     */
-    public static function closeBodyAndPage()
-    {
-        print("</body></html>");
-    }
 
     /**
      * Write directly an error as a javascript instruction
@@ -151,7 +105,58 @@ class HTMLWriter
         die("<script language='javascript'>parent.ajaxplorer.displayMessage('ERROR', '".str_replace("'", "\'", $errorMessage)."');</script>");
     }
 
-    public static function encodeAttachmentName($name){
+
+    /**
+     * @param ResponseInterface $response
+     * @param $attachName
+     * @param $fileSize
+     * @param $mimeType
+     * @return ResponseInterface
+     */
+    public static function responseWithInlineHeaders(ResponseInterface $response, $attachName, $fileSize, $mimeType){
+        return self::generateInlineHeaders($attachName, $fileSize, $mimeType, $response);
+    }
+
+    /**
+     * @param ResponseInterface $response
+     * @param $attachmentName
+     * @param $dataSize
+     * @param bool $isFile
+     * @param bool $gzip
+     * @return null|ResponseInterface
+     */
+    public static function responseWithAttachmentsHeaders(ResponseInterface $response, &$attachmentName, $dataSize, $isFile=true, $gzip=false){
+        return self::generateAttachmentsHeader($attachmentName, $dataSize, $isFile, $gzip, $response);
+    }
+
+
+    /**
+     * @param $attachName
+     * @param $fileSize
+     * @param $mimeType
+     */
+    public static function emitInlineHeaders($attachName, $fileSize, $mimeType){
+        self::generateInlineHeaders($attachName, $fileSize, $mimeType);
+    }
+
+    /**
+     * @param $attachmentName
+     * @param $dataSize
+     * @param bool $isFile
+     * @param bool $gzip
+     */
+    public static function emitAttachmentsHeaders(&$attachmentName, $dataSize, $isFile=true, $gzip=false){
+        self::generateAttachmentsHeader($attachmentName, $dataSize, $isFile, $gzip);
+    }
+
+
+
+    /**
+     * Correctly encode name for attachment header
+     * @param string $name
+     * @return string
+     */
+    private static function encodeAttachmentName($name){
         if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])
             || preg_match('/ WebKit /',$_SERVER['HTTP_USER_AGENT'])
             || preg_match('/ Trident/',$_SERVER['HTTP_USER_AGENT'])) {
@@ -166,68 +171,97 @@ class HTMLWriter
      * @param int $dataSize
      * @param bool $isFile
      * @param bool $gzip If true, make sure the $dataSize is the size of the ENCODED data.
+     * @param ResponseInterface $response Response to update instead of generating headers
+     * @return ResponseInterface|null Update response interface if passed by argument
      */
-    public static function generateAttachmentsHeader(&$attachmentName, $dataSize, $isFile=true, $gzip=false)
+    private static function generateAttachmentsHeader(&$attachmentName, $dataSize, $isFile=true, $gzip=false, ResponseInterface $response = null)
     {
         $attachmentName = self::encodeAttachmentName($attachmentName);
 
-        header("Content-Type: application/force-download; name=\"".$attachmentName."\"");
-        header("Content-Transfer-Encoding: binary");
+        $headers = [];
+        $headers["Content-Type"] = "application/force-download; name=\"".$attachmentName."\"";
+        $headers["Content-Transfer-Encoding"] = "binary";
         if ($gzip) {
-            header("Content-Encoding: gzip");
+            $headers["Content-Encoding"]  = "gzip";
         }
-        header("Content-Length: ".$dataSize);
+        $headers["Content-Length"] = $dataSize;
         if ($isFile && ($dataSize != 0)) {
-            header("Content-Range: bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";");
+            $headers["Content-Range"] = "bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";";
         }
-        header("Content-Disposition: attachment; filename=\"".$attachmentName."\"");
-        header("Expires: 0");
-        header("Cache-Control: no-cache, must-revalidate");
-        header("Pragma: no-cache");
+        $headers["Content-Disposition"] = "attachment; filename=\"".$attachmentName."\"";
+        $headers["Expires"] = "0";
+        $headers["Cache-Control"] = "no-cache, must-revalidate";
+        $headers["Pragma"] = "no-cache";
+
         if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])) {
-            header("Cache-Control: max_age=0");
-            header("Pragma: public");
+            $headers["Pragma"] = "public";
+            $headers["Cache-Control"] = "max_age=0";
         }
 
         // IE8 is dumb
         if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])) {
-            header("Pragma: public");
-            header("Expires: 0");
-            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-            header("Cache-Control: private",false);
+            $headers["Pragma"] = "public";
+            $headers["Cache-Control"] = "private, must-revalidate, post-check=0, pre-check=0";
         }
 
         // For SSL websites there is a bug with IE see article KB 323308
         // therefore we must reset the Cache-Control and Pragma Header
         if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])) {
-            header("Cache-Control:");
-            header("Pragma:");
+            $headers["Pragma"] = "";
+            $headers["Cache-Control"] = "";
         }
+
+        foreach($headers as $headerName => $headerValue){
+            if($response !== null){
+                $response = $response->withHeader($headerName, $headerValue);
+            }else{
+                header($headerName.": ".$headerValue);
+            }
+        }
+
+        return $response;
     }
 
-    public static function generateInlineHeaders($attachName, $fileSize, $mimeType)
+    /**
+     * Generate correct headers
+     * @param string $attachName
+     * @param int $fileSize
+     * @param string $mimeType
+     * @param ResponseInterface $response
+     * @return ResponseInterface
+     */
+    private static function generateInlineHeaders($attachName, $fileSize, $mimeType, ResponseInterface $response = null)
     {
         $attachName = self::encodeAttachmentName($attachName);
 
-        //Send headers
-        header("Content-Type: " . $mimeType . "; name=\"" . $attachName . "\"");
-        header("Content-Disposition: inline; filename=\"" . $attachName . "\"");
+        $headers = [];
+        $headers["Content-Type"] =  $mimeType . "; name=\"" . $attachName . "\"";
+        $headers["Content-Disposition"] = "inline; filename=\"" . $attachName . "\"";
         // changed header for IE 7 & 8
         if (preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])) {
-            header("Pragma: public");
-            header("Expires: 0");
-            header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-            header("Cache-Control: private",false);
+            $headers["Expires"] = "0";
+            $headers["Pragma"] = "public";
+            $headers["Cache-Control"] = "private, must-revalidate, post-check=0, pre-check=0";
         } else {
-            header("Cache-Control: public");
+            $headers["Cache-Control"] = "public";
         }
-        header("Content-Length: " . $fileSize);
+        $headers["Content-Length"] = $fileSize;
 
         // Neccessary for IE 8 and xx
         if (ConfService::getConf("USE_HTTPS")==1 && preg_match('/ MSIE /',$_SERVER['HTTP_USER_AGENT'])) {
-            header("Cache-Control:");
-            header("Pragma:");
+            $headers["Pragma"] = "";
+            $headers["Cache-Control"] = "";
         }
+
+        foreach($headers as $headerName => $headerValue){
+            if($response !== null){
+                $response = $response->withHeader($headerName, $headerValue);
+            }else{
+                header($headerName.": ".$headerValue);
+            }
+        }
+
+        return $response;
 
     }
 

@@ -73,10 +73,11 @@ class GitManager extends AJXP_AbstractMetaSource
      */
     public function applyActions(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $actionName = $requestInterface->getAttribute("action");
-        $httpVars = $requestInterface->getParsedBody();
-        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        $responseInterface = $responseInterface->withBody($x);
+        
+        $actionName         = $requestInterface->getAttribute("action");
+        $httpVars           = $requestInterface->getParsedBody();
+        $x                  = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        $responseInterface  = $responseInterface->withBody($x);
 
         $git = new VersionControl_Git($this->repoBase);
         switch ($actionName) {
@@ -145,28 +146,30 @@ class GitManager extends AJXP_AbstractMetaSource
                 $command->addArgument($commitId.":".$file);
                 $commandLine = $command->createCommandString();
 
-                $reader = function() use ($git, $commandLine, $attach, $file, $size){
-                    if ($attach == "inline") {
-                        $fileExt = substr(strrchr(basename($file), '.'), 1);
-                        if (empty($fileExt)) {
-                            $fileMime = "application/octet-stream";
-                        } else {
-                            $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                            $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
-                            foreach ($lines as $line) {
-                                if(substr($line, 0, 1) == '#')
-                                    continue; // skip comments
-                                $line = rtrim($line) . " ";
-                                if(!preg_match($regex, $line, $matches))
-                                    continue; // no match to the extension
-                                $fileMime = $matches[1];
-                            }
-                        }
-                        if(empty($fileMime)) $fileMime = "application/octet-stream";
-                        HTMLWriter::generateInlineHeaders(basename($file), $size, $fileMime);
+                if ($attach == "inline") {
+                    $fileExt = substr(strrchr(basename($file), '.'), 1);
+                    if (empty($fileExt)) {
+                        $fileMime = "application/octet-stream";
                     } else {
-                        HTMLWriter::generateAttachmentsHeader(basename($file), $size, false, false);
+                        $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
+                        $lines = file( AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.browser/resources/other/mime.types");
+                        foreach ($lines as $line) {
+                            if(substr($line, 0, 1) == '#')
+                                continue; // skip comments
+                            $line = rtrim($line) . " ";
+                            if(!preg_match($regex, $line, $matches))
+                                continue; // no match to the extension
+                            $fileMime = $matches[1];
+                        }
                     }
+                    if(empty($fileMime)) $fileMime = "application/octet-stream";
+                    $responseInterface = HTMLWriter::responseWithInlineHeaders($responseInterface, basename($file), $size, $fileMime);
+                } else {
+                    $responseInterface = HTMLWriter::responseWithAttachmentsHeaders($responseInterface, basename($file), $size, false, false);
+                }
+
+
+                $reader = function() use ($git, $commandLine){
                     $outputStream = fopen("php://output", "a");
                     $this->executeCommandInStreams($git, $commandLine, $outputStream);
                     fclose($outputStream);

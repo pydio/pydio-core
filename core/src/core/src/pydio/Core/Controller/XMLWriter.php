@@ -706,29 +706,6 @@ class XMLWriter
     }
 
     /**
-     * Writes a <logging_result> tag
-     * @static
-     * @param integer $result
-     * @param string $rememberLogin
-     * @param string $rememberPass
-     * @param string $secureToken
-     * @return void|string
-     */
-    public static function loggingResult($result, $rememberLogin="", $rememberPass = "", $secureToken="", $print = true)
-    {
-        $remString = "";
-        if ($rememberPass != "" && $rememberLogin!= "") {
-            $remString = " remember_login=\"$rememberLogin\" remember_pass=\"$rememberPass\"";
-        }
-        if ($secureToken != "") {
-            $remString .= " secure_token=\"$secureToken\"";
-        }
-        $st = "<logging_result value=\"$result\"$remString/>";
-        if($print) print $st;
-        else return $st;
-    }
-
-    /**
      * Create plain PHP associative array from XML.
      *
      * Example usage:

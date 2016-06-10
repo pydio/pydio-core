@@ -37,81 +37,90 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class FileMimeSender extends Plugin
 {
-    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $ctx)
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
+        if($requestInterface->getAttribute("action") !== "open_file"){
+            return;
+        }
+
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx        = $requestInterface->getAttribute("ctx");
+        $httpVars   = $requestInterface->getParsedBody();
+
         $repository = RepositoryService::getRepositoryById($httpVars["repository_id"]);
         
         if (UsersService::usersEnabled()) {
             $loggedUser = $ctx->getUser();
             if (!$loggedUser->canSwitchTo($repository->getId())) {
-                echo("You do not have permissions to access this resource");
-                return false;
+                throw new \Pydio\Core\Exception\AuthRequiredException();
             }
         }
 
         $selection = UserSelection::fromContext($ctx, $httpVars);
 
-        if ($action == "open_file") {
-            $selectedNode = $selection->getUniqueNode();
-            $selectedNodeUrl = $selectedNode->getUrl();
+        $selectedNode = $selection->getUniqueNode();
+        $selectedNodeUrl = $selectedNode->getUrl();
 
-            if (!file_exists($selectedNodeUrl) || !is_readable($selectedNodeUrl)) {
-                echo("File does not exist");
-                return false;
-            }
+        if (!file_exists($selectedNodeUrl) || !is_readable($selectedNodeUrl)) {
+            throw new \Pydio\Core\Exception\PydioException("File does not exist");
+        }
 
-            $filesize = filesize($selectedNodeUrl);
-            $fp = fopen($selectedNodeUrl, "rb");
-            $fileMime = "application/octet-stream";
+        $filesize = filesize($selectedNodeUrl);
+        $fp = fopen($selectedNodeUrl, "rb");
+        $fileMime = "application/octet-stream";
 
-            //Get mimetype with fileinfo PECL extension
-            if (class_exists("finfo")) {
-                $finfo = new finfo(FILEINFO_MIME);
-                $fileMime = $finfo->buffer(fread($fp, 2000));
-            }
-            //Get mimetype with (deprecated) mime_content_type
-            if (strpos($fileMime, "application/octet-stream")===0 && function_exists("mime_content_type")) {
-                $fileMime = @mime_content_type($fp);
-            }
-            //Guess mimetype based on file extension
-            if (strpos($fileMime, "application/octet-stream")===0 ) {
-                $fileExt = substr(strrchr(basename($selectedNodeUrl), '.'), 1);
-                if(empty($fileExt))
-                    $fileMime = "application/octet-stream";
-                else {
-                    $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                    $lines = file( $this->getBaseDir()."/resources/other/mime.types");
-                    foreach ($lines as $line) {
-                        if(substr($line, 0, 1) == '#')
-                            continue; // skip comments
-                        $line = rtrim($line) . " ";
-                        if(!preg_match($regex, $line, $matches))
-                            continue; // no match to the extension
-                        $fileMime = $matches[1];
-                    }
+        //Get mimetype with fileinfo PECL extension
+        if (class_exists("finfo")) {
+            $finfo = new finfo(FILEINFO_MIME);
+            $fileMime = $finfo->buffer(fread($fp, 2000));
+        }
+        //Get mimetype with (deprecated) mime_content_type
+        if (strpos($fileMime, "application/octet-stream")===0 && function_exists("mime_content_type")) {
+            $fileMime = @mime_content_type($fp);
+        }
+        //Guess mimetype based on file extension
+        if (strpos($fileMime, "application/octet-stream")===0 ) {
+            $fileExt = substr(strrchr(basename($selectedNodeUrl), '.'), 1);
+            if(empty($fileExt))
+                $fileMime = "application/octet-stream";
+            else {
+                $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
+                $lines = file( $this->getBaseDir()."/resources/other/mime.types");
+                foreach ($lines as $line) {
+                    if(substr($line, 0, 1) == '#')
+                        continue; // skip comments
+                    $line = rtrim($line) . " ";
+                    if(!preg_match($regex, $line, $matches))
+                        continue; // no match to the extension
+                    $fileMime = $matches[1];
                 }
             }
-            fclose($fp);
-            // If still no mimetype, give up and serve application/octet-stream
-            if(empty($fileMime))
-                $fileMime = "application/octet-stream";
+        }
+        fclose($fp);
+        // If still no mimetype, give up and serve application/octet-stream
+        if(empty($fileMime))
+            $fileMime = "application/octet-stream";
 
-            if(strpos($fileMime, "image/svg+xml;") === 0){
-                // Do not open SVG directly in browser.
-                $fileMime = "application/octet-stream";
-            }
+        if(strpos($fileMime, "image/svg+xml;") === 0){
+            // Do not open SVG directly in browser.
+            $fileMime = "application/octet-stream";
+        }
 
-            //Send headers
-            HTMLWriter::generateInlineHeaders(basename($selectedNodeUrl), $filesize, $fileMime);
+        //Send headers
+        $responseInterface = HTMLWriter::responseWithInlineHeaders($responseInterface, basename($selectedNodeUrl), $filesize, $fileMime);
+        $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selectedNode){
 
             $stream = fopen("php://output", "a");
-            AJXP_MetaStreamWrapper::copyFileInStream($selectedNodeUrl, $stream);
+            AJXP_MetaStreamWrapper::copyFileInStream($selectedNode->getUrl(), $stream);
             fflush($stream);
             fclose($stream);
 
             Controller::applyHook("node.read", array($selectedNode));
-            $this->logInfo('Download', 'Read content of '.$selectedNodeUrl, array("files" => $selectedNodeUrl));
+            $this->logInfo('Download', 'Read content of '.$selectedNode->getUrl(), array("files" => $selectedNode->getUrl()));
 
-        }
+        });
+
+        $responseInterface = $responseInterface->withBody($aSyncReader);
+
     }
 }

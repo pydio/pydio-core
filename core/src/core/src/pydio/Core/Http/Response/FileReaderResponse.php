@@ -272,7 +272,7 @@ class FileReaderResponse extends AsyncResponseStream
 
                 }
 
-                HTMLWriter::generateAttachmentsHeader($localName, $size, $isFile, $confGzip);
+                HTMLWriter::emitAttachmentsHeaders($localName, $size, $isFile, $confGzip);
 
                 if ($confGzip && isSet($gzippedData)) {
                     print $gzippedData;
