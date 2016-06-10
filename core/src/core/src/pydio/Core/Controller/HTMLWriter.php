@@ -213,7 +213,7 @@ class HTMLWriter
 
         foreach($headers as $headerName => $headerValue){
             if($response !== null){
-                $response = $response->withHeader($headerName, $headerValue);
+                $response = $response->withHeader($headerName, (string) $headerValue);
             }else{
                 header($headerName.": ".$headerValue);
             }
@@ -255,7 +255,7 @@ class HTMLWriter
 
         foreach($headers as $headerName => $headerValue){
             if($response !== null){
-                $response = $response->withHeader($headerName, $headerValue);
+                $response = $response->withHeader($headerName, (string) $headerValue);
             }else{
                 header($headerName.": ".$headerValue);
             }
