@@ -300,9 +300,6 @@ class UserSelection
         }
         $currentFile = $this->getUniqueFile();
         $ajxpNode = new AJXP_Node($this->currentBaseUrl().$currentFile);
-        if($this->context->hasUser()){
-            $ajxpNode->setUserId($this->context->getUser()->getId());
-        }
         return $ajxpNode;
 
     }

@@ -1058,10 +1058,12 @@ class ShareCenter extends Plugin
         $modifiedNodes = $shareStore->moveSharesFromMetaRecursive($oldNode, $delete, $oldNode->getPath(), ($newNode != null ? $newNode->getPath() : null));
         // Force switching back to correct driver!
         if($modifiedNodes > 0){
+            /*
             $oldNode->getRepository()->driverInstance = null;
             $oldNode->setDriver(null);
             $oldNode->getDriver();
-        }
+            */
+        }         
         return;
 
     }

@@ -24,6 +24,7 @@ namespace Pydio\Share\Store;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -50,7 +51,7 @@ class ShareStore {
      */
     private $hashMinLength;
 
-    public $modifiableShareKeys = array("counter", "tags", "short_form_url");
+    public $modifiableShareKeys = ["counter", "tags", "short_form_url"];
     /**
      * @var sqlConfDriver
      */
@@ -172,7 +173,7 @@ class ShareStore {
                     return $data;
                 }
             }
-            return array();
+            return [];
         }
         $lines = file($file);
         $inputData = '';
@@ -241,7 +242,7 @@ class ShareStore {
      * @return array
      */
     public function findSharesForRepo($repositoryId){
-        if(!$this->sqlSupported) return array();
+        if(!$this->sqlSupported) return [];
         return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
 
@@ -269,7 +270,7 @@ class ShareStore {
      */
     public function listShares($limitToUser = '', $parentRepository = '', $cursor = null, $shareType = null){
 
-        $dbLets = array();
+        $dbLets = [];
         if($this->sqlSupported){
             // Get DB files
             $dbLets = $this->confStorage->simpleStoreList(
@@ -315,7 +316,7 @@ class ShareStore {
 
         if(empty($shareType) || $shareType == "repository"){
             // BACKWARD COMPATIBILITY: collect old-school shared repositories that are not yet stored in simpleStore
-            $storedIds = array();
+            $storedIds = [];
             foreach($dbLets as $share){
                 if(empty($limitToUser) || $limitToUser == $share["OWNER_ID"]) {
                     if(is_string($share["REPOSITORY"])) $storedIds[] = $share["REPOSITORY"];
@@ -323,7 +324,7 @@ class ShareStore {
                 }
             }
             // Find repositories that would have a parent
-            $criteria = array();
+            $criteria = [];
             $criteria["parent_uuid"] = ($parentRepository == "" ? AJXP_FILTER_NOT_EMPTY : $parentRepository);
             $criteria["owner_user_id"] = ($limitToUser == "" ? AJXP_FILTER_NOT_EMPTY : $limitToUser);
             if(count($storedIds)){
@@ -331,12 +332,12 @@ class ShareStore {
             }
             $oldRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
             foreach($oldRepos as $sharedWorkspace){
-                $dbLets['repo-'.$sharedWorkspace->getId()] = array(
+                $dbLets['repo-'.$sharedWorkspace->getId()] = [
                     "SHARE_TYPE"    => "repository",
                     "OWNER_ID"      => $sharedWorkspace->getOwner(),
                     "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
                     "LEGACY_REPO_OR_MINI"   => true
-                );
+                ];
             }
         }
 
@@ -459,7 +460,7 @@ class ShareStore {
                 }
             }
         } else if ($type == "user") {
-            $this->testUserCanEditShare($element, array());
+            $this->testUserCanEditShare($element, []);
             UsersService::deleteUser($element);
         } else if ($type == "file") {
             $publicletData = $this->loadShare($element);
@@ -500,7 +501,7 @@ class ShareStore {
                 $relativePath = "";
             }
             $modifiedDifferentNodes ++;
-            $changeOldNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$oldPath.$relativePath);
+            $changeOldNode = new AJXP_Node($baseNode->getContext()->getUrlBase().$oldPath.$relativePath);
 
             foreach($metadata as $ownerId => $meta){
                 if(!isSet($meta["shares"])){
@@ -511,37 +512,38 @@ class ShareStore {
                 $changeNewNode = null;
                 if(!$delete){
                     //$newPath = preg_replace('#^'.preg_quote($oldPath, '#').'#', $newPath, $path);
-                    $changeNewNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$newPath.$relativePath);
+                    $changeNewNode = new AJXP_Node($baseNode->getContext()->getUrlBase().$newPath.$relativePath);
                     $changeNewNode->setUserId($ownerId);
                 }
-                $collectedRepositories = array();
+                $collectedRepositories = [];
                 list($privateShares, $publicShares) = $this->moveSharesFromMeta($meta["shares"], $delete?"delete":"move", $changeOldNode, $changeNewNode, $collectedRepositories, $parentRepositoryPath);
 
                 if($basePath == "/"){
                     // Just update target node!
-                    $changeMetaNode = new AJXP_Node("pydio://".$baseNode->getContext()->getUrlBase().$relativePath);
+                    $changeMetaNode = new AJXP_Node($baseNode->getContext()->getUrlBase().$relativePath);
                     $changeMetaNode->setUserId($ownerId);
                     $this->getMetaManager()->clearNodeMeta($changeMetaNode);
                     if(count($privateShares)){
-                        $this->getMetaManager()->setNodeMeta($changeMetaNode, array("shares" => $privateShares), true);
+                        $this->getMetaManager()->setNodeMeta($changeMetaNode, ["shares" => $privateShares], true);
                     }
                     if(count($publicShares)){
-                        $this->getMetaManager()->setNodeMeta($changeMetaNode, array("shares" => $privateShares), false);
+                        $this->getMetaManager()->setNodeMeta($changeMetaNode, ["shares" => $privateShares], false);
                     }
                 }else{
                     $this->getMetaManager()->clearNodeMeta($changeOldNode);
                     if(!$delete){
                         if(count($privateShares)){
-                            $this->getMetaManager()->setNodeMeta($changeNewNode, array("shares" => $privateShares), true);
+                            $this->getMetaManager()->setNodeMeta($changeNewNode, ["shares" => $privateShares], true);
                         }
                         if(count($publicShares)){
-                            $this->getMetaManager()->setNodeMeta($changeNewNode, array("shares" => $privateShares), false);
+                            $this->getMetaManager()->setNodeMeta($changeNewNode, ["shares" => $privateShares], false);
                         }
                     }
                 }
 
                 foreach($collectedRepositories as $sharedRepoId => $parentRepositoryPath){
-                    $modifiedDifferentNodes += $this->moveSharesFromMetaRecursive(new AJXP_Node("pydio://".$sharedRepoId."/"), $delete, $changeOldNode->getPath(), $changeNewNode->getPath(), $parentRepositoryPath);
+                    $ctx = new Context($ownerId, $sharedRepoId);
+                    $modifiedDifferentNodes += $this->moveSharesFromMetaRecursive(new AJXP_Node($ctx->getUrlBase()), $delete, $changeOldNode->getPath(), $changeNewNode->getPath(), $parentRepositoryPath);
                 }
 
             }
@@ -561,10 +563,10 @@ class ShareStore {
      * @return array
      * @throws \Exception
      */
-    public function moveSharesFromMeta($shares, $operation="move", $oldNode, $newNode=null, &$collectRepositories = array(), $parentRepositoryPath = null){
+    public function moveSharesFromMeta($shares, $operation="move", $oldNode, $newNode=null, &$collectRepositories = [], $parentRepositoryPath = null){
 
-        $privateShares = array();
-        $publicShares = array();
+        $privateShares = [];
+        $publicShares = [];
         foreach($shares as $id => $data){
             $type = $data["type"];
             if($operation == "delete"){
@@ -631,7 +633,7 @@ class ShareStore {
                 }
             }
         }
-        return array($privateShares, $publicShares);
+        return [$privateShares, $publicShares];
     }
 
     /**
@@ -693,7 +695,7 @@ class ShareStore {
             $originalUser = $this->context->getUser()->getId();
             $userId = null;
         }
-        $deleted = array();
+        $deleted = [];
         $switchBackToOriginal = false;
 
         $publicLets = $this->listShares($currentUser? $userId: '');

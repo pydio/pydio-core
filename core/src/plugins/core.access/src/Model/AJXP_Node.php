@@ -171,7 +171,6 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function createChildNode($pathSegment){
         $n = new AJXP_Node($this->getUrl()."/".$pathSegment);
-        $n->setUserId($this->getUserId());
         return $n;
     }
 
@@ -311,7 +310,6 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         }
         $parent = new AJXP_Node(dirname($this->_url));
         $parent->setDriver($this->_accessDriver);
-        $parent->setUserId($this->_user);
         return $parent;
 
     }
@@ -557,11 +555,12 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      * @param string $userId A username
      */
     public function setUserId($userId){
+        // Update url with a user@workspaceID
+        $crtStart = $this->getScheme()."://".(!empty($this->_user)?$this->_user."@":"").$this->getRepositoryId();
         $this->_user = $userId;
         $this->urlParts["user"] = $userId;
-        // Update url with a user@workspaceID
-        $crt = $this->getScheme()."://".$this->getRepositoryId();
-        $this->_url = str_replace($crt, $this->getScheme()."://".$this->_user."@".$this->getRepositoryId(), $this->_url);
+        $newStart = $this->getScheme()."://".$this->_user."@".$this->getRepositoryId();
+        $this->_url = str_replace($crtStart, $newStart, $this->_url);
     }
 
     /**
