@@ -154,7 +154,7 @@ class AJXP_Notification implements ContextProviderInterface
     {
         if(isSet($_SESSION["CURRENT_MINISITE"]) && class_exists("\\Pydio\\Share\\ShareCenter")){
             $hash = $_SESSION["CURRENT_MINISITE"];
-            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter();
+            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter($this->getContext());
             if(!empty($shareCenter)){
                 return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
             }

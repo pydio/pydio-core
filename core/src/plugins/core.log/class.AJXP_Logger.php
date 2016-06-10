@@ -74,10 +74,16 @@ class AJXP_Logger extends Plugin
         self::$context =  $ctx;
     }
 
+    /**
+     * @return AbstractLogDriver
+     */
     public function getLoggerInstance(){
         return $this->pluginInstance;
     }
 
+    /**
+     * @param ContextInterface $context
+     */
     public static function updateContext($context){
         self::$context = $context;
     }
@@ -90,11 +96,11 @@ class AJXP_Logger extends Plugin
      * @param string $prefix A quick description
      * @param array $messages An array of messages (string or array).
      */
-    public static function log2($level, $source, $prefix, $messages = array())
+    public static function log2($level, $source, $prefix, $messages = [])
     {
         $res = "";
         $i = 0;
-        $nodePathes = array();
+        $nodePathes = [];
         foreach ($messages as $value) {
             if($i > 0) $res .= "\t";
             $i++;
@@ -111,7 +117,7 @@ class AJXP_Logger extends Plugin
                 $res .= print_r($value, true);
             }
         }
-        $res = str_replace(array("\r\n", "\n", "\r"), ' ', $res);
+        $res = str_replace(["\r\n", "\n", "\r"], ' ', $res);
         $ip = self::getClientAdress();
         $user = self::getLoggedUser();
         $logger = self::getInstance();
@@ -148,7 +154,7 @@ class AJXP_Logger extends Plugin
         if(!ConfService::getConf("SERVER_DEBUG")) return ;
         if (func_num_args() <= 2) {
             self::notice(__CLASS__, "Deprecated", "You are calling debug() with ".func_num_args()." arguments, please use at least 3");
-            $args = array();
+            $args = [];
             $args[0] = $prefix;
             self::log2(LOG_LEVEL_DEBUG, "Deprecated", $source, $args);
         } else {
@@ -232,10 +238,10 @@ class AJXP_Logger extends Plugin
      * @param string|array $params
      * @return void
      */
-    public static function logAction($action, $params=array())
+    public static function logAction($action, $params= [])
     {
         self::notice(__CLASS__, "Deprecated", "Function logAction() is deprecated, use info() instead");
-        $args = array();
+        $args = [];
         $args[0] = $params;
         self::log2(LOG_LEVEL_INFO, "Deprecated", $action, $args);
     }
@@ -327,8 +333,11 @@ class AJXP_Logger extends Plugin
     public static function getInstance()
     {
         if (!isset(self::$loggerInstance)) {
-            $p = PluginsService::findPlugin("core", "log");
-            if(is_object($p)) $p->init(Context::emptyContext(), array());
+            $ctx = Context::emptyContext();
+            $p = PluginsService::getInstance($ctx)->getPluginByTypeName("core", "log");
+            if(is_object($p)) {
+                $p->init($ctx, []);
+            }
         }
         return self::$loggerInstance;
     }

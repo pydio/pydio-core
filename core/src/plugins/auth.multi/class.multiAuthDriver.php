@@ -64,7 +64,7 @@ class multiAuthDriver extends AbstractAuthDriver
             $options = $def["OPTIONS"];
             $options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
             $options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];
-            $instance = PluginsService::findPlugin("auth", $name);
+            $instance = PluginsService::getInstance($ctx)->getPluginByTypeName("auth", $name);
             if (!is_object($instance)) {
                 throw new Exception("Cannot find plugin $name for type 'auth'");
             }

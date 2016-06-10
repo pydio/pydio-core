@@ -2169,7 +2169,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $handle=opendir($dirName);
         $shareCenter = false;
         if(class_exists("\\Pydio\\Share\\ShareCenter")){
-            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter();
+            $shareCenter = \Pydio\Share\ShareCenter::getShareCenter(AJXP_Node::contextFromUrl($dirName));
         }
         if($handle === false){
             $this->logError(__FUNCTION__, "Cannot open folder ".$dirName);

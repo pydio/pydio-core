@@ -364,7 +364,7 @@ class Controller
      */
     private static function handleRequest($callback, ServerRequestInterface &$request, ResponseInterface &$response){
 
-        list($plugInstance, $methodName) = self::parseCallback($callback);
+        list($plugInstance, $methodName) = self::parseCallback($request->getAttribute("ctx"), $callback);
 
         $reflectMethod = new \ReflectionMethod($plugInstance, $methodName);
         $reflectParams = $reflectMethod->getParameters();
@@ -400,7 +400,7 @@ class Controller
      * @throws PydioException
      * @return array
      */
-    private static function parseCallback($callback){
+    private static function parseCallback(ContextInterface $ctx, $callback){
         if(is_array($callback)){
             $plugId = $callback["pluginId"];
             $methodName = $callback["methodName"];
@@ -408,7 +408,7 @@ class Controller
             $plugId = $callback->getAttribute("pluginId");
             $methodName = $callback->getAttribute("methodName");
         }
-        $plugInstance = PluginsService::findPluginById($plugId);
+        $plugInstance = PluginsService::getInstance($ctx)->getPluginById($plugId);
         if(empty($plugInstance) || !method_exists($plugInstance, $methodName)){
             throw new PydioException("Cannot find method $methodName for plugin $plugId!");
         }

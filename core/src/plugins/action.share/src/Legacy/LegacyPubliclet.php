@@ -27,6 +27,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\ConfService;
@@ -47,9 +48,21 @@ use Pydio\Share\View\PublicAccessManager;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class LegacyPubliclet
+ * Model for links generated in old versions of Pydio when they
+ * were stored in small php files on disk instead of inside Database
+ *
+ * @package Pydio\Share\Legacy
+ */
 class LegacyPubliclet
 {
 
+    /**
+     * @param $data
+     * @param $hash
+     * @param null $message
+     */
     private static function renderError($data, $hash, $message = null){
         MinisiteRenderer::renderError($data, $hash, $message);
     }
@@ -96,7 +109,7 @@ class LegacyPubliclet
             $link = $publicAccessManager->buildPublicLink($shareId);
         }
         if ($watcher != false && $node != null) {
-            $result = array();
+            $result = [];
             $elementWatch = $watcher->hasWatchOnNode(
                 $node,
                 $ctx->getUser()->getId(),
@@ -107,7 +120,7 @@ class LegacyPubliclet
                 $elementWatch = false;
             }
         }
-        $jsonData = array_merge(array(
+        $jsonData = array_merge([
             "element_id"       => $shareId,
             "publiclet_link"   => $link,
             "download_counter" => 0,
@@ -116,7 +129,7 @@ class LegacyPubliclet
             "has_password"     => (!empty($pData["PASSWORD"])),
             "element_watch"    => $elementWatch,
             "is_expired"       => ShareLink::isShareExpired($pData)
-        ), $shareMeta);
+        ], $shareMeta);
 
         return $jsonData;
     }
@@ -205,7 +218,7 @@ class LegacyPubliclet
                                 try{
                                     $link = new ShareLink($shareStore);
                                     $link->setOwnerId($userName);
-                                    $parameters = array("custom_handle" => $element, "simple_right_download" => true);
+                                    $parameters = ["custom_handle" => $element, "simple_right_download" => true];
                                     if(isSet($publiclet["EXPIRE_TIME"])) $parameters["expiration"] = $publiclet["EXPIRE_TIME"];
                                     if(isSet($publiclet["DOWNLOAD_LIMIT"])) $parameters["downloadlimit"] = $publiclet["DOWNLOAD_LIMIT"];
                                     $link->parseHttpVars($parameters);
@@ -217,12 +230,14 @@ class LegacyPubliclet
                                     /**
                                      * @var AbstractAccessDriver $driverInstance
                                      */
-                                    $driverInstance = PluginsService::findPlugin("access", $parentRepositoryObject->getAccessType());
+                                    $currentContext = new Context($userName);
+                                    $currentContext->setRepositoryObject($parentRepositoryObject);
+                                    $driverInstance = PluginsService::getInstance($currentContext)->findPlugin("access", $parentRepositoryObject->getAccessType());
                                     if(empty($driverInstance)){
                                         print("\n-- ERROR: Cannot find driver instance!");
                                         continue;
                                     }
-                                    $options = $driverInstance->makeSharedRepositoryOptions(["file" => "/"], $parentRepositoryObject);
+                                    $options = $driverInstance->makeSharedRepositoryOptions($currentContext, ["file" => "/"]);
                                     $options["SHARE_ACCESS"] = "private";
                                     $newRepo = $parentRepositoryObject->createSharedChild(
                                         basename($filePath),
@@ -268,7 +283,7 @@ class LegacyPubliclet
                                     }
 
                                     // UPDATE METADATA
-                                    $meta["ajxp_shared"] = ["shares" => [$element => array("type" => "minisite")]];
+                                    $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "minisite"]]];
 
                                 }catch(\Exception $e){
                                     print("\n-- ERROR: ".$e->getMessage());
@@ -292,7 +307,7 @@ class LegacyPubliclet
                         if($repo !== null){
                             print("\n--Shared repository: just metadata");
                             // Shared repo, migrating the meta should be enough
-                            $meta["ajxp_shared"] = array("shares" => [$element => array("type" => "repository")]);
+                            $meta["ajxp_shared"] = ["shares" => [$element => ["type" => "repository"]]];
                         }
                     }
                 }

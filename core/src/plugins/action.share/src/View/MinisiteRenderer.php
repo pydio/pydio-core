@@ -33,22 +33,46 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Share\ShareCenter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class MinisiteRenderer
+ * View class to load a share and display it as a minisite
+ *
+ * @package Pydio\Share\View
+ */
 class MinisiteRenderer
 {
+    /**
+     * Render a simple error instead of the minisite
+     * @param $data
+     * @param string $hash
+     * @param null $error
+     */
     public static function renderError($data, $hash = '', $error = null){
         self::loadMinisite($data, $hash, $error);
     }
 
+    /**
+     * Load the minisite
+     *
+     * @param $data
+     * @param string $hash
+     * @param null $error
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\LoginException
+     * @throws \Pydio\Core\Exception\WorkspaceNotFoundException
+     */
     public static function loadMinisite($data, $hash = '', $error = null)
     {
         $repository = $data["REPOSITORY"];
         $confs = [];
-        PluginsService::getInstance(Context::emptyContext())->initActivePlugins();
-        $shareCenter = PluginsService::findPlugin("action", "share");
+        $ctx = Context::emptyContext();
+        PluginsService::getInstance($ctx)->initActivePlugins();
+        $shareCenter = ShareCenter::getShareCenter($ctx);
         if($shareCenter !== false){
             $confs = $shareCenter->getConfigs();
         }
@@ -90,7 +114,7 @@ class MinisiteRenderer
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
-        Controller::applyHook("tpl.filter_html", array(Context::emptyContext(), &$html));
+        Controller::applyHook("tpl.filter_html", [$ctx, &$html]);
         $html = XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
@@ -102,7 +126,7 @@ class MinisiteRenderer
         $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
-        $guiConfigs = PluginsService::findPluginById("gui.ajax")->getConfigs();
+        $guiConfigs = PluginsService::getInstance($ctx)->findPluginById("gui.ajax")->getConfigs();
         $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"])){

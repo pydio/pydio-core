@@ -133,7 +133,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         // logfile name by date:
                         $today = getdate();
                         $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
-                        empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
+                        $file_path= empty($this->cas_debug_file) ? $file_path: $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
 

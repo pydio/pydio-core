@@ -2576,7 +2576,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         if(isSet($labels[$pluginId])){
             return $labels[$pluginId];
         }
-        $plugin = PluginsService::findPluginById("access.".$pluginId);
+        $plugin = PluginsService::getInstance(Context::emptyContext())->getPluginById("access.".$pluginId);
         if(!is_object($plugin)) {
             $label = "access.$plugin (plugin disabled!)";
         }else{

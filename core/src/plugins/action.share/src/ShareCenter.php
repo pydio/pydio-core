@@ -31,6 +31,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -188,6 +189,11 @@ class ShareCenter extends Plugin
     /**************************/
     /* PUBLIC LINKS ROUTER
     /**************************/
+    /**
+     * @param $serverBase
+     * @param $route
+     * @param $params
+     */
     public static function publicRoute($serverBase, $route, $params){
 
         if(isSet($params["hash"])){
@@ -256,10 +262,21 @@ class ShareCenter extends Plugin
     /**
      * @return ShareCenter
      */
-    public static function getShareCenter(){
-        return PluginsService::findPluginById("action.share");
+    public static function getShareCenter(ContextInterface $ctx = null){
+        if($ctx === null){
+            $ctx = Context::emptyContext();
+        }
+        /** @var ShareCenter $shareCenter */
+        $shareCenter = PluginsService::getInstance($ctx)->getPluginById("action.share");
+        if(empty($shareCenter->currentContext)){
+            $shareCenter->currentContext = $ctx;
+        }
+        return $shareCenter;
     }
 
+    /**
+     * @return bool
+     */
     public static function currentContextIsLinkDownload(){
         return (isSet($_GET["dl"]) && isSet($_GET["dl"]) == "true");
     }
@@ -393,8 +410,14 @@ class ShareCenter extends Plugin
         return false;
     }
 
+    /**
+     * @param $childRepoId
+     * @param $userId
+     * @param bool $toggle
+     * @param null $parentUserId
+     */
     protected function toggleWatchOnSharedRepository($childRepoId, $userId, $toggle = true, $parentUserId = null){
-        if ($this->watcher === false || !$this->currentContext->hasUser() == null) {
+        if ($this->watcher === false || !$this->currentContext->hasUser()) {
             return;
         }
         $rootNode = new AJXP_Node("pydio://".$userId."@".$childRepoId."/");
@@ -1118,6 +1141,13 @@ class ShareCenter extends Plugin
         return $result;
     }
 
+    /**
+     * @param null $fromMirrors
+     * @param null $toMirrors
+     * @param bool $copy
+     * @param null $direction
+     * @throws \Exception
+     */
     private function applyForwardEvent($fromMirrors = null, $toMirrors = null, $copy = false, $direction = null){
         if($fromMirrors === null){
             // Create
@@ -1171,7 +1201,7 @@ class ShareCenter extends Plugin
 
         $refNode = ($fromNode != null ? $fromNode : $toNode);// cannot be both null
         if(empty($direction) && $this->getContextualOption($refNode->getContext(), "FORK_EVENT_FORWARDING")){
-            OCS::applyActionInBackground(
+            CliRunner::applyActionInBackground(
                 $refNode->getContext(),
                 "forward_change_event",
                 array(
@@ -1207,6 +1237,11 @@ class ShareCenter extends Plugin
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     */
     public function forwardEventToSharesAction($actionName, $httpVars, $fileVars){
 
         $fromMirrors = null;
@@ -1260,7 +1295,7 @@ class ShareCenter extends Plugin
         if(isSet($_GET["lang"])){
             LocaleService::setLanguage($_GET["lang"]);
         }
-        $shareCenter = self::getShareCenter();
+        $shareCenter = self::getShareCenter(Context::emptyContext());
         $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = LocaleService::getMessages();
         if($data === false){
@@ -1298,7 +1333,7 @@ class ShareCenter extends Plugin
      */
     public static function loadPubliclet($data)
     {
-        $shareCenter = self::getShareCenter();
+        $shareCenter = self::getShareCenter(Context::emptyContext());
         $options = $shareCenter->getConfigs();
         $shareStore = $shareCenter->getShareStore();
         LegacyPubliclet::render($data, $options, $shareStore);

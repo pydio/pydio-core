@@ -173,7 +173,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             // WARNING - This needs to be relative... :/
             $response = $client->get('ocs-provider/');
         } catch (RequestException $e) {
-            throw new \Exception('Failed to communicate with ocs provider');
+            throw new \Exception('Failed to communicate with ocs provider : '. $e->getMessage());
         }
 
         if ($response->getStatusCode() != 200) {
