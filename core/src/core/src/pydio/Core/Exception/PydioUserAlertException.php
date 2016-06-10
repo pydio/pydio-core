@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Exception;
 
-use Pydio\Core\Exception\PydioException;
+
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

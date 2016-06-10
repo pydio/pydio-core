@@ -20,15 +20,15 @@
  */
 namespace Pydio\Share\Store;
 
-use Pydio\Access\Core\AbstractAccessDriver;
+
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Auth\Core\AJXP_Safe;
+
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
-use Pydio\Core\Controller\Controller;
+
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;

@@ -20,13 +20,13 @@
  */
 namespace Pydio\Access\Core\Model;
 
-use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
+
+
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

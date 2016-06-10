@@ -15,7 +15,6 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Services\ConfService;
 
 class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 {

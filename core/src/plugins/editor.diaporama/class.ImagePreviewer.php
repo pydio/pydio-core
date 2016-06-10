@@ -22,7 +22,7 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -120,6 +120,12 @@ class ImagePreviewer extends Plugin
         }
     }
 
+    /**
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @param $masterFile
+     * @param $targetFile
+     * @return bool
+     */
     public function generateThumbnail(\Pydio\Core\Model\ContextInterface $ctx, $masterFile, $targetFile)
     {
         $size = $this->currentDimension;
@@ -143,6 +149,7 @@ class ImagePreviewer extends Plugin
             $this->logError("ImagePreviewer", $pThumb->error_array);
             return false;
         }
+        return true;
     }
 
     //public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){

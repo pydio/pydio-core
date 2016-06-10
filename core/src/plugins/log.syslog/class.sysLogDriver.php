@@ -53,6 +53,7 @@ class sysLogDriver extends textLogDriver
         if ($this->fileHandle !== false) {
             $this->close();
         }
+        parent::__destruct();
     }
 
     /**
@@ -61,6 +62,7 @@ class sysLogDriver extends textLogDriver
     public function __clone() {
         $this->close();
         $this->open();
+        parent::__clone();
     }
 
     /**

@@ -29,7 +29,7 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Model\Context;
+
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;

@@ -26,7 +26,7 @@ use PclZip;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
@@ -437,6 +437,7 @@ class fsAccessWrapper implements IAjxpWrapper
      *
      * @param string $path
      * @param int $options
+     * @return bool
      */
     public function dir_opendir ($path , $options )
     {

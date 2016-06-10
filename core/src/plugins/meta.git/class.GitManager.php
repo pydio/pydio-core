@@ -113,7 +113,7 @@ class GitManager extends AJXP_AbstractMetaSource
                 $command = $git->getCommand("cat-file");
                 $command->setOption("s", true);
                 $command->addArgument($commitId.":".$file);
-                $size = $command->execute();
+                $command->execute();
 
                 $command = $git->getCommand("show");
                 $command->addArgument($commitId.":".$file);

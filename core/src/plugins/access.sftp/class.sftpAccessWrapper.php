@@ -23,11 +23,11 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -92,7 +92,6 @@ class sftpAccessWrapper extends fsAccessWrapper
      */
     protected static function initPath($path, $streamType="", $sftpResource = false, $skipZip = false)
     {
-        $url = Utils::safeParseUrl($path);
         $node = new AJXP_Node($path);
         $repoObject = $node->getRepository();
         if(!isSet($repoObject)) {
@@ -113,7 +112,7 @@ class sftpAccessWrapper extends fsAccessWrapper
             $path = substr($path, 1);
         }
         // SHOULD RETURN ssh2.sftp://Resource #23/server/path/folder/path
-        return  "ssh2.sftp://".self::getSftpResource($repoObject).$basePath."/".$path;
+        return  "ssh2.sftp://".self::getSftpResource($ctx).$basePath."/".$path;
     }
 
     /**

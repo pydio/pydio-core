@@ -166,7 +166,6 @@ class Collection extends Node implements Sabre\DAV\ICollection
 
 
         $contents = array();
-        $errors = array();
 
         $nodes = scandir($this->getUrl());
 

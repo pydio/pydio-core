@@ -25,13 +25,14 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Exception\DBConnectionException;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpRole;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -685,6 +686,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Instantiate the right class
      *
      * @param AbstractAjxpUser $userId
+     * @return AbstractAjxpUser|AJXP_SqlUser
      */
     public function instantiateAbstractUserImpl($userId)
     {
@@ -738,6 +740,8 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * @param AJXP_Role[] $roles
+     * @return void
+     * @throws PydioException
      */
     public function saveRoles($roles)
     {
@@ -763,14 +767,16 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                     );
                     break;
                 default:
-                    return "ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__";
+                    throw new PydioException("ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__");
             }
         }
     }
 
     /**
      * @param AJXP_Role $role
+     * @param null $userObject
      * @return string|void
+     * @throws PydioException
      */
     public function updateRole($role, $userObject = null)
     {
@@ -793,7 +799,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 dibi::query("INSERT INTO [ajxp_roles] ([role_id],[serial_role],[last_updated]) VALUES (%s, %s, %i) ON DUPLICATE KEY UPDATE [serial_role]=VALUES([serial_role]), [last_updated]=VALUES([last_updated])", $role->getId(), serialize($role), time());
                 break;
             default:
-                return "ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__";
+                throw new PydioException("ERROR!, DB driver ". $this->sqlDriver["driver"] ." not supported yet in __FUNCTION__");
         }
     }
 

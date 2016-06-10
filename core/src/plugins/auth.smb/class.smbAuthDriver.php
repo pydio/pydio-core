@@ -21,7 +21,7 @@
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\RepositoryService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -74,7 +74,7 @@ class smbAuthDriver extends AbstractAuthDriver
         $repoId = $this->options["REPOSITORY_ID"];
         $repoObject = RepositoryService::getRepositoryById($repoId);
         if(!isSet($repoObject)) throw new Exception("Cannot find repository with id ".$repoId);
-        $path = "";
+
         $basePath   = $repoObject->getSafeOption("PATH");
         $basePath   = str_replace("AJXP_USER", $login, $basePath);
         $host       = $repoObject->getSafeOption("HOST");

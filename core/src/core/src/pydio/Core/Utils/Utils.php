@@ -21,9 +21,10 @@
 namespace Pydio\Core\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
@@ -915,7 +916,7 @@ class Utils
     }
 
     /**
-     * @param Repository $repository
+     * @param RepositoryInterface $repository
      * @return string
      */
     public static function getWorkspaceShortcutURL($repository){

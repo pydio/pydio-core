@@ -209,13 +209,4 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
     }
 
-    /**
-     * @param $url
-     * @return mixed|string
-     */
-    private static function getPath($url) {
-        $path = parse_url($url, PHP_URL_PATH);
-        if($path == "/" || $path === $url) return "";
-        return $path;
-    }
 }

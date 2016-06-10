@@ -20,7 +20,7 @@
  */
 namespace Pydio\Tests;
 
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Core\Model\Context;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

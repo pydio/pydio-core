@@ -27,7 +27,7 @@ use Dropbox_Exception_NotFound;
 use Dropbox_OAuth_PEAR;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;

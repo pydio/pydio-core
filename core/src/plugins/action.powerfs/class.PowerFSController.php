@@ -21,7 +21,7 @@
 
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
@@ -75,8 +75,7 @@ class PowerFSController extends Plugin
             case "postcompress_download":
 
                 $archive = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
-                /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
-                $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
+
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
                     $fileReader = new \Pydio\Core\Http\Response\FileReaderResponse($archive);

@@ -20,7 +20,7 @@
  */
 namespace Pydio\Tests;
 
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 

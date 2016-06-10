@@ -20,7 +20,7 @@
  */
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 

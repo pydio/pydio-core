@@ -33,7 +33,7 @@ use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
-use Pydio\Core\Model\Context;
+
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
@@ -904,7 +904,6 @@ abstract class AbstractConfDriver extends Plugin
 
                 $webdavActive = false;
                 $passSet = false;
-                $digestSet = false;
                 // Detect http/https and host
                 if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
                     $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
@@ -1108,7 +1107,6 @@ abstract class AbstractConfDriver extends Plugin
 
             case "user_list_authorized_users" :
 
-                $defaultFormat = "html";
                 if(isSet($httpVars["format"]) && $httpVars["format"] == "xml"){
                     header('Content-Type: text/xml; charset=UTF-8');
                     header('Cache-Control: no-cache');

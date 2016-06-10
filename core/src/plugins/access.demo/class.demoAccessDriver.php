@@ -24,7 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\FS;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Core\Controller\XMLWriter;
+
 use Pydio\Core\Exception\PydioException;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

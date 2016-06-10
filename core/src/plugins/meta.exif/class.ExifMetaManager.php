@@ -21,12 +21,12 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Model\AJXP_Node;
+
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Controller\HTMLWriter;
+
+
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
@@ -137,10 +137,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
             $exifData["IPTC"] = $iptc;
         }
         $excludeTags = array();// array("componentsconfiguration", "filesource", "scenetype", "makernote", "datadump");
-        $format = "xml";
-        if(isSet($httpVars["format"]) && $httpVars["format"] == "json"){
-            $format = "json";
-        }
+
         $filteredData = array();
         foreach ($exifData as $section => $data) {
             $filteredData[$section] = array();

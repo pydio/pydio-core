@@ -29,8 +29,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;

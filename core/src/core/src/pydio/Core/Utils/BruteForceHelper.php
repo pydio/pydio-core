@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Utils;
 
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Log\Core\AJXP_Logger;
 

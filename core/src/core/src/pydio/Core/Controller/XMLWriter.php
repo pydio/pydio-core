@@ -24,6 +24,8 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -79,6 +81,7 @@ class XMLWriter
     {
         if($print){
             print("</$docNode>");
+            return "";
         }else{
             return "</$docNode>";
         }
@@ -615,10 +618,10 @@ class XMLWriter
 
     /**
      * @param string $repoId
-     * @param \Pydio\Access\Core\Model\Repository $repoObject
+     * @param RepositoryInterface $repoObject
      * @param array $exposed
      * @param array $streams
-     * @param AbstractAjxpUser $loggedUser
+     * @param UserInterface $loggedUser
      * @param string $accessStatus
      * @return string
      * @throws \Exception
@@ -638,7 +641,7 @@ class XMLWriter
         }
 
         $streamString = "";
-        if (in_array($repoObject->accessType, $streams)) {
+        if (in_array($repoObject->getAccessType(), $streams)) {
             $streamString = "allowCrossRepositoryCopy=\"true\"";
         }
         if ($repoObject->getUniqueUser()) {
@@ -678,7 +681,7 @@ class XMLWriter
         $ctx = Context::contextWithObjects($loggedUser, $repoObject);
         $roleString="";
         if($loggedUser != null){
-            $merged = $loggedUser->mergedRole;
+            $merged = $loggedUser->getMergedRole();
             $params = array();
             foreach($exposed as $exposed_prop){
                 $metaOptions = $repoObject->getContextOption($ctx, "META_SOURCES");
@@ -701,7 +704,7 @@ class XMLWriter
                 $roleString.= ' hasMask="true" ';
             }
         }
-        return "<repo access_type=\"".$repoObject->accessType."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings($ctx)."</repo>";
+        return "<repo access_type=\"".$repoObject->getAccessType()."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$repoObject->getClientSettings($ctx)."</repo>";
 
     }
 

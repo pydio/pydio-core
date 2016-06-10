@@ -26,9 +26,8 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Conf\Core\AjxpGroupPathProvider;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\VarsFilter;

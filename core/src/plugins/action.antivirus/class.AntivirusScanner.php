@@ -138,11 +138,11 @@ class AntivirusScanner extends Plugin
     {
         $this->setPath($nodeObject);
         $this->setFileExtension($nodeObject);
-        $this->setExtensionScan();
-        $this->setScanDiffFolder ();
-        $this->setScanMaxSize ();
+        $this->setExtensionScan($nodeObject);
+        $this->setScanDiffFolder($nodeObject);
+        $this->setScanMaxSize($nodeObject);
         $this->setFileSize($nodeObject);
-        $this->setScanAll();
+        $this->setScanAll($nodeObject);
 
         //debug option, put in a file attribute values
         if (self::DEBUG_ON == 1) {

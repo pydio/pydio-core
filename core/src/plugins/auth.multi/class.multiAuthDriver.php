@@ -20,7 +20,7 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

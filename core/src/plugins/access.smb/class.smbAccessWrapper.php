@@ -24,8 +24,8 @@ namespace Pydio\Access\Driver\StreamProvider\SMB;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Log\Core\AJXP_Logger;

@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -95,6 +95,8 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
      * @param String $nameSpace
      * @param bool $private
      * @param int $scope
+     * @return array|void
+     * @throws Exception
      */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {

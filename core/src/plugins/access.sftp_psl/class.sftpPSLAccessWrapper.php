@@ -24,10 +24,10 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 use Net_SSH2;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 

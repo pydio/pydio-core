@@ -21,7 +21,7 @@
 namespace Pydio\Metastore\Core;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\IAjxpWrapper;
+
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;

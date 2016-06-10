@@ -30,6 +30,7 @@
 namespace Pydio\Core\Utils;
 
 //define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
+use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
 define("JSON_DIR", AJXP_INSTALL_PATH."/../api");

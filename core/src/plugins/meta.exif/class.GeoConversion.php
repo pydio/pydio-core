@@ -1,13 +1,13 @@
 <?php
 //*************************English Description***************************//
 // Class to convert Latitude/Longitude Coordinates                       //
-// Developed by: Diêgo Garrido de Almeida (diego@brflog.net)             //
+// Developed by: Diï¿½go Garrido de Almeida (diego@brflog.net)             //
 // Location: Conselheiro Lafaiete - Minas Gerais / Brazil                //
 // License: None, this class can be used without credits                 //
 // Recommended use: To convert the Google Earth standard coordinates     //
 //                  to Google Maps API standard coordinates, to do this, //
 //                  use the method GeoConversao::DMS2Dd.                 //
-//                  eg: $GeoConversao->DMS2Dd('45º22\'38"') -> 45.3772   //
+//                  eg: $GeoConversao->DMS2Dd('45ï¿½22\'38"') -> 45.3772   //
 //                                                                       //
 //                                                                       //
 //                                                                       //
@@ -23,22 +23,22 @@
 // DMS (DMS) = Degrees, Minutes, Seconds (eg. 45o22'38")                 //
 //***********************************************************************//
 
-//**************************Descrição em Português*********************//
-// Classe para conversão de coordenadas de Latitude e Longitude        //
-// Desenvolvida por: Diêgo Garrido de Almeida                          //
-// Localização: Conselheiro Lafaiete - Minas Gerais / Brasil           //
-// Licença: Nenhuma, podendo ser alterada, sem necessidade de créditos //
-// Utilização Recomendada: Conversão das Coordenadas do Google Earth   //
-//                         para a API do Google Maps para WEB, através //
-//                         do Método GeoConversao::DMS2Dd              //
-//                 ex: $GeoConversao->DMS2Dd('45º22\'38"') -> 45.3772  //
+//**************************Descrio em Portugus*********************//
+// Classe para converso de coordenadas de Latitude e Longitude        //
+// Desenvolvida por: Diego Garrido de Almeida                          //
+// Localizado: Conselheiro Lafaiete - Minas Gerais / Brasil           //
+// Licenca: Nenhuma, podendo ser alterada, sem necessidade de creditos //
+// Utilizatio Recomendada: Conversco das Coordenadas do Google Earth   //
+//                         para a API do Google Maps para WEB, atraves //
+//                         do Metodo GeoConversao::DMS2Dd              //
+//                 ex: $GeoConversao->DMS2Dd('45a22\'38"') -> 45.3772  //
 //                                                                     //
-// Considerações:                                                      //
+// Considerades:                                                      //
 // D = Degrees (Degrais)                                               //
 // M = Minutes (Minutos)                                               //
 // S = Seconds (Segundos)                                              //
-// .m = Decimal Minutes (Décimos de Minuto)                            //
-// .s = Decimal Seconds (Décimos de Segundo)                           //
+// .m = Decimal Minutes (Decimos de Minuto)                            //
+// .s = Decimal Seconds (Decimos de Segundo)                           //
 //                                                                     //
 // DM.m (DMm) = Degrees, Minutes, Decimal Minutes (ex. 45o22.6333)     //
 // D.d (Dd) = Degrees, Decimal Degrees (ex. 45.3772o)                  //
@@ -106,7 +106,7 @@ Class GeoConversion{
        $array_DMm['M'] = $array_DMS['M'];
        $array_DMm['D'] = $array_DMS['D'];
 
-       return $this->negative_path.$array_DMm['D'].'º'.($array_DMm['M'] + $array_DMm['m']);
+       return $this->negative_path.$array_DMm['D'].'ï¿½'.($array_DMm['M'] + $array_DMm['m']);
    }
 
    public function DMm2Dd($DMm)
@@ -143,7 +143,7 @@ Class GeoConversion{
        $array_DMS['M'] = $array_DMm['M'];
        $array_DMS['D'] = $array_DMm['D'];
 
-       return $array_DMS['D'].'°'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
+       return $array_DMS['D'].'ï¿½'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
    }
 
    public function Dd2DMm($Dd)
@@ -161,7 +161,7 @@ Class GeoConversion{
        $array_DMm['M'] = $dados_Mm[0];
        $array_DMm['D'] = $array_Dd['D'];
 
-       return $this->negative_path.$array_DMm['D']."º ".$array_DMm['M'].".".$array_DMm['m'];
+       return $this->negative_path.$array_DMm['D']."ï¿½ ".$array_DMm['M'].".".$array_DMm['m'];
    }
 
    public function Dd2DMS($Dd)

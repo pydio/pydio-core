@@ -253,7 +253,7 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
      * @param $permissionTree
      * @param $level
      */
-    public function toStr($permissionTree, $level)
+    public function toStr($permissionTree, &$level)
     {
         $level = $level + 1;
         foreach ($permissionTree as $key => $node) {

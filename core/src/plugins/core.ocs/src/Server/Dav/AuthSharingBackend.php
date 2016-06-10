@@ -24,6 +24,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Http\Dav\Collection;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
@@ -103,7 +104,8 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+        $ctx = new Context($token, null);
+        $shareStore = new ShareStore($ctx, ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;

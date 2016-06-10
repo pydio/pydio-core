@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Model;
 
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 

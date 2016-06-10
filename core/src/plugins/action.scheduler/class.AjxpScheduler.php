@@ -22,7 +22,7 @@
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\Controller;
+
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;

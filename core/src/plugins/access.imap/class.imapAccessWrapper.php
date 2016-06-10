@@ -23,7 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\Imap;
 use EmlParser;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
@@ -466,12 +466,9 @@ class imapAccessWrapper implements IAjxpWrapper
         $fp = fopen($path, 'r');
         $bufferSize = 4096 * 8;
         if ($fp) {
-            $i = 0;
             while (!feof($fp)) {
                 $data = fread($fp, $bufferSize);
                 fwrite($stream, $data, strlen($data));
-                //if($i > 10) break;
-                //$i++;
             }
             fclose($fp);
         }

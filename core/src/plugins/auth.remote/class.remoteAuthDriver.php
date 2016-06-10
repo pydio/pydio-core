@@ -259,7 +259,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         if(UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if(!is_array($users)) $users = array();
-        if(array_key_exists($login, $users)) return "exists";
+        if(array_key_exists($login, $users)) return;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = Utils::pbkdf2_create_hash($passwd);
         } else {

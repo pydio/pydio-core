@@ -26,12 +26,12 @@ use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Controller\XMLWriter;
+
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

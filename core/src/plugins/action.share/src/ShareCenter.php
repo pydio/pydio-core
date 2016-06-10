@@ -31,7 +31,6 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -295,7 +294,7 @@ class ShareCenter extends Plugin
                 $hMin = $this->getContextualOption($this->currentContext, "HASH_MIN_LENGTH");
             }
             $this->shareStore = new ShareStore(
-                isSet($this->currentContext) ? $this->currentContext : Context::fromGlobalServices(),
+                $this->currentContext,
                 ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
                 $hMin
             );
@@ -343,7 +342,7 @@ class ShareCenter extends Plugin
                 );
             }
             $this->rightsManager = new ShareRightsManager(
-                isSet($this->currentContext) ? $this->currentContext : Context::fromGlobalServices(),
+                $this->currentContext,
                 $options,
                 $this->getShareStore(),
                 $this->watcher);

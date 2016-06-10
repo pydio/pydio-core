@@ -23,8 +23,8 @@ namespace Pydio\Core\PluginFramework;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Services\AuthService;
+
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Log\Core\AJXP_Logger;

@@ -23,7 +23,7 @@ namespace Pydio\Access\Core\Model;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 

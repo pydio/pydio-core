@@ -22,7 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
@@ -60,7 +60,7 @@ class IMagickPreviewer extends Plugin
     {
         $convert = $this->getContextualOption($contextInterface, "IMAGE_MAGICK_CONVERT");
         if (empty($convert)) {
-            return false;
+            return ;
         }
         $flyThreshold = 1024*1024*intval($this->getContextualOption($contextInterface, "ONTHEFLY_THRESHOLD"));
         $selection = UserSelection::fromContext($contextInterface, $httpVars);
@@ -78,7 +78,7 @@ class IMagickPreviewer extends Plugin
             }
 
             if (($size = filesize($file)) === false) {
-                return false;
+                return ;
             } else {
                 if($size > $flyThreshold) $this->useOnTheFly = true;
                 else $this->useOnTheFly = false;
@@ -100,14 +100,14 @@ class IMagickPreviewer extends Plugin
                 $files = $this->listExtractedJpg($file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
-                return false;
+                return ;
             } else if ($this->extractAll) { // on the fly extract mode
                 $ext = pathinfo($file, PATHINFO_EXTENSION);
                 $prefix = str_replace(".$ext", "", $cache->getId());
                 $files = $this->listPreviewFiles($contextInterface, $file, $prefix);
                 header("Content-Type: application/json");
                 print(json_encode($files));
-                return false;
+                return ;
             } else {
                 header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
                 header("Content-Length: ".strlen($cacheData));
@@ -116,7 +116,7 @@ class IMagickPreviewer extends Plugin
                 header("Last-Modified: " . gmdate("D, d M Y H:i:s", time()-10000) . " GMT");
                 header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
                 print($cacheData);
-                return false;
+                return ;
             }
 
         } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
@@ -136,7 +136,7 @@ class IMagickPreviewer extends Plugin
                 $this->generateJpegsCallback($contextInterface, $destStreamURL.$srcfile, $file);
 
             }
-            if(!is_file($file)) return false;
+            if(!is_file($file)) return ;
             header("Content-Type: image/jpeg; name=\"".basename($file)."\"");
             header("Content-Length: ".filesize($file));
             header('Cache-Control: public');
@@ -151,6 +151,7 @@ class IMagickPreviewer extends Plugin
             }
             */
         }
+        
     }
 
     /**

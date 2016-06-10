@@ -602,47 +602,47 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         }
         if($doc == null) throw new Exception("Could not load document");
 
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl()), TextEncoder::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), TextEncoder::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Text("basename", basename($ajxpNode->getPath())), TextEncoder::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_node", "yes"), TextEncoder::getEncoding());
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "shared"));
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
-        $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_bytesize", $ajxpNode->bytesize));
+        $doc->addField(Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl()), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath())), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::text("basename", basename($ajxpNode->getPath())), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_node", "yes"), TextEncoder::getEncoding());
+        $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_scope", "shared"));
+        $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
+        $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_bytesize", $ajxpNode->bytesize));
         $ajxpMime = $ajxpNode->ajxp_mime;
         if (empty($ajxpMime)) {
-            $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION)));
+            $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_mime", pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION)));
         } else {
-            $doc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_mime", $ajxpNode->ajxp_mime));
+            $doc->addField(Zend_Search_Lucene_Field::keyword("ajxp_mime", $ajxpNode->ajxp_mime));
         }
 
 
         // Store a cached copy of the metadata
         $serializedMeta = base64_encode(serialize($ajxpNode->metadata));
-        $doc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", $serializedMeta));
+        $doc->addField(Zend_Search_Lucene_Field::binary("serialized_metadata", $serializedMeta));
         if (isSet($ajxpNode->indexableMetaKeys["shared"])) {
             foreach ($ajxpNode->indexableMetaKeys["shared"] as $sharedField) {
-                if($ajxpNode->$sharedField) $doc->addField(Zend_search_Lucene_Field::keyword($sharedField, $ajxpNode->$sharedField));
+                if($ajxpNode->$sharedField) $doc->addField(Zend_Search_Lucene_Field::keyword($sharedField, $ajxpNode->$sharedField));
             }
         }
         foreach ($this->metaFields as $field) {
             if ($ajxpNode->$field != null) {
-                $doc->addField(Zend_Search_Lucene_Field::Text("ajxp_meta_$field", $ajxpNode->$field), TextEncoder::getEncoding());
+                $doc->addField(Zend_Search_Lucene_Field::text("ajxp_meta_$field", $ajxpNode->$field), TextEncoder::getEncoding());
             }
         }
         if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && UsersService::usersEnabled() && $ajxpNode->getContext()->hasUser() ) {
             $privateDoc = new Zend_Search_Lucene_Document();
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_url", $ajxpNode->getUrl(), TextEncoder::getEncoding()));
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), TextEncoder::getEncoding()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), TextEncoder::getEncoding()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), TextEncoder::getEncoding()));
 
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_scope", "user"));
-            $privateDoc->addField(Zend_Search_Lucene_Field::Keyword("ajxp_user", $ajxpNode->getContext()->getUser()->getId()));
+            $privateDoc->addField(Zend_Search_Lucene_Field::keyword("ajxp_scope", "user"));
+            $privateDoc->addField(Zend_Search_Lucene_Field::keyword("ajxp_user", $ajxpNode->getContext()->getUser()->getId()));
             foreach ($ajxpNode->indexableMetaKeys["user"] as $userField) {
                 if ($ajxpNode->$userField) {
-                    $privateDoc->addField(Zend_search_Lucene_Field::keyword($userField, $ajxpNode->$userField));
+                    $privateDoc->addField(Zend_Search_Lucene_Field::keyword($userField, $ajxpNode->$userField));
                 }
             }
-            $privateDoc->addField(Zend_Search_Lucene_Field::Binary("serialized_metadata", $serializedMeta));
+            $privateDoc->addField(Zend_Search_Lucene_Field::binary("serialized_metadata", $serializedMeta));
 
             $index->addDocument($privateDoc);
         }

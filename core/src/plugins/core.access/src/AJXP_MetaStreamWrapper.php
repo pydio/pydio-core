@@ -24,7 +24,7 @@ namespace Pydio\Access\Core;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
+
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
 
@@ -202,7 +202,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         return self::findWrapperClassName(AJXP_Node::contextFromUrl($url), $nextScheme, $context);
     }
 
-    /** @param $node AJXP_Node */
+    /** @var $node AJXP_Node */
     protected static function actualRepositoryWrapperData(AJXP_Node $node){
         $repositoryId = $node->getRepositoryId();
         if(isSet(self::$cachedRepositoriesWrappers[$repositoryId])){

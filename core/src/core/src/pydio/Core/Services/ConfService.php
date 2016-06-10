@@ -20,16 +20,16 @@
  */
 namespace Pydio\Core\Services;
 
-use Pydio\Access\Core\AbstractAccessDriver;
+
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
-use Pydio\Core\Exception\PydioException;
+
 use Pydio\Core\Model\Context;
-use Pydio\Core\Model\RepositoryInterface;
+
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;

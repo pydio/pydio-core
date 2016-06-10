@@ -24,7 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Services\LocaleService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
@@ -505,6 +505,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             return mysql_fetch_array($res);
             // ["Field", "Type", "Null", "Key", "Default", "Extra"] => Type is like "enum('a', 'b', 'c')"
         }
+        return [];
     }
 
     public function makeColumnDef($row, $prefix="", $suffix="")

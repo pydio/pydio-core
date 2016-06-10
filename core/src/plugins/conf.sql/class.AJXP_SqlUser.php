@@ -474,6 +474,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
      * Save user rights, preferences and bookmarks.
      * @param String $context
      * @see AbstractAjxpUser#save()
+     * @return mixed|void
      */
     protected function _save($context = "superuser")
     {
@@ -545,6 +546,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
      *
      * @param string $key String key of data to save.
      * @param mixed $value Value to save
+     * @return mixed|void
      */
     public function saveTemporaryData($key, $value)
     {

@@ -22,7 +22,7 @@
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;

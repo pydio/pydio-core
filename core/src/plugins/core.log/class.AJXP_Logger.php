@@ -23,7 +23,7 @@ namespace Pydio\Log\Core;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;

@@ -134,7 +134,7 @@ class CliRunner
             if (AJXP_SERVER_DEBUG) $cmd .= " > " . $logFile;
             if (class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")) {
                 $WshShell = new COM("WScript.Shell");
-                $oExec = $WshShell->Run("cmd /C $cmd", 0, false);
+                $WshShell->Run("cmd /C $cmd", 0, false);
             } else {
                 $basePath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
                 $tmpBat = implode(DIRECTORY_SEPARATOR, array($basePath, "data", "tmp", md5(time()) . ".bat"));

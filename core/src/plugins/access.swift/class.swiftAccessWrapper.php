@@ -23,7 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\Swift;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -136,8 +136,6 @@ class swiftAccessWrapper extends fsAccessWrapper
         }
         return $stat;
 
-        // Non existing file
-           return null;
     }
 
     /**

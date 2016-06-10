@@ -167,11 +167,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if($size != -1){
             return $size;
         }else{
-            return $this->recursiveDirUsageByListing($directoryPath);
+            return $this->recursiveDirUsageByListing($node->getUrl());
         }
 
     }
 
+    /**
+     * @param $path
+     * @return int|string
+     */
     protected function recursiveDirUsageByListing($path){
         $total_size = 0;
         $files = scandir($path);
@@ -190,6 +194,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $total_size;
     }
 
+    /**
+     * @param $contribNode
+     * @param $arrayActions
+     * @param $targetMethod
+     */
     public function redirectActionsToMethod(&$contribNode, $arrayActions, $targetMethod)
     {
         $actionXpath=new DOMXPath($contribNode->ownerDocument);

@@ -196,7 +196,7 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 
     public function createUser($login, $passwd)
     {
-        if($this->userExists($login)) return "exists";
+        if($this->userExists($login)) return;
         $userData = array("login" => $login);
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $userData["password"] = Utils::pbkdf2_create_hash($passwd); //md5($passwd);

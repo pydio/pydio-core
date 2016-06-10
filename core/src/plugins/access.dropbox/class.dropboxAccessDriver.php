@@ -25,7 +25,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 

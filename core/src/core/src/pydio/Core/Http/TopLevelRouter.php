@@ -23,7 +23,7 @@ namespace Pydio\Core\Http;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\Utils;
+
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');

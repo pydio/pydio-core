@@ -22,17 +22,16 @@
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use DOMNode;
-use PclZip;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+
+
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
-use Pydio\Core\Model\Context;
+
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\TextEncoder;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

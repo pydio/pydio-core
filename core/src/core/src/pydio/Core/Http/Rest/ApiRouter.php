@@ -100,7 +100,7 @@ class ApiRouter
                 //$response = $response->withStatus(404);
                 break;
             case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
+                //$allowedMethods = $routeInfo[1];
                 //$response = $response->withStatus(405);
                 break;
             case \FastRoute\Dispatcher::FOUND:

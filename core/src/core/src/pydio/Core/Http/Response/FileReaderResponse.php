@@ -178,7 +178,7 @@ class FileReaderResponse extends AsyncResponseStream
         } else {
             $size = $byteLength;
         }
-        if ($confGzip && ($size > $confGzipLimit || !function_exists("gzencode") || @strpos($serverParams['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE)) {
+        if ($confGzip && ($size > $confGzipLimit || !function_exists("gzencode") || (isSet($serverParams['HTTP_ACCEPT_ENCODING']) && strpos($serverParams['HTTP_ACCEPT_ENCODING'], 'gzip') === FALSE))) {
             $confGzip = false;
         }
 

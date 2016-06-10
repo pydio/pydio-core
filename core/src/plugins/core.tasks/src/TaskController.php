@@ -24,14 +24,14 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\CliRunner;
-use Pydio\Core\Controller\Controller;
+
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\SimpleRestResourceRouter;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Tasks\Providers\SqlTasksProvider;
 use Zend\Diactoros\Response\JsonResponse;

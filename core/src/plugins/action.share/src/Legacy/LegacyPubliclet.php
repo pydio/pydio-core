@@ -28,15 +28,15 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\Controller;
+
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+
 use Pydio\Share\Model\ShareLink;
 use Pydio\Share\ShareCenter;
 use Pydio\Share\Store\ShareRightsManager;
@@ -264,7 +264,7 @@ class LegacyPubliclet
                                     print("\n-- Should save following LINK: ");
                                     print_r($link->getJsonData($shareCenter->getPublicAccessManager(), LocaleService::getMessages()));
                                     if(!$dryRun){
-                                        $hash = $link->save();
+                                        $link->save();
                                     }
 
                                     // UPDATE METADATA

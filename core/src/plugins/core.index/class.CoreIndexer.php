@@ -19,12 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
@@ -175,7 +172,7 @@ class CoreIndexer extends Plugin {
 
 
     /**
-     * @param \Pydio\Access\Core\Model\Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      * @return string
      */
@@ -194,7 +191,7 @@ class CoreIndexer extends Plugin {
     /**
      * @param String $status
      * @param String $message
-     * @param Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      * @param boolean $stoppable
      */
@@ -211,7 +208,7 @@ class CoreIndexer extends Plugin {
     }
 
     /**
-     * @param Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      * @return array Array(STATUS, Message)
      */
@@ -226,7 +223,7 @@ class CoreIndexer extends Plugin {
     }
 
     /**
-     * @param Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      */
     protected function releaseStatus($repository, $user)
@@ -241,7 +238,7 @@ class CoreIndexer extends Plugin {
 
 
     /**
-     * @param Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      */
     protected function requireInterrupt($repository, $user)
@@ -250,7 +247,7 @@ class CoreIndexer extends Plugin {
     }
 
     /**
-     * @param Repository $repository
+     * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
      * @return boolean
      */

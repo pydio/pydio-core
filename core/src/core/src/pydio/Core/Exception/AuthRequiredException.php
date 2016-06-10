@@ -23,7 +23,7 @@ namespace Pydio\Core\Exception;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');

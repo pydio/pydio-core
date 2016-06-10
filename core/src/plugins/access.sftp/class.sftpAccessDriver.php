@@ -34,7 +34,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Utils;
-use Sabre\CalDAV\Principal\User;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

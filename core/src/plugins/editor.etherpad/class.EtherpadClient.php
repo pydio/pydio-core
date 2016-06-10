@@ -22,9 +22,9 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Services\LocaleService;
+
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;

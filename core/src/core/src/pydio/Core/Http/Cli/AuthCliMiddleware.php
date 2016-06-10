@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Cli;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Auth\Core\AJXP_Safe;
-use Pydio\Core\Controller\Controller;
+
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Http\Server;

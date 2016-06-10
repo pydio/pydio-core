@@ -372,12 +372,6 @@ class PThumb{
                 	print(implode("",file($cache_file)));
                 	die();
                 	
-					//Prepare redirectional URL
-					$redir_url = $_SERVER["HTTP_HOST"].dirname($_SERVER["PHP_SELF"])."/".$cache_file;
-					//Remove instances of double slashes "//"
-					$redir_url = str_replace("//","/",$redir_url);
-                    header("Location: http://$redir_url");                    
-                    die();
                 }
                 else{
                     return implode("",file($cache_file));

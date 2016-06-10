@@ -24,8 +24,8 @@ use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\RepositoryService;
+
+
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use \Sabre;

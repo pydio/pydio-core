@@ -22,7 +22,7 @@
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -365,7 +365,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
 
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
-        if($this->sqlDriver["password"] == "XXXX") return array();
+        if($this->sqlDriver["password"] == "XXXX") return;
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }

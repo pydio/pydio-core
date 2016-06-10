@@ -22,7 +22,7 @@ namespace Pydio\Meta\Core;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\RepositoryService;
 

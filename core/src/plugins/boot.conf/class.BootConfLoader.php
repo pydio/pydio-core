@@ -691,6 +691,7 @@ class BootConfLoader extends AbstractConfDriver
      *
      * @param String $userId
      * @param array $deletedSubUsers
+     * @return array
      */
     public function deleteUser($userId, &$deletedSubUsers) {
         return array();

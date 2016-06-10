@@ -93,6 +93,7 @@ class AJXP_SerialUser extends AbstractAjxpUser
     public function __wakeup()
     {
         $this->registerForSave = array();
+        parent::__wakeup();
     }
 
     public function getStoragePath()

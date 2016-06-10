@@ -21,7 +21,7 @@
 namespace Pydio\Conf\Core;
 
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Core\Model\RepositoryInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');

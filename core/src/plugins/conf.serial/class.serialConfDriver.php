@@ -650,7 +650,7 @@ class serialConfDriver extends AbstractConfDriver
      * @param String $keyType
      * @param String $keyId
      * @param String $userId
-     * @param Array $data
+     * @param array $data
      * @return boolean
      */
     public function saveTemporaryKey($keyType, $keyId, $userId, $data)

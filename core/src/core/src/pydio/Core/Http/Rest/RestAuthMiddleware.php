@@ -25,12 +25,12 @@ use Pydio\Authfront\Core\FrontendsLoader;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
-use Pydio\Core\Exception\WorkspaceNotFoundException;
+
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Services\RepositoryService;
+
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;

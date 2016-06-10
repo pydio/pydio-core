@@ -81,12 +81,14 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
            "Submit"   => "Log in",
            "remember" => "yes"
        );
-    $xmlDoc = @DOMDocument::loadHTML($content);
+    $xmlDoc = new DOMDocument();
+    $xmlDoc->loadHTML($content);
     if ($xmlDoc === false) {
         $pos1 = strpos($content, "<form ");
         $pos2 = strpos($content, "</form>", $pos1);
-        $content = substr($content, $pos1, $pos2 + "7" - $pos1);
-        $xmlDoc = @DOMDocument::loadHTML($content);
+        $content = substr($content, $pos1, $pos2 + 7 - $pos1);
+        $xmlDoc = new DOMDocument();
+        $xmlDoc->loadHTML($content);
     }
     if ($xmlDoc !== false) {
            $xPath = new DOMXPath($xmlDoc);
@@ -129,7 +131,8 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
     $client->setHandleRedirects(false);
     $client->get($uri);
     $content = $client->getContent();
-    $xmlDoc = DOMDocument::loadHTML($content);
+    $xmlDoc = new DOMDocument();
+    $xmlDoc->loadHTML($content);
     $xPath = new DOMXPath($xmlDoc);
     if($formId == "") $formId = "user-login-form";
     $nodes = $xPath->query('//form[@id="'.$formId.'"]');

@@ -328,53 +328,55 @@ class AjaXplorerUpgrader
     public function upgradeDB()
     {
         $confDriver = ConfService::getConfStorageImpl();
-        if ($confDriver instanceof \Pydio\Conf\Sql\sqlConfDriver) {
-            $conf = Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
-            if(!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
-            switch ($conf["driver"]) {
-                case "sqlite":
-                case "sqlite3":
-                    $ext = ".sqlite";
-                    break;
-                case "postgre":
-                    $ext = ".pgsql";
-                    break;
-                case "mysql":
-                    $ext = (is_file($this->workingFolder."/".$this->dbUpgrade.".mysql")) ? ".mysql" : ".sql";
-                    break;
-                default:
-                    return "ERROR!, DB driver ". $conf["driver"] ." not supported yet in __FUNCTION__";
-            }
-
-            $file = $this->dbUpgrade.$ext;
-            if(!is_file($this->workingFolder."/".$file)) return "Nothing to do.";
-            $sqlInstructions = file_get_contents($this->workingFolder."/".$file);
-
-            $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
-            $results = array();
-            $errors = array();
-
-            dibi::connect($conf);
-            dibi::begin();
-            foreach ($parts as $sqlPart) {
-                if(empty($sqlPart)) continue;
-                try {
-                    dibi::nativeQuery($sqlPart);
-                    $results[] = $sqlPart;
-                } catch (DibiException $e) {
-                    $errors[] = $sqlPart. " (". $e->getMessage().")";
-                }
-            }
-            dibi::commit();
-            dibi::disconnect();
-
-            if (!count($errors)) {
-                return "Database successfully upgraded";
-            } else {
-                return "Database upgrade failed. <br>The following statements were executed : <br>".implode("<br>", $results).",<br><br> The following statements failed : <br>".implode("<br>", $errors)."<br><br> You should manually upgrade your DB.";
-            }
-
+        if (!$confDriver instanceof \Pydio\Conf\Sql\sqlConfDriver) {
+            return "";
         }
+
+        $conf = Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+        if(!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
+        switch ($conf["driver"]) {
+            case "sqlite":
+            case "sqlite3":
+                $ext = ".sqlite";
+                break;
+            case "postgre":
+                $ext = ".pgsql";
+                break;
+            case "mysql":
+                $ext = (is_file($this->workingFolder."/".$this->dbUpgrade.".mysql")) ? ".mysql" : ".sql";
+                break;
+            default:
+                return "ERROR!, DB driver ". $conf["driver"] ." not supported yet in __FUNCTION__";
+        }
+
+        $file = $this->dbUpgrade.$ext;
+        if(!is_file($this->workingFolder."/".$file)) return "Nothing to do.";
+        $sqlInstructions = file_get_contents($this->workingFolder."/".$file);
+
+        $parts = array_map("trim", explode("/* SEPARATOR */", $sqlInstructions));
+        $results = array();
+        $errors = array();
+
+        dibi::connect($conf);
+        dibi::begin();
+        foreach ($parts as $sqlPart) {
+            if(empty($sqlPart)) continue;
+            try {
+                dibi::nativeQuery($sqlPart);
+                $results[] = $sqlPart;
+            } catch (DibiException $e) {
+                $errors[] = $sqlPart. " (". $e->getMessage().")";
+            }
+        }
+        dibi::commit();
+        dibi::disconnect();
+
+        if (!count($errors)) {
+            return "Database successfully upgraded";
+        } else {
+            return "Database upgrade failed. <br>The following statements were executed : <br>".implode("<br>", $results).",<br><br> The following statements failed : <br>".implode("<br>", $errors)."<br><br> You should manually upgrade your DB.";
+        }
+
 
     }
 
@@ -432,6 +434,7 @@ class AjaXplorerUpgrader
             <h1>Upgrade report</h1>
             </div>";
         }
+        return "";
     }
 
     /**

@@ -22,14 +22,14 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Core\Http\Message\BgActionTrigger;
+
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\TextEncoder;
+
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;

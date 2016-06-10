@@ -28,7 +28,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;

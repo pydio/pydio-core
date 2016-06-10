@@ -21,7 +21,7 @@
 namespace Pydio\Share\Store;
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Share\Model\CompositeShare;
 

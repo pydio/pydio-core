@@ -20,7 +20,7 @@
  */
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextProviderInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;

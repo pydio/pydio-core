@@ -403,9 +403,13 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
     /**
      * List available log files in XML
      *
-     * @param String [optional] $nodeName
-     * @param String [optional] $year
-     * @param String [optional] $month
+     * @param string $nodeName
+     * @param null $year
+     * @param null $month
+     * @param string $rootPath
+     * @param bool $print
+     * @return array|String[]
+     * @throws \Pydio\Core\Exception\PydioException
      */
     public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
     {
@@ -430,8 +434,7 @@ class sqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $dFunc = "DATE([logdate])";
                 break;
             default:
-                echo "ERROR!, DB driver "+ $this->sqlDriver["driver"] +" not supported yet in __FUNCTION__";
-                exit(1);
+                throw new \Pydio\Core\Exception\PydioException("ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__");
         }
 
         try {

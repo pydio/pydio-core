@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Dav;
 use Pydio\Core\Model\FilteredRepositoriesList;
 use \Sabre;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

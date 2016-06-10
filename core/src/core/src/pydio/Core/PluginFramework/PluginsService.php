@@ -31,10 +31,10 @@ use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Services\AuthService;
+
+
 use Pydio\Core\Services\CacheService;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;

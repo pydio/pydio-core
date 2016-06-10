@@ -21,7 +21,7 @@
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 use Pydio\Metastore\Core\MetaStoreProvider;
 
@@ -144,7 +144,7 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
             $data = self::$metaCache[$ajxpNode->getPath()];
         } else {
             $pathName = $this->updateNodeMetaPath($ajxpNode, false);
-            if($pathName == null) return;
+            if($pathName == null) return [];
             try{
                 $response = $aws->headObject(array("Bucket" => $this->bucketName, "Key" => $pathName));
                 $metadata = $response["Metadata"];

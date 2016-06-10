@@ -21,7 +21,7 @@
 namespace Pydio\Core\Utils;
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\SessionService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

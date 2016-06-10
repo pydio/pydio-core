@@ -25,7 +25,7 @@ use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
@@ -75,7 +75,7 @@ class PixlrEditor extends Plugin
         if ($action == "post_to_server") {
             if(!is_writeable($selectedNodeUrl)){
                 header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
-                return false;
+                return;
             }
 
             // Backward compat
@@ -131,7 +131,7 @@ class PixlrEditor extends Plugin
 
             if(!is_writeable($selectedNode->getUrl())){
                 $this->logError("Pixlr Editor", "Trying to edit an unauthorized file ".$selectedNode->getUrl());
-                return false;
+                return;
             }
 
             $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));

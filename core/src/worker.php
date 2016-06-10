@@ -25,7 +25,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Tasks\Schedule;
+
 use Pydio\Tasks\Task;
 
 include_once("base.conf.php");

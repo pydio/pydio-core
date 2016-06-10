@@ -25,7 +25,7 @@ namespace Pydio\Access\WebDAV;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;

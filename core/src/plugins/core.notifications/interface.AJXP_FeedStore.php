@@ -89,7 +89,7 @@ interface AJXP_FeedStore
      * @return void
      */
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
-    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc");
+    public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc", $recurring=true);
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false);
 
 }

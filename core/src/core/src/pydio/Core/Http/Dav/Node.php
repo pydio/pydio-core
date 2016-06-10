@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Http\Dav;
 
+use Pydio\Core\Exception\PydioException;
 use \Sabre;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
@@ -89,7 +90,7 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
             $n = new AJXP_Node($this->getUrl());
             return $n->getDriver();
         }
-        throw new \Exception("Cannot find driver instance for current node! ".$this->path);
+        throw new \Sabre\DAV\Exception\NotFound("Cannot find driver instance for current node! ".$this->path);
     }
 
     /**

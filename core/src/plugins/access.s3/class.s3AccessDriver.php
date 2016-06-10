@@ -24,7 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\S3;
 use DOMNode;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
-use Pydio\Access\Core\Model\Repository;
+
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;

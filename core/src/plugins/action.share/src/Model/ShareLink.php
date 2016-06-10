@@ -20,7 +20,7 @@
  */
 namespace Pydio\Share\Model;
 
-use Pydio\Core\Services\ConfService;
+
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;

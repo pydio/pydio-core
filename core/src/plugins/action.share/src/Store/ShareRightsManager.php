@@ -26,7 +26,7 @@ use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
@@ -561,7 +561,7 @@ class ShareRightsManager
 
 
     /**
-     * @param AbstractAjxpUser $parentUser
+     * @param UserInterface $parentUser
      * @param string $parentRepoId
      * @param AJXP_Node $ajxpNode
      * @return AJXP_PermissionMask|null
@@ -569,8 +569,8 @@ class ShareRightsManager
     public function forkMaskIfAny($parentUser, $parentRepoId, $ajxpNode){
 
         $file = $ajxpNode->getPath();
-        if($file != "/" && $parentUser->mergedRole->hasMask($parentRepoId)){
-            $parentTree = $parentUser->mergedRole->getMask($parentRepoId)->getTree();
+        if($file != "/" && $parentUser->getMergedRole()->hasMask($parentRepoId)){
+            $parentTree = $parentUser->getMergedRole()->getMask($parentRepoId)->getTree();
             // Try to find a branch on the current selection
             $parts = explode("/", trim($file, "/"));
             while( ($next = array_shift($parts))  !== null){

@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Middleware;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Http\Rest\ApiRouter;
+
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Utils\Utils;

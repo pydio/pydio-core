@@ -26,19 +26,15 @@ use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Exception\RepositoryLoadException;
+
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Services\RolesService;
-use Pydio\Core\Services\SessionService;
-use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+
+
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');

@@ -99,7 +99,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         $searchables = array();
         $searchablesRenderers = array();
         $index = 0;
-        $fieldType = "text";
+
         foreach ($def as $key=> $data) {
             $label = $data["label"];
             $fieldType = $data["type"];

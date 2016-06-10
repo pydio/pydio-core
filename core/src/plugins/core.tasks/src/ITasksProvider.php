@@ -21,8 +21,8 @@
 namespace Pydio\Tasks;
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractAjxpUser;
+
+
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 

@@ -20,7 +20,7 @@
  */
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Core\Services\ConfService;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

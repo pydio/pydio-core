@@ -24,8 +24,8 @@ namespace Pydio\Share\Model;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\ConfService;
+
+
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;

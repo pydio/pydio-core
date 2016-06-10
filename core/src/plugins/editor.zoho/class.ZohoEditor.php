@@ -124,7 +124,6 @@ class ZohoEditor extends Plugin
         $action = $request->getAttribute("action");
         $httpVars = $request->getParsedBody();
 
-        $repository = $ctx->getRepository();
         $loggedUser = $ctx->getUser();
 
         if($loggedUser != null){
@@ -238,7 +237,7 @@ class ZohoEditor extends Plugin
                 $this->logError("Zoho Editor", "Trying to edit an unauthorized file ".$node->getUrl());
 
                 $stream->write("NOT_ALLOWED");
-                return false;
+                return ;
             }
 
             Controller::applyHook("node.before_change", array(&$node));

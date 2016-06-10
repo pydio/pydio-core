@@ -87,7 +87,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
     }
 
-    public function revokeUserTokens($userId){
+    public function revokeUserTokens(\Pydio\Core\Model\ContextInterface $ctx, $userId){
 
         $this->storage = ConfService::getConfStorageImpl();
         if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;

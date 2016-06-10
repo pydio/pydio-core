@@ -23,7 +23,7 @@ namespace Pydio\Tasks\Providers;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractAjxpUser;
-use Pydio\Core\Services\AuthService;
+
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
