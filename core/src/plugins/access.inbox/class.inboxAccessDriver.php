@@ -30,12 +30,19 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Driver for inbox repository
+ * Class inboxAccessDriver
+ * @package Pydio\Access\Driver\StreamProvider\Inbox
+ */
 class inboxAccessDriver extends fsAccessDriver
 {
     private static $output;
@@ -50,6 +57,12 @@ class inboxAccessDriver extends fsAccessDriver
         $this->urlBase = $contextInterface->getUrlBase();
     }
 
+    /**
+     * Hook to node.info event
+     * @param AJXP_Node $ajxpNode
+     * @param bool $parentNode
+     * @param bool $details
+     */
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
         parent::loadNodeInfo($ajxpNode, $parentNode, $details);
@@ -60,7 +73,7 @@ class inboxAccessDriver extends fsAccessDriver
             if(isSet($originalNode["meta"])){
                 $meta = $originalNode["meta"];
             }else{
-                $meta = array();
+                $meta = [];
             }
             $label = $originalNode["label"];
 
@@ -74,39 +87,48 @@ class inboxAccessDriver extends fsAccessDriver
         }
     }
 
+    /**
+     * Hook for load_repository_info event
+     * @param ContextInterface $ctx
+     * @param $data
+     */
     public function loadRepositoryInfo(ContextInterface $ctx, &$data){
-        $allNodes = self::getNodes(false, false);
-        $data['access.inbox'] = array(
+        $allNodes = self::getNodes($ctx, false, false);
+        $data['access.inbox'] = [
             'files' => count($allNodes)
-        );
+        ];
     }
 
+    /**
+     * @param string $nodePath Url of a node
+     * @return array|mixed
+     */
     public static function getNodeData($nodePath){
-        $basename = basename(parse_url($nodePath, PHP_URL_PATH));
-        if(empty($basename)){
+        $nodeObject = new AJXP_Node($nodePath);
+        $basename = $nodeObject->getLabel();
+        if($nodeObject->isRoot()){
             return ['stat' => stat(Utils::getAjxpTmpDir())];
         }
-        $allNodes = self::getNodes(false);
+        $allNodes = self::getNodes($nodeObject->getContext(), false);
         $nodeData = $allNodes[$basename];
         if(!isSet($nodeData["stat"])){
-            if(in_array(pathinfo($basename, PATHINFO_EXTENSION), array("error", "invitation"))){
+            if(in_array(pathinfo($basename, PATHINFO_EXTENSION), ["error", "invitation"])){
                 $stat = stat(Utils::getAjxpTmpDir());
             }else{
                 $url = $nodeData["url"];
-                $node = new AJXP_Node($nodeData["url"]);
-                $node->getRepository()->driverInstance = null;
+                $node = new AJXP_Node($url);
                 try{
                     $node->getDriver()->detectStreamWrapper(true);
                     if($node->getRepository()->hasContentFilter()){
                         $node->setLeaf(true);
                     }
-                    Controller::applyHook("node.read", array(&$node));
+                    Controller::applyHook("node.read", [&$node]);
                     $stat = stat($url);
                 }catch (\Exception $e){
                     $stat = stat(Utils::getAjxpTmpDir());
                 }
-                if(is_array($stat) && AuthService::getLoggedUser() != null){
-                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($nodeData["meta"]["shared_repository_id"]);
+                if(is_array($stat) && $nodeObject->getContext()->hasUser()){
+                    $acl = $nodeObject->getContext()->getUser()->getMergedRole()->getAcl($nodeData["meta"]["shared_repository_id"]);
                     if($acl == "r"){
                         self::disableWriteInStat($stat);
                     }
@@ -118,34 +140,45 @@ class inboxAccessDriver extends fsAccessDriver
         return $nodeData;
     }
 
-    public static function getNodes($checkStats = false, $touch = true){
+    /**
+     * @param ContextInterface $parentContext
+     * @param bool $checkStats
+     * @param bool $touch
+     * @return array
+     */
+    public static function getNodes(ContextInterface $parentContext, $checkStats = false, $touch = true){
 
         if(isSet(self::$output)){
             return self::$output;
         }
 
-        $globalContext = Context::fromGlobalServices();
         $mess = LocaleService::getMessages();
-        $repos = UsersService::getRepositoriesForUser($globalContext->getUser());
+        $repos = UsersService::getRepositoriesForUser($parentContext->getUser());
+        $userId = $parentContext->getUser()->getId();
 
-        $output = array();
-        $touchReposIds = array();
+        $output = [];
+        $touchReposIds = [];
         foreach($repos as $repo) {
             if (!$repo->hasOwner() || !$repo->hasContentFilter()) {
                 continue;
             }
             $repoId = $repo->getId();
 
-            if(strpos("ocs_remote_share_", $repoId) !== 0){
+//            DISABLE REMOTE SHARE FOR TESTING
+//            if(strpos($repoId, "ocs_remote_share_") === 0){
+//                continue;
+//            }
+
+            if(strpos($repoId, "ocs_remote_share_") !== 0){
                 $touchReposIds[] = $repoId;
             }
 
-            $url = "pydio://" . $repoId . "/";
-            $meta = array(
+            $url = "pydio://".$userId . "@" . $repoId . "/";
+            $meta = [
                 "shared_repository_id" => $repoId,
                 "ajxp_description" => "File shared by ".$repo->getOwner(). " ". Utils::relativeDate($repo->getSafeOption("CREATION_TIME"), $mess),
                 "share_meta_type" => 1
-            );
+            ];
 
             $cFilter = $repo->getContentFilter();
             $filter = ($cFilter instanceof ContentFilter) ? array_keys($cFilter->filters)[0] : $cFilter;
@@ -169,14 +202,13 @@ class inboxAccessDriver extends fsAccessDriver
 
             if($checkStats){
 
-                $node->getRepository()->driverInstance = null;
                 try{
                     $node->getDriver()->detectStreamWrapper(true);
                 }catch (\Exception $e){
                     $ext = "error";
                     $meta["ajxp_mime"] = "error";
                 }
-                AJXP_MetaStreamWrapper::detectWrapperForNode($node, true);
+
                 $stat = @stat($url);
                 if($stat === false){
                     $ext = "error";
@@ -203,8 +235,8 @@ class inboxAccessDriver extends fsAccessDriver
                 }else if($ext == "error"){
                     $label .= " (".$mess["inbox_driver.5"].")";
                 }
-                if(is_array($stat) && AuthService::getLoggedUser() != null){
-                    $acl = AuthService::getLoggedUser()->mergedRole->getAcl($repoId);
+                if(is_array($stat) && $parentContext->hasUser()){
+                    $acl = $parentContext->getUser()->getMergedRole()->getAcl($repoId);
                     if($acl == "r"){
                         self::disableWriteInStat($stat);
                     }
@@ -228,17 +260,16 @@ class inboxAccessDriver extends fsAccessDriver
                 $output[$name.$suffix.".".$ext]['stat'] = $stat;
             }
         }
-        //ConfService::loadDriverForRepository($globalContext->getRepository());
         self::$output = $output;
 
         if ($touch) {
-            if (count($touchReposIds) && AuthService::getLoggedUser() != null) {
-                $uPref = AuthService::getLoggedUser()->getPref("repository_last_connected");
-                if (empty($uPref)) $uPref = array();
+            if (count($touchReposIds) && $parentContext->hasUser()) {
+                $uPref = $parentContext->getUser()->getPref("repository_last_connected");
+                if (empty($uPref)) $uPref = [];
                 foreach ($touchReposIds as $rId) {
                     $uPref[$rId] = time();
                 }
-                AuthService::getLoggedUser()->setPref("repository_last_connected", $uPref);
+                $parentContext->getUser()->setPref("repository_last_connected", $uPref);
             }
         }
         return $output;

@@ -30,6 +30,11 @@ use Pydio\Core\Utils\Utils;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class inboxAccessWrapper
+ * Stream wrapper for Inbox repository
+ * @package Pydio\Access\Driver\StreamProvider\Inbox
+ */
 class inboxAccessWrapper implements IAjxpWrapper
 {
     /**
@@ -58,8 +63,9 @@ class inboxAccessWrapper implements IAjxpWrapper
      */
     public function dir_opendir($path, $options)
     {
-        if(trim(parse_url($path, PHP_URL_PATH), "/") == ""){
-            $this->nodesIterator = new ArrayIterator(inboxAccessDriver::getNodes(true));
+        $node = new AJXP_Node($path);
+        if($node->isRoot()){
+            $this->nodesIterator = new ArrayIterator(inboxAccessDriver::getNodes($node->getContext(), true));
         }else{
             $this->nodesIterator = new ArrayIterator([]);
         }
@@ -118,9 +124,10 @@ class inboxAccessWrapper implements IAjxpWrapper
 
         $pydioScheme = false;
         self::$linkNode = null;
+        $initialNode = new AJXP_Node($path);
 
-        $nodes = inboxAccessDriver::getNodes(false);
-        $nodePath = basename(parse_url($path, PHP_URL_PATH));
+        $nodes = inboxAccessDriver::getNodes($initialNode->getContext(), false);
+        $nodePath = basename($initialNode->getPath());
         $node = $nodes[ltrim($nodePath, '/')];
 
         if (empty($node) || ! isset($node['url'])) {
