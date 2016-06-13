@@ -28,6 +28,7 @@ class PathWrapper extends AJXP_SchemeTranslatorWrapper
 
     public static function applyInitPathHook($url, $context = 'core')
     {
+        return;
         $params = [];
         $parts = Utils::safeParseUrl($url);
 

@@ -19,6 +19,7 @@ use Pydio\Core\Utils\Utils;
 class AuthWrapper extends AJXP_SchemeTranslatorWrapper
 {
     public static function applyInitPathHook($url, $context = 'core') {
+        return;
         $urlParts = Utils::safeParseUrl($url);
 
         $repository = RepositoryService::getRepositoryById($urlParts["host"]);
