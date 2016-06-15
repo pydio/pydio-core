@@ -170,9 +170,11 @@ class HTMLWriter
         if ($gzip) {
             header("Content-Encoding: gzip");
         }
-        header("Content-Length: ".$dataSize);
-        if ($isFile && ($dataSize != 0)) {
-            header("Content-Range: bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";");
+        if ($dataSize >= 0) {
+        	header("Content-Length: ".$dataSize);
+        	if ($isFile && ($dataSize != 0)) {
+            	header("Content-Range: bytes 0-" . ($dataSize- 1) . "/" . $dataSize . ";");
+        	}
         }
         header("Content-Disposition: attachment; filename=\"".$attachmentName."\"");
         header("Expires: 0");

@@ -283,20 +283,27 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $zip = true;
                 }
                 if ($zip) {
-                    // Make a temp zip and send it as download
-                    $loggedUser = AuthService::getLoggedUser();
-                    $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
-                    $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
-                    if(!$zipFile) throw new AJXP_Exception("Error while compressing");
-                    if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
-                        && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
-                        register_shutdown_function("unlink", $file);
-                    }
                     $localName = (empty($base)?"Files":$base).".zip";
                     if(isSet($httpVars["archive_name"])){
-                        $localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
+                       	$localName = AJXP_Utils::decodeSecureMagic($httpVars["archive_name"]);
                     }
-                    $this->readFile($file, "force-download", $localName, false, false, true);
+                    if ($this->getFilteredOption("ZIP_ON_THE_FLY", $this->repository)) {
+                        // Make a zip on the fly and send stream as download
+                        $this->prepareReadStream("force-download", $localName);
+                        $zipFile = $this->makeZip($selection->getFiles(), "php://output", empty($dir)?"/":$dir);
+                        if(!$zipFile) throw new AJXP_Exception("Error while compressing");
+                    } else {
+                        // Make a temp zip and send it as download
+                        $loggedUser = AuthService::getLoggedUser();
+                        $file = AJXP_Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                        $zipFile = $this->makeZip($selection->getFiles(), $file, empty($dir)?"/":$dir);
+                        if(!$zipFile) throw new AJXP_Exception("Error while compressing");
+                        if(!$this->getFilteredOption("USE_XSENDFILE", $this->repository)
+                            && !$this->getFilteredOption("USE_XACCELREDIRECT", $this->repository)){
+                            register_shutdown_function("unlink", $file);
+                        }
+                        $this->readFile($file, "force-download", $localName, false, false, true);
+                    }
                 } else {
                     $localName = "";
                     AJXP_Controller::applyHook("dl.localname", array($this->urlBase.$selection->getUniqueFile(), &$localName));
@@ -1357,6 +1364,30 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         @unlink($folder."/".$source);
         return $already_existed;
 
+    }
+
+    public function prepareReadStream($headerType, $localName)
+    {
+        session_write_close();
+
+        restore_error_handler();
+        restore_exception_handler();
+
+        set_exception_handler('download_exception_handler');
+        set_error_handler('download_exception_handler');
+        // required for IE, otherwise Content-disposition is ignored
+        if (ini_get('zlib.output_compression')) {
+            AJXP_Utils::safeIniSet('zlib.output_compression', 'Off');
+        }
+
+        if ($headerType == "plain") {
+            header("Content-type:text/plain");
+        } else if ($headerType == "image") {
+            header("Content-Type: ".AJXP_Utils::getImageMimeType(basename($localName))."; name=\"".$localName."\"");
+            header('Cache-Control: public');
+        } else {
+            HTMLWriter::generateAttachmentsHeader($localName, -1, false, false);
+        }
     }
 
     public function readFile($filePathOrData, $headerType="plain", $localName="", $data=false, $gzip=null, $realfileSystem=false, $byteOffset=-1, $byteLength=-1)
