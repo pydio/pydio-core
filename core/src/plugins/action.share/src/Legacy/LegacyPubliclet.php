@@ -232,7 +232,7 @@ class LegacyPubliclet
                                      */
                                     $currentContext = new Context($userName);
                                     $currentContext->setRepositoryObject($parentRepositoryObject);
-                                    $driverInstance = PluginsService::getInstance($currentContext)->findPlugin("access", $parentRepositoryObject->getAccessType());
+                                    $driverInstance = PluginsService::getInstance($currentContext)->getPluginByTypeName("access", $parentRepositoryObject->getAccessType());
                                     if(empty($driverInstance)){
                                         print("\n-- ERROR: Cannot find driver instance!");
                                         continue;

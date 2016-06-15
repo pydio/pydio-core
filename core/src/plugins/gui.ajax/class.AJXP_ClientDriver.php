@@ -307,7 +307,7 @@ class AJXP_ClientDriver extends Plugin
      ************************/
     public static function filterXml(&$value)
     {
-        $instance = PluginsService::getInstance(Context::emptyContext())->findPlugin("gui", "ajax");
+        $instance = PluginsService::getInstance(Context::emptyContext())->getPluginByTypeName("gui", "ajax");
         if($instance === false) return null;
         $confs = $instance->getConfigs();
         $theme = $confs["GUI_THEME"];

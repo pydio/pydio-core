@@ -469,7 +469,7 @@ class ConfService
     public static function getCoreConf($varName, $coreType = "ajaxplorer")
     {
         $ctx = Context::fromGlobalServices();
-        $coreP = PluginsService::getInstance($ctx)->findPlugin("core", $coreType);
+        $coreP = PluginsService::getInstance($ctx)->getPluginByTypeName("core", $coreType);
         if($coreP === false) return null;
         $confs = $coreP->getConfigs();
         if($ctx->hasUser()){

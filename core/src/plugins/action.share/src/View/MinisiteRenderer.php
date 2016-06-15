@@ -126,7 +126,7 @@ class MinisiteRenderer
         $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
-        $guiConfigs = PluginsService::getInstance($ctx)->findPluginById("gui.ajax")->getConfigs();
+        $guiConfigs = PluginsService::getInstance($ctx)->getPluginById("gui.ajax")->getConfigs();
         $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"])){

@@ -133,9 +133,9 @@ class PluginsService
     {
         $ctx = Context::emptyContext();
         /** @var AbstractConfDriver $booter */
-        $booter = PluginsService::getInstance($ctx)->softLoad("boot.conf", array());
+        $booter = PluginsService::getInstance($ctx)->softLoad("boot.conf", []);
         $coreConfigs = $booter->loadPluginConfig("core", "conf");
-        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.conf", array());
+        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.conf", []);
         $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getImplementation();
 
@@ -147,10 +147,10 @@ class PluginsService
     public static function cachePluginSoftLoad()
     {
         $ctx = Context::emptyContext();
-        $coreConfigs = array();
-        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.cache", array());
+        $coreConfigs = [];
+        $corePlug = PluginsService::getInstance($ctx)->softLoad("core.cache", []);
         /** @var CoreConfLoader $coreConf */
-        $coreConf = PluginsService::getInstance($ctx)->softLoad("core.conf", array());
+        $coreConf = PluginsService::getInstance($ctx)->softLoad("core.conf", []);
         $coreConf->loadBootstrapConfForPlugin("core.cache", $coreConfigs);
         if (!empty($coreConfigs)) $corePlug->loadConfigs($coreConfigs);
         return $corePlug->getImplementation();
@@ -162,20 +162,9 @@ class PluginsService
      * @param string $name
      * @return Plugin
      */
-    public static function findPlugin($type, $name)
+    public static function findPluginWithoutCtxt($type, $name)
     {
         return self::getInstance()->getPluginByTypeName($type, $name);
-    }
-
-    /**
-     * Simply find a plugin by its id (type.name)
-     * @static
-     * @param $id
-     * @return Plugin
-     */
-    public static function findPluginById($id)
-    {
-        return self::getInstance()->getPluginById($id);
     }
 
     /**
@@ -367,9 +356,10 @@ class PluginsService
     public function searchAllManifests($query, $stringOrNodeFormat = "string", $limitToActivePlugins = false, $limitToEnabledPlugins = false, $loadExternalFiles = false)
     {
         $buffer = "";
-        $nodes = array();
+        $nodes = [];
         $detectedPlugins = $this->getDetectedPlugins();
         foreach ($detectedPlugins as $plugType) {
+            /** @var Plugin $plugObject */
             foreach ($plugType as $plugName => $plugObject) {
                 if ($limitToActivePlugins) {
                     $plugId = $plugObject->getId();
@@ -487,10 +477,10 @@ class PluginsService
         }
 
         if (is_string($pluginFolder)) {
-            $pluginFolder = array($pluginFolder);
+            $pluginFolder = [$pluginFolder];
         }
 
-        $pluginsPool = array();
+        $pluginsPool = [];
         foreach ($pluginFolder as $sourceFolder) {
             $handler = @opendir($sourceFolder);
             if ($handler) {
@@ -549,7 +539,7 @@ class PluginsService
         $plugin = new Plugin($pluginId, AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/".$pluginId);
         $plugin->loadManifest();
         $plugin = $this->instanciatePluginClass($plugin);
-        $plugin->loadConfigs(array()); // Load default
+        $plugin->loadConfigs([]); // Load default
         $plugin->init($this->context, $pluginOptions);
         return $plugin;
     }
@@ -562,7 +552,7 @@ class PluginsService
     public function getPluginsByType($type)
     {
         if(isSet($this->detectedPlugins[$type])) return $this->detectedPlugins[$type];
-        else return array();
+        else return [];
     }
 
     /**
@@ -602,7 +592,7 @@ class PluginsService
     {
         if(AJXP_SKIP_CACHE) return;
         $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
-        if(!is_array($test)) $test = array();
+        if(!is_array($test)) $test = [];
         $test[$key] = $value;
         Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
     }
@@ -643,9 +633,9 @@ class PluginsService
         /**
          * @var Plugin $pObject
          */
-        $toActivate = array();
+        $toActivate = [];
         foreach ($detected as $pType => $pObjects) {
-            $coreP = $this->findPlugin("core", $pType);
+            $coreP = $this->getPluginByTypeName("core", $pType);
             if($coreP !== false && !isSet($coreP->AUTO_LOAD_TYPE)) continue;
             foreach ($pObjects as $pName => $pObject) {
                 $toActivate[$pObject->getId()] = $pObject ;
@@ -654,7 +644,7 @@ class PluginsService
         $o = $this->getOrderByDependency($toActivate, false);
         foreach ($o as $id) {
             $pObject = $toActivate[$id];
-            $pObject->init($this->context, array());
+            $pObject->init($this->context, []);
             try {
                 $pObject->performChecks();
                 if(!$pObject->isEnabled() || $pObject->hasMissingExtensions()) continue;
@@ -744,7 +734,7 @@ class PluginsService
     public function getActivePluginsForType($type, $unique = false)
     {
         $detectedPlugins = $this->getDetectedPlugins();
-        $acts = array();
+        $acts = [];
         foreach ($this->activePlugins as $plugId => $active) {
             if(!$active) continue;
             list($pT,$pN) = explode(".", $plugId);
@@ -868,6 +858,7 @@ class PluginsService
         $nodeList = $this->mixinsXPath->query($mixinName);
         if(!$nodeList->length) return;
         $mixinNode = $nodeList->item(0);
+        /** @var \DOMElement $child */
         foreach ($mixinNode->childNodes as $child) {
             if($child->nodeType != XML_ELEMENT_NODE) continue;
             $uuidAttr = $child->getAttribute("uuidAttr") OR "name";
@@ -946,7 +937,7 @@ class PluginsService
         }
         $plugType = $plugin->getType();
         if (!isSet($this->detectedPlugins[$plugType])) {
-            $this->detectedPlugins[$plugType] = array();
+            $this->detectedPlugins[$plugType] = [];
         }
         $options = $confStorage->loadPluginConfig($plugType, $plugin->getName());
         if($plugin->isEnabled() || (isSet($options["AJXP_PLUGIN_ENABLED"]) && $options["AJXP_PLUGIN_ENABLED"] === true)){
@@ -993,6 +984,7 @@ class PluginsService
 
                 // Refresh streamWrapperPlugins
                 foreach ($this->detectedPlugins as $plugs) {
+                    /** @var Plugin $plugin */
                     foreach ($plugs as $plugin) {
                         if (method_exists($plugin, "detectStreamWrapper") && $plugin->detectStreamWrapper(false) !== false) {
                             $this->streamWrapperPlugins[] = $plugin->getId();
@@ -1063,10 +1055,15 @@ class PluginsService
         }
     }
 
+    /**
+     * @param $plugins
+     * @param bool $withStatus
+     * @return array
+     */
     private function getOrderByDependency($plugins, $withStatus = true)
     {
-        $keys = array();
-        $unkowns = array();
+        $keys = [];
+        $unkowns = [];
         if ($withStatus) {
             foreach ($plugins as $pid => $status) {
                 if($status) $keys[] = $pid;
@@ -1074,7 +1071,7 @@ class PluginsService
         } else {
             $keys = array_keys($plugins);
         }
-        $result = array();
+        $result = [];
         while (count($keys) > 0) {
             $test = array_shift($keys);
             $testObject = $this->getPluginById($test);
@@ -1211,6 +1208,7 @@ class PluginsService
         if ($parentSelection->length) {
             $parentNode = $parentSelection->item(0);
             $xPath = new \DOMXPath($original);
+            /** @var \DOMElement $child */
             foreach ($childrenNodes as $child) {
                 if($child->nodeType != XML_ELEMENT_NODE) continue;
                 if ($child->getAttribute($uuidAttr) == "*") {
@@ -1221,6 +1219,7 @@ class PluginsService
                 $childrenSel = $xPath->query($query);
                 if ($childrenSel->length) {
                     if($doNotOverrideChildren) continue;
+                    /** @var \DOMElement $existingNode */
                     foreach ($childrenSel as $existingNode) {
                         if($existingNode->getAttribute("forbidOverride") == "true"){
                             continue;
@@ -1257,10 +1256,12 @@ class PluginsService
             $old->parentNode->replaceChild($new, $old);
             return;
         }
+        /** @var \DOMElement $newChild */
         foreach ($new->childNodes as $newChild) {
             if($newChild->nodeType != XML_ELEMENT_NODE) continue;
 
             $found = null;
+            /** @var \DOMElement $oldChild */
             foreach ($old->childNodes as $oldChild) {
                 if($oldChild->nodeType != XML_ELEMENT_NODE) continue;
                 if ($oldChild->nodeName == $newChild->nodeName) {

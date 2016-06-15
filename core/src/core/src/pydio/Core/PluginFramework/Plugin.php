@@ -537,7 +537,7 @@ class Plugin implements \Serializable
      * the extended version is called when sending to the client, whereas the "small" version is loaded to find and apply actions.
      * @param ContextInterface $ctx
      * @param bool $extendedVersion Can be used by subclasses to optimize the size of the XML returned.
-     * @return array
+     * @return \DOMElement[]
      */
     public function getRegistryContributions(ContextInterface $ctx, $extendedVersion = true)
     {
@@ -728,7 +728,7 @@ class Plugin implements \Serializable
      */
     public function getConfigs()
     {
-        $core = PluginsService::getInstance()->findPlugin("core", $this->type);
+        $core = PluginsService::getInstance()->getPluginByTypeName("core", $this->type);
         if (!empty($core)) {
             $coreConfs = $core->getConfigs();
             return array_merge($coreConfs, $this->pluginConf);
