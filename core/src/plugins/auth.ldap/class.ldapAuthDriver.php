@@ -760,15 +760,25 @@ class ldapAuthDriver extends AbstractAuthDriver
                                     $userroles = $userObject->getRoles();
                                     //remove all mapped roles before
 
+                                    $userroles = $userObject->getRoles();
+                                    //remove all mapped roles before
+
+                                    $oldRoles = array();
+                                    $newRoles = array();
+
                                     if (is_array($userroles)) {
                                         foreach ($userroles as $key => $role) {
                                             if ((AuthService::getRole($key)) && !(strpos($key, $this->mappedRolePrefix) === false)) {
-                                                $userObject->removeRole($key);
+                                                if (isSet($matchFilter) && !preg_match($matchFilter, $key)) continue;
+                                                if (isSet($valueFilters) && !in_array($key, $valueFilters)) continue;
+                                                //$userObject->removeRole($key);
+                                                $oldRoles[$key] = $role;
                                             }
                                         }
                                     }
-                                    $userObject->recomputeMergedRole();
+                                    //$userObject->recomputeMergedRole();
 
+                                    // Detect changes
                                     foreach ($memberValues as $uniqValue => $fullDN) {
                                         $uniqValueWithPrefix = $rolePrefix . $uniqValue;
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
@@ -779,9 +789,30 @@ class ldapAuthDriver extends AbstractAuthDriver
                                             $roleToAdd->setLabel($uniqValue);
                                             AuthService::updateRole($roleToAdd);
                                         }
-                                        $userObject->addRole($roleToAdd);
+                                        $newRoles[$roleToAdd->getId()] = $roleToAdd;
+                                        //$userObject->addRole($roleToAdd);
+                                    }
+
+                                    if((count(array_diff(array_keys($oldRoles), array_keys($newRoles))) > 0) ||
+                                        (count(array_diff(array_keys($newRoles), array_keys($oldRoles))) > 0) )
+                                    {
+                                        // remove old roles
+                                        foreach ($oldRoles as $key => $role) {
+                                            if ((AuthService::getRole($key)) && !(strpos($key, $this->mappedRolePrefix) === false)) {
+                                                $userObject->removeRole($key);
+                                            }
+                                        }
+
+                                        //Add new roles;
+                                        foreach($newRoles as $key => $role){
+                                            if ((AuthService::getRole($key)) && !(strpos($key, $this->mappedRolePrefix) === false)) {
+                                                $userObject->addRole($role);
+                                            }
+                                        }
+                                        $userObject->recomputeMergedRole();
                                         $changes = true;
                                     }
+
                                 } else {
                                     foreach ($entry[$key] as $uniqValue) {
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
