@@ -30,23 +30,7 @@ use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-
-/**
- * Autoload function for Elastica classes
- * @param $class
- */
-function __autoload_elastica ($class)
-{
-    $path = AJXP_INSTALL_PATH."/plugins/index.elasticsearch/";
-    $class = str_replace('\\', '/', $class);
-
-    if (file_exists($path . $class . '.php')) {
-        require_once($path . $class . '.php');
-    }
-}
-
-spl_autoload_register('__autoload_elastica');
-
+require_once (dirname(__FILE__)."/vendor/autoload.php");
 
 /**
  * Encapsultion of the Elastica component as a plugin
@@ -64,7 +48,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
     private $nextId;
     private $lastIdPath;
 
-    private $metaFields = array();
+    private $metaFields = [];
     private $indexContent = false;
     private $specificId = "";
     private $verboseIndexation = false;
@@ -83,13 +67,13 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         }
 
         if (!empty($specKey)) {
-            $this->specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx));
+            $this->specificId = "-".str_replace([",", "/"], ["-", "__"], VarsFilter::filter($specKey, $ctx));
         }
 
         /* Connexion to Elastica Client with the default parameters */
-        $this->client = new Elastica\Client(array(
+        $this->client = new Elastica\Client([
             "host" => $this->getContextualOption($ctx, "ELASTICSEARCH_HOST"),
-            "port" => $this->getContextualOption($ctx, "ELASTICSEARCH_PORT"))
+            "port" => $this->getContextualOption($ctx, "ELASTICSEARCH_PORT")]
         );
 
         $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
@@ -107,9 +91,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
-                $data = array("indexed_meta_fields" => $metaFields,
-                    "additionnal_meta_columns" => array("ajxp_document_content" => "Content")
-                );
+                $data = ["indexed_meta_fields" => $metaFields,
+                    "additionnal_meta_columns" => ["ajxp_document_content" => "Content"]
+                ];
                 $el->setAttribute("indexed_meta_fields", json_encode($data));
             } else {
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
@@ -168,7 +152,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             }
 
             try {
-                $this->loadIndex($repoId, false);
+                $this->loadIndex($ctx, false);
             } catch (Exception $ex) {
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
@@ -191,12 +175,12 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             $this->currentIndex->open();
             $fieldQuery = new Elastica\Query\QueryString();
-            $fieldQuery->setAllowLeadingWildcard(false);
+            $fieldQuery->setAllowLeadingWildcard(true);
             $fieldQuery->setFuzzyMinSim(0.8);
 
             if($textQuery == "*"){
 
-                $fields = array("ajxp_node");
+                $fields = ["ajxp_node"];
                 $fieldQuery->setQuery("yes");
                 $fieldQuery->setFields($fields);
 
@@ -209,7 +193,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             } else{
 
-                $fields = array("basename","ajxp_meta_*", "node_*","body");
+                $fields = ["basename","ajxp_meta_*", "body"];
                 $fieldQuery->setQuery($textQuery);
                 $fieldQuery->setFields($fields);
 
@@ -248,9 +232,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
-            $searchOptions = array(
+            $searchOptions = [
                 \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
-                \Elastica\Search::OPTION_SIZE => $maxResults);
+                \Elastica\Search::OPTION_SIZE => $maxResults];
 
             $this->logDebug(__FUNCTION__,"Executing query: ", $textQuery);
             $fullQuery = new Elastica\Query();
@@ -258,15 +242,10 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             $qb = new Elastica\QueryBuilder();
             $fullQuery = new Elastica\Query();
+            $filter = $qb->query()->match("ajxp_scope", "shared");
             $fullQuery->setQuery(
-                $qb->query()->filtered(
-                    $fieldQuery,
-                    $qb->filter()->bool()
-                        ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "shared")))
-                )
+                $qb->query()->bool()->addMust($fieldQuery)->addFilter($filter)
             );
-
-
             $result = $search->search($fullQuery, $searchOptions);
             $this->logDebug(__FUNCTION__,"Search finished. ");
             $hits = $result->getResults();
@@ -278,7 +257,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     $meta = unserialize(base64_decode($source["serialized_metadata"]));
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), []);
                     $tmpNode->loadNodeInfo();
                 }
 
@@ -293,30 +272,16 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
         } else if ($actionName == "search_by_keyword") {
 
-            $scope = "user";
             try {
-                $this->loadIndex($repoId, false);
+                $this->loadIndex($ctx, false);
             } catch (Exception $ex) {
                 throw new Exception($messages["index.lucene.7"]);
             }
-            $sParts = array();
-            $searchField = $httpVars["field"];
 
-            if ($scope == "user") {
-                if (UsersService::usersEnabled() && $ctxUser == null) {
-                    throw new Exception("Cannot find current user");
-                }
-                $sParts[] = "ajxp_scope:user";
-                $sParts[] = "ajxp_user:".$ctxUser->getId();
-            } else {
-                $sParts[] = "ajxp_scope:shared";
-            }
-            $query = implode(" AND ", $sParts);
-            $this->logDebug("Query : $query");
-
+            $searchField = \Pydio\Core\Utils\Utils::sanitize($httpVars["field"], AJXP_SANITIZE_ALPHANUM);
 
             $fieldQuery = new Elastica\Query\QueryString();
-            $fields = array($searchField);
+            $fields = [$searchField];
             $fieldQuery->setQuery($searchField == "ajxp_node"?"yes":"true");
 
             $fieldQuery->setFields($fields);
@@ -331,23 +296,17 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             if(isSet($httpVars['limit'])){
                 $maxResults = intval($httpVars['limit']);
             }
-            $searchOptions = array(
+            $searchOptions = [
                 \Elastica\Search::OPTION_SEARCH_TYPE => \Elastica\Search::OPTION_SEARCH_TYPE_QUERY_THEN_FETCH,
-                \Elastica\Search::OPTION_SIZE => $maxResults);
-
-            // ADD SCOPE FILTER
-            $term = new Elastica\Filter\Term();
-            $term->setTerm("ajxp_scope", "user");
+                \Elastica\Search::OPTION_SIZE => $maxResults];
 
             $qb = new Elastica\QueryBuilder();
             $fullQuery = new Elastica\Query();
             $fullQuery->setQuery(
-                $qb->query()->filtered(
-                    $fieldQuery,
-                    $qb->filter()->bool()
-                        ->addMust(new Elastica\Filter\Term(array("ajxp_scope" => "user")))
-                        ->addMust(new Elastica\Filter\Term(array("user" => $ctxUser->getId())))
-                )
+                $qb->query()->bool()
+                    ->addMust($fieldQuery)
+                    ->addMust($qb->query()->match("ajxp_scope", "user"))
+                    ->addMust($qb->query()->match("user", $ctxUser->getId()))
             );
 
             $result = $search->search($fullQuery, $searchOptions);
@@ -360,7 +319,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
@@ -532,7 +491,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $parseContent = false;
         }
 
-        $data = array();
+        $data = [];
         $data["node_url"] = $ajxpNode->getUrl();
         $data["node_path"] = str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath());
         $data["basename"] = basename($ajxpNode->getPath());
@@ -577,13 +536,13 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
         if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && UsersService::usersEnabled() && $ajxpNode->getContext()->hasUser()) {
 
-            $userData = array(
+            $userData = [
                 "ajxp_scope" => "user",
                 "user"      => $ajxpNode->getUser()->getId(),
                 "serialized_metadata" => $data["serialized_metadata"],
                 "node_url"  => $data["node_url"],
                 "node_path"  => $data["node_path"]
-            );
+            ];
             $userData["ajxp_user"] = $ajxpNode->getContext()->getUser()->getId();
             foreach ($ajxpNode->indexableMetaKeys["user"] as $userField) {
                 if ($ajxpNode->$userField) {
@@ -606,22 +565,27 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
     }
 
+    /**
+     * Transform not data to ready to store mapping
+     * @param $data
+     * @return array
+     */
     protected function dataToMappingProperties($data){
 
-        $mapping_properties = array();
+        $mapping_properties = [];
         foreach ($data as $key => $value) {
             if ($key == "node_url" || $key == "node_path") {
-                $mapping_properties[$key] = array("type" => "string", "index" => "not_analyzed");
+                $mapping_properties[$key] = ["type" => "string", "index" => "not_analyzed"];
             } else if($key == "serialized_metadata"){
-                $mapping_properties[$key] = array("type" => "string" /*, "index" => "no" */);
+                $mapping_properties[$key] = ["type" => "string" /*, "index" => "no" */];
             } else if ($key == "ajxp_bytesize"){
-                $mapping_properties[$key] = array("type" => "long");
+                $mapping_properties[$key] = ["type" => "long"];
             } else {
                 $type = gettype($value);
                 if ($type != "integer" && $type != "boolean" && $type != "double") {
                     $type = "string";
                 }
-                $mapping_properties[$key] = array("type" => $type);
+                $mapping_properties[$key] = ["type" => $type];
             }
         }
         return $mapping_properties;
