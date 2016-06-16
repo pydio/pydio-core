@@ -53,7 +53,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     /**
      * @var array The node metadata
      */
-    protected $_metadata = array();
+    protected $_metadata = [];
     /**
      * @var string Associated wrapper
      */
@@ -61,7 +61,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     /**
      * @var array Parsed url fragments
      */
-    protected $urlParts = array();
+    protected $urlParts = [];
     /**
      * @var string A local representation of a real file, if possible
      */
@@ -95,21 +95,29 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     /**
      * @var array
      */
-    private $_indexableMetaKeys = array();
+    private $_indexableMetaKeys = [];
+
+    /**
+     * @var bool
+     */
+    private $_metadataBulkUpdate = false;
 
     /**
      * @param string $url URL of the node in the form ajxp.protocol://repository_id/path/to/node
      * @param array $metadata Node metadata
      */
-    public function __construct($url, $metadata = array())
+    public function __construct($url, $metadata = [])
     {
         $this->setUrl($url);
         $this->_metadata = $metadata;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
-        $t = array_diff(array_keys(get_class_vars("AJXP_Node")), array("_accessDriver", "_repository", "_metaStore"));
+        $t = array_diff(array_keys(get_class_vars("AJXP_Node")), ["_accessDriver", "_repository", "_metaStore"]);
         return $t;
     }
 
@@ -209,9 +217,29 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         return $this->_metaStore;
     }
 
+    /**
+     * Check if there is currently a MetaStore provider set
+     * @return bool
+     */
     public function hasMetaStore()
     {
-        return ($this->getMetaStore() != false);
+        return ($this->getMetaStore() !== false);
+    }
+
+    /**
+     * Start a session of set / remove Metadata calls without applying the node.meta_change hook
+     */
+    public function startUpdatingMetadata(){
+        $this->_metadataBulkUpdate = true;
+    }
+
+    /**
+     * Finish updating the metadata and trigger the node.meta_change event
+     * @throws \Exception
+     */
+    public function finishedUpdatingMetadata(){
+        $this->_metadataBulkUpdate = false;
+        Controller::applyHook("node.meta_change", [&$this]);
     }
 
     /**
@@ -223,15 +251,17 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function setMetadata($nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
     {
-        $metaStore = $this->getMetaStore();
-        if ($metaStore !== false) {
-            $metaStore->setMetadata($this, $nameSpace, $metaData, $private, $scope);
-            //$this->mergeMetadata($metaData);
-            if ($indexable) {
-                if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
-                $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
-            }
-            Controller::applyHook("node.meta_change", array(&$this));
+        if(!$this->hasMetaStore()){
+            return;
+        }
+        $this->getMetaStore()->setMetadata($this, $nameSpace, $metaData, $private, $scope);
+        //$this->mergeMetadata($metaData);
+        if ($indexable) {
+            if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = [];
+            $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
+        }
+        if(!$this->_metadataBulkUpdate){
+            Controller::applyHook("node.meta_change", [&$this]);
         }
     }
 
@@ -243,13 +273,15 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function removeMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
     {
-        $metaStore = $this->getMetaStore();
-        if ($metaStore !== false) {
-            $metaStore->removeMetadata($this, $nameSpace, $private, $scope);
-            if ($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])) {
-                unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
-            }
-            Controller::applyHook("node.meta_change", array(&$this));
+        if(!$this->hasMetaStore()){
+            return;
+        }
+        $this->getMetaStore()->removeMetadata($this, $nameSpace, $private, $scope);
+        if ($indexable && isSet($this->_indexableMetaKeys[$private ? "user":"shared"]) && isset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace])) {
+            unset($this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace]);
+        }
+        if(!$this->_metadataBulkUpdate) {
+            Controller::applyHook("node.meta_change", [&$this]);
         }
     }
 
@@ -262,16 +294,15 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function retrieveMetadata($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false)
     {
-        $metaStore = $this->getMetaStore();
-        if ($metaStore !== false) {
-            $data = $metaStore->retrieveMetadata($this, $nameSpace, $private, $scope);
-            if (!empty($data) && $indexable) {
-                if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = array();
-                $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
-            }
-            return $data;
+        if(!$this->hasMetaStore()){
+            return [];
         }
-        return array();
+        $data = $this->getMetaStore()->retrieveMetadata($this, $nameSpace, $private, $scope);
+        if (!empty($data) && $indexable) {
+            if(!isSet($this->_indexableMetaKeys[$private ? "user":"shared"]))$this->_indexableMetaKeys[$private ? "user":"shared"] = [];
+            $this->_indexableMetaKeys[$private ? "user":"shared"][$nameSpace] = $nameSpace;
+        }
+        return $data;
     }
 
     /**
@@ -286,7 +317,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     public function copyOrMoveMetadataFromNode($originalNode, $nameSpace, $operation="move", $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
 
         if($this->getMetaStore() == false || $this->getMetaStore()->inherentMetaMove()){
-            return array();
+            return [];
         }
         $metaData = $originalNode->retrieveMetadata($nameSpace, $private, $scope, $indexable);
         if(isSet($metaData) && !empty($metaData)){
@@ -296,7 +327,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             }
             return $metaData;
         }
-        return array();
+        return [];
 
     }
 
@@ -337,7 +368,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      * @param bool $indexable
      * @param array $collect
      */
-    public function collectMetadataInParents($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
+    public function collectMetadataInParents($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect= []){
 
         $parentNode = $this->getParent();
         if($parentNode != null){
@@ -358,11 +389,11 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      * @param bool $indexable
      * @param array $collect
      */
-    public function collectMetadatasInParents($nameSpaces, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect=array()){
+    public function collectMetadatasInParents($nameSpaces, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false, &$collect= []){
 
         $parentNode = $this->getParent();
         if($parentNode != null){
-            $nodeMeta = array();
+            $nodeMeta = [];
             foreach($nameSpaces as $nameSpace){
                 $metadata = $parentNode->retrieveMetadata($nameSpace, $private, $scope,$indexable);
                 if($metadata != false){
@@ -379,7 +410,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     }
 
     public function collectRepositoryMetadatasInChildren($nameSpace, $userScope){
-        $result = array();
+        $result = [];
         $metaStore = $this->getMetaStore();
         if($metaStore !== false && method_exists($metaStore, "collectChildrenWithRepositoryMeta")){
             $result = $metaStore->collectChildrenWithRepositoryMeta($this, $nameSpace, $userScope);
@@ -468,14 +499,14 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
                 if(is_object($driver)) $driver->detectStreamWrapper(true, $this->getContext());
             }
         }
-        Controller::applyHook("node.info.start", array(&$this, $contextNode, $details, $forceRefresh));
+        Controller::applyHook("node.info.start", [&$this, $contextNode, $details, $forceRefresh]);
         if($this->nodeInfoLoaded && !$forceRefresh){
-            Controller::applyHook("node.info.nocache", array(&$this, $contextNode, $details, $forceRefresh));
+            Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
             return;
         }
-        Controller::applyHook("node.info", array(&$this, $contextNode, $details, $forceRefresh));
-        Controller::applyHook("node.info.end", array(&$this, $contextNode, $details, $forceRefresh));
-        Controller::applyHook("node.info.nocache", array(&$this, $contextNode, $details, $forceRefresh));
+        Controller::applyHook("node.info", [&$this, $contextNode, $details, $forceRefresh]);
+        Controller::applyHook("node.info.end", [&$this, $contextNode, $details, $forceRefresh]);
+        Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
         $this->nodeInfoLoaded = true;
         $this->nodeInfoLevel = $details;
     }
@@ -633,7 +664,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             return $this->_metadata["bytesize"];
         }else{
             $result = -1;
-            Controller::applyHook("node.size.recursive", array(&$this, &$result));
+            Controller::applyHook("node.size.recursive", [&$this, &$result]);
             if($result == -1){
                 try{
                     return $this->getDriver()->directoryUsage($this);

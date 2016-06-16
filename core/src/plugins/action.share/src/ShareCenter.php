@@ -640,6 +640,7 @@ class ShareCenter extends Plugin
 
                     $results = $this->shareNode($ctx, $ajxpNode, $httpVars, $isUpdate);
                     if(is_array($results) && $ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()){
+                        $ajxpNode->startUpdatingMetadata();
                         foreach($results as $shareObject){
                             if($shareObject instanceof \Pydio\OCS\Model\TargettedLink){
                                 $hash = $shareObject->getHash();
@@ -669,7 +670,7 @@ class ShareCenter extends Plugin
                                 );
                             }
                         }
-
+                        $ajxpNode->finishedUpdatingMetadata();
                     }
                 }
 
@@ -833,6 +834,7 @@ class ShareCenter extends Plugin
                     }
                     if(count($shares)){
                         $res = true;
+                        $ajxpNode->startUpdatingMetadata();
                         foreach($shares as $shareId =>  $share){
                             $t = isSet($share["type"]) ? $share["type"] : "file";
                             try{
@@ -841,12 +843,14 @@ class ShareCenter extends Plugin
                                 if($e->getMessage() == "repo-not-found"){
                                     $result = true;
                                 }else{
+                                    $ajxpNode->finishedUpdatingMetadata();
                                     throw $e;
                                 }
                             }
                             $this->getShareStore()->getMetaManager()->removeShareFromMeta($ajxpNode, $shareId);
                             $res = $result && $res;
                         }
+                        $ajxpNode->finishedUpdatingMetadata();
                         if($res !== false){
 
                             $x = new SerializableResponseStream([new UserMessage($mess["share_center.216"])]);

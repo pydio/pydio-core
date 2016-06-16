@@ -65,6 +65,7 @@ class ShareMetaManager
         if(count($otherScopeMeta)){
             $node->removeMetadata(AJXP_SHARED_META_NAMESPACE, $otherScope, AJXP_METADATA_SCOPE_REPOSITORY, true);
         }
+        $node->ajxp_shared = "true";
         $node->setMetadata(AJXP_SHARED_META_NAMESPACE, $meta, $private, AJXP_METADATA_SCOPE_REPOSITORY, true);
     }
 
@@ -114,7 +115,6 @@ class ShareMetaManager
                 $this->clearNodeMeta($node);
             }
         }
-
     }
 
     /**

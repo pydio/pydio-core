@@ -135,7 +135,6 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $ctxUser = $ctx->getUser();
 
         $messages = LocaleService::getMessages();
-        $repoId = $this->accessDriver->repository->getId();
 
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $nodesList = new \Pydio\Access\Core\Model\NodesList();
@@ -323,7 +322,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
-                    $this->currentType->deleteById($hit->id);
+                    $this->currentType->deleteById($hit->getId());
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -414,7 +413,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
             $oldDocId = $this->getIndexedDocumentId($oldNode);
             if ($oldDocId != null) {
                 $this->currentType->deleteById($oldDocId);
-                $childrenHits = $this->getIndexedChildrenDocuments($newNode);
+                $childrenHits = $this->getIndexedChildrenDocuments($oldNode);
 
                 if ($childrenHits != null) {
                     $childrenHits = $childrenHits->getResults();
