@@ -186,7 +186,8 @@ class PluginsService
             self::$instances[$identifier] = $pServ = new $c($ctx);
             if(!$ctx->isEmpty()) {
                 $emptyInstance = self::getInstance(Context::contextWithObjects(null, null));
-                $pServ->getDetectedPlugins();
+                //$pServ->getDetectedPlugins();
+                $pServ->cloneDetectedPluginsFromCoreInstance($emptyInstance);
                 $pServ->copyCorePluginFromService($emptyInstance, "conf");
                 $pServ->copyCorePluginFromService($emptyInstance, "cache");
                 $pServ->copyCorePluginFromService($emptyInstance, "auth");
@@ -787,6 +788,21 @@ class PluginsService
             }
         }
         return $this->detectedPlugins;
+    }
+
+    /**
+     * @param $emptyInstance PluginsService
+     */
+    public function cloneDetectedPluginsFromCoreInstance($emptyInstance){
+        $detected = $emptyInstance->getDetectedPlugins();
+        $this->detectedPlugins = [];
+        $this->streamWrapperPlugins = $emptyInstance->streamWrapperPlugins;
+        foreach($detected as $type => $plugins){
+            $this->detectedPlugins[$type] = [];
+            foreach($plugins as $name => $plugin){
+                $this->detectedPlugins[$type][$name] = clone $plugin;
+            }
+        }
     }
 
     /*********************************/
