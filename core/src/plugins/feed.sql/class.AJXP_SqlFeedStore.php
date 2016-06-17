@@ -126,7 +126,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
             if(count($masks)){
                 $pathesOr = array();
                 foreach($masks as $mask){
-                    $filterLike = "://".$repoId.rtrim($mask, "/") . "/";
+                    $filterLike = "://%@".$repoId.rtrim($mask, "/") . "/";
                     $pathesOr[] = array("[index_path] LIKE %~like~", $filterLike);
                 }
                 if(count($pathesOr)){
@@ -153,7 +153,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
                 if($filterByPath[strlen($filterByPath)-1]=='/'){
                     //$groupByClause = " GROUP BY [index_path] ";
                 }
-                $index_path = "%://".$filterByRepositories[0].$filterByPath."%";
+                $index_path = "%://%@".$filterByRepositories[0].$filterByPath."%";
                 $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
                 AND
                   ( %or )
