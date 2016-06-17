@@ -374,7 +374,7 @@ class AJXP_ClientDriver extends Plugin
         if($currentIsMinisite) $to = -1;
         $config["client_timeout"] = intval($to);
         $config["client_timeout_warning"] = floatval($this->getContextualOption($ctx, "CLIENT_TIMEOUT_WARN"));
-        $config["availableLanguages"] = ConfService::getConf("AVAILABLE_LANG");
+        $config["availableLanguages"] = LocaleService::listAvailableLanguages();
         $config["usersEditable"] = ConfService::getAuthDriverImpl()->usersEditable();
         $config["ajxpVersion"] = AJXP_VERSION;
         $config["ajxpVersionDate"] = AJXP_VERSION_DATE;
