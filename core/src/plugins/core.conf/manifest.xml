@@ -79,6 +79,6 @@
         <global_param name="NEWUSERS_EDIT_PARAMETERS" group="CONF_MESSAGE[External Users Creation]" type="string" label="CONF_MESSAGE[External users parameters]" description="CONF_MESSAGE[List of parameters to be edited when creating a new shared user.]" mandatory="false" default="email,USER_DISPLAY_NAME,lang" expose="true"/>
 
 
-        <global_param type="plugin_instance:conf" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Configuration Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="conf.serial"/>
+        <global_param type="plugin_instance:conf" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Configuration Store Instance]" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="true" default="boot.conf"/>
     </server_settings>
 </ajxpcore>

@@ -28,7 +28,10 @@ use Pydio\Core\PluginFramework\PluginsService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RolesService
+ * @package Pydio\Core\Services
+ */
 class RolesService
 {
 
@@ -345,8 +348,10 @@ class RolesService
             }
             RolesService::updateRole($rootRole);
         }
+        file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
 
         // Legacy, should never happen
+        /*
         $adminCount = UsersService::countAdminUsers();
         if ($adminCount == 0) {
             $authDriver = ConfService::getAuthDriverImpl();
@@ -374,7 +379,7 @@ class RolesService
             file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
             throw new PydioException("There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.");
         }
-        file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
+        */
 
     }
 }

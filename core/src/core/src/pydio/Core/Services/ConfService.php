@@ -108,7 +108,10 @@ class ConfService
         $inst = self::getInstance();
         $inst->startInst();
         $confStorageDriver = self::getConfStorageImpl();
-        require_once($confStorageDriver->getUserClassFileName());
+        $userFile = $confStorageDriver->getUserClassFileName();
+        if(!empty($userFile)){
+            require_once($userFile);
+        }
     }
     /**
      * Init CONF, AUTH drivers

@@ -42,6 +42,7 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
+        if(empty($options["SQL_DRIVER"])) return;
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if(!dibi::isConnected()) {

@@ -7,7 +7,7 @@
         </resources>
     </client_settings>
     <server_settings>
-        <param name="DRIVER" type="group_switch:driver" label="CONF_MESSAGE[Cache Driver]" description="CONF_MESSAGE[Cache driver]" mandatory="false"/>
+        <param name="DRIVER" type="group_switch:driver" label="CONF_MESSAGE[Cache Driver]" description="CONF_MESSAGE[Cache driver]" default="apc" mandatory="false"/>
 
         <param group_switch_name="driver" group_switch_label="apc" group_switch_value="apc" name="driver" type="hidden" label="" description="" mandatory="false" default="apc"/>
 
