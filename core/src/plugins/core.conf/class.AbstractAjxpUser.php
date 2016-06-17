@@ -22,10 +22,10 @@ namespace Pydio\Conf\Core;
 
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -369,7 +369,7 @@ abstract class AbstractAjxpUser implements UserInterface
 
     public function save($context = "superuser"){
         $this->_save($context);
-        CacheService::save("shared", "pydio:user:" . $this->getId(), $this);
+        UsersService::updateUser($this);
     }
 
     /**

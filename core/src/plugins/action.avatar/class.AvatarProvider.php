@@ -67,8 +67,7 @@ class AvatarProvider extends Plugin
             if (isSet($httpVars["userid"])) {
                 $userid = $httpVars["userid"];
                 if (UsersService::usersEnabled() && UsersService::userExists($userid)) {
-                    $confDriver = ConfService::getConfStorageImpl();
-                    $user = $confDriver->createUserObject($userid);
+                    $user = UsersService::getUserById($userid, false);
                     $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($userEmail)) {
                         $url .= md5(strtolower(trim($userEmail)));

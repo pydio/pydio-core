@@ -587,11 +587,9 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function setUserId($userId){
         // Update url with a user@workspaceID
-        $crtStart = $this->getScheme()."://".(!empty($this->_user)?$this->_user."@":"").$this->getRepositoryId();
         $this->_user = $userId;
         $this->urlParts["user"] = $userId;
-        $newStart = $this->getScheme()."://".$this->_user."@".$this->getRepositoryId();
-        $this->_url = str_replace($crtStart, $newStart, $this->_url);
+        $this->_url = $this->getScheme()."://".$this->_user."@".$this->getRepositoryId().$this->getPath();
     }
 
     /**

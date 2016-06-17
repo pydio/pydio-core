@@ -165,7 +165,7 @@ class LegacyPubliclet
                     if(!UsersService::userExists($userName)){
                         continue;
                     }
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userName);
+                    $userObject = UsersService::getUserById($userName, false);
 
                     if(isSet($meta["ajxp_shared"]) && isSet($meta["ajxp_shared"]["element"])){
                         print("\n\nItem $filePath requires upgrade :");
@@ -193,7 +193,7 @@ class LegacyPubliclet
                                     $shareLink = new ShareLink($shareStore, $publiclet);
                                     $user = $shareLink->getUniqueUser();
                                     if(UsersService::userExists($user)){
-                                        $userObject = ConfService::getConfStorageImpl()->createUserObject($user);
+                                        $userObject = UsersService::getUserById($user, false);
                                         $userObject->setHidden(true);
                                         print("\n--Should set existing user $user as hidden");
                                         if(!$dryRun){

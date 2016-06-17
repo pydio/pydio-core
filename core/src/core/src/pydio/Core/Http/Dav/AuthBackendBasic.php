@@ -24,6 +24,7 @@ namespace Pydio\Core\Http\Dav;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\ContextInterface;
@@ -87,8 +88,12 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         // Authenticates the user
         //AJXP_Logger::info(__CLASS__,"authenticate",$userpass[0]);
 
-        $confDriver = ConfService::getConfStorageImpl();
-        $userObject = $confDriver->createUserObject($userpass[0]);
+        try{
+            $userObject = UsersService::getUserById($userpass[0]);
+        }catch (UserNotFoundException $e){
+            throw new Sabre\DAV\Exception\NotAuthenticated();
+        }
+        
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
         if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));

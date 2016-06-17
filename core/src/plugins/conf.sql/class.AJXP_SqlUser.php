@@ -567,7 +567,7 @@ class AJXP_SqlUser extends AbstractAjxpUser
             foreach ($res as $row) {
                 $userId = $row->login;
                 // UPDATE USER GROUP AND ROLES
-                $u = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $u = UsersService::getUserById($userId, false);
                 $u->setGroupPath($groupPath);
                 $r = $u->getRoles();
                 // REMOVE OLD GROUP ROLES

@@ -157,7 +157,8 @@ class UserDashboardDriver extends AbstractAccessDriver
                         $mime = "minisite";
                         $element = $minisites[$element];
                     }
-                    $shareCenter->getShareStore()->deleteShare($mime, $element);
+                    
+                    $shareCenter->getShareStore($ctx)->deleteShare($mime, $element);
                     $out = "";
                     if($mime == "repository" || $mime == "minisite") $out = $mess["ajxp_conf.59"];
                     else if($mime == "user") $out = $mess["ajxp_conf.60"];
@@ -186,7 +187,7 @@ class UserDashboardDriver extends AbstractAccessDriver
          * @var ShareCenter $shareCenter
          */
         $shareCenter = PluginsService::getInstance($ctx)->getPluginById("action.share");
-        $publicLets = $shareCenter->listShares($ctx->hasUser() ? $ctx->getUser()->getId() : "shared", null);
+        $publicLets = $shareCenter->getShareStore($ctx)->listShares($ctx->hasUser() ? $ctx->getUser()->getId() : "shared", "");
         $minisites = array();
         foreach ($publicLets as $hash => $publicletData) {
             if(!isSet($publicletData["AJXP_APPLICATION_BASE"]) && !isSet($publicletData["TRAVEL_PATH_TO_ROOT"])) continue;
@@ -216,12 +217,12 @@ class UserDashboardDriver extends AbstractAccessDriver
         $nodesList->appendColumn('ajxp_conf.6', 'ajxp_label');
         $nodesList->appendColumn('user_dash.10', 'repo_accesses');
 
-        $teams = $conf->listUserTeams();
+        $teams = $conf->listUserTeams($ctx->getUser());
         foreach ($teams as $teamId => $team) {
             if(empty($team["LABEL"])) continue;
             $team["USERS_LABELS"] = array();
             foreach(array_values($team["USERS"]) as $userId){
-                $team["USERS_LABELS"][] = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userId, "core.conf", $userId);
+                $team["USERS_LABELS"][] = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userId, "core.conf", $userId);
             }
             $metaData = [
                 "text" => $team["LABEL"],
@@ -268,7 +269,7 @@ class UserDashboardDriver extends AbstractAccessDriver
         }
         ksort($userArray);
         foreach ($userArray as $userObject) {
-            $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject);
+            $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject);
             $isAdmin = $userObject->isAdmin();
             $userId = $userObject->getId();
             $repoAccesses = array();

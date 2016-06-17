@@ -120,7 +120,7 @@ class AuthService
             AJXP_Safe::storeCredentials($authId, $authPwd);
         }
 
-        $user = $confDriver->createUserObject($user_id);
+        $user = UsersService::getUserById($user_id, false);
 
         if ($user->getLock() === "logout") {
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));

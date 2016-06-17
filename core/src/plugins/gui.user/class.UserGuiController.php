@@ -109,8 +109,9 @@ class UserGuiController extends Plugin
                 // Find user by id
                 if (UsersService::userExists($httpVars["email"])) {
                     // Send email
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($httpVars["email"]);
-                    $email = $userObject->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+                    $mailUId = Utils::sanitize($httpVars["email"], AJXP_SANITIZE_EMAILCHARS);
+                    $userObject = UsersService::getUserById($mailUId);
+                    $email = $userObject->getPersonalRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($email)) {
                         $uuid = Utils::generateRandomString(48);
                         ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, Utils::decodeSecureMagic($httpVars["email"]), array());

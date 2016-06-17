@@ -28,6 +28,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -424,7 +425,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 "ajxp_mime" => "user_editable"
             );
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $userDisplayName = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+            $userDisplayName = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             echo XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
         }
 
@@ -691,7 +692,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (strpos($roleId, "AJXP_USR_") === 0) {
                     $usrId = str_replace("AJXP_USR_/", "", $roleId);
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
+                    $userObject = UsersService::getUserById($usrId);
                     if(!empty($currentMainUser) && !$currentMainUser->canAdministrate($userObject)){
                         throw new \Exception("Cant find user!");
                     }
@@ -766,7 +767,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             if(isSet($allReps[$repoParentId])){
                                 $repoParentLabel = TextEncoder::toUTF8($allReps[$repoParentId]->getDisplay());
                             }
-                            $repoOwnerLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
+                            $repoOwnerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
                             $repoDetailed[$repositoryId]["share"] = array(
                                 "parent_user" => $repoOwnerId,
                                 "parent_user_label" => $repoOwnerLabel,
@@ -879,7 +880,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if (strpos($roleId, "AJXP_USR_") === 0) {
                     $usrId = str_replace("AJXP_USR_/", "", $roleId);
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($usrId);
+                    $userObject = UsersService::getUserById($usrId);
                     $ctxUser = $ctx->getUser();
                     if(!empty($ctxUser) && !$ctxUser->canAdministrate($userObject)){
                         throw new \Exception("Cannot post role for user ".$usrId);
@@ -999,7 +1000,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $lockType = $httpVars["lock_type"];
                 $ctxUser = $ctx->getUser();
                 if (UsersService::userExists($userId)) {
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    $userObject = UsersService::getUserById($userId, false);
                     if( !empty($ctxUser) && !$ctxUser->canAdministrate($userObject)){
                         throw new \Exception("Cannot update user data for ".$userId);
                     }
@@ -1036,9 +1037,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new \Exception($mess["ajxp_conf.43"]);
                 }
 
-                UsersService::createUser($new_user_login, $httpVars["new_user_pwd"]);
-                $confStorage = ConfService::getConfStorageImpl();
-                $newUser = $confStorage->createUserObject($new_user_login);
+                $newUser = UsersService::createUser($new_user_login, $httpVars["new_user_pwd"]);
                 if (!empty($httpVars["group_path"])) {
                     $newUser->setGroupPath(rtrim($currentAdminBasePath, "/")."/".ltrim($httpVars["group_path"], "/"));
                 } else {
@@ -1055,11 +1054,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "change_admin_right" :
                 $userId = $httpVars["user_id"];
-                if (!UsersService::userExists($userId)) {
-                    throw new \Exception("Invalid user id!");
-                }
-                $confStorage = ConfService::getConfStorageImpl();
-                $user = $confStorage->createUserObject($userId);
+                $user = UsersService::getUserById($userId);
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user with id ".$userId);
                 }
@@ -1111,9 +1106,8 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     XMLWriter::close();
                     return;
                 }
-                $confStorage = ConfService::getConfStorageImpl();
                 $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
-                $user = $confStorage->createUserObject($userId);
+                $user = UsersService::getUserById($userId);
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user with id ".$userId);
                 }
@@ -1146,7 +1140,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $groupPath = substr($dest, strlen("/data/users"));
                 }
 
-                $confStorage = ConfService::getConfStorageImpl();
                 $userId = null;
                 $usersMoved = array();
 
@@ -1158,10 +1151,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
                 foreach ($userSelection->getFiles() as $selectedUser) {
                     $userId = basename($selectedUser);
-                    if (!UsersService::userExists($userId)) {
+                    try{
+                        $user = UsersService::getUserById($userId);
+                    }catch (UserNotFoundException $u){
                         continue;
                     }
-                    $user = $confStorage->createUserObject($userId);
                     if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                         continue;
                     }
@@ -1208,8 +1202,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $roles = json_decode($httpVars["roles"], true);
                 $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
-                $confStorage = ConfService::getConfStorageImpl();
-                $user = $confStorage->createUserObject($userId);
+                $user = UsersService::getUserById($userId);
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user data for ".$userId);
                 }
@@ -1233,7 +1226,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 foreach($userIds as $userId){
                     $userId = Utils::sanitize($userId, AJXP_SANITIZE_EMAILCHARS);
                     if(!UsersService::userExists($userId)) continue;
-                    $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                    $userObject = UsersService::getUserById($userId, false);
                     if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)) continue;
                     foreach($rolesOperations as $addOrRemove => $roles){
                         if(!in_array($addOrRemove, array("add", "remove"))) {
@@ -1284,7 +1277,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     if (isSet($update)) {
                         $userObject = $this->updateUserRole($ctx->getUser(), $userId, $roleId, $update);
                     } else {
-                        $userObject = $confStorage->createUserObject($userId);
+                        try{
+                            $userObject = UsersService::getUserById($userId);
+                        }catch(UserNotFoundException $u){
+                            continue;
+                        }
                         if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)){
                             continue;
                         }
@@ -1322,8 +1319,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if ($userId == $loggedUser->getId()) {
                     $user = $loggedUser;
                 } else {
-                    $confStorage = ConfService::getConfStorageImpl();
-                    $user = $confStorage->createUserObject($userId);
+                    $user = UsersService::getUserById($userId);
                 }
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user with id ".$userId);
@@ -1353,8 +1349,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if ($userId == $loggedUser->getId()) {
                     $user = $loggedUser;
                 } else {
-                    $confStorage = ConfService::getConfStorageImpl();
-                    $user = $confStorage->createUserObject($userId);
+                    $user = UsersService::getUserById($userId);
                 }
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user with id ".$userId);
@@ -1391,7 +1386,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     return;
                 }
                 $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
-                $user = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $user = UsersService::getUserById($userId);
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user data for ".$userId);
                 }
@@ -1415,8 +1410,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 if ($userId == $loggedUser->getId()) {
                     $userObject = $loggedUser;
                 } else {
-                    $confStorage = ConfService::getConfStorageImpl();
-                    $userObject = $confStorage->createUserObject($userId);
+                    $userObject = UsersService::getUserById($userId);
                 }
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)){
                     throw new \Exception("Cannot update user data for ".$userId);
@@ -2467,7 +2461,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 $rightsString = implode(", ", $r);
             }
-            $nodeLabel = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+            $nodeLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             $scheme = UsersService::getAuthScheme($userId);
             $nodeKey = "/data/$root/".$userId;
             $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
@@ -2936,10 +2930,19 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return strcmp($key1, $key2);
     }
 
+    /**
+     * @param UserInterface $ctxUser
+     * @param $userId
+     * @param $roleId
+     * @param $addOrRemove
+     * @param bool $updateSubUsers
+     * @return UserInterface
+     * @throws UserNotFoundException
+     * @throws \Exception
+     */
     public function updateUserRole(UserInterface $ctxUser, $userId, $roleId, $addOrRemove, $updateSubUsers = false)
     {
-        $confStorage = ConfService::getConfStorageImpl();
-        $user = $confStorage->createUserObject($userId);
+        $user = UsersService::getUserById($userId);
         if(!empty($ctxUser) && !$ctxUser->canAdministrate($user)){
             throw new \Exception("Cannot update user data for ".$userId);
         }

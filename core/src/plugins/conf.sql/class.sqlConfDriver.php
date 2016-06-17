@@ -527,7 +527,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $children_results = dibi::query('SELECT [ajxp_users].[login] FROM [ajxp_user_rights],[ajxp_users] WHERE [repo_uuid] = %s AND [rights] = %s AND [ajxp_user_rights].[login] = [ajxp_users].[login] AND '.$ignoreHiddens, "ajxp.parent_user", $userId);
         $all = $children_results->fetchAll();
         foreach ($all as $item) {
-            $children[] = $this->createUserObject($item["login"]);
+            $children[] = UsersService::getUserById($item["login"]);
         }
         return $children;
 

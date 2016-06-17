@@ -22,6 +22,7 @@ namespace Pydio\Core\Http\Dav;
 
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 
@@ -62,11 +63,11 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
     public function getDigestHash($realm, $username)
     {
-        if (!UsersService::userExists($username)) {
-            return false;
+        try{
+            $user = UsersService::getUserById($username);
+        }catch (UserNotFoundException $e){
+            throw new Sabre\DAV\Exception\NotAuthenticated();
         }
-        $confDriver = ConfService::getConfStorageImpl();
-        $user = $confDriver->createUserObject($username);
         $webdavData = $user->getPref("AJXP_WEBDAV_DATA");
         if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"]) ) ) {
             return false;

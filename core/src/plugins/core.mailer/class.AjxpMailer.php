@@ -235,10 +235,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
 
     public function processNotification(AJXP_Notification &$notification)
     {
-        $userExist = UsersService::userExists($notification->getTarget());
-        if ($userExist === true) {
-            $userObject = ConfService::getConfStorageImpl()->createUserObject($notification->getTarget());
-        } else {
+        try{
+            $userObject = UsersService::getUserById($notification->getTarget());
+        }catch (\Pydio\Core\Exception\UserNotFoundException $e){
             $messages = LocaleService::getMessages();
             throw new PydioException($messages['core.mailer.2']);
         }
@@ -457,7 +456,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     if ($this->validateEmail($recipient)) {
                         $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
                     } else if (UsersService::userExists($recipient)) {
-                        $user = ConfService::getConfStorageImpl()->createUserObject($recipient);
+                        $user = UsersService::getUserById($recipient, false);
                         $res = $this->abstractUserToAdress($user);
                         if($res !== false) $realRecipients[] = $res;
                     }

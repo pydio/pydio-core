@@ -354,9 +354,8 @@ class RolesService
             if (!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
                 $adminPass = md5(ADMIN_PASSWORD);
             }
-            UsersService::createUser("admin", $adminPass, true);
+            $userObject = UsersService::createUser("admin", $adminPass, true);
             if (ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD) {
-                $userObject = ConfService::getConfStorageImpl()->createUserObject("admin");
                 $userObject->setAdmin(true);
                 RolesService::updateAdminRights($userObject);
                 if (UsersService::changePasswordEnabled()) {
@@ -369,8 +368,7 @@ class RolesService
             }
         } else if ($adminCount == -1) {
             // Here we may come from a previous version! Check the "admin" user and set its right as admin.
-            $confStorage = ConfService::getConfStorageImpl();
-            $adminUser = $confStorage->createUserObject("admin");
+            $adminUser = UsersService::getUserById("admin");
             $adminUser->setAdmin(true);
             $adminUser->save("superuser");
             file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");

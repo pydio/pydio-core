@@ -1,3 +1,4 @@
+/plugins/index.elasticsearch/vendor
 /plugins/access.ajxp_home/res/build
 /plugins/access.inbox/res/build
 /plugins/core.mailer/js/build

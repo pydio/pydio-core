@@ -278,7 +278,7 @@ class AJXP_Notification implements ContextProviderInterface
                 $uLabel = self::$usersCaches[$this->getAuthor()];
             }
         } else if (UsersService::userExists($this->getAuthor())) {
-            $obj = ConfService::getConfStorageImpl()->createUserObject($this->getAuthor());
+            $obj = UsersService::getUserById($this->getAuthor(), false);
             if($obj->isHidden()){
                 return $this->getPublicAuthorLabel();
             }

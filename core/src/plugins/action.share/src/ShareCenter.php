@@ -301,17 +301,19 @@ class ShareCenter extends Plugin
 
 
     /**
+     * @param ContextInterface $ctx
      * @return ShareStore
      */
-    public function getShareStore(){
+    public function getShareStore(ContextInterface $ctx = null){
 
-        if(!isSet($this->shareStore)){
+        if(!isSet($this->shareStore) || $ctx !== null){
             $hMin = 32;
-            if(isSet($this->currentContext)){
-                $hMin = $this->getContextualOption($this->currentContext, "HASH_MIN_LENGTH");
+            $context = $ctx !== null ? $ctx : $this->currentContext;
+            if(!empty($context)){
+                $hMin = $this->getContextualOption($context, "HASH_MIN_LENGTH");
             }
             $this->shareStore = new ShareStore(
-                $this->currentContext,
+                $context,
                 ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
                 $hMin
             );

@@ -44,12 +44,12 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             return false;
         }
 
-        $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
+        $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
         $duoActive = false;
-        if(!empty($userId)){
-            $uObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+        if(!empty($userId) && \Pydio\Core\Services\UsersService::userExists($userId)){
+            $uObject = \Pydio\Core\Services\UsersService::getUserById($userId);
             if($uObject != null){
-                $duoActive = $uObject->mergedRole->filterParameterValue("authfront.duosecurity","DUO_AUTH_ACTIVE", AJXP_REPO_SCOPE_ALL, false);
+                $duoActive = $uObject->getMergedRole()->filterParameterValue("authfront.duosecurity","DUO_AUTH_ACTIVE", AJXP_REPO_SCOPE_ALL, false);
             }
         }
         if(!$duoActive) {

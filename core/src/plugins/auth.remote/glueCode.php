@@ -158,10 +158,8 @@ switch ($plugInAction) {
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
             $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
-            UsersService::createUser($user["name"], $user["password"], $isAdmin);
+            $userObject = UsersService::createUser($user["name"], $user["password"], $isAdmin);
             if (isSet($user["roles"])) {
-                $confDriver = ConfService::getConfStorageImpl();
-                $userObject = $confDriver->createUserObject($user["name"]);
                 ajxp_gluecode_updateRole($user, $userObject);
                 $userObject->save("superuser");
             }
@@ -181,7 +179,7 @@ switch ($plugInAction) {
             if (UsersService::userExists($user["name"]) && UsersService::updatePassword($user["name"], $user["password"])) {
                 $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
                 $confDriver = ConfService::getConfStorageImpl();
-                $userObject = $confDriver->createUserObject($user["name"]);
+                $userObject = UsersService::getUserById($user["name"], false);
                 $userObject->setAdmin($isAdmin);
                 ajxp_gluecode_updateRole($user, $userObject);
                 $userObject->save("superuser");

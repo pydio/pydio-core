@@ -21,8 +21,8 @@
 namespace Pydio\Core\Model;
 
 
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -123,7 +123,7 @@ class Context implements ContextInterface
             return $this->userObject;
         }
         if(isSet($this->userId)){
-            $this->userObject = ConfService::getConfStorageImpl()->createUserObject($this->userId);
+            $this->userObject = UsersService::getUserById($this->userId, false);
             return $this->userObject;
         }
         return null;
@@ -215,15 +215,13 @@ class Context implements ContextInterface
 
     public function getStringIdentifier()
     {
-        $logged = $this->getUser();
-        $u = $logged == null ? "shared" : $logged->getId();
+        $u = $this->userId == null ? "shared" : $this->userId;
         $a = "norepository";
         $r = $this->getRepository();
         if($r !== null){
             $a = $r->getSlug();
         }
         return $u.":".$a;
-
     }
 
     /**

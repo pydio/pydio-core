@@ -22,9 +22,9 @@
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -71,7 +71,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $user = $ctx->getUser();
         if ($repo->hasParent() && $repo->getOwner() != null && $repo->getOwner() != $user->getId()) {
             // Pass parent user instead of currently logged
-            $userObject = ConfService::getConfStorageImpl()->createUserObject($repo->getOwner());
+            $userObject = UsersService::getUserById($repo->getOwner());
             $newCtx = \Pydio\Core\Model\Context::contextWithObjects($userObject, $repo);
             return parent::getContextualOption($newCtx, $optionName);
         }else{

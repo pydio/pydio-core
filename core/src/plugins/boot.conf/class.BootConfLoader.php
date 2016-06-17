@@ -401,19 +401,18 @@ class BootConfLoader extends AbstractConfDriver
         $adminLogin = Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
-        UsersService::createUser($adminLogin, $adminPass, true);
-        $uObj = $newConfigPlugin->createUserObject($adminLogin);
+        $uObj = UsersService::createUser($adminLogin, $adminPass, true);
         if($loginIsEmail){
-            $uObj->personalRole->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
+            $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
         }else if(isSet($data["MAILER_ADMIN"])) {
-            $uObj->personalRole->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
+            $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
         }
-        $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
+        $uObj->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
         $repos = \Pydio\Core\Services\RepositoryService::listAllRepositories();
         foreach($repos as $repo){
-            $uObj->personalRole->setAcl($repo->getId(), "rw");
+            $uObj->getPersonalRole()->setAcl($repo->getId(), "rw");
         }
-        RolesService::updateRole($uObj->personalRole);
+        RolesService::updateRole($uObj->getPersonalRole());
 
         $loginP = "USER_LOGIN";
         $i = 0;
@@ -422,11 +421,10 @@ class BootConfLoader extends AbstractConfDriver
             $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
             $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
             $saniLogin = Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
-            UsersService::createUser($saniLogin, $pass);
-            $uObj = $newConfigPlugin->createUserObject($saniLogin);
-            $uObj->personalRole->setParameterValue("core.conf", "email", $mail);
-            $uObj->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
-            RolesService::updateRole($uObj->personalRole);
+            $uObj = UsersService::createUser($saniLogin, $pass);
+            $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $mail);
+            $uObj->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
+            RolesService::updateRole($uObj->getPersonalRole());
             $i++;
             $loginP = "USER_LOGIN_".$i;
         }

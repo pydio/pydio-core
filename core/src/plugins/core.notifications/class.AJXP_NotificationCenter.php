@@ -233,6 +233,8 @@ class AJXP_NotificationCenter extends Plugin
                         $this->logInfo("Warning", "Empty node stored in notification ".$notif->getAuthor()."/ ".$notif->getAction());
                         continue;
                     }
+                    // Backward compat : make sure there is a user ID in the node url.
+                    $node->setUserId($node->hasUser() ? $node->getUserId() : $notif->getAuthor());
                     try {
                         @$node->loadNodeInfo();
                     } catch (Exception $e) {

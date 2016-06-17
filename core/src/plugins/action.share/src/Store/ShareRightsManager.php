@@ -218,7 +218,7 @@ class ShareRightsManager
                     throw new \Exception( str_replace("%s", $u, $mess["share_center.222"]));
                 }
                 if($userExistsRead){
-                    $userObject = $confDriver->createUserObject($u);
+                    $userObject = UsersService::getUserById($u, false);
                     if ( $allowCrossUserSharing != true && ( !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId() ) ) {
                         throw new \Exception($mess["share_center.221"]);
                     }
@@ -327,7 +327,7 @@ class ShareRightsManager
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
                 $role = RolesService::getRole($rId);
-                $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
+                $userObject = UsersService::getUserById($userId);
                 $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
                 $AVATAR = $role->filterParameterValue("core.conf", "avatar", AJXP_REPO_SCOPE_ALL, "");
                 if(empty($LABEL)) $LABEL = $userId;
@@ -414,12 +414,12 @@ class ShareRightsManager
         if($isUpdate){
             $this->unregisterRemovedUsers($childRepoId, $users, $groups, $selection->getUniqueNode());
         }
-        $confDriver = ConfService::getConfStorageImpl();
+
         $loggedUser = $this->context->getUser();
         foreach ($users as $userName => $userEntry) {
 
             if (UsersService::userExists($userName, "r")) {
-                $userObject = $confDriver->createUserObject($userName);
+                $userObject = UsersService::getUserById($userName);
                 if(isSet($userEntry["HIDDEN"]) && isSet($userEntry["UPDATE_PASSWORD"])){
                     UsersService::updatePassword($userName, $userEntry["UPDATE_PASSWORD"]);
                 }
@@ -487,8 +487,8 @@ class ShareRightsManager
         if (count($removeUsers)) {
             foreach ($removeUsers as $user) {
                 if (UsersService::userExists($user)) {
-                    $userObject = $confDriver->createUserObject($user);
-                    $userObject->personalRole->setAcl($repoId, "");
+                    $userObject = UsersService::getUserById($user, false);
+                    $userObject->getPersonalRole()->setAcl($repoId, "");
                     $userObject->save("superuser");
                 }
                 if($this->watcher !== false && $watcherNode !== null){
@@ -543,15 +543,15 @@ class ShareRightsManager
                 }
             }
         }
-        UsersService::createUser($userName, $pass, false, $isHidden);
-        $userObject = $confDriver->createUserObject($userName);
-        $userObject->personalRole->clearAcls();
+
+        $userObject = UsersService::createUser($userName, $pass, false, $isHidden);
+        $userObject->getPersonalRole()->clearAcls();
         $userObject->setParent($parentUser->getId());
         $userObject->setGroupPath($parentUser->getGroupPath());
         $userObject->setProfile("shared");
         if($isHidden){
             $userObject->setHidden(true);
-            $userObject->personalRole->setParameterValue("core.conf", "USER_DISPLAY_NAME", $display);
+            $userObject->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $display);
         }
         Controller::applyHook("user.after_create", array($this->context, $userObject));
 

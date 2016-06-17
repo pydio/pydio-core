@@ -19,8 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Authfront\Core\AbstractAuthFrontend;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -132,14 +132,14 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     private function loadConfig($userid)
     {
-        $confStorage = ConfService::getConfStorageImpl();
-        $userObject = $confStorage->createUserObject($userid);
+
+        $userObject = UsersService::getUserById($userid);
 
         if($userObject != null){
-            $this->google = $userObject->mergedRole->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
-            $this->googleLast = $userObject->mergedRole->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
-            $this->yubikey1 = $userObject->mergedRole->filterParameterValue("authfront.otp", "yubikey1", AJXP_REPO_SCOPE_ALL, '');
-            $this->yubikey2 = $userObject->mergedRole->filterParameterValue("authfront.otp", "yubikey2", AJXP_REPO_SCOPE_ALL, '');
+            $this->google = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
+            $this->googleLast = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
+            $this->yubikey1 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey1", AJXP_REPO_SCOPE_ALL, '');
+            $this->yubikey2 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey2", AJXP_REPO_SCOPE_ALL, '');
         }
         if (!empty($this->pluginConf["YUBICO_CLIENT_ID"])) {
             $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
@@ -238,9 +238,8 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 if ($codeOTP == $stest) {
                     $valid = 1;
                     // save google_last
-                    $confStorage = ConfService::getConfStorageImpl();
-                    $userObject = $confStorage->createUserObject($loginId);
-                    $role = $userObject->personalRole;
+                    $userObject = UsersService::getUserById($loginId);
+                    $role = $userObject->getPersonalRole();
                     if ($role === false) {
                         throw new Exception("Cant find role! ");
                     }

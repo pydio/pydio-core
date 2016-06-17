@@ -70,8 +70,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {
-                UsersService::createUser("guest", "");
-                $guest = ConfService::getConfStorageImpl()->createUserObject("guest");
+                $guest = UsersService::createUser("guest", "");
                 $guest->save("superuser");
             }
             $logged = AuthService::logUser("guest", null);

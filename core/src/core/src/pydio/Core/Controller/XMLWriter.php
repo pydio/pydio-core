@@ -663,7 +663,7 @@ class XMLWriter
             if($loggedUser != null && $loggedUser->getId() == $uId){
                 $currentUserIsOwner = true;
             }
-            $label = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
+            $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             $ownerLabel = $label;
             $isSharedString =  'owner="'.Utils::xmlEntities($label).'"';
         }

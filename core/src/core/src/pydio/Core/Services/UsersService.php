@@ -22,6 +22,7 @@ namespace Pydio\Core\Services;
 
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Model\Context;
@@ -36,11 +37,78 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class UsersService
 {
+    /**
+     * @var UsersService
+     */
     private static $_instance;
-    private $cache = [];
+    /**
+     * @var array
+     */
+    private $repositoriesCache = [];
+    /**
+     * @var array
+     */
+    private $usersCache = [];
+
+    /**
+     * @var array
+     */
+    private $userParametersCache = [];
+
+    /**
+     * @return UsersService
+     */
     public static function instance(){
         if(empty(self::$_instance)) self::$_instance = new UsersService();
         return self::$_instance;
+    }
+
+    /**
+     * @param string $userId
+     * @param bool $checkExists
+     * @return UserInterface
+     * @throws UserNotFoundException
+     */
+    public static function getUserById($userId, $checkExists = true){
+
+        $self = self::instance();
+        // Try to get from memory
+        if(isSet($self->usersCache[$userId])){
+            return $self->usersCache[$userId];
+        }
+        // Try to get from cache
+        $test = CacheService::fetch("shared", "pydio:user:" . $userId);
+        if($test !== false && $test instanceof UserInterface){
+            if($test->getPersonalRole() === null){
+                $test->personalRole = $test->roles["AJXP_USR_/".$userId];
+            }
+            $test->recomputeMergedRole();
+            $self->usersCache[$userId] = $test;
+            return $test;
+        }
+        if($checkExists && !self::userExists($userId)){
+            throw new UserNotFoundException($userId);
+        }
+        // Try to get from conf
+        $userObject = ConfService::getConfStorageImpl()->createUserObject($userId, false);
+        if($userObject instanceof UserInterface){
+            // Save in memory
+            $self->usersCache[$userId] = $userObject;
+            // Save in cache
+            CacheService::save("shared", "pydio:user:" . $userId, $userObject);
+        }
+        return $userObject;
+
+    }
+
+    /**
+     * @param $userObject UserInterface
+     */
+    public static function updateUser($userObject){
+        $self = self::instance();
+        $userId = $userObject->getId();
+        $self->usersCache[$userId] = $userObject;
+        CacheService::save("shared", "pydio:user:" . $userId, $userObject);
     }
 
     /**
@@ -100,20 +168,22 @@ class UsersService
      * @return mixed|null|\Pydio\Core\Model\RepositoryInterface[]
      */
     private function getFromCaches($userId){
+
         $fromSesssion = SessionService::getLoadedRepositories();
         if($fromSesssion !== null){
-            $this->cache[$userId] = $fromSesssion;
+            $this->repositoriesCache[$userId] = $fromSesssion;
             return $fromSesssion;
         }
-        if(isSet($this->cache[$userId])) {
-            $configsNotCorrupted = array_reduce($this->cache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
+        if(isSet($this->repositoriesCache[$userId])) {
+            $configsNotCorrupted = array_reduce($this->repositoriesCache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
             if($configsNotCorrupted){
-                return $this->cache[$userId];
+                return $this->repositoriesCache[$userId];
             }else{
-                $this->cache = [];
+                $this->repositoriesCache = [];
             }
         }
         return null;
+
     }
 
     /**
@@ -121,13 +191,19 @@ class UsersService
      * @param RepositoryInterface[] $repoList
      */
     private function setInCache($userId, $repoList){
-        $this->cache[$userId] = $repoList;
+
+        $this->repositoriesCache[$userId] = $repoList;
         SessionService::updateLoadedRepositories($repoList);
+
     }
 
     public static function invalidateCache(){
-        self::instance()->cache = [];
+
+        self::instance()->repositoriesCache = [];
+        self::instance()->usersCache = [];
+        CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
         SessionService::invalidateLoadedRepositories();
+
     }
 
     
@@ -235,8 +311,7 @@ class UsersService
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($cookieString) {
-            $confDriver = ConfService::getConfStorageImpl();
-            $userObject = $confDriver->createUserObject($userId);
+            $userObject = self::getUserById($userId);
             $res = CookiesHelper::checkCookieString($userObject, $userPass);
             return $res;
         }
@@ -270,7 +345,7 @@ class UsersService
             // We can directly update the HA1 version of the WEBDAV Digest
             $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
-            $zObj = ConfService::getConfStorageImpl()->createUserObject($userId);
+            $zObj = self::getUserById($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
             if (!is_array($wData)) $wData = array();
             $wData["HA1"] = $ha1;
@@ -289,7 +364,7 @@ class UsersService
      * @param $userPass
      * @param bool $isAdmin
      * @param bool $isHidden
-     * @return null
+     * @return UserInterface
      */
     public static function createUser($userId, $userPass, $isAdmin = false, $isHidden = false)
     {
@@ -300,9 +375,8 @@ class UsersService
             throw new \Exception("Reserved user id");
         }
         $authDriver = ConfService::getAuthDriverImpl();
-        $confDriver = ConfService::getConfStorageImpl();
         $authDriver->createUser($userId, $userPass);
-        $user = $confDriver->createUserObject($userId);
+        $user = self::getUserById($userId, false);
         if ($isAdmin) {
             $user->setAdmin(true);
             $user->save("superuser");
@@ -322,7 +396,7 @@ class UsersService
         }
         Controller::applyHook("user.after_create", array($localContext, $user));
         AJXP_Logger::info(__CLASS__, "Create User", array("user_id" => $userId));
-        return null;
+        return $user;
     }
 
     /**
@@ -466,7 +540,7 @@ class UsersService
         foreach (array_keys($users) as $userId) {
             if (($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
             if ($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
-            $allUsers[$userId] = $confDriver->createUserObject($userId);
+            $allUsers[$userId] = self::getUserById($userId);
             $index++;
 
             // Callback func for display progression on cli mode
@@ -560,5 +634,50 @@ class UsersService
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->supportsAuthSchemes();
+    }
+
+    /**
+     * @param string $parameterName Plugin parameter name
+     * @param UserInterface|string $userIdOrObject
+     * @param string $pluginId Plugin name, core.conf by default
+     * @param null $defaultValue
+     * @return mixed
+     */
+    public static function getUserPersonalParameter($parameterName, $userIdOrObject, $pluginId = "core.conf", $defaultValue = null)
+    {
+        $self = self::instance();
+
+        $cacheId = $pluginId . "-" . $parameterName;
+        if (!isSet($self->userParametersCache[$cacheId])) {
+            $self->userParametersCache[$cacheId] = [];
+        }
+        // Passed an already loaded object
+        if ($userIdOrObject instanceof UserInterface) {
+            $value = $userIdOrObject->getPersonalRole()->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+            $self->userParametersCache[$cacheId][$userIdOrObject->getId()] = $value;
+            if (empty($value) && !empty($defaultValue)) $value = $defaultValue;
+            return $value;
+        }
+        // Already in memory cache
+        if (isSet($self->userParametersCache[$cacheId][$userIdOrObject])) {
+            return $self->userParametersCache[$cacheId][$userIdOrObject];
+        }
+
+        // Try to load personal role if it was already loaded.
+        $uRole = RolesService::getRole("AJXP_USR_/" . $userIdOrObject);
+        if ($uRole === false && UsersService::userExists($userIdOrObject)) {
+            $uObject = self::getUserById($userIdOrObject, false);
+            $uRole = $uObject->getPersonalRole();
+        }
+        if (empty($uRole)) {
+            return $defaultValue;
+        }
+        $value = $uRole->filterParameterValue($pluginId, $parameterName, AJXP_REPO_SCOPE_ALL, $defaultValue);
+        if (empty($value) && !empty($defaultValue)) {
+            $value = $userIdOrObject;
+        }
+        $self->userParametersCache[$cacheId][$userIdOrObject] = $value;
+        return $value;
+
     }
 }

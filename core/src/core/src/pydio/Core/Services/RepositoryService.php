@@ -354,10 +354,12 @@ class RepositoryService
         }
         $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId);
         if($test !== false){
+            $this->cache["REPOSITORIES"][$repoId] = $test;
             return $test;
         }
         $test =  ConfService::getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
+            $this->cache["REPOSITORIES"][$repoId] = $test;
             CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $test);
             return $test;
         }
@@ -365,6 +367,7 @@ class RepositoryService
         $statics = self::getStaticRepositories();
         if (isSet($statics[$repoId])) {
             $repo = $statics[$repoId];
+            $this->cache["REPOSITORIES"][$repoId] = $test;
             CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $repo);
             return $repo;
         }

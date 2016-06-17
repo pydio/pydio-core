@@ -117,7 +117,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         if(is_array($lock)
             && array_key_exists("lock_user", $lock)){
             if ($lock["lock_user"] != $node->getContext()->getUser()->getId()) {
-                $displayName = ConfService::getUserPersonalParameter("USER_DISPLAY_NAME", $lock["lock_user"], "core.conf", $lock["lock_user"]);
+                $displayName = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $lock["lock_user"], "core.conf", $lock["lock_user"]);
                 $node->setLabel($node->getLabel() . " (locked by ".$displayName.")");
                 $node->mergeMetadata(array(
                     "sl_locked" => "true",

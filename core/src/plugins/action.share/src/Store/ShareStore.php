@@ -362,7 +362,7 @@ class ShareStore {
         $crtUser = $this->context->getUser();
         if($crtUser->getId() == $userId) return true;
         if($crtUser->isAdmin()) return true;
-        $user = ConfService::getConfStorageImpl()->createUserObject($userId);
+        $user = UsersService::getUserById($userId);
         if($user->hasParent() && $user->getParent() == $crtUser->getId()){
             return true;
         }
