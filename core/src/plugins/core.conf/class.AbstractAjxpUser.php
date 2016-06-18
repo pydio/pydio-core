@@ -493,6 +493,11 @@ abstract class AbstractAjxpUser implements UserInterface
         return $this->personalRole;
     }
 
+    public function updatePersonalRole(AJXP_Role $role)
+    {
+        $this->personalRole = $role;
+    }
+
     protected function migrateRightsToPersonalRole()
     {
         $changes = 0;

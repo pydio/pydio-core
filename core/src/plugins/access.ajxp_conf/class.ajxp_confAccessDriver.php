@@ -28,6 +28,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -714,7 +715,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $sharedRepos = array();
                     if(isSet($userObject)){
                         // Add User shared Repositories as well
-                        $acls = $userObject->mergedRole->listAcls();
+                        $acls = $userObject->getMergedRole()->listAcls();
                         if(count($acls)) {
                             $sharedRepos = RepositoryService::listRepositoriesWithCriteria(array(
                                 "uuid" => array_keys($acls),
@@ -804,7 +805,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         foreach($rolesList as $rId => $rObj){
                             $data["ALL"]["ROLES_DETAILS"][$rId] = array("label" => $rObj->getLabel(), "sticky" => $rObj->alwaysOverrides());
                         }
-                        if (isSet($userObject->parentRole)) {
+                        if ($userObject instanceof AbstractAjxpUser && isSet($userObject->parentRole)) {
                             $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
                         }
                     } else if (isSet($groupPath)) {
@@ -976,7 +977,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 try {
                     $originalRole->bunchUpdate($roleData);
                     if (isSet($userObject)) {
-                        $userObject->personalRole = $originalRole;
+                        $userObject->updatePersonalRole($originalRole);
                         $userObject->save("superuser");
                     } else {
                         RolesService::updateRole($originalRole);
@@ -1259,7 +1260,6 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
             case "user_update_role" :
 
-                $confStorage = ConfService::getConfStorageImpl();
                 $selection = UserSelection::fromContext($ctx, $httpVars);
                 $files = $selection->getFiles();
                 $detectedRoles = array();

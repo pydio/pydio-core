@@ -430,12 +430,12 @@ class ShareRightsManager
             }
 
             // ASSIGN NEW REPO RIGHTS
-            $userObject->personalRole->setAcl($childRepoId, $userEntry["RIGHT"]);
+            $userObject->getPersonalRole()->setAcl($childRepoId, $userEntry["RIGHT"]);
 
             // FORK MASK IF THERE IS ANY
             $childMask = $this->forkMaskIfAny($loggedUser, $parentRepository->getId(), $selection->getUniqueNode());
             if($childMask != null){
-                $userObject->personalRole->setMask($childRepoId, $childMask);
+                $userObject->getPersonalRole()->setMask($childRepoId, $childMask);
             }
 
             // CREATE A MINISITE-LIKE ROLE FOR THIS REPOSITORY
@@ -448,9 +448,9 @@ class ShareRightsManager
             // ADD "my shared files" REPO OTHERWISE SOME USER CANNOT ACCESS
             if( !isSet($userEntry["HIDDEN"]) && $childRepository->hasContentFilter()){
                 $inboxRepo = RepositoryService::getRepositoryById("inbox");
-                $currentAcl = $userObject->mergedRole->getAcl("inbox");
+                $currentAcl = $userObject->getMergedRole()->getAcl("inbox");
                 if($inboxRepo !== null && empty($currentAcl)){
-                    $userObject->personalRole->setAcl("inbox", "rw");
+                    $userObject->getPersonalRole()->setAcl("inbox", "rw");
                 }
             }
 
@@ -473,8 +473,6 @@ class ShareRightsManager
      * @param AJXP_Node|null $watcherNode
      */
     public function unregisterRemovedUsers($repoId, $newUsers, $newGroups, $watcherNode = null){
-
-        $confDriver = ConfService::getConfStorageImpl();
 
         $currentRights = $this->computeSharedRepositoryAccessRights(
             $repoId,

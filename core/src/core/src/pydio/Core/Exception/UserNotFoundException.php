@@ -34,6 +34,6 @@ class UserNotFoundException extends PydioException
      */
     public function __construct($userId)
     {
-        parent::__construct("Cannot find user ".$userId, null, 50014);
+        parent::__construct("Cannot find user ".$userId, false, 50014);
     }
 }

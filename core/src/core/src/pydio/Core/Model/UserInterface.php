@@ -266,7 +266,12 @@ interface UserInterface extends AjxpGroupPathProvider
      * @return AJXP_Role
      */
     public function getPersonalRole();
-    
+
+    /**
+     * @param AJXP_Role $role
+     */
+    public function updatePersonalRole(AJXP_Role $role);
+
     /**
      * @return bool
      * @throws \Exception

@@ -85,7 +85,6 @@ class AuthService
     public static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
     {
         $user_id = UsersService::filterUserSensitivity($user_id);
-        $confDriver = ConfService::getConfStorageImpl();
         $authDriver = ConfService::getAuthDriverImpl();
         // CHECK USER PASSWORD HERE!
         $loginAttempt = BruteForceHelper::getBruteForceLoginArray();

@@ -80,7 +80,7 @@ class UsersService
         $test = CacheService::fetch("shared", "pydio:user:" . $userId);
         if($test !== false && $test instanceof UserInterface){
             if($test->getPersonalRole() === null){
-                $test->personalRole = $test->roles["AJXP_USR_/".$userId];
+                $test->updatePersonalRole($test->getRoles()["AJXP_USR_/".$userId]);
             }
             $test->recomputeMergedRole();
             $self->usersCache[$userId] = $test;
@@ -90,7 +90,7 @@ class UsersService
             throw new UserNotFoundException($userId);
         }
         // Try to get from conf
-        $userObject = ConfService::getConfStorageImpl()->createUserObject($userId, false);
+        $userObject = ConfService::getConfStorageImpl()->createUserObject($userId);
         if($userObject instanceof UserInterface){
             // Save in memory
             $self->usersCache[$userId] = $userObject;

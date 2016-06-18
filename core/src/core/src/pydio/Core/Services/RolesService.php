@@ -137,7 +137,7 @@ class RolesService
      * Create or update role
      *
      * @param AJXP_Role $roleObject
-     * @param null $userObject
+     * @param UserInterface|null $userObject
      */
     public static function updateRole($roleObject, $userObject = null)
     {

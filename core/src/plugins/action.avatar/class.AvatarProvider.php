@@ -33,6 +33,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AvatarProvider extends Plugin
 {
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function receiveAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $ctx = $requestInterface->getAttribute("ctx");
@@ -68,7 +73,7 @@ class AvatarProvider extends Plugin
                 $userid = $httpVars["userid"];
                 if (UsersService::usersEnabled() && UsersService::userExists($userid)) {
                     $user = UsersService::getUserById($userid, false);
-                    $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+                    $userEmail = $user->getPersonalRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($userEmail)) {
                         $url .= md5(strtolower(trim($userEmail)));
                     }

@@ -21,7 +21,6 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextProviderInterface;
 
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
@@ -91,12 +90,22 @@ class AJXP_Notification implements ContextProviderInterface
     {
     }
 
+    /**
+     * @param $string
+     * @return string
+     */
     protected function getRoot($string)
     {
         if(empty($string)) return "/";
         return $string;
     }
 
+    /**
+     * @param $tplString
+     * @param $mess
+     * @param bool $rich
+     * @return mixed
+     */
     protected function replaceVars($tplString, $mess, $rich = true)
     {
         $repoId = $this->getNode()->getRepositoryId();
@@ -183,6 +192,7 @@ class AJXP_Notification implements ContextProviderInterface
     }
 
     /**
+     * @param bool $skipLink
      * @return string
      */
     public function getDescriptionLong($skipLink = false)
@@ -220,6 +230,9 @@ class AJXP_Notification implements ContextProviderInterface
         return $tpl;
     }
 
+    /**
+     * @return mixed
+     */
     public function getDescriptionLocation(){
         $mess = LocaleService::getMessages();
         if(!isSet($this->locationType)){
@@ -252,26 +265,42 @@ class AJXP_Notification implements ContextProviderInterface
         $this->locationType = $type;
     }
 
+    /**
+     * @param $action
+     */
     public function setAction($action)
     {
         $this->action = $action;
     }
 
+    /**
+     * @return String
+     */
     public function getAction()
     {
         return $this->action;
     }
 
+    /**
+     * @param $author
+     */
     public function setAuthor($author)
     {
         $this->author = $author;
     }
 
+    /**
+     * @return String
+     */
     public function getAuthor()
     {
         return $this->author;
     }
 
+    /**
+     * @return mixed|String
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function getAuthorLabel(){
         if (array_key_exists($this->getAuthor(), self::$usersCaches)) {
             if(self::$usersCaches[$this->getAuthor()] != 'AJXP_USER_DONT_EXISTS'){
@@ -282,7 +311,7 @@ class AJXP_Notification implements ContextProviderInterface
             if($obj->isHidden()){
                 return $this->getPublicAuthorLabel();
             }
-            $uLabel = $obj->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            $uLabel = $obj->getPersonalRole()->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
             self::$usersCaches[$this->getAuthor()] = $uLabel;
         } else{
             self::$usersCaches[$this->getAuthor()] = 'AJXP_USER_DONT_EXISTS';
@@ -291,17 +320,26 @@ class AJXP_Notification implements ContextProviderInterface
         else return $this->getAuthor();
     }
 
+    /**
+     * @return mixed
+     */
     protected function getPublicAuthorLabel(){
         $m = LocaleService::getMessages();
         $label = str_replace("%s", AJXP_Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
         return $label;
     }
 
+    /**
+     * @param $date
+     */
     public function setDate($date)
     {
         $this->date = $date;
     }
 
+    /**
+     * @return int
+     */
     public function getDate()
     {
         return $this->date;
@@ -327,11 +365,17 @@ class AJXP_Notification implements ContextProviderInterface
         return $this->node;
     }
 
+    /**
+     * @param $secondaryNode
+     */
     public function setSecondaryNode($secondaryNode)
     {
         $this->secondaryNode = $secondaryNode;
     }
 
+    /**
+     * @return AJXP_Node
+     */
     public function getSecondaryNode()
     {
         return $this->secondaryNode;

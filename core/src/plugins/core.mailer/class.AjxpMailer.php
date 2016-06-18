@@ -22,6 +22,7 @@
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
@@ -62,17 +63,32 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @return array
+     * @throws Exception
+     */
     protected function getDibiDriver () {
         if (!isset($this->_dibiDriver)) {
             $this->_dibiDriver = Utils::cleanDibiDriverParameters(array("group_switch_value"=>"core"));
         }
         return $this->_dibiDriver;
     }
+
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws PydioException
+     */
     public function mailConsumeQueue ($action, $httpVars, $fileVars, ContextInterface $ctx) {
 
         if ($action === "consume_mail_queue") {
             
             $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
+            if(!$mailer instanceof AjxpMailer){
+                throw new PydioException("Cannot find active mailer!");
+            }
             if (!dibi::isConnected()) {
                 dibi::connect($this->getDibiDriver());
             }
@@ -167,10 +183,19 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $int
+     * @return string
+     */
     protected function stringify($int){
         return ($int < 10 ? "0".$int : "".$int);
     }
 
+    /**
+     * @param $frequencyType
+     * @param $frequencyDetail
+     * @return DateTime|int|null|string
+     */
     protected function computeEmailSendDate($frequencyType, $frequencyDetail){
 
         $date = new DateTime("now");
@@ -233,6 +258,11 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         return $nextFrequency;
     }
 
+    /**
+     * @param AJXP_Notification $notification
+     * @throws Exception
+     * @throws PydioException
+     */
     public function processNotification(AJXP_Notification &$notification)
     {
         try{
@@ -241,15 +271,15 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             $messages = LocaleService::getMessages();
             throw new PydioException($messages['core.mailer.2']);
         }
-        if($userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true") !== "true"){
+        if($userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true") !== "true"){
             // User does not want to receive any emails.
             return;
         }
 
-        $notification_email = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
+        $notification_email = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
         $arrayRecipients = array();
-        $mainRecipient = $userObject->mergedRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-        $useHtml = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true") === "true" ? 1 : 0;
+        $mainRecipient = $userObject->getMergedRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+        $useHtml = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true") === "true" ? 1 : 0;
 
         if(!empty($mainRecipient)) $arrayRecipients[] = $mainRecipient;
         $additionalRecipients = array_map("trim", explode(',', $notification_email));
@@ -259,8 +289,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
 
         if ($this->pluginConf["MAILER_ACTIVATE_QUEUE"] && count($arrayRecipients)) {
 
-            $frequencyType = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL,"M");
-            $frequencyDetail = $userObject->mergedRole->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL,"5");
+            $frequencyType = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL,"M");
+            $frequencyDetail = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL,"5");
             $nextFrequency = $this->computeEmailSendDate(
                 $frequencyType,
                 $frequencyDetail
@@ -287,7 +317,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             }
         } else {
             $mailer = PluginsService::getInstance($notification->getNode()->getContext())->getActivePluginsForType("mailer", true);
-            if ($mailer !== false) {
+            if ($mailer !== false && $mailer instanceof AjxpMailer) {
                 try {
                     $mailer->sendMail(
                         $notification->getNode()->getContext(),
@@ -305,6 +335,15 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $recipients
+     * @param $subject
+     * @param $body
+     * @param null $from
+     * @param null $imageLink
+     * @param bool $useHtml
+     */
     public function sendMail(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
     {
         $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
@@ -361,9 +400,23 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $recipients
+     * @param $subject
+     * @param $body
+     * @param null $from
+     * @param array $images
+     * @param bool $useHtml
+     */
     protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws Exception
+     */
     public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $mess = LocaleService::getMessages();
@@ -397,6 +450,11 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param null $fromAdress
+     * @return array|mixed
+     */
     public function resolveFrom(ContextInterface $ctx, $fromAdress = null)
     {
         $fromResult = array();
@@ -467,24 +525,36 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         return $realRecipients;
     }
 
-    public function abstractUserToAdress(AbstractAjxpUser $user)
+    /**
+     * @param UserInterface $user
+     * @return array|bool
+     */
+    public function abstractUserToAdress(UserInterface $user)
     {
         // SHOULD CHECK THAT THIS USER IS "AUTHORIZED" TO AVOID SPAM
-        $userEmail = $user->personalRole->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
+        $userEmail = $user->getPersonalRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
         if (empty($userEmail)) {
             return false;
         }
-        $displayName = $user->personalRole->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+        $displayName = $user->getPersonalRole()->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
         if(empty($displayName)) $displayName = $user->getId();
         return array("name" => $displayName, "adress" => $userEmail);
     }
 
 
+    /**
+     * @param $email
+     * @return bool
+     */
     public function validateEmail($email)
     {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 
+    /**
+     * @param $html
+     * @return string
+     */
     public static function simpleHtml2Text($html){
 
         $html = preg_replace('/<br\>/', "\n", $html);
