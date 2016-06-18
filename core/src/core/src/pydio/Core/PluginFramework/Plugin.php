@@ -59,7 +59,7 @@ class Plugin implements \Serializable
     protected $manifestLoaded = false;
     protected $externalFilesAppended = false;
     protected $enabled;
-    protected $registryContributions = array();
+    protected $registryContributions = [];
     protected $contributionsLoaded = false;
     /**
      * @var array
@@ -70,8 +70,8 @@ class Plugin implements \Serializable
     protected $dependencies;
     protected $extensionsDependencies;
     protected $streamData;
-    protected $mixins = array();
-    protected $cachedXPathResults = array();
+    protected $mixins = [];
+    protected $cachedXPathResults = [];
     public $loadingState = "";
     /**
      * The manifest.xml loaded
@@ -87,7 +87,7 @@ class Plugin implements \Serializable
      */
     private $manifestXML;
 
-    private $serializableAttributes = array(
+    private $serializableAttributes = [
         "baseDir",
         "id",
         "name",
@@ -99,7 +99,7 @@ class Plugin implements \Serializable
         "contributionsLoaded",
         "mixins",
         "streamData",
-        "options", "pluginConf", "pluginConfDefinition", "dependencies", "extensionsDependencies", "loadingState", "manifestXML", "cachedXPathResults");
+        "options", "pluginConf", "pluginConfDefinition", "dependencies", "extensionsDependencies", "loadingState", "manifestXML", "cachedXPathResults"];
 
     /**
      * Construction method
@@ -114,14 +114,36 @@ class Plugin implements \Serializable
         $split = explode(".", $id);
         $this->type = $split[0];
         $this->name = $split[1];
-        $this->dependencies = array();
-        $this->extensionsDependencies = array();
+        $this->dependencies = [];
+        $this->extensionsDependencies = [];
     }
 
+    /**
+     * Make sure to clone the XML manifest document, otherwise if the plugin
+     * changes it dynamically, it can mess up things.
+     * @inheritdoc
+     */
+    public function __clone()
+    {
+        if($this->manifestDoc !== null){
+            $this->manifestDoc = clone $this->manifestDoc;
+            $this->reloadXPath();
+        }
+    }
+
+    /**
+     * @param $pluginId
+     * @return string
+     */
     public static function getWorkDirForPluginId($pluginId) {
         return AJXP_DATA_PATH.DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$pluginId;
     }
 
+    /**
+     * @param bool $check
+     * @return string
+     * @throws \Exception
+     */
     protected function getPluginWorkDir($check = false)
     {
         $d = self::getWorkDirForPluginId($this->getId());
@@ -133,6 +155,12 @@ class Plugin implements \Serializable
         return $d;
     }
 
+    /**
+     * @param bool $shared
+     * @param bool $check
+     * @return string
+     * @throws \Exception
+     */
     protected function getPluginCacheDir($shared = false, $check = false)
     {
         $d = ($shared ? AJXP_SHARED_CACHE_DIR : AJXP_CACHE_DIR).DIRECTORY_SEPARATOR."plugins".DIRECTORY_SEPARATOR.$this->getId();
@@ -169,7 +197,7 @@ class Plugin implements \Serializable
      */
     protected function getContextualOption(ContextInterface $ctx, $optionName){
 
-        if(!is_array($this->options)) $this->options = array();
+        if(!is_array($this->options)) $this->options = [];
         $merged = $this->options;
         if(is_array($this->pluginConf)) $merged = array_merge($merged, $this->pluginConf);
 
@@ -270,12 +298,12 @@ class Plugin implements \Serializable
                 if ($include != "*") {
                     $include = explode(",", $include);
                 } else {
-                    $include = array("*");
+                    $include = ["*"];
                 }
                 if ($exclude != "") {
                     $exclude = explode(",", $exclude);
                 } else {
-                    $exclude = array();
+                    $exclude = [];
                 }
                 $this->initXmlContributionFile($ctx, $filename, $include, $exclude, $dry);
             } else {
@@ -310,7 +338,7 @@ class Plugin implements \Serializable
      * @param array $exclude XPath query for XML Nodes to exclude from the included ones.
      * @param bool $dry Dry-run of the inclusion
      */
-    protected function initXmlContributionFile(ContextInterface $ctx, $xmlFile, $include=array("*"), $exclude=array(), $dry = false)
+    protected function initXmlContributionFile(ContextInterface $ctx, $xmlFile, $include= ["*"], $exclude= [], $dry = false)
     {
         $contribDoc = new \DOMDocument();
         $contribDoc->load(AJXP_INSTALL_PATH."/".$xmlFile);
@@ -322,20 +350,20 @@ class Plugin implements \Serializable
             return;
         }
         $xPath = new \DOMXPath($contribDoc);
-        $excluded = array();
+        $excluded = [];
         foreach ($exclude as $excludePath) {
             $children = $xPath->query($excludePath);
             foreach ($children as $child) {
                 $excluded[] = $child;
             }
         }
-        $selected = array();
+        $selected = [];
         foreach ($include as $includePath) {
             $incChildren = $xPath->query($includePath);
             if(!$incChildren->length) continue;
             $parentNode = $incChildren->item(0)->parentNode;
             if (!isSet($selected[$parentNode->nodeName])) {
-                $selected[$parentNode->nodeName]=array("parent"=>$parentNode, "nodes"=>array());
+                $selected[$parentNode->nodeName]= ["parent"=>$parentNode, "nodes"=> []];
             }
             foreach ($incChildren as $incChild) {
                 $foundEx = false;
@@ -457,7 +485,7 @@ class Plugin implements \Serializable
         if ($this->manifestDoc != null) {
             $this->manifestXML = serialize(base64_encode($this->manifestDoc->saveXML()));
         }
-        $serialArray = array();
+        $serialArray = [];
         foreach ($this->serializableAttributes as $attr) {
             $serialArray[$attr] = $this->$attr;
         }
@@ -490,7 +518,7 @@ class Plugin implements \Serializable
      * that property $this->manifestXML is not null.
      */
     protected function unserializeManifest(){
-        if($this->manifestXML != null){
+        if($this->manifestXML !== null){
             $this->manifestDoc = new \DOMDocument(1.0, "UTF-8");
             $this->manifestDoc->loadXML(base64_decode(unserialize($this->manifestXML)));
             $this->reloadXPath();
@@ -603,14 +631,18 @@ class Plugin implements \Serializable
             || in_array(substr($pluginName, 0, strpos($pluginName, "."))."+", $this->dependencies));
     }
 
+    /**
+     * @param $query
+     * @return array|mixed
+     */
     protected function cachedNodesFromManifest($query){
         if(isSet($this->cachedXPathResults[$query])){
             return $this->cachedXPathResults[$query];
         }
-        if(!$this->manifestLoaded) return array();
+        if(!$this->manifestLoaded) return [];
         if($this->manifestXML != null) $this->unserializeManifest();
         $nodes = $this->xPath->query($query);
-        $res = array();
+        $res = [];
         foreach($nodes as $xmlNode){
             $arrayNode = $this->nodeAttrToHash($xmlNode);
             $arrayNode["__NODE_NAME__"] = $xmlNode->nodeName;
@@ -628,7 +660,7 @@ class Plugin implements \Serializable
      */
     public function getActiveDependencies($pluginService)
     {
-        $deps = array();
+        $deps = [];
         $nodes = $this->cachedNodesFromManifest("dependencies/activePlugin");
         foreach ($nodes as $arrayNode) {
             $value = $arrayNode["pluginName"];
@@ -653,7 +685,7 @@ class Plugin implements \Serializable
     protected function loadConfigsDefinitions()
     {
         $params = $this->cachedNodesFromManifest("//server_settings/global_param|//server_settings/param");
-        $this->pluginConf = array();
+        $this->pluginConf = [];
         foreach ($params as $paramNode) {
             $global = ($paramNode['__NODE_NAME__'] == "global_param");
             $this->pluginConfDefinition[$paramNode["name"]] = $paramNode;
@@ -673,7 +705,7 @@ class Plugin implements \Serializable
      */
     protected function loadOptionsDefaults()
     {
-        $optionsDefaults = array();
+        $optionsDefaults = [];
         $params = $this->cachedNodesFromManifest("//server_settings/param[@default]");
         foreach ($params as $node) {
             $default = $node["default"];
@@ -748,8 +780,11 @@ class Plugin implements \Serializable
         return $this->nodeAttrToHash($files->item(0));
     }
 
+    /**
+     * @return array
+     */
     public function missingExtensions(){
-        $missing = array();
+        $missing = [];
         if(count($this->extensionsDependencies)){
             foreach($this->extensionsDependencies as $ext){
                 if (!extension_loaded($ext)) {
@@ -760,6 +795,9 @@ class Plugin implements \Serializable
         return $missing;
     }
 
+    /**
+     * @return bool
+     */
     public function hasMissingExtensions(){
         return count($this->missingExtensions()) > 0;
     }
@@ -942,18 +980,22 @@ class Plugin implements \Serializable
         $this->reloadXPath();
     }
 
+    /**
+     * @return array
+     */
     public function getPluginInformation()
     {
-        $info = array(
+        $info = [
             "plugin_author" => "",
             "plugin_uri"   => "",
             "core_packaged" => true,
             "plugin_version"=> "follow",
             "core_version" => AJXP_VERSION,
-        );
+        ];
         if($this->manifestXML != null) $this->unserializeManifest();
         $infoBranch = $this->xPath->query("plugin_info");
         if ($infoBranch->length) {
+            /** @var \DOMElement $child */
             foreach ($infoBranch->item(0)->childNodes as $child) {
                 if($child->nodeType != 1) continue;
                 if ($child->nodeName != "core_relation") {
@@ -969,6 +1011,11 @@ class Plugin implements \Serializable
         return $info;
     }
 
+    /**
+     * @param $defaultAuthor
+     * @param $defaultUriBase
+     * @return string
+     */
     public function getPluginInformationHTML($defaultAuthor, $defaultUriBase)
     {
         $pInfo = $this->getPluginInformation();
@@ -985,13 +1032,13 @@ class Plugin implements \Serializable
             unset($pInfo["core_version"]);
         }
         $pInfo["core_packaged"] = ($pInfo["core_packaged"] === true ? "Yes": "No");
-        $humanKeys = array(
+        $humanKeys = [
             "plugin_author" => "Author",
             "plugin_version" => "Version",
             "plugin_uri"    => "Url",
             "core_packaged" => "Core distrib.",
             "core_version"   => "Core version"
-        );
+        ];
         if(empty($pInfo["plugin_author"])) $pInfo["plugin_author"] = $defaultAuthor;
         foreach ($pInfo as $k => $v) {
             $pInfoString .= "<li><span class='pluginfo_key'>".$humanKeys[$k]."</span><span class='pluginfo_value'>$v</span></li>";
@@ -1038,7 +1085,7 @@ class Plugin implements \Serializable
      */
     protected function nodeAttrToHash($node)
     {
-        $hash = array();
+        $hash = [];
         $attributes  = $node->attributes;
         if ($attributes!=null) {
             foreach ($attributes as $domAttr) {

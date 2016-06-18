@@ -33,6 +33,8 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
 
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\CacheService;
 
 use Pydio\Core\Services\UsersService;
@@ -385,6 +387,26 @@ class PluginsService
         else return $nodes;
     }
 
+
+    /**
+     * Gather stream data from repositories driver, without loading the whole context.
+     *
+     * @param RepositoryInterface[] $repositories
+     * @return array
+     */
+    public static function detectRepositoriesStreams($repositories){
+        $streams = [];
+        foreach ($repositories as $repository) {
+            $accessType = $repository->getAccessType();
+            // Find access driver from base plugins
+            $plugin = self::findPluginWithoutCtxt("access", $accessType);
+            if($plugin instanceof AbstractAccessDriver){
+                $streamData = $plugin->detectStreamWrapper(false);
+                if($streamData !== false) $streams[$streamData["protocol"]] = $accessType;
+            }
+        }
+        return $streams;
+    }
 
     /*********************************/
     /*        PUBLIC FUNCTIONS       */
@@ -799,8 +821,13 @@ class PluginsService
         $this->streamWrapperPlugins = $emptyInstance->streamWrapperPlugins;
         foreach($detected as $type => $plugins){
             $this->detectedPlugins[$type] = [];
+            /**
+             * @var string $name
+             * @var Plugin $plugin
+             */
             foreach($plugins as $name => $plugin){
-                $this->detectedPlugins[$type][$name] = clone $plugin;
+                $cloned = clone $plugin;
+                $this->detectedPlugins[$type][$name] = $cloned;
             }
         }
     }

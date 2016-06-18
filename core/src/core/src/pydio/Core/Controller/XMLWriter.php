@@ -567,9 +567,11 @@ class XMLWriter
     public static function writeRepositoriesData(ContextInterface $ctx)
     {
         $loggedUser = $ctx->getUser();
+        $accessible = UsersService::getRepositoriesForUser($loggedUser);
+        $streams = PluginsService::detectRepositoriesStreams($accessible);
+
         $st = "<repositories>";
-        $streams = ConfService::detectRepositoryStreams($loggedUser, false);
-        
+
         $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'repository') and @expose='true']", function($nodes){
             $exposedNodes = [];
             foreach($nodes as $exposed_prop){
@@ -580,8 +582,6 @@ class XMLWriter
             }
             return $exposedNodes;
         });
-
-        $accessible = UsersService::getRepositoriesForUser($loggedUser);
 
         $inboxStatus = 0;
         foreach($accessible as $repoId => $repoObject){

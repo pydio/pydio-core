@@ -21,6 +21,7 @@
 namespace Pydio\Core\Services;
 
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AbstractAuthDriver;
@@ -289,38 +290,7 @@ class ConfService
         UsersService::invalidateCache();
         PluginsService::clearRegistryCaches();
     }
-
-
-    /**
-     * See instance method
-     * @param UserInterface $user
-     * @param bool $register
-     * @return array
-     */
-    public static function detectRepositoryStreams(UserInterface $user, $register = false)
-    {
-        return self::getInstance()->detectRepositoryStreamsInst($user, $register);
-    }
     
-    /**
-     * Call the detectStreamWrapper method
-     * @param UserInterface $user
-     * @param bool $register
-     * @return array
-     */
-    public function detectRepositoryStreamsInst(UserInterface $user, $register = false)
-    {
-        $streams = array();
-        $currentRepos = UsersService::getRepositoriesForUser($user);
-        foreach ($currentRepos as $repository) {
-            $ctx = new Context();
-            $ctx->setUserObject($user);
-            $ctx->setRepositoryObject($repository);
-            AJXP_MetaStreamWrapper::detectWrapperForNode(new AJXP_Node($ctx->getUrlBase()),$register, $streams);
-        }
-        return $streams;
-    }
-
     
     /**
      *  ZIP FEATURES

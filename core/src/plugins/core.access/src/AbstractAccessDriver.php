@@ -153,7 +153,6 @@ abstract class AbstractAccessDriver extends Plugin
             return;
         }
 
-        ConfService::detectRepositoryStreams($ctx->getUser(), true);
         $mess = LocaleService::getMessages();
 
         $selection = UserSelection::fromContext($ctx, $httpVars);
