@@ -49,6 +49,14 @@
     "path" : "plugins/action.share/src/ShareCenter.php",
     "method": "publicRoute"
   },
+  "/favicon":{
+    "methods": "GET",
+    "routes":[
+      "/favicon.ico"
+    ],
+    "class":"Pydio\\Core\\Http\\Base",
+    "method":"handleRoute"
+  },
   "/": {
     "methods": "*",
     "routes": [

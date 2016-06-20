@@ -35,12 +35,23 @@ class Base
     public static function handleRoute($base, $route){
 
         if($route === "/api") {
+
             $server = new Rest\RestServer($base.$route);
-        }else if($route === "/user"){
+
+        }else if($route === "/user") {
+
             $_GET["get_action"] = "user_access_point";
             $server = new Server($base);
-        }else{
+
+        }else if($route == "/favicon"){
+
+            $_GET["get_action"] = "serve_favicon";
             $server = new Server($base);
+
+        }else{
+
+            $server = new Server($base);
+            
         }
         $server->registerCatchAll();
 

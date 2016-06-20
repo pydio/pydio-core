@@ -8,6 +8,11 @@
 				</serverCallback>
 			</processing>
 		</action>
+		<action name="serve_favicon" skipSecureToken="true">
+			<processing>
+				<serverCallback methodName="switchAction" restParams="/" developerComment="Return site favicon"/>
+			</processing>
+		</action>
 		<action name="display_doc">
 			<processing>
 				<serverCallback methodName="switchAction" restParams="/doc_file" developerComment="Load a doc file">

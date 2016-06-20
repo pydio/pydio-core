@@ -24,6 +24,7 @@ use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
+use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -213,6 +214,15 @@ class AJXP_ClientDriver extends Plugin
 
         switch ($requestInterface->getAttribute("action")) {
 
+            case "serve_favicon":
+
+                $image = AJXP_THEME_FOLDER."/images/html-folder.png";
+                $reader = new FileReaderResponse($image);
+                $reader->setHeaderType("image");
+                $responseInterface = $responseInterface->withBody($reader);
+
+                break;
+
             //------------------------------------
             //	GET I18N MESSAGES
             //------------------------------------
@@ -223,8 +233,9 @@ class AJXP_ClientDriver extends Plugin
                     LocaleService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode(LocaleService::getMessages($refresh));
+                //HTMLWriter::charsetHeader("application/json");
+                //echo json_encode(LocaleService::getMessages($refresh));
+                $responseInterface = new JsonResponse(LocaleService::getMessages($refresh));
 
             break;
 
