@@ -30,11 +30,16 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\FilteredRepositoriesList;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class UsersService
+ * @package Pydio\Core\Services
+ */
 class UsersService
 {
     /**
@@ -634,6 +639,30 @@ class UsersService
     {
         $authDriver = ConfService::getAuthDriverImpl();
         return $authDriver->supportsAuthSchemes();
+    }
+
+    /**
+     * Get parameters with scope='user' expose='true' attributes.
+     * Cached in plugin service.
+     * 
+     * @return array Array of [PLUGIN_ID=>id, NAME=>name] objects.
+     */
+    public static function getUsersExposedParameters(){
+        $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'user') and @expose='true']", function($nodes){
+            $result = [];
+            /** @var \DOMElement $exposed_prop */
+            foreach($nodes as $exposed_prop){
+                $parentNode = $exposed_prop->parentNode->parentNode;
+                $pluginId = $parentNode->getAttribute("id");
+                if (empty($pluginId)) {
+                    $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
+                }
+                $paramName = $exposed_prop->getAttribute("name");
+                $result[] = ["PLUGIN_ID" => $pluginId, "NAME" => $paramName];
+            }
+            return $result;
+        });
+        return $exposed;
     }
 
     /**

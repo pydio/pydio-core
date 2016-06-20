@@ -212,9 +212,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if ($query == "*") {
                 $index->setDefaultSearchField("ajxp_node");
                 $query = "yes";
-                $hits = $index->find($query, "node_url", SORT_STRING);
+                $hits = $index->find($query);
             } else {
-                //$index->setResultSetLimit( isSet($httpVars["limit"]) ? intval($httpVars["limit"]) + 1 : 100 );
+                if(isSet($httpVars["limit"])){
+                    $limit = intval($httpVars["limit"]);
+                    // Ask one more to detect if there is "more" results or not.
+                    $index->setResultSetLimit( $limit + 50 );
+                }
                 $hits = $index->find($query);
             }
             $commitIndex = false;
@@ -223,9 +227,6 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             $x->addChunk($nodesList);
 
             $cursor = 0;
-            if(isSet($httpVars['limit'])){
-                $limit = intval($httpVars['limit']);
-            }
             if(!empty($limit) && count($hits) > $limit){
                 $nodesList->setPaginationData(count($hits), 1, 1);
             }
@@ -310,7 +311,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
             $query = implode(" AND ", $sParts);
             $this->logDebug("Query : $query");
-//            $index->setResultSetLimit(40);
+            $index->setResultSetLimit(isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 50);
             $hits = $index->find($query);
 
             $commitIndex = false;

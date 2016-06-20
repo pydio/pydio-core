@@ -134,13 +134,8 @@ abstract class AbstractConfDriver extends Plugin
             }
         } 
 
-        $hasExposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'user') and @expose='true']", function ($nodes) {
-            return (is_array($nodes) && count($nodes));
-        }, function($test){
-            return ($test !== null);
-        });
-
-        if (!$hasExposed) {
+        $exposed = UsersService::getUsersExposedParameters();
+        if (!count($exposed)) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="custom_data_edit"]', $contribNode);
             $publicUrlNode = $publicUrlNodeList->item(0);
@@ -555,22 +550,9 @@ abstract class AbstractConfDriver extends Plugin
             $prefs[$pref] = ["value" => $userObject->getPref($pref), "type" => "json"];
         }
 
-        $exposed = PluginsService::searchManifestsWithCache("//server_settings/param[contains(@scope,'user') and @expose='true']", function($nodes){
-            $result = [];
-            foreach($nodes as $exposed_prop){
-                $parentNode = $exposed_prop->parentNode->parentNode;
-                $pluginId = $parentNode->getAttribute("id");
-                if (empty($pluginId)) {
-                    $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
-                }
-                $paramName = $exposed_prop->getAttribute("name");
-                $result[] = ["PLUGIN_ID" => $pluginId, "NAME" => $paramName];
-            }
-            return $result;
-        });
-
+        $exposed = UsersService::getUsersExposedParameters();
         foreach ($exposed as $exposedProp) {
-            $value = $userObject->mergedRole->filterParameterValue($exposedProp["PLUGIN_ID"], $exposedProp["NAME"], AJXP_REPO_SCOPE_ALL, "");
+            $value = $userObject->getMergedRole()->filterParameterValue($exposedProp["PLUGIN_ID"], $exposedProp["NAME"], AJXP_REPO_SCOPE_ALL, "");
             $prefs[$exposedProp["NAME"]] = ["value" => $value, "type" => "string", "pluginId" => $exposedProp["PLUGIN_ID"]];
         }
 
@@ -799,30 +781,22 @@ abstract class AbstractConfDriver extends Plugin
                     Utils::parseStandardFormParameters($ctx, $httpVars, $data, "PREFERENCES_");
                 }
 
-                $paramNodes = PluginsService::getInstance($ctx)->searchAllManifests("//server_settings/param[contains(@scope,'user') and @expose='true']", "node", false, false, true);
                 $rChanges = false;
-                if (is_array($paramNodes) && count($paramNodes)) {
-                    foreach ($paramNodes as $xmlNode) {
-                        if ($xmlNode->getAttribute("expose") == "true") {
-                            $parentNode = $xmlNode->parentNode->parentNode;
-                            $pluginId = $parentNode->getAttribute("id");
-                            if (empty($pluginId)) {
-                                $pluginId = $parentNode->nodeName.".".$parentNode->getAttribute("name");
-                            }
-                            $name = $xmlNode->getAttribute("name");
-                            if (isSet($data[$name]) || $data[$name] === "") {
-                                if($data[$name] == "__AJXP_VALUE_SET__") continue;
-                                $pRole = null;
-                                $persRole = $userObject->getPersonalRole();
-                                if($userObject instanceof AbstractAjxpUser) $pRole = $userObject->parentRole;
-                                if ($data[$name] === ""
-                                    || $pRole === null || $pRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
-                                    || $persRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name])
-                                {
-                                    $persRole->setParameterValue($pluginId, $name, $data[$name]);
-                                    $rChanges = true;
-                                }
-                            }
+                $exposed = UsersService::getUsersExposedParameters();
+                foreach($exposed as $parameter){
+                    $pluginId = $parameter["PLUGIN_ID"];
+                    $name     = $parameter["NAME"];
+                    if (isSet($data[$name]) || $data[$name] === "") {
+                        if($data[$name] == "__AJXP_VALUE_SET__") continue;
+                        $pRole = null;
+                        $persRole = $userObject->getPersonalRole();
+                        if($userObject instanceof AbstractAjxpUser) $pRole = $userObject->parentRole;
+                        if ($data[$name] === ""
+                            || $pRole === null || $pRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name]
+                            || $persRole->filterParameterValue($pluginId, $name, AJXP_REPO_SCOPE_ALL, "") != $data[$name])
+                        {
+                            $persRole->setParameterValue($pluginId, $name, $data[$name]);
+                            $rChanges = true;
                         }
                     }
                 }
