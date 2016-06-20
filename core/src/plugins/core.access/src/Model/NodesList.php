@@ -118,6 +118,15 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                 $this->paginationData["remoteSort"],
                 false);
         }
+        if(isSet($this->columnsDescription)){
+            $xmlChildren = [];
+            foreach($this->columnsDescription['columns'] as $column){
+                $xmlChildren[] = XMLWriter::toXmlElement("column", $column);
+            }
+            $xmlConfig = XMLWriter::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
+            $xmlConfig = XMLWriter::toXmlElement("component_config", ["className" => "FilesList"], $xmlConfig);
+            $buffer .= XMLWriter::toXmlElement("client_configs", [], $xmlConfig);
+        }
         foreach ($this->children as $child){
             if($child instanceof NodesList){
                 $buffer .= $child->toXML();

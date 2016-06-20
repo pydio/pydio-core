@@ -482,6 +482,26 @@ class XMLWriter
             print("<client_configs><component_config className=\"FilesList\">$config</component_config></client_configs>");
         }
     }
+
+    /**
+     * Simple XML element build from associative array. Can pass specific $children for nested elements.
+     * @param string $tagName
+     * @param array $attributes
+     * @param string $xmlChildren
+     * @return string
+     */
+    public static function toXmlElement($tagName, $attributes, $xmlChildren = ""){
+        $buffer = "<$tagName ";
+        foreach ($attributes as $attName => $attValue){
+            $buffer.= "$attName=\"".Utils::xmlEntities($attValue)."\" ";
+        }
+        if(!strlen($xmlChildren)) {
+            $buffer .= "/>";
+        } else{
+            $buffer .= ">".$xmlChildren."</$tagName>";
+        }
+        return $buffer;
+    }
     /**
      * Send a success or error message to the client.
      * @static
