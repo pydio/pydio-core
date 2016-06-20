@@ -109,29 +109,51 @@ class AJXP_NotificationCenter extends Plugin
     }
 
 
+    /**
+     * @param AJXP_Node|null $oldNode
+     * @param AJXP_Node|null $newNode
+     * @param bool $copy
+     * @param string $targetNotif
+     * @throws Exception
+     */
     public function persistChangeHookToFeed(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new")
     {
         if(!$this->eventStore) return;
 
-        $n = ($oldNode == null ? $newNode : $oldNode);
-        $ctx = $n->getContext();
-        if(!$ctx->hasUser() || !$ctx->hasRepository()){
-            return;
+        $nodes = [];
+        if($oldNode !== null && $newNode !== null && $oldNode->getRepositoryId() !== $newNode->getRepositoryId()){
+            $nodes[] = $oldNode;
+            $nodes[] = $newNode;
+        }else{
+            $nodes[] = ($oldNode === null ? $newNode : $oldNode);
         }
-        $repository = $n->getContext()->getRepository();
-        $userObject = $n->getContext()->getUser();
-        $repositoryScope = $repository->securityScope();
-        $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
-        $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
-        Controller::applyHook("msg.instant",array(
-            $ctx,
-            "<reload_user_feed/>",
-            $userObject->getId()
-        ));
-        $this->eventStore->persistEvent("node.change", func_get_args(), $repository->getId(), $repositoryScope, $repositoryOwner, $userObject->getId(), $userObject->getGroupPath());
+        /** @var AJXP_Node $n */
+        foreach($nodes as $n){
+            $ctx = $n->getContext();
+            if(!$ctx->hasUser() || !$ctx->hasRepository()){
+                return;
+            }
+            $repository = $n->getContext()->getRepository();
+            $userObject = $n->getContext()->getUser();
+            $repositoryScope = $repository->securityScope();
+            $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
+            $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
+            Controller::applyHook("msg.instant",array(
+                $ctx,
+                "<reload_user_feed/>",
+                $userObject->getId()
+            ));
+            $this->eventStore->persistEvent("node.change", func_get_args(), $repository->getId(), $repositoryScope, $repositoryOwner, $userObject->getId(), $userObject->getGroupPath());
+        }
 
     }
 
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $data
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $body = [
             'format' => 'array',
