@@ -63,6 +63,7 @@ class smb
         list ($pu['share'], $pu['path']) = (preg_match ('/^([^\/]+)\/(.*)/', $path, $regs))
           ? array ($regs[1], preg_replace ('/\//', '\\', $regs[2]))
           : array ($path, '');
+        if (empty($pu["path"]) && preg_match('/\/$/', $url)) $pu["path"] = "/";
         $pu['type'] = $pu['path'] ? 'path' : ($pu['share'] ? 'share' : ($pu['host'] ? 'host' : '**error**'));
         if (! ($pu['port'] = intval(@$pu['port']))) $pu['port'] = 139;
        /* $i = 0; $atcount = 0;
