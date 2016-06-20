@@ -94,6 +94,9 @@ abstract class AbstractConfDriver extends Plugin
 
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
@@ -218,6 +221,11 @@ abstract class AbstractConfDriver extends Plugin
         return $options;
     }
 
+    /**
+     * @param string $pluginId
+     * @param array $options
+     * @return mixed
+     */
     abstract public function _loadPluginConfig($pluginId, &$options);
 
     /**
@@ -307,9 +315,14 @@ abstract class AbstractConfDriver extends Plugin
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
      * @param boolean $excludeReserved,
-     * @return array AjxpRole[]
+     * @return array AJXP_Role[]
      */
     abstract public function listRoles($roleIds = [], $excludeReserved = false);
+
+    /**
+     * @param AJXP_Role[] $roles
+     * @return mixed
+     */
     abstract public function saveRoles($roles);
 
     /**
@@ -514,6 +527,9 @@ abstract class AbstractConfDriver extends Plugin
      */
     abstract public function getChildrenGroups($baseGroup = "/");
 
+    /**
+     * @inheritdoc
+     */
     public function getOption($optionName)
     {
         return (isSet($this->options[$optionName])?$this->options[$optionName]:"");
@@ -559,6 +575,13 @@ abstract class AbstractConfDriver extends Plugin
         return $prefs;
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws PydioException
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
@@ -1083,13 +1106,17 @@ abstract class AbstractConfDriver extends Plugin
                 $crtValue = $httpVars["value"];
                 $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
                 $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
-                if(!empty($crtValue)) $regexp = '^'.$crtValue;
-                else $regexp = null;
+                if(!empty($crtValue)) {
+                    $regexp = '^'.$crtValue;
+                    $pregexp = '/^'.preg_quote($crtValue).'/i';
+                } else {
+                    $regexp = $pregexp = null;
+                }
                 $skipDisplayWithoutRegexp = ConfService::getCoreConf("USERS_LIST_REGEXP_MANDATORY", "conf");
                 if($skipDisplayWithoutRegexp && $regexp == null){
                     $users = "";
                     if (method_exists($this, "listUserTeams")) {
-                        $teams = $this->listUserTeams();
+                        $teams = $this->listUserTeams($ctx->getUser());
                         foreach ($teams as $tId => $tData) {
                             $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
                         }
@@ -1174,23 +1201,25 @@ abstract class AbstractConfDriver extends Plugin
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";
                 }
                 $mess = LocaleService::getMessages();
-                if ($regexp == null && !$usersOnly) {
+                if (!$usersOnly && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
                     $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".$mess["447"]."\"><span class='user_entry_label'>".$mess["447"]."</span></li>";
                 }
                 $indexGroup = 0;
                 if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
-                        if ($regexp == null ||  preg_match("/$regexp/i", $groupLabel)) {
+                        if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
                             $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"$groupLabel\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
                             $indexGroup++;
                         }
                         if($indexGroup == $limit) break;
                     }
                 }
-                if ($regexp == null && method_exists($this, "listUserTeams") && !$usersOnly) {
-                    $teams = $this->listUserTeams();
+                if (method_exists($this, "listUserTeams") && !$usersOnly) {
+                    $teams = $this->listUserTeams($ctx->getUser());
                     foreach ($teams as $tId => $tData) {
-                        $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                        if($regexp == null  ||  preg_match($pregexp, $tData["LABEL"])){
+                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                        }
                     }
                 }
                 foreach ($allUsers as $userId => $userObject) {

@@ -517,7 +517,7 @@ class UsersService
      * @param bool $recursive
      * @param null $countCallback
      * @param null $loopCallback
-     * @return AbstractAjxpUser[]
+     * @return UserInterface[]
      */
     public static function listUsers($baseGroup = "/", $regexp = null, $offset = -1, $limit = -1, $cleanLosts = true, $recursive = true, $countCallback = null, $loopCallback = null)
     {
@@ -644,7 +644,7 @@ class UsersService
     /**
      * Get parameters with scope='user' expose='true' attributes.
      * Cached in plugin service.
-     * 
+     *
      * @return array Array of [PLUGIN_ID=>id, NAME=>name] objects.
      */
     public static function getUsersExposedParameters(){
