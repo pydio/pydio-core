@@ -67,6 +67,9 @@ class AJXP_NotificationCenter extends Plugin
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
            parent::parseSpecificContributions($ctx, $contribNode);
@@ -88,6 +91,11 @@ class AJXP_NotificationCenter extends Plugin
            }
     }
 
+    /**
+     * Hooked on msg.notifications
+     * @param AJXP_Notification $notification
+     * @throws Exception
+     */
     public function persistNotificationToAlerts(AJXP_Notification &$notification)
     {
         if ($this->eventStore) {
@@ -326,7 +334,11 @@ class AJXP_NotificationCenter extends Plugin
         $this->eventStore->dismissAlertById($ctx, $alertId, $oc);
     }
 
-
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @param \Pydio\Access\Core\Model\NodesList|null $nodesList
+     */
     public function loadUserAlerts(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, \Pydio\Access\Core\Model\NodesList &$nodesList = null)
     {
         if(!$this->eventStore) return;
@@ -522,6 +534,9 @@ class AJXP_NotificationCenter extends Plugin
     }
 
 
+    /**
+     * @param AJXP_Notification $notif
+     */
     public function prepareNotification(AJXP_Notification &$notif)
     {
         $notif->setAuthor($this->userId);
