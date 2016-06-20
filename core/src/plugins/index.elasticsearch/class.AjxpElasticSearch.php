@@ -126,6 +126,12 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return null
+     * @throws Exception
+     */
     public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $actionName = $requestInterface->getAttribute("action");

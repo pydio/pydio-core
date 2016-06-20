@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Http\Message\UserMessage;
@@ -27,7 +28,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -43,7 +44,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
      * @var Zend_Search_Lucene_Interface
      */
     private $currentIndex;
-    private $metaFields = array();
+    private $metaFields = [];
     private $indexContent = false;
     private $verboseIndexation = false;
 
@@ -62,7 +63,11 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
     }
 
-    public function initMeta(ContextInterface $contextInterface, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
+    /**
+     * @param ContextInterface $contextInterface
+     * @param AbstractAccessDriver $accessDriver
+     */
+    public function initMeta(ContextInterface $contextInterface, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($contextInterface, $accessDriver);
         if (!empty($this->metaFields) || $this->indexContent) {
@@ -70,9 +75,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
-                $data = array("indexed_meta_fields" => $metaFields,
-                              "additionnal_meta_columns" => array("ajxp_document_content" => "Content")
-                );
+                $data = ["indexed_meta_fields" => $metaFields,
+                              "additionnal_meta_columns" => ["ajxp_document_content" => "Content"]
+                ];
                 $el->setAttribute("indexed_meta_fields", json_encode($data));
             } else {
                 $el->setAttribute("indexed_meta_fields", json_encode($metaFields));
@@ -179,7 +184,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $query = "ajxp_scope:shared AND ($textQuery)";
             }
             else if ((isSet($this->metaFields) || $this->indexContent) && isSet($httpVars["fields"])) {
-                $sParts = array();
+                $sParts = [];
                 foreach (explode(",",$httpVars["fields"]) as $searchField) {
                     if ($searchField == "filename") {
                         $sParts[] = "basename:".$textQuery;
@@ -209,6 +214,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 $query = "yes";
                 $hits = $index->find($query, "node_url", SORT_STRING);
             } else {
+                //$index->setResultSetLimit( isSet($httpVars["limit"]) ? intval($httpVars["limit"]) + 1 : 100 );
                 $hits = $index->find($query);
             }
             $commitIndex = false;
@@ -229,7 +235,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     if(isSet($meta["ajxp_modiftime"])){
-                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ".Utils::relativeDate($meta["ajxp_modiftime"], $messages);
+                        $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ". StatHelper::relativeDate($meta["ajxp_modiftime"], $messages);
                     }
                     $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
                     if(!$tmpNode->hasUser()){
@@ -237,7 +243,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                         else $tmpNode->setUserId($ctx->getUser()->getId());
                     }
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
@@ -260,7 +266,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d" => true, "f" => true, "z" => true))){
+                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d" => true, "f" => true, "z" => true])){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -286,7 +292,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 return null;
             }
-            $sParts = array();
+            $sParts = [];
             $searchField = $httpVars["field"];
             if ($searchField == "ajxp_node") {
                 $sParts[] = "$searchField:yes";
@@ -304,12 +310,14 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             }
             $query = implode(" AND ", $sParts);
             $this->logDebug("Query : $query");
+//            $index->setResultSetLimit(40);
             $hits = $index->find($query);
 
             $commitIndex = false;
 
             $nodesList = new NodesList();
             $x->addChunk($nodesList);
+            $leafNodes = [];
             foreach ($hits as $hit) {
                 // Backward compat with old protocols
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
@@ -321,7 +329,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                         else $tmpNode->setUserId($ctx->getUser()->getId());
                     }
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), array());
+                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
@@ -338,13 +346,19 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, array("d"=>true, "f"=>true))){
+                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d"=>true, "f"=>true])){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
-                $nodesList->addBranch($tmpNode);
+                if($isLeaf){
+                    $leafNodes[]= $tmpNode;
+                }else{
+                    $nodesList->addBranch($tmpNode);
+                }
             }
-
+            foreach ($leafNodes as $leaf){
+                $nodesList->addBranch($leaf);
+            }
             if ($commitIndex) {
                 $index->commit();
             }
@@ -381,6 +395,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         $this->updateNodeIndex(null, $node, false, false);
     }
 
+    /**
+     * @param $url
+     */
     public function recursiveIndexation($url)
     {
         //print("Indexing $url \n");
@@ -401,7 +418,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 try {
                     $newNode = new AJXP_Node($newUrl);
                     $this->updateNodeIndex(null, $newNode, false, true);
-                    Controller::applyHook("node.index.add", array($newNode));
+                    Controller::applyHook("node.index.add", [$newNode]);
                 } catch (Exception $e) {
                     if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
                         print("Error indexing node ".$newUrl." (".$e->getMessage().") \n");
@@ -589,13 +606,13 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
         if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
             $doc = @Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Docx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
+            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
             $doc = @Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
         } elseif ($parseContent && $ext == "docx" && class_exists("Zend_Search_Lucene_Document_Pptx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
+            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
             $doc = @Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
         } elseif ($parseContent && $ext == "xlsx" && class_exists("Zend_Search_Lucene_Document_Xlsx")) {
-            $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
+            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
             $doc = @Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
         } else {
             $doc = new Zend_Search_Lucene_Document();
