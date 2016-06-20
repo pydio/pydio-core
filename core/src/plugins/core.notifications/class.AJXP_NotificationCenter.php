@@ -95,26 +95,36 @@ class AJXP_NotificationCenter extends AJXP_Plugin
     {
         if(!$this->eventStore) return;
 
-        $n = ($oldNode == null ? $newNode : $oldNode);
-        $repoId = $n->getRepositoryId();
-        if($n->getUser()){
-            $userId = $n->getUser();
-            $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
-            if($obj) $userGroup = $obj->getGroupPath();
+        $nodes = [];
+        if($oldNode !== null && $newNode !== null && $oldNode->getRepositoryId() !== $newNode->getRepositoryId()){
+            $nodes[] = $oldNode;
+            $nodes[] = $newNode;
         }else{
-            $userId = AuthService::getLoggedUser()->getId();
-            $userGroup = AuthService::getLoggedUser()->getGroupPath();
+            $nodes[] = ($oldNode === null ? $newNode : $oldNode);
         }
-        $repository = ConfService::getRepositoryById($repoId);
-        $repositoryScope = $repository->securityScope();
-        $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
-        $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
-        AJXP_Controller::applyHook("msg.instant",array(
-            "<reload_user_feed/>",
-            $repoId,
-            $userId
-        ));
-        $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
+
+        foreach($nodes as $n){
+            $repoId = $n->getRepositoryId();
+            $userGroup = null;
+            if($n->getUser()){
+                $userId = $n->getUser();
+                $obj = ConfService::getConfStorageImpl()->createUserObject($userId);
+                if($obj) $userGroup = $obj->getGroupPath();
+            }else{
+                $userId = AuthService::getLoggedUser()->getId();
+                $userGroup = AuthService::getLoggedUser()->getGroupPath();
+            }
+            $repository = ConfService::getRepositoryById($repoId);
+            $repositoryScope = $repository->securityScope();
+            $repositoryScope = ($repositoryScope !== false ? $repositoryScope : "ALL");
+            $repositoryOwner = $repository->hasOwner() ? $repository->getOwner() : null;
+            AJXP_Controller::applyHook("msg.instant",array(
+                "<reload_user_feed/>",
+                $repoId,
+                $userId
+            ));
+            $this->eventStore->persistEvent("node.change", func_get_args(), $repoId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
+        }
 
     }
 
