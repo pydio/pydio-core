@@ -24,12 +24,17 @@ namespace Pydio\Core\Http\Middleware;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Server;
-use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class SecureTokenMiddleware
+ * CSRF Prevention
+ * @package Pydio\Core\Http\Middleware
+ */
 class SecureTokenMiddleware
 {
 
@@ -43,7 +48,15 @@ class SecureTokenMiddleware
      */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
-        $pluginsUnSecureActions = ConfService::getDeclaredUnsecureActions();
+        $pluginsUnSecureActions = PluginsService::searchManifestsWithCache("//action[@skipSecureToken]", function($nodes){
+            $res = array();
+            /** @var \DOMElement $node */
+            foreach ($nodes as $node) {
+                $res[] = $node->getAttribute("name");
+            }
+            return $res;
+        });
+
         $pluginsUnSecureActions[] = "get_secure_token";
         if (!in_array($requestInterface->getAttribute("action"), $pluginsUnSecureActions) && self::getSecureToken()) {
             $params = $requestInterface->getParsedBody();

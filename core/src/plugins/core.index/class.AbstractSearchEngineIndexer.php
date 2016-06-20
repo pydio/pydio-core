@@ -1,6 +1,7 @@
 <?php
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -117,7 +118,7 @@ abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
                 //list($from, $to) = sscanf($v, "[%s TO %s]");
                 preg_match('/\[(.*) TO (.*)\]/', $v, $matches);
                 $oldSize = $s;
-                $newSize = "ajxp_bytesize:[".intval(Utils::convertBytes($matches[1]))." TO ".intval(Utils::convertBytes($matches[2]))."]";
+                $newSize = "ajxp_bytesize:[".intval(StatHelper::convertBytes($matches[1]))." TO ".intval(StatHelper::convertBytes($matches[2]))."]";
             }
         }
         if(isSet($newSize) && isSet($oldSize)){

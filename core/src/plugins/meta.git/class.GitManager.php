@@ -23,6 +23,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
@@ -75,18 +76,20 @@ class GitManager extends AJXP_AbstractMetaSource
     {
         
         $actionName         = $requestInterface->getAttribute("action");
+        $ctx                = $requestInterface->getAttribute("context");
         $httpVars           = $requestInterface->getParsedBody();
         $x                  = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface  = $responseInterface->withBody($x);
+        $userSelection      = \Pydio\Access\Core\Model\UserSelection::fromContext($ctx, $httpVars);
 
         $git = new VersionControl_Git($this->repoBase);
         switch ($actionName) {
             case "git_history":
                 $nodesList = new \Pydio\Access\Core\Model\NodesList();
-                $file = Utils::decodeSecureMagic($httpVars["file"]);
-                $file = ltrim($file, "/");
+                $selectedNode = $userSelection->getUniqueNode();
+                $file = ltrim($selectedNode->getPath(), "/");
                 $res = $this->gitHistory($git, $file);
-                $ic = Utils::mimetype($file, "image", false);
+                $ic = StatHelper::getMimeInfo($selectedNode, false)[1];
                 $index = count($res);
                 $mess = LocaleService::getMessages();
                 foreach ($res as &$commit) {

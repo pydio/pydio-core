@@ -548,7 +548,9 @@
         },
         onHoverLink:function(event, ws){
             bufferCallback('hoverWorkspaceTimer', 400, function(){
-                this.refs.legend.setWorkspace(ws);
+                if(this.refs && this.refs.legend){
+                    this.refs.legend.setWorkspace(ws);
+                }
             }.bind(this));
         },
         onOutLink:function(event, ws){

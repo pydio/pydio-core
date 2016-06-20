@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -48,8 +48,8 @@ class CoreUploaderLoader extends Plugin
 
     private function filterData(&$data)
     {
-        $confMaxSize = Utils::convertBytes($data["UPLOAD_MAX_SIZE"]);
-        $UploadMaxSize = min(Utils::convertBytes(ini_get('upload_max_filesize')), Utils::convertBytes(ini_get('post_max_size')));
+        $confMaxSize = StatHelper::convertBytes($data["UPLOAD_MAX_SIZE"]);
+        $UploadMaxSize = min(StatHelper::convertBytes(ini_get('upload_max_filesize')), StatHelper::convertBytes(ini_get('post_max_size')));
         if (intval($confMaxSize) != 0) {
             $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
         }

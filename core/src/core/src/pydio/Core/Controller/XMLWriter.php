@@ -22,19 +22,13 @@ namespace Pydio\Core\Controller;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Serializer\RepositoryXML;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Services;
-use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\TextEncoder;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -88,6 +82,13 @@ class XMLWriter
         }
     }
 
+    /**
+     * Wrap xml inside a <tree>...</tree> document, including <?xml> declaration.
+     * @param $content
+     * @param string $docNode
+     * @param array $attributes
+     * @return string
+     */
     public static function wrapDocument($content, $docNode = "tree", $attributes = array()){
 
         if(self::$headerSent !== false && self::$headerSent == $docNode) {
@@ -259,10 +260,10 @@ class XMLWriter
             $xml = str_replace("AJXP_SERVER_ACCESS", AJXP_SERVER_ACCESS, $xml);
         }
         $xml = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $xml);
-        $xml = str_replace("AJXP_MIMES_EDITABLE", Utils::getAjxpMimes("editable"), $xml);
-        $xml = str_replace("AJXP_MIMES_IMAGE", Utils::getAjxpMimes("image"), $xml);
-        $xml = str_replace("AJXP_MIMES_AUDIO", Utils::getAjxpMimes("audio"), $xml);
-        $xml = str_replace("AJXP_MIMES_ZIP", Utils::getAjxpMimes("zip"), $xml);
+        $xml = str_replace("AJXP_MIMES_EDITABLE", StatHelper::getAjxpMimes("editable"), $xml);
+        $xml = str_replace("AJXP_MIMES_IMAGE", StatHelper::getAjxpMimes("image"), $xml);
+        $xml = str_replace("AJXP_MIMES_AUDIO", StatHelper::getAjxpMimes("audio"), $xml);
+        $xml = str_replace("AJXP_MIMES_ZIP", StatHelper::getAjxpMimes("zip"), $xml);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($authDriver != NULL) {
             $loginRedirect = $authDriver->getLoginRedirect();
@@ -415,6 +416,14 @@ class XMLWriter
         return $data;
     }
 
+    /**
+     * Send directly JavaScript code to the client
+     * @param $jsCode
+     * @param $messageId
+     * @param bool $print
+     * @param int $delay
+     * @return string
+     */
     public static function triggerBgJSAction($jsCode, $messageId, $print=true, $delay = 0)
     {
            $data = XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);

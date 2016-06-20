@@ -1,6 +1,6 @@
 <?php
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -220,7 +220,7 @@ class AntivirusScanner extends Plugin
      */
     public function setScanMaxSize ($nodeObject)
     {
-        $this->scan_max_size = Utils::convertBytes($this->getContextualOption($nodeObject->getContext(), "SIZE"));
+        $this->scan_max_size = StatHelper::convertBytes($this->getContextualOption($nodeObject->getContext(), "SIZE"));
         return ;
     }
 

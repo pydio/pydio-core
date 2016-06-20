@@ -29,6 +29,7 @@ use Pydio\Core\Model\RepositoryInterface;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
@@ -643,7 +644,7 @@ class Repository implements RepositoryInterface
         }
         if (isSet($this->parentId) && isset($this->owner)) {
             if (isSet($this->options["CREATION_TIME"])) {
-                $date = Utils::relativeDate($this->options["CREATION_TIME"], $m);
+                $date = StatHelper::relativeDate($this->options["CREATION_TIME"], $m);
                 return str_replace(
                     array("%date", "%user"),
                     array($date, $ownerLabel!= null ? $ownerLabel : $this->owner),
@@ -656,7 +657,7 @@ class Repository implements RepositoryInterface
                     $m["472"]);
             }
         } else if ($this->isWriteable() && isSet($this->options["CREATION_TIME"])) {
-            $date = Utils::relativeDate($this->options["CREATION_TIME"], $m);
+            $date = StatHelper::relativeDate($this->options["CREATION_TIME"], $m);
             if (isSet($this->options["CREATION_USER"])) {
                 return str_replace(array("%date", "%user"), array($date, $this->options["CREATION_USER"]), $m["471"]);
             } else {

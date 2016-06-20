@@ -30,6 +30,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
@@ -615,7 +616,7 @@ abstract class AbstractAccessDriver extends Plugin
         $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
         foreach ($files as $file) {
             $file = basename($file);
-            if (Utils::isHidden($file) && !$showHiddenFiles) {
+            if (StatHelper::isHidden($file) && !$showHiddenFiles) {
                 throw new \Exception("$file Forbidden", 411);
             }
             if ($this->filterFile($ctx, $file) || $this->filterFolder($ctx, $file)) {
@@ -636,14 +637,14 @@ abstract class AbstractAccessDriver extends Plugin
     {
         $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
         if($isLeaf === ""){
-            $isLeaf = (is_file($nodePath."/".$nodeName) || Utils::isBrowsableArchive($nodeName));
+            $isLeaf = (is_file($nodePath."/".$nodeName) || StatHelper::isBrowsableArchive($nodeName));
         }
-        if (Utils::isHidden($nodeName) && !$showHiddenFiles) {
+        if (StatHelper::isHidden($nodeName) && !$showHiddenFiles) {
             return false;
         }
         $nodeType = "d";
         if ($isLeaf) {
-            if(Utils::isBrowsableArchive($nodeName)) $nodeType = "z";
+            if(StatHelper::isBrowsableArchive($nodeName)) $nodeType = "z";
             else $nodeType = "f";
         }
         if(!$lsOptions[$nodeType]) return false;
@@ -675,7 +676,7 @@ abstract class AbstractAccessDriver extends Plugin
         $pathParts = pathinfo($fileName);
         if($hiddenTest){
             $showHiddenFiles = $this->getContextualOption($ctx, "SHOW_HIDDEN_FILES");
-            if (Utils::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
+            if (StatHelper::isHidden($pathParts["basename"]) && !$showHiddenFiles) return true;
         }
         $hiddenFileNames = $this->getContextualOption($ctx, "HIDE_FILENAMES");
         $hiddenExtensions = $this->getContextualOption($ctx, "HIDE_EXTENSIONS");

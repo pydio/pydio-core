@@ -24,7 +24,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -243,8 +243,8 @@ class AJXP_NotificationCenter extends Plugin
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
                     $node->event_description = TextEncoder::fromUTF8($node->event_description);
                     $node->event_description_long = $notif->getDescriptionLong(true);
-                    $node->event_date = TextEncoder::fromUTF8(Utils::relativeDate($notif->getDate(), $mess));
-                    $node->short_date = Utils::relativeDate($notif->getDate(), $mess, true);
+                    $node->event_date = TextEncoder::fromUTF8(StatHelper::relativeDate($notif->getDate(), $mess));
+                    $node->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
                     $node->event_id = $object->event_id;
@@ -396,7 +396,7 @@ class AJXP_NotificationCenter extends Plugin
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
                 $node->event_description = TextEncoder::fromUTF8($node->event_description);
                 $node->event_description_long = $notification->getDescriptionLong(true);
-                $node->event_date = TextEncoder::fromUTF8(Utils::relativeDate($notification->getDate(), $mess));
+                $node->event_date = TextEncoder::fromUTF8(StatHelper::relativeDate($notification->getDate(), $mess));
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
                 if ($node->getRepository() != null) {

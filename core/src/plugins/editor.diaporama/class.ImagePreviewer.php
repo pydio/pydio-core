@@ -25,7 +25,7 @@ use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -50,7 +50,7 @@ class ImagePreviewer extends Plugin
         if ($action == "preview_data_proxy") {
             $file = $selection->getUniqueFile();
             if (!file_exists($destStreamURL.$file) || !is_readable($destStreamURL.$file)) {
-                header("Content-Type: ".Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
+                header("Content-Type: ". StatHelper::getImageMimeType(basename($file)) ."; name=\"".basename($file)."\"");
                 header("Content-Length: 0");
                 return;
             }
@@ -66,7 +66,7 @@ class ImagePreviewer extends Plugin
                 $data = $cacheItem->getData();
                 $cId = $cacheItem->getId();
 
-                header("Content-Type: ".Utils::getImageMimeType(basename($cId))."; name=\"".basename($cId)."\"");
+                header("Content-Type: ". StatHelper::getImageMimeType(basename($cId)) ."; name=\"".basename($cId)."\"");
                 header("Content-Length: ".strlen($data));
                 header('Cache-Control: public');
                 header("Pragma:");
@@ -82,7 +82,7 @@ class ImagePreviewer extends Plugin
                 $fp = fopen($destStreamURL.$file, "r");
                 $stat = fstat($fp);
                 $filesize = $stat["size"];
-                header("Content-Type: ".Utils::getImageMimeType(basename($file))."; name=\"".basename($file)."\"");
+                header("Content-Type: ". StatHelper::getImageMimeType(basename($file)) ."; name=\"".basename($file)."\"");
                 header("Content-Length: ".$filesize);
                 header('Cache-Control: public');
                 header("Pragma:");
@@ -161,7 +161,7 @@ class ImagePreviewer extends Plugin
     {
         $currentPath = $ajxpNode->getUrl();
         $wrapperClassName = $ajxpNode->wrapperClassName;
-        $isImage = Utils::is_image($currentPath);
+        $isImage = StatHelper::basenameIsImage($currentPath);
         $ajxpNode->is_image = $isImage;
         if(!$isImage) return;
 

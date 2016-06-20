@@ -23,6 +23,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\UnixProcess;
@@ -245,7 +246,7 @@ class HttpDownloader extends Plugin
             $data = unserialize(file_get_contents($hidFile));
             if ($data["totalSize"] != -1) {
                 $ajxpNode->target_bytesize = $data["totalSize"];
-                $ajxpNode->target_filesize = Utils::roundSize($data["totalSize"]);
+                $ajxpNode->target_filesize = StatHelper::roundSize($data["totalSize"]);
                 $ajxpNode->process_stoppable = (isSet($data["pid"])?"true":"false");
             }
         }

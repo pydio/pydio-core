@@ -42,6 +42,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -2479,7 +2480,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             if($userObject->hasParent()) $meta["shared_user"] = "true";
             if(isSet($connections) && isSet($connections[$userObject->getId()]) && !empty($connections[$userObject->getId()])) {
                 $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
-                $meta["last_connection_readable"] = Utils::relativeDate($meta["last_connection"], $mess);
+                $meta["last_connection_readable"] = StatHelper::relativeDate($meta["last_connection"], $mess);
             }
             if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
             $xml = XMLWriter::renderNode($nodeKey, $nodeLabel, true, $meta, true, false);

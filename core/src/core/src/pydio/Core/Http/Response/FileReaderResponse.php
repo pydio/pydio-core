@@ -25,6 +25,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -191,7 +192,7 @@ class FileReaderResponse extends AsyncResponseStream
 
         } else if ($headerType == "image") {
 
-            header("Content-Type: ".Utils::getImageMimeType(basename($filePathOrData))."; name=\"".$localName."\"");
+            header("Content-Type: ". StatHelper::getImageMimeType(basename($filePathOrData)) ."; name=\"".$localName."\"");
             header("Content-Length: ".$size);
             header('Cache-Control: public');
 
@@ -219,7 +220,7 @@ class FileReaderResponse extends AsyncResponseStream
                         $mimeType = trim($splitChar[0]);
                         $this->logDebug("Detected mime $mimeType for $realfile");
                     } else {
-                        $mimeType = Utils::getStreamingMimeType(basename($filePathOrData));
+                        $mimeType = StatHelper::getStreamingMimeType(basename($filePathOrData));
                     }
                     header('Content-type: '.$mimeType);
                 }

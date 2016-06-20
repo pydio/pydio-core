@@ -46,6 +46,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -610,7 +611,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $this->logInfo("Get_content", ["files"=>$this->addSlugToPath($selection)]);
 
-                if (Utils::getStreamingMimeType(basename($dlFile))!==false) {
+                if (StatHelper::getStreamingMimeType(basename($dlFile)) !==false) {
                     $readMode  = "stream_content";
                 } else {
                     $readMode  = "plain";
@@ -1341,7 +1342,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                     $nodeType = "d";
                     if ($node->isLeaf()) {
-                        if (Utils::isBrowsableArchive($nodeName)) {
+                        if (StatHelper::isBrowsableArchive($nodeName)) {
                             if ($lsOptions["f"] && $lsOptions["z"]) {
                                 $nodeType = "f";
                             } else {
@@ -1495,7 +1496,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
         if (!isSet($metaData["is_file"])) {
-            $isLeaf = is_file($ajxpNode->getUrl()) || Utils::isBrowsableArchive($nodeName);
+            $isLeaf = is_file($ajxpNode->getUrl()) || StatHelper::isBrowsableArchive($nodeName);
             $metaData["is_file"] = ($isLeaf?"1":"0");
         } else {
             $isLeaf = $metaData["is_file"] == "1" ? true : false;
@@ -1509,7 +1510,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $ajxpNode->setLabel($mess[122]);
             $metaData["ajxp_mime"] = "ajxp_recycle";
         } else {
-            $mimeData = Utils::mimeData($ajxpNode->getUrl(), !$isLeaf);
+            $mimeData = StatHelper::getMimeInfo($ajxpNode, !$isLeaf);
             $metaData["mimestring_id"] = $mimeData[0]; //AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
             $metaData["icon"] = $mimeData[1]; //AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
             if ($metaData["icon"] == "folder.png") {
@@ -1536,13 +1537,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $metaData["file_perms"] = $fPerms;
         $datemodif = $this->date_modif($ajxpNode->getUrl());
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ".Utils::relativeDate($datemodif, $mess);
+        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ". StatHelper::relativeDate($datemodif, $mess);
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
             $metaData["bytesize"] = filesize($ajxpNode->getUrl());
         }
-        $metaData["filesize"] = Utils::roundSize($metaData["bytesize"]);
-        if (Utils::isBrowsableArchive($nodeName)) {
+        $metaData["filesize"] = StatHelper::roundSize($metaData["bytesize"]);
+        if (StatHelper::isBrowsableArchive($nodeName)) {
             $metaData["ajxp_mime"] = "ajxp_browsable_archive";
         }
 
@@ -1684,7 +1685,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $showHiddenFiles = $this->getContextualOption($dirNode->getContext(), "SHOW_HIDDEN_FILES");
         while (false !== ($file = readdir($handle))) {
             if($file != "." && $file !=".."
-                && !(Utils::isHidden($file) && !$showHiddenFiles)){
+                && !(StatHelper::isHidden($file) && !$showHiddenFiles)){
                 if($foldersOnly && is_file($dirName."/".$file)) continue;
                 $count++;
                 if($nonEmptyCheckOnly) break;
@@ -2178,7 +2179,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             return;
         }
         while (false !== ($entry = readdir($handle))) {
-            if ($entry == "" || $entry == ".."  || Utils::isHidden($entry) ) {
+            if ($entry == "" || $entry == ".."  || StatHelper::isHidden($entry)) {
                 continue;
             }
             $fileName = $dirName."/".$entry;

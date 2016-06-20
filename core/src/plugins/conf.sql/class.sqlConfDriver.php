@@ -35,6 +35,7 @@ use Pydio\Conf\Core\AjxpRole;
 
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
@@ -1084,7 +1085,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         if ($outputStream != null) {
             fwrite($outputStream, $data, strlen($data));
         } else {
-            header("Content-Type: ".Utils::getImageMimeType($ID));
+            header("Content-Type: ". StatHelper::getImageMimeType($ID));
             echo $data;
         }
     }

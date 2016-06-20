@@ -20,20 +20,16 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Inbox;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -176,7 +172,7 @@ class inboxAccessDriver extends fsAccessDriver
             $url = "pydio://".$userId . "@" . $repoId . "/";
             $meta = [
                 "shared_repository_id" => $repoId,
-                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". Utils::relativeDate($repo->getSafeOption("CREATION_TIME"), $mess),
+                "ajxp_description" => "File shared by ".$repo->getOwner(). " ". StatHelper::relativeDate($repo->getSafeOption("CREATION_TIME"), $mess),
                 "share_meta_type" => 1
             ];
 

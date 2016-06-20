@@ -25,6 +25,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
 
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
@@ -412,7 +413,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
                         foreach ($row as $key=>$value) {
                             if (in_array($key, $blobCols)) {
                                 $sizeStr = " - NULL";
-                                if(strlen($value)) $sizeStr = " - ".Utils::roundSize(strlen($value));
+                                if(strlen($value)) $sizeStr = " - ". StatHelper::roundSize(strlen($value));
                                 print "$key=\"BLOB$sizeStr\" ";
                             } else {
                                 $value = str_replace("\"", "", $value);
@@ -477,7 +478,7 @@ class mysqlAccessDriver extends AbstractAccessDriver
             while ($rec = mysql_fetch_array($result)) {
                 $t+=($rec['Data_length'] + $rec['Index_length']);
             }
-            $total = Utils::roundSize($t);
+            $total = StatHelper::roundSize($t);
         } else {
             $total="Unknown";
         }

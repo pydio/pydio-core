@@ -22,6 +22,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -157,7 +158,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     $uniqNode->setMetadata(AJXP_META_SPACE_COMMENTS, $existingFeed, false);
                 }
                 HTMLWriter::charsetHeader("application/json");
-                $com["hdate"] = Utils::relativeDate($com["date"], $mess);
+                $com["hdate"] = StatHelper::relativeDate($com["date"], $mess);
                 $com["path"] = $uniqNode->getPath();
                 echo json_encode($com);
 
@@ -190,7 +191,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                         $rPath = ltrim($rPath, "/");
                         $newItem = array(
                             "date"      =>$stdObject->date,
-                            "hdate"     => Utils::relativeDate($stdObject->date, $mess),
+                            "hdate"     => StatHelper::relativeDate($stdObject->date, $mess),
                             "author"    => $stdObject->author,
                             "content"   => base64_decode($stdObject->content),
                             "path"      => $stdObject->path,
@@ -208,7 +209,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                     echo json_encode($theFeed);
                 } else {
                     foreach ($existingFeed as &$item) {
-                        $item["hdate"] = Utils::relativeDate($item["date"], $mess);
+                        $item["hdate"] = StatHelper::relativeDate($item["date"], $mess);
                     }
                     echo json_encode($existingFeed);
                 }
@@ -225,7 +226,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
                         if ($fElement["date"] == $data["date"] && $fElement["author"] == $data["author"] && $fElement["content"] == $data["content"]) {
                             continue;
                         }
-                        $fElement["hdate"] = Utils::relativeDate($fElement["date"], $mess);
+                        $fElement["hdate"] = StatHelper::relativeDate($fElement["date"], $mess);
                         $reFeed[] = $fElement;
                     }
                     $uniqNode->removeMetadata(AJXP_META_SPACE_COMMENTS, false);

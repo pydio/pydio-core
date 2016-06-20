@@ -27,6 +27,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -105,6 +106,7 @@ class imapAccessDriver extends fsAccessDriver
     public function enrichMetadata(&$ajxpNode)//, &$metadata, $wrapperClassName, &$realFile)
     {
         $currentNode = $ajxpNode->getUrl();
+        $baseUrl = $ajxpNode->getContext()->getUrlBase();
         $metadata = $ajxpNode->metadata;
         $parsed = parse_url($currentNode);
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
@@ -114,8 +116,10 @@ class imapAccessDriver extends fsAccessDriver
                 foreach ($meta as $attach) {
                     if ($attach["x-attachment-id"] == $attachmentId) {
                         $metadata["text"] = $attach["filename"];
-                        $metadata["icon"] = Utils::mimetype($attach["filename"], "image", false);
-                        $metadata["mimestring"] = Utils::mimetype($attach["filename"], "text", false);
+                        $fakeNode = new AJXP_Node($baseUrl."/".ltrim($attach["filename"], "/"));
+                        $mimeData = StatHelper::getMimeInfo($fakeNode, false);
+                        $metadata["mimestring_id"] = $mimeData[0];
+                        $metadata["icon"] = $mimeData[1];
                     }
                 }
             }

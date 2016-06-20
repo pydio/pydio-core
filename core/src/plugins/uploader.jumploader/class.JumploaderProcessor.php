@@ -24,6 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Log\Core\AJXP_Logger;
@@ -341,7 +342,7 @@ class JumploaderProcessor extends Plugin
                     $dirname=Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
                     $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
-                    if (Utils::isHidden($dirname)) {
+                    if (StatHelper::isHidden($dirname)) {
                         $folderForbidden = true;
                         break;
                     }

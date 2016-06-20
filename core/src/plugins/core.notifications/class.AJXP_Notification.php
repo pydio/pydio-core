@@ -24,6 +24,7 @@ use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
 
@@ -132,7 +133,7 @@ class AJXP_Notification implements ContextProviderInterface
             "AJXP_REPOSITORY_LABEL" => $em.$repoLabel.$me,
             "AJXP_LINK"             => $this->getMainLink(),
             "AJXP_USER"             => $uLabel,
-            "AJXP_DATE"             => Utils::relativeDate($this->getDate(),$mess),
+            "AJXP_DATE"             => StatHelper::relativeDate($this->getDate(), $mess),
         );
 
         if($replaces["AJXP_NODE_LABEL"]==$em.$me || $replaces["AJXP_NODE_LABEL"] == $em."/".$me ){

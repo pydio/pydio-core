@@ -21,17 +21,12 @@
 namespace Pydio\Core\Services;
 
 
-use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Cache\Core\AbstractCacheDriver;
-use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 
 use Pydio\Core\Model\Context;
 
-use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -327,65 +322,7 @@ class ConfService
         if(!self::zipEnabled()) return false;
         return ConfService::getCoreConf("ZIP_CREATION");
     }
-
-
-    /**
-     * MISC CONFS 
-     */
-    /**
-     * Get all registered extensions, from both the conf/extensions.conf.php and from the plugins
-     * @static
-     * @return
-     */
-    public static function getRegisteredExtensions()
-    {
-        return self::getInstance()->getRegisteredExtensionsInst();
-    }
-    /**
-     * See static method
-     * @return
-     */
-    public function getRegisteredExtensionsInst()
-    {
-        if (!isSet($this->configs["EXTENSIONS"])) {
-            $EXTENSIONS = array();
-            $RESERVED_EXTENSIONS = array();
-            include_once(AJXP_CONF_PATH."/extensions.conf.php");
-            $EXTENSIONS = array_merge($RESERVED_EXTENSIONS, $EXTENSIONS);
-            foreach ($EXTENSIONS as $key => $value) {
-                unset($EXTENSIONS[$key]);
-                $EXTENSIONS[$value[0]] = $value;
-            }
-            $nodes = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//extensions/extension", "nodes", true);
-            $res = array();
-            /** @var \DOMElement $node */
-            foreach ($nodes as $node) {
-                $res[$node->getAttribute("mime")] = array($node->getAttribute("mime"), $node->getAttribute("icon"), $node->getAttribute("messageId"));
-            }
-            if (count($res)) {
-                $EXTENSIONS = array_merge($EXTENSIONS, $res);
-            }
-            $this->configs["EXTENSIONS"] = $EXTENSIONS;
-        }
-        return $this->configs["EXTENSIONS"];
-    }
-    /**
-     * Get the actions that declare to skip the secure token in the plugins
-     * @static
-     * @return array
-     */
-    public static function getDeclaredUnsecureActions()
-    {
-        return PluginsService::searchManifestsWithCache("//action[@skipSecureToken]", function($nodes){
-            $res = array();
-            /** @var \DOMElement $node */
-            foreach ($nodes as $node) {
-                $res[] = $node->getAttribute("name");
-            }
-            return $res;
-        });
-    }
-
+    
     /**
      * Get a config by its name
      * @static

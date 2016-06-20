@@ -25,7 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Meta\Core\AJXP_AbstractMetaSource;
 
@@ -99,7 +99,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q + $delta >= $quota) {
             $mess = LocaleService::getMessages();
-            throw new Exception($mess["meta.quota.3"]." (".Utils::roundSize($quota) .")!");
+            throw new Exception($mess["meta.quota.3"]." (". StatHelper::roundSize($quota) .")!");
         } else if ( $soft !== false && ($q + $delta) >= $soft && $q <= $soft) {
             $this->sendSoftLimitAlert($node->getContext());
         }
@@ -166,7 +166,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
     {
         if(self::$loadedQuota != null) return self::$loadedQuota;
         $q = $this->getContextualOption($ctx, "DEFAULT_QUOTA");
-        self::$loadedQuota = Utils::convertBytes($q);
+        self::$loadedQuota = StatHelper::convertBytes($q);
         return self::$loadedQuota;
     }
 

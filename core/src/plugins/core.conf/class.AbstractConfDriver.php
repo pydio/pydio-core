@@ -37,13 +37,13 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Core\Services\CacheService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
@@ -957,7 +957,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 $async = new AsyncResponseStream(function() use($logo, $iconFormat){
                     if (isSet($logo) && is_file(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo)) {
-                        header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                        header("Content-Type: ". StatHelper::getImageMimeType($logo) ."; name=\"".$logo."\"");
                         header("Content-Length: ".filesize(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo));
                         header('Pragma:');
                         header('Cache-Control: public');
@@ -966,7 +966,7 @@ abstract class AbstractConfDriver extends Plugin
                         readfile(AJXP_DATA_PATH."/plugins/core.conf/tpl_logos/".$logo);
                     } else {
                         $logo = "default_template_logo-".($iconFormat == "small"?16:22).".png";
-                        header("Content-Type: ".Utils::getImageMimeType($logo)."; name=\"".$logo."\"");
+                        header("Content-Type: ". StatHelper::getImageMimeType($logo) ."; name=\"".$logo."\"");
                         header("Content-Length: ".filesize(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.conf/".$logo));
                         header('Pragma:');
                         header('Cache-Control: public');
