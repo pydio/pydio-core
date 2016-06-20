@@ -117,8 +117,10 @@ class ShareCenter extends Plugin
     {
         parent::init($ctx, $options);
         if(!$ctx->hasRepository()){
-            $this->enabled = false;
+            //$this->enabled = false;
             return;
+        }else{
+            //$this->enabled = true;
         }
         $this->repository = $ctx->getRepository();
         if (!($this->repository->getDriverInstance() instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {

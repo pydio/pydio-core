@@ -164,14 +164,15 @@ class PluginCompression extends Plugin
                     }
                     $finalArchive = $tmpArchiveName . "." . $archiveTypeCompress;
                 }
-                $destArchive = AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $archiveName);
+
+                $newNode = new AJXP_Node($currentDirUrl . $archiveName);
+                $destArchive = $newNode->getRealFile();
                 rename($finalArchive, $destArchive);
-                Controller::applyHook("node.before_create", array($destArchive, filesize($destArchive)));
+                Controller::applyHook("node.before_create", array($newNode, filesize($destArchive)));
                 if (file_exists($tmpArchiveName)) {
                     unlink($tmpArchiveName);
                     unlink(substr($tmpArchiveName, 0, -4));
                 }
-                $newNode = new AJXP_Node($currentDirUrl . $archiveName);
                 Controller::applyHook("node.change", array(null, $newNode, false), true);
                 $postMessageStatus("Finished", Task::STATUS_COMPLETE);
 
