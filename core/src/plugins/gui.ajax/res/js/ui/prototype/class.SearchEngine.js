@@ -962,7 +962,7 @@ Class.create("SearchEngine", AjxpPane, {
             connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
-            if(limit){
+            if(limit && limit !== -1){
                 connexion.addParameter('limit', limit);
             }
             if(this.hasMetaSearch()){
@@ -1048,10 +1048,10 @@ Class.create("SearchEngine", AjxpPane, {
         if(showAllDiv) showAllDiv.remove();
         if(paginationNode && this.currentLimitDefault){
             var totalCount = parseInt(paginationNode.getAttribute("count"));
-            showAllDiv = new Element('div', {id:'search_show_all'}).update(pydio.MessageHash['543'].replace('%s', totalCount) + ' ');
+            showAllDiv = new Element('div', {id:'search_show_all'}).update(pydio.MessageHash['543'].replace('%s', 100) + ' ');
             var showAllLink = new Element('a').update(pydio.MessageHash['544']);
             showAllLink.observe("click", function(){
-                this.search(totalCount, true);
+                this.search(-1, true);
             }.bind(this));
             showAllDiv.insert(showAllLink);
             this.htmlElement.down("#basic_search").insert(showAllDiv);
