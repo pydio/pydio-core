@@ -33,7 +33,13 @@ use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class FileReaderResponse
+ * Async class that can be used as a Body for a ResponseInterface. Will read the file or data
+ * when the reponse is emitted.
+ *
+ * @package Pydio\Core\Http\Response
+ */
 class FileReaderResponse extends AsyncResponseStream
 {
     /** @var  AJXP_Node */
@@ -82,14 +88,28 @@ class FileReaderResponse extends AsyncResponseStream
         parent::__construct($callable);
     }
 
+    /**
+     * Simple debug instruction
+     * @param $message
+     * @param array $params
+     */
     protected function logDebug($message, $params = []){
         AJXP_Logger::getInstance()->logDebug("FileReader", $message, $params);
     }
 
+    /**
+     * Set a possible header type "plain", "image" if it's force attachement.
+     * @param $headerType
+     */
     public function setHeaderType($headerType){
         $this->headerType = $headerType;
     }
 
+    /**
+     * Set the name as it should appear in the download window,
+     * if it's not the file basename
+     * @param $localName
+     */
     public function setLocalName($localName){
         $this->localName = $localName;
     }
@@ -103,14 +123,26 @@ class FileReaderResponse extends AsyncResponseStream
         $this->length = $length;
     }
 
+    /**
+     * Callback to be triggered just before reading the file
+     * @param callable $pre
+     */
     public function setPreReadCallback(callable $pre){
         $this->preRead = $pre;
     }
 
+    /**
+     * Callback to be triggered at the end of the file read operation
+     * @param callable $post
+     */
     public function setPostReadCallback(callable $post){
         $this->postRead = $post;
     }
 
+    /**
+     * Actually read the data to the output
+     * @throws \Exception
+     */
     protected function readData(){
         if($this->preRead){
             call_user_func($this->preRead);
