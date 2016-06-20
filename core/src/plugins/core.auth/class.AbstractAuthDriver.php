@@ -26,6 +26,7 @@ use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Serializer\UserXML;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\RolesService;
@@ -107,27 +108,29 @@ class AbstractAuthDriver extends Plugin
     }
 
 
+    /**
+     * @inheritdoc
+     */
     public function getRegistryContributions(ContextInterface $ctx, $extendedVersion = true )
     {
         $this->loadRegistryContributions($ctx);
         if(!$extendedVersion) return $this->registryContributions;
-
-        $logged = $ctx->getUser();
-        if (UsersService::usersEnabled()) {
-            if ($logged == null) {
-                return $this->registryContributions;
-            } else {
-                $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($ctx, $logged);
-            }
-        } else {
-            $xmlString = \Pydio\Core\Controller\XMLWriter::getUserXML($ctx, null);
+        if(UsersService::usersEnabled() && !$ctx->hasUser()){
+            return $this->registryContributions;
         }
+
+        $userSerializer = new UserXML();
+        $xmlString = $userSerializer->serialize($ctx);
+
         $dom = new \DOMDocument();
         $dom->loadXML($xmlString);
         $this->registryContributions[]=$dom->documentElement;
         return $this->registryContributions;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);

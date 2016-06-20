@@ -27,9 +27,9 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 
-
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -143,6 +143,9 @@ class Repository implements RepositoryInterface
      */
     private $contentFilterData;
 
+    /**
+     * @param ContentFilter $contentFilter
+     */
     public function setContentFilter($contentFilter)
     {
         $this->contentFilter = $contentFilter;
@@ -160,11 +163,17 @@ class Repository implements RepositoryInterface
         }
     }
 
+    /**
+     * @return bool
+     */
     public function hasContentFilter(){
         $this->checkCFilterData();
         return isSet($this->contentFilter);
     }
 
+    /**
+     * @return ContentFilter
+     */
     public function getContentFilter()
     {
         $this->checkCFilterData();
@@ -198,7 +207,7 @@ class Repository implements RepositoryInterface
         $this->setDisplay($display);
         $this->setId($id);
         $this->uuid = md5(microtime());
-        $this->slug = \Pydio\Core\Utils\Utils::slugify($display);
+        $this->slug = Utils::slugify($display);
         $this->inferOptionsFromParent = false;
         $this->options["CREATION_TIME"] = time();
 //        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
@@ -206,6 +215,14 @@ class Repository implements RepositoryInterface
 //        }
     }
 
+    /**
+     * @param string $newLabel
+     * @param array $newOptions
+     * @param string $parentId
+     * @param string $owner
+     * @param null $uniqueUser
+     * @return Repository
+     */
     public function createSharedChild($newLabel, $newOptions, $parentId, $owner, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
@@ -221,6 +238,13 @@ class Repository implements RepositoryInterface
         return $repo;
     }
 
+    /**
+     * @param string $newLabel
+     * @param array $newOptions
+     * @param null $creator
+     * @param null $uniqueUser
+     * @return Repository
+     */
     public function createTemplateChild($newLabel, $newOptions, $creator = null, $uniqueUser = null)
     {
         $repo = new Repository(0, $newLabel, $this->accessType);
@@ -232,6 +256,9 @@ class Repository implements RepositoryInterface
         return $repo;
     }
 
+    /**
+     * @return bool
+     */
     public function upgradeId()
     {
         if (!isSet($this->uuid)) {
@@ -242,6 +269,10 @@ class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * @param bool $serial
+     * @return string
+     */
     public function getUniqueId($serial=false)
     {
         if ($serial) {
@@ -250,40 +281,30 @@ class Repository implements RepositoryInterface
         return $this->uuid;
     }
 
+    /**
+     * @return string
+     */
     public function getSlug()
     {
         return $this->slug;
     }
 
+    /**
+     * @param null $slug
+     */
     public function setSlug($slug = null)
     {
         if ($slug === null) {
-            $this->slug = \Pydio\Core\Utils\Utils::slugify($this->display);
+            $this->slug = Utils::slugify($this->display);
         } else {
             $this->slug = $slug;
         }
     }
 
-    public function getClientSettings(ContextInterface $ctx)
-    {
-        $plugin = $this->driverInstance;
-        if(!$plugin) return "";
-        if (isSet($this->parentId)) {
-            $parentObject = RepositoryService::getRepositoryById($this->parentId);
-            if ($parentObject != null && $parentObject->isTemplate) {
-                $ic = $parentObject->getContextOption($ctx, "TPL_ICON_SMALL");
-                $settings = $plugin->getManifestRawContent("//client_settings", "node");
-                if (!empty($ic) && $settings->length) {
-                    $newAttr = $settings->item(0)->ownerDocument->createAttribute("icon_tpl_id");
-                    $newAttr->nodeValue = $this->parentId;
-                    $settings->item(0)->appendChild($newAttr);
-                    return $settings->item(0)->ownerDocument->saveXML($settings->item(0));
-                }
-            }
-        }
-        return $plugin->getManifestRawContent("//client_settings", "string");
-    }
-
+    /**
+     * @param $oName
+     * @param $oValue
+     */
     public function addOption($oName, $oValue)
     {
         if (strpos($oName, "PATH") !== false) {
@@ -333,7 +354,7 @@ class Repository implements RepositoryInterface
                 $pathChanged = true;
             }
             if ($pathChanged) {
-                return \Pydio\Core\Utils\Utils::securePath($pvalue);
+                return Utils::securePath($pvalue);
             }
         }
         if (isSet($this->options[$oName])) {
@@ -346,9 +367,11 @@ class Repository implements RepositoryInterface
 
     }
 
+    /**
+     * @return array
+     */
     public function getOptionsDefined()
     {
-        //return array_keys($this->options);
         $keys = array();
         foreach ($this->options as $key => $value) {
             if(is_string($value) && strstr($value, "AJXP_ALLOW_SUB_PATH") !== false) continue;
@@ -357,18 +380,28 @@ class Repository implements RepositoryInterface
         return $keys;
     }
 
+    /**
+     * @return mixed|string
+     * @throws PydioException
+     */
     public function getDefaultRight()
     {
         $opt = $this->getSafeOption("DEFAULT_RIGHTS");
         return (isSet($opt)?$opt:"");
     }
 
-
+    /**
+     * @return string
+     */
     public function getAccessType()
     {
         return $this->accessType;
     }
 
+    /**
+     * @return mixed|string
+     * @throws PydioException
+     */
     public function getDisplay()
     {
         if (isSet($this->displayStringId)) {
@@ -380,53 +413,85 @@ class Repository implements RepositoryInterface
         return VarsFilter::filter($this->display, Context::emptyContext());
     }
 
+    /**
+     * @return string
+     */
     public function getId()
     {
         if($this->isWriteable() || $this->id === null) return $this->getUniqueId();
         return $this->id;
     }
 
+    /**
+     * @return bool
+     * @throws PydioException
+     */
     public function getCreate()
     {
         return (bool) $this->getSafeOption("CREATE");
     }
 
+    /**
+     * @param bool $create
+     */
     public function setCreate($create)
     {
         $this->options["CREATE"] = (bool) $create;
     }
 
-
+    /**
+     * @param String $accessType
+     */
     public function setAccessType($accessType)
     {
         $this->accessType = $accessType;
     }
 
+    /**
+     * @param String $display
+     */
     public function setDisplay($display)
     {
         $this->display = $display;
     }
 
+    /**
+     * @param int $id
+     */
     public function setId($id)
     {
         $this->id = $id;
     }
 
+    /**
+     * @return bool
+     */
     public function isWriteable()
     {
         return (bool) $this->writeable;
     }
 
+    /**
+     * @param bool $w
+     */
     public function setWriteable($w)
     {
         $this->writeable = (bool) $w;
     }
 
+    /**
+     * @param string $id
+     */
     public function setDisplayStringId($id)
     {
         $this->displayStringId = $id;
     }
 
+    /**
+     * @param string $repoParentId
+     * @param null $ownerUserId
+     * @param null $childUserId
+     */
     public function setOwnerData($repoParentId, $ownerUserId = null, $childUserId = null)
     {
         $this->owner = $ownerUserId;
@@ -434,36 +499,71 @@ class Repository implements RepositoryInterface
         $this->parentId = $repoParentId;
     }
 
+    /**
+     * @return string
+     */
     public function getOwner()
     {
         return $this->owner;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getParentId()
     {
         return $this->parentId;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function isTemplate(){
+        return $this->isTemplate;
+    }
+    /**
+     * @return null|RepositoryInterface
+     */
+    public function getParentRepository(){
+        if(!$this->hasParent()) return null;
+        return RepositoryService::getRepositoryById($this->parentId);
+    }
+
+    /**
+     * @return string
+     */
     public function getUniqueUser()
     {
         return $this->uniqueUser;
     }
 
+    /**
+     * @return bool
+     */
     public function hasOwner()
     {
         return isSet($this->owner);
     }
 
+    /**
+     * @return bool
+     */
     public function hasParent()
     {
         return isSet($this->parentId);
     }
 
+    /**
+     * @param $bool
+     */
     public function setInferOptionsFromParent($bool)
     {
         $this->inferOptionsFromParent = (bool) $bool;
     }
 
+    /**
+     * @return bool
+     */
     public function getInferOptionsFromParent()
     {
         return (bool) $this->inferOptionsFromParent;
@@ -486,31 +586,51 @@ class Repository implements RepositoryInterface
         return $this->groupPath;
     }
 
+    /**
+     * @param String $descriptionText
+     */
     public function setDescription( $descriptionText )
     {
         $this->options["USER_DESCRIPTION"] = $descriptionText;
     }
 
+    /**
+     * @return string
+     */
     public function getAccessStatus()
     {
         return $this->accessStatus;
     }
 
+    /**
+     * @param string $accessStatus
+     */
     public function setAccessStatus($accessStatus)
     {
         $this->accessStatus = $accessStatus;
     }
 
+    /**
+     * @return string
+     */
     public function getRepositoryType()
     {
         return $this->repositoryType;
     }
 
+    /**
+     * @param string $repositoryType
+     */
     public function setRepositoryType($repositoryType)
     {
         $this->repositoryType = $repositoryType;
     }
 
+    /**
+     * @param bool $public
+     * @param null $ownerLabel
+     * @return mixed
+     */
     public function getDescription( $public = false, $ownerLabel = null )
     {
         $m = LocaleService::getMessages();
@@ -523,7 +643,7 @@ class Repository implements RepositoryInterface
         }
         if (isSet($this->parentId) && isset($this->owner)) {
             if (isSet($this->options["CREATION_TIME"])) {
-                $date = \Pydio\Core\Utils\Utils::relativeDate($this->options["CREATION_TIME"], $m);
+                $date = Utils::relativeDate($this->options["CREATION_TIME"], $m);
                 return str_replace(
                     array("%date", "%user"),
                     array($date, $ownerLabel!= null ? $ownerLabel : $this->owner),
@@ -536,7 +656,7 @@ class Repository implements RepositoryInterface
                     $m["472"]);
             }
         } else if ($this->isWriteable() && isSet($this->options["CREATION_TIME"])) {
-            $date = \Pydio\Core\Utils\Utils::relativeDate($this->options["CREATION_TIME"], $m);
+            $date = Utils::relativeDate($this->options["CREATION_TIME"], $m);
             if (isSet($this->options["CREATION_USER"])) {
                 return str_replace(array("%date", "%user"), array($date, $this->options["CREATION_USER"]), $m["471"]);
             } else {
@@ -547,11 +667,15 @@ class Repository implements RepositoryInterface
         }
     }
 
+    /**
+     * @return bool|string
+     * @throws PydioException
+     */
     public function securityScope()
     {
         if($this->hasParent()){
             $parentRepo = RepositoryService::getRepositoryById($this->getParentId());
-            if(!empty($parentRepo) && $parentRepo->isTemplate){
+            if(!empty($parentRepo) && $parentRepo->isTemplate()){
                 $path = $parentRepo->getSafeOption("PATH");
                 $container = $parentRepo->getSafeOption("CONTAINER");
                 // If path is set in the template, compute identifier from the template path.
@@ -573,6 +697,9 @@ class Repository implements RepositoryInterface
         return false;
     }
 
+    /**
+     * @return array
+     */
     public function __sleep()
     {
         $this->driverInstance = null;

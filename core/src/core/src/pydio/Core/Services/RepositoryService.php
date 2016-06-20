@@ -286,7 +286,7 @@ class RepositoryService
      * Retrieve a repository object
      *
      * @param String $repoId
-     * @return Repository
+     * @return RepositoryInterface
      */
     public static function getRepositoryById($repoId)
     {
@@ -297,7 +297,7 @@ class RepositoryService
      * Retrieve a repository object by its slug
      *
      * @param String $repoAlias
-     * @return Repository
+     * @return RepositoryInterface
      */
     public static function getRepositoryByAlias($repoAlias)
     {

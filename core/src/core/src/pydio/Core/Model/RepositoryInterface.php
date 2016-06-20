@@ -110,13 +110,6 @@ interface RepositoryInterface extends AjxpGroupPathProvider
     public function setSlug($slug = null);
 
     /**
-     * Get the <client_settings> content of the manifest.xml
-     * @param ContextInterface $ctx
-     * @return \DOMElement|\DOMNodeList|string
-     */
-    public function getClientSettings(ContextInterface $ctx);
-    
-    /**
      * Add options
      * @param $oName
      * @param $oValue
@@ -226,6 +219,11 @@ interface RepositoryInterface extends AjxpGroupPathProvider
     public function getParentId();
 
     /**
+     * @return null|RepositoryInterface
+     */
+    public function getParentRepository();
+
+    /**
      * @return string|null
      */
     public function getUniqueUser();
@@ -239,6 +237,11 @@ interface RepositoryInterface extends AjxpGroupPathProvider
      * @return bool
      */
     public function hasParent();
+
+    /**
+     * @return bool
+     */
+    public function isTemplate();
 
     /**
      * @param $bool

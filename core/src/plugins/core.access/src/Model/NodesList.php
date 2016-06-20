@@ -26,6 +26,10 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
 
+/**
+ * Class NodesList
+ * @package Pydio\Access\Core\Model
+ */
 class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResponseChunk
 {
 
@@ -44,10 +48,16 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
 
     private $columnsDescription;
 
+    /**
+     * NodesList constructor.
+     */
     public function __construct(){
         $this->parentNode = new AJXP_Node("/");
     }
 
+    /**
+     * @param AJXP_Node $parentNode
+     */
     public function setParentNode(AJXP_Node $parentNode){
         $this->parentNode = $parentNode;
     }
@@ -68,6 +78,13 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         return $this->children;
     }
 
+    /**
+     * @param $count
+     * @param $currentPage
+     * @param $totalPages
+     * @param int $dirsCount
+     * @param null $remoteSortAttributes
+     */
     public function setPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null){
         $this->paginationData = [
             'count' => $count,
@@ -78,6 +95,9 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         ];
     }
 
+    /**
+     * @param $bool
+     */
     public function setRoot($bool){
         $this->isRoot = $bool;
     }
@@ -167,6 +187,9 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         return $this->parentNode->getPath();
     }
 
+    /**
+     * @return string
+     */
     public function getCharset()
     {
         return "UTF-8";

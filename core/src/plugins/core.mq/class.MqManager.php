@@ -363,7 +363,8 @@ class MqManager extends Plugin
             throw new Exception("You must be logged in");
         }
 
-        $xml = XMLWriter::getUserXML($ctx, $user);
+        $serializer = new \Pydio\Core\Serializer\UserXML();
+        $xml = $serializer->serialize($ctx);
         // add groupPath
         if ($user->getGroupPath() != null) {
             $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";

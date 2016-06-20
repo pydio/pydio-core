@@ -525,7 +525,7 @@ abstract class AbstractConfDriver extends Plugin
     }
 
     /**
-     * @param AbstractAjxpUser $userObject
+     * @param UserInterface $userObject
      * @return array()
      */
     public function getExposedPreferences($userObject)
