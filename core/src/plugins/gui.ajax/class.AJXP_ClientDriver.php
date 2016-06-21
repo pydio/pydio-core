@@ -229,12 +229,11 @@ class AJXP_ClientDriver extends Plugin
             case "get_i18n_messages":
 
                 $refresh = false;
+                $httpVars = $requestInterface->getParsedBody();
                 if (isSet($httpVars["lang"])) {
                     LocaleService::setLanguage($httpVars["lang"]);
                     $refresh = true;
                 }
-                //HTMLWriter::charsetHeader("application/json");
-                //echo json_encode(LocaleService::getMessages($refresh));
                 $responseInterface = new JsonResponse(LocaleService::getMessages($refresh));
 
             break;
