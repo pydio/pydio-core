@@ -30,7 +30,10 @@ use Sabre\DAV as DAV;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class DAVServer
+ * @package Pydio\Core\Http\Dav
+ */
 class DAVServer
 {
     /**
@@ -39,13 +42,17 @@ class DAVServer
     private static $context;
 
 
+    /**
+     * @param $baseURI
+     * @param $davRoute
+     */
     public static function handleRoute($baseURI, $davRoute){
 
         ConfService::init();
         ConfService::start();
         self::$context = Context::emptyContext();
 
-        if (!ConfService::getCoreConf("WEBDAV_ENABLE")) {
+        if (!ConfService::getGlobalConf("WEBDAV_ENABLE")) {
             die('You are not allowed to access this service');
         }
 
@@ -92,13 +99,13 @@ class DAVServer
 
         }
 
-        if((AuthBackendBasic::detectBasicHeader() || ConfService::getCoreConf("WEBDAV_FORCE_BASIC"))
+        if((AuthBackendBasic::detectBasicHeader() || ConfService::getGlobalConf("WEBDAV_FORCE_BASIC"))
             && ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")){
             $authBackend = new AuthBackendBasic(self::$context);
         } else {
             $authBackend = new AuthBackendDigest(self::$context);
         }
-        $authPlugin = new DAV\Auth\Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
+        $authPlugin = new DAV\Auth\Plugin($authBackend, ConfService::getGlobalConf("WEBDAV_DIGESTREALM"));
         $server->addPlugin($authPlugin);
 
         if (!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")) {
@@ -112,7 +119,7 @@ class DAVServer
         $lockPlugin = new DAV\Locks\Plugin($lockBackend);
         $server->addPlugin($lockPlugin);
 
-        if (ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
+        if (ConfService::getGlobalConf("WEBDAV_BROWSER_LISTING")) {
             $browerPlugin = new BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
             $extPlugin = new DAV\Browser\GuessContentType();
             $server->addPlugin($browerPlugin);

@@ -31,6 +31,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Zend\Diactoros\Response\TextResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -49,6 +50,12 @@ class AbstractAuthDriver extends Plugin
     public $driverName = "abstract";
     public $driverType = "auth";
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return string
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $action     = $requestInterface->getAttribute("action");
@@ -59,9 +66,7 @@ class AbstractAuthDriver extends Plugin
         switch ($action) {
 
             case "get_secure_token" :
-                \Pydio\Core\Controller\HTMLWriter::charsetHeader("text/plain");
-                print SecureTokenMiddleware::generateSecureToken();
-                //exit(0);
+                $responseInterface = new TextResponse(SecureTokenMiddleware::generateSecureToken());
                 break;
 
             //------------------------------------
@@ -78,7 +83,7 @@ class AbstractAuthDriver extends Plugin
                 $oldPass = $httpVars["old_pass"];
                 $newPass = $httpVars["new_pass"];
                 $passSeed = $httpVars["pass_seed"];
-                if (strlen($newPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
+                if (strlen($newPass) < ConfService::getContextConf($ctx, "PASSWORD_MINLENGTH", "auth")) {
                     header("Content-Type:text/plain");
                     print "PASS_ERROR";
                     break;
@@ -244,10 +249,26 @@ class AbstractAuthDriver extends Plugin
      */
     public function passwordsEditable(){}
 
+    /**
+     * @param $login
+     * @param $passwd
+     */
     public function createUser($login, $passwd){}
+
+    /**
+     * @param $login
+     * @param $newPass
+     */
     public function changePassword($login, $newPass){}
+
+    /**
+     * @param $login
+     */
     public function deleteUser($login){}
 
+    /**
+     * @return bool
+     */
     public function supportsAuthSchemes()
     {
         return false;
@@ -261,6 +282,9 @@ class AbstractAuthDriver extends Plugin
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function getLoginRedirect()
     {
         if (isSet($this->options["LOGIN_REDIRECT"])) {
@@ -270,11 +294,18 @@ class AbstractAuthDriver extends Plugin
         }
     }
 
+    /**
+     * @return bool
+     */
     public function getLogoutRedirect()
     {
         return false;
     }
 
+    /**
+     * @param $optionName
+     * @return string
+     */
     public function getOption($optionName)
     {
         return (isSet($this->options[$optionName])?$this->options[$optionName]:"");
@@ -292,11 +323,18 @@ class AbstractAuthDriver extends Plugin
         );
     }
 
+    /**
+     * @param $login
+     * @return bool
+     */
     public function isAjxpAdmin($login)
     {
         return ($this->getOption("AJXP_ADMIN_LOGIN") === $login);
     }
 
+    /**
+     * @return bool
+     */
     public function autoCreateUser()
     {
         $opt = $this->getOption("AUTOCREATE_AJXPUSER");
@@ -304,6 +342,10 @@ class AbstractAuthDriver extends Plugin
         return false;
     }
 
+    /**
+     * @param bool $new
+     * @return int|string
+     */
     public function getSeed($new=true)
     {
         if($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) return -1;
@@ -316,6 +358,11 @@ class AbstractAuthDriver extends Plugin
         }
     }
 
+    /**
+     * @param $userId
+     * @param $pwd
+     * @return array
+     */
     public function filterCredentials($userId, $pwd)
     {
         return array($userId, $pwd);

@@ -105,7 +105,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
         // Authenticates the user
         $token = $userpass[0];
         $ctx = new Context($token, null);
-        $shareStore = new ShareStore($ctx, ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+        $shareStore = new ShareStore($ctx, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;

@@ -37,6 +37,10 @@ use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class TaskService
+ * @package Pydio\Tasks
+ */
 class TaskService implements ITasksProvider
 {
     /**
@@ -49,6 +53,9 @@ class TaskService implements ITasksProvider
      */
     private static $instance;
 
+    /**
+     * @param ITasksProvider $provider
+     */
     public function setProvider(ITasksProvider $provider){
         $this->realProvider = $provider;
     }
@@ -73,7 +80,7 @@ class TaskService implements ITasksProvider
      */
     public function enqueueTask(Task $task, ServerRequestInterface $request = null, ResponseInterface $response = null){
         
-        $workers = ConfService::getCoreConf("MQ_USE_WORKERS", "mq");
+        $workers = ConfService::getGlobalConf("MQ_USE_WORKERS", "mq");
         if($workers && !$task->getSchedule()->shouldRunNow()){
             AJXP_Logger::getInstance()->logInfo("TaskService", "Enqueuing Task ".$task->getId());
             $msg = ["pending_task" => $task->getId()];
@@ -101,6 +108,10 @@ class TaskService implements ITasksProvider
 
     }
 
+    /**
+     * @param Task $task
+     * @throws \Exception
+     */
     protected function publishTaskUpdate(Task $task){
 
         $json = Utils::xmlEntities(json_encode($task));
@@ -121,6 +132,14 @@ class TaskService implements ITasksProvider
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $actionName
+     * @param $parameters
+     * @param array $nodePathes
+     * @param int $flags
+     * @return Task
+     */
     public static function actionAsTask(ContextInterface $ctx, $actionName, $parameters, $nodePathes = [], $flags = 0){
 
         $userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";

@@ -34,18 +34,26 @@ class BrowserPlugin extends Sabre\DAV\Browser\Plugin
 
     protected $repositoryLabel;
 
+    /**
+     * BrowserPlugin constructor.
+     * @param null $currentRepositoryLabel
+     */
     public function __construct($currentRepositoryLabel = null)
     {
         parent::__construct(false, true);
         $this->repositoryLabel = $currentRepositoryLabel;
     }
 
+    /**
+     * @param string $path
+     * @return mixed|string
+     */
     public function generateDirectoryIndex($path)
     {
         $html = parent::generateDirectoryIndex($path);
         $html = str_replace("image/vnd.microsoft.icon", "image/png", $html);
 
-        $title = ConfService::getCoreConf("APPLICATION_TITLE");
+        $title = ConfService::getGlobalConf("APPLICATION_TITLE");
         $html = preg_replace("/<title>(.*)<\/title>/i", '<title>'.$title.'</title>', $html);
 
         $repoString = "</h1>";
@@ -60,6 +68,11 @@ class BrowserPlugin extends Sabre\DAV\Browser\Plugin
 
     }
 
+    /**
+     * @param string $name
+     * @return string
+     * @throws Sabre\DAV\Exception\Forbidden
+     */
     public function getLocalAssetPath($name)
     {
         if ($name != "favicon.ico") {

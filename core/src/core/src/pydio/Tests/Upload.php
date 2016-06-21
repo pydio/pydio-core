@@ -31,13 +31,20 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class Upload extends AbstractTest
 {
+    /**
+     * Upload constructor.
+     */
     public function __construct() { parent::__construct("Upload particularities", "<b>Testing configs</b>"); }
+
+    /**
+     * @return bool
+     */
     public function doTest()
     {
         $tmpDir = ini_get("upload_tmp_dir");
         if (!$tmpDir) $tmpDir = realpath(sys_get_temp_dir());
-        if (ConfService::getCoreConf("AJXP_TMP_DIR") != "") {
-            $tmpDir = ConfService::getCoreConf("AJXP_TMP_DIR");
+        if (ConfService::getGlobalConf("AJXP_TMP_DIR") != "") {
+            $tmpDir = ConfService::getGlobalConf("AJXP_TMP_DIR");
         }
         if (defined("AJXP_TMP_DIR") && AJXP_TMP_DIR !="") {
             $tmpDir = AJXP_TMP_DIR;

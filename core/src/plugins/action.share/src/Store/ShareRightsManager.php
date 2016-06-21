@@ -27,7 +27,6 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 
-use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -48,6 +47,10 @@ define('PARAM_USER_RIGHT_READ_PREFIX', "right_read_");
 define('PARAM_USER_RIGHT_WRITE_PREFIX', "right_write_");
 define('PARAM_USER_ENTRY_TYPE', "entry_type_");
 
+/**
+ * Class ShareRightsManager
+ * @package Pydio\Share\Store
+ */
 class ShareRightsManager
 {
     /**
@@ -188,8 +191,8 @@ class ShareRightsManager
     public function createUsersFromParameters($httpVars, &$users = array(), &$groups = array()){
 
         $index = 0;
-        $allowCrossUserSharing = ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf");
-        $allowSharedUsersCreation = ConfService::getCoreConf("USER_CREATE_USERS", "conf");
+        $allowCrossUserSharing = ConfService::getContextConf($this->context, "ALLOW_CROSSUSERS_SHARING", "conf");
+        $allowSharedUsersCreation = ConfService::getContextConf($this->context, "USER_CREATE_USERS", "conf");
         $loggedUser = $this->context->getUser();
         $confDriver = ConfService::getConfStorageImpl();
         $mess = LocaleService::getMessages();
@@ -348,7 +351,7 @@ class ShareRightsManager
                 $currentUserGroup = ($this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
                 $rootGroup = "/";
                 if(empty($loadedGroups)){
-                    $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+                    $displayAll = ConfService::getContextConf($this->context, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
                     $loadedGroups = UsersService::listChildrenGroups($displayAll ? $rootGroup : $currentUserGroup);
                     if(!$displayAll){
                         foreach($loadedGroups as $loadedG => $loadedLabel){

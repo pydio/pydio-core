@@ -51,6 +51,10 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
      */
     private $context;
 
+    /**
+     * AuthBackendDigest constructor.
+     * @param $context
+     */
     public function __construct($context)
     {
         $this->context = $context;
@@ -61,6 +65,12 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         }
     }
 
+    /**
+     * @param string $realm
+     * @param string $username
+     * @return bool|string
+     * @throws Sabre\DAV\Exception\NotAuthenticated
+     */
     public function getDigestHash($realm, $username)
     {
         try{
@@ -81,6 +91,12 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
     }
 
+    /**
+     * @param Sabre\DAV\Server $server
+     * @param string $realm
+     * @return bool
+     * @throws Sabre\DAV\Exception\NotAuthenticated
+     */
     public function authenticate(Sabre\DAV\Server $server, $realm)
     {
         //AJXP_Logger::debug("Try authentication on $realm", $server);
@@ -104,10 +120,6 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
                 throw new Sabre\DAV\Exception\NotAuthenticated();
             }
             $this->updateCurrentUserRights($loggedUser);
-            if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
-                $webdavData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
-                AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
-            }
         } else {
           if ($success === false) {
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
@@ -129,6 +141,10 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
                 throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
             }
             $this->context->setRepositoryObject($repoObject);
+        }
+        if (ConfService::getContextConf($this->context, "SESSION_SET_CREDENTIALS", "auth")) {
+            $webdavData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
+            AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
         }
 
         // NOW UPDATE CONTEXT
@@ -155,6 +171,11 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         return true;
     }
 
+    /**
+     * @param $encoded
+     * @param $user
+     * @return string
+     */
     private function _decodePassword($encoded, $user)
     {
         if (function_exists('mcrypt_decrypt')) {

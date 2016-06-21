@@ -22,7 +22,6 @@ class ComposerStaticInitb3e17649037b8fca0fc9c00fa2156aaf
 
     public static $classMap = array (
         'Pydio\\Share\\Legacy\\LegacyPubliclet' => __DIR__ . '/../..' . '/src/Legacy/LegacyPubliclet.php',
-        'Pydio\\Share\\Legacy\\PublicletCounter' => __DIR__ . '/../..' . '/src/Legacy/PublicletCounter.php',
         'Pydio\\Share\\Model\\CompositeShare' => __DIR__ . '/../..' . '/src/Model/CompositeShare.php',
         'Pydio\\Share\\Model\\ShareLink' => __DIR__ . '/../..' . '/src/Model/ShareLink.php',
         'Pydio\\Share\\ShareCenter' => __DIR__ . '/../..' . '/src/ShareCenter.php',

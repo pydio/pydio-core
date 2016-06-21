@@ -117,8 +117,8 @@ class MinisiteRenderer
         Controller::applyHook("tpl.filter_html", [$ctx, &$html]);
         $html = XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
-        $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
-        $html = str_replace("PYDIO_APP_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $html);
+        $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
+        $html = str_replace("PYDIO_APP_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
         if(isSet($repository) && isSet($repoObject)){
             $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
             $html = str_replace("AJXP_REPOSITORY_LABEL", RepositoryService::getRepositoryById($repository)->getDisplay(), $html);
@@ -175,7 +175,7 @@ class MinisiteRenderer
                         }
                     }
                 }
-                $ctx = Context::fromGlobalServices();
+                $ctx = Context::emptyContext();
                 $req =  Controller::executableRequest($ctx, $ACTION, $params);
                 $response = Controller::run($req);
                 $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();

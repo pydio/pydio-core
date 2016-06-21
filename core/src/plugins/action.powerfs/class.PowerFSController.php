@@ -48,23 +48,24 @@ class PowerFSController extends Plugin
         }
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
-
-        $httpVars = $request->getParsedBody();
-        $repository = $ctx->getRepository();
-
-        $dir = $httpVars["dir"] OR "";
-        $dir = Utils::decodeSecureMagic($dir);
+        $ctx        = $request->getAttribute("ctx");
+        $httpVars   = $request->getParsedBody();
+        $dir        = $httpVars["dir"] OR "";
+        $dir        = Utils::decodeSecureMagic($dir);
         if($dir == "/") $dir = "";
-        $selection = UserSelection::fromContext($ctx, $httpVars);
-        if (!$selection->isEmpty()) {
-            //$this->filterUserSelectionToHidden($selection->getFiles());
-        }
-        $urlBase = "pydio://". $repository->getId();
-        $mess = LocaleService::getMessages();
+        $selection  = UserSelection::fromContext($ctx, $httpVars);
+        $urlBase    = $ctx->getUrlBase();
+        $mess       = LocaleService::getMessages();
+
         $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         if($request->getAttribute("action") != "postcompress_download"){
             $response = $response->withBody($bodyStream);

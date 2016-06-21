@@ -101,7 +101,7 @@ abstract class AbstractConfDriver extends Plugin
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
-        if ($contribNode->nodeName == 'client_configs' && !ConfService::getCoreConf("WEBDAV_ENABLE")) {
+        if ($contribNode->nodeName == 'client_configs' && !ConfService::getContextConf($ctx, "WEBDAV_ENABLE")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $webdavCompNodeList = $actionXpath->query('component_config/additional_tab[@id="webdav_pane"]', $contribNode);
             if ($webdavCompNodeList->length) {
@@ -112,7 +112,7 @@ abstract class AbstractConfDriver extends Plugin
         if($contribNode->nodeName != "actions") return;
 
         // WEBDAV ACTION
-        if (!ConfService::getCoreConf("WEBDAV_ENABLE")) {
+        if (!ConfService::getContextConf($ctx, "WEBDAV_ENABLE")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="webdav_preferences"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -147,7 +147,7 @@ abstract class AbstractConfDriver extends Plugin
         }
 
         // CREATE A NEW REPOSITORY
-        if (!ConfService::getCoreConf("USER_CREATE_REPOSITORY", "conf")) {
+        if (!ConfService::getContextConf($ctx, "USER_CREATE_REPOSITORY", "conf")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_create_repository"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -163,7 +163,7 @@ abstract class AbstractConfDriver extends Plugin
         }
 
         // CREATE A NEW USER
-        if (!ConfService::getCoreConf("USER_CREATE_USERS", "conf")) {
+        if (!ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf")) {
             $actionXpath=new \DOMXPath($contribNode->ownerDocument);
             $publicUrlNodeList = $actionXpath->query('action[@name="user_create_user"]', $contribNode);
             if ($publicUrlNodeList->length) {
@@ -545,10 +545,10 @@ abstract class AbstractConfDriver extends Plugin
         $stringPrefs = ["lang","history/last_repository","pending_folder","plugins_preferences"];
         $jsonPrefs = ["ls_history","gui_preferences"];
         $prefs = [];
-        if ( $userObject->getId()=="guest" && ConfService::getCoreConf("SAVE_GUEST_PREFERENCES", "conf") === false) {
+        if ( $userObject->getId()=="guest" && ConfService::getGlobalConf("SAVE_GUEST_PREFERENCES", "conf") === false) {
             return [];
         }
-        if ( ConfService::getCoreConf("SKIP_USER_HISTORY", "conf") === true ) {
+        if ( ConfService::getGlobalConf("SKIP_USER_HISTORY", "conf") === true ) {
             $stringPrefs = ["lang","pending_folder", "plugins_preferences"];
             $jsonPrefs = ["gui_preferences"];
             $prefs["SKIP_USER_HISTORY"] = ["value" => "true", "type" => "string"];
@@ -840,7 +840,7 @@ abstract class AbstractConfDriver extends Plugin
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
                             $link = Utils::detectServerURL();
-                            $apptitle = ConfService::getCoreConf("APPLICATION_TITLE");
+                            $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
                             $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $data["new_user_id"], $data["new_password"]], $mess["508"]);
                             $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
@@ -871,7 +871,7 @@ abstract class AbstractConfDriver extends Plugin
                 if($userObject->getParent() != $loggedUser->getId()){
                     throw new \Exception("Cannot find user");
                 }
-                $paramsString = ConfService::getCoreConf("NEWUSERS_EDIT_PARAMETERS", "conf");
+                $paramsString = ConfService::getContextConf($ctx, "NEWUSERS_EDIT_PARAMETERS", "conf");
                 $result = [];
                 $params = explode(",", $paramsString);
                 foreach($params as $p){
@@ -891,12 +891,12 @@ abstract class AbstractConfDriver extends Plugin
                 $webdavActive = false;
                 $passSet = false;
                 // Detect http/https and host
-                if (ConfService::getCoreConf("WEBDAV_BASEHOST") != "") {
-                    $baseURL = ConfService::getCoreConf("WEBDAV_BASEHOST");
+                if (ConfService::getGlobalConf("WEBDAV_BASEHOST") != "") {
+                    $baseURL = ConfService::getGlobalConf("WEBDAV_BASEHOST");
                 } else {
                     $baseURL = \Pydio\Core\Utils\Utils::detectServerURL();
                 }
-                $webdavBaseUrl = $baseURL.ConfService::getCoreConf("WEBDAV_BASEURI")."/";
+                $webdavBaseUrl = $baseURL.ConfService::getGlobalConf("WEBDAV_BASEURI")."/";
                 $davData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
                 $digestSet = isSet($davData["HA1"]);
                 if (isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])) {
@@ -936,7 +936,7 @@ abstract class AbstractConfDriver extends Plugin
                     "webdav_active"  => $webdavActive,
                     "password_set"   => $passSet,
                     "digest_set"    => $digestSet,
-                    "webdav_force_basic" => (ConfService::getCoreConf("WEBDAV_FORCE_BASIC") === true),
+                    "webdav_force_basic" => (ConfService::getGlobalConf("WEBDAV_FORCE_BASIC") === true),
                     "webdav_base_url"  => $webdavBaseUrl,
                     "webdav_repositories" => $davRepos
                 ];
@@ -1113,7 +1113,7 @@ abstract class AbstractConfDriver extends Plugin
                 } else {
                     $regexp = $pregexp = null;
                 }
-                $skipDisplayWithoutRegexp = ConfService::getCoreConf("USERS_LIST_REGEXP_MANDATORY", "conf");
+                $skipDisplayWithoutRegexp = ConfService::getContextConf($ctx, "USERS_LIST_REGEXP_MANDATORY", "conf");
                 if($skipDisplayWithoutRegexp && $regexp == null){
                     $users = "";
                     if (method_exists($this, "listUserTeams")) {
@@ -1125,9 +1125,9 @@ abstract class AbstractConfDriver extends Plugin
                     print("<ul>$users</ul>");
                     break;
                 }
-                $limit = intval(ConfService::getCoreConf("USERS_LIST_COMPLETE_LIMIT", "conf"));
-                $searchAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf");
-                $displayAll = ConfService::getCoreConf("CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
+                $limit = intval(ConfService::getContextConf($ctx, "USERS_LIST_COMPLETE_LIMIT", "conf"));
+                $searchAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS", "conf");
+                $displayAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
                 $baseGroup = "/";
                 if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) && $ctx->hasUser()){
                     $baseGroup = $ctx->getUser()->getGroupPath();
@@ -1137,7 +1137,7 @@ abstract class AbstractConfDriver extends Plugin
                 if (!$usersOnly) {
                     $allGroups = [];
 
-                    $roleOrGroup = ConfService::getCoreConf("GROUP_OR_ROLE", "conf");
+                    $roleOrGroup = ConfService::getContextConf($ctx, "GROUP_OR_ROLE", "conf");
                     $rolePrefix = $excludeString = $includeString = null;
                     if(!is_array($roleOrGroup)){
                         $roleOrGroup = ["group_switch_value" => $roleOrGroup];
@@ -1196,7 +1196,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 $users = "";
                 $index = 0;
-                if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getCoreConf("USER_CREATE_USERS", "conf") && !$existingOnly) {
+                if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf") && !$existingOnly) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 } else if ($existingOnly && !empty($crtValue)) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";
@@ -1225,12 +1225,12 @@ abstract class AbstractConfDriver extends Plugin
                 }
                 foreach ($allUsers as $userId => $userObject) {
                     if($userObject->getId() == $loggedUser->getId()) continue;
-                    if ( ( !$userObject->hasParent() &&  ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
+                    if ( ( !$userObject->hasParent() &&  ConfService::getContextConf($ctx, "ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
                         $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
                         $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
                         //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
                         $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
-                        if (ConfService::getCoreConf("USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
+                        if (ConfService::getContextConf($ctx, "USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
                             $userDisplay = $userLabel;
                         }
                         $userIsExternal = $userObject->hasParent() ? "true":"false";

@@ -123,9 +123,6 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         $this->updateCurrentUserRights($loggedUser);
-        if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
-            AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
-        }
         if($this->context->hasRepository()){
             $repoId = $this->context->getRepositoryId();
             try{
@@ -144,6 +141,9 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
+        if (ConfService::getContextConf($this->context, "SESSION_SET_CREDENTIALS", "auth")) {
+            AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
+        }
         //PluginsService::getInstance($this->context);
         AJXP_Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);

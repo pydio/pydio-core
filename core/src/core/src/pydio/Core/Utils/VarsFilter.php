@@ -90,9 +90,12 @@ class VarsFilter
         return $value;
     }
 
+    /**
+     * @param $array
+     */
     public static function filterI18nStrings(&$array){
         if(!is_array($array)) return;
-        $appTitle = ConfService::getCoreConf("APPLICATION_TITLE");
+        $appTitle = ConfService::getGlobalConf("APPLICATION_TITLE");
         foreach($array as &$value){
             $value = str_replace("APPLICATION_TITLE", $appTitle, $value);
         }

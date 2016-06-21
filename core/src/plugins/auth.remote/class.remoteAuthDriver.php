@@ -20,6 +20,7 @@
  */
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
@@ -103,8 +104,9 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
 
         $this->slaveMode = $options["SLAVE_MODE"] == "true";
-        if ($this->slaveMode && ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
+        if ($this->slaveMode && ConfService::getContextConf($ctx, "ALLOW_GUEST_BROWSING", "auth")) {
             $contribs = $this->getXPath()->query("registry_contributions/external_file");
+            /** @var DOMElement $contribNode */
             foreach ($contribs as $contribNode) {
                 if ($contribNode->getAttribute('filename') == 'plugins/core.auth/standard_auth_actions.xml') {
                     $contribNode->parentNode->removeChild($contribNode);
@@ -119,11 +121,21 @@ class remoteAuthDriver extends AbstractAuthDriver
         $this->urls = array($options["LOGIN_URL"], $options["LOGOUT_URL"]);
     }
 
+    /**
+     * Wether users can be listed using offset and limit
+     * @return bool
+     */
     public function supportsUsersPagination()
     {
         return true;
     }
 
+    /**
+     *
+     * @param string $baseGroup
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
     public function listUsers($baseGroup = "/", $recursive = true)
     {
         $users = Utils::loadSerialFile($this->usersSerFile);
@@ -134,6 +146,15 @@ class remoteAuthDriver extends AbstractAuthDriver
         return $users;
     }
 
+    /**
+     * List users using offsets
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
     public function listUsersPaginated($baseGroup, $regexp, $offset = -1 , $limit = -1, $recursive = true)
     {
         $users = $this->listUsers();
@@ -153,12 +174,25 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
         return $result;
     }
+
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null|string $filterProperty Can be "admin" or "parent"
+     * @param null|string $filterValue Can be a user Id, or AJXP_FILTER_EMPTY or AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
+     * @return int
+     */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive=true)
     {
         return count($this->listUsersPaginated($baseGroup, $regexp));
     }
 
 
+    /**
+     * @param $login
+     * @return boolean
+     */
     public function userExists($login)
     {
         $users = $this->listUsers();
@@ -167,6 +201,12 @@ class remoteAuthDriver extends AbstractAuthDriver
         return true;
     }
 
+    /**
+     * @param string $login
+     * @param string $pass
+     * @param string $seed
+     * @return bool
+     */
     public function checkPassword($login, $pass, $seed)
     {
         if(UsersService::ignoreUserCase()) $login = strtolower($login);
@@ -182,7 +222,7 @@ class remoteAuthDriver extends AbstractAuthDriver
         } else {
             $crtSessionId = session_id();
             session_write_close();
-            $host = "";
+
             if (isSet($this->options["MASTER_HOST"])) {
                 $host = $this->options["MASTER_HOST"];
             } else {
@@ -239,21 +279,36 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param string $login
+     * @return string
+     */
     public function createCookieString($login)
     {
         $userPass = $this->getUserPass($login);
         return md5($login.":".$userPass.":ajxp");
     }
 
+    /**
+     * @return bool
+     */
     public function usersEditable()
     {
         return true;
     }
+
+    /**
+     * @return bool
+     */
     public function passwordsEditable()
     {
         return false;
     }
 
+    /**
+     * @param $login
+     * @param $passwd
+     */
     public function createUser($login, $passwd)
     {
         if(UsersService::ignoreUserCase()) $login = strtolower($login);
@@ -267,6 +322,11 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
         Utils::saveSerialFile($this->usersSerFile, $users);
     }
+
+    /**
+     * @param $login
+     * @param $newPass
+     */
     public function changePassword($login, $newPass)
     {
         if(UsersService::ignoreUserCase()) $login = strtolower($login);
@@ -279,6 +339,10 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
         Utils::saveSerialFile($this->usersSerFile, $users);
     }
+
+    /**
+     * @param $login
+     */
     public function deleteUser($login)
     {
         if(UsersService::ignoreUserCase()) $login = strtolower($login);
@@ -289,6 +353,10 @@ class remoteAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @return bool|UserInterface
+     */
     public function getUserPass($login)
     {
         if(!$this->userExists($login)) return false;
@@ -296,11 +364,17 @@ class remoteAuthDriver extends AbstractAuthDriver
         return $users[$login];
     }
 
+    /**
+     * @return bool
+     */
     public function getLoginRedirect()
     {
         return parent::getLoginRedirect();
     }
 
+    /**
+     * @return bool
+     */
     public function getLogoutRedirect()
     {
         return $this->urls[1];

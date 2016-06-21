@@ -19,6 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Authfront\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
@@ -30,6 +31,9 @@ use Pydio\Core\Controller\HTMLWriter;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
+/**
+ * Class KeystoreAuthFrontend
+ */
 class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
     /**
@@ -37,12 +41,23 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
      */
     var $storage;
 
+    /**
+     * @param $httpVars
+     * @param $varName
+     * @return string
+     */
     function detectVar(&$httpVars, $varName){
         if(isSet($httpVars[$varName])) return $httpVars[$varName];
         if(isSet($_SERVER["HTTP_PYDIO_".strtoupper($varName)])) return $_SERVER["HTTP_".strtoupper($varName)];
         return "";
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @param bool $isLast
+     * @return bool
+     */
     function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
 
         $httpVars = $request->getParsedBody();
@@ -87,7 +102,12 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
 
     }
 
-    public function revokeUserTokens(\Pydio\Core\Model\ContextInterface $ctx, $userId){
+    /**
+     * @param ContextInterface $ctx
+     * @param $userId
+     * @return bool|null
+     */
+    public function revokeUserTokens(ContextInterface $ctx, $userId){
 
         $this->storage = ConfService::getConfStorageImpl();
         if(!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
@@ -106,9 +126,11 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
      * @param String $action
      * @param array $httpVars
      * @param array $fileVars
+     * @param ContextInterface $ctx
      * @return String
+     * @throws Exception
      */
-    function authTokenActions($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $ctx){
+    function authTokenActions($action, $httpVars, $fileVars, ContextInterface $ctx){
 
         if(!$ctx->hasUser()) {
             return null;
@@ -125,7 +147,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend {
             
             case "keystore_generate_auth_token":
 
-                if(ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")){
+                if(ConfService::getContextConf($ctx, "SESSION_SET_CREDENTIALS", "auth")){
                     $this->logDebug("Keystore Generate Tokens", "Session Credentials set: returning empty tokens to force basic authentication");
                     HTMLWriter::charsetHeader("text/plain");
                     echo "";

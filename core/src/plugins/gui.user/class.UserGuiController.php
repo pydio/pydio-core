@@ -68,6 +68,14 @@ class UserGuiController extends Plugin
     }
 
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\ActionNotFoundException
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function processUserAccessPoint(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
         $action = $requestInterface->getAttribute("action");
@@ -76,10 +84,10 @@ class UserGuiController extends Plugin
         
         switch ($action) {
             case "user_access_point":
-                $setUrl = ConfService::getCoreConf("SERVER_URL");
+                $setUrl = ConfService::getGlobalConf("SERVER_URL");
                 $realUri = "/";
                 if(!empty($setUrl)){
-                    $realUri = parse_url(ConfService::getCoreConf("SERVER_URL"), PHP_URL_PATH);
+                    $realUri = parse_url(ConfService::getGlobalConf("SERVER_URL"), PHP_URL_PATH);
                 }
                 $requestURI = str_replace("//", "/", $_SERVER["REQUEST_URI"]);
                 $uri = trim(str_replace(rtrim($realUri, "/")."/user", "", $requestURI), "/");
@@ -158,6 +166,11 @@ class UserGuiController extends Plugin
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $args
+     * @throws Exception
+     */
     protected function processSubAction($actionName, $args)
     {
         switch ($actionName) {

@@ -33,11 +33,18 @@ use Pydio\Log\Core\AJXP_Logger;
 use Pydio\Share\Store\ShareStore;
 use Sabre;
 
+/**
+ * Class Server
+ * @package Pydio\OCS\Server\Dav
+ */
 class Server extends Sabre\DAV\Server
 {
     var $rootCollection;
     var $uniqueBaseFile;
 
+    /**
+     * Server constructor.
+     */
     public function __construct()
     {
         $this->rootCollection = new Collection("/", null, null);
@@ -53,7 +60,7 @@ class Server extends Sabre\DAV\Server
             $userPass = $testBackend->getUserPass();
             if(isSet($userPass[0])){
                 $ctx = new Context($userPass[0], null);
-                $shareStore = new ShareStore($ctx, ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+                $shareStore = new ShareStore($ctx, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
                 if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
                     $repo = RepositoryService::getRepositoryById($shareData["REPOSITORY"]);
@@ -66,6 +73,11 @@ class Server extends Sabre\DAV\Server
         return null;
     }
 
+    /**
+     * @param string $uri
+     * @return string
+     * @throws Sabre\DAV\Exception\Forbidden
+     */
     public function calculateUri($uri) {
         $uri = parent::calculateUri($uri);
         if(!empty($this->uniqueBaseFile) && '/'.$uri !== $this->uniqueBaseFile){
@@ -74,13 +86,16 @@ class Server extends Sabre\DAV\Server
         return $uri;
     }
 
+    /**
+     * @param string $baseUri
+     */
     public function start($baseUri = "/"){
 
         $this->uniqueBaseFile = $this->pointToBaseFile();
         $this->setBaseUri($baseUri);
 
         $authBackend = new AuthSharingBackend($this->rootCollection);
-        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, ConfService::getCoreConf("WEBDAV_DIGESTREALM"));
+        $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, ConfService::getGlobalConf("WEBDAV_DIGESTREALM"));
         $this->addPlugin($authPlugin);
 
         if (!is_dir(AJXP_DATA_PATH."/plugins/server.sabredav")) {
@@ -94,7 +109,7 @@ class Server extends Sabre\DAV\Server
         $lockPlugin = new Sabre\DAV\Locks\Plugin($lockBackend);
         $this->addPlugin($lockPlugin);
 
-        if (ConfService::getCoreConf("WEBDAV_BROWSER_LISTING")) {
+        if (ConfService::getGlobalConf("WEBDAV_BROWSER_LISTING")) {
             $browerPlugin = new BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
             $extPlugin = new Sabre\DAV\Browser\GuessContentType();
             $this->addPlugin($browerPlugin);

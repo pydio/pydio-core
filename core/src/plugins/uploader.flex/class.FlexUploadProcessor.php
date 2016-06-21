@@ -42,14 +42,16 @@ class FlexUploadProcessor extends Plugin
      * @param \Psr\Http\Message\ResponseInterface $response
      */
     public function getTemplate(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response){
-
-        $confMaxSize = StatHelper::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+        
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $confMaxSize = StatHelper::convertBytes(ConfService::getContextConf($ctx, "UPLOAD_MAX_SIZE", "uploader"));
         $UploadMaxSize = min(StatHelper::convertBytes(ini_get('upload_max_filesize')), StatHelper::convertBytes(ini_get('post_max_size')));
         if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
-        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
-        $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
-        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
-        $maxLength = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
+        $confTotalNumber = ConfService::getContextConf($ctx, "UPLOAD_MAX_NUMBER", "uploader");
+        $confTotalSize = ConfService::getContextConf($ctx, "UPLOAD_MAX_SIZE_TOTAL", "uploader");
+        $confTotalNumber = ConfService::getContextConf($ctx, "UPLOAD_MAX_NUMBER", "uploader");
+        $maxLength = ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH");
 
         $FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
         $pluginConfigs = $this->getConfigs();

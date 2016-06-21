@@ -43,6 +43,12 @@ class AjxpScheduler extends Plugin
 {
     public $db;
 
+    /**
+     * Construction method
+     *
+     * @param string $id
+     * @param string $baseDir
+     */
     public function __construct($id, $baseDir)
     {
         parent::__construct($id, $baseDir);
@@ -62,6 +68,10 @@ class AjxpScheduler extends Plugin
         }
     }
 
+    /**
+     * @return string
+     * @throws Exception
+     */
     public function getDbFile()
     {
         if (!isSet($this->db)) {
@@ -70,6 +80,11 @@ class AjxpScheduler extends Plugin
         return $this->db;
     }
 
+    /**
+     * Load this plugin from its serialized reprensation. The manifest XML is base64 decoded.
+     * @param $string
+     * @return void
+     */
     public function unserialize($serialized)
     {
         parent::unserialize($serialized);
@@ -113,6 +128,11 @@ class AjxpScheduler extends Plugin
         $paramNode->attributes->getNamedItem("default")->nodeValue = $ctx->getUser()->getId();
     }
 
+    /**
+     * @param $tId
+     * @return mixed
+     * @throws Exception
+     */
     public function getTaskById($tId)
     {
         $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
@@ -124,6 +144,11 @@ class AjxpScheduler extends Plugin
         throw new Exception("Cannot find task");
     }
 
+    /**
+     * @param $taskId
+     * @param $status
+     * @param bool $preserveModeDate
+     */
     public function setTaskStatus($taskId, $status, $preserveModeDate =false)
     {
         $statusFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status";
@@ -132,6 +157,10 @@ class AjxpScheduler extends Plugin
         if($preserveModeDate) @touch($statusFile, $mtime);
     }
 
+    /**
+     * @param $taskId
+     * @return array|bool
+     */
     public function getTaskStatus($taskId)
     {
         $statusFile = AJXP_CACHE_DIR."/cmd_outputs/task_".$taskId.".status";
@@ -152,6 +181,9 @@ class AjxpScheduler extends Plugin
         return false;
     }
 
+    /**
+     * @return int
+     */
     public function countCurrentlyRunning()
     {
         $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
@@ -165,6 +197,14 @@ class AjxpScheduler extends Plugin
         return $count;
     }
 
+    /**
+     * @param $taskId
+     * @param null $status
+     * @param int $currentlyRunning
+     * @param bool $forceStart
+     * @return bool
+     * @throws Exception
+     */
     public function runTask($taskId, $status = null, &$currentlyRunning = -1, $forceStart=false)
     {
         $data = $this->getTaskById($taskId);
@@ -231,12 +271,20 @@ class AjxpScheduler extends Plugin
         return false;
     }
 
+    /**
+     * @param string $baseGroup
+     * @return array
+     */
     protected function listUsersIds($baseGroup = "/"){
         $authDriver = ConfService::getAuthDriverImpl();
         $pairs = $authDriver->listUsers($baseGroup);
         return array_keys($pairs);
     }
 
+    /**
+     * @param $users
+     * @param string $startGroup
+     */
     protected function gatherUsers(&$users, $startGroup="/")
     {
         $u = $this->listUsersIds($startGroup);
@@ -250,6 +298,11 @@ class AjxpScheduler extends Plugin
     }
 
 
+    /**
+     * @param $data1
+     * @param $data2
+     * @return int
+     */
     public function sortTasksByPriorityStatus($data1, $data2)
     {
         if(is_array($data1["status"]) && in_array("QUEUED", $data1["status"])) return -1;
@@ -257,6 +310,12 @@ class AjxpScheduler extends Plugin
         return 0;
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $postProcessData
+     * @param ContextInterface $contextInterface
+     */
     public function switchAction($action, $httpVars, $postProcessData, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         switch ($action) {
@@ -307,7 +366,7 @@ class AjxpScheduler extends Plugin
 
             case "scheduler_generateCronExpression":
 
-                $phpCmd = ConfService::getCoreConf("CLI_PHP");
+                $phpCmd = ConfService::getGlobalConf("CLI_PHP");
                 $rootInstall = AJXP_INSTALL_PATH.DIRECTORY_SEPARATOR."cmd.php" ;
                 $logFile = AJXP_CACHE_DIR.DIRECTORY_SEPARATOR."cmd_outputs".DIRECTORY_SEPARATOR."cron_commands.log";
                 $cronTiming = "*/5 * * * *";
@@ -322,6 +381,10 @@ class AjxpScheduler extends Plugin
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $configTree
+     */
     public function placeConfigNode(ContextInterface $ctx, &$configTree)
     {
         $mess = LocaleService::getMessages();
@@ -349,6 +412,11 @@ class AjxpScheduler extends Plugin
         }
     }
 
+    /**
+     * @param $nodeName
+     * @param $baseDir
+     * @throws Exception
+     */
     public function listTasks($nodeName, $baseDir)
     {
         $mess = LocaleService::getMessages();
@@ -392,6 +460,11 @@ class AjxpScheduler extends Plugin
 
     }
 
+    /**
+     * @param $schedule
+     * @return mixed
+     * @throws Exception
+     */
     public function getTimeArray($schedule)
     {
         $parts = explode(" ", $schedule);
@@ -405,6 +478,16 @@ class AjxpScheduler extends Plugin
     }
 
 
+    /**
+     * @param $taskId
+     * @param $label
+     * @param $schedule
+     * @param $actionName
+     * @param $repositoryIds
+     * @param $userId
+     * @param $paramsArray
+     * @throws Exception
+     */
     public function addOrUpdateTask($taskId, $label, $schedule, $actionName, $repositoryIds, $userId, $paramsArray)
     {
         $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
@@ -432,6 +515,10 @@ class AjxpScheduler extends Plugin
 
     }
 
+    /**
+     * @param $taskId
+     * @throws Exception
+     */
     public function removeTask($taskId)
     {
         $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
@@ -444,6 +531,12 @@ class AjxpScheduler extends Plugin
         Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @throws Exception
+     */
     public function handleTasks($action, $httpVars, $fileVars)
     {
         $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
@@ -548,6 +641,12 @@ class AjxpScheduler extends Plugin
 
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $context
+     */
     public function fakeLongTask($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $context)
     {
         $minutes = (isSet($httpVars["time_length"])?intval($httpVars["time_length"]):2);
@@ -557,6 +656,11 @@ class AjxpScheduler extends Plugin
         print('ENDIND FAKE TASK');
     }
 
+    /**
+     * @param $referenceTime
+     * @param $timeArray
+     * @return mixed
+     */
     public function getNextExecutionTimeForScript($referenceTime, $timeArray)
     {
         $a=null; $m=null; $j=null; $h=null; $min=null;
@@ -619,6 +723,12 @@ class AjxpScheduler extends Plugin
         }
     }
 
+    /**
+     * @param $min
+     * @param $max
+     * @param $intervalle
+     * @return array
+     */
     public function parseFormat($min, $max, $intervalle)
     {
         $retour = Array();
@@ -656,6 +766,14 @@ class AjxpScheduler extends Plugin
         return $retour;
     }
 
+    /**
+     * @param $timeArray
+     * @param $a
+     * @param $m
+     * @param $j
+     * @param $h
+     * @param $min
+     */
     public function nextMonth($timeArray, &$a, &$m, &$j, &$h, &$min)
     {
         $valeurs = $this->parseFormat(1, 12, $timeArray['months']);
@@ -667,6 +785,16 @@ class AjxpScheduler extends Plugin
             }
         } while ($valeurs[$m] != TRUE);
     }
+
+    /**
+     * @param $timeArray
+     * @param $a
+     * @param $m
+     * @param $j
+     * @param $h
+     * @param $min
+     * @return int
+     */
     public function nextDay($timeArray, &$a, &$m, &$j, &$h, &$min)
     {
         $valeurs = $this->parseFormat(1, 31, $timeArray['days']);
@@ -681,6 +809,16 @@ class AjxpScheduler extends Plugin
             $js = date('w', mktime(0, 0, 0, $m, $j, $a));
         } while ($valeurs[$j] != TRUE || $valeurSemaine[$js] != TRUE);
     }
+
+    /**
+     * @param $timeArray
+     * @param $a
+     * @param $m
+     * @param $j
+     * @param $h
+     * @param $min
+     * @return int
+     */
     public function nextHour($timeArray, &$a, &$m, &$j, &$h, &$min)
     {
         $valeurs = $this->parseFormat(0, 23, $timeArray['hours']);
@@ -691,6 +829,15 @@ class AjxpScheduler extends Plugin
         } while ($valeurs[$h] != TRUE);
     }
 
+    /**
+     * @param $timeArray
+     * @param $a
+     * @param $m
+     * @param $j
+     * @param $h
+     * @param $min
+     * @return int
+     */
     public function nextMinute($timeArray, &$a, &$m, &$j, &$h, &$min)
     {
         $valeurs = $this->parseFormat(0, 59, $timeArray['minutes']);

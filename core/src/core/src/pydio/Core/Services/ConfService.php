@@ -27,6 +27,7 @@ use Pydio\Conf\Core\AbstractConfDriver;
 
 use Pydio\Core\Model\Context;
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
@@ -47,10 +48,7 @@ class ConfService
 
     private $errors = array();
     private $configs = array();
-
-    private $contextRepositoryId;
-    private $contextCharset;
-
+    
 
     /**
      * @return AbstractConfDriver
@@ -209,7 +207,7 @@ class ConfService
      */
     public static function backgroundActionsSupported()
     {
-        return function_exists("mcrypt_create_iv") && ConfService::getCoreConf("CMDLINE_ACTIVE");
+        return function_exists("mcrypt_create_iv") && ConfService::getGlobalConf("CMDLINE_ACTIVE");
     }
 
     /**
@@ -309,7 +307,7 @@ class ConfService
     public static function zipBrowsingEnabled()
     {
         if(!self::zipEnabled()) return false;
-        return !ConfService::getCoreConf("DISABLE_ZIP_BROWSING");
+        return !ConfService::getGlobalConf("DISABLE_ZIP_BROWSING");
     }
 
     /**
@@ -320,7 +318,7 @@ class ConfService
     public static function zipCreationEnabled()
     {
         if(!self::zipEnabled()) return false;
-        return ConfService::getCoreConf("ZIP_CREATION");
+        return ConfService::getGlobalConf("ZIP_CREATION");
     }
     
     /**
@@ -369,16 +367,31 @@ class ConfService
     {
         $this->configs[$varName] = $varValue;
     }
+    
     /**
-     * Get config from the core.$coreType plugin
+     * Get config from the core.$coreType plugin without context
      * @static
      * @param string $varName
      * @param string $coreType
      * @return mixed|null|string
      */
-    public static function getCoreConf($varName, $coreType = "ajaxplorer")
+    public static function getGlobalConf($varName, $coreType = "ajaxplorer")
     {
-        $ctx = Context::fromGlobalServices();
+        $ctx = Context::emptyContext();
+        $coreP = PluginsService::getInstance($ctx)->getPluginByTypeName("core", $coreType);
+        if($coreP === false) return null;
+        $confs = $coreP->getConfigs();
+        return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName], $ctx) : null);
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $varName
+     * @param string $coreType
+     * @return mixed
+     */
+    public static function getContextConf(ContextInterface $ctx, $varName, $coreType = "ajaxplorer"){
+
         $coreP = PluginsService::getInstance($ctx)->getPluginByTypeName("core", $coreType);
         if($coreP === false) return null;
         $confs = $coreP->getConfigs();
@@ -386,6 +399,7 @@ class ConfService
             $confs = $ctx->getUser()->getMergedRole()->filterPluginConfigs("core".$coreType, $confs, $ctx->getRepositoryId());
         }
         return (isSet($confs[$varName]) ? VarsFilter::filter($confs[$varName], $ctx) : null);
+
     }
 
     /**

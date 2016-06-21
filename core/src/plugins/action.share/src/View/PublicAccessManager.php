@@ -27,6 +27,10 @@ use Pydio\Core\Utils\Utils;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class PublicAccessManager
+ * @package Pydio\Share\View
+ */
 class PublicAccessManager
 {
     /**
@@ -49,7 +53,7 @@ class PublicAccessManager
      */
     public function buildPublicLink($hash)
     {
-        $addLang = LocaleService::getLanguage() != ConfService::getCoreConf("DEFAULT_LANGUAGE");
+        $addLang = LocaleService::getLanguage() != ConfService::getGlobalConf("DEFAULT_LANGUAGE");
         if($addLang) return $this->buildPublicDlURL()."/".$hash."--". LocaleService::getLanguage();
         else return $this->buildPublicDlURL()."/".$hash;
     }
@@ -60,8 +64,8 @@ class PublicAccessManager
      */
     public function buildPublicDlURL()
     {
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+        $downloadFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
+        $dlURL = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_URL");
         if (!empty($dlURL)) {
             $parts = parse_url($dlURL);
             if($parts['scheme']) {
@@ -76,6 +80,9 @@ class PublicAccessManager
         }
     }
 
+    /**
+     * @return string
+     */
     public function computeMinisiteToServerURL()
     {
         $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
@@ -88,7 +95,7 @@ class PublicAccessManager
      * @return string
      */
     public function getPublicDownloadFolder(){
-        return ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        return ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
     }
 
     /**
@@ -96,8 +103,8 @@ class PublicAccessManager
      * @return string|null
      */
     public function getPublicDownloadUrl(){
-        $downloadFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
-        $dlURL = ConfService::getCoreConf("PUBLIC_DOWNLOAD_URL");
+        $downloadFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
+        $dlURL = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_URL");
         if (!empty($dlURL)) {
             $parts = parse_url($dlURL);
             if($parts['scheme']) {

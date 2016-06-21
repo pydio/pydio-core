@@ -32,7 +32,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PHPCLI extends AbstractTest
 {
+    /**
+     * PHPCLI constructor.
+     */
     public function __construct() { parent::__construct("PHP Command Line", "Testing PHP command line (default is php)"); }
+
+    /**
+     * @return bool
+     */
     public function doTest()
     {
         if (!is_writable(AJXP_CACHE_DIR)) {
@@ -64,7 +71,7 @@ class PHPCLI extends AbstractTest
             }
         }
 
-        $defaultCli = ConfService::getCoreConf("CLI_PHP");
+        $defaultCli = ConfService::getGlobalConf("CLI_PHP");
         if($defaultCli == null) $defaultCli = "php";
 
         $token = md5(time());
@@ -120,6 +127,7 @@ class PHPCLI extends AbstractTest
                 $this->failedInfo = "Php command line detected, this will allow to send some tasks in background. Enable it in the Pydio Core Options";
             }
         } else {
+            $log = "";
             if (is_file($logFile)) {
                 $log = file_get_contents($logFile);
                 unlink($logFile);

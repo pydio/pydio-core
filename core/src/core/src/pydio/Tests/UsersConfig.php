@@ -27,17 +27,25 @@ use Pydio\Core\Services\UsersService;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * Gather the users configuration
- * @package Pydio
- * @subpackage Tests
+ * Class UsersConfig
+ * @package Pydio\Tests
  */
 class UsersConfig extends AbstractTest
 {
+    /**
+     * UsersConfig constructor.
+     */
     public function __construct() { parent::__construct("Users Configuration", "Current config for users"); }
+
+    /**
+     * Perform the test, should be overwritten in concrete classes
+     * @abstract
+     * @return Boolean
+     */
     public function doTest()
     {
         $this->testedParams["Users enabled"] = UsersService::usersEnabled();
-        $this->testedParams["Guest enabled"] = ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth");
+        $this->testedParams["Guest enabled"] = ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth");
         $this->failedLevel = "info";
         return FALSE;
     }

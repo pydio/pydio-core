@@ -113,13 +113,14 @@ class AuthService
         // Successful login attempt
         BruteForceHelper::setBruteForceLoginArray($loginAttempt, true);
 
+        $user = UsersService::getUserById($user_id, false);
+        
         // Setting session credentials if asked in config
-        if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
+        if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
             list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
             AJXP_Safe::storeCredentials($authId, $authPwd);
         }
 
-        $user = UsersService::getUserById($user_id, false);
 
         if ($user->getLock() === "logout") {
             AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
@@ -171,7 +172,7 @@ class AuthService
             AJXP_Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
             //if(isSet(self::$currentUser)) unset(self::$currentUser);
-            if (ConfService::getCoreConf("SESSION_SET_CREDENTIALS", "auth")) {
+            if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
                 AJXP_Safe::clearCredentials();
             }
             Controller::applyHook("user.after_disconnect", array(Context::emptyContext(), $userId));

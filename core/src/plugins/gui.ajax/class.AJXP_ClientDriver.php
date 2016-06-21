@@ -41,19 +41,29 @@ use Zend\Diactoros\Response\JsonResponse;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * User Interface main implementation
- * @package AjaXplorer_Plugins
- * @subpackage Gui
+ * Class AJXP_ClientDriver
+ * @package Pydio\Gui\Ajax
  */
 class AJXP_ClientDriver extends Plugin
 {
     private static $loadedBookmarks;
 
+    /**
+     * @return bool
+     */
     public function isEnabled()
     {
         return true;
     }
 
+    /**
+     * Load the configs passed as parameter. This method will
+     * + Parse the config definitions and load the default values
+     * + Merge these values with the $configData parameter
+     * + Publish their value in the manifest if the global_param is "exposed" to the client.
+     * @param array $configData
+     * @return void
+     */
     public function loadConfigs($configData)
     {
         parent::loadConfigs($configData);
@@ -113,7 +123,7 @@ class AJXP_ClientDriver extends Plugin
         }
 
         $root = parse_url($request->getServerParams()['REQUEST_URI'], PHP_URL_PATH);
-        $configUrl = ConfService::getCoreConf("SERVER_URL");
+        $configUrl = ConfService::getGlobalConf("SERVER_URL");
         if(!empty($configUrl)){
             $root = '/'.ltrim(parse_url($configUrl, PHP_URL_PATH), '/');
             if(strlen($root) > 1) $root = rtrim($root, '/').'/';
@@ -360,7 +370,7 @@ class AJXP_ClientDriver extends Plugin
         self::filterXml($customIcon);
         $config["customWording"] = array(
             "welcomeMessage" => $this->getContextualOption($ctx, "CUSTOM_WELCOME_MESSAGE"),
-            "title"			 => ConfService::getCoreConf("APPLICATION_TITLE"),
+            "title"			 => ConfService::getGlobalConf("APPLICATION_TITLE"),
             "icon"			 => $customIcon,
             "iconWidth"		 => $this->getContextualOption($ctx, "CUSTOM_ICON_WIDTH"),
             "iconHeight"     => $this->getContextualOption($ctx, "CUSTOM_ICON_HEIGHT"),

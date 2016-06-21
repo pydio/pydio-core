@@ -282,7 +282,7 @@ class Utils
      */
     public static function getAjxpTmpDir()
     {
-        $conf = ConfService::getCoreConf("AJXP_TMP_DIR");
+        $conf = ConfService::getGlobalConf("AJXP_TMP_DIR");
         if (!empty($conf)) {
             return $conf;
         }
@@ -588,7 +588,7 @@ class Utils
      */
     public static function detectServerURL($withURI = false)
     {
-        $setUrl = ConfService::getCoreConf("SERVER_URL");
+        $setUrl = ConfService::getGlobalConf("SERVER_URL");
         if (!empty($setUrl)) {
             return $setUrl;
         }
@@ -622,7 +622,7 @@ class Utils
             return "";
         }
         $repoSlug = $repository->getSlug();
-        $skipHistory = ConfService::getCoreConf("SKIP_USER_HISTORY", "conf");
+        $skipHistory = ConfService::getGlobalConf("SKIP_USER_HISTORY", "conf");
         if($skipHistory){
             $prefix = "/ws-";
         }else{
@@ -1091,6 +1091,8 @@ class Utils
 
     /**
      * Load an array stored serialized inside a file.
+     * Warning : currently does not take a context, filtering will be applied only based on global configs
+     * (AJXP_DATA_PATH, etc...). Make sure to filter the path if required (e.g. AJXP_USER) before passing it to the function.
      *
      * @param String $filePath Full path to the file
      * @param Boolean $skipCheck do not test for file existence before opening
@@ -1099,7 +1101,7 @@ class Utils
      */
     public static function loadSerialFile($filePath, $skipCheck = false, $format="ser")
     {
-        $filePath = VarsFilter::filter($filePath, Context::fromGlobalServices());
+        $filePath = VarsFilter::filter($filePath, Context::emptyContext());
         $result = array();
         if ($skipCheck) {
             $fileLines = @file($filePath);
@@ -1119,6 +1121,7 @@ class Utils
 
     /**
      * Stores an Array as a serialized string inside a file.
+     * @see loadSerialFile regarding path filtering.
      *
      * @param String $filePath Full path to the file
      * @param array|object $value The value to store
@@ -1133,7 +1136,7 @@ class Utils
         if(!in_array($format, array("ser", "json"))){
             throw new \Exception("Unsupported serialization format: ".$format);
         }
-        $filePath = VarsFilter::filter($filePath, Context::fromGlobalServices());
+        $filePath = VarsFilter::filter($filePath, Context::emptyContext());
         if ($createDir && !is_dir(dirname($filePath))) {
             @mkdir(dirname($filePath), 0755, true);
             if (!is_dir(dirname($filePath))) {
@@ -1530,6 +1533,13 @@ class Utils
     }
 
     private static $_dibiParamClean = array();
+
+    /**
+     * @param $params
+     * @return array|mixed
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public static function cleanDibiDriverParameters($params)
     {
         if(!is_array($params)) return $params;
@@ -1550,7 +1560,7 @@ class Utils
             }
             foreach ($params as $k => $v) {
                 $explode = explode("_", $k, 2);
-                $params[array_pop($explode)] = VarsFilter::filter($v, Context::fromGlobalServices());
+                $params[array_pop($explode)] = VarsFilter::filter($v, Context::emptyContext());
                 unset($params[$k]);
             }
         }
@@ -1567,6 +1577,11 @@ class Utils
         return $params;
     }
 
+    /**
+     * @param $p
+     * @param $file
+     * @return string
+     */
     public static function runCreateTablesQuery($p, $file)
     {
 

@@ -283,7 +283,7 @@ class ShareStore {
         }
 
         // Get hardcoded files
-        $files = glob(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
+        $files = glob(ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
         if($files === false) return $dbLets;
         foreach ($files as $file) {
             if(basename($file) == "share.php") continue;

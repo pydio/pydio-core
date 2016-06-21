@@ -27,6 +27,10 @@ use Pydio\Core\Utils\VarsFilter;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class LocaleService
+ * @package Pydio\Core\Services
+ */
 class LocaleService
 {
     /**
@@ -52,6 +56,9 @@ class LocaleService
         return self::$instance;
     }
 
+    /**
+     * LocaleService constructor.
+     */
     private function __construct(){
         $this->cache["AVAILABLE_LANG"] = LocaleService::listAvailableLanguages();
     }
@@ -82,7 +89,7 @@ class LocaleService
     {
         $lang = self::getInstance()->currentLanguage;
         if ($lang == null) {
-            $lang = ConfService::getInstance()->getCoreConf("DEFAULT_LANGUAGE");
+            $lang = ConfService::getInstance()->getGlobalConf("DEFAULT_LANGUAGE");
         }
         if (empty($lang)) return "en";
         return $lang;

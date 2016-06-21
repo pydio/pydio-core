@@ -26,6 +26,10 @@ use Pydio\Log\Core\AJXP_Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class BruteForceHelper
+ * @package Pydio\Core\Utils
+ */
 class BruteForceHelper
 {
 
@@ -89,7 +93,7 @@ class BruteForceHelper
         } else $login = array("count" => 1, "time" => time());
         $loginArray[$serverAddress] = $login;
         if ($login["count"] > 3) {
-            if (AJXP_SERVER_DEBUG || ConfService::getCoreConf("DISABLE_BRUTE_FORCE_CHECK", "auth") === true) {
+            if (AJXP_SERVER_DEBUG || ConfService::getGlobalConf("DISABLE_BRUTE_FORCE_CHECK", "auth") === true) {
                 AJXP_Logger::debug("Warning: failed login 3 time from address $serverAddress, but ignored because captcha is disabled.");
                 return true;
             }

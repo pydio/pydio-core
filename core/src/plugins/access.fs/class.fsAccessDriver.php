@@ -61,6 +61,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 // This is used to catch exception while downloading
 if (!function_exists('download_exception_handler')) {
+    /**
+     * @param $exception
+     */
     function download_exception_handler($exception){}
 }
 /**
@@ -133,6 +136,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
+    /**
+     * @param String $path
+     * @return string
+     */
     public function getResourceUrl($path)
     {
         return $this->urlBase.$path;
@@ -277,11 +284,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
-    protected function getNodesDiffArray()
-    {
-        return ["REMOVE" => [], "ADD" => [], "UPDATE" => []];
-    }
-
+    /**
+     * @param $selection
+     * @return array|string
+     */
     public function addSlugToPath($selection)
     {
         if (is_array($selection))
@@ -303,10 +309,19 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $files;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param $message
+     * @param $code
+     */
     protected function writeUploadError(ServerRequestInterface &$request, $message, $code){
         $request = $request->withAttribute("upload_process_result", ["ERROR" => ["CODE" => $code, "MESSAGE" => $message]]);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param $nodeData
+     */
     protected function writeUploadSuccess(ServerRequestInterface &$request, $nodeData){
         $arr = array_merge(["SUCCESS" => true], $nodeData);
         $request = $request->withAttribute("upload_process_result", $arr);
@@ -423,7 +438,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if (isSet($httpVars["urlencoded_filename"])) {
                     $userfile_name = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
                 }
-                $userfile_name = substr($userfile_name, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+                $userfile_name = substr($userfile_name, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                 if (isSet($httpVars["auto_rename"])) {
                     $userfile_name = self::autoRenameForDest($destination, $userfile_name);
                 }
@@ -579,7 +594,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection, $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new PydioException("Error while compressing");
-                    if(!ConfService::getCoreConf("USE_XSENDFILE")  && !ConfService::getCoreConf("USE_XACCELREDIRECT")){
+                    if(!ConfService::getContextConf($ctx, "USE_XSENDFILE")  && !ConfService::getContextConf($ctx, "USE_XACCELREDIRECT")){
                         register_shutdown_function("unlink", $file);
                     }
                     $localName = (empty($base)?"Files":$base).".zip";
@@ -1002,7 +1017,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $messages = [];
                 $errors = [];
-                $max_length = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
+                $max_length = ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH");
                 foreach($files as $newDirPath){
                     $parentDir = Utils::safeDirname($newDirPath);
                     $basename = Utils::safeBasename($newDirPath);
@@ -1053,7 +1068,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $parent = rtrim(Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME), "/");
                     $filename = $parent ."/" . Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
                 }
-                $filename = substr($filename, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+                $filename = substr($filename, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden($ctx, [$filename]);
                 $node = $selection->nodeForPath($filename);
                 $content = "";
@@ -1436,6 +1451,13 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     }
 
+    /**
+     * @param $nodes
+     * @param $path
+     * @param $orderField
+     * @param $orderDirection
+     * @return array
+     */
     protected function orderNodes($nodes, $path, $orderField, $orderDirection){
 
         usort($nodes, "strcasecmp");
@@ -1460,6 +1482,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     }
 
+    /**
+     * @param $optionString
+     * @return array
+     */
     public function parseLsOptions($optionString)
     {
         // LS OPTIONS : dz , a, d, z, all of these with or without l
@@ -1660,7 +1686,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $already_existed;
 
     }
-    
+
+    /**
+     * @param AJXP_Node $dirNode
+     * @param bool $foldersOnly
+     * @param bool $nonEmptyCheckOnly
+     * @param null $dirHANDLE
+     * @return int
+     * @throws \Exception
+     */
     public function countChildren(AJXP_Node $dirNode, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHANDLE = null)
     {
         $dirName = $dirNode->getUrl();
@@ -1697,12 +1731,24 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $count;
     }
 
+    /**
+     * @param $file
+     * @return int
+     */
     public function date_modif($file)
     {
         $tmp = @filemtime($file) or 0;
         return $tmp;// date("d,m L Y H:i:s",$tmp);
     }
 
+    /**
+     * @param $crtUrlBase
+     * @param $status
+     * @param $data
+     * @param null $taskId
+     * @return int
+     * @throws \Exception
+     */
     public function extractArchiveItemPreCallback($crtUrlBase, $status, $data, $taskId = null){
         $fullname = $data['filename'];
         $size = $data['size'];
@@ -1720,6 +1766,15 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return 1;
     }
 
+    /**
+     * @param $crtUrlBase
+     * @param $status
+     * @param $data
+     * @param null $taskId
+     * @return int
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function extractArchiveItemPostCallback($crtUrlBase, $status, $data, $taskId = null){
         $fullname = $data['filename'];
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($crtUrlBase);
@@ -1844,7 +1899,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
         if(!empty($filename_new)){
             $filename_new=  Utils::sanitize(TextEncoder::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
-            $filename_new = substr($filename_new, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+            $filename_new = substr($filename_new, 0, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
         }
 
         if (empty($filename_new) && empty($dest)) {
@@ -1876,6 +1931,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
     }
 
+    /**
+     * @param $destination
+     * @param $fileName
+     * @return string
+     */
     public static function autoRenameForDest($destination, $fileName)
     {
         if(!is_file($destination."/".$fileName)) return $fileName;
@@ -2020,6 +2080,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return null;
     }
 
+    /**
+     * @param $origFile
+     * @param $destFile
+     * @return bool
+     */
     public function simpleCopy($origFile, $destFile)
     {
         return copy($origFile, $destFile);
@@ -2109,7 +2174,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
-        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+        $zipEncoding = ConfService::getContextConf($selection->getContext(), "ZIP_ENCODING");
 
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
@@ -2131,7 +2196,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
         $this->logDebug("Pathes", $filePaths);
         $archive = new PclZip($dest);
-        $zipEncoding = ConfService::getCoreConf("ZIP_ENCODING");
+        $zipEncoding = ConfService::getContextConf($selection->getContext(), "ZIP_ENCODING");
         $fsEncoding = TextEncoder::getEncoding();
         $ctx = $selection->getContext();
 
@@ -2167,6 +2232,11 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
 
+    /**
+     * @param $dirName
+     * @param $hardPurgeTime
+     * @param int $softPurgeTime
+     */
     public function recursivePurge($dirName, $hardPurgeTime, $softPurgeTime = 0)
     {
         $handle=opendir($dirName);
@@ -2211,6 +2281,10 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
     }
 
+    /**
+     * @param $fileName
+     * @throws \Exception
+     */
     private function purge($fileName)
     {
         $node = new AJXP_Node($fileName);
@@ -2236,6 +2310,12 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         return $data;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param array $httpVars
+     * @return array
+     * @throws \Exception
+     */
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
         $repository = $ctx->getRepository();

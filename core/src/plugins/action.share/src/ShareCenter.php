@@ -316,7 +316,7 @@ class ShareCenter extends Plugin
             }
             $this->shareStore = new ShareStore(
                 $context,
-                ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"),
+                ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"),
                 $hMin
             );
         }
@@ -1325,7 +1325,7 @@ class ShareCenter extends Plugin
                 self::loadPubliclet($data);
             }
         }else{
-            $setUrl = ConfService::getCoreConf("SERVER_URL");
+            $setUrl = ConfService::getGlobalConf("SERVER_URL");
             $data = array();
             if (!empty($setUrl)) {
                 $data["AJXP_APPLICATION_BASE"] = $setUrl;
@@ -1496,7 +1496,7 @@ class ShareCenter extends Plugin
                 null
             );
             $gPath = $loggedUser->getGroupPath();
-            if (!empty($gPath) && !ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf")) {
+            if (!empty($gPath) && !ConfService::getContextConf($this->currentContext, "CROSSUSERS_ALLGROUPS", "conf")) {
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);

@@ -31,6 +31,10 @@ use Pydio\Log\Core\AJXP_Logger;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class RepositoryService
+ * @package Pydio\Core\Services
+ */
 class RepositoryService
 {
     private $cache = [];
@@ -53,6 +57,9 @@ class RepositoryService
         return self::$instance;
     }
 
+    /**
+     * RepositoryService constructor.
+     */
     private function __construct(){
 
         if (is_file(AJXP_CONF_PATH."/bootstrap_repositories.php")) {
@@ -80,7 +87,7 @@ class RepositoryService
         if (!$userObject->canSee($repositoryObject)) {
             return false;
         }
-        if ($repositoryObject->isTemplate) {
+        if ($repositoryObject->isTemplate()) {
             return false;
         }
         if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
@@ -112,8 +119,9 @@ class RepositoryService
             }
             if ($userObject != null && $repositoryObject->hasOwner() && !$userObject->hasParent()) {
                 // Display the repositories if allow_crossusers is ok
-                if(ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") === false
-                    || ConfService::getCoreConf("ALLOW_CROSSUSERS_SHARING", "conf") === 0) {
+                $fakeCtx = Context::contextWithObjects($userObject, $repositoryObject);
+                if(ConfService::getContextConf($fakeCtx, "ALLOW_CROSSUSERS_SHARING", "conf") === false
+                    || ConfService::getContextConf($fakeCtx, "ALLOW_CROSSUSERS_SHARING", "conf") === 0) {
                     return false;
                 }
                 // But still do not display its own shared repositories!
@@ -185,7 +193,7 @@ class RepositoryService
                 else if ($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
                 else if ($key == "display") $comp = $repoObject->getDisplay();
                 else if ($key == "accessType") $comp = $repoObject->getAccessType();
-                else if ($key == "isTemplate") $comp = $repoObject->isTemplate;
+                else if ($key == "isTemplate") $comp = $repoObject->isTemplate();
                 else if ($key == "slug") $comp = $repoObject->getSlug();
                 else if ($key == "groupPath") $comp = $repoObject->getGroupPath();
                 if (is_array($value) && in_array($comp, $value)) {

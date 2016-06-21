@@ -75,17 +75,17 @@ class CliRunner
         $logFile = $logDir . "/" . $token . ".out";
 
         if (UsersService::usersEnabled()) {
-            $cKey = ConfService::getCoreConf("AJXP_CLI_SECRET_KEY", "conf");
+            $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
             if (empty($cKey)) {
                 $cKey = "\1CDAFx¨op#";
             }
             $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($token . $cKey), $user, MCRYPT_MODE_ECB));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
-        $cmd = ConfService::getCoreConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
+        $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
         /* Inserted next 3 lines to quote the command if in windows - rmeske*/
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            $cmd = ConfService::getCoreConf("CLI_PHP") . " " . chr(34) . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php" . chr(34) . " -u=$user -t=$token -a=$actionName -r=$repositoryId";
+            $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . chr(34) . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php" . chr(34) . " -u=$user -t=$token -a=$actionName -r=$repositoryId";
         }
         if (!empty($statusFile)) {
             $cmd .= " -s=" . $statusFile;
@@ -132,7 +132,7 @@ class CliRunner
     {
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
             if (AJXP_SERVER_DEBUG) $cmd .= " > " . $logFile;
-            if (class_exists("COM") && ConfService::getCoreConf("CLI_USE_COM")) {
+            if (class_exists("COM") && ConfService::getGlobalConf("CLI_USE_COM")) {
                 $WshShell = new COM("WScript.Shell");
                 $WshShell->Run("cmd /C $cmd", 0, false);
             } else {

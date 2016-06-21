@@ -79,12 +79,14 @@ class LegacyPubliclet
     }
 
 
-
     /**
+     * @param ContextInterface $ctx
      * @param string $shareId
+     * @param $shareMeta
      * @param ShareStore $shareStore
      * @param PublicAccessManager $publicAccessManager
      * @param MetaWatchRegister|null $watcher
+     * @param $node
      * @return array|false
      * @throws \Exception
      */
@@ -139,10 +141,12 @@ class LegacyPubliclet
      * @param ShareCenter $shareCenter
      * @param ShareStore $shareStore
      * @param ShareRightsManager $shareRightManager
+     * @param bool $dryRun
+     * @throws \Pydio\Core\Exception\UserNotFoundException
      */
     public static function migrateLegacyMeta(ContextInterface $ctx, $shareCenter, $shareStore, $shareRightManager, $dryRun = true){
         $metaStoreDir = AJXP_DATA_PATH."/plugins/metastore.serial";
-        $publicFolder = ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER");
+        $publicFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
         // TODO 1: Check all metastores of all repositories?
         // TODO 2: load $publicFolder/.ajxp_publiclet_counters.ser and reassign download counts
         $metastores = glob($metaStoreDir."/ajxp_meta_0");
@@ -247,7 +251,7 @@ class LegacyPubliclet
                                         null
                                     );
                                     $gPath = $userObject->getGroupPath();
-                                    if (!empty($gPath) && !ConfService::getCoreConf("CROSSUSERS_ALLGROUPS", "conf")) {
+                                    if (!empty($gPath) && !ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS", "conf")) {
                                         $newRepo->setGroupPath($gPath);
                                     }
                                     $newRepo->setDescription("");

@@ -346,15 +346,15 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      */
     public function sendMail(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
     {
-        $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
-        $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
-        $layoutFolder = ConfService::getCoreConf("LAYOUT_FOLDER", "mailer");
-        $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
-        $forceFrom = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
-        $coreFrom = ConfService::getCoreConf("FROM", "mailer");
+        $prepend = ConfService::getContextConf($ctx, "SUBJECT_PREPEND", "mailer");
+        $append = ConfService::getContextConf($ctx, "SUBJECT_APPEND", "mailer");
+        $layoutFolder = ConfService::getContextConf($ctx, "LAYOUT_FOLDER", "mailer");
+        $layout = ConfService::getContextConf($ctx, "BODY_LAYOUT", "mailer");
+        $forceFrom = ConfService::getContextConf($ctx, "FORCE_UNIQUE_FROM", "mailer");
+        $coreFrom = ConfService::getContextConf($ctx, "FROM", "mailer");
 
         if($forceFrom && $coreFrom != null){
-            $coreFromName = ConfService::getCoreConf("FROM_NAME", "mailer");
+            $coreFromName = ConfService::getContextConf($ctx, "FROM_NAME", "mailer");
             $from = array("adress" => $coreFrom, "name" => $coreFromName);
         }
         $rowBody = $body;
@@ -466,8 +466,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             if(count($arr)) $fromResult = $arr[0];
         }
         if (!count($fromResult)) {
-            $f = ConfService::getCoreConf("FROM", "mailer");
-            $fName = ConfService::getCoreConf("FROM_NAME", "mailer");
+            $f = ConfService::getContextConf($ctx, "FROM", "mailer");
+            $fName = ConfService::getContextConf($ctx, "FROM_NAME", "mailer");
             $fromResult = array("adress" => $f, "name" => $fName );
         }
         return $fromResult;

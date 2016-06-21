@@ -57,11 +57,11 @@ class JumploaderProcessor extends Plugin
 
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        $confMaxSize = StatHelper::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+        $confMaxSize = StatHelper::convertBytes(ConfService::getContextConf($ctx, "UPLOAD_MAX_SIZE", "uploader"));
         $UploadMaxSize = min(StatHelper::convertBytes(ini_get('upload_max_filesize')), StatHelper::convertBytes(ini_get('post_max_size')));
         if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
-        $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
-        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+        $confTotalSize = ConfService::getContextConf($ctx, "UPLOAD_MAX_SIZE_TOTAL", "uploader");
+        $confTotalNumber = ConfService::getContextConf($ctx, "UPLOAD_MAX_NUMBER", "uploader");
 
         $repository = $ctx->getRepository();
         $accessType = $repository->getAccessType();
@@ -375,7 +375,7 @@ class JumploaderProcessor extends Plugin
                 foreach ($subs as $key => $spath) {
                     $messtmp="";
                     $dirname=Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
-                    $dirname = substr($dirname, 0, ConfService::getCoreConf("NODENAME_MAX_LENGTH"));
+                    $dirname = substr($dirname, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
                     if (StatHelper::isHidden($dirname)) {
                         $folderForbidden = true;

@@ -220,7 +220,7 @@ class UsersService
      */
     public static function usersEnabled()
     {
-        return ConfService::getCoreConf("ENABLE_USERS", "auth");
+        return ConfService::getGlobalConf("ENABLE_USERS", "auth");
     }
 
     /**
@@ -241,7 +241,7 @@ class UsersService
      */
     public static function filterUserSensitivity($user)
     {
-        if (!ConfService::getCoreConf("CASE_SENSITIVE", "auth")) {
+        if (!ConfService::getGlobalConf("CASE_SENSITIVE", "auth")) {
             return strtolower($user);
         } else {
             return $user;
@@ -254,7 +254,7 @@ class UsersService
      */
     public static function ignoreUserCase()
     {
-        return !ConfService::getCoreConf("CASE_SENSITIVE", "auth");
+        return !ConfService::getGlobalConf("CASE_SENSITIVE", "auth");
     }
 
     /**
@@ -278,7 +278,7 @@ class UsersService
      */
     public static function userExists($userId, $mode = "r")
     {
-        if ($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) {
+        if ($userId == "guest" && !ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth")) {
             return false;
         }
         $userId = self::filterUserSensitivity($userId);
@@ -312,7 +312,7 @@ class UsersService
      */
     public static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
     {
-        if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
+        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
         $userId = self::filterUserSensitivity($userId);
         $authDriver = ConfService::getAuthDriverImpl();
         if ($cookieString) {
@@ -336,7 +336,7 @@ class UsersService
      */
     public static function updatePassword($userId, $userPass)
     {
-        if (strlen($userPass) < ConfService::getCoreConf("PASSWORD_MINLENGTH", "auth")) {
+        if (strlen($userPass) < ConfService::getGlobalConf("PASSWORD_MINLENGTH", "auth")) {
             $messages = LocaleService::getMessages();
             throw new \Exception($messages[378]);
         }
@@ -348,7 +348,7 @@ class UsersService
         Controller::applyHook("user.after_password_change", array($ctx, $userId));
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             // We can directly update the HA1 version of the WEBDAV Digest
-            $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
+            $realm = ConfService::getGlobalConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $zObj = self::getUserById($userId);
             $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
@@ -376,7 +376,7 @@ class UsersService
         $userId = self::filterUserSensitivity($userId);
         $localContext = new Context($userId, null);
         Controller::applyHook("user.before_create", array($localContext, $userId, $userPass, $isAdmin, $isHidden));
-        if (!ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
+        if (!ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new \Exception("Reserved user id");
         }
         $authDriver = ConfService::getAuthDriverImpl();
@@ -391,7 +391,7 @@ class UsersService
             $user->save("superuser");
         }
         if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $realm = ConfService::getCoreConf("WEBDAV_DIGESTREALM");
+            $realm = ConfService::getGlobalConf("WEBDAV_DIGESTREALM");
             $ha1 = md5("{$userId}:{$realm}:{$userPass}");
             $wData = $user->getPref("AJXP_WEBDAV_DATA");
             if (!is_array($wData)) $wData = array();
@@ -543,7 +543,7 @@ class UsersService
 
         RolesService::enableRolesCache(true);
         foreach (array_keys($users) as $userId) {
-            if (($userId == "guest" && !ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
+            if (($userId == "guest" && !ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth")) || $userId == "ajxp.admin.users" || $userId == "") continue;
             if ($regexp != null && !$authDriver->supportsUsersPagination() && !preg_match("/$regexp/i", $userId)) continue;
             $allUsers[$userId] = self::getUserById($userId);
             $index++;

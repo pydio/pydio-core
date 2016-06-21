@@ -176,10 +176,10 @@ class FileReaderResponse extends AsyncResponseStream
         if(!$data === null && !file_exists($filePathOrData)){
             throw new \Exception("File $filePathOrData not found!");
         }
-        $confGzip               = ConfService::getCoreConf("GZIP_COMPRESSION");
-        $confGzipLimit          = ConfService::getCoreConf("GZIP_LIMIT");
-        $confUseXSendFile       = ConfService::getCoreConf("USE_XSENDFILE");
-        $confUseXAccelRedirect  = ConfService::getCoreConf("USE_XACCELREDIRECT");
+        $confGzip               = ConfService::getGlobalConf("GZIP_COMPRESSION");
+        $confGzipLimit          = ConfService::getGlobalConf("GZIP_LIMIT");
+        $confUseXSendFile       = ConfService::getGlobalConf("USE_XSENDFILE");
+        $confUseXAccelRedirect  = ConfService::getGlobalConf("USE_XACCELREDIRECT");
         $fakeReq = ServerRequestFactory::fromGlobals();
         $serverParams = $fakeReq->getServerParams();
 

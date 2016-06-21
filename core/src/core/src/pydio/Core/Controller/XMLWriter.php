@@ -259,7 +259,7 @@ class XMLWriter
             //$xml = str_replace("AJXP_THEME_FOLDER", AJXP_THEME_FOLDER, $xml);
             $xml = str_replace("AJXP_SERVER_ACCESS", AJXP_SERVER_ACCESS, $xml);
         }
-        $xml = str_replace("AJXP_APPLICATION_TITLE", ConfService::getCoreConf("APPLICATION_TITLE"), $xml);
+        $xml = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $xml);
         $xml = str_replace("AJXP_MIMES_EDITABLE", StatHelper::getAjxpMimes("editable"), $xml);
         $xml = str_replace("AJXP_MIMES_IMAGE", StatHelper::getAjxpMimes("image"), $xml);
         $xml = str_replace("AJXP_MIMES_AUDIO", StatHelper::getAjxpMimes("audio"), $xml);
@@ -427,7 +427,7 @@ class XMLWriter
     public static function triggerBgJSAction($jsCode, $messageId, $print=true, $delay = 0)
     {
            $data = XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);
-        $data .= XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
+            $data .= XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
            $data .= XMLWriter::write("</trigger_bg_action>", $print);
            return $data;
        }

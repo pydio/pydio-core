@@ -97,6 +97,10 @@ class MqManager extends Plugin
     }
 
 
+    /**
+     * @param AJXP_Notification $notification
+     * @throws Exception
+     */
     public function sendToQueue(AJXP_Notification $notification)
     {
         if (!$this->useQueue) {
@@ -112,6 +116,13 @@ class MqManager extends Plugin
         }
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws Exception
+     */
     public function consumeQueue($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         if($action != "consume_notification_queue" || $this->msgExchanger === false) return;
@@ -131,7 +142,7 @@ class MqManager extends Plugin
      */
     public function publishNodeChange($origNode = null, $newNode = null, $copy = false)
     {
-        $content = "";$repo = "";$targetUserId=null; $nodePathes = array();
+        $content = "";$targetUserId=null; $nodePathes = array();
         $update = false;
         $ctx = null;
         if ($newNode != null) {
@@ -164,6 +175,13 @@ class MqManager extends Plugin
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $xmlContent
+     * @param null $targetUserId
+     * @param null $targetGroupPath
+     * @param array $nodePathes
+     */
     public function sendInstantMessage(ContextInterface $ctx, $xmlContent, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
     {
         $currentUser = $ctx->getUser();
@@ -229,6 +247,10 @@ class MqManager extends Plugin
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $content
+     */
     public function sendTaskMessage(ContextInterface $ctx, $content){
 
         $this->logInfo("Core.mq", "Should now publish a message to NSQ :". json_encode($content));
@@ -251,6 +273,10 @@ class MqManager extends Plugin
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param ResponseInterface $responseInterface
+     */
     public function appendRefreshInstruction(ContextInterface $ctx, ResponseInterface &$responseInterface){
         if(! $this->hasPendingMessage ){
             return;
@@ -345,6 +371,11 @@ class MqManager extends Plugin
         }
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws Exception
+     */
     public function wsAuthenticate(ServerRequestInterface $request, ResponseInterface &$response)
     {
         $this->logDebug("Entering wsAuthenticate");
@@ -378,6 +409,11 @@ class MqManager extends Plugin
 
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws Exception
+     */
     public function switchWorkerOn($params)
     {
         $wDir = $this->getPluginWorkDir(true);
@@ -391,7 +427,7 @@ class MqManager extends Plugin
                 throw new Exception("Worker seems to already be running!");
             }
         }
-        $cmd = ConfService::getCoreConf("CLI_PHP")." worker.php";
+        $cmd = ConfService::getGlobalConf("CLI_PHP")." worker.php";
         chdir(AJXP_INSTALL_PATH);
         $process = CliRunner::runCommandInBackground($cmd, AJXP_CACHE_DIR . "/cmd_outputs/worker.log");
         if ($process != null) {
@@ -402,15 +438,28 @@ class MqManager extends Plugin
         return "SUCCESS: Started worker Server";
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws Exception
+     */
     public function switchWorkerOff($params){
         return $this->switchOff($params, "worker");
     }
 
+    /**
+     * @param $params
+     * @return string
+     */
     public function getWorkerStatus($params){
         return $this->getStatus($params, "worker");
     }
 
     // Handler testing the generation of the caddy file to spot any error
+    /**
+     * @param $params
+     * @return string
+     */
     public function getCaddyFile($params) {
         $error = "OK";
 
@@ -428,6 +477,10 @@ class MqManager extends Plugin
         return $error;
     }
 
+    /**
+     * @param $params
+     * @return string
+     */
     public function generateCaddyFile($params) {
         $data = "";
 
@@ -490,6 +543,11 @@ class MqManager extends Plugin
         return $data;
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws Exception
+     */
     public function saveCaddyFile($params) {
         $data = $this->generateCaddyFile($params);
 
@@ -502,6 +560,11 @@ class MqManager extends Plugin
         return $caddyFile;
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws Exception
+     */
     public function switchCaddyOn($params) {
 
         $caddyFile = $this->saveCaddyFile($params);
@@ -520,7 +583,7 @@ class MqManager extends Plugin
 
         chdir($wDir);
 
-        $cmd = "env TMPDIR=/tmp ". ConfService::getCoreConf("CLI_PYDIO")." -conf ".$caddyFile . " 2>&1 | tee pydio.out";
+        $cmd = "env TMPDIR=/tmp ". ConfService::getGlobalConf("CLI_PYDIO")." -conf ".$caddyFile . " 2>&1 | tee pydio.out";
 
         $process = CliRunner::runCommandInBackground($cmd, null);
         if ($process != null) {
@@ -531,14 +594,29 @@ class MqManager extends Plugin
         return "SUCCESS: Started WebSocket Server";
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws Exception
+     */
     public function switchCaddyOff($params){
         return $this->switchOff($params, "caddy");
     }
 
+    /**
+     * @param $params
+     * @return string
+     */
     public function getCaddyStatus($params){
         return $this->getStatus($params, "caddy");
     }
 
+    /**
+     * @param $params
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
     public function switchOff($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
@@ -555,6 +633,12 @@ class MqManager extends Plugin
         return "SUCCESS: Killed $type Server";
     }
 
+    /**
+     * @param $params
+     * @param string $type
+     * @return string
+     * @throws Exception
+     */
     public function getStatus($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);

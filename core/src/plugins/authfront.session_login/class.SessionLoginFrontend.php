@@ -69,7 +69,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
             return true;
         }
 
-        if (ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
+        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
 
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {
@@ -143,7 +143,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend {
 
         if ($loggedUser != null) {
 
-            if(ConfService::getCoreConf("ALLOW_GUEST_BROWSING", "auth")){
+            if(ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth")){
                 ConfService::getInstance()->invalidateLoadedRepositories();
             }
 

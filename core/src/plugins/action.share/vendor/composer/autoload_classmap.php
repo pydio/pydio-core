@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'Pydio\\Share\\Legacy\\LegacyPubliclet' => $baseDir . '/src/Legacy/LegacyPubliclet.php',
-    'Pydio\\Share\\Legacy\\PublicletCounter' => $baseDir . '/src/Legacy/PublicletCounter.php',
     'Pydio\\Share\\Model\\CompositeShare' => $baseDir . '/src/Model/CompositeShare.php',
     'Pydio\\Share\\Model\\ShareLink' => $baseDir . '/src/Model/ShareLink.php',
     'Pydio\\Share\\ShareCenter' => $baseDir . '/src/ShareCenter.php',
