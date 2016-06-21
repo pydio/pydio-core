@@ -311,7 +311,7 @@ class RepositoryService
      * Replace a repository by an update one.
      *
      * @param String $oldId
-     * @param \Pydio\Access\Core\Model\Repository $oRepositoryObject
+     * @param RepositoryInterface $oRepositoryObject
      * @return mixed
      */
     public static function replaceRepository($oldId, $oRepositoryObject)
@@ -458,7 +458,7 @@ class RepositoryService
     /**
      * See static method
      * @param string $oldId
-     * @param Repository $oRepositoryObject
+     * @param RepositoryInterface $oRepositoryObject
      * @return int
      */
     private function replaceRepositoryInst($oldId, $oRepositoryObject)

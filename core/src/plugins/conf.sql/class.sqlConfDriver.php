@@ -27,6 +27,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Exception\DBConnectionException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Conf\Core\AbstractConfDriver;
@@ -112,6 +113,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param string $pluginId
+     * @param array $options
+     */
     public function _loadPluginConfig($pluginId, &$options)
     {
         if($this->sqlDriver["driver"] == "postgre"){
@@ -162,7 +167,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      *
      * @param $result DibiResult of a dibi::query() as array
      * @param array|DibiResult $options_result Result of dibi::query() for options as array
-     * @return Repository object
+     * @return RepositoryInterface object
      */
     public function repoFromDb($result, $options_result = Array())
     {
@@ -199,7 +204,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * Convert a repository object to an array, which will be stored in the database.
      *
-     * @param $repository \Pydio\Access\Core\Model\Repository
+     * @param $repository RepositoryInterface
      * @return array containing row values, and another array with the key "options" to be stored as repo options.
      */
     public function repoToArray($repository)
@@ -219,7 +224,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 'options'                   => $repository->options,
                 'groupPath'                 => $repository->getGroupPath(),
                 'slug'		                => $repository->getSlug(),
-                'isTemplate'                => (bool) $repository->isTemplate,
+                'isTemplate'                => (bool) $repository->isTemplate(),
                 'inferOptionsFromParent'    => $repository->getInferOptionsFromParent()
         );
 
@@ -278,7 +283,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
 
     /**
      * @param AJXP_Role $role
-     * @return \Pydio\Access\Core\Model\Repository[]
+     * @return RepositoryInterface[]
      */
     public function listRepositoriesForRole($role){
         $acls = $role->listAcls();
@@ -356,7 +361,7 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Get repository by Unique ID (a hash calculated from the serialised object).
      *
      * @param String $repositoryId hash uuid
-     * @return \Pydio\Access\Core\Model\Repository object
+     * @return RepositoryInterface object
      */
     public function getRepositoryById($repositoryId)
     {
@@ -368,14 +373,18 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * Retrieve a Repository given its alias.
      *
      * @param String $repositorySlug
-     * @return \Pydio\Access\Core\Model\Repository
+     * @return RepositoryInterface
      */
     public function getRepositoryByAlias($repositorySlug)
     {
         return $this->_loadRepository("slug", $repositorySlug);
     }
 
-
+    /**
+     * @param $slugOrAlias
+     * @param $value
+     * @return RepositoryInterface|null
+     */
     protected function _loadRepository($slugOrAlias, $value){
         if($this->sqlDriver["driver"] == "postgre"){
             dibi::nativeQuery("SET bytea_output=escape");
@@ -521,7 +530,12 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return 1;
     }
 
-    public function getUserChildren( $userId )
+    /**
+     * @abstract
+     * @param $userId
+     * @return AbstractAjxpUser[]
+     */
+    public function getUserChildren($userId )
     {
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] WHERE [ajxp_user_rights.login]=[ajxp_users.login] AND [ajxp_user_rights.repo_uuid] = 'ajxp.hidden')";
         $children = array();
@@ -632,6 +646,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $allRoles;
     }
 
+    /**
+     * @param $roleId
+     * @param bool $countOnly
+     * @return \DibiRow[]|mixed
+     */
     public function getUsersForRole($roleId, $countOnly = false) {
         if($countOnly){
             $res =  dibi::query("SELECT count([login]) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] LIKE %~like~", "ajxp.roles", '"'.$roleId.'";b:1');
@@ -705,6 +724,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
 
+    /**
+     * @param array $roleIds
+     * @param bool $excludeReserved
+     * @return array
+     */
     public function listRoles($roleIds = array(), $excludeReserved = false)
     {
         $wClauses = array();
@@ -827,6 +851,9 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $res->fetchSingle();
     }
 
+    /**
+     * @return mixed
+     */
     public function countAdminUsers()
     {
         $rows = dibi::query("SELECT COUNT(*) FROM [ajxp_user_rights] WHERE [repo_uuid] = %s AND [rights] = %s", "ajxp.admin", "1");
@@ -873,12 +900,20 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param string $groupPath
+     * @param string $groupLabel
+     */
     public function relabelGroup($groupPath, $groupLabel)
     {
         dibi::query("UPDATE [ajxp_groups] SET [groupLabel]=%s WHERE [groupPath]=%s", $groupLabel, $groupPath);
     }
 
 
+    /**
+     * @param $groupPath
+     * @throws \Exception
+     */
     public function deleteGroup($groupPath)
     {
         // Delete users of this group, as well as subgroups
@@ -949,6 +984,14 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $storeID
+     * @param $dataID
+     * @param $data
+     * @param string $dataType
+     * @param null $relatedObjectId
+     * @throws \Exception
+     */
     public function simpleStoreSet($storeID, $dataID, $data, $dataType = "serial", $relatedObjectId = null)
     {
         $values = array(
@@ -970,11 +1013,22 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $dataID, $storeID, $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
     }
 
+    /**
+     * @param $storeID
+     * @param $dataID
+     */
     public function simpleStoreClear($storeID, $dataID)
     {
         dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id]=%s", $storeID, $dataID);
     }
 
+    /**
+     * @param $storeID
+     * @param $dataID
+     * @param $dataType
+     * @param $data
+     * @return bool
+     */
     public function simpleStoreGet($storeID, $dataID, $dataType, &$data)
     {
         if($this->sqlDriver["driver"] == "postgre"){
@@ -996,6 +1050,15 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $storeId
+     * @param null $cursor
+     * @param string $dataIdLike
+     * @param string $dataType
+     * @param string $serialDataLike
+     * @param string $relatedObjectId
+     * @return array
+     */
     public function simpleStoreList($storeId, $cursor=null, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId=""){
         $wheres = array();
         $wheres[] = array('[store_id]=%s', $storeId);
@@ -1027,6 +1090,10 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $result;
     }
 
+    /**
+     * @param $context
+     * @return string
+     */
     protected function binaryContextToStoreID($context)
     {
         $storage = "binaries";
@@ -1144,6 +1211,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
 
+    /**
+     * @param array $param
+     * @return string
+     * @throws \Exception
+     */
     public function installSQLTables($param)
     {
         $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
@@ -1157,11 +1229,18 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $res;
     }
 
+    /**
+     * @return bool
+     */
     public function supportsUserTeams()
     {
         return true;
     }
 
+    /**
+     * @param UserInterface $parentUser
+     * @return array
+     */
     public function listUserTeams(UserInterface $parentUser)
     {
         dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
@@ -1178,6 +1257,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $all;
     }
 
+    /**
+     * @param UserInterface $parentUser
+     * @param $teamId
+     * @return array
+     */
     public function teamIdToUsers(UserInterface $parentUser, $teamId)
     {
         if(empty($parentUser)) {
@@ -1196,6 +1280,12 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         return $res;
     }
 
+    /**
+     * @param UserInterface $parentUser
+     * @param $teamId
+     * @param $userId
+     * @param null $teamLabel
+     */
     private function addUserToTeam(UserInterface $parentUser, $teamId, $userId, $teamLabel = null)
     {
         if ($teamLabel == null) {
@@ -1208,6 +1298,12 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         );
     }
 
+    /**
+     * @param UserInterface $parentUser
+     * @param $teamId
+     * @param $users
+     * @param null $teamLabel
+     */
     private function editTeamUsers(UserInterface $parentUser, $teamId, $users, $teamLabel = null)
     {
         if ($teamLabel == null) {
@@ -1225,6 +1321,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param UserInterface $parentUser
+     * @param $teamId
+     * @param null $userId
+     */
     private function removeUserFromTeam(UserInterface $parentUser, $teamId, $userId = null)
     {
         if ($userId == null) {
@@ -1238,6 +1339,13 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function userTeamsActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         switch ($actionName) {
@@ -1285,6 +1393,11 @@ class sqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     }
 
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     */
     public function ajxpTableExists($actionName, $httpVars, $fileVars){
 
         $p = $this->sqlDriver;

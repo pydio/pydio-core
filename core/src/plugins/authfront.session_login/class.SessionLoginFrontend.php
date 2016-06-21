@@ -32,6 +32,9 @@ use Pydio\Core\Utils\CaptchaProvider;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
+/**
+ * Class SessionLoginFrontend
+ */
 class SessionLoginFrontend extends AbstractAuthFrontend {
 
     /**

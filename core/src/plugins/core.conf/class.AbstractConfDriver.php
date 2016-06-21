@@ -35,6 +35,7 @@ use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
@@ -264,7 +265,7 @@ abstract class AbstractConfDriver extends Plugin
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
      * @param AbstractAjxpUser $user
-     * @return \Pydio\Access\Core\Model\Repository[]
+     * @return RepositoryInterface[]
      */
     abstract public function listRepositories($user = null);
 
@@ -277,7 +278,7 @@ abstract class AbstractConfDriver extends Plugin
      *      - ORDERBY = array("KEY"=>"", "DIR"=>""), GROUPBY, CURSOR = array("OFFSET" => 0, "LIMIT", 30)
      *      - COUNT_ONLY
      * @param $count int fill this integer with a count
-     * @return \Pydio\Access\Core\Model\Repository[]
+     * @return RepositoryInterface[]
      */
     abstract public function listRepositoriesWithCriteria($criteria, &$count=null);
 
@@ -286,20 +287,20 @@ abstract class AbstractConfDriver extends Plugin
      * Retrieve a Repository given its unique ID.
      *
      * @param String $repositoryId
-     * @return \Pydio\Access\Core\Model\Repository
+     * @return RepositoryInterface
      */
     abstract public function getRepositoryById($repositoryId);
     /**
      * Retrieve a Repository given its alias.
      *
      * @param String $repositorySlug
-     * @return \Pydio\Access\Core\Model\Repository
+     * @return RepositoryInterface
      */
     abstract public function getRepositoryByAlias($repositorySlug);
     /**
      * Stores a repository, new or not.
      *
-     * @param \Pydio\Access\Core\Model\Repository $repositoryObject
+     * @param RepositoryInterface $repositoryObject
      * @param Boolean $update
      * @return -1 if failed
      */

@@ -33,6 +33,7 @@ use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\AuthService;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
@@ -159,6 +160,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     );
 
 
+    /**
+     * Do not display AJXP_GRP_/ and AJXP_USR_/ roles if not in server debug mode
+     * @param $key
+     * @return bool
+     */
     protected function filterReservedRoles($key){
         return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
     }
@@ -219,6 +225,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $actions;
     }
 
+    /**
+     * List actions
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     */
     public function listAllActions($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $loggedUser = $ctx->getUser();
@@ -360,6 +373,11 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
+    /**
+     * Bookmark any page for the admin interface
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
     public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response)
     {
 
@@ -433,7 +451,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
-
+    /**
+     * Search users
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     */
     public function searchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         if(! Utils::decodeSecureMagic($httpVars["dir"]) == "/data/users") return;
@@ -447,6 +471,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
+    /**
+     * Called internally to populate left menu
+     * @param ContextInterface $ctx
+     * @return array
+     * @throws \Exception
+     */
     protected function getMainTree(ContextInterface $ctx){
         $rootNodes = $this->rootNodes;
         $user = $ctx->getUser();
@@ -460,6 +490,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $rootNodes;
     }
 
+    /**
+     * Render a bookmark node
+     * @param $path
+     * @param $data
+     * @param $messages
+     */
     protected function renderNode($path, $data, $messages){
         if(isSet($messages[$data["LABEL"]])) $data["LABEL"] = $messages[$data["LABEL"]];
         if(isSet($messages[$data["DESCRIPTION"]])) $data["DESCRIPTION"] = $messages[$data["DESCRIPTION"]];
@@ -491,6 +527,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         XMLWriter::close();
     }
 
+    /**
+     * Main switch for actions
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws UserNotFoundException
+     * @throws \Exception
+     */
     public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         //parent::accessPreprocess($action, $httpVars, $fileVars);
@@ -701,7 +746,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $role = $userObject->getPersonalRole();
                 } else {
                     if($roleGroup){
-                        $role = RolesService::getOrCreateRole($roleId, $this->currentContext->hasUser() ? $this->currentContext->getUser()->getGroupPath() : "/");
+                        $role = RolesService::getOrCreateRole($roleId, $ctx->hasUser() ? $ctx->getUser()->getGroupPath() : "/");
                     }else{
                         $role = RolesService::getRole($roleId);
                     }
@@ -891,7 +936,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 } else {
                     // second param = create if not exists.
                     if($roleGroup){
-                        $originalRole = RolesService::getOrCreateRole($roleId, $this->currentContext->hasUser() ? $this->currentContext->getUser()->getGroupPath() : "/");
+                        $originalRole = RolesService::getOrCreateRole($roleId, $ctx->hasUser() ? $ctx->getUser()->getGroupPath() : "/");
                     }else{
                         $originalRole = RolesService::getRole($roleId);
                     }
@@ -1530,6 +1575,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                                 if($metaPlug == null) continue;
                                 $pNodes = $metaPlug->getManifestRawContent("//param[@default]", "nodes");
                                 $defaultParams = array();
+                                /** @var \DOMElement $domNode */
                                 foreach ($pNodes as $domNode) {
                                     $defaultParams[$domNode->getAttribute("name")] = $domNode->getAttribute("default");
                                 }
@@ -1592,9 +1638,9 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     throw new \Exception("You are not allowed to edit this workspace!");
                 }
                 $pServ = PluginsService::getInstance($ctx);
-                $plug = $pServ->getPluginById("access.".$repository->accessType);
+                $plug = $pServ->getPluginById("access.".$repository->getAccessType());
                 if ($plug == null) {
-                    throw new \Exception("Cannot find access driver (".$repository->accessType.") for workspace!");
+                    throw new \Exception("Cannot find access driver (".$repository->getAccessType().") for workspace!");
                 }
                 XMLWriter::header("admin_data");
                 $slug = $repository->getSlug();
@@ -1646,7 +1692,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         }
                     }
                     // Add SLUG
-                    if(!$repository->isTemplate) print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
+                    if(!$repository->isTemplate()) print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
                     if ($repository->getGroupPath() != null) {
                         $groupPath = $repository->getGroupPath();
                         if($currentAdminBasePath != "/") $groupPath = substr($repository->getGroupPath(), strlen($currentAdminBasePath));
@@ -1659,7 +1705,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 }
                 if ($repository->hasParent()) {
                     $parent = RepositoryService::getRepositoryById($repository->getParentId());
-                    if (isSet($parent) && $parent->isTemplate) {
+                    if (isSet($parent) && $parent->isTemplate()) {
                         $parentLabel = $parent->getDisplay();
                         $parentType = $parent->getAccessType();
                         print("<template repository_id=\"".$repository->getParentId()."\" repository_label=\"$parentLabel\" repository_type=\"$parentType\">");
@@ -1677,11 +1723,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
                     $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
                 }
-                print("<ajxpdriver name=\"".$repository->accessType."\" label=\"".Utils::xmlEntities($plug->getManifestLabel())."\" iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" description=\"".Utils::xmlEntities($plug->getManifestDescription())."\">$manifest</ajxpdriver>");
+                print("<ajxpdriver name=\"".$repository->getAccessType()."\" label=\"".Utils::xmlEntities($plug->getManifestLabel())."\" iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" description=\"".Utils::xmlEntities($plug->getManifestDescription())."\">$manifest</ajxpdriver>");
                 print("<metasources>");
                 $metas = $pServ->getPluginsByType("metastore");
                 $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
                 $metas = array_merge($metas, $pServ->getPluginsByType("index"));
+                /** @var Plugin $metaPlug */
                 foreach ($metas as $metaPlug) {
                     print("<meta id=\"".$metaPlug->getId()."\" label=\"".Utils::xmlEntities($metaPlug->getManifestLabel())."\" description=\"".Utils::xmlEntities($metaPlug->getManifestDescription())."\">");
                     $manifest = $metaPlug->getManifestRawContent("server_settings/param");
@@ -1690,7 +1737,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     print("</meta>");
                 }
                 print("</metasources>");
-                if(!$repository->isTemplate){
+                if(!$repository->isTemplate()){
                     print "<additional_info>";
                     $users = UsersService::countUsersForRepository($ctx, $repId, false, true);
                     $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", null, "", "serial", '', $repId);
@@ -1745,7 +1792,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = array();
                     $existing = $repo->getOptionsDefined();
                     $existingValues = array();
-                    if(!$repo->isTemplate){
+                    if(!$repo->isTemplate()){
                         foreach($existing as $exK) {
                             $existingValues[$exK] = $repo->getSafeOption($exK);
                         }
@@ -1773,7 +1820,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                             $repo->addOption($key, $value);
                         }
                     }
-                    if($repo->isTemplate){
+                    if($repo->isTemplate()){
                         foreach($existing as $definedOption){
                             if($definedOption == "META_SOURCES" || $definedOption == "CREATION_TIME" || $definedOption == "CREATION_USER"){
                                 continue;
@@ -2039,6 +2086,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 $addParams = "";
                 $instancesDefinitions = array();
                 $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
+                /** @var \DOMElement $pInstNode */
                 foreach ($pInstNodes as $pInstNode) {
                     $type = $pInstNode->getAttribute("type");
                     $instType = str_replace("plugin_instance:", "", $type);
@@ -2192,7 +2240,17 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return;
     }
 
-
+    /**
+     * List available plugins
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @param string $file
+     * @param null $aliasedDir
+     * @return array
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false, $file="", $aliasedDir=null)
     {
         $dir = "/$dir";
@@ -2242,6 +2300,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             $all =  $first = "";
             foreach ($uniqTypes as $type) {
                 if(!isset($types[$type])) continue;
+                /** @var Plugin $pObject */
                 foreach ($types[$type] as $pObject) {
                     $isMain = ($pObject->getId() == "core.ajaxplorer");
                     $meta = array(
@@ -2277,6 +2336,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
             <column messageId="ajxp_conf.105" attributeName="can_active" sortType="String" defaultWidth="10%"/>
             </columns>');
             $mess = LocaleService::getMessages();
+            /** @var Plugin $pObject */
             foreach ($types[$type] as $pObject) {
                 $errors = "OK";
                 try {
@@ -2302,6 +2362,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * List users for a given group
+     * @param $root
+     * @param $child
+     * @param null $hashValue
+     * @param bool $returnNodes
+     * @param null $findNodePosition
+     * @return array
+     */
     public function listUsers($root, $child, $hashValue = null, $returnNodes = false, $findNodePosition=null)
     {
         $USER_PER_PAGE = 50;
@@ -2490,6 +2559,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * List Roles
+     * @param $root
+     * @param $child
+     * @param null $hashValue
+     * @param bool $returnNodes
+     * @return array
+     */
     public function listRoles($root, $child, $hashValue = null, $returnNodes = false)
     {
         $allNodes = array();
@@ -2567,6 +2644,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return strcasecmp($a->getDisplay(), $b->getDisplay());
     }
 
+    /**
+     * Get label for an access.* plugin
+     * @param $pluginId
+     * @param $labels
+     * @return mixed|string
+     */
     protected function getDriverLabel($pluginId, &$labels){
         if(isSet($labels[$pluginId])){
             return $labels[$pluginId];
@@ -2582,6 +2665,16 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     }
 
 
+    /**
+     * List all workspaces
+     * @param $root
+     * @param $child
+     * @param null $hashValue
+     * @param bool $returnNodes
+     * @param string $file
+     * @param null $aliasedDir
+     * @param $httpVars
+     */
     public function listRepositories($root, $child, $hashValue = null, $returnNodes = false, $file="", $aliasedDir=null, $httpVars){
         $REPOS_PER_PAGE = 50;
         $allNodes = array();
@@ -2698,7 +2791,15 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
 
     }
 
-
+    /**
+     * List actions
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @return array
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function listActions($dir, $root = NULL, $hash = null, $returnNodes = false)
     {
         $allNodes = array();
@@ -2731,6 +2832,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
                 <column messageId="ajxp_conf.103" attributeName="actions" sortType="String"/>
             </columns>');
+            /** @var Plugin $pObject */
             foreach ($types[$type] as $pObject) {
                 $actions = $pObject->getManifestRawContent("//action/@name", "xml", true);
                 $actLabel = array();
@@ -2761,6 +2863,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                 <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
                 <column messageId="ajxp_conf.103" attributeName="parameters" sortType="String" fixedWidth="30%"/>
             </columns>');
+            /** @var Plugin $pObject */
             $pObject = $types[$type][$name];
 
             $actions = $pObject->getManifestRawContent("//action", "xml", true);
@@ -2770,6 +2873,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $xPath = new DOMXPath($node->ownerDocument);
                     $callbacks = $xPath->query("processing/serverCallback", $node);
                     if(!$callbacks->length) continue;
+                    /** @var \DOMElement $callback */
                     $callback = $callbacks->item(0);
 
                     $actName = $actLabel = $node->attributes->getNamedItem("name")->nodeValue;
@@ -2791,6 +2895,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     }
                     if ($params->length) {
                         $paramLabel[] = "Expected Parameters :";
+                        /** @var \DOMElement $param */
                         foreach ($params as $param) {
                             $paramLabel[]= '. ['.$param->getAttribute("type").'] <b>'.$param->getAttribute("name").($param->getAttribute("mandatory") == "true" ? '*':'').'</b> : '.$param->getAttribute("description");
                         }
@@ -2820,6 +2925,13 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @return array
+     */
     public function listHooks($dir, $root = NULL, $hash = null, $returnNodes = false)
     {
         $jsonContent = json_decode(file_get_contents(Utils::getHooksFile()), true);
@@ -2857,6 +2969,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * List all log files
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @return array
+     */
     public function listLogFiles($dir, $root = NULL, $hash = null, $returnNodes = false)
     {
         $dir = "/$dir";
@@ -2894,6 +3014,14 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * Output the tests results
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @return array
+     */
     public function printDiagnostic($dir, $root = NULL, $hash = null, $returnNodes = false)
     {
         $outputArray = array();
@@ -2916,6 +3044,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return $allNodes;
     }
 
+    /**
+     * Reorder meta sources 
+     * @param $key1
+     * @param $key2
+     * @return int
+     */
     public function metaSourceOrderingFunction($key1, $key2)
     {
         $a1 = explode(".", $key1);
@@ -2977,6 +3111,10 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         $this->mergeExistingParameters($options, $existingValues);
     }
 
+    /**
+     * @param array $parsed
+     * @param array $existing
+     */
     protected function mergeExistingParameters(&$parsed, $existing){
         foreach($parsed as $k => &$v){
             if($v === "__AJXP_VALUE_SET__" && isSet($existing[$k])){
@@ -2987,6 +3125,12 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         }
     }
 
+    /**
+     * @param $result
+     * @param $definitions
+     * @param $values
+     * @param string $parent
+     */
     public function flattenKeyValues(&$result, &$definitions, $values, $parent = "")
     {
         foreach ($values as $key => $value) {
@@ -3022,6 +3166,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
     {
         $nodeList = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
         $xmlBuffer = "";
+        /** @var \DOMElement $node */
         foreach ($nodeList as $node) {
             $dName = $node->getAttribute("name");
             if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
