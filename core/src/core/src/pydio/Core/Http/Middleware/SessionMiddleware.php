@@ -40,6 +40,7 @@ class SessionMiddleware
             $cookies = $requestInterface->getCookieParams();
             if (!isSet($cookies[$sessionName])) {
                 $cookies[$sessionName] = $getParams[PYDIO_SESSION_QUERY_PARAM];
+                $_COOKIE[$sessionName] = $getParams[PYDIO_SESSION_QUERY_PARAM];
                 $requestInterface = $requestInterface->withCookieParams($cookies);
             }
         }
