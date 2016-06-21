@@ -19,16 +19,20 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Cache\Core;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Utils\Utils;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -128,36 +132,57 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
     }
 
     /**
+     * Hooked to workspace.after_update event
+     * @param ContextInterface $ctx
      * @param Repository $repositoryObject
      */
-    public function clearWorkspaceNodeInfos($repositoryObject){
+    public function onWorkspaceUpdate(ContextInterface $ctx, $repositoryObject){
+        $this->clearWorkspaceCache($repositoryObject->getId());
+    }
+
+    /**
+     * Hooked to workspace.after_delete event
+     * @param ContextInterface $ctx
+     * @param string $repositoryId
+     */
+    public function onWorkspaceDelete(ContextInterface $ctx, $repositoryId){
+        $this->clearWorkspaceCache($repositoryId);
+    }
+
+    /**
+     * Util to clear all caches (node.info, stat, list) for a workspace (any users).
+     * @param $repositoryId
+     */
+    private function clearWorkspaceCache($repositoryId){
         $cDriver = ConfService::getCacheDriverImpl();
         if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
             return;
         }
-        $node = new AJXP_Node("pydio://".$repositoryObject->getId()."/");
-        $node->setLeaf(false);
-        $this->clearCacheForNode($node);
+        $cDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeFullRepositoryId($repositoryId, "node.info"));
+        $cDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeFullRepositoryId($repositoryId, "stat"));
+        $cDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeFullRepositoryId($repositoryId, "list"));
     }
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     protected function clearCacheForNode($node){
+        $cacheDriver = ConfService::getCacheDriverImpl();
+        if($cacheDriver === null) {
+            return;
+        }
+        // Clear meta for this node
+        $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
+        $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
         if($node->isLeaf()){
-            // Clear meta
-            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
-            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
             // Clear stat
-            CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
             // Clear parent listing
             if($node->getParent() !== null){
-                CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+                $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
             }
         }else {
-            $cacheDriver = ConfService::getCacheDriverImpl();
-            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
-            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+            // Delete node data and all its children
             $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
             if($node->getParent() !== null){
                 $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
@@ -176,7 +201,11 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
         return AbstractCacheDriver::computeIdForNode($node, "node.info", $details?"all":"short");
     }
 
-    public function exposeCacheStats($actionName, $httpVars, $fileVars){
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function exposeCacheStats(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
         $cImpl = $this->getImplementation();
         $result = [];
@@ -188,21 +217,23 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
                 $result[] = $data;
             }
         }
-        \Pydio\Core\Controller\HTMLWriter::charsetHeader("application/json");
-        echo json_encode($result);
+        $responseInterface = new JsonResponse($result);
 
     }
 
-    public function clearCacheByNS($actionName, $httpVars, $fileVars){
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function clearCacheByNS(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
-        $ns = \Pydio\Core\Utils\Utils::sanitize($httpVars["namespace"], AJXP_SANITIZE_ALPHANUM);
+        $ns = Utils::sanitize($requestInterface->getParsedBody()["namespace"], AJXP_SANITIZE_ALPHANUM);
         if($ns == AJXP_CACHE_SERVICE_NS_SHARED){
             ConfService::clearAllCaches();
         }else{
             CacheService::deleteAll($ns);
         }
-        HTMLWriter::charsetHeader("text/json");
-        echo json_encode(["result"=>"ok"]);
+        $responseInterface = new JsonResponse(["result"=>"ok"]);
 
     }
 

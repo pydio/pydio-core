@@ -63,6 +63,9 @@ abstract class AbstractCacheDriver extends Plugin
     abstract public function getCacheDriver($namespace=AJXP_CACHE_SERVICE_NS_SHARED);
 
     /**
+     * Compute a cache ID for a given node. Will be in the form
+     * cacheType://repositoryId/userSepcificKey|shared/nodePath[##detail]
+     *
      * @param AJXP_Node $node
      * @param string $cacheType
      * @param string $details
@@ -71,19 +74,34 @@ abstract class AbstractCacheDriver extends Plugin
     public static function computeIdForNode($node, $cacheType, $details = ''){
         $ctx = $node->getContext();
         $repo = $node->getRepository();
-        $user = $ctx->getUser();
         if($repo == null) return "failed-id";
         $scope = $repo->securityScope();
-        $additional = "";
-        if($scope === "USER"){
-            $additional = ($user!==null ? $user->getId() : "shared")."@";
+        $userId = $node->getUserId();
+        // Compute second segment
+        if($userId === "*"){
+            $subPath = "";
+        }else if($scope === "USER"){
+            $subPath = "/".$userId;
         }else if($scope == "GROUP"){
             $gPath = "/";
+            $user = $ctx->getUser();
             if($user !== null) $gPath = $user->getGroupPath();
-            $additional =  ltrim(str_replace("/", "__", $gPath), "__")."@";
+            $subPath =  "/".ltrim(str_replace("/", "__", $gPath), "__");
+        }else{
+            $subPath = "/shared";
         }
-        $scheme = parse_url($node->getUrl(), PHP_URL_SCHEME);
-        return str_replace($scheme . "://", $cacheType."://".$additional, $node->getUrl()).($details?"##".$details:"");
+        $ID = $cacheType."://".$repo->getId().$subPath.$node->getPath().($details?"##$details":"");
+        return $ID;
+    }
+
+    /**
+     * Same as computeIdForNode but maybe used if a repository has been deleted
+     * @param $repositoryId
+     * @param $cacheType
+     * @return string
+     */
+    public static function computeFullRepositoryId($repositoryId, $cacheType){
+        return $ID = $cacheType."://".$repositoryId."/";
     }
 
     /**
