@@ -38,20 +38,65 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class PluploadProcessor
+ */
 class PluploadProcessor extends Plugin
 {
-// 15 minutes execution time
-//@set_time_limit(15 * 60);
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
+    public function getTemplate(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface){
 
-// Uncomment this one to fake upload time
-// usleep(5000);
+        /** @var \Pydio\Core\Model\ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $UploadMaxSize = StatHelper::convertBytes(ini_get('upload_max_filesize'));
+        $UploadMaxPostSize = StatHelper::convertBytes(ini_get('post_max_size'));
+        if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
+        $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
+        if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
 
+        $pluginConfigs = $this->getConfigs();
+        $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
+        $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");
+
+        $repository = $ctx->getRepository();
+        $accessType = $repository->getAccessType();
+        if($accessType == "fs"){
+            $partitionLength = $UploadMaxSize - 1000;
+        }else if($accessType == "remotefs"){
+            $maxFileLength = $UploadMaxSize;
+        }else if($accessType == "ftp"){
+            $maxFileLength = $UploadMaxSize;
+        }
+
+        $minisite_session = "";
+        if(strpos(session_name(), "AjaXplorer_Shared") === 0) {
+            $minisite_session = "&minisite_session=" . substr(session_name(), strlen("AjaXplorer_Shared"));
+        }
+        $secureToken = $requestInterface->getParsedBody()["secure_token"];
+        include($this->getBaseDir()."/pluploader_tpl.html");
+
+    }
+
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\ActionNotFoundException
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
     public function unifyChunks($action, &$httpVars, &$fileVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
 

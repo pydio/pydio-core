@@ -11,6 +11,11 @@
     </server_settings>
 	<registry_contributions>
 		<actions>
+            <action name="jumploader_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
+                </processing>
+            </action>
 			<action name="upload">
 				<pre_processing>
 					<serverCallback methodName="preProcess"/>
@@ -35,8 +40,11 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=jumploader_tpl&encode=false';
         modal.getForm().down('#jumpframe').src = src;
 		]]></dialogOnOpen>
+        <activeCondition><![CDATA[
+            return navigator.javaEnabled();
+        ]]></activeCondition>
 	</processing>
 </uploader>

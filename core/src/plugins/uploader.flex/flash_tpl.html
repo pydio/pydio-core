@@ -1,19 +1,3 @@
-<?php 
-use Pydio\Core\Utils\Utils as AJXP_Utils;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\PluginFramework\PluginsService as AJXP_PluginsService;
-
-    $confMaxSize = AJXP_Utils::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
-	$UploadMaxSize = min(AJXP_Utils::convertBytes(ini_get('upload_max_filesize')), AJXP_Utils::convertBytes(ini_get('post_max_size')));
-	if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
-	$confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
-    $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
-    $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
-    $maxLength = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
-    
-	$FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
-	$pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "flex")->getConfigs();
-?>
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	

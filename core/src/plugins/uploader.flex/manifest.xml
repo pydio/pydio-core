@@ -11,6 +11,11 @@
 	</server_settings>
 	<registry_contributions>
 		<actions>
+            <action name="flex_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
+                </processing>
+            </action>
 			<action name="upload">
 				<pre_processing>
 					<serverCallback methodName="preProcess"/>
@@ -35,7 +40,7 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=flex_tpl&encode=false';
         modal.getForm().down('#flashframe').src = src;
 		]]></dialogOnOpen>
 		<activeCondition><![CDATA[

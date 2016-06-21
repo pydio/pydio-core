@@ -22,7 +22,9 @@
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,6 +37,30 @@ class FlexUploadProcessor extends Plugin
 {
     private static $active = false;
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     */
+    public function getTemplate(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response){
+
+        $confMaxSize = StatHelper::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+        $UploadMaxSize = min(StatHelper::convertBytes(ini_get('upload_max_filesize')), StatHelper::convertBytes(ini_get('post_max_size')));
+        if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+        $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+        $maxLength = ConfService::getCoreConf("NODENAME_MAX_LENGTH");
+
+        $FlashVar = '&totalUploadSize='.$confTotalSize.'&fileSizeLimit='.$UploadMaxSize.'&maxFileNumber='.$confTotalNumber.'&maxFilenameLength='.$maxLength;
+        $pluginConfigs = $this->getConfigs();
+        include($this->getBaseDir()."/flash_tpl.html");
+
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     */
     public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
         /** @var ContextInterface $ctx */
@@ -69,6 +95,11 @@ class FlexUploadProcessor extends Plugin
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @throws Exception
+     */
     public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
         if (!self::$active) {

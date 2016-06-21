@@ -23,6 +23,11 @@
                     <serverCallback methodName="unifyChunks"/>
                 </processing>
             </action>
+            <action name="plupload_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
+                </processing>
+            </action>
         </actions>
     </registry_contributions>
     <dependencies>
@@ -39,7 +44,7 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=pluploader_tpl.html&pluginName=uploader.plupload&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=plupload_tpl&encode=false';
         modal.getForm().down('#pluploadframe').src = src;
 		]]></dialogOnOpen>
 	</processing>

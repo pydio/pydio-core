@@ -22,6 +22,7 @@
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\StatHelper;
@@ -41,13 +42,47 @@ class JumploaderProcessor extends Plugin
     /**
      * Handle UTF8 Decoding
      *
-     * @var unknown_type
+     * @var bool
      */
     private static $skipDecoding = false;
     private static $remote = false;
     private static $wrapperIsRemote = false;
     private static $partitions = array();
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     */
+    public function getTemplate(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response){
+
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $confMaxSize = StatHelper::convertBytes(ConfService::getCoreConf("UPLOAD_MAX_SIZE", "uploader"));
+        $UploadMaxSize = min(StatHelper::convertBytes(ini_get('upload_max_filesize')), StatHelper::convertBytes(ini_get('post_max_size')));
+        if($confMaxSize != 0) $UploadMaxSize = min ($UploadMaxSize, $confMaxSize);
+        $confTotalSize = ConfService::getCoreConf("UPLOAD_MAX_SIZE_TOTAL", "uploader");
+        $confTotalNumber = ConfService::getCoreConf("UPLOAD_MAX_NUMBER", "uploader");
+
+        $repository = $ctx->getRepository();
+        $accessType = $repository->getAccessType();
+
+        $partitionLength = $UploadMaxSize - 1000;
+
+        if($accessType == "remotefs"){
+            $maxFileLength = $UploadMaxSize;
+        }else if($accessType == "ftp"){
+            $partitionLength = $UploadMaxSize - 1000;
+        }
+
+        include($this->getBaseDir()."/jumploader_tpl.html");
+
+    }
+
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @throws Exception
+     */
     public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
         $httpVars = $request->getParsedBody();
@@ -464,6 +499,10 @@ class JumploaderProcessor extends Plugin
         }
     }
 
+    /**
+     * @param $params
+     * @return string
+     */
     public function jumploaderInstallApplet($params)
     {
         if (is_file($this->getBaseDir()."/jumploader_z.jar")) {

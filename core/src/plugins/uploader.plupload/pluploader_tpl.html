@@ -1,32 +1,3 @@
-<?php 
-use Pydio\Core\Utils\Utils as AJXP_Utils;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\PluginFramework\PluginsService as AJXP_PluginsService;
-
-    $UploadMaxSize = AJXP_Utils::convertBytes(ini_get('upload_max_filesize'));
-    $UploadMaxPostSize = AJXP_Utils::convertBytes(ini_get('post_max_size'));
-    if($UploadMaxPostSize > 0 && $UploadMaxPostSize < $UploadMaxSize) $UploadMaxSize = $UploadMaxPostSize;
-    $confMaxSize = ConfService::getConf("UPLOAD_MAX_FILE");
-    if($confMaxSize != 0 &&  $confMaxSize < $UploadMaxSize) $UploadMaxSize = $confMaxSize;
-    $confTotalSize = ConfService::getConf("UPLOAD_MAX_TOTAL");
-    $confTotalNumber = ConfService::getConf("UPLOAD_MAX_NUMBER");    
-    $pluginConfigs = AJXP_PluginsService::getInstance()->findPlugin("uploader", "plupload")->getConfigs();    
-
-	$repository = ConfService::getRepository();
-	$accessType = $repository->getAccessType();
-	if($accessType == "fs"){
-		$partitionLength = $UploadMaxSize - 1000;	
-	}else if($accessType == "remotefs"){
-		$maxFileLength = $UploadMaxSize;
-	}else if($accessType == "ftp"){
-		$maxFileLength = $UploadMaxSize;
-	}
-
-    $minisite_session = "";
-    if(strpos(session_name(), "AjaXplorer_Shared") === 0){
-    $minisite_session = "&minisite_session=".substr(session_name(), strlen("AjaXplorer_Shared"));
-    }
-?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
@@ -53,7 +24,7 @@ var maxFileLength = <?php echo ($maxFileLength?$maxFileLength:-1); ?>;
 
 var ftpUrl = '<?php echo ($ftpURL?$ftpURL:""); ?>';
 
-var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $httpVars["secure_token"];?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
+var uploadUrl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=upload_chunks_unify_plupload&secure_token=<?php echo $secureToken;?>&ajxp_sessid=<?php echo session_id().$minisite_session; ?>';
 
 var maxFileSize = '<?PHP echo ($UploadMaxSize/1048576) . "mb"; ?>';
 var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
