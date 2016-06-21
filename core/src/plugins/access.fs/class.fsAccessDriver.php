@@ -742,7 +742,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw $e;
                 }
                 @rename($tmpFNAME, $urlBase.$dir."/".$localName);
-                $newArchiveNode = $currentDirNode->getParent()->createChildNode($localName);
+                $newArchiveNode = $currentDirNode->createChildNode($localName);
                 Controller::applyHook("node.change", [null, $newArchiveNode, false], true);
                 if($taskId !== null){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Finished compression in background");
