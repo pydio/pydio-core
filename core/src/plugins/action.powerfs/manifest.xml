@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin enabled="false" label="CONF_MESSAGE[Power FS]" description="CONF_MESSAGE[This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="PowerFSController" filename="plugins/action.powerfs/class.PowerFSController.php"/>
+    <class_definition classname="Pydio\Action\Compression\PowerFSController" filename="plugins/action.powerfs/PowerFSController.php"/>
     <client_settings>
         <resources>
             <i18n namespace="powerfs" path="plugins/action.powerfs/i18n"/>

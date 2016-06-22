@@ -19,15 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Action\Skeleton;
+
+use DOMNode;
+use DOMXPath;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Simple non-fonctionnal plugin for demoing pre/post processes hooks
- * @package AjaXplorer_Plugins
- * @subpackage Action
  */
 class PluginSkeleton extends Plugin
 {
@@ -37,12 +39,12 @@ class PluginSkeleton extends Plugin
      */
     public function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        if($contribNode->nodeName != "client_configs") return;
+        if ($contribNode->nodeName != "client_configs") return;
         // This demonstrate how the tight integration of XML, PHP and JS Client make plugins programming
         // very flexible. Here if the plugin configuration SHOW_CUSTOM_FOOTER is set to false, we
         // dynamically remove some XML from the manifest before it's sent to the client, thus disabling
         // the custom footer. In the other case, we update the XML Node content with the CUSTOM_FOOTER_CONTENT
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $actionXpath = new DOMXPath($contribNode->ownerDocument);
         $footerTplNodeList = $actionXpath->query('template[@name="bottom"]', $contribNode);
         $footerTplNode = $footerTplNodeList->item(0);
         if (!$this->getContextualOption($ctx, "SHOW_CUSTOM_FOOTER")) {
@@ -50,9 +52,9 @@ class PluginSkeleton extends Plugin
         } else {
             $content = $this->getContextualOption($ctx, "CUSTOM_FOOTER_CONTENT");
             $content = str_replace("\\n", "<br>", $content);
-            $cdata = '<div id="optional_bottom_div" style="font-family:arial;padding:10px;">'.$content.'</div>';
+            $cdata = '<div id="optional_bottom_div" style="font-family:arial;padding:10px;">' . $content . '</div>';
             $cdataSection = $contribNode->ownerDocument->createCDATASection($cdata);
-            foreach($footerTplNode->childNodes as $child) $footerTplNode->removeChild($child);
+            foreach ($footerTplNode->childNodes as $child) $footerTplNode->removeChild($child);
             $footerTplNode->appendChild($cdataSection);
         }
     }

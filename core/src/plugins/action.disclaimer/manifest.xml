@@ -76,5 +76,5 @@
             </action>
         </actions>
     </registry_contributions>
-    <class_definition filename="plugins/action.disclaimer/class.DisclaimerProvider.php" classname="DisclaimerProvider"/>
+    <class_definition filename="plugins/action.disclaimer/DisclaimerProvider.php" classname="Pydio\Action\Disclaimer\DisclaimerProvider"/>
 </ajxp_plugin>

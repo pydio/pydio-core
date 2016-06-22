@@ -19,23 +19,34 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Action\Disclaimer;
+
+use Pydio\Core\Http\Middleware\SessionMiddleware;
+use Pydio\Core\Http\Middleware\SessionRepositoryMiddleware;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\UsersService;
+use Pydio\Log\Core\AJXP_Logger;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Simple implementation for forcing using to accept a disclaimer
- * @package AjaXplorer_Plugins
- * @subpackage Disclaimer
  */
 class DisclaimerProvider extends Plugin
 {
 
-    public function toggleDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
+    public function toggleDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response)
+    {
 
         $httpVars = $request->getParsedBody();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
@@ -44,29 +55,26 @@ class DisclaimerProvider extends Plugin
         $u->getPersonalRole()->setParameterValue(
             "action.disclaimer",
             "DISCLAIMER_ACCEPTED",
-            $httpVars["validate"] == "true"  ? "yes" : "no",
+            $httpVars["validate"] == "true" ? "yes" : "no",
             AJXP_REPO_SCOPE_ALL
         );
 
-        if($httpVars["validate"] == "true"){
+        if ($httpVars["validate"] == "true") {
 
             $u->removeLock();
             $u->save("superuser");
             AuthService::updateUser($u);
-            ConfService::switchUserToActiveRepository($u);
-            $force = $u->getMergedRole()->filterParameterValue("core.conf", "DEFAULT_START_REPOSITORY", AJXP_REPO_SCOPE_ALL, -1);
-            $passId = -1;
-            if ($force != "" && $u->canSwitchTo($force) && !isSet($httpVars["tmp_repository_id"]) && !isSet($_SESSION["PENDING_REPOSITORY_ID"])) {
-                $passId = $force;
-            }
-            $res = ConfService::switchUserToActiveRepository($u, $passId);
-            if (!$res) {
+            $repo = SessionRepositoryMiddleware::switchUserToRepository($u, $request);
+            if (!$repo) {
                 AuthService::disconnect();
                 throw new \Pydio\Core\Exception\AuthRequiredException();
             }
+            $ctx->setRepositoryObject($repo);
+            SessionMiddleware::updateContext($ctx);
+            AJXP_Logger::updateContext($ctx);
             ConfService::getInstance()->invalidateLoadedRepositories();
 
-        }else{
+        } else {
 
             $u->setLock("validate_disclaimer");
             $u->save("superuser");
@@ -77,13 +85,18 @@ class DisclaimerProvider extends Plugin
         }
     }
 
-    public function loadDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response){
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
+    public function loadDisclaimer(ServerRequestInterface &$request, ResponseInterface &$response)
+    {
 
         $response = $response->withHeader("Content-Type", "text/plain");
         $content = $this->getContextualOption($request->getAttribute("ctx"), "DISCLAIMER_CONTENT");
         $state = $this->getContextualOption($request->getAttribute("ctx"), "DISCLAIMER_ACCEPTED");
-        if($state == "true") $state = "yes";
-        $response->getBody()->write($state .":" . nl2br($content));
+        if ($state == "true") $state = "yes";
+        $response->getBody()->write($state . ":" . nl2br($content));
 
     }
 

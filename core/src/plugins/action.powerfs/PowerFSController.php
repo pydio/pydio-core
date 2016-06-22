@@ -19,6 +19,9 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Action\Compression;
+
+use Exception;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
 
@@ -32,6 +35,8 @@ use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Http\Message\BgActionTrigger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -42,8 +47,9 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class PowerFSController extends Plugin
 {
 
-    public function performChecks(){
-        if(class_exists("\\Pydio\\Share\\ShareCenter") && \Pydio\Share\ShareCenter::currentContextIsLinkDownload()) {
+    public function performChecks()
+    {
+        if (class_exists("\\Pydio\\Share\\ShareCenter") && \Pydio\Share\ShareCenter::currentContextIsLinkDownload()) {
             throw new Exception("Disable during link download");
         }
     }
@@ -57,25 +63,25 @@ class PowerFSController extends Plugin
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx        = $request->getAttribute("ctx");
-        $httpVars   = $request->getParsedBody();
-        $dir        = $httpVars["dir"] OR "";
-        $dir        = Utils::decodeSecureMagic($dir);
-        if($dir == "/") $dir = "";
-        $selection  = UserSelection::fromContext($ctx, $httpVars);
-        $urlBase    = $ctx->getUrlBase();
-        $mess       = LocaleService::getMessages();
+        $ctx = $request->getAttribute("ctx");
+        $httpVars = $request->getParsedBody();
+        $dir = $httpVars["dir"] OR "";
+        $dir = Utils::decodeSecureMagic($dir);
+        if ($dir == "/") $dir = "";
+        $selection = UserSelection::fromContext($ctx, $httpVars);
+        $urlBase = $ctx->getUrlBase();
+        $mess = LocaleService::getMessages();
 
         $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        if($request->getAttribute("action") != "postcompress_download"){
+        if ($request->getAttribute("action") != "postcompress_download") {
             $response = $response->withBody($bodyStream);
         }
 
         switch ($request->getAttribute("action")) {
-            
+
             case "postcompress_download":
 
-                $archive = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$httpVars["ope_id"]."_".Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archive = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
 
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
@@ -97,7 +103,7 @@ class PowerFSController extends Plugin
                 $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
                 $taskId = $request->getAttribute("pydio-task-id");
 
-                if($taskId === null){
+                if ($taskId === null) {
                     $task = TaskService::actionAsTask($ctx, $request->getAttribute("action"), $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
@@ -112,8 +118,8 @@ class PowerFSController extends Plugin
                 $replaceReplace = array("", "/");
                 foreach ($selection->getFiles() as $selectionFile) {
                     $baseFile = $selectionFile;
-                    $args[] = escapeshellarg(substr($selectionFile, strlen($dir)+($dir=="/"?0:1)));
-                    $selectionFile = fsAccessWrapper::getRealFSReference($urlBase.$selectionFile);
+                    $args[] = escapeshellarg(substr($selectionFile, strlen($dir) + ($dir == "/" ? 0 : 1)));
+                    $selectionFile = fsAccessWrapper::getRealFSReference($urlBase . $selectionFile);
                     $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
                     if (is_dir($selectionFile)) {
                         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($selectionFile), RecursiveIteratorIterator::SELF_FIRST);
@@ -121,35 +127,35 @@ class PowerFSController extends Plugin
                             $todo[] = str_replace($replaceSearch, $replaceReplace, $name);
                         }
                     }
-                    if(trim($baseFile, "/") == ""){
+                    if (trim($baseFile, "/") == "") {
                         // ROOT IS SELECTED, FIX IT
                         $args = array(escapeshellarg(basename($rootDir)));
                         $rootDir = dirname($rootDir);
                         break;
                     }
                 }
-                $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows")? "&" : ";");
-                $opeId = substr(md5(time()),0,10);
+                $cmdSeparator = ((PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") ? "&" : ";");
+                $opeId = substr(md5(time()), 0, 10);
                 $originalArchiveParam = $archiveName;
                 if ($request->getAttribute("action") == "precompress") {
-                    $archiveName = Utils::getAjxpTmpDir().DIRECTORY_SEPARATOR.$opeId."_".$archiveName;
+                    $archiveName = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
                 }
                 chdir($rootDir);
-                $cmd = $this->getContextualOption($ctx, "ZIP_PATH")." -r ".escapeshellarg($archiveName)." ".implode(" ", $args);
+                $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if ((!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) && stripos(PHP_OS, "win") === false) {
                     $cmd .= " -x .\*";
                 }
-                $cmd .= " ".$cmdSeparator." echo ZIP_FINISHED";
+                $cmd .= " " . $cmdSeparator . " echo ZIP_FINISHED";
                 $proc = popen($cmd, "r");
                 $toks = array();
                 $handled = array();
                 $finishedEchoed = false;
                 $percent = 0;
                 while (!feof($proc)) {
-                    set_time_limit (20);
+                    set_time_limit(20);
                     $results = fgets($proc, 256);
                     if (strlen($results) == 0) {
                     } else {
@@ -166,23 +172,23 @@ class PowerFSController extends Plugin
                             }
                             $tok = strtok("\n");
                         }
-                        if($finishedEchoed) $percent = 100;
-                        else $percent = min( round(count($handled) / count($todo) * 100),  100);
-                        TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Creating archive ".$percent." %", null, $percent);
+                        if ($finishedEchoed) $percent = 100;
+                        else $percent = min(round(count($handled) / count($todo) * 100), 100);
+                        TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Creating archive " . $percent . " %", null, $percent);
                     }
                     // avoid a busy wait
-                    if($percent < 100) usleep(1);
+                    if ($percent < 100) usleep(1);
                 }
                 pclose($proc);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
-                if($request->getAttribute("action") === "compress"){
-                    $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase.$dir."/".$archiveName);
+                if ($request->getAttribute("action") === "compress") {
+                    $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase . $dir . "/" . $archiveName);
                     $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
                     $nodesDiff->add($newNode);
                     Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
-                }else{
+                } else {
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
-                    $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'".$opeId."',archive_name:'".$archiveName."'}); ";
+                    $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'" . $opeId . "',archive_name:'" . $archiveName . "'}); ";
                     $actionTrigger = BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]);
                     Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML()));
 

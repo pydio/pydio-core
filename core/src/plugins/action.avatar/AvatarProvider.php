@@ -20,16 +20,16 @@
  */
 
 
+namespace Pydio\Action\Avatar;
+
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\UsersService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Simple implementation of Avatar for Gravatar / Libravatar
- * @package AjaXplorer_Plugins
- * @subpackage Avatar
  */
 class AvatarProvider extends Plugin
 {
@@ -55,7 +55,7 @@ class AvatarProvider extends Plugin
                         $url = "http://www.gravatar.com";
                     }
                     $url .= "/avatar/";
-                    $suffix .= "?s=80&r=g&d=".$type;
+                    $suffix .= "?s=80&r=g&d=" . $type;
                     break;
                 case "libravatar":
                     // Federated Servers are not supported here without libravatar.org. Should query DNS server first.
@@ -65,7 +65,7 @@ class AvatarProvider extends Plugin
                         $url = "http://cdn.libravatar.org";
                     }
                     $url .= "/avatar/";
-                    $suffix = "?s=80&d=".$type;
+                    $suffix = "?s=80&d=" . $type;
                     break;
             }
 

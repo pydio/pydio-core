@@ -96,6 +96,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @param bool $isLast
+     * @return \Psr\Http\Message\ResponseInterface|static
      */
     function logUserFromLoginAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, $isLast = false)
     {

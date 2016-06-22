@@ -19,42 +19,54 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Action\Cart;
+
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
+/**
+ * Class CartManager
+ * @package Pydio\Action\Cart
+ */
 class CartManager extends Plugin
 {
-    public function switchAction (\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws \Pydio\Core\Exception\ActionNotFoundException
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
+    public function switchAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        if($requestInterface->getAttribute("action") != "search-cart-download"){
+        if ($requestInterface->getAttribute("action") != "search-cart-download") {
             return;
         }
 
         // Pipe SEARCH + DOWNLOAD actions.
         $ctx = $requestInterface->getAttribute("ctx");
         $indexer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("index");
-        if($indexer == false) return;
+        if ($indexer == false) return;
         $httpVars = $requestInterface->getParsedBody();
         unset($httpVars["get_action"]);
         $requestInterface = $requestInterface->withAttribute("action", "search")->withParsedBody($httpVars);
         $response = Controller::run($requestInterface);
         $body = $response->getBody();
-        if($body instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
+        if ($body instanceof \Pydio\Core\Http\Response\SerializableResponseStream) {
             $chunks = $body->getChunks();
-            foreach($chunks as $chunk){
-                if($chunk instanceof \Pydio\Access\Core\Model\NodesList){
+            foreach ($chunks as $chunk) {
+                if ($chunk instanceof \Pydio\Access\Core\Model\NodesList) {
                     $res = $chunk->getChildren();
                 }
             }
         }
-        
+
 
         if (isSet($res) && is_array($res)) {
             $newHttpVars = array(
-                "selection_nodes"   => $res,
-                "dir"               => "__AJXP_ZIP_FLAT__/",
-                "archive_name"      => $httpVars["archive_name"]
+                "selection_nodes" => $res,
+                "dir" => "__AJXP_ZIP_FLAT__/",
+                "archive_name" => $httpVars["archive_name"]
             );
             $requestInterface = $requestInterface->withAttribute("action", "download")->withParsedBody($newHttpVars);
             $responseInterface = Controller::run($requestInterface);

@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Action\Compression;
+
+use Exception;
+use Phar;
+use PharData;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -33,6 +38,8 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -56,19 +63,19 @@ class PluginCompression extends Plugin
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 
-        $httpVars       = $requestInterface->getParsedBody();
-        $messages       = LocaleService::getMessages();
+        $httpVars = $requestInterface->getParsedBody();
+        $messages = LocaleService::getMessages();
 
-        $userSelection  = UserSelection::fromContext($ctx, $httpVars);
-        $nodes          = $userSelection->buildNodes();
+        $userSelection = UserSelection::fromContext($ctx, $httpVars);
+        $nodes = $userSelection->buildNodes();
         $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
-        $currentDirUrl  = $userSelection->currentBaseUrl().$currentDirPath;
-        
+        $currentDirUrl = $userSelection->currentBaseUrl() . $currentDirPath;
+
         $serializableStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($serializableStream);
 
-        switch ($requestInterface->getAttribute("action")){
+        switch ($requestInterface->getAttribute("action")) {
 
             case "compression":
 
@@ -88,7 +95,7 @@ class PluginCompression extends Plugin
                 $typeArchive = $httpVars["type_archive"];
                 $taskId = $requestInterface->getAttribute("pydio-task-id");
                 // LAUNCH IN BACKGROUND AND EXIT
-                if(empty($taskId)){
+                if (empty($taskId)) {
                     $task = TaskService::actionAsTask($ctx, "compression", $httpVars, [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.5"]);
                     $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
@@ -96,7 +103,7 @@ class PluginCompression extends Plugin
                 }
 
                 $task = TaskService::getInstance()->getTaskById($taskId);
-                $postMessageStatus = function($message, $taskStatus, $progress = null) use($task){
+                $postMessageStatus = function ($message, $taskStatus, $progress = null) use ($task) {
                     $this->operationStatus($task, $message, $taskStatus, $progress);
                 };
 
@@ -201,7 +208,7 @@ class PluginCompression extends Plugin
                     throw new PydioException($messages["compression.15"]);
                 }
                 $onlyFileName = substr($fileArchive, 0, -$extensionLength);
-                $lastPosOnlyFileName =  strrpos($onlyFileName, "-");
+                $lastPosOnlyFileName = strrpos($onlyFileName, "-");
                 $tmpOnlyFileName = substr($onlyFileName, 0, $lastPosOnlyFileName);
                 $counterDuplicate = substr($onlyFileName, $lastPosOnlyFileName + 1);
                 if (!is_int($lastPosOnlyFileName) || !is_int($counterDuplicate)) {
@@ -216,14 +223,14 @@ class PluginCompression extends Plugin
                 // LAUNCHME IN BACKGROUND
                 $taskId = $requestInterface->getAttribute("pydio-task-id");
                 // LAUNCH IN BACKGROUND AND EXIT
-                if(empty($taskId)){
+                if (empty($taskId)) {
                     $task = TaskService::actionAsTask($ctx, "extraction", $httpVars, [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.12"]);
                     $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     break;
                 }
                 $task = TaskService::getInstance()->getTaskById($taskId);
-                $postMessageStatus = function($message, $taskStatus, $progress = null) use($task){
+                $postMessageStatus = function ($message, $taskStatus, $progress = null) use ($task) {
                     $this->operationStatus($task, $message, $taskStatus, $progress);
                 };
 
@@ -234,7 +241,7 @@ class PluginCompression extends Plugin
                     $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
                     foreach ($fichiersArchive as $file) {
                         $fileGetPathName = $file->getPathname();
-                        if($file->isDir()) {
+                        if ($file->isDir()) {
                             continue;
                         }
                         $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
@@ -246,7 +253,7 @@ class PluginCompression extends Plugin
                         }
                         $counterExtract++;
                         $progress = round(($counterExtract / $archive->count()) * 100, 0, PHP_ROUND_HALF_DOWN);
-                        $postMessageStatus(sprintf($messages["compression.13"], $progress."%"), Task::STATUS_RUNNING, $progress);
+                        $postMessageStatus(sprintf($messages["compression.13"], $progress . "%"), Task::STATUS_RUNNING, $progress);
                     }
                 } catch (Exception $e) {
                     $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);

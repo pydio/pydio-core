@@ -297,7 +297,7 @@
             <serverCallback methodName="placeConfigNode" hookName="admin.list_config_nodes"/>
         </hooks>
     </registry_contributions>
-    <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
+    <class_definition filename="plugins/action.scheduler/Scheduler.php" classname="Pydio\Action\Scheduler\Scheduler"/>
     <dependencies>
         <activePlugin pluginName="access.ajxp_conf|access.ajxp_admin"/>
     </dependencies>

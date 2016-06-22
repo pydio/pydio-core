@@ -23,5 +23,5 @@
             </action>
         </actions>
     </registry_contributions>
-    <class_definition filename="plugins/action.avatar/class.AvatarProvider.php" classname="AvatarProvider"/>
+    <class_definition filename="plugins/action.avatar/AvatarProvider.php" classname="Pydio\Action\Avatar\AvatarProvider"/>
 </ajxp_plugin>

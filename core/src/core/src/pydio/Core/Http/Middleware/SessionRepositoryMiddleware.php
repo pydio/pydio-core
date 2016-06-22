@@ -39,6 +39,10 @@ use Pydio\Log\Core\AJXP_Logger;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class SessionRepositoryMiddleware
+ * @package Pydio\Core\Http\Middleware
+ */
 class SessionRepositoryMiddleware
 {
     /**
