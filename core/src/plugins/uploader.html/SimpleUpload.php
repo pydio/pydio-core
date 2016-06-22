@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Uploader\Processor;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -35,8 +36,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class SimpleUploadProcessor extends Plugin
+class SimpleUpload extends Plugin
 {
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     */
     public function getDropBg($action, $httpVars, $fileVars)
     {
         $lang = LocaleService::getLanguage();
@@ -167,6 +173,13 @@ class SimpleUploadProcessor extends Plugin
         }
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param \Pydio\Core\Model\ContextInterface $contextInterface
+     * @throws \Exception
+     */
     public function unifyChunks($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         $selection = UserSelection::fromContext($contextInterface, []);

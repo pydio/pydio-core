@@ -4,6 +4,8 @@
 *         based in bit.ly plugin
 */
 
+namespace Pydio\LinkShortener;
+
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
@@ -15,7 +17,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Shorten
  */
-class multiShortener extends Plugin
+class MultiShortener extends Plugin
 {
 
     /**
@@ -26,6 +28,11 @@ class multiShortener extends Plugin
         $shorten = $this->generateLink($ctx, $url);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $url
+     * @return bool|mixed|null|string
+     */
     protected function generateLink(ContextInterface $ctx, $url){
 
         $type = $this->getContextualOption($ctx, "SHORTEN_TYPE");

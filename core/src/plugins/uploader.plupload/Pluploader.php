@@ -1,6 +1,5 @@
 <?php
 /**
- * @package info.ajaxplorer
  *
  * Copyright 2007-2009 Charles du Jeu
  * This file is part of Pydio.
@@ -33,6 +32,8 @@
  *
  * Description : Class for handling flex upload
  */
+namespace Pydio\Uploader\Processor;
+
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -47,9 +48,9 @@ use Pydio\Core\PluginFramework\Plugin;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * Class PluploadProcessor
+ * Class Pluploader
  */
-class PluploadProcessor extends Plugin
+class Pluploader extends Plugin
 {
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
@@ -93,7 +94,7 @@ class PluploadProcessor extends Plugin
      * @param $httpVars
      * @param $fileVars
      * @param \Pydio\Core\Model\ContextInterface $ctx
-     * @throws Exception
+     * @throws \Exception
      * @throws \Pydio\Core\Exception\ActionNotFoundException
      * @throws \Pydio\Core\Exception\AuthRequiredException
      */

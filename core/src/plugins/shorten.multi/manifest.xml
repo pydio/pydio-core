@@ -33,7 +33,7 @@
             <serverCallback methodName="processShortenHook" hookName="url.shorten"/>
         </hooks>
 	</registry_contributions>
-	<class_definition filename="plugins/shorten.multi/class.multiShortener.php" classname="multiShortener"/>
+	<class_definition filename="plugins/shorten.multi/MultiShortener.php" classname="Pydio\LinkShortener\MultiShortener"/>
     <dependencies>
         <activePlugin pluginName="action.share"/>
     </dependencies>

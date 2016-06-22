@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Uploader\Core;
 
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
@@ -33,12 +34,25 @@ class CoreUploaderLoader extends Plugin
 {
     public $AUTO_LOAD_TYPE = true;
 
+    /**
+     * Return this plugin configs, merged with its associated "core" configs.
+     * @return array
+     */
     public function getConfigs()
     {
         $data = parent::getConfigs();
         $this->filterData($data);
         return $data;
     }
+
+    /**
+     * Load the configs passed as parameter. This method will
+     * + Parse the config definitions and load the default values
+     * + Merge these values with the $configData parameter
+     * + Publish their value in the manifest if the global_param is "exposed" to the client.
+     * @param array $data
+     * @return void
+     */
     public function loadConfigs($data)
     {
         $this->filterData($data);
@@ -46,6 +60,9 @@ class CoreUploaderLoader extends Plugin
 
     }
 
+    /**
+     * @param $data
+     */
     private function filterData(&$data)
     {
         $confMaxSize = StatHelper::convertBytes($data["UPLOAD_MAX_SIZE"]);

@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Uploader\Processor;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
@@ -33,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class FlexUploadProcessor extends Plugin
+class FlexUpload extends Plugin
 {
     private static $active = false;
 
@@ -100,7 +101,7 @@ class FlexUploadProcessor extends Plugin
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface $response
-     * @throws Exception
+     * @throws \Exception
      */
     public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {

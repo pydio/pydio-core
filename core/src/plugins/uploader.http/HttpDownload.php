@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Uploader\Processor;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -37,8 +38,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Downloader
  */
-class HttpDownloader extends Plugin
+class HttpDownload extends Plugin
 {
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $request
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @return bool
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $request, \Psr\Http\Message\ResponseInterface $response)
     {
         //$this->logInfo("DL file", $httpVars);
@@ -56,13 +64,13 @@ class HttpDownloader extends Plugin
         }else if (isSet($httpVars["dlfile"])) {
             $dlFile = $userSelection->currentBaseUrl().Utils::decodeSecureMagic($httpVars["dlfile"]);
             $realFile = file_get_contents($dlFile);
-            if(empty($realFile)) throw new Exception("cannot find file $dlFile for download");
+            if(empty($realFile)) throw new \Exception("cannot find file $dlFile for download");
             $parts = parse_url($realFile);
             $getPath = $parts["path"];
             $basename = basename($getPath);
             //$dlURL = $realFile;
         }else{
-            throw new Exception("Missing argument, either file or dlfile");
+            throw new \Exception("Missing argument, either file or dlfile");
         }
 
         switch ($action) {
@@ -89,7 +97,7 @@ class HttpDownloader extends Plugin
                             TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, sprintf($msg, $progress), null, $progress);
                         } //  Showing progress for the download
                     );
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     // In case of a problem, removing the task
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $e->getMessage());
                     return false;
@@ -148,16 +156,16 @@ class HttpDownloader extends Plugin
      * @param string $url
      * @param AJXP_Node $node
      * @param $updateFn
-     * @throws Exception
+     * @throws \Exception
      */
     public function externalDownload($url, $node, $updateFn) {
 
-        $client = new GuzzleHttp\Client(['base_url' => $url]);
+        $client = new \GuzzleHttp\Client(['base_url' => $url]);
 
         $response = $client->get();
 
         if ($response->getStatusCode() !== 200) {
-            throw new Exception("There was a problem retrieving the file from the server");
+            throw new \Exception("There was a problem retrieving the file from the server");
         }
 
         $totalSize = -1;

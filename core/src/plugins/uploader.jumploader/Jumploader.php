@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Uploader\Processor;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -37,7 +38,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Uploader
  */
-class JumploaderProcessor extends Plugin
+class Jumploader extends Plugin
 {
     /**
      * Handle UTF8 Decoding
@@ -81,7 +82,7 @@ class JumploaderProcessor extends Plugin
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface $response
-     * @throws Exception
+     * @throws \Exception
      */
     public function preProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {
@@ -129,7 +130,7 @@ class JumploaderProcessor extends Plugin
 
             if (!self::$remote) {
                 $resumeIndexes = array ();
-                $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($destStreamURL));
+                $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($destStreamURL));
                 $it->setMaxDepth(0);
                 while ($it->valid()) {
                     if (!$it->isDot()) {
@@ -215,7 +216,7 @@ class JumploaderProcessor extends Plugin
      * @param \Psr\Http\Message\ServerRequestInterface $request
      * @param \Psr\Http\Message\ResponseInterface $response
      * @return void
-     * @throws Exception
+     * @throws \Exception
      */
     public function postProcess(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response)
     {

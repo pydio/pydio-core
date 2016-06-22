@@ -5,7 +5,7 @@
         <plugin_author>lmanders</plugin_author>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
-	<class_definition filename="plugins/uploader.plupload/class.PluploadProcessor.php" classname="PluploadProcessor"/>
+	<class_definition filename="plugins/uploader.plupload/Pluploader.php" classname="Pydio\Uploader\Processor\Pluploader"/>
 	<client_settings>
 		<resources>
 	        <i18n namespace="plupload" path="plugins/uploader.plupload/i18n" />
