@@ -1,4 +1,28 @@
 <?php
+/*
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <http://pyd.io/>.
+ */
+
+namespace Pydio\Access\Indexer\Core;
+
+use DOMNode;
+use DOMXPath;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\StatHelper;
@@ -7,24 +31,23 @@ use Pydio\Core\Utils\VarsFilter;
 use Pydio\Meta\Core\AbstractMetaSource;
 
 /**
- * Created by PhpStorm.
- * User: charles
- * Date: 15/04/2015
- * Time: 14:52
+ * Class AbstractSearchEngineIndexer
+ * @package Pydio\Access\Indexer\Core
  */
-
-abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
+abstract class AbstractSearchEngineIndexer extends AbstractMetaSource
+{
 
     /**
      * @param DOMNode $contribNode
      */
-    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
+    {
         parent::parseSpecificContributions($ctx, $contribNode);
-        if($this->getContextualOption($ctx, "HIDE_MYSHARES_SECTION") !== true) return;
-        if($contribNode->nodeName != "client_configs") return ;
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        if ($this->getContextualOption($ctx, "HIDE_MYSHARES_SECTION") !== true) return;
+        if ($contribNode->nodeName != "client_configs") return;
+        $actionXpath = new DOMXPath($contribNode->ownerDocument);
         $nodeList = $actionXpath->query('component_config[@className="AjxpPane::navigation_scroller"]', $contribNode);
-        if(!$nodeList->length) return ;
+        if (!$nodeList->length) return;
         $contribNode->removeChild($nodeList->item(0));
     }
 
@@ -32,13 +55,14 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
      * @param AJXP_Node $ajxpNode
      * @return null|string
      */
-    protected function extractIndexableContent($ajxpNode){
+    protected function extractIndexableContent($ajxpNode)
+    {
 
         $ext = strtolower(pathinfo($ajxpNode->getLabel(), PATHINFO_EXTENSION));
-        if (in_array($ext, explode(",",$this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_TXT")))) {
+        if (in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_TXT")))) {
             return file_get_contents($ajxpNode->getUrl());
         }
-        $unoconv = $this->getContextualOption($ajxpNode->getContext(),"UNOCONV");
+        $unoconv = $this->getContextualOption($ajxpNode->getContext(), "UNOCONV");
         $pipe = false;
         if (!empty($unoconv) && in_array($ext, array("doc", "odt", "xls", "ods"))) {
             $targetExt = "txt";
@@ -49,10 +73,10 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
                 $pipe = true;
             }
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $unoconv = "HOME=".Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f $targetExt ".escapeshellarg($realFile);
+            $unoconv = "HOME=" . Utils::getAjxpTmpDir() . " " . $unoconv . " --stdout -f $targetExt " . escapeshellarg($realFile);
             if ($pipe) {
                 $newTarget = str_replace(".$ext", ".pdf", $realFile);
-                $unoconv.= " > $newTarget";
+                $unoconv .= " > $newTarget";
                 register_shutdown_function("unlink", $newTarget);
             }
             $output = array();
@@ -72,7 +96,7 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
             if ($pipe && isset($newTarget) && is_file($newTarget)) {
                 $realFile = $newTarget;
             }
-            $cmd = $pdftotext." ".escapeshellarg($realFile)." -";
+            $cmd = $pdftotext . " " . escapeshellarg($realFile) . " -";
             $output = array();
             exec($cmd, $output, $return);
             $out = implode("\n", $output);
@@ -94,34 +118,34 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
             $t2 = date("Ymd");
             $query = str_replace("AJXP_SEARCH_RANGE_TODAY", "[$t1 TO  $t2]", $query);
         } else if (strpos($query, "AJXP_SEARCH_RANGE_YESTERDAY") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d')-1, date('Y')));
+            $t1 = date("Ymd", mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
+            $t2 = date("Ymd", mktime(0, 0, 0, date('m'), date('d') - 1, date('Y')));
             $query = str_replace("AJXP_SEARCH_RANGE_YESTERDAY", "[$t1 TO $t2]", $query);
         } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_WEEK") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d')-7, date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $t1 = date("Ymd", mktime(0, 0, 0, date('m'), date('d') - 7, date('Y')));
+            $t2 = date("Ymd", mktime(0, 0, 0, date('m'), date('d'), date('Y')));
             $query = str_replace("AJXP_SEARCH_RANGE_LAST_WEEK", "[$t1 TO $t2]", $query);
         } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_MONTH") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m')-1, date('d'), date('Y')));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $t1 = date("Ymd", mktime(0, 0, 0, date('m') - 1, date('d'), date('Y')));
+            $t2 = date("Ymd", mktime(0, 0, 0, date('m'), date('d'), date('Y')));
             $query = str_replace("AJXP_SEARCH_RANGE_LAST_MONTH", "[$t1 TO $t2]", $query);
         } else if (strpos($query, "AJXP_SEARCH_RANGE_LAST_YEAR") !== false) {
-            $t1 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')-1));
-            $t2 = date("Ymd", mktime(0,0,0,date('m'), date('d'), date('Y')));
+            $t1 = date("Ymd", mktime(0, 0, 0, date('m'), date('d'), date('Y') - 1));
+            $t2 = date("Ymd", mktime(0, 0, 0, date('m'), date('d'), date('Y')));
             $query = str_replace("AJXP_SEARCH_RANGE_LAST_YEAR", "[$t1 TO $t2]", $query);
         }
 
         $split = array_map("trim", explode("AND", $query));
-        foreach($split as $s){
+        foreach ($split as $s) {
             list($k, $v) = explode(":", $s, 2);
-            if($k == "ajxp_bytesize"){
+            if ($k == "ajxp_bytesize") {
                 //list($from, $to) = sscanf($v, "[%s TO %s]");
                 preg_match('/\[(.*) TO (.*)\]/', $v, $matches);
                 $oldSize = $s;
-                $newSize = "ajxp_bytesize:[".intval(StatHelper::convertBytes($matches[1]))." TO ".intval(StatHelper::convertBytes($matches[2]))."]";
+                $newSize = "ajxp_bytesize:[" . intval(StatHelper::convertBytes($matches[1])) . " TO " . intval(StatHelper::convertBytes($matches[2])) . "]";
             }
         }
-        if(isSet($newSize) && isSet($oldSize)){
+        if (isSet($newSize) && isSet($oldSize)) {
             $query = str_replace($oldSize, $newSize, $query);
         }
 
@@ -132,13 +156,14 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
      * @param ContextInterface $ctx
      * @return string
      */
-    protected function buildSpecificId(ContextInterface $ctx){
+    protected function buildSpecificId(ContextInterface $ctx)
+    {
         $specificId = "";
         $specKey = $this->getContextualOption($ctx, "repository_specific_keywords");
         if (!empty($specKey)) {
-            $specificId = "-".str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx));
+            $specificId = "-" . str_replace(array(",", "/"), array("-", "__"), VarsFilter::filter($specKey, $ctx));
         }
-        return $ctx->getRepositoryId().$specificId;
+        return $ctx->getRepositoryId() . $specificId;
     }
 
 } 

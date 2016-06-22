@@ -19,7 +19,10 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Access\Indexer\Implementation;
+
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Indexer\Core\AbstractSearchEngineIndexer;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -27,6 +30,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
+use \Elastica;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,7 +44,7 @@ require_once (dirname(__FILE__)."/vendor/autoload.php");
  * @property Elastica\Index $currentIndex
  * @property Elastica\Type $currentType
  */
-class AjxpElasticSearch extends AbstractSearchEngineIndexer
+class ElasticSearchIndexer extends AbstractSearchEngineIndexer
 {
     private $client;
     private $currentIndex;
@@ -88,6 +92,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
         $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
+            /** @var \DOMElement $el */
             $el = $this->getXPath()->query("/indexer")->item(0);
             if ($this->indexContent) {
                 if($this->indexContent) $metaFields[] = "ajxp_document_content";
@@ -130,7 +135,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @return null
-     * @throws Exception
+     * @throws \Exception
      */
     public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
@@ -158,7 +163,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             try {
                 $this->loadIndex($ctx, false);
-            } catch (Exception $ex) {
+            } catch (\Exception $ex) {
                 if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
@@ -279,8 +284,8 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
             try {
                 $this->loadIndex($ctx, false);
-            } catch (Exception $ex) {
-                throw new Exception($messages["index.lucene.7"]);
+            } catch (\Exception $ex) {
+                throw new \Exception($messages["index.lucene.7"]);
             }
 
             $searchField = \Pydio\Core\Utils\Utils::sanitize($httpVars["field"], AJXP_SANITIZE_ALPHANUM);
@@ -339,6 +344,9 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
     }
 
+    /**
+     * @param $url
+     */
     public function recursiveIndexation($url)
     {
         //print("Indexing $url \n");
@@ -356,7 +364,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
                 $this->logDebug("Indexing Node ".$newUrl);
                 try {
                     $this->updateNodeIndex(null, new AJXP_Node($newUrl));
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
                 }
             }
@@ -485,7 +493,7 @@ class AjxpElasticSearch extends AbstractSearchEngineIndexer
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
-     * @throws Exception
+     * @throws \Exception
      */
     public function createIndexedDocument($ajxpNode)
     {

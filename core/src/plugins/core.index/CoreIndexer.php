@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+
+namespace Pydio\Access\Indexer\Core;
+
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -33,11 +36,18 @@ use Pydio\Tasks\TaskService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class CoreIndexer
+ * @package Pydio\Access\Indexer\Core
+ */
 class CoreIndexer extends Plugin {
 
     private $verboseIndexation = false;
     private $currentTaskId;
 
+    /**
+     * @param string $message
+     */
     public function debug($message = ""){
         $this->logDebug("core.indexer", $message);
         if($this->verboseIndexation && ConfService::currentContextIsCommandLine()){
@@ -45,6 +55,13 @@ class CoreIndexer extends Plugin {
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return null|\Psr\Http\Message\ResponseInterface
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function applyAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
 
@@ -87,13 +104,13 @@ class CoreIndexer extends Plugin {
                     if($this->currentTaskId){
                         TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
                     }
-                }catch (Exception $e){
+                }catch (\Exception $e){
                     $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
                 }
             }else{
                 try{
                     $this->recursiveIndexation($ctx, $node);
-                }catch (Exception $e){
+                }catch (\Exception $e){
                     $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
                 }
             }
@@ -107,7 +124,7 @@ class CoreIndexer extends Plugin {
      *
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param int $depth
-     * @throws Exception
+     * @throws \Exception
      */
     public function recursiveIndexation(ContextInterface $ctx, $node, $depth = 0)
     {
@@ -123,7 +140,7 @@ class CoreIndexer extends Plugin {
                 $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
                 Controller::applyHook("node.index.recursive.end", array($node));
                 $this->releaseStatus($repository, $user);
-                throw new Exception("User interrupted");
+                throw new \Exception("User interrupted");
             }
         }
 
@@ -134,7 +151,7 @@ class CoreIndexer extends Plugin {
         if($node->getPath() != "/"){
             try {
                 Controller::applyHook("node.index", array($node));
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->debug("Error Indexing Node ".$url." (".$e->getMessage().")");
             }
         }
@@ -152,7 +169,7 @@ class CoreIndexer extends Plugin {
                     try {
                         $this->debug("Indexing Node ".$childUrl);
                         Controller::applyHook("node.index", array($childNode));
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $this->debug("Error Indexing Node ".$childUrl." (".$e->getMessage().")");
                     }
                 }

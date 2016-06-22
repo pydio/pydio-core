@@ -4,7 +4,7 @@
         <core_relation packaged="false" tested_version="1.0"/>
     </plugin_info>
 
-    <class_definition filename="plugins/index.elasticsearch/class.AjxpElasticSearch.php" classname="AjxpElasticSearch"/>
+    <class_definition filename="plugins/index.elasticsearch/ElasticSearchIndexer.php" classname="Pydio\Access\Indexer\Implementation\ElasticSearchIndexer"/>
     <client_settings>
         <resources>
             <img_library alias="elastic_search_images" path="plugins/index.elasticsearch/resources/images"/>

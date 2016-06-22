@@ -148,20 +148,6 @@
             }.bind(this));
         }
 
-        static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE){
-            let task = {
-                label: label,
-                flags: flags,
-                status: 1,
-                statusMessage : '',
-                action: action,
-                parameters: parameters,
-                nodes: nodes
-            };
-            TaskAPI.createTask(new Task(task));
-        }
-
-
         getTasks(forceRefresh = false){
             if(this._tasksList == undefined || forceRefresh){
                 this._tasksList = new Map();
@@ -176,8 +162,34 @@
                         global.pydio.notify("poller.frequency", {});
                     }
                 }.bind(this));
+                // Add local tasks
+                if(this._localTasks){
+                    this._localTasks.forEach(function(lT){
+                        this._tasksList.set(lT.getId(), lT);
+                    }.bind(this));
+                }
             }
             return this._tasksList;
+        }
+
+        static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE){
+            let task = {
+                label: label,
+                flags: flags,
+                status: 1,
+                statusMessage : '',
+                action: action,
+                parameters: parameters,
+                nodes: nodes
+            };
+            TaskAPI.createTask(new Task(task));
+        }
+
+        static enqueueLocalTask(task){
+            if(!this._localTasks) {
+                this._localTasks = new Map();
+            }
+            this._localTasks.set(task.getId(), task);
         }
 
     }
