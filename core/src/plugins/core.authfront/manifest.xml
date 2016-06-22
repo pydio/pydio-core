@@ -3,5 +3,5 @@
           description="CONF_MESSAGE[Actual way to authenticate users (via credentials, certificates, http, etc]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="Pydio\Authfront\Core\FrontendsLoader" filename="plugins/core.authfront/class.FrontendsLoader.php"/>
+    <class_definition classname="Pydio\Auth\Frontend\Core\FrontendsLoader" filename="plugins/core.authfront/FrontendsLoader.php"/>
 </ajxpcore>

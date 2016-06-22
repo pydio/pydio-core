@@ -18,10 +18,15 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Auth\Core\AJXP_Safe;
+namespace Pydio\Auth\Frontend;
+
+use phpCAS;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\sqlConfDriver;
 use Pydio\Core\Services\RolesService;
@@ -34,9 +39,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
 require_once 'CAS.php';
 require_once 'CAS/ProxiedService/Samba.php';
 
-define(PHPCAS_MODE_CLIENT, 'client');
-define(PHPCAS_MODE_PROXY, 'proxy');
+define('PHPCAS_MODE_CLIENT', 'client');
+define('PHPCAS_MODE_PROXY', 'proxy');
 
+/**
+ * Class CasAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
 class CasAuthFrontend extends AbstractAuthFrontend
 {
 
@@ -59,19 +68,28 @@ class CasAuthFrontend extends AbstractAuthFrontend
     private $cas_setFixedCallbackURL;
 
 
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
+    /**
+     * Try to authenticate the user based on various external parameters
+     * Return true if user is now logged.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param bool $isLast Whether this is is the last plugin called.
+     * @return bool
+     */
+    function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
     {
         $httpVars = $request->getParsedBody();
 
-        if(isset($_SESSION["CURRENT_MINISITE"])){
+        if (isset($_SESSION["CURRENT_MINISITE"])) {
             return false;
         }
 
         $this->loadConfig();
 
-        if(isset($_SESSION['AUTHENTICATE_BY_CAS'])){
+        if (isset($_SESSION['AUTHENTICATE_BY_CAS'])) {
             $flag = $_SESSION['AUTHENTICATE_BY_CAS'];
-        }else{
+        } else {
             $flag = 0;
         }
 
@@ -84,26 +102,26 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
         if ($this->cas_modify_login_page) {
 
-            if(($flag == 0) && ($enre) && !$logged && !$pgtIou){
+            if (($flag == 0) && ($enre) && !$logged && !$pgtIou) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif(($flag == 1) && (!$enre) && !$logged && !$pgtIou && !$ticket && !$pgt){
+            } elseif (($flag == 1) && (!$enre) && !$logged && !$pgtIou && !$ticket && !$pgt) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
-            }elseif(($flag == 1) && ($enre) && !$logged && !$pgtIou){
+            } elseif (($flag == 1) && ($enre) && !$logged && !$pgtIou) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif($pgtIou || $pgt){
+            } elseif ($pgtIou || $pgt) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
-            }elseif($ticket){
+            } elseif ($ticket) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 1;
                 $_SESSION['AUTHENTICATE_BY_CAS_CLIENT_MOD_TICKET_PENDDING'] = 1;
-            }elseif($logged && $pgtIou){
+            } elseif ($logged && $pgtIou) {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 2;
-            }else{
+            } else {
                 $_SESSION['AUTHENTICATE_BY_CAS'] = 0;
             }
             if ($_SESSION['AUTHENTICATE_BY_CAS'] < 1) {
-                if($clientModeTicketPendding){
+                if ($clientModeTicketPendding) {
                     unset($_SESSION['AUTHENTICATE_BY_CAS_CLIENT_MOD_TICKET_PENDDING']);
-                }else{
+                } else {
                     return false;
                 }
             }
@@ -132,12 +150,12 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if ($this->cas_debug_mode) {
                         // logfile name by date:
                         $today = getdate();
-                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
-                        $file_path= empty($this->cas_debug_file) ? $file_path: $this->cas_debug_file;
+                        $file_path = AJXP_DATA_PATH . '/logs/phpcas_' . $today['year'] . '-' . $today['month'] . '-' . $today['mday'] . '.txt';
+                        $file_path = empty($this->cas_debug_file) ? $file_path : $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
 
-                   phpCAS::forceAuthentication();
+                    phpCAS::forceAuthentication();
 
                 } else {
                     AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode CLIENT, please verify the configuration", "");
@@ -169,14 +187,14 @@ class CasAuthFrontend extends AbstractAuthFrontend
                      * Debug
                      */
                     if ($this->cas_debug_mode) {
-                         // logfile name by date:
+                        // logfile name by date:
                         $today = getdate();
-                        $file_path = AJXP_DATA_PATH. '/logs/phpcas_'.$today['year'].'-'.$today['month'].'-'.$today['mday'].'.txt';
-                        empty($this->cas_debug_file) ? $file_path: $file_path = $this->cas_debug_file;
+                        $file_path = AJXP_DATA_PATH . '/logs/phpcas_' . $today['year'] . '-' . $today['month'] . '-' . $today['mday'] . '.txt';
+                        empty($this->cas_debug_file) ? $file_path : $file_path = $this->cas_debug_file;
                         phpCAS::setDebug($file_path);
                     }
 
-                    if(!empty($this->cas_setFixedCallbackURL)){
+                    if (!empty($this->cas_setFixedCallbackURL)) {
                         phpCAS::setFixedCallbackURL($this->cas_setFixedCallbackURL);
                     }
                     //
@@ -219,12 +237,12 @@ class CasAuthFrontend extends AbstractAuthFrontend
             UsersService::createUser($cas_user, openssl_random_pseudo_bytes(20));
         }
         if (UsersService::userExists($cas_user)) {
-            try{
+            try {
                 $userObj = AuthService::logUser($cas_user, "", true);
-                AJXP_Safe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
+                MemorySafe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
 
-                if(!empty($this->cas_additional_role)){
+                if (!empty($this->cas_additional_role)) {
                     $userObj = UsersService::getUserById($cas_user, false);
                     $cas_RoleID = $this->cas_additional_role;
                     $userObj->addRole(RolesService::getOrCreateRole($cas_RoleID, $userObj->getGroupPath()));
@@ -248,7 +266,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
 
                 $request = $request->withAttribute("ctx", Context::contextWithObjects($userObj, null));
                 return true;
-            }catch (\Pydio\Core\Exception\LoginException $l){
+            } catch (\Pydio\Core\Exception\LoginException $l) {
 
             }
         }
@@ -256,16 +274,20 @@ class CasAuthFrontend extends AbstractAuthFrontend
         return false;
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
     function logOutCAS(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $action = $requestInterface->getAttribute("action");
-        if($action !== "logout") return;
+        if ($action !== "logout") return;
 
         require_once "LogoutUrlMessage.php";
         $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface = $responseInterface->withBody($x);
 
-        if(isset($_SESSION['LOGGED_IN_BY_CAS'])){
+        if (isset($_SESSION['LOGGED_IN_BY_CAS'])) {
             AuthService::disconnect();
 
             $this->loadConfig();
@@ -279,7 +301,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
             $x->addChunk(new LogoutUrlMessage($this->cas_logoutUrl));
             session_unset();
             session_destroy();
-        }else{
+        } else {
             AuthService::disconnect();
             $x->addChunk(new LogoutUrlMessage("#"));
             session_unset();
@@ -348,12 +370,18 @@ class CasAuthFrontend extends AbstractAuthFrontend
         }
     }
 
+    /**
+     * @return bool
+     */
     function checkConfigurationForClientMode()
     {
         return !empty($this->cas_server) &&
         (strcmp($this->cas_mode, PHPCAS_MODE_CLIENT) === 0);
     }
 
+    /**
+     * @return bool
+     */
     function checkConfigurationForProxyMode()
     {
         return !empty($this->cas_server) &&
@@ -377,7 +405,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     if (!empty($dbconfig->sqlDriver["username"])) {
                         $db_username = $dbconfig->sqlDriver["username"];
                         $db_password = $dbconfig->sqlDriver["password"];
-                        $db_database = "mysql:"."dbname=".$dbconfig->sqlDriver["database"].";host=".$dbconfig->sqlDriver["host"];
+                        $db_database = "mysql:" . "dbname=" . $dbconfig->sqlDriver["database"] . ";host=" . $dbconfig->sqlDriver["host"];
                         $db_table = "ajxp_cas_pgt";
                         AJXP_Logger::info(__CLASS__, __FUNCTION__, $db_database);
                         phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table, "");
@@ -389,6 +417,9 @@ class CasAuthFrontend extends AbstractAuthFrontend
         }
     }
 
+    /**
+     * @return string
+     */
     public function installSQLTables()
     {
         $param = ConfService::getConfStorageImpl();

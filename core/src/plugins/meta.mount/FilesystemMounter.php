@@ -22,7 +22,7 @@ namespace Pydio\Access\Meta\Mount;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
@@ -77,11 +77,11 @@ class FilesystemMounter extends AbstractMetaSource
         $password = $this->options["PASS"];
         // 1BIS : encoded?
         if ($user == "" && isSet($this->options["ENCODED_CREDENTIALS"])) {
-            list($user,$password) = AJXP_Safe::getCredentialsFromEncodedString($this->options["ENCODED_CREDENTIALS"]);
+            list($user,$password) = MemorySafe::getCredentialsFromEncodedString($this->options["ENCODED_CREDENTIALS"]);
         }
         // 2. Try from session
         if ($user=="" &&  isSet($this->options["USE_SESSION_CREDENTIALS"]) ) {
-            $safeCred = AJXP_Safe::loadCredentials();
+            $safeCred = MemorySafe::loadCredentials();
             if ($safeCred !== false) {
                 $user = $safeCred["user"];
                 $password = $safeCred["password"];

@@ -24,7 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\FTP;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 
 
@@ -452,7 +452,7 @@ class ftpAccessWrapper implements IAjxpWrapper
             throw new \Exception("Cannot find repository for dynamic ftp authentication.");
         }
         $ctx = $node->getContext();
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($node->getContext());
         $this->user = $credentials["user"];
         $this->password = $credentials["password"];
         if ($this->user=="") {

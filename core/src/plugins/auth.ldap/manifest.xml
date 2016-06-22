@@ -48,7 +48,7 @@
         <param name="LDAP_COUNT_CACHE_TTL" group="CONF_MESSAGE[Advanced Parameters]" type="integer" label="CONF_MESSAGE[Cache User Count (hours)]" description="CONF_MESSAGE[Locally cache the total number of users during X hours. Can be handy for huge directories.]" mandatory="false" default="1"/>
 
     </server_settings>
-    <class_definition filename="plugins/auth.ldap/class.ldapAuthDriver.php" classname="ldapAuthDriver"/>
+    <class_definition filename="plugins/auth.ldap/LdapAuthDriver.php" classname="Pydio\Auth\Driver\LdapAuthDriver"/>
     <registry_contributions>
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
     </registry_contributions>

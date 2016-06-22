@@ -37,7 +37,7 @@
         <param group_switch_name="cms" group_switch_label="CONF_MESSAGE[Custom]" group_switch_value="custom" name="LOGOUT_URL" type="string" label="CONF_MESSAGE[Logout URL]" description="CONF_MESSAGE[Redirect to the given URL on loggin out]" mandatory="false" />
 	    <param group_switch_name="cms" group_switch_label="CONF_MESSAGE[Custom]" group_switch_value="custom" name="MASTER_AUTH_FUNCTION" type="string" label="CONF_MESSAGE[Custom Auth Function]" description="CONF_MESSAGE[User-defined function for performing real password check, necessary for REST API (including iOS client). Add this function inside the plugin cms_auth_functions.php file]" mandatory="true"/>
 	</server_settings>
-	<class_definition filename="plugins/auth.remote/class.remoteAuthDriver.php" classname="remoteAuthDriver"/>
+	<class_definition filename="plugins/auth.remote/RemoteAuthDriver.php" classname="Pydio\Auth\Driver\RemoteAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*"/>
 		<external_file filename="plugins/auth.remote/remoteAuthActions.xml" include="actions/*"/>

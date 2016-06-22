@@ -18,41 +18,60 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Frontend;
+
+use Duo;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\BruteForceHelper;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\CaptchaProvider;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class DuoSecurityFrontend
+ * @package Pydio\Auth\Frontend
+ */
+class DuoSecurityFrontend extends AbstractAuthFrontend
+{
 
-class DuoSecurityFrontend extends AbstractAuthFrontend {
-
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+    /**
+     * Try to authenticate the user based on various external parameters
+     * Return true if user is now logged.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param bool $isLast Whether this is is the last plugin called.
+     * @return bool
+     */
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
+    {
 
         $httpVars = $request->getParsedBody();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx      = $request->getAttribute("ctx");
+        $ctx = $request->getAttribute("ctx");
         // CATCH THE STANDARD LOGIN OPERATION
-        if($request->getAttribute("action") != "login"){
+        if ($request->getAttribute("action") != "login") {
             return false;
         }
-        if(Utils::userAgentIsNativePydioApp()){
+        if (Utils::userAgentIsNativePydioApp()) {
             return false;
         }
 
-        $userId = (isSet($httpVars["userid"])?Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS):null);
+        $userId = (isSet($httpVars["userid"]) ? Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS) : null);
         $duoActive = false;
-        if(!empty($userId) && \Pydio\Core\Services\UsersService::userExists($userId)){
+        if (!empty($userId) && \Pydio\Core\Services\UsersService::userExists($userId)) {
             $uObject = \Pydio\Core\Services\UsersService::getUserById($userId);
-            if($uObject != null){
-                $duoActive = $uObject->getMergedRole()->filterParameterValue("authfront.duosecurity","DUO_AUTH_ACTIVE", AJXP_REPO_SCOPE_ALL, false);
+            if ($uObject != null) {
+                $duoActive = $uObject->getMergedRole()->filterParameterValue("authfront.duosecurity", "DUO_AUTH_ACTIVE", AJXP_REPO_SCOPE_ALL, false);
             }
         }
-        if(!$duoActive) {
+        if (!$duoActive) {
             return false;
         }
 
@@ -63,10 +82,10 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
             $loggingResult = -4;
         } else {
-            $userId = (isSet($httpVars["userid"])?trim($httpVars["userid"]):null);
-            $userPass = (isSet($httpVars["password"])?trim($httpVars["password"]):null);
-            $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true")?true:false);
-            $cookieLogin = (isSet($httpVars["cookie_login"])?true:false);
+            $userId = (isSet($httpVars["userid"]) ? trim($httpVars["userid"]) : null);
+            $userPass = (isSet($httpVars["password"]) ? trim($httpVars["password"]) : null);
+            $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true") ? true : false);
+            $cookieLogin = (isSet($httpVars["cookie_login"]) ? true : false);
             $loggingResult = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
             if ($rememberMe && $loggingResult == 1) {
                 $rememberLogin = "notify";
@@ -96,7 +115,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
             }
         }
 
-        if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe ==true))) {
+        if ($loggedUser != null && (CookiesHelper::hasRememberCookie() || (isSet($rememberMe) && $rememberMe == true))) {
             CookiesHelper::refreshRememberCookie($loggedUser);
         }
 
@@ -104,14 +123,14 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
         $response = $response->withBody($x);
         $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult, $rememberLogin, $rememberPass, $secureToken));
 
-        if($loggingResult > 0 && $loggedUser != null){
+        if ($loggingResult > 0 && $loggedUser != null) {
 
             // Create an updated context
             $ctx = \Pydio\Core\Model\Context::fromGlobalServices();
-            require_once($this->getBaseDir()."/duo_php/duo_web.php");
-            $appUnique  = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
-            $iKey       = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
-            $sKey       = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
+            require_once($this->getBaseDir() . "/duo_php/duo_web.php");
+            $appUnique = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
+            $iKey = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
+            $sKey = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
             $res = Duo::signRequest($iKey, $sKey, $appUnique, $loggedUser->getId());
 
@@ -133,25 +152,25 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
     public function postVerificationCode(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
 
-        if($requestInterface->getAttribute("action") !== "duo_post_verification_code") {
+        if ($requestInterface->getAttribute("action") !== "duo_post_verification_code") {
             return;
         }
 
-        $httpVars   = $requestInterface->getParsedBody();
+        $httpVars = $requestInterface->getParsedBody();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx        = $requestInterface->getAttribute("ctx");
+        $ctx = $requestInterface->getAttribute("ctx");
         $u = $ctx->getUser();
-        if($u == null) return;
+        if ($u == null) return;
         $sigResponse = $httpVars["sig_response"];
 
-        require_once($this->getBaseDir()."/duo_php/duo_web.php");
-        $appUnique  = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
-        $iKey       = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
-        $sKey       = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
+        require_once($this->getBaseDir() . "/duo_php/duo_web.php");
+        $appUnique = $this->getContextualOption($ctx, "DUO_AUTH_AKEY");
+        $iKey = $this->getContextualOption($ctx, "DUO_AUTH_IKEY");
+        $sKey = $this->getContextualOption($ctx, "DUO_AUTH_SKEY");
 
         $verif = Duo::verifyResponse($iKey, $sKey, $appUnique, $sigResponse);
 
-        if($verif != null && $verif == $u->getId()){
+        if ($verif != null && $verif == $u->getId()) {
             $u->removeLock();
             $u->save("superuser");
             $u->recomputeMergedRole();
@@ -168,7 +187,7 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
                 throw new \Pydio\Core\Exception\AuthRequiredException();
             }
             ConfService::getInstance()->invalidateLoadedRepositories();
-        }else{
+        } else {
             AuthService::disconnect();
             throw new \Pydio\Core\Exception\AuthRequiredException();
         }
@@ -176,5 +195,4 @@ class DuoSecurityFrontend extends AbstractAuthFrontend {
     }
 
 
-
-} 
+}

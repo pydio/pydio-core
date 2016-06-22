@@ -18,29 +18,57 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+namespace Pydio\Auth\Frontend;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+use DOMXPath;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
+use Pydio\Core\Model\ContextInterface;
 
+defined('AJXP_EXEC') or die('Access not allowed');
 
-class MultiAuthFrontend extends AbstractAuthFrontend {
+/**
+ * Class MultiAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
+class MultiAuthFrontend extends AbstractAuthFrontend
+{
 
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+    /**
+     * Try to authenticate the user based on various external parameters
+     * Return true if user is now logged.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param bool $isLast Whether this is is the last plugin called.
+     * @return bool
+     */
+    function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
+    {
         return false;
     }
 
-    protected function parseSpecificContributions(\Pydio\Core\Model\ContextInterface $ctx, \DOMNode &$contribNode)
+    /**
+     * Dynamically modify some registry contributions nodes. Can be easily derivated to enable/disable
+     * some features dynamically during plugin initialization.
+     * @param ContextInterface $ctx
+     * @param \DOMNode $contribNode
+     * @return void
+     */
+    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
-        if($contribNode->nodeName != "actions") return ;
+        if ($contribNode->nodeName != "actions") return;
         $sources = array();
 
-        if(!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])
-            || (isSet($this->options["MODE"]) && $this->options["MODE"] == "MASTER_SLAVE") ) {
+        if (!isSet($this->options) || !isSet($this->options["DRIVERS"]) || !is_array($this->options["DRIVERS"])
+            || (isSet($this->options["MODE"]) && $this->options["MODE"] == "MASTER_SLAVE")
+        ) {
 
-            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $actionXpath = new DOMXPath($contribNode->ownerDocument);
             $action = $actionXpath->query('action[@name="login"]', $contribNode);
-            if($action->length) {
+            if ($action->length) {
                 $action = $action->item(0);
                 $contribNode->removeChild($action);
             }
@@ -48,7 +76,7 @@ class MultiAuthFrontend extends AbstractAuthFrontend {
 
         }
 
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $actionXpath = new DOMXPath($contribNode->ownerDocument);
         $loginCallbackNodeList = $actionXpath->query('//clientCallback', $contribNode);
         $callbackNode = $loginCallbackNodeList->item(0);
         $xmlContent = $callbackNode->firstChild->wholeText;
@@ -67,7 +95,7 @@ class MultiAuthFrontend extends AbstractAuthFrontend {
         $xmlContent = str_replace("AJXP_MULTIAUTH_SOURCES", json_encode($sources), $xmlContent);
         $xmlContent = str_replace("AJXP_MULTIAUTH_MASTER", $this->options["MASTER_DRIVER"], $xmlContent);
         $xmlContent = str_replace("AJXP_USER_ID_SEPARATOR", $this->options["USER_ID_SEPARATOR"], $xmlContent);
-        if($callbackNode) {
+        if ($callbackNode) {
             $callbackNode->removeChild($callbackNode->firstChild);
             $callbackNode->appendChild($contribNode->ownerDocument->createCDATASection($xmlContent));
         }

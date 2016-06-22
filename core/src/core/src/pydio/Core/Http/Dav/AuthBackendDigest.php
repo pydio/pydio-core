@@ -30,7 +30,7 @@ use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use \Sabre;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -144,7 +144,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         }
         if (ConfService::getContextConf($this->context, "SESSION_SET_CREDENTIALS", "auth")) {
             $webdavData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
-            AJXP_Safe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
+            MemorySafe::storeCredentials($this->currentUser, $this->_decodePassword($webdavData["PASS"], $this->currentUser));
         }
 
         // NOW UPDATE CONTEXT

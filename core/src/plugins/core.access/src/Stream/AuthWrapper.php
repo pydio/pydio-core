@@ -12,7 +12,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 
@@ -27,7 +27,7 @@ class AuthWrapper extends AJXP_SchemeTranslatorWrapper
             throw new \Exception("Cannot find repository");
         }
 
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources(AJXP_Node::contextFromUrl($url));
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources(AJXP_Node::contextFromUrl($url));
         $user = $credentials["user"];
         $password = $credentials["password"];
 

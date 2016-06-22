@@ -25,7 +25,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Utils\Utils;
@@ -133,7 +133,7 @@ class sftpAccessWrapper extends fsAccessWrapper
                             'macerror'	=> "macerrorSftp");
         $remote_serv = $repoObject->getContextOption($context, "SERV");
         $remote_port = $repoObject->getContextOption($context, "PORT");
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($context);
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($context);
         $remote_user = $credentials["user"];
         $remote_pass = $credentials["password"];
 
@@ -322,7 +322,7 @@ class sftpAccessWrapper extends fsAccessWrapper
         $repoObject  = $ctx->getRepository();
         $remote_serv = $repoObject->getContextOption($ctx, "SERV");
         $remote_port = $repoObject->getContextOption($ctx, "PORT");
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($ctx);
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($ctx);
         $remote_user = $credentials["user"];
         $remote_pass = $credentials["password"];
         $remote_base_path = $repoObject->getContextOption($ctx, "PATH");

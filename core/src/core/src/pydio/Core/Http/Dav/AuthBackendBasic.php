@@ -21,7 +21,7 @@
 
 namespace Pydio\Core\Http\Dav;
 
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Exception\UserNotFoundException;
@@ -142,7 +142,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         // NOW UPDATE CONTEXT
         $this->context->setUserId($this->currentUser);
         if (ConfService::getContextConf($this->context, "SESSION_SET_CREDENTIALS", "auth")) {
-            AJXP_Safe::storeCredentials($this->currentUser, $userpass[1]);
+            MemorySafe::storeCredentials($this->currentUser, $userpass[1]);
         }
         //PluginsService::getInstance($this->context);
         AJXP_Logger::updateContext($this->context);

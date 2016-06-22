@@ -18,20 +18,27 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Driver;
+
+use dibi;
+use DibiException;
+use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
+
 /**
  * Store authentication data in a custom SQL database with custom schema.
  * Users and password are NOT editable.
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class customDbAuthDriver extends AbstractAuthDriver
+class CustomDbAuthDriver extends AbstractAuthDriver
 {
     public $sqlDriver;
     public $driverName = "custom_db";
@@ -59,7 +66,8 @@ class customDbAuthDriver extends AbstractAuthDriver
         $this->customTableHashing = $options["SQL_CUSTOM_TABLE_PWD_HASH"];
     }
 
-    private function connect(){
+    private function connect()
+    {
         try {
             dibi::connect($this->sqlDriver);
         } catch (DibiException $e) {
@@ -68,123 +76,186 @@ class customDbAuthDriver extends AbstractAuthDriver
         }
     }
 
-    private function close(){
+    private function close()
+    {
         dibi::disconnect();
         dibi::connect($this->coreSqlDriver);
     }
 
     public function performChecks()
     {
-        if(!isSet($this->options)) return;
+        if (!isSet($this->options)) return;
         $test = Utils::cleanDibiDriverParameters($this->options["SQL_CUSTOM_DRIVER"]);
         if (!count($test)) {
             throw new Exception("Could not find any driver definition for CustomDB plugin! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 
+    /**
+     * Wether users can be listed using offset and limit
+     * @return bool
+     */
     public function supportsUsersPagination()
     {
         return true;
     }
 
     // $baseGroup = "/"
+    /**
+     * List users using offsets
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         $this->connect();
-        $orderBy = "ORDER BY [".$this->customTableUid."] ASC";
-        if($this->sqlDriver["driver"] == "mssql"){
+        $orderBy = "ORDER BY [" . $this->customTableUid . "] ASC";
+        if ($this->sqlDriver["driver"] == "mssql") {
             $orderBy = "";
             $offset = $limit = -1;
         }
         if ($regexp != null) {
-            if($offset != -1 && $limit != -1){
-                $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] WHERE [".$this->customTableUid."] ".Utils::regexpToLike($regexp)." $orderBy %lmt %ofs", Utils::cleanRegexp($regexp), $limit, $offset) ;
-            }else{
-                $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] WHERE [".$this->customTableUid."] ".Utils::regexpToLike($regexp)." $orderBy", Utils::cleanRegexp($regexp)) ;
+            if ($offset != -1 && $limit != -1) {
+                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . Utils::regexpToLike($regexp) . " $orderBy %lmt %ofs", Utils::cleanRegexp($regexp), $limit, $offset);
+            } else {
+                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . Utils::regexpToLike($regexp) . " $orderBy", Utils::cleanRegexp($regexp));
             }
         } else if ($offset != -1 && $limit != -1) {
-            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] $orderBy %lmt %ofs", $limit, $offset);
+            $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] $orderBy %lmt %ofs", $limit, $offset);
         } else {
-            $res = dibi::query("SELECT [".$this->customTableUid."],[".$this->customTablePwd."] FROM [".$this->customTableName."] $orderBy");
+            $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] $orderBy");
         }
         $pairs = $res->fetchPairs($this->customTableUid, $this->customTablePwd);
         $this->close();
         return $pairs;
     }
 
-    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset){
+    /**
+     * Applicable if supportsUsersPagination(), try to detect at what page the user is
+     * @param string $baseGroup
+     * @param string $userLogin
+     * @param int $usersPerPage
+     * @param int $offset
+     * @return int
+     */
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset)
+    {
         $this->connect();
-        $res = dibi::query("SELECT COUNT(*) FROM [".$this->customTableName."] WHERE [".$this->customTableUid."] <= %s", $userLogin);
+        $res = dibi::query("SELECT COUNT(*) FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] <= %s", $userLogin);
         $count = $res->fetchSingle();
         $this->close();
         return ceil(($count - $offset) / $usersPerPage) - 1;
 
     }
 
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null|string $filterProperty Can be "admin" or "parent"
+     * @param null|string $filterValue Can be a user Id, or AJXP_FILTER_EMPTY or AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
+     * @return int
+     */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         $this->connect();
         $ands = array();
 
-        if(!empty($regexp)){
-            $select = "SELECT COUNT(*) FROM [".$this->customTableName."] WHERE %and";
-            $ands[] = array("[".$this->customTableUid."] ".Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
+        if (!empty($regexp)) {
+            $select = "SELECT COUNT(*) FROM [" . $this->customTableName . "] WHERE %and";
+            $ands[] = array("[" . $this->customTableUid . "] " . Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
             $res = dibi::query($select);
-        }else{
-            $select = "SELECT COUNT(*) FROM [".$this->customTableName."]";
+        } else {
+            $select = "SELECT COUNT(*) FROM [" . $this->customTableName . "]";
             $res = dibi::query($select, $ands);
         }
         $this->close();
         return $res->fetchSingle();
     }
 
+    /**
+     *
+     * @param string $baseGroup
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
     public function listUsers($baseGroup = "/", $recursive = true)
     {
         return $this->listUsersPaginated($baseGroup, null, 0, -1);
     }
 
+    /**
+     * @param $login
+     * @return boolean
+     */
     public function userExists($login)
     {
         $this->connect();
-        $res = dibi::query("SELECT COUNT(*) FROM [".$this->customTableName."] WHERE [".$this->customTableUid."]=%s", $login);
+        $res = dibi::query("SELECT COUNT(*) FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "]=%s", $login);
         $this->close();
         return (intval($res->fetchSingle()) > 0);
     }
 
+    /**
+     * @param $login
+     * @return mixed
+     */
     public function getUserPass($login)
     {
         $this->connect();
-        $res = dibi::query("SELECT [".$this->customTablePwd."] FROM [".$this->customTableName."] WHERE [".$this->customTableUid."]=%s", $login);
+        $res = dibi::query("SELECT [" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "]=%s", $login);
         $pass = $res->fetchSingle();
         $this->close();
         return $pass;
     }
 
+    /**
+     * @param string $login
+     * @param string $pass
+     * @param string $seed
+     * @return bool
+     */
     public function checkPassword($login, $pass, $seed)
     {
         $userStoredPass = $this->getUserPass($login);
-        if(!$userStoredPass) return false;
+        if (!$userStoredPass) return false;
         $hashAlgo = $this->getOption("SQL_CUSTOM_TABLE_PWD_HASH");
-        if($hashAlgo == "pbkdf2"){
+        if ($hashAlgo == "pbkdf2") {
             return Utils::pbkdf2_validate_password($pass, $userStoredPass);
-        }else if($hashAlgo == "md5"){
+        } else if ($hashAlgo == "md5") {
             return md5($pass) === $userStoredPass;
-        }else if($hashAlgo == "clear"){
+        } else if ($hashAlgo == "clear") {
             return $pass == $userStoredPass;
         }
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function usersEditable()
     {
         return false;
     }
+
+    /**
+     * @return bool
+     */
     public function passwordsEditable()
     {
         return false;
     }
 
 
+    /**
+     * @param $httpVars
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function testSQLConnexion($httpVars)
     {
         $p = Utils::cleanDibiDriverParameters($httpVars["SQL_CUSTOM_DRIVER"]);
@@ -198,12 +269,12 @@ class customDbAuthDriver extends AbstractAuthDriver
         // Should throw an exception if there was a problem.
         dibi::connect($p);
         $cTableName = $httpVars["SQL_CUSTOM_TABLE"];
-        $cUserField= $httpVars["SQL_CUSTOM_TABLE_USER_FIELD"];
-        $cUserValue= $httpVars["SQL_CUSTOM_TABLE_TEST_USER"];
-        $res = dibi::query("SELECT COUNT(*) FROM [".$cTableName."] WHERE [".$cUserField."]=%s", $cUserValue);
+        $cUserField = $httpVars["SQL_CUSTOM_TABLE_USER_FIELD"];
+        $cUserValue = $httpVars["SQL_CUSTOM_TABLE_TEST_USER"];
+        $res = dibi::query("SELECT COUNT(*) FROM [" . $cTableName . "] WHERE [" . $cUserField . "]=%s", $cUserValue);
         $found = (intval($res->fetchSingle()) > 0);
-        if(!$found){
-            throw new Exception("Could connect to the DB but could not find user ".$cUserValue);
+        if (!$found) {
+            throw new Exception("Could connect to the DB but could not find user " . $cUserValue);
         }
         dibi::disconnect();
         echo "SUCCESS:Connexion established and user $cUserValue found in DB";

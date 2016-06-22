@@ -21,7 +21,7 @@
 namespace Pydio\Core\Http\Middleware;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Authfront\Core\FrontendsLoader;
+use Pydio\Auth\Frontend\Core\FrontendsLoader;
 use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\NoActiveWorkspaceException;

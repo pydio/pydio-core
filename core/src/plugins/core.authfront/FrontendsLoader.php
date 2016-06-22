@@ -18,9 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Authfront\Core;
+namespace Pydio\Auth\Frontend\Core;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;

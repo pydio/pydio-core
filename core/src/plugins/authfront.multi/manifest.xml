@@ -7,7 +7,7 @@
         <global_param name="ORDER" type="integer" label="Order"
                       description="Order this plugin with other auth frontends" default="200"/>
     </server_settings>
-    <class_definition classname="MultiAuthFrontend" filename="plugins/authfront.multi/class.MultiAuthFrontend.php"/>
+    <class_definition classname="Pydio\Auth\Frontend\MultiAuthFrontend" filename="plugins/authfront.multi/MultiAuthFrontend.php"/>
     <registry_contributions>
         <actions>
             <action name="login">

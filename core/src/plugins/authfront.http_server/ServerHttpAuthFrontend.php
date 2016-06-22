@@ -18,31 +18,49 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Frontend;
+
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\UsersService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class ServerHttpAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
+class ServerHttpAuthFrontend extends AbstractAuthFrontend
+{
 
-class ServerHttpAuthFrontend extends AbstractAuthFrontend {
-
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+    /**
+     * Try to authenticate the user based on various external parameters
+     * Return true if user is now logged.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param bool $isLast Whether this is is the last plugin called.
+     * @return bool
+     */
+    function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
+    {
 
         $serverData = $request->getServerParams();
         $localHttpLogin = $serverData["REMOTE_USER"];
         $localHttpPassw = isSet($serverData['PHP_AUTH_PW']) ? $serverData['PHP_AUTH_PW'] : "";
-        if(!isSet($localHttpLogin)) return false;
+        if (!isSet($localHttpLogin)) return false;
 
-        if(!UsersService::userExists($localHttpLogin) && $this->pluginConf["CREATE_USER"] === true){
+        if (!UsersService::userExists($localHttpLogin) && $this->pluginConf["CREATE_USER"] === true) {
             UsersService::createUser($localHttpLogin, $localHttpPassw, (isset($this->pluginConf["AJXP_ADMIN"]) && $this->pluginConf["AJXP_ADMIN"] == $localHttpLogin));
         }
-        try{
+        try {
             $logged = AuthService::logUser($localHttpLogin, $localHttpPassw, true);
             $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
             return true;
-        }catch (\Pydio\Core\Exception\LoginException $l){
+        } catch (\Pydio\Core\Exception\LoginException $l) {
         }
         return false;
 

@@ -21,7 +21,7 @@
 namespace Pydio\Core\Http\Rest;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Authfront\Core\FrontendsLoader;
+use Pydio\Auth\Frontend\Core\FrontendsLoader;
 use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;

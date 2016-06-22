@@ -18,33 +18,25 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper;
+namespace Pydio\Auth\Driver;
+
+use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 
 use Pydio\Core\PluginFramework\PluginsService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
-
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAccessWrapper.php");
-
-class ftpSonWrapper extends ftpAccessWrapper
-{
-    public function initUrl($url)
-    {
-        $this->parseUrl($url, true);
-    }
-}
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Authenticate users against an FTP server
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class ftpAuthDriver extends AbstractAuthDriver
+class FtpAuthDriver extends AbstractAuthDriver
 {
     public $driverName = "ftp";
 
@@ -55,7 +47,7 @@ class ftpAuthDriver extends AbstractAuthDriver
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false){
+        if (!isset($this->options["FTP_LOGIN_SCREEN"]) || $this->options["FTP_LOGIN_SCREEN"] != "TRUE" || $this->options["FTP_LOGIN_SCREEN"] === false) {
             return;
         }
         // ENABLE WEBFTP LOGIN SCREEN
@@ -74,7 +66,7 @@ class ftpAuthDriver extends AbstractAuthDriver
 
     public function userExists($login)
     {
-        return true ;
+        return true;
     }
 
     /**
@@ -83,18 +75,18 @@ class ftpAuthDriver extends AbstractAuthDriver
      */
     public function logoutCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $safeCredentials = AJXP_Safe::loadCredentials();
+        $safeCredentials = MemorySafe::loadCredentials();
         $crtUser = $safeCredentials["user"];
         if (isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])) {
             unset($_SESSION["AJXP_DYNAMIC_FTP_DATA"]);
         }
-        AJXP_Safe::clearCredentials();
+        MemorySafe::clearCredentials();
         $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
         if (isSet($this->options["ADMIN_USER"])) {
-              $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
-          }
+            $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
+        }
         $subUsers = array();
-        if ($crtUser != $adminUser && $crtUser!="") {
+        if ($crtUser != $adminUser && $crtUser != "") {
             ConfService::getConfStorageImpl()->deleteUser($crtUser, $subUsers);
         }
         AuthService::disconnect();
@@ -123,14 +115,15 @@ class ftpAuthDriver extends AbstractAuthDriver
     {
         $this->logDebug("TESTING", $params);
         $repositoryId = $params["REPOSITORY_ID"];
-        $wrapper = new ftpSonWrapper();
+        require_once($this->getBaseDir() . "/FtpSonWrapper.php");
+        $wrapper = new \Pydio\Access\Driver\StreamProvider\FTP\FtpSonWrapper();
         try {
             $wrapper->initUrl("ajxp.ftp://fake:fake@$repositoryId/");
         } catch (Exception $e) {
             if ($e->getMessage() == "Cannot login to FTP server with user fake") {
                 return "SUCCESS: FTP server successfully contacted.";
             } else {
-                return "ERROR: ".$e->getMessage();
+                return "ERROR: " . $e->getMessage();
             }
         }
         return "SUCCESS: Could succesfully connect to the FTP server!";
@@ -138,11 +131,12 @@ class ftpAuthDriver extends AbstractAuthDriver
 
     public function checkPassword($login, $pass, $seed)
     {
-        $wrapper = new ftpSonWrapper();
+        require_once($this->getBaseDir() . "/FtpSonWrapper.php");
+        $wrapper = new \Pydio\Access\Driver\StreamProvider\FTP\FtpSonWrapper();
         $repoId = $this->options["REPOSITORY_ID"];
         try {
-            $wrapper->initUrl("ajxp.ftp://".rawurlencode($login).":".rawurlencode($pass)."@$repoId/");
-            AJXP_Safe::storeCredentials($login, $pass);
+            $wrapper->initUrl("ajxp.ftp://" . rawurlencode($login) . ":" . rawurlencode($pass) . "@$repoId/");
+            MemorySafe::storeCredentials($login, $pass);
         } catch (Exception $e) {
             return false;
         }
@@ -153,6 +147,7 @@ class ftpAuthDriver extends AbstractAuthDriver
     {
         return false;
     }
+
     public function passwordsEditable()
     {
         return false;
@@ -161,9 +156,11 @@ class ftpAuthDriver extends AbstractAuthDriver
     public function createUser($login, $passwd)
     {
     }
+
     public function changePassword($login, $newPass)
     {
     }
+
     public function deleteUser($login)
     {
     }

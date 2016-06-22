@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="authfront.keystore" label="CONF_MESSAGE[API Keystore]" enabled="true" description="CONF_MESSAGE[Store API keys/token to simplify REST connection]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.keystore/class.KeystoreAuthFrontend.php" classname="KeystoreAuthFrontend"/>
+	<class_definition filename="plugins/authfront.keystore/KeystoreAuthFrontend.php" classname="Pydio\Auth\Frontend\KeystoreAuthFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.keystore" path="plugins/authfront.keystore/i18n"/>

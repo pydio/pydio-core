@@ -19,14 +19,16 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-use Pydio\Auth\Core\AbstractAuthDriver;
+namespace Pydio\Auth\Core;
+
+use Exception;
 use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Config loader overrider
@@ -40,20 +42,24 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
      */
     protected static $authStorageImpl;
 
+    /**
+     * Return this plugin configs, merged with its associated "core" configs.
+     * @return array
+     */
     public function getConfigs()
     {
         $configs = parent::getConfigs();
         $configs["ALLOW_GUEST_BROWSING"] = !isSet($_SERVER["HTTP_AJXP_FORCE_LOGIN"]) && ($configs["ALLOW_GUEST_BROWSING"] === "true" || $configs["ALLOW_GUEST_BROWSING"] === true || intval($configs["ALLOW_GUEST_BROWSING"]) == 1);
         // FORCE CASE INSENSITIVY FOR SQL BASED DRIVERS
-        if (isSet($configs["MASTER_INSTANCE_CONFIG"]) && is_array($configs["MASTER_INSTANCE_CONFIG"]) &&  isSet($configs["MASTER_INSTANCE_CONFIG"]["instance_name"]) && $configs["MASTER_INSTANCE_CONFIG"]["instance_name"] == "auth.sql") {
+        if (isSet($configs["MASTER_INSTANCE_CONFIG"]) && is_array($configs["MASTER_INSTANCE_CONFIG"]) && isSet($configs["MASTER_INSTANCE_CONFIG"]["instance_name"]) && $configs["MASTER_INSTANCE_CONFIG"]["instance_name"] == "auth.sql") {
             $configs["CASE_SENSITIVE"] = false;
         }
-        if (isSet($configs["SLAVE_INSTANCE_CONFIG"]) && !empty($configs["SLAVE_INSTANCE_CONFIG"])  && isset($configs["SLAVE_INSTANCE_CONFIG"]["instance_name"]) && $configs["SLAVE_INSTANCE_CONFIG"]["instance_name"] == "auth.sql") {
+        if (isSet($configs["SLAVE_INSTANCE_CONFIG"]) && !empty($configs["SLAVE_INSTANCE_CONFIG"]) && isset($configs["SLAVE_INSTANCE_CONFIG"]["instance_name"]) && $configs["SLAVE_INSTANCE_CONFIG"]["instance_name"] == "auth.sql") {
             $configs["CASE_SENSITIVE"] = false;
         }
         return $configs;
     }
-    
+
     /**
      * @param PluginsService|null $pluginsServiceInstance
      * @return null|AbstractAuthDriver|Plugin
@@ -61,7 +67,7 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
      */
     public function getImplementation($pluginsServiceInstance = null)
     {
-        if($pluginsServiceInstance === null){
+        if ($pluginsServiceInstance === null) {
             $pluginsServiceInstance = PluginsService::getInstance(Context::emptyContext());
         }
         if (!isSet(self::$authStorageImpl)) {
@@ -69,7 +75,7 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
                 throw new Exception("Please set up at least one MASTER_INSTANCE_CONFIG in core.auth options");
             }
             $masterName = is_array($this->pluginConf["MASTER_INSTANCE_CONFIG"]) ? $this->pluginConf["MASTER_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["MASTER_INSTANCE_CONFIG"];
-            if(is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) && $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] !== $masterName){
+            if (is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) && $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] !== $masterName) {
                 $slaveName = is_array($this->pluginConf["SLAVE_INSTANCE_CONFIG"]) ? $this->pluginConf["SLAVE_INSTANCE_CONFIG"]["instance_name"] : $this->pluginConf["SLAVE_INSTANCE_CONFIG"];
             }
             if (!empty($slaveName) && !empty($this->pluginConf["MULTI_MODE"])) {
@@ -78,20 +84,22 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
                 // Manually set up a multi config
 
                 $userBase = $this->pluginConf["MULTI_USER_BASE_DRIVER"];
-                if($userBase == "master") $baseName = $masterName;
-                else if($userBase == "slave") $baseName = $slaveName;
+                if ($userBase == "master") $baseName = $masterName;
+                else if ($userBase == "slave") $baseName = $slaveName;
                 else $baseName = "";
 
-                $mLabel = ""; $sLabel = "";$separator = "";
+                $mLabel = "";
+                $sLabel = "";
+                $separator = "";
                 $cacheMasters = true;
-                if(isSet($this->pluginConf["MULTI_MODE"]) && !isSet($this->pluginConf["MULTI_MODE"]["instance_name"])){
+                if (isSet($this->pluginConf["MULTI_MODE"]) && !isSet($this->pluginConf["MULTI_MODE"]["instance_name"])) {
                     $this->pluginConf["MULTI_MODE"]["instance_name"] = $this->pluginConf["MULTI_MODE"]["group_switch_value"];
                 }
                 if ($this->pluginConf["MULTI_MODE"]["instance_name"] == "USER_CHOICE") {
                     $mLabel = $this->pluginConf["MULTI_MODE"]["MULTI_MASTER_LABEL"];
                     $sLabel = $this->pluginConf["MULTI_MODE"]["MULTI_SLAVE_LABEL"];
                     $separator = $this->pluginConf["MULTI_MODE"]["MULTI_USER_ID_SEPARATOR"];
-                }else{
+                } else {
                     $cacheMasters = $this->pluginConf["MULTI_MODE"]["CACHE_MASTER_USERS_TO_SLAVE"];
                 }
                 $newOptions = array(

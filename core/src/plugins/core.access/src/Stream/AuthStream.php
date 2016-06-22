@@ -11,7 +11,7 @@ namespace Pydio\Access\Core\Stream;
 use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 
 class AuthStream implements StreamInterface
@@ -27,7 +27,7 @@ class AuthStream implements StreamInterface
     ) {
         $this->context = $node->getContext();
 
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($this->context);
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($this->context);
         $user = $credentials["user"];
         $password = $credentials["password"];
 

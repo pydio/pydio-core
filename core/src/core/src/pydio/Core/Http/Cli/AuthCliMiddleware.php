@@ -22,7 +22,7 @@ namespace Pydio\Core\Http\Cli;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\LoginException;
@@ -129,7 +129,7 @@ class AuthCliMiddleware
             $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
             $env = getenv("AJXP_SAFE_CREDENTIALS");
             if(!empty($env)){
-                $array = AJXP_Safe::getCredentialsFromEncodedString($env);
+                $array = MemorySafe::getCredentialsFromEncodedString($env);
                 if(isSet($array["user"]) && $array["user"] == $optUser){
                     unset($optToken);
                     $optPass = $array["password"];

@@ -31,7 +31,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_Safe
+class MemorySafe
 {
     private static $instance;
 
@@ -156,12 +156,12 @@ class AJXP_Safe
 
     /**
      * Creates the singleton instance
-     * @return AJXP_Safe
+     * @return MemorySafe
      */
     public static function getInstance()
     {
         if (empty(self::$instance)) {
-            self::$instance = new AJXP_Safe();
+            self::$instance = new MemorySafe();
         }
         return self::$instance;
     }
@@ -174,7 +174,7 @@ class AJXP_Safe
      */
     public static function storeCredentials($user, $password)
     {
-        $inst = AJXP_Safe::getInstance();
+        $inst = MemorySafe::getInstance();
         $inst->setCredentials($user, $password);
         $inst->store();
     }
@@ -185,7 +185,7 @@ class AJXP_Safe
      */
     public static function clearCredentials()
     {
-        $inst = AJXP_Safe::getInstance();
+        $inst = MemorySafe::getInstance();
         $inst->clear();
     }
     /**
@@ -195,7 +195,7 @@ class AJXP_Safe
      */
     public static function loadCredentials()
     {
-        $inst = AJXP_Safe::getInstance();
+        $inst = MemorySafe::getInstance();
         $inst->load();
         return $inst->getCredentials();
     }
@@ -207,7 +207,7 @@ class AJXP_Safe
 
     public static function getCredentialsFromEncodedString($encoded)
     {
-        $tmpInstance = new AJXP_Safe();
+        $tmpInstance = new MemorySafe();
         $tmpInstance->load($encoded);
         return $tmpInstance->getCredentials();
     }
@@ -217,7 +217,7 @@ class AJXP_Safe
      * + Try to get the credentials from the url parsing
      * + Try to get them from the user "Wallet" (personal data)
      * + Try to get them from the repository configuration
-     * + Try to get them from the AJXP_Safe.
+     * + Try to get them from the MemorySafe.
      *
      * @param ContextInterface $ctx
      * @return array
@@ -268,7 +268,7 @@ class AJXP_Safe
         }
         // 4. Test if there are encoded credentials available
         if ($user == "" && $repository->getContextOption($ctx, "ENCODED_CREDENTIALS") != "") {
-            list($user, $password) = AJXP_Safe::getCredentialsFromEncodedString($repository->getContextOption($ctx, "ENCODED_CREDENTIALS"));
+            list($user, $password) = MemorySafe::getCredentialsFromEncodedString($repository->getContextOption($ctx, "ENCODED_CREDENTIALS"));
         }
         // 5. Try from session
         $storeCreds = false;
@@ -282,7 +282,7 @@ class AJXP_Safe
             }
         }
         if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
-            $safeCred = AJXP_Safe::loadCredentials();
+            $safeCred = MemorySafe::loadCredentials();
             if ($safeCred !== false) {
                 $user = $safeCred["user"];
                 $password = $safeCred["password"];

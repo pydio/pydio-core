@@ -18,19 +18,23 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Driver;
+
+use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
 
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Ability to encapsulate many auth drivers and choose the right one at login.
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class multiAuthDriver extends AbstractAuthDriver
+class MultiAuthDriver extends AbstractAuthDriver
 {
     public $driverName = "multi";
     public $driversDef = array();
@@ -46,7 +50,7 @@ class multiAuthDriver extends AbstractAuthDriver
     /**
      * @var $drivers AbstractAuthDriver[]
      */
-    public $drivers =  array();
+    public $drivers = array();
 
     /**
      * @param ContextInterface $ctx
@@ -68,7 +72,7 @@ class multiAuthDriver extends AbstractAuthDriver
             if (!is_object($instance)) {
                 throw new Exception("Cannot find plugin $name for type 'auth'");
             }
-            if (!$instance->isEnabled()){
+            if (!$instance->isEnabled()) {
                 throw new Exception("You have selected a disabled plugin ($name) for type 'auth'");
             }
             $instance->init($options);
@@ -79,10 +83,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         $multi = PluginsService::getInstance($ctx)->getPluginById("authfront.multi");
         $multi->options = $this->options;
-        if(!$this->masterSlaveMode){
+        if (!$this->masterSlaveMode) {
             // Enable Multiple choice login screen
             PluginsService::getInstance($ctx)->setPluginActive("authfront", "multi", true, $multi);
-        }else{
+        } else {
             PluginsService::getInstance($ctx)->setPluginActive("authfront", "multi", false, $multi);
         }
         // THE "LOAD REGISTRY CONTRIBUTIONS" METHOD
@@ -90,7 +94,10 @@ class multiAuthDriver extends AbstractAuthDriver
         // SESSION IS ALREADY STARTED.
     }
 
-    public function getRegistryContributions(\Pydio\Core\Model\ContextInterface $ctx, $extendedVersion = true )
+    /**
+     * @inheritdoc
+     */
+    public function getRegistryContributions(\Pydio\Core\Model\ContextInterface $ctx, $extendedVersion = true)
     {
         $this->loadRegistryContributions($ctx);
         return parent::getRegistryContributions($ctx, $extendedVersion);
@@ -113,11 +120,17 @@ class multiAuthDriver extends AbstractAuthDriver
         $this->setCurrentDriverName($authSource);
     }
 
+    /**
+     * @param $name
+     */
     protected function setCurrentDriverName($name)
     {
         $this->currentDriver = $name;
     }
 
+    /**
+     * @return bool|AbstractAuthDriver
+     */
     protected function getCurrentDriver()
     {
         $this->detectCurrentDriver();
@@ -128,6 +141,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $userId
+     * @return mixed
+     */
     protected function extractRealId($userId)
     {
         $parts = explode($this->getOption("USER_ID_SEPARATOR"), $userId);
@@ -144,33 +161,48 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @return String
+     */
     public function getAuthScheme($login)
     {
-        if (!isSet(multiAuthDriver::$schemesCache)) {
+        if (!isSet(MultiAuthDriver::$schemesCache)) {
             foreach ($this->drivers as $scheme => $d) {
-                if($d->userExists($login)) return $scheme;
+                if ($d->userExists($login)) return $scheme;
             }
-        } else if (isSet(multiAuthDriver::$schemesCache[$login])) {
-            return multiAuthDriver::$schemesCache[$login];
+        } else if (isSet(MultiAuthDriver::$schemesCache[$login])) {
+            return MultiAuthDriver::$schemesCache[$login];
         }
         return null;
     }
 
+    /**
+     * @return bool
+     */
     public function supportsAuthSchemes()
     {
         return true;
     }
 
+    /**
+     * @param $usersList
+     * @param $scheme
+     */
     public function addToCache($usersList, $scheme)
     {
-        if (!isset(multiAuthDriver::$schemesCache)) {
-            multiAuthDriver::$schemesCache = array();
+        if (!isset(MultiAuthDriver::$schemesCache)) {
+            MultiAuthDriver::$schemesCache = array();
         }
         foreach ($usersList as $userName) {
-            multiAuthDriver::$schemesCache[$userName] = $scheme;
+            MultiAuthDriver::$schemesCache[$userName] = $scheme;
         }
     }
 
+    /**
+     * Wether users can be listed using offset and limit
+     * @return bool
+     */
     public function supportsUsersPagination()
     {
         if (!empty($this->baseName)) {
@@ -181,6 +213,15 @@ class multiAuthDriver extends AbstractAuthDriver
     }
 
     // $baseGroup = "/"
+    /**
+     * List users using offsets
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         if (!empty($this->baseName) && $regexp == null) {
@@ -199,27 +240,45 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null|string $filterProperty Can be "admin" or "parent"
+     * @param null|string $filterValue Can be a user Id, or AJXP_FILTER_EMPTY or AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
+     * @return int
+     */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         if (empty($this->baseName)) {
             if ($this->masterSlaveMode) {
-                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) +  $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
             } else {
                 $keys = array_keys($this->drivers);
-                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) +  $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
             }
         } else {
             return $this->drivers[$this->baseName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
         }
     }
 
+    /**
+     * @param $login
+     * @return bool
+     */
     public function isAjxpAdmin($login)
     {
         $keys = array_keys($this->drivers);
-        return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) ||  ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
+        return ($this->drivers[$keys[0]]->getOption("AJXP_ADMIN_LOGIN") === $login) || ($this->drivers[$keys[1]]->getOption("AJXP_ADMIN_LOGIN") === $login);
     }
 
-    public function listUsers($baseGroup="/", $recursive = true)
+    /**
+     *
+     * @param string $baseGroup
+     * @param bool $recursive
+     * @return UserInterface[]
+     */
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         if ($this->masterSlaveMode) {
             if (!empty($this->baseName)) {
@@ -243,6 +302,9 @@ class multiAuthDriver extends AbstractAuthDriver
         return $allUsers;
     }
 
+    /**
+     * @param UserInterface $userObject
+     */
     public function updateUserObject(&$userObject)
     {
         $s = $this->getAuthScheme($userObject->getId());
@@ -258,7 +320,7 @@ class multiAuthDriver extends AbstractAuthDriver
         } else if (!empty($this->currentDriver) && isSet($this->drivers[$this->currentDriver])) {
             $this->drivers[$this->currentDriver]->updateUserObject($userObject);
         }
-        if(isSet($restore)) $userObject->setId($restore);
+        if (isSet($restore)) $userObject->setId($restore);
     }
 
     /**
@@ -270,7 +332,7 @@ class multiAuthDriver extends AbstractAuthDriver
     public function listChildrenGroups($baseGroup = "/")
     {
         if ($this->masterSlaveMode) {
-            if(!empty($this->baseName)) return $this->drivers[$this->baseName]->listChildrenGroups($baseGroup);
+            if (!empty($this->baseName)) return $this->drivers[$this->baseName]->listChildrenGroups($baseGroup);
             $aGroups = $this->drivers[$this->masterName]->listChildrenGroups($baseGroup);
             $bGroups = $this->drivers[$this->slaveName]->listChildrenGroups($baseGroup);
             return $aGroups + $bGroups;
@@ -284,7 +346,13 @@ class multiAuthDriver extends AbstractAuthDriver
         }
         return $groups;
     }
-    
+
+    /**
+     * Alternative method to be used when checking if user exists
+     * before creating a new user.
+     * @param $login
+     * @return bool
+     */
     public function userExistsWrite($login)
     {
         if ($this->masterSlaveMode) {
@@ -297,6 +365,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @return boolean
+     */
     public function userExists($login)
     {
         if ($this->masterSlaveMode) {
@@ -309,7 +381,7 @@ class multiAuthDriver extends AbstractAuthDriver
             return false;
         }
         $login = $this->extractRealId($login);
-        $this->logDebug("user exists ".$login);
+        $this->logDebug("user exists " . $login);
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->userExists($login);
         } else {
@@ -317,13 +389,19 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param string $login
+     * @param string $pass
+     * @param string $seed
+     * @return bool
+     */
     public function checkPassword($login, $pass, $seed)
     {
         if ($this->masterSlaveMode) {
             if ($this->drivers[$this->masterName]->userExists($login)) {
                 // check master, and refresh slave if necessary
                 if ($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)) {
-                    if($this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE")){
+                    if ($this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE")) {
                         if ($this->drivers[$this->slaveName]->userExists($login)) {
                             $this->drivers[$this->slaveName]->changePassword($login, $pass);
                         } else {
@@ -332,7 +410,7 @@ class multiAuthDriver extends AbstractAuthDriver
                     }
                     return true;
                 } else {
-                    if(!$this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)){
+                    if (!$this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)) {
                         // User may in fact be a SLAVE user
                         return $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
                     }
@@ -345,7 +423,7 @@ class multiAuthDriver extends AbstractAuthDriver
         }
 
         $login = $this->extractRealId($login);
-        $this->logDebug("check pass ".$login);
+        $this->logDebug("check pass " . $login);
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
         } else {
@@ -353,9 +431,12 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @return bool
+     */
     public function usersEditable()
     {
-        if($this->masterSlaveMode) return true;
+        if ($this->masterSlaveMode) return true;
 
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->usersEditable();
@@ -364,9 +445,12 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @return bool
+     */
     public function passwordsEditable()
     {
-        if($this->masterSlaveMode) return true;
+        if ($this->masterSlaveMode) return true;
 
         if ($this->getCurrentDriver()) {
             return $this->getCurrentDriver()->passwordsEditable();
@@ -377,6 +461,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @param $passwd
+     */
     public function createUser($login, $passwd)
     {
         if ($this->masterSlaveMode) {
@@ -391,6 +479,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @param $newPass
+     */
     public function changePassword($login, $newPass)
     {
         if ($this->masterSlaveMode) {
@@ -404,6 +496,10 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @throws Exception
+     */
     public function deleteUser($login)
     {
         if ($this->masterSlaveMode) {
@@ -417,6 +513,11 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $login
+     * @return mixed
+     * @throws Exception
+     */
     public function getUserPass($login)
     {
         if ($this->masterSlaveMode) {
@@ -430,9 +531,14 @@ class multiAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param $userId
+     * @param $pwd
+     * @return array
+     */
     public function filterCredentials($userId, $pwd)
     {
-        if($this->masterSlaveMode) return array($userId, $pwd);
+        if ($this->masterSlaveMode) return array($userId, $pwd);
         return array($this->extractRealId($userId), $pwd);
     }
 

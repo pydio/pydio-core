@@ -18,14 +18,17 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Frontend;
+
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class BasicHttpAuthFrontend extends AbstractAuthFrontend {
+class BasicHttpAuthFrontend extends AbstractAuthFrontend
+{
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $request
@@ -33,7 +36,8 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend {
      * @param bool $isLast
      * @return bool
      */
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
+    {
 
         $serverData = $request->getServerParams();
         $localHttpLogin = $serverData["PHP_AUTH_USER"];
@@ -44,36 +48,36 @@ class BasicHttpAuthFrontend extends AbstractAuthFrontend {
             $localHttpLogin = $serverData['PHP_AUTH_USER'];
             $localHttpPassw = $serverData['PHP_AUTH_PW'];
 
-        // most other servers
+            // most other servers
         } elseif (isset($serverData['HTTP_AUTHORIZATION'])) {
-            if (strpos(strtolower($serverData['HTTP_AUTHORIZATION']),'basic')===0){
-                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($serverData['HTTP_AUTHORIZATION'], 6)));
+            if (strpos(strtolower($serverData['HTTP_AUTHORIZATION']), 'basic') === 0) {
+                list($localHttpLogin, $localHttpPassw) = explode(':', base64_decode(substr($serverData['HTTP_AUTHORIZATION'], 6)));
             }
-        // Sometimes prepend a REDIRECT
+            // Sometimes prepend a REDIRECT
         } elseif (isset($serverData['REDIRECT_HTTP_AUTHORIZATION'])) {
 
-            if (strpos(strtolower($serverData['REDIRECT_HTTP_AUTHORIZATION']),'basic')===0){
-                list($localHttpLogin,$localHttpPassw) = explode(':',base64_decode(substr($serverData['REDIRECT_HTTP_AUTHORIZATION'], 6)));
+            if (strpos(strtolower($serverData['REDIRECT_HTTP_AUTHORIZATION']), 'basic') === 0) {
+                list($localHttpLogin, $localHttpPassw) = explode(':', base64_decode(substr($serverData['REDIRECT_HTTP_AUTHORIZATION'], 6)));
             }
 
         }
 
-        if($isLast && empty($localHttpLogin)){
+        if ($isLast && empty($localHttpLogin)) {
             $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
             return true;
         }
-        if(!isSet($localHttpLogin)) {
+        if (!isSet($localHttpLogin)) {
             return false;
         }
 
-        try{
-            
+        try {
+
             $loggedUser = AuthService::logUser($localHttpLogin, $localHttpPassw, false, false, "-1");
             $request = $request->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
             return true;
-            
-        }catch (\Pydio\Core\Exception\LoginException $l){
-            if($isLast && $l->getLoginError() !== -4){
+
+        } catch (\Pydio\Core\Exception\LoginException $l) {
+            if ($isLast && $l->getLoginError() !== -4) {
                 $response = $response->withHeader("WWW-Authenticate", "Basic realm=\"Pydio API\"")->withStatus(401);
                 return true;
             }

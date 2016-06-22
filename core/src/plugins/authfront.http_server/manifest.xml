@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="authfront.http_server" enabled="false" label="CONF_MESSAGE[Basic Http by Server]" description="CONF_MESSAGE[Basic Http Auth performed by server (e.g. apache htaccess)]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.http_server/class.ServerHttpAuthFrontend.php" classname="ServerHttpAuthFrontend"/>
+	<class_definition filename="plugins/authfront.http_server/ServerHttpAuthFrontend.php" classname="Pydio\Auth\Frontend\ServerHttpAuthFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.http_server" path="plugins/authfront.http_server/i18n"/>

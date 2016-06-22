@@ -2,7 +2,7 @@
 <ajxpcore id="authfront.session_login" enabled="always" label="CONF_MESSAGE[Standard login screen]"
           description="CONF_MESSAGE[Display a standard user/password login screen]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.session_login/class.SessionLoginFrontend.php" classname="SessionLoginFrontend"/>
+	<class_definition filename="plugins/authfront.session_login/SessionLoginFrontend.php" classname="Pydio\Auth\Frontend\SessionLoginFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.session_login" path="plugins/authfront.session_login/i18n"/>

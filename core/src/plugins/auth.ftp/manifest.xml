@@ -10,7 +10,7 @@
         <param name="FTP_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[FTP Login Screen]" description="CONF_MESSAGE[Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)]" mandatory="true" default="false"/>
         <param name="REPOSITORY_ID" type="select" choices="json_list:list_all_repositories_json" label="CONF_MESSAGE[Workspace]" description="CONF_MESSAGE[ID of the workspace used to validate credentials]" mandatory="true"/>
 	</server_settings>
-	<class_definition filename="plugins/auth.ftp/class.ftpAuthDriver.php" classname="ftpAuthDriver"/>
+	<class_definition filename="plugins/auth.ftp/FtpAuthDriver.php" classname="Pydio\Auth\Driver\FtpAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/action[@name='back']" exclude=""/>
         <client_configs>

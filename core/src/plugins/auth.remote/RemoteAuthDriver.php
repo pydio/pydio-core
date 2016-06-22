@@ -18,6 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Driver;
+
+use DOMElement;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -25,34 +28,34 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Plugin to bridge authentication between Ajxp and external CMS
  *  This class works in 2 modes (master / slave)
-    It requires the following arguments:
-       - SLAVE_MODE
-       - LOGIN_URL
-       - LOGOUT_URL
-       - SECRET
-       - USERS_FILEPATH (the users.ser filepath)
-
-    In master mode, the login dialog is still displayed in AJXP.
-       When the user attempt a login, the given credential are sent back to the given remote URL.
-       The LOGIN_URL is called as GET LOGIN_URL?name=<entered_user_name>&pass=<entered_password>&key=MD5(name.password.SECRET)
-       The method must return a valid PHP serialized object for us to continue (see below)
-
-    In slave mode, the login dialog is not displayed in AJXP.
-    If the user directly go to the main page, (s)he's redirected to the LOGIN_URL.
-    The logout button isn't displayed either, a back button linking to LOGOUT_URL is used instead.
-    The user will log in on the remote site, and the remote script will call us, as GET ajxpPath/plugins/auth.remote/login.php?object=<serialized object>&key=MD5(object.SECRET)
-
-    The serialized object contains the same data as the serialAuthDriver.
+ * It requires the following arguments:
+ * - SLAVE_MODE
+ * - LOGIN_URL
+ * - LOGOUT_URL
+ * - SECRET
+ * - USERS_FILEPATH (the users.ser filepath)
+ *
+ * In master mode, the login dialog is still displayed in AJXP.
+ * When the user attempt a login, the given credential are sent back to the given remote URL.
+ * The LOGIN_URL is called as GET LOGIN_URL?name=<entered_user_name>&pass=<entered_password>&key=MD5(name.password.SECRET)
+ * The method must return a valid PHP serialized object for us to continue (see below)
+ *
+ * In slave mode, the login dialog is not displayed in AJXP.
+ * If the user directly go to the main page, (s)he's redirected to the LOGIN_URL.
+ * The logout button isn't displayed either, a back button linking to LOGOUT_URL is used instead.
+ * The user will log in on the remote site, and the remote script will call us, as GET ajxpPath/plugins/auth.remote/login.php?object=<serialized object>&key=MD5(object.SECRET)
+ *
+ * The serialized object contains the same data as the serialAuthDriver.
  *
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class remoteAuthDriver extends AbstractAuthDriver
+class RemoteAuthDriver extends AbstractAuthDriver
 {
     public $usersSerFile;
     /** The current authentication mode */
@@ -84,17 +87,17 @@ class remoteAuthDriver extends AbstractAuthDriver
                     $rootURI = $cmsOpts["MASTER_URL"];
                 }
                 $cmsOpts["MASTER_HOST"] = $rootHost;
-                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = Utils::securePath("/".$rootURI."/".$loginURI);
+                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = Utils::securePath("/" . $rootURI . "/" . $loginURI);
                 $logoutAction = $cmsOpts["LOGOUT_ACTION"];
                 switch ($cmsOpts["cms"]) {
                     case "wp":
-                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["MASTER_URL"] : $cmsOpts["MASTER_URL"]."/wp-login.php?action=logout");
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["MASTER_URL"] : $cmsOpts["MASTER_URL"] . "/wp-login.php?action=logout");
                         break;
                     case "joomla":
                         $cmsOpts["LOGOUT_URL"] = $cmsOpts["LOGIN_URL"];
                         break;
                     case "drupal":
-                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"]."/user/logout");
+                        $cmsOpts["LOGOUT_URL"] = ($logoutAction == "back" ? $cmsOpts["LOGIN_URL"] : $cmsOpts["MASTER_URL"] . "/user/logout");
                         break;
                     default:
                         break;
@@ -155,7 +158,7 @@ class remoteAuthDriver extends AbstractAuthDriver
      * @param bool $recursive
      * @return UserInterface[]
      */
-    public function listUsersPaginated($baseGroup, $regexp, $offset = -1 , $limit = -1, $recursive = true)
+    public function listUsersPaginated($baseGroup, $regexp, $offset = -1, $limit = -1, $recursive = true)
     {
         $users = $this->listUsers();
         $result = array();
@@ -165,12 +168,12 @@ class remoteAuthDriver extends AbstractAuthDriver
                 continue;
             }
             if ($offset != -1 && $index < $offset) {
-                $index ++;
+                $index++;
                 continue;
             }
             $result[$usr] = $pass;
-            $index ++;
-            if($limit != -1 && count($result) >= $limit) break;
+            $index++;
+            if ($limit != -1 && count($result) >= $limit) break;
         }
         return $result;
     }
@@ -183,7 +186,7 @@ class remoteAuthDriver extends AbstractAuthDriver
      * @param bool $recursive
      * @return int
      */
-    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive=true)
+    public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         return count($this->listUsersPaginated($baseGroup, $regexp));
     }
@@ -196,8 +199,8 @@ class remoteAuthDriver extends AbstractAuthDriver
     public function userExists($login)
     {
         $users = $this->listUsers();
-        if(UsersService::ignoreUserCase()) $login = strtolower($login);
-        if(!is_array($users) || !array_key_exists($login, $users)) return false;
+        if (UsersService::ignoreUserCase()) $login = strtolower($login);
+        if (!is_array($users) || !array_key_exists($login, $users)) return false;
         return true;
     }
 
@@ -209,15 +212,15 @@ class remoteAuthDriver extends AbstractAuthDriver
      */
     public function checkPassword($login, $pass, $seed)
     {
-        if(UsersService::ignoreUserCase()) $login = strtolower($login);
+        if (UsersService::ignoreUserCase()) $login = strtolower($login);
         global $AJXP_GLUE_GLOBALS;
-        if (isSet($AJXP_GLUE_GLOBALS) || (!empty($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0) ) {
+        if (isSet($AJXP_GLUE_GLOBALS) || (!empty($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0)) {
             $userStoredPass = $this->getUserPass($login);
-            if(!$userStoredPass) return false;
+            if (!$userStoredPass) return false;
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-                return  Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
+                return Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
             } else {
-                return (md5($userStoredPass.$seed) === $pass);
+                return (md5($userStoredPass . $seed) === $pass);
             }
         } else {
             $crtSessionId = session_id();
@@ -244,7 +247,7 @@ class remoteAuthDriver extends AbstractAuthDriver
                         session_start();
                         if (!$this->slaveMode) {
                             foreach ($sessCookies as $k => $v) {
-                                if($k == "AjaXplorer") continue;
+                                if ($k == "AjaXplorer") continue;
                                 setcookie($k, urldecode($v), 0, $uri);
                             }
                         }
@@ -264,11 +267,11 @@ class remoteAuthDriver extends AbstractAuthDriver
             }
             // NOW CHECK IN LOCAL USERS LIST
             $userStoredPass = $this->getUserPass($login);
-            if(!$userStoredPass) return false;
+            if (!$userStoredPass) return false;
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
                 $res = Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
             } else {
-                $res = (md5($userStoredPass.$seed) === $pass);
+                $res = (md5($userStoredPass . $seed) === $pass);
             }
             if ($res) {
                 session_id($crtSessionId);
@@ -286,7 +289,7 @@ class remoteAuthDriver extends AbstractAuthDriver
     public function createCookieString($login)
     {
         $userPass = $this->getUserPass($login);
-        return md5($login.":".$userPass.":ajxp");
+        return md5($login . ":" . $userPass . ":ajxp");
     }
 
     /**
@@ -311,10 +314,10 @@ class remoteAuthDriver extends AbstractAuthDriver
      */
     public function createUser($login, $passwd)
     {
-        if(UsersService::ignoreUserCase()) $login = strtolower($login);
+        if (UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
-        if(!is_array($users)) $users = array();
-        if(array_key_exists($login, $users)) return;
+        if (!is_array($users)) $users = array();
+        if (array_key_exists($login, $users)) return;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = Utils::pbkdf2_create_hash($passwd);
         } else {
@@ -329,9 +332,9 @@ class remoteAuthDriver extends AbstractAuthDriver
      */
     public function changePassword($login, $newPass)
     {
-        if(UsersService::ignoreUserCase()) $login = strtolower($login);
+        if (UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
-        if(!is_array($users) || !array_key_exists($login, $users)) return ;
+        if (!is_array($users) || !array_key_exists($login, $users)) return;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $users[$login] = Utils::pbkdf2_create_hash($newPass);
         } else {
@@ -345,7 +348,7 @@ class remoteAuthDriver extends AbstractAuthDriver
      */
     public function deleteUser($login)
     {
-        if(UsersService::ignoreUserCase()) $login = strtolower($login);
+        if (UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if (is_array($users) && array_key_exists($login, $users)) {
             unset($users[$login]);
@@ -359,7 +362,7 @@ class remoteAuthDriver extends AbstractAuthDriver
      */
     public function getUserPass($login)
     {
-        if(!$this->userExists($login)) return false;
+        if (!$this->userExists($login)) return false;
         $users = $this->listUsers();
         return $users[$login];
     }

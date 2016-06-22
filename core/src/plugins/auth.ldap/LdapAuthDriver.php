@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Driver;
+
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -33,7 +35,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class ldapAuthDriver extends AbstractAuthDriver
+class LdapAuthDriver extends AbstractAuthDriver
 {
     public $ldapUrl;
     public $ldapPort = 389;
@@ -88,7 +90,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         if (!empty($options["LDAP_FAKE_MEMBEROF"])) $this->fakeAttrMemberOf = $options["LDAP_FAKE_MEMBEROF"];
         if (isset($options["LDAP_VALUE_MEMBERATTR_IN_GROUP"])) {
             $this->attrMemberInGroup = $options["LDAP_VALUE_MEMBERATTR_IN_GROUP"];
-        }else{
+        } else {
             $this->attrMemberInGroup = true;
         }
 
@@ -261,20 +263,18 @@ class ldapAuthDriver extends AbstractAuthDriver
                 $searchAttrArray = explode(",", $searchAttr);
             }
 
-            if(isset($searchAttrArray)){
-                if(count($searchAttrArray) > 1){
+            if (isset($searchAttrArray)) {
+                if (count($searchAttrArray) > 1) {
                     $searchAttrFilter = "(|";
-                    foreach($searchAttrArray as $attr){
-                        $searchAttrFilter .= "(". $attr . "=" . $login . ")";
+                    foreach ($searchAttrArray as $attr) {
+                        $searchAttrFilter .= "(" . $attr . "=" . $login . ")";
                     }
                     $searchAttrFilter .= ")";
-                }
-                else{
+                } else {
                     $searchAttrFilter = "(" . $searchAttrArray[0] . "=" . $login . ")";
                 }
 
-            }
-            else{
+            } else {
                 $searchAttrFilter = "(" . $this->ldapUserAttr . "=" . $login . ")";
             }
 
@@ -336,7 +336,7 @@ class ldapAuthDriver extends AbstractAuthDriver
 
         //Update progress bar in CLI mode
         $isListAll = (($offset == -1) && ($limit == -1) && (is_null($login)) && $regexpOnSearchAttr && (php_sapi_name() == "cli"));
-        if($isListAll){
+        if ($isListAll) {
             $total = $this->getCountFromCache();
             $progressBar = new ProgressBarCLI();
             $progressBar->init($index, $total["count"], "Get ldap users");
@@ -347,7 +347,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 ldap_control_paged_result($this->ldapconn, $this->pageSize, false, $cookie);
 
             $ret = ldap_search($conn, $this->ldapDN, $filter, $expected, 0, 0);
-            if($ret === false) break;
+            if ($ret === false) break;
             foreach ($ret as $i => $resourceResult) {
                 if ($resourceResult === false) continue;
                 if ($countOnly) {
@@ -376,15 +376,15 @@ class ldapAuthDriver extends AbstractAuthDriver
 
                         // fake memberOf
                         if (($this->fakeAttrMemberOf) && method_exists($this, "fakeMemberOf") && in_array(strtolower("memberof"), array_map("strtolower", $expected))) {
-                            if($this->attrMemberInGroup){
+                            if ($this->attrMemberInGroup) {
                                 $uid = $entry["dn"];
-                            }else{
+                            } else {
                                 $uidWithEqual = explode(",", $entry["dn"]);
-                                $uidShort = explode("=",$uidWithEqual[0]);
+                                $uidShort = explode("=", $uidWithEqual[0]);
                                 $uid = $uidShort[1];
                             }
 
-                            $strldap = "(&" . $this->ldapGFilter . "(" .$this->fakeAttrMemberOf. "=" . $uid . "))";
+                            $strldap = "(&" . $this->ldapGFilter . "(" . $this->fakeAttrMemberOf . "=" . $uid . "))";
                             $this->fakeMemberOf($conn, $this->ldapGDN, $strldap, array("cn"), $entry);
                         }
 
@@ -392,7 +392,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                         $index++;
 
                         //Update progress bar in CLI mode
-                        if(isset($progressBar))
+                        if (isset($progressBar))
                             $progressBar->update($index);
 
 
@@ -406,7 +406,7 @@ class ldapAuthDriver extends AbstractAuthDriver
             }
             if ($isSupportPagedResult)
                 foreach ($ret as $element) {
-                    if(is_resource($element))
+                    if (is_resource($element))
                         @ldap_control_paged_result_response($this->ldapconn, $element, $cookie);
                 }
         } while (($cookie !== null && $cookie != '') && ($isSupportPagedResult) && (!$gotAllEntries));
@@ -523,7 +523,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                 }
                 // TODO: REMOVE filterBaseGroup() instruction.
                 // MAYBE THIS WILL BREAK SOMEHTING
-                if(!ConfService::getConfStorageImpl()->groupExists(rtrim($parent, "/")."/".$dn)) {
+                if (!ConfService::getConfStorageImpl()->groupExists(rtrim($parent, "/") . "/" . $dn)) {
                     UsersService::createGroup($parent, $dn, $login);
                 }
             }
@@ -788,7 +788,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
                                         $roleToAdd = RolesService::getRole($uniqValueWithPrefix);
-                                        if($roleToAdd === false){
+                                        if ($roleToAdd === false) {
                                             $roleToAdd = RolesService::getOrCreateRole($uniqValueWithPrefix, $userObject->getGroupPath());
                                             $roleToAdd->setLabel($uniqValue);
                                             RolesService::updateRole($roleToAdd);
@@ -828,7 +828,7 @@ class ldapAuthDriver extends AbstractAuthDriver
                                         if (count($branch)) {
                                             $parent = "/" . implode("/", array_reverse($branch));
                                         }
-                                        if(!ConfService::getConfStorageImpl()->groupExists(rtrim($userObject->getRealGroupPath($parent), "/")."/".$fullDN)) {
+                                        if (!ConfService::getConfStorageImpl()->groupExists(rtrim($userObject->getRealGroupPath($parent), "/") . "/" . $fullDN)) {
                                             UsersService::createGroup($parent, $fullDN, $humanName);
                                         }
                                         $userObject->setGroupPath(rtrim($parent, "/") . "/" . $fullDN, true);
@@ -910,7 +910,7 @@ class ldapAuthDriver extends AbstractAuthDriver
     public function getCountFromCache()
     {
         $ttl = $this->getOption("LDAP_COUNT_CACHE_TTL");
-        if(empty($ttl)) $ttl = 1;
+        if (empty($ttl)) $ttl = 1;
         $fileName = "ldap.ser";
         if (file_exists($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName)) {
             $fileContent = unserialize(file_get_contents($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName));
@@ -956,10 +956,9 @@ class ldapAuthDriver extends AbstractAuthDriver
         if (is_array($entries) && $entries["count"] > 0) {
             unset($entries["count"]);
             foreach ($entries as $key => $entry) {
-                if(isset($this->mappedRolePrefix)){
+                if (isset($this->mappedRolePrefix)) {
                     $returnArray[$this->mappedRolePrefix . $entry[$this->ldapGroupAttr][0]] = $this->mappedRolePrefix . $entry[$this->ldapGroupAttr][0];
-                }
-                else{
+                } else {
                     $returnArray[$entry[$this->ldapGroupAttr][0]] = $entry[$this->ldapGroupAttr][0];
                 }
             }

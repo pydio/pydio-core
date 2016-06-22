@@ -18,33 +18,41 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Frontend;
+
+use data;
+use dencrypted;
 use Pydio\Core\Services\AuthService;
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class CypheredAuthFrontend extends AbstractAuthFrontend {
+class CypheredAuthFrontend extends AbstractAuthFrontend
+{
 
-    function detectVar(&$httpVars, $varName){
-        if(isSet($httpVars[$varName])) return $httpVars[$varName];
-        if(isSet($_SERVER["HTTP_PYDIO_".strtoupper($varName)])) return $_SERVER["HTTP_".strtoupper($varName)];
+    function detectVar(&$httpVars, $varName)
+    {
+        if (isSet($httpVars[$varName])) return $httpVars[$varName];
+        if (isSet($_SERVER["HTTP_PYDIO_" . strtoupper($varName)])) return $_SERVER["HTTP_" . strtoupper($varName)];
         return "";
     }
 
-    function getLastKeys(){
-        $file = $this->getPluginWorkDir(false)."/last_inc";
-        if(!is_file($file)) return array();
+    function getLastKeys()
+    {
+        $file = $this->getPluginWorkDir(false) . "/last_inc";
+        if (!is_file($file)) return array();
         $content = file_get_contents($file);
-        if(empty($content)) return array();
+        if (empty($content)) return array();
         $data = unserialize($content);
-        if(is_array($data)) return $data;
+        if (is_array($data)) return $data;
         return array();
     }
 
-    function storeLastKeys($data){
-        $file = $this->getPluginWorkDir(true)."/last_inc";
+    function storeLastKeys($data)
+    {
+        $file = $this->getPluginWorkDir(true) . "/last_inc";
         file_put_contents($file, serialize($data));
     }
 
@@ -55,7 +63,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
      * @param data $edata
      * @return dencrypted data
      */
-    public function decrypt($password, $edata) {
+    public function decrypt($password, $edata)
+    {
         $data = base64_decode($edata);
         $salt = substr($data, 8, 8);
         $ct = substr($data, 16);
@@ -70,16 +79,16 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
          * 3 rounds for 192 since it's not evenly divided by 128 bits
          */
         $rounds = 3;
-        $data00 = $password.$salt;
+        $data00 = $password . $salt;
         $md5_hash = array();
         $md5_hash[0] = md5($data00, true);
         $result = $md5_hash[0];
         for ($i = 1; $i < $rounds; $i++) {
-            $md5_hash[$i] = md5($md5_hash[$i - 1].$data00, true);
+            $md5_hash[$i] = md5($md5_hash[$i - 1] . $data00, true);
             $result .= $md5_hash[$i];
         }
         $key = substr($result, 0, 32);
-        $iv  = substr($result, 32,16);
+        $iv = substr($result, 32, 16);
 
         return openssl_decrypt($ct, 'aes-256-cbc', $key, true, $iv);
     }
@@ -91,7 +100,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
      * @param string $data
      * @return string encrypted data
      */
-    public function crypt($password, $data) {
+    public function crypt($password, $data)
+    {
         // Set a random salt
         $salt = openssl_random_pseudo_bytes(8);
 
@@ -99,67 +109,67 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
         $dx = '';
         // Salt the key(32) and iv(16) = 48
         while (strlen($salted) < 48) {
-            $dx = md5($dx.$password.$salt, true);
+            $dx = md5($dx . $password . $salt, true);
             $salted .= $dx;
         }
 
         $key = substr($salted, 0, 32);
-        $iv  = substr($salted, 32,16);
+        $iv = substr($salted, 32, 16);
 
         $encrypted_data = openssl_encrypt($data, 'aes-256-cbc', $key, true, $iv);
         return base64_encode('Salted__' . $salt . $encrypted_data);
     }
 
 
-
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
+    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
+    {
 
         $httpVars = $request->getParsedBody();
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
-        $ctx      = $request->getAttribute("ctx");
+        $ctx = $request->getAttribute("ctx");
         $checkNonce = $this->pluginConf["CHECK_NONCE"] === true;
         $token = $this->detectVar($httpVars, "cyphered_token");
         $tokenInc = $this->detectVar($httpVars, "cyphered_token_inc");
-        if(empty($token) || ($checkNonce && empty($tokenInc))){
+        if (empty($token) || ($checkNonce && empty($tokenInc))) {
             return false;
         }
 
-        if(!$checkNonce){
+        if (!$checkNonce) {
             $decoded = $this->decrypt($this->pluginConf["PRIVATE_KEY"], $token);
-        }else{
-            $decoded = $this->decrypt($this->pluginConf["PRIVATE_KEY"].":".$tokenInc, $token);
+        } else {
+            $decoded = $this->decrypt($this->pluginConf["PRIVATE_KEY"] . ":" . $tokenInc, $token);
         }
-        if($decoded == null){
+        if ($decoded == null) {
             return false;
         }
         $data = unserialize($decoded);
-        if(empty($data) || !is_array($data) || !isset($data["user_id"]) || !isset($data["user_pwd"])){
+        if (empty($data) || !is_array($data) || !isset($data["user_id"]) || !isset($data["user_pwd"])) {
             $this->logDebug(__FUNCTION__, "Cyphered Token found but wrong deserizalized data");
             return false;
         }
-        if($ctx->hasUser() != null){
+        if ($ctx->hasUser() != null) {
             $currentUser = $ctx->getUser()->getId();
-            if($currentUser != $data["user_id"]){
+            if ($currentUser != $data["user_id"]) {
                 AuthService::disconnect();
             }
         }
-        $this->logDebug(__FUNCTION__, "Trying to log user ".$data["user_id"]." from cyphered token");
+        $this->logDebug(__FUNCTION__, "Trying to log user " . $data["user_id"] . " from cyphered token");
         $userId = $data["user_id"];
-        if($checkNonce){
+        if ($checkNonce) {
             $keys = $this->getLastKeys();
             $lastInc = 0;
-            if(isSet($keys[$userId])){
+            if (isSet($keys[$userId])) {
                 $lastInc = $keys[$userId];
             }
-            if($tokenInc <= $lastInc){
+            if ($tokenInc <= $lastInc) {
                 $this->logDebug(__FUNCTION__, "Key was already used for this user id");
                 return false;
             }
         }
-        try{
+        try {
             $loggedUser = AuthService::logUser($data["user_id"], $data["user_pwd"], false, false, -1);
             $this->logDebug(__FUNCTION__, "Success");
-            if($checkNonce){
+            if ($checkNonce) {
                 $keys[$userId] = $tokenInc;
                 $this->storeLastKeys($keys);
             }
@@ -167,8 +177,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend {
             $request = $request->withAttribute("ctx", $ctx);
             return true;
 
-        }catch (\Pydio\Core\Exception\LoginException $l){
-            $this->logDebug(__FUNCTION__, "Wrong result ".$l->getLoginError());
+        } catch (\Pydio\Core\Exception\LoginException $l) {
+            $this->logDebug(__FUNCTION__, "Wrong result " . $l->getLoginError());
         }
 
         return false;

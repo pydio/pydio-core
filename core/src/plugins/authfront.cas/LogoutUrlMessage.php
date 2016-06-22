@@ -19,18 +19,32 @@
  * The latest code can be found at <https://pydio.com/>.
  */
 
+namespace Pydio\Auth\Frontend;
+use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class LogoutUrlMessage implements \Pydio\Core\Http\Response\XMLDocSerializableResponseChunk
+/**
+ * Class LogoutUrlMessage
+ * @package Pydio\Auth\Frontend
+ */
+class LogoutUrlMessage implements XMLDocSerializableResponseChunk
 {
     protected $url;
 
+    /**
+     * LogoutUrlMessage constructor.
+     * @param $url
+     */
     public function __construct($url)
     {
         $this->url = $url;
     }
 
+    /**
+     * @return string
+     */
     public function getCharset()
     {
         return "UTF-8";
@@ -41,6 +55,6 @@ class LogoutUrlMessage implements \Pydio\Core\Http\Response\XMLDocSerializableRe
      */
     public function toXML()
     {
-        return "<url>".$this->url."</url>";
+        return "<url>" . $this->url . "</url>";
     }
 }

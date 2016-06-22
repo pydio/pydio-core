@@ -37,7 +37,7 @@ use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Message\UserMessage;
@@ -2327,7 +2327,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             "DATA_TEMPLATE"  => ""
         ];
         if ($repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") === true) {
-            $newOptions["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
         }
         $customData = [];
         foreach ($httpVars as $key => $value) {
@@ -2342,7 +2342,7 @@ class fsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $newOptions["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
             foreach ($newOptions["META_SOURCES"] as $index => &$data) {
                 if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
-                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = AJXP_Safe::getEncodedCredentialString();
+                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
                 }
             }
             Controller::applyHook("workspace.share_metasources", [$ctx, &$newOptions["META_SOURCES"]]);

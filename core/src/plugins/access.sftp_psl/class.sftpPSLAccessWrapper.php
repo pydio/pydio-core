@@ -26,7 +26,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
@@ -74,7 +74,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
         $host       = $repoObject->getContextOption($ctx, "SFTP_HOST");
         $port       = $repoObject->getContextOption($ctx, "SFTP_PORT");
 
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($node->getContext());
         $user = $credentials["user"];
         $pass = $credentials["password"];
 
@@ -194,7 +194,7 @@ class sftpPSLAccessWrapper extends fsAccessWrapper
         $host = $repoObject->getContextOption($ctx, "SFTP_HOST");
         $port = $repoObject->getContextOption($ctx, "SFTP_PORT");
 
-        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($node->getContext());
         $user = $credentials["user"];
         $pass = $credentials["password"];
 

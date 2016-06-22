@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2015 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Abstrium <contact (at) pydio.com>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -16,17 +16,27 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com/>.
  */
-use Pydio\Authfront\Core\AbstractAuthFrontend;
+namespace Pydio\Access\Driver\StreamProvider\FTP;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAccessWrapper.php");
 
-class FTPAuthFrontend extends AbstractAuthFrontend {
-
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false){
-        return false;
+/**
+ * Class FtpSonWrapper
+ * @package Pydio\Access\Driver\StreamProvider\FTP
+ */
+class FtpSonWrapper extends ftpAccessWrapper
+{
+    /**
+     * @param $url
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
+    public function initUrl($url)
+    {
+        $this->parseUrl($url, true);
     }
-
 }

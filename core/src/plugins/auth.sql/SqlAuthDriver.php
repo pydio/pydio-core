@@ -18,19 +18,24 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Auth\Driver;
+
+use dibi;
+use DibiException;
+use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Store authentication data in an SQL database
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
+class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 {
     public $sqlDriver;
     public $driverName = "sql";
@@ -38,14 +43,16 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     /**
      * @param ContextInterface $ctx
      * @param array $options
+     * @throws Exception
+     * @throws \Pydio\Core\Exception\DBConnectionException
      */
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        if(empty($options["SQL_DRIVER"])) return;
+        if (empty($options["SQL_DRIVER"])) return;
         $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
-            if(!dibi::isConnected()) {
+            if (!dibi::isConnected()) {
                 dibi::connect($this->sqlDriver);
             }
         } catch (DibiException $e) {
@@ -55,29 +62,42 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 
     public function performChecks()
     {
-        if(!isSet($this->options)) return;
+        if (!isSet($this->options)) return;
         $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
     }
 
+    /**
+     * Wether users can be listed using offset and limit
+     * @return bool
+     */
     public function supportsUsersPagination()
     {
         return true;
     }
 
     // $baseGroup = "/"
+    /**
+     * List users using offsets
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param int $offset
+     * @param int $limit
+     * @param bool $recursive
+     * @return []
+     */
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
-        if($recursive){
+        if ($recursive) {
             $groupPathCondition = "[groupPath] LIKE %like~";
-        }else{
+        } else {
             $groupPathCondition = "[groupPath] = %s";
         }
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] ".Utils::regexpToLike($regexp)." AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset) ;
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] " . Utils::regexpToLike($regexp) . " AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset);
         } else if ($offset != -1 || $limit != -1) {
             $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
@@ -95,7 +115,8 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
      * @param int $offset
      * @return float
      */
-    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0){
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0)
+    {
 
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login] <= %s", $userLogin);
         $count = $res->fetchSingle();
@@ -103,6 +124,14 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
 
     }
 
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null|string $filterProperty Can be "admin" or "parent"
+     * @param null|string $filterValue Can be a user Id, or AJXP_FILTER_EMPTY or AJXP_FILTER_NOT_EMPTY
+     * @param bool $recursive
+     * @return int
+     */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
         // WITH PARENT
@@ -114,33 +143,33 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         $ands = array();
         $select = "SELECT COUNT(*) FROM [ajxp_users] AS u WHERE %and";
 
-        if(!empty($regexp)){
-            $ands[] = array("[u.login] ".Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
+        if (!empty($regexp)) {
+            $ands[] = array("[u.login] " . Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
         }
-        if($recursive){
+        if ($recursive) {
             $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
-        }else{
+        } else {
             $ands[] = array("[u.groupPath] = %s", $baseGroup);
         }
         $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')");
 
-        if($filterProperty !== null && $filterValue !== null){
-            if($filterProperty == "parent"){
+        if ($filterProperty !== null && $filterValue !== null) {
+            if ($filterProperty == "parent") {
                 $filterProperty = "ajxp.parent_user";
-            }else if($filterProperty == "admin"){
+            } else if ($filterProperty == "admin") {
                 $filterProperty = "ajxp.admin";
             }
-            if($filterValue == AJXP_FILTER_EMPTY){
-                $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = %s)",$filterProperty);
-            }else if($filterValue == AJXP_FILTER_NOT_EMPTY){
+            if ($filterValue == AJXP_FILTER_EMPTY) {
+                $ands[] = array("NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = %s)", $filterProperty);
+            } else if ($filterValue == AJXP_FILTER_NOT_EMPTY) {
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
                 $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
-            }else{
+            } else {
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
                 $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
-                $ands[] = array("[r.rights] ".Utils::likeToLike($filterValue), Utils::cleanLike($filterValue));
+                $ands[] = array("[r.rights] " . Utils::likeToLike($filterValue), Utils::cleanLike($filterValue));
             }
         }
 
@@ -154,7 +183,7 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
      * @param bool|true $recursive
      * @return array
      */
-    public function listUsers($baseGroup="/", $recursive = true)
+    public function listUsers($baseGroup = "/", $recursive = true)
     {
         $pairs = array();
         $ignoreHiddens = "NOT EXISTS (SELECT * FROM [ajxp_user_rights] AS c WHERE [c.login]=[u.login] AND [c.repo_uuid] = 'ajxp.hidden')";
@@ -162,42 +191,63 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         $rows = $res->fetchAll();
         foreach ($rows as $row) {
             $grp = $row["groupPath"];
-            if(strlen($grp) > strlen($baseGroup)) continue;
+            if (strlen($grp) > strlen($baseGroup)) continue;
             $pairs[$row["login"]] = $row["password"];
         }
         return $pairs;
     }
 
+    /**
+     * @param $login
+     * @return boolean
+     */
     public function userExists($login)
     {
         $res = dibi::query("SELECT COUNT(*) FROM [ajxp_users] WHERE [login]=%s", $login);
         return (intval($res->fetchSingle()) > 0);
     }
 
+    /**
+     * @param string $login
+     * @param string $pass
+     * @param string $seed
+     * @return bool
+     */
     public function checkPassword($login, $pass, $seed)
     {
         $userStoredPass = $this->getUserPass($login);
-        if(!$userStoredPass) return false;
+        if (!$userStoredPass) return false;
 
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) { // Seed = -1 means that password is not encoded.
             return Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
         } else {
-            return (md5($userStoredPass.$seed) === $pass);
+            return (md5($userStoredPass . $seed) === $pass);
         }
     }
 
+    /**
+     * @return bool
+     */
     public function usersEditable()
     {
         return true;
     }
+
+    /**
+     * @return bool
+     */
     public function passwordsEditable()
     {
         return true;
     }
 
+    /**
+     * @param $login
+     * @param $passwd
+     */
     public function createUser($login, $passwd)
     {
-        if($this->userExists($login)) return;
+        if ($this->userExists($login)) return;
         $userData = array("login" => $login);
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $userData["password"] = Utils::pbkdf2_create_hash($passwd); //md5($passwd);
@@ -207,9 +257,14 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         $userData['groupPath'] = '/';
         dibi::query('INSERT INTO [ajxp_users]', $userData);
     }
+
+    /**
+     * @param $login
+     * @param $newPass
+     */
     public function changePassword($login, $newPass)
     {
-        if(!$this->userExists($login)) throw new Exception("User does not exists!");
+        if (!$this->userExists($login)) throw new Exception("User does not exists!");
         $userData = array("login" => $login);
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
             $userData["password"] = Utils::pbkdf2_create_hash($newPass); //md5($newPass);
@@ -218,11 +273,19 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         }
         dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE [login]=%s", $login);
     }
+
+    /**
+     * @param $login
+     */
     public function deleteUser($login)
     {
         dibi::query("DELETE FROM [ajxp_users] WHERE [login]=%s", $login);
     }
 
+    /**
+     * @param $login
+     * @return mixed
+     */
     public function getUserPass($login)
     {
         $res = dibi::query("SELECT [password] FROM [ajxp_users] WHERE [login]=%s", $login);
@@ -230,10 +293,15 @@ class sqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         return $pass;
     }
 
+    /**
+     * @param array $param
+     * @return string
+     * @throws Exception
+     */
     public function installSQLTables($param)
     {
         $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        return Utils::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
 }

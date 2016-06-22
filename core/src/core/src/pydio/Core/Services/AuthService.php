@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 namespace Pydio\Core\Services;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Conf\Core\AbstractAjxpUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
@@ -118,7 +118,7 @@ class AuthService
         // Setting session credentials if asked in config
         if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
             list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
-            AJXP_Safe::storeCredentials($authId, $authPwd);
+            MemorySafe::storeCredentials($authId, $authPwd);
         }
 
 
@@ -173,7 +173,7 @@ class AuthService
             unset($_SESSION["AJXP_USER"]);
             //if(isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
-                AJXP_Safe::clearCredentials();
+                MemorySafe::clearCredentials();
             }
             Controller::applyHook("user.after_disconnect", array(Context::emptyContext(), $userId));
         }

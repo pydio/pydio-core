@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2015 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,14 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Authfront\Core;
+namespace Pydio\Auth\Frontend;
+
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
-abstract class AbstractAuthFrontend extends Plugin {
+/**
+ * Class FTPAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
+class FTPAuthFrontend extends AbstractAuthFrontend
+{
 
     /**
      * Try to authenticate the user based on various external parameters
@@ -36,6 +42,9 @@ abstract class AbstractAuthFrontend extends Plugin {
      * @param bool $isLast Whether this is is the last plugin called.
      * @return bool
      */
-    abstract function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false);
+    function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
+    {
+        return false;
+    }
 
-} 
+}

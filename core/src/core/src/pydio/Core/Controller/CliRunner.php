@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Controller;
 
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
@@ -109,7 +109,7 @@ class CliRunner
         $repoObject = $ctx->getRepository();
         $clearEnv = false;
         if ($repoObject->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $encodedCreds = AJXP_Safe::getEncodedCredentialString();
+            $encodedCreds = MemorySafe::getEncodedCredentialString();
             if (!empty($encodedCreds)) {
                 putenv("AJXP_SAFE_CREDENTIALS=" . $encodedCreds);
                 $clearEnv = "AJXP_SAFE_CREDENTIALS";

@@ -23,7 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
-use Pydio\Auth\Core\AJXP_Safe;
+use Pydio\Auth\Core\MemorySafe;
 
 
 use Pydio\Core\Utils\Utils;
@@ -71,7 +71,7 @@ class smbAccessWrapper extends fsAccessWrapper
         }
         $host = str_replace("//", "", $hostOption);
         $credentials = "";
-        $safeCreds = AJXP_Safe::tryLoadingCredentialsFromSources($node->getContext());
+        $safeCreds = MemorySafe::tryLoadingCredentialsFromSources($node->getContext());
         if ($safeCreds["user"] != "" && $safeCreds["password"] != "") {
             $login = $safeCreds["user"];
             $pass = $safeCreds["password"];
