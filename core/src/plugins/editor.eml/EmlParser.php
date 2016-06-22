@@ -20,7 +20,6 @@
  */
 namespace Pydio\Editor\EML;
 
-use EmlXmlMessage;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;

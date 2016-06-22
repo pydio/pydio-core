@@ -18,11 +18,18 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
+namespace Pydio\Editor\EML;
+
+use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class EmlXmlMessage implements \Pydio\Core\Http\Response\XMLDocSerializableResponseChunk
+/**
+ * Class EmlXmlMessage
+ * @package Pydio\Editor\EML
+ */
+class EmlXmlMessage implements XMLDocSerializableResponseChunk
 {
 
     protected $charset;
@@ -67,6 +74,9 @@ class EmlXmlMessage implements \Pydio\Core\Http\Response\XMLDocSerializableRespo
         
     }
 
+    /**
+     * @return string
+     */
     public function getCharset()
     {
         return $this->charset;
