@@ -18,10 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Cache\Doctrine\Ext;
+namespace Pydio\Cache\Doctrine\Ext;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface PatternClearableCache
+ * @package Pydio\Cache\Doctrine\Ext
+ */
 interface PatternClearableCache{
 
     /**

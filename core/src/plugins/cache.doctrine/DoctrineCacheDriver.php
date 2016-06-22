@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Cache\Implementation;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -34,7 +35,7 @@ use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
-use \Pydio\Plugins\Cache\Doctrine\Ext;
+use Pydio\Cache\Doctrine\Ext;
 
 /**
  * Standard Memcache driver
@@ -107,6 +108,10 @@ class doctrineCacheDriver extends AbstractCacheDriver
         }
     }
 
+    /**
+     * @param $namespace
+     * @return Cache\ApcCache|Cache\MemcacheCache|Cache\MemcachedCache|Cache\XcacheCache|null|Ext\PydioApcuCache|Ext\PydioRedisCache
+     */
     private function initCacheWithNamespace($namespace){
         $cacheDriver    = null;
         $emptyContext   = \Pydio\Core\Model\Context::emptyContext();
@@ -150,6 +155,10 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
     }
 
+    /**
+     * @param $options
+     * @return Cache\ApcCache|Ext\PydioApcuCache
+     */
     public function _apc_init($options) {
         if (extension_loaded('apcu')) {
             $cacheDriver = new Ext\PydioApcuCache();
@@ -159,8 +168,12 @@ class doctrineCacheDriver extends AbstractCacheDriver
         return $cacheDriver;
     }
 
+    /**
+     * @param $options
+     * @return Cache\MemcacheCache|null
+     */
     public function _memcache_init($options) {
-        $memcache = new Memcache();
+        $memcache = new \Memcache();
         @$running = $memcache->connect($options['MEMCACHE_HOSTNAME'], $options['MEMCACHE_PORT']);
 
         if (! $running) return null;
@@ -170,8 +183,12 @@ class doctrineCacheDriver extends AbstractCacheDriver
         return $cacheDriver;
     }
 
+    /**
+     * @param $options
+     * @return Cache\MemcachedCache|null
+     */
     public function _memcached_init($options) {
-        $memcached = new Memcached();
+        $memcached = new \Memcached();
         @$running = $memcached->addServer($options['MEMCACHED_HOSTNAME'], $options['MEMCACHED_PORT']);
 
         if (! $running) return null;
@@ -181,8 +198,12 @@ class doctrineCacheDriver extends AbstractCacheDriver
         return $cacheDriver;
     }
 
+    /**
+     * @param $options
+     * @return null|Ext\PydioRedisCache
+     */
     public function _redis_init($options) {
-        $redis = new Redis();
+        $redis = new \Redis();
         @$running = $redis->connect($options['REDIS_HOSTNAME'], $options['REDIS_PORT']);
 
         if (! $running) return null;
@@ -192,6 +213,10 @@ class doctrineCacheDriver extends AbstractCacheDriver
         return $cacheDriver;
     }
 
+    /**
+     * @param $options
+     * @return Cache\XcacheCache
+     */
     public function _xcache_init($options) {
         $cacheDriver = new Cache\XcacheCache();
         return $cacheDriver;

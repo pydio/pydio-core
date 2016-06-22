@@ -18,12 +18,16 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Cache\Doctrine\Ext;
+namespace Pydio\Cache\Doctrine\Ext;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Redis;
 
 
+/**
+ * Class PydioRedisCache
+ * @package Pydio\Cache\Doctrine\Ext
+ */
 class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements PatternClearableCache
 {
     /**
@@ -34,6 +38,13 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
     protected $internalNamespaceVersion;
 
 
+    /**
+     * Sets the redis instance to use.
+     *
+     * @param Redis $redis
+     *
+     * @return void
+     */
     public function setRedis($redis){
         parent::setRedis($redis);
         $this->internalRedis = $redis;

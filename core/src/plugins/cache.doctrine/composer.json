@@ -4,7 +4,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Pydio\\Plugins\\Cache\\Doctrine\\Ext\\": "./src"
+      "Pydio\\Cache\\Doctrine\\Ext\\": "./src"
     }
   }
 }

@@ -30,7 +30,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 
 
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
+use Pydio\Cache\Doctrine\Ext\PatternClearableCache;
 
 /**
  * @package AjaXplorer_Plugins
