@@ -1,16 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver enabled="false" name="dropbox" label="CONF_MESSAGE[Dropbox]" description="CONF_MESSAGE[This plugin allows accessing a dropbox account. Still experimental, requires PEAR/HTTP_OAuth extension.]" mixins="filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver enabled="false" name="dropbox" label="CONF_MESSAGE[Dropbox]" description="CONF_MESSAGE[This plugin allows accessing a dropbox account.]" mixins="oauth_commons,filesystem_commons,slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.dropbox/dropboxLogo.png" description_template="" iconClass="icon-dropbox">
         <resources>
             <i18n namespace="access_dropbox" path="plugins/access.dropbox/i18n"/>
         </resources>
     </client_settings>
 	<server_settings>
+		<param name="API_URL" type="string" label="CONF_MESSAGE[API URL]" description="CONF_MESSAGE[API URL]" mandatory="true" default="https://api.dropbox.com/2/"/>
 		<param name="CONSUMER_KEY" type="string" label="CONF_MESSAGE[Consumer Key]" description="CONF_MESSAGE[Key]" mandatory="true"/>
 		<param name="CONSUMER_SECRET" type="string" label="CONF_MESSAGE[Consumer Secret]" description="CONF_MESSAGE[Secret]" mandatory="true"/>
+		<param name="API_RESOURCES_PATH" type="string" label="CONF_MESSAGE[API Path]" description="CONF_MESSAGE[Real path to the api files]" mandatory="true" default="Resources" />
+		<param name="API_RESOURCES_FILE" type="string" label="CONF_MESSAGE[API File]" description="CONF_MESSAGE[File name of the api files]" mandatory="true" default="dropbox.json" />
 	</server_settings>
-	<class_definition filename="plugins/access.dropbox/class.dropboxAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Dropbox\dropboxAccessDriver"/>
+	<class_definition filename="plugins/access.dropbox/vendor/autoload.php" classname="Pydio\Access\DropBox\Driver"/>
 	<registry_contributions>
+		<actions>
+			<action name="dropbox_oauth_authorize" skipSecureToken="true">
+				<processing>
+					<serverCallback methodName="switchAction"></serverCallback>
+				</processing>
+			</action>
+		</actions>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*"/>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*"/>
@@ -20,5 +30,5 @@
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-    <class_stream_wrapper filename="plugins/access.dropbox/class.dropboxWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Dropbox\dropboxWrapper" protocol="ajxp.dropbox"/>
+    <class_stream_wrapper filename="plugins/core.access/vendor/autoload.php" classname="Pydio\Access\Core\Stream\StreamWrapper" protocol="access.dropbox"/>
 </ajxpdriver>

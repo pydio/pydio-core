@@ -23,6 +23,8 @@ namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Stream\Stream;
+use Pydio\Access\Core\Stream\StreamWrapper;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\PluginFramework\PluginsService;
@@ -141,7 +143,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      * @return string
      * @throws \Exception
      */
-    protected static function translateScheme($url, $crtInstance = null){
+    public static function translateScheme($url, $crtInstance = null){
 
         $node               = new AJXP_Node($url);
         $currentScheme      = $node->getScheme();
@@ -253,7 +255,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
         $currentScheme = parse_url($path, PHP_URL_SCHEME);
         $wrapper = self::findWrapperClassName(AJXP_Node::contextFromUrl($path), $currentScheme, $context);
 
-        if (is_callable(array($wrapper, "applyInitPathHook"))){
+        if (is_callable(array($wrapper, "applyInitPathHook"))) {
             call_user_func(array($wrapper, "applyInitPathHook"), $path);
         }
     }
@@ -363,6 +365,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
     public function dir_opendir($path, $options)
     {
         $newPath = self::translateScheme($path, $this);
+
         $this->handle = opendir($newPath);
         if($this->handle !== false){
             $this->currentDirPath = parse_url($path, PHP_URL_PATH);
@@ -609,8 +612,10 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      */
     public function url_stat($path, $flags)
     {
-        $stat = @stat($this->translateScheme($path));
-        if($stat === false){
+        $path = $this->translateScheme($path);
+
+        $stat = @stat($path);
+        if($stat === false) {
             return null;
         }
         $bytesize = $stat["size"];

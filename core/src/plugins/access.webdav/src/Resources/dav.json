@@ -2,6 +2,78 @@
     "name" : "WebDAV Client",
     "description" : "WebDAV REST API client",
     "operations" : {
+        "Stat" : {
+            "httpMethod" : "PROPFIND",
+            "uri" : "{path}",
+            "summary" : "Returns the stat of a specific object",
+            "responseClass" : "Stat",
+            "exceptions" : false,
+            "data": {
+                "headers": {
+                    "Depth": 0
+                },
+                "body": [
+                    "<?xml version=\"1.0\"?>",
+                    "<a:propfind xmlns:a=\"DAV:\">",
+                        "<a:prop><a:getcontenttype/></a:prop>",
+                        "<a:prop><a:getcontentlength/></a:prop>",
+                        "<a:prop><a:resourcetype/></a:prop>",
+                    "</a:propfind>"
+                ]
+            },
+            "parameters" : {
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [
+                        {
+                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                            "args": [
+                                "@value"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "Ls": {
+            "httpMethod" : "PROPFIND",
+            "uri" : "{path}",
+            "summary" : "Returns the stat of a specific object",
+            "responseClass" : "Directory",
+            "exceptions" : false,
+            "data": {
+                "headers": {
+                    "Depth": 1
+                },
+                "body": [
+                    "<?xml version=\"1.0\"?>",
+                    "<a:propfind xmlns:a=\"DAV:\">",
+                    "<a:prop><a:getcontenttype/></a:prop>",
+                    "<a:prop><a:getcontentlength/></a:prop>",
+                    "<a:prop><a:resourcetype/></a:prop>",
+                    "</a:propfind>"
+                ]
+            },
+            "parameters" : {
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [
+                        {
+                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                            "args": [
+                                "@value"
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
         "Open" : {
             "httpMethod" : "GET",
             "uri" : "{path/basepath}/{path/fullpath}",
@@ -116,26 +188,59 @@
         }
     },
     "models" : {
-        "OpenOutput" : {
-            "type" : "object"
+        "Directory": {
+            "type": "array",
+            "location": "json",
+            "items": {
+                "type": "object",
+                "location": "json",
+                "properties" : {
+                    "type": {
+                        "type": "string",
+                        "sentAs": "resourcetype"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "lastModified": {
+                        "type": "string",
+                        "sentAs": "client_modified"
+                    },
+                    "size": {
+                        "type": "string",
+                        "sentAs": "contentlength"
+                    }
+                }
+            }
         },
-        "StatOutput" : {
-            "type" : "object"
+        "File": {
+            "type": "object",
+            "properties": {
+                "body": {
+                    "location": "body"
+                }
+            }
         },
-        "MkdirOutput" : {
-            "type" : "object"
-        },
-        "RmdirOutput" : {
-            "type" : "object"
-        },
-        "MoveOutput" : {
-            "type": "object"
-        },
-        "PutOutput": {
-            "type" : "object"
-        },
-        "DeleteOutput": {
-            "type" : "object"
+        "Stat" : {
+            "type" : "object",
+            "location" : "json",
+            "properties" : {
+                "type": {
+                    "type": "string",
+                    "sentAs": "resourcetype"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "lastModified": {
+                    "type": "string",
+                    "sentAs": "client_modified"
+                },
+                "size": {
+                    "type": "string",
+                    "sentAs": "contentlength"
+                }
+            }
         }
     }
 }
