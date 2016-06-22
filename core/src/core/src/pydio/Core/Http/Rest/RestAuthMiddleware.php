@@ -34,7 +34,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -87,7 +87,7 @@ class RestAuthMiddleware
         $ctx->setRepositoryObject($repo);
         $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
 
-        AJXP_Logger::updateContext($ctx);
+        Logger::updateContext($ctx);
 
         if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
             RolesService::bootSequence();

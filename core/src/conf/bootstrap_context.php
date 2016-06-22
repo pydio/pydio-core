@@ -102,7 +102,11 @@ if ($corePlugAutoloads !== false && count($corePlugAutoloads)) {
     }
 }
 
-function AjaXplorer_autoload($className)
+/**
+ * Used as autoloader
+ * @param $className
+ */
+function pydioAutoloader($className)
 {
     // Temp : super dummy autoloader, take only class name
     $parts = explode("\\", $className);
@@ -116,20 +120,8 @@ function AjaXplorer_autoload($className)
         require_once($corePlugClass[0]);
         return;
     }
-
-    // TODO  : should be useless after refactorings
-    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
-    if ($corePlugClass !== false && count($corePlugClass)) {
-        require_once($corePlugClass[0]);
-        return;
-    }
-    $corePlugInterface = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/interface.".$className.".php", GLOB_NOSORT);
-    if ($corePlugInterface !== false && count($corePlugInterface)) {
-        require_once($corePlugInterface[0]);
-        return;
-    }
 }
-spl_autoload_register('AjaXplorer_autoload');
+spl_autoload_register('pydioAutoloader');
 
 include_once(AJXP_INSTALL_PATH . "/core/compat.php");
 

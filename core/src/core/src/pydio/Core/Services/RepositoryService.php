@@ -26,7 +26,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\FilteredRepositoriesList;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -439,7 +439,7 @@ class RepositoryService
             return $res;
         }
         Controller::applyHook("workspace.after_create", array(Context::fromGlobalServices(), $oRepository));
-        AJXP_Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
+        Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
         CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$oRepository->getId(), $oRepository);
         // TODO  ?
         //$this->invalidateLoadedRepositories();
@@ -478,7 +478,7 @@ class RepositoryService
             return -1;
         }
         Controller::applyHook("workspace.after_update", array(Context::fromGlobalServices(), $oRepositoryObject));
-        AJXP_Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
+        Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         // TODO ?
         //$this->invalidateLoadedRepositories();
         CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $oRepositoryObject->getId(), $oRepositoryObject);
@@ -507,7 +507,7 @@ class RepositoryService
             $this->deleteRepositoryInst($deleteId);
         }
         Controller::applyHook("workspace.after_delete", array(Context::fromGlobalServices(), $repoId));
-        AJXP_Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
+        Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         // TODO ?
         //$this->invalidateLoadedRepositories();
         CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$repoId);

@@ -28,11 +28,11 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
-use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -134,7 +134,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
             case PHPCAS_MODE_CLIENT:
                 if ($this->checkConfigurationForClientMode()) {
 
-                    AJXP_Logger::info(__FUNCTION__, "Start phpCAS mode Client: ", "sucessfully");
+                    Logger::info(__FUNCTION__, "Start phpCAS mode Client: ", "sucessfully");
 
                     phpCAS::client(CAS_VERSION_2_0, $this->cas_server, $this->cas_port, $this->cas_uri, false);
 
@@ -158,7 +158,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                     phpCAS::forceAuthentication();
 
                 } else {
-                    AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode CLIENT, please verify the configuration", "");
+                    Logger::error(__FUNCTION__, "Could not start phpCAS mode CLIENT, please verify the configuration", "");
                     return false;
                 }
                 break;
@@ -170,7 +170,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                  */
 
                 if ($this->checkConfigurationForProxyMode()) {
-                    AJXP_Logger::info(__FUNCTION__, "Start phpCAS mode Proxy: ", "sucessfully");
+                    Logger::info(__FUNCTION__, "Start phpCAS mode Proxy: ", "sucessfully");
                     /**
                      * init phpCAS in mode proxy
                      */
@@ -211,18 +211,18 @@ class CasAuthFrontend extends AbstractAuthFrontend
                      */
                     $err_code = null;
                     $serviceURL = $this->cas_proxied_service;
-                    AJXP_Logger::debug(__FUNCTION__, "Try to get proxy ticket for service: ", $serviceURL);
+                    Logger::debug(__FUNCTION__, "Try to get proxy ticket for service: ", $serviceURL);
                     $res = phpCAS::serviceSMB($serviceURL, $err_code);
 
                     if (!empty($res)) {
                         $_SESSION['PROXYTICKET'] = $res;
-                        AJXP_Logger::info(__FUNCTION__, "Get Proxy ticket successfully ", "");
+                        Logger::info(__FUNCTION__, "Get Proxy ticket successfully ", "");
                     } else {
-                        AJXP_Logger::info(__FUNCTION__, "Could not get Proxy ticket. ", "");
+                        Logger::info(__FUNCTION__, "Could not get Proxy ticket. ", "");
                     }
                     break;
                 } else {
-                    AJXP_Logger::error(__FUNCTION__, "Could not start phpCAS mode PROXY, please verify the configuration", "");
+                    Logger::error(__FUNCTION__, "Could not start phpCAS mode PROXY, please verify the configuration", "");
                     return false;
                 }
 
@@ -231,7 +231,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                 break;
         }
 
-        AJXP_Logger::debug(__FUNCTION__, "Call phpCAS::getUser() after forceAuthentication ", "");
+        Logger::debug(__FUNCTION__, "Call phpCAS::getUser() after forceAuthentication ", "");
         $cas_user = phpCAS::getUser();
         if (!UsersService::userExists($cas_user) && $this->is_AutoCreateUser) {
             UsersService::createUser($cas_user, openssl_random_pseudo_bytes(20));
@@ -401,13 +401,13 @@ class CasAuthFrontend extends AbstractAuthFrontend
                 /**
                  * support only for mySQL
                  */
-                if ($dbconfig instanceof sqlConfDriver) {
+                if ($dbconfig instanceof SqlConfDriver) {
                     if (!empty($dbconfig->sqlDriver["username"])) {
                         $db_username = $dbconfig->sqlDriver["username"];
                         $db_password = $dbconfig->sqlDriver["password"];
                         $db_database = "mysql:" . "dbname=" . $dbconfig->sqlDriver["database"] . ";host=" . $dbconfig->sqlDriver["host"];
                         $db_table = "ajxp_cas_pgt";
-                        AJXP_Logger::info(__CLASS__, __FUNCTION__, $db_database);
+                        Logger::info(__CLASS__, __FUNCTION__, $db_database);
                         phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table, "");
                     }
                 }

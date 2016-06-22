@@ -27,7 +27,7 @@ use DibiException;
 use Exception;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
@@ -505,9 +505,9 @@ class Mailer extends Plugin implements SqlTableProvider
         if (isSet($newRecs)) {
             $recipients = array_merge($recipients, $newRecs);
         }
-        // Recipients can be either AbstractAjxpUser objects, either array(adress, name), either "adress".
+        // Recipients can be either UserInterface objects, either array(adress, name), either "adress".
         foreach ($recipients as $recipient) {
-            if (is_object($recipient) && $recipient instanceof AbstractAjxpUser) {
+            if (is_object($recipient) && $recipient instanceof AbstractUser) {
                 $resolved = $this->abstractUserToAdress($recipient);
                 if ($resolved !== false) {
                     $realRecipients[] = $resolved;

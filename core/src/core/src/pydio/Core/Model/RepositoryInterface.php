@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
-use Pydio\Conf\Core\AjxpGroupPathProvider;
+use Pydio\Conf\Core\IGroupPathProvider;
 
 
 /**
@@ -33,7 +33,7 @@ use Pydio\Conf\Core\AjxpGroupPathProvider;
  * @package Pydio
  * @subpackage Core
  */
-interface RepositoryInterface extends AjxpGroupPathProvider
+interface RepositoryInterface extends IGroupPathProvider
 {
 
     /**

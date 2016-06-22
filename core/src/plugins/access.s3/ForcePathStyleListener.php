@@ -25,8 +25,9 @@
  *
  * Original Copyright 2010-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  */
-namespace Aws\S3;
+namespace Pydio\Access\Driver\StreamProvider\S3;
 
+use Aws\S3\S3Client;
 use Guzzle\Common\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
@@ -37,6 +38,9 @@ class ForcePathStyleStyleListener implements EventSubscriberInterface
 {
     private static $exclusions = array('GetBucketLocation' => true);
 
+    /**
+     * @return array
+     */
     public static function getSubscribedEvents()
     {
         return array('command.after_prepare' => array('onCommandAfterPrepare', -255));

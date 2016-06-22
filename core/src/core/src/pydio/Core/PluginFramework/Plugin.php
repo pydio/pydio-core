@@ -27,7 +27,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -856,7 +856,7 @@ class Plugin implements \Serializable
         if(!ConfService::getConf("SERVER_DEBUG")) return ;
         $args = func_get_args();
         array_shift($args);
-        AJXP_Logger::log2(LOG_LEVEL_DEBUG, $this->getId(), $prefix, $args);
+        Logger::log2(LOG_LEVEL_DEBUG, $this->getId(), $prefix, $args);
     }
 
     /**
@@ -869,7 +869,7 @@ class Plugin implements \Serializable
     {
         $args = func_get_args();
         array_shift($args);
-        AJXP_Logger::log2(LOG_LEVEL_INFO, $this->getId(), $prefix, $args);
+        Logger::log2(LOG_LEVEL_INFO, $this->getId(), $prefix, $args);
     }
 
     /**
@@ -882,7 +882,7 @@ class Plugin implements \Serializable
     {
         $args = func_get_args();
         array_shift($args);
-        AJXP_Logger::log2(LOG_LEVEL_NOTICE, $this->getId(), $prefix, $args);
+        Logger::log2(LOG_LEVEL_NOTICE, $this->getId(), $prefix, $args);
     }
 
     /**
@@ -895,7 +895,7 @@ class Plugin implements \Serializable
     {
         $args = func_get_args();
         array_shift($args);
-        AJXP_Logger::log2(LOG_LEVEL_WARNING, $this->getId(), $prefix, $args);
+        Logger::log2(LOG_LEVEL_WARNING, $this->getId(), $prefix, $args);
     }
 
     /**
@@ -908,7 +908,7 @@ class Plugin implements \Serializable
     {
         $args = func_get_args();
         array_shift($args);
-        AJXP_Logger::log2(LOG_LEVEL_ERROR, $this->getId(), $prefix, $args);
+        Logger::log2(LOG_LEVEL_ERROR, $this->getId(), $prefix, $args);
     }
 
     /**

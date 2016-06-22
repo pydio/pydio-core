@@ -25,7 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
@@ -33,7 +33,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -82,7 +82,7 @@ class TaskService implements ITasksProvider
         
         $workers = ConfService::getGlobalConf("MQ_USE_WORKERS", "mq");
         if($workers && !$task->getSchedule()->shouldRunNow()){
-            AJXP_Logger::getInstance()->logInfo("TaskService", "Enqueuing Task ".$task->getId());
+            Logger::getInstance()->logInfo("TaskService", "Enqueuing Task ".$task->getId());
             $msg = ["pending_task" => $task->getId()];
             Controller::applyHook("msg.task", [$task->getContext(), $msg]);
             return $response;
@@ -261,7 +261,7 @@ class TaskService implements ITasksProvider
     }
 
     /**
-     * @param AbstractAjxpUser $user
+     * @param AbstractUser $user
      * @param Repository $repository
      * @param int $status
      * @return Task[]

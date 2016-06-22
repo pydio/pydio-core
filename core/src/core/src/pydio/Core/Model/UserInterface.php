@@ -23,14 +23,12 @@ namespace Pydio\Core\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Conf\Core\AjxpGroupPathProvider;
+use Pydio\Conf\Core\IGroupPathProvider;
 
 /**
- * @class AbstractAjxpUser
- * @abstract
  * User abstraction, the "conf" driver must provides its own implementation
  */
-interface UserInterface extends AjxpGroupPathProvider
+interface UserInterface extends IGroupPathProvider
 {
     /**
      * @param bool $hidden
@@ -209,17 +207,17 @@ interface UserInterface extends AjxpGroupPathProvider
 
     /**
      * Check if the current user can administrate the GroupPathProvider object
-     * @param AjxpGroupPathProvider $provider
+     * @param IGroupPathProvider $provider
      * @return bool
      */
-    public function canAdministrate(AjxpGroupPathProvider $provider);
+    public function canAdministrate(IGroupPathProvider $provider);
 
     /**
      * Check if the current user can assign administration for the GroupPathProvider object
-     * @param AjxpGroupPathProvider $provider
+     * @param IGroupPathProvider $provider
      * @return bool
      */
-    public function canSee(AjxpGroupPathProvider $provider);
+    public function canSee(IGroupPathProvider $provider);
 
     /**
      * Automatically set the group to the current user base

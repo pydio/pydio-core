@@ -36,7 +36,7 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -173,7 +173,7 @@ class AuthCliMiddleware
                     $ctx->setUserObject($loggedUser);
                     $ctx->setRepositoryId($optRepoId);
                     $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
-                    AJXP_Logger::updateContext($ctx);
+                    Logger::updateContext($ctx);
 
                     $subResponse = Server::callNextMiddleWareAndRewind(function($middleware){
                         return (is_array($middleware) && $middleware["0"] == "Pydio\\Core\\Http\\Cli\\AuthCliMiddleware" && $middleware[1] == "handleRequest");
@@ -200,7 +200,7 @@ class AuthCliMiddleware
             $ctx->setUserObject($loggedUser);
             $ctx->setRepositoryObject($repoObject);
             $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
-            AJXP_Logger::updateContext($ctx);
+            Logger::updateContext($ctx);
             TextEncoder::updateContext($ctx);
 
             return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);

@@ -35,7 +35,7 @@ use Pydio\Core\Services\ConfService;
 
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use \Sabre;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -96,7 +96,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
         if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         // check if there are cached credentials. prevents excessive authentication calls to external
@@ -111,7 +111,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 
 
         if (!$cachedPasswordValid && (!$this->validateUserPass($userpass[0],$userpass[1]))) {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "Invalid WebDAV user or password"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "Invalid WebDAV user or password"));
             $auth->requireLogin();
             throw new Sabre\DAV\Exception\NotAuthenticated('Username or password does not match');
         }
@@ -145,7 +145,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
             MemorySafe::storeCredentials($this->currentUser, $userpass[1]);
         }
         //PluginsService::getInstance($this->context);
-        AJXP_Logger::updateContext($this->context);
+        Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
 
         // the method used here will invalidate the cached password every minute on the minute

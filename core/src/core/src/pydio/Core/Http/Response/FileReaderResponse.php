@@ -22,13 +22,13 @@ namespace Pydio\Core\Http\Response;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -94,7 +94,7 @@ class FileReaderResponse extends AsyncResponseStream
      * @param array $params
      */
     protected function logDebug($message, $params = []){
-        AJXP_Logger::getInstance()->logDebug("FileReader", $message, $params);
+        Logger::getInstance()->logDebug("FileReader", $message, $params);
     }
 
     /**
@@ -185,7 +185,7 @@ class FileReaderResponse extends AsyncResponseStream
 
         if ($node !== null  && !$node->wrapperIsRemote()) {
             $originalFilePath = $filePathOrData;
-            $filePathOrData = fsAccessWrapper::patchPathForBaseDir($filePathOrData);
+            $filePathOrData = FsAccessWrapper::patchPathForBaseDir($filePathOrData);
         }
         session_write_close();
 

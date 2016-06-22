@@ -39,7 +39,7 @@ use Pydio\Core\Services\CacheService;
 
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -250,7 +250,7 @@ class PluginsService
                     $instance->init($ctx, $options);
                     $instance->beforeInitMeta($ctx, $plugInstance);
                 } catch (\Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $errors[] = $e->getMessage();
                 }
             }
@@ -292,7 +292,7 @@ class PluginsService
                     }
                     $instance->initMeta($ctx, $plugInstance);
                 } catch (\Exception $e) {
-                    AJXP_Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
+                    Logger::error(__CLASS__, 'Meta plugin', 'Cannot instanciate Meta plugin, reason : '.$e->getMessage());
                     $errors[] = $e->getMessage();
                 }
                 $this->setPluginActive($split[0], $split[1]);

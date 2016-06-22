@@ -32,7 +32,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Tests\AbstractTest;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -593,7 +593,7 @@ class Utils
             return $setUrl;
         }
         if (php_sapi_name() == "cli") {
-            AJXP_Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");
+            Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");
         }
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
         $port = (($protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443)

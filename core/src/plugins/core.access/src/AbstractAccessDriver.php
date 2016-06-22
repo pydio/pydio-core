@@ -36,7 +36,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 
@@ -585,11 +585,11 @@ abstract class AbstractAccessDriver extends Plugin
             $actualPerms = $otherPerms;
 
             if ( ( isSet($uid) && $stat["uid"] == $uid ) || $fixPermPolicy == "user"  ) {
-                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to ubit");
+                Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to ubit");
                 $userPerms = decbin(intval($p[$lastInd - 2]));
                 $actualPerms |= $userPerms;
             } else if ( ( isSet($gid) && $stat["gid"] == $gid ) || $fixPermPolicy == "group"  ) {
-                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to gbit");
+                Logger::debug(__CLASS__,__FUNCTION__,"upgrading abit to gbit");
                 $groupPerms = decbin(intval($p[$lastInd - 1]));
                 $actualPerms |= $groupPerms;
             }

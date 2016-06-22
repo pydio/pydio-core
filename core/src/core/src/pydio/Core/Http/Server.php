@@ -31,7 +31,7 @@ use Pydio\Core\Http\Middleware\SapiMiddleware;
 use Pydio\Core\Http\Response\SerializableResponseChunk;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 
@@ -201,7 +201,7 @@ class Server
         if(error_reporting() == 0) {
             return ;
         }
-        AJXP_Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
+        Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
         if(AJXP_SERVER_DEBUG){
             if($context instanceof  \Exception){
                 $message .= $context->getTraceAsString();

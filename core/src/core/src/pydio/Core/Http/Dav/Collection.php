@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Dav;
 use \Sabre;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -64,7 +64,7 @@ class Collection extends Node implements Sabre\DAV\ICollection
     {
         try {
             $name = ltrim($name, "/");
-            AJXP_Logger::debug("CREATE FILE $name");
+            Logger::debug("CREATE FILE $name");
 
             $request = new \Zend\Diactoros\ServerRequest();
             $request = $request
@@ -103,7 +103,7 @@ class Collection extends Node implements Sabre\DAV\ICollection
             return $node->getETag();
 
         } catch (\Exception $e) {
-            AJXP_Logger::debug("Error ".$e->getMessage(), $e->getTraceAsString());
+            Logger::debug("Error ".$e->getMessage(), $e->getTraceAsString());
             return null;
         }
 

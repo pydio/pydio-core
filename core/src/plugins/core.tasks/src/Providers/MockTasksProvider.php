@@ -23,7 +23,7 @@ namespace Pydio\Tasks\Providers;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\Schedule;
 
@@ -99,7 +99,7 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     }
 
     /**
-     * @param \Pydio\Conf\Core\AbstractAjxpUser $user
+     * @param \Pydio\Conf\Core\AbstractUser $user
      * @param \Pydio\Access\Core\Model\Repository $repository
      * @param int $status
      * @return Task[]
@@ -113,7 +113,7 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     }
 
     /**
-     * @param AbstractAjxpUser $user
+     * @param AbstractUser $user
      * @param Repository $repository
      * @return Task[]
      */

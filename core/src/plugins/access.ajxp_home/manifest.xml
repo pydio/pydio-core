@@ -112,5 +112,5 @@
 			]]></template_part>
         </client_configs>
 	</registry_contributions>
-    <class_definition filename="plugins/access.ajxp_home/class.HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>
+    <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>
 </ajxpdriver>

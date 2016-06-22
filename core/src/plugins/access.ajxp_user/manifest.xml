@@ -232,5 +232,5 @@
 			</action>
 		</actions>
 	</registry_contributions>
-	<class_definition filename="plugins/access.ajxp_user/class.UserDashboardDriver.php" classname="Pydio\Access\Driver\DataProvider\UserDashboardDriver"/>
+	<class_definition filename="plugins/access.ajxp_user/UserDashboardDriver.php" classname="Pydio\Access\Driver\DataProvider\UserDashboardDriver"/>
 </ajxpdriver>

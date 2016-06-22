@@ -31,7 +31,7 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\TaskService;
@@ -544,10 +544,10 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
             if ($newNode != null && $this->excludeNode($newNode)) {
                 // CREATE
                 if($oldNode == null) {
-                    AJXP_Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
+                    Logger::debug("Ignoring ".$newNode->getUrl()." for indexation");
                     return;
                 }else{
-                    AJXP_Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
+                    Logger::debug("Target node is excluded, see it as a deletion: ".$newNode->getUrl());
                     $newNode = null;
                 }
             }
@@ -635,8 +635,8 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                 }
             }
         } catch (\Exception $e) {
-            AJXP_Logger::error("[meta.syncable]", "Exception", $e->getTraceAsString());
-            AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
+            Logger::error("[meta.syncable]", "Exception", $e->getTraceAsString());
+            Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
 
     }

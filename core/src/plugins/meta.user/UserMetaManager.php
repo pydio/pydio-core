@@ -253,7 +253,7 @@ class UserMetaManager extends AbstractMetaSource
     public function editMeta(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
-        if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
+        if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
             throw new \Exception("Write actions are disabled in demo mode!");
         }
         /** @var ContextInterface $ctx */
@@ -383,7 +383,7 @@ class UserMetaManager extends AbstractMetaSource
     protected function loadTags(ContextInterface $ctx){
 
         $store = ConfService::getConfStorageImpl();
-        if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return array();
+        if(!($store instanceof \Pydio\Conf\Sql\SqlConfDriver)) return array();
         $data = array();
         $store->simpleStoreGet("meta_user_tags", $ctx->getRepositoryId(), "serial", $data);
         return $data;
@@ -398,7 +398,7 @@ class UserMetaManager extends AbstractMetaSource
     protected function updateTags(ContextInterface $ctx, $tagString){
 
         $store = ConfService::getConfStorageImpl();
-        if(!($store instanceof \Pydio\Conf\Sql\sqlConfDriver)) return;
+        if(!($store instanceof \Pydio\Conf\Sql\SqlConfDriver)) return;
         $tags = $this->loadTags($ctx);
         $tags = array_merge($tags, array_map("trim", explode(",", $tagString)));
         $tags = array_unique($tags);

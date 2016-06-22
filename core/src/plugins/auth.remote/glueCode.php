@@ -33,7 +33,7 @@
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
@@ -81,7 +81,7 @@ if ($authPlug->getOption("SECRET") == "") {
 
 /**
  * @param array $loginData
- * @param AbstractAjxpUser $userObject
+ * @param AbstractUser $userObject
  */
 if(!function_exists("ajxp_gluecode_updateRole")){
 

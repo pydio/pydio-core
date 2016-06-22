@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,7 +35,7 @@ class SessionSwitcher
     /** Construction. This kills the current session if any started, and restart the given session */
     public function __construct($name, $killPreviousSession = false, $loadPreviousSession = false, $saveHandlerType = "files", $saveHandlerData = null)
     {
-        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Switching to session ".$name);
+        Logger::debug(__CLASS__,__FUNCTION__,"Switching to session ".$name);
         if (session_id() == "") {
             if (isSet($saveHandlerData)) {
                 session_set_save_handler(
@@ -66,7 +66,7 @@ class SessionSwitcher
                 setcookie(session_name(), '', time() - 42000, '/');
                 session_destroy();
             }
-            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Closing previous session ".session_name()." / ".session_id());
+            Logger::debug(__CLASS__,__FUNCTION__,"Closing previous session ".session_name()." / ".session_id());
             session_write_close();
             session_regenerate_id(false);
             $_SESSION = array();
@@ -88,7 +88,7 @@ class SessionSwitcher
         }
 
         if ($loadPreviousSession) {
-            AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
+            Logger::debug(__CLASS__,__FUNCTION__,"Restoring previous session".SessionSwitcher::$sessionArray[0]['id']);
             session_id(SessionSwitcher::$sessionArray[0]['id']);
             $name = SessionSwitcher::$sessionArray[0]['name'];
             ini_set('session.save_handler', SessionSwitcher::$sessionArray[0]['save_handler']);
@@ -98,6 +98,6 @@ class SessionSwitcher
         }
         session_name($name);
         session_start();
-        AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Restarted session ".session_name()." / ".session_id(), $_SESSION);
+        Logger::debug(__CLASS__,__FUNCTION__,"Restarted session ".session_name()." / ".session_id(), $_SESSION);
     }
 };

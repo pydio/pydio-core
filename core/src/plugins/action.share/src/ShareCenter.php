@@ -49,7 +49,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Legacy\LegacyPubliclet;
 use Pydio\Share\Model\CompositeShare;
@@ -1301,7 +1301,7 @@ class ShareCenter extends Plugin
      * @param string $hash
      */
     public static function loadShareByHash($hash){
-        AJXP_Logger::debug(__CLASS__, __FUNCTION__, "Do something");
+        Logger::debug(__CLASS__, __FUNCTION__, "Do something");
         PluginsService::getInstance()->initActivePlugins();
         if(isSet($_GET["lang"])){
             LocaleService::setLanguage($_GET["lang"]);

@@ -1,5 +1,5 @@
 <?php
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 /**
  * Version 0.9, 6th April 2003 - Simon Willison ( http://simon.incutio.com/ )
@@ -200,7 +200,7 @@ class HttpClient
                             if (isSet($this->collectHeaders[$hKey])) {
                                 if($hKey == "content-length" && $hValue == "0") continue;
                                 $this->collectHeaders[$hKey] = $hValue;
-                                AJXP_Logger::debug("Setting $hKey", $this->collectHeaders);
+                                Logger::debug("Setting $hKey", $this->collectHeaders);
                             }
                         }
                     }
@@ -495,7 +495,7 @@ class HttpClient
                 $st .= '<pre>'.$content.'</pre>';
             }
             $st .= '</div>';
-            AJXP_Logger::debug($msg . ($object!==false?" - ".print_r($object, true):""));
+            Logger::debug($msg . ($object!==false?" - ".print_r($object, true):""));
         }
     }
 }

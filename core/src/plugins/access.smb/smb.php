@@ -20,8 +20,9 @@
 # GNU General Public License for more details.
 #
 ###################################################################
+namespace Pydio\Access\Driver\StreamProvider\SMB;
 
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 define ('SMB4PHP_VERSION', '0.8');
 
@@ -107,7 +108,7 @@ class smb
                 }
             }
         }
-        AJXP_Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
+        Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
     }
 
 
@@ -209,7 +210,7 @@ class smb
                 } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
                     self::debug("Smbclient alternate stream : ".$error);
                 } else {
-                    AJXP_Logger::error(__CLASS__,"Smbclient error",$error);
+                    Logger::error(__CLASS__,"Smbclient error",$error);
                 }
             }
             $output = $pipes[1];
@@ -229,6 +230,7 @@ class smb
                     $tag = $t;
                     break;
                 }
+                $mode = '';
                 switch ($tag) {
                     case 'skip':    continue;
                     case 'shares':  $mode = 'shares';     break;
@@ -308,7 +310,7 @@ class smb
                 //self::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
                    $stat = stat (SMB4PHP_SMBTMP);
                 else
-                  trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
+                  trigger_error ("url_stat(): list failed for host", E_USER_WARNING);
                 break;
             case 'share':
                 $id = "smb_".md5($pu["host"].$pu["user"]);
@@ -456,7 +458,7 @@ class smb
         smb::clearstatcache ($url_from);
         $res = smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
         if(empty($res)) return true;
-        AJXP_Logger::info(__CLASS__, "SmbClient rename error: ".$res);
+        Logger::info(__CLASS__, "Smb Client", "SmbClient rename error: ".$res);
         return false;
     }
 

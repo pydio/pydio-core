@@ -30,6 +30,6 @@
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-	<class_definition filename="plugins/access.smb/class.smbAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SMB\smbAccessDriver"/>
-    <class_stream_wrapper filename="plugins/access.smb/class.smbAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SMB\smbAccessWrapper" protocol="ajxp.smb"/>
+	<class_definition filename="plugins/access.smb/SMBAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SMB\SMBAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.smb/SMBAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SMB\SMBAccessWrapper" protocol="ajxp.smb"/>
 </ajxpdriver>

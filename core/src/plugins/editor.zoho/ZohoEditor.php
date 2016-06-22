@@ -34,7 +34,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 use GuzzleHttp\Client;
 
@@ -82,9 +82,9 @@ class ZohoEditor extends Plugin
         // Create the private and public key
         $res = openssl_pkey_new($config);
         if($res === false){
-            AJXP_Logger::error(__CLASS__, __FUNCTION__, "Warning, OpenSSL is active but could not correctly generate a key for Zoho Editor. Please make sure the openssl.cnf file is correctly set up.");
+            Logger::error(__CLASS__, __FUNCTION__, "Warning, OpenSSL is active but could not correctly generate a key for Zoho Editor. Please make sure the openssl.cnf file is correctly set up.");
             while($message = openssl_error_string()){
-                AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Open SSL Error: ".$message);
+                Logger::debug(__CLASS__,__FUNCTION__,"Open SSL Error: ".$message);
             }
         }else{
             openssl_pkey_export_to_file($res, $keyFile);

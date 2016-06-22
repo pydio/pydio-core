@@ -30,7 +30,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -71,7 +71,7 @@ class DisclaimerProvider extends Plugin
             }
             $ctx->setRepositoryObject($repo);
             SessionMiddleware::updateContext($ctx);
-            AJXP_Logger::updateContext($ctx);
+            Logger::updateContext($ctx);
             ConfService::getInstance()->invalidateLoadedRepositories();
 
         } else {

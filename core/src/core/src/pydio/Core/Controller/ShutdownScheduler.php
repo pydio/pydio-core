@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Controller;
 
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
@@ -103,11 +103,11 @@ class ShutdownScheduler
             try {
                 call_user_func_array($callback, $arguments);
             } catch (\Exception $e) {
-                AJXP_Logger::error(__CLASS__, __FUNCTION__, array("context" => "Applying hook " . get_class($callback[0]) . "::" . $callback[1], "message" => $e->getMessage()));
+                Logger::error(__CLASS__, __FUNCTION__, array("context" => "Applying hook " . get_class($callback[0]) . "::" . $callback[1], "message" => $e->getMessage()));
             }
             $index++;
             if($index > 200) {
-                AJXP_Logger::error(__CLASS__, __FUNCTION__, "Breaking ShutdownScheduler loop, seems too big (200)");
+                Logger::error(__CLASS__, __FUNCTION__, "Breaking ShutdownScheduler loop, seems too big (200)");
                 break;
             }
         }

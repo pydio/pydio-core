@@ -28,7 +28,7 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -328,7 +328,7 @@ class Notification implements ContextProviderInterface
      */
     protected function getPublicAuthorLabel(){
         $m = LocaleService::getMessages();
-        $label = str_replace("%s", AJXP_Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
+        $label = str_replace("%s", Logger::getClientAdress(), $m["notification.tpl.location.public_user"]);
         return $label;
     }
 

@@ -22,13 +22,13 @@ namespace Pydio\Access\Driver\StreamProvider\FTP;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/class.ftpAccessWrapper.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/access.ftp/FtpAccessWrapper.php");
 
 /**
  * Class FtpSonWrapper
  * @package Pydio\Access\Driver\StreamProvider\FTP
  */
-class FtpSonWrapper extends ftpAccessWrapper
+class FtpSonWrapper extends FtpAccessWrapper
 {
     /**
      * @param $url

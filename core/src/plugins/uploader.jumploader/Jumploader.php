@@ -29,7 +29,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -135,7 +135,7 @@ class Jumploader extends Plugin
                 while ($it->valid()) {
                     if (!$it->isDot()) {
                         $subPathName = $it->getSubPathName();
-                        AJXP_Logger::debug("Iterator SubPathName: " . $it->getSubPathName());
+                        Logger::debug("Iterator SubPathName: " . $it->getSubPathName());
                         if (strstr($subPathName, $fileHash) != false) {
                             $explodedSubPathName = explode('.', $subPathName);
                             $resumeFileId = $explodedSubPathName[1];
@@ -153,10 +153,10 @@ class Jumploader extends Plugin
                     return;
                 }
 
-                AJXP_Logger::debug("ResumeFileID: " . $resumeFileId);
-                AJXP_Logger::debug("Max Resume Index: " . max($resumeIndexes));
+                Logger::debug("ResumeFileID: " . $resumeFileId);
+                Logger::debug("Max Resume Index: " . max($resumeIndexes));
                 $nextResumeIndex = max($resumeIndexes) + 1;
-                AJXP_Logger::debug("Next Resume Index: " . $nextResumeIndex);
+                Logger::debug("Next Resume Index: " . $nextResumeIndex);
 
                 if (isSet($resumeFileId)) {
                     $this->logDebug("ResumeFileId is set. Returning values: fileId: " . $resumeFileId . ", partitionIndex: " . $nextResumeIndex);

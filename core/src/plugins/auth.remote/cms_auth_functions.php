@@ -21,7 +21,7 @@
  * This functions are necessary to implement the bridge between Pydio
  * and other CMS's.
  */
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 /**
  * @package AjaXplorer_Plugins
@@ -142,7 +142,7 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
     $form = $nodes->item(0);
     $postUri = $form->getAttribute("action");
     $hiddens = $xPath->query('.//input[@type="hidden"]', $form);
-    AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Carry on Drupal hiddens ". $hiddens->length);
+    Logger::debug(__CLASS__,__FUNCTION__,"Carry on Drupal hiddens ". $hiddens->length);
     $postData = array(
         "name" => $login,
         "pass" => $pass,

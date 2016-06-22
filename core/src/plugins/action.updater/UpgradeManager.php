@@ -401,7 +401,7 @@ class UpgradeManager
     public function upgradeDB()
     {
         $confDriver = ConfService::getConfStorageImpl();
-        if (!$confDriver instanceof \Pydio\Conf\Sql\sqlConfDriver) {
+        if (!$confDriver instanceof \Pydio\Conf\Sql\SqlConfDriver) {
             return "";
         }
 

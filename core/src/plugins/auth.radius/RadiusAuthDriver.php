@@ -5,7 +5,7 @@ use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -97,60 +97,60 @@ class RadiusAuthDriver extends AbstractAuthDriver
     public function prepareRequest($res, $login, $pass, $seed)
     {
         if (!radius_add_server($res, $this->radiusServer, $this->radiusPort, $this->radiusSecret, 3, 3)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not add server (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not add server (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_create_request($res, RADIUS_ACCESS_REQUEST)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not create request (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not create request (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_string($res, RADIUS_NAS_IDENTIFIER, isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : 'localhost')) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for nas_identifier (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for nas_identifier (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_int($res, RADIUS_SERVICE_TYPE, RADIUS_FRAMED)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for service_type (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for service_type (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_int($res, RADIUS_FRAMED_PROTOCOL, RADIUS_PPP)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for framed_protocol (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for framed_protocol (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_string($res, RADIUS_CALLING_STATION_ID, isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '127.0.0.1') == -1) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for calling_station_id (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for calling_station_id (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_string($res, RADIUS_USER_NAME, $login)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for user name (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for user name (" . radius_strerror($res) . ")");
             return false;
         }
         if ($this->radiusAuthType == 'chap') {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Using CHAP.");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Using CHAP.");
             mt_srand(time());
             $chall = mt_rand();
             $chapval = pack('H*', md5(pack('Ca*', 1, $pass . $chall)));
             $pass = pack('C', 1) . $chapval;
             if (!radius_put_attr($res, RADIUS_CHAP_PASSWORD, $pass)) {
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put attribute for chap password (" . radius_strerror($res) . ")");
+                Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put attribute for chap password (" . radius_strerror($res) . ")");
                 return false;
             }
             if (!radius_put_attr($res, RADIUS_CHAP_CHALLENGE, $chall)) {
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put attribute for chap callenge (" . radius_strerror($res) . ")");
+                Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put attribute for chap callenge (" . radius_strerror($res) . ")");
                 return false;
             }
         } else {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Using PAP.");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Using PAP.");
             if (!radius_put_string($res, RADIUS_USER_PASSWORD, $pass)) {
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for pap password (" . radius_strerror($res) . ")");
+                Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put string for pap password (" . radius_strerror($res) . ")");
                 return false;
             }
         }
         if (!radius_put_int($res, RADIUS_SERVICE_TYPE, RADIUS_FRAMED)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for second service type (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for second service type (" . radius_strerror($res) . ")");
             return false;
         }
         if (!radius_put_int($res, RADIUS_FRAMED_PROTOCOL, RADIUS_PPP)) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for second framed protocol (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not put int for second framed protocol (" . radius_strerror($res) . ")");
             return false;
         }
     }
@@ -158,26 +158,26 @@ class RadiusAuthDriver extends AbstractAuthDriver
     public function checkPassword($login, $pass, $seed)
     {
         if (!extension_loaded('radius')) {
-            AJXP_Logger::logAction("RADIUS: php radius extension is missing, please install it.");
+            Logger::logAction("RADIUS: php radius extension is missing, please install it.");
             return false;
         }
         $res = radius_auth_open();
         $this->prepareRequest($res, $login, $pass, $seed);
         $req = radius_send_request($res);
         if (!$req) {
-            AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not send request (" . radius_strerror($res) . ")");
+            Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not send request (" . radius_strerror($res) . ")");
             return false;
         }
         switch ($req) {
             case RADIUS_ACCESS_ACCEPT:
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: authentication for user \"" . $login . "\" successful");
+                Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: authentication for user \"" . $login . "\" successful");
                 radius_close($res);
                 return true;
             case RADIUS_ACCESS_REJECT:
-                AJXP_Logger::logAction("RADIUS: authentication for user \"" . $login . "\" failed");
+                Logger::logAction("RADIUS: authentication for user \"" . $login . "\" failed");
                 break;
             default:
-                AJXP_Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: unknwon return value " . $req);
+                Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: unknwon return value " . $req);
                 break;
         }
         radius_close($res);

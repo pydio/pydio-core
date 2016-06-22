@@ -29,7 +29,7 @@ require_once(__DIR__ . '/../vendor/autoload.php');
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Stream\Listener\PathListener;
 use Pydio\Access\Core\Stream\Stream;
-use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
+use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Access\DropBox\Listener\DropBoxSubscriber;
 use Pydio\Access\WebDAV\Listener\WebDAVSubscriber;
 use Pydio\Core\Model\ContextInterface;
@@ -39,7 +39,7 @@ use Pydio\Core\Model\ContextInterface;
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class Driver extends fsAccessDriver
+class Driver extends FsAccessDriver
 {
     const PROTOCOL = "access.webdav";
     const RESOURCES_PATH = "Resources";

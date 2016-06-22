@@ -22,7 +22,7 @@
                       label="CONF_MESSAGE[UID]" name="ENCFS_UID"
                       type="integer" mandatory="true" default="33"/>
     </server_settings>
-    <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
+    <class_definition classname="Pydio\Action\Cypher\EncfsMounter" filename="plugins/cypher.encfs/EncfsMounter.php"/>
     <registry_contributions>
         <actions>
             <action name="encfs.cypher_folder_create">

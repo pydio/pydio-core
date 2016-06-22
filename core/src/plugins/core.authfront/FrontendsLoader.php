@@ -27,7 +27,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -52,7 +52,7 @@ class FrontendsLoader extends Plugin {
             foreach($frontends as $frontendPlugin){
                 if(!$frontendPlugin->isEnabled()) continue;
                 if(!method_exists($frontendPlugin, "tryToLogUser")){
-                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
+                    Logger::error(__CLASS__, __FUNCTION__, "Trying to use an authfront plugin without tryToLogUser method. Wrongly initialized?");
                     continue;
                 }
                 //$res = $frontendPlugin->tryToLogUser($httpVars, ($index == count($frontends)-1));

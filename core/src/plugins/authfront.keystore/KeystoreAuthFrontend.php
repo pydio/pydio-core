@@ -26,7 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
-use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
@@ -41,7 +41,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
 {
 
     /**
-     * @var sqlConfDriver $storage
+     * @var SqlConfDriver $storage
      */
     var $storage;
 
@@ -73,7 +73,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
             return false;
         }
         $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
+        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
 
         $data = null;
         $this->storage->simpleStoreGet("keystore", $token, "serial", $data);
@@ -118,7 +118,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
     {
 
         $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
+        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
 
         $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:' . strlen($userId) . ':"' . $userId . '"%');
         foreach ($keys as $keyId => $keyData) {
@@ -145,7 +145,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
             return null;
         }
         $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\sqlConfDriver)) return false;
+        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
 
         $u = $ctx->getUser();
         $user = $u->getId();

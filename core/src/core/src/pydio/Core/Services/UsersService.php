@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Services;
 
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
@@ -32,7 +32,7 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\CookiesHelper;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -357,7 +357,7 @@ class UsersService
             $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
             $zObj->save();
         }
-        AJXP_Logger::info(__CLASS__, "Update Password", array("user_id" => $userId));
+        Logger::info(__CLASS__, "Update Password", array("user_id" => $userId));
         return true;
     }
 
@@ -400,7 +400,7 @@ class UsersService
             $user->save();
         }
         Controller::applyHook("user.after_create", array($localContext, $user));
-        AJXP_Logger::info(__CLASS__, "Create User", array("user_id" => $userId));
+        Logger::info(__CLASS__, "Create User", array("user_id" => $userId));
         return $user;
     }
 
@@ -439,7 +439,7 @@ class UsersService
             $authDriver->deleteUser($deletedUser);
         }
         Controller::applyHook("user.after_delete", array($ctx, $userId));
-        AJXP_Logger::info(__CLASS__, "Delete User", array("user_id" => $userId, "sub_user" => implode(",", $subUsers)));
+        Logger::info(__CLASS__, "Delete User", array("user_id" => $userId, "sub_user" => implode(",", $subUsers)));
         return true;
     }
 
@@ -487,7 +487,7 @@ class UsersService
     /**
      * Count the number of children a given user has already created
      * @param $parentUserId
-     * @return AbstractAjxpUser[]
+     * @return AbstractUser[]
      */
     public static function getChildrenUsers($parentUserId)
     {
@@ -524,7 +524,7 @@ class UsersService
         $authDriver = ConfService::getAuthDriverImpl();
         $confDriver = ConfService::getConfStorageImpl();
         /**
-         * @var $allUsers AbstractAjxpUser[]
+         * @var $allUsers AbstractUser[]
          */
         $allUsers = array();
         $paginated = false;

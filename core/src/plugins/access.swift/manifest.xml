@@ -24,6 +24,6 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_definition filename="plugins/access.swift/class.swiftAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Swift\swiftAccessDriver"/>
-    <class_stream_wrapper filename="plugins/access.swift/class.swiftAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Swift\swiftAccessWrapper" protocol="ajxp.swift"/>
+    <class_definition filename="plugins/access.swift/SwiftAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Swift\SwiftAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.swift/SwiftAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Swift\SwiftAccessWrapper" protocol="ajxp.swift"/>
 </ajxpdriver>

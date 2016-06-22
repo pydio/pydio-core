@@ -23,7 +23,7 @@ namespace Pydio\Action\Compression;
 
 use Exception;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Access\Driver\StreamProvider\FS\fsAccessWrapper;
+use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
@@ -110,7 +110,7 @@ class PowerFSController extends Plugin
                     return;
                 }
 
-                $rootDir = fsAccessWrapper::getRealFSReference($urlBase) . $dir;
+                $rootDir = FsAccessWrapper::getRealFSReference($urlBase) . $dir;
                 // List all files
                 $todo = array();
                 $args = array();
@@ -119,7 +119,7 @@ class PowerFSController extends Plugin
                 foreach ($selection->getFiles() as $selectionFile) {
                     $baseFile = $selectionFile;
                     $args[] = escapeshellarg(substr($selectionFile, strlen($dir) + ($dir == "/" ? 0 : 1)));
-                    $selectionFile = fsAccessWrapper::getRealFSReference($urlBase . $selectionFile);
+                    $selectionFile = FsAccessWrapper::getRealFSReference($urlBase . $selectionFile);
                     $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
                     if (is_dir($selectionFile)) {
                         $objects = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($selectionFile), RecursiveIteratorIterator::SELF_FIRST);
@@ -142,7 +142,7 @@ class PowerFSController extends Plugin
                 }
                 chdir($rootDir);
                 $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);
-                /** @var \Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver $fsDriver */
+                /** @var \Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
                 if ((!isSet($c["SHOW_HIDDEN_FILES"]) || $c["SHOW_HIDDEN_FILES"] == false) && stripos(PHP_OS, "win") === false) {

@@ -28,14 +28,14 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Conf\Sql\SqlConfDriver;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
 
@@ -53,7 +53,7 @@ class ShareStore {
 
     public $modifiableShareKeys = ["counter", "tags", "short_form_url"];
     /**
-     * @var sqlConfDriver
+     * @var SqlConfDriver
      */
     var $confStorage;
 
@@ -382,7 +382,7 @@ class ShareStore {
     public function deleteShare($type, $element, $keepRepository = false, $ignoreRepoNotFound = false, $ajxpNode = null)
     {
         $mess = LocaleService::getMessages();
-        AJXP_Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
+        Logger::debug(__CLASS__, __FILE__, "Deleting shared element ".$type."-".$element);
 
         if ($type == "repository") {
             if(strpos($element, "repo-") === 0) $element = str_replace("repo-", "", $element);

@@ -34,7 +34,7 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -80,7 +80,7 @@ class SessionRepositoryMiddleware
         }
 
         SessionMiddleware::updateContext($ctx);
-        AJXP_Logger::updateContext($ctx);
+        Logger::updateContext($ctx);
 
         //Set language
         if($ctx->hasUser() && $ctx->getUser()->getPref("lang") != "") {

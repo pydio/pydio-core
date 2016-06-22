@@ -47,9 +47,9 @@
             </action>
         </actions>
 	</registry_contributions>
-	<class_definition filename="plugins/access.ftp/class.ftpAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\FTP\ftpAccessDriver"/>
+	<class_definition filename="plugins/access.ftp/FtpAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\FTP\FtpAccessDriver"/>
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-    <class_stream_wrapper filename="plugins/access.ftp/class.ftpAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\FTP\ftpAccessWrapper" protocol="ajxp.ftp"/>
+    <class_stream_wrapper filename="plugins/access.ftp/FtpAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\FTP\FtpAccessWrapper" protocol="ajxp.ftp"/>
 </ajxpdriver>

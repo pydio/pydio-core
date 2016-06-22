@@ -22,7 +22,7 @@ namespace Pydio\Tasks\Providers;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
@@ -136,7 +136,7 @@ class SqlTasksProvider implements ITasksProvider
     }
 
     /**
-     * @param AbstractAjxpUser $user
+     * @param AbstractUser $user
      * @param Repository $repository
      * @return Task[]
      */
@@ -174,7 +174,7 @@ class SqlTasksProvider implements ITasksProvider
     }
 
     /**
-     * @param AbstractAjxpUser $user
+     * @param AbstractUser $user
      * @param Repository $repository
      * @param int $status
      * @return Task[]

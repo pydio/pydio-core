@@ -65,7 +65,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
         if (isSet($_SESSION["AJXP_USER"]) && !$_SESSION["AJXP_USER"] instanceof __PHP_Incomplete_Class && $_SESSION["AJXP_USER"] instanceof \Pydio\Core\Model\UserInterface) {
             /**
-             * @var \Pydio\Conf\Core\AbstractAjxpUser $u
+             * @var \Pydio\Conf\Core\AbstractUser $u
              */
             $u = $_SESSION["AJXP_USER"];
             if ($u->reloadRolesIfRequired()) {
@@ -235,7 +235,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
                     restore_exception_handler();
                     set_error_handler(function ($code, $message, $script) {
                         if (error_reporting() == 0) return;
-                        \Pydio\Log\Core\AJXP_Logger::error("Captcha", "Error while loading captcha : " . $message, []);
+                        \Pydio\Log\Core\Logger::error("Captcha", "Error while loading captcha : " . $message, []);
                     });
                     CaptchaProvider::sendCaptcha();
                     return "";

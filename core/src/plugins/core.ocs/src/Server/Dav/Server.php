@@ -29,7 +29,7 @@ use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Share\Store\ShareStore;
 use Sabre;
 
@@ -118,7 +118,7 @@ class Server extends Sabre\DAV\Server
         try {
             $this->exec();
         } catch ( \Exception $e ) {
-            AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
+            Logger::error(__CLASS__,"Exception",$e->getMessage());
         }
     }
 

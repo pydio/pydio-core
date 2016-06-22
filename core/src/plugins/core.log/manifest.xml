@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Application Logger]" description="CONF_MESSAGE[Setup the logging system]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="Pydio\Log\Core\AJXP_Logger" filename="plugins/core.log/class.AJXP_Logger.php"/>
+    <class_definition classname="Pydio\Log\Core\Logger" filename="plugins/core.log/Logger.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core.log" path="plugins/core.log/i18n"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Caching Driver]" description="CONF_MESSAGE[Setup the caching system]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="Pydio\Cache\Core\CoreCacheLoader" filename="plugins/core.cache/class.CoreCacheLoader.php"/>
+    <class_definition classname="Pydio\Cache\Core\CoreCacheLoader" filename="plugins/core.cache/CoreCacheLoader.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core.cache" path="plugins/core.cache/i18n"/>

@@ -34,7 +34,7 @@ use \Doctrine\Common\Cache;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Cache\Doctrine\Ext;
 
 /**
@@ -75,31 +75,31 @@ class doctrineCacheDriver extends AbstractCacheDriver
         switch ($driverOptions['driver']) {
             case "apc":
                 if (!APC_EXTENSION_LOADED) {
-                    AJXP_Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
+                    Logger::error(__CLASS__, "init", "The APC extension package must be installed!");
                     return;
                 }
                 break;
             case "memcache":
                 if (!MEMCACHE_EXTENSION_LOADED) {
-                    AJXP_Logger::error(__CLASS__, "init", "The Memcache extension package must be installed!");
+                    Logger::error(__CLASS__, "init", "The Memcache extension package must be installed!");
                     return;
                 }
                 break;
             case "memcached":
                 if (!MEMCACHED_EXTENSION_LOADED) {
-                    AJXP_Logger::error(__CLASS__, "init", "The Memcached extension package must be installed!");
+                    Logger::error(__CLASS__, "init", "The Memcached extension package must be installed!");
                     return;
                 }
                 break;
             case "redis":
                 if (!REDIS_EXTENSION_LOADED) {
-                    AJXP_Logger::error(__CLASS__, "init", "The Redis extension package must be installed!");
+                    Logger::error(__CLASS__, "init", "The Redis extension package must be installed!");
                     return;
                 }
                 break;
             case "xcache":
                 if (!XCACHE_EXTENSION_LOADED) {
-                    AJXP_Logger::error(__CLASS__, "init", "The XCache extension package must be installed!");
+                    Logger::error(__CLASS__, "init", "The XCache extension package must be installed!");
                     return;
                 }
                 break;

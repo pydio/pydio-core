@@ -31,7 +31,7 @@ use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Services;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 use Pydio\Core\Exception\ActionNotFoundException;
 use Pydio\Core\Exception\AuthRequiredException;
@@ -439,7 +439,7 @@ class Controller
             }
         }
         if($findContext == null){
-            AJXP_Logger::error("Controller", "applyHook", "Applying hook $hookName without context");
+            Logger::error("Controller", "applyHook", "Applying hook $hookName without context");
             throw new \Exception("No context found for hook $hookName: please make sure to pass at list one ContextInterface or Context Provider object");
         }
 
@@ -492,7 +492,7 @@ class Controller
                 try{
                     self::applyCallback($findContext, $hookCallback, $args, $defer);
                 }catch(\Exception $e){
-                    AJXP_Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
+                    Logger::error("[Hook $hookName]", "[Callback ".$plugId.".".$methodName."]", $e->getMessage());
                 }
             }else{
                 self::applyCallback($findContext, $hookCallback, $args, $defer);

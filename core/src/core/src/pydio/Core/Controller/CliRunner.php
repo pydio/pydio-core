@@ -25,7 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\UnixProcess;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 
@@ -140,14 +140,14 @@ class CliRunner
                 $tmpBat = implode(DIRECTORY_SEPARATOR, array($basePath, "data", "tmp", md5(time()) . ".bat"));
                 $cmd = "@chcp 1252 > nul \r\n" . $cmd;
                 $cmd .= "\n DEL " . chr(34) . $tmpBat . chr(34);
-                AJXP_Logger::debug("Writing file $cmd to $tmpBat");
+                Logger::debug("Writing file $cmd to $tmpBat");
                 file_put_contents($tmpBat, $cmd);
                 pclose(popen('start /b "CLI" "' . $tmpBat . '"', 'r'));
             }
             return null;
         } else {
             $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG ? $logFile : null));
-            AJXP_Logger::debug("Starting process and sending output dev null");
+            Logger::debug("Starting process and sending output dev null");
             return $process;
         }
     }

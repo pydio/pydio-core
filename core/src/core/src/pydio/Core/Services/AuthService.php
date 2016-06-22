@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Services;
 use Pydio\Auth\Core\MemorySafe;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Model\Context;
@@ -28,7 +28,7 @@ use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\BruteForceHelper;
 use Pydio\Core\Utils\CookiesHelper;
 use Pydio\Core\Utils\Utils;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -56,7 +56,7 @@ class AuthService
     }
     /**
      * Get the currently logged user object
-     * @return AbstractAjxpUser
+     * @return AbstractUser
      */
     public static function getLoggedUser()
     {
@@ -92,7 +92,7 @@ class AuthService
         BruteForceHelper::setBruteForceLoginArray($loginAttempt);
 
         if (!$authDriver->userExists($user_id)) {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
             if ($bruteForceLogin === FALSE) {
                 throw new LoginException(-4);
             } else {
@@ -101,7 +101,7 @@ class AuthService
         }
         if (!$bypass_pwd) {
             if (!UsersService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
-                AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
+                Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
                 if ($bruteForceLogin === FALSE) {
                     throw new LoginException(-4);
                 } else {
@@ -123,7 +123,7 @@ class AuthService
 
 
         if ($user->getLock() === "logout") {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
             throw new LoginException(-1);
         }
 
@@ -141,7 +141,7 @@ class AuthService
 
         self::updateUser($user);
 
-        AJXP_Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
+        Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
         return $user;
     }
 
@@ -169,7 +169,7 @@ class AuthService
             $userId = $user->id;
             Controller::applyHook("user.before_disconnect", array(Context::emptyContext(), $user));
             CookiesHelper::clearRememberCookie($user);
-            AJXP_Logger::info(__CLASS__, "Log Out", "");
+            Logger::info(__CLASS__, "Log Out", "");
             unset($_SESSION["AJXP_USER"]);
             //if(isSet(self::$currentUser)) unset(self::$currentUser);
             if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {

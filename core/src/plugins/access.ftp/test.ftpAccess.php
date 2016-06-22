@@ -36,9 +36,9 @@ class ftpAccessTest extends AbstractTest
 
         $basePath = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/" ;
         // Check file exists
-        if (!file_exists($basePath."class.ftpAccessDriver.php")
+        if (!file_exists($basePath."FtpAccessDriver.php")
          || !file_exists($basePath."manifest.xml"))
-        { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
+        { $this->failedInfo .= "Missing at least one of the plugin files (FtpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
 
         return TRUE;
     }

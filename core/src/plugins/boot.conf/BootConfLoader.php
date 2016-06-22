@@ -28,7 +28,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Services\ConfService;
@@ -588,7 +588,7 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * Returns a list of available repositories (dynamic ones only, not the ones defined in the config file).
-     * @param AbstractAjxpUser $user
+     * @param AbstractUser $user
      * @return array
      */
     public function listRepositories($user = null)
@@ -672,7 +672,7 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * @param AJXP_Role $role
-     * @param AbstractAjxpUser $userObject
+     * @param AbstractUser $userObject
      * @return void
      */
     public function updateRole($role, $userObject = null)
@@ -743,7 +743,7 @@ class BootConfLoader extends AbstractConfDriver
      * Instantiate the right class
      *
      * @param string $userId
-     * @return AbstractAjxpUser
+     * @return AbstractUser
      */
     public function instantiateAbstractUserImpl($userId)
     {
@@ -760,7 +760,7 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * @param $userId
-     * @return AbstractAjxpUser[]
+     * @return AbstractUser[]
      */
     public function getUserChildren($userId)
     {
@@ -792,7 +792,7 @@ class BootConfLoader extends AbstractConfDriver
     }
 
     /**
-     * @param AbstractAjxpUser[] $flatUsersList
+     * @param AbstractUser[] $flatUsersList
      * @param string $baseGroup
      * @param bool $fullTree
      * @return void

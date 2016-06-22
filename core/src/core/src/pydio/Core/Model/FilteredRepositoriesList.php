@@ -24,7 +24,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -118,7 +118,7 @@ class FilteredRepositoriesList
                     $drvList[$repoId] = $repoObject;
                 }
                 if($repoObject->hasParent() && !RepositoryService::findRepositoryByIdOrAlias($repoObject->getParentId())){
-                    AJXP_Logger::error(__CLASS__, __FUNCTION__, "Disabling repository ".$repoObject->getSlug()." as parent cannot be correctly loaded.");
+                    Logger::error(__CLASS__, __FUNCTION__, "Disabling repository ".$repoObject->getSlug()." as parent cannot be correctly loaded.");
                     unset($drvList[$repoId]);
                 }
             }

@@ -25,7 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 use Sabre\DAV as DAV;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -80,7 +80,7 @@ class DAVServer
                 }
             }
             if ($repository == null) {
-                AJXP_Logger::debug("not found, dying $repositoryId");
+                Logger::debug("not found, dying $repositoryId");
                 die('You are not allowed to access this service');
             }
 
@@ -128,7 +128,7 @@ class DAVServer
         try {
             $server->exec();
         } catch ( \Exception $e ) {
-            AJXP_Logger::error(__CLASS__,"Exception",$e->getMessage());
+            Logger::error(__CLASS__,"Exception",$e->getMessage());
         }
     }
 }

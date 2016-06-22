@@ -22,7 +22,7 @@ namespace Pydio\Auth\Core;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Conf\Core\AbstractAjxpUser;
+use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -178,7 +178,7 @@ class AbstractAuthDriver extends Plugin
      * @param int $offset
      * @param int $limit
      * @param bool $recursive
-     * @return AbstractAjxpUser[]
+     * @return AbstractUser[]
      */
     public function listUsersPaginated($baseGroup, $regexp, $offset, $limit, $recursive = true)
     {
@@ -202,7 +202,7 @@ class AbstractAuthDriver extends Plugin
      *
      * @param string $baseGroup
      * @param bool $recursive
-     * @return AbstractAjxpUser[]
+     * @return AbstractUser[]
      */
     public function listUsers($baseGroup = "/", $recursive = true){}
 

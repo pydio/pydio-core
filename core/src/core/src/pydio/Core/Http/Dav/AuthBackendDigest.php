@@ -34,7 +34,7 @@ use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Log\Core\AJXP_Logger;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -122,7 +122,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
             $this->updateCurrentUserRights($loggedUser);
         } else {
           if ($success === false) {
-            AJXP_Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
           }
           throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
         }
@@ -149,7 +149,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
 
         // NOW UPDATE CONTEXT
         $this->context->setUserObject($loggedUser);
-        AJXP_Logger::updateContext($this->context);
+        Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
 
         return true;

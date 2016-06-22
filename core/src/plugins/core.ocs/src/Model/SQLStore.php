@@ -21,7 +21,7 @@
 namespace Pydio\OCS\Model;
 
 use Pydio\Core\Services\ConfService;
-use Pydio\Conf\Sql\sqlConfDriver;
+use Pydio\Conf\Sql\SqlConfDriver;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -32,7 +32,7 @@ define('OCS_SQLSTORE_NS_REMOTE_SHARE', 'ocs_remote_share');
 class SQLStore implements IStore
 {
     /**
-     * @var sqlConfDriver
+     * @var SqlConfDriver
      */
     protected $storage;
 

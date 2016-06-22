@@ -64,7 +64,7 @@
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
 
-    <class_definition filename="plugins/access.sftp_psl/class.sftpPSLAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SFTP_PSL\sftpPSLAccessDriver"/>
-    <class_stream_wrapper filename="plugins/access.sftp_psl/class.sftpPSLAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SFTP_PSL\sftpPSLAccessWrapper" protocol="ajxp.sftppsl"/>
+    <class_definition filename="plugins/access.sftp_psl/SftpPSLAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SFTP_PSL\SftpPSLAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.sftp_psl/SftpPSLAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SFTP_PSL\SftpPSLAccessWrapper" protocol="ajxp.sftppsl"/>
 
 </ajxpdriver>
