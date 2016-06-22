@@ -18,16 +18,25 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
+namespace Pydio\Meta\Exif;
 
 use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class ExifXmlMessage
+ * @package Pydio\Meta\Exif
+ */
 class ExifXmlMessage implements \Pydio\Core\Http\Response\XMLSerializableResponseChunk, \Pydio\Core\Http\Response\JSONSerializableResponseChunk
 {
     protected $data;
 
+    /**
+     * ExifXmlMessage constructor.
+     * @param $filteredData
+     */
     public function __construct($filteredData)
     {
         $this->data = $filteredData;
@@ -50,11 +59,17 @@ class ExifXmlMessage implements \Pydio\Core\Http\Response\XMLSerializableRespons
 
     }
 
+    /**
+     * @return string
+     */
     public function jsonSerializableKey()
     {
         return "exif";
     }
 
+    /**
+     * @return mixed
+     */
     public function jsonSerializableData()
     {
         return $this->data;

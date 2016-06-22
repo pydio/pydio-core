@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.syncable" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Track changes on this workspace to enable the synchronization with an external client]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
+    <class_definition filename="plugins/meta.syncable/ChangesTracker.php" classname="Pydio\Meta\Sync\ChangesTracker"/>
     <client_settings>
         <resources>
             <i18n namespace="meta.syncable" path="plugins/meta.syncable/i18n"/>

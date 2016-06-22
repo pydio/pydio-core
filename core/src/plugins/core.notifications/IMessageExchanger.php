@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Notification\Core;
 
 use Pydio\Core\Model\ContextInterface;
 
@@ -27,7 +28,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-interface AJXP_MessageExchanger
+interface IMessageExchanger
 {
     /**
      * @abstract

@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Sync;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
@@ -31,9 +32,10 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\TaskService;
+use \dibi as dibi;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -42,7 +44,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
+class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
 {
     private $sqlDriver;
 
@@ -69,7 +71,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
         }
         try{
             $this->accessDriver->filterUserSelectionToHidden($ctx, [$path]);
-        }catch(Exception $e){
+        }catch(\Exception $e){
             return true;
         }
         return false;
@@ -96,7 +98,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
             $cp = substr($cRow->node_path, 1);
             if(empty($cp)) continue;
             if(PHP_OS == 'Darwin'){
-                $cp = Normalizer::normalize($cp, Normalizer::FORM_D);
+                $cp = \Normalizer::normalize($cp, \Normalizer::FORM_D);
             }
             $mod["children"][$cp] = $cRow->mtime;
         }
@@ -129,7 +131,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                     $cp = substr($cRow->node_path, strlen($path)+1);
                     if(empty($cp)) continue;
                     if(PHP_OS == 'Darwin'){
-                        $cp = Normalizer::normalize($cp, Normalizer::FORM_D);
+                        $cp = \Normalizer::normalize($cp, \Normalizer::FORM_D);
                     }
                     $mod["children"][$cp] = $cRow->mtime;
                 }
@@ -197,7 +199,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
      * @param ContextInterface $ctx
      * @param bool $check
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     protected function getResyncTimestampFile(\Pydio\Core\Model\ContextInterface $ctx, $check = false){
         $repo = $ctx->getRepository();
@@ -231,7 +233,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
      * @param $fileVars
      * @param ContextInterface $contextInterface
      * @return null
-     * @throws Exception
+     * @throws \Exception
      * @throws \Pydio\Core\Exception\PydioException
      */
     public function switchActions($actionName, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
@@ -592,7 +594,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                             $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
                             $this->updateNodesIndex(null, $newNode, false);
                         }
-                    }catch (Exception $e){}
+                    }catch (\Exception $e){}
 
                 } else {
                     // PATH CHANGE ONLY
@@ -608,7 +610,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                                 $this->logError(__FUNCTION__, "There was an update event on a non-indexed node (".$newNode->getPath()."), creating index entry!");
                                 $this->updateNodesIndex(null, $newNode, false);
                             }
-                        }catch (Exception $e){}
+                        }catch (\Exception $e){}
                     } else {
                         $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
@@ -627,12 +629,12 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
                                 TaskService::getInstance()->enqueueTask($task);
 
                             }
-                        }catch (Exception $e){}
+                        }catch (\Exception $e){}
                     }
 
                 }
             }
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             AJXP_Logger::error("[meta.syncable]", "Exception", $e->getTraceAsString());
             AJXP_Logger::error("[meta.syncable]", "Indexation", $e->getMessage());
         }
@@ -694,7 +696,7 @@ class ChangesTracker extends AJXP_AbstractMetaSource implements SqlTableProvider
     /**
      * @param array $param
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function installSQLTables($param)
     {

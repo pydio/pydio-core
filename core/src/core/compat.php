@@ -27,3 +27,4 @@ class_alias("Pydio\\Access\\Core\\Model\\AJXP_Node", "AJXP_Node", true);
 class_alias("Pydio\\Conf\\Core\\AJXP_Role", "AJXP_Role", true);
 class_alias("Pydio\\Access\\Core\\Model\\Repository", "Repository", true);
 class_alias("Pydio\\Access\\Core\\Filter\\ContentFilter", "ContentFilter", true);
+class_alias("Pydio\\Notification\\Core\\Notification", "AJXP_Notification", true);

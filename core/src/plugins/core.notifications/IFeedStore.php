@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Notification\Core;
 
 use Pydio\Core\Model\ContextInterface;
 
@@ -27,7 +28,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-interface AJXP_FeedStore
+interface IFeedStore
 {
     /**
      * @abstract
@@ -51,22 +52,22 @@ interface AJXP_FeedStore
      * @param integer $limit
      * @param boolean $enlargeToOwned
      * @param string $userId
-     * @return AJXP_Notification[]
+     * @return Notification[]
      */
     public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId);
 
     /**
      * @abstract
-     * @param AJXP_Notification $notif
+     * @param Notification $notif
      * @return mixed
      */
-    public function persistAlert(AJXP_Notification $notif);
+    public function persistAlert(Notification $notif);
 
     /**
      * @abstract
      * @param $userId
      * @param null $repositoryIdFilter
-     * @return AJXP_Notification[]
+     * @return Notification[]
      */
     public function loadAlerts($userId, $repositoryIdFilter = null);
 

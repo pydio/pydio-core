@@ -4,7 +4,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 /**
  * Created by PhpStorm.
@@ -13,7 +13,7 @@ use Pydio\Meta\Core\AJXP_AbstractMetaSource;
  * Time: 14:52
  */
 
-abstract class AbstractSearchEngineIndexer extends AJXP_AbstractMetaSource {
+abstract class AbstractSearchEngineIndexer extends AbstractMetaSource {
 
     /**
      * @param DOMNode $contribNode

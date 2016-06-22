@@ -32,6 +32,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Notification\Core\Notification;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -259,11 +260,11 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     }
 
     /**
-     * @param AJXP_Notification $notification
+     * @param Notification $notification
      * @throws Exception
      * @throws PydioException
      */
-    public function processNotification(AJXP_Notification &$notification)
+    public function processNotification(Notification &$notification)
     {
         try{
             $userObject = UsersService::getUserById($notification->getTarget());

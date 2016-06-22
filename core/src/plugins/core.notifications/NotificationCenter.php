@@ -18,8 +18,11 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Notification\Core;
+
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
@@ -27,6 +30,7 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use \DOMXPath as DOMXPath;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -35,14 +39,14 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AJXP_NotificationCenter extends Plugin
+class NotificationCenter extends Plugin
 {
     /**
      * @var String
      */
     private $userId;
     /**
-     * @var AJXP_FeedStore|bool
+     * @var IFeedStore|bool
      */
     private $eventStore = false;
 
@@ -54,10 +58,10 @@ class AJXP_NotificationCenter extends Plugin
     {
         parent::init($ctx, $options);
         $this->userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
-        $pService = \Pydio\Core\PluginFramework\PluginsService::getInstance($ctx);
+        $pService = PluginsService::getInstance($ctx);
         try {
-            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "AJXP_FeedStore", $pService);
-        } catch (Exception $e) {
+            $this->eventStore = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_FEED_INSTANCE"], "Pydio\\Notification\\Core\\IFeedStore", $pService);
+        } catch (\Exception $e) {
 
         }
         if ($this->eventStore === false) {
@@ -93,10 +97,10 @@ class AJXP_NotificationCenter extends Plugin
 
     /**
      * Hooked on msg.notifications
-     * @param AJXP_Notification $notification
-     * @throws Exception
+     * @param Notification $notification
+     * @throws \Exception
      */
-    public function persistNotificationToAlerts(AJXP_Notification &$notification)
+    public function persistNotificationToAlerts(Notification &$notification)
     {
         if ($this->eventStore) {
             $this->eventStore->persistAlert($notification);
@@ -122,7 +126,7 @@ class AJXP_NotificationCenter extends Plugin
      * @param AJXP_Node|null $newNode
      * @param bool $copy
      * @param string $targetNotif
-     * @throws Exception
+     * @throws \Exception
      */
     public function persistChangeHookToFeed(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new")
     {
@@ -267,7 +271,7 @@ class AJXP_NotificationCenter extends Plugin
                     $node->setUserId($node->hasUser() ? $node->getUserId() : $notif->getAuthor());
                     try {
                         @$node->loadNodeInfo();
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
@@ -420,7 +424,7 @@ class AJXP_NotificationCenter extends Plugin
                 }
                 try {
                     @$node->loadNodeInfo();
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     if($notification->alert_id){
                         $this->eventStore->dismissAlertById($ctx, $notification->alert_id);
                     }
@@ -486,14 +490,14 @@ class AJXP_NotificationCenter extends Plugin
      * @param \Pydio\Access\Core\Model\AJXP_Node $newNode
      * @param bool $copy
      * @param string $targetNotif
-     * @return AJXP_Notification
+     * @return Notification
      */
     public function generateNotificationFromChangeHook(AJXP_Node $oldNode = null, AJXP_Node $newNode = null, $copy = false, $targetNotif = "new")
     {
         $type = "";
         $primaryNode = null;
         $secondNode = null;
-        $notif = new AJXP_Notification();
+        $notif = new Notification();
         if ($oldNode == null) {
             if($targetNotif == "old") return false;
             $type = AJXP_NOTIF_NODE_ADD;
@@ -535,19 +539,19 @@ class AJXP_NotificationCenter extends Plugin
 
 
     /**
-     * @param AJXP_Notification $notif
+     * @param Notification $notif
      */
-    public function prepareNotification(AJXP_Notification &$notif)
+    public function prepareNotification(Notification &$notif)
     {
         $notif->setAuthor($this->userId);
         $notif->setDate(time());
 
     }
     /**
-     * @param AJXP_Notification $notif
+     * @param Notification $notif
      * @param string $targetId
      */
-    public function postNotification(AJXP_Notification $notif, $targetId)
+    public function postNotification(Notification $notif, $targetId)
     {
         $this->prepareNotification($notif);
         $notif->setTarget($targetId);

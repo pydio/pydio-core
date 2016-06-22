@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Notification\Core;
+
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextProviderInterface;
 
@@ -46,7 +48,7 @@ define('AJXP_NOTIF_NODE_MOVE_FROM', "move_from");
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AJXP_Notification implements ContextProviderInterface
+class Notification implements ContextProviderInterface
 {
 
     /**
@@ -76,7 +78,7 @@ class AJXP_Notification implements ContextProviderInterface
     public $secondaryNode;
 
     /**
-     * @var AJXP_Notification[]
+     * @var Notification[]
      */
     public $relatedNotifications;
 
@@ -399,7 +401,7 @@ class AJXP_Notification implements ContextProviderInterface
     }
 
     /**
-     * @param AJXP_Notification $relatedNotification
+     * @param Notification $relatedNotification
      */
     public function addRelatedNotification($relatedNotification)
     {
@@ -407,7 +409,7 @@ class AJXP_Notification implements ContextProviderInterface
     }
 
     /**
-     * @return AJXP_Notification
+     * @return Notification
      */
     public function getRelatedNotifications()
     {

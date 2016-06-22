@@ -18,17 +18,19 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Watch;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Notification\Core\Notification;
+use Pydio\Notification\Core\NotificationCenter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -37,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class MetaWatchRegister extends AJXP_AbstractMetaSource
+class WatchRegister extends AbstractMetaSource
 {
     public static $META_WATCH_CHANGE = "META_WATCH_CHANGE";
     public static $META_WATCH_READ = "META_WATCH_READ";
@@ -49,12 +51,12 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     public static $META_WATCH_USERS_NAMESPACE = "META_WATCH_USERS";
 
     /**
-     * @var MetaStoreProvider
+     * @var IMetaStoreProvider
      */
     protected $metaStore;
 
     /**
-     * @var AJXP_NotificationCenter
+     * @var NotificationCenter
      */
     protected $notificationCenter;
 
@@ -374,6 +376,10 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
         return $IDS;
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
     public function switchActions(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $actionName = $requestInterface->getAttribute("action");
@@ -432,6 +438,11 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
     }
 
 
+    /**
+     * @param AJXP_Node|null $oldNode
+     * @param AJXP_Node|null $newNode
+     * @param bool $copy
+     */
     public function processChangeHook(AJXP_Node $oldNode=null, AJXP_Node $newNode=null, $copy = false)
     {
         $newNotif = $this->notificationCenter->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "new");
@@ -448,16 +459,24 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function processReadHook(AJXP_Node $node)
     {
-        $notification = new AJXP_Notification();
+        $notification = new Notification();
         $notification->setAction(AJXP_NOTIF_NODE_VIEW);
         $notification->setNode($node);
         $this->processActiveHook($notification, self::$META_WATCH_READ);
 
     }
 
-    private function processActiveHook(AJXP_Notification $notification, $namespace, $parentActionType = null){
+    /**
+     * @param Notification $notification
+     * @param $namespace
+     * @param null $parentActionType
+     */
+    private function processActiveHook(Notification $notification, $namespace, $parentActionType = null){
         $origNode = $notification->getNode();
         $node = new AJXP_Node($origNode->getUrl());
         $all = $this->collectWatches($node, $namespace);
@@ -470,7 +489,7 @@ class MetaWatchRegister extends AJXP_AbstractMetaSource
             $this->notificationCenter->postNotification($notification, $id);
         }
         foreach($all["ancestors"] as $pair){
-            $parentNotification = new AJXP_Notification();
+            $parentNotification = new Notification();
             /**
              * @var \Pydio\Access\Core\Model\AJXP_Node $parentNode
              */

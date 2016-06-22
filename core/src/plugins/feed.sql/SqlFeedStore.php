@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Notification\Feed;
 
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Model\Context;
@@ -28,6 +29,11 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Notification\Core\IFeedStore;
+use Pydio\Notification\Core\Notification;
+
+use \dibi as dibi;
+use \DibiException as DibiException;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -35,7 +41,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Feed
  */
-class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvider
+class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
 {
 
     private $sqlDriver;
@@ -55,7 +61,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         if(!isSet($this->options)) return;
         $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
-            throw new Exception("Please define an SQL connexion in the core configuration");
+            throw new \Exception("Please define an SQL connexion in the core configuration");
         }
     }
 
@@ -181,7 +187,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         }
         $data = array();
         foreach ($res as $n => $row) {
-            $object = new stdClass();
+            $object = new \stdClass();
             $object->hookname = $row->htype;
             $object->arguments = unserialize($row->content);
             $object->author = $row->user_id;
@@ -195,10 +201,10 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
 
     /**
      * @abstract
-     * @param AJXP_Notification $notif
+     * @param Notification $notif
      * @return mixed
      */
-    public function persistAlert(AJXP_Notification $notif)
+    public function persistAlert(Notification $notif)
     {
         if(!$notif->getNode()) return;
         $repositoryId = $notif->getNode()->getRepositoryId();
@@ -245,7 +251,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         $data = array();
         foreach ($res as $n => $row) {
             $test = unserialize($row->content);
-            if ($test instanceof AJXP_Notification) {
+            if ($test instanceof Notification) {
                 $test->alert_id = $row->id;
                 $data[] = $test;
             }
@@ -274,7 +280,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
                 break;
             }
             /**
-             * @var $startEventNotif AJXP_Notification
+             * @var $startEventNotif Notification
              */
             $startEventNotif = unserialize($startEventRow->content);
             if(empty($startEventNotif)) {
@@ -300,11 +306,11 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
         $res = dibi::query("SELECT [id],[content],[index_path] FROM [ajxp_feed] WHERE [etype] = %s AND [index_path] IS NULL", "alert");
         foreach ($res as $row) {
             $test = unserialize($row->content);
-            if ($test instanceof AJXP_Notification) {
+            if ($test instanceof Notification) {
                 $url = $test->getNode()->getUrl();
                 try {
                     dibi::query("UPDATE [ajxp_feed] SET [index_path]=%s WHERE [id] = %i", $url, $row->id);
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     $this->logError("[sql]", $e->getMessage());
                 }
             }
@@ -354,7 +360,7 @@ class AJXP_SqlFeedStore extends Plugin implements AJXP_FeedStore, SqlTableProvid
 
         $data = array();
         foreach ($res as $n => $row) {
-            $object = new stdClass();
+            $object = new \stdClass();
             $object->path = $row->index_path;
             $object->content = unserialize($row->content);
             $object->author = $row->user_id;

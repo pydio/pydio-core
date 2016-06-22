@@ -29,10 +29,10 @@ use Pydio\Core\Services\RepositoryService;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * Class AJXP_AbstractMetaSource
+ * Class AbstractMetaSource
  * Abstract class from which all meta.* plugins must extend.
  */
-abstract class AJXP_AbstractMetaSource extends Plugin {
+abstract class AbstractMetaSource extends Plugin {
 
     /**
      * @var AbstractAccessDriver

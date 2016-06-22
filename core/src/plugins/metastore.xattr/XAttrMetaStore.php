@@ -18,30 +18,37 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Metastore\Implementation;
+
 use Pydio\Access\Core\Model\AJXP_Node;
 
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
 /**
- * Use an xattr-enabled filesystem to store metadata
- * @package AjaXplorer_Plugins
- * @subpackage Metastore
+ * Class XAttrMetaStore
+ * @package Pydio\Metastore\Implementation
  */
-class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
+class XAttrMetaStore extends AbstractMetaSource implements IMetaStoreProvider
 {
     protected $rootPath;
 
     public function performChecks()
     {
         if (!function_exists("xattr_list")) {
-            throw new Exception("The PHP Xattr Extension does not seem to be loaded");
+            throw new \Exception("The PHP Xattr Extension does not seem to be loaded");
         }
     }
 
+    /**
+     * @param $namespace
+     * @param $scope
+     * @param $user
+     * @return string
+     */
     private function getMetaKey($namespace, $scope, $user)
     {
         return strtolower($namespace."-".$scope."-".$user);
@@ -81,11 +88,11 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
         $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
-        if (!xattr_supported($path)) {
-            throw new Exception("Filesystem does not support Extended Attributes!");
+        if (!\xattr_supported($path)) {
+            throw new \Exception("Filesystem does not support Extended Attributes!");
         }
         $value = base64_encode(serialize($metaData));
-        xattr_set($path, $key, $value);
+        \xattr_set($path, $key, $value);
 
     }
 
@@ -96,17 +103,17 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
      * @param bool $private
      * @param int $scope
      * @return array|void
-     * @throws Exception
+     * @throws \Exception
      */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return;
         $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
-        if (!xattr_supported($path)) {
-            throw new Exception("Filesystem does not support Extended Attributes!");
+        if (!\xattr_supported($path)) {
+            throw new \Exception("Filesystem does not support Extended Attributes!");
         }
-        xattr_remove($path, $key);
+        \xattr_remove($path, $key);
     }
 
     /**
@@ -121,17 +128,17 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
     {
         $path = $ajxpNode->getRealFile();
         if(!file_exists($path)) return array();
-        if (!xattr_supported($path)) {
+        if (!\xattr_supported($path)) {
             //throw new Exception("Filesystem does not support Extended Attributes!");
             return array();
         }
         if($private === AJXP_METADATA_ALLUSERS){
             $startKey = $this->getMetaKey($nameSpace, $scope, "");
             $arrMeta = array();
-            $keyList = xattr_list($path);
+            $keyList = \xattr_list($path);
             foreach($keyList as $k){
                 if(strpos($k, $startKey) === 0){
-                    $mData = xattr_get($path, $k);
+                    $mData = \xattr_get($path, $k);
                     $decData = unserialize(base64_decode($mData));
                     if(is_array($decData)) $arrMeta = array_merge_recursive($arrMeta, $decData);
                 }
@@ -139,7 +146,7 @@ class xAttrMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvide
             return $arrMeta;
         }else{
             $key = $this->getMetaKey($nameSpace, $scope, $this->getUserId($private, $ajxpNode));
-            $data = xattr_get($path, $key);
+            $data = \xattr_get($path, $key);
             $data = unserialize(base64_decode($data));
             if( empty($data) || !is_array($data)) return array();
             return $data;

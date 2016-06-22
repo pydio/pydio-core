@@ -44,15 +44,22 @@
 // D.d (Dd) = Degrees, Decimal Degrees (ex. 45.3772o)                  //
 // DMS (DMS) = Degrees, Minutes, Seconds (ex. 45o22'38")               //
 //*********************************************************************//
+namespace Pydio\Meta\Exif;
 
-
+/**
+ * Class GeoConversion
+ * @package Pydio\Meta\Exif
+ */
 Class GeoConversion{
 
    public $negative = FALSE;
    public $real = FALSE;
    public $negative_path = '';
 
-   private function is_negative(&$string)
+    /**
+     * @param $string
+     */
+    private function is_negative(&$string)
    {
       if ($string[0] == '-') {
         $this->negative = TRUE;
@@ -62,7 +69,11 @@ Class GeoConversion{
       $real = TRUE;
    }
 
-   private function replace_special_chars(&$string,$decimal)
+    /**
+     * @param $string
+     * @param $decimal
+     */
+    private function replace_special_chars(&$string, $decimal)
    {
        for ($I = 0 ; $I < strlen($string) ; $I++) {
          $not_decimal = $decimal == FALSE ? ($string[$I] != '.') : TRUE;
@@ -74,28 +85,44 @@ Class GeoConversion{
        }
    }
 
-   private function SepDMS($DMS)
+    /**
+     * @param $DMS
+     * @return array
+     */
+    private function SepDMS($DMS)
    {
        $this->replace_special_chars($DMS,FALSE);
        $dados = explode(';',$DMS);
        return array('D' => $dados[0],'M' => $dados[1],'S' => $dados[2]);
    }
 
-   private function SepDMm($DMm)
+    /**
+     * @param $DMm
+     * @return array
+     */
+    private function SepDMm($DMm)
    {
        $this->replace_special_chars($DMm,TRUE);
        $dados = explode(';',$DMm);
        return array('D' => $dados[0],'M' => $dados[1],'m' => $dados[2]);
    }
 
-   private function SepDd($Dd)
+    /**
+     * @param $Dd
+     * @return array
+     */
+    private function SepDd($Dd)
    {
        $this->replace_special_chars($Dd,TRUE);
        $dados = explode(';',$Dd);
        return array('D' => $dados[0],'d' => $dados[1]);
    }
 
-   public function DMS2DMm($DMS)
+    /**
+     * @param $DMS
+     * @return string
+     */
+    public function DMS2DMm($DMS)
    {
        $this->is_negative($DMS);
 
@@ -109,7 +136,11 @@ Class GeoConversion{
        return $this->negative_path.$array_DMm['D'].'�'.($array_DMm['M'] + $array_DMm['m']);
    }
 
-   public function DMm2Dd($DMm)
+    /**
+     * @param $DMm
+     * @return string
+     */
+    public function DMm2Dd($DMm)
    {
        $this->is_negative($DMm);
 
@@ -122,7 +153,11 @@ Class GeoConversion{
        return $this->negative_path.($array_Dd['D'] + $array_Dd['d']);
    }
 
-   public function DMS2Dd($DMS)
+    /**
+     * @param $DMS
+     * @return string
+     */
+    public function DMS2Dd($DMS)
    {
        $this->is_negative($DMS);
 
@@ -130,7 +165,11 @@ Class GeoConversion{
        return $this->DMm2Dd($DMm);
    }
 
-   public function DMm2DMS($DMm)
+    /**
+     * @param $DMm
+     * @return string
+     */
+    public function DMm2DMS($DMm)
    {
        $this->is_negative($DMm);
 
@@ -146,7 +185,11 @@ Class GeoConversion{
        return $array_DMS['D'].'�'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
    }
 
-   public function Dd2DMm($Dd)
+    /**
+     * @param $Dd
+     * @return string
+     */
+    public function Dd2DMm($Dd)
    {
        $this->is_negative($Dd);
 
@@ -164,7 +207,11 @@ Class GeoConversion{
        return $this->negative_path.$array_DMm['D']."� ".$array_DMm['M'].".".$array_DMm['m'];
    }
 
-   public function Dd2DMS($Dd)
+    /**
+     * @param $Dd
+     * @return string
+     */
+    public function Dd2DMS($Dd)
    {
        $this->is_negative($Dd);
 

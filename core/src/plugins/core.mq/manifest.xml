@@ -40,7 +40,7 @@
         <global_param group="CONF_MESSAGE[Workers]" type="button" name="MQ_WORKER_SWITCH_ON" choices="run_plugin_action:core.mq:switchWorkerOn" label="CONF_MESSAGE[Start Worker]" description="CONF_MESSAGE[Switch a worker ON]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Workers]" type="button" name="MQ_WORKER_SWITCH_OFF" choices="run_plugin_action:core.mq:switchWorkerOff" label="CONF_MESSAGE[Stop Worker]" description="CONF_MESSAGE[Switch a worker OFF]" mandatory="false"/>
     </server_settings>
-    <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
+    <class_definition classname="Pydio\Mq\Core\MqManager" filename="plugins/core.mq/MqManager.php"/>
     <registry_contributions>
         <actions>
             <action name="consume_notification_queue">

@@ -35,7 +35,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 
 /**
@@ -83,7 +83,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     private $_accessDriver;
     /**
-     * @var MetaStoreProvider
+     * @var IMetaStoreProvider
      */
     private $_metaStore;
 
@@ -206,7 +206,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     }
 
     /**
-     * @return MetaStoreProvider
+     * @return IMetaStoreProvider
      */
     protected function getMetaStore()
     {

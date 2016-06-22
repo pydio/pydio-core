@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.watch" label="CONF_MESSAGE[Watch Metadata]" description="CONF_MESSAGE[Register watched on files or folders]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/meta.watch/class.MetaWatchRegister.php" classname="MetaWatchRegister"/>
+    <class_definition filename="plugins/meta.watch/WatchRegister.php" classname="Pydio\Meta\Watch\WatchRegister"/>
     <client_settings>
         <resources>
             <img_library alias="meta.watch" path="plugins/meta.watch/icons"/>

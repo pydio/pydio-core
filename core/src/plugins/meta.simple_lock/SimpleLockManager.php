@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Lock;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -28,8 +29,8 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -38,11 +39,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class SimpleLockManager extends AJXP_AbstractMetaSource
+class SimpleLockManager extends AbstractMetaSource
 {
     const METADATA_LOCK_NAMESPACE = "simple_lock";
     /**
-    * @var MetaStoreProvider
+    * @var IMetaStoreProvider
     */
     protected $metaStore;
 
@@ -65,7 +66,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
-     * @throws Exception
+     * @throws \Exception
      */
     public function applyChangeLock(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
@@ -74,12 +75,12 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
         $ctx = $requestInterface->getAttribute("ctx");
 
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
-            throw new Exception("Write actions are disabled in demo mode!");
+            throw new \Exception("Write actions are disabled in demo mode!");
         }
         $repo = $this->accessDriver->repository;
         $user = $ctx->getUser();
         if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
-            throw new Exception("You have no right on this action.");
+            throw new \Exception("You have no right on this action.");
         }
         $selection = UserSelection::fromContext($ctx, $httpVars);
 
@@ -138,6 +139,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
+     * @throws \Exception
      */
     public function checkFileLock($node)
     {
@@ -151,7 +153,7 @@ class SimpleLockManager extends AJXP_AbstractMetaSource
             && array_key_exists("lock_user", $lock)
             && $lock["lock_user"] != $node->getUserId()){
             $mess = LocaleService::getMessages();
-            throw new Exception($mess["meta.simple_lock.5"]);
+            throw new \Exception($mess["meta.simple_lock.5"]);
         }
     }
 }

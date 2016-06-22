@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Version;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -26,16 +27,15 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Manage versioning using Git
- * @package AjaXplorer_Plugins
- * @subpackage Meta
+ * @package Pydio\Meta\Version
  */
-class GitManager extends AJXP_AbstractMetaSource
+class GitManager extends AbstractMetaSource
 {
 
     private $repoBase;
@@ -44,14 +44,14 @@ class GitManager extends AJXP_AbstractMetaSource
     {
         $ex = Utils::searchIncludePath("VersionControl/Git.php");
         if (!$ex) {
-            throw new Exception("Cannot find PEAR library VersionControl/Git");
+            throw new \Exception("Cannot find PEAR library VersionControl/Git");
         }
     }
 
     /**
      * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
-     * @throws Exception
+     * @throws \Exception
      */
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
@@ -60,10 +60,10 @@ class GitManager extends AJXP_AbstractMetaSource
         $repo = $ctx->getRepository();
         $this->repoBase = $repo->getContextOption($ctx, "PATH");
         if(empty($this->repoBase)){
-            throw new Exception("Meta.git: cannot find PATH option in repository! Are you sure it's an FS-based workspace?");
+            throw new \Exception("Meta.git: cannot find PATH option in repository! Are you sure it's an FS-based workspace?");
         }
         if (!is_dir($this->repoBase.DIRECTORY_SEPARATOR.".git")) {
-            $git = new VersionControl_Git($this->repoBase);
+            $git = new \VersionControl_Git($this->repoBase);
             $git->initRepository();
         }
     }
@@ -76,13 +76,13 @@ class GitManager extends AJXP_AbstractMetaSource
     {
         
         $actionName         = $requestInterface->getAttribute("action");
-        $ctx                = $requestInterface->getAttribute("context");
+        $ctx                = $requestInterface->getAttribute("ctx");
         $httpVars           = $requestInterface->getParsedBody();
         $x                  = new \Pydio\Core\Http\Response\SerializableResponseStream();
         $responseInterface  = $responseInterface->withBody($x);
         $userSelection      = \Pydio\Access\Core\Model\UserSelection::fromContext($ctx, $httpVars);
 
-        $git = new VersionControl_Git($this->repoBase);
+        $git = new \VersionControl_Git($this->repoBase);
         switch ($actionName) {
             case "git_history":
                 $nodesList = new \Pydio\Access\Core\Model\NodesList();
@@ -192,6 +192,13 @@ class GitManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param \VersionControl_Git $git
+     * @param $commandLine
+     * @param $outputStream
+     * @param null $errorStream
+     * @return string
+     */
     protected function executeCommandInStreams($git, $commandLine, $outputStream, $errorStream = null)
     {
         $descriptorspec = array(
@@ -222,6 +229,11 @@ class GitManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param \VersionControl_Git $git
+     * @param string $file
+     * @return array
+     */
     protected function gitHistory($git, $file)
     {
         $command = $git->getCommand("log");
@@ -235,6 +247,7 @@ class GitManager extends AJXP_AbstractMetaSource
         $res = $command->execute();
         $lines = explode(PHP_EOL, $res);
         $allCommits = array();
+        $grabOtherLines  = $grabMessageLines = false;
         while (count($lines)) {
             $line = array_shift($lines);
             if (preg_match("/^commit /i", $line)) {
@@ -267,7 +280,7 @@ class GitManager extends AJXP_AbstractMetaSource
                 $currentCommit["DATE"] = trim(substr($line, strlen("Date: ")));
                 $currentCommit["ajxp_modiftime"] = strtotime(substr($line, strlen("Date: ")));
             } else if ($grabOtherLines) {
-                if(count($currentCommit["DETAILS"]) >= 10) continue;
+                if(isSet($currentCommit) && count($currentCommit["DETAILS"]) >= 10) continue;
                 $currentCommit["DETAILS"][] = $line;
             } else if (trim($line) == "") {
                 $grabMessageLines = !$grabMessageLines;
@@ -277,11 +290,13 @@ class GitManager extends AJXP_AbstractMetaSource
             }
         }
         // $currentCommit
-        if (count($currentCommit["DETAILS"]) && substr($currentCommit["DETAILS"][0], 0, strlen("new file")) == "new file") {
-            $currentCommit["EVENT"] = "CREATION";
-            unset($currentCommit["DETAILS"]);
+        if(isSet($currentCommit)){
+            if (count($currentCommit["DETAILS"]) && substr($currentCommit["DETAILS"][0], 0, strlen("new file")) == "new file") {
+                $currentCommit["EVENT"] = "CREATION";
+                unset($currentCommit["DETAILS"]);
+            }
+            $allCommits[] = $currentCommit;
         }
-        $allCommits[] = $currentCommit;
         return $allCommits;
     }
 
@@ -304,7 +319,7 @@ class GitManager extends AJXP_AbstractMetaSource
      */
     private function commitChanges(ContextInterface $ctx, $path = null)
     {
-        $git = new VersionControl_Git($this->repoBase);
+        $git = new \VersionControl_Git($this->repoBase);
         $command = $git->getCommand("add");
         $command->addArgument(".");
         try {
@@ -312,7 +327,7 @@ class GitManager extends AJXP_AbstractMetaSource
             $this->logDebug("Git command ".$cmd);
             $res = $command->execute();
             $this->logDebug("GIT RESULT ADD : ".$res);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->logDebug("Error in GIT Command ".$e->getMessage());
         }
 
@@ -332,10 +347,10 @@ class GitManager extends AJXP_AbstractMetaSource
             $cmd = $command->createCommandString();
             $this->logDebug("Git command ".$cmd);
             $res = $command->execute();
-        } catch (Exception $e) {
+            $this->logDebug("GIT RESULT COMMIT : ".$res);
+        } catch (\Exception $e) {
             $this->logDebug("Error ".$e->getMessage());
         }
-        $this->logDebug("GIT RESULT COMMIT : ".$res);
     }
 
 }

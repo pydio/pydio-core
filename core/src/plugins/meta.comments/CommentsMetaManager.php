@@ -18,6 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\UserGenerated;
+
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -26,19 +28,25 @@ use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Notification\Core\IFeedStore;
 
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
-class CommentsMetaManager extends AJXP_AbstractMetaSource
+/**
+ * Class CommentsMetaManager
+ * Manage use defined comments
+ * @package Pydio\Meta\Comment
+ */
+class CommentsMetaManager extends AbstractMetaSource
 {
     /**
-     * @var MetaStoreProvider
+     * @var IMetaStoreProvider
      */
     private $metaStore;
     /**
-     * @var AJXP_FeedStore
+     * @var IFeedStore
      */
     private $feedStore;
 
@@ -47,7 +55,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     /**
      * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
-     * @throws Exception
+     * @throws \Exception
      */
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
@@ -60,7 +68,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
         } else {
             $store = $pService->getUniqueActivePluginForType("metastore");
             if ($store === false) {
-                throw new Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
+                throw new \Exception("The 'meta.comments' plugin requires at least one active 'metastore' plugin");
             }
             $this->metaStore = $store;
             $this->storageMode = "METASTORE";
@@ -119,7 +127,7 @@ class CommentsMetaManager extends AJXP_AbstractMetaSource
     {
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         $uniqNode = $userSelection->getUniqueNode();
-        /** @var AJXP_FeedStore $feedStore */
+        /** @var IFeedStore $feedStore */
         $feedStore = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("feed");
         $existingFeed = $uniqNode->retrieveMetadata(AJXP_META_SPACE_COMMENTS, false);
         if ($existingFeed == null) {

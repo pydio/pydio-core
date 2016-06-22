@@ -111,6 +111,13 @@ function AjaXplorer_autoload($className)
     if($className == "dibi"){
         require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");
     }
+    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/".$className.".php", GLOB_NOSORT);
+    if ($corePlugClass !== false && count($corePlugClass)) {
+        require_once($corePlugClass[0]);
+        return;
+    }
+
+    // TODO  : should be useless after refactorings
     $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
     if ($corePlugClass !== false && count($corePlugClass)) {
         require_once($corePlugClass[0]);

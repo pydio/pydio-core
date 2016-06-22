@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Mq\Core;
 
 use nsqphp\nsqphp;
 use Psr\Http\Message\ResponseInterface;
@@ -36,6 +37,8 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\UnixProcess;
+use Pydio\Notification\Core\IMessageExchanger;
+use Pydio\Notification\Core\Notification;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -68,7 +71,7 @@ class MqManager extends Plugin
     private $nsqClient;
 
     /**
-     * @var AJXP_MessageExchanger;
+     * @var IMessageExchanger;
      */
     private $msgExchanger = false;
     private $useQueue = false ;
@@ -85,7 +88,7 @@ class MqManager extends Plugin
         $this->useQueue = $this->pluginConf["USE_QUEUE"];
         try {
             $pService = PluginsService::getInstance($ctx);
-            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "AJXP_MessageExchanger", $pService);
+            $this->msgExchanger = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_MS_INSTANCE"], "Pydio\\Notification\\Core\\IMessageExchanger", $pService);
             if(!empty($this->msgExchanger)){
                 $pService->setPluginActive($this->msgExchanger->getType(), $this->msgExchanger->getName(), true, $this->msgExchanger);
             }
@@ -93,15 +96,15 @@ class MqManager extends Plugin
                 $this->sendInstantMessage($ctx, AuthService::$bufferedMessage, $ctx->getUser()->getId());
                 AuthService::$bufferedMessage = null;
             }
-        } catch (Exception $e) {}
+        } catch (\Exception $e) {}
     }
 
 
     /**
-     * @param AJXP_Notification $notification
-     * @throws Exception
+     * @param Notification $notification
+     * @throws \Exception
      */
-    public function sendToQueue(AJXP_Notification $notification)
+    public function sendToQueue(Notification $notification)
     {
         if (!$this->useQueue) {
             $this->logDebug("SHOULD DISPATCH NOTIFICATION ON ".$notification->getNode()->getUrl()." ACTION ".$notification->getAction());
@@ -121,7 +124,7 @@ class MqManager extends Plugin
      * @param $httpVars
      * @param $fileVars
      * @param ContextInterface $ctx
-     * @throws Exception
+     * @throws \Exception
      */
     public function consumeQueue($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
@@ -204,7 +207,7 @@ class MqManager extends Plugin
         }
 
         // Publish for pollers
-        $message = new stdClass();
+        $message = new \stdClass();
         $message->content = $xmlContent;
         if(isSet($userId)) {
             $message->userId = $userId;
@@ -263,7 +266,7 @@ class MqManager extends Plugin
                 $nsq->publishTo(join(":", [$host, $port]), 1);
                 $nsq->publish('task', new \nsqphp\Message\Message(json_encode($content)));
                 $this->logInfo("Core.mq", "Published a message to NSQ :". json_encode($content));
-            }catch (Exception $e){
+            }catch (\Exception $e){
                 $this->logError("Core.mq", "sendTaskMessage", $e->getMessage());
                 if(ConfService::currentContextIsCommandLine()){
                     print("Error while trying to send a task message ".json_encode($content)." : ".$e->getMessage());
@@ -374,7 +377,7 @@ class MqManager extends Plugin
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @throws Exception
+     * @throws \Exception
      */
     public function wsAuthenticate(ServerRequestInterface $request, ResponseInterface &$response)
     {
@@ -383,7 +386,7 @@ class MqManager extends Plugin
         $configs = $this->getConfigs();
         $httpVars = $request->getQueryParams();
         if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
-            throw new Exception("Cannot authentify admin key");
+            throw new \Exception("Cannot authentify admin key");
         }
 
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
@@ -391,7 +394,7 @@ class MqManager extends Plugin
         $user = $ctx->getUser();
         if ($user == null) {
             $this->logDebug("Error Authenticating through WebSocket (not logged)");
-            throw new Exception("You must be logged in");
+            throw new \Exception("You must be logged in");
         }
 
         $serializer = new \Pydio\Core\Serializer\UserXML();
@@ -412,7 +415,7 @@ class MqManager extends Plugin
     /**
      * @param $params
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchWorkerOn($params)
     {
@@ -424,7 +427,7 @@ class MqManager extends Plugin
             $unixProcess->setPid($pId);
             $status = $unixProcess->status();
             if ($status) {
-                throw new Exception("Worker seems to already be running!");
+                throw new \Exception("Worker seems to already be running!");
             }
         }
         $cmd = ConfService::getGlobalConf("CLI_PHP")." worker.php";
@@ -441,7 +444,7 @@ class MqManager extends Plugin
     /**
      * @param $params
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchWorkerOff($params){
         return $this->switchOff($params, "worker");
@@ -546,7 +549,7 @@ class MqManager extends Plugin
     /**
      * @param $params
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function saveCaddyFile($params) {
         $data = $this->generateCaddyFile($params);
@@ -563,7 +566,7 @@ class MqManager extends Plugin
     /**
      * @param $params
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchCaddyOn($params) {
 
@@ -577,7 +580,7 @@ class MqManager extends Plugin
             $unixProcess->setPid($pId);
             $status = $unixProcess->status();
             if ($status) {
-                throw new Exception("Caddy server seems to already be running!");
+                throw new \Exception("Caddy server seems to already be running!");
             }
         }
 
@@ -597,7 +600,7 @@ class MqManager extends Plugin
     /**
      * @param $params
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchCaddyOff($params){
         return $this->switchOff($params, "caddy");
@@ -615,14 +618,14 @@ class MqManager extends Plugin
      * @param $params
      * @param string $type
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function switchOff($params, $type = "ws")
     {
         $wDir = $this->getPluginWorkDir(true);
         $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
         if (!file_exists($pidFile)) {
-            throw new Exception("No information found about $type server");
+            throw new \Exception("No information found about $type server");
         } else {
             $pId = file_get_contents($pidFile);
             $unixProcess = new UnixProcess();
@@ -637,7 +640,7 @@ class MqManager extends Plugin
      * @param $params
      * @param string $type
      * @return string
-     * @throws Exception
+     * @throws \Exception
      */
     public function getStatus($params, $type = "ws")
     {

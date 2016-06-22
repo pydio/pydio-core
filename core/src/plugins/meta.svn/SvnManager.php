@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Version;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
@@ -31,7 +32,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 define('SVNLIB_PATH', '');
@@ -43,7 +44,7 @@ if (SVNLIB_PATH != "") {
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class SvnManager extends AJXP_AbstractMetaSource
+class SvnManager extends AbstractMetaSource
 {
     private static $svnListDir;
     private static $svnListCache;
@@ -70,6 +71,14 @@ class SvnManager extends AJXP_AbstractMetaSource
         parent::init($ctx, $this->options);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $httpVars
+     * @param array $additionnalPathes
+     * @param bool $testRecycle
+     * @return array
+     * @throws \Exception
+     */
     protected function initDirAndSelection(ContextInterface $ctx, $httpVars, $additionnalPathes = array(), $testRecycle = false)
     {
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
@@ -111,17 +120,22 @@ class SvnManager extends AJXP_AbstractMetaSource
         return $result;
     }
 
+    /**
+     * @param $repoFile
+     * @param $realFile
+     * @throws \Exception
+     */
     protected function addIfNotVersionned($repoFile, $realFile)
     {
         $error = false;
+        $res = [];
         try {
-            //$res = ExecSvnCmd("svnversion", $realFile, "");
             $res = ExecSvnCmd("svn status ", $realFile);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $error = true;
         }
         if ($error || (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?")) {
-            $res2 = ExecSvnCmd("svn add", "$realFile");
+            ExecSvnCmd("svn add", "$realFile");
             $this->commitMessageParams = "Recycle cache file";
             $this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
         }
@@ -143,7 +157,7 @@ class SvnManager extends AJXP_AbstractMetaSource
             $nodeRealFile = AJXP_MetaStreamWrapper::getRealFSReference($ajxpNode->getUrl());
             try {
                 ExecSvnCmd("svn propset metachange ".time(), $nodeRealFile);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->commitChanges("COMMIT_META", $realFile, array());
                 return;
             }
@@ -158,6 +172,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function switchAction($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
         $init = $this->initDirAndSelection($ctx, $httpVars);
@@ -232,6 +253,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function addSelection($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
         switch ($actionName) {
@@ -264,6 +292,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function copyOrMoveSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
     {
         if ($actionName != "rename") {
@@ -303,6 +338,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         XMLWriter::close();
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function deleteSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
     {
         $init = $this->initDirAndSelection($ctx, $httpVars, array(), true);
@@ -337,6 +379,13 @@ class SvnManager extends AJXP_AbstractMetaSource
         XMLWriter::close();
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function commitChanges($actionName, $httpVars, $filesVars, ContextInterface $ctx)
     {
         if (is_array($httpVars)) {
@@ -374,7 +423,7 @@ class SvnManager extends AJXP_AbstractMetaSource
                 SvnManager::$svnListDir = $realDir;
                 $entries = $this->svnListNode($realDir);
                 SvnManager::$svnListCache = $entries;
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $this->logError("ExtractMeta", $e->getMessage());
             }
         }
@@ -384,6 +433,12 @@ class SvnManager extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param $realPath
+     * @param null $revision
+     * @return array
+     * @throws \Exception
+     */
     protected function svnListNode($realPath, $revision = null)
     {
         $command = 'svn list';
@@ -395,14 +450,14 @@ class SvnManager extends AJXP_AbstractMetaSource
         //if(substr(strtolower(PHP_OS), 0, 3) == "win") session_write_close();
         try {
             $res = ExecSvnCmd($command, $realPath, $switches);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return array();
         }
         //if(substr(strtolower(PHP_OS), 0, 3) == "win") session_start();
         unset($_SESSION["SVN_COMMAND_RUNNING"]);
-        $domDoc = new DOMDocument();
+        $domDoc = new \DOMDocument();
         $domDoc->loadXML($res[IDX_STDOUT]);
-        $xPath = new DOMXPath($domDoc);
+        $xPath = new \DOMXPath($domDoc);
         $entriesList = $xPath->query("list/entry");
         $entries = array();
         foreach ($entriesList as $entry) {

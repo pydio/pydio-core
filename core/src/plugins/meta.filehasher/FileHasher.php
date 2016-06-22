@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Hash;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
@@ -30,35 +31,44 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Generates and caches and md5 hash of each file
- * @package AjaXplorer_Plugins
- * @subpackage Meta
+ * @package Pydio\Meta\Hash
  */
-class FileHasher extends AJXP_AbstractMetaSource
+class FileHasher extends AbstractMetaSource
 {
     const METADATA_HASH_NAMESPACE = "file_hahser";
     /**
-     * @var MetaStoreProvider
+     * @var IMetaStoreProvider
      */
     protected $metaStore;
 
+    /**
+     * @return bool
+     */
     public static function rsyncEnabled()
     {
         return function_exists("rsync_generate_signature");
     }
 
+    /**
+     * @return array
+     */
     public function getConfigs()
     {
         $data = parent::getConfigs();
         $this->filterData($data);
         return $data;
     }
+
+    /**
+     * @param array $data
+     */
     public function loadConfigs($data)
     {
         $this->filterData($data);
@@ -66,19 +76,26 @@ class FileHasher extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param $data
+     */
     private function filterData(&$data)
     {
         $data["RSYNC_SUPPORTED"] = self::rsyncEnabled();
     }
 
 
+    /**
+     * @param ContextInterface $ctx
+     * @param \DOMNode $contribNode
+     */
     public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
         if (!self::rsyncEnabled() && $contribNode->nodeName == "actions") {
             // REMOVE rsync actions, this will advertise the fact that
             // rsync is not enabled.
-            $xp = new DOMXPath($contribNode->ownerDocument);
+            $xp = new \DOMXPath($contribNode->ownerDocument);
             $children = $xp->query("action[contains(@name, 'filehasher')]", $contribNode);
             foreach ($children as $child) {
                 $contribNode->removeChild($child);
@@ -86,7 +103,7 @@ class FileHasher extends AJXP_AbstractMetaSource
         }
         if ($this->getContextualOption($ctx, "CACHE_XML_TREE") !== true && $contribNode->nodeName == "actions") {
             // REMOVE pre and post process on LS action
-            $xp = new DOMXPath($contribNode->ownerDocument);
+            $xp = new \DOMXPath($contribNode->ownerDocument);
             $children = $xp->query("action[@name='ls']", $contribNode);
             foreach ($children as $child) {
                 $contribNode->removeChild($child);
@@ -110,6 +127,13 @@ class FileHasher extends AJXP_AbstractMetaSource
         $this->metaStore->initMeta($ctx, $accessDriver);
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     */
     public function switchActions($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $selection = UserSelection::fromContext($ctx, $httpVars);
@@ -129,7 +153,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                 // HANDLE UPLOAD DATA
                 $this->logDebug("Received signature file, should compute delta now");
                 if (!isSet($fileVars) && !is_array($fileVars["userfile_0"])) {
-                    throw new Exception("These action should find uploaded data");
+                    throw new \Exception("These action should find uploaded data");
                 }
                 $signature_delta_file = $fileVars["userfile_0"]["tmp_name"];
                 $fileUrl = $selection->getUniqueNode()->getUrl();
@@ -137,7 +161,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                 if ($actionName == "filehasher_delta") {
                     $deltaFile = tempnam(Utils::getAjxpTmpDir(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");
-                    rsync_generate_delta($signature_delta_file, $file, $deltaFile);
+                    \rsync_generate_delta($signature_delta_file, $file, $deltaFile);
                     $this->logDebug("Computed delta file, size is ".filesize($deltaFile));
                     header("Content-Type:application/octet-stream");
                     header("Content-Length:".filesize($deltaFile));
@@ -145,7 +169,7 @@ class FileHasher extends AJXP_AbstractMetaSource
                     unlink($deltaFile);
                 } else {
                     $patched = $file.".rdiff_patched";
-                    rsync_patch_file($file, $signature_delta_file, $patched);
+                    \rsync_patch_file($file, $signature_delta_file, $patched);
                     rename($patched, $file);
                     $node = $selection->getUniqueNode();
                     Controller::applyHook("node.change", array($node, $node, false));
@@ -284,8 +308,12 @@ class FileHasher extends AJXP_AbstractMetaSource
     }
 
 
+    /**
+     * @param $masterFile
+     * @param $targetFile
+     */
     public function generateSignature($masterFile, $targetFile)
     {
-        rsync_generate_signature($masterFile, $targetFile);
+        \rsync_generate_signature($masterFile, $targetFile);
     }
 }

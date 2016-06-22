@@ -28,7 +28,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -258,11 +258,11 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
 
 
     /**
-     * @return MetaStoreProvider|bool
+     * @return IMetaStoreProvider|bool
      */
     protected function getMetastore()
     {
-        /** @var MetaStoreProvider $metaStore */
+        /** @var IMetaStoreProvider $metaStore */
         $metaStore = PluginsService::getInstance($this->context)->getUniqueActivePluginForType("metastore");
         if($metaStore === false) return false;
         $metaStore->initMeta($this->context, $this->getAccessDriver());

@@ -18,13 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Mount;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -34,7 +35,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @subpackage Meta
  *
  */
-class FilesystemMounter extends AJXP_AbstractMetaSource
+class FilesystemMounter extends AbstractMetaSource
 {
     /**
      * @var Repository
@@ -65,6 +66,10 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $this->repository = $this->accessDriver->repository;
     }
 
+    /**
+     * @return array
+     * @throws \Exception
+     */
     protected function getCredentials()
     {
         // 1. Try from plugin config
@@ -81,12 +86,21 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
                 $user = $safeCred["user"];
                 $password = $safeCred["password"];
             } else {
-                throw new Exception("Session credential are empty! Did you forget to check the Set Session Credential in the Authentication configuration panel?");
+                throw new \Exception("Session credential are empty! Did you forget to check the Set Session Credential in the Authentication configuration panel?");
             }
         }
         return array($user, $password);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $name
+     * @param string $user
+     * @param string $pass
+     * @param bool $escapePass
+     * @return mixed
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     protected function getOption(ContextInterface $ctx, $name, $user="", $pass="", $escapePass = true)
     {
         $opt = $this->options[$name];
@@ -104,6 +118,11 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         return $opt;
     }
 
+    /**
+     * @param ContextInterface $contextInterface
+     * @return bool
+     * @throws \Exception
+     */
     protected function isAlreadyMounted(ContextInterface $contextInterface)
     {
         list($user, $password) = $this->getCredentials();
@@ -122,6 +141,11 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function mountFS(ContextInterface $ctx)
     {
         list($user, $password) = $this->getCredentials();
@@ -181,7 +205,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
             $success = (in_array($res, $acceptedResults));
         }
         if (!$success) {
-            throw new Exception("Error while mounting file system!");
+            throw new \Exception("Error while mounting file system!");
         } else {
             if ($recycle !== false && !is_dir($recycle)) {
                 @mkdir($recycle, 0755);
@@ -189,6 +213,11 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param ContextInterface $contextInterface
+     * @return bool
+     * @throws \Exception
+     */
     public function umountFS(ContextInterface $contextInterface)
     {
         $this->logDebug("FSMounter::unmountFS");

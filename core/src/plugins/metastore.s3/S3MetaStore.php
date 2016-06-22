@@ -18,12 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Metastore\Implementation;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -32,7 +33,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
+class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
 {
     private static $metaCache;
     protected $bucketName;
@@ -98,6 +99,13 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         return $trim."/.meta";
     }
 
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param array $metaData
+     * @param bool $private
+     * @param int $scope
+     */
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $aws = $this->getAwsService();
@@ -116,6 +124,12 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         $this->logDebug("UPDATE RESPONSE", $response);
     }
 
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $aws = $this->getAwsService();
@@ -135,6 +149,13 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         }
     }
 
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @return array|mixed
+     */
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $aws = $this->getAwsService();
@@ -178,6 +199,12 @@ class s3MetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
         return array();
     }
 
+    /**
+     * @param $namespace
+     * @param $scope
+     * @param $user
+     * @return string
+     */
     private function getMetaKey($namespace, $scope, $user)
     {
         return strtolower($namespace."-".$scope."-".$user);

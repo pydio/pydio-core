@@ -18,13 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Monitor;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\CliRunner;
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -33,7 +34,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class FSMonitoringManager extends AJXP_AbstractMetaSource
+class FSMonitoringManager extends AbstractMetaSource
 {
     private $repoBase;
 
@@ -48,18 +49,31 @@ class FSMonitoringManager extends AJXP_AbstractMetaSource
         $this->repoBase = $repo->getContextOption($ctx, "PATH");
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function beforePathChange(AJXP_Node $node){
         $this->informWatcher("path_change", $node->getPath());
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function beforeChange(AJXP_Node $node){
         $this->informWatcher("content_change", $node->getPath());
     }
 
+    /**
+     * @param AJXP_Node $node
+     */
     public function beforeCreate(AJXP_Node $node){
         $this->informWatcher("create", $node->getPath());
     }
 
+    /**
+     * @param $action
+     * @param $path
+     */
     protected function informWatcher($action, $path)
     {
         $cmd = "python ".$this->getBaseDir()."/framework_watch.py --action=$action --path=". escapeshellarg($path);

@@ -6,8 +6,8 @@
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
 
-    <class_definition classname="FSMonitoringManager"
-                      filename="plugins/meta.monitor_fs/class.FSMonitoringManager.php"/>
+    <class_definition classname="Pydio\Meta\Monitor\FSMonitoringManager"
+                      filename="plugins/meta.monitor_fs/FSMonitoringManager.php"/>
     <client_settings>
         <resources>
             <i18n namespace="meta.monitor_fs" path="plugins/meta.monitor_fs/i18n" />

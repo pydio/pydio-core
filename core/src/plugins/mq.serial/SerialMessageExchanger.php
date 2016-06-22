@@ -18,50 +18,34 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Mq\Implementation;
 
 use Pydio\Core\Model\ContextInterface;
-
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Notification\Core\IMessageExchanger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
-
 /**
- * Sql-based plugin to manage messages queues
- *
+ * Serialized file plugin to manage messages queues
  * @package AjaXplorer_Plugins
  * @subpackage Mq
  */
-class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
+class SerialMessageExchanger extends Plugin implements IMessageExchanger
 {
-
-    /**
-     * @param ContextInterface $ctx
-     * @param array $options
-     */
-    public function init(ContextInterface $ctx, $options = [])
-    {
-           parent::init($ctx, $options);
-           $this->sqlDriver = $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
-       }
-
-    public function performChecks()
-    {
-        if(!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
-        if (!count($test)) {
-            throw new Exception("Please define an SQL connexion in the core configuration");
-        }
-    }
-
 
     /**
      * @var array
      */
     private $channels;
     private $clientsGCTime = 10;
-    private $sqlDriver;
 
+    /**
+     * @param $channelName
+     * @param bool $create
+     * @throws \Exception
+     */
     public function loadChannel($channelName, $create = false)
     {
         if (isSet($this->channels) && is_array($this->channels[$channelName])) {
@@ -97,24 +81,25 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
 
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
+     * @throws \Exception
      * @return mixed
-     * @throws Exception
      */
     public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName, true);
-        if ($ctx->hasUser()) {
+        if (UsersService::usersEnabled()) {
             $user = $ctx->getUser();
             if ($user == null) {
-                throw new Exception("You must be logged in");
+                throw new \Exception("You must be logged in");
             }
             $GROUP_PATH = $user->getGroupPath();
             $USER_ID = $user->getId();
         } else {
-            $GROUP_PATH = "/";
-            $USER_ID = "shared";
+            $GROUP_PATH = '/';
+            $USER_ID = 'shared';
         }
         if($GROUP_PATH == null) $GROUP_PATH = false;
         $this->channels[$channelName]["CLIENTS"][$clientId] = array(
@@ -122,14 +107,13 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
             "USER_ID" => $USER_ID,
             "GROUP_PATH" => $GROUP_PATH
         );
-        /*
         foreach ($this->channels[$channelName]["MESSAGES"] as &$object) {
             $object->messageRC[$clientId] = $clientId;
         }
-        */
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @return mixed
@@ -165,6 +149,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @param $userId
@@ -173,6 +158,8 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
      */
     public function consumeInstantChannel(ContextInterface $ctx, $channelName, $clientId, $userId, $userGroup)
     {
+        // Force refresh
+        //$this->channels = null;
         $this->loadChannel($channelName);
         if(!isSet($this->channels) || !isSet($this->channels[$channelName])) {
             return null;
@@ -195,7 +182,7 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
             $this->suscribeToChannel($ctx, $channelName, $clientId);
         }
         $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
-
+        
         $result = array();
         foreach ($this->channels[$channelName]["MESSAGES"] as $index => $object) {
             if (!isSet($object->messageRC[$clientId])) {
@@ -219,60 +206,49 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
         }
         return $result;
     }
-    
+
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $filter
      * @return mixed
      */
     public function consumeWorkerChannel(ContextInterface $ctx, $channelName, $filter = null)
     {
-        if(!dibi::isConnected()) {
-            dibi::connect($this->sqlDriver);
+        $data = array();
+        if (file_exists($this->getPluginWorkDir()."/worker/$channelName.ser")) {
+            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channelName.ser"));
+            file_put_contents($this->getPluginWorkDir()."/worker/$channelName.ser", array(), LOCK_EX);
         }
-        $castType = "UNSIGNED";
-        if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
-        $results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE [store_id]=%s ORDER BY CAST([object_id] AS ".$castType.") ASC", "queues.$channelName");
-        $rows = $results->fetchAll();
-        $arr = array();
-        $deleted = array();
-        foreach ($rows as $row) {
-            $arr[] = unserialize($row["serialized_data"]);
-            $deleted[] = $row["object_id"];
-        }
-        if (count($deleted)) {
-            // We use (%s) instead of %in to pass everyting as string ('1' instead of 1)
-            dibi::query("DELETE FROM [ajxp_simple_store] WHERE [store_id]=%s AND [object_id] IN (%s)", "queues.$channelName", $deleted);
-        }
-        return $arr;
+        return $data;
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param string $channel Name of the persistant queue to create
      * @param object $message Message to send
      * @return mixed
      */
     public function publishWorkerMessage(ContextInterface $ctx, $channel, $message)
     {
-        if(!dibi::isConnected()) {
-            dibi::connect($this->sqlDriver);
+        $data = array();
+        $fExists = false;
+        if (file_exists($this->getPluginWorkDir()."/worker/$channel.ser")) {
+            $fExists = true;
+            $data = unserialize(file_get_contents($this->getPluginWorkDir()."/worker/$channel.ser"));
         }
-        $castType = "UNSIGNED";
-        if($this->sqlDriver["driver"] == "postgre") $castType = "INTEGER";
-        $r = dibi::query("SELECT MAX( CAST( [object_id] AS ".$castType." ) ) FROM [ajxp_simple_store] WHERE [store_id]=%s", "queues.$channel");
-        $index = $r->fetchSingle();
-        if($index == null) $index = 1;
-        else $index = intval($index)+1;
-        $values = array(
-            "store_id" => "queues.$channel",
-            "object_id" => $index,
-            "serialized_data" => serialize($message)
-        );
-        dibi::query("INSERT INTO [ajxp_simple_store] ([object_id],[store_id],[serialized_data],[binary_data],[related_object_id]) VALUES (%s,%s,%bin,%bin,%s)",
-            $values["object_id"], $values["store_id"], $values["serialized_data"], $values["binary_data"], $values["related_object_id"]);
+        $data[] = $message;
+        if (!$fExists) {
+            if (!is_dir($this->getPluginWorkDir()."/queues")) {
+                mkdir($this->getPluginWorkDir()."/queues", 0755, true);
+            }
+        }
+        $res = file_put_contents($this->getPluginWorkDir()."/worker/$channel.ser", serialize($data), LOCK_EX);
+        return $res;
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channel
      * @param $message
      * @return Object
@@ -287,5 +263,4 @@ class AJXP_SqlMessageExchanger extends Plugin implements AJXP_MessageExchanger
         $message->messageTS = microtime();
         $this->channels[$channel]["MESSAGES"][] = $message;
     }
-
 }

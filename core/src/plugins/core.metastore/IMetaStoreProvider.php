@@ -38,7 +38,7 @@ define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-interface MetaStoreProvider
+interface IMetaStoreProvider
 {
 
     /**
@@ -63,8 +63,8 @@ interface MetaStoreProvider
      * Either AJXP_METADATA_SCOPE_REPOSITORY (this metadata is available only inside the current repository)
      * or AJXP_METADATA_SCOPE_GLOBAL (metadata available globally).
      */
-
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY);
+    
     /**
      *
      * @abstract

@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\Quota;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -27,7 +28,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -36,7 +37,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class QuotaComputer extends AJXP_AbstractMetaSource
+class QuotaComputer extends AbstractMetaSource
 {
     /**
      * @var AbstractAccessDriver
@@ -47,7 +48,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
     public static $loadedQuota;
     public static $loadedSoftLimit;
     /**
-     * @var AjxpMailer
+     * @var \AjxpMailer
      */
     protected $mailer;
     
@@ -64,7 +65,12 @@ class QuotaComputer extends AJXP_AbstractMetaSource
             return $ctx;
         }
     }
-    
+
+    /**
+     * @param ContextInterface $ctx
+     * @param $optionName
+     * @return mixed|null
+     */
     public function getContextualOption(ContextInterface $ctx, $optionName)
     {
         $repo = $ctx->getRepository();
@@ -84,7 +90,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param int $newSize
      * @return mixed
-     * @throws Exception
+     * @throws \Exception
      */
     public function precheckQuotaUsage($node, $newSize = 0)
     {
@@ -99,12 +105,15 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $this->logDebug("QUOTA : Previous usage was $q");
         if ($q + $delta >= $quota) {
             $mess = LocaleService::getMessages();
-            throw new Exception($mess["meta.quota.3"]." (". StatHelper::roundSize($quota) .")!");
+            throw new \Exception($mess["meta.quota.3"]." (". StatHelper::roundSize($quota) .")!");
         } else if ( $soft !== false && ($q + $delta) >= $soft && $q <= $soft) {
             $this->sendSoftLimitAlert($node->getContext());
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     */
     protected function sendSoftLimitAlert(ContextInterface $ctx)
     {
         $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
@@ -119,6 +128,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
     public function getCurrentQuota(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $ctx = $requestInterface->getAttribute("ctx");
@@ -127,6 +140,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         return;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $data
+     */
     public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $data['meta.quota'] = array(
             'usage' => $u = $this->getUsageForContext($ctx),
@@ -138,7 +155,7 @@ class QuotaComputer extends AJXP_AbstractMetaSource
      * @param AJXP_Node $oldNode
      * @param AJXP_Node $newNode
      * @param bool $copy
-     * @throws Exception
+     * @throws \Exception
      */
     public function recomputeQuotaUsage($oldNode = null, $newNode = null, $copy = false)
     {
@@ -153,6 +170,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         Controller::applyHook("msg.instant", array($refNode->getContext(), "<metaquota usage='{$q}' total='{$t}'/>"));
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $quota
+     */
     protected function storeUsage(ContextInterface $ctx, $quota)
     {
         $data = $this->getUserData($ctx);
@@ -162,6 +183,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         $this->saveUserData($ctx, $data);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return int
+     */
     protected function getAuthorized(ContextInterface $ctx)
     {
         if(self::$loadedQuota != null) return self::$loadedQuota;
@@ -170,6 +195,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         return self::$loadedQuota;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return bool|float
+     */
     protected function getSoftLimit(ContextInterface $ctx)
     {
         if(self::$loadedSoftLimit != null) return self::$loadedSoftLimit;
@@ -208,6 +237,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return array|mixed|string
+     */
     private function getUserData(ContextInterface $ctx)
     {
         $logged = $ctx->getUser();
@@ -216,6 +249,10 @@ class QuotaComputer extends AJXP_AbstractMetaSource
         else return array();
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $data
+     */
     private function saveUserData(ContextInterface $ctx, $data)
     {
         $logged = $ctx->getUser();

@@ -40,7 +40,7 @@ use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -234,7 +234,7 @@ class PluginsService
             $keys = array_keys($metaSources);
             foreach ($keys as $plugId) {
                 if($plugId == "") continue;
-                /** @var AJXP_AbstractMetaSource $instance */
+                /** @var AbstractMetaSource $instance */
                 $instance = $this->getPluginById($plugId);
                 if (!is_object($instance)) {
                     continue;
@@ -276,7 +276,7 @@ class PluginsService
             foreach ($keys as $plugId) {
                 if($plugId == "") continue;
                 $split = explode(".", $plugId);
-                /** @var AJXP_AbstractMetaSource $instance */
+                /** @var AbstractMetaSource $instance */
                 $instance = $this->getPluginById($plugId);
                 if (!is_object($instance)) {
                     continue;

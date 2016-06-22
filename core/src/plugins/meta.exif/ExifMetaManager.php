@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Meta\Exif;
+
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 
@@ -28,7 +30,7 @@ use Pydio\Core\Utils\Utils;
 
 
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
+use Pydio\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -37,7 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class ExifMetaManager extends AJXP_AbstractMetaSource
+class ExifMetaManager extends AbstractMetaSource
 {
     protected $metaDefinitions;
 
@@ -53,7 +55,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
     public function performChecks()
     {
         if (!function_exists("exif_imagetype")) {
-            throw new Exception("Exif PHP extension does not seem to be installed!");
+            throw new \Exception("Exif PHP extension does not seem to be installed!");
         }
     }
 
@@ -84,6 +86,7 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         }
 
         $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
+        /** @var \DOMElement $contrib */
         $contrib = $selection->item(0);
         $contrib->setAttribute("attributes", implode(",", array_keys($def)));
         $contrib->setAttribute("modifier", "ExifCellRenderer.prototype.infoPanelModifier");
@@ -96,6 +99,9 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @return array
+     */
     protected function getMetaDefinition()
     {
         if (isSet($this->metaDefinitions)) {
@@ -118,6 +124,10 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         return $result;
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
     public function extractExif(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars       = $requestInterface->getParsedBody();
@@ -159,6 +169,10 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param $str
+     * @return string
+     */
     public function string_format($str)
     {
         $tmpStr = "";
@@ -204,6 +218,10 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         $ajxpNode->mergeMetadata($additionalMeta);
     }
 
+    /**
+     * @param $realFile
+     * @return array
+     */
     private function extractIPTC($realFile){
         $output = array();
         if(!function_exists("iptcparse")) {
@@ -250,10 +268,14 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         return $output;
     }
 
+    /**
+     * @param $exif
+     * @return array
+     */
     private function convertGPSData($exif)
     {
         if(!isSet($exif["GPS"])) return array();
-        require_once(AJXP_INSTALL_PATH."/plugins/meta.exif/class.GeoConversion.php");
+        require_once(AJXP_INSTALL_PATH . "/plugins/meta.exif/GeoConversion.php");
         $converter = new GeoConversion();
         $latDeg=@$this->parseGPSValue($exif["GPS"]["GPSLatitude"][0]);
         $latMin=@$this->parseGPSValue($exif["GPS"]["GPSLatitude"][1]);
@@ -273,6 +295,10 @@ class ExifMetaManager extends AJXP_AbstractMetaSource
         return $gpsData;
     }
 
+    /**
+     * @param $value
+     * @return float
+     */
     private function parseGPSValue($value)
     {
         if (strstr($value, "/") === false) {

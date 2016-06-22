@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Mq\Core;
 
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
@@ -25,6 +26,10 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class ConsumeChannelMessage
+ * @package Pydio\Mq\Core
+ */
 class ConsumeChannelMessage implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
 

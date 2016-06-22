@@ -18,11 +18,12 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Metastore\Implementation;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -31,7 +32,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Metastore
  */
-class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvider
+class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
 {
     private static $currentMetaName;
     private static $metaCache;
@@ -69,6 +70,13 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         return "shared";
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param array $metaData
+     * @param bool $private
+     * @param int $scope
+     */
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $this->loadMetaFileData(
@@ -92,6 +100,12 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         );
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         $this->loadMetaFileData(
@@ -108,6 +122,13 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         );
     }
 
+    /**
+     * @param AJXP_Node $ajxpNode
+     * @param String $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @return array
+     */
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
         if($private === AJXP_METADATA_ALLUSERS){
@@ -155,6 +176,11 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         $ajxpNode->mergeMetadata($allMeta);
     }
 
+    /**
+     * @param $metaFile
+     * @param \Pydio\Core\Model\ContextInterface $ctx
+     * @return string
+     */
     protected function updateSecurityScope($metaFile, \Pydio\Core\Model\ContextInterface $ctx)
     {
         $repo = $ctx->getRepository();
@@ -374,6 +400,10 @@ class SerialMetaStore extends AJXP_AbstractMetaSource implements MetaStoreProvid
         */
     }
 
+    /**
+     * @param $data
+     * @return array
+     */
     protected function upgradeDataFromMetaSerial($data)
     {
         $new = array();

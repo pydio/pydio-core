@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Meta\UserGenerated;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -29,8 +30,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Meta\Core\AJXP_AbstractMetaSource;
-use Pydio\Metastore\Core\MetaStoreProvider;
+use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,10 +41,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Meta
  */
-class UserMetaManager extends AJXP_AbstractMetaSource
+class UserMetaManager extends AbstractMetaSource
 {
     /**
-     * @var MetaStoreProvider
+     * @var IMetaStoreProvider
      */
     protected $metaStore;
     protected $fieldsAdditionalData = array();
@@ -184,6 +185,9 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @return array
+     */
     protected function getMetaDefinition()
     {
         if (!$this->metaOptionsParsed) {
@@ -241,18 +245,23 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         return $result;
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws \Exception
+     */
     public function editMeta(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
         if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\demoAccessDriver) {
-            throw new Exception("Write actions are disabled in demo mode!");
+            throw new \Exception("Write actions are disabled in demo mode!");
         }
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $user = $ctx->getUser();
 
         if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($ctx->getRepositoryId())) {
-            throw new Exception("You have no right on this action.");
+            throw new \Exception("You have no right on this action.");
         }
         $selection = UserSelection::fromContext($ctx, $httpVars);
 
@@ -263,7 +272,7 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
             $newValues = array();
             if(!is_writable($ajxpNode->getUrl())){
-                throw new Exception("You are not allowed to perform this action");
+                throw new \Exception("You are not allowed to perform this action");
             }
             Controller::applyHook("node.before_change", array(&$ajxpNode));
             foreach ($def as $key => $data) {
@@ -353,6 +362,11 @@ class UserMetaManager extends AJXP_AbstractMetaSource
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return \Psr\Http\Message\ResponseInterface|\Zend\Diactoros\Response\JsonResponse
+     */
     public function listTags(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface){
 
         $tags = $this->loadTags($requestInterface->getAttribute("ctx"));
@@ -362,6 +376,10 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     */
     protected function loadTags(ContextInterface $ctx){
 
         $store = ConfService::getConfStorageImpl();
@@ -372,6 +390,11 @@ class UserMetaManager extends AJXP_AbstractMetaSource
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $tagString
+     * @throws \Exception
+     */
     protected function updateTags(ContextInterface $ctx, $tagString){
 
         $store = ConfService::getConfStorageImpl();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Notification Center]" description="CONF_MESSAGE[Handle users watches and notifications]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="AJXP_NotificationCenter" filename="plugins/core.notifications/class.AJXP_NotificationCenter.php"/>
+    <class_definition classname="Pydio\Notification\Core\NotificationCenter" filename="plugins/core.notifications/NotificationCenter.php"/>
     <client_settings>
         <resources>
             <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
