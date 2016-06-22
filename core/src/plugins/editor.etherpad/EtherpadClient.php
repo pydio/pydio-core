@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Etherpad;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -34,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Class EtherpadClient
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Etherpad
  */
 class EtherpadClient extends Plugin
 {

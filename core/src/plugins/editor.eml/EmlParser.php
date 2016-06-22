@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\EML;
 
 use EmlXmlMessage;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
@@ -39,8 +39,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Parses an EML file and return the result as XML
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Editor\EML
  */
 class EmlParser extends Plugin
 {

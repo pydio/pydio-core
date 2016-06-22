@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Image;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,7 +41,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Class PixlrEditor
  * Uses Pixlr.com service to edit images online.
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Image
  */
 class PixlrEditor extends Plugin
 {

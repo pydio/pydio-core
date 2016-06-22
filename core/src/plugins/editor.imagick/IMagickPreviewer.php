@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Image;
 
 use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Class IMagickPreviewer
  * Encapsulates calls to Image Magick to extract JPG previews of PDF, PSD, TIFF, etc.
  *
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Image
  */
 class IMagickPreviewer extends Plugin
 {

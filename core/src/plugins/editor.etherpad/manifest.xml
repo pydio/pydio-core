@@ -127,5 +127,5 @@
             <serverCallback methodName="handleNodeChange" hookName="node.change"/>
         </hooks>
     </registry_contributions>
-    <class_definition classname="Pydio\Plugins\Editor\EtherpadClient" filename="plugins/editor.etherpad/EtherpadClient.php"/>
+    <class_definition classname="Pydio\Editor\Etherpad\EtherpadClient" filename="plugins/editor.etherpad/EtherpadClient.php"/>
 </editor>

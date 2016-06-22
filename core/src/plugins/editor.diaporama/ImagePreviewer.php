@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Image;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -34,7 +34,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Class ImagePreviewer
  * Generate an image thumbnail and send the thumb/full version to the browser
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Image
  */
 class ImagePreviewer extends Plugin
 {

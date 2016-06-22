@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Mime;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\UserSelection;
@@ -35,7 +35,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Class FileMimeSender
  * Extract the mimetype of a file and send it to the browser
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Mime
  */
 class FileMimeSender extends Plugin
 {

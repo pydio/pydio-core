@@ -21,7 +21,7 @@
  * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
  * Improved by cdujeu / Https Support now necessary for zoho API.
  */
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Office;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

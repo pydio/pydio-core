@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace Pydio\Plugins\Editor;
+namespace Pydio\Editor\Audio;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Exception\FileNotFoundException;
@@ -37,7 +37,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Class AudioPreviewer
  * Streams MP3 files to a client
- * @package Pydio\Plugins\Editor
+ * @package Pydio\Editor\Audio
  */
 class AudioPreviewer extends Plugin
 {
