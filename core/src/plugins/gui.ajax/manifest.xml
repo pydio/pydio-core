@@ -181,7 +181,7 @@
                 />
 
 	</server_settings>
-	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="Pydio\Gui\Ajax\AJXP_ClientDriver"/>
+	<class_definition filename="plugins/gui.ajax/RichClient.php" classname="Pydio\Gui\RichClient"/>
 	<registry_contributions>
 		<actions>
 			<action name="get_boot_gui" skipSecureToken="true">

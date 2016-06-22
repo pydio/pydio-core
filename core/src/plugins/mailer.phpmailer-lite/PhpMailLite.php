@@ -19,17 +19,23 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Mailer\Implementation;
+
+use Exception;
+use phpmailerException;
+use PHPMailerLite;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Mailer\Core\Mailer;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Send notifications to user on some predefined actions
  * @package AjaXplorer_Plugins
  * @subpackage Mailer
  */
-class PhpMailLiteMailer extends AjxpMailer
+class PhpMailLite extends Mailer
 {
     /**
      * @param ContextInterface $ctx
@@ -78,15 +84,15 @@ class PhpMailLiteMailer extends AjxpMailer
         }
 
         $mail->Subject = $subject;
-        if($useHtml){
-            if (strpos($body, "<html")!==false) {
+        if ($useHtml) {
+            if (strpos($body, "<html") !== false) {
                 $mail->Body = $body;
             } else {
-                $mail->Body = "<html><body>".nl2br($body)."</body></html>";
+                $mail->Body = "<html><body>" . nl2br($body) . "</body></html>";
             }
-            $mail->AltBody = AjxpMailer::simpleHtml2Text($mail->Body);
-        }else{
-            $mail->Body = AjxpMailer::simpleHtml2Text($body);
+            $mail->AltBody = Mailer::simpleHtml2Text($mail->Body);
+        } else {
+            $mail->Body = Mailer::simpleHtml2Text($body);
         }
 
         if (!$mail->Send()) {

@@ -19,6 +19,11 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Conf\Boot;
+
+use dibi;
+use DOMXPath;
+use Exception;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -39,24 +44,23 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Implementation of the configuration driver on serial files
- * @package AjaXplorer_Plugins
- * @subpackage Boot
  */
 class BootConfLoader extends AbstractConfDriver
 {
     private static $internalConf;
-    private static $jsonConf;
-    private static $jsonPath;
 
+    /**
+     * @return mixed
+     */
     private function getInternalConf()
     {
         if (!isSet(BootConfLoader::$internalConf)) {
-            if (file_exists(AJXP_CONF_PATH."/bootstrap_plugins.php")) {
-                include(AJXP_CONF_PATH."/bootstrap_plugins.php");
+            if (file_exists(AJXP_CONF_PATH . "/bootstrap_plugins.php")) {
+                include(AJXP_CONF_PATH . "/bootstrap_plugins.php");
                 if (isSet($PLUGINS)) {
                     BootConfLoader::$internalConf = $PLUGINS;
                 }
@@ -76,8 +80,8 @@ class BootConfLoader extends AbstractConfDriver
         parent::init($ctx, $options);
         try {
             $dir = $this->getPluginWorkDir(true);
-            if(!is_file($dir.DIRECTORY_SEPARATOR."server_uuid")){
-                file_put_contents($dir.DIRECTORY_SEPARATOR."server_uuid", md5(json_encode($_SERVER)));
+            if (!is_file($dir . DIRECTORY_SEPARATOR . "server_uuid")) {
+                file_put_contents($dir . DIRECTORY_SEPARATOR . "server_uuid", md5(json_encode($_SERVER)));
             }
         } catch (Exception $e) {
             die("Impossible write into the AJXP_DATA_PATH folder: Make sure to grant write access to this folder for your webserver!");
@@ -96,15 +100,21 @@ class BootConfLoader extends AbstractConfDriver
         }
     }
 
-    public function getServerUuid(){
-        return file_get_contents($this->getPluginWorkDir().DIRECTORY_SEPARATOR."server_uuid");
+    /**
+     * @return string
+     * @throws Exception
+     */
+    public function getServerUuid()
+    {
+        return file_get_contents($this->getPluginWorkDir() . DIRECTORY_SEPARATOR . "server_uuid");
     }
 
     /**
      * @param $fullManifest
      * @return string
      */
-    public function printFormFromServerSettings($fullManifest){
+    public function printFormFromServerSettings($fullManifest)
+    {
 
         $xmlString = "<admin_data>";
         $xPath = new DOMXPath($fullManifest->ownerDocument);
@@ -114,37 +124,37 @@ class BootConfLoader extends AbstractConfDriver
             $type = $pInstNode->getAttribute("type");
             $instType = str_replace("plugin_instance:", "", $type);
             $fieldName = $pInstNode->getAttribute("name");
-            $pInstNode->setAttribute("type", "group_switch:".$fieldName);
+            $pInstNode->setAttribute("type", "group_switch:" . $fieldName);
             $typePlugs = PluginsService::getInstance(Context::emptyContext())->getPluginsByType($instType);
             foreach ($typePlugs as $typePlug) {
-                if($typePlug->getId() == "auth.multi") continue;
+                if ($typePlug->getId() == "auth.multi") continue;
                 $checkErrorMessage = "";
                 try {
                     $typePlug->performChecks();
                 } catch (Exception $e) {
-                    $checkErrorMessage = " (Warning : ".$e->getMessage().")";
+                    $checkErrorMessage = " (Warning : " . $e->getMessage() . ")";
                 }
                 $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
-                $addParams .= '<global_param group_switch_name="'.$fieldName.'" name="instance_name" group_switch_label="'.$typePlug->getManifestLabel().$checkErrorMessage.'" group_switch_value="'.$typePlug->getId().'" default="'.$typePlug->getId().'" type="hidden"/>';
-                $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"".$typePlug->getManifestLabel().$checkErrorMessage."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
+                $addParams .= '<global_param group_switch_name="' . $fieldName . '" name="instance_name" group_switch_label="' . $typePlug->getManifestLabel() . $checkErrorMessage . '" group_switch_value="' . $typePlug->getId() . '" default="' . $typePlug->getId() . '" type="hidden"/>';
+                $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"" . $typePlug->getManifestLabel() . $checkErrorMessage . "\" group_switch_value=\"" . $typePlug->getId() . "\" ", $tParams);
                 $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
         $uri = $_SERVER["REQUEST_URI"];
-        if(strpos($uri, '.php') !== false) $uri = Utils::safeDirname($uri);
-        if(empty($uri)) $uri = "/";
+        if (strpos($uri, '.php') !== false) $uri = Utils::safeDirname($uri);
+        if (empty($uri)) $uri = "/";
         $loadedValues = array(
-            "ENCODING"  => (defined('AJXP_LOCALE')?AJXP_LOCALE:TextEncoder::getEncoding()),
-            "SERVER_URI"=> $uri
+            "ENCODING" => (defined('AJXP_LOCALE') ? AJXP_LOCALE : TextEncoder::getEncoding()),
+            "SERVER_URI" => $uri
         );
-        foreach($loadedValues as $pName => $pValue){
+        foreach ($loadedValues as $pName => $pValue) {
             $vNodes = $xPath->query("server_settings/global_param[@name='$pName']");
-            if(!$vNodes->length) continue;
+            if (!$vNodes->length) continue;
             $vNodes->item(0)->setAttribute("default", $pValue);
         }
         $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
         $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
-        $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
+        $allParams = str_replace("</server_settings>", $addParams . "</server_settings>", $allParams);
 
         $xmlString .= $allParams;
         $xmlString .= "</admin_data>";
@@ -160,7 +170,7 @@ class BootConfLoader extends AbstractConfDriver
     public function loadInstallerForm(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
-        if(isSet($httpVars["lang"])){
+        if (isSet($httpVars["lang"])) {
             LocaleService::setLanguage($httpVars["lang"]);
         }
         $fullManifest = $this->getManifestRawContent("", "xml");
@@ -200,14 +210,15 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $htAccessToUpdate file path
      * @param String $htContent file content
      */
-    public function sendInstallResult($htAccessToUpdate, $htContent){
+    public function sendInstallResult($htAccessToUpdate, $htContent)
+    {
         ConfService::clearAllCaches();
         Utils::setApplicationFirstRunPassed();
 
-        if($htAccessToUpdate != null){
+        if ($htAccessToUpdate != null) {
             HTMLWriter::charsetHeader("application/json");
             echo json_encode(array('file' => $htAccessToUpdate, 'content' => $htContent));
-        }else{
+        } else {
             session_destroy();
             HTMLWriter::charsetHeader("text/plain");
             echo 'OK';
@@ -220,9 +231,10 @@ class BootConfLoader extends AbstractConfDriver
      * @param array $data Installer parsed form result
      * @throws Exception
      */
-    public function setAdditionalData($data){
-        if($data["ENCODING"] != (defined('AJXP_LOCALE')?AJXP_LOCALE:TextEncoder::getEncoding())){
-            file_put_contents($this->getPluginWorkDir()."/encoding.php", "<?php \$ROOT_ENCODING='".$data["ENCODING"]."';");
+    public function setAdditionalData($data)
+    {
+        if ($data["ENCODING"] != (defined('AJXP_LOCALE') ? AJXP_LOCALE : TextEncoder::getEncoding())) {
+            file_put_contents($this->getPluginWorkDir() . "/encoding.php", "<?php \$ROOT_ENCODING='" . $data["ENCODING"] . "';");
         }
     }
 
@@ -234,17 +246,18 @@ class BootConfLoader extends AbstractConfDriver
      * @param array $data
      * @param null|array $optionsLinks
      */
-    public function feedPluginsOptions($confDriver, $data, $optionsLinks = null){
+    public function feedPluginsOptions($confDriver, $data, $optionsLinks = null)
+    {
 
-        if(isSet($optionsLinks)){
+        if (isSet($optionsLinks)) {
             $direct = $optionsLinks;
-        }else{
+        } else {
             $data["ENABLE_NOTIF"] = true;
             // Prepare plugins configs
             $direct = array(
                 "APPLICATION_TITLE" => "core.ajaxplorer/APPLICATION_TITLE",
                 "APPLICATION_LANGUAGE" => "core.ajaxplorer/DEFAULT_LANGUAGE",
-                "ENABLE_NOTIF"      => "core.notifications/USER_EVENTS",
+                "ENABLE_NOTIF" => "core.notifications/USER_EVENTS",
                 "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
             );
             $mailerEnabled = $data["MAILER_ENABLE"]["status"];
@@ -276,16 +289,19 @@ class BootConfLoader extends AbstractConfDriver
      * @return array 2 entries array containing the new Conf Driver (0) and Auth Driver (1)
      * @throws Exception
      */
-    public function createBootstrapConf($data){
+    public function createBootstrapConf($data)
+    {
 
         // Create a custom bootstrap.json file
-        $coreConf = array(); $coreAuth = array(); $coreCache = array();
+        $coreConf = array();
+        $coreAuth = array();
+        $coreCache = array();
         $this->_loadPluginConfig("core.conf", $coreConf);
         $this->_loadPluginConfig("core.auth", $coreAuth);
         $this->_loadPluginConfig("core.cache", $coreCache);
-        if(!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
-        if(!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
-        if(!isSet($coreCache["UNIQUE_INSTANCE_CONFIG"])) $coreCache["UNIQUE_INSTANCE_CONFIG"] = array();
+        if (!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
+        if (!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
+        if (!isSet($coreCache["UNIQUE_INSTANCE_CONFIG"])) $coreCache["UNIQUE_INSTANCE_CONFIG"] = array();
         $coreConf["AJXP_CLI_SECRET_KEY"] = Utils::generateRandomString(24, true);
 
         // REWRITE BOOTSTRAP.JSON
@@ -297,32 +313,32 @@ class BootConfLoader extends AbstractConfDriver
             }
         }
         $coreConf["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreConf["UNIQUE_INSTANCE_CONFIG"], array(
-            "instance_name"=> "conf.sql",
-            "group_switch_value"=> "conf.sql",
-            "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+            "instance_name" => "conf.sql",
+            "group_switch_value" => "conf.sql",
+            "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
         ));
         $coreAuth["MASTER_INSTANCE_CONFIG"] = array_merge($coreAuth["MASTER_INSTANCE_CONFIG"], array(
-            "instance_name"=> "auth.sql",
-            "group_switch_value"=> "auth.sql",
-            "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+            "instance_name" => "auth.sql",
+            "group_switch_value" => "auth.sql",
+            "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
         ));
         $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
         $registry = PluginsService::getInstance(Context::emptyContext())->getDetectedPlugins();
         $driverData = array("SQL_DRIVER" => $data["db_type"]);
-        foreach($registry as $type => $plugins){
-            foreach($plugins as $plugObject){
-                if($plugObject instanceof SqlTableProvider){
+        foreach ($registry as $type => $plugins) {
+            foreach ($plugins as $plugObject) {
+                if ($plugObject instanceof SqlTableProvider) {
                     $plugObject->installSQLTables($driverData);
                 }
             }
         }
 
 
-        $oldBoot = $this->getPluginWorkDir(true)."/bootstrap.json";
+        $oldBoot = $this->getPluginWorkDir(true) . "/bootstrap.json";
         if (is_file($oldBoot)) {
-            copy($oldBoot, $oldBoot.".bak");
+            copy($oldBoot, $oldBoot . ".bak");
             unlink($oldBoot);
         }
         $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth, "core.cache" => $coreCache);
@@ -343,13 +359,13 @@ class BootConfLoader extends AbstractConfDriver
             "core.mq/UNIQUE_MS_INSTANCE" => "mq.sql"
         );
         foreach ($sqlPlugs as $core => $value) {
-            list($pluginId, $param) = explode("/",$core);
+            list($pluginId, $param) = explode("/", $core);
             $options = array();
             $newConfigPlugin->_loadPluginConfig($pluginId, $options);
             $options[$param] = array(
-                "instance_name"=> $value,
-                "group_switch_value"=> $value,
-                "SQL_DRIVER"   => array("core_driver" => "core", "group_switch_value" => "core")
+                "instance_name" => $value,
+                "group_switch_value" => $value,
+                "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
             );
             $newConfigPlugin->_savePluginConfig($pluginId, $options);
         }
@@ -366,22 +382,23 @@ class BootConfLoader extends AbstractConfDriver
      * @param $htContent
      * @return null|string
      */
-    public function updateHtAccess($data, &$htContent){
+    public function updateHtAccess($data, &$htContent)
+    {
 
         $htAccessToUpdate = null;
-        $tpl = file_get_contents($this->getBaseDir()."/htaccess.tpl");
-        if(!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/"){
+        $tpl = file_get_contents($this->getBaseDir() . "/htaccess.tpl");
+        if (!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/") {
             $htContent = str_replace('${APPLICATION_ROOT}', $data["SERVER_URI"], $tpl);
-        }else{
+        } else {
             $htContent = str_replace('${APPLICATION_ROOT}/', "/", $tpl);
             $htContent = str_replace('${APPLICATION_ROOT}', "/", $htContent);
         }
-        if(is_writeable(AJXP_INSTALL_PATH."/.htaccess")){
-            file_put_contents(AJXP_INSTALL_PATH."/.htaccess", $htContent);
-        }else if(AJXP_PACKAGING == "zip"){
-            $testContent = @file_get_contents(AJXP_INSTALL_PATH."/.htaccess");
-            if($testContent === false || $testContent != $htContent){
-                $htAccessToUpdate = AJXP_INSTALL_PATH."/.htaccess";
+        if (is_writeable(AJXP_INSTALL_PATH . "/.htaccess")) {
+            file_put_contents(AJXP_INSTALL_PATH . "/.htaccess", $htContent);
+        } else if (AJXP_PACKAGING == "zip") {
+            $testContent = @file_get_contents(AJXP_INSTALL_PATH . "/.htaccess");
+            if ($testContent === false || $testContent != $htContent) {
+                $htAccessToUpdate = AJXP_INSTALL_PATH . "/.htaccess";
             }
         }
         return $htAccessToUpdate;
@@ -394,7 +411,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param bool $loginIsEmail Whether to use the login as primary email.
      * @throws Exception
      */
-    public function createUsers($data, $loginIsEmail = false){
+    public function createUsers($data, $loginIsEmail = false)
+    {
         $newConfigPlugin = ConfService::getConfStorageImpl();
         require_once($newConfigPlugin->getUserClassFileName());
 
@@ -402,14 +420,14 @@ class BootConfLoader extends AbstractConfDriver
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         $uObj = UsersService::createUser($adminLogin, $adminPass, true);
-        if($loginIsEmail){
+        if ($loginIsEmail) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["ADMIN_USER_LOGIN"]);
-        }else if(isSet($data["MAILER_ADMIN"])) {
+        } else if (isSet($data["MAILER_ADMIN"])) {
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $data["MAILER_ADMIN"]);
         }
         $uObj->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $adminName);
         $repos = \Pydio\Core\Services\RepositoryService::listAllRepositories();
-        foreach($repos as $repo){
+        foreach ($repos as $repo) {
             $uObj->getPersonalRole()->setAcl($repo->getId(), "rw");
         }
         RolesService::updateRole($uObj->getPersonalRole());
@@ -417,16 +435,16 @@ class BootConfLoader extends AbstractConfDriver
         $loginP = "USER_LOGIN";
         $i = 0;
         while (isSet($data[$loginP]) && !empty($data[$loginP])) {
-            $pass  = $data[str_replace("_LOGIN", "_PASS",  $loginP)];
-            $name  = $data[str_replace("_LOGIN", "_NAME",  $loginP)];
-            $mail  = $data[str_replace("_LOGIN", "_MAIL",  $loginP)];
+            $pass = $data[str_replace("_LOGIN", "_PASS", $loginP)];
+            $name = $data[str_replace("_LOGIN", "_NAME", $loginP)];
+            $mail = $data[str_replace("_LOGIN", "_MAIL", $loginP)];
             $saniLogin = Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
             $uObj = UsersService::createUser($saniLogin, $pass);
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $mail);
             $uObj->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
             RolesService::updateRole($uObj->getPersonalRole());
             $i++;
-            $loginP = "USER_LOGIN_".$i;
+            $loginP = "USER_LOGIN_" . $i;
         }
 
     }
@@ -463,7 +481,7 @@ class BootConfLoader extends AbstractConfDriver
             $mailerPlug = PluginsService::getInstance($ctx)->getPluginById("mailer.phpmailer-lite");
             $mailerPlug->loadConfigs(array("MAILER" => $data["MAILER_ENABLE"]["MAILER_SYSTEM"]));
             $mailerPlug->sendMail(
-                $ctx, 
+                $ctx,
                 array("adress" => $data["MAILER_ENABLE"]["MAILER_ADMIN"]),
                 "Pydio Test Mail",
                 "Body of the test",
@@ -474,6 +492,11 @@ class BootConfLoader extends AbstractConfDriver
         }
     }
 
+    /**
+     * @param string $pluginId
+     * @param array $options
+     * @return mixed
+     */
     public function _loadPluginConfig($pluginId, &$options)
     {
         $internal = self::getInternalConf();
@@ -481,8 +504,8 @@ class BootConfLoader extends AbstractConfDriver
         if ($pluginId == "core.conf" && isSet($internal["CONF_DRIVER"])) {
             // Reformat
             $options["UNIQUE_INSTANCE_CONFIG"] = array(
-                "instance_name" => "conf.".$internal["CONF_DRIVER"]["NAME"],
-                "group_switch_value" => "conf.".$internal["CONF_DRIVER"]["NAME"],
+                "instance_name" => "conf." . $internal["CONF_DRIVER"]["NAME"],
+                "group_switch_value" => "conf." . $internal["CONF_DRIVER"]["NAME"],
             );
             unset($internal["CONF_DRIVER"]["NAME"]);
             $options["UNIQUE_INSTANCE_CONFIG"] = array_merge($options["UNIQUE_INSTANCE_CONFIG"], $internal["CONF_DRIVER"]["OPTIONS"]);
@@ -494,7 +517,7 @@ class BootConfLoader extends AbstractConfDriver
 
         } else if ($pluginId == "core.cache" && isSet($internal["CACHE_DRIVER"])) {
             $options['UNIQUE_INSTANCE_CONFIG'] = array(
-                "instance_name" => "cache.".$internal["CACHE_DRIVER"]["NAME"]
+                "instance_name" => "cache." . $internal["CACHE_DRIVER"]["NAME"]
             );
             return;
         }
@@ -502,12 +525,16 @@ class BootConfLoader extends AbstractConfDriver
         CoreConfLoader::loadBootstrapConfForPlugin($pluginId, $options);
     }
 
+    /**
+     * @param $legacy
+     * @return array
+     */
     protected function authLegacyToBootConf($legacy)
     {
         $data = array();
-        $kOpts = array("LOGIN_REDIRECT","TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER");
+        $kOpts = array("LOGIN_REDIRECT", "TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER");
         foreach ($kOpts as $k) {
-            if(isSet($legacy["OPTIONS"][$k])) $data[$k] = $legacy["OPTIONS"][$k];
+            if (isSet($legacy["OPTIONS"][$k])) $data[$k] = $legacy["OPTIONS"][$k];
         }
         if ($legacy["NAME"] == "multi") {
             $drivers = $legacy["OPTIONS"]["DRIVERS"];
@@ -515,13 +542,13 @@ class BootConfLoader extends AbstractConfDriver
             $slave = array_pop(array_diff(array_keys($drivers), array($master)));
 
             $data["MULTI_MODE"] = array("instance_name" => $legacy["OPTIONS"]["MODE"]);
-            $data["MULTI_USER_BASE_DRIVER"] = $legacy["OPTIONS"]["USER_BASE_DRIVER"] == $master ? "master" : ($legacy["OPTIONS"]["USER_BASE_DRIVER"] == $slave ? "slave" :  "" ) ;
+            $data["MULTI_USER_BASE_DRIVER"] = $legacy["OPTIONS"]["USER_BASE_DRIVER"] == $master ? "master" : ($legacy["OPTIONS"]["USER_BASE_DRIVER"] == $slave ? "slave" : "");
 
-            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$master]["OPTIONS"], array("instance_name" => "auth.".$master));
-            $data["SLAVE_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$slave]["OPTIONS"], array("instance_name" => "auth.".$slave));
+            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$master]["OPTIONS"], array("instance_name" => "auth." . $master));
+            $data["SLAVE_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"]["DRIVERS"][$slave]["OPTIONS"], array("instance_name" => "auth." . $slave));
 
         } else {
-            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"], array("instance_name" => "auth.".$legacy["NAME"]));
+            $data["MASTER_INSTANCE_CONFIG"] = array_merge($legacy["OPTIONS"], array("instance_name" => "auth." . $legacy["NAME"]));
         }
         return $data;
     }
@@ -534,11 +561,11 @@ class BootConfLoader extends AbstractConfDriver
     {
         $jsonData = CoreConfLoader::getBootstrapConf();
 
-        if(!is_array($jsonData)) $jsonData = array();
+        if (!is_array($jsonData)) $jsonData = array();
         $jsonData[$pluginId] = $options;
 
         if ($pluginId == "core.conf" || $pluginId == "core.auth" || $pluginId == "core.cache") {
-            $testKey = ($pluginId == "core.conf" || $pluginId == "core.cache" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG" );
+            $testKey = ($pluginId == "core.conf" || $pluginId == "core.cache" ? "UNIQUE_INSTANCE_CONFIG" : "MASTER_INSTANCE_CONFIG");
             $current = array();
             $this->_loadPluginConfig($pluginId, $current);
             if (isSet($current[$testKey]["instance_name"]) && $current[$testKey]["instance_name"] != $options[$testKey]["instance_name"]) {
@@ -554,7 +581,7 @@ class BootConfLoader extends AbstractConfDriver
                 AuthService::disconnect();
             } else if ($pluginId == "core.auth") {
                 // DELETE admin_counted file and DISCONNECT
-                @unlink(AJXP_CACHE_DIR."/admin_counted");
+                @unlink(AJXP_CACHE_DIR . "/admin_counted");
             }
         }
     }
@@ -575,7 +602,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param int $count
      * @return array
      */
-    public function listRepositoriesWithCriteria($criteria, &$count = null){
+    public function listRepositoriesWithCriteria($criteria, &$count = null)
+    {
         return array();
     }
 
@@ -596,7 +624,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $repositorySlug
      * @return \Pydio\Access\Core\Model\Repository
      */
-    public function getRepositoryByAlias($repositorySlug) {
+    public function getRepositoryByAlias($repositorySlug)
+    {
         return null;
     }
 
@@ -607,7 +636,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param Boolean $update
      * @return int -1 if failed
      */
-    public function saveRepository($repositoryObject, $update = false) {
+    public function saveRepository($repositoryObject, $update = false)
+    {
         return -1;
     }
 
@@ -616,21 +646,28 @@ class BootConfLoader extends AbstractConfDriver
      *
      * @param String $repositoryId
      */
-    public function deleteRepository($repositoryId) {
+    public function deleteRepository($repositoryId)
+    {
 
     }
 
     /**
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
-     * @param boolean $excludeReserved,
+     * @param boolean $excludeReserved ,
      * @return array AjxpRole[]
      */
-    public function listRoles($roleIds = array(), $excludeReserved = false) {
+    public function listRoles($roleIds = array(), $excludeReserved = false)
+    {
         return array();
     }
 
-    public function saveRoles($roles) {
+    /**
+     * @param AJXP_Role[] $roles
+     * @return mixed
+     */
+    public function saveRoles($roles)
+    {
     }
 
     /**
@@ -638,21 +675,24 @@ class BootConfLoader extends AbstractConfDriver
      * @param AbstractAjxpUser $userObject
      * @return void
      */
-    public function updateRole($role, $userObject = null) {
+    public function updateRole($role, $userObject = null)
+    {
     }
 
     /**
      * @param AJXP_Role|String $role
      * @return void
      */
-    public function deleteRole($role) {
+    public function deleteRole($role)
+    {
 
     }
 
     /**
      * Specific queries
      */
-    public function countAdminUsers() {
+    public function countAdminUsers()
+    {
     }
 
     /**
@@ -661,7 +701,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $ID
      * @return String $ID
      */
-    public function saveBinary($context, $fileName, $ID = null) {
+    public function saveBinary($context, $fileName, $ID = null)
+    {
         return $ID;
     }
 
@@ -671,7 +712,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param resource $outputStream
      * @return boolean
      */
-    public function loadBinary($context, $ID, $outputStream = null) {
+    public function loadBinary($context, $ID, $outputStream = null)
+    {
         return false;
     }
 
@@ -680,7 +722,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $ID
      * @return boolean
      */
-    public function deleteBinary($context, $ID) {
+    public function deleteBinary($context, $ID)
+    {
         return false;
     }
 
@@ -691,7 +734,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param array $deletedSubUsers
      * @return array
      */
-    public function deleteUser($userId, &$deletedSubUsers) {
+    public function deleteUser($userId, &$deletedSubUsers)
+    {
         return array();
     }
 
@@ -701,11 +745,16 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $userId
      * @return AbstractAjxpUser
      */
-    public function instantiateAbstractUserImpl($userId) {
+    public function instantiateAbstractUserImpl($userId)
+    {
         return null;
     }
 
-    public function getUserClassFileName() {
+    /**
+     * @return string
+     */
+    public function getUserClassFileName()
+    {
         return "";
     }
 
@@ -713,10 +762,11 @@ class BootConfLoader extends AbstractConfDriver
      * @param $userId
      * @return AbstractAjxpUser[]
      */
-    public function getUserChildren($userId) {
+    public function getUserChildren($userId)
+    {
         return array();
     }
-    
+
     /**
      * @abstract
      * @param string $repositoryId
@@ -724,7 +774,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param bool $countOnly
      * @return array()
      */
-    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false){
+    public function getRolesForRepository($repositoryId, $rolePrefix = '', $countOnly = false)
+    {
         return array();
     }
 
@@ -735,7 +786,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param bool $admin
      * @return array
      */
-    public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin=false){
+    public function countUsersForRepository(ContextInterface $ctx, $repositoryId, $details = false, $admin = false)
+    {
         return array();
     }
 
@@ -745,7 +797,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param bool $fullTree
      * @return void
      */
-    public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false) {
+    public function filterUsersByGroup(&$flatUsersList, $baseGroup = "/", $fullTree = false)
+    {
     }
 
     /**
@@ -753,7 +806,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $groupLabel
      * @return mixed
      */
-    public function createGroup($groupPath, $groupLabel) {
+    public function createGroup($groupPath, $groupLabel)
+    {
         return false;
     }
 
@@ -761,7 +815,8 @@ class BootConfLoader extends AbstractConfDriver
      * @param $groupPath
      * @return void
      */
-    public function deleteGroup($groupPath) {
+    public function deleteGroup($groupPath)
+    {
     }
 
     /**
@@ -769,14 +824,16 @@ class BootConfLoader extends AbstractConfDriver
      * @param string $groupLabel
      * @return void
      */
-    public function relabelGroup($groupPath, $groupLabel) {
+    public function relabelGroup($groupPath, $groupLabel)
+    {
     }
 
     /**
      * @param string $baseGroup
      * @return string[]
      */
-    public function getChildrenGroups($baseGroup = "/") {
+    public function getChildrenGroups($baseGroup = "/")
+    {
     }
 
     /**
@@ -787,7 +844,9 @@ class BootConfLoader extends AbstractConfDriver
      * @param array $data
      * @return boolean
      */
-    public function saveTemporaryKey($keyType, $keyId, $userId, $data){}
+    public function saveTemporaryKey($keyType, $keyId, $userId, $data)
+    {
+    }
 
     /**
      * @abstract
@@ -795,7 +854,9 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $keyId
      * @return array
      */
-    public function loadTemporaryKey($keyType, $keyId){}
+    public function loadTemporaryKey($keyType, $keyId)
+    {
+    }
 
     /**
      * @abstract
@@ -803,7 +864,9 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $keyId
      * @return boolean
      */
-    public function deleteTemporaryKey($keyType, $keyId){}
+    public function deleteTemporaryKey($keyType, $keyId)
+    {
+    }
 
     /**
      * @abstract
@@ -811,7 +874,9 @@ class BootConfLoader extends AbstractConfDriver
      * @param String $expiration
      * @return null
      */
-    public function pruneTemporaryKeys($keyType, $expiration){}
+    public function pruneTemporaryKeys($keyType, $expiration)
+    {
+    }
 
     /**
      * Check if group already exists

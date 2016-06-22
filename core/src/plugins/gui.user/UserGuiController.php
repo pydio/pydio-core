@@ -18,6 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Gui;
+
+use DOMNode;
+use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\ContextInterface;
@@ -30,12 +34,12 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * @package AjaXplorer_Plugins
  * @subpackage Gui
- * @class UserGuiController
+ * @class Pydio\Gui\UserGuiController
  * Handle the specific /user access point
  */
 class UserGuiController extends Plugin
@@ -52,7 +56,7 @@ class UserGuiController extends Plugin
             if ($contribNode->nodeName == "client_configs") {
                 $children = $contribNode->childNodes;
                 foreach ($children as $child) {
-                    if($child->nodeType == XML_ELEMENT_NODE) $contribNode->removeChild($child);
+                    if ($child->nodeType == XML_ELEMENT_NODE) $contribNode->removeChild($child);
                 }
             } else if ($contribNode->nodeName == "actions") {
                 $children = $contribNode->childNodes;
@@ -81,27 +85,27 @@ class UserGuiController extends Plugin
         $action = $requestInterface->getAttribute("action");
         $httpVars = $requestInterface->getParsedBody();
         $context = $requestInterface->getAttribute("ctx");
-        
+
         switch ($action) {
             case "user_access_point":
                 $setUrl = ConfService::getGlobalConf("SERVER_URL");
                 $realUri = "/";
-                if(!empty($setUrl)){
+                if (!empty($setUrl)) {
                     $realUri = parse_url(ConfService::getGlobalConf("SERVER_URL"), PHP_URL_PATH);
                 }
                 $requestURI = str_replace("//", "/", $_SERVER["REQUEST_URI"]);
-                $uri = trim(str_replace(rtrim($realUri, "/")."/user", "", $requestURI), "/");
+                $uri = trim(str_replace(rtrim($realUri, "/") . "/user", "", $requestURI), "/");
                 $uriParts = explode("/", $uri);
                 $action = array_shift($uriParts);
                 $key = ($action == "reset-password" && count($uriParts)) ? array_shift($uriParts) : "";
-                try{
+                try {
                     $this->processSubAction($action, $uriParts);
                     $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
-                        "REBASE"=>"../../",
+                        "REBASE" => "../../",
                         "USER_GUI_ACTION" => $action,
                         "USER_ACTION_KEY" => $key
                     );
-                }catch(Exception $e){
+                } catch (Exception $e) {
                     $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
                         "ALERT" => $e->getMessage()
                     );
@@ -126,8 +130,8 @@ class UserGuiController extends Plugin
                         $mailer = PluginsService::getInstance($context)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
-                            $link = Utils::detectServerURL()."/user/reset-password/".$uuid;
-                            $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"]."<a href=\"$link\">$link</a>");
+                            $link = Utils::detectServerURL() . "/user/reset-password/" . $uuid;
+                            $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"] . "<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';
                         }
@@ -146,13 +150,13 @@ class UserGuiController extends Plugin
                 if (isSet($httpVars["key"]) && isSet($httpVars["user_id"])) {
                     $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
                     ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);
-                    $uId  = $httpVars["user_id"];
-                    if(UsersService::ignoreUserCase()){
+                    $uId = $httpVars["user_id"];
+                    if (UsersService::ignoreUserCase()) {
                         $uId = strtolower($uId);
                     }
                     if ($key != null && strtolower($key["user_id"]) == $uId && UsersService::userExists($uId)) {
                         UsersService::updatePassword($key["user_id"], $httpVars["new_pass"]);
-                    }else{
+                    } else {
                         echo 'PASS_ERROR';
                         break;
                     }

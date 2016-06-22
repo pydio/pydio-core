@@ -19,13 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Gui;
+
+use DOMXPath;
+use Exception;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Test user agent
@@ -36,32 +40,44 @@ class MobileGuiPlugin extends Plugin
 {
     public function performChecks()
     {
-        if(!Utils::userAgentIsMobile()) throw new Exception("no");
+        if (!Utils::userAgentIsMobile()) throw new Exception("no");
     }
 
+    /**
+     * Dynamically modify some registry contributions nodes. Can be easily derivated to enable/disable
+     * some features dynamically during plugin initialization.
+     * @param ContextInterface $ctx
+     * @param \DOMNode $contribNode
+     * @return void
+     */
     public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
 
-        if($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive($ctx)){
+        if ($contribNode->nodeName == "client_configs" && !$this->orbitExtensionActive($ctx)) {
             // remove template_part for orbit_content
-            $xPath=new DOMXPath($contribNode->ownerDocument);
+            $xPath = new DOMXPath($contribNode->ownerDocument);
             $tplNodeList = $xPath->query('template_part[@ajxpId="orbit_content"]', $contribNode);
-            if(!$tplNodeList->length) return ;
+            if (!$tplNodeList->length) return;
             $contribNode->removeChild($tplNodeList->item(0));
         }
 
     }
 
-    private function orbitExtensionActive(ContextInterface $ctx){
+    /**
+     * @param ContextInterface $ctx
+     * @return bool
+     */
+    private function orbitExtensionActive(ContextInterface $ctx)
+    {
         $confs = ConfService::getConfStorageImpl()->loadPluginConfig("gui", "ajax");
-        if(!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
-        if($confs["GUI_THEME"] == "orbit"){
+        if (!isset($confs) || !isSet($confs["GUI_THEME"])) $confs["GUI_THEME"] = "orbit";
+        if ($confs["GUI_THEME"] == "orbit") {
             $pServ = PluginsService::getInstance($ctx);
-            $activePlugs    = $pServ->getActivePlugins();
+            $activePlugs = $pServ->getActivePlugins();
             $streamWrappers = $pServ->getStreamWrapperPlugins();
-            $streamActive   = false;
-            foreach($streamWrappers as $sW){
-                if((array_key_exists($sW, $activePlugs) && $activePlugs[$sW] === true)){
+            $streamActive = false;
+            foreach ($streamWrappers as $sW) {
+                if ((array_key_exists($sW, $activePlugs) && $activePlugs[$sW] === true)) {
                     $streamActive = true;
                     break;
                 }

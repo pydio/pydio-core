@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="light" label="CONF_MESSAGE[Light]" description="CONF_MESSAGE[Simple Template for Bookmarklets]">
-    <class_definition filename="plugins/gui.light/class.LightGuiPlugin.php" classname="LightGuiPlugin"/>
+    <class_definition filename="plugins/gui.light/LightGuiPlugin.php" classname="Pydio\Gui\LightGuiPlugin"/>
     <client_settings>
         <resources>
             <i18n namespace="light_gui" path="plugins/gui.light/i18n"/>

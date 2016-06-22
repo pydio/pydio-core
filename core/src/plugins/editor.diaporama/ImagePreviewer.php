@@ -138,7 +138,7 @@ class ImagePreviewer extends Plugin
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new \PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
+        $pThumb = new \Pydio\Editor\Image\PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
 
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
@@ -199,7 +199,7 @@ class ImagePreviewer extends Plugin
 
                 if($this->getContextualOption($context, "EXIF_ROTATION")){
                     require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-                    $pThumb = new \PThumb($this->getContextualOption($context, "THUMBNAIL_QUALITY"),$this->getContextualOption($context, "EXIF_ROTATION"));
+                    $pThumb = new \Pydio\Editor\Image\PThumb($this->getContextualOption($context, "THUMBNAIL_QUALITY"),$this->getContextualOption($context, "EXIF_ROTATION"));
                     $orientation = $pThumb->exiforientation($realFile, false);
                     if ($pThumb->rotationsupported($orientation))
                     {

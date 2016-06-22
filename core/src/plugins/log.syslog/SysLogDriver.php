@@ -19,16 +19,18 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Log\Implementation;
+
 use Pydio\Core\Model\ContextInterface;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Standard logger. Writes logs into text files
  * @package AjaXplorer_Plugins
  * @subpackage Log
  */
-class sysLogDriver extends textLogDriver
+class SysLogDriver extends TextLogDriver
 {
     /**
      * @var Integer File handle to currently open log file.
@@ -59,7 +61,8 @@ class sysLogDriver extends textLogDriver
     /**
      * If the plugin is cloned, make sure to renew the $fileHandle
      */
-    public function __clone() {
+    public function __clone()
+    {
         $this->close();
         $this->open();
         parent::__clone();
@@ -78,7 +81,7 @@ class sysLogDriver extends textLogDriver
      */
     public function open()
     {
-        $this->fileHandle = openlog($this->signature, LOG_ODELAY | LOG_PID, LOG_LOCAL0 );
+        $this->fileHandle = openlog($this->signature, LOG_ODELAY | LOG_PID, LOG_LOCAL0);
         if ($this->fileHandle !== false && count($this->stack)) {
             $this->stackFlush();
         }
@@ -149,7 +152,7 @@ class sysLogDriver extends textLogDriver
 
         if ($this->fileHandle !== false) {
 
-            if(count($this->stack)) $this->stackFlush();
+            if (count($this->stack)) $this->stackFlush();
             syslog($sysLevel, $textMessage);
 
         } else {
@@ -178,7 +181,7 @@ class sysLogDriver extends textLogDriver
      */
     public function close()
     {
-        if($this->fileHandle) closelog();
+        if ($this->fileHandle) closelog();
     }
 
     /**
@@ -193,14 +196,14 @@ class sysLogDriver extends textLogDriver
      * @param bool $print
      * @return null
      */
-    public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
+    public function xmlListLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs", $print = true)
     {
         $xml = "<$nodeName icon=\"toggle_log.png\" date=\"\"
         display=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         text=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
         is_file=\"1\"
         filename=\"$rootPath/see\"/>";
-        if($print) print $xml;
+        if ($print) print $xml;
         return array($xml);
     }
 

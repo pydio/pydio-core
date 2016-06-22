@@ -9,7 +9,7 @@
         </resources>
     </client_settings>
 
-    <class_definition classname="UserGuiController" filename="plugins/gui.user/class.UserGuiController.php"/>
+    <class_definition classname="Pydio\Gui\UserGuiController" filename="plugins/gui.user/UserGuiController.php"/>
 
     <registry_contributions>
         <actions>

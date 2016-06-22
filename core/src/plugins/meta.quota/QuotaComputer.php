@@ -48,7 +48,7 @@ class QuotaComputer extends AbstractMetaSource
     public static $loadedQuota;
     public static $loadedSoftLimit;
     /**
-     * @var \AjxpMailer
+     * @var \Pydio\Mailer\Core\Mailer
      */
     protected $mailer;
     

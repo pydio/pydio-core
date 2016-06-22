@@ -19,20 +19,35 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Gui;
+
+use Exception;
+use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\Plugin;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Test cookie
+ * Test user agent
  * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @subpackage Gui
  */
-class LightGuiPlugin extends Plugin
+class MobileNativeRedirect extends Plugin
 {
     public function performChecks()
     {
-        if(!isSet($_COOKIE["AJXP_GUI"]) || $_COOKIE["AJXP_GUI"] != "light") throw new Exception("no");
+        if (isSet($_SESSION["CURRENT_MINISITE"])) throw new Exception("Disabled for minisites");
+        if (Utils::userAgentIsWindowsPhone()) {
+            throw new Exception("No native app for windows phone");
+        }
+
+        if (Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
+            return;
+        }
+        if (Utils::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])) {
+            return;
+        }
+        throw new Exception("Active only when mobile user agent detected.");
     }
 
 }

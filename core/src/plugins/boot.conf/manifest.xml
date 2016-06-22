@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Bootstrap Loader]" description="CONF_MESSAGE[Core plugin for loading the framework. Do NOT disable this plugin!]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_provider" id="boot.conf">
-    <class_definition classname="BootConfLoader" filename="plugins/boot.conf/class.BootConfLoader.php" />
+    <class_definition classname="Pydio\Conf\Boot\BootConfLoader" filename="plugins/boot.conf/BootConfLoader.php" />
     <client_settings>
         <resources>
             <css file="plugins/boot.conf/installer.css" autoload="true"/>

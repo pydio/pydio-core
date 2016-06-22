@@ -19,6 +19,12 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Mailer\Core;
+
+use DateTime;
+use dibi;
+use DibiException;
+use Exception;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Conf\Core\AbstractAjxpUser;
@@ -40,7 +46,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package AjaXplorer_Plugins
  * @subpackage Core
  */
-class AjxpMailer extends Plugin implements SqlTableProvider
+class Mailer extends Plugin implements SqlTableProvider
 {
 
     public $mailCache;
@@ -54,12 +60,12 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     {
         parent::init($ctx, $options);
         if (AJXP_SERVER_DEBUG) {
-            $this->mailCache = $this->getPluginWorkDir(true)."/mailbox";
+            $this->mailCache = $this->getPluginWorkDir(true) . "/mailbox";
         }
         $pConf = $this->pluginConf["UNIQUE_MAILER_INSTANCE"];
         if (!empty($pConf)) {
             $pService = PluginsService::getInstance($ctx);
-            $p = ConfService::instanciatePluginFromGlobalParams($pConf, "AjxpMailer", $pService);
+            $p = ConfService::instanciatePluginFromGlobalParams($pConf, "Pydio\\Mailer\\Core\\Mailer", $pService);
             $pService->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
         }
     }
@@ -68,9 +74,10 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @return array
      * @throws Exception
      */
-    protected function getDibiDriver () {
+    protected function getDibiDriver()
+    {
         if (!isset($this->_dibiDriver)) {
-            $this->_dibiDriver = Utils::cleanDibiDriverParameters(array("group_switch_value"=>"core"));
+            $this->_dibiDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
         }
         return $this->_dibiDriver;
     }
@@ -82,18 +89,19 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @param ContextInterface $ctx
      * @throws PydioException
      */
-    public function mailConsumeQueue ($action, $httpVars, $fileVars, ContextInterface $ctx) {
+    public function mailConsumeQueue($action, $httpVars, $fileVars, ContextInterface $ctx)
+    {
 
         if ($action === "consume_mail_queue") {
-            
+
             $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
-            if(!$mailer instanceof AjxpMailer){
+            if (!$mailer instanceof Mailer) {
                 throw new PydioException("Cannot find active mailer!");
             }
             if (!dibi::isConnected()) {
                 dibi::connect($this->getDibiDriver());
             }
-            if($this->_dibiDriver["driver"] == "postgre"){
+            if ($this->_dibiDriver["driver"] == "postgre") {
                 dibi::query("SET bytea_output=escape");
             }
             $time = time();
@@ -112,9 +120,10 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     $ajxpAction = $ajxpNotification->getAction();
                     $ajxpAuthor = $ajxpNotification->getAuthor();
                     $ajxpNode = new AJXP_Node($value['url']);
-                    try{
+                    try {
                         @$ajxpNode->loadNodeInfo();
-                    }catch(Exception $e){}
+                    } catch (Exception $e) {
+                    }
                     if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
                         $ajxpContent = $ajxpNode->getParent()->getPath();
                     } else {
@@ -123,13 +132,13 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                             $ajxpContent = '/';
                         }
                     }
-                    if($ajxpNode->getRepository() != null){
+                    if ($ajxpNode->getRepository() != null) {
                         $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
-                    }else{
+                    } else {
                         $ajxpNodeWorkspace = "Deleted Workspace";
                     }
                     $recipientFormats[$value['recipient']] = ($value["html"] == 1);
-                    $ajxpKey = $ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
+                    $ajxpKey = $ajxpAction . "|" . $ajxpAuthor . "|" . $ajxpContent;
                     $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
@@ -142,16 +151,16 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                         $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
                         foreach ($arrayAjxpKey as $ajxpKey => $arrayNotif) {
                             $descs = array();
-                            foreach($arrayNotif as $notif){
+                            foreach ($arrayNotif as $notif) {
                                 $desc = $notif->getDescriptionLong(true);
-                                if(array_key_exists($desc, $descs)){
-                                    $descs[$desc] ++;
-                                }else{
+                                if (array_key_exists($desc, $descs)) {
+                                    $descs[$desc]++;
+                                } else {
                                     $descs[$desc] = 1;
                                 }
                             }
-                            foreach($descs as $sentence => $occurences){
-                                $body = $body . '<li>' . $sentence . ($occurences > 1 ? ' ('.count($arrayNotif).')' :'').'</li>';
+                            foreach ($descs as $sentence => $occurences) {
+                                $body = $body . '<li>' . $sentence . ($occurences > 1 ? ' (' . count($arrayNotif) . ')' : '') . '</li>';
                             }
                         }
                         $body = $body . '</ul>';
@@ -159,7 +168,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     $body .= $useHtml ? "</div>" : "";
                     try {
                         $mailer->sendMail(
-                            $ctx, 
+                            $ctx,
                             array($recipient),
                             $digestTitle,
                             $body,
@@ -167,9 +176,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                             null,
                             $useHtml
                         );
-                        $output["success"][] = "Email sent to ".$recipient;
+                        $output["success"][] = "Email sent to " . $recipient;
                     } catch (PydioException $e) {
-                        $output["error"][] = "Sending email to ".$recipient.": ".$e->getMessage();
+                        $output["error"][] = "Sending email to " . $recipient . ": " . $e->getMessage();
                     }
                 }
                 try {
@@ -179,7 +188,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                 }
             }
             HTMLWriter::charsetHeader("text/json");
-            $output = array("report" => "Sent ".count($output["success"])." emails", "detail" => $output);
+            $output = array("report" => "Sent " . count($output["success"]) . " emails", "detail" => $output);
             echo json_encode($output);
         }
     }
@@ -188,8 +197,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @param $int
      * @return string
      */
-    protected function stringify($int){
-        return ($int < 10 ? "0".$int : "".$int);
+    protected function stringify($int)
+    {
+        return ($int < 10 ? "0" . $int : "" . $int);
     }
 
     /**
@@ -197,7 +207,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @param $frequencyDetail
      * @return DateTime|int|null|string
      */
-    protected function computeEmailSendDate($frequencyType, $frequencyDetail){
+    protected function computeEmailSendDate($frequencyType, $frequencyDetail)
+    {
 
         $date = new DateTime("now");
         $year = $date->format("Y");
@@ -266,38 +277,38 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      */
     public function processNotification(Notification &$notification)
     {
-        try{
+        try {
             $userObject = UsersService::getUserById($notification->getTarget());
-        }catch (\Pydio\Core\Exception\UserNotFoundException $e){
+        } catch (\Pydio\Core\Exception\UserNotFoundException $e) {
             $messages = LocaleService::getMessages();
             throw new PydioException($messages['core.mailer.2']);
         }
-        if($userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL,"true") !== "true"){
+        if ($userObject->getMergedRole()->filterParameterValue("core.mailer", "NOTIFICATIONS_EMAIL_GET", AJXP_REPO_SCOPE_ALL, "true") !== "true") {
             // User does not want to receive any emails.
             return;
         }
 
-        $notification_email = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL,"");
+        $notification_email = $userObject->getMergedRole()->filterParameterValue("core.mailer", "NOTIFICATIONS_EMAIL", AJXP_REPO_SCOPE_ALL, "");
         $arrayRecipients = array();
         $mainRecipient = $userObject->getMergedRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
-        $useHtml = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL,"true") === "true" ? 1 : 0;
+        $useHtml = $userObject->getMergedRole()->filterParameterValue("core.mailer", "NOTIFICATIONS_EMAIL_SEND_HTML", AJXP_REPO_SCOPE_ALL, "true") === "true" ? 1 : 0;
 
-        if(!empty($mainRecipient)) $arrayRecipients[] = $mainRecipient;
+        if (!empty($mainRecipient)) $arrayRecipients[] = $mainRecipient;
         $additionalRecipients = array_map("trim", explode(',', $notification_email));
-        foreach($additionalRecipients as $addR){
-            if(!empty($addR)) $arrayRecipients[] = $addR;
+        foreach ($additionalRecipients as $addR) {
+            if (!empty($addR)) $arrayRecipients[] = $addR;
         }
 
         if ($this->pluginConf["MAILER_ACTIVATE_QUEUE"] && count($arrayRecipients)) {
 
-            $frequencyType = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL,"M");
-            $frequencyDetail = $userObject->getMergedRole()->filterParameterValue("core.mailer","NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL,"5");
+            $frequencyType = $userObject->getMergedRole()->filterParameterValue("core.mailer", "NOTIFICATIONS_EMAIL_FREQUENCY", AJXP_REPO_SCOPE_ALL, "M");
+            $frequencyDetail = $userObject->getMergedRole()->filterParameterValue("core.mailer", "NOTIFICATIONS_EMAIL_FREQUENCY_USER", AJXP_REPO_SCOPE_ALL, "5");
             $nextFrequency = $this->computeEmailSendDate(
                 $frequencyType,
                 $frequencyDetail
             );
 
-            if(!empty($nextFrequency)){
+            if (!empty($nextFrequency)) {
                 if (!dibi::isConnected()) {
                     dibi::connect($this->getDibiDriver());
                 }
@@ -313,12 +324,12 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                         $this->logError("[mailer]", $e->getMessage());
                     }
                 }
-            }else{
-                $this->logError("[mailer]", "Could not determine email frequency from $frequencyType / $frequencyDetail for send email to user ".$userObject->getId());
+            } else {
+                $this->logError("[mailer]", "Could not determine email frequency from $frequencyType / $frequencyDetail for send email to user " . $userObject->getId());
             }
         } else {
             $mailer = PluginsService::getInstance($notification->getNode()->getContext())->getActivePluginsForType("mailer", true);
-            if ($mailer !== false && $mailer instanceof AjxpMailer) {
+            if ($mailer !== false && $mailer instanceof Mailer) {
                 try {
                     $mailer->sendMail(
                         $notification->getNode()->getContext(),
@@ -354,50 +365,50 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         $forceFrom = ConfService::getContextConf($ctx, "FORCE_UNIQUE_FROM", "mailer");
         $coreFrom = ConfService::getContextConf($ctx, "FROM", "mailer");
 
-        if($forceFrom && $coreFrom != null){
+        if ($forceFrom && $coreFrom != null) {
             $coreFromName = ConfService::getContextConf($ctx, "FROM_NAME", "mailer");
             $from = array("adress" => $coreFrom, "name" => $coreFromName);
         }
         $rowBody = $body;
         $images = array();
-        if(!empty($prepend)) $subject = $prepend ." ". $subject;
-        if(!empty($append)) $subject .= " ".$append;
+        if (!empty($prepend)) $subject = $prepend . " " . $subject;
+        if (!empty($append)) $subject .= " " . $append;
         if (!empty($layoutFolder)) {
             $layoutFolder .= "/";
             $lang = LocaleService::getLanguage();
-            if(!$useHtml){
-                if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt")) {
-                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".txt"));
-                } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.txt")) {
-                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.txt"));
-                } else{
+            if (!$useHtml) {
+                if (is_file(AJXP_INSTALL_PATH . "/" . $layoutFolder . $lang . ".txt")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH . "/" . $layoutFolder . $lang . ".txt"));
+                } else if (is_file(AJXP_INSTALL_PATH . "/" . $layoutFolder . "en.txt")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH . "/" . $layoutFolder . "en.txt"));
+                } else {
                     $layout = "AJXP_MAIL_BODY";
                 }
-            }else{
-                if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html")) {
-                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder.$lang.".html"));
-                } else if (is_file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html")) {
-                    $layout = implode("", file(AJXP_INSTALL_PATH."/".$layoutFolder."en.html"));
+            } else {
+                if (is_file(AJXP_INSTALL_PATH . "/" . $layoutFolder . $lang . ".html")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH . "/" . $layoutFolder . $lang . ".html"));
+                } else if (is_file(AJXP_INSTALL_PATH . "/" . $layoutFolder . "en.html")) {
+                    $layout = implode("", file(AJXP_INSTALL_PATH . "/" . $layoutFolder . "en.html"));
                 }
             }
         }
         if (strpos($layout, "AJXP_MAIL_BODY") !== false) {
-            $body = str_replace("AJXP_MAIL_BODY", $useHtml?nl2br($body):$body, $layout);
+            $body = str_replace("AJXP_MAIL_BODY", $useHtml ? nl2br($body) : $body, $layout);
         }
         if ($imageLink != null && $useHtml) {
-            $body = str_replace(array("AJXP_IMAGE_LINK"), "<a href='".$imageLink."'>".'<img alt="Download" width="100" style="width: 100px;" src="cid:download_id">'."</a>", $body);
-            $images[] = array("path" => AJXP_INSTALL_PATH."/".$layoutFolder."/download.png", "cid" => "download_id");
+            $body = str_replace(array("AJXP_IMAGE_LINK"), "<a href='" . $imageLink . "'>" . '<img alt="Download" width="100" style="width: 100px;" src="cid:download_id">' . "</a>", $body);
+            $images[] = array("path" => AJXP_INSTALL_PATH . "/" . $layoutFolder . "/download.png", "cid" => "download_id");
         } else {
             $body = str_replace(array("AJXP_IMAGE_LINK", "AJXP_IMAGE_END"), "", $body);
         }
         $body = str_replace("AJXP_MAIL_SUBJECT", $subject, $body);
         $this->sendMailImpl($ctx, $recipients, $subject, $body, $from, $images, $useHtml);
         if (AJXP_SERVER_DEBUG) {
-            if(!$useHtml) {
-                $rowBody = '[TEXT ONLY] '.AjxpMailer::simpleHtml2Text($rowBody);
+            if (!$useHtml) {
+                $rowBody = '[TEXT ONLY] ' . Mailer::simpleHtml2Text($rowBody);
             }
             $line = "------------------------------------------------------------------------\n";
-            file_put_contents($this->mailCache, $line."Sending mail from ".print_r($from, true)." to ".print_r($recipients, true)."\nSubject: $subject\nBody:\n$rowBody\n", FILE_APPEND);
+            file_put_contents($this->mailCache, $line . "Sending mail from " . print_r($from, true) . " to " . print_r($recipients, true) . "\nSubject: $subject\nBody:\n$rowBody\n", FILE_APPEND);
         }
     }
 
@@ -410,7 +421,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @param array $images
      * @param bool $useHtml
      */
-    protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
+    protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
+    {
     }
 
     /**
@@ -461,15 +473,15 @@ class AjxpMailer extends Plugin implements SqlTableProvider
         $fromResult = array();
         if ($fromAdress != null) {
             $arr = $this->resolveAdresses($ctx, array($fromAdress));
-            if(count($arr)) $fromResult = $arr[0];
+            if (count($arr)) $fromResult = $arr[0];
         } else if ($ctx->hasUser()) {
             $arr = $this->resolveAdresses($ctx, array($ctx->getUser()));
-            if(count($arr)) $fromResult = $arr[0];
+            if (count($arr)) $fromResult = $arr[0];
         }
         if (!count($fromResult)) {
             $f = ConfService::getContextConf($ctx, "FROM", "mailer");
             $fName = ConfService::getContextConf($ctx, "FROM_NAME", "mailer");
-            $fromResult = array("adress" => $f, "name" => $fName );
+            $fromResult = array("adress" => $f, "name" => $fName);
         }
         return $fromResult;
     }
@@ -517,7 +529,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
                     } else if (UsersService::userExists($recipient)) {
                         $user = UsersService::getUserById($recipient, false);
                         $res = $this->abstractUserToAdress($user);
-                        if($res !== false) $realRecipients[] = $res;
+                        if ($res !== false) $realRecipients[] = $res;
                     }
                 }
             }
@@ -538,7 +550,7 @@ class AjxpMailer extends Plugin implements SqlTableProvider
             return false;
         }
         $displayName = $user->getPersonalRole()->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
-        if(empty($displayName)) $displayName = $user->getId();
+        if (empty($displayName)) $displayName = $user->getId();
         return array("name" => $displayName, "adress" => $userEmail);
     }
 
@@ -556,7 +568,8 @@ class AjxpMailer extends Plugin implements SqlTableProvider
      * @param $html
      * @return string
      */
-    public static function simpleHtml2Text($html){
+    public static function simpleHtml2Text($html)
+    {
 
         $html = preg_replace('/<br\>/', "\n", $html);
         $html = preg_replace('/<br>/', "\n", $html);
@@ -573,9 +586,9 @@ class AjxpMailer extends Plugin implements SqlTableProvider
     public function installSQLTables($param)
     {
         $base = basename($this->getBaseDir());
-        if($base == "core.mailer"){
+        if ($base == "core.mailer") {
             $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-            return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+            return Utils::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
         }
         return true;
     }

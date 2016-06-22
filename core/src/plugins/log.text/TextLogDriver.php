@@ -19,20 +19,23 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Log\Implementation;
+
+use Exception;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Standard logger. Writes logs into text files
  * @package AjaXplorer_Plugins
  * @subpackage Log
  */
-class textLogDriver extends AbstractLogDriver
+class TextLogDriver extends AbstractLogDriver
 {
     /**
      * @var Integer Default permissions, in chmod format.
@@ -65,13 +68,14 @@ class textLogDriver extends AbstractLogDriver
      */
     public function __destruct()
     {
-        if($this->fileHandle !== false) $this->close();
+        if ($this->fileHandle !== false) $this->close();
     }
 
     /**
      * If the plugin is cloned, make sure to renew the $fileHandle
      */
-    public function __clone() {
+    public function __clone()
+    {
         $this->close();
         $this->open();
     }
@@ -93,7 +97,7 @@ class textLogDriver extends AbstractLogDriver
      */
     public function open()
     {
-        if ($this->storageDir!="") {
+        if ($this->storageDir != "") {
             $create = false;
             if (!file_exists($this->storageDir . $this->logFileName)) {
                 // file creation
@@ -101,17 +105,17 @@ class textLogDriver extends AbstractLogDriver
             }
             $this->fileHandle = @fopen($this->storageDir . $this->logFileName, "at+");
             if ($this->fileHandle === false) {
-                error_log("Cannot open log file ".$this->storageDir . $this->logFileName);
+                error_log("Cannot open log file " . $this->storageDir . $this->logFileName);
             }
             if ($this->fileHandle !== false && count($this->stack)) {
                 $this->stackFlush();
             }
             if ($create && $this->fileHandle !== false) {
-                $mainLink = $this->storageDir."ajxp_access.log";
+                $mainLink = $this->storageDir . "ajxp_access.log";
                 if (file_exists($mainLink)) {
                     @unlink($mainLink);
                 }
-                @symlink($this->storageDir.$this->logFileName, $mainLink);
+                @symlink($this->storageDir . $this->logFileName, $mainLink);
             }
         }
     }
@@ -135,12 +139,12 @@ class textLogDriver extends AbstractLogDriver
 
         $this->storageDir = isset($this->options['LOG_PATH']) ? $this->options['LOG_PATH'] : "";
         $this->storageDir = VarsFilter::filter($this->storageDir, $ctx);
-        $this->storageDir = (rtrim($this->storageDir))."/";
+        $this->storageDir = (rtrim($this->storageDir)) . "/";
         $this->logFileName = isset($this->options['LOG_FILE_NAME']) ? $this->options['LOG_FILE_NAME'] : 'log_' . date('m-d-y') . '.txt';
         $this->USER_GROUP_RIGHTS = isset($this->options['LOG_CHMOD']) ? $this->options['LOG_CHMOD'] : 0770;
 
         if (preg_match("/(.*)date\('(.*)'\)(.*)/i", $this->logFileName, $matches)) {
-            $this->logFileName = $matches[1].date($matches[2]).$matches[3];
+            $this->logFileName = $matches[1] . date($matches[2]) . $matches[3];
         }
 
         $this->initStorage();
@@ -164,12 +168,12 @@ class textLogDriver extends AbstractLogDriver
      */
     public function write2($level, $ip, $user, $repositoryId, $source, $prefix, $message, $nodePathes = array())
     {
-        if(Utils::detectXSS($message)) $message = "XSS Detected in message!";
+        if (Utils::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
-        $textMessage .= "$ip\t".strtoupper((string) $level)."\t$user\t$source\t$prefix\t$message\n";
+        $textMessage .= "$ip\t" . strtoupper((string)$level) . "\t$user\t$source\t$prefix\t$message\n";
 
         if ($this->fileHandle !== false) {
-            if(count($this->stack)) $this->stackFlush();
+            if (count($this->stack)) $this->stackFlush();
             if (fwrite($this->fileHandle, $textMessage) === false) {
                 throw new Exception("There was an error writing to log file ($this->logFileName)");
             }
@@ -198,7 +202,7 @@ class textLogDriver extends AbstractLogDriver
      */
     public function close()
     {
-        if(is_resource($this->fileHandle)){
+        if (is_resource($this->fileHandle)) {
             fclose($this->fileHandle);
             $this->fileHandle = FALSE;
         }
@@ -214,28 +218,28 @@ class textLogDriver extends AbstractLogDriver
      * @param Integer $month The month to list.
      * @return null
      */
-    public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true)
+    public function xmlListLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs", $print = true)
     {
-        if(!is_dir($this->storageDir)) return "";
+        if (!is_dir($this->storageDir)) return "";
         $logs = array();
         $years = array();
         $months = array();
-        if (($handle = opendir($this->storageDir))!==false) {
+        if (($handle = opendir($this->storageDir)) !== false) {
             while ($file = readdir($handle)) {
-                if($file == "index.html" || $file == "ajxp_access.log") continue;
+                if ($file == "index.html" || $file == "ajxp_access.log") continue;
                 $split = explode(".", $file);
-                if(!count($split) || $split[0] == "") continue;
+                if (!count($split) || $split[0] == "") continue;
                 $split2 = explode("_", $split[0]);
                 $date = $split2[1];
                 $dSplit = explode("-", $date);
-                $time = mktime(0,0,1,intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
+                $time = mktime(0, 0, 1, intval($dSplit[0]), intval($dSplit[1]), intval($dSplit[2]));
                 $display = date("l d", $time);
                 $fullYear = date("Y", $time);
                 $fullMonth = date("F", $time);
                 $logY = $fullYear;
                 $logM = $fullMonth;
-                if($year != null && $fullYear != $year) continue;
-                if($month != null && $fullMonth != $month) continue;
+                if ($year != null && $fullYear != $year) continue;
+                if ($month != null && $fullMonth != $month) continue;
                 $logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth/$date\"/>";
                 $years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" filename=\"$rootPath/$fullYear\"/>";
                 $months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth\"/>";
@@ -250,7 +254,7 @@ class textLogDriver extends AbstractLogDriver
             }
         }
         krsort($result, SORT_STRING);
-        if($print) foreach($result as $log) print($log);
+        if ($print) foreach ($result as $log) print($log);
         return $result;
     }
 
@@ -263,35 +267,35 @@ class textLogDriver extends AbstractLogDriver
      */
     public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
     {
-        $fName = $this->storageDir."log_".$date.".txt";
+        $fName = $this->storageDir . "log_" . $date . ".txt";
 
-        if(!is_file($fName) || !is_readable($fName)) return;
+        if (!is_file($fName) || !is_readable($fName)) return;
 
         $lines = file($fName);
         foreach ($lines as $line) {
             $line = Utils::xmlEntities($line);
-            $matches = explode("\t",$line,7);
-            if (count($matches) == 6){
+            $matches = explode("\t", $line, 7);
+            if (count($matches) == 6) {
                 $matches[6] = $matches[5];
                 $matches[5] = $matches[4];
                 $matches[4] = $matches[3];
                 $matches[3] = "";
             }
             if (count($matches) == 7) {
-                $fileName = $parentDir."/".$matches[0];
+                $fileName = $parentDir . "/" . $matches[0];
                 foreach ($matches as $key => $match) {
                     $match = Utils::xmlEntities($match);
                     $match = str_replace("\"", "'", $match);
                     $matches[$key] = $match;
                 }
-                if(count($matches) < 3) continue;
+                if (count($matches) < 3) continue;
                 // rebuild timestamp
                 $date = $matches[0];
-                list($m,$d,$Y,$h,$i,$s) = sscanf($date, "%i-%i-%i %i:%i:%i");
-                $tStamp = mktime($h,$i,$s,$m,$d,$Y);
+                list($m, $d, $Y, $h, $i, $s) = sscanf($date, "%i-%i-%i %i:%i:%i");
+                $tStamp = mktime($h, $i, $s, $m, $d, $Y);
                 print(TextEncoder::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" source=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
             }
         }
-        return ;
+        return;
     }
 }

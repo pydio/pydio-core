@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/gui.mobile/class.MobileGuiPlugin.php" classname="MobileGuiPlugin"/>
+    <class_definition filename="plugins/gui.mobile/MobileGuiPlugin.php" classname="Pydio\Gui\MobileGuiPlugin"/>
     <client_settings>
         <resources>
             <i18n namespace="mobile_gui" path="plugins/gui.mobile/i18n"/>

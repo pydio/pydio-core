@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Gui\Ajax;
+namespace Pydio\Gui;
 
 use DOMXPath;
 use Psr\Http\Message\ServerRequestInterface;
@@ -41,10 +41,11 @@ use Zend\Diactoros\Response\JsonResponse;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * Class AJXP_ClientDriver
- * @package Pydio\Gui\Ajax
+ * Class RichClient
+ * Serves the GUI
+ * @package Pydio\Gui
  */
-class AJXP_ClientDriver extends Plugin
+class RichClient extends Plugin
 {
     private static $loadedBookmarks;
 
@@ -415,4 +416,4 @@ class AJXP_ClientDriver extends Plugin
 
 }
 
-Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\Ajax\\AJXP_ClientDriver", "filterXml"));
+Controller::registerIncludeHook("xml.filter", array("Pydio\\Gui\\RichClient", "filterXml"));
