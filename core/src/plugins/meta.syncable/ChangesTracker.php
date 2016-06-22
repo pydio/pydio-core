@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\Sync;
+namespace Pydio\Access\Meta\Sync;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
@@ -32,7 +32,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AJXP_Logger;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\TaskService;
 use \dibi as dibi;

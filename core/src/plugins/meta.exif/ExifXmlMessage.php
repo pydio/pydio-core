@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Meta\Exif;
+namespace Pydio\Access\Meta\Exif;
 
 use Pydio\Core\Utils\Utils;
 
@@ -27,7 +27,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Class ExifXmlMessage
- * @package Pydio\Meta\Exif
+ * @package Pydio\Access\Meta\Exif
  */
 class ExifXmlMessage implements \Pydio\Core\Http\Response\XMLSerializableResponseChunk, \Pydio\Core\Http\Response\JSONSerializableResponseChunk
 {

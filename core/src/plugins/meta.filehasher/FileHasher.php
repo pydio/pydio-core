@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\Hash;
+namespace Pydio\Access\Meta\Hash;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
@@ -31,14 +31,14 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Meta\Core\AbstractMetaSource;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Generates and caches and md5 hash of each file
- * @package Pydio\Meta\Hash
+ * @package Pydio\Access\Meta\Hash
  */
 class FileHasher extends AbstractMetaSource
 {

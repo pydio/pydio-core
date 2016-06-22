@@ -18,10 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Metastore\Core;
+namespace Pydio\Access\Metastore\Core;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
@@ -35,8 +34,7 @@ define('AJXP_METADATA_SCOPE_REPOSITORY', 2);
 /**
  * Metadata interface, must be implemented by Metastore plugins.
  *
- * @package AjaXplorer_Plugins
- * @subpackage Core
+ * @package Pydio\Access\Metastore\Core;
  */
 interface IMetaStoreProvider
 {

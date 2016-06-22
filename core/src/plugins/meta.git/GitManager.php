@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\Version;
+namespace Pydio\Access\Meta\Version;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -27,13 +27,13 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Manage versioning using Git
- * @package Pydio\Meta\Version
+ * @package Pydio\Access\Meta\Version
  */
 class GitManager extends AbstractMetaSource
 {

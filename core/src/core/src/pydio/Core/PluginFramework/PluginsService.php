@@ -40,7 +40,7 @@ use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\AJXP_Logger;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

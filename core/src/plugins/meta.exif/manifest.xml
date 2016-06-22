@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.exif" label="CONF_MESSAGE[Exif Metadata]" description="CONF_MESSAGE[Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/meta.exif/ExifMetaManager.php" classname="Pydio\Meta\Exif\ExifMetaManager"/>
+	<class_definition filename="plugins/meta.exif/ExifMetaManager.php" classname="Pydio\Access\Meta\Exif\ExifMetaManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
 			<i18n namespace="meta.exif" path="plugins/meta.exif/i18n" />

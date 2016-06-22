@@ -6,7 +6,7 @@
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
 
-    <class_definition classname="Pydio\Meta\Monitor\FSMonitoringManager"
+    <class_definition classname="Pydio\Access\Meta\Monitor\FSMonitoringManager"
                       filename="plugins/meta.monitor_fs/FSMonitoringManager.php"/>
     <client_settings>
         <resources>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.quota" label="CONF_MESSAGE[User quota]" description="CONF_MESSAGE[Maintain the size of a given directory for each user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/meta.quota/QuotaComputer.php" classname="Pydio\Meta\Quota\QuotaComputer"/>
+    <class_definition filename="plugins/meta.quota/QuotaComputer.php" classname="Pydio\Access\Meta\Quota\QuotaComputer"/>
     <server_settings>
         <param description="CONF_MESSAGE[Authorized quota. Use php.ini like values (20M, 2G), etc.]" label="CONF_MESSAGE[User Quota]" name="DEFAULT_QUOTA" type="string" inherit="true"/>
         <param description="CONF_MESSAGE[Store computed quota value in the user preferences, to avoid triggering computation each time it is requested. This may introduce some lag if the repository is shared by many users.]" label="CONF_MESSAGE[Cache value]" name="CACHE_QUOTA" type="boolean" default="false"/>

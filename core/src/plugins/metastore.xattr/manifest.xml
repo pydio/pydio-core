@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metastore id="metastore.xattr" enabled="false" label="CONF_MESSAGE[Extended Attributes]" description="CONF_MESSAGE[Stores metadata inside filesystem Extended Attributes.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/metastore.xattr/XAttrMetaStore.php" classname="Pydio\Metastore\Implementation\XAttrMetaStore"/>
+	<class_definition filename="plugins/metastore.xattr/XAttrMetaStore.php" classname="Pydio\Access\Metastore\Implementation\XAttrMetaStore"/>
 	<client_settings>
         <resources>
             <i18n namespace="xAttrMetaStore" path="plugins/metastore.xattr/i18n" />

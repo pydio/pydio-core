@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\UserGenerated;
+namespace Pydio\Access\Meta\UserGenerated;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
@@ -28,8 +28,8 @@ use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Meta\Core\AbstractMetaSource;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 use Pydio\Notification\Core\IFeedStore;
 
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");

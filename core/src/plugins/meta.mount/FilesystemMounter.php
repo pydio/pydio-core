@@ -18,14 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\Mount;
+namespace Pydio\Access\Meta\Mount;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\AJXP_Safe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

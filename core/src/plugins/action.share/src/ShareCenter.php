@@ -22,7 +22,7 @@ namespace Pydio\Share;
 
 use DOMNode;
 use DOMXPath;
-use MetaWatchRegister;
+
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
@@ -31,6 +31,7 @@ use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
@@ -91,7 +92,7 @@ class ShareCenter extends Plugin
     private $publicAccessManager;
 
     /**
-     * @var \MetaWatchRegister
+     * @var WatchRegister
      */
     private $watcher = false;
 
@@ -431,7 +432,7 @@ class ShareCenter extends Plugin
                 $this->watcher->setWatchOnFolder(
                     $rootNode,
                     $userId,
-                    MetaWatchRegister::$META_WATCH_USERS_CHANGE,
+                    WatchRegister::$META_WATCH_USERS_CHANGE,
                     array($parentUserId)
                 );
             } else {
@@ -448,7 +449,7 @@ class ShareCenter extends Plugin
                 $this->watcher->setWatchOnFolder(
                     $rootNode,
                     $userId,
-                    MetaWatchRegister::$META_WATCH_BOTH);
+                    WatchRegister::$META_WATCH_BOTH);
 
             } else {
 
@@ -737,7 +738,7 @@ class ShareCenter extends Plugin
                             $this->watcher->setWatchOnFolder(
                                 $selectedNode,
                                 $ctxUser->getId(),
-                                MetaWatchRegister::$META_WATCH_USERS_READ,
+                                WatchRegister::$META_WATCH_USERS_READ,
                                 array($elementId)
                             );
                         } else {
@@ -753,7 +754,7 @@ class ShareCenter extends Plugin
                             $this->watcher->setWatchOnFolder(
                                 $selectedNode,
                                 $ctxUser->getId(),
-                                MetaWatchRegister::$META_WATCH_BOTH
+                                WatchRegister::$META_WATCH_BOTH
                             );
                         } else {
                             $this->watcher->removeWatchFromFolder(
@@ -2025,7 +2026,7 @@ class ShareCenter extends Plugin
                 $elementWatch = $this->watcher->hasWatchOnNode(
                     $watchNode,
                     $ctx->hasUser()?$ctx->getUser()->getId():"shared",
-                    MetaWatchRegister::$META_WATCH_NAMESPACE
+                    WatchRegister::$META_WATCH_NAMESPACE
                 );
             }
             if($node != null){

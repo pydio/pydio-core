@@ -23,6 +23,7 @@ namespace Pydio\Share\Model;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Model\ContextInterface;
 
 
@@ -115,7 +116,7 @@ class CompositeShare
     }
 
     /**
-     * @param \MetaWatchRegister|false $watcher
+     * @param WatchRegister|false $watcher
      * @param ShareRightsManager $rightsManager
      * @param PublicAccessManager $publicAccessManager
      * @param array $messages
@@ -129,7 +130,7 @@ class CompositeShare
             $elementWatch = $watcher->hasWatchOnNode(
                 $repoRootNode,
                 $ctx->getUser()->getId(),
-                \MetaWatchRegister::$META_WATCH_NAMESPACE
+                WatchRegister::$META_WATCH_NAMESPACE
             );
         }
         $sharedEntries = $rightsManager->computeSharedRepositoryAccessRights($this->getRepositoryId(), true, $repoRootNode);

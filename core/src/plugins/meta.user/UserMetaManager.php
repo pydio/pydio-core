@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\UserGenerated;
+namespace Pydio\Access\Meta\UserGenerated;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -30,8 +30,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Meta\Core\AbstractMetaSource;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

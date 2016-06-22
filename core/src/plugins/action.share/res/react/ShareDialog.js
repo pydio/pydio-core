@@ -685,8 +685,9 @@
 
         buildLabel: function(){
             var link = this.props.linkData;
-            var host = link.HOST || link.invitation.HOST;
-            var user = link.USER || link.invitation.USER;
+            var host = link.HOST || (link.invitation ? link.invitation.HOST : null);
+            var user = link.USER || (link.invitation ? link.invitation.USER : null);
+            if(!host || !user) return "Error";
             return user + " @ " + host ;
         },
 

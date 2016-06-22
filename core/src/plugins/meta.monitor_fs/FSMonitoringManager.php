@@ -18,14 +18,14 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Meta\Monitor;
+namespace Pydio\Access\Meta\Monitor;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\CliRunner;
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

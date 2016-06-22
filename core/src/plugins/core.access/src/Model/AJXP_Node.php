@@ -35,7 +35,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 
 /**

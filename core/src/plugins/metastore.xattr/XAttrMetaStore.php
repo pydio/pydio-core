@@ -18,19 +18,19 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Metastore\Implementation;
+namespace Pydio\Access\Metastore\Implementation;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 
-use Pydio\Meta\Core\AbstractMetaSource;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
 /**
  * Class XAttrMetaStore
- * @package Pydio\Metastore\Implementation
+ * @package Pydio\Access\Metastore\Implementation
  */
 class XAttrMetaStore extends AbstractMetaSource implements IMetaStoreProvider
 {

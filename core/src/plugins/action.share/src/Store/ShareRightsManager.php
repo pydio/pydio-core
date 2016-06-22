@@ -20,10 +20,10 @@
  */
 namespace Pydio\Share\Store;
 
-use MetaWatchRegister;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 
@@ -54,7 +54,7 @@ define('PARAM_USER_ENTRY_TYPE', "entry_type_");
 class ShareRightsManager
 {
     /**
-     * @var MetaWatchRegister|bool
+     * @var WatchRegister|bool
      */
     var $watcher;
     /**
@@ -75,7 +75,7 @@ class ShareRightsManager
      * @param ContextInterface $context
      * @param array $options
      * @param ShareStore $store
-     * @param MetaWatchRegister|bool $watcher
+     * @param WatchRegister|bool $watcher
      */
     public function __construct(ContextInterface $context, $options, $store, $watcher = false)
     {
@@ -340,7 +340,7 @@ class ShareRightsManager
                     $WATCH = $this->watcher->hasWatchOnNode(
                         $watcherNode,
                         $userId,
-                        MetaWatchRegister::$META_WATCH_USERS_NAMESPACE
+                        WatchRegister::$META_WATCH_USERS_NAMESPACE
                     );
                 }
                 $ID = $userId;

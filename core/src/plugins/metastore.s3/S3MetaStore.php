@@ -18,20 +18,18 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Metastore\Implementation;
+namespace Pydio\Access\Metastore\Implementation;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Meta\Core\AbstractMetaSource;
-use Pydio\Metastore\Core\IMetaStoreProvider;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
  * Simple metadata implementation, coupled with an S3 repository, stores
  * the metadata in the s3 bucket
- * @package AjaXplorer_Plugins
- * @subpackage Metastore
  */
 class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
 {

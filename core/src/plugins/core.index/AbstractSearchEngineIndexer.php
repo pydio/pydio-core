@@ -28,7 +28,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\StatHelper;
 use Pydio\Core\Utils\Utils;
 use Pydio\Core\Utils\VarsFilter;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 /**
  * Class AbstractSearchEngineIndexer

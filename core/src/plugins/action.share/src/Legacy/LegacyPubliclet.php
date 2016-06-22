@@ -21,12 +21,12 @@
 
 namespace Pydio\Share\Legacy;
 
-use MetaWatchRegister;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
@@ -85,7 +85,7 @@ class LegacyPubliclet
      * @param $shareMeta
      * @param ShareStore $shareStore
      * @param PublicAccessManager $publicAccessManager
-     * @param MetaWatchRegister|null $watcher
+     * @param WatchRegister|null $watcher
      * @param $node
      * @return array|false
      * @throws \Exception
@@ -115,7 +115,7 @@ class LegacyPubliclet
             $elementWatch = $watcher->hasWatchOnNode(
                 $node,
                 $ctx->getUser()->getId(),
-                MetaWatchRegister::$META_WATCH_USERS_NAMESPACE,
+                WatchRegister::$META_WATCH_USERS_NAMESPACE,
                 $result
             );
             if ($elementWatch && !in_array($shareId, $result)) {

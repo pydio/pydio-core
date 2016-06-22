@@ -19,7 +19,7 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace Pydio\Meta\Exif;
+namespace Pydio\Access\Meta\Exif;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
@@ -30,7 +30,7 @@ use Pydio\Core\Utils\Utils;
 
 
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Meta\Core\AbstractMetaSource;
+use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

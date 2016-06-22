@@ -44,11 +44,11 @@
 // D.d (Dd) = Degrees, Decimal Degrees (ex. 45.3772o)                  //
 // DMS (DMS) = Degrees, Minutes, Seconds (ex. 45o22'38")               //
 //*********************************************************************//
-namespace Pydio\Meta\Exif;
+namespace Pydio\Access\Meta\Exif;
 
 /**
  * Class GeoConversion
- * @package Pydio\Meta\Exif
+ * @package Pydio\Access\Meta\Exif
  */
 Class GeoConversion{
 
