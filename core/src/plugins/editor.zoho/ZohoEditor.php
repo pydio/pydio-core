@@ -1,7 +1,6 @@
 <?php
-
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -22,9 +21,12 @@
  * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
  * Improved by cdujeu / Https Support now necessary for zoho API.
  */
+namespace Pydio\Plugins\Editor;
+
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -53,7 +55,7 @@ class ZohoEditor extends Plugin
 
     public function performChecks() {
         if (!extension_loaded("openssl")) {
-            throw new Exception("Zoho plugin requires PHP 'openssl' extension, as posting the document to the Zoho server requires the Https protocol.");
+            throw new \Exception("Zoho plugin requires PHP 'openssl' extension, as posting the document to the Zoho server requires the Https protocol.");
         }
     }
 
@@ -89,6 +91,14 @@ class ZohoEditor extends Plugin
         }
     }
 
+    /**
+     * Load the configs passed as parameter. This method will
+     * + Parse the config definitions and load the default values
+     * + Merge these values with the $configData parameter
+     * + Publish their value in the manifest if the global_param is "exposed" to the client.
+     * @param array $configData
+     * @return void
+     */
     public function loadConfigs($configData) {
 
         parent::loadConfigs($configData);
@@ -102,6 +112,11 @@ class ZohoEditor extends Plugin
         }
     }
 
+    /**
+     * @param $id
+     * @return bool|string
+     * @throws \Exception
+     */
     public function signID($id) {
 
         $keyFile = $this->getPluginWorkDir(true)."/agent.pem";
@@ -117,6 +132,11 @@ class ZohoEditor extends Plugin
     }
 
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         /** @var ContextInterface $ctx */
@@ -149,7 +169,7 @@ class ZohoEditor extends Plugin
             }
             $nodeUrl = $destStreamURL.$file;
             if(!is_readable($nodeUrl)){
-                throw new Exception("Cannot find file!");
+                throw new FileNotFoundException($file);
             }
 
             $target = base64_decode($httpVars["parent_url"]);
@@ -211,7 +231,7 @@ class ZohoEditor extends Plugin
             }
 
             if (!isset($result["RESULT"]) || $result["RESULT"] !== "TRUE" || !isset($result["URL"])) {
-                throw new Exception("Could not open file");
+                throw new FileNotFoundException("Could not open file");
             }
 
             $response = $response

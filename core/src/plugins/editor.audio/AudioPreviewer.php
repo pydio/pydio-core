@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -19,10 +19,13 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Plugins\Editor;
+
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Services\AuthService;
+use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Utils;
@@ -32,9 +35,9 @@ use Pydio\Core\PluginFramework\Plugin;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
+ * Class AudioPreviewer
  * Streams MP3 files to a client
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Plugins\Editor
  */
 class AudioPreviewer extends Plugin
 {
@@ -43,7 +46,7 @@ class AudioPreviewer extends Plugin
      * Action Controller
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
-     * @throws Exception
+     * @throws FileNotFoundException
      */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
@@ -67,7 +70,7 @@ class AudioPreviewer extends Plugin
             if(!$exist && strpos($httpVars["file"], "base64encoded:") === false){
                 $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
                 if(!file_exists($destStreamURL.$file)){
-                    throw new Exception("Cannot find file!");
+                    throw new FileNotFoundException($file);
                 }else{
                     $user = $node->getUserId();
                     $node = new AJXP_Node($destStreamURL.$file);
@@ -75,7 +78,7 @@ class AudioPreviewer extends Plugin
                 }
             }
             if(!is_readable($node->getUrl())){
-                throw new Exception("Cannot find file!");
+                throw new FileNotFoundException($node->getPath());
             }
             
 
@@ -112,7 +115,7 @@ class AudioPreviewer extends Plugin
             // Transform the XML into XSPF
             $xmlString = $responseInterface->getBody()->getContents();
             $responseInterface->getBody()->rewind();
-            $xmlDoc = new DOMDocument();
+            $xmlDoc = new \DOMDocument();
             $xmlDoc->loadXML($xmlString);
             $xElement = $xmlDoc->documentElement;
             $xmlBuff = "";
@@ -120,13 +123,14 @@ class AudioPreviewer extends Plugin
             $xmlBuff.='<?xml version="1.0" encoding="UTF-8"?>';
             $xmlBuff.='<playlist version="1" xmlns="http://xspf.org/ns/0/">';
             $xmlBuff.="<trackList>";
+            /** @var \DOMElement $child */
             foreach ($xElement->childNodes as $child) {
                 $isFile = ($child->getAttribute("is_file") == "true");
                 $label = $child->getAttribute("text");
                 $ar = explode(".", $label);
                 $ext = strtolower(end($ar));
                 if(!$isFile || $ext != "mp3") continue;
-                $xmlBuff.="<track><location>".AJXP_SERVER_ACCESS."?secure_token=".AuthService::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>";
+                $xmlBuff.="<track><location>".AJXP_SERVER_ACCESS."?secure_token=".SecureTokenMiddleware::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>";
             }
             $xmlBuff.="</trackList>";
             $xmlBuff.= "</playlist>";

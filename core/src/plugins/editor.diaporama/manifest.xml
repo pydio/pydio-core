@@ -8,7 +8,7 @@
 		<global_param name="THUMBNAIL_QUALITY" type="integer" label="CONF_MESSAGE[Quality]" description="CONF_MESSAGE[Thumbs quality]" default="2"/>
     <global_param name="EXIF_ROTATION" type="boolean" label="CONF_MESSAGE[Exif Rotation]" description="CONF_MESSAGE[Rotate image using exif rotation]" default="true"/>
 	</server_settings>
-	<class_definition filename="plugins/editor.diaporama/class.ImagePreviewer.php" classname="ImagePreviewer"/>
+	<class_definition filename="plugins/editor.diaporama/ImagePreviewer.php" classname="Pydio\Plugins\Editor\ImagePreviewer"/>
     <client_settings>
         <resources>
             <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>

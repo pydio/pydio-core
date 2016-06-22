@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -31,14 +32,21 @@ use Pydio\Core\PluginFramework\Plugin;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
+ * Class ImagePreviewer
  * Generate an image thumbnail and send the thumb/full version to the browser
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Plugins\Editor
  */
 class ImagePreviewer extends Plugin
 {
     private $currentDimension;
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $filesVars
+     * @param \Pydio\Core\Model\ContextInterface $contextInterface
+     * @throws \Exception
+     */
     public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         if (!isSet($this->pluginConf)) {
@@ -130,7 +138,7 @@ class ImagePreviewer extends Plugin
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
+        $pThumb = new \PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
 
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
@@ -191,7 +199,7 @@ class ImagePreviewer extends Plugin
 
                 if($this->getContextualOption($context, "EXIF_ROTATION")){
                     require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-                    $pThumb = new PThumb($this->getContextualOption($context, "THUMBNAIL_QUALITY"),$this->getContextualOption($context, "EXIF_ROTATION"));
+                    $pThumb = new \PThumb($this->getContextualOption($context, "THUMBNAIL_QUALITY"),$this->getContextualOption($context, "EXIF_ROTATION"));
                     $orientation = $pThumb->exiforientation($realFile, false);
                     if ($pThumb->rotationsupported($orientation))
                     {
@@ -214,6 +222,10 @@ class ImagePreviewer extends Plugin
         //$this->logDebug("CURRENT NODE IN EXTRACT IMAGE METADATA ", $ajxpNode);
     }
 
+    /**
+     * @param $filename
+     * @return bool
+     */
     protected function handleMime($filename)
     {
         $mimesAtt = explode(",", $this->getXPath()->query("@mimes")->item(0)->nodeValue);

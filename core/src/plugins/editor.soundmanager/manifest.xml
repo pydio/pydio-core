@@ -5,7 +5,7 @@
         label="CONF_MESSAGE[Sound Player]" description="CONF_MESSAGE[Uses HTML5 or Flash to play a sound]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="AudioPreviewer" filename="plugins/editor.audio/class.AudioPreviewer.php"/>
+    <class_definition filename="plugins/editor.audio/AudioPreviewer.php" classname="Pydio\Plugins\Editor\AudioPreviewer"/>
     <client_settings>
         <resources>
             <js className="SMPlayer" file="plugins/editor.soundmanager/class.SMPlayer.js" autoload="true"/>

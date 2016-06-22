@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -38,9 +39,9 @@ use GuzzleHttp\Client;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
+ * Class PixlrEditor
  * Uses Pixlr.com service to edit images online.
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Plugins\Editor
  */
 class PixlrEditor extends Plugin
 {
@@ -51,6 +52,9 @@ class PixlrEditor extends Plugin
     private $client;
 
     // Plugin initialisation
+    /**
+     * @param ContextInterface $context
+     */
     public function init(\Pydio\Core\Model\ContextInterface $context) {
 
         parent::init($context);
@@ -61,6 +65,12 @@ class PixlrEditor extends Plugin
     }
 
     // Main controller function
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
 
         /** @var ContextInterface $ctx */

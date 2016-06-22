@@ -18,8 +18,10 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
@@ -32,11 +34,17 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Streams video to a client
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Plugins\Editor
  */
 class VideoReader extends Plugin
 {
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $filesVars
+     * @param \Pydio\Core\Model\ContextInterface $contextInterface
+     * @throws FileNotFoundException
+     */
     public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         $selection = UserSelection::fromContext($contextInterface, $httpVars);
@@ -44,7 +52,7 @@ class VideoReader extends Plugin
 
         if ($action == "read_video_data") {
             if(!file_exists($node->getUrl()) || !is_readable($node->getUrl())){
-                throw new Exception("Cannot find file!");
+                throw new FileNotFoundException($node->getPath());
             }
             $this->logDebug("Reading video");
             session_write_close();
@@ -87,7 +95,7 @@ class VideoReader extends Plugin
                 header('Accept-Ranges:bytes');
                 header("Content-Length: ". $length);
                 $file = fopen($filename, 'rb');
-                if(!is_resource($file)) throw new Exception("Cannot open file $file!");
+                if(!is_resource($file)) throw new FileNotFoundException($file);
                 fseek($file, 0);
                 $relOffset = $offset;
                 while ($relOffset > 2.0E9) {

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -19,6 +19,8 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
+namespace Pydio\Plugins\Editor;
+
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\UserSelection;
 
@@ -31,12 +33,18 @@ use Pydio\Core\Services\UsersService;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
+ * Class FileMimeSender
  * Extract the mimetype of a file and send it to the browser
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ * @package Pydio\Plugins\Editor
  */
 class FileMimeSender extends Plugin
 {
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         if($requestInterface->getAttribute("action") !== "open_file"){
@@ -71,7 +79,7 @@ class FileMimeSender extends Plugin
 
         //Get mimetype with fileinfo PECL extension
         if (class_exists("finfo")) {
-            $finfo = new finfo(FILEINFO_MIME);
+            $finfo = new \finfo(FILEINFO_MIME);
             $fileMime = $finfo->buffer(fread($fp, 2000));
         }
         //Get mimetype with (deprecated) mime_content_type

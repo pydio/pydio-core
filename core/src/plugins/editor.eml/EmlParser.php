@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
+use EmlXmlMessage;
 use Pydio\Access\Core\AJXP_MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -47,14 +49,14 @@ class EmlParser extends Plugin
     public function performChecks()
     {
         if (!Utils::searchIncludePath("Mail/mimeDecode.php")) {
-            throw new Exception("Cannot find Mail/mimeDecode PEAR library");
+            throw new \Exception("Cannot find Mail/mimeDecode PEAR library");
         }
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
-     * @throws Exception
+     * @throws \Exception
      * @throws \Pydio\Core\Exception\PydioException
      */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
@@ -87,7 +89,7 @@ class EmlParser extends Plugin
                 $xml = $decoder->getXML($decoder->decode($params));
                 $doc = new \Pydio\Core\Http\Message\XMLDocMessage($xml);
                 if (function_exists("imap_mime_header_decode")) {
-                    $xPath = new DOMXPath($doc);
+                    $xPath = new \DOMXPath($doc);
                     $headers = $xPath->query("//headername");
                     $charset = "UTF-8";
                     foreach ($headers as $headerNode) {
@@ -124,7 +126,7 @@ class EmlParser extends Plugin
                     $content = file_get_contents($file);
                 }
 
-                $decoder = new Mail_mimeDecode($content);
+                $decoder = new \Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $html = $this->_findPartByCType($structure, "text", "html");
                 $text = $this->_findPartByCType($structure, "text", "plain");
@@ -154,7 +156,7 @@ class EmlParser extends Plugin
                 } else {
                     $content = file_get_contents($file);
                 }
-                $decoder = new Mail_mimeDecode($content);
+                $decoder = new \Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
 
@@ -185,7 +187,7 @@ class EmlParser extends Plugin
                     $content = file_get_contents($file);
                 }
 
-                $decoder = new Mail_mimeDecode($content);
+                $decoder = new \Mail_mimeDecode($content);
                 $structure = $decoder->decode($params);
                 $part = $this->_findAttachmentById($structure, $attachId);
                 if ($part !== false) {
@@ -194,7 +196,7 @@ class EmlParser extends Plugin
                         $destRepoId = $httpVars["dest_repository_id"];
                         if (UsersService::usersEnabled()) {
                             $loggedUser = $ctx->getUser();
-                            if(!$loggedUser->canWrite($destRepoId)) throw new Exception($mess[364]);
+                            if(!$loggedUser->canWrite($destRepoId)) throw new \Exception($mess[364]);
                         }
                         $user = $ctx->getUser()->getId();
                         $destStreamURL = "pydio://$user@$destRepoId";
@@ -266,6 +268,10 @@ class EmlParser extends Plugin
         $ajxpNode->metadata = $metadata;
     }
 
+    /**
+     * @param $masterFile
+     * @param $targetFile
+     */
     public function mimeExtractorCallback($masterFile, $targetFile)
     {
         $metadata = array();
@@ -276,7 +282,7 @@ class EmlParser extends Plugin
             'decode_headers' => 'UTF-8'
         );
         $content = file_get_contents($masterFile);
-        $decoder = new Mail_mimeDecode($content);
+        $decoder = new \Mail_mimeDecode($content);
         $structure = $decoder->decode($params);
         $allowedHeaders = array("to", "from", "subject", "message-id", "mime-version", "date", "return-path");
         foreach ($structure->headers as $hKey => $hValue) {
@@ -311,6 +317,11 @@ class EmlParser extends Plugin
         file_put_contents($targetFile, serialize($metadata));
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @return \Psr\Http\Message\ResponseInterface|\Zend\Diactoros\Response|static
+     */
     public function lsPostProcess(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         if (!EmlParser::$currentListingOnlyEmails) {
@@ -330,13 +341,14 @@ class EmlParser extends Plugin
 
         $responseData = $responseInterface->getBody()->getContents();
 
-        $dom = new DOMDocument("1.0", "UTF-8");
+        $dom = new \DOMDocument("1.0", "UTF-8");
         $dom->loadXML($responseData);
         $mobileAgent = Utils::userAgentIsIOS() || Utils::userAgentIsNativePydioApp();
         $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
             // Replace all text attributes by the "from" value
             $index = 1;
+            /** @var \DOMElement $child */
             foreach ($dom->documentElement->childNodes as $child) {
                 if ($mobileAgent) {
                     $from = $child->getAttribute("eml_from");
@@ -356,7 +368,7 @@ class EmlParser extends Plugin
         }
 
         // Add the columns template definition
-        $insert = new DOMDocument("1.0", "UTF-8");
+        $insert = new \DOMDocument("1.0", "UTF-8");
         $config = "<client_configs><component_config className=\"FilesList\" local=\"true\">$config</component_config></client_configs>";
         $insert->loadXML($config);
         $imported = $dom->importNode($insert->documentElement, true);
@@ -373,7 +385,7 @@ class EmlParser extends Plugin
      * Enter description here ...
      * @param string $file url
      * @param boolean $cacheRemoteContent
-     * @return Mail_mimeDecode
+     * @return \Mail_mimeDecode
      */
     public function getStructureDecoder($file, $cacheRemoteContent = false)
     {
@@ -384,7 +396,7 @@ class EmlParser extends Plugin
         } else {
             $content = file_get_contents ( $file );
         }
-        $decoder = new Mail_mimeDecode ( $content );
+        $decoder = new \Mail_mimeDecode ( $content );
 
         header ( 'Content-Type: text/xml; charset=UTF-8' );
         header ( 'Cache-Control: no-cache' );
@@ -392,7 +404,13 @@ class EmlParser extends Plugin
     }
 
     // $cacheRemoteContent = false
-    public function listAttachments($file, $cacheRemoteContent, &$attachments,  $structure = null)
+    /**
+     * @param $file
+     * @param $cacheRemoteContent
+     * @param $attachments
+     * @param null $structure
+     */
+    public function listAttachments($file, $cacheRemoteContent, &$attachments, $structure = null)
     {
         if ($structure == null) {
             $decoder = $this->getStructureDecoder($file, $cacheRemoteContent);
@@ -416,6 +434,13 @@ class EmlParser extends Plugin
         }
     }
 
+    /**
+     * @param $file
+     * @param $attachmentId
+     * @param bool $cacheRemoteContent
+     * @param array $metadata
+     * @return bool
+     */
     public function getAttachmentBody($file, $attachmentId, $cacheRemoteContent = false, &$metadata = array())
     {
         $decoder = $this->getStructureDecoder($file, $cacheRemoteContent);
@@ -435,6 +460,12 @@ class EmlParser extends Plugin
         return $part->body;
     }
 
+    /**
+     * @param $structure
+     * @param $primary
+     * @param $secondary
+     * @return bool
+     */
     protected function _findPartByCType($structure, $primary, $secondary)
     {
         if ($structure->ctype_primary == $primary && $structure->ctype_secondary == $secondary) {
@@ -450,6 +481,11 @@ class EmlParser extends Plugin
         return false;
     }
 
+    /**
+     * @param $structure
+     * @param $attachId
+     * @return bool
+     */
     protected function _findAttachmentById($structure, $attachId)
     {
         if (is_numeric($attachId)) {
@@ -479,6 +515,10 @@ class EmlParser extends Plugin
         }
     }
 
+    /**
+     * @param $mailPath
+     * @return string
+     */
     public static function computeCacheId($mailPath)
     {
         $header = file_get_contents($mailPath."#header");

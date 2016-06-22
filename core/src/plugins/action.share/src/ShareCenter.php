@@ -1131,7 +1131,7 @@ class ShareCenter extends Plugin
             if($node->getRepository()->hasParent()){
                 $parentRepoId = $node->getRepository()->getParentId();
                 $parentRepository = RepositoryService::getRepositoryById($parentRepoId);
-                if(!empty($parentRepository) && !$parentRepository->isTemplate){
+                if(!empty($parentRepository) && !$parentRepository->isTemplate()){
                     $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                     $newContext = $crtContext->withRepositoryId($parentRepoId);
                     $owner = $node->getRepository()->getOwner();

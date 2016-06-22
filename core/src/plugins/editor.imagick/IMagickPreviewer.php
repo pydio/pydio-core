@@ -18,7 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -32,9 +34,10 @@ use Pydio\Core\PluginFramework\Plugin;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
+ * Class IMagickPreviewer
  * Encapsulates calls to Image Magick to extract JPG previews of PDF, PSD, TIFF, etc.
- * @package AjaXplorer_Plugins
- * @subpackage Editor
+ *
+ * @package Pydio\Plugins\Editor
  */
 class IMagickPreviewer extends Plugin
 {
@@ -45,6 +48,14 @@ class IMagickPreviewer extends Plugin
     protected $imagickExtensions = array("pdf", "svg", "tif", "tiff", "psd", "xcf", "eps", "cr2","ai");
     protected $unoconvExtensios = array("xls", "xlt", "xlsx", "xltx", "ods", "doc", "dot", "docx", "dotx", "odt", "ppt", "pptx", "odp", "rtf");
 
+    /**
+     * Load the configs passed as parameter. This method will
+     * + Parse the config definitions and load the default values
+     * + Merge these values with the $configData parameter
+     * + Publish their value in the manifest if the global_param is "exposed" to the client.
+     * @param array $configsData
+     * @return void
+     */
     public function loadConfigs($configsData)
     {
         parent::loadConfigs($configsData);
@@ -56,6 +67,14 @@ class IMagickPreviewer extends Plugin
         }
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $filesVars
+     * @param ContextInterface $contextInterface
+     * @throws PydioException
+     * @throws FileNotFoundException
+     */
     public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         $convert = $this->getContextualOption($contextInterface, "IMAGE_MAGICK_CONVERT");
@@ -70,7 +89,7 @@ class IMagickPreviewer extends Plugin
             $this->extractAll = false;
             $file = $selection->getUniqueNode()->getUrl();
             if(!file_exists($file) || !is_readable($file)){
-                throw new Exception("Cannot find file");
+                throw new FileNotFoundException($file);
             }
             if(isSet($httpVars["all"])) {
                 $this->logInfo('Preview', 'Preview content of '.$file, array("files" => $file));
@@ -177,6 +196,11 @@ class IMagickPreviewer extends Plugin
         }
     }
 
+    /**
+     * @param $file
+     * @param $prefix
+     * @return array
+     */
     protected function listExtractedJpg($file, $prefix)
     {
         $n = new AJXP_Node($file);
@@ -207,6 +231,12 @@ class IMagickPreviewer extends Plugin
         return $files;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $file
+     * @param $prefix
+     * @return array
+     */
     protected function listPreviewFiles(ContextInterface $ctx, $file, $prefix)
     {
         $files = array();
@@ -248,6 +278,13 @@ class IMagickPreviewer extends Plugin
         return $files;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $masterFile
+     * @param $targetFile
+     * @return bool
+     * @throws PydioException
+     */
     public function generateJpegsCallback(ContextInterface $ctx, $masterFile, $targetFile)
     {
         $unoconv =  $this->getContextualOption($ctx, "UNOCONV");
@@ -372,6 +409,10 @@ class IMagickPreviewer extends Plugin
         return true;
     }
 
+    /**
+     * @param $filename
+     * @return bool
+     */
     protected function handleMime($filename)
     {
         $mimesAtt = explode(",", $this->getXPath()->query("@mimes")->item(0)->nodeValue);
@@ -379,6 +420,10 @@ class IMagickPreviewer extends Plugin
         return in_array($ext, $mimesAtt);
     }
 
+    /**
+     * @param $file
+     * @return int|null
+     */
     protected function countPages($file)
     {
         $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));

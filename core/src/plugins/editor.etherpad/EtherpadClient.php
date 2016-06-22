@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Plugins\Editor;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -31,11 +32,24 @@ use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class EtherpadClient
+ * @package Pydio\Plugins\Editor
+ */
 class EtherpadClient extends Plugin
 {
     public $baseURL = "http://localhost:9001";
     public $apiKey = "";
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @return null
+     * @throws \Exception
+     * @throws \Exception
+     */
     public function switchAction($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $this->baseURL = rtrim($this->getContextualOption($ctx, "ETHERPAD_SERVER"), "/");
@@ -43,12 +57,12 @@ class EtherpadClient extends Plugin
 
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if ($userSelection->isEmpty()){
-            throw new Exception("Empty selection");
+            throw new \Exception("Empty selection");
         }
         $selectedNode = $userSelection->getUniqueNode();
         $selectedNode->loadNodeInfo();
         if(!$selectedNode->isLeaf()){
-            throw new Exception("Cannot handle folders, please select a file!");
+            throw new \Exception("Cannot handle folders, please select a file!");
         }
         $nodeExtension = strtolower(pathinfo($selectedNode->getPath(), PATHINFO_EXTENSION));
 
@@ -67,7 +81,7 @@ class EtherpadClient extends Plugin
         }
 
         require_once("etherpad-client/etherpad-lite-client.php");
-        $client = new EtherpadLiteClient($this->apiKey,$this->baseURL."/api");
+        $client = new \EtherpadLiteClient($this->apiKey,$this->baseURL."/api");
         $loggedUser = $ctx->getUser();
         $userName = $loggedUser->getId();
         $userLabel = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $userName);

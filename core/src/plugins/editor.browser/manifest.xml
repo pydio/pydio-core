@@ -28,8 +28,8 @@
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
-    <class_definition filename="plugins/editor.browser/class.FileMimeSender.php"
-        classname="FileMimeSender" />
+    <class_definition filename="plugins/editor.browser/FileMimeSender.php"
+        classname="Pydio\Plugins\Editor\FileMimeSender" />
     <registry_contributions>
     	<actions>
     		<action name="open_file" skipSecureToken="true">
