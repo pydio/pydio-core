@@ -719,6 +719,4 @@ abstract class AbstractAccessDriver extends Plugin
         }
         return false;
     }
-
-
 }

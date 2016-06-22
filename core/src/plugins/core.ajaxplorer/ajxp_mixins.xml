@@ -2,6 +2,7 @@
 <ajxp_mixins xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:ajxp_registry.xsd">
     <credentials_consumer>
         <server_settings uuidAttr="name">
+            <param group="MIXIN_MESSAGE[User Credentials]" name="USE_AUTH_STREAM" type="hidden" mandatory="true" default="true" />
             <param group="MIXIN_MESSAGE[User Credentials]" name="USER" type="string" label="MIXIN_MESSAGE[User]" description="MIXIN_MESSAGE[User name - Can be overriden on a per-user basis (see users 'Personal Data' tab)]" mandatory="false"/>
             <param group="MIXIN_MESSAGE[User Credentials]" name="PASS" type="password" label="MIXIN_MESSAGE[Password]" description="MIXIN_MESSAGE[User password - Can be overriden on a per-user basis.]" mandatory="false"/>
             <param group="MIXIN_MESSAGE[User Credentials]" name="USE_SESSION_CREDENTIALS" type="boolean" label="MIXIN_MESSAGE[Session credentials]" description="MIXIN_MESSAGE[Try to use the current Pydio user credentials for connecting. Warning, the AJXP_SESSION_SET_CREDENTIALS config must be set to true!]" mandatory="false" default="false"/>
@@ -106,9 +107,10 @@
     </dibidriver_third_provider>
     <oauth_commons>
         <server_settings uuidAttr="name">
+            <param group="MIXIN_MESSAGE[OAuth Commons]" name="USE_OAUTH_STREAM" type="hidden" default="true" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="CLIENT_ID" type="string" label="MIXIN_MESSAGE[Client ID]" description="MIXIN_MESSAGE[Client ID]" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="CLIENT_SECRET" type="string" label="MIXIN_MESSAGE[Client SECRET]" description="MIXIN_MESSAGE[Client SECRET]" mandatory="true"/>
-            <param group="MIXIN_MESSAGE[OAuth Commons]" name="SCOPE" type="string" label="MIXIN_MESSAGE[Scope]" description="MIXIN_MESSAGE[Scope]" mandatory="true"/>
+            <param group="MIXIN_MESSAGE[OAuth Commons]" name="SCOPE" type="string" label="MIXIN_MESSAGE[Scope]" description="MIXIN_MESSAGE[Scope]" default=""/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="AUTH_URL" type="string" label="MIXIN_MESSAGE[Auth URL]" description="MIXIN_MESSAGE[API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app]" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="TOKEN_URL" type="string" label="MIXIN_MESSAGE[Token URL]" description="MIXIN_MESSAGE[API endpoint - Used to refresh or validate the token retrieved in the authentication part]" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="REDIRECT_URL" type="string" label="MIXIN_MESSAGE[Redirect URL]" description="MIXIN_MESSAGE[API setting - Redirect URL for the OAuth Application]" mandatory="true"/>

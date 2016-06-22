@@ -31,7 +31,7 @@ use Sabre\DAV\Exception\NotFound;
  * Client to interact with a WebDAV FS
  *
  */
-class Client extends CoreClient
+class Client
 {
     const PROTOCOL = "pydio.dav";
     const RESOURCES_PATH = "Resources";
@@ -56,9 +56,9 @@ class Client extends CoreClient
         $description = $jsonLoader->load($locator->locate(self::RESOURCES_FILE));
         $description = new GuzzleDescription($description);
 
-        parent::__construct($httpClient, $description);
+        //parent::__construct($httpClient, $description);
 
-        $this->getEmitter()->attach(new PathListener());
+        //$this->getEmitter()->attach(new PathListener());
 
         $this->registerStreamWrapper();
     }
@@ -70,7 +70,7 @@ class Client extends CoreClient
      */
     public function registerStreamWrapper()
     {
-        StreamWrapper::register($this, self::PROTOCOL);
+        StreamWrapper::register(self::PROTOCOL);
 
         return $this;
     }

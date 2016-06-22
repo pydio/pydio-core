@@ -20,19 +20,21 @@
  *
  */
 
-namespace Pydio\Access\WebDAV;
+namespace Pydio\Access\DropBox;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Stream\Listener\PathListener;
+use Pydio\Access\Core\Stream\OAuthStream;
 use Pydio\Access\Core\Stream\Stream;
 use Pydio\Access\Driver\StreamProvider\FS\fsAccessDriver;
 use Pydio\Access\DropBox\Listener\DropBoxSubscriber;
-use Pydio\Access\WebDAV\Listener\WebDAVSubscriber;
 use Pydio\Core\Model\ContextInterface;
+
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * AJXP_Plugin to access a DropBox enabled server
@@ -41,11 +43,11 @@ use Pydio\Core\Model\ContextInterface;
  */
 class Driver extends fsAccessDriver
 {
-    const PROTOCOL = "access.webdav";
+    const PROTOCOL = "access.dropbox";
     const RESOURCES_PATH = "Resources";
-    const RESOURCES_FILE = "dav.json";
+    const RESOURCES_FILE = "dropbox.json";
 
-    public $driverType = "webdav";
+    public $driverType = "dropbox";
 
     /**
      * Driver Initialization
@@ -68,35 +70,41 @@ class Driver extends fsAccessDriver
         $this->detectStreamWrapper(true);
 
         Stream::addContextOption($context, [
-            "subscribers" => [
-                new PathListener(),
-                new WebDAVSubscriber()
-            ]
+            "subscribers" => [new DropBoxSubscriber()]
         ]);
 
         return true;
     }
 
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
+        $httpVars = $request->getParsedBody();
+
+        if (isset($httpVars["code"])) {
+            $context = $request->getAttribute("ctx");
+
+            Stream::addContextOption($context, [
+                "oauth_code" => $httpVars["code"]
+            ]);
+
+            // Simulate the creation of a stream to ensure we store the oauth in the stream context
+            $stream = new OAuthStream(Stream::factory('php://memory'), $context);
+            $stream->close();
+        }
+
+        return parent::switchAction($request, $response);
+    }
+
     /********************************************************
      * Static functions used in the JSON service description
-     *******************************************************
-     * @param AJXP_Node $node
-     */
-
-
-    public static function convertPath($node) {
-
-        $ctx = $node->getContext();
-        $repository = $node->getRepository();
-
-        $basePath = $repository->getContextOption($ctx, "PATH");
+     ********************************************************/
+    public static function convertPath($value) {
+        $node = new AJXP_Node($value);
         $path = $node->getPath();
 
         if (isset($path)) {
-            return "/" . $basePath . $path;
+            return $path;
         }
-
-        return $basePath;
+        return "";
     }
 
     public static function convertToJSON($key, $value) {
