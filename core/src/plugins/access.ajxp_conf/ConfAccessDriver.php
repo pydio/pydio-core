@@ -719,14 +719,14 @@ class ConfAccessDriver extends AbstractAccessDriver
                 $currentMainUser = $ctx->getUser();
 
                 if (strpos($roleId, "AJXP_GRP_") === 0) {
-                    $groupPath = Utils::forwardSlashDirname(substr($roleId, strlen("AJXP_GRP_")));
+                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
                     $filteredGroupPath = (!empty($currentMainUser) ? $currentMainUser->getRealGroupPath($groupPath) : $groupPath);
                     if($filteredGroupPath == "/"){
                         $roleId = "AJXP_GRP_/";
                         $groupLabel = $mess["ajxp_conf.151"];
                         $roleGroup = true;
                     }else{
-                        $groups = UsersService::listChildrenGroups($filteredGroupPath);
+                        $groups = UsersService::listChildrenGroups(Utils::forwardSlashDirname($filteredGroupPath));
                         $key = "/".basename($groupPath);
                         if (!array_key_exists($key, $groups)) {
                             throw new \Exception("Cannot find group with this id!");
@@ -909,11 +909,11 @@ class ConfAccessDriver extends AbstractAccessDriver
                 $currentMainUser = $ctx->getUser();
                 $userObject = $usrId = $filteredGroupPath = null;
                 if (strpos($roleId, "AJXP_GRP_") === 0) {
-                    $groupPath = Utils::forwardSlashDirname(substr($roleId, strlen("AJXP_GRP_")));
+                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
                     $filteredGroupPath = (!empty($currentMainUser) ? $currentMainUser->getRealGroupPath($groupPath) : $groupPath);
                     $roleId = "AJXP_GRP_".$filteredGroupPath;
                     if($roleId != "AJXP_GRP_/"){
-                        $groups = UsersService::listChildrenGroups($filteredGroupPath);
+                        $groups = UsersService::listChildrenGroups(Utils::forwardSlashDirname($filteredGroupPath));
                         $key = "/".basename($groupPath);
                         if (!array_key_exists($key, $groups)) {
                             throw new \Exception("Cannot find group with this id!");
@@ -2436,8 +2436,8 @@ class ConfAccessDriver extends AbstractAccessDriver
         if(!UsersService::usersEnabled()) return array();
         if(empty($hashValue)) $hashValue = 1;
 
-        $ctxUser = $this->currentContext->getUser();
-        if(!empty($ctxUser)) $baseGroup = $ctxUser->getRealGroupPath($baseGroup);
+        //$ctxUser = $this->currentContext->getUser();
+        //if(!empty($ctxUser)) $baseGroup = $ctxUser->getRealGroupPath($baseGroup);
         $count = UsersService::authCountUsers($baseGroup, "", null, null, false);
         if (UsersService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
             $offset = ($hashValue - 1) * $USER_PER_PAGE;
