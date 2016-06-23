@@ -35,6 +35,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 
 
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -66,12 +67,7 @@ class AuthMiddleware
 
         } catch (NoActiveWorkspaceException $ex){
 
-            /** @var ContextInterface $ctx */
-            $ctx = $requestInterface->getAttribute("ctx");
-            if($ctx->hasUser()) $lock = $ctx->getUser()->getLock();
-            if(empty($lock)){
-                throw new AuthRequiredException();
-            }
+            throw new AuthRequiredException();
 
         } catch(ActionNotFoundException $a){
 
@@ -83,9 +79,7 @@ class AuthMiddleware
                 return new EmptyResponse();
             }
         }
-
-        return $responseInterface;
-
+        
     }
 
 }

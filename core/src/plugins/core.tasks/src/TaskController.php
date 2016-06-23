@@ -77,7 +77,7 @@ class TaskController extends Plugin implements SqlTableProvider
         $taskService = TaskService::getInstance();
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        if(!$ctx->hasUser()){
+        if(!$ctx->hasUser() || !$ctx->hasRepository()){
             return;
         }
         switch ($action){

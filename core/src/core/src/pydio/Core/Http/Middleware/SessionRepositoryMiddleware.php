@@ -71,6 +71,15 @@ class SessionRepositoryMiddleware
                 }
                 throw $r;
 
+            } catch (NoActiveWorkspaceException $nA) {
+
+                $lock = $loggedUser->getLock();
+                if(!empty($lock)){
+                    return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+                }else{
+                    throw $nA;
+                }
+
             }
         }
 

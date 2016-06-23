@@ -129,7 +129,7 @@ class UsersService
             throw new WorkspaceNotFoundException($repositoryId);
         }
         if(!RepositoryService::repositoryIsAccessible($repo, $user)){
-            return new WorkspaceForbiddenException($repositoryId);
+            throw new WorkspaceForbiddenException($repositoryId);
         }
         return $repo;
     }
