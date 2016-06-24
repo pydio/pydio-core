@@ -29,7 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\NodesDiff;
@@ -389,7 +389,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
+        if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
             $dir = FsAccessWrapper::patchPathForBaseDir($dir);
         }
         $dir = Utils::securePath($dir);
@@ -647,7 +647,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $sessionKey = "chunk_file_".md5($fileId.time());
                 $totalSize = filesize($fileId);
                 $chunkSize = intval ( $totalSize / $chunkCount );
-                $realFile  = AJXP_MetaStreamWrapper::getRealFSReference($fileId, true);
+                $realFile  = MetaStreamWrapper::getRealFSReference($fileId, true);
                 $chunkData = [
                     "localname"	  => basename($fileId),
                     "chunk_count" => $chunkCount,
@@ -1144,7 +1144,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
                 }
                 $patch = false;
-                if (AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($selection->currentBaseUrl())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
+                if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($selection->currentBaseUrl())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
                     $dir = FsAccessWrapper::patchPathForBaseDir($dir);
                     $patch = true;
                 }
@@ -1250,7 +1250,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));
                 Controller::applyHook("node.read", [&$parentAjxpNode]);
 
-                $streamIsSeekable = AJXP_MetaStreamWrapper::wrapperIsSeekable($path);
+                $streamIsSeekable = MetaStreamWrapper::wrapperIsSeekable($path);
 
                 $sharedHandle = null; $handle = null;
                 if($streamIsSeekable){
@@ -1628,7 +1628,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             if(is_array($uploadData)){
                 $result = @move_uploaded_file($uploadData["tmp_name"], $destination);
                 if (!$result) {
-                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference($destination);
+                    $realPath = MetaStreamWrapper::getRealFSReference($destination);
                     $result = move_uploaded_file($uploadData["tmp_name"], $realPath);
                 }
             }else{
@@ -1639,7 +1639,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }catch(\Exception $e){
                     // Can be blocked by open_basedir, try to perform the move again, with the
                     // real FS reference.
-                    $realPath = AJXP_MetaStreamWrapper::getRealFSReference($destination);
+                    $realPath = MetaStreamWrapper::getRealFSReference($destination);
                     try{
                         $clone->moveTo($realPath);
                         $result = true;
@@ -1752,7 +1752,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function extractArchiveItemPreCallback($crtUrlBase, $status, $data, $taskId = null){
         $fullname = $data['filename'];
         $size = $data['size'];
-        $realBase = AJXP_MetaStreamWrapper::getRealFSReference($crtUrlBase);
+        $realBase = MetaStreamWrapper::getRealFSReference($crtUrlBase);
         $realBase = str_replace("\\", "/", $realBase);
         $repoName = $crtUrlBase.str_replace($realBase, "", $fullname);
 
@@ -1777,7 +1777,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function extractArchiveItemPostCallback($crtUrlBase, $status, $data, $taskId = null){
         $fullname = $data['filename'];
-        $realBase = AJXP_MetaStreamWrapper::getRealFSReference($crtUrlBase);
+        $realBase = MetaStreamWrapper::getRealFSReference($crtUrlBase);
         $repoName = str_replace($realBase, "", $fullname);
         if($taskId !== null){
             TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Extracted file ".$repoName);
@@ -1806,7 +1806,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $files = $selection->getFiles();
         $currentUrlBase = $selection->currentBaseUrl();
 
-        $realZipFile = AJXP_MetaStreamWrapper::getRealFSReference($currentUrlBase.$zipPath);
+        $realZipFile = MetaStreamWrapper::getRealFSReference($currentUrlBase.$zipPath);
         $archive = new PclZip($realZipFile);
         $content = $archive->listContent();
         foreach ($files as $key => $item) {// Remove path
@@ -1822,7 +1822,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
         }
         $this->logDebug("Archive", $this->addSlugToPath($files));
-        $realDestination = AJXP_MetaStreamWrapper::getRealFSReference($currentUrlBase.$destDir);
+        $realDestination = MetaStreamWrapper::getRealFSReference($currentUrlBase.$destDir);
         $this->logDebug("Extract", [$realDestination, $realZipFile, $this->addSlugToPath($files), $zipLocalPath]);
 
         $result = $archive->extract(PCLZIP_OPT_BY_NAME,     $files,
@@ -2120,12 +2120,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $nodeUrl = $node->getUrl();
         if (is_file($nodeUrl)) {
             if ($nodeType=="both" || $nodeType=="file") {
-                AJXP_MetaStreamWrapper::changeMode($nodeUrl, $realValue);
+                MetaStreamWrapper::changeMode($nodeUrl, $realValue);
                 $changedFiles[] = $node->getPath();
             }
         } else {
             if ($nodeType=="both" || $nodeType=="dir") {
-                AJXP_MetaStreamWrapper::changeMode($nodeUrl, $realValue);
+                MetaStreamWrapper::changeMode($nodeUrl, $realValue);
                 $changedFiles[] = $node->getPath();
             }
             if ($recursive) {
@@ -2217,7 +2217,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if($basedir == "__AJXP_ZIP_FLAT__/"){
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }else{
-            $basedir = AJXP_MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()).trim($basedir);
+            $basedir = MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()).trim($basedir);
             $this->logDebug("Basedir", [$basedir]);
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }
@@ -2275,8 +2275,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      */
     public function setHiddenAttribute($node){
-        if(AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
-            $realPath =  AJXP_MetaStreamWrapper::getRealFSReference($node->getUrl());
+        if(MetaStreamWrapper::actualRepositoryWrapperClass($node) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper" && strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
+            $realPath =  MetaStreamWrapper::getRealFSReference($node->getUrl());
             @shell_exec("attrib +H " . escapeshellarg($realPath));
         }
     }

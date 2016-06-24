@@ -20,7 +20,7 @@
  */
 namespace Pydio\Uploader\Processor;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -101,7 +101,7 @@ class Jumploader extends Plugin
             self::$remote = true;
         }
 
-        $wrapperName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase()));
+        $wrapperName = MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase()));
         if ($wrapperName == "ajxp.ftp" || $wrapperName == "ajxp.remotefs") {
             $this->logDebug("Skip decoding");
             self::$skipDecoding = true;

@@ -23,13 +23,13 @@ namespace Pydio\Access\Core;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Class AJXP_SchemeTranslatorWrapper
+ * Class SchemeTranslatorWrapper
  * Simple Wrapper that justs converts a given protocol to another one.
  *
  * @package Pydio
  * @subpackage Core
  */
-class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAjxpWrapper
+class SchemeTranslatorWrapper extends MetaStreamWrapper implements IAjxpWrapper
 {
     /**
      * @var resource
@@ -42,7 +42,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
     protected $currentDirPath;
 
 
-    /*
+    /**
      * Initialise the path for a file
      */
     public static function applyInitPathHook($path, $context = 'core') {
@@ -59,8 +59,8 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public static function getRealFSReference($path, $persistent = false)
     {
-        $wrapper = AJXP_MetaStreamWrapper::findSubWrapperClassName($path);
-        return call_user_func(array($wrapper, "getRealFSReference"), AJXP_MetaStreamWrapper::translateScheme($path), $persistent);
+        $wrapper = MetaStreamWrapper::findSubWrapperClassName($path);
+        return call_user_func(array($wrapper, "getRealFSReference"), MetaStreamWrapper::translateScheme($path), $persistent);
     }
 
     /**
@@ -71,8 +71,8 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public static function copyFileInStream($path, $stream)
     {
-        $wrapper = AJXP_MetaStreamWrapper::findSubWrapperClassName($path);
-        call_user_func(array($wrapper, "copyFileInStream"), AJXP_MetaStreamWrapper::translateScheme($path), $stream);
+        $wrapper = MetaStreamWrapper::findSubWrapperClassName($path);
+        call_user_func(array($wrapper, "copyFileInStream"), MetaStreamWrapper::translateScheme($path), $stream);
     }
 
     /**
@@ -83,8 +83,8 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public static function changeMode($path, $chmodValue)
     {
-        $wrapper = AJXP_MetaStreamWrapper::findSubWrapperClassName($path);
-        call_user_func(array($wrapper, "changeMode"), AJXP_MetaStreamWrapper::translateScheme($path), $chmodValue);
+        $wrapper = MetaStreamWrapper::findSubWrapperClassName($path);
+        call_user_func(array($wrapper, "changeMode"), MetaStreamWrapper::translateScheme($path), $chmodValue);
     }
 
     /**
@@ -109,7 +109,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public function dir_opendir($path, $options)
     {
-        $newPath = AJXP_MetaStreamWrapper::translateScheme($path);
+        $newPath = MetaStreamWrapper::translateScheme($path);
         $this->handle = opendir($newPath);
         if($this->handle !== false){
             $this->currentDirPath = $path;
@@ -156,7 +156,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public function mkdir($path, $mode, $options)
     {
-        return mkdir(AJXP_MetaStreamWrapper::translateScheme($path), $mode, $options);
+        return mkdir(MetaStreamWrapper::translateScheme($path), $mode, $options);
     }
 
     /**
@@ -168,7 +168,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public function rename($path_from, $path_to)
     {
-        return rename(AJXP_MetaStreamWrapper::translateScheme($path_from), AJXP_MetaStreamWrapper::translateScheme($path_to));
+        return rename(MetaStreamWrapper::translateScheme($path_from), MetaStreamWrapper::translateScheme($path_to));
     }
 
     /**
@@ -181,9 +181,9 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
     public function rmdir($path, $options)
     {
         if(is_resource($options)){
-            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path), $options);
+            return rmdir(MetaStreamWrapper::translateScheme($path), $options);
         }else{
-            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path));
+            return rmdir(MetaStreamWrapper::translateScheme($path));
         }
     }
 
@@ -237,9 +237,9 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
     public function stream_open($path, $mode, $options, &$context)
     {
         if(is_resource($context)){
-            $this->handle = fopen(AJXP_MetaStreamWrapper::translateScheme($path), $mode, $options, $context);
+            $this->handle = fopen(MetaStreamWrapper::translateScheme($path), $mode, $options, $context);
         }else{
-            $this->handle = fopen(AJXP_MetaStreamWrapper::translateScheme($path), $mode, $options);
+            $this->handle = fopen(MetaStreamWrapper::translateScheme($path), $mode, $options);
         }
         return ($this->handle !== false);
     }
@@ -321,7 +321,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public function unlink($path)
     {
-        return unlink(AJXP_MetaStreamWrapper::translateScheme($path));
+        return unlink(MetaStreamWrapper::translateScheme($path));
     }
 
     /**
@@ -333,7 +333,7 @@ class AJXP_SchemeTranslatorWrapper extends AJXP_MetaStreamWrapper implements IAj
      */
     public function url_stat($path, $flags)
     {
-        $stat = @stat(AJXP_MetaStreamWrapper::translateScheme($path));
+        $stat = @stat(MetaStreamWrapper::translateScheme($path));
         if($stat === false){
             return null;
         }

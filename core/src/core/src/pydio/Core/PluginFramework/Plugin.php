@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\PluginFramework;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
@@ -949,7 +949,7 @@ class Plugin implements \Serializable
                 stream_wrapper_register($streamData["protocol"], $streamData["classname"]);
                 $pServ->registerWrapperClass($streamData["protocol"], $streamData["classname"]);
             }
-            AJXP_MetaStreamWrapper::register($wrappers);
+            MetaStreamWrapper::register($wrappers);
         }
         return $streamData;
     }

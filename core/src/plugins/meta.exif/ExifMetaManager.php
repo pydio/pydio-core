@@ -22,7 +22,7 @@
 namespace Pydio\Access\Meta\Exif;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -134,7 +134,7 @@ class ExifMetaManager extends AbstractMetaSource
         $ctx            = $requestInterface->getAttribute("ctx");
         $userSelection  = UserSelection::fromContext($ctx, $httpVars);
         $selectedNode   = $userSelection->getUniqueNode();
-        $realFile       = AJXP_MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+        $realFile       = MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
 
         Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);

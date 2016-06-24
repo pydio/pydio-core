@@ -21,7 +21,7 @@
 namespace Pydio\Access\Meta\Version;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
@@ -98,24 +98,24 @@ class SvnManager extends AbstractMetaSource
                 $sessionKey = "AJXP_SVN_".$repo->getId()."_RECYCLE_CHECKED";
                 if (isSet($_SESSION[$sessionKey])) {
                     $file = RecycleBinManager::getRelativeRecycle()."/".RecycleBinManager::getCacheFileName();
-                    $realFile = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$file);
+                    $realFile = MetaStreamWrapper::getRealFSReference($urlBase.$file);
                     $this->addIfNotVersionned($file, $realFile);
                     $_SESSION[$sessionKey] = true;
                 }
             }
         }
 
-        $result["DIR"] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.Utils::decodeSecureMagic($httpVars["dir"]));
+        $result["DIR"] = MetaStreamWrapper::getRealFSReference($urlBase.Utils::decodeSecureMagic($httpVars["dir"]));
         $result["ORIGINAL_SELECTION"] = $userSelection;
         $result["SELECTION"] = array();
         if (!$userSelection->isEmpty()) {
             $files = $userSelection->getFiles();
             foreach ($files as $selected) {
-                $result["SELECTION"][] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$selected);
+                $result["SELECTION"][] = MetaStreamWrapper::getRealFSReference($urlBase.$selected);
             }
         }
         foreach ($additionnalPathes as $parameter => $path) {
-            $result[$parameter] = AJXP_MetaStreamWrapper::getRealFSReference($urlBase.$path);
+            $result[$parameter] = MetaStreamWrapper::getRealFSReference($urlBase.$path);
         }
         return $result;
     }
@@ -147,14 +147,14 @@ class SvnManager extends AbstractMetaSource
      */
     public function commitFile($file, $ajxpNode = null)
     {
-        $realFile = AJXP_MetaStreamWrapper::getRealFSReference($file);
+        $realFile = MetaStreamWrapper::getRealFSReference($file);
 
         $res = ExecSvnCmd("svn status ", $realFile);
         if (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?") {
             $res2 = ExecSvnCmd("svn add", "$realFile");
         }
         if ($ajxpNode != null) {
-            $nodeRealFile = AJXP_MetaStreamWrapper::getRealFSReference($ajxpNode->getUrl());
+            $nodeRealFile = MetaStreamWrapper::getRealFSReference($ajxpNode->getUrl());
             try {
                 ExecSvnCmd("svn propset metachange ".time(), $nodeRealFile);
             } catch (\Exception $e) {

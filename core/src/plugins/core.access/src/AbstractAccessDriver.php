@@ -163,12 +163,12 @@ abstract class AbstractAccessDriver extends Plugin
         $repositoryId = $this->repository->getId();
         $origStreamURL = "pydio://$crtUser@$repositoryId";
         $origNode = new AJXP_Node($origStreamURL);
-        AJXP_MetaStreamWrapper::detectWrapperForNode($origNode, true);
+        MetaStreamWrapper::detectWrapperForNode($origNode, true);
 
         $destRepoId = $httpVars["dest_repository_id"];
         $destStreamURL = "pydio://$crtUser@$destRepoId";
         $destNode = new AJXP_Node($destStreamURL);
-        AJXP_MetaStreamWrapper::detectWrapperForNode($destNode, true);
+        MetaStreamWrapper::detectWrapperForNode($destNode, true);
 
         // Check rights
         if (UsersService::usersEnabled()) {
@@ -310,7 +310,7 @@ abstract class AbstractAccessDriver extends Plugin
             if ($move) {
                 Controller::applyHook("node.before_path_change", array($srcNode));
                 if(file_exists($destFile)) unlink($destFile);
-                if(AJXP_MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
+                if(MetaStreamWrapper::nodesUseSameWrappers($realSrcFile, $destFile)){
                     rename($realSrcFile, $destFile);
                 }else{
                     copy($realSrcFile, $destFile);
@@ -365,9 +365,9 @@ abstract class AbstractAccessDriver extends Plugin
      */
     protected function filecopy($srcFile, $destFile)
     {
-        if (!AJXP_MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)
-            || AJXP_MetaStreamWrapper::wrapperIsRemote($srcFile)
-            || AJXP_MetaStreamWrapper::wrapperIsRemote($destFile)) {
+        if (!MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)
+            || MetaStreamWrapper::wrapperIsRemote($srcFile)
+            || MetaStreamWrapper::wrapperIsRemote($destFile)) {
             $src = fopen($srcFile, "r");
             $dest = fopen($destFile, "w");
             if (is_resource($src) && is_resource($dest)) {
@@ -423,7 +423,7 @@ abstract class AbstractAccessDriver extends Plugin
                         if(is_file($dstfile)) $ow = filemtime($srcfile) - filemtime($dstfile); else $ow = 1;
                         if ($ow > 0) {
                             try {
-                                if($convertSrcFile) $tmpPath = AJXP_MetaStreamWrapper::getRealFSReference($srcfile);
+                                if($convertSrcFile) $tmpPath = MetaStreamWrapper::getRealFSReference($srcfile);
                                 else $tmpPath = $srcfile;
                                 if($verbose) echo "Copying '$tmpPath' to '$dstfile'...";
                                 if(!empty($taskId)){
@@ -465,7 +465,7 @@ abstract class AbstractAccessDriver extends Plugin
         $chmodValue = $repoData["chmod"];
         if (isSet($chmodValue) && $chmodValue != "") {
             $chmodValue = octdec(ltrim($chmodValue, "0"));
-            AJXP_MetaStreamWrapper::changeMode($filePath, $chmodValue);
+            MetaStreamWrapper::changeMode($filePath, $chmodValue);
         }
     }
 

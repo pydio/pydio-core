@@ -7,7 +7,7 @@ v0.1
 
 namespace Pydio\Action\Timestamp;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Exception\PydioException;
@@ -58,7 +58,7 @@ class TimestampCreator extends Plugin
 
         $fileName = $selection->getUniqueFile();
         $fileUrl = $destStreamURL . $fileName;
-        $file = AJXP_MetaStreamWrapper::getRealFSReference($fileUrl, true);
+        $file = MetaStreamWrapper::getRealFSReference($fileUrl, true);
 
         //Hash the file, to send it to Universign
         $hashedDataToTimestamp = hash_file('sha256', $file);

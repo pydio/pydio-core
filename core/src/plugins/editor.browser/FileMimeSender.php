@@ -21,7 +21,7 @@
 
 namespace Pydio\Editor\Mime;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Controller\Controller;
@@ -119,7 +119,7 @@ class FileMimeSender extends Plugin
         $aSyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selectedNode){
 
             $stream = fopen("php://output", "a");
-            AJXP_MetaStreamWrapper::copyFileInStream($selectedNode->getUrl(), $stream);
+            MetaStreamWrapper::copyFileInStream($selectedNode->getUrl(), $stream);
             fflush($stream);
             fclose($stream);
 

@@ -34,7 +34,7 @@
  */
 namespace Pydio\Uploader\Processor;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
@@ -127,7 +127,7 @@ class Pluploader extends Plugin
                 }
                 $target = $tmpFolder.'/'.$filename;
                 $fileVars["file"]["destination"] = base64_encode($dir);
-            }else if(AJXP_MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
+            }else if(MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
                 $remote = true;
                 $tmpFolder = Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
                 if(!is_dir($tmpFolder)){

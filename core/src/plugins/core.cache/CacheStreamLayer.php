@@ -21,13 +21,13 @@
 namespace Pydio\Cache\Core;
 
 
-use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Access\Core\SchemeTranslatorWrapper;
 use Pydio\Core\Services\CacheService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class CacheStreamLayer extends AJXP_SchemeTranslatorWrapper
+class CacheStreamLayer extends SchemeTranslatorWrapper
 {
     public static function clearStatCache($path){
         $scheme = parse_url($path, PHP_URL_SCHEME);

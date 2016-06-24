@@ -21,7 +21,7 @@
 namespace Pydio\Cache\Core;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -67,7 +67,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
             }
             self::$cacheInstance = $pluginInstance;
             if($pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
-                AJXP_MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
+                MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
             }
         }
 

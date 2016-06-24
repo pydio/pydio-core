@@ -21,7 +21,7 @@
 namespace Pydio\Access\Driver\StreamProvider\Inbox;
 
 use ArrayIterator;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapper;
 
@@ -156,7 +156,7 @@ class InboxAccessWrapper implements IAjxpWrapper
             }catch (\Exception $e){
 
             }
-            AJXP_MetaStreamWrapper::detectWrapperForNode($node, true);
+            MetaStreamWrapper::detectWrapperForNode($node, true);
         }
         return $url;
     }
@@ -172,8 +172,8 @@ class InboxAccessWrapper implements IAjxpWrapper
     {
         $url = self::translateURL($path);
         if(self::$linkNode !== null){
-            $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($url);
-            $realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($url, true);
+            $isRemote = MetaStreamWrapper::wrapperIsRemote($url);
+            $realFilePointer = MetaStreamWrapper::getRealFSReference($url, true);
             if(!$isRemote){
                 $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
                 $tmpname = tempnam(Utils::getAjxpTmpDir(), "real-file-inbox-pointer").".".$ext;
@@ -201,11 +201,7 @@ class InboxAccessWrapper implements IAjxpWrapper
     public static function copyFileInStream($path, $stream)
     {
         $url = self::translateURL($path);
-        AJXP_MetaStreamWrapper::copyFileInStream($url, $stream);
-        /*
-        $wrapperClass = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass(parse_url($url, PHP_URL_HOST));
-        call_user_func(array($wrapperClass, "copyFileInStream"), $url, $stream);
-        */
+        MetaStreamWrapper::copyFileInStream($url, $stream);
         if(self::$linkNode !== null){
             self::$linkNode->getDriver();
         }

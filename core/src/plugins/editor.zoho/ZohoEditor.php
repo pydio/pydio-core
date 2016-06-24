@@ -25,7 +25,7 @@ namespace Pydio\Editor\Office;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -173,7 +173,7 @@ class ZohoEditor extends Plugin
             }
 
             $target = base64_decode($httpVars["parent_url"]);
-            $tmp = AJXP_MetaStreamWrapper::getRealFSReference($nodeUrl);
+            $tmp = MetaStreamWrapper::getRealFSReference($nodeUrl);
 
             $node = new AJXP_Node($nodeUrl);
             Controller::applyHook("node.read", array($node));

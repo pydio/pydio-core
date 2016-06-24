@@ -20,7 +20,7 @@
  */
 namespace Pydio\Core\Http\Response;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
@@ -391,7 +391,7 @@ class FileReaderResponse extends AsyncResponseStream
                 fclose($fp);
             } else {
 
-                AJXP_MetaStreamWrapper::copyFileInStream($filePathOrData, $stream);
+                MetaStreamWrapper::copyFileInStream($filePathOrData, $stream);
 
             }
             fflush($stream);

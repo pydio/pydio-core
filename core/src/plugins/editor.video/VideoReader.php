@@ -20,7 +20,7 @@
  */
 namespace Pydio\Editor\Video;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -126,7 +126,7 @@ class VideoReader extends Plugin
                 header('Cache-Control: public');
 
                 $stream = fopen("php://output", "a");
-                AJXP_MetaStreamWrapper::copyFileInStream($node->getUrl(), $stream);
+                MetaStreamWrapper::copyFileInStream($node->getUrl(), $stream);
                 fflush($stream);
                 fclose($stream);
             }

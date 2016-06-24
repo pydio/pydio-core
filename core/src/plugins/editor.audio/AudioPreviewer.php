@@ -21,7 +21,7 @@
 
 namespace Pydio\Editor\Audio;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -93,7 +93,7 @@ class AudioPreviewer extends Plugin
                 header("Content-Length: ".$size);
 
                 $stream = fopen("php://output", "a");
-                AJXP_MetaStreamWrapper::copyFileInStream($fileUrl, $stream);
+                MetaStreamWrapper::copyFileInStream($fileUrl, $stream);
                 fflush($stream);
                 fclose($stream);
 

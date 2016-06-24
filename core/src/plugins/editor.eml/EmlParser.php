@@ -20,7 +20,7 @@
  */
 namespace Pydio\Editor\EML;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -73,7 +73,7 @@ class EmlParser extends Plugin
         $file = $node->getUrl();
         Controller::applyHook("node.read", array($node));
 
-        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($node);
+        $wrapperClassName = MetaStreamWrapper::actualRepositoryWrapperClass($node);
 
         $mess = LocaleService::getMessages();
         switch ($action) {
@@ -198,7 +198,7 @@ class EmlParser extends Plugin
                         }
                         $user = $ctx->getUser()->getId();
                         $destStreamURL = "pydio://$user@$destRepoId";
-                        AJXP_MetaStreamWrapper::detectWrapperForNode(new AJXP_Node($destStreamURL), true);
+                        MetaStreamWrapper::detectWrapperForNode(new AJXP_Node($destStreamURL), true);
                     }
                     $destFile = $destStreamURL.$destRep."/".$part->d_parameters['filename'];
                     $fp = fopen($destFile, "w");
@@ -228,7 +228,7 @@ class EmlParser extends Plugin
         if($isParent) return;
         $currentNode = $ajxpNode->getUrl();
         $metadata = $ajxpNode->metadata;
-        $wrapperClassName = AJXP_MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode);
+        $wrapperClassName = MetaStreamWrapper::actualRepositoryWrapperClass($ajxpNode);
 
         $noMail = true;
         if ($metadata["is_file"] && ($wrapperClassName == "imapAccessWrapper" || preg_match("/\.eml$/i",$currentNode))) {

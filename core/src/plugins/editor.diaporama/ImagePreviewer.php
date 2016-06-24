@@ -20,7 +20,7 @@
  */
 namespace Pydio\Editor\Image;
 
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
@@ -98,7 +98,7 @@ class ImagePreviewer extends Plugin
                 header("Expires: " . gmdate("D, d M Y H:i:s", time()+5*24*3600) . " GMT");
 
                 $stream = fopen("php://output", "a");
-                AJXP_MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
+                MetaStreamWrapper::copyFileInStream($destStreamURL.$file, $stream);
                 fflush($stream);
                 fclose($stream);
                 Controller::applyHook("node.read", array($node));
@@ -141,7 +141,7 @@ class ImagePreviewer extends Plugin
         $pThumb = new \Pydio\Editor\Image\PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
 
         if (!$pThumb->isError()) {
-            $pThumb->remote_wrapper = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
+            $pThumb->remote_wrapper = "Pydio\\Access\\Core\\MetaStreamWrapper";
             //$this->logDebug("Will fit thumbnail");
             $sizes = $pThumb->fit_thumbnail($masterFile, $size, -1, 1, true);
             //$this->logDebug("Will print thumbnail");

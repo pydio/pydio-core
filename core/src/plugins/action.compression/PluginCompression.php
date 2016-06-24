@@ -24,7 +24,7 @@ namespace Pydio\Action\Compression;
 use Exception;
 use Phar;
 use PharData;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
@@ -150,7 +150,7 @@ class PluginCompression extends Plugin
                 $tabAllFiles = array_combine($tabAllRecursiveFiles, $tabFilesNames);
                 foreach ($tabAllFiles as $fullPath => $fileName) {
                     try {
-                        $archive->addFile(AJXP_MetaStreamWrapper::getRealFSReference($fullPath), $fileName);
+                        $archive->addFile(MetaStreamWrapper::getRealFSReference($fullPath), $fileName);
                         $counterCompression++;
                         $percent = round(($counterCompression / count($tabAllFiles)) * 100, 0, PHP_ROUND_HALF_DOWN);
                         $postMessageStatus(sprintf($messages["compression.6"], $percent . " %"), Task::STATUS_RUNNING, $percent);
@@ -194,7 +194,7 @@ class PluginCompression extends Plugin
                 $extensionLength = 0;
                 $counterExtract = 0;
                 $currentAllPydioPath = $currentDirUrl . $fileArchive;
-                $pharCurrentAllPydioPath = "phar://" . AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath);
+                $pharCurrentAllPydioPath = "phar://" . MetaStreamWrapper::getRealFSReference($currentAllPydioPath);
                 $pathInfoCurrentAllPydioPath = pathinfo($currentAllPydioPath, PATHINFO_EXTENSION);
                 //WE TAKE ONLY TAR, TAR.GZ AND TAR.BZ2 ARCHIVES
                 foreach ($authorizedExtension as $extension => $strlenExtension) {
@@ -235,9 +235,9 @@ class PluginCompression extends Plugin
                 };
 
                 mkdir($currentDirUrl . $onlyFileName, 0777, true);
-                chmod(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), 0777);
+                chmod(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), 0777);
                 try {
-                    $archive = new PharData(AJXP_MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
+                    $archive = new PharData(MetaStreamWrapper::getRealFSReference($currentAllPydioPath));
                     $fichiersArchive = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($pharCurrentAllPydioPath));
                     foreach ($fichiersArchive as $file) {
                         $fileGetPathName = $file->getPathname();
@@ -246,7 +246,7 @@ class PluginCompression extends Plugin
                         }
                         $fileNameInArchive = substr(strstr($fileGetPathName, $fileArchive), strlen($fileArchive) + 1);
                         try {
-                            $archive->extractTo(AJXP_MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
+                            $archive->extractTo(MetaStreamWrapper::getRealFSReference($currentDirUrl . $onlyFileName), $fileNameInArchive, false);
                         } catch (Exception $e) {
                             $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
                             throw new PydioException($e);

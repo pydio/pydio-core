@@ -21,7 +21,7 @@
 namespace Pydio\Access\Meta\Hash;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
@@ -157,7 +157,7 @@ class FileHasher extends AbstractMetaSource
                 }
                 $signature_delta_file = $fileVars["userfile_0"]["tmp_name"];
                 $fileUrl = $selection->getUniqueNode()->getUrl();
-                $file = AJXP_MetaStreamWrapper::getRealFSReference($fileUrl, true);
+                $file = MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
                     $deltaFile = tempnam(Utils::getAjxpTmpDir(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");

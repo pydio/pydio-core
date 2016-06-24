@@ -33,17 +33,14 @@ use Pydio\Core\Services\RepositoryService;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Class AJXP_MetaStreamWrapper
+ * Class MetaStreamWrapper
  *
  * Global streamWrapper that encapsulates all wrappers to access a driver's resource.
  * Registered under the "pydio" protocol, it should replace all the old ajxp.XX direct calls.
  * The static "appendMetaWrapper" method allows to add additional wrapper that will be sequentially called until
  * reaching the driver ajxp.XX wrapper.
- *
- * @package Pydio
- * @subpackage Core
  */
-class AJXP_MetaStreamWrapper implements IAjxpWrapper
+class MetaStreamWrapper implements IAjxpWrapper
 {
     /**
      * @var resource
@@ -57,7 +54,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
 
     protected static $metaWrappers = [
         'core' => [
-            'pydio' => 'Pydio\Access\Core\AJXP_MetaStreamWrapper'
+            'pydio' => 'Pydio\Access\Core\MetaStreamWrapper'
         ]
     ];
 
@@ -139,7 +136,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
 
     /**
      * @param string $url
-     * @param AJXP_MetaStreamWrapper $crtInstance
+     * @param MetaStreamWrapper $crtInstance
      * @return string
      * @throws \Exception
      */
@@ -306,7 +303,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      */
     public static function isRemote()
     {
-        throw new \Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsRemote() instead");
+        throw new \Exception("Do not call this method directly, but MetaStreamWrapper::wrapperIsRemote() instead");
     }
 
     /**
@@ -318,7 +315,7 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
      */
     public static function isSeekable($url)
     {
-        throw new \Exception("Do not call this method directly, but AJXP_MetaStreamWrapper::wrapperIsSeekable() instead");
+        throw new \Exception("Do not call this method directly, but MetaStreamWrapper::wrapperIsSeekable() instead");
     }
 
     /**
@@ -460,9 +457,9 @@ class AJXP_MetaStreamWrapper implements IAjxpWrapper
     public function rmdir($path, $options)
     {
         if(is_resource($options)){
-            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path), $options);
+            return rmdir(MetaStreamWrapper::translateScheme($path), $options);
         }else{
-            return rmdir(AJXP_MetaStreamWrapper::translateScheme($path));
+            return rmdir(MetaStreamWrapper::translateScheme($path));
         }
     }
 

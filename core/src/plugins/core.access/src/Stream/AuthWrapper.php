@@ -10,13 +10,13 @@ namespace Pydio\Access\Core\Stream;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use Pydio\Access\Core\AJXP_SchemeTranslatorWrapper;
+use Pydio\Access\Core\SchemeTranslatorWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Utils;
 
-class AuthWrapper extends AJXP_SchemeTranslatorWrapper
+class AuthWrapper extends SchemeTranslatorWrapper
 {
     public static function applyInitPathHook($url, $context = 'core') {
         return;

@@ -23,7 +23,7 @@ namespace Pydio\Access\Core\Model;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\ContextProviderInterface;
@@ -519,8 +519,8 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     public function getRealFile()
     {
         if (!isset($this->realFilePointer)) {
-        $this->realFilePointer = AJXP_MetaStreamWrapper::getRealFSReference($this->_url, true);
-            $isRemote = AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
+        $this->realFilePointer = MetaStreamWrapper::getRealFSReference($this->_url, true);
+            $isRemote = MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
                 register_shutdown_function(function(){
                     Utils::silentUnlink($this->realFilePointer);
@@ -536,7 +536,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      * @return bool
      */
     public function wrapperIsRemote(){
-        return AJXP_MetaStreamWrapper::wrapperIsRemote($this->_url);
+        return MetaStreamWrapper::wrapperIsRemote($this->_url);
     }
 
     /**
@@ -733,7 +733,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             $pServ = PluginsService::getInstance($this->getContext());
             $this->_wrapperClassName = $pServ->getWrapperClassName($this->urlParts["scheme"]);
         }else if($this->urlParts["scheme"] == "pydio"){
-            $this->_wrapperClassName = "Pydio\\Access\\Core\\AJXP_MetaStreamWrapper";
+            $this->_wrapperClassName = "Pydio\\Access\\Core\\MetaStreamWrapper";
         }
     }
 

@@ -23,7 +23,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP;
 
 use DOMNode;
 use PclZip;
-use Pydio\Access\Core\AJXP_MetaStreamWrapper;
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Core\RecycleBinManager;
@@ -101,7 +101,7 @@ class SFTPAccessDriver extends FsAccessDriver
 
     protected function filecopy($srcFile, $destFile)
     {
-        if (AJXP_MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
+        if (MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
             $srcFilePath = Utils::safeParseUrl($srcFile)["path"];
             $destFilePath = Utils::safeParseUrl($destFile)["path"];
             $destDirPath = dirname($destFilePath);
