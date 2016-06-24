@@ -1460,7 +1460,7 @@ class Utils
                         $value = intval($value);
                     } else if ($type == "array") {
                         $value = explode(",", $value);
-                    } else if ($type == "password" && $ctx->hasUser()) {
+                    } else if ($type == "password" && $ctx->hasUser() && !empty($cypheredPassPrefix)) {
                         if (trim($value) != "" && $value != "__AJXP_VALUE_SET__" && function_exists('mcrypt_encrypt')) {
                             // We encode as base64 so if we need to store the result in a database, it can be stored in text column
                             $value = $cypheredPassPrefix . base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($ctx->getUser()->getId()."\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB));
