@@ -23,14 +23,12 @@ namespace Pydio\Access\WebDAV\Listener;
 
 use GuzzleHttp\Command\Event\PreparedEvent;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
-use GuzzleHttp\Event\BeforeEvent;
 use GuzzleHttp\Event\CompleteEvent;
 use GuzzleHttp\Event\ErrorEvent;
 use GuzzleHttp\Event\RequestEvents;
 use GuzzleHttp\Event\SubscriberInterface;
 use GuzzleHttp\Message\Response;
 use GuzzleHttp\Stream\Stream;
-use Sabre\DAV\XMLUtil;
 use SimpleXMLElement;
 
 /**
@@ -69,23 +67,28 @@ class WebDAVSubscriber implements SubscriberInterface
         $headers = $operation->getData("headers");
         $body    = $operation->getData("body");
 
-        $request->addHeaders($headers);
-        $request->setBody(Stream::factory(join($body, "")));
+        if (isset($headers)) {
+            $request->addHeaders($headers);
+        }
+
+        if (isset($body)) {
+            $request->setBody(Stream::factory(join($body, "")));
+        }
     }
 
     /**
      * @param CompleteEvent $event
      */
-    public function onComplete(CompleteEvent $event, $name)
+    public function onComplete(CompleteEvent $event)
     {
         $request  = $event->getRequest();
         $basePath = $request->getPath();
 
         $response = $event->getResponse();
-
         $contentType = $response->getHeader('Content-Type');
 
-        if (!isset($contentType) || strpos($contentType, "application/xml") < 0) {
+        // Checking we have xml as response
+        if (!isset($contentType) || strpos($contentType, "application/xml") === FALSE) {
             return;
         }
 
@@ -108,7 +111,6 @@ class WebDAVSubscriber implements SubscriberInterface
         $responseXML->registerXPathNamespace('d', 'urn:DAV');
 
         $result = [];
-
         foreach($responseXML->xpath('d:response') as $xml) {
             $xml->registerXPathNamespace('d', 'urn:DAV');
             $href = $xml->xpath('d:href');
@@ -126,26 +128,33 @@ class WebDAVSubscriber implements SubscriberInterface
 
                         $propertyName = $propNodeData->localName;
 
-                        if ($propNodeData->firstChild) {
+                        if ($propNodeData->nodeValue == "" && isset($propNodeData->firstChild)) {
                             $propResult[$propertyName] = $propNodeData->firstChild->localName;
                         } else {
-                            $propResult[$propertyName] = $propNodeData->textContent;
+                            $propResult[$propertyName] = $propNodeData->nodeValue;
                         }
                     }
                 }
             }
 
-            $propResult["name"] = trim(str_replace($basePath, "", $href), "/");
+            $propResult["name"] = urldecode(trim(str_replace($basePath, "", $href), "/"));
             $propResult["resourcetype"] = $propResult["resourcetype"] == "collection" ? "folder" : "file";
 
             $result[] = $propResult;
         }
 
-        if ($request->getHeader("Depth") == 0) {
+        $len = count($result);
+        $depth = $request->getHeader("Depth");
+        $minDepth = max(0, $request->getHeader("Min-Depth"));
+
+        $result = array_slice($result, $minDepth, $len - $minDepth);
+
+        if ($depth == 0) {
             $message = json_encode($result[0]);
         } else {
-            $message = json_encode(array_slice($result, 1));
+            $message = json_encode($result);
         }
+
         $stream = Stream::factory($message);
         $response->setHeader("Content-Type", "application/json");
 
@@ -179,10 +188,6 @@ class WebDAVSubscriber implements SubscriberInterface
 
                 $event->intercept($response);
             }
-        } elseif ($response && 401 == $response->getStatusCode()) {
-            $body = $response->getBody();
-
-            $reason = $body->getContents();
         }
     }
 }

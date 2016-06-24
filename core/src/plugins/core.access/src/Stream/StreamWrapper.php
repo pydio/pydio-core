@@ -64,6 +64,30 @@ class StreamWrapper
         return true;
     }
 
+    public function stream_stat() {
+        return $this->stream->stat();
+    }
+
+    public function stream_write($data) {
+        return (int) $this->stream->write($data);
+    }
+
+    public function stream_read($count) {
+        return $this->stream->read($count);
+    }
+
+    public function stream_tell() {
+        return $this->stream->tell();
+    }
+
+    public function stream_eof() {
+        return $this->stream->eof();
+    }
+
+    public function stream_seek($offset, $whence) {
+        return $this->stream->seek($offset, $whence);
+    }
+
     /**
      * @param $path
      * @param $options
@@ -140,6 +164,13 @@ class StreamWrapper
         return $stream->rmdir();
     }
 
+    public function rename($oldname, $newname) {
+
+        $stream = self::createStream($oldname);
+
+        return $stream->rename(new AJXP_Node($newname));
+    }
+
     public function url_stat($path, $flags) {
         $stream = self::createStream($path);
         $resource = PydioStreamWrapper::getResource($stream);
@@ -175,26 +206,21 @@ class StreamWrapper
         return $tmpFile;
     }
 
-    public static function copyFileInStream($path, $stream)
-    {
-        $fp = fopen($path, "r");
+    public static function copyFileInStream($path, $stream) {
+        $nodeStream = self::createStream($path);
+        $nodeStream->getContents();
 
-        self::copyStreamInStream($fp, $stream);
-
-        fclose($fp);
+        self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $stream);
     }
 
-    public static function copyStreamInStream($from, $to)
-    {
+    public static function copyStreamInStream($from, $to) {
         while (!feof($from)) {
             $data = fread($from, 4096);
             fwrite($to, $data, strlen($data));
         }
     }
 
-    public static function createStream($path)
-    {
-
+    public static function createStream($path) {
         // TODO - determines this with the config
         $node = new AJXP_Node($path);
         $repository = $node->getRepository();

@@ -116,7 +116,7 @@ class PydioStreamWrapper
             'rdev'    => 0,
             'size'    => $this->stream->getSize() ?: 0,
             'atime'   => 0,
-            'mtime'   => 0,
+            'mtime'   => $this->stream->getLastModifiedTime() ?: 0,
             'ctime'   => 0,
             'blksize' => 0,
             'blocks'  => 0

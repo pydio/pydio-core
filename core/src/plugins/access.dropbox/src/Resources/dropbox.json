@@ -10,7 +10,7 @@
       "parameters" : {
         "path" : {
           "required" : true,
-          "type" : "string",
+          "type" : "object",
           "location" : "json",
           "sentAs": "path",
           "filters": [{
@@ -28,7 +28,7 @@
       "parameters" : {
         "path" : {
           "required" : true,
-          "type" : "string",
+          "type" : "object",
           "location" : "header",
           "sentAs": "Dropbox-API-Arg",
           "filters": [{
@@ -47,7 +47,7 @@
       "parameters" : {
         "path" : {
           "required" : true,
-          "type" : "string",
+          "type" : "object",
           "location" : "json",
           "sentAs": "path",
           "filters": [{
@@ -63,7 +63,7 @@
       "parameters" : {
         "path" : {
           "required" : true,
-          "type" : "string",
+          "type" : "object",
           "location" : "json",
           "sentAs": "path",
           "filters": [{
@@ -79,7 +79,7 @@
       "parameters" : {
         "path" : {
           "required" : true,
-          "type" : "string",
+          "type" : "object",
           "location" : "json",
           "sentAs": "path",
           "filters": [{

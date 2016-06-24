@@ -26,11 +26,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
+use GuzzleHttp\Command\Guzzle\Parameter;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Stream\Listener\PathListener;
+use Pydio\Access\Core\Stream\Listener\PathSubscriber;
 use Pydio\Access\Core\Stream\Stream;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
-use Pydio\Access\DropBox\Listener\DropBoxSubscriber;
 use Pydio\Access\WebDAV\Listener\WebDAVSubscriber;
 use Pydio\Core\Model\ContextInterface;
 
@@ -69,7 +69,7 @@ class Driver extends FsAccessDriver
 
         Stream::addContextOption($context, [
             "subscribers" => [
-                new PathListener(),
+                new PathSubscriber(),
                 new WebDAVSubscriber()
             ]
         ]);
@@ -79,11 +79,10 @@ class Driver extends FsAccessDriver
 
     /********************************************************
      * Static functions used in the JSON service description
-     *******************************************************
+     ******************************************************
      * @param AJXP_Node $node
+     * @return string
      */
-
-
     public static function convertPath($node) {
 
         $ctx = $node->getContext();
@@ -99,10 +98,10 @@ class Driver extends FsAccessDriver
         return $basePath;
     }
 
-    public static function convertToJSON($key, $value) {
-        $key = '' . $key->getName();
-        $value = '' . $value;
-        $arr = [$key => $value];
-        return json_encode($arr);
+    public static function convertTime($date) {
+        $date = date_create($date);
+
+        return date_timestamp_get($date);
     }
+
 }

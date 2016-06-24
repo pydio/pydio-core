@@ -21,6 +21,7 @@ class Stream implements StreamInterface
 {
     private $resource;
     private $size;
+    private $lastModifiedTime;
     private $customMetadata;
 
     /** @var AJXP_Node $node */
@@ -236,6 +237,35 @@ class Stream implements StreamInterface
         return null;
     }
 
+    /**
+     * Returns the size of the limited subset of data
+     * {@inheritdoc}
+     */
+    public function getLastModifiedTime() {
+        if ($this->lastModifiedTime !== null) {
+            return $this->lastModifiedTime;
+        }
+
+        if (!$this->resource) {
+            return null;
+        }
+
+        // Clear the stat cache if the stream has a URI
+        $uri = $this->getMetadata("uri");
+        if (isset($uri)) {
+            clearstatcache(true, $uri);
+        }
+
+        $stat = $this->stat();
+
+        if (isset($stat["mtime"])) {
+            $this->lastModifiedTime = (int) $stat["mtime"];
+            return $this->lastModifiedTime;
+        }
+
+        return null;
+    }
+
     public function isFile() {
         if (!$this->resource) {
             return null;
@@ -297,7 +327,19 @@ class Stream implements StreamInterface
         // We can't know the size after writing anything
         $this->size = null;
 
-        $this->resource->write($string);
+        $this->detach();
+
+        $stream = Stream::factory($string);
+        $this->attach(GuzzleStreamWrapper::getResource($stream));
+
+        $command = $this->client->getCommand('Put', [
+            'path' => $this->node,
+            'body' => $stream
+        ]);
+
+        $this->client->execute($command);
+
+        return $stream->getSize();
     }
 
     public function getMetadata($key = null) {
@@ -313,7 +355,6 @@ class Stream implements StreamInterface
     }
 
     private function ls() {
-
         $command = $this->client->getCommand('Ls', [
             'path' => $this->node
         ]);
@@ -324,13 +365,8 @@ class Stream implements StreamInterface
     }
 
     private function get() {
-        $path = $this->node->getPath();
-        if (!isset($path)) {
-            $path = "";
-        }
-
         $command = $this->client->getCommand('Get', [
-            'path' => $path
+            'path' => $this->node
         ]);
 
         $result = $this->client->execute($command);
@@ -342,11 +378,6 @@ class Stream implements StreamInterface
     }
 
     public function stat() {
-        $path = $this->node->getPath();
-        if (!isset($path)) {
-            $path = "";
-        }
-
         $command = $this->client->getCommand('Stat', [
             'path' => $this->node
         ]);
@@ -361,13 +392,8 @@ class Stream implements StreamInterface
     }
 
     public function mkdir() {
-        $path = $this->node->getPath();
-        if (!isset($path)) {
-            $path = "";
-        }
-
         $command = $this->client->getCommand('Mkdir', [
-            'path' => $path
+            'path' => $this->node
         ]);
 
         $this->client->execute($command);
@@ -376,13 +402,8 @@ class Stream implements StreamInterface
     }
 
     public function rmdir() {
-        $path = $this->node->getPath();
-        if (!isset($path)) {
-            $path = "";
-        }
-
         $command = $this->client->getCommand('Rmdir', [
-            'path' => $path
+            'path' => $this->node
         ]);
 
         $this->client->execute($command);
@@ -390,28 +411,14 @@ class Stream implements StreamInterface
         return true;
     }
 
-    /*private function put($stream) {
-        $path = $this->node->getPath();
-
-        if (!isset($path)) {
-            $path = "";
-        }
-
-        stream_copy_to_stream();
-    }*/
-
-    /*private function rename() {
-        $path = $this->node->getPath();
-        if (!isset($path)) {
-            $path = "";
-        }
-
-        $command = $this->client->getCommand('Rmdir', [
-            'path' => $path
+    public function rename($newNode) {
+        $command = $this->client->getCommand('Rename', [
+            'path'    => $this->node,
+            'newPath' => $newNode
         ]);
 
         $this->client->execute($command);
 
         return true;
-    }*/
+    }
 }

@@ -27,7 +27,7 @@ use GuzzleHttp\Command\Event\PreparedEvent;
 /**
  * Listener used to change the way the paths are given (no urlencode for the slash)
  */
-class PathListener implements SubscriberInterface
+class PathSubscriber implements SubscriberInterface
 {
 
     /**
