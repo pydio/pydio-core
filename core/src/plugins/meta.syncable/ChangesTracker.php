@@ -27,7 +27,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
@@ -54,7 +56,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
      */
     public function init(ContextInterface $ctx, $options = [])
     {
-        $this->sqlDriver = Utils::cleanDibiDriverParameters(["group_switch_value" => "core"]);
+        $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters(["group_switch_value" => "core"]);
         parent::init($ctx, $options);
     }
 
@@ -281,7 +283,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
 
 
         $veryLastSeq = intval(dibi::query("SELECT MAX([seq]) FROM [ajxp_changes]")->fetchSingle());
-        $seqId = intval(Utils::sanitize($httpVars["seq_id"], AJXP_SANITIZE_ALPHANUM));
+        $seqId = intval(InputFilter::sanitize($httpVars["seq_id"], InputFilter::SANITIZE_ALPHANUM));
         if($veryLastSeq > 0 && $seqId > $veryLastSeq){
             // This is not normal! Send a signal reload all changes from start.
             if(!$stream) echo json_encode(['changes'=> [], 'last_seq'=>1]);
@@ -294,7 +296,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
         $ands[] = ["[ajxp_changes].[repository_identifier] = %s", $this->computeIdentifier($contextInterface)];
         $ands[]= ["[seq] > %i", $seqId];
         if(isSet($httpVars["filter"])) {
-            $filter = Utils::decodeSecureMagic($httpVars["filter"]);
+            $filter = InputFilter::decodeSecureMagic($httpVars["filter"]);
             $filterLike = rtrim($filter, "/") . "/";
             $ands[] = ["[source] LIKE %like~ OR [target] LIKE %like~", $filterLike, $filterLike];
         }
@@ -700,8 +702,8 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = Utils::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"])?$param["SQL_DRIVER"]:$this->sqlDriver);
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = OptionsHelper::cleanDibiDriverParameters(isSet($param) && isSet($param["SQL_DRIVER"]) ? $param["SQL_DRIVER"] : $this->sqlDriver);
+        return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
 }

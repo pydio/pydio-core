@@ -24,7 +24,8 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
@@ -184,14 +185,14 @@ class SimpleUpload extends Plugin
     public function unifyChunks($action, $httpVars, $fileVars, \Pydio\Core\Model\ContextInterface $contextInterface)
     {
         $selection = UserSelection::fromContext($contextInterface, []);
-        $dir = Utils::decodeSecureMagic($httpVars["dir"]);
+        $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
         $destStreamURL = $selection->currentBaseUrl().$dir."/";
-        $filename = Utils::decodeSecureMagic($httpVars["file_name"]);
+        $filename = InputFilter::decodeSecureMagic($httpVars["file_name"]);
 
         $chunks = array();
         $index = 0;
         while (isSet($httpVars["chunk_".$index])) {
-            $chunks[] = Utils::decodeSecureMagic($httpVars["chunk_".$index]);
+            $chunks[] = InputFilter::decodeSecureMagic($httpVars["chunk_" . $index]);
             $index++;
         }
 

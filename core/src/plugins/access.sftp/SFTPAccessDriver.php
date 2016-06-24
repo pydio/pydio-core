@@ -33,7 +33,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -102,8 +102,8 @@ class SFTPAccessDriver extends FsAccessDriver
     protected function filecopy($srcFile, $destFile)
     {
         if (MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
-            $srcFilePath = Utils::safeParseUrl($srcFile)["path"];
-            $destFilePath = Utils::safeParseUrl($destFile)["path"];
+            $srcFilePath = UrlUtils::safeParseUrl($srcFile)["path"];
+            $destFilePath = UrlUtils::safeParseUrl($destFile)["path"];
             $destDirPath = dirname($destFilePath);
             list($connection, $remote_base_path) = SFTPAccessWrapper::getSshConnection(AJXP_Node::contextFromUrl($srcFile));
             $remoteSrc = $remote_base_path.$srcFilePath;

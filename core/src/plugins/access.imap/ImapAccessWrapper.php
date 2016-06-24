@@ -24,7 +24,7 @@ use EmlParser;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 
@@ -91,7 +91,7 @@ class ImapAccessWrapper implements IAjxpWrapper
     {
         // parse URL
         $node = new AJXP_Node($path);
-        $parts = Utils::safeParseUrl($path);
+        $parts = UrlUtils::safeParseUrl($path);
         $this->repositoryId = $node->getRepositoryId();
 
         $mainCacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR);

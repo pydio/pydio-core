@@ -26,11 +26,15 @@ use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class SapiMiddleware
+ * Main Middleware for Http requests
+ * @package Pydio\Core\Http\Middleware
+ */
 class SapiMiddleware implements ITopLevelMiddleware
 {
 
@@ -68,6 +72,10 @@ class SapiMiddleware implements ITopLevelMiddleware
         $this->emitResponse($request, $response);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $responseInterface
+     */
     protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$responseInterface){
 
         $serverData = $request->getServerParams();
@@ -82,12 +90,18 @@ class SapiMiddleware implements ITopLevelMiddleware
             $action = (strpos($serverData["HTTP_ACCEPT"], "text/html") !== false ? "get_boot_gui" : "ping");
         }
         $request = $request
-            ->withAttribute("action", Utils::sanitize($action, AJXP_SANITIZE_EMAILCHARS))
+            ->withAttribute("action", InputFilter::sanitize($action, InputFilter::SANITIZE_EMAILCHARS))
             ->withAttribute("api", "session")
         ;
 
     }
 
+    /**
+     * Output the response to the browser, if no headers were already sent.
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return void
+     */
     public function emitResponse(ServerRequestInterface $request, ResponseInterface $response){
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
             /**

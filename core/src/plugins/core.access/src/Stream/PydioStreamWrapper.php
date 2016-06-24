@@ -1,7 +1,7 @@
 <?php
 namespace Pydio\Access\Core\Stream;
 use GuzzleHttp\Stream\StreamInterface;
-use Pydio\Core\Utils\Utils;
+
 
 /**
  * Converts Guzzle streams into PHP stream resources.

@@ -31,7 +31,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -424,6 +424,6 @@ class CasAuthFrontend extends AbstractAuthFrontend
     {
         $param = ConfService::getConfStorageImpl();
         $p = $param->sqlDriver;
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
+        return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . '/createPGTStorage.mysql');
     }
 }

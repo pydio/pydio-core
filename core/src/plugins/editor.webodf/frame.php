@@ -1,11 +1,12 @@
 <?php
 define('AJXP_EXEC', true);
-require_once('../../core/src/pydio/Core/Utils/Utils.php');
-use Pydio\Core\Utils\Utils;
-$AJXP_FILE_URL = Utils::securePath(Utils::sanitize($_GET["file"], 5));
-$parts = explode("/", Utils::securePath($_GET["file"]));
+require_once('../../core/src/pydio/Core/Utils/Vars/InputFilter.php');
+use Pydio\Core\Utils\Vars\InputFilter;
+
+$AJXP_FILE_URL = InputFilter::securePath(InputFilter::sanitize($_GET["file"], 5));
+$parts = explode("/", InputFilter::securePath($_GET["file"]));
 foreach($parts as  $i => $part){
-    $parts[$i] = Utils::sanitize($part, AJXP_SANITIZE_FILENAME);
+    $parts[$i] = InputFilter::sanitize($part, InputFilter::SANITIZE_FILENAME);
 }
 $AJXP_FILE_URL = implode("/", $parts);
 ?>

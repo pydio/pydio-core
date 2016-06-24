@@ -27,7 +27,8 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Psr\Http\Message\ServerRequestInterface;
@@ -66,7 +67,7 @@ class PowerFSController extends Plugin
         $ctx = $request->getAttribute("ctx");
         $httpVars = $request->getParsedBody();
         $dir = $httpVars["dir"] OR "";
-        $dir = Utils::decodeSecureMagic($dir);
+        $dir = InputFilter::decodeSecureMagic($dir);
         if ($dir == "/") $dir = "";
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $urlBase = $ctx->getUrlBase();
@@ -81,7 +82,7 @@ class PowerFSController extends Plugin
 
             case "postcompress_download":
 
-                $archive = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archive = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["archive_name"]), InputFilter::SANITIZE_FILENAME);
 
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
@@ -100,7 +101,7 @@ class PowerFSController extends Plugin
             case "compress" :
             case "precompress" :
 
-                $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archiveName = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["archive_name"]), InputFilter::SANITIZE_FILENAME);
                 $taskId = $request->getAttribute("pydio-task-id");
 
                 if ($taskId === null) {
@@ -138,7 +139,7 @@ class PowerFSController extends Plugin
                 $opeId = substr(md5(time()), 0, 10);
                 $originalArchiveParam = $archiveName;
                 if ($request->getAttribute("action") == "precompress") {
-                    $archiveName = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
+                    $archiveName = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
                 }
                 chdir($rootDir);
                 $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);

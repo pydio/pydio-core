@@ -25,7 +25,7 @@ use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -113,7 +113,7 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
         if (count($this->removed)) {
             $buffer .= "<remove>";
             foreach ($this->removed as $nodePath) {
-                $nodePath = Utils::xmlEntities($nodePath, true);
+                $nodePath = StringHelper::xmlEntities($nodePath, true);
                 $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
             }
             $buffer .= "</remove>";

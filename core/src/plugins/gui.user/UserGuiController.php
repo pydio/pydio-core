@@ -30,7 +30,10 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -121,16 +124,16 @@ class UserGuiController extends Plugin
                 // Find user by id
                 if (UsersService::userExists($httpVars["email"])) {
                     // Send email
-                    $mailUId = Utils::sanitize($httpVars["email"], AJXP_SANITIZE_EMAILCHARS);
+                    $mailUId = InputFilter::sanitize($httpVars["email"], InputFilter::SANITIZE_EMAILCHARS);
                     $userObject = UsersService::getUserById($mailUId);
                     $email = $userObject->getPersonalRole()->filterParameterValue("core.conf", "email", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($email)) {
-                        $uuid = Utils::generateRandomString(48);
-                        ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, Utils::decodeSecureMagic($httpVars["email"]), array());
+                        $uuid = StringHelper::generateRandomString(48);
+                        ConfService::getConfStorageImpl()->saveTemporaryKey("password-reset", $uuid, InputFilter::decodeSecureMagic($httpVars["email"]), array());
                         $mailer = PluginsService::getInstance($context)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
-                            $link = Utils::detectServerURL() . "/user/reset-password/" . $uuid;
+                            $link = ApplicationState::detectServerURL() . "/user/reset-password/" . $uuid;
                             $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"] . "<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';

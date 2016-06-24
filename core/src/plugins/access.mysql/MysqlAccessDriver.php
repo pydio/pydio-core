@@ -25,8 +25,9 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
 
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -80,11 +81,19 @@ class MysqlAccessDriver extends AbstractAccessDriver
         }
     }
 
+    /**
+     * @param $action
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @return null|string
+     * @throws PydioException
+     */
     public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $xmlBuffer = "";
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = Utils::securePath($getValue);
+            $$getName = InputFilter::securePath($getValue);
         }
         $selection = UserSelection::fromContext($ctx, $httpVars);
         if (isSet($dir) && $action != "upload") {
@@ -103,7 +112,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
 
         // Sanitize all httpVars entries
         foreach($httpVars as $k=>&$value){
-            $value = Utils::sanitize($value, AJXP_SANITIZE_FILENAME);
+            $value = InputFilter::sanitize($value, InputFilter::SANITIZE_FILENAME);
         }
 
         switch ($action) {
@@ -339,7 +348,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
-                        if(Utils::detectXSS($tableName)) {
+                        if(InputFilter::detectXSS($tableName)) {
                             $tableName = "XSS Detected!";
                             $size = 'N/A';
                             $count = 'N/A';
@@ -417,8 +426,8 @@ class MysqlAccessDriver extends AbstractAccessDriver
                                 print "$key=\"BLOB$sizeStr\" ";
                             } else {
                                 $value = str_replace("\"", "", $value);
-                                if(Utils::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
-                                $value = Utils::xmlEntities($value);
+                                if(InputFilter::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
+                                $value = StringHelper::xmlEntities($value);
                                 print $key.'="'.TextEncoder::toUTF8($value).'" ';
                                 if ($result["HAS_PK"]>0) {
                                     if (in_array($key, $result["PK_FIELDS"])) {
@@ -445,7 +454,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
         }
 
         if (isset($logMessage) || isset($errorMessage)) {
-            if(Utils::detectXSS($logMessage) || Utils::detectXSS($errorMessage)){
+            if(InputFilter::detectXSS($logMessage) || InputFilter::detectXSS($errorMessage)){
                 $xmlBuffer = XMLWriter::sendMessage(null, "XSS Detected!", false);
             }
             $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);

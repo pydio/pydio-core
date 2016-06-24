@@ -18,10 +18,11 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Http;
 
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -40,7 +41,7 @@ class BruteForceHelper
      */
     public static function getBruteForceLoginArray()
     {
-        $failedLog = Utils::getAjxpTmpDir() . "/failedAJXP.log";
+        $failedLog = ApplicationState::getAjxpTmpDir() . "/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
         $loginArray = unserialize($loginAttempt);
         $ret = array();
@@ -65,7 +66,7 @@ class BruteForceHelper
         if($validCurrent && isSet($loginArray[$_SERVER["REMOTE_ADDR"]])){
             unset($loginArray[$_SERVER["REMOTE_ADDR"]]);
         }
-        $failedLog = Utils::getAjxpTmpDir() . "/failedAJXP.log";
+        $failedLog = ApplicationState::getAjxpTmpDir() . "/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
 

@@ -23,7 +23,8 @@ namespace Pydio\Share\Model;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Share\Store\ShareStore;
 use Pydio\Share\View\PublicAccessManager;
 
@@ -164,7 +165,7 @@ class ShareLink
 
         $data = &$this->internal;
         $data["DOWNLOAD_DISABLED"] = (isSet($httpVars["simple_right_download"]) ? false : true);
-        $data["AJXP_APPLICATION_BASE"] = Utils::detectServerURL(true);
+        $data["AJXP_APPLICATION_BASE"] = ApplicationState::detectServerURL(true);
         if(isSet($httpVars["minisite_layout"])){
             $data["AJXP_TEMPLATE_NAME"] = $httpVars["minisite_layout"];
         }
@@ -186,7 +187,7 @@ class ShareLink
         if(isSet($httpVars["custom_handle"]) && !empty($httpVars["custom_handle"]) &&
             (!isSet($this->hash) || $httpVars["custom_handle"] != $this->hash)){
             // Existing already
-            $value = Utils::sanitize($httpVars["custom_handle"], AJXP_SANITIZE_ALPHANUM);
+            $value = InputFilter::sanitize($httpVars["custom_handle"], InputFilter::SANITIZE_ALPHANUM);
             $value = strtolower($value);
             if(strlen($value) < $this->store->getHashMinLength()){
                 $mess = LocaleService::getMessages();

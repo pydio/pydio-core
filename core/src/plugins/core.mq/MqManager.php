@@ -33,10 +33,12 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\UnixProcess;
+use Pydio\Core\Controller\UnixProcess;
 use Pydio\Notification\Core\IMessageExchanger;
 use Pydio\Notification\Core\Notification;
 
@@ -401,7 +403,7 @@ class MqManager extends Plugin
         $xml = $serializer->serialize($ctx);
         // add groupPath
         if ($user->getGroupPath() != null) {
-            $groupString = "groupPath=\"".Utils::xmlEntities($user->getGroupPath())."\"";
+            $groupString = "groupPath=\"". StringHelper::xmlEntities($user->getGroupPath()) ."\"";
             $xml = str_replace("<user id=", "<user {$groupString} id=", $xml);
         }
 
@@ -492,7 +494,7 @@ class MqManager extends Plugin
         $configs = $this->getConfigs();
 
         // Getting URLs of the Pydio system
-        $serverURL = Utils::detectServerURL();
+        $serverURL = ApplicationState::detectServerURL();
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
         $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
 

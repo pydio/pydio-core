@@ -28,7 +28,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -140,9 +142,9 @@ class IMagickPreviewer extends Plugin
 
         } else if ($action == "get_extracted_page" && isSet($httpVars["file"])) {
 
-            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/".Utils::decodeSecureMagic($httpVars["file"]);
+            $file = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full/". InputFilter::decodeSecureMagic($httpVars["file"]);
             if (!is_file($file)) {
-                $srcfile = Utils::decodeSecureMagic($httpVars["src_file"]);
+                $srcfile = InputFilter::decodeSecureMagic($httpVars["src_file"]);
                 if($contextInterface->getRepository()->hasContentFilter()){
                     $contentFilter = $contextInterface->getRepository()->getContentFilter();
                     $srcfile = $contentFilter->filterExternalPath($srcfile);
@@ -306,7 +308,7 @@ class IMagickPreviewer extends Plugin
         $isStream = (preg_match( "!^$wrappers_re://!", $targetFile ) === 1);
         if ($isStream) {
             $backToStreamTarget = $targetFile;
-            $targetFile = tempnam(Utils::getAjxpTmpDir(), "imagick_").".pdf";
+            $targetFile = tempnam(ApplicationState::getAjxpTmpDir(), "imagick_").".pdf";
         }else{
             $backToStreamTarget = null;
         }
@@ -329,7 +331,7 @@ class IMagickPreviewer extends Plugin
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
                 } else {
-                    $unoconv =  "HOME=".Utils::getAjxpTmpDir()." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
+                    $unoconv =  "HOME=". ApplicationState::getAjxpTmpDir() ." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
                 if(defined('AJXP_LOCALE')){
                     putenv('LC_CTYPE='.AJXP_LOCALE);

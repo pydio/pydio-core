@@ -20,7 +20,7 @@
  */
 namespace Pydio\Access\Core\Filter;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -47,7 +47,7 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
     function __construct($serializedForm = null){
         if($serializedForm != null){
             foreach($serializedForm as $path => $permissionValue){
-                $path = Utils::sanitize(Utils::securePath($path), AJXP_SANITIZE_DIRNAME);
+                $path = InputFilter::sanitize(InputFilter::securePath($path), InputFilter::SANITIZE_DIRNAME);
                 if(!is_array($permissionValue) || $permissionValue["children"]) continue;
                 $perm = new AJXP_Permission();
                 if($permissionValue["read"]) $perm->setRead();

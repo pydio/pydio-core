@@ -29,7 +29,9 @@ use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 
@@ -83,7 +85,7 @@ class FsAccessWrapper implements IAjxpWrapper
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
         $path       = self::unPatchPathForBaseDir($path);
-        $url        = Utils::safeParseUrl($path);
+        $url        = UrlUtils::safeParseUrl($path);
         $node       = new AJXP_Node($path);
         $repoObject = $node->getRepository();
         $repoId     = $node->getRepositoryId();
@@ -109,7 +111,7 @@ class FsAccessWrapper implements IAjxpWrapper
             //print($streamType.$path);
                if ($streamType == "file") {
                    if (self::$crtZip == null ||  !is_array(self::$currentListingKeys)) {
-                       $tmpDir = Utils::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
+                       $tmpDir = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
                        mkdir($tmpDir);
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");
@@ -117,11 +119,11 @@ class FsAccessWrapper implements IAjxpWrapper
                            if(is_file($tmpFileName)) unlink($tmpFileName);
                            if(is_dir($tmpDir)) rmdir($tmpDir);
                        });
-                        $crtZip = new PclZip(Utils::securePath($resolvedPath.$zipPath));
+                        $crtZip = new PclZip(InputFilter::securePath($resolvedPath . $zipPath));
                         $content = $crtZip->listContent();
                         if(is_array($content)){
                             foreach ($content as $item) {
-                                $fName = Utils::securePath($item["stored_filename"]);
+                                $fName = InputFilter::securePath($item["stored_filename"]);
                                 if ($fName == $localPath || "/".$fName == $localPath) {
                                     $localPath = $fName;
                                     break;
@@ -142,7 +144,7 @@ class FsAccessWrapper implements IAjxpWrapper
                        }
                    }
                } else {
-                $crtZip = new PclZip(Utils::securePath($resolvedPath.$zipPath));
+                $crtZip = new PclZip(InputFilter::securePath($resolvedPath . $zipPath));
                 $liste = $crtZip->listContent();
                    if(!is_array($liste)) $liste = array();
                 if($storeOpenContext) self::$crtZip = $crtZip;
@@ -283,7 +285,7 @@ class FsAccessWrapper implements IAjxpWrapper
     public function stream_open($path, $mode, $options, &$context)
     {
         try {
-            $this->realPath = Utils::securePath(self::initPath($path, "file"));
+            $this->realPath = InputFilter::securePath(self::initPath($path, "file"));
         } catch (\Exception $e) {
             Logger::error(__CLASS__,"stream_open", "Error while opening stream $path (".$e->getMessage().")");
             return false;

@@ -26,8 +26,9 @@ use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -171,7 +172,7 @@ class Notification implements ContextProviderInterface
                 return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
             }
         }
-        return Utils::getWorkspaceShortcutURL($this->getNode()->getRepository()).$this->getNode()->getPath();
+        return ApplicationState::getWorkspaceShortcutURL($this->getNode()->getRepository()) .$this->getNode()->getPath();
     }
 
     /**

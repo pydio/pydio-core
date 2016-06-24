@@ -27,7 +27,7 @@
  * @package Pydio
  * @subpackage Core
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Reflection;
 
 //define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
 use Pydio\Core\PluginFramework\Plugin;

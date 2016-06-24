@@ -25,7 +25,10 @@ use DibiException;
 use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\PasswordEncoder;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -50,7 +53,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     {
         parent::init($ctx, $options);
         if (empty($options["SQL_DRIVER"])) return;
-        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+        $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if (!dibi::isConnected()) {
                 dibi::connect($this->sqlDriver);
@@ -63,7 +66,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     public function performChecks()
     {
         if (!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
@@ -97,7 +100,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
             $groupPathCondition = "[groupPath] = %s";
         }
         if ($regexp != null) {
-            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] " . Utils::regexpToLike($regexp) . " AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", Utils::cleanRegexp($regexp), $baseGroup, $limit, $offset);
+            $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE [login] " . StringHelper::regexpToLike($regexp) . " AND $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", StringHelper::cleanRegexp($regexp), $baseGroup, $limit, $offset);
         } else if ($offset != -1 || $limit != -1) {
             $res = dibi::query("SELECT * FROM [ajxp_users] AS u WHERE $groupPathCondition AND $ignoreHiddens ORDER BY [login] ASC %lmt %ofs", $baseGroup, $limit, $offset);
         } else {
@@ -144,7 +147,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         $select = "SELECT COUNT(*) FROM [ajxp_users] AS u WHERE %and";
 
         if (!empty($regexp)) {
-            $ands[] = array("[u.login] " . Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
+            $ands[] = array("[u.login] " . StringHelper::regexpToLike($regexp), StringHelper::cleanRegexp($regexp));
         }
         if ($recursive) {
             $ands[] = array("[u.groupPath] LIKE %like~", $baseGroup);
@@ -169,7 +172,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
                 $select = "SELECT COUNT(*) FROM [ajxp_users] AS u, [ajxp_user_rights] AS r WHERE %and";
                 $ands[] = array("[r.login]=[u.login]");
                 $ands[] = array("[r.repo_uuid] = %s", $filterProperty);
-                $ands[] = array("[r.rights] " . Utils::likeToLike($filterValue), Utils::cleanLike($filterValue));
+                $ands[] = array("[r.rights] " . StringHelper::likeToLike($filterValue), StringHelper::cleanLike($filterValue));
             }
         }
 
@@ -219,7 +222,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         if (!$userStoredPass) return false;
 
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) { // Seed = -1 means that password is not encoded.
-            return Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
+            return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
         } else {
             return (md5($userStoredPass . $seed) === $pass);
         }
@@ -250,7 +253,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         if ($this->userExists($login)) return;
         $userData = array("login" => $login);
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $userData["password"] = Utils::pbkdf2_create_hash($passwd); //md5($passwd);
+            $userData["password"] = PasswordEncoder::pbkdf2_create_hash($passwd); //md5($passwd);
         } else {
             $userData["password"] = $passwd;
         }
@@ -267,7 +270,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
         if (!$this->userExists($login)) throw new Exception("User does not exists!");
         $userData = array("login" => $login);
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $userData["password"] = Utils::pbkdf2_create_hash($newPass); //md5($newPass);
+            $userData["password"] = PasswordEncoder::pbkdf2_create_hash($newPass); //md5($newPass);
         } else {
             $userData["password"] = $newPass;
         }
@@ -300,8 +303,8 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
+        $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
 }

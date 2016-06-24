@@ -32,7 +32,10 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 use Pydio\Tasks\Providers\SqlTasksProvider;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -58,7 +61,7 @@ class TaskController extends Plugin implements SqlTableProvider
         if(isSet($params["taskId"])) {
             $task->setId($params["taskId"]);
         } else {
-            $task->setId(Utils::createGUID());
+            $task->setId(StringHelper::createGUID());
         }
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
@@ -185,8 +188,8 @@ class TaskController extends Plugin implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
 }

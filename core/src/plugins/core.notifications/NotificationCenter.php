@@ -27,7 +27,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 use \DOMXPath as DOMXPath;

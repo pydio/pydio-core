@@ -34,7 +34,7 @@ use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 
 
@@ -523,7 +523,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             $isRemote = MetaStreamWrapper::wrapperIsRemote($this->_url);
             if ($isRemote) {
                 register_shutdown_function(function(){
-                    Utils::silentUnlink($this->realFilePointer);
+                    FileHelper::silentUnlink($this->realFilePointer);
                 });
 
             }

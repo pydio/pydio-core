@@ -31,7 +31,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
@@ -163,7 +165,7 @@ class ZohoEditor extends Plugin
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
-                $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $file = InputFilter::decodeSecureMagic(base64_decode($httpVars["file"]));
             }else{
                 $file = $selection->getUniqueFile();
             }
@@ -268,7 +270,7 @@ class ZohoEditor extends Plugin
 
                 $url =  $this->getContextualOption($ctx, "ZOHO_AGENT_URL")."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
 
-                $data = Utils::getRemoteContent($url);
+                $data = FileHelper::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
 

@@ -21,7 +21,8 @@
 namespace Pydio\Access\Core;
 
 use Pydio\Access\Core\Model\UserSelection;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\PathUtils;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -94,7 +95,7 @@ class RecycleBinManager
         if(!self::recycleEnabled() || $selection->isEmpty()) {
             return;
         }
-        $currentLocation = Utils::safeDirname($selection->getUniqueFile());
+        $currentLocation = PathUtils::forwardSlashDirname($selection->getUniqueFile());
 
         // FILTER ACTION FOR DELETE
         if ($action == "delete" && !self::currentLocationIsRecycle($currentLocation) && !isSet($httpVars["force_deletion"])) {

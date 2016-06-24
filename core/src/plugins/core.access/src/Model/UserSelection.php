@@ -27,7 +27,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
+
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -167,7 +169,7 @@ class UserSelection
             if(strpos($v, "base64encoded:") === 0){
                 $v = base64_decode(array_pop(explode(':', $v, 2)));
             }
-            $this->addFile(Utils::decodeSecureMagic($v));
+            $this->addFile(InputFilter::decodeSecureMagic($v));
             $this->isUnique = true;
             //return ;
         }
@@ -178,7 +180,7 @@ class UserSelection
                 if(strpos($v, "base64encoded:") === 0){
                     $v = base64_decode(array_pop(explode(':', $v, 2)));
                 }
-                $this->addFile(Utils::decodeSecureMagic($v));
+                $this->addFile(InputFilter::decodeSecureMagic($v));
                 $index ++;
             }
             $this->isUnique = false;
@@ -192,7 +194,7 @@ class UserSelection
                 $array["path"] = [$array["path"]];
             }
             foreach ($array["path"] as $p){
-                $p = Utils::decodeSecureMagic($p);
+                $p = InputFilter::decodeSecureMagic($p);
                 // First part must be the repository ID
                 $p = "/".implode("/", array_slice(explode("/", trim($p, "/")), 1));
                 $this->addFile($p);
@@ -201,19 +203,19 @@ class UserSelection
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
             foreach($array["nodes"] as $value){
-                $this->addFile(Utils::decodeSecureMagic($value));
+                $this->addFile(InputFilter::decodeSecureMagic($value));
             }
             $this->isUnique = count($this->files) == 1;
         }
         if (isSet($array[$this->dirPrefix])) {
-            $this->dir = Utils::securePath($array[$this->dirPrefix]);
+            $this->dir = InputFilter::securePath($array[$this->dirPrefix]);
             if ($test = $this->detectZip($this->dir)) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];
             }
         } else if (!$this->isEmpty() && $this->isUnique()) {
-            if ($test = $this->detectZip(Utils::safeDirname($this->files[0]))) {
+            if ($test = $this->detectZip(PathUtils::forwardSlashDirname($this->files[0]))) {
                 $this->inZip = true;
                 $this->zipFile = $test[0];
                 $this->localZipPath = $test[1];
@@ -250,7 +252,7 @@ class UserSelection
      */
     public function getZipPath($decode = false)
     {
-        if($decode) return \Pydio\Core\Utils\Utils::decodeSecureMagic($this->zipFile);
+        if($decode) return InputFilter::decodeSecureMagic($this->zipFile);
         else return $this->zipFile;
     }
 
@@ -261,7 +263,7 @@ class UserSelection
      */
     public function getZipLocalPath($decode = false)
     {
-        if($decode) return Utils::decodeSecureMagic($this->localZipPath);
+        if($decode) return InputFilter::decodeSecureMagic($this->localZipPath);
         else return $this->localZipPath;
     }
     /**

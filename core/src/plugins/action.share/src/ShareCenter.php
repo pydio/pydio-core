@@ -44,7 +44,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -717,7 +718,7 @@ class ShareCenter extends Plugin
                 $folder = false;
                 if (isSet($httpVars["element_type"]) && $httpVars["element_type"] == "folder") {
                     $folder = true;
-                    $selectedNode = new AJXP_Node("pydio://". $ctx->getUser()->getId() ."@". Utils::sanitize($httpVars["repository_id"], AJXP_SANITIZE_ALPHANUM)."/");
+                    $selectedNode = new AJXP_Node("pydio://". $ctx->getUser()->getId() ."@". InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM) ."/");
                 }
                 $shares = array();
                 $this->getShareStore()->getMetaManager()->getSharesFromMeta($shareNode, $shares, false);
@@ -784,13 +785,14 @@ class ShareCenter extends Plugin
 
                 }else{
 
-                    $file = Utils::decodeSecureMagic($httpVars["file"]);
+                    $file = InputFilter::decodeSecureMagic($httpVars["file"]);
                     $node = new AJXP_Node($ctx->getUrlBase().$file);
                     $loggedUser = $ctx->getUser();
                     if(isSet($httpVars["owner"]) && $loggedUser->isAdmin()
-                        && $loggedUser->getGroupPath() == "/" && $loggedUser->getId() != Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS)){
+                        && $loggedUser->getGroupPath() == "/" && $loggedUser->getId() != InputFilter::sanitize($httpVars["owner"], InputFilter::SANITIZE_EMAILCHARS)
+                    ){
                         // Impersonate the current user
-                        $node->setUserId(Utils::sanitize($httpVars["owner"], AJXP_SANITIZE_EMAILCHARS));
+                        $node->setUserId(InputFilter::sanitize($httpVars["owner"], InputFilter::SANITIZE_EMAILCHARS));
                     }
                     if(!file_exists($node->getUrl())){
                         $mess = LocaleService::getMessages();
@@ -817,7 +819,7 @@ class ShareCenter extends Plugin
                 $mess = LocaleService::getMessages();
                 $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 if(isSet($httpVars["hash"])){
-                    $sanitizedHash = Utils::sanitize($httpVars["hash"], AJXP_SANITIZE_ALPHANUM);
+                    $sanitizedHash = InputFilter::sanitize($httpVars["hash"], InputFilter::SANITIZE_ALPHANUM);
                     $ajxpNode = ($userSelection->isEmpty() ? null : $userSelection->getUniqueNode());
                     $result = $this->getShareStore()->deleteShare($httpVars["element_type"], $sanitizedHash, false, false, $ajxpNode);
                     if($result !== false){
@@ -914,7 +916,7 @@ class ShareCenter extends Plugin
                 if(!in_array($httpVars["p_name"], array("counter", "tags"))){
                     return null;
                 }
-                $hash = Utils::decodeSecureMagic($httpVars["element_id"]);
+                $hash = InputFilter::decodeSecureMagic($httpVars["element_id"]);
                 $userSelection = UserSelection::fromContext($ctx, $httpVars);
                 $ajxpNode = $userSelection->getUniqueNode();
                 if($this->getShareStore()->shareIsLegacy($hash)){
@@ -944,7 +946,7 @@ class ShareCenter extends Plugin
                 if($userContext == "global" && $ctx->getUser()->isAdmin()){
                     $currentUser = false;
                 }else if($userContext == "user" && $ctx->getUser()->isAdmin() && !empty($httpVars["user_id"])){
-                    $currentUser = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+                    $currentUser = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
                 }
                 $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
 
@@ -1435,8 +1437,8 @@ class ShareCenter extends Plugin
         }
 
         // CHECK REPO DOES NOT ALREADY EXISTS WITH SAME LABEL
-        $label = Utils::sanitize(Utils::securePath($httpVars["repo_label"]), AJXP_SANITIZE_HTML);
-        $description = Utils::sanitize(Utils::securePath($httpVars["repo_description"]), AJXP_SANITIZE_HTML);
+        $label = InputFilter::sanitize(InputFilter::securePath($httpVars["repo_label"]), InputFilter::SANITIZE_HTML);
+        $description = InputFilter::sanitize(InputFilter::securePath($httpVars["repo_description"]), InputFilter::SANITIZE_HTML);
         $exists = $this->checkRepoWithSameLabel($label, isSet($editingRepo)?$editingRepo:null);
         if($exists){
             $mess = LocaleService::getMessages();
@@ -2050,7 +2052,7 @@ class ShareCenter extends Plugin
                 "description"   => $repo->getDescription(),
                 "entries"       => $sharedEntries,
                 "element_watch" => $elementWatch,
-                "repository_url"=> Utils::getWorkspaceShortcutURL($repo)."/",
+                "repository_url"=> ApplicationState::getWorkspaceShortcutURL($repo) ."/",
                 "content_filter"=> $cFilter,
                 "share_owner"   => $repo->getOwner(),
                 "share_scope"    => (isSet($repo->options["SHARE_ACCESS"]) ? $repo->options["SHARE_ACCESS"] : "private")

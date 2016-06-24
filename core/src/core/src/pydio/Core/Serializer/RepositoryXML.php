@@ -26,8 +26,8 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Core\Utils\Utils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -126,7 +126,7 @@ class RepositoryXML
             }
             $label = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $uId, "core.conf", $uId);
             $ownerLabel = $label;
-            $isSharedString =  'owner="'.Utils::xmlEntities($label).'"';
+            $isSharedString =  'owner="'. StringHelper::xmlEntities($label) .'"';
         }
         if ($repoObject->securityScope() == "USER" || $currentUserIsOwner){
             $streamString .= " userScope=\"true\"";
@@ -137,7 +137,7 @@ class RepositoryXML
         if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
         $description = $repoObject->getDescription($public, $ownerLabel);
         if (!empty($description)) {
-            $descTag = '<description>'.Utils::xmlEntities($description, true).'</description>';
+            $descTag = '<description>'. StringHelper::xmlEntities($description, true) .'</description>';
         }
         $ctx = Context::contextWithObjects($loggedUser, $repoObject);
         $roleString="";
@@ -156,8 +156,8 @@ class RepositoryXML
                 $value = $merged->filterParameterValue($exposed_prop["PLUGIN_ID"], $exposed_prop["NAME"], $repoId, $value);
                 if($value !== null){
                     if($value === true  || $value === false) $value = ($value === true ?"true":"false");
-                    $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'.Utils::xmlEntities($value).'"/>';
-                    $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'.Utils::xmlEntities($value).'" ';
+                    $params[] = '<repository_plugin_param plugin_id="'.$exposed_prop["PLUGIN_ID"].'" name="'.$exposed_prop["NAME"].'" value="'. StringHelper::xmlEntities($value) .'"/>';
+                    $roleString .= str_replace(".", "_",$exposed_prop["PLUGIN_ID"])."_".$exposed_prop["NAME"].'="'. StringHelper::xmlEntities($value) .'" ';
                 }
             }
             $roleString.='acl="'.$merged->getAcl($repoId).'"';
@@ -166,7 +166,7 @@ class RepositoryXML
             }
         }
         $clientSettings = (!$isActive ? "" : $this->repositoryClientSettings($repoObject, $ctx));
-        return "<repo access_type=\"".$repoObject->getAccessType()."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(Utils::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$clientSettings."</repo>";
+        return "<repo access_type=\"".$repoObject->getAccessType()."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(StringHelper::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$clientSettings."</repo>";
 
     }
 

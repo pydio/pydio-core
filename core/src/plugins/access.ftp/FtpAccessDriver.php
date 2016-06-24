@@ -34,7 +34,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Task;
@@ -160,7 +160,7 @@ class FtpAccessDriver extends FsAccessDriver
 
             case "upload":
                 $httpVars = $request->getParsedBody();
-                $destinationFolder = Utils::securePath("/".$httpVars['dir']);
+                $destinationFolder = InputFilter::securePath("/" . $httpVars['dir']);
 
                 /** @var UploadedFileInterface[] $uploadedFiles */
                 $uploadedFiles = $request->getUploadedFiles();
@@ -173,7 +173,7 @@ class FtpAccessDriver extends FsAccessDriver
                     try {
 
                         $this->logDebug("Upload : rep_source ", array($destinationFolder));
-                        $err = Utils::parseFileDataErrors($uploadedFile, true);
+                        $err = InputFilter::parseFileDataErrors($uploadedFile, true);
                         if ($err != null) {
                             $errorCode = $err[0];
                             $errorMessage = $err[1];

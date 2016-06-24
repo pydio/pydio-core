@@ -34,11 +34,10 @@ use Pydio\Core\Model\ContextInterface;
 
 
 use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\CacheService;
 
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 
@@ -529,8 +528,8 @@ class PluginsService
         }
 
         if (!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false) {
-            Utils::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
-            Utils::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->detectedPlugins, false, false);
+            FileHelper::saveSerialFile(AJXP_PLUGINS_REQUIRES_FILE, $this->required_files, false, false);
+            FileHelper::saveSerialFile(AJXP_PLUGINS_CACHE_FILE, $this->detectedPlugins, false, false);
             if (is_file(AJXP_PLUGINS_QUERIES_CACHE)) {
                 @unlink(AJXP_PLUGINS_QUERIES_CACHE);
             }
@@ -598,7 +597,7 @@ class PluginsService
     public function loadFromPluginQueriesCache($key)
     {
         if(AJXP_SKIP_CACHE) return null;
-        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        $test = FileHelper::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
         if (!empty($test) && is_array($test) && isset($test[$key])) {
             return $test[$key];
         }
@@ -614,10 +613,10 @@ class PluginsService
     public function storeToPluginQueriesCache($key, $value)
     {
         if(AJXP_SKIP_CACHE) return;
-        $test = Utils::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
+        $test = FileHelper::loadSerialFile(AJXP_PLUGINS_QUERIES_CACHE);
         if(!is_array($test)) $test = [];
         $test[$key] = $value;
-        Utils::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
+        FileHelper::saveSerialFile(AJXP_PLUGINS_QUERIES_CACHE, $test);
     }
 
     /*********************************/
@@ -998,7 +997,7 @@ class PluginsService
     private function _loadDetectedPluginsFromCache($cacheStorage){
 
         if((!defined("AJXP_SKIP_CACHE") || AJXP_SKIP_CACHE === false)){
-            $reqs = Utils::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
+            $reqs = FileHelper::loadSerialFile(AJXP_PLUGINS_REQUIRES_FILE);
             if (count($reqs)) {
                 foreach ($reqs as $fileName) {
                     if (!is_file($fileName)) {
@@ -1020,7 +1019,7 @@ class PluginsService
 
                 // Retrieving Registry from files cache
                 if (empty($res)) {
-                    $res = Utils::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
+                    $res = FileHelper::loadSerialFile(AJXP_PLUGINS_CACHE_FILE);
                     $this->detectedPlugins=$res;
                     $this->savePluginsRegistryToCache($cacheStorage);
                 }

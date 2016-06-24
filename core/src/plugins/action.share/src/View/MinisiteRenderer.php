@@ -29,7 +29,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -88,7 +89,7 @@ class MinisiteRenderer
         // Default value
         if(isSet($data["AJXP_TEMPLATE_NAME"])){
             $templateName = $data["AJXP_TEMPLATE_NAME"];
-            if($templateName == "ajxp_film_strip" && Utils::userAgentIsMobile()){
+            if($templateName == "ajxp_film_strip" && UserAgent::userAgentIsMobile()){
                 $templateName = "ajxp_shared_folder";
             }
         }
@@ -201,7 +202,7 @@ class MinisiteRenderer
             $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
         }
 
-        $serverBaseUrl = Utils::detectServerURL(true);
+        $serverBaseUrl = ApplicationState::detectServerURL(true);
 
         // Update Host dynamically if it differ from registered one.
         $registeredHost = parse_url($tPath, PHP_URL_HOST);

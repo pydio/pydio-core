@@ -26,7 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 

@@ -31,7 +31,8 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -227,7 +228,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      */
     public function clearCacheByNS(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
-        $ns = Utils::sanitize($requestInterface->getParsedBody()["namespace"], AJXP_SANITIZE_ALPHANUM);
+        $ns = InputFilter::sanitize($requestInterface->getParsedBody()["namespace"], InputFilter::SANITIZE_ALPHANUM);
         if($ns == AJXP_CACHE_SERVICE_NS_SHARED){
             ConfService::clearAllCaches();
         }else{

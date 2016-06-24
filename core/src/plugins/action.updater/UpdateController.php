@@ -26,7 +26,7 @@ use DOMXPath;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -137,7 +137,7 @@ class UpdateController extends Plugin
 
             case "perform_upgrade" :
 
-                Utils::safeIniSet("output_buffering", "Off");
+                ApplicationState::safeIniSet("output_buffering", "Off");
                 if (AJXP_PACKAGING != "zip") {
                     $lang = LocaleService::getLanguage();
                     $file = $this->getBaseDir() . "/howto/linux_en.html";

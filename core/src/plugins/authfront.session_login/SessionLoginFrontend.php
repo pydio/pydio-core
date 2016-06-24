@@ -27,11 +27,12 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\BruteForceHelper;
-use Pydio\Core\Utils\CookiesHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Http\BruteForceHelper;
+use Pydio\Core\Utils\Http\CookiesHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Utils\CaptchaProvider;
+use Pydio\Core\Utils\Http\CaptchaProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -48,7 +49,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
      */
     function isEnabled()
     {
-        if (Utils::detectApplicationFirstRun()) return false;
+        if (ApplicationState::detectApplicationFirstRun()) return false;
         return parent::isEnabled();
     }
 
@@ -120,7 +121,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
             if ($cookieLogin) {
                 list($userId, $userPass) = CookiesHelper::getRememberCookieData();
             } else {
-                $userId = (isSet($httpVars["userid"]) ? Utils::sanitize($httpVars["userid"], AJXP_SANITIZE_EMAILCHARS) : null);
+                $userId = (isSet($httpVars["userid"]) ? InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS) : null);
                 $userPass = (isSet($httpVars["password"]) ? trim($httpVars["password"]) : null);
             }
             $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true") ? true : false);

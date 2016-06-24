@@ -26,7 +26,8 @@
  */
 namespace Pydio\Editor\Image;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+
 
 /**
  * @package PThumb
@@ -515,7 +516,7 @@ class PThumb
             $isStream = (preg_match("!^$wrappers_re://!", $target_file) === 1);
             if ($isStream) {
                 $backToStreamTarget = $target_file;
-                $target_file = tempnam(Utils::getAjxpTmpDir(), "pthumb_");
+                $target_file = tempnam(ApplicationState::getAjxpTmpDir(), "pthumb_");
             }
 
             switch ($format) {

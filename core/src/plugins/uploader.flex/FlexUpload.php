@@ -25,7 +25,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

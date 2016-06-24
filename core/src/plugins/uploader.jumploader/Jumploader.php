@@ -26,8 +26,11 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Log\Core\Logger;
 
@@ -123,7 +126,7 @@ class Jumploader extends Plugin
         if (!isSet($httpVars["fileId"])) {
             $this->logDebug("Trying Cross-Session Resume request");
 
-            $dir = Utils::decodeSecureMagic($httpVars["dir"]);
+            $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
             $context = UserSelection::fromContext($ctx, $httpVars);
             $destStreamURL = $context->currentBaseUrl().$dir;
             $fileHash = md5($httpVars["fileName"]);
@@ -243,7 +246,7 @@ class Jumploader extends Plugin
             if (isset($httpVars["lastPartition"]) && isset($httpVars["partitionCount"])) {
                 /* we get the stream url (where all the partitions have been uploaded so far) */
 
-                $dir = Utils::decodeSecureMagic($httpVars["dir"]);
+                $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
                 $context = UserSelection::fromContext($request->getAttribute("ctx"), []);
                 $destStreamURL = $context->currentBaseUrl().$dir."/";
 
@@ -277,7 +280,7 @@ class Jumploader extends Plugin
         $driver = $repository->getDriverInstance();
 
         if ($httpVars["lastPartition"]) {
-            $dir = Utils::decodeSecureMagic($httpVars["dir"]);
+            $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
             $context = UserSelection::fromContext($ctx, $httpVars);
             $destStreamURL = $context->currentBaseUrl().$dir."/";
 
@@ -375,7 +378,7 @@ class Jumploader extends Plugin
                 // Create the folder tree as necessary
                 foreach ($subs as $key => $spath) {
                     $messtmp="";
-                    $dirname=Utils::decodeSecureMagic($spath, AJXP_SANITIZE_FILENAME);
+                    $dirname= InputFilter::decodeSecureMagic($spath, InputFilter::SANITIZE_FILENAME);
                     $dirname = substr($dirname, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                     //$this->filterUserSelectionToHidden(array($dirname));
                     if (StatHelper::isHidden($dirname)) {
@@ -416,10 +419,10 @@ class Jumploader extends Plugin
                 $this->logDebug("PartitionRealName", $destStreamURL.$httpVars["partitionRealName"]);
 
                 // Get file by name (md5 value)
-                $relPath_md5 = Utils::decodeSecureMagic(md5($httpVars["relativePath"]));
+                $relPath_md5 = InputFilter::decodeSecureMagic(md5($httpVars["relativePath"]));
 
                 // original file name
-                $relPath = Utils::decodeSecureMagic($httpVars["relativePath"]);
+                $relPath = InputFilter::decodeSecureMagic($httpVars["relativePath"]);
 
                 $target = $destStreamURL;
                 $target .= (self::$remote)? basename($relPath) : $relPath;
@@ -433,8 +436,8 @@ class Jumploader extends Plugin
 
                 if ($httpVars["partitionCount"] > 1) {
                     if (self::$remote) {
-                        $test = Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
-                        $newDest = fopen(Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"], "w");
+                        $test = ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"];
+                        $newDest = fopen(ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"], "w");
                         $newFile = array();
                         $length = 0;
                         for ($i = 0, $count = count($partitions); $i < $count; $i++) {
@@ -453,7 +456,7 @@ class Jumploader extends Plugin
                         $newFile["name"] = $httpVars["partitionRealName"];
                         $newFile["error"] = 0;
                         $newFile["size"] = $length;
-                        $newFile["tmp_name"] = Utils::getAjxpTmpDir()."/".$httpVars["partitionRealName"];
+                        $newFile["tmp_name"] = ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"];
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
                     } else {
@@ -509,7 +512,7 @@ class Jumploader extends Plugin
         if (is_file($this->getBaseDir()."/jumploader_z.jar")) {
             return "ERROR: The applet is already installed!";
         }
-        $fileData = Utils::getRemoteContent("http://jumploader.com/jar/jumploader_z.jar");
+        $fileData = FileHelper::getRemoteContent("http://jumploader.com/jar/jumploader_z.jar");
         if (!is_writable($this->getBaseDir())) {
             file_put_contents(AJXP_CACHE_DIR."/jumploader_z.jar", $fileData);
             return "ERROR: The applet was downloaded, but the folder plugins/uploader.jumploader is not writeable. Applet is located in the cache folder, please put it manually in the plugin folder.";

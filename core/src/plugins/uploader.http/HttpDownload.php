@@ -24,10 +24,11 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\UnixProcess;
+use Pydio\Core\Controller\UnixProcess;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 
@@ -53,7 +54,7 @@ class HttpDownload extends Plugin
         $httpVars = $request->getParsedBody();
         $action = $request->getAttribute("action");
         $userSelection = UserSelection::fromContext($request->getAttribute("ctx"), $httpVars);
-        $dir = Utils::decodeSecureMagic($httpVars["dir"]);
+        $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
         $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";
         $dlURL = null;
         if (isSet($httpVars["file"])) {
@@ -62,7 +63,7 @@ class HttpDownload extends Plugin
             $basename = basename($getPath);
             //$dlURL = $httpVars["file"];
         }else if (isSet($httpVars["dlfile"])) {
-            $dlFile = $userSelection->currentBaseUrl().Utils::decodeSecureMagic($httpVars["dlfile"]);
+            $dlFile = $userSelection->currentBaseUrl(). InputFilter::decodeSecureMagic($httpVars["dlfile"]);
             $realFile = file_get_contents($dlFile);
             if(empty($realFile)) throw new \Exception("cannot find file $dlFile for download");
             $parts = parse_url($realFile);
@@ -116,7 +117,7 @@ class HttpDownload extends Plugin
             break;
             case "update_dl_data":
 
-                $file = Utils::decodeSecureMagic($httpVars["file"]);
+                $file = InputFilter::decodeSecureMagic($httpVars["file"]);
                 header("text/plain");
                 if (is_file($currentDirUrl.$file)) {
                     $node = new AJXP_Node($currentDirUrl.$file);

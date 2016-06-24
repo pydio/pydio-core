@@ -29,8 +29,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -103,13 +103,13 @@ class InboxAccessDriver extends FsAccessDriver
         $nodeObject = new AJXP_Node($nodePath);
         $basename = $nodeObject->getLabel();
         if($nodeObject->isRoot()){
-            return ['stat' => stat(Utils::getAjxpTmpDir())];
+            return ['stat' => stat(ApplicationState::getAjxpTmpDir())];
         }
         $allNodes = self::getNodes($nodeObject->getContext(), false);
         $nodeData = $allNodes[$basename];
         if(!isSet($nodeData["stat"])){
             if(in_array(pathinfo($basename, PATHINFO_EXTENSION), ["error", "invitation"])){
-                $stat = stat(Utils::getAjxpTmpDir());
+                $stat = stat(ApplicationState::getAjxpTmpDir());
             }else{
                 $url = $nodeData["url"];
                 $node = new AJXP_Node($url);
@@ -121,7 +121,7 @@ class InboxAccessDriver extends FsAccessDriver
                     Controller::applyHook("node.read", [&$node]);
                     $stat = stat($url);
                 }catch (\Exception $e){
-                    $stat = stat(Utils::getAjxpTmpDir());
+                    $stat = stat(ApplicationState::getAjxpTmpDir());
                 }
                 if(is_array($stat) && $nodeObject->getContext()->hasUser()){
                     $acl = $nodeObject->getContext()->getUser()->getMergedRole()->getAcl($nodeData["meta"]["shared_repository_id"]);
@@ -217,7 +217,7 @@ class InboxAccessDriver extends FsAccessDriver
                     $remoteShare = $ocsStore->remoteShareById($linkId);
                     $status = $remoteShare->getStatus();
                     if($status == OCS_INVITATION_STATUS_PENDING){
-                        $stat = stat(Utils::getAjxpTmpDir());
+                        $stat = stat(ApplicationState::getAjxpTmpDir());
                         $ext = "invitation";
                         $meta["ajxp_mime"] = "invitation";
                         $meta["share_meta_type"] = 0;

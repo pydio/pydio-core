@@ -26,7 +26,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PasswordEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -87,7 +89,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
                     $rootURI = $cmsOpts["MASTER_URL"];
                 }
                 $cmsOpts["MASTER_HOST"] = $rootHost;
-                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = Utils::securePath("/" . $rootURI . "/" . $loginURI);
+                $cmsOpts["LOGIN_URL"] = $cmsOpts["MASTER_URI"] = InputFilter::securePath("/" . $rootURI . "/" . $loginURI);
                 $logoutAction = $cmsOpts["LOGOUT_ACTION"];
                 switch ($cmsOpts["cms"]) {
                     case "wp":
@@ -141,7 +143,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
      */
     public function listUsers($baseGroup = "/", $recursive = true)
     {
-        $users = Utils::loadSerialFile($this->usersSerFile);
+        $users = FileHelper::loadSerialFile($this->usersSerFile);
         if (UsersService::ignoreUserCase()) {
             $users = array_combine(array_map("strtolower", array_keys($users)), array_values($users));
         }
@@ -218,7 +220,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
             $userStoredPass = $this->getUserPass($login);
             if (!$userStoredPass) return false;
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-                return Utils::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
+                return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
             } else {
                 return (md5($userStoredPass . $seed) === $pass);
             }
@@ -269,7 +271,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
             $userStoredPass = $this->getUserPass($login);
             if (!$userStoredPass) return false;
             if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-                $res = Utils::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
+                $res = PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
             } else {
                 $res = (md5($userStoredPass . $seed) === $pass);
             }
@@ -319,11 +321,11 @@ class RemoteAuthDriver extends AbstractAuthDriver
         if (!is_array($users)) $users = array();
         if (array_key_exists($login, $users)) return;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = Utils::pbkdf2_create_hash($passwd);
+            $users[$login] = PasswordEncoder::pbkdf2_create_hash($passwd);
         } else {
             $users[$login] = $passwd;
         }
-        Utils::saveSerialFile($this->usersSerFile, $users);
+        FileHelper::saveSerialFile($this->usersSerFile, $users);
     }
 
     /**
@@ -336,11 +338,11 @@ class RemoteAuthDriver extends AbstractAuthDriver
         $users = $this->listUsers();
         if (!is_array($users) || !array_key_exists($login, $users)) return;
         if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = Utils::pbkdf2_create_hash($newPass);
+            $users[$login] = PasswordEncoder::pbkdf2_create_hash($newPass);
         } else {
             $users[$login] = $newPass;
         }
-        Utils::saveSerialFile($this->usersSerFile, $users);
+        FileHelper::saveSerialFile($this->usersSerFile, $users);
     }
 
     /**
@@ -352,7 +354,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
         $users = $this->listUsers();
         if (is_array($users) && array_key_exists($login, $users)) {
             unset($users[$login]);
-            Utils::saveSerialFile($this->usersSerFile, $users);
+            FileHelper::saveSerialFile($this->usersSerFile, $users);
         }
     }
 

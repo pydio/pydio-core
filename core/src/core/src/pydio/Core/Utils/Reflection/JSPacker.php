@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Reflection;
 use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
 

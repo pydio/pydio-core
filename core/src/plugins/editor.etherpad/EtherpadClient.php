@@ -26,7 +26,9 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Controller\Controller;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -75,7 +77,7 @@ class EtherpadClient extends Plugin
             if(isSet($metadata["pad_id"])){
                 $padID = $metadata["pad_id"];
             }else{
-                $padID = Utils::generateRandomString();
+                $padID = StringHelper::generateRandomString();
                 $selectedNode->setMetadata("etherpad", array("pad_id" => $padID), AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
             }
         }
@@ -197,7 +199,7 @@ class EtherpadClient extends Plugin
      */
     public function hideExtension(&$ajxpNode){
         if($ajxpNode->hasExtension("pad")){
-            $baseName = Utils::safeBasename($ajxpNode->getPath());
+            $baseName = PathUtils::forwardSlashBasename($ajxpNode->getPath());
             $ajxpNode->setLabel(str_replace(".pad", "", $baseName));
         }
     }

@@ -34,6 +34,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\Logger;
@@ -41,7 +42,10 @@ use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Authenticatino middleware used in Command Line context
+ * @package Pydio\Core\Http\Cli
+ */
 class AuthCliMiddleware
 {
     /**
@@ -155,7 +159,7 @@ class AuthCliMiddleware
 
         $requestInterface = $requestInterface->withAttribute("action", $options["a"]);
 
-        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+        if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){
             RolesService::bootSequence();
         }
 

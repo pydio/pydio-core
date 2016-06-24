@@ -26,7 +26,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\ProgressBarCLI;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -442,7 +442,7 @@ class LdapAuthDriver extends AbstractAuthDriver
             return array();
         }
 
-        $entries = $this->getUserEntries(Utils::regexpToLdap($regexp), false, $offset, $limit, true);
+        $entries = $this->getUserEntries(StringHelper::regexpToLdap($regexp), false, $offset, $limit, true);
         $this->dynamicFilter = null;
         $persons = array();
         unset($entries['count']); // remove 'count' entry
@@ -470,7 +470,7 @@ class LdapAuthDriver extends AbstractAuthDriver
             }
         }
 
-        $res = $this->getUserEntries(Utils::regexpToLdap($regexp), true, null);
+        $res = $this->getUserEntries(StringHelper::regexpToLdap($regexp), true, null);
         $this->saveCountToCache($res);
         $this->dynamicFilter = null;
         return $res["count"];

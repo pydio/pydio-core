@@ -26,7 +26,8 @@ use Pydio\Access\Core\MetaStreamWrapper;
 
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+
 
 
 use Pydio\Core\Utils\TextEncoder;
@@ -136,7 +137,7 @@ class ExifMetaManager extends AbstractMetaSource
         $selectedNode   = $userSelection->getUniqueNode();
         $realFile       = MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
 
-        Utils::safeIniSet('exif.encode_unicode', 'UTF-8');
+        ApplicationState::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);
         if($exifData === false || !is_array($exifData)) return;
         if ($exifData !== false && isSet($exifData["GPS"])) {

@@ -33,7 +33,9 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -77,7 +79,7 @@ class Mailer extends Plugin implements SqlTableProvider
     protected function getDibiDriver()
     {
         if (!isset($this->_dibiDriver)) {
-            $this->_dibiDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
+            $this->_dibiDriver = OptionsHelper::cleanDibiDriverParameters(array("group_switch_value" => "core"));
         }
         return $this->_dibiDriver;
     }
@@ -588,8 +590,8 @@ class Mailer extends Plugin implements SqlTableProvider
     {
         $base = basename($this->getBaseDir());
         if ($base == "core.mailer") {
-            $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-            return Utils::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
+            $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+            return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
         }
         return true;
     }

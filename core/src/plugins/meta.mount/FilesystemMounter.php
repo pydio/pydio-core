@@ -24,7 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 
 defined('AJXP_EXEC') or die('Access not allowed');

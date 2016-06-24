@@ -28,7 +28,9 @@ use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\HTMLWriter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -150,7 +152,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
         $u = $ctx->getUser();
         $user = $u->getId();
         if ($u->isAdmin() && isSet($httpVars["user_id"])) {
-            $user = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+            $user = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
         }
         switch ($action) {
 
@@ -163,8 +165,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                     break;
                 }
 
-                $token = Utils::generateRandomString();
-                $private = Utils::generateRandomString();
+                $token = StringHelper::generateRandomString();
+                $private = StringHelper::generateRandomString();
                 $data = array("USER_ID" => $user, "PRIVATE" => $private);
                 if (!empty($httpVars["device"])) {
                     // Revoke previous tokens for this device
@@ -222,7 +224,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                             else if (strpos($agent, "Windows/8") !== false) $deviceOS = "Windows 8";
                             else if (strpos($agent, "Linux") !== false) $deviceOS = "Linux";
                         } else {
-                            $deviceOS = Utils::osFromUserAgent($agent);
+                            $deviceOS = UserAgent::osFromUserAgent($agent);
                         }
                     }
                     $keyData["DEVICE_DESC"] = $deviceDesc;

@@ -25,7 +25,8 @@ use DOMXPath;
 use Exception;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Http\UserAgent;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -40,7 +41,7 @@ class MobileGuiPlugin extends Plugin
 {
     public function performChecks()
     {
-        if (!Utils::userAgentIsMobile()) throw new Exception("no");
+        if (!UserAgent::userAgentIsMobile()) throw new Exception("no");
     }
 
     /**

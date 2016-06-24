@@ -31,7 +31,7 @@ use Pydio\Core\Model\FilteredRepositoriesList;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\CookiesHelper;
+use Pydio\Core\Utils\Http\CookiesHelper;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');

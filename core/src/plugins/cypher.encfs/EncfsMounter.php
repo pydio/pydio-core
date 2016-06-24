@@ -26,7 +26,8 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -60,7 +61,7 @@ class EncfsMounter extends Plugin
 
     public function preProcessMove($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)
     {
-        $destO = Utils::decodeSecureMagic($httpVars["dest"]);
+        $destO = InputFilter::decodeSecureMagic($httpVars["dest"]);
         $dest = substr($destO, 1, strpos(ltrim($destO, "/"), "/"));
         if (empty($dest)) $dest = ltrim($destO, "/");
         $userSelection = UserSelection::fromContext($ctx, $httpVars);

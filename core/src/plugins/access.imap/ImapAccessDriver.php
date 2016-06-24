@@ -27,8 +27,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

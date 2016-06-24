@@ -26,7 +26,7 @@ use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

@@ -44,8 +44,11 @@ use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -592,7 +595,7 @@ abstract class AbstractConfDriver extends Plugin
         $loggedUser = $ctx->getUser();
 
         foreach ($httpVars as $getName=>$getValue) {
-            $$getName = Utils::securePath($getValue);
+            $$getName = InputFilter::securePath($getValue);
         }
 
         $mess = LocaleService::getMessages();
@@ -640,7 +643,7 @@ abstract class AbstractConfDriver extends Plugin
                 }
                 $xPath = null;
                 if (isSet($httpVars["xPath"])) {
-                    $xPath = ltrim(Utils::securePath($httpVars["xPath"]), "/");
+                    $xPath = ltrim(InputFilter::securePath($httpVars["xPath"]), "/");
                 }
                 $json = (isSet($httpVars["format"]) && $httpVars["format"] == "json");
                 $message = new RegistryMessage($clone, $xPath, $clonePath);
@@ -658,7 +661,7 @@ abstract class AbstractConfDriver extends Plugin
                             ->withHeader("ETag", $etag);
                     }
                 }
-                Utils::safeIniSet("zlib.output_compression", "4096");
+                ApplicationState::safeIniSet("zlib.output_compression", "4096");
                 $x = new SerializableResponseStream();
                 $responseInterface = $responseInterface->withBody($x);
                 $x->addChunk($message);
@@ -691,10 +694,10 @@ abstract class AbstractConfDriver extends Plugin
 
                 $repositoryId = $ctx->getRepositoryId();
                 if (isSet($httpVars["bm_action"]) && isset($httpVars["bm_path"])) {
-                    $bmPath = Utils::decodeSecureMagic($httpVars["bm_path"]);
+                    $bmPath = InputFilter::decodeSecureMagic($httpVars["bm_path"]);
                     if ($httpVars["bm_action"] == "add_bookmark") {
                         $title = "";
-                        if(isSet($httpVars["bm_title"])) $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        if(isSet($httpVars["bm_title"])) $title = InputFilter::decodeSecureMagic($httpVars["bm_title"]);
                         if($title == "" && $bmPath=="/") $title = $ctx->getRepository()->getDisplay();
                         $bmUser->addBookmark($repositoryId, $bmPath, $title);
                         if ($driver) {
@@ -708,7 +711,7 @@ abstract class AbstractConfDriver extends Plugin
                             $node->removeMetadata("ajxp_bookmarked", true, AJXP_METADATA_SCOPE_REPOSITORY, true);
                         }
                     } else if ($httpVars["bm_action"] == "rename_bookmark" && isset($httpVars["bm_title"])) {
-                        $title = Utils::decodeSecureMagic($httpVars["bm_title"]);
+                        $title = InputFilter::decodeSecureMagic($httpVars["bm_title"]);
                         $bmUser->renameBookmark($repositoryId, $bmPath, $title);
                     }
                     Controller::applyHook("msg.instant", [$ctx, "<reload_bookmarks/>", $loggedUser->getId()]
@@ -734,8 +737,8 @@ abstract class AbstractConfDriver extends Plugin
 
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
-                    $prefName = Utils::sanitize($httpVars["pref_name_".$i], AJXP_SANITIZE_ALPHANUM);
-                    $prefValue = \Pydio\Core\Utils\Utils::sanitize(TextEncoder::magicDequote($httpVars["pref_value_".$i]));
+                    $prefName = InputFilter::sanitize($httpVars["pref_name_" . $i], InputFilter::SANITIZE_ALPHANUM);
+                    $prefValue = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["pref_value_" . $i]));
                     if($prefName == "password") continue;
                     if ($prefName != "pending_folder" && $loggedUser == null) {
                         $i++;
@@ -762,9 +765,9 @@ abstract class AbstractConfDriver extends Plugin
 
                 if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
                     $updating = false;
-                    Utils::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
-                    $original_id = Utils::decodeSecureMagic($data["new_user_id"]);
-                    $data["new_user_id"] = Utils::decodeSecureMagic($data["new_user_id"], AJXP_SANITIZE_EMAILCHARS);
+                    OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
+                    $original_id = InputFilter::decodeSecureMagic($data["new_user_id"]);
+                    $data["new_user_id"] = InputFilter::decodeSecureMagic($data["new_user_id"], InputFilter::SANITIZE_EMAILCHARS);
                     if($original_id != $data["new_user_id"]){
                         throw new \Exception(str_replace("%s", $data["new_user_id"], $mess["ajxp_conf.127"]));
                     }
@@ -789,7 +792,7 @@ abstract class AbstractConfDriver extends Plugin
                 } else if($action == "user_create_user" && isSet($httpVars["NEW_existing_user_id"])){
 
                     $updating = true;
-                    Utils::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
+                    OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
                     $userId = $data["existing_user_id"];
                     $userObject = UsersService::getUserById($userId);
                     if($userObject->getParent() !== $loggedUser->getId()){
@@ -802,7 +805,7 @@ abstract class AbstractConfDriver extends Plugin
                 } else {
                     $updating = false;
                     $userObject = $loggedUser;
-                    Utils::parseStandardFormParameters($ctx, $httpVars, $data, "PREFERENCES_");
+                    OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "PREFERENCES_");
                 }
 
                 $rChanges = false;
@@ -839,7 +842,7 @@ abstract class AbstractConfDriver extends Plugin
                         $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
-                            $link = Utils::detectServerURL();
+                            $link = ApplicationState::detectServerURL();
                             $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
                             $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $data["new_user_id"], $data["new_password"]], $mess["508"]);
@@ -865,7 +868,7 @@ abstract class AbstractConfDriver extends Plugin
                 if(!isSet($httpVars["user_id"])) {
                     throw new \Exception("invalid arguments");
                 }
-                $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
                 $userObject = UsersService::getUserById($userId);
 
                 if($userObject->getParent() != $loggedUser->getId()){
@@ -894,7 +897,7 @@ abstract class AbstractConfDriver extends Plugin
                 if (ConfService::getGlobalConf("WEBDAV_BASEHOST") != "") {
                     $baseURL = ConfService::getGlobalConf("WEBDAV_BASEHOST");
                 } else {
-                    $baseURL = \Pydio\Core\Utils\Utils::detectServerURL();
+                    $baseURL = ApplicationState::detectServerURL();
                 }
                 $webdavBaseUrl = $baseURL.ConfService::getGlobalConf("WEBDAV_BASEURI")."/";
                 $davData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
@@ -1026,8 +1029,8 @@ abstract class AbstractConfDriver extends Plugin
                 $tplId = $httpVars["template_id"];
                 $tplRepo = RepositoryService::getRepositoryById($tplId);
                 $options = [];
-                Utils::parseStandardFormParameters($ctx, $httpVars, $options);
-                $newRep = $tplRepo->createTemplateChild(Utils::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
+                OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $options);
+                $newRep = $tplRepo->createTemplateChild(InputFilter::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
                 if (!empty($gPath)) {
                     $newRep->setGroupPath($gPath);
@@ -1080,7 +1083,7 @@ abstract class AbstractConfDriver extends Plugin
 
             case "user_delete_user":
 
-                $userId = Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS);
+                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
                 $userObject = UsersService::getUserById($userId);
                 if ($userObject == null || !$userObject->hasParent() || $userObject->getParent() != $loggedUser->getId()) {
                     throw new \Exception("You are not allowed to edit this user");
@@ -1262,7 +1265,7 @@ abstract class AbstractConfDriver extends Plugin
             case "get_binary_param" :
 
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = \Pydio\Core\Utils\Utils::getAjxpTmpDir()."/".Utils::securePath($httpVars["tmp_file"]);
+                    $file = ApplicationState::getAjxpTmpDir() ."/". InputFilter::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         session_write_close();
                         header("Content-Type:image/png");
@@ -1271,14 +1274,14 @@ abstract class AbstractConfDriver extends Plugin
                 } else if (isSet($httpVars["binary_id"])) {
                     if (isSet($httpVars["user_id"]) && $loggedUser != null
                         && ( $loggedUser->getId() == $httpVars["user_id"] || $loggedUser->isAdmin() )) {
-                        $context = ["USER" => \Pydio\Core\Utils\Utils::sanitize($httpVars["user_id"], AJXP_SANITIZE_EMAILCHARS)];
+                        $context = ["USER" => InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS)];
                     } else if($loggedUser !== null) {
                         $context = ["USER" => $loggedUser->getId()];
                     } else {
                         $context = [];
                     }
                     session_write_close();
-                    $this->loadBinary($context, \Pydio\Core\Utils\Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
+                    $this->loadBinary($context, InputFilter::sanitize($httpVars["binary_id"], InputFilter::SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1286,13 +1289,13 @@ abstract class AbstractConfDriver extends Plugin
 
                 session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = \Pydio\Core\Utils\Utils::getAjxpTmpDir()."/". \Pydio\Core\Utils\Utils::securePath($httpVars["tmp_file"]);
+                    $file = ApplicationState::getAjxpTmpDir() ."/". InputFilter::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         header("Content-Type:image/png");
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    $this->loadBinary([], Utils::sanitize($httpVars["binary_id"], AJXP_SANITIZE_ALPHANUM));
+                    $this->loadBinary([], InputFilter::sanitize($httpVars["binary_id"], InputFilter::SANITIZE_ALPHANUM));
                 }
             break;
 
@@ -1304,16 +1307,16 @@ abstract class AbstractConfDriver extends Plugin
                      * @var UploadedFileInterface $boxData
                      */
                     $boxData = array_shift($uploadedFiles);
-                    $err = Utils::parseFileDataErrors($boxData);
+                    $err = InputFilter::parseFileDataErrors($boxData);
                     if ($err != null) {
 
                     } else {
                         $rand = substr(md5(time()), 0, 6);
                         $tmp = $rand."-". $boxData->getClientFilename();
-                        $boxData->moveTo(Utils::getAjxpTmpDir() . "/" . $tmp);
+                        $boxData->moveTo(ApplicationState::getAjxpTmpDir() . "/" . $tmp);
                     }
                 }
-                if (isSet($tmp) && file_exists(Utils::getAjxpTmpDir()."/".$tmp)) {
+                if (isSet($tmp) && file_exists(ApplicationState::getAjxpTmpDir() ."/".$tmp)) {
                     print('<script type="text/javascript">');
                     print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
                     print('</script>');

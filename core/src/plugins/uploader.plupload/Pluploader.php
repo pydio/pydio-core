@@ -40,8 +40,10 @@ use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -101,7 +103,7 @@ class Pluploader extends Plugin
     public function unifyChunks($action, &$httpVars, &$fileVars, \Pydio\Core\Model\ContextInterface $ctx)
     {
 
-        $filename = Utils::decodeSecureMagic($httpVars["name"]);
+        $filename = InputFilter::decodeSecureMagic($httpVars["name"]);
 
         $tmpName = $fileVars["file"]["tmp_name"];
         $chunk = $httpVars["chunk"];
@@ -111,7 +113,7 @@ class Pluploader extends Plugin
 
         $repository = $ctx->getRepository();
         $userSelection = UserSelection::fromContext($ctx, []);
-        $dir = Utils::securePath($httpVars["dir"]);
+        $dir = InputFilter::securePath($httpVars["dir"]);
         $destStreamURL = $userSelection->currentBaseUrl().$dir."/";
 
         $parentNode = new AJXP_Node($userSelection->currentBaseUrl());
@@ -129,7 +131,7 @@ class Pluploader extends Plugin
             $fileVars["file"]["destination"] = base64_encode($dir);
         }else if(MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
             $remote = true;
-            $tmpFolder = Utils::getAjxpTmpDir()."/".$httpVars["secure_token"];
+            $tmpFolder = ApplicationState::getAjxpTmpDir() ."/".$httpVars["secure_token"];
             if(!is_dir($tmpFolder)){
                 @mkdir($tmpFolder, 0700, true);
             }

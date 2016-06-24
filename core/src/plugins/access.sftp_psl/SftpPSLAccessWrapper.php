@@ -28,7 +28,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Auth\Core\MemorySafe;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed' );
@@ -61,7 +63,7 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
      */
     protected static function initPath($path, $streamType = '', $storeOpenContext = false, $skipZip = true)
     {
-        $url = Utils::safeParseUrl($path);
+        $url = UrlUtils::safeParseUrl($path);
         $node = new AJXP_Node($url);
         $ctx  = $node->getContext();
         $repoObject = $node->getRepository();
@@ -86,7 +88,7 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
             $basePath = "/$basePath";
         }
 
-        $path = Utils::securePath($path);
+        $path = InputFilter::securePath($path);
 
         if ($path[0] == "/") {
             $path = substr($path, 1);
@@ -104,7 +106,7 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);

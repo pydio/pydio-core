@@ -29,7 +29,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Share\Store\ShareRightsManager;
 use Pydio\Share\View\PublicAccessManager;
 
@@ -148,7 +148,7 @@ class CompositeShare
             "description"   => $this->getRepository()->getDescription(),
             "entries"       => $sharedEntries,
             "element_watch" => $elementWatch,
-            "repository_url"=> Utils::getWorkspaceShortcutURL($this->getRepository())."/",
+            "repository_url"=> ApplicationState::getWorkspaceShortcutURL($this->getRepository()) ."/",
             "content_filter"=> $cFilter,
             "share_owner"   => $this->getOwner(),
             "share_scope"    => $this->getVisibilityScope()

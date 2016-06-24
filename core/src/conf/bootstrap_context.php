@@ -125,14 +125,14 @@ spl_autoload_register('pydioAutoloader');
 
 include_once(AJXP_INSTALL_PATH . "/core/compat.php");
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 
-Utils::safeIniSet("session.cookie_httponly", 1);
+ApplicationState::safeIniSet("session.cookie_httponly", 1);
 
 if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
     include(AJXP_CONF_PATH."/bootstrap_conf.php");
     if (isSet($AJXP_INISET)) {
-        foreach($AJXP_INISET as $key => $value) Utils::safeIniSet($key, $value);
+        foreach($AJXP_INISET as $key => $value) ApplicationState::safeIniSet($key, $value);
     }
     if (defined('AJXP_LOCALE')) {
         setlocale(LC_CTYPE, AJXP_LOCALE);

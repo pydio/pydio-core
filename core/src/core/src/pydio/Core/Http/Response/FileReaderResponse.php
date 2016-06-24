@@ -25,9 +25,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\Logger;
 use Zend\Diactoros\ServerRequestFactory;
 
@@ -196,7 +196,7 @@ class FileReaderResponse extends AsyncResponseStream
         set_error_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
         // required for IE, otherwise Content-disposition is ignored
         if (ini_get('zlib.output_compression')) {
-            Utils::safeIniSet('zlib.output_compression', 'Off');
+            ApplicationState::safeIniSet('zlib.output_compression', 'Off');
         }
 
         $isFile = ($data !== null) && !$confGzip;

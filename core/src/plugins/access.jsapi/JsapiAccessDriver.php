@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -46,7 +46,7 @@ class JsapiAccessDriver extends AbstractAccessDriver
             return;
         }
 
-        $jsName = Utils::decodeSecureMagic($request->getParsedBody()["object_name"]);
+        $jsName = InputFilter::decodeSecureMagic($request->getParsedBody()["object_name"]);
         $jsType = $request->getParsedBody()["object_type"]; // class or interface?
         $fName = "class.".strtolower($jsName).".js";
         if ($jsName == "Splitter") {

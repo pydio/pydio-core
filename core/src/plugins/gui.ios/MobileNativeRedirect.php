@@ -22,7 +22,8 @@
 namespace Pydio\Gui;
 
 use Exception;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Http\UserAgent;
+
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -37,14 +38,14 @@ class MobileNativeRedirect extends Plugin
     public function performChecks()
     {
         if (isSet($_SESSION["CURRENT_MINISITE"])) throw new Exception("Disabled for minisites");
-        if (Utils::userAgentIsWindowsPhone()) {
+        if (UserAgent::userAgentIsWindowsPhone()) {
             throw new Exception("No native app for windows phone");
         }
 
-        if (Utils::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
+        if (UserAgent::userAgentIsIOS() && !isSet($_GET["skipIOS"]) && !isSet($_COOKIE["SKIP_IOS"])) {
             return;
         }
-        if (Utils::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])) {
+        if (UserAgent::userAgentIsAndroid() && !isSet($_GET["skipANDROID"]) && !isSet($_COOKIE["SKIP_ANDROID"])) {
             return;
         }
         throw new Exception("Active only when mobile user agent detected.");

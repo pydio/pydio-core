@@ -28,7 +28,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
@@ -277,9 +278,9 @@ class UserMetaManager extends AbstractMetaSource
             Controller::applyHook("node.before_change", array(&$ajxpNode));
             foreach ($def as $key => $data) {
                 if (isSet($httpVars[$key])) {
-                    $newValues[$key] = Utils::decodeSecureMagic($httpVars[$key]);
+                    $newValues[$key] = InputFilter::decodeSecureMagic($httpVars[$key]);
                     if($data["type"] == "tags"){
-                        $this->updateTags($ctx, Utils::decodeSecureMagic($httpVars[$key]));
+                        $this->updateTags($ctx, InputFilter::decodeSecureMagic($httpVars[$key]));
                     }
                 } else {
                     if (!isset($original)) {

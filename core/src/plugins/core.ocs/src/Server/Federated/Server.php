@@ -22,7 +22,8 @@ namespace Pydio\OCS\Server\Federated;
 
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\SQLStore;
 use Pydio\OCS\Client\OCSClient;
@@ -61,14 +62,14 @@ class Server extends Dummy
 
     protected function actionReceive($parameters){
 
-        $targetUser = Utils::sanitize($parameters["shareWith"], AJXP_SANITIZE_EMAILCHARS);
+        $targetUser = InputFilter::sanitize($parameters["shareWith"], InputFilter::SANITIZE_EMAILCHARS);
         if(!UsersService::userExists($targetUser)){
             throw new UserNotFoundException();
         }
-        $token          = Utils::sanitize($parameters["token"], AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = Utils::sanitize($parameters["remoteId"], AJXP_SANITIZE_ALPHANUM);
-        $documentName   = Utils::sanitize($parameters["name"], AJXP_SANITIZE_FILENAME);
-        $sender         = Utils::sanitize($parameters["owner"], AJXP_SANITIZE_EMAILCHARS);
+        $token          = InputFilter::sanitize($parameters["token"], InputFilter::SANITIZE_ALPHANUM);
+        $remoteId       = InputFilter::sanitize($parameters["remoteId"], InputFilter::SANITIZE_ALPHANUM);
+        $documentName   = InputFilter::sanitize($parameters["name"], InputFilter::SANITIZE_FILENAME);
+        $sender         = InputFilter::sanitize($parameters["owner"], InputFilter::SANITIZE_EMAILCHARS);
         $remote         = $parameters["remote"];
         $testParts = parse_url($remote);
         if(!is_array($testParts) || empty($testParts["scheme"]) || empty($testParts["host"])){
@@ -143,8 +144,8 @@ class Server extends Dummy
 
     protected function actionUnshare($remoteId, $token, $parameters){
 
-        $token          = Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
+        $token          = InputFilter::sanitize($token, InputFilter::SANITIZE_ALPHANUM);
+        $remoteId       = InputFilter::sanitize($remoteId, InputFilter::SANITIZE_ALPHANUM);
         $store = new SQLStore();
         $remoteShare = $store->remoteShareForOcsRemoteId($remoteId);
         if(empty($remoteShare)){

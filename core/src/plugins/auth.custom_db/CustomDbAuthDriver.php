@@ -27,8 +27,10 @@ use Pydio\Auth\Core\AbstractAuthDriver;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\PasswordEncoder;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\Vars\VarsFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -57,8 +59,8 @@ class CustomDbAuthDriver extends AbstractAuthDriver
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_CUSTOM_DRIVER"]);
-        $this->coreSqlDriver = Utils::cleanDibiDriverParameters(array("group_switch_value" => "core"));
+        $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters($options["SQL_CUSTOM_DRIVER"]);
+        $this->coreSqlDriver = OptionsHelper::cleanDibiDriverParameters(array("group_switch_value" => "core"));
 
         $this->customTableName = $options["SQL_CUSTOM_TABLE"];
         $this->customTableUid = $options["SQL_CUSTOM_TABLE_USER_FIELD"];
@@ -85,7 +87,7 @@ class CustomDbAuthDriver extends AbstractAuthDriver
     public function performChecks()
     {
         if (!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_CUSTOM_DRIVER"]);
+        $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_CUSTOM_DRIVER"]);
         if (!count($test)) {
             throw new Exception("Could not find any driver definition for CustomDB plugin! To fix this issue you have to remove the file \"bootstrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
@@ -120,9 +122,9 @@ class CustomDbAuthDriver extends AbstractAuthDriver
         }
         if ($regexp != null) {
             if ($offset != -1 && $limit != -1) {
-                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . Utils::regexpToLike($regexp) . " $orderBy %lmt %ofs", Utils::cleanRegexp($regexp), $limit, $offset);
+                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . StringHelper::regexpToLike($regexp) . " $orderBy %lmt %ofs", StringHelper::cleanRegexp($regexp), $limit, $offset);
             } else {
-                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . Utils::regexpToLike($regexp) . " $orderBy", Utils::cleanRegexp($regexp));
+                $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] " . StringHelper::regexpToLike($regexp) . " $orderBy", StringHelper::cleanRegexp($regexp));
             }
         } else if ($offset != -1 && $limit != -1) {
             $res = dibi::query("SELECT [" . $this->customTableUid . "],[" . $this->customTablePwd . "] FROM [" . $this->customTableName . "] $orderBy %lmt %ofs", $limit, $offset);
@@ -167,7 +169,7 @@ class CustomDbAuthDriver extends AbstractAuthDriver
 
         if (!empty($regexp)) {
             $select = "SELECT COUNT(*) FROM [" . $this->customTableName . "] WHERE %and";
-            $ands[] = array("[" . $this->customTableUid . "] " . Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
+            $ands[] = array("[" . $this->customTableUid . "] " . StringHelper::regexpToLike($regexp), StringHelper::cleanRegexp($regexp));
             $res = dibi::query($select);
         } else {
             $select = "SELECT COUNT(*) FROM [" . $this->customTableName . "]";
@@ -225,7 +227,7 @@ class CustomDbAuthDriver extends AbstractAuthDriver
         if (!$userStoredPass) return false;
         $hashAlgo = $this->getOption("SQL_CUSTOM_TABLE_PWD_HASH");
         if ($hashAlgo == "pbkdf2") {
-            return Utils::pbkdf2_validate_password($pass, $userStoredPass);
+            return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);
         } else if ($hashAlgo == "md5") {
             return md5($pass) === $userStoredPass;
         } else if ($hashAlgo == "clear") {
@@ -258,7 +260,7 @@ class CustomDbAuthDriver extends AbstractAuthDriver
      */
     public function testSQLConnexion($httpVars)
     {
-        $p = Utils::cleanDibiDriverParameters($httpVars["SQL_CUSTOM_DRIVER"]);
+        $p = OptionsHelper::cleanDibiDriverParameters($httpVars["SQL_CUSTOM_DRIVER"]);
         if ($p["driver"] == "sqlite3") {
             $dbFile = VarsFilter::filter($p["database"], Context::emptyContext());
             if (!file_exists(dirname($dbFile))) {

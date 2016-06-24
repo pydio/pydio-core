@@ -26,6 +26,7 @@ use Pydio\Core\PluginFramework\CoreInstanceProvider;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\FileHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
@@ -68,7 +69,7 @@ class CoreConfLoader extends Plugin implements CoreInstanceProvider
      * @return array jsonData
      */
     public static function getBootstrapConf() {
-       return \Pydio\Core\Utils\Utils::loadSerialFile(self::_getBootstrapFilePath(), false, "json");
+       return FileHelper::loadSerialFile(self::_getBootstrapFilePath(), false, "json");
     }
 
     /**
@@ -91,7 +92,7 @@ class CoreConfLoader extends Plugin implements CoreInstanceProvider
         if (file_exists($jsonPath)) {
             copy($jsonPath, $jsonPath.".bak");
         }
-        \Pydio\Core\Utils\Utils::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
+        FileHelper::saveSerialFile($jsonPath, $jsonData, true, false, "json", true);
     }
 
 }

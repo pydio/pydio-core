@@ -28,7 +28,8 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -68,7 +69,7 @@ class AudioPreviewer extends Plugin
             }catch(\Exception $e){
             }
             if(!$exist && strpos($httpVars["file"], "base64encoded:") === false){
-                $file = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $file = InputFilter::decodeSecureMagic(base64_decode($httpVars["file"]));
                 if(!file_exists($destStreamURL.$file)){
                     throw new FileNotFoundException($file);
                 }else{

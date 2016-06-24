@@ -14,13 +14,14 @@ use Pydio\Access\Core\SchemeTranslatorWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\UrlUtils;
+
 
 class AuthWrapper extends SchemeTranslatorWrapper
 {
     public static function applyInitPathHook($url, $context = 'core') {
         return;
-        $urlParts = Utils::safeParseUrl($url);
+        $urlParts = UrlUtils::safeParseUrl($url);
 
         $repository = RepositoryService::getRepositoryById($urlParts["host"]);
         if ($repository == null) {

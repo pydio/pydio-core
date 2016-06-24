@@ -24,8 +24,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Services;
 use Pydio\Core\Services\ConfService;
 
@@ -199,18 +200,18 @@ class XMLWriter
     {
         $string = "<tree";
         $metaData["filename"] = $nodeName;
-        if(Utils::detectXSS($nodeName)) $metaData["filename"] = "/XSS Detected - Please contact your admin";
+        if(InputFilter::detectXSS($nodeName)) $metaData["filename"] = "/XSS Detected - Please contact your admin";
         if (!isSet($metaData["text"])) {
-            if(Utils::detectXSS($nodeLabel)) $nodeLabel = "XSS Detected - Please contact your admin";
+            if(InputFilter::detectXSS($nodeLabel)) $nodeLabel = "XSS Detected - Please contact your admin";
             $metaData["text"] = $nodeLabel;
         }else{
-            if(Utils::detectXSS($metaData["text"])) $metaData["text"] = "XSS Detected - Please contact your admin";
+            if(InputFilter::detectXSS($metaData["text"])) $metaData["text"] = "XSS Detected - Please contact your admin";
         }
         $metaData["is_file"] = ($isLeaf?"true":"false");
         $metaData["ajxp_im_time"] = time();
         foreach ($metaData as $key => $value) {
-            if(Utils::detectXSS($value)) $value = "XSS Detected!";
-            $value = Utils::xmlEntities($value, true);
+            if(InputFilter::detectXSS($value)) $value = "XSS Detected!";
+            $value = StringHelper::xmlEntities($value, true);
             $string .= " $key=\"$value\"";
         }
         if ($close) {
@@ -286,7 +287,7 @@ class XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("CONF_MESSAGE[$messId]", Utils::xmlEntities($message), $xml);
+                $xml = str_replace("CONF_MESSAGE[$messId]", StringHelper::xmlEntities($message), $xml);
             }
         }
         if (preg_match_all("/MIXIN_MESSAGE(\[.*?\])/", $xml, $matches, PREG_SET_ORDER)) {
@@ -296,7 +297,7 @@ class XMLWriter
                 if (array_key_exists($messId, $confMessages)) {
                     $message = $confMessages[$messId];
                 }
-                $xml = str_replace("MIXIN_MESSAGE[$messId]", Utils::xmlEntities($message), $xml);
+                $xml = str_replace("MIXIN_MESSAGE[$messId]", StringHelper::xmlEntities($message), $xml);
             }
         }
         if ($stripSpaces) {
@@ -318,8 +319,8 @@ class XMLWriter
      */
     public static function reloadDataNode($nodePath="", $pendingSelection="", $print = true)
     {
-        $nodePath = Utils::xmlEntities($nodePath, true);
-        $pendingSelection = Utils::xmlEntities($pendingSelection, true);
+        $nodePath = StringHelper::xmlEntities($nodePath, true);
+        $pendingSelection = StringHelper::xmlEntities($pendingSelection, true);
         return XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
     }
 
@@ -341,7 +342,7 @@ class XMLWriter
         if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
             $buffer .= "<remove>";
             foreach ($diffNodes["REMOVE"] as $nodePath) {
-                $nodePath = Utils::xmlEntities($nodePath, true);
+                $nodePath = StringHelper::xmlEntities($nodePath, true);
                 $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
             }
             $buffer .= "</remove>";
@@ -406,10 +407,10 @@ class XMLWriter
      */
     public static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0)
     {
-        $messageId = Utils::xmlEntities($messageId);
+        $messageId = StringHelper::xmlEntities($messageId);
         $data = XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
         foreach ($parameters as $paramName=>$paramValue) {
-            $paramValue = Utils::xmlEntities($paramValue);
+            $paramValue = StringHelper::xmlEntities($paramValue);
             $data .= XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
         }
         $data .= XMLWriter::write("</trigger_bg_action>", $print);
@@ -469,7 +470,7 @@ class XMLWriter
                     $buffer .= XMLWriter::renderNode($path, $title, false, array('icon' => "mime_empty.png"), true, false);
                 }
             } else {
-                $buffer .= "<bookmark path=\"".Utils::xmlEntities($path, true)."\" title=\"".Utils::xmlEntities($title, true)."\"/>";
+                $buffer .= "<bookmark path=\"". StringHelper::xmlEntities($path, true) ."\" title=\"". StringHelper::xmlEntities($title, true) ."\"/>";
             }
         }
         if($print) {
@@ -502,7 +503,7 @@ class XMLWriter
     public static function toXmlElement($tagName, $attributes, $xmlChildren = ""){
         $buffer = "<$tagName ";
         foreach ($attributes as $attName => $attValue){
-            $buffer.= "$attName=\"".Utils::xmlEntities($attValue)."\" ";
+            $buffer.= "$attName=\"". StringHelper::xmlEntities($attValue) ."\" ";
         }
         if(!strlen($xmlChildren)) {
             $buffer .= "/>";
@@ -523,10 +524,10 @@ class XMLWriter
     {
         if ($errorMessage == null) {
             $messageType = "SUCCESS";
-            $message = Utils::xmlContentEntities($logMessage);
+            $message = StringHelper::xmlContentEntities($logMessage);
         } else {
             $messageType = "ERROR";
-            $message = Utils::xmlContentEntities($errorMessage);
+            $message = StringHelper::xmlContentEntities($errorMessage);
         }
         return XMLWriter::write("<message type=\"$messageType\">".$message."</message>", $print);
     }

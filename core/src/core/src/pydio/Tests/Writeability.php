@@ -21,7 +21,7 @@
 namespace Pydio\Tests;
 
 use Pydio\Core\Model\Context;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

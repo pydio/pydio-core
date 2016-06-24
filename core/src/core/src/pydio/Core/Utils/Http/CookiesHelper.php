@@ -18,13 +18,17 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Http;
 
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CookiesHelper - Helper for http cookies
+ * @package Pydio\Core\Utils
+ */
 class CookiesHelper
 {
 
@@ -62,6 +66,7 @@ class CookiesHelper
     /**
      * @static
      * Warning, must be called before sending other headers!
+     * @param $user
      */
     public static function clearRememberCookie($user)
     {
@@ -109,7 +114,7 @@ class CookiesHelper
         } else {
             $hashes = explode(",", $hashes);
         }
-        $newHash = md5($user->getId().":".Utils::generateRandomString());
+        $newHash = md5($user->getId().":". StringHelper::generateRandomString());
         array_push($hashes, $newHash);
         $user->setPref("cookie_hash", implode(",",$hashes));
         $user->save("user");

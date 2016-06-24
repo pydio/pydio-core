@@ -21,7 +21,8 @@
 namespace Pydio\Auth\Core;
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+
 
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -245,7 +246,7 @@ class MemorySafe
                 $wallet = $loggedUser->getPref("AJXP_WALLET");
                 if (is_array($wallet) && isSet($wallet[$repository->getId()][$optionsPrefix."USER"])) {
                     $user = $wallet[$repository->getId()][$optionsPrefix."USER"];
-                    $password = Utils::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix."PASS"]);
+                    $password = OptionsHelper::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix . "PASS"]);
                 }
             }
         }
@@ -257,7 +258,7 @@ class MemorySafe
                 $p = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
                 if (!empty($u) && !empty($p)) {
                     $user = $u;
-                    $password = Utils::decypherStandardFormPassword($loggedUser->getId(), $p);
+                    $password = OptionsHelper::decypherStandardFormPassword($loggedUser->getId(), $p);
                 }
             }
         }

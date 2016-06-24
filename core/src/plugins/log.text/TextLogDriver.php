@@ -23,8 +23,10 @@ namespace Pydio\Log\Implementation;
 
 use Exception;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
@@ -168,7 +170,7 @@ class TextLogDriver extends AbstractLogDriver
      */
     public function write2($level, $ip, $user, $repositoryId, $source, $prefix, $message, $nodePathes = array())
     {
-        if (Utils::detectXSS($message)) $message = "XSS Detected in message!";
+        if (InputFilter::detectXSS($message)) $message = "XSS Detected in message!";
         $textMessage = date("m-d-y") . " " . date("H:i:s") . "\t";
         $textMessage .= "$ip\t" . strtoupper((string)$level) . "\t$user\t$source\t$prefix\t$message\n";
 
@@ -273,7 +275,7 @@ class TextLogDriver extends AbstractLogDriver
 
         $lines = file($fName);
         foreach ($lines as $line) {
-            $line = Utils::xmlEntities($line);
+            $line = StringHelper::xmlEntities($line);
             $matches = explode("\t", $line, 7);
             if (count($matches) == 6) {
                 $matches[6] = $matches[5];
@@ -284,7 +286,7 @@ class TextLogDriver extends AbstractLogDriver
             if (count($matches) == 7) {
                 $fileName = $parentDir . "/" . $matches[0];
                 foreach ($matches as $key => $match) {
-                    $match = Utils::xmlEntities($match);
+                    $match = StringHelper::xmlEntities($match);
                     $match = str_replace("\"", "'", $match);
                     $matches[$key] = $match;
                 }

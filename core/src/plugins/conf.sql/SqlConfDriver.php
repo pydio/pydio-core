@@ -36,8 +36,11 @@ use Pydio\Conf\Core\AjxpRole;
 
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
 use \dibi;
@@ -82,7 +85,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
-        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+        $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         try {
             if(!dibi::isConnected()) {
                 dibi::connect($this->sqlDriver);
@@ -107,7 +110,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new \Exception("You probably did something wrong! To fix this issue you have to remove the file \"bootsrap.json\" and rename the backup file \"bootstrap.json.bak\" into \"bootsrap.json\" in data/plugins/boot.conf/");
         }
@@ -322,7 +325,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                     }
                 }else if(strpos($cValue, "regexp:") === 0){
                     $regexp = str_replace("regexp:", "", $cValue);
-                    $wheres[] = array("[$cName] ".Utils::regexpToLike($regexp), Utils::cleanRegexp($regexp));
+                    $wheres[] = array("[$cName] ". StringHelper::regexpToLike($regexp), StringHelper::cleanRegexp($regexp));
                 }else if ($cValue == AJXP_FILTER_NOT_EMPTY){
                     $wheres[] = array("[$cName] IS NOT NULL");
                 }else if ($cValue == AJXP_FILTER_EMPTY){
@@ -1218,8 +1221,8 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function installSQLTables($param)
     {
-        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        $res = Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        $res = DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
         // SET DB VERSION
         if(defined('AJXP_VERSION_DB') && AJXP_VERSION_DB != "##DB_VERSION##"){
             dibi::connect($p);
@@ -1353,16 +1356,16 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             case "user_team_create":
 
                 $userIds = $httpVars["user_ids"];
-                $teamLabel = Utils::sanitize($httpVars["team_label"], AJXP_SANITIZE_HTML_STRICT);
+                $teamLabel = InputFilter::sanitize($httpVars["team_label"], InputFilter::SANITIZE_HTML_STRICT);
                 if(empty($teamLabel)){
                     throw new \Exception("Empty Team Label!");
                 }
                 if(empty($userIds)){
                     throw new \Exception("Please select some users for this team.");
                 }
-                $teamId = Utils::slugify($teamLabel)."-".intval(rand(0,1000));
+                $teamId = StringHelper::slugify($teamLabel) ."-".intval(rand(0,1000));
                 foreach ($userIds as $userId) {
-                    $id = Utils::sanitize($userId, AJXP_SANITIZE_EMAILCHARS);
+                    $id = InputFilter::sanitize($userId, InputFilter::SANITIZE_EMAILCHARS);
                     $this->addUserToTeam($ctx->getUser(), $teamId, $id, $teamLabel);
                 }
                 echo 'Created Team $teamId';
@@ -1408,7 +1411,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         }else{
             $tableQuery = "SHOW TABLES LIKE %s";
         }
-        $tableName = Utils::sanitize($httpVars["table_name"], AJXP_SANITIZE_ALPHANUM);
+        $tableName = InputFilter::sanitize($httpVars["table_name"], InputFilter::SANITIZE_ALPHANUM);
         $tables = dibi::query($tableQuery, $tableName)->fetchPairs();
         $exists = (count($tables) && in_array($tableName, $tables));
         HTMLWriter::charsetHeader("application/json");

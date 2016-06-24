@@ -22,6 +22,7 @@ namespace Pydio\Access\Core\Filter;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -74,11 +75,11 @@ class ContentFilter {
     }
 
     function getBaseDir(){
-        return \Pydio\Core\Utils\Utils::safeDirname(array_keys($this->filters)[0]);
+        return PathUtils::forwardSlashDirname(array_keys($this->filters)[0]);
     }
 
     function getUniquePath(){
-        return \Pydio\Core\Utils\Utils::safeBasename(array_keys($this->filters)[0]);
+        return PathUtils::forwardSlashBasename(array_keys($this->filters)[0]);
     }
 
     /**

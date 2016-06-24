@@ -28,7 +28,8 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
@@ -159,7 +160,7 @@ class FileHasher extends AbstractMetaSource
                 $fileUrl = $selection->getUniqueNode()->getUrl();
                 $file = MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
-                    $deltaFile = tempnam(Utils::getAjxpTmpDir(), $actionName."-delta");
+                    $deltaFile = tempnam(ApplicationState::getAjxpTmpDir(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");
                     \rsync_generate_delta($signature_delta_file, $file, $deltaFile);
                     $this->logDebug("Computed delta file, size is ".filesize($deltaFile));

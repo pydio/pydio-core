@@ -25,7 +25,9 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\TextEncoder;
@@ -52,14 +54,14 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      */
     public function init(ContextInterface $ctx, $options = [])
     {
-        $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+        $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters($options["SQL_DRIVER"]);
         parent::init($ctx, $options);
     }
 
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new \Exception("Please define an SQL connexion in the core configuration");
         }
@@ -340,6 +342,18 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
     }
 
+    /**
+     * @param $repositoryId
+     * @param $indexPath
+     * @param $userId
+     * @param $userGroup
+     * @param int $offset
+     * @param int $limit
+     * @param string $orderBy
+     * @param string $orderDir
+     * @param bool $recurring
+     * @return array
+     */
     public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc", $recurring = true)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
@@ -372,6 +386,12 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         return $data;
     }
 
+    /**
+     * @param $repositoryId
+     * @param $oldPath
+     * @param null $newPath
+     * @param bool $copy
+     */
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
         if($this->sqlDriver["password"] == "XXXX") return;
@@ -401,11 +421,15 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
 
     }
 
-
+    /**
+     * @param array $param
+     * @return string
+     * @throws \Exception
+     */
     public function installSQLTables($param)
     {
-        $p = Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
-        return Utils::runCreateTablesQuery($p, $this->getBaseDir()."/create.sql");
+        $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);
+        return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
 }

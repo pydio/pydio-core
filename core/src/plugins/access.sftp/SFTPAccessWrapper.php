@@ -28,7 +28,8 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -107,7 +108,7 @@ class SFTPAccessWrapper extends FsAccessWrapper
         if ($basePath[0] != "/") {
             $basePath = "/$basePath";
         }
-        $path = Utils::securePath($path);
+        $path = InputFilter::securePath($path);
         if ($path[0] == "/") {
             $path = substr($path, 1);
         }
@@ -253,7 +254,7 @@ class SFTPAccessWrapper extends FsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);

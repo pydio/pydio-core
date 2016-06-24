@@ -34,7 +34,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
 
@@ -212,7 +212,7 @@ class ShareRightsManager
 
             if ($eType == "user") {
 
-                $u = Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index], AJXP_SANITIZE_EMAILCHARS);
+                $u = InputFilter::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX . $index], InputFilter::SANITIZE_EMAILCHARS);
                 $userExistsRead = UsersService::userExists($u);
                 if (!$userExistsRead && !isSet($httpVars[PARAM_USER_PASS_PREFIX.$index])) {
                     $index++;
@@ -237,7 +237,7 @@ class ShareRightsManager
 
             } else {
 
-                $u = Utils::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX.$index]);
+                $u = InputFilter::decodeSecureMagic($httpVars[PARAM_USER_LOGIN_PREFIX . $index]);
 
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
@@ -428,7 +428,7 @@ class ShareRightsManager
                 }
             } else {
                 $mess = LocaleService::getMessages();
-                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". Utils::sanitize($childRepository->getDisplay(), AJXP_SANITIZE_EMAILCHARS);
+                $hiddenUserLabel = "[".$mess["share_center.109"]."] ". InputFilter::sanitize($childRepository->getDisplay(), InputFilter::SANITIZE_EMAILCHARS);
                 $userObject = $this->createNewUser($loggedUser, $userName, $userEntry["PASSWORD"], isset($userEntry["HIDDEN"]), $hiddenUserLabel);
             }
 

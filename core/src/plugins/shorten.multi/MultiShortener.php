@@ -7,7 +7,8 @@
 namespace Pydio\LinkShortener;
 
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -48,7 +49,7 @@ class MultiShortener extends Plugin
                 $adfly_uid = $type["ADFLY_UID"];
                 $adfly_dom = $type["ADFLY_DOMAIN"];
                 $adfly = 'http://api.adf.ly/api.php?key='.$adfly_api.'&uid='.$adfly_uid.'&advert_type='.$adfly_type.'&domain='.$adfly_dom.'&url='.urlencode($url);
-                $response = Utils::getRemoteContent($adfly);
+                $response = FileHelper::getRemoteContent($adfly);
                 $response = strip_tags($response, '<body>');
                 $response = strip_tags($response);
                 if (isSet($response)) {
@@ -66,7 +67,7 @@ class MultiShortener extends Plugin
                 $format = 'json';
                 $version = '2.0.1';
                 $bitly = 'http://api.bit.ly/shorten?version='.$version.'&longUrl='.urlencode($url).'&login='.$bitly_login.'&apiKey='.$bitly_api.'&format='.$format;
-                $response = Utils::getRemoteContent($bitly);
+                $response = FileHelper::getRemoteContent($bitly);
                 $json = json_decode($response, true);
                 if (isSet($json['results'][$url]['shortUrl'])) {
                     return $json['results'][$url]['shortUrl'];
@@ -108,7 +109,7 @@ class MultiShortener extends Plugin
                 }
                 $post_api = $type["POST_APIKEY"];
                 $post = 'http://po.st/api/shorten?longUrl='.urlencode($url).'&apiKey='.$post_api.'&format=txt';
-                $response = Utils::getRemoteContent($post);
+                $response = FileHelper::getRemoteContent($post);
                 if (isSet($response)) {
                     return $response;
                 }
@@ -130,7 +131,7 @@ class MultiShortener extends Plugin
                 $yourls_domain = $type["YOURLS_DOMAIN"];
                 $yourls_api = $type["YOURLS_APIKEY"];
                 $yourls = 'http://'.$yourls_domain.'/yourls-api.php?signature='.$yourls_api.'&action=shorturl&format=simple&url='.urlencode($url);
-                $response = Utils::getRemoteContent($yourls);
+                $response = FileHelper::getRemoteContent($yourls);
                 if (isSet($response)) {
                     $shorturl = $response;
                     if ($useidn) {

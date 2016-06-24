@@ -30,7 +30,11 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\SessionService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 use Pydio\Log\Core\Logger;
 
@@ -70,13 +74,13 @@ class FtpAccessWrapper implements IAjxpWrapper
 
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
+        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
         $tmpHandle = fopen($tmpFile, "wb");
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);
         if (!$persistent) {
             register_shutdown_function(function() use($tmpFile){
-                Utils::silentUnlink($tmpFile);
+                FileHelper::silentUnlink($tmpFile);
             });
         }
         return $tmpFile;
@@ -97,7 +101,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         $fake = new FtpAccessWrapper();
         $parts = $fake->parseUrl($path);
         $link = $fake->createFTPLink();
-        $serverPath = Utils::securePath($fake->path."/".$parts["path"]);
+        $serverPath = InputFilter::securePath($fake->path . "/" . $parts["path"]);
         Logger::debug($serverPath);
         ftp_fget($link, $stream, $serverPath, FTP_BINARY);
     }
@@ -107,7 +111,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         $fake = new FtpAccessWrapper();
         $parts = $fake->parseUrl($path);
         $link = $fake->createFTPLink();
-        $serverPath = Utils::securePath($fake->path."/".$parts["path"]);
+        $serverPath = InputFilter::securePath($fake->path . "/" . $parts["path"]);
         ftp_chmod($link, $chmodValue, $serverPath);
     }
 
@@ -116,7 +120,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         if (stripos($mode, "w") !== false) {
             $this->crtMode = 'write';
             $parts = $this->parseUrl($url);
-            $this->crtTarget = Utils::securePath($this->path."/".$parts["path"]);
+            $this->crtTarget = InputFilter::securePath($this->path . "/" . $parts["path"]);
             $this->crtLink = $this->createFTPLink();
             $this->fp = tmpfile();
         } else {
@@ -222,9 +226,9 @@ class FtpAccessWrapper implements IAjxpWrapper
         // We are in an opendir loop
         Logger::debug(__CLASS__,__FUNCTION__,"URL_STAT", $path);
         $node = new AJXP_Node($path);
-        $testLoopPath = Utils::safeDirname($path);
+        $testLoopPath = PathUtils::forwardSlashDirname($path);
         if (is_array(self::$dirContent[$testLoopPath])) {
-            $search = Utils::safeBasename($path);
+            $search = PathUtils::forwardSlashBasename($path);
             //if($search == "") $search = ".";
             if (array_key_exists($search, self::$dirContent[$testLoopPath])) {
                 return self::$dirContent[$testLoopPath][$search];
@@ -232,16 +236,16 @@ class FtpAccessWrapper implements IAjxpWrapper
         }
         $parts = $this->parseUrl($path);
         $link = $this->createFTPLink();
-        $serverPath = Utils::securePath($this->path."/".$parts["path"]);
+        $serverPath = InputFilter::securePath($this->path . "/" . $parts["path"]);
         if(empty($parts["path"])) $parts["path"] = "/";
         if ($parts["path"] == "/") {
             $basename = ".";
         } else {
-            $basename = Utils::safeBasename($serverPath);
+            $basename = PathUtils::forwardSlashBasename($serverPath);
         }
 
-        $serverParent = Utils::safeDirname($parts["path"]);
-        $serverParent = Utils::securePath($this->path."/".$serverParent);
+        $serverParent = PathUtils::forwardSlashDirname($parts["path"]);
+        $serverParent = InputFilter::securePath($this->path . "/" . $serverParent);
 
         $testCd = @ftp_chdir($link, $serverPath);
         if ($testCd === true) {
@@ -284,7 +288,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         }
         $parts = $this->parseUrl($url);
         $link = $this->createFTPLink();
-        $serverPath = Utils::securePath($this->path."/".$parts["path"]);
+        $serverPath = InputFilter::securePath($this->path . "/" . $parts["path"]);
         $contents = $this->rawList($link, $serverPath);
         $folders = $files = array();
         foreach ($contents as $entry) {
@@ -342,8 +346,8 @@ class FtpAccessWrapper implements IAjxpWrapper
     protected function rawList($link, $serverPath, $target = 'd', $retry = true)
     {
         if ($target == 'f') {
-            $parentDir = Utils::safeDirname($serverPath);
-            $fileName = Utils::safeBasename($serverPath);
+            $parentDir = PathUtils::forwardSlashDirname($serverPath);
+            $fileName = PathUtils::forwardSlashBasename($serverPath);
             ftp_chdir($link, $parentDir);
             $rl_dirlist = @ftp_rawlist($link, "-a .");
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FILE RAWLIST FROM ".$parentDir);
@@ -444,7 +448,7 @@ class FtpAccessWrapper implements IAjxpWrapper
     protected function parseUrl($url, $forceLogin = false)
     {
         // URL MAY BE ajxp.ftp://username:password@host/path
-        $urlParts = Utils::safeParseUrl($url);
+        $urlParts = UrlUtils::safeParseUrl($url);
         $node = new AJXP_Node($url);
         $this->repositoryId = $node->getRepositoryId();
         $repository = $node->getRepository();
@@ -510,9 +514,9 @@ class FtpAccessWrapper implements IAjxpWrapper
             $parts = $this->parseUrl($url);
         } else {
             // parseUrl already called before (rename case).
-            $parts = Utils::safeParseUrl($url);
+            $parts = UrlUtils::safeParseUrl($url);
         }
-        $serverPath = Utils::securePath("/$this->path/".$parts["path"]);
+        $serverPath = InputFilter::securePath("/$this->path/" . $parts["path"]);
         return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;
     }
 
@@ -530,7 +534,7 @@ class FtpAccessWrapper implements IAjxpWrapper
 
         if ($ctx->getRepository()->getContextOption($ctx, "CREATE") == true) {
             // Test if root exists and create it otherwise
-            $serverPath = Utils::securePath($this->path."/");
+            $serverPath = InputFilter::securePath($this->path . "/");
             $testCd = @ftp_chdir($link, $serverPath);
             if ($testCd !== true) {
                 $res = @ftp_mkdir($link, $serverPath);

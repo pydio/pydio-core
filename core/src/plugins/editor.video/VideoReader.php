@@ -26,7 +26,8 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\PathUtils;
+
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -58,7 +59,7 @@ class VideoReader extends Plugin
             session_write_close();
             $filesize = filesize($node->getUrl());
             $filename = $node->getUrl();
-            $basename = Utils::safeBasename($filename);
+            $basename = PathUtils::forwardSlashBasename($filename);
 
             //$fp = fopen($destStreamURL.$file, "r");
             if (preg_match("/\.ogv$/", $basename)) {

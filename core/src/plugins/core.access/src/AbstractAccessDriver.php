@@ -30,12 +30,14 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\TextEncoder;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
@@ -194,7 +196,7 @@ abstract class AbstractAccessDriver extends Plugin
         $errorMessages = array();
         foreach ($files as $file) {
 
-            $destFile = Utils::decodeSecureMagic($httpVars["dest"]) ."/". Utils::safeBasename($file);
+            $destFile = InputFilter::decodeSecureMagic($httpVars["dest"]) ."/". PathUtils::forwardSlashBasename($file);
             $this->copyOrMoveFile(
                 $destFile,
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
@@ -234,7 +236,7 @@ abstract class AbstractAccessDriver extends Plugin
         Controller::applyHook("dl.localname", array($srcFile, &$localName));
         if(!empty($localName)) $bName = $localName;
         */
-        $destDir = Utils::safeDirname($destFile);
+        $destDir = PathUtils::forwardSlashDirname($destFile);
         $destFile = $destUrlBase.$destFile;
         $realSrcFile = $srcUrlBase.$srcFile;
 
@@ -269,7 +271,7 @@ abstract class AbstractAccessDriver extends Plugin
                     }
                 }
                 // auto rename file
-                $destDir = Utils::safeDirname($destFile);
+                $destDir = PathUtils::forwardSlashDirname($destFile);
                 $i = 1;
                 $newName = $base;
                 while (file_exists($destDir."/".$newName)) {
@@ -498,7 +500,7 @@ abstract class AbstractAccessDriver extends Plugin
             }
             closedir($all);
             @rmdir($location);
-            if($taskId != null) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Deleting ".Utils::safeBasename($location));
+            if($taskId != null) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Deleting ". PathUtils::forwardSlashBasename($location));
         } else {
             if (file_exists("$location")) {
                 Controller::applyHook("node.before_path_change", array(new AJXP_Node($location)));

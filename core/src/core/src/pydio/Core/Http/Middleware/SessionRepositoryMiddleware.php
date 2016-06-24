@@ -33,7 +33,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -98,7 +98,7 @@ class SessionRepositoryMiddleware
             LocaleService::setLanguage($requestInterface->getCookieParams()["AJXP_lang"]);
         }
 
-        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+        if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){
             try{
                 RolesService::bootSequence();
             }catch (PydioException $e){

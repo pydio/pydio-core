@@ -24,8 +24,9 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
@@ -142,9 +143,9 @@ class CommentsMetaManager extends AbstractMetaSource
                 $uId = $ctx->getUser()->getId();
                 $limit = $this->getContextualOption($ctx, "COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
-                    $content = substr(Utils::decodeSecureMagic($httpVars["content"]), 0, $limit);
+                    $content = substr(InputFilter::decodeSecureMagic($httpVars["content"]), 0, $limit);
                 } else {
-                    $content = Utils::decodeSecureMagic($httpVars["content"]);
+                    $content = InputFilter::decodeSecureMagic($httpVars["content"]);
                 }
                 $com = array(
                     "date"      => time(),
@@ -176,8 +177,8 @@ class CommentsMetaManager extends AbstractMetaSource
 
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
-                    $sortBy = isSet($httpVars["sort_by"])?Utils::decodeSecureMagic($httpVars["sort_by"]):"date";
-                    $sortDir = isSet($httpVars["sort_dir"])?Utils::decodeSecureMagic($httpVars["sort_dir"]):"asc";
+                    $sortBy = isSet($httpVars["sort_by"])? InputFilter::decodeSecureMagic($httpVars["sort_by"]) :"date";
+                    $sortDir = isSet($httpVars["sort_dir"])? InputFilter::decodeSecureMagic($httpVars["sort_dir"]) :"asc";
                     $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]) : 0;
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
                     $uniqNode->loadNodeInfo();

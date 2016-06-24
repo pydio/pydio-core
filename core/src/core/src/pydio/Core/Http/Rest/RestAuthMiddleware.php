@@ -33,12 +33,16 @@ use Pydio\Core\Services\ConfService;
 
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Authentication middleware used in Rest context
+ * @package Pydio\Core\Http\Rest
+ */
 class RestAuthMiddleware
 {
 
@@ -89,7 +93,7 @@ class RestAuthMiddleware
 
         Logger::updateContext($ctx);
 
-        if(UsersService::usersEnabled() && Utils::detectApplicationFirstRun()){
+        if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){
             RolesService::bootSequence();
         }
 

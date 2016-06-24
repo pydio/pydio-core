@@ -26,8 +26,8 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Auth\Core\MemorySafe;
 
 
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -166,7 +166,7 @@ class SMBAccessWrapper extends FsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = Utils::getAjxpTmpDir()."/".md5(time());
+            $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);

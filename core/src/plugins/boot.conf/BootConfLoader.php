@@ -36,8 +36,13 @@ use Pydio\Conf\Core\CoreConfLoader;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -91,7 +96,7 @@ class BootConfLoader extends AbstractConfDriver
     public function loadManifest()
     {
         parent::loadManifest();
-        if (!Utils::detectApplicationFirstRun()) {
+        if (!ApplicationState::detectApplicationFirstRun()) {
             $actions = $this->getXPath()->query("server_settings|registry_contributions");
             foreach ($actions as $ac) {
                 $ac->parentNode->removeChild($ac);
@@ -141,7 +146,7 @@ class BootConfLoader extends AbstractConfDriver
             }
         }
         $uri = $_SERVER["REQUEST_URI"];
-        if (strpos($uri, '.php') !== false) $uri = Utils::safeDirname($uri);
+        if (strpos($uri, '.php') !== false) $uri = PathUtils::forwardSlashDirname($uri);
         if (empty($uri)) $uri = "/";
         $loadedValues = array(
             "ENCODING" => (defined('AJXP_LOCALE') ? AJXP_LOCALE : TextEncoder::getEncoding()),
@@ -189,7 +194,7 @@ class BootConfLoader extends AbstractConfDriver
     public function applyInstallerForm($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $data = array();
-        Utils::parseStandardFormParameters($ctx, $httpVars, $data, "");
+        OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "");
 
         list($newConfigPlugin, $newAuthPlugin, $newCachePlugin) = $this->createBootstrapConf($data);
 
@@ -213,7 +218,7 @@ class BootConfLoader extends AbstractConfDriver
     public function sendInstallResult($htAccessToUpdate, $htContent)
     {
         ConfService::clearAllCaches();
-        Utils::setApplicationFirstRunPassed();
+        ApplicationState::setApplicationFirstRunPassed();
 
         if ($htAccessToUpdate != null) {
             HTMLWriter::charsetHeader("application/json");
@@ -302,7 +307,7 @@ class BootConfLoader extends AbstractConfDriver
         if (!isSet($coreConf["UNIQUE_INSTANCE_CONFIG"])) $coreConf["UNIQUE_INSTANCE_CONFIG"] = array();
         if (!isSet($coreAuth["MASTER_INSTANCE_CONFIG"])) $coreAuth["MASTER_INSTANCE_CONFIG"] = array();
         if (!isSet($coreCache["UNIQUE_INSTANCE_CONFIG"])) $coreCache["UNIQUE_INSTANCE_CONFIG"] = array();
-        $coreConf["AJXP_CLI_SECRET_KEY"] = Utils::generateRandomString(24, true);
+        $coreConf["AJXP_CLI_SECRET_KEY"] = StringHelper::generateRandomString(24, true);
 
         // REWRITE BOOTSTRAP.JSON
         $coreConf["DIBI_PRECONFIGURATION"] = $data["db_type"];
@@ -342,7 +347,7 @@ class BootConfLoader extends AbstractConfDriver
             unlink($oldBoot);
         }
         $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth, "core.cache" => $coreCache);
-        Utils::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
+        FileHelper::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
 
 
         // Write new bootstrap and reload conf plugin!
@@ -416,7 +421,7 @@ class BootConfLoader extends AbstractConfDriver
         $newConfigPlugin = ConfService::getConfStorageImpl();
         require_once($newConfigPlugin->getUserClassFileName());
 
-        $adminLogin = Utils::sanitize($data["ADMIN_USER_LOGIN"], AJXP_SANITIZE_EMAILCHARS);
+        $adminLogin = InputFilter::sanitize($data["ADMIN_USER_LOGIN"], InputFilter::SANITIZE_EMAILCHARS);
         $adminName = $data["ADMIN_USER_NAME"];
         $adminPass = $data["ADMIN_USER_PASS"];
         $uObj = UsersService::createUser($adminLogin, $adminPass, true);
@@ -438,7 +443,7 @@ class BootConfLoader extends AbstractConfDriver
             $pass = $data[str_replace("_LOGIN", "_PASS", $loginP)];
             $name = $data[str_replace("_LOGIN", "_NAME", $loginP)];
             $mail = $data[str_replace("_LOGIN", "_MAIL", $loginP)];
-            $saniLogin = Utils::sanitize($data[$loginP], AJXP_SANITIZE_EMAILCHARS);
+            $saniLogin = InputFilter::sanitize($data[$loginP], InputFilter::SANITIZE_EMAILCHARS);
             $uObj = UsersService::createUser($saniLogin, $pass);
             $uObj->getPersonalRole()->setParameterValue("core.conf", "email", $mail);
             $uObj->getPersonalRole()->setParameterValue("core.conf", "USER_DISPLAY_NAME", $name);
@@ -459,11 +464,11 @@ class BootConfLoader extends AbstractConfDriver
     public function testConnexions($action, $httpVars, $fileVars, ContextInterface $ctx)
     {
         $data = array();
-        Utils::parseStandardFormParameters($ctx, $httpVars, $data, "DRIVER_OPTION_");
+        OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "DRIVER_OPTION_");
 
         if ($action == "boot_test_sql_connexion") {
 
-            $p = Utils::cleanDibiDriverParameters($data["db_type"]);
+            $p = OptionsHelper::cleanDibiDriverParameters($data["db_type"]);
             if ($p["driver"] == "sqlite3") {
                 $dbFile = VarsFilter::filter($p["database"], $ctx);
                 if (!file_exists(dirname($dbFile))) {

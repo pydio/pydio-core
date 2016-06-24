@@ -25,9 +25,9 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Utils\BruteForceHelper;
-use Pydio\Core\Utils\CookiesHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Http\BruteForceHelper;
+use Pydio\Core\Utils\Http\CookiesHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -92,7 +92,7 @@ class AuthService
         BruteForceHelper::setBruteForceLoginArray($loginAttempt);
 
         if (!$authDriver->userExists($user_id)) {
-            Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid user"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => InputFilter::sanitize($user_id, InputFilter::SANITIZE_EMAILCHARS), "error" => "Invalid user"));
             if ($bruteForceLogin === FALSE) {
                 throw new LoginException(-4);
             } else {
@@ -101,7 +101,7 @@ class AuthService
         }
         if (!$bypass_pwd) {
             if (!UsersService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
-                Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Invalid password"));
+                Logger::warning(__CLASS__, "Login failed", array("user" => InputFilter::sanitize($user_id, InputFilter::SANITIZE_EMAILCHARS), "error" => "Invalid password"));
                 if ($bruteForceLogin === FALSE) {
                     throw new LoginException(-4);
                 } else {
@@ -123,7 +123,7 @@ class AuthService
 
 
         if ($user->getLock() === "logout") {
-            Logger::warning(__CLASS__, "Login failed", array("user" => Utils::sanitize($user_id, AJXP_SANITIZE_EMAILCHARS), "error" => "Locked user"));
+            Logger::warning(__CLASS__, "Login failed", array("user" => InputFilter::sanitize($user_id, InputFilter::SANITIZE_EMAILCHARS), "error" => "Locked user"));
             throw new LoginException(-1);
         }
 

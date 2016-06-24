@@ -27,7 +27,8 @@ use Exception;
 use PclZip;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -158,7 +159,7 @@ class UpgradeManager
         if (isSet(self::$context)) {
             $json = file_get_contents($url . "?channel=" . $channel . "&version=" . AJXP_VERSION . "&package=" . $packageName, null, self::$context);
         } else {
-            $json = Utils::getRemoteContent($url . "?channel=" . $channel . "&version=" . AJXP_VERSION . "&package=" . $packageName);
+            $json = FileHelper::getRemoteContent($url . "?channel=" . $channel . "&version=" . AJXP_VERSION . "&package=" . $packageName);
         }
         if ($format == "php") return json_decode($json, true);
         else return $json;
@@ -244,7 +245,7 @@ class UpgradeManager
         if (self::$context) {
             $content = file_get_contents($this->archiveURL, null, self::$context);
         } else {
-            $content = Utils::getRemoteContent($this->archiveURL);
+            $content = FileHelper::getRemoteContent($this->archiveURL);
         }
         if ($content === false || strlen($content) == 0) {
             throw new Exception("Error while downloading");
@@ -405,7 +406,7 @@ class UpgradeManager
             return "";
         }
 
-        $conf = Utils::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
+        $conf = OptionsHelper::cleanDibiDriverParameters($confDriver->getOption("SQL_DRIVER"));
         if (!is_array($conf) || !isSet($conf["driver"])) return "Nothing to do";
         switch ($conf["driver"]) {
             case "sqlite":

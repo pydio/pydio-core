@@ -21,7 +21,7 @@
 namespace Pydio\Tests;
 
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\UnixProcess;
+use Pydio\Core\Controller\UnixProcess;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

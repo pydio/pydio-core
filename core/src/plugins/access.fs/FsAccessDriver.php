@@ -46,8 +46,11 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
@@ -346,8 +349,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $params = $request->getParsedBody();
         $newAction = null;
         if(isSet($params["copy_source"])){
-            $newVars["dest"] = Utils::safeDirname($notDecodedPath);
-            $newVars["targetBaseName"] = Utils::safeBasename($notDecodedPath);
+            $newVars["dest"] = PathUtils::forwardSlashDirname($notDecodedPath);
+            $newVars["targetBaseName"] = PathUtils::forwardSlashBasename($notDecodedPath);
             $newVars["file"] = "/".implode("/", array_slice(explode("/", trim($params["copy_source"], "/")), 1));
             if(isSet($params["delete_source"]) && $params["delete_source"] == "true"){
                 $newAction = "move";
@@ -386,18 +389,18 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     public function uploadAction(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $httpVars = $request->getParsedBody();
-        $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+        $dir = InputFilter::sanitize($httpVars["dir"], InputFilter::SANITIZE_DIRNAME) OR "";
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
             $dir = FsAccessWrapper::patchPathForBaseDir($dir);
         }
-        $dir = Utils::securePath($dir);
+        $dir = InputFilter::securePath($dir);
         $selection = UserSelection::fromContext($ctx, $httpVars);
         if (!$selection->isEmpty()) {
             $this->filterUserSelectionToHidden($selection->getContext(), $selection->getFiles());
             if(empty($dir) && $selection->isUnique()){
-                $dir = Utils::safeDirname($selection->getUniqueFile());
+                $dir = PathUtils::forwardSlashDirname($selection->getUniqueFile());
             }
         }
         $mess = LocaleService::getMessages();
@@ -408,7 +411,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         ];
         $this->logDebug("Upload Files Data", $request->getUploadedFiles());
 
-        $destNode = $selection->nodeForPath(Utils::decodeSecureMagic($dir));
+        $destNode = $selection->nodeForPath(InputFilter::decodeSecureMagic($dir));
         $destination = $destNode->getUrl();
         $this->logDebug("Upload inside", ["destination"=>$this->addSlugToPath($destNode->getUrl())]);
         if (!$this->isWriteable($destNode)) {
@@ -431,12 +434,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             
             try{
                 // CHECK PHP UPLOAD ERRORS
-                Utils::parseFileDataErrors($uploadedFile, true);
+                InputFilter::parseFileDataErrors($uploadedFile, true);
 
                 // FIND PROPER FILE NAME
-                $userfile_name=Utils::sanitize(TextEncoder::fromPostedFileName($uploadedFile->getClientFileName()), AJXP_SANITIZE_FILENAME);
+                $userfile_name= InputFilter::sanitize(TextEncoder::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME);
                 if (isSet($httpVars["urlencoded_filename"])) {
-                    $userfile_name = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), AJXP_SANITIZE_FILENAME);
+                    $userfile_name = InputFilter::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), InputFilter::SANITIZE_FILENAME);
                 }
                 $userfile_name = substr($userfile_name, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                 if (isSet($httpVars["auto_rename"])) {
@@ -481,7 +484,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
                 if (isSet($httpVars["appendto_urlencoded_part"])) {
-                    $appendTo = Utils::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), AJXP_SANITIZE_FILENAME);
+                    $appendTo = InputFilter::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), InputFilter::SANITIZE_FILENAME);
                     if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
                         $originalAppendTo = $appendTo;
                         $appendTo .= ".dlpart";
@@ -584,14 +587,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $node = $selection->getUniqueNode();
                 } else {
                     if(isset($httpVars["dir"])){
-                        $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
+                        $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
                     }
                     $zip = true;
                 }
                 if ($zip) {
                     // Make a temp zip and send it as download
                     $loggedUser = $ctx->getUser();
-                    $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                    $file = ApplicationState::getAjxpTmpDir() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection, $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new PydioException("Error while compressing");
                     if(!ConfService::getContextConf($ctx, "USE_XSENDFILE")  && !ConfService::getContextConf($ctx, "USE_XACCELREDIRECT")){
@@ -599,7 +602,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     }
                     $localName = (empty($base)?"Files":$base).".zip";
                     if(isSet($httpVars["archive_name"])){
-                        $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
+                        $localName = InputFilter::decodeSecureMagic($httpVars["archive_name"]);
                     }
                     $fileReader = new FileReaderResponse($file);
                     $fileReader->setLocalName($localName);
@@ -731,17 +734,17 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($taskId !== null){
                     TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Starting compression in background");
                 }
-                $dir = Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME);
+                $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
                 $currentDirNode = $selection->nodeForPath($dir);
                 // Make a temp zip
                 $loggedUser = $ctx->getUser();
                 if (isSet($httpVars["archive_name"])) {
-                    $localName = Utils::decodeSecureMagic($httpVars["archive_name"]);
+                    $localName = InputFilter::decodeSecureMagic($httpVars["archive_name"]);
                     $this->filterUserSelectionToHidden($ctx, [$localName]);
                 } else {
                     $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
                 }
-                $file = Utils::getAjxpTmpDir()."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
+                $file = ApplicationState::getAjxpTmpDir() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
                 if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
                 else $baseDir = $dir;
                 $zipFile = $this->makeZip($selection, $file, $baseDir, $taskId);
@@ -902,7 +905,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     throw new PydioException("You are not allowed to write", 207);
                 }
                 $success = $error = [];
-                $destPath = Utils::decodeSecureMagic($httpVars["dest"]);
+                $destPath = InputFilter::decodeSecureMagic($httpVars["dest"]);
                 $targetBaseName = null;
                 if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
                     $targetBaseName = $httpVars["targetBaseName"];
@@ -983,11 +986,11 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $destNode = null;
                 $filename_new = "";
                 if (isSet($httpVars["dest"])) {
-                    $dest = Utils::decodeSecureMagic($httpVars["dest"]);
+                    $dest = InputFilter::decodeSecureMagic($httpVars["dest"]);
                     $destNode = $selection->nodeForPath($dest);
                     $this->filterUserSelectionToHidden($ctx, [$destNode->getLabel()]);
                 }else if(isSet($httpVars["filename_new"])){
-                    $filename_new = Utils::decodeSecureMagic($httpVars["filename_new"]);
+                    $filename_new = InputFilter::decodeSecureMagic($httpVars["filename_new"]);
                     $this->filterUserSelectionToHidden($ctx, [$filename_new]);
                 }
                 $renamedNode = $this->rename($originalNode, $destNode, $filename_new);
@@ -1011,16 +1014,16 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $files = $selection->getFiles();
                 if(isSet($httpVars["dir"]) && isSet($httpVars["dirname"])){
                     $files[] =
-                        rtrim(Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME), "/")
+                        rtrim(InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME), "/")
                         ."/".
-                        Utils::decodeSecureMagic($httpVars["dirname"], AJXP_SANITIZE_FILENAME);
+                        InputFilter::decodeSecureMagic($httpVars["dirname"], InputFilter::SANITIZE_FILENAME);
                 }
                 $messages = [];
                 $errors = [];
                 $max_length = ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH");
                 foreach($files as $newDirPath){
-                    $parentDir = Utils::safeDirname($newDirPath);
-                    $basename = Utils::safeBasename($newDirPath);
+                    $parentDir = PathUtils::forwardSlashDirname($newDirPath);
+                    $basename = PathUtils::forwardSlashBasename($newDirPath);
                     $basename = substr($basename, 0, $max_length);
                     $this->filterUserSelectionToHidden($ctx, [$basename]);
                     $parentNode = $selection->nodeForPath($parentDir);
@@ -1063,10 +1066,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             case "mkfile":
 
                 if(empty($httpVars["filename"]) && isSet($httpVars["node"])){
-                    $filename= Utils::decodeSecureMagic($httpVars["node"]);
+                    $filename= InputFilter::decodeSecureMagic($httpVars["node"]);
                 }else{
-                    $parent = rtrim(Utils::decodeSecureMagic($httpVars["dir"], AJXP_SANITIZE_DIRNAME), "/");
-                    $filename = $parent ."/" . Utils::decodeSecureMagic($httpVars["filename"], AJXP_SANITIZE_FILENAME);
+                    $parent = rtrim(InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME), "/");
+                    $filename = $parent ."/" . InputFilter::decodeSecureMagic($httpVars["filename"], InputFilter::SANITIZE_FILENAME);
                 }
                 $filename = substr($filename, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
                 $this->filterUserSelectionToHidden($ctx, [$filename]);
@@ -1118,10 +1121,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $toNode = null;
                 $copyOrMove = false;
                 if (isSet($httpVars["from"])) {
-                    $fromNode = $selection->nodeForPath(Utils::decodeSecureMagic($httpVars["from"]));
+                    $fromNode = $selection->nodeForPath(InputFilter::decodeSecureMagic($httpVars["from"]));
                 }
                 if (isSet($httpVars["to"])) {
-                    $toNode = $selection->nodeForPath(Utils::decodeSecureMagic($httpVars["to"]));
+                    $toNode = $selection->nodeForPath(InputFilter::decodeSecureMagic($httpVars["to"]));
                 }
                 if (isSet($httpVars["copy"]) && $httpVars["copy"] == "true") {
                     $copyOrMove = true;
@@ -1141,14 +1144,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $dir = $selection->getUniqueFile();
                     $selection->setFiles([]);
                 }else{
-                    $dir = Utils::sanitize($httpVars["dir"], AJXP_SANITIZE_DIRNAME) OR "";
+                    $dir = InputFilter::sanitize($httpVars["dir"], InputFilter::SANITIZE_DIRNAME) OR "";
                 }
                 $patch = false;
                 if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($selection->currentBaseUrl())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
                     $dir = FsAccessWrapper::patchPathForBaseDir($dir);
                     $patch = true;
                 }
-                $dir = Utils::securePath($dir);
+                $dir = InputFilter::securePath($dir);
 
                 // FILTER DIR PAGINATION ANCHOR
                 $page = null;
@@ -1224,7 +1227,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         }
                         if(isSet($httpVars["page_position"]) && $httpVars["page_position"] == "true"){
                             // Detect page position: we have to loading "siblings"
-                            $parentPath = Utils::safeDirname($node->getPath());
+                            $parentPath = PathUtils::forwardSlashDirname($node->getPath());
                             $siblings = scandir($selection->currentBaseUrl().$parentPath);
                             foreach($siblings as $i => $s){
                                 if($this->filterFile($ctx, $s, true)) unset($siblings[$i]);
@@ -1275,7 +1278,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
 
                 $nodesList->setParentNode($parentAjxpNode);
-                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || ! Utils::userAgentIsNativePydioApp())) {
+                if (isSet($totalPages) && isSet($crtPage) && ($totalPages > 1 || !UserAgent::userAgentIsNativePydioApp())) {
                     $remoteOptions = null;
                     if ($this->getContextualOption($ctx, "REMOTE_SORTING")) {
                         $remoteOptions = [
@@ -1649,7 +1652,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
             }
             if (!$result) {
-                $errorMessage="$messages[33] ".Utils::safeBasename($destination);
+                $errorMessage="$messages[33] ". PathUtils::forwardSlashBasename($destination);
                 throw new \Exception($errorMessage, 411);
             }
         }
@@ -1898,7 +1901,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $mess = LocaleService::getMessages();
 
         if(!empty($filename_new)){
-            $filename_new=  Utils::sanitize(TextEncoder::magicDequote($filename_new), AJXP_SANITIZE_FILENAME);
+            $filename_new= InputFilter::sanitize(TextEncoder::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME);
             $filename_new = substr($filename_new, 0, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
         }
 
@@ -2320,7 +2323,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         $repository = $ctx->getRepository();
         $newOptions = [
-            "PATH"           => "AJXP_PARENT_OPTION:PATH:".Utils::decodeSecureMagic($httpVars["file"]),
+            "PATH"           => "AJXP_PARENT_OPTION:PATH:". InputFilter::decodeSecureMagic($httpVars["file"]),
             "CREATE"         => $repository->getContextOption($ctx, "CREATE"),
             "RECYCLE_BIN"    => isSet($httpVars["inherit_recycle"])? $repository->getContextOption($ctx, "RECYCLE_BIN") : "",
             "DEFAULT_RIGHTS" => "",

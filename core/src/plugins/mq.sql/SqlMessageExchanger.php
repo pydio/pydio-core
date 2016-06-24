@@ -22,7 +22,9 @@ namespace Pydio\Mq\Implementation;
 
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\OptionsHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Notification\Core\IMessageExchanger;
 use \dibi as dibi;
@@ -45,13 +47,13 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     public function init(ContextInterface $ctx, $options = [])
     {
            parent::init($ctx, $options);
-           $this->sqlDriver = $this->sqlDriver = Utils::cleanDibiDriverParameters($options["SQL_DRIVER"]);
+           $this->sqlDriver = $this->sqlDriver = OptionsHelper::cleanDibiDriverParameters($options["SQL_DRIVER"]);
        }
 
     public function performChecks()
     {
         if(!isSet($this->options)) return;
-        $test = Utils::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
+        $test = OptionsHelper::cleanDibiDriverParameters($this->options["SQL_DRIVER"]);
         if (!count($test)) {
             throw new \Exception("Please define an SQL connexion in the core configuration");
         }
@@ -77,7 +79,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
         }
         if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
             if(!isset($this->channels)) $this->channels = array();
-            $data = Utils::loadSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName");
+            $data = FileHelper::loadSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName");
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -97,7 +99,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
         if (isSet($this->channels) && is_array($this->channels)) {
             foreach ($this->channels as $channelName => $data) {
                 if (is_array($data)) {
-                    Utils::saveSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName", $data);
+                    FileHelper::saveSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName", $data);
                 }
             }
         }
@@ -105,6 +107,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
 
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @return mixed
@@ -138,6 +141,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @return mixed
@@ -173,11 +177,13 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $clientId
      * @param $userId
      * @param $userGroup
      * @return mixed
+     * @throws \Exception
      */
     public function consumeInstantChannel(ContextInterface $ctx, $channelName, $clientId, $userId, $userGroup)
     {
@@ -227,8 +233,9 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
         }
         return $result;
     }
-    
+
     /**
+     * @param ContextInterface $ctx
      * @param $channelName
      * @param $filter
      * @return mixed
@@ -256,6 +263,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param string $channel Name of the persistant queue to create
      * @param object $message Message to send
      * @return mixed
@@ -281,6 +289,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param $channel
      * @param $message
      * @return Object

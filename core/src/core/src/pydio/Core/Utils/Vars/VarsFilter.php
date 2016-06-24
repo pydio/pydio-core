@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Vars;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;

@@ -23,7 +23,8 @@ namespace Pydio\OCS\Client;
 defined('AJXP_EXEC') or die('Access not allowed');
 defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+
 use GuzzleHttp\Exception\RequestException;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\ShareInvitation;
@@ -53,7 +54,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'name' => $invitation->getDocumentName(),
             'remoteId' => $invitation->getId(),
             'owner' => $invitation->getOwner(),
-            'remote' => Utils::detectServerURL(true)
+            'remote' => ApplicationState::detectServerURL(true)
         ];
 
         $response = $client->post(ltrim($endpoints['share'], '/'), [

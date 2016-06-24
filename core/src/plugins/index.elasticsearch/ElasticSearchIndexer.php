@@ -28,7 +28,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\Utils\TextEncoder;
 use \Elastica;
 
@@ -288,7 +289,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 throw new \Exception($messages["index.lucene.7"]);
             }
 
-            $searchField = \Pydio\Core\Utils\Utils::sanitize($httpVars["field"], AJXP_SANITIZE_ALPHANUM);
+            $searchField = InputFilter::sanitize($httpVars["field"], InputFilter::SANITIZE_ALPHANUM);
 
             $fieldQuery = new Elastica\Query\QueryString();
             $fields = [$searchField];

@@ -30,7 +30,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -84,13 +86,13 @@ class PixlrEditor extends Plugin
 
         if ($action == "post_to_server") {
             if(!is_writeable($selectedNodeUrl)){
-                header("Location:".Utils::detectServerURL(true)."/plugins/editor.pixlr/fake_error_pixlr.php");
+                header("Location:". ApplicationState::detectServerURL(true) ."/plugins/editor.pixlr/fake_error_pixlr.php");
                 return;
             }
 
             // Backward compat
             if(strpos($httpVars["file"], "base64encoded:") !== 0){
-                $legacyFilePath = Utils::decodeSecureMagic(base64_decode($httpVars["file"]));
+                $legacyFilePath = InputFilter::decodeSecureMagic(base64_decode($httpVars["file"]));
                 $selectedNode = new AJXP_Node($selection->currentBaseUrl().$legacyFilePath);
                 $selectedNodeUrl = $selectedNode->getUrl();
             }
@@ -135,7 +137,7 @@ class PixlrEditor extends Plugin
 
         } else if ($action == "retrieve_pixlr_image") {
 
-            $file = Utils::decodeSecureMagic($httpVars["original_file"]);
+            $file = InputFilter::decodeSecureMagic($httpVars["original_file"]);
             $selectedNode = new AJXP_Node($selection->currentBaseUrl() . $file);
             $selectedNode->loadNodeInfo();
 

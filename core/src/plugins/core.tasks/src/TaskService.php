@@ -32,7 +32,8 @@ use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -114,7 +115,7 @@ class TaskService implements ITasksProvider
      */
     protected function publishTaskUpdate(Task $task){
 
-        $json = Utils::xmlEntities(json_encode($task));
+        $json = StringHelper::xmlEntities(json_encode($task));
         if(count($task->nodes)){
             $nodesDiff = new NodesDiff();
             foreach($task->nodes as $url){
@@ -147,7 +148,7 @@ class TaskService implements ITasksProvider
         
         $task = new Task();
         $task->setLabel("Launching action ".$actionName);
-        $task->setId(Utils::createGUID());
+        $task->setId(StringHelper::createGUID());
         $task->setUserId($userId);
         $task->setWsId($repoId);
         $task->setStatus(Task::STATUS_PENDING);

@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Vars;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\Context;

@@ -33,7 +33,8 @@ define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 use \Doctrine\Common\Cache;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\Cache\Doctrine\Ext;
 
@@ -147,7 +148,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
         }
 
         if(empty($cachePrefix)){
-            $cachePrefix = Utils::slugify(Utils::detectServerURL(true));
+            $cachePrefix = StringHelper::slugify(ApplicationState::detectServerURL(true));
         }
         $cachePrefix .= "_".$namespace."_";
         $cacheDriver->setNamespace($cachePrefix);

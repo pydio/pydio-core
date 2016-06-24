@@ -20,7 +20,8 @@
  */
 namespace Pydio\Access\Meta\Exif;
 
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -51,7 +52,7 @@ class ExifXmlMessage implements \Pydio\Core\Http\Response\XMLSerializableRespons
         foreach ($this->data as $section => $data) {
             $buffer .= "<exifSection name='$section'>";
             foreach ($data as $key => $value) {
-                $buffer .= "<exifTag name=\"$key\">". Utils::xmlEntities($value)."</exifTag>";
+                $buffer .= "<exifTag name=\"$key\">". StringHelper::xmlEntities($value) ."</exifTag>";
             }
             $buffer .= "</exifSection>";
         }

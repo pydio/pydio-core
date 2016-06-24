@@ -22,7 +22,8 @@ namespace Pydio\Mq\Implementation;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Notification\Core\IMessageExchanger;
 
@@ -53,7 +54,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
         }
         if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
             if(!isset($this->channels)) $this->channels = array();
-            $data = Utils::loadSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName");
+            $data = FileHelper::loadSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName");
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -73,7 +74,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
         if (isSet($this->channels) && is_array($this->channels)) {
             foreach ($this->channels as $channelName => $data) {
                 if (is_array($data)) {
-                    Utils::saveSerialFile($this->getPluginWorkDir()."/queues/channel-$channelName", $data);
+                    FileHelper::saveSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName", $data);
                 }
             }
         }

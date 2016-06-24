@@ -29,7 +29,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\InputFilter;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
@@ -105,7 +106,7 @@ class SvnManager extends AbstractMetaSource
             }
         }
 
-        $result["DIR"] = MetaStreamWrapper::getRealFSReference($urlBase.Utils::decodeSecureMagic($httpVars["dir"]));
+        $result["DIR"] = MetaStreamWrapper::getRealFSReference($urlBase. InputFilter::decodeSecureMagic($httpVars["dir"]));
         $result["ORIGINAL_SELECTION"] = $userSelection;
         $result["SELECTION"] = array();
         if (!$userSelection->isEmpty()) {
@@ -264,12 +265,12 @@ class SvnManager extends AbstractMetaSource
     {
         switch ($actionName) {
             case "mkdir":
-                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_DIR" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["dirname"])));
+                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_DIR" => InputFilter::decodeSecureMagic($httpVars["dir"] . "/" . $httpVars["dirname"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_DIR"]);
                 $this->commitMessageParams = $httpVars["dirname"];
             break;
             case "mkfile":
-                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_FILE" => Utils::decodeSecureMagic($httpVars["dir"]."/".$httpVars["filename"])));
+                $init = $this->initDirAndSelection($ctx, $httpVars, array("NEW_FILE" => InputFilter::decodeSecureMagic($httpVars["dir"] . "/" . $httpVars["filename"])));
                 $res = ExecSvnCmd("svn add", $init["NEW_FILE"]);
                 $this->commitMessageParams = $httpVars["filename"];
             break;
@@ -302,7 +303,7 @@ class SvnManager extends AbstractMetaSource
     public function copyOrMoveSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
     {
         if ($actionName != "rename") {
-            $init = $this->initDirAndSelection($ctx, $httpVars, array("DEST_DIR" => Utils::decodeSecureMagic($httpVars["dest"])));
+            $init = $this->initDirAndSelection($ctx, $httpVars, array("DEST_DIR" => InputFilter::decodeSecureMagic($httpVars["dest"])));
             $this->commitMessageParams = "To:".$httpVars["dest"].";items:";
         } else {
             $init = $this->initDirAndSelection($ctx, $httpVars, array(), true);
@@ -314,7 +315,7 @@ class SvnManager extends AbstractMetaSource
         }
         foreach ($init["SELECTION"] as $selectedFile) {
             if ($actionName == "rename") {
-                $destFile = dirname($selectedFile)."/".Utils::decodeSecureMagic($httpVars["filename_new"]);
+                $destFile = dirname($selectedFile)."/". InputFilter::decodeSecureMagic($httpVars["filename_new"]);
                 $this->commitMessageParams = "To:".$httpVars["filename_new"].";item:".$httpVars["file"];
             } else {
                 $destFile = $init["DEST_DIR"]."/".basename($selectedFile);

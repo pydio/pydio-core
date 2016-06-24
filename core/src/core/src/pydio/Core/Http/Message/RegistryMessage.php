@@ -23,11 +23,15 @@ namespace Pydio\Core\Http\Message;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RegistryMessage
+ * Send a piece or a full registry as XML or JSON
+ * @package Pydio\Core\Http\Message
+ */
 class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializableResponseChunk
 {
     /**
@@ -50,6 +54,12 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
      */
     protected $renderedXML;
 
+    /**
+     * RegistryMessage constructor.
+     * @param $registry
+     * @param null $xPath
+     * @param null $xPathObject
+     */
     public function __construct($registry, $xPath = null, $xPathObject = null)
     {
         $this->registry = $registry;
@@ -58,6 +68,9 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
     }
 
 
+    /**
+     * @return string
+     */
     public function getCharset()
     {
         return "UTF-8";
@@ -85,7 +98,7 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
 
         } else {
 
-            Utils::safeIniSet("zlib.output_compression", "4096");
+            ApplicationState::safeIniSet("zlib.output_compression", "4096");
             $xml = XMLWriter::replaceAjxpXmlKeywords($this->registry->saveXML());
 
         }

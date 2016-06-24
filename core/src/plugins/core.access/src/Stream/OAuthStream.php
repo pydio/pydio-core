@@ -18,7 +18,8 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\CacheService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+
 
 class OAuthStream implements StreamInterface
 {
@@ -165,7 +166,7 @@ class OAuthStream implements StreamInterface
         if ($tokens = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $key)) return $tokens;
 
         // TOKENS IN FILE ?
-        return Utils::loadSerialFile(AJXP_CACHE_DIR . '/' . $key);
+        return FileHelper::loadSerialFile(AJXP_CACHE_DIR . '/' . $key);
     }
 
     /**
@@ -180,7 +181,7 @@ class OAuthStream implements StreamInterface
         $value = [$accessToken, $refreshToken];
 
         // Save in file
-        Utils::saveSerialFile(AJXP_CACHE_DIR . '/' . $key, $value, true);
+        FileHelper::saveSerialFile(AJXP_CACHE_DIR . '/' . $key, $value, true);
 
         // Save in cache
         CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $key, $value);

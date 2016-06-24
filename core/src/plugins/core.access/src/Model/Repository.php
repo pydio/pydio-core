@@ -29,9 +29,11 @@ use Pydio\Core\Model\RepositoryInterface;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
+
+use Pydio\Core\Utils\Vars\VarsFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -208,7 +210,7 @@ class Repository implements RepositoryInterface
         $this->setDisplay($display);
         $this->setId($id);
         $this->uuid = md5(microtime());
-        $this->slug = Utils::slugify($display);
+        $this->slug = StringHelper::slugify($display);
         $this->inferOptionsFromParent = false;
         $this->options["CREATION_TIME"] = time();
 //        if (AuthService::usersEnabled() && AuthService::getLoggedUser() != null) {
@@ -296,7 +298,7 @@ class Repository implements RepositoryInterface
     public function setSlug($slug = null)
     {
         if ($slug === null) {
-            $this->slug = Utils::slugify($this->display);
+            $this->slug = StringHelper::slugify($this->display);
         } else {
             $this->slug = $slug;
         }
@@ -355,7 +357,7 @@ class Repository implements RepositoryInterface
                 $pathChanged = true;
             }
             if ($pathChanged) {
-                return Utils::securePath($pvalue);
+                return InputFilter::securePath($pvalue);
             }
         }
         if (isSet($this->options[$oName])) {

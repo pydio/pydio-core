@@ -31,12 +31,13 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\UnixProcess;
+use Pydio\Core\Controller\UnixProcess;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -121,7 +122,7 @@ class Scheduler extends Plugin
         $sVals = array();
         $repos = RepositoryService::listAllRepositories(true);
         foreach ($repos as $repoId => $repoObject) {
-            $sVals[] = $repoId . "|" . Utils::xmlEntities($repoObject->getDisplay());
+            $sVals[] = $repoId . "|" . StringHelper::xmlEntities($repoObject->getDisplay());
         }
         $sVals[] = "*|All Repositories";
         $paramNode->attributes->getNamedItem("choices")->nodeValue = implode(",", $sVals);
@@ -140,7 +141,7 @@ class Scheduler extends Plugin
      */
     public function getTaskById($tId)
     {
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task) {
             if (!empty($task["task_id"]) && $task["task_id"] == $tId) {
                 return $task;
@@ -191,7 +192,7 @@ class Scheduler extends Plugin
      */
     public function countCurrentlyRunning()
     {
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         $count = 0;
         foreach ($tasks as $task) {
             $s = $this->getTaskStatus($task["task_id"]);
@@ -331,7 +332,7 @@ class Scheduler extends Plugin
             //------------------------------------
             case "scheduler_runAll":
 
-                $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+                $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
                 $message = "";
                 $startRunning = $this->countCurrentlyRunning();
                 $statuses = array();
@@ -437,7 +438,7 @@ class Scheduler extends Plugin
                  <column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
                  <column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
         </columns>');
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task) {
 
             $timeArray = $this->getTimeArray($task["schedule"]);
@@ -496,7 +497,7 @@ class Scheduler extends Plugin
      */
     public function addOrUpdateTask($taskId, $label, $schedule, $actionName, $repositoryIds, $userId, $paramsArray)
     {
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         if (isSet($taskId)) {
             foreach ($tasks as $index => $task) {
                 if ($task["task_id"] == $taskId) {
@@ -517,7 +518,7 @@ class Scheduler extends Plugin
         $data["PARAMS"] = $paramsArray;
         if (isSet($theIndex)) $tasks[$theIndex] = $data;
         else $tasks[] = $data;
-        Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+        FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
     }
 
@@ -527,14 +528,14 @@ class Scheduler extends Plugin
      */
     public function removeTask($taskId)
     {
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $index => $task) {
             if ($task["task_id"] == $taskId) {
                 unset($tasks[$index]);
                 break;
             }
         }
-        Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+        FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
     }
 
     /**
@@ -545,7 +546,7 @@ class Scheduler extends Plugin
      */
     public function handleTasks($action, $httpVars, $fileVars)
     {
-        $tasks = Utils::loadSerialFile($this->getDbFile(), false, "json");
+        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         switch ($action) {
             case "scheduler_addTask":
                 if (isSet($httpVars["task_id"])) {
@@ -586,7 +587,7 @@ class Scheduler extends Plugin
                 }
                 if (isSet($theIndex)) $tasks[$theIndex] = $data;
                 else $tasks[] = $data;
-                Utils::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+                FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
 
                 XMLWriter::header();
                 XMLWriter::sendMessage("Successfully added/edited task", null);

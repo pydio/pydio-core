@@ -24,7 +24,6 @@ use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\UnixProcess;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;

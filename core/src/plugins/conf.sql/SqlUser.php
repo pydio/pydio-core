@@ -26,10 +26,9 @@ use Pydio\Conf\Core\AbstractUser;
 use Pydio\Conf\Core\AbstractConfDriver;
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\FileHelper;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -530,7 +529,7 @@ class SqlUser extends AbstractUser
             Logger::info(__CLASS__,"getTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();
-        return Utils::loadSerialFile($dirPath."/".$id."/temp-".$key.".ser");
+        return FileHelper::loadSerialFile($dirPath . "/" . $id . "/temp-" . $key . ".ser");
     }
 
     /**
@@ -549,7 +548,7 @@ class SqlUser extends AbstractUser
             Logger::info(__CLASS__,"setTemporaryData", array("Warning" => "The conf.sql driver is missing a mandatory option USERS_DIRPATH!"));
         }
         $id = UsersService::ignoreUserCase() ?strtolower($this->getId()):$this->getId();
-        Utils::saveSerialFile($dirPath."/".$id."/temp-".$key.".ser", $value);
+        FileHelper::saveSerialFile($dirPath . "/" . $id . "/temp-" . $key . ".ser", $value);
     }
 
     public function setGroupPath($groupPath, $update = false)

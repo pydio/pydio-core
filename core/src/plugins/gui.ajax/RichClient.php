@@ -27,11 +27,19 @@ use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Reflection\DiagnosticRunner;
+use Pydio\Core\Utils\Reflection\DocsParser;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Reflection\JSPacker;
+use Pydio\Core\Utils\Reflection\LocaleExtractor;
+use Pydio\Core\Utils\TextEncoder;
+
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -49,6 +57,105 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class RichClient extends Plugin
 {
     private static $loadedBookmarks;
+
+    /**
+     * Utilitary to pass some parameters directly at startup :
+     * + repository_id / folder
+     * + compile & skipDebug
+     * + update_i18n, extract, create
+     * + external_selector_type
+     * + skipIOS
+     * + gui
+     * @static
+     * @param ContextInterface $ctx
+     * @param $parameters
+     * @param $output
+     * @param $session
+     * @return void
+     */
+    public static function parseApplicationGetParameters(ContextInterface $ctx, $parameters, &$output, &$session)
+    {
+        $output["EXT_REP"] = "/";
+
+        if (isSet($parameters["repository_id"]) && isSet($parameters["folder"]) || isSet($parameters["goto"])) {
+            if (isSet($parameters["goto"])) {
+                $explode = explode("/", ltrim($parameters["goto"], "/"));
+                $repoId = array_shift($explode);
+                $parameters["folder"] = str_replace($repoId, "", ltrim($parameters["goto"], "/"));
+            } else {
+                $repoId = $parameters["repository_id"];
+            }
+            $repository = RepositoryService::getRepositoryById($repoId);
+            if ($repository == null) {
+                $repository = RepositoryService::getRepositoryByAlias($repoId);
+                if ($repository != null) {
+                    $parameters["repository_id"] = $repository->getId();
+                }
+            } else {
+                $parameters["repository_id"] = $repository->getId();
+            }
+            if (UsersService::usersEnabled()) {
+                $loggedUser = $ctx->getUser();
+                if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
+                    $output["FORCE_REGISTRY_RELOAD"] = true;
+                    $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
+                    $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
+                    $loggedUser->setPref("pending_folder", TextEncoder::toUTF8(InputFilter::decodeSecureMagic($parameters["folder"])));
+                    AuthService::updateUser($loggedUser);
+                } else {
+                    $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
+                    $session["PENDING_FOLDER"] = TextEncoder::toUTF8(InputFilter::decodeSecureMagic($parameters["folder"]));
+                }
+            } else {
+                //ConfService::switchRootDir($parameters["repository_id"]);
+                $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
+            }
+        }
+
+
+        if (isSet($parameters["skipDebug"])) {
+            ConfService::setConf("JS_DEBUG", false);
+        }
+        if (ConfService::getConf("JS_DEBUG") && isSet($parameters["compile"])) {
+            JSPacker::pack();
+        }
+        if (ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])) {
+            if (isSet($parameters["extract"])) {
+                LocaleExtractor::extractConfStringsFromManifests();
+            }
+            LocaleExtractor::updateAllI18nLibraries((isSet($parameters["create"]) ? $parameters["create"] : ""));
+        }
+        if (ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])) {
+            @unlink(AJXP_PLUGINS_CACHE_FILE);
+            @unlink(AJXP_PLUGINS_REQUIRES_FILE);
+        }
+        if (AJXP_SERVER_DEBUG && isSet($parameters["extract_application_hooks"])) {
+            DocsParser::extractHooksToDoc();
+        }
+
+        if (isSet($parameters["external_selector_type"])) {
+            $output["SELECTOR_DATA"] = array("type" => $parameters["external_selector_type"], "data" => $parameters);
+        }
+
+        if (isSet($parameters["skipIOS"])) {
+            setcookie("SKIP_IOS", "true");
+        }
+        if (isSet($parameters["skipANDROID"])) {
+            setcookie("SKIP_ANDROID", "true");
+        }
+        if (isSet($parameters["gui"])) {
+            setcookie("AJXP_GUI", $parameters["gui"]);
+            if ($parameters["gui"] == "light") $session["USE_EXISTING_TOKEN_IF_EXISTS"] = true;
+        } else {
+            if (isSet($session["USE_EXISTING_TOKEN_IF_EXISTS"])) {
+                unset($session["USE_EXISTING_TOKEN_IF_EXISTS"]);
+            }
+            setcookie("AJXP_GUI", null);
+        }
+        if (isSet($session["OVERRIDE_GUI_START_PARAMETERS"])) {
+            $output = array_merge($output, $session["OVERRIDE_GUI_START_PARAMETERS"]);
+        }
+    }
 
     /**
      * @return bool
@@ -90,7 +197,7 @@ class RichClient extends Plugin
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         $out = array();
-        Utils::parseApplicationGetParameters($ctx, $request->getQueryParams(), $out, $_SESSION);
+        self::parseApplicationGetParameters($ctx, $request->getQueryParams(), $out, $_SESSION);
         $config = $this->computeBootConf($ctx);
         $response = new JsonResponse($config);
 
@@ -115,13 +222,13 @@ class RichClient extends Plugin
         if (!is_file(TESTS_RESULT_FILE)) {
             $outputArray = array();
             $testedParams = array();
-            $passed = Utils::runTests($outputArray, $testedParams);
+            $passed = DiagnosticRunner::runTests($outputArray, $testedParams);
             if (!$passed && !isset($httpVars["ignore_tests"])) {
-                $html = Utils::testResultsToTable($outputArray, $testedParams);
+                $html = DiagnosticRunner::testResultsToTable($outputArray, $testedParams);
                 $response = new HtmlResponse($html);
                 return;
             } else {
-                Utils::testResultsToFile($outputArray, $testedParams);
+                DiagnosticRunner::testResultsToFile($outputArray, $testedParams);
             }
         }
 
@@ -147,7 +254,7 @@ class RichClient extends Plugin
             $START_PARAMETERS["ALERT"] = $request->getAttribute("flash");
         }
 
-        Utils::parseApplicationGetParameters($ctx, $request->getQueryParams(), $START_PARAMETERS, $_SESSION);
+        self::parseApplicationGetParameters($ctx, $request->getQueryParams(), $START_PARAMETERS, $_SESSION);
 
         $confErrors = ConfService::getErrors();
         if (count($confErrors)) {
@@ -257,7 +364,7 @@ class RichClient extends Plugin
             case "display_doc":
 
                 $responseInterface = $responseInterface->withHeader("Content-type", "text/plain;charset=UTF-8");
-                $docPath = Utils::securePath(htmlentities($requestInterface->getParsedBody()["doc_file"]));
+                $docPath = InputFilter::securePath(htmlentities($requestInterface->getParsedBody()["doc_file"]));
                 $responseInterface->getBody()->write(HTMLWriter::getDocFile($docPath));
 
             break;

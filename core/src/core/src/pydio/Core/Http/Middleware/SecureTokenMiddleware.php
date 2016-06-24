@@ -25,7 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Server;
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -85,7 +85,7 @@ class SecureTokenMiddleware
             $_SESSION["SECURE_TOKENS"][] = $_SESSION["FORCE_SECURE_TOKEN"];
             return $_SESSION["FORCE_SECURE_TOKEN"];
         }
-        $newToken = Utils::generateRandomString(32);
+        $newToken = StringHelper::generateRandomString(32);
         $_SESSION["SECURE_TOKENS"][] = $newToken;
         return $newToken;
     }

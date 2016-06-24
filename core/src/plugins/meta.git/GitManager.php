@@ -24,8 +24,10 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\StatHelper;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StatHelper;
+
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 
@@ -42,7 +44,7 @@ class GitManager extends AbstractMetaSource
 
     public function performChecks()
     {
-        $ex = Utils::searchIncludePath("VersionControl/Git.php");
+        $ex = ApplicationState::searchIncludePath("VersionControl/Git.php");
         if (!$ex) {
             throw new \Exception("Cannot find PEAR library VersionControl/Git");
         }
@@ -109,8 +111,8 @@ class GitManager extends AbstractMetaSource
 
             case "git_revertfile":
 
-                $originalFile = Utils::decodeSecureMagic($httpVars["original_file"]);
-                $file = Utils::decodeSecureMagic($httpVars["file"]);
+                $originalFile = InputFilter::decodeSecureMagic($httpVars["original_file"]);
+                $file = InputFilter::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
 
                 $command = $git->getCommand("cat-file");
@@ -136,7 +138,7 @@ class GitManager extends AbstractMetaSource
 
             case "git_getfile":
 
-                $file = Utils::decodeSecureMagic($httpVars["file"]);
+                $file = InputFilter::decodeSecureMagic($httpVars["file"]);
                 $commitId = $httpVars["commit_id"];
                 $attach = $httpVars["attach"];
 

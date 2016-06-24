@@ -24,7 +24,7 @@ namespace Pydio\Action\Antivirus;
 
 use Exception;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Utils\StatHelper;
+use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die('Access not allowed');

@@ -31,7 +31,9 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
 
 use Pydio\Core\PluginFramework\Plugin;
 
@@ -68,7 +70,7 @@ class PluginCompression extends Plugin
 
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         $nodes = $userSelection->buildNodes();
-        $currentDirPath = Utils::safeDirname($userSelection->getUniqueNode()->getPath());
+        $currentDirPath = PathUtils::forwardSlashDirname($userSelection->getUniqueNode()->getPath());
         $currentDirPath = rtrim($currentDirPath, "/") . "/";
         $currentDirUrl = $userSelection->currentBaseUrl() . $currentDirPath;
 
@@ -79,7 +81,7 @@ class PluginCompression extends Plugin
 
             case "compression":
 
-                $archiveName = Utils::sanitize(Utils::decodeSecureMagic($httpVars["archive_name"]), AJXP_SANITIZE_FILENAME);
+                $archiveName = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["archive_name"]), InputFilter::SANITIZE_FILENAME);
                 $archiveFormat = $httpVars["type_archive"];
                 $tabTypeArchive = array(".tar", ".tar.gz", ".tar.bz2");
                 $acceptedExtension = false;
@@ -139,7 +141,7 @@ class PluginCompression extends Plugin
                     throw new PydioException($messages["compression.17"]);
                 }
                 try {
-                    $tmpArchiveName = tempnam(Utils::getAjxpTmpDir(), "tar-compression") . ".tar";
+                    $tmpArchiveName = tempnam(ApplicationState::getAjxpTmpDir(), "tar-compression") . ".tar";
                     $archive = new PharData($tmpArchiveName);
                 } catch (Exception $e) {
                     $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
@@ -187,7 +189,7 @@ class PluginCompression extends Plugin
 
             case "extraction":
 
-                $fileArchive = Utils::sanitize(Utils::decodeSecureMagic($httpVars["file"]), AJXP_SANITIZE_DIRNAME);
+                $fileArchive = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["file"]), InputFilter::SANITIZE_DIRNAME);
                 $fileArchive = substr(strrchr($fileArchive, DIRECTORY_SEPARATOR), 1);
                 $authorizedExtension = array("tar" => 4, "gz" => 7, "bz2" => 8);
                 $acceptedArchive = false;

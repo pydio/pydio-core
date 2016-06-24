@@ -21,10 +21,10 @@
 
 namespace Pydio\Access\Core\Stream;
 use ArrayIterator;
-use GuzzleHttp\Stream\GuzzleStreamWrapper;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+
 use React\Promise\Deferred;
 
 
@@ -162,7 +162,7 @@ class StreamWrapper
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
 
-        $tmpFile = Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
         $tmpHandle = fopen($tmpFile, "wb");
 
         self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $tmpHandle);

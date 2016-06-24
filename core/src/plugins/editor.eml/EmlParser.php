@@ -30,7 +30,11 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Utils;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\Http\UserAgent;
+
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 
@@ -46,7 +50,7 @@ class EmlParser extends Plugin
 
     public function performChecks()
     {
-        if (!Utils::searchIncludePath("Mail/mimeDecode.php")) {
+        if (!ApplicationState::searchIncludePath("Mail/mimeDecode.php")) {
             throw new \Exception("Cannot find Mail/mimeDecode PEAR library");
         }
     }
@@ -167,7 +171,7 @@ class EmlParser extends Plugin
             case "eml_cp_attachment":
 
                 $attachId = $httpVars["attachment_id"];
-                $destRep = Utils::decodeSecureMagic($httpVars["destination"]);
+                $destRep = InputFilter::decodeSecureMagic($httpVars["destination"]);
                 if (!isset($attachId)) {
                     throw new \Pydio\Core\Exception\PydioException("Wrong Parameters");
                 }
@@ -292,10 +296,10 @@ class EmlParser extends Plugin
                 $date = strtotime($hValue);
                 $metadata["eml_time"] = $date;
             }
-            $metadata["eml_".$hKey] = Utils::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
+            $metadata["eml_".$hKey] = StringHelper::xmlEntities(@htmlentities($hValue, ENT_COMPAT, "UTF-8"));
             //$this->logDebug($hKey." - ".$hValue. " - ".$metadata["eml_".$hKey]);
             if ($metadata["eml_".$hKey] == "") {
-                $metadata["eml_".$hKey] = Utils::xmlEntities(@htmlentities($hValue));
+                $metadata["eml_".$hKey] = StringHelper::xmlEntities(@htmlentities($hValue));
                 if (!TextEncoder::isUtf8($metadata["eml_".$hKey])) {
                     $metadata["eml_".$hKey] = TextEncoder::toUTF8($metadata["eml_".$hKey]);
                 }
@@ -341,7 +345,7 @@ class EmlParser extends Plugin
 
         $dom = new \DOMDocument("1.0", "UTF-8");
         $dom->loadXML($responseData);
-        $mobileAgent = Utils::userAgentIsIOS() || Utils::userAgentIsNativePydioApp();
+        $mobileAgent = UserAgent::userAgentIsIOS() || UserAgent::userAgentIsNativePydioApp();
         $this->logDebug("MOBILE AGENT DETECTED?".$mobileAgent, $_SERVER["HTTP_USER_AGENT"]);
         if (EmlParser::$currentListingOnlyEmails === true) {
             // Replace all text attributes by the "from" value
@@ -353,7 +357,7 @@ class EmlParser extends Plugin
                     $ar = explode("&lt;", $from);
                     $from = trim(array_shift($ar));
                     $text = ($index < 10?"0":"").$index.". ".$from." &gt; ".$child->getAttribute("eml_subject");
-                    if (Utils::userAgentIsNativePydioApp()) {
+                    if (UserAgent::userAgentIsNativePydioApp()) {
                         $text = html_entity_decode($text, ENT_COMPAT, "UTF-8");
                     }
                     $index ++;

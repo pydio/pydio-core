@@ -29,8 +29,8 @@ use Pydio\Core\Model\Context;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
-use Pydio\Core\Utils\Utils;
-use Pydio\Core\Utils\VarsFilter;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -85,7 +85,7 @@ class ConfService
             $this->configs["USE_HTTPS"] = true;
         }
         if (isSet($this->configs["USE_HTTPS"])) {
-            Utils::safeIniSet("session.cookie_secure", true);
+            ApplicationState::safeIniSet("session.cookie_secure", true);
         }
         $this->configs["JS_DEBUG"] = AJXP_CLIENT_DEBUG;
         $this->configs["SERVER_DEBUG"] = AJXP_SERVER_DEBUG;
@@ -415,7 +415,11 @@ class ConfService
          }
          return self::$instance;
      }
-     private function __construct(){}
+
+    /**
+     * ConfService constructor.
+     */
+    private function __construct(){}
     public function __clone()
     {
         trigger_error("Cannot clone me, i'm a singleton!", E_USER_ERROR);

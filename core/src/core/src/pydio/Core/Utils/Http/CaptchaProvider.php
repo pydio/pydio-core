@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Utils\Http;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -26,8 +26,6 @@ include_once(AJXP_BIN_FOLDER."/lib/securimage/securimage.php");
 
 /**
  * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.
- * @package Pydio
- * @subpackage Core
  */
 class CaptchaProvider
 {
