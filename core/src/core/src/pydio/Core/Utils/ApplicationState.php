@@ -108,7 +108,7 @@ class ApplicationState
     {
         $setUrl = ConfService::getGlobalConf("SERVER_URL");
         if (!empty($setUrl)) {
-            return $setUrl;
+            return (string)$setUrl;
         }
         if (php_sapi_name() == "cli") {
             Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");

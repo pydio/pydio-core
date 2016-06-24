@@ -40,6 +40,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class XMLWriter
 {
+    /**
+     * @var bool|string
+     */
     public static $headerSent = false;
 
     /**

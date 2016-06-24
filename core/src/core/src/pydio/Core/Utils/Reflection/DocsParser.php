@@ -71,7 +71,8 @@ class DocsParser
                         if (strpos($filename, "/plugins") === 0) {
                             $source = explode("/", $filename)[2];
                         } else {
-                            $source = str_replace(array("class.", ".php"), "", array_pop(explode("/", $filename)));
+                            $parts = explode("/", $filename);
+                            $source = str_replace(array("class.", ".php"), "", array_pop($parts));
                         }
                         if (!isSet($hooks[$hookName]["TRIGGERS"][$source])) {
                             $hooks[$hookName]["TRIGGERS"][$source] = array();

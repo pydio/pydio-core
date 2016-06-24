@@ -54,7 +54,8 @@ class InputFilter
         //
         $path = str_replace(chr(0), "", $path);
         $dirs = explode('/', $path);
-        for ($i = 0; $i < count($dirs); $i++) {
+        $count = count($dirs);
+        for ($i = 0; $i < $count; $i++) {
             if ($dirs[$i] == '.' or $dirs[$i] == '..') {
                 $dirs[$i] = '';
             }
@@ -160,7 +161,8 @@ class InputFilter
         $s = ' ' . $s;
 
         //begin removal
-        /**/ //remove comment blocks
+        //remove comment blocks
+        $pos = []; $len = [];
         while (stripos($s, '<!--') > 0) {
             $pos[1] = stripos($s, '<!--');
             $pos[2] = stripos($s, '-->', $pos[1]);
@@ -169,10 +171,12 @@ class InputFilter
             $s = str_replace($x, '', $s);
         }
 
-        /**/ //remove tags with content between them
+        //remove tags with content between them
         if (strlen($expand) > 0) {
             $e = explode('|', $expand);
-            for ($i = 0; $i < count($e); $i++) {
+            $pos = []; $len = [];
+            $eLength = count($e);
+            for ($i = 0; $i < $eLength; $i++) {
                 while (stripos($s, '<' . $e[$i]) > 0) {
                     $len[1] = strlen('<' . $e[$i]);
                     $pos[1] = stripos($s, '<' . $e[$i]);

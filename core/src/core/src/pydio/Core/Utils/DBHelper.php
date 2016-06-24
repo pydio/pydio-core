@@ -71,7 +71,8 @@ class DBHelper
             } else {
                 $parts = explode(";", $sep);
                 $remove = array();
-                for ($i = 0; $i < count($parts); $i++) {
+                $count = count($parts);
+                for ($i = 0; $i < $count; $i++) {
                     $part = $parts[$i];
                     if (strpos($part, "BEGIN") && isSet($parts[$i + 1])) {
                         $parts[$i] .= ';' . $parts[$i + 1];

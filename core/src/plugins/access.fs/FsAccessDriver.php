@@ -348,6 +348,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $notDecodedPath = TextEncoder::toUTF8($path);
         $params = $request->getParsedBody();
         $newAction = null;
+        $newVars = [];
         if(isSet($params["copy_source"])){
             $newVars["dest"] = PathUtils::forwardSlashDirname($notDecodedPath);
             $newVars["targetBaseName"] = PathUtils::forwardSlashBasename($notDecodedPath);
