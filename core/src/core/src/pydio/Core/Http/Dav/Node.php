@@ -89,8 +89,9 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
         if(empty($driver)){
             $n = new AJXP_Node($this->getUrl());
             return $n->getDriver();
+        }else{
+            return $driver;
         }
-        throw new \Sabre\DAV\Exception\NotFound("Cannot find driver instance for current node! ".$this->path);
     }
 
     /**
