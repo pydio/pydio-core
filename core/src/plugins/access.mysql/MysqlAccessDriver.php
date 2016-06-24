@@ -439,7 +439,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     XMLWriter::close();
                 }
                 $this->closeDbLink($link);
-                exit(1);
+                return null;
 
             break;
         }

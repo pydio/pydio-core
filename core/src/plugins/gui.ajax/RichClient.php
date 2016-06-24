@@ -36,6 +36,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -116,8 +117,9 @@ class RichClient extends Plugin
             $testedParams = array();
             $passed = Utils::runTests($outputArray, $testedParams);
             if (!$passed && !isset($httpVars["ignore_tests"])) {
-                Utils::testResultsToTable($outputArray, $testedParams);
-                die();
+                $html = Utils::testResultsToTable($outputArray, $testedParams);
+                $response = new HtmlResponse($html);
+                return;
             } else {
                 Utils::testResultsToFile($outputArray, $testedParams);
             }

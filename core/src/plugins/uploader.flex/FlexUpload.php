@@ -77,8 +77,8 @@ class FlexUpload extends Plugin
             if ($request->getAttribute("action") == "upload" &&
                 ($loggedUser == null || !$loggedUser->canWrite($ctx->getRepositoryId().""))
                 && isSet($request->getUploadedFiles()['Filedata'])) {
-                header('HTTP/1.0 ' . '410 Not authorized');
-                die('Error 410 Not authorized!');
+                $response = $response->withStatus(410, "Not authorized");
+                return;
             }
         }
 

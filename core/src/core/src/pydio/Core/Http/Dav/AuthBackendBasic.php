@@ -41,6 +41,10 @@ use \Sabre;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
+/**
+ * Class AuthBackendBasic
+ * @package Pydio\Core\Http\Dav
+ */
 class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
 {
     /**
@@ -61,18 +65,33 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         return  (strpos(strtolower($value),'basic') ===0) ;
     }
 
+    /**
+     * AuthBackendBasic constructor.
+     * @param ContextInterface $ctx
+     */
     public function __construct(ContextInterface $ctx)
     {
         $this->context = $ctx;
     }
 
 
+    /**
+     * @param string $username
+     * @param string $password
+     * @return bool|void
+     */
     protected function validateUserPass($username, $password)
     {
         // Warning, this can only work if TRANSMIT_CLEAR_PASS is true;
         return UsersService::checkPassword($username, $password, false, -1);
     }
 
+    /**
+     * @param Sabre\DAV\Server $server
+     * @param string $realm
+     * @return bool
+     * @throws Sabre\DAV\Exception\NotAuthenticated
+     */
     public function authenticate(Sabre\DAV\Server $server, $realm)
     {
         $auth = new Sabre\HTTP\BasicAuth();

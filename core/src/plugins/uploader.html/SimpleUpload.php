@@ -28,6 +28,7 @@ use Pydio\Core\Utils\Utils;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use Zend\Diactoros\Response\TextResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -92,7 +93,7 @@ class SimpleUpload extends Plugin
             // Checking headers
             if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
                 if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
-                    exit('Warning, wrong headers');
+                    $response = new TextResponse("Warning, wrong headers");
                 }
             }
 

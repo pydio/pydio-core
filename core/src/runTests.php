@@ -247,7 +247,7 @@ if(isSet($_GET["api"])){
     $testedParams = array();
     $passed = true;
     $passed = Utils::runTests($outputArray, $testedParams);
-    Utils::testResultsToTable($outputArray, $testedParams, true);
     Utils::testResultsToFile($outputArray, $testedParams);
+    echo Utils::testResultsToTable($outputArray, $testedParams, true);
 
 }

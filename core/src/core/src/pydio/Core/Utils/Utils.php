@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use Psr\Http\Message\UploadedFileInterface;
 
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
@@ -945,7 +946,7 @@ class Utils
      * @param $outputArray
      * @param $testedParams
      * @param bool $showSkipLink
-     * @return void
+     * @return string
      */
     public static function testResultsToTable($outputArray, $testedParams, $showSkipLink = true)
     {
@@ -975,8 +976,9 @@ class Utils
             if($result == "dump") $result = "passed";
             $ALL_ROWS[$result][$item["name"]] = $item["info"];
         }
-
+        ob_start();
         include(AJXP_TESTS_FOLDER . "/startup.phtml");
+        return ob_get_flush();
     }
 
     /**
@@ -1650,7 +1652,7 @@ class Utils
     }
 
 
-    /*
+    /**
      * PBKDF2 key derivation function as defined by RSA's PKCS #5: https://www.ietf.org/rfc/rfc2898.txt
      * $algorithm - The hash algorithm to use. Recommended: SHA256
      * $password - The password.
@@ -1664,15 +1666,23 @@ class Utils
      *
      * This implementation of PBKDF2 was originally created by https://defuse.ca
      * With improvements by http://www.variations-of-shadow.com
+     * @param $algorithm
+     * @param $password
+     * @param $salt
+     * @param $count
+     * @param $key_length
+     * @param bool $raw_output
+     * @return string
+     * @throws PydioException
      */
     public static function pbkdf2_apply($algorithm, $password, $salt, $count, $key_length, $raw_output = false)
     {
         $algorithm = strtolower($algorithm);
 
         if(!in_array($algorithm, hash_algos(), true))
-            die('PBKDF2 ERROR: Invalid hash algorithm.');
+            throw new PydioException('PBKDF2 ERROR: Invalid hash algorithm.');
         if($count <= 0 || $key_length <= 0)
-            die('PBKDF2 ERROR: Invalid parameters.');
+            throw new PydioException('PBKDF2 ERROR: Invalid parameters.');
 
         $hash_length = strlen(hash($algorithm, "", true));
         $block_count = ceil($key_length / $hash_length);
@@ -1700,7 +1710,12 @@ class Utils
     }
 
 
-    // Compares two strings $a and $b in length-constant time.
+    /**
+     * Compares two strings $a and $b in length-constant time.
+     * @param $a
+     * @param $b
+     * @return bool
+     */
     public static function pbkdf2_slow_equals($a, $b)
     {
         $diff = strlen($a) ^ strlen($b);
@@ -1711,6 +1726,12 @@ class Utils
         return $diff === 0;
     }
 
+    /**
+     * @param $password
+     * @param $correct_hash
+     * @return bool
+     * @throws PydioException
+     */
     public static function pbkdf2_validate_password($password, $correct_hash)
     {
         $params = explode(":", $correct_hash);
@@ -1737,6 +1758,11 @@ class Utils
     }
 
 
+    /**
+     * @param $password
+     * @return string
+     * @throws PydioException
+     */
     public static function pbkdf2_create_hash($password)
     {
         // format: algorithm:iterations:salt:hash

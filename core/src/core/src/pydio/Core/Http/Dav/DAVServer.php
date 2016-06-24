@@ -27,6 +27,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Log\Core\Logger;
 use Sabre\DAV as DAV;
+use Sabre\DAV\Exception\Forbidden;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -45,6 +46,7 @@ class DAVServer
     /**
      * @param $baseURI
      * @param $davRoute
+     * @throws Forbidden
      */
     public static function handleRoute($baseURI, $davRoute){
 
@@ -53,7 +55,7 @@ class DAVServer
         self::$context = Context::emptyContext();
 
         if (!ConfService::getGlobalConf("WEBDAV_ENABLE")) {
-            die('You are not allowed to access this service');
+            throw new Forbidden('You are not allowed to access this service');
         }
 
         PluginsService::getInstance(self::$context)->initActivePlugins();
@@ -80,8 +82,7 @@ class DAVServer
                 }
             }
             if ($repository == null) {
-                Logger::debug("not found, dying $repositoryId");
-                die('You are not allowed to access this service');
+                throw new Forbidden('You are not allowed to access this service');
             }
 
             self::$context->setRepositoryId($repositoryId);

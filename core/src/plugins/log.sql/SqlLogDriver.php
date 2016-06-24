@@ -539,8 +539,7 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 }
             }
         } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
+            throw $e;
         }
 
         if ($print) {

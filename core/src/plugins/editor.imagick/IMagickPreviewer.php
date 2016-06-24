@@ -160,7 +160,6 @@ class IMagickPreviewer extends Plugin
             header("Content-Length: ".filesize($file));
             header('Cache-Control: public');
             readfile($file);
-            exit(1);
 
         } else if ($action == "delete_imagick_data" && !$selection->isEmpty()) {
             /*
