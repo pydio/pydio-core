@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services;
 
@@ -53,7 +54,7 @@ class VarsFilter
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
             if (UsersService::usersEnabled()) {
                 if(!$ctx->hasUser()){
-                    throw new PydioException("Cannot resolve path AJXP_USER without user passed in context");
+                    throw new PydioException("Cannot resolve AJXP_USER without user passed in context");
                 }
                 $value = str_replace("AJXP_USER", $ctx->getUser()->getId(), $value);
             } else {
@@ -83,6 +84,18 @@ class VarsFilter
         }
         if (is_string($value) && strstr($value, "AJXP_WORKSPACE_SLUG") !== false) {
             $value = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $ctx->getRepository()->getSlug(), $value), "/");
+        }
+        if(is_string($value) && preg_match("/AJXP_PARENT_OPTION:([\w_-]*):/", $value, $matches)){
+            $repoObject = $ctx->getRepository();
+            $parentRepository = $repoObject->getParentRepository();
+            if(empty($parentRepository)){
+                throw new PydioException("Cannot resolve ".$matches[0]." without parent workspace");
+            }
+            $parentOwner = $ctx->getRepository()->getOwner();
+            $parentContext = Context::contextWithObjects(null, $parentRepository);
+            $parentContext->setUserId($parentOwner);
+            $parentPath = rtrim($parentRepository->getContextOption($parentContext, $matches[1]), "/");
+            $value = str_replace($matches[0], $parentPath, $value);
         }
 
         $tab = array(&$value, $ctx);

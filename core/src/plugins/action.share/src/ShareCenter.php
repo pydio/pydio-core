@@ -1883,6 +1883,7 @@ class ShareCenter extends Plugin
                 }else{
                     $meta["ajxp_shared_minisite"] = "public";
                     $meta["icon"] = "folder.png";
+                    $ctx = $ctx->withRepositoryId($repoObject->getId());
                     $meta["original_path"] = $repoObject->getContextOption($ctx, "PATH");
                 }
                 if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){

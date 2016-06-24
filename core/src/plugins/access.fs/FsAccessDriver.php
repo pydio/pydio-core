@@ -2320,7 +2320,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     {
         $repository = $ctx->getRepository();
         $newOptions = [
-            "PATH"           => TextEncoder::toStorageEncoding($repository->getContextOption($ctx, "PATH")).Utils::decodeSecureMagic($httpVars["file"]),
+            "PATH"           => "AJXP_PARENT_OPTION:PATH:".Utils::decodeSecureMagic($httpVars["file"]),
             "CREATE"         => $repository->getContextOption($ctx, "CREATE"),
             "RECYCLE_BIN"    => isSet($httpVars["inherit_recycle"])? $repository->getContextOption($ctx, "RECYCLE_BIN") : "",
             "DEFAULT_RIGHTS" => "",

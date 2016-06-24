@@ -201,7 +201,7 @@ class S3AccessDriver extends FsAccessDriver
     public function makeSharedRepositoryOptions(ContextInterface $ctx, $httpVars)
     {
         $newOptions                 = parent::makeSharedRepositoryOptions($ctx, $httpVars);
-        $newOptions["CONTAINER"]    = $ctx->getRepository()->getContextOption($ctx, "CONTAINER");
+        $newOptions["CONTAINER"]    = "AJXP_PARENT_OPTION:CONTAINER"; //$ctx->getRepository()->getContextOption($ctx, "CONTAINER");
         
         return $newOptions;
     }
