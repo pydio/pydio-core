@@ -433,6 +433,7 @@ class Mailer extends Plugin implements SqlTableProvider
     public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         $mess = LocaleService::getMessages();
+        /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $mailers = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer");
         if (!count($mailers)) {
@@ -446,8 +447,8 @@ class Mailer extends Plugin implements SqlTableProvider
         //$toGroups =  explode(",", $httpVars["groups_ids"]);
         $toUsers = $httpVars["emails"];
 
-        $emails = $this->resolveAdresses($requestInterface->getAttribute("ctx"), $toUsers);
-        $from = $this->resolveFrom($httpVars["from"]);
+        $emails = $this->resolveAdresses($ctx, $toUsers);
+        $from = $this->resolveFrom($ctx, $httpVars["from"]);
         $imageLink = isSet($httpVars["link"]) ? $httpVars["link"] : null;
 
         $subject = $httpVars["subject"];

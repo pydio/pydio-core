@@ -3190,8 +3190,6 @@ class ConfAccessDriver extends AbstractAccessDriver
     /**
      * @param ContextInterface $ctx
      */
-    protected function initRepository(ContextInterface $ctx)
-    {
-        // TODO: Implement initRepository() method.
+    protected function initRepository(ContextInterface $ctx){
     }
 }

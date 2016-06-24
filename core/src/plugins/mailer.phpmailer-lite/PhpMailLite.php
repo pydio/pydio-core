@@ -57,7 +57,7 @@ class PhpMailLite extends Mailer
         $mail = new PHPMailerLite(true);
         $mail->Mailer = $this->getContextualOption(Context::emptyContext(), "MAILER");
         $mail->Sendmail = $this->getContextualOption(Context::emptyContext(), "SENDMAIL_PATH");
-        $from = $this->resolveFrom($from);
+        $from = $this->resolveFrom($ctx, $from);
         if (!is_array($from) || empty($from["adress"])) {
             throw new Exception("Cannot send email without a FROM address. Please check your core.mailer configuration.");
         }

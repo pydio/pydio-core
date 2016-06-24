@@ -411,7 +411,7 @@ class InboxAccessWrapper implements IAjxpWrapper
      */
     public function unlink($path)
     {
-        // TODO: Implement unlink() method.
+        // Do nothing
     }
 
     /**
