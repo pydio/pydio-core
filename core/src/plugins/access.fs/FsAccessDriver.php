@@ -154,7 +154,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function directoryUsage(AJXP_Node $node){
 
-        //$dir = (isSet($repositoryResolvedOptions["PATH"]) ? $repositoryResolvedOptions["PATH"] : $this->repository->getOption("PATH")).$directoryPath;
+        if(MetaStreamWrapper::wrapperIsRemote($node->getUrl())){
+            return $this->recursiveDirUsageByListing($node->getUrl());
+        }
         $dir = $node->getRealFile();
         $size = -1;
         if ( ( PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") && class_exists("COM") ) {
@@ -845,13 +847,17 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $nodes = $selection->buildNodes();
                 $bgSizeThreshold = 1*1024*1024;
                 $bgWorkerThreshold = 80*1024*1024;
-                foreach($nodes as $node){
-                    $size += $node->getSizeRecursive();
+                if(!MetaStreamWrapper::wrapperIsRemote($selection->currentBaseUrl())){
+                    foreach($nodes as $node){
+                        $size += $node->getSizeRecursive();
+                    }
+                }else if(!$selection->isUnique() || !$selection->getUniqueNode()->isLeaf()){
+                    $size = -1;
                 }
                 $taskId = $request->getAttribute("pydio-task-id");
-                if($taskId === null && ($size > $bgSizeThreshold)){
+                if($taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
-                    if($size > $bgWorkerThreshold){
+                    if($size === -1 || $size > $bgWorkerThreshold){
                         $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     }
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
@@ -886,13 +892,17 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $nodes = $selection->buildNodes();
                 $bgSizeThreshold = 10*1024*1024;
                 $bgWorkerThreshold = 80*1024*1024;
-                foreach($nodes as $node){
-                    $size += $node->getSizeRecursive();
+                if(!MetaStreamWrapper::wrapperIsRemote($selection->currentBaseUrl())){
+                    foreach($nodes as $node){
+                        $size += $node->getSizeRecursive();
+                    }
+                }else if(!$selection->isUnique() || !$selection->getUniqueNode()->isLeaf()){
+                    $size = -1;
                 }
-                if($taskId === null && ($size > $bgSizeThreshold)){
+                if($taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setFlags(Task::FLAG_STOPPABLE);
-                    if($size > $bgWorkerThreshold){
+                    if($size === -1 || $size > $bgWorkerThreshold){
                         $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     }
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
@@ -2059,6 +2069,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $selectedNode) {
 
+            $selectedNode->loadNodeInfo();
             $fileUrl = $selectedNode->getUrl();
             $filePath = $selectedNode->getPath();
 
