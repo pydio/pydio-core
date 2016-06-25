@@ -7,7 +7,7 @@
         <target>core/doc/php</target>
     </transformer>
     <files>
-        <file>core/src/pydio/*.php</file>
+        <directory>core/src/pydio</directory>
         <directory>plugins</directory>
         <ignore>*phpseclib*</ignore>
         <ignore>*vendor/composer*</ignore>
