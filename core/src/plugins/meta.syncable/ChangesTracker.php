@@ -61,18 +61,18 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
     }
 
     /**
+     * @param ContextInterface $ctx
      * @param string $path
      * @return bool
      */
-    protected function excludeFromSync($path){
+    protected function excludeFromSync($ctx, $path){
         $excludedExtensions = ["dlpart"];
-        $ctx = AJXP_Node::contextFromUrl($path);
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         if(!empty($ext) && in_array($ext, $excludedExtensions)){
             return true;
         }
         try{
-            $this->accessDriver->filterUserSelectionToHidden($ctx, [$path]);
+            $ctx->getRepository()->getDriverInstance()->filterUserSelectionToHidden($ctx, [$path]);
         }catch(\Exception $e){
             return true;
         }
@@ -156,7 +156,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                 // Ignore dirs modified time
                 // if(is_dir($nodeUrl) && $mod_data["path"] != "/") continue;
                 if(!isSet($currentChildren[$f])){
-                    if($this->excludeFromSync($nodeUrl)){
+                    if($this->excludeFromSync($ctx, $nodeUrl)){
                         $this->logDebug(__FUNCTION__, "Excluding item detected on storage: ".$nodeUrl);
                         continue;
                     }
@@ -167,7 +167,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                 }else {
                     if(is_dir($nodeUrl)) continue; // Make sure to not trigger a recursive indexation here.
                     if(filemtime($nodeUrl) > $currentChildren[$f]){
-                        if($this->excludeFromSync($nodeUrl)){
+                        if($this->excludeFromSync($ctx, $nodeUrl)){
                             $this->logDebug(__FUNCTION__, "Excluding item changed on storage: ".$nodeUrl);
                             continue;
                         }
@@ -180,7 +180,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
             foreach($currentChildren as $cPath => $mtime){
                 $this->logDebug(__FUNCTION__, "Existing children ".$cPath);
                 if(!in_array($cPath, $files)){
-                    if($this->excludeFromSync($url."/".$cPath)){
+                    if($this->excludeFromSync($ctx, $url."/".$cPath)){
                         $this->logDebug(__FUNCTION__, "Excluding item deleted on storage: ".$url."/".$cPath);
                         continue;
                     }
@@ -246,7 +246,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
         }
         $filter = null;
         $masks = [];
-        $currentRepo = $this->accessDriver->repository;
+        $currentRepo = $contextInterface->getRepository();
         Controller::applyHook("role.masks", [$contextInterface, &$masks, AJXP_Permission::READ]);
         if(count($masks) == 1 && $masks[0] == "/"){
             $masks = [];

@@ -177,7 +177,7 @@ class QuotaComputer extends AbstractMetaSource
     protected function storeUsage(ContextInterface $ctx, $quota)
     {
         $data = $this->getUserData($ctx);
-        $repo = $this->accessDriver->repository->getId();
+        $repo = $ctx->getRepositoryId();
         if(!isset($data["REPO_USAGES"])) $data["REPO_USAGES"] = array();
         $data["REPO_USAGES"][$repo] = $quota;
         $this->saveUserData($ctx, $data);

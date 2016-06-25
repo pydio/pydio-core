@@ -43,7 +43,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($ctx, $accessDriver);
-        $this->bucketName = $this->accessDriver->repository->getContextOption($ctx, "CONTAINER");
+        $this->bucketName = $ctx->getRepository()->getContextOption($ctx, "CONTAINER");
     }
 
     /**
@@ -68,10 +68,10 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
     /**
      * @return \aws\S3\S3Client
      */
-    protected function getAwsService()
+    protected function getAwsService(ContextInterface $ctx)
     {
-        if(method_exists($this->accessDriver, "getS3Service")){
-            return $this->accessDriver->getS3Service();
+        if(method_exists($ctx->getRepository()->getDriverInstance(), "getS3Service")){
+            return $ctx->getRepository()->getDriverInstance()->getS3Service();
         }
         return null;
     }
@@ -106,7 +106,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
      */
     public function setMetadata($ajxpNode, $nameSpace, $metaData, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
-        $aws = $this->getAwsService();
+        $aws = $this->getAwsService($ajxpNode->getContext());
         if($aws == null) return;
         $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
         $pathName = $this->updateNodeMetaPath($ajxpNode, true);
@@ -130,7 +130,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
      */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
-        $aws = $this->getAwsService();
+        $aws = $this->getAwsService($ajxpNode->getContext());
         if($aws == null) return;
         $user = ($private?$this->getUserId($ajxpNode):AJXP_METADATA_SHAREDUSER);
         $pathName = $this->updateNodeMetaPath($ajxpNode, false);
@@ -156,7 +156,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
      */
     public function retrieveMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
-        $aws = $this->getAwsService();
+        $aws = $this->getAwsService($ajxpNode->getContext());
         if($aws == null) return array();
 
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {
@@ -216,7 +216,7 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
     public function enrichNode(&$ajxpNode)
     {
         // Try both
-        $aws = $this->getAwsService();
+        $aws = $this->getAwsService($ajxpNode->getContext());
         if($aws == null) return;
 
         if (isSet(self::$metaCache[$ajxpNode->getPath()])) {

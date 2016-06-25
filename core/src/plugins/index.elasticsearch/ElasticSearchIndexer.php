@@ -90,7 +90,6 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
      */
     public function initMeta(ContextInterface $ctx, \Pydio\Access\Core\AbstractAccessDriver $accessDriver)
     {
-        $this->accessDriver = $accessDriver;
         if (!empty($this->metaFields) || $this->indexContent) {
             $metaFields = $this->metaFields;
             /** @var \DOMElement $el */

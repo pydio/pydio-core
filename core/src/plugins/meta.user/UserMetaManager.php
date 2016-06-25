@@ -86,7 +86,7 @@ class UserMetaManager extends AbstractMetaSource
         else $visibilities = explode(",", $this->options["meta_visibility"]);
         $editButton = '';
         $u = $ctx->getUser();
-        if($u != null && $u->canWrite($this->accessDriver->repository->getId())){
+        if($u != null && $u->canWrite($ctx->getRepositoryId())){
             $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
         }
         $cdataHead = '<div>
@@ -253,12 +253,12 @@ class UserMetaManager extends AbstractMetaSource
      */
     public function editMeta(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
-        if ($this->accessDriver instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
-            throw new \Exception("Write actions are disabled in demo mode!");
-        }
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
+        $httpVars = $requestInterface->getParsedBody();
+        if ($ctx->getRepository()->getDriverInstance() instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
+            throw new \Exception("Write actions are disabled in demo mode!");
+        }
         $user = $ctx->getUser();
 
         if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($ctx->getRepositoryId())) {

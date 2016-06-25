@@ -134,7 +134,6 @@ class CommentsMetaManager extends AbstractMetaSource
         if ($existingFeed == null) {
             $existingFeed = array();
         }
-        $this->accessDriver = $ctx->getRepository()->getDriverInstance();
         $mess = LocaleService::getMessages();
         switch ($actionName) {
 
@@ -183,7 +182,7 @@ class CommentsMetaManager extends AbstractMetaSource
                     $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]) : 100;
                     $uniqNode->loadNodeInfo();
                     $data = $feedStore->findMetaObjectsByIndexPath(
-                        $this->accessDriver->repository->getId(),
+                        $ctx->getRepositoryId(),
                         $uniqNode->getPath(),
                         $ctx->getUser()->getId(),
                         $ctx->getUser()->getGroupPath(),

@@ -38,18 +38,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class FilesystemMounter extends AbstractMetaSource
 {
     /**
-     * @var Repository
-     */
-    protected $repository;
-
-    /**
      * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
      */
     public function beforeInitMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
-        $this->accessDriver = $accessDriver;
-        $this->repository = $ctx->getRepository();
         if($this->isAlreadyMounted($ctx)) {
             return;
         }
@@ -63,7 +56,6 @@ class FilesystemMounter extends AbstractMetaSource
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($ctx, $accessDriver);
-        $this->repository = $this->accessDriver->repository;
     }
 
     /**
@@ -110,7 +102,7 @@ class FilesystemMounter extends AbstractMetaSource
         $opt = str_replace("AJXP_SERVER_UID", posix_getuid(), $opt);
         $opt = str_replace("AJXP_SERVER_GID", posix_getgid(), $opt);
         if (stristr($opt, "AJXP_REPOSITORY_PATH") !== false) {
-            $repo = $this->repository;
+            $repo = $ctx->getRepository();
             $path = $repo->getContextOption($ctx, "PATH");
             $opt = str_replace("AJXP_REPOSITORY_PATH", $path, $opt);
         }
@@ -150,7 +142,7 @@ class FilesystemMounter extends AbstractMetaSource
     {
         list($user, $password) = $this->getCredentials();
         $this->logDebug("FSMounter::mountFS Should mount" . $user);
-        $repo = $this->repository;
+        $repo = $ctx->getRepository();
 
         if(isset($this->options["MOUNT_DEVIL"]) && !empty($this->options["MOUNT_DEVIL"]) && $this->options["MOUNT_DEVIL"]) {
             $udevil = "udevil ";

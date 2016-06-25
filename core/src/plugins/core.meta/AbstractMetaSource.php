@@ -46,11 +46,10 @@ abstract class AbstractMetaSource extends Plugin {
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
 
-        $this->accessDriver = $accessDriver;
         // Override options with parent META SOURCE options
         // Could be refined ?
-        if($this->accessDriver->repository->hasParent()){
-            $parentRepo = RepositoryService::getRepositoryById($this->accessDriver->repository->getParentId());
+        if($ctx->getRepository()->hasParent()){
+            $parentRepo = RepositoryService::getRepositoryById($ctx->getRepository()->getParentId());
             if($parentRepo != null){
                 $sources = $parentRepo->getContextOption($ctx, "META_SOURCES");
                 $qParent = $sources["meta.quota"];
