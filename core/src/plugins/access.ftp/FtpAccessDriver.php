@@ -49,11 +49,16 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class FtpAccessDriver extends FsAccessDriver
 {
+    /**
+     * Load manifest
+     * @throws \Exception
+     */
     public function loadManifest()
     {
         parent::loadManifest();
         // BACKWARD COMPATIBILITY!
         $res = $this->getXPath()->query('//param[@name="USER"] | //param[@name="PASS"] | //user_param[@name="USER"] | //user_param[@name="PASS"]');
+        /** @var \DOMElement $node */
         foreach ($res as $node) {
             if ($node->getAttribute("name") == "USER") {
                 $node->setAttribute("name", "FTP_USER");
@@ -98,6 +103,12 @@ class FtpAccessDriver extends FsAccessDriver
 
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return null
+     * @throws PydioException
+     */
     public function uploadActions(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         /** @var ContextInterface $ctx */
@@ -198,7 +209,7 @@ class FtpAccessDriver extends FsAccessDriver
                                 throw new PydioException("Warning, cannot create folder for temporary copy", false, 413);
                             }
                         }
-                        if (!$this->isWriteable($destCopy)) {
+                        if (!is_writable($destCopy)) {
                             $this->logDebug("Upload error: cannot write into temporary folder");
                             throw new PydioException("Warning, cannot write into temporary folder", false, 414);
                             break;
@@ -229,18 +240,27 @@ class FtpAccessDriver extends FsAccessDriver
         return null;
     }
 
-    public function isWriteable($path, $type="dir")
+    /**
+     * Specific isWriteable implementation
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    public function isWriteable(AJXP_Node $node)
     {
-        $parts = parse_url($path);
-        $dir = $parts["path"];
-        if ($type == "dir" && ($dir == "" || $dir == "/" || $dir == "\\")) { // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
+        if ($node->isRoot()) { // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
             return true;
         } else {
-            return is_writable($path);
+            return is_writable($node->getUrl());
         }
 
     }
 
+    /**
+     * Recursive del dir
+     * @param string $location
+     * @param array $repoData
+     * @throws \Exception
+     */
     public function deldir($location, $repoData)
     {
         if (is_dir($location)) {
@@ -274,6 +294,10 @@ class FtpAccessDriver extends FsAccessDriver
     }
 
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $fileData
+     */
     public function storeFileToCopy(ContextInterface $ctx, $fileData)
     {
         $user = $ctx->getUser();
@@ -283,6 +307,10 @@ class FtpAccessDriver extends FsAccessDriver
         $user->saveTemporaryData("tmp_upload", $files);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return mixed
+     */
     public function getFileNameToCopy(ContextInterface $ctx)
     {
             $user = $ctx->getUser();
@@ -290,6 +318,10 @@ class FtpAccessDriver extends FsAccessDriver
             return $files[0]["name"];
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return string
+     */
     public function getNextFileToCopy(ContextInterface $ctx)
     {
             if(!$this->hasFilesToCopy($ctx)) return "";
@@ -301,6 +333,10 @@ class FtpAccessDriver extends FsAccessDriver
             return $fData;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return bool
+     */
     public function hasFilesToCopy(ContextInterface $ctx)
     {
             $user = $ctx->getUser();
@@ -308,6 +344,11 @@ class FtpAccessDriver extends FsAccessDriver
             return (count($files)?true:false);
     }
 
+    /**
+     * @param $params
+     * @return string
+     * @throws PydioException
+     */
     public function testParameters($params)
     {
         if (empty($params["FTP_USER"])) {
