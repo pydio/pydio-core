@@ -254,6 +254,13 @@ class NotificationCenter extends Plugin
                 error_log("Skipping notification as nodes are not excepted class, probably a deserialization issue");
                 continue;
             }
+            // Backward compat : make sure there is a user ID in the node url.
+            if( $oldNode !== null && !$oldNode->hasUser() ){
+                $oldNode->setUserId($object->author);
+            }
+            if( $newNode !== null && !$newNode->hasUser() ){
+                $newNode->setUserId($object->author);
+            }
             $notif = $this->generateNotificationFromChangeHook($oldNode, $newNode, $copy, "unify");
             if ($notif !== false && $notif->getNode() !== false) {
                 $notif->setAuthor($object->author);
@@ -267,8 +274,7 @@ class NotificationCenter extends Plugin
                         $this->logInfo("Warning", "Empty node stored in notification ".$notif->getAuthor()."/ ".$notif->getAction());
                         continue;
                     }
-                    // Backward compat : make sure there is a user ID in the node url.
-                    $node->setUserId($node->hasUser() ? $node->getUserId() : $notif->getAuthor());
+                    //$node->setUserId($node->hasUser() ? $node->getUserId() : $notif->getAuthor());
                     try {
                         @$node->loadNodeInfo();
                     } catch (\Exception $e) {
