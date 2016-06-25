@@ -149,7 +149,7 @@ class Logger extends Plugin
      */
     public static function debug($source, $prefix = "")
     {
-        if(!class_exists("ConfService")) return ;
+        if(!class_exists("Pydio\\Core\\Services\\ConfService")) return ;
         if(!ConfService::getConf("SERVER_DEBUG")) return ;
         if (func_num_args() <= 2) {
             self::notice(__CLASS__, "Deprecated", "You are calling debug() with ".func_num_args()." arguments, please use at least 3");
