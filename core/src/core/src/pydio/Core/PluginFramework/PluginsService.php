@@ -226,6 +226,9 @@ class PluginsService
         $accessType = $repository->getAccessType();
         /** @var AbstractAccessDriver $plugInstance */
         $plugInstance = $this->getPluginByTypeName("access", $accessType);
+        if(!$plugInstance instanceof AbstractAccessDriver){
+            throw new RepositoryLoadException($repository, "Could not load plugin as an AccessDriver");
+        }
 
         // TRIGGER BEFORE INIT META
         $metaSources = $repository->getContextOption($ctx, "META_SOURCES");
