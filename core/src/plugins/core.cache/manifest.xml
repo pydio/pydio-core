@@ -24,6 +24,11 @@
                     <serverCallback methodName="clearCacheByNS" restParams="/namespace"/>
                 </processing>
             </action>
+            <action name="clear_cache_key" skipSecureToken="true">
+                <processing>
+                    <serverCallback methodName="clearCacheKey" restParams="/namespace"/>
+                </processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="loadNodeInfoFromCache" hookName="node.info.start"/>

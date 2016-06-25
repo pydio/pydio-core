@@ -33,6 +33,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Utils\Vars\InputFilter;
 
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -238,5 +239,33 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
 
     }
 
+    /**
+     * Service to clear a cache key or a pattern
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function clearCacheKey(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $cacheDriver = ConfService::getCacheDriverImpl();
+        if($cacheDriver === null) {
+            $responseInterface = new JsonResponse(["result" => "NOCACHEFOUND"]);
+            return;
+        }
+        $params = $requestInterface->getParsedBody();
+        $data = json_decode($params["data"], true);
+        foreach($data as $key => $params){
+            $ns = $params['namespace'];
+            if(isSet($params["key"])){
+                Logger::info("CoreCacheLoader", "Clear Key ".$params["key"], $params);
+                $cacheDriver->delete($ns, $params["key"]);
+            }else if(isSet($params["pattern"])){
+                Logger::info("CoreCacheLoader", "Clear Pattern ".$params["pattern"], $params);
+                $cacheDriver->deleteKeyStartingWith($ns, $params["pattern"]);
+            }else if(isSet($params["all"])) {
+                Logger::info("CoreCacheLoader", "Clear All ", $params);
+                $cacheDriver->deleteAll($ns);
+            }
+        }
+        $responseInterface = new JsonResponse(["result" => "SUCCESS"]);
+    }
 
 }

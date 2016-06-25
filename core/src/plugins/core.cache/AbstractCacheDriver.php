@@ -26,11 +26,17 @@ define('AJXP_CACHE_SERVICE_NS_SHARED', 'shared');
 define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 
+use Pydio\Cache\Doctrine\Ext\PydioApcuCache;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Cache\Doctrine\Ext\PatternClearableCache;
+use Pydio\Core\Services\ConfService;
+use GuzzleHttp\Client;
+use Pydio\Core\Utils\ApplicationState;
+use Pydio\Log\Core\Logger;
 
 /**
  * @package AjaXplorer_Plugins
@@ -55,6 +61,16 @@ abstract class AbstractCacheDriver extends Plugin
      */
     protected $namespacedCaches = array();
 
+    /**
+     * Keep a pointer to an http client if necessary
+     * @var Client
+     */
+    protected $httpClient;
+
+    /**
+     * @var array
+     */
+    private $httpDeletion = [];
     
     /**
      * @param string $namespace
@@ -102,29 +118,6 @@ abstract class AbstractCacheDriver extends Plugin
      */
     public static function computeFullRepositoryId($repositoryId, $cacheType){
         return $ID = $cacheType."://".$repositoryId."/";
-    }
-
-    /**
-     * @param string $namespace
-     * @return bool
-     */
-    public function supportsPatternDelete($namespace)
-    {
-        $cacheDriver = $this->getCacheDriver($namespace);
-        return $cacheDriver instanceof PatternClearableCache;
-    }
-
-    /**
-     * @param string $namespace
-     * @param string $id
-     * @return bool
-     */
-    public function deleteKeyStartingWith($namespace, $id){
-        $cacheDriver = $this->getCacheDriver($namespace);
-        if(!($cacheDriver instanceof PatternClearableCache)){
-            return false;
-        }
-        return $cacheDriver->deleteKeysStartingWith($id);
     }
 
     /**
@@ -194,11 +187,17 @@ abstract class AbstractCacheDriver extends Plugin
      * @return bool TRUE if the entry was successfully deleted, FALSE otherwise.
      */
     public function delete($namespace, $id){
+
         $cacheDriver = $this->getCacheDriver($namespace);
+        if($this->requiresHttpForwarding($cacheDriver)){
+            $this->httpDeletion[$namespace.$id.'key'] = ["namespace"=>$namespace, "key" => $id];
+            return true;
+        }
 
         if (isset($cacheDriver) && $cacheDriver->contains($id)) {
-           $result = $cacheDriver->delete($id);
-           return $result;
+            Logger::debug("CacheDriver::Http", "Clear Key ".$id, ["namespace" => $namespace]);
+            $result = $cacheDriver->delete($id);
+            return $result;
         }
 
         return false;
@@ -212,23 +211,103 @@ abstract class AbstractCacheDriver extends Plugin
      *
      */
     public function deleteAll($namespace){
+
         $cacheDriver = $this->getCacheDriver($namespace);
+        if($this->requiresHttpForwarding($cacheDriver)){
+            $this->httpDeletion[$namespace.'all'] = ["namespace"=>$namespace, "all" => "true"];
+            return true;
+        }
 
         if (isset($cacheDriver)) {
-           $result = $cacheDriver->deleteAll();
-           return $result;
+            Logger::debug("CacheDriver::Http", "Clear All", ["namespace" => $namespace]);
+            $result = $cacheDriver->deleteAll();
+            return $result;
         }
 
         return false;
     }
 
+    /**
+     * @param string $namespace
+     * @return bool
+     */
+    public function supportsPatternDelete($namespace)
+    {
+        $cacheDriver = $this->getCacheDriver($namespace);
+        return $cacheDriver instanceof PatternClearableCache;
+    }
+
+    /**
+     * @param string $namespace
+     * @param string $id
+     * @return bool
+     */
+    public function deleteKeyStartingWith($namespace, $id){
+
+        $cacheDriver = $this->getCacheDriver($namespace);
+        if($this->requiresHttpForwarding($cacheDriver)){
+            $this->httpDeletion[$namespace.$id.'pattern'] = ["namespace"=>$namespace, "pattern" => $id];
+            return true;
+        }
+
+        if(!($cacheDriver instanceof PatternClearableCache)){
+            return false;
+        }
+        Logger::debug("CacheDriver::Http", "Clear Pattern ".$id, ["namespace" => $namespace]);
+        return $cacheDriver->deleteKeysStartingWith($id);
+    }
+
+
+    /**
+     * @return array
+     */
     public function listNamespaces(){
         return [AJXP_CACHE_SERVICE_NS_SHARED, AJXP_CACHE_SERVICE_NS_NODES];
     }
 
+    /**
+     * @param $namespace
+     * @return array|null
+     */
     public function getStats($namespace){
         $cacheDriver = $this->getCacheDriver($namespace);
         return $cacheDriver->getStats();
+    }
+
+    /**
+     * @param CacheProvider
+     * @return bool
+     */
+    protected function requiresHttpForwarding($cacheDriver){
+        if(!empty($cacheDriver) && $cacheDriver instanceof PydioApcuCache && ConfService::currentContextIsCommandLine()){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @return Client
+     */
+    protected function getHttpClient(){
+        if(!isSet($this->httpClient)){
+            $this->httpClient = new Client([
+                'base_url' => ApplicationState::detectServerURL(true)
+            ]);
+        }
+        return $this->httpClient;
+    }
+
+    public function __destruct()
+    {
+        if(count($this->httpDeletion)){
+            Logger::debug("CacheDriver::CLI", "Sending cache clear to http", $this->httpDeletion);
+            $this->getHttpClient()->post('/?get_action=clear_cache_key', [
+                'body' => [
+                    'data' => json_encode($this->httpDeletion)
+                ]
+            ]);
+
+        }
     }
 
 }
