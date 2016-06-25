@@ -24,6 +24,7 @@ use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocalCache;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\Vars\StatHelper;
@@ -44,10 +45,10 @@ class ImagePreviewer extends Plugin
      * @param $action
      * @param $httpVars
      * @param $filesVars
-     * @param \Pydio\Core\Model\ContextInterface $contextInterface
+     * @param ContextInterface $contextInterface
      * @throws \Exception
      */
-    public function switchAction($action, $httpVars, $filesVars, \Pydio\Core\Model\ContextInterface $contextInterface)
+    public function switchAction($action, $httpVars, $filesVars, ContextInterface $contextInterface)
     {
         if (!isSet($this->pluginConf)) {
             $this->pluginConf = array("GENERATE_THUMBNAIL"=>false);
@@ -83,7 +84,6 @@ class ImagePreviewer extends Plugin
                 print($data);
 
             } else {
-                 //$filesize = filesize($destStreamURL.$file);
 
                 $node = new AJXP_Node($destStreamURL.$file);
 
@@ -134,11 +134,11 @@ class ImagePreviewer extends Plugin
      * @param $targetFile
      * @return bool
      */
-    public function generateThumbnail(\Pydio\Core\Model\ContextInterface $ctx, $masterFile, $targetFile)
+    public function generateThumbnail(ContextInterface $ctx, $masterFile, $targetFile)
     {
         $size = $this->currentDimension;
         require_once(AJXP_INSTALL_PATH."/plugins/editor.diaporama/PThumb.lib.php");
-        $pThumb = new \Pydio\Editor\Image\PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
+        $pThumb = new PThumb($this->getContextualOption($ctx, "THUMBNAIL_QUALITY"), $this->getContextualOption($ctx, "EXIF_ROTATION"));
 
         if (!$pThumb->isError()) {
             $pThumb->remote_wrapper = "Pydio\\Access\\Core\\MetaStreamWrapper";
@@ -163,9 +163,9 @@ class ImagePreviewer extends Plugin
     //public function extractImageMetadata($currentNode, &$metadata, $wrapperClassName, &$realFile){
     /**
      * Enrich node metadata
-     * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
+     * @param AJXP_Node $ajxpNode
      */
-    public function extractImageMetadata(&$ajxpNode)
+    public function extractImageMetadata(AJXP_Node &$ajxpNode)
     {
         $currentPath = $ajxpNode->getUrl();
         $wrapperClassName = $ajxpNode->wrapperClassName;

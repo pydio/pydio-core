@@ -35,7 +35,7 @@ class AuthStream implements StreamInterface
             throw new \Exception("Cannot find user/pass for Remote Access!");
         }
 
-        $auth = ["admin", "security", 'digest'];
+        $auth = [$user, $password, 'digest'];
 
         Stream::addContextOption($this->context, [
             "auth" => $auth

@@ -6,11 +6,12 @@
             "httpMethod" : "PROPFIND",
             "uri" : "{path}",
             "summary" : "Returns the stat of a specific object",
-            "responseClass" : "Stat",
+            "responseClass" : "Directory",
             "exceptions" : false,
             "data": {
                 "headers": {
-                    "Depth": 0
+                    "Depth": 1,
+                    "Min-Depth": 0
                 },
                 "body": [
                     "<?xml version=\"1.0\"?>",
@@ -18,6 +19,7 @@
                         "<a:prop><a:getcontenttype/></a:prop>",
                         "<a:prop><a:getcontentlength/></a:prop>",
                         "<a:prop><a:resourcetype/></a:prop>",
+                        "<a:prop><a:getlastmodified/></a:prop>",
                     "</a:propfind>"
                 ]
             },
@@ -27,14 +29,12 @@
                     "type": "object",
                     "location": "uri",
                     "sentAs": "path",
-                    "filters": [
-                        {
-                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
-                            "args": [
-                                "@value"
-                            ]
-                        }
-                    ]
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
@@ -46,14 +46,16 @@
             "exceptions" : false,
             "data": {
                 "headers": {
-                    "Depth": 1
+                    "Depth": 1,
+                    "Min-Depth": 1
                 },
                 "body": [
                     "<?xml version=\"1.0\"?>",
                     "<a:propfind xmlns:a=\"DAV:\">",
-                    "<a:prop><a:getcontenttype/></a:prop>",
-                    "<a:prop><a:getcontentlength/></a:prop>",
-                    "<a:prop><a:resourcetype/></a:prop>",
+                        "<a:prop><a:getcontenttype/></a:prop>",
+                        "<a:prop><a:getcontentlength/></a:prop>",
+                        "<a:prop><a:resourcetype/></a:prop>",
+                        "<a:prop><a:getlastmodified/></a:prop>",
                     "</a:propfind>"
                 ]
             },
@@ -63,106 +65,120 @@
                     "type": "object",
                     "location": "uri",
                     "sentAs": "path",
-                    "filters": [
-                        {
-                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
-                            "args": [
-                                "@value"
-                            ]
-                        }
-                    ]
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
-        "Open" : {
+        "Get" : {
             "httpMethod" : "GET",
-            "uri" : "{path/basepath}/{path/fullpath}",
+            "uri" : "{path}",
             "summary" : "Open the object as a stream for the StreamWrapper to access",
-            "responseClass" : "OpenOutput",
+            "responseClass" : "File",
             "parameters" : {
-                "path/fullpath" : {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
         "Mkdir" : {
             "httpMethod" : "MKCOL",
-            "uri" : "{path/basepath}/{path/fullpath}",
-            "responseClass" : "MkdirOutput",
+            "uri" : "{path}",
+            "responseClass" : "File",
             "parameters" : {
-                "path/fullpath" : {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
         "Rmdir" : {
             "httpMethod" : "DELETE",
-            "uri" : "{path/basepath}/{path/fullpath}",
-            "responseClass" : "RmdirOutput",
+            "uri" : "{path}",
+            "responseClass" : "File",
             "parameters" : {
-                "path/fullpath":  {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
         "Rename" : {
             "httpMethod" : "MOVE",
-            "uri" : "{frompath/basepath}/{frompath/fullpath}",
-            "responseClass" : "MoveOutput",
-            "parameters" : {
-                "frompath/fullpath":  {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+            "uri" : "{path}",
+            "responseClass" : "File",
+            "parameters" :  {
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 },
-                "frompath/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "topath/fulluri" : {
-                    "required" : true,
-                    "type" : "string",
+                "newPath" : {
+                    "required": true,
+                    "type": "object",
                     "location" : "header",
-                    "sentAs" : "Destination"
+                    "sentAs" : "Destination",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         },
         "Put" : {
             "httpMethod" : "PUT",
-            "uri" : "{path/basepath}/{path/fullpath}",
-            "responseClass" : "PutOutput",
-            "parameters" : {
-                "path/fullpath":  {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+            "uri" : "{path}",
+            "responseClass" : "File",
+            "parameters" :  {
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 },
                 "body" : {
                     "location" : "body"
@@ -202,13 +218,19 @@
                     "name": {
                         "type": "string"
                     },
-                    "lastModified": {
+                    "mtime": {
                         "type": "string",
-                        "sentAs": "client_modified"
+                        "sentAs": "getlastmodified",
+                        "filters": [{
+                            "method": "\\Pydio\\Access\\WebDAV\\Driver::convertTime",
+                            "args": [
+                                "@value"
+                            ]
+                        }]
                     },
                     "size": {
                         "type": "string",
-                        "sentAs": "contentlength"
+                        "sentAs": "getcontentlength"
                     }
                 }
             }
@@ -232,13 +254,19 @@
                 "name": {
                     "type": "string"
                 },
-                "lastModified": {
+                "mtime": {
                     "type": "string",
-                    "sentAs": "client_modified"
+                    "sentAs": "getlastmodified",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertTime",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 },
                 "size": {
                     "type": "string",
-                    "sentAs": "contentlength"
+                    "sentAs": "getcontentlength"
                 }
             }
         }

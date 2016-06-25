@@ -136,6 +136,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function setUrl($url)
     {
+        $url = rtrim($url, "/");
         $this->_url = $url;
         // Clean url
         $testExp = explode("//", $url);
@@ -589,7 +590,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         // Update url with a user@workspaceID
         $this->_user = $userId;
         $this->urlParts["user"] = $userId;
-        $this->_url = $this->getScheme()."://".$this->_user."@".$this->getRepositoryId().$this->getPath();
+        $this->setUrl($this->getScheme()."://".$this->_user."@".$this->getRepositoryId().$this->getPath());
     }
 
     /**

@@ -96,9 +96,12 @@ class Driver extends FsAccessDriver
 
     /********************************************************
      * Static functions used in the JSON service description
-     ********************************************************/
-    public static function convertPath($value) {
-        $node = new AJXP_Node($value);
+     *******************************************************
+     * @param AJXP_Node $node
+     * @return string
+     */
+
+    public static function convertPath(AJXP_Node $node) {
         $path = $node->getPath();
 
         if (isset($path)) {

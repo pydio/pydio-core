@@ -8,13 +8,13 @@
 
 namespace Pydio\Access\Core\Stream;
 
-use CommerceGuys\Guzzle\Oauth2\GrantType\AuthorizationCode;
 use CommerceGuys\Guzzle\Oauth2\GrantType\RefreshToken;
 use CommerceGuys\Guzzle\Oauth2\Oauth2Subscriber;
 use GuzzleHttp\Client;
 use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Stream\Utils\AuthorizationCode;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\CacheService;
@@ -28,15 +28,33 @@ class OAuthStream implements StreamInterface
     /** @var ContextInterface Context */
     private $context;
 
+
+    /**
+     * OAuthStream constructor.
+     * @param StreamInterface $stream
+     * @param mixed $base
+     * @throws PydioUserAlertException
+     * @throws \Exception
+     */
     public function __construct(
         StreamInterface $stream,
-        AJXP_Node $node
+        $base
     ) {
-        $this->context = $node->getContext();
+        /** @var AJXP_Node $node */
+        $node = null;
 
-        // Context Variables
-        $repository = $this->context->getRepository();
-        $user = $this->context->getUser();
+        $context = null;
+
+        if ($base instanceof AJXP_Node) {
+            $node = $base;
+            $context = $node->getContext();
+        } elseif ($base instanceof ContextInterface) {
+            $context = $base;
+        } else {
+            return;
+        }
+
+        $this->context = $context;
 
         // Repository options
         $options = $this->getOptions($this->context);
@@ -116,8 +134,10 @@ class OAuthStream implements StreamInterface
             "subscribers" => [$oauth2]
         ]);
 
-        $resource = PydioStreamWrapper::getResource($stream);
-        $this->stream = new Stream($resource, $node);
+        if (isset($node)) {
+            $resource = PydioStreamWrapper::getResource($stream);
+            $this->stream = new Stream($resource, $node);
+        }
     }
 
     public function getOptions(ContextInterface $ctx) {

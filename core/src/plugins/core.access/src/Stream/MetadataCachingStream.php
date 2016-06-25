@@ -22,14 +22,11 @@ class MetadataCachingStream implements StreamInterface
     /** @var array stat */
     private static $stat;
 
-    /** @var array stat */
-    private $size = -1;
-
-    /** @var boolean is_file */
-    private $is_file = null;
-
     /** @var string uri */
     private $uri;
+
+    /** @var string path */
+    private $path;
 
     /**
      * We will treat the buffer object as the body of the stream
@@ -44,6 +41,7 @@ class MetadataCachingStream implements StreamInterface
         StreamInterface $target = null
     ) {
         $this->uri = $node->getUrl();
+        $this->path = parse_url($this->uri, PHP_URL_PATH);
 
         $this->stream = $stream;
 
@@ -58,8 +56,17 @@ class MetadataCachingStream implements StreamInterface
         $stat = $this->stat();
 
         if (isset($stat["size"])) {
-            $this->size = (int) $stat["size"];
-            return $this->size;
+            return (int) $stat["size"];
+        }
+
+        return null;
+    }
+
+    public function getLastModifiedTime() {
+        $stat = $this->stat();
+
+        if (isset($stat["mtime"])) {
+            return (int) $stat["mtime"];
         }
 
         return null;
@@ -83,7 +90,20 @@ class MetadataCachingStream implements StreamInterface
             return self::$stat[$this->uri];
         }
 
-        self::$stat[$this->uri] = $this->stream->stat();
+        $stats = $this->stream->stat();
+
+        // Some APIs will return us multiple uri to avoid having to send multiple requests
+        // So storing them in a local cache
+        if (is_array($stats[0])) {
+            foreach ($stats as $stat) {
+                $path = $stat["name"];
+                $key = rtrim($this->uri . "/" . $path, "/");
+                self::$stat[$key] = $stat;
+            }
+        } else {
+            self::$stat[$this->uri] = $stats;
+        }
+
         return self::$stat[$this->uri];
     }
 }
