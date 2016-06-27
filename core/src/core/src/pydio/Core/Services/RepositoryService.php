@@ -188,7 +188,7 @@ class RepositoryService
                 if (!in_array($key, $searchableKeys)) continue;
                 $criteriumOk = false;
                 $comp = null;
-                if ($key == "uuid") $comp = $repoObject->getUniqueId();
+                if ($key == "uuid") $comp = $repoObject->getId();
                 else if ($key == "parent_uuid") $comp = $repoObject->getParentId();
                 else if ($key == "owner_user_id") $comp = $repoObject->getUniqueUser();
                 else if ($key == "display") $comp = $repoObject->getDisplay();

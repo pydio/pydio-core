@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Meta\Hash;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -34,6 +36,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -129,6 +132,63 @@ class FileHasher extends AbstractMetaSource
     }
 
     /**
+     * Handle stat_hash action
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function statAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        $selection = UserSelection::fromContext($requestInterface->getAttribute("ctx"), $requestInterface->getParsedBody());
+
+        clearstatcache();
+        if ($selection->isUnique()) {
+            $node = $selection->getUniqueNode();
+            $stat = @stat($node->getUrl());
+            if (!$stat || !is_readable($node->getUrl())) {
+                $responseData = new \stdClass();
+            } else {
+                if(is_file($node->getUrl())) {
+                    $serverParams = $requestInterface->getServerParams();
+                    if(isSet($serverParams["HTTP_RANGE"])){
+                        $fullSize = floatval($stat['size']);
+                        $ranges = explode('=', $serverParams["HTTP_RANGE"]);
+                        $offsets = explode('-', $ranges[1]);
+                        $offset = floatval($offsets[0]);
+                        $length = floatval($offsets[1]) - $offset;
+                        if (!$length) $length = $fullSize - $offset;
+                        if ($length + $offset > $fullSize || $length < 0) $length = $fullSize - $offset;
+                        $hash = $this->getPartialHash($node, $offset, $length);
+                    }else{
+                        $hash = $this->getFileHash($selection->getUniqueNode());
+                    }
+                }
+                else $hash = 'directory';
+                $stat[13] = $stat["hash"] = $hash;
+                $responseData = $stat;
+            }
+        } else {
+            $files = $selection->getFiles();
+            $responseData = [];
+            foreach ($files as $index => $path) {
+                $node = new AJXP_Node($selection->currentBaseUrl().$path);
+                $stat = @stat($selection->currentBaseUrl().$path);
+                if(!$stat || !is_readable($node->getUrl())) {
+                    $stat = new \stdClass();
+                } else {
+                    if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
+                    else $hash = 'directory';
+                    $stat[13] = $stat["hash"] = $hash;
+                }
+                $responseData[TextEncoder::toUTF8($path)] = $stat;
+            }
+
+        }
+
+        $responseInterface = new JsonResponse($responseData);
+
+    }
+
+    /**
      * @param $actionName
      * @param $httpVars
      * @param $fileVars
@@ -140,6 +200,7 @@ class FileHasher extends AbstractMetaSource
         $selection = UserSelection::fromContext($ctx, $httpVars);
         
         switch ($actionName) {
+
             case "filehasher_signature":
                 $file = $selection->getUniqueNode();
                 if(!file_exists($file->getUrl())) break;
@@ -149,6 +210,7 @@ class FileHasher extends AbstractMetaSource
                 header("Content-Length", strlen($data));
                 echo($data);
                 break;
+            
             case "filehasher_delta":
             case "filehasher_patch":
                 // HANDLE UPLOAD DATA
@@ -178,55 +240,7 @@ class FileHasher extends AbstractMetaSource
                     echo md5_file($file);
                 }
                 break;
-            case "stat_hash" :
-                clearstatcache();
-                header("Content-type:application/json");
-                if ($selection->isUnique()) {
-                    $node = $selection->getUniqueNode();
-                    $stat = @stat($node->getUrl());
-                    if (!$stat || !is_readable($node->getUrl())) {
-                        print '{}';
-                    } else {
-                        if(is_file($node->getUrl())) {
-                            if(isSet($_SERVER["HTTP_RANGE"])){
-                                $fullSize = floatval($stat['size']);
-                                $ranges = explode('=', $_SERVER["HTTP_RANGE"]);
-                                $offsets = explode('-', $ranges[1]);
-                                $offset = floatval($offsets[0]);
-                                $length = floatval($offsets[1]) - $offset;
-                                if (!$length) $length = $fullSize - $offset;
-                                if ($length + $offset > $fullSize || $length < 0) $length = $fullSize - $offset;
-                                $hash = $this->getPartialHash($node, $offset, $length);
-                            }else{
-                                $hash = $this->getFileHash($selection->getUniqueNode());
-                            }
-                        }
-                        else $hash = 'directory';
-                        $stat[13] = $stat["hash"] = $hash;
-                        print json_encode($stat);
-                    }
-                } else {
-                    $files = $selection->getFiles();
-                    print '{';
-                    foreach ($files as $index => $path) {
-                        $node = new AJXP_Node($selection->currentBaseUrl().$path);
-                        $stat = @stat($selection->currentBaseUrl().$path);
-                        if(!$stat || !is_readable($node->getUrl())) $stat = '{}';
-                        else {
-                            if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
-                            else $hash = 'directory';
-                            $stat[13] = $stat["hash"] = $hash;
-                            $stat = json_encode($stat);
-                        }
-                        print json_encode(TextEncoder::toUTF8($path)).':'.$stat . (($index < count($files) -1) ? "," : "");
-                    }
-                    print '}';
-                }
 
-                break;
-
-
-                break;
         }
     }
 
@@ -236,6 +250,8 @@ class FileHasher extends AbstractMetaSource
      */
     public function getFileHash($node)
     {
+        // Make sure that node is really there
+        $node->loadNodeInfo(true);
         if ($node->isLeaf()) {
             $md5 = null;
             if ($this->metaStore != false) {

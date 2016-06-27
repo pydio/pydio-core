@@ -39,7 +39,7 @@
                <action name="stat_hash">
                    <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                    <processing>
-                       <serverCallback methodName="switchActions" checkParams="false" restParams="/file+" developerComment="Returns an fstat() structure including the hash of the file">
+                       <serverCallback methodName="statAction" checkParams="false" restParams="/file+" developerComment="Returns an fstat() structure including the hash of the file">
                            <input_param description="One or more nodes to stat." name="nodes" type="AJXP_NODE[]"/>
                            <output type="json"/>
                        </serverCallback>
