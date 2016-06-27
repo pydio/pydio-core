@@ -26,6 +26,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Meta\Core\IFileHasher;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocalCache;
@@ -44,7 +45,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * Generates and caches and md5 hash of each file
  * @package Pydio\Access\Meta\Hash
  */
-class FileHasher extends AbstractMetaSource
+class FileHasher extends AbstractMetaSource implements IFileHasher
 {
     const METADATA_HASH_NAMESPACE = "file_hahser";
     /**
@@ -159,6 +160,7 @@ class FileHasher extends AbstractMetaSource
                         if ($length + $offset > $fullSize || $length < 0) $length = $fullSize - $offset;
                         $hash = $this->getPartialHash($node, $offset, $length);
                     }else{
+                        $selection->getUniqueNode()->loadNodeInfo(true);
                         $hash = $this->getFileHash($selection->getUniqueNode());
                     }
                 }
@@ -175,8 +177,12 @@ class FileHasher extends AbstractMetaSource
                 if(!$stat || !is_readable($node->getUrl())) {
                     $stat = new \stdClass();
                 } else {
-                    if(!is_dir($node->getUrl())) $hash = $this->getFileHash($node);
-                    else $hash = 'directory';
+                    if(!is_dir($node->getUrl())) {
+                        $node->loadNodeInfo(true);
+                        $hash = $this->getFileHash($node);
+                    } else {
+                        $hash = 'directory';
+                    }
                     $stat[13] = $stat["hash"] = $hash;
                 }
                 $responseData[TextEncoder::toUTF8($path)] = $stat;
@@ -248,10 +254,9 @@ class FileHasher extends AbstractMetaSource
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @return String md5
      */
-    public function getFileHash($node)
+    public function getFileHash(AJXP_Node $node)
     {
         // Make sure that node is really there
-        $node->loadNodeInfo(true);
         if ($node->isLeaf()) {
             $md5 = null;
             if ($this->metaStore != false) {

@@ -479,6 +479,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $partialTargetSize = intval($httpVars["partial_target_bytesize"]);
                     if(!isSet($httpVars["appendto_urlencoded_part"])){
                         $userfile_name .= ".dlpart";
+                        $targetUrl = $destination."/".$userfile_name;
                     }
                 }
 
@@ -495,6 +496,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $this->logDebug("AppendTo FILE".$appendTo);
                     $already_existed = $this->appendUploadedData($destination, $userfile_name, $appendTo);
                     $userfile_name = $appendTo;
+                    $targetAppended = new AJXP_Node($destination."/".$userfile_name);
+                    clearstatcache(true, $targetAppended->getUrl());
+                    $targetAppended->loadNodeInfo(true);
                     if($partialUpload && $partialTargetSize == filesize($destination."/".$userfile_name)){
                         // This was the last part. We can now rename to the original name.
                         if(is_file($destination."/".$originalAppendTo)){
@@ -508,6 +512,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         $partialUpload = false;
                         // Send a create event!
                         $already_existed = false;
+                        $lastPartAppended = true;
                     }
                 }
 
@@ -521,20 +526,24 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 if($partialUpload){
                     $this->logDebug("Return Partial Upload: SUCESS but no event yet");
+                    // Make sure to clear cache for parent
+                    $createdNode->getParent()->loadNodeInfo(true);
                     if(isSet($already_existed) && $already_existed === true){
                         $this->writeUploadSuccess($request, ["PARTIAL_NODE" => $createdNode]);
-                        return;
+                    }else if(isSet($lastPartAppended)){
+                        $createdNode->loadHash();
+                        $this->writeUploadSuccess($request, ["CREATED_NODE" => $createdNode]);
                     }
                 } else {
                     $this->logDebug("Return success");
+                    $createdNode->loadHash();
                     if(isSet($already_existed) && $already_existed === true){
                         $this->writeUploadSuccess($request, ["UPDATED_NODE" => $createdNode]);
-                        return;
                     }else{
                         $this->writeUploadSuccess($request, ["CREATED_NODE" => $createdNode]);
-                        return;
                     }
                 }
+                return;
 
             }catch(\Exception $e){
                 $errorCode = $e->getCode();

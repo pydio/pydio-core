@@ -24,6 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
+use Pydio\Access\Meta\Core\IFileHasher;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\ContextProviderInterface;
@@ -86,6 +87,10 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      * @var IMetaStoreProvider
      */
     private $_metaStore;
+    /**
+     * @var IFileHasher
+     */
+    private $_fileHasher;
 
     /**
      * @var String
@@ -219,6 +224,23 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     }
 
     /**
+     * @return IFileHasher
+     */
+    protected function getFileHasher()
+    {
+        if (!isSet($this->_fileHasher)) {
+            $this->getDriver();
+            $hashers = PluginsService::getInstance($this->getContext())->getActivePluginsForType("meta");
+            if(is_array($hashers) && array_key_exists("filehasher", $hashers)){
+                $this->_fileHasher = $hashers["filehasher"];
+            }else{
+                $this->_fileHasher = false;
+            }
+        }
+        return $this->_fileHasher;
+    }
+
+    /**
      * Check if there is currently a MetaStore provider set
      * @return bool
      */
@@ -346,6 +368,15 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
 
     }
 
+
+    /**
+     * Search for metadata in parents, recursively
+     * @param $nameSpace
+     * @param bool $private
+     * @param int $scope
+     * @param bool $indexable
+     * @return array|bool
+     */
     public function findMetadataInParent($nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY, $indexable = false){
 
         $metadata = false;
@@ -410,6 +441,11 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
 
     }
 
+    /**
+     * @param $nameSpace
+     * @param $userScope
+     * @return array
+     */
     public function collectRepositoryMetadatasInChildren($nameSpace, $userScope){
         $result = [];
         $metaStore = $this->getMetaStore();
@@ -417,6 +453,15 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             $result = $metaStore->collectChildrenWithRepositoryMeta($this, $nameSpace, $userScope);
         }
         return $result;
+    }
+
+    /**
+     * @return void
+     */
+    public function loadHash(){
+        if($this->getFileHasher() !== false){
+            $this->getFileHasher()->getFileHash($this);
+        }
     }
 
     /**
@@ -501,7 +546,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             }
         }
         Controller::applyHook("node.info.start", [&$this, $contextNode, $details, $forceRefresh]);
-        if($this->nodeInfoLoaded && !$forceRefresh){
+        if($this->nodeInfoLoaded && !$forceRefresh && isSet($this->_metadata["ajxp_mime"])){
             Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
             return;
         }
