@@ -24,7 +24,10 @@ use Pydio\Core\Model\RepositoryInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RepositoryLoadException
+ * @package Pydio\Core\Exception
+ */
 class RepositoryLoadException extends PydioException
 {
     /**
@@ -33,16 +36,23 @@ class RepositoryLoadException extends PydioException
     private $repository;
     /**
      * RepositoryLoadException constructor.
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface|String $repository
      * @param array $errors
      */
     public function __construct($repository, $errors)
     {
-        $message = "Error while loading workspace ".$repository->getDisplay()." : ".implode("\n-", $errors);
-        $this->repository = $repository;
+        if($repository instanceof RepositoryInterface){
+            $message = "Error while loading workspace ".$repository->getDisplay()." : ".implode("\n-", $errors);
+            $this->repository = $repository;
+        }else{
+            $message = "Error while loading workspace ".$repository." : ".implode("\n-", $errors);
+        }
         parent::__construct($message, false, 5000);
     }
 
+    /**
+     * @return RepositoryInterface|String
+     */
     public function getRepository(){
         return $this->repository;
     }

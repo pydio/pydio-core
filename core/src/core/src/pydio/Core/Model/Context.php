@@ -208,11 +208,18 @@ class Context implements ContextInterface
         }
     }
 
+    /**
+     * Set repositoryId and repositoryObject to null
+     */
     public function resetRepository()
     {
         $this->repositoryId = $this->repositoryObject = null;
     }
 
+    /**
+     * Build a unique string identifier for this context
+     * @return string
+     */
     public function getStringIdentifier()
     {
         $u = $this->userId == null ? "shared" : $this->userId;

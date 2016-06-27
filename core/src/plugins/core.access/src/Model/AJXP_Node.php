@@ -196,8 +196,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         if (!isSet($this->_accessDriver)) {
             $repo = $this->getRepository();
             if ($repo != null) {
-                $accessType = $repo->getAccessType();
-                $this->_accessDriver = PluginsService::getInstance($this->getContext())->getPluginByTypeName("access", $accessType);
+                $this->_accessDriver = $repo->getDriverInstance($this->getContext());
             }
         }
         return $this->_accessDriver;

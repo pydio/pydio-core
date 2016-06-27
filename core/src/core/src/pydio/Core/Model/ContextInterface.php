@@ -20,6 +20,8 @@
  */
 namespace Pydio\Core\Model;
 
+use Pydio\Access\Core\AbstractAccessDriver;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 

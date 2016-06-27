@@ -223,6 +223,9 @@ class PluginsService
 
         $errors = [];
         $repository = $ctx->getRepository();
+        if(empty($repository)){
+            throw new RepositoryLoadException($repository, []);
+        }
         $accessType = $repository->getAccessType();
         /** @var AbstractAccessDriver $plugInstance */
         $plugInstance = $this->getPluginByTypeName("access", $accessType);

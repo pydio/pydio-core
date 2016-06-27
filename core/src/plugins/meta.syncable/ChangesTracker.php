@@ -72,7 +72,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
             return true;
         }
         try{
-            $ctx->getRepository()->getDriverInstance()->filterUserSelectionToHidden($ctx, [$path]);
+            $ctx->getRepository()->getDriverInstance($ctx)->filterUserSelectionToHidden($ctx, [$path]);
         }catch(\Exception $e){
             return true;
         }

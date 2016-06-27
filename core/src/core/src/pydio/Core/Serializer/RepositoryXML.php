@@ -177,7 +177,7 @@ class RepositoryXML
      */
     protected function repositoryClientSettings($repoObject, $ctx){
 
-        $plugin = $repoObject->getDriverInstance();
+        $plugin = $repoObject->getDriverInstance($ctx);
         if(empty($plugin)){
             $plugin = PluginsService::getInstance($ctx)->getPluginByTypeName("access", $repoObject->getAccessType());
         }

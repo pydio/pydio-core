@@ -20,6 +20,7 @@
  */
 namespace Pydio\Uploader\Processor;
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -98,7 +99,7 @@ class Jumploader extends Plugin
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         $repository = $ctx->getRepository();
-        $driver = $repository->getDriverInstance();
+        $driver = $repository->getDriverInstance($ctx);
 
         if (method_exists($driver, "storeFileToCopy")) {
             self::$remote = true;
@@ -277,7 +278,7 @@ class Jumploader extends Plugin
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         $repository = $ctx->getRepository();
-        $driver = $repository->getDriverInstance();
+        $driver = $repository->getDriverInstance($ctx);
 
         if ($httpVars["lastPartition"]) {
             $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);

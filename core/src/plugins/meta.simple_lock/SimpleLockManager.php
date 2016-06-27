@@ -74,7 +74,7 @@ class SimpleLockManager extends AbstractMetaSource
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 
-        if ($ctx->getRepository()->getDriverInstance() instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
+        if ($ctx->getRepository()->getDriverInstance($ctx) instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
             throw new \Exception("Write actions are disabled in demo mode!");
         }
         $repo = $ctx->getRepository();

@@ -450,7 +450,7 @@ class XMLWriter
         $driver = false;
         $repository = $context->getRepository();
         if ($format == "node_list") {
-            $driver = $repository->getDriverInstance();
+            $driver = $repository->getDriverInstance($context);
             if (!($driver instanceof IAjxpWrapperProvider)) {
                 $driver = false;
             }

@@ -125,10 +125,10 @@ class ShareCenter extends Plugin
             //$this->enabled = true;
         }
         $this->repository = $ctx->getRepository();
-        if (!($this->repository->getDriverInstance() instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
+        if (!($this->repository->getDriverInstance($ctx) instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
             return;
         }
-        $this->accessDriver = $this->repository->getDriverInstance();
+        $this->accessDriver = $this->repository->getDriverInstance($ctx);
         $this->urlBase = $ctx->getUrlBase();
         if (array_key_exists("meta.watch", PluginsService::getInstance($ctx)->getActivePlugins())) {
             $this->watcher = PluginsService::getInstance($ctx)->getPluginById("meta.watch");
@@ -521,7 +521,7 @@ class ShareCenter extends Plugin
 
         if (strpos($action, "sharelist") === false && !isSet($this->accessDriver)) {
             //throw new \Exception("Cannot find access driver!");
-            $this->accessDriver = $ctx->getRepository()->getDriverInstance();
+            $this->accessDriver = $ctx->getRepository()->getDriverInstance($ctx);
         }
 
 

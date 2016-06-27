@@ -686,7 +686,7 @@ abstract class AbstractConfDriver extends Plugin
                 }
                 /** @var ContextInterface $ctx */
                 $ctx = $requestInterface->getAttribute("ctx");
-                $driver = $ctx->getRepository()->getDriverInstance();
+                $driver = $ctx->getRepository()->getDriverInstance($ctx);
                 if (!($driver instanceof IAjxpWrapperProvider)) {
                     $driver = false;
                 }

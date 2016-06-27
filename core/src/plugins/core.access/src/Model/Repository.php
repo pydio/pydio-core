@@ -23,10 +23,12 @@ namespace Pydio\Access\Core\Model;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\RepositoryLoadException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Vars\InputFilter;
@@ -184,10 +186,19 @@ class Repository implements RepositoryInterface
     }
 
     /**
+     * @param ContextInterface $contextInterface
      * @return AbstractAccessDriver
+     * @throws RepositoryLoadException
      */
-    public function getDriverInstance()
+    public function getDriverInstance(ContextInterface $contextInterface)
     {
+        if(!isSet($this->driverInstance)){
+            $plugin = PluginsService::getInstance($contextInterface)->getUniqueActivePluginForType("access");
+            if(empty($plugin)){
+                throw new RepositoryLoadException($this, ["Cannot find access driver for repository ".$this->getSlug()]);
+            }
+            $this->driverInstance = $plugin;
+        }
         return $this->driverInstance;
     }
 

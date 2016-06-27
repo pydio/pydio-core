@@ -70,8 +70,8 @@ class S3MetaStore extends AbstractMetaSource implements IMetaStoreProvider
      */
     protected function getAwsService(ContextInterface $ctx)
     {
-        if(method_exists($ctx->getRepository()->getDriverInstance(), "getS3Service")){
-            return $ctx->getRepository()->getDriverInstance()->getS3Service();
+        if(method_exists($ctx->getRepository()->getDriverInstance($ctx), "getS3Service")){
+            return $ctx->getRepository()->getDriverInstance($ctx)->getS3Service();
         }
         return null;
     }

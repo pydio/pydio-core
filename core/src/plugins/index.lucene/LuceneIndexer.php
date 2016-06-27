@@ -269,7 +269,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d" => true, "f" => true, "z" => true])){
+                if (!$ctx->getRepository()->getDriverInstance($ctx)->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d" => true, "f" => true, "z" => true])){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -349,7 +349,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 }
                 $basename = basename($tmpNode->getPath());
                 $isLeaf = $tmpNode->isLeaf();
-                if (!$ctx->getRepository()->getDriverInstance()->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d"=>true, "f"=>true])){
+                if (!$ctx->getRepository()->getDriverInstance($ctx)->filterNodeName($ctx, $tmpNode->getPath(), $basename, $isLeaf, ["d"=>true, "f"=>true])){
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -822,7 +822,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         } else {
             if (!$create) {
                 $messages = LocaleService::getMessages();
-                throw new Exception($messages["index.lucene.9"]);
+                throw new \Exception($messages["index.lucene.9"]);
             }
             try{
                 $index = \Zend_Search_Lucene::create($iPath);

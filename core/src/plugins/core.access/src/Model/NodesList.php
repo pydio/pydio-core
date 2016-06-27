@@ -72,7 +72,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     }
 
     /**
-     * @return array
+     * @return AJXP_Node[]|NodesList[]
      */
     public function getChildren(){
         return $this->children;

@@ -25,6 +25,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Conf\Core\IGroupPathProvider;
+use Pydio\Core\Exception\RepositoryLoadException;
 
 
 /**
@@ -37,9 +38,11 @@ interface RepositoryInterface extends IGroupPathProvider
 {
 
     /**
+     * @param ContextInterface $ctx
      * @return AbstractAccessDriver
+     * @throws RepositoryLoadException
      */
-    public function getDriverInstance();
+    public function getDriverInstance(ContextInterface $ctx);
 
     /**
      * @param AbstractAccessDriver $driverInstance
