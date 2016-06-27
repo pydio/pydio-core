@@ -1844,6 +1844,37 @@ div.autocomplete ul li {
 div.autocomplete ul li.selected {
   background-color: aliceblue !important;
 }
+div.react-autosuggest {
+  padding-left: 1px;
+}
+div.react-autosuggest li.react-autosuggest__suggestion {
+  display: block;
+}
+div.react-autosuggest .react-autosuggest__suggestion--focused {
+  background-color: aliceblue;
+}
+div.react-autosuggest input.react-autosuggest__input {
+  width: 300px;
+}
+div.react-autosuggest .react-autosuggest__suggestions {
+  background-color: white;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.63);
+  display: block;
+  margin-top: 1px;
+  max-height: 300px;
+  overflow-y: auto;
+  position: absolute;
+  width: 300px;
+  z-index: 20;
+}
+.list-force-hide div.react-autosuggest .react-autosuggest__suggestions {
+  display: none !important;
+}
+div.react-autosuggest input#users-autosuggest {
+  font-size: 18px;
+  padding-bottom: 9px !important;
+  padding-left: 4px !important;
+}
 a.carousel-control {
   border-left: 1px solid #c4c7c1;
   border-right: 1px solid #c4c7c1;

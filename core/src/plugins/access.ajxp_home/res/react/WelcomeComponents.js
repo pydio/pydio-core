@@ -18,6 +18,107 @@
         }
     });
 
+    var HomeSearchEngine = React.createClass({
+
+        getInitialState:function(){
+            return {
+                loading : 0,
+                value   : ''
+            };
+        },
+
+        suggestionLoader:function(input, callback) {
+
+            let nodeProvider = new RemoteNodeProvider();
+            nodeProvider.initProvider({get_action:'multisearch', query:input});
+            let rootNode     = new AjxpNode('/', false);
+            this.setState({loading:true, value: input});
+            nodeProvider.loadNode(rootNode, function(){
+                let results = [];
+                let previousRepo = -1;
+                rootNode.getChildren().forEach(function(v){
+                    let repoId = v.getMetadata().get("repository_id");
+                    if(repoId != previousRepo){
+                        let node = new AjxpNode('/', false, v.getMetadata().get("repository_display"));
+                        node.setRoot();
+                        node.getMetadata().set("repository_id", repoId);
+                        results.push(node);
+                    }
+                    results.push(v);
+                    previousRepo = repoId;
+                });
+                callback(null, results);
+                this.setState({loading:false});
+            }.bind(this));
+        },
+
+        getSuggestions(input, callback){
+            if(input.length < 3){
+                callback(null, []);
+                return;
+            }
+            bufferCallback('suggestion-loader-search', 150, function(){
+                this.suggestionLoader(input, callback);
+            }.bind(this));
+        },
+
+        suggestionValue: function(suggestion){
+            return '';
+        },
+
+        onSuggestionSelected: function(resultNode, event){
+            pydio.goTo(resultNode);
+        },
+
+        renderSuggestion(resultNode){
+            if(resultNode.isRoot()){
+                return <span className="groupHeader">{resultNode.getLabel()}<span className="openicon icon-long-arrow-right"></span></span>;
+            }else{
+                let isLeaf = resultNode.isLeaf();
+                let label = resultNode.getLabel();
+                let value = this.state.value;
+                let r = new RegExp(value, 'gi');
+                label = label.replace(r, function(m){return '<span class="highlight">'+m+'</span>'});
+                let htmlFunc = function(){return {__html:label}};
+                return (
+                    <span className="nodeSuggestion">
+                        <span className={isLeaf ? "icon icon-file-alt" : "icon icon-folder-close-alt"}></span>
+                        <span dangerouslySetInnerHTML={htmlFunc()}/>
+                    </span>);
+            }
+        },
+
+        render: function(){
+
+            const inputAttributes = {
+                id: 'search-autosuggest',
+                name: 'search-autosuggest',
+                className: 'react-autosuggest__input',
+                placeholder: pydio.MessageHash['user_home.72'],
+                onBlur: event => pydio.UI.enableAllKeyBindings(),
+                onFocus: event => pydio.UI.disableAllKeyBindings(),
+                value: ''   // Initial value
+            };
+            return (
+                <div className={this.props.className + ' home_search'}>
+                    <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
+                    <ReactAutoSuggest
+                        ref="autosuggest"
+                        cache={true}
+                        showWhen = {input => true }
+                        inputAttributes={inputAttributes}
+                        suggestions={this.getSuggestions}
+                        suggestionRenderer={this.renderSuggestion}
+                        suggestionValue={this.suggestionValue}
+                        onSuggestionSelected={this.onSuggestionSelected}
+                    />
+                </div>
+
+            );
+        }
+
+    });
+
     var ConfigLogo = React.createClass({
         render: function(){
             var logo = this.props.pydio.Registry.getPluginConfigs(this.props.pluginName).get(this.props.pluginParameter);
@@ -311,12 +412,16 @@
             if(mobileBlocks.length && syncBlocks.length){
                 blocksSep = <div className="dl_blocks_sep"></div>;
             }
-
+            let searchBlock;
+            if(pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH")){
+                searchBlock = <HomeSearchEngine className="react-mui-context"/>;
+            }
             return (
                 <div id="tutorial_dl_apps_pane">
                     <div id="dl_pydio_cont" className="react-mui-context">
                         {syncBlocks}{blocksSep}{mobileBlocks}
                     </div>
+                    {searchBlock}
                 </div>
             );
         }

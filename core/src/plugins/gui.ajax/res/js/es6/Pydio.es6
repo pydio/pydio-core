@@ -289,6 +289,7 @@ class Pydio extends Observable{
                 && nodeOrPath.getAjxpMime() != "repository" && nodeOrPath.getAjxpMime() != "repository_editable"){
                 if(this.user){
                     this.user.setPreference("pending_folder", nodeOrPath.getPath());
+                    this._initLoadRep = nodeOrPath.getPath();
                 }
                 this.triggerRepositoryChange(nodeOrPath.getMetadata().get("repository_id"));
                 return;

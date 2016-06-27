@@ -216,7 +216,7 @@
     height: 100%;
     div#logo_div{
       transition: @bezier_transition;
-      margin-top:20%;
+      margin-top:17%;
       position: relative;
     }
     &.legend_visible div#logo_div{
@@ -679,7 +679,99 @@ div#tutorial_dl_apps_pane{
 
 }
 
+div.home_search{
+  text-align: center;
+  position: relative;
+  top: 120px;
+  background-color: transparent;
+  width: 710px;
+  margin: 0 auto;
+  height: 40px;
+  overflow: visible;
 
+  div.react-autosuggest{
+    position: absolute;
+    input.react-autosuggest__input {
+      width: 340px;
+      font-size:16px;
+      padding: 8px 0;
+      position: relative;
+      border-width:0 0 1px 0;
+      border-color: white;
+      border-radius: 0;
+      background-color: transparent;
+      color: white;
+      @placeholder: rgba(255, 255, 255, 0.73);
+      &::-webkit-input-placeholder {
+        color: @placeholder;
+      }
+      &:-moz-placeholder { /* Firefox 18- */
+        color: @placeholder;
+      }
+      &::-moz-placeholder {  /* Firefox 19+ */
+        color: @placeholder;
+      }
+      &:-ms-input-placeholder {
+        color: @placeholder;
+      }
+    }
+    .react-autosuggest__suggestions{
+      width: 340px;
+      background-color: rgba(255, 255, 255, 0.98);
+      max-height: 235px;
+      li.react-autosuggest__suggestion{
+        text-align: left;
+        span.nodeSuggestion{
+          display: block;
+          padding: 16px 8px;
+          border-bottom: 1px solid #e0e0e0;
+          font-size:14px;
+          color: rgba(0,0,0,0.93);
+          cursor: pointer;
+          span.highlight{
+            display: inline-block;
+            background-color: rgba(255, 255, 0, 0.26);
+          }
+          span.icon{
+            font-size:16px;
+            display: inline-block;
+            margin: 0 12px 0 5px;
+            color: rgba(0,0,0,0.73);
+            text-align: center;
+            width: 25px;
+          }
+        }
+        span.groupHeader{
+          display: block;;
+          padding: 8px 8px;
+          border-bottom: 0px;
+          font-size:13px;
+          color: white;
+          cursor: pointer;
+          background-color: #009688;
+          span.openicon{
+            display: none;
+            float: right;
+          }
+          &:hover{
+            span.openicon{
+              margin-top: 3px;
+              display: inline-block;
+            }
+          }
+        }
+      }
+    }
+  }
+  span.suggest-search{
+    font-size:16px;
+    position: absolute;
+    color: white;
+    right: 380px;
+    top: 10px
+  }
+
+}
 
 @media only screen
 and (max-width : 980px){

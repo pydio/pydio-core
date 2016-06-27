@@ -83,4 +83,5 @@ $mess=array(
 "69"=> "Télécharger l'appli de synchro (Mac)",
 "70"=> "Application pour smarthpones iOS",
 "71"=> "Application pour smarthpones Android",
+"72"=> "Chercher dans tous les dépôts...",
 );

@@ -32,3 +32,36 @@ div.autocomplete
     }
   }
 }
+
+@width0: 300px;
+div.react-autosuggest {
+  padding-left: 1px;
+  li.react-autosuggest__suggestion{
+    display: block;
+  }
+  .react-autosuggest__suggestion--focused {
+    background-color: aliceblue;
+  }
+  input.react-autosuggest__input {
+    width: @width0;
+  }
+  .react-autosuggest__suggestions {
+    background-color: white;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.63);
+    display: block;
+    margin-top: 1px;
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    width: @width0;
+    z-index: 20;
+    .list-force-hide &{
+      display: none !important;
+    }
+  }
+  input#users-autosuggest {
+    font-size: 18px;
+    padding-bottom: 9px !important;
+    padding-left: 4px !important;
+  }
+}
