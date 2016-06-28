@@ -164,11 +164,11 @@ class StreamWrapper
         return $stream->rmdir();
     }
 
-    public function rename($oldname, $newname) {
+    public function rename($oldName, $newName) {
 
-        $stream = self::createStream($oldname);
+        $stream = self::createStream($oldName);
 
-        return $stream->rename(new AJXP_Node($newname));
+        return $stream->rename(new AJXP_Node($newName));
     }
 
     public function url_stat($path, $flags) {
@@ -188,8 +188,7 @@ class StreamWrapper
         return true;
     }
 
-    public static function getRealFSReference($path, $persistent = false)
-    {
+    public static function getRealFSReference($path, $persistent = false) {
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
 
@@ -221,7 +220,6 @@ class StreamWrapper
     }
 
     public static function createStream($path) {
-        // TODO - determines this with the config
         $node = new AJXP_Node($path);
         $repository = $node->getRepository();
         $ctx = $node->getContext();
