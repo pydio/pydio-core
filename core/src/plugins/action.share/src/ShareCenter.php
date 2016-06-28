@@ -119,10 +119,7 @@ class ShareCenter extends Plugin
     {
         parent::init($ctx, $options);
         if(!$ctx->hasRepository()){
-            //$this->enabled = false;
             return;
-        }else{
-            //$this->enabled = true;
         }
         $this->repository = $ctx->getRepository();
         if (!($this->repository->getDriverInstance($ctx) instanceof \Pydio\Access\Core\IAjxpWrapperProvider)) {
@@ -145,12 +142,11 @@ class ShareCenter extends Plugin
         parent::parseSpecificContributions($ctx, $contribNode);
         $disableSharing = false;
         $xpathesToRemove = array();
+        $selectionContext = false;
 
         if( strpos($ctx->getRepository()->getAccessType(), "ajxp_") === 0){
 
-            $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
-            $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
-            $xpathesToRemove[] = 'action[@name="share-edit-shared"]';
+            $disableSharing = true;
 
         }else if (UsersService::usersEnabled()) {
 
@@ -166,17 +162,20 @@ class ShareCenter extends Plugin
         }
         if ($disableSharing) {
             // All share- actions
-            $xpathesToRemove[] = 'action[contains(@name, "share-")]';
+            $xpathesToRemove[] = 'action[@name="share-edit-shared"]';
+            $xpathesToRemove[] = 'action[@name="share_react"]';
+
         }else{
             $folderSharingAllowed = $this->getAuthorization($ctx, "folder", "any");
             $fileSharingAllowed   = $this->getAuthorization($ctx, "file", "any");
-            if($fileSharingAllowed === false){
-                // Share file button
-                $xpathesToRemove[] = 'action[@name="share-file-minisite"]';
-            }
-            if(!$folderSharingAllowed){
-                // Share folder button
-                $xpathesToRemove[] = 'action[@name="share-folder-minisite-public"]';
+            if($folderSharingAllowed && !$fileSharingAllowed){
+                $selectionContext = "dir";
+            }else if(!$folderSharingAllowed && $fileSharingAllowed){
+                $selectionContext = "file";
+            }else if(!$fileSharingAllowed && !$folderSharingAllowed){
+                // All share- actions
+                $xpathesToRemove[] = 'action[@name="share-edit-shared"]';
+                $xpathesToRemove[] = 'action[@name="share_react"]';
             }
         }
 
@@ -187,6 +186,16 @@ class ShareCenter extends Plugin
                 $contribNode->removeChild($shareActionNode);
             }
         }
+        if(isSet($selectionContext)){
+            $actionXpath=new DOMXPath($contribNode->ownerDocument);
+            $nodeList = $actionXpath->query('action[@name="share_react"]/gui/selectionContext', $contribNode);
+            if(!$nodeList->length) return;
+            /** @var \DOMElement $selectionContextNode */
+            $selectionContextNode =  $nodeList->item(0);
+            if($selectionContext == "dir") $selectionContextNode->setAttribute("file", "false");
+            else if($selectionContext == "file") $selectionContextNode->setAttribute("dir", "false");
+        }
+
     }
 
 
@@ -247,6 +256,21 @@ class ShareCenter extends Plugin
      */
     protected function getAuthorization(ContextInterface $ctx, $nodeType, $shareType = "any"){
 
+        $all             = $this->getContextualOption($ctx, "DISABLE_ALL_SHARING");
+        if($all){
+            return false;
+        }
+        if($ctx->getRepository()->hasParent()){
+            $p = $ctx->getRepository()->getParentRepository();
+            if(!empty($p) && !$p->isTemplate()){
+                $pContext = new Context($ctx->getRepository()->getOwner(), $p->getId());
+                $all = $this->getContextualOption($pContext, "DISABLE_RESHARING");
+                if($all){
+                    return false;
+                }
+            }
+        }
+        
         $filesMini       = $this->getContextualOption($ctx, "ENABLE_FILE_PUBLIC_LINK");
         $filesInternal   = $this->getContextualOption($ctx, "ENABLE_FILE_INTERNAL_SHARING");
         $foldersMini     = $this->getContextualOption($ctx, "ENABLE_FOLDER_PUBLIC_LINK");
@@ -1304,10 +1328,10 @@ class ShareCenter extends Plugin
      */
     public static function loadShareByHash($hash){
         Logger::debug(__CLASS__, __FUNCTION__, "Do something");
-        PluginsService::getInstance()->initActivePlugins();
         if(isSet($_GET["lang"])){
             LocaleService::setLanguage($_GET["lang"]);
         }
+        PluginsService::getInstance()->initActivePlugins();
         $shareCenter = self::getShareCenter(Context::emptyContext());
         $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = LocaleService::getMessages();

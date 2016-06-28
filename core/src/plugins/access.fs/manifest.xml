@@ -36,6 +36,7 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <hooks>
             <serverCallback hookName="node.info" methodName="loadNodeInfo"/>
+            <serverCallback hookName="node.info.nocache" methodName="localizeNodeInfo"/>
         </hooks>
 	</registry_contributions>
     <class_stream_wrapper filename="plugins/access.fs/FsAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper" protocol="ajxp.fs"/>

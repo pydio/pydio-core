@@ -832,6 +832,12 @@ abstract class AbstractConfDriver extends Plugin
                     $userObject->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
                         AuthService::updateUser($userObject);
+                        $crtLang = LocaleService::getLanguage();
+                        $newLang = $userObject->getPersonalRole()->filterParameterValue("core.conf", "lang", AJXP_REPO_SCOPE_ALL, $crtLang);
+                        if($newLang !== $crtLang){
+                            LocaleService::setLanguage($newLang);
+                            $mess = LocaleService::getMessages(true);
+                        }
                     }
                 }
 

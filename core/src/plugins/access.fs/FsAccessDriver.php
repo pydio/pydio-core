@@ -1533,6 +1533,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
     }
 
     /**
+     * Update node metadata with core FS metadata.
      * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode
      * @param bool $parentNode
      * @param bool $details
@@ -1540,8 +1541,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function loadNodeInfo(&$ajxpNode, $parentNode = false, $details = false)
     {
-        $mess = LocaleService::getMessages();
-
         $nodeName = basename($ajxpNode->getPath());
         $metaData = $ajxpNode->metadata;
         if (!isSet($metaData["is_file"])) {
@@ -1555,13 +1554,13 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if (RecycleBinManager::recycleEnabled() && $ajxpNode->getPath() == RecycleBinManager::getRelativeRecycle()) {
             $recycleIcon = ($this->countChildren($ajxpNode, false, true)>0?"trashcan_full.png":"trashcan.png");
             $metaData["icon"] = $recycleIcon;
-            $metaData["mimestring"] = $mess[122];
-            $ajxpNode->setLabel($mess[122]);
+            $metaData["mimestring_id"] = 122;
+            //$ajxpNode->setLabel($mess[122]);
             $metaData["ajxp_mime"] = "ajxp_recycle";
         } else {
             $mimeData = StatHelper::getMimeInfo($ajxpNode, !$isLeaf);
-            $metaData["mimestring_id"] = $mimeData[0]; //AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
-            $metaData["icon"] = $mimeData[1]; //AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
+            $metaData["mimestring_id"] = $mimeData[0];
+            $metaData["icon"] = $mimeData[1];
             if ($metaData["icon"] == "folder.png") {
                 $metaData["openicon"] = "folder_open.png";
             }
@@ -1569,7 +1568,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $metaData["ajxp_mime"] = "ajxp_folder";
             }
         }
-        //if ($lsOptions["l"]) {
 
         $metaData["file_group"] = @filegroup($ajxpNode->getUrl()) || "unknown";
         $metaData["file_owner"] = @fileowner($ajxpNode->getUrl()) || "unknown";
@@ -1586,12 +1584,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $metaData["file_perms"] = $fPerms;
         $datemodif = $this->date_modif($ajxpNode->getUrl());
         $metaData["ajxp_modiftime"] = ($datemodif ? $datemodif : "0");
-        $metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ". StatHelper::relativeDate($datemodif, $mess);
+        //$metaData["ajxp_description"] =$metaData["ajxp_relativetime"] = $mess[4]." ". StatHelper::relativeDate($datemodif, $mess);
         $metaData["bytesize"] = 0;
         if ($isLeaf) {
             $metaData["bytesize"] = filesize($ajxpNode->getUrl());
         }
-        $metaData["filesize"] = StatHelper::roundSize($metaData["bytesize"]);
+        //$metaData["filesize"] = StatHelper::roundSize($metaData["bytesize"]);
         if (StatHelper::isBrowsableArchive($nodeName)) {
             $metaData["ajxp_mime"] = "ajxp_browsable_archive";
         }
@@ -1606,6 +1604,42 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $ajxpNode->mergeMetadata($miniMeta);
         } else {
             $ajxpNode->mergeMetadata($metaData);
+        }
+
+    }
+
+    /**
+     * Update nodes metadata with localized info (will NOT be cached)
+     * Hooked to node.info.nocache
+     * @param AJXP_Node $ajxpNode
+     * @param bool $parentNode
+     * @param bool $details
+     */
+    public function localizeNodeInfo(&$ajxpNode, $parentNode = false, $details = false){
+
+        $messages = LocaleService::getMessages();
+        $localMeta = [];
+
+        // Recompute "Modifed on ... " string
+        $currentMeta = $ajxpNode->getNodeInfoMeta();
+        if(!empty($currentMeta["ajxp_modiftime"])){
+            $dateModif = $currentMeta["ajxp_modiftime"];
+            $localMeta["ajxp_description"] = $localMeta["ajxp_relativetime"] = $messages[4]." ". StatHelper::relativeDate($dateModif, $messages);
+        }
+
+        // Recompute human readable size
+        if(!empty($currentMeta["bytesize"])){
+            $localMeta["filesize"] = StatHelper::roundSize($currentMeta["bytesize"]);
+        }
+
+        // Update Recycle Bin label
+        if ($currentMeta["ajxp_mime"] === "ajxp_recycle"){
+            $ajxpNode->setLabel($messages[122]);
+        }
+
+        // Now remerge in node
+        if(count($localMeta)){
+            $ajxpNode->mergeMetadata($localMeta);
         }
 
     }

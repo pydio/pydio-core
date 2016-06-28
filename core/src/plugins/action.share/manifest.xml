@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin name="share" label="CONF_MESSAGE[Sharing Features]" description="CONF_MESSAGE[Share Center actions and hooks]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
+        <global_param name="DISABLE_ALL_SHARING" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Disable all sharing on files or folders]" label="CONF_MESSAGE[Disable all sharing]" type="boolean" default="false" expose="false"/>
+        <global_param name="DISABLE_RESHARING" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Disallow all sharing for shared workspaces]" label="CONF_MESSAGE[Disable resharing]" type="boolean" default="false" expose="false"/>
         <global_param name="ENABLE_FILE_PUBLIC_LINK" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Allow users to generate public links on files]" label="CONF_MESSAGE[Files: enable public links]" type="boolean" default="true" expose="true"/>
         <global_param name="ENABLE_FILE_INTERNAL_SHARING" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Enable internal file sharing (sharing with users existing or temporary users)]" label="CONF_MESSAGE[Files: enable internal sharing]" type="boolean" mandatory="true" default="true" expose="true"/>
         <global_param name="ENABLE_FOLDER_PUBLIC_LINK" group="CONF_MESSAGE[Authorizations]" description="CONF_MESSAGE[Allow users to generate public links on folders]" label="CONF_MESSAGE[Folders: enable public links]" type="boolean" default="true" expose="true"/>
@@ -105,72 +107,6 @@
                     <serverCallback methodName="migrateLegacyShares" restParams="/dry_run"/>
                 </processing>
             </action>
-            <!--
-            <action name="share-edit-shared">
-                <gui src="share.png" iconClass="icon-share" text="share_center.125" title="share_center.126">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" behaviour="hidden"/>
-                    <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
-                            if(!pydio.getController().shareCenter) {
-                                pydio.getController().shareCenter = new ShareCenter();
-                            }
-                            pydio.getController().shareCenter.performShareAction();
-                        });
-                    ]]></clientCallback>
-                </processing>
-            </action>
-            <action name="share-file-minisite">
-                <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share" />
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
-                            if(!pydio.getController().shareCenter) {
-                                pydio.getController().shareCenter = new ShareCenter();
-                            }
-                            pydio.getController().shareCenter.performShare('minisite-public');
-                        });
-                    ]]></clientCallback>
-                </processing>
-            </action>
-            <action name="share-selection-minisite">
-                <gui src="share.png" iconClass="icon-share" text="share_center.123" title="share_center.124">
-                    <context dir="true" recycle="false" selection="true"/>
-                    <selectionContext dir="false" file="true" multipleOnly="true" recycle="false" unique="false"/>
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
-                            if(!pydio.getController().shareCenter) {
-                                pydio.getController().shareCenter = new ShareCenter();
-                            }
-                            pydio.getController().shareCenter.performShare('minisite-public');
-                        });
-                    ]]></clientCallback>
-                </processing>
-            </action>
-            <action name="share-folder-minisite-public">
-                <gui src="share.png" iconClass="icon-share" text="292" title="292">
-                    <context dir="true" recycle="hidden" selection="true" actionBar="true" contextMenu="true" actionBarGroup="get,info_panel_share"/>
-                    <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="!metadata.get('ajxp_shared')" />
-                </gui>
-                <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        ResourcesManager.detectModuleToLoadAndApply('ShareCenter', function(){
-                            if(!pydio.getController().shareCenter) {
-                                pydio.getController().shareCenter = new ShareCenter();
-                            }
-                            pydio.getController().shareCenter.performShare('minisite-public');
-                        });
-                    ]]></clientCallback>
-                </processing>
-            </action>
-            -->
             <action name="load_shared_element_data">
                 <processing>
                     <serverCallback methodName="switchAction" restParams="/file+" developerComment="Loads all current sharing data for a given resource. Workspace must support metadata management (metastore).">
