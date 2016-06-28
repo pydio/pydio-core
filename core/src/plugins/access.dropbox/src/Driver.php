@@ -69,8 +69,14 @@ class Driver extends FsAccessDriver
     {
         $this->detectStreamWrapper(true);
 
+        $repository = $context->getRepository();
+        $resourcesFile = $repository->getContextOption($context, "API_RESOURCES_FILE", __DIR__ . "/" . self::RESOURCES_PATH . "/" . self::RESOURCES_FILE);
+
         Stream::addContextOption($context, [
-            "subscribers" => [new DropBoxSubscriber()]
+            "resources"   => $resourcesFile,
+            "subscribers" => [
+                new DropBoxSubscriber()
+            ]
         ]);
 
         return true;

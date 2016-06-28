@@ -372,7 +372,7 @@ class Repository implements RepositoryInterface
                 return InputFilter::securePath($pvalue);
             }
         }
-        if (isSet($this->options[$oName])) {
+        if (isSet($this->options[$oName]) && (!empty($this->options[$oName]) || empty($default))) {
             return VarsFilter::filter($this->options[$oName], $ctx);
         }
         if ($this->inferOptionsFromParent && isset($parentTemplateObject)) {
