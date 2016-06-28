@@ -27,7 +27,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\S3;
 
-use Aws\S3\S3Client;
+use \Aws\S3\S3Client;
 use Guzzle\Common\Event;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 

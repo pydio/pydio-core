@@ -34,6 +34,9 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once(AJXP_INSTALL_PATH . "/plugins/access.fs/FsAccessWrapper.php");
 
+require_once("aws.phar");
+
+
 /**
  * Encapsulation of the PEAR webDAV client
  * @package AjaXplorer_Plugins
@@ -51,7 +54,7 @@ class S3AccessWrapper extends FsAccessWrapper
      */
     protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
-        require_once("aws.phar");
+
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
             // Get a client
@@ -94,7 +97,7 @@ class S3AccessWrapper extends FsAccessWrapper
                 ]);
                 $s3Client->registerStreamWrapper($repoObject->getId());
             } else {
-                $s3Client = Aws\S3\S3Client::factory($options);
+                $s3Client = \Aws\S3\S3Client::factory($options);
                 if ($repoObject->getContextOption($ctx, "VHOST_NOT_SUPPORTED")) {
                     // Use virtual hosted buckets when possible
                     require_once("ForcePathStyleListener.php");
