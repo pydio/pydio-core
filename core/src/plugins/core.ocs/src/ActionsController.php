@@ -23,8 +23,10 @@ namespace Pydio\OCS;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Vars\InputFilter;
 
+use Pydio\Log\Core\Logger;
 use Pydio\OCS\Client\OCSClient;
 use Pydio\OCS\Model\SQLStore;
+use Symfony\Component\Config\Definition\Exception\Exception;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -56,19 +58,24 @@ class ActionsController
                 $remoteShare = $store->remoteShareById($remoteShareId);
                 if($remoteShare !== null){
                     $client = new OCSClient();
-                    $client->declineInvitation($remoteShare);
+                    try {
+                        $client->declineInvitation($remoteShare);
+                    } catch (\Exception $e) {
+                        // If the reject fails, we still want the share to be removed from the db
+                        Logger::error(__CLASS__,"Exception",$e->getMessage());
+                    }
                     $store->deleteRemoteShare($remoteShare);
                     ConfService::getInstance()->invalidateLoadedRepositories();
                 }
 
                 break;
+
             default:
+
                 break;
+            
         }
 
         return null;
-
     }
-
-
 }

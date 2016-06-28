@@ -20,6 +20,8 @@
  */
 namespace Pydio\OCS;
 
+use Pydio\Core\Http\Dav\Collection;
+use Pydio\Core\Http\Dav\RootCollection;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -28,11 +30,13 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\OCS\Server\Dummy;
+use Sabre\DAV\Exception\Forbidden;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-class OCSPlugin extends Plugin{
+class OCSPlugin extends Plugin {
 
     /**
      * @var ActionsController $controller
@@ -86,22 +90,19 @@ class OCSPlugin extends Plugin{
 
     public function route($baseUri, $endpoint, $uriParts, $parameters){
 
-        if($endpoint == "dav" && $this->federatedEnabled()){
+        if($endpoint == "dav" && $this->federatedEnabled()) {
 
             $server = new Server\Dav\Server();
             $server->start($baseUri."/ocs/v2/dav");
 
-        }else if($endpoint == "shares" && $this->federatedEnabled()){
+        } else if($endpoint == "shares" && $this->federatedEnabled()) {
 
             $server = new Server\Federated\Server();
             $server->run($uriParts, $parameters);
 
-        }else{
-
+        } else {
             Dummy::notImplemented($uriParts, $parameters);
-
         }
-
     }
 
     /**
@@ -151,8 +152,8 @@ class OCSPlugin extends Plugin{
     }
 
 
-    public static function startServer($base, $route){
-
+    public static function startServer($base, $route) {
+        
         $pServ = PluginsService::getInstance(Context::emptyContext());
         ConfService::$useSession = false;
         AuthService::$useSession = false;
@@ -167,22 +168,22 @@ class OCSPlugin extends Plugin{
          */
         $coreLoader = $pServ->getPluginById("core.ocs");
 
-        if( $route == "/ocs-provider"){
+        if ($route == "/ocs-provider") {
 
             $coreLoader->publishServices();
 
-        }else if($route == "/ocs"){
+        } else if ($route == "/ocs") {
 
             $uri = $_SERVER["REQUEST_URI"];
             $parts = explode("/", trim(parse_url($uri, PHP_URL_PATH), "/"));
             $baseUri = array();
             $root = array_shift($parts);
-            while(!in_array($root, array("ocs-provider", "ocs")) && count($parts)){
+            while (!in_array($root, array("ocs-provider", "ocs")) && count($parts)) {
                 $baseUri[] = $root;
                 $root = array_shift($parts);
             }
 
-            if(count($parts) < 2){
+            if (count($parts) < 2) {
                 $d = new Dummy();
                 $response = $d->buildResponse("fail", "400", "Wrong URI");
                 $d->sendResponse($response);
@@ -190,21 +191,20 @@ class OCSPlugin extends Plugin{
             }
 
             $version = array_shift($parts);
-            if($version != "v2"){
+            if ($version != "v2") {
                 $d = new Dummy();
                 $response = $d->buildResponse("fail", "400", "Api version not supported - Please switch to v2.");
                 $d->sendResponse($response);
                 return;
             }
             $endpoint = array_shift($parts);
-            if(count($baseUri)){
-                $baseUriStr = "/".implode("/", $baseUri);
-            }else{
+            if (count($baseUri)) {
+                $baseUriStr = "/" . implode("/", $baseUri);
+            } else {
                 $baseUriStr = "";
             }
-            $coreLoader->route($baseUriStr, $endpoint, $parts, array_merge($_GET, $_POST));
 
+            $coreLoader->route($baseUriStr, $endpoint, $parts, array_merge($_GET, $_POST));
         }
     }
-
 }

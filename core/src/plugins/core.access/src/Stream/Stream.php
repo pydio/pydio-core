@@ -70,8 +70,6 @@ class Stream implements StreamInterface
         $apiUrl = $repository->getContextOption($ctx, "API_URL");
         $host = $repository->getContextOption($ctx, "HOST");
         $uri = $repository->getContextOption($ctx, "URI");
-        $resourcePath = $repository->getContextOption($ctx, "API_RESOURCES_PATH");
-        $resourceFile = $repository->getContextOption($ctx, "API_RESOURCES_FILE");
 
         if ($apiUrl == "") {
             $apiUrl = $options["api_url"];
@@ -81,26 +79,18 @@ class Stream implements StreamInterface
             }
         }
 
-        if ($resourcePath == "") {
-            $resourcePath = $options["api_resources_path"];
-        }
-
-        if ($resourceFile == "") {
-            $resourceFile = $options["api_resources_file"];
-        }
-
         $options["base_url"] = $apiUrl;
-        $default = stream_context_get_options(stream_context_get_default());;
-        $options["defaults"] = $default[$node->getScheme()];
+        $options["defaults"] = self::getContextOption($ctx);
+        $resources = $options["defaults"]["resources"];
+        $options["defaults"] = array_intersect_key($options["defaults"], ["subscribers" => "", "auth" => ""]);
 
         // Creating Guzzle instances
         $httpClient = new HTTPClient($options);
-        $locator = new FileLocator([$resourcePath]);
+        $locator = new FileLocator([dirname($resources)]);
         $jsonLoader = new JsonLoader($locator);
-        $description = $jsonLoader->load($locator->locate($resourceFile));
+        $description = $jsonLoader->load($locator->locate(basename($resources)));
         $description = new Description($description);
         $client = new GuzzleClient($httpClient, $description, $options);
-
         foreach ($options["defaults"]["subscribers"] as $subscriber) {
             $client->getEmitter()->attach($subscriber);
         }
@@ -145,18 +135,18 @@ class Stream implements StreamInterface
         stream_context_set_default($default);
     }
 
-    public static function getContextOption(ContextInterface $ctx, $key = null) {
-        $default = stream_context_get_options(stream_context_get_default());
+    public static function getContextOption(ContextInterface $ctx, $key = null, $default = null) {
+        $options = stream_context_get_options(stream_context_get_default());
 
         $contextKey = "access." . $ctx->getRepository()->getAccessType();
 
-        if ($key != null && isset($default[$contextKey][$key])) {
-            return $default[$contextKey][$key];
+        if ($key != null && isset($options[$contextKey][$key])) {
+            return $options[$contextKey][$key];
         } elseif ($key == null) {
-            return $default[$contextKey];
+            return $options[$contextKey];
         }
 
-        return null;
+        return $default;
     }
 
     public function __toString()

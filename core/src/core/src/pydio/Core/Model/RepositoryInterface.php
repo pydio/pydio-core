@@ -123,10 +123,10 @@ interface RepositoryInterface extends IGroupPathProvider
     /**
      * @param ContextInterface $ctx
      * @param string $oName
+     * @param null $default
      * @return mixed
-     * @throws \Pydio\Core\Exception\PydioException
      */
-    public function getContextOption(ContextInterface $ctx, $oName);
+    public function getContextOption(ContextInterface $ctx, $oName, $default=null);
 
     /**
      * @param string $oName
