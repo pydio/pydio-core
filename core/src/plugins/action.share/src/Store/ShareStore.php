@@ -243,7 +243,8 @@ class ShareStore {
      */
     public function findSharesForRepo($repositoryId){
         if(!$this->sqlSupported) return [];
-        return $this->confStorage->simpleStoreList("share", null, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
+        $cursor = null;
+        return $this->confStorage->simpleStoreList("share", $cursor, "", "serial", '%"REPOSITORY";s:32:"'.$repositoryId.'"%');
     }
 
     /**
@@ -268,7 +269,7 @@ class ShareStore {
      * @param null $shareType
      * @return array
      */
-    public function listShares($limitToUser = '', $parentRepository = '', $cursor = null, $shareType = null){
+    public function listShares($limitToUser = '', $parentRepository = '', &$cursor = null, $shareType = null){
 
         $dbLets = [];
         if($this->sqlSupported){
@@ -283,6 +284,7 @@ class ShareStore {
         }
 
         // Get hardcoded files
+        /*
         $files = glob(ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
         if($files === false) return $dbLets;
         foreach ($files as $file) {
@@ -301,6 +303,7 @@ class ShareStore {
             $publicletData["SHARE_TYPE"] = "file";
             $dbLets[$id] = $publicletData;
         }
+        */
 
         // Update share_type and filter if necessary
         foreach($dbLets as $id => &$shareData){
@@ -330,14 +333,35 @@ class ShareStore {
             if(count($storedIds)){
                 $criteria["!uuid"] = $storedIds;
             }
+            $otherCountOnly = false;
+            if(isSet($cursor)){
+                $offset = $cursor[0];
+                $limit = $cursor[1];
+                $loadedDbLets = count($dbLets);
+                $totalDbLets = $cursor["total"];
+                $newPosition = max(0, $offset - $totalDbLets);
+                if($loadedDbLets >= $limit){
+                    //return $dbLets;
+                    $criteria["CURSOR"] = ["OFFSET" => 0, "LIMIT" => 1];
+                    $otherCountOnly = true;
+                }else{
+                    if($loadedDbLets > 0) $limit = $limit - $loadedDbLets;
+                    $criteria["CURSOR"] = ["OFFSET" => $newPosition, "LIMIT" => $limit];
+                }
+            }
             $oldRepos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
-            foreach($oldRepos as $sharedWorkspace){
-                $dbLets['repo-'.$sharedWorkspace->getId()] = [
-                    "SHARE_TYPE"    => "repository",
-                    "OWNER_ID"      => $sharedWorkspace->getOwner(),
-                    "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
-                    "LEGACY_REPO_OR_MINI"   => true
-                ];
+            if(!$otherCountOnly){
+                foreach($oldRepos as $sharedWorkspace){
+                    $dbLets['repo-'.$sharedWorkspace->getId()] = [
+                        "SHARE_TYPE"    => "repository",
+                        "OWNER_ID"      => $sharedWorkspace->getOwner(),
+                        "REPOSITORY"    => $sharedWorkspace->getUniqueId(),
+                        "LEGACY_REPO_OR_MINI"   => true
+                    ];
+                }
+            }
+            if(isSet($cursor)){
+                $cursor["total"] += $count;
             }
         }
 
@@ -361,8 +385,10 @@ class ShareStore {
         }
         $crtUser = $this->context->getUser();
         if($crtUser->getId() == $userId) return true;
-        if($crtUser->isAdmin()) return true;
         $user = UsersService::getUserById($userId);
+        if($crtUser->isAdmin() && $crtUser->canAdministrate($user)) {
+            return true;
+        }
         if($user->hasParent() && $user->getParent() == $crtUser->getId()){
             return true;
         }
@@ -375,7 +401,7 @@ class ShareStore {
      * @param String $element
      * @param bool $keepRepository
      * @param bool $ignoreRepoNotFound
-     * @param null $ajxpNode
+     * @param AJXP_Node $ajxpNode
      * @return bool
      * @throws \Exception
      */
@@ -393,11 +419,15 @@ class ShareStore {
                 if(is_array($share) && isSet($share["REPOSITORY"])){
                     $repo = RepositoryService::getRepositoryById($share["REPOSITORY"]);
                 }
+                if(isSet($share["OWNER_ID"])) {
+                    $owner = $share["OWNER_ID"];
+                }
                 if($repo == null && !$ignoreRepoNotFound){
                     throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
                 }
             }
             if($repo != null){
+                $owner = $repo->getOwner();
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
                 $res = RepositoryService::deleteRepository($element);
                 if ($res == -1) {
@@ -405,6 +435,9 @@ class ShareStore {
                 }
             }
             if($ajxpNode != null){
+                if(isSet($owner) && $owner !== $this->context->getUser()->getId()){
+                    $ajxpNode->setUserId($owner);
+                }
                 $this->getMetaManager()->removeShareFromMeta($ajxpNode, $element);
             }
             if($this->sqlSupported){
@@ -430,6 +463,7 @@ class ShareStore {
                     throw new \Exception(str_replace('%s', 'Cannot find associated repository', $mess["share_center.219"]));
                 }
             }else{
+                $owner = $repo->getOwner();
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             }
             if(!$keepRepository){
@@ -454,6 +488,9 @@ class ShareStore {
                 $this->confStorage->simpleStoreClear("share", $element);
             }
             if($ajxpNode !== null){
+                if(isSet($owner) && $owner !== $this->context->getUser()->getId()){
+                    $ajxpNode->setUserId($owner);
+                }
                 $this->getMetaManager()->removeShareFromMeta($ajxpNode, $element);
                 if(!$keepRepository){
                     $this->getMetaManager()->removeShareFromMeta($ajxpNode, $repoId);

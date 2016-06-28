@@ -229,7 +229,7 @@
                 );
             }else{
                 var unshareButton;
-                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error'){
+                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error' || global.pydio.user.activeRepository === "ajxp_conf"){
                     unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
