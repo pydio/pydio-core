@@ -1192,21 +1192,28 @@
         propTypes:{
             tableKeys:React.PropTypes.object.isRequired,
             loading:React.PropTypes.bool,
-            reload:React.PropTypes.func
+            reload:React.PropTypes.func,
+            dm:React.PropTypes.instanceOf(PydioDataModel),
+            node:React.PropTypes.instanceOf(AjxpNode)
         },
 
         render: function(){
-            var cells = [];
+            let cells = [];
             for(var key in this.props.tableKeys){
                 if(!this.props.tableKeys.hasOwnProperty(key)) continue;
                 var data = this.props.tableKeys[key];
                 var style = data['width']?{width:data['width']}:null;
                 cells.push(<span key={key} className={'cell header_cell cell-' + key} style={style}>{data['label']}</span>);
             }
+            let paginator;
+            if(this.props.node.getMetadata().get("paginationData")){
+                paginator = <ListPaginator dataModel={this.props.dm} node={this.props.node}/>;
+            }
             return (
                 <ReactMUI.Toolbar className="toolbarTableHeader">
                     <ReactMUI.ToolbarGroup float="left">{cells}</ReactMUI.ToolbarGroup>
                     <ReactMUI.ToolbarGroup float="right">
+                        {paginator}
                         <ReactMUI.FontIcon
                             key={1}
                             tooltip={this.context.getMessage('149', '')}
@@ -1948,6 +1955,8 @@
                     loading={this.state.loading}
                     reload={this.reload}
                     ref="loading_indicator"
+                    dm={this.props.dataModel}
+                    node={this.props.node}
                 />
             }else{
                 toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
@@ -2056,6 +2065,7 @@
                         dataModel={this.state.dataModel}
                         actionBarGroups={this.props.actionBarGroups}
                         skipParentNavigation={true}
+                        observeNodeReload={true}
                     />
                 </div>
             );
