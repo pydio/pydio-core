@@ -34,8 +34,6 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once(AJXP_INSTALL_PATH . "/plugins/access.fs/FsAccessWrapper.php");
 
-require_once("aws.phar");
-
 
 /**
  * Encapsulation of the PEAR webDAV client
@@ -54,6 +52,7 @@ class S3AccessWrapper extends FsAccessWrapper
      */
     protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
+        require_once("aws.phar");
 
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
