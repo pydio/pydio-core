@@ -30,18 +30,34 @@ defined('AJXP_EXEC') or die('Access not allowed');
 define('PYDIO_SESSION_NAME', 'AjaXplorer');
 define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
 
+/**
+ * Class SessionService
+ * @package Pydio\Core\Services
+ */
 class SessionService implements RepositoriesCache
 {
     private static $sessionName = PYDIO_SESSION_NAME;
 
+    /**
+     * @param $sessionName
+     */
     public static function setSessionName($sessionName){
         self::$sessionName = $sessionName;
     }
 
+    /**
+     * @return string
+     */
     public static function getSessionName(){
         return self::$sessionName;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param callable|null $next
+     * @return mixed|ResponseInterface
+     */
     public static function handleRequest(ServerRequestInterface &$request, ResponseInterface $response, callable $next = null){
 
         $getParams = $request->getQueryParams();
@@ -92,15 +108,24 @@ class SessionService implements RepositoriesCache
         }
     }
 
+    /**
+     * @return null
+     */
     public static function getSessionRepositoryId(){
 
         return isSet($_SESSION["REPO_ID"]) ? $_SESSION["REPO_ID"] : null;
     }
 
+    /**
+     * @param $repoId
+     */
     public static function saveRepositoryId($repoId){
         $_SESSION["REPO_ID"] = $repoId;
     }
 
+    /**
+     * @param $repoId
+     */
     public static function switchSessionRepositoriId($repoId){
         if(isSet($_SESSION["REPO_ID"])){
             $_SESSION["PREVIOUS_REPO_ID"] = $_SESSION["REPO_ID"];
@@ -108,6 +133,9 @@ class SessionService implements RepositoriesCache
         $_SESSION["REPO_ID"] = $repoId;
     }
 
+    /**
+     * @return null
+     */
     public static function getPreviousRepositoryId(){
         return isSet($_SESSION["PREVIOUS_REPO_ID"]) ? $_SESSION["PREVIOUS_REPO_ID"] : null;
     }
@@ -147,17 +175,44 @@ class SessionService implements RepositoriesCache
         }
     }
 
+    /**
+     * @param $repositoryId
+     * @return null
+     */
     public static function getContextCharset($repositoryId)
     {
         if (isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
         return null;
     }
 
+    /**
+     * @param $repositoryId
+     * @param $value
+     */
     public static function setContextCharset($repositoryId, $value)
     {
         if (ConfService::$useSession) {
             $_SESSION["AJXP_CHARSET"] = $value;
         }
+    }
+
+    /**
+     * @param string $lang
+     */
+    public static function setLanguage($lang){
+        if(ConfService::$useSession){
+            $_SESSION["AJXP_LANG"] = $lang;
+        }
+    }
+
+    /**
+     * @return string|null
+     */
+    public static function getLanguage(){
+        if(isSet($_SESSION["AJXP_LANG"])){
+            return $_SESSION["AJXP_LANG"];
+        }
+        return null;
     }
     
 }

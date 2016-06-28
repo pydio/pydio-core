@@ -545,7 +545,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
             }
         }
         Controller::applyHook("node.info.start", [&$this, $contextNode, $details, $forceRefresh]);
-        if($this->nodeInfoLoaded && !$forceRefresh && isSet($this->_metadata["ajxp_mime"])){
+        if($this->nodeInfoLoaded && !$forceRefresh && (isSet($this->_metadata["ajxp_mime"]) || isSet($this->_metadata["mimestring_id"]))){
             Controller::applyHook("node.info.nocache", [&$this, $contextNode, $details, $forceRefresh]);
             return;
         }

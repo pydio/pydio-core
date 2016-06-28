@@ -96,6 +96,8 @@ class SessionRepositoryMiddleware
             LocaleService::setLanguage($ctx->getUser()->getPref("lang"));
         } else if(isSet($requestInterface->getCookieParams()["AJXP_lang"])) {
             LocaleService::setLanguage($requestInterface->getCookieParams()["AJXP_lang"]);
+        } else if(SessionService::getLanguage() !== null){
+            LocaleService::setLanguage(SessionService::getLanguage());
         }
 
         if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){

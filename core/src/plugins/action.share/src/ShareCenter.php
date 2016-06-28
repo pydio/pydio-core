@@ -1328,10 +1328,10 @@ class ShareCenter extends Plugin
      */
     public static function loadShareByHash($hash){
         Logger::debug(__CLASS__, __FUNCTION__, "Do something");
-        PluginsService::getInstance()->initActivePlugins();
         if(isSet($_GET["lang"])){
             LocaleService::setLanguage($_GET["lang"]);
         }
+        PluginsService::getInstance()->initActivePlugins();
         $shareCenter = self::getShareCenter(Context::emptyContext());
         $data = $shareCenter->getShareStore()->loadShare($hash);
         $mess = LocaleService::getMessages();

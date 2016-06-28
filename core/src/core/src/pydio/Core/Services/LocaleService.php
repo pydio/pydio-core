@@ -76,7 +76,11 @@ class LocaleService
     {
         $inst = self::getInstance();
         if (array_key_exists($lang, $inst->cache["AVAILABLE_LANG"])) {
+            if($lang !== $inst->currentLanguage && isSet($inst->cache["MESSAGES"])){
+                $inst->cache["MESSAGES"] = null;
+            }
             $inst->currentLanguage = $lang;
+            SessionService::setLanguage($lang);
         }
     }
 
