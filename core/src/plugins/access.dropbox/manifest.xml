@@ -9,8 +9,7 @@
 		<param name="API_URL" type="string" label="CONF_MESSAGE[API URL]" description="CONF_MESSAGE[API URL]" mandatory="true" default="https://api.dropbox.com/2/"/>
 		<param name="CONSUMER_KEY" type="string" label="CONF_MESSAGE[Consumer Key]" description="CONF_MESSAGE[Key]" mandatory="true"/>
 		<param name="CONSUMER_SECRET" type="string" label="CONF_MESSAGE[Consumer Secret]" description="CONF_MESSAGE[Secret]" mandatory="true"/>
-		<param name="API_RESOURCES_PATH" type="string" label="CONF_MESSAGE[API Path]" description="CONF_MESSAGE[Real path to the api files]" mandatory="true" default="Resources" />
-		<param name="API_RESOURCES_FILE" type="string" label="CONF_MESSAGE[API File]" description="CONF_MESSAGE[File name of the api files]" mandatory="true" default="dropbox.json" />
+		<param name="API_RESOURCES_FILE" type="string" label="CONF_MESSAGE[API File]" description="CONF_MESSAGE[File name of the api files]" default="" />
 	</server_settings>
 	<class_definition filename="plugins/access.dropbox/vendor/autoload.php" classname="Pydio\Access\DropBox\Driver"/>
 	<registry_contributions>
