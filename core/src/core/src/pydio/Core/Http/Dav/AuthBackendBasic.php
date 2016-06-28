@@ -60,7 +60,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
     {
         if(isSet($_SERVER["PHP_AUTH_USER"])) return true;
         if(isSet($_SERVER["HTTP_AUTHORIZATION"])) $value = $_SERVER["HTTP_AUTHORIZATION"];
-        if(!isSet($value) && isSet($_SERVER["REDIRECT_HTTP_AUTHORIZATION"])) $value = $_SERVER["HTTP_AUTHORIZATION"];
+        if(!isSet($value) && isSet($_SERVER["REDIRECT_HTTP_AUTHORIZATION"])) $value = $_SERVER["REDIRECT_HTTP_AUTHORIZATION"];
         if(!isSet($value)) return false;
         return  (strpos(strtolower($value),'basic') ===0) ;
     }

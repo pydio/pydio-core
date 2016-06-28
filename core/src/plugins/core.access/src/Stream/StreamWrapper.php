@@ -226,8 +226,8 @@ class StreamWrapper
         $repository = $node->getRepository();
         $ctx = $node->getContext();
 
-        $useAuthStream = $repository->getContextOption($ctx, "USE_AUTH_STREAM");
-        $useOAuthStream = $repository->getContextOption($ctx, "USE_OAUTH_STREAM");
+        $useAuthStream = $repository->getContextOption($ctx, "USE_AUTH_STREAM", true);
+        $useOAuthStream = $repository->getContextOption($ctx, "USE_OAUTH_STREAM", false);
 
         $nodeStream = Stream::factory($node);
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);

@@ -350,10 +350,11 @@ class Repository implements RepositoryInterface
     /**
      * @param ContextInterface $ctx
      * @param string $oName
+     * @param null $default
      * @return mixed
-     * @throws \Pydio\Core\Exception\PydioException
+     * @throws PydioException
      */
-    public function getContextOption(ContextInterface $ctx, $oName){
+    public function getContextOption(ContextInterface $ctx, $oName, $default = null){
         if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
             $parentTemplateObject = RepositoryService::getRepositoryById($this->parentId);
             if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
@@ -375,9 +376,9 @@ class Repository implements RepositoryInterface
             return VarsFilter::filter($this->options[$oName], $ctx);
         }
         if ($this->inferOptionsFromParent && isset($parentTemplateObject)) {
-                return $parentTemplateObject->getContextOption($ctx, $oName);
+            return $parentTemplateObject->getContextOption($ctx, $oName);
         }
-        return null;
+        return $default;
 
     }
 

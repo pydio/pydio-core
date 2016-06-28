@@ -21,10 +21,9 @@
 
 namespace Pydio\Access\Core;
 
+use Normalizer;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Stream\Stream;
-use Pydio\Access\Core\Stream\StreamWrapper;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\PluginFramework\PluginsService;
@@ -399,7 +398,9 @@ class MetaStreamWrapper implements IAjxpWrapper
         if($test === false || $test == "." || $test == ".."){
             return $test;
         }
-        $test = \Normalizer::normalize($test);
+        if (class_exists("Normalizer")) {
+            $test = Normalizer::normalize($test);
+        }
         if($this->currentUniquePath == $test) {
             return $test;
         }

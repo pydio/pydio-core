@@ -67,7 +67,11 @@ class Driver extends FsAccessDriver
     {
         $this->detectStreamWrapper(true);
 
+        $repository = $context->getRepository();
+        $resourcesFile = $repository->getContextOption($context, "API_RESOURCES_FILE", __DIR__ . "/" . self::RESOURCES_PATH . "/" . self::RESOURCES_FILE);
+
         Stream::addContextOption($context, [
+            "resources"   => $resourcesFile,
             "subscribers" => [
                 new PathSubscriber(),
                 new WebDAVSubscriber()
@@ -88,7 +92,7 @@ class Driver extends FsAccessDriver
         $ctx = $node->getContext();
         $repository = $node->getRepository();
 
-        $basePath = $repository->getContextOption($ctx, "PATH");
+        $basePath = ltrim($repository->getContextOption($ctx, "PATH"), "/");
         $path = $node->getPath();
 
         if (isset($path)) {

@@ -27,6 +27,7 @@ require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vend
 use Pydio\Core\Http\Dav\BrowserPlugin;
 use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Log\Core\Logger;
@@ -47,43 +48,37 @@ class Server extends Sabre\DAV\Server
      */
     public function __construct()
     {
-        $this->rootCollection = new Collection("/", null, null);
+        $context = $this->buildContext(Context::emptyContext());
+        $this->rootCollection = new Collection("/", $context);
+
         parent::__construct($this->rootCollection);
     }
 
     /**
-     * @return string
+     * @param ContextInterface $context
+     * @return ContextInterface|null
      */
-    protected function pointToBaseFile(){
-        try{
+    protected function buildContext(ContextInterface $context){
+        try {
             $testBackend = new BasicAuthNoPass();
             $userPass = $testBackend->getUserPass();
-            if(isSet($userPass[0])){
-                $ctx = new Context($userPass[0], null);
-                $shareStore = new ShareStore($ctx, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
+            if(isSet($userPass[0])) {
+
+                $context = $context->withUserId($userPass[0]);
+
+                $shareStore = new ShareStore($context, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
                 $shareData = $shareStore->loadShare($userPass[0]);
-                if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
-                    $repo = RepositoryService::getRepositoryById($shareData["REPOSITORY"]);
-                    if(!empty($repo) && $repo->hasContentFilter()){
-                        return "/".$repo->getContentFilter()->getUniquePath();
-                    }
+
+                if(isSet($shareData) && isSet($shareData["REPOSITORY"])) {
+                    $context = $context->withRepositoryId($shareData["REPOSITORY"]);
                 }
             }
-        }catch (\Exception $e){}
-        return null;
-    }
 
-    /**
-     * @param string $uri
-     * @return string
-     * @throws Sabre\DAV\Exception\Forbidden
-     */
-    public function calculateUri($uri) {
-        $uri = parent::calculateUri($uri);
-        if(!empty($this->uniqueBaseFile) && '/'.$uri !== $this->uniqueBaseFile){
-            $uri.= $this->uniqueBaseFile;
+            return $context;
+        } catch (\Exception $e) {
+
         }
-        return $uri;
+        return null;
     }
 
     /**
@@ -91,7 +86,6 @@ class Server extends Sabre\DAV\Server
      */
     public function start($baseUri = "/"){
 
-        $this->uniqueBaseFile = $this->pointToBaseFile();
         $this->setBaseUri($baseUri);
 
         $authBackend = new AuthSharingBackend($this->rootCollection);
@@ -110,54 +104,16 @@ class Server extends Sabre\DAV\Server
         $this->addPlugin($lockPlugin);
 
         if (ConfService::getGlobalConf("WEBDAV_BROWSER_LISTING")) {
-            $browerPlugin = new BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
+            $browserPlugin = new BrowserPlugin((isSet($repository)?$repository->getDisplay():null));
             $extPlugin = new Sabre\DAV\Browser\GuessContentType();
-            $this->addPlugin($browerPlugin);
+            $this->addPlugin($browserPlugin);
             $this->addPlugin($extPlugin);
         }
+        
         try {
             $this->exec();
         } catch ( \Exception $e ) {
             Logger::error(__CLASS__,"Exception",$e->getMessage());
         }
     }
-
-    /**
-     * Not used for the moment
-     * This will expose folder as /dav/FolderName and file as /dav/FileName.txt
-     *
-     * @param $baseUri
-     * @return Collection|SharingCollection
-     * @throws \Exception
-     */
-     /*
-    protected function initCollectionForFileOrFolderAsUniqueItem(&$baseUri){
-        try{
-            $testBackend = new BasicAuthNoPass();
-            $userPass = $testBackend->getUserPass();
-            if(isSet($userPass[0])){
-                $shareStore = new ShareStore(ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
-                $shareData = $shareStore->loadShare($userPass[0]);
-                if(isSet($shareData) && isSet($shareData["REPOSITORY"])){
-                    $repo = ConfService::getRepositoryById($shareData["REPOSITORY"]);
-                    if(!empty($repo) && !$repo->hasContentFilter()){
-                        $baseDir = basename($repo->getOption("PATH"));
-                    }
-                }
-            }
-        }catch (\Exception $e){}
-        $rootCollection =  new Collection("/", null, null);
-        if(isSet($baseDir)){
-            $currentPath = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-            if($currentPath == $baseUri || $currentPath == $baseUri."/"){
-                $rootCollection = new SharingCollection("/", null, null);
-            }else{
-                $baseUri .= "/$baseDir";
-            }
-        }
-        return $rootCollection;
-    }
-    */
-    
-
 }
