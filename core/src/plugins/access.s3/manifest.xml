@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="s3" label="CONF_MESSAGE[S3 (Amazon Web Service)]" description="CONF_MESSAGE[Access an AWS server. Requires AWS-SDK v2 for PHP]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/access.s3/class.s3AccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\S3\s3AccessDriver"/>
+    <class_definition filename="plugins/access.s3/S3AccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\S3\S3AccessDriver"/>
     <client_settings icon="plugins/access.fs/icon.png" description_template="{REGION}{STORAGE_URL}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="s3_access" path="plugins/access.s3/i18n"/>
@@ -30,5 +30,5 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.s3/class.s3AccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\S3\s3AccessWrapper" protocol="ajxp.s3"/>
+    <class_stream_wrapper filename="plugins/access.s3/S3AccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\S3\S3AccessWrapper" protocol="ajxp.s3"/>
 </ajxpdriver>
