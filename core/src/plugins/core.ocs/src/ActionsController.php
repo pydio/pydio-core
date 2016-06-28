@@ -20,22 +20,31 @@
  */
 
 namespace Pydio\OCS;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Cache\Core\CacheStreamLayer;
+use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Vars\InputFilter;
 
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Client\OCSClient;
 use Pydio\OCS\Model\SQLStore;
-use Symfony\Component\Config\Definition\Exception\Exception;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
 class ActionsController
 {
-    public function switchActions($actionName, $httpVars, $fileVars){
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
 
-        switch($actionName){
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        $action = $request->getAttribute("action");
+        $httpVars = $request->getParsedBody();
+        
+        switch($action){
 
             case "accept_invitation":
 
@@ -48,6 +57,14 @@ class ActionsController
                     $remoteShare->setStatus(OCS_INVITATION_STATUS_ACCEPTED);
                     $store->storeRemoteShare($remoteShare);
                 }
+                
+                $urlBase = $ctx->getUrlBase();
+                
+                CacheStreamLayer::clearDirCache($urlBase);
+                CacheStreamLayer::clearStatCache($urlBase . "/" . $remoteShare->getDocumentName());
+
+                $remoteCtx = new Context($remoteShare->getUser(), "ocs_remote_share_" . $remoteShare->getId());
+                CacheStreamLayer::clearStatCache($remoteCtx->getUrlBase());
 
                 break;
 
@@ -67,6 +84,14 @@ class ActionsController
                     $store->deleteRemoteShare($remoteShare);
                     ConfService::getInstance()->invalidateLoadedRepositories();
                 }
+
+                $urlBase = $ctx->getUrlBase();
+
+                CacheStreamLayer::clearDirCache($urlBase);
+                CacheStreamLayer::clearStatCache($urlBase . "/" . $remoteShare->getDocumentName());
+
+                $remoteCtx = new Context($remoteShare->getUser(), "ocs_remote_share_" . $remoteShare->getId());
+                CacheStreamLayer::clearStatCache($remoteCtx->getUrlBase());
 
                 break;
 

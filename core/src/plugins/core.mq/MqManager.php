@@ -20,6 +20,7 @@
  */
 namespace Pydio\Mq\Core;
 
+use nsqphp\Message\Message;
 use nsqphp\nsqphp;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,8 +28,12 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Serializer\UserXML;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
@@ -48,17 +53,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 
 /**
- * Websocket JS Sample
- *
- * var websocket = new WebSocket("ws://serverURL:8090/echo");
-websocket.onmessage = function(event){console.log(event.data);};
- *
- *     new PeriodicalExecuter(function(pe){
-     var conn = new Connexion();
-     conn.setParameters($H({get_action:'client_consume_channel',channel:'nodes:0',client_id:'toto'}));
-     conn.onComplete = function(transport){PydioApi.getClient().parseXmlMessage(transport.responseXML);};
-     conn.sendAsync();
-     }, 5);
+ * MqManager
  *
  * @package AjaXplorer_Plugins
  * @subpackage Core
@@ -147,13 +142,13 @@ class MqManager extends Plugin
      */
     public function publishNodeChange($origNode = null, $newNode = null, $copy = false)
     {
-        $content = "";$targetUserId=null; $nodePathes = array();
+        $content = "";$targetUserId=null; $nodePaths = array();
         $update = false;
         $ctx = null;
         if ($newNode != null) {
             $ctx = $newNode->getContext();
             $targetUserId = $newNode->getUserId();
-            $nodePathes[] = $newNode->getPath();
+            $nodePaths[] = $newNode->getPath();
             $update = false;
             $data = array();
             if ($origNode != null && !$copy) {
@@ -168,13 +163,13 @@ class MqManager extends Plugin
 
             $ctx = $origNode->getContext();
             $targetUserId = $origNode->getUserId();
-            $nodePathes[] = $origNode->getPath();
+            $nodePaths[] = $origNode->getPath();
             $content = XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
 
         }
         if (!empty($content) && !empty($ctx)) {
 
-            $this->sendInstantMessage($ctx, $content, $targetUserId, null, $nodePathes);
+            $this->sendInstantMessage($ctx, $content, $targetUserId, null, $nodePaths);
 
         }
 
@@ -185,9 +180,9 @@ class MqManager extends Plugin
      * @param $xmlContent
      * @param null $targetUserId
      * @param null $targetGroupPath
-     * @param array $nodePathes
+     * @param array $nodePaths
      */
-    public function sendInstantMessage(ContextInterface $ctx, $xmlContent, $targetUserId = null, $targetGroupPath = null, $nodePathes = array())
+    public function sendInstantMessage(ContextInterface $ctx, $xmlContent, $targetUserId = null, $targetGroupPath = null, $nodePaths = array())
     {
         $currentUser = $ctx->getUser();
         $repositoryId = $ctx->getRepositoryId();
@@ -217,14 +212,13 @@ class MqManager extends Plugin
         if(isSet($gPath)) {
             $message->groupPath = $gPath;
         }
-        if(count($nodePathes)) {
-            $message->nodePathes = $nodePathes;
+        if(count($nodePaths)) {
+            $message->nodePaths = $nodePaths;
         }
 
         if ($this->msgExchanger) {
             $this->msgExchanger->publishInstantMessage($ctx, "nodes:$repositoryId", $message);
         }
-
 
         // Publish for websockets
         $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
@@ -233,23 +227,13 @@ class MqManager extends Plugin
         } else if(isSet($gPath)) {
             $input["GROUP_PATH"] = $gPath;
         }
-        if(count($nodePathes)) {
-            $input["NODE_PATHES"] = $nodePathes;
+        if(count($nodePaths)) {
+            $input["NODE_PATHES"] = $nodePaths;
         }
 
-        $host = $this->getContextualOption($ctx, "NSQ_HOST");
-        $port = $this->getContextualOption($ctx, "NSQ_PORT");
-        if(!empty($host) && !empty($port)){
-            if(empty($this->nsqClient)){
-                // Publish on NSQ
-                $this->nsqClient = new nsqphp;
-                $this->nsqClient->publishTo(join(":", [$host, $port]), 1);
-            }
-            $this->nsqClient->publish('im', new \nsqphp\Message\Message(json_encode($input)));
-        }
+        $this->_sendMessage($ctx, 'im', json_encode($input));
 
         $this->hasPendingMessage = true;
-
     }
 
     /**
@@ -259,23 +243,39 @@ class MqManager extends Plugin
     public function sendTaskMessage(ContextInterface $ctx, $content){
 
         $this->logInfo("Core.mq", "Should now publish a message to NSQ :". json_encode($content));
+
+        $this->_sendMessage($ctx, 'task', json_encode($content));
+    }
+
+    private function _sendMessage(ContextInterface $ctx, $topic, $content) {
+
         $host = $this->getContextualOption($ctx, "NSQ_HOST");
         $port = $this->getContextualOption($ctx, "NSQ_PORT");
+
         if(!empty($host) && !empty($port)){
-            // Publish on NSQ
-            try{
-                $nsq = new nsqphp;
-                $nsq->publishTo(join(":", [$host, $port]), 1);
-                $nsq->publish('task', new \nsqphp\Message\Message(json_encode($content)));
-                $this->logInfo("Core.mq", "Published a message to NSQ :". json_encode($content));
-            }catch (\Exception $e){
-                $this->logError("Core.mq", "sendTaskMessage", $e->getMessage());
+
+            if(empty($this->nsqClient)){
+
+                // Publish on NSQ
+                $this->nsqClient = new nsqphp;
+                $this->nsqClient->publishTo(join(":", [$host, $port]), 1);
+
+                $this->logInfo("core.mq", "Published to NSQ " .$topic." :". $content);
+            }
+
+            set_error_handler(function ($errNo, $str) use (&$msg) { $msg = $str; });
+            try {
+                $this->nsqClient->publish($topic, new Message($content));
+            } catch (\Exception $e) {
+
+                $this->logError("core.mq", "sendMessage " . $topic, $e->getMessage());
+
                 if(ConfService::currentContextIsCommandLine()){
-                    print("Error while trying to send a task message ".json_encode($content)." : ".$e->getMessage());
+                    print("Error while trying to send a ".$topic." message ".$content." : ".$e->getMessage());
                 }
             }
+            restore_error_handler();
         }
-
     }
 
     /**
@@ -287,11 +287,11 @@ class MqManager extends Plugin
             return;
         }
         $respType = &$responseInterface->getBody();
-        if(!$respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream && !$respType->getSize()){
-            $respType = new \Pydio\Core\Http\Response\SerializableResponseStream();
+        if(!$respType instanceof SerializableResponseStream && !$respType->getSize()){
+            $respType = new SerializableResponseStream();
             $responseInterface = $responseInterface->withBody($respType);
         }
-        if($respType instanceof \Pydio\Core\Http\Response\SerializableResponseStream){
+        if($respType instanceof SerializableResponseStream){
             require_once("ConsumeChannelMessage.php");
             $respType->addChunk(new ConsumeChannelMessage());
         }
@@ -307,8 +307,10 @@ class MqManager extends Plugin
         if(!$this->msgExchanger) return;
         $action = $request->getAttribute("action");
         $httpVars = $request->getParsedBody();
+
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
+
         switch ($action) {
             case "client_register_channel":
                 
@@ -325,7 +327,7 @@ class MqManager extends Plugin
                 if (UsersService::usersEnabled()) {
                     $user = $ctx->getUser();
                     if ($user == null) {
-                        throw new \Pydio\Core\Exception\AuthRequiredException();
+                        throw new AuthRequiredException();
                     }
                     $GROUP_PATH = $user->getGroupPath();
                     if($GROUP_PATH == null) $GROUP_PATH = false;
@@ -334,6 +336,7 @@ class MqManager extends Plugin
                     $GROUP_PATH = '/';
                     $uId = 'shared';
                 }
+
                 $currentRepository = $ctx->getRepositoryId();
                 $currentRepoMasks = array(); $regexp = null;
                 Controller::applyHook("role.masks", array($ctx, &$currentRepoMasks, AJXP_Permission::READ));
@@ -344,11 +347,12 @@ class MqManager extends Plugin
                     }
                     $regexp = '/'.implode("|", $regexps).'/';
                 }
+
                 $channelRepository = str_replace("nodes:", "", $httpVars["channel"]);
-                $serialBody = new \Pydio\Core\Http\Response\SerializableResponseStream();
+                $serialBody = new SerializableResponseStream();
                 $response = $response->withBody($serialBody);
                 if($channelRepository != $currentRepository){
-                    $serialBody->addChunk(new \Pydio\Core\Http\Message\XMLMessage("<require_registry_reload repositoryId=\"$currentRepository\"/>"));
+                    $serialBody->addChunk(new XMLMessage("<require_registry_reload repositoryId=\"$currentRepository\"/>"));
                     return;
                 }
 
@@ -356,9 +360,9 @@ class MqManager extends Plugin
                 if (count($data)) {
                    ksort($data);
                    foreach ($data as $messageObject) {
-                       if(isSet($regexp) && isSet($messageObject->nodePathes)){
+                       if(isSet($regexp) && isSet($messageObject->nodePaths)){
                            $pathIncluded = false;
-                           foreach($messageObject->nodePathes as $nodePath){
+                           foreach($messageObject->nodePaths as $nodePath){
                                if(preg_match($regexp, $nodePath)){
                                    $pathIncluded = true;
                                    break;
@@ -366,7 +370,7 @@ class MqManager extends Plugin
                            }
                            if(!$pathIncluded) continue;
                        }
-                       $serialBody->addChunk(new \Pydio\Core\Http\Message\XMLMessage($messageObject->content));
+                       $serialBody->addChunk(new XMLMessage($messageObject->content));
                    }
                 }
 
@@ -399,7 +403,7 @@ class MqManager extends Plugin
             throw new \Exception("You must be logged in");
         }
 
-        $serializer = new \Pydio\Core\Serializer\UserXML();
+        $serializer = new UserXML();
         $xml = $serializer->serialize($ctx);
         // add groupPath
         if ($user->getGroupPath() != null) {
@@ -408,8 +412,8 @@ class MqManager extends Plugin
         }
 
         $this->logDebug("Authenticating user ".$user->getId()." through WebSocket");
-        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        $x->addChunk(new \Pydio\Core\Http\Message\XMLMessage($xml));
+        $x = new SerializableResponseStream();
+        $x->addChunk(new XMLMessage($xml));
         $response = $response->withBody($x);
 
     }

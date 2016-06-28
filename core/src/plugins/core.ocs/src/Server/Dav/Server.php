@@ -40,7 +40,7 @@ use Sabre;
  */
 class Server extends Sabre\DAV\Server
 {
-    var $rootCollection;
+    var $context;
     var $uniqueBaseFile;
 
     /**
@@ -48,10 +48,10 @@ class Server extends Sabre\DAV\Server
      */
     public function __construct()
     {
-        $context = $this->buildContext(Context::emptyContext());
-        $this->rootCollection = new Collection("/", $context);
+        $this->context = $this->buildContext(Context::emptyContext());
+        $rootCollection = new Collection("/", $this->context);
 
-        parent::__construct($this->rootCollection);
+        parent::__construct($rootCollection);
     }
 
     /**
@@ -88,7 +88,7 @@ class Server extends Sabre\DAV\Server
 
         $this->setBaseUri($baseUri);
 
-        $authBackend = new AuthSharingBackend($this->rootCollection);
+        $authBackend = new AuthSharingBackend($this->context);
         $authPlugin = new Sabre\DAV\Auth\Plugin($authBackend, ConfService::getGlobalConf("WEBDAV_DIGESTREALM"));
         $this->addPlugin($authPlugin);
 

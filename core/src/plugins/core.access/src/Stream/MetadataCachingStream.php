@@ -25,6 +25,9 @@ class MetadataCachingStream implements StreamInterface
     /** @var string uri */
     private $uri;
 
+    /** @var array contentFilters */
+    private $contentFilters;
+
     /** @var string path */
     private $path;
 
@@ -41,6 +44,7 @@ class MetadataCachingStream implements StreamInterface
         StreamInterface $target = null
     ) {
         $this->uri = $node->getUrl();
+        $this->contentFilters = $node->getRepository()->getContentFilter()->filters;
         $this->path = parse_url($this->uri, PHP_URL_PATH);
 
         $this->stream = $stream;
@@ -96,8 +100,13 @@ class MetadataCachingStream implements StreamInterface
         // So storing them in a local cache
         if (is_array($stats[0])) {
             foreach ($stats as $stat) {
-                $path = $stat["name"];
-                $key = rtrim($this->uri . "/" . $path, "/");
+                $path = "/" . $stat["name"];
+
+                if (isset($this->contentFilters[$path])) {
+                    $path = $this->contentFilters[$path];
+                }
+
+                $key = rtrim($this->uri . $path, "/");
                 self::$stat[$key] = $stat;
             }
         } else {

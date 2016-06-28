@@ -20,8 +20,8 @@
  */
 namespace Pydio\OCS;
 
-use Pydio\Core\Http\Dav\Collection;
-use Pydio\Core\Http\Dav\RootCollection;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -30,9 +30,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Services\RepositoryService;
 use Pydio\OCS\Server\Dummy;
-use Sabre\DAV\Exception\Forbidden;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -62,8 +60,8 @@ class OCSPlugin extends Plugin {
         return $this->controller;
     }
 
-    public function applyActions($actionName, $httpVars, $fileVars){
-        return $this->getController()->switchActions($actionName, $httpVars, $fileVars);
+    public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
+        return $this->getController()->switchAction($request, $response);
     }
 
     public function federatedEnabled(){
@@ -132,7 +130,6 @@ class OCSPlugin extends Plugin {
     }
 
     public function remoteRepositoryById($repositoryId, &$repoObject){
-        
         if(strpos($repositoryId, "ocs_remote_share_") !== 0){
             return;
         }

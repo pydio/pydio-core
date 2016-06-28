@@ -95,6 +95,19 @@ class Driver extends FsAccessDriver
         $basePath = ltrim($repository->getContextOption($ctx, "PATH"), "/");
         $path = $node->getPath();
 
+        $contentFilters = $node->getRepository()->getContentFilter();
+
+        if (isset($contentFilters)) {
+            $contentFilters = $contentFilters->filters;
+
+            foreach ($contentFilters as $key => $value) {
+                if ($value == $path || empty($path)) {
+                    $path = $key;
+                    break;
+                }
+            }
+        }
+
         if (isset($path)) {
             return "/" . $basePath . $path;
         }

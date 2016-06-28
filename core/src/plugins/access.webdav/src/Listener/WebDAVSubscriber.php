@@ -95,6 +95,7 @@ class WebDAVSubscriber implements SubscriberInterface
         $body = $response->getBody();
 
         $contents = $body->getContents();
+
         $contents = preg_replace("/xmlns(:[A-Za-z0-9_]*)?=(\"|\')DAV:(\\2)/","xmlns\\1=\\2urn:DAV\\2",$contents);
         $contents = preg_replace("/\n/","",$contents);
 

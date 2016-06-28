@@ -21,6 +21,7 @@
 namespace Pydio\Cache\Core;
 
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\SchemeTranslatorWrapper;
 use Pydio\Core\Services\CacheService;
 
@@ -30,12 +31,10 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class CacheStreamLayer extends SchemeTranslatorWrapper
 {
     public static function clearStatCache($path){
-        $scheme = parse_url($path, PHP_URL_SCHEME);
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, str_replace($scheme . "://", "stat://", $path));
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, self::computeCacheId($path, "stat"));
     }
     public static function clearDirCache($path){
-        $scheme = parse_url($path, PHP_URL_SCHEME);
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, str_replace($scheme . "://", "list://", $path));
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, self::computeCacheId($path, "list"));
     }
 
     private $currentListingOrig = null;
@@ -49,16 +48,16 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
      * @param $type
      * @return string
      */
-    protected function computeCacheId($path, $type){
+    protected static function computeCacheId($path, $type){
 
-        return AbstractCacheDriver::computeIdForNode(new \Pydio\Access\Core\Model\AJXP_Node($path), $type);
-        
+        return AbstractCacheDriver::computeIdForNode(new AJXP_Node($path), $type);
+
     }
 
     // Keep listing in cache
     public function dir_opendir($path, $options)
     {
-        $id = $this->computeCacheId($path, "list");
+        $id = self::computeCacheId($path, "list");
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
             $this->currentListingRead = $this->currentListingOrig = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
             return true;
@@ -107,7 +106,7 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
 
     public function url_stat($path, $flags)
     {
-        $id = $this->computeCacheId($path, "stat");
+        $id = self::computeCacheId($path, "stat");
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
             $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
             if(is_array($stat)) return $stat;
