@@ -156,13 +156,34 @@ class IMagickPreviewer extends AJXP_Plugin
         // Should remove imagick cache file
         if(!$this->handleMime($oldFile)) return;
         if ($newNode == null || $copy == false) {
+
+            // Main Thumb
             AJXP_Cache::clearItem("imagick_thumb", $oldFile);
-            $cache = AJXP_Cache::getItem("imagick_full", $oldFile, false);
-            $prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());
-            $files = $this->listExtractedJpg($oldFile, $prefix);
-            foreach ($files as $file) {
-                if(is_file((defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/".$file["file"])) unlink(AJXP_CACHE_DIR."/".$file["file"]);
+
+            // Unoconv small PDF
+            $thumbCache = AJXP_Cache::getItem("imagick_thumb", $oldFile, false);
+            $unoFile = pathinfo($thumbCache->getId(), PATHINFO_DIRNAME).DIRECTORY_SEPARATOR.pathinfo($thumbCache->getId(), PATHINFO_FILENAME)."_unoconv.pdf";
+            if(file_exists($unoFile)){
+                unlink($unoFile);
             }
+
+            $cache = AJXP_Cache::getItem("imagick_full", $oldFile, false);
+            // Unoconv full pdf
+            $unoFile = pathinfo($cache->getId(), PATHINFO_DIRNAME).DIRECTORY_SEPARATOR.pathinfo($cache->getId(), PATHINFO_FILENAME)."_unoconv.pdf";
+            if(file_exists($unoFile)){
+                unlink($unoFile);
+            }
+            $prefix = str_replace(".".pathinfo($cache->getId(), PATHINFO_EXTENSION), "", $cache->getId());
+            // Additional Extracted pages
+            $files = $this->listExtractedJpg($oldFile, $prefix);
+            $cacheDir = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/imagick_full";
+            foreach ($files as $file) {
+                if(is_file($cacheDir."/".$file["file"])) {
+                    unlink($cacheDir."/".$file["file"]);
+                }
+            }
+
+
         }
     }
 

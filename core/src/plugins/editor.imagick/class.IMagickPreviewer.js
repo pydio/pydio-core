@@ -31,7 +31,7 @@ Class.create("IMagickPreviewer", Diaporama, {
             actions : {}
         }, editorOptions);
 		$super(oFormObject, options);
-		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page&file=";
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page";
 		// Override onload for the text
 		this.jsImage.onload = function(){
 			this.jsImageLoading = false;
@@ -53,6 +53,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	
 	open : function($super, node)
 	{
+        this.inputNode = node;
 		this.src_file = node.getPath();
 		this.currentIM = getBaseName(this.src_file);
 		// Extract the pages and load result!
@@ -170,11 +171,11 @@ Class.create("IMagickPreviewer", Diaporama, {
 
 	getThumbnailSource : function(ajxpNode){
         var repoString = "";
-        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+        if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){
             repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
         }
-        var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
-		return ajxpServerAccessPath+"&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
+        var mtimeString = this.buildRandomSeed(ajxpNode);
+		return pydioBootstrap.parameters.get('ajxpServerAccess') + "&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{
@@ -198,9 +199,10 @@ Class.create("IMagickPreviewer", Diaporama, {
 		if(this.crtWidth){
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
+        var mstring = this.buildRandomSeed(this.inputNode);
 		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
-			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
+			this.jsImage.src  = this.baseUrl + mstring + "&file=" + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
 			if(!this.crtWidth && !this.crtHeight){
 				this.crtWidth = this.imgTag.getWidth();
 				this.crtHeight = this.imgTag.getHeight();
