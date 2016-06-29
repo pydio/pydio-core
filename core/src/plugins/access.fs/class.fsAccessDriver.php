@@ -1597,7 +1597,6 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
         $realBase = str_replace("\\", "/", $realBase);
         $repoName = $this->urlBase.str_replace($realBase, "", $fullname);
-
         $toNode = new AJXP_Node($repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
         if(file_exists($toNode->getUrl())){
@@ -1612,6 +1611,12 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         $fullname = $data['filename'];
         $realBase = AJXP_MetaStreamWrapper::getRealFSReference($this->urlBase);
         $repoName = str_replace($realBase, "", $fullname);
+        try{
+            $this->filterUserSelectionToHidden([$repoName]);
+        }catch(Exception $e){
+            @unlink($this->urlBase.$repoName);
+            return 1;
+        }
         $toNode = new AJXP_Node($this->urlBase.$repoName);
         $toNode->setLeaf($data['folder'] ? false:true);
         AJXP_Controller::applyHook("node.change", array(null, $toNode, false));

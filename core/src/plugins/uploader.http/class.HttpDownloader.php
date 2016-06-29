@@ -56,6 +56,8 @@ class HttpDownloader extends AJXP_Plugin
         }else{
             throw new Exception("Missing argument, either file or dlfile");
         }
+        $fsDriver = AJXP_PluginsService::getInstance()->getUniqueActivePluginForType("access");
+        $fsDriver->filterUserSelectionToHidden(array($basename));
 
         switch ($action) {
             case "external_download":
