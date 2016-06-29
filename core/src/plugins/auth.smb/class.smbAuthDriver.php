@@ -61,7 +61,7 @@ class smbAuthDriver extends AbstractAuthDriver
     {
         if(!defined('SMB4PHP_SMBCLIENT'))
         {
-            define('SMB4PHP_SMBCLIENT', $this->pluginConf["SMBCLIENT"]);
+            define('SMB4PHP_SMBCLIENT', $this->options["SMBCLIENT"]);
         }
 
         require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.smb/smb.php");
