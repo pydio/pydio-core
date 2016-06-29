@@ -209,12 +209,12 @@ class Action extends Observable{
 		
 	/**
 	 * Updates the action status on context change
+     * @param PydioDataModel dataModel
+     * @param boolean usersEnabled
+     * @param string crtUser
 	 * @returns void
 	 */
-	fireContextChange(){
-		if(arguments.length < 3) return;
-		var usersEnabled = arguments[0];
-		var crtUser = arguments[1];
+	fireContextChange(dataModel, usersEnabled, crtUser){
 
         var crtIsRecycle = false;
         var crtInZip = false;
@@ -222,7 +222,7 @@ class Action extends Observable{
         var crtAjxpMime = '';
         var crtIsReadOnly = false;
 
-        var crtNode = arguments[2];
+        var crtNode = dataModel.getContextNode();
         if(crtNode){
             crtIsRecycle = (crtNode.getAjxpMime() == "ajxp_recycle");
             crtInZip = crtNode.hasAjxpMimeInBranch("ajxp_browsable_archive");
@@ -284,7 +284,8 @@ class Action extends Observable{
 		if(!this.context.root && crtIsRoot){
 			return this.hideForContext();
 		}
-		this.showForContext();				
+
+		this.showForContext(dataModel);
 		
 	}
 		
@@ -663,11 +664,11 @@ class Action extends Observable{
 	/**
 	 * Changes show/hide state
 	 */
-	showForContext(){
+	showForContext(dataModel){
         this.contextHidden = false;
         this.show();
         if(this.selectionContext){
-            this.fireSelectionChange();
+            this.fireSelectionChange(dataModel);
         }
 	}
 	

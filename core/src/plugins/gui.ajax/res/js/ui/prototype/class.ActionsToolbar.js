@@ -423,9 +423,10 @@ Class.create("ActionsToolbar", AjxpPane, {
 	attachListeners : function(button, action){
 
         if(this.options.attachToNode){
-            action.fireContextChange(ajaxplorer.usersEnabled, ajaxplorer.user, this.options.attachToNode.getParent());
             var fakeDm = new PydioDataModel();
+            fakeDm.setContextNode(this.options.attachToNode.getParent());
             fakeDm.setSelectedNodes([this.options.attachToNode]);
+            action.fireContextChange(fakeDm, pydio.usersEnabled, pydio.user);
             action.fireSelectionChange(fakeDm);
             if(action.deny) {
                 button.hideButton();
