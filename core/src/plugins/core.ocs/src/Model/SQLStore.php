@@ -77,7 +77,8 @@ class SQLStore implements IStore
      */
     public function invitationsForLink($linkToken)
     {
-        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_INVITATION, null, "", OCS_SQLSTORE_FORMAT, "", $linkToken);
+        $cursor = null;
+        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_INVITATION, $cursor, "", OCS_SQLSTORE_FORMAT, "", $linkToken);
     }
 
     /**
@@ -126,7 +127,8 @@ class SQLStore implements IStore
      */
     public function remoteSharesForUser($userName)
     {
-        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, null, "", OCS_SQLSTORE_FORMAT, "", $userName);
+        $cursor = null;
+        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, $cursor, "", OCS_SQLSTORE_FORMAT, "", $userName);
     }
 
     /**
@@ -142,7 +144,8 @@ class SQLStore implements IStore
 
     public function remoteShareForOcsRemoteId($ocsRemoteId){
         $searchString = 's:11:"ocsRemoteId";s:'.strlen($ocsRemoteId).':"'.$ocsRemoteId.'"';
-        $l = $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, null,  "", OCS_SQLSTORE_FORMAT, "%$searchString%");
+        $cursor = null;
+        $l = $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, $cursor,  "", OCS_SQLSTORE_FORMAT, "%$searchString%");
         if(count($l)){
             return array_shift(array_values($l));
         }else{

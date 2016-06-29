@@ -184,7 +184,7 @@
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
                     if(!$('get_bookmarks_button')) {
-                        if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
+                        if(!pydio.bookmarkBar) pydio.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
                     if(!window.BookmarksBar) return;
@@ -202,7 +202,7 @@
                         image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
                         icon_class:'icon-plus-sign',
                         callback:function(e){
-                            var node = ajaxplorer.getContextNode();
+                            var node = pydio.getContextNode();
                             node.getMetadata().set('ajxp_bookmarked', 'true');
                             node.getMetadata().set('overlay_icon', 'bookmark.png');
                             node.getMetadata().set('overlay_class', 'icon-bookmark');
@@ -262,8 +262,8 @@
                 <clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
                         var f = new FormManager();
-                          var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
-                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
+                          var definitions = f.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, pydio.user.preferences, false, true);
                           modal.refreshDialogPosition();
                     ]]></dialogOnOpen>
                     <dialogOnComplete hideDialog="true"><![CDATA[
@@ -280,7 +280,7 @@
                                   if(event.memo != "user/preferences") return;
                                   pydio.Registry.logXmlUser();
                               });
-                              ajaxplorer.loadXmlRegistry(false, "user/preferences");
+                              pydio.loadXmlRegistry(false, "user/preferences");
                           };
                           conn.sendAsync();
                     ]]></dialogOnComplete>
@@ -315,7 +315,7 @@
                                 var values = $H(transport.responseJSON);
                                 values.set("existing_user_id", user_id);
 
-                                var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                                var params = $A(pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
                                 for(var i=0;i<params.length;i++){
                                     params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
                                 }
@@ -338,7 +338,7 @@
                                     scope: "user",
                                     type: "password-create"
                                 }));
-                                var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                                var definitions = f.parseParameters(pydio.getXmlRegistry(), params.join('|'));
                                 definitions.each(function(el){ def1.push(el); });
                                 f.createParametersInputs(oForm.down('#user_create_user'), def1, true, values, false, true);
                                 modal.refreshDialogPosition();
@@ -360,7 +360,7 @@
                                    if($("address_book")){
                                         $("address_book").ajxpPaneObject.reloadDataModel();
                                   }
-                                  ajaxplorer.displayMessage("SUCCESS", MessageHash[521]);
+                                  pydio.displayMessage("SUCCESS", MessageHash[521]);
                                 }
                           };
                           conn.sendAsync();
@@ -378,7 +378,7 @@
             <processing>
                 <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
-                        var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
+                        var params = $A(pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
                         for(var i=0;i<params.length;i++){
                             params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
                         }
@@ -401,7 +401,7 @@
                             scope: "user",
                             type: "password-create"
                         }));
-                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
+                        var definitions = f.parseParameters(pydio.getXmlRegistry(), params.join('|'));
                         definitions.each(function(el){ def1.push(el); });
                         f.createParametersInputs(oForm.down('#user_create_user'), def1, true, $H(), false, true);
                         modal.refreshDialogPosition();
@@ -437,7 +437,7 @@
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
-					    if(ajaxplorer.user) var userLang = ajaxplorer.user.getPreference("lang");
+					    if(pydio.user) var userLang = pydio.user.getPreference("lang");
 						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
 						var selector = $(oForm).select('select[id="language_selector"]')[0];
 						var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
@@ -449,30 +449,33 @@
 						selector.setValue(userLang);
 						selector.observe("change", function(){
 							var value = selector.getValue();
-							if(ajaxplorer.user){
-    							ajaxplorer.user.setPreference("lang", selector.getValue());
-	    						ajaxplorer.user.savePreference("lang");
+							if(pydio.user){
+    							pydio.user.setPreference("lang", selector.getValue());
+	    						pydio.user.savePreference("lang");
 	    					}
 						});
 						$(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="true"><![CDATA[
-                        if(ajaxplorer.user){
-                            var oUser = ajaxplorer.user;
+                        if(pydio.user){
+                            var oUser = pydio.user;
                             if(oUser.getPreference('lang') != null
                                 && oUser.getPreference('lang') != ""
-                                && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
+                                && oUser.getPreference('lang') != pydio.currentLanguage)
                             {
-                                ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-                                ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+                                pydio.loadI18NMessages(oUser.getPreference('lang'));
+                                pydio.displayMessage('SUCCESS', MessageHash[241]);
                             }
                         }else{
                             var selector = $(oForm).select('select[id="language_selector"]')[0];
                             var value = selector.getValue();
-                            ajaxplorer.loadI18NMessages(value);
+                            pydio.loadI18NMessages(value);
                             window.ajxpBootstrap.parameters.set("currentLanguage", value);
                         }
 					]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[
+                        pydio.Controller.fireAction("login");
+                    ]]></dialogOnCancel>
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="switch_language_form"><![CDATA[
@@ -492,28 +495,28 @@
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
-					if(!ajaxplorer.user) return;
+					if(!pydio.user) return;
 					var cont = $('webdav_repo_list');
 					cont.update('');
 					var even = false;
 					var conn = new Connexion();
 					conn.setParameters(new Hash({get_action:'webdav_preferences'}));
 					conn.onComplete = function(transport){
-						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digest_set
-						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+						pydio.webdavCurrentPreferences = transport.responseJSON;
+						$('webdav_activator').checked = pydio.webdavCurrentPreferences.webdav_active;
+						if($('webdav_activator').checked && !pydio.webdavCurrentPreferences.digest_set
+						    && !pydio.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-                        ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
-                            if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
+                        ProtoCompat.map2hash(pydio.user.getRepositoriesList()).each(function(pair){
+                            if(pydio.webdavCurrentPreferences.webdav_repositories[pair.key]){
                                 var div = new Element('div', {className:(even?'even':'')});
-                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
+                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ pydio.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
                                 cont.insert(div);
                                 even = !even;
                             }
                         });
-                        modal.getForm().down('#webdav_main_access').setValue(ajaxplorer.webdavCurrentPreferences.webdav_base_url);
+                        modal.getForm().down('#webdav_main_access').setValue(pydio.webdavCurrentPreferences.webdav_base_url);
                         modal.getForm().down('#webdav_main_access').observe("click", function(){
                             modal.getForm().down('#webdav_main_access').select();
                         });
@@ -536,21 +539,21 @@
                                     activate:(checked?'true':'false')
                                 }));
                                 conn.onComplete = function(transport){
-                                    ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active){
-                                        if(!ajaxplorer.webdavCurrentPreferences.digest_set
-                                        || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                    pydio.webdavCurrentPreferences = transport.responseJSON;
+                                    if(pydio.webdavCurrentPreferences.webdav_active){
+                                        if(!pydio.webdavCurrentPreferences.digest_set
+                                        || pydio.webdavCurrentPreferences.webdav_force_basic) {
                                             $('webdav_password_form').show();
                                         }
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[408]);
                                     }else {
                                         $('webdav_password_form').hide();
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[409]);
                                     }
                                 };
                                 conn.sendAsync();
                             });
-                            if(!ajaxplorer.webdavCurrentPreferences.digest_set){
+                            if(!pydio.webdavCurrentPreferences.digest_set){
                                 $('webdav_pass_saver').observe("click", function(){
                                     var conn = new Connexion();
                                     conn.setMethod('POST');
@@ -559,7 +562,7 @@
                                         webdav_pass: $('webdav_password').value
                                     }));
                                     conn.onComplete = function(transport){
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[410]);
                                     };
                                     conn.sendAsync();
                                 });
@@ -600,8 +603,8 @@
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
-                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_user"){
-                        ajaxplorer.triggerRepositoryChange('ajxp_user');
+                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_user"){
+                        pydio.triggerRepositoryChange('ajxp_user');
                     }
                 ]]></clientCallback>
             </processing>
@@ -613,8 +616,8 @@
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
-                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_conf"){
-                        ajaxplorer.triggerRepositoryChange('ajxp_conf');
+                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_conf"){
+                        pydio.triggerRepositoryChange('ajxp_conf');
                     }
                 ]]></clientCallback>
             </processing>

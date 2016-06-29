@@ -53,12 +53,15 @@ class DuoSecurityFrontend extends SessionLoginFrontend
 
         }
 
-        $test = $this->logUserFromLoginAction($request, $response, $isLast);
-        if(!$test){
+        $testResponse = $this->logUserFromLoginAction($request, $response, $isLast);
+        if(!$testResponse){
             return false;
         }
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
+        if(!$ctx->hasUser()){
+            return false;
+        }
         $uObject = $ctx->getUser();
         $duoActive = $uObject->getMergedRole()->filterParameterValue("authfront.duosecurity", "DUO_AUTH_ACTIVE", AJXP_REPO_SCOPE_ALL, false);
         if(!$duoActive){

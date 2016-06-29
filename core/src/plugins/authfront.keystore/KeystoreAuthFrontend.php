@@ -121,8 +121,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
 
         $this->storage = ConfService::getConfStorageImpl();
         if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
-
-        $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:' . strlen($userId) . ':"' . $userId . '"%');
+        $cursor = null;
+        $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"USER_ID";s:' . strlen($userId) . ':"' . $userId . '"%');
         foreach ($keys as $keyId => $keyData) {
             $this->storage->simpleStoreClear("keystore", $keyId);
         }
@@ -171,7 +171,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                 if (!empty($httpVars["device"])) {
                     // Revoke previous tokens for this device
                     $device = $httpVars["device"];
-                    $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"DEVICE_ID";s:' . strlen($device) . ':"' . $device . '"%');
+                    $cursor = null;
+                    $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"DEVICE_ID";s:' . strlen($device) . ':"' . $device . '"%');
                     foreach ($keys as $keyId => $keyData) {
                         if ($keyData["USER_ID"] != $user) continue;
                         $this->storage->simpleStoreClear("keystore", $keyId);
@@ -195,7 +196,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                 $mess = LocaleService::getMessages();
                 $passedKeyId = "";
                 if (isSet($httpVars["key_id"])) $passedKeyId = $httpVars["key_id"];
-                $keys = $this->storage->simpleStoreList("keystore", null, $passedKeyId, "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
+                $cursor = null;
+                $keys = $this->storage->simpleStoreList("keystore", $cursor, $passedKeyId, "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
                 foreach ($keys as $keyId => $keyData) {
                     $this->storage->simpleStoreClear("keystore", $keyId);
                 }
@@ -209,7 +211,8 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
 
             case "keystore_list_tokens":
                 if (!isSet($user)) break;
-                $keys = $this->storage->simpleStoreList("keystore", null, "", "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
+                $cursor = null;
+                $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
                 foreach ($keys as $keyId => &$keyData) {
                     unset($keyData["PRIVATE"]);
                     unset($keyData["USER_ID"]);

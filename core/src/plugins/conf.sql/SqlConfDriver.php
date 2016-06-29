@@ -1062,7 +1062,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      * @param string $relatedObjectId
      * @return array
      */
-    public function simpleStoreList($storeId, $cursor=null, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId=""){
+    public function simpleStoreList($storeId, &$cursor=null, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId=""){
         $wheres = array();
         $wheres[] = array('[store_id]=%s', $storeId);
         if(!empty($dataIdLike)){
@@ -1075,6 +1075,11 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
         }
         if($cursor != null){
+            $total = dibi::query("SELECT count(*) FROM [ajxp_simple_store] WHERE %and", $wheres);
+            $cursor["total"] = $total->fetchSingle();
+            if(isSet($cursor["count"])) {
+                return [];
+            }
             $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and %lmt %ofs", $wheres, $cursor[1], $cursor[0]);
         }else{
             $children_results = dibi::query("SELECT * FROM [ajxp_simple_store] WHERE %and", $wheres);

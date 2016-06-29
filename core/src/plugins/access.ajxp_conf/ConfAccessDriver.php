@@ -1744,7 +1744,8 @@ class ConfAccessDriver extends AbstractAccessDriver
                 if(!$repository->isTemplate()){
                     print "<additional_info>";
                     $users = UsersService::countUsersForRepository($ctx, $repId, false, true);
-                    $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", null, "", "serial", '', $repId);
+                    $cursor = ["count"];
+                    $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repId);
                     print('<users total="'.$users.'"/>');
                     print('<shares total="'.count($shares).'"/>');
                     $rootGroup = RolesService::getRole("AJXP_GRP_/");

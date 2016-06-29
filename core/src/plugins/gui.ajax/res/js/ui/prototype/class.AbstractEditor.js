@@ -46,7 +46,7 @@ Class.create("AbstractEditor" , {
 	 */
 	editorOptions:null,
     /**
-     * @var An AjxpNode or an array of nodes
+     * @var Node or an array of nodes
      */
     inputNode : null,
 	

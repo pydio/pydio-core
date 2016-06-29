@@ -33,6 +33,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Controller\CliRunner;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -964,6 +965,9 @@ class ShareCenter extends Plugin
 
             case "sharelist-load":
 
+                $itemsPerPage   = 50;
+                $crtPage        = 1;
+                $crtOffset      = 0;
                 $parentRepoId = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
                 $userContext = $httpVars["user_context"];
                 $currentUser = $ctx->getUser()->getId();
@@ -972,9 +976,19 @@ class ShareCenter extends Plugin
                 }else if($userContext == "user" && $ctx->getUser()->isAdmin() && !empty($httpVars["user_id"])){
                     $currentUser = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
                 }
-                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId);
+                if (isSet($httpVars["dir"]) && strstr($httpVars["dir"], "%23")!==false) {
+                    $parts = explode("%23", $httpVars["dir"]);
+                    $crtPage = intval($parts[1]);
+                    $crtOffset = ($crtPage - 1) * $itemsPerPage;
+                }
+                $cursor = [$crtOffset, $itemsPerPage];
+                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId, $cursor);
+                $total = $cursor["total"];
 
                 $nodesList = new NodesList();
+                if($total > $itemsPerPage){
+                    $nodesList->setPaginationData($total, $crtPage, round($total / $itemsPerPage));
+                }
                 if($userContext == "current"){
                     $nodesList->initColumnsData("", "", "ajxp_user.shares");
                     $nodesList->appendColumn("ajxp_conf.8", "ajxp_label");
@@ -1819,7 +1833,7 @@ class ShareCenter extends Plugin
      * @param null $cursor
      * @return array
      */
-    public function listShares($currentUser, $parentRepositoryId="", $cursor = null){
+    public function listShares($currentUser, $parentRepositoryId="", &$cursor = null){
         if($currentUser === false){
             $crtUser = "";
         }else {
@@ -1837,7 +1851,7 @@ class ShareCenter extends Plugin
      * @param bool $xmlPrint
      * @return AJXP_Node[]
      */
-    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", $cursor = null, $xmlPrint = false){
+    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", &$cursor = null, $xmlPrint = false){
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
