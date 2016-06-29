@@ -84,6 +84,7 @@ class IMagickPreviewer extends AJXP_Plugin
             }
 
             $cache = AJXP_Cache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, array($this, "generateJpegsCallback"));
+            session_write_close();
             $cacheData = $cache->getData();
 
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view
