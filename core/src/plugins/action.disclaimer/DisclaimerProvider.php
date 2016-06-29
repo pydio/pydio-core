@@ -23,6 +23,8 @@ namespace Pydio\Action\Disclaimer;
 
 use Pydio\Core\Http\Middleware\SessionMiddleware;
 use Pydio\Core\Http\Middleware\SessionRepositoryMiddleware;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
@@ -35,12 +37,14 @@ use Pydio\Log\Core\Logger;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Simple implementation for forcing using to accept a disclaimer
+ * Implementation for forcing using to accept a disclaimer
  */
 class DisclaimerProvider extends Plugin
 {
 
     /**
+     * Set disclaimer validation on/off
+     *
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @throws \Pydio\Core\Exception\AuthRequiredException
@@ -86,6 +90,8 @@ class DisclaimerProvider extends Plugin
     }
 
     /**
+     * Serve the content of the Dicsclaimer.
+     *
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      */
@@ -100,4 +106,37 @@ class DisclaimerProvider extends Plugin
 
     }
 
+    /**
+     * Hooked to user.after_create
+     * Is disabled on shared links, this will automatically validate the disclaimer
+     * for any new shared user created .
+     *
+     * @param ContextInterface $ctx
+     * @param UserInterface $userObject
+     */
+    public function updateSharedUser(ContextInterface $ctx, UserInterface $userObject){
+        if($userObject->isHidden() && !$this->getContextualOption($ctx, "DISCLAIMER_ENABLE_SHARED")){
+            $userObject->removeLock();
+            $userObject->getPersonalRole()->setParameterValue("action.disclaimer", "DISCLAIMER_ACCEPTED", "yes", AJXP_REPO_SCOPE_SHARED);
+            $userObject->save("superuser");
+        }
+    }
+
+    /**
+     * Hooked to user.after_login
+     * If enabled on shared links, this will always reset the validation to false just after login.
+     * Validation should be ok during the session, then disabled next time the link is loaded.
+     *
+     * @param ContextInterface $ctx
+     * @param UserInterface $userObject
+     */
+    public function updateSharedUserLogin(ContextInterface $ctx, UserInterface $userObject){
+        if($userObject->isHidden() && $this->getContextualOption($ctx, "DISCLAIMER_ENABLE_SHARED")){
+            $userObject->setLock("validate_disclaimer");
+            $userObject->getPersonalRole()->setParameterValue("action.disclaimer", "DISCLAIMER_ACCEPTED", "no", AJXP_REPO_SCOPE_SHARED);
+            $userObject->save("superuser");
+        }
+    }    
+    
 }
+
