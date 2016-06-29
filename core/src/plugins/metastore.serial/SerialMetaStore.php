@@ -271,6 +271,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
         $currentFile = $ajxpNode->getUrl();
         $repositoryId = $ajxpNode->getRepositoryId();
         $fileKey = $ajxpNode->getPath();
+        if(empty($fileKey)) $fileKey = "/";
         if (isSet($this->options["METADATA_FILE_LOCATION"]) && $this->options["METADATA_FILE_LOCATION"] == "outside") {
             // Force scope
             $scope = AJXP_METADATA_SCOPE_REPOSITORY;
