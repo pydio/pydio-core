@@ -1210,7 +1210,7 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                         if($indexGroup == $limit) break;
                     }
                 }
-                if ($regexp == null && method_exists($this, "listUserTeams") && !$usersOnly) {
+                if (method_exists($this, "listUserTeams") && !$usersOnly) {
                     $teams = $this->listUserTeams();
                     foreach ($teams as $tId => $tData) {
                         if($regexp == null  ||  preg_match($pregexp, $tData["LABEL"])){
