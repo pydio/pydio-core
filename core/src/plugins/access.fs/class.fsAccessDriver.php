@@ -281,6 +281,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $node = $selection->getUniqueNode();
                 } else {
                     $zip = true;
+                    $base = basename(dirname($selection->getUniqueFile()));
                 }
                 if ($zip) {
                     $localName = (empty($base)?"Files":$base).".zip";
