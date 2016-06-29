@@ -716,8 +716,8 @@
             var actionName = event.currentTarget.getAttribute("data-action");
             this.props.dataModel.setSelectedNodes([this.props.node]);
             var a = global.pydio.Controller.getActionByName(actionName);
-            a.fireContextChange(true, global.pydio.user, this.props.dataModel.getContextNode());
-            a.fireSelectionChange(this.props.dataModel);
+            a.fireContextChange(this.props.dataModel, true, global.pydio.user);
+            //a.fireSelectionChange(this.props.dataModel);
             a.apply([this.props.dataModel]);
             event.stopPropagation();
             event.preventDefault();
@@ -1551,8 +1551,8 @@
             });
             dm.setSelectedNodes(selNodes);
             var a = global.pydio.Controller.getActionByName(actionName);
-            a.fireContextChange(true, global.pydio.user, dm.getContextNode());
-            a.fireSelectionChange(dm);
+            a.fireContextChange(dm, true, global.pydio.user);
+            //a.fireSelectionChange(dm);
             a.apply([dm]);
 
             ev.stopPropagation();
@@ -1568,8 +1568,8 @@
             }else{
                 dm.setSelectedNodes([node]);
                 global.pydio.Controller.actions.forEach(function(a){
-                    a.fireContextChange(true, global.pydio.user, dm.getContextNode());
-                    a.fireSelectionChange(dm);
+                    a.fireContextChange(dm, true, global.pydio.user);
+                    //a.fireSelectionChange(dm);
                     if(a.context.selection && a.context.actionBar && a.selectionContext[cacheKey] && !a.deny && a.options.icon_class
                         && (!this.props.actionBarGroups || this.props.actionBarGroups.indexOf(a.context.actionBarGroup) !== -1)
                     ) {
