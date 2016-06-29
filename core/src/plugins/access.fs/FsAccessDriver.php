@@ -160,7 +160,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $dir = $node->getRealFile();
         $size = -1;
         if ( ( PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") && class_exists("COM") ) {
-            $obj = new COM ( 'scripting.filesystemobject' );
+            $obj = new \COM ( 'scripting.filesystemobject' );
             if ( is_object ( $obj ) ) {
                 $ref = $obj->getfolder ( $dir );
                 $size = floatval($ref->size);

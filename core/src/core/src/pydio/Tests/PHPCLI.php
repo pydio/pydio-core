@@ -92,7 +92,7 @@ class PHPCLI extends AbstractTest
 
             $comCommand = $cmd;
             if ($useCOM) {
-                $WshShell   = new COM("WScript.Shell");
+                $WshShell   = new \COM("WScript.Shell");
                 $res = $WshShell->Run("cmd /C $comCommand", 0, false);
             } else {
                 $tmpBat = implode(DIRECTORY_SEPARATOR, array(str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH), "data","tmp", md5(time()).".bat"));
@@ -106,7 +106,7 @@ class PHPCLI extends AbstractTest
                 // Failed, but we can try with COM
                 if ( ! is_file(AJXP_CACHE_DIR."/cli_result.php") && $comEnabled ) {
                     $useCOM = true;
-                    $WshShell   = new COM("WScript.Shell");
+                    $WshShell   = new \COM("WScript.Shell");
                     $res = $WshShell->Run("cmd /C $comCommand", 0, false);
                 }
             }
