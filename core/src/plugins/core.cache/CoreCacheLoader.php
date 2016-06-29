@@ -69,7 +69,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
             }
             self::$cacheInstance = $pluginInstance;
             if($pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
-                //MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
+                MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
             }
         }
 

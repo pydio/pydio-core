@@ -10,6 +10,9 @@ namespace Pydio\Access\Core\Stream;
 use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Cache\Core\CacheStreamLayer;
+use Pydio\Core\Services\CacheService;
 
 /**
  * Stream decorator that can cache previously read bytes from a sequentially
@@ -22,6 +25,9 @@ class MetadataCachingStream implements StreamInterface
     /** @var array stat */
     private static $stat;
 
+    /** @var AJXP_Node node */
+    private $node;
+
     /** @var string uri */
     private $uri;
 
@@ -30,6 +36,9 @@ class MetadataCachingStream implements StreamInterface
 
     /** @var string path */
     private $path;
+
+    /** @var string statCacheId */
+    private $cacheId;
 
     /**
      * We will treat the buffer object as the body of the stream
@@ -43,7 +52,9 @@ class MetadataCachingStream implements StreamInterface
         AJXP_Node $node,
         StreamInterface $target = null
     ) {
+        $this->node = $node;
         $this->uri = $node->getUrl();
+        $this->cacheId = AbstractCacheDriver::computeIdForNode($node, "meta");
         $this->contentFilters = $node->getRepository()->getContentFilter()->filters;
         $this->path = parse_url($this->uri, PHP_URL_PATH);
 
@@ -90,9 +101,10 @@ class MetadataCachingStream implements StreamInterface
     }
 
     public function stat() {
-        if (isset(self::$stat[$this->uri])) {
-            return self::$stat[$this->uri];
-        }
+
+        $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId);
+
+        if(is_array($stat)) return $stat;
 
         $stats = $this->stream->stat();
 
@@ -106,13 +118,16 @@ class MetadataCachingStream implements StreamInterface
                     $path = $this->contentFilters[$path];
                 }
 
-                $key = rtrim($this->uri . $path, "/");
-                self::$stat[$key] = $stat;
+                $node = new AJXP_Node($this->uri . "/" . $path);
+
+                $id = AbstractCacheDriver::computeIdForNode($node, "meta");
+
+                CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $stat);
             }
         } else {
-            self::$stat[$this->uri] = $stats;
+            CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId, $stats);
         }
 
-        return self::$stat[$this->uri];
+        return CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId);
     }
 }

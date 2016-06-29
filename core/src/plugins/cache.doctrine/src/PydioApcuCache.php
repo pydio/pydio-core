@@ -20,13 +20,15 @@
  */
 namespace Pydio\Cache\Doctrine\Ext;
 
+use Doctrine\Common\Cache\ApcuCache;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
  * Class PydioApcuCache
  * @package Pydio\Cache\Doctrine\Ext
  */
-class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements PatternClearableCache
+class PydioApcuCache extends ApcuCache implements PatternClearableCache
 {
     protected $internalNamespace;
     protected $internalNamespaceVersion;
@@ -38,8 +40,8 @@ class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements Pattern
      *
      * @return string The namespaced id.
      */
-    private function namespacedIdAsPattern($id)
-    {
+    private function namespacedIdAsPattern($id) {
+        
         return sprintf('%s\['.preg_quote($id, "/"), $this->internalNamespace);
     }
 
@@ -47,8 +49,7 @@ class PydioApcuCache extends \Doctrine\Common\Cache\ApcuCache implements Pattern
      * @param string $pattern
      * @return bool
      */
-    public function deleteKeysStartingWith($pattern)
-    {
+    public function deleteKeysStartingWith($pattern) {
         $pattern = '/^'.$this->namespacedIdAsPattern($pattern).'/';
         //SAMPLE /^pydio-unique-id_nodes_\[list\:\/\/1/
         $iterator = new \APCIterator('user', $pattern);

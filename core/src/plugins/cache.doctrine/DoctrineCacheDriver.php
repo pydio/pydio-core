@@ -31,7 +31,11 @@ define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
 define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ChainCache;
 use Pydio\Cache\Core\AbstractCacheDriver;
+use Pydio\Cache\Doctrine\Ext\PydioChainCache;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
@@ -115,7 +119,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
      */
     private function initCacheWithNamespace($namespace){
         $cacheDriver    = null;
-        $emptyContext   = \Pydio\Core\Model\Context::emptyContext();
+        $emptyContext   = Context::emptyContext();
         $driverOptions  = $this->getContextualOption($emptyContext, "DRIVER");
         $cachePrefix    = $this->getContextualOption($emptyContext, "CACHE_PREFIX");
 
@@ -150,7 +154,19 @@ class doctrineCacheDriver extends AbstractCacheDriver
         if(empty($cachePrefix)){
             $cachePrefix = StringHelper::slugify(ApplicationState::detectServerURL(true));
         }
+
         $cachePrefix .= "_".$namespace."_";
+
+        // Using chained array for nodes
+        if ($namespace == AJXP_CACHE_SERVICE_NS_NODES) {
+            $arrayCache = new ArrayCache();
+
+            $cacheDriver = new PydioChainCache([
+                $arrayCache,
+                $cacheDriver
+            ]);
+        }
+
         $cacheDriver->setNamespace($cachePrefix);
         return $cacheDriver;
 
