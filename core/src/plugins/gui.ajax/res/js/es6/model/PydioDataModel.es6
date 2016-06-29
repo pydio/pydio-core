@@ -34,7 +34,6 @@ class PydioDataModel extends Observable{
 		this._bEmpty = true;
         this._globalEvents = !localEvents;
 
-        this._bUnique= false;
         this._bFile= false;
         this._bDir= false;
         this._isRecycle= false;
@@ -460,10 +459,8 @@ class PydioDataModel extends Observable{
 		this._selectedNodes = ajxpDataNodes;
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
 		this._bFile = this._bDir = this._isRecycle = false;
-        this._bUnique = false;
 		if(!this._bEmpty)
 		{
-			this._bUnique = (ajxpDataNodes.length == 1);
 			for(var i=0; i<ajxpDataNodes.length; i++)
 			{
 				var selectedNode = ajxpDataNodes[i];
@@ -555,7 +552,7 @@ class PydioDataModel extends Observable{
 	 * @returns Boolean
 	 */
 	isUnique  (){
-		return this._bUnique;
+		return this._selectedNodes && this._selectedNodes.length === 1;
 	}
 	
 	/**
