@@ -47,6 +47,10 @@
                     results.push(v);
                     previousRepo = repoId;
                 });
+                // Hack : force suggestions display
+                if(this.refs.autosuggest.lastSuggestionsInputValue && this.refs.autosuggest.lastSuggestionsInputValue.indexOf(input) === 0){
+                    this.refs.autosuggest.lastSuggestionsInputValue = input;
+                }
                 callback(null, results);
                 this.setState({loading:false});
             }.bind(this));
@@ -57,7 +61,7 @@
                 callback(null, []);
                 return;
             }
-            bufferCallback('suggestion-loader-search', 150, function(){
+            bufferCallback('suggestion-loader-search', 350, function(){
                 this.suggestionLoader(input, callback);
             }.bind(this));
         },
@@ -67,10 +71,16 @@
         },
 
         onSuggestionSelected: function(resultNode, event){
+            if(typeof resultNode === "string"){
+                return ;
+            }
             pydio.goTo(resultNode);
         },
 
         renderSuggestion(resultNode){
+            if(typeof resultNode === "string"){
+                return <span className="groupHeader">{resultNode}</span>;
+            }
             if(resultNode.isRoot()){
                 return <span className="groupHeader">{resultNode.getLabel()}<span className="openicon icon-long-arrow-right"></span></span>;
             }else{
@@ -104,7 +114,7 @@
                     <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
                     <ReactAutoSuggest
                         ref="autosuggest"
-                        cache={true}
+                        cache={false}
                         showWhen = {input => true }
                         inputAttributes={inputAttributes}
                         suggestions={this.getSuggestions}

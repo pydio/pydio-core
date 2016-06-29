@@ -163,7 +163,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             } catch (\Exception $ex) {
                 if ($this->seemsCurrentlyIndexing($ctx, 3)){
                     $x->addChunk(new UserMessage($messages["index.lucene.11"]));
-                }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !isSet($httpVars["skip_unindexed"])) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
