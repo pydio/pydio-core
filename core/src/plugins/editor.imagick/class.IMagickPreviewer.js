@@ -37,7 +37,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
             this.imgTag.setStyle({opacity:1});
-			this.resizeImage(true);
+			this.resizeImage();
 			var i;
 			for(i=0;i<this.items.length;i++){
 				if(this.items[i] == this.currentFile){
