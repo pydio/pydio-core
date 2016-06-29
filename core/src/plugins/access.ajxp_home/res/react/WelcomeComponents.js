@@ -114,7 +114,7 @@
                     <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
                     <ReactAutoSuggest
                         ref="autosuggest"
-                        cache={false}
+                        cache={true}
                         showWhen = {input => true }
                         inputAttributes={inputAttributes}
                         suggestions={this.getSuggestions}
