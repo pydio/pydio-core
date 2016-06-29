@@ -75,6 +75,7 @@ Class.create("FormManager", {
 			var name = param.get('name');
 			var type = param.get('type');
 			var desc = param.get('description');
+            var disabled = param.get('editable') ? (param.get('editable') === 'false') : false;
             var conn = new Connexion();
 
             // deduplicate
