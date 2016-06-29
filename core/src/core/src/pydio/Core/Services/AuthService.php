@@ -114,9 +114,12 @@ class AuthService
         BruteForceHelper::setBruteForceLoginArray($loginAttempt, true);
 
         $user = UsersService::getUserById($user_id, false);
-        
+
+        $tempContext = Context::contextWithObjects($user, null);
+        Controller::applyHook("user.before_login", [$tempContext, &$user]);
+
         // Setting session credentials if asked in config
-        if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
+        if (ConfService::getContextConf($tempContext, "SESSION_SET_CREDENTIALS", "auth")) {
             list($authId, $authPwd) = $authDriver->filterCredentials($user_id, $pwd);
             MemorySafe::storeCredentials($authId, $authPwd);
         }
@@ -140,6 +143,7 @@ class AuthService
         }
 
         self::updateUser($user);
+        Controller::applyHook("user.after_login", [$tempContext, $user]);
 
         Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
         return $user;
