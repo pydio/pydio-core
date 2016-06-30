@@ -221,11 +221,11 @@ class MqManager extends Plugin
         }
 
         // Publish for websockets
-        $input = array("REPO_ID" => $repositoryId, "CONTENT" => "<tree>".$xmlContent."</tree>");
+        $input = array("REPO_ID" => "$repositoryId", "CONTENT" => "<tree>".$xmlContent."</tree>");
         if(isSet($userId)){
-            $input["USER_ID"] = $userId;
+            $input["USER_ID"] = "$userId";
         } else if(isSet($gPath)) {
-            $input["GROUP_PATH"] = $gPath;
+            $input["GROUP_PATH"] = "$gPath";
         }
         if(count($nodePaths)) {
             $input["NODE_PATHES"] = $nodePaths;

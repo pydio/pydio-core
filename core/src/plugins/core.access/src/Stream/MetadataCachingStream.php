@@ -11,7 +11,6 @@ use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Cache\Core\AbstractCacheDriver;
-use Pydio\Cache\Core\CacheStreamLayer;
 use Pydio\Core\Services\CacheService;
 
 /**
@@ -37,8 +36,8 @@ class MetadataCachingStream implements StreamInterface
     /** @var string path */
     private $path;
 
-    /** @var string statCacheId */
-    private $cacheId;
+    /** @var array statCacheId */
+    private $cacheOptions;
 
     /**
      * We will treat the buffer object as the body of the stream
@@ -54,17 +53,13 @@ class MetadataCachingStream implements StreamInterface
     ) {
         $this->node = $node;
         $this->uri = $node->getUrl();
-        $this->cacheId = AbstractCacheDriver::computeIdForNode($node, "meta");
+        $this->cacheOptions = AbstractCacheDriver::getOptionsForNode($node, "meta");
         $this->contentFilters = $node->getRepository()->getContentFilter()->filters;
         $this->path = parse_url($this->uri, PHP_URL_PATH);
 
         $this->stream = $stream;
 
         $this->stat();
-    }
-
-    public function __destruct() {
-        $this->stream->close();
     }
 
     public function getSize() {
@@ -102,7 +97,7 @@ class MetadataCachingStream implements StreamInterface
 
     public function stat() {
 
-        $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId);
+        $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
 
         if(is_array($stat)) return $stat;
 
@@ -120,14 +115,14 @@ class MetadataCachingStream implements StreamInterface
 
                 $node = new AJXP_Node($this->uri . "/" . $path);
 
-                $id = AbstractCacheDriver::computeIdForNode($node, "meta");
+                $id = AbstractCacheDriver::getOptionsForNode($node, "meta")["id"];
 
                 CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $stat);
             }
         } else {
-            CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId, $stats);
+            CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"], $stats, $this->cacheOptions["timelimit"]);
         }
 
-        return CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheId);
+        return CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
     }
 }

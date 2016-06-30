@@ -3,9 +3,10 @@ namespace Pydio\Access\Core\Stream;
 
 use Exception;
 use Guzzle\Service\Loader\JsonLoader;
+use GuzzleHttp\Client;
+use GuzzleHttp\Command\Command;
 use GuzzleHttp\Command\Guzzle\Description;
 use GuzzleHttp\Command\Guzzle\GuzzleClient;
-use GuzzleHttp\Client as HTTPClient;
 use GuzzleHttp\Stream\GuzzleStreamWrapper;
 use GuzzleHttp\Stream\Stream as GuzzleStream;
 use GuzzleHttp\Stream\StreamInterface;
@@ -29,6 +30,12 @@ class Stream implements StreamInterface
 
     /** @var GuzzleClient $client */
     private $client;
+
+    /** @var Client $httpClient */
+    private $httpClient;
+
+    /** @var Command $command */
+    private $command;
 
     private $seekable = true;
     private $readable = true;
@@ -62,10 +69,19 @@ class Stream implements StreamInterface
         AJXP_Node $node,
         $options = []
     ) {
+
+        $this->node = $node;
+
         $ctx = $node->getContext();
         $repository = $ctx->getRepository();
 
+
         $this->customMetadata["uri"] = $node->getUrl();
+
+        $this->attach($resource);
+
+        $this->readable = isset($options['readable']) ? $options['readable'] : $this->readable;
+        $this->writable = isset($options['writable']) ? $options['writable'] : $this->writable;
 
         $apiUrl = $repository->getContextOption($ctx, "API_URL");
         $host = $repository->getContextOption($ctx, "HOST");
@@ -80,35 +96,35 @@ class Stream implements StreamInterface
         }
 
         $options["base_url"] = $apiUrl;
+        $this->httpClient = new Client([
+            "base_url" => $apiUrl
+        ]);
+
         $options["defaults"] = self::getContextOption($ctx);
         $resources = $options["defaults"]["resources"];
-        $options["defaults"] = array_intersect_key($options["defaults"], ["subscribers" => "", "auth" => ""]);
 
-        // Creating Guzzle instances
-        $httpClient = new HTTPClient($options);
         $locator = new FileLocator([dirname($resources)]);
         $jsonLoader = new JsonLoader($locator);
         $description = $jsonLoader->load($locator->locate(basename($resources)));
         $description = new Description($description);
-        $client = new GuzzleClient($httpClient, $description, $options);
+        $client = new GuzzleClient($this->httpClient, $description);
+
         foreach ($options["defaults"]["subscribers"] as $subscriber) {
             $client->getEmitter()->attach($subscriber);
         }
 
-        $stream = Stream::factory($resource);
-        $resource = PydioStreamWrapper::getResource($stream);
-        $this->attach($resource);
-
-        $this->node = $node;
         $this->client = $client;
     }
 
-    public static function factory($resource = '', array $options = [])
-    {
+    public static function factory($resource = '', $mode = "r+", array $options = []) {
         if ($resource instanceof AJXP_Node) {
-            $stream = fopen('php://memory', 'r+');
 
-            return new self($stream, $resource, $options);
+            $node = $resource;
+
+            return new self(fopen('php://memory', $mode), $node, [
+                "readable" => isset(self::$readWriteHash['read'][$mode]),
+                "writable" => isset(self::$readWriteHash['write'][$mode])
+            ]);
         }
 
         return GuzzleStream::factory($resource, $options);
@@ -192,8 +208,8 @@ class Stream implements StreamInterface
     public function attach($stream) {
         $this->resource = $stream;
         $meta = stream_get_meta_data($this->resource);
-
         $this->seekable = $meta['seekable'];
+
         $this->readable = isset(self::$readWriteHash['read'][$meta['mode']]);
         $this->writable = isset(self::$readWriteHash['write'][$meta['mode']]);
     }
@@ -304,6 +320,8 @@ class Stream implements StreamInterface
     /**
      * Give a relative tell()
      * {@inheritdoc}
+
+
      */
     public function tell() {
         return $this->resource ? ftell($this->resource) : false;
@@ -313,18 +331,29 @@ class Stream implements StreamInterface
         return $this->readable ? fread($this->resource, $length) : false;
     }
 
-    public function write($string) {
+    public function write($buffer) {
         // We can't know the size after writing anything
-        $this->size = null;
-
         $this->detach();
 
-        $stream = Stream::factory($string);
+        $type = gettype($buffer);
+
+        if ($type == "string") {
+            $stream = Stream::factory($buffer);
+        } else {
+            $stream = $buffer;
+            $stream->seek(0);
+        }
+
         $this->attach(GuzzleStreamWrapper::getResource($stream));
 
+        $this->size = $stream->getSize();
+
         $command = $this->client->getCommand('Put', [
-            'path' => $this->node,
-            'body' => $stream
+            'path'    => $this->node,
+            'headers' => [
+                "Content-Length" => $this->size
+            ],
+            'body' => $this->resource
         ]);
 
         $this->client->execute($command);
@@ -344,22 +373,42 @@ class Stream implements StreamInterface
         }
     }
 
-    private function ls() {
-        $command = $this->client->getCommand('Ls', [
+    private function prepare($cmdName = null) {
+
+        $options = self::getContextOption($this->node->getContext());
+        $options = array_intersect_key($options, ["subscribers" => "", "auth" => ""]);
+
+        if (!isset($this->httpClient)) {
+            $this->httpClient = new Client($options);
+        } else {
+            foreach ($options as $key => $option) {
+                $this->httpClient->setDefaultOption($key, $option);
+            }
+        }
+
+        if (!isset($cmdName)) {
+            return;
+        }
+
+        $this->command = $this->client->getCommand($cmdName, [
             'path' => $this->node
         ]);
+    }
 
-        $result = $this->client->execute($command);
+    private function ls() {
+
+        $this->prepare('Ls');
+
+        $result = $this->client->execute($this->command);
 
         return $result;
     }
 
     private function get() {
-        $command = $this->client->getCommand('Get', [
-            'path' => $this->node
-        ]);
 
-        $result = $this->client->execute($command);
+        $this->prepare('Get');
+
+        $result = $this->client->execute($this->command);
 
         $this->detach();
         $this->attach(GuzzleStreamWrapper::getResource($result["body"]));
@@ -368,12 +417,11 @@ class Stream implements StreamInterface
     }
 
     public function stat() {
-        $command = $this->client->getCommand('Stat', [
-            'path' => $this->node
-        ]);
+
+        $this->prepare('Stat');
 
         try {
-            $result = $this->client->execute($command);
+            $result = $this->client->execute($this->command);
         } catch (Exception $e) {
             return null;
         }
@@ -382,32 +430,30 @@ class Stream implements StreamInterface
     }
 
     public function mkdir() {
-        $command = $this->client->getCommand('Mkdir', [
-            'path' => $this->node
-        ]);
 
-        $this->client->execute($command);
+        $this->prepare('Mkdir');
+
+        $this->client->execute($this->command);
 
         return true;
     }
 
     public function rmdir() {
-        $command = $this->client->getCommand('Rmdir', [
-            'path' => $this->node
-        ]);
 
-        $this->client->execute($command);
+        $this->prepare('Rmdir');
+
+        $this->client->execute($this->command);
 
         return true;
     }
 
     public function rename($newNode) {
-        $command = $this->client->getCommand('Rename', [
+        $this->client->getCommand('Rename', [
             'path'    => $this->node,
             'newPath' => $newNode
         ]);
 
-        $this->client->execute($command);
+        $this->client->execute($this->command);
 
         return true;
     }

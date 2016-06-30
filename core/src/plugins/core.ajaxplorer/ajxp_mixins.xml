@@ -107,7 +107,7 @@
     </dibidriver_third_provider>
     <oauth_commons>
         <server_settings uuidAttr="name">
-            <param group="MIXIN_MESSAGE[OAuth Commons]" name="USE_OAUTH_STREAM" type="hidden" default="true" mandatory="true"/>
+            <param group="MIXIN_MESSAGE[OAuth Commons]" name="USE_OAUTH_STREAM" label="MIXIN_MESSAGE[OAuth Stream enabled]" description="MIXIN_MESSAGE[OAuth Stream enabled]" type="hidden" default="true" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="CLIENT_ID" type="string" label="MIXIN_MESSAGE[Client ID]" description="MIXIN_MESSAGE[Client ID]" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="CLIENT_SECRET" type="string" label="MIXIN_MESSAGE[Client SECRET]" description="MIXIN_MESSAGE[Client SECRET]" mandatory="true"/>
             <param group="MIXIN_MESSAGE[OAuth Commons]" name="SCOPE" type="string" label="MIXIN_MESSAGE[Scope]" description="MIXIN_MESSAGE[Scope]" default=""/>
