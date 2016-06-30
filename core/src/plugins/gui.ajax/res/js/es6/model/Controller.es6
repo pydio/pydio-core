@@ -441,12 +441,9 @@ class Controller extends Observable{
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireSelectionChange(){
-		var userSelection = null;
-        userSelection = this._dataModel;
-        if(userSelection.isEmpty()) userSelection = null;
 		this.actions.forEach(function(action){
-			action.fireSelectionChange(userSelection);
-		});
+			action.fireSelectionChange(this._dataModel);
+		}.bind(this));
         if(this.localDataModel){
             this.notify("actions_refreshed");
         }else{
@@ -459,11 +456,10 @@ class Controller extends Observable{
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireContextChange(){
-        var crtNode = this._dataModel.getContextNode();
 		this.actions.forEach(function(action){
-			action.fireContextChange(this.usersEnabled,
-									 this.oUser, 									 
-									 crtNode);
+			action.fireContextChange(this._dataModel,
+                                     this.usersEnabled,
+									 this.oUser);
 		}.bind(this));
         if(this.localDataModel){
             this.notify("actions_refreshed");

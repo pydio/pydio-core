@@ -164,7 +164,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             try {
                 $this->loadIndex($ctx, false);
             } catch (\Exception $ex) {
-                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !isSet($httpVars["skip_unindexed"])) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));

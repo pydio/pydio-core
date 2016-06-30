@@ -702,7 +702,7 @@ abstract class AbstractUser implements UserInterface
         if(strpos($r2, "AJXP_USR_") === 0) return -1;
 
         // Two groups, sort by string, will magically keep group hierarchy
-        if(strpos($r1, "AJXP_GRP_") === 0 && strpos($r2, "AJXP_GRP_") === 000) {
+        if(strpos($r1, "AJXP_GRP_") === false && strpos($r2, "AJXP_GRP_") === false) {
             return strcmp($r1,$r2);
         }
 

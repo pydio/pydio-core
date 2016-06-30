@@ -597,7 +597,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function getPath()
     {
-        return $this->urlParts["path"];
+        return !empty($this->urlParts["path"]) ? $this->urlParts["path"] : "/";
     }
 
     public function isRoot()

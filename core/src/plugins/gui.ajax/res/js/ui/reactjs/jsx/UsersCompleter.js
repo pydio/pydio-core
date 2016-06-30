@@ -57,6 +57,10 @@
                         return excludes.indexOf(user.getId()) == -1;
                     });
                 }
+                // Hack : force suggestions display
+                if(this.refs.autosuggest.lastSuggestionsInputValue && this.refs.autosuggest.lastSuggestionsInputValue.indexOf(input) === 0){
+                    this.refs.autosuggest.lastSuggestionsInputValue = input;
+                }
                 callback(null, users);
             }.bind(this), this.props.usersOnly, this.props.existingOnly);
         },

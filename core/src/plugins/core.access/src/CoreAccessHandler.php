@@ -59,6 +59,7 @@ class CoreAccessHandler extends Plugin
         $results->setParentNode(new AJXP_Node($parentContext->getUrlBase()));
         $searchParams = $requestInterface->getParsedBody();
         $searchParams["limit"] = 5;
+        $searchParams["skip_unindexed"] = "true";
         $searchParams["query"] = $searchParams["query"]."*";
         foreach($repositories as $repository){
             try{

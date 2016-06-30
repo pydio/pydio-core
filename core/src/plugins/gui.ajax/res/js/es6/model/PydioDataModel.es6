@@ -391,6 +391,14 @@ class PydioDataModel extends Observable{
                 parent.addChild(node);
             }
         }else{
+            if(node.getMetadata().get("original_path") === "/" && node.getPath() === "/"){
+                n = this.getRootNode();
+                n._metadata = node.getMetadata();
+                if(setSelectedAfterUpdate && this.getContextNode() == n) {
+                    this.setSelectedNodes([n], {});
+                }
+                return;
+            }
             fake = new AjxpNode(original);
             n = fake.findInArbo(this.getRootNode(), undefined);
             if(n && !n.isMoreRecentThan(node)){
