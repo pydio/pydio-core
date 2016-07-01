@@ -405,7 +405,8 @@ class NotificationCenter extends Plugin
                 $nodeRepo = $node->getRepository();
 
                 if($nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
-                    $currentRoot = $nodeRepo->getContextOption($ctx, "PATH");
+                    $newCtx = $node->getContext();
+                    $currentRoot = $nodeRepo->getContextOption($newCtx, "PATH");
                     $contentFilter = $nodeRepo->getContentFilter();
                     if(isSet($contentFilter)){
                         $nodePath = $contentFilter->filterExternalPath($node->getPath());
