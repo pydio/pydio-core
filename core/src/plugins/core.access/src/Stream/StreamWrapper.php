@@ -59,7 +59,11 @@ class StreamWrapper
     }
 
     public function stream_open($path, $mode, $options, &$opened_path) {
-        $this->stream = self::createStream($path);
+        $this->stream = self::createStream($path, $mode);
+
+        if ($this->stream->isWritable() && !$this->stream->isReadable()) {
+            $a = 1;
+        }
 
         return true;
     }
@@ -86,6 +90,10 @@ class StreamWrapper
 
     public function stream_seek($offset, $whence) {
         return $this->stream->seek($offset, $whence);
+    }
+
+    public function stream_close() {
+        $this->stream->close();
     }
 
     /**
@@ -164,11 +172,11 @@ class StreamWrapper
         return $stream->rmdir();
     }
 
-    public function rename($oldname, $newname) {
+    public function rename($oldName, $newName) {
 
-        $stream = self::createStream($oldname);
+        $stream = self::createStream($oldName);
 
-        return $stream->rename(new AJXP_Node($newname));
+        return $stream->rename(new AJXP_Node($newName));
     }
 
     public function url_stat($path, $flags) {
@@ -188,8 +196,7 @@ class StreamWrapper
         return true;
     }
 
-    public static function getRealFSReference($path, $persistent = false)
-    {
+    public static function getRealFSReference($path, $persistent = false) {
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
 
@@ -220,8 +227,10 @@ class StreamWrapper
         }
     }
 
-    public static function createStream($path) {
-        // TODO - determines this with the config
+    public static function changeMode($path, $chmodValue) {
+    }
+
+    public static function createStream($path, $mode = "r+") {
         $node = new AJXP_Node($path);
         $repository = $node->getRepository();
         $ctx = $node->getContext();
@@ -229,12 +238,15 @@ class StreamWrapper
         $useOAuthStream = $repository->getContextOption($ctx, "USE_OAUTH_STREAM", false);
         $useAuthStream = $repository->getContextOption($ctx, "USE_AUTH_STREAM", !$useOAuthStream);
 
-        $nodeStream = Stream::factory($node);
+        $nodeStream = Stream::factory($node, $mode);
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
         if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
+
         $nodeStream = new MetadataCachingStream($nodeStream, $node);
+        $nodeStream = new WriteBufferStream($nodeStream, $node);
+
+        PydioStreamWrapper::getResource($nodeStream);
 
         return $nodeStream;
-
     }
 }

@@ -176,20 +176,21 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
         // Clear meta for this node
         $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, true));
         $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, $this->computeId($node, false));
+        
         if($node->isLeaf()){
             // Clear stat
-            $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "stat")["id"]);
             // Clear parent listing
             if($node->getParent() !== null){
-                $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+                $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node->getParent(), "list"))["id"];
             }
         }else {
             // Delete node data and all its children
-            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "stat"));
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "stat")["id"]);
             if($node->getParent() !== null){
-                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node->getParent(), "list"));
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node->getParent(), "list")["id"]);
             }else{
-                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::computeIdForNode($node, "list"));
+                $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "list")["id"]);
             }
         }
     }
@@ -200,7 +201,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      * @return string
      */
     protected function computeId($node, $details){
-        return AbstractCacheDriver::computeIdForNode($node, "node.info", $details?"all":"short");
+        return AbstractCacheDriver::getOptionsForNode($node, "node.info", $details?"all":"short")["id"];
     }
 
     /**

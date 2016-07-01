@@ -754,14 +754,14 @@ Class.create("XHRUploader", {
         var uri;
 
         if (!this.configs.get("UPLOAD_ACTIVE")) {
-            xhr.withCredentials = true;
-
-            var uri = ajxpBootstrap.parameters.get('ajxpServerAccess') + "&get_action=upload&xhr_uploader=true&dir=" + encodeURIComponent(currentDir);
+            uri = ajxpBootstrap.parameters.get('ajxpServerAccess') + "&get_action=upload&xhr_uploader=true&dir=" + encodeURIComponent(currentDir);
 
             if (queryStringParam) {
                 uri += '&' + queryStringParam;
             }
         } else {
+            xhr.withCredentials = true;
+
             uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;
         }
 

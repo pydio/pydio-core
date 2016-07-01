@@ -21,6 +21,7 @@
 namespace Pydio\Cache\Doctrine\Ext;
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Doctrine\Common\Cache\RedisCache;
 use Redis;
 
 
@@ -28,7 +29,7 @@ use Redis;
  * Class PydioRedisCache
  * @package Pydio\Cache\Doctrine\Ext
  */
-class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements PatternClearableCache
+class PydioRedisCache extends RedisCache implements PatternClearableCache
 {
     /**
      * @var Redis

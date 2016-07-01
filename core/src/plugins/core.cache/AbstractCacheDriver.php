@@ -87,10 +87,10 @@ abstract class AbstractCacheDriver extends Plugin
      * @param string $details
      * @return string
      */
-    public static function computeIdForNode($node, $cacheType, $details = ''){
+    public static function getOptionsForNode($node, $cacheType, $details = ''){
         $ctx = $node->getContext();
         $repo = $node->getRepository();
-        if($repo == null) return "failed-id";
+        if($repo == null) return ["id" => "failed-id"];
         $scope = $repo->securityScope();
         $userId = $node->getUserId();
         // Compute second segment
@@ -106,8 +106,12 @@ abstract class AbstractCacheDriver extends Plugin
         }else{
             $subPath = "/shared";
         }
-        $ID = $cacheType."://".$repo->getId().$subPath.$node->getPath().($details?"##$details":"");
-        return $ID;
+
+        $options = [
+            "id"        => $cacheType."://".$repo->getId().$subPath.$node->getPath().($details?"##$details":""),
+            "timelimit" => $repo->getContextOption($ctx, "CACHE_TIMELIMIT", 5)
+        ];
+        return $options;
     }
 
     /**

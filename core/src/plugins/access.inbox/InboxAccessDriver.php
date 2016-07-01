@@ -161,9 +161,9 @@ class InboxAccessDriver extends FsAccessDriver
             $repoId = $repo->getId();
 
 //            DISABLE REMOTE SHARE FOR TESTING
-            if(strpos($repoId, "ocs_remote_share_") === 0){
+            /*if(strpos($repoId, "ocs_remote_share_") === 0){
                 continue;
-            }
+            }*/
 
             if(strpos($repoId, "ocs_remote_share_") !== 0){
                 $touchReposIds[] = $repoId;

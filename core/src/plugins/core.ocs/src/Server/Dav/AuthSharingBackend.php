@@ -25,9 +25,12 @@ defined('AJXP_EXEC') or die('Access not allowed');
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Log\Core\Logger;
 use Pydio\Share\Store\ShareStore;
 use Sabre\DAV;
 use Sabre\HTTP;
@@ -38,9 +41,10 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {
 
     /**
-     * @var Collection
+     * @var ContextInterface
      */
-    var $rootCollection;
+    private $context;
+
     /**
      * @var array
      */
@@ -48,10 +52,10 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
     /**
      * OCS_DavAuthSharingBackend constructor.
-     * @param Collection $rootCollection Repository object will be updated once authentication is passed
+     * @param ContextInterface $context Repository object will be updated once authentication is passed
      */
-    public function __construct($rootCollection){
-        $this->rootCollection = $rootCollection;
+    public function __construct(ContextInterface $context){
+        $this->context = $context;
     }
 
     /**
@@ -104,8 +108,8 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $ctx = new Context($token, null);
-        $shareStore = new ShareStore($ctx, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
+
+        $shareStore = new ShareStore($this->context, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;
@@ -126,10 +130,15 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
         if ($repository == null) {
             throw new DAV\Exception\NotAuthenticated('Username cannot access any repository');
         }else{
-            $this->rootCollection->updateRepository($repository);
+            $this->context->setRepositoryObject($repository);
         }
 
         $this->currentUser = $userpass[0];
+        $this->context->setUserId($this->currentUser);
+
+        Logger::updateContext($this->context);
+        TextEncoder::updateContext($this->context);
+
         return true;
     }
 

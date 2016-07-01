@@ -14,8 +14,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 
-class AuthStream implements StreamInterface
-{
+class AuthStream implements StreamInterface {
     use StreamDecoratorTrait;
 
     /** @var ContextInterface Context */
@@ -43,8 +42,7 @@ class AuthStream implements StreamInterface
             "auth" => $auth
         ]);
 
-        $resource = PydioStreamWrapper::getResource($stream);
-        $this->stream = new Stream($resource, $node);
+        $this->stream = $stream;
     }
 
     public function getContents() {

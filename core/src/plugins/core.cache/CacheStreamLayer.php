@@ -21,6 +21,7 @@
 namespace Pydio\Cache\Core;
 
 
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\SchemeTranslatorWrapper;
 use Pydio\Core\Services\CacheService;
 
@@ -29,91 +30,95 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class CacheStreamLayer extends SchemeTranslatorWrapper
 {
-    public static function clearStatCache($path){
-        $scheme = parse_url($path, PHP_URL_SCHEME);
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, str_replace($scheme . "://", "stat://", $path));
+    public static function clearStatCache($path) {
+        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "stat");
+
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);
     }
-    public static function clearDirCache($path){
-        $scheme = parse_url($path, PHP_URL_SCHEME);
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, str_replace($scheme . "://", "list://", $path));
+    public static function clearDirCache($path) {
+        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
+
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);
     }
 
     private $currentListingOrig = null;
     private $currentListingRead = null;
 
-    private $currentBufferId = null;
+    private $currentBufferOptions = null;
     private $currentBuffer = array();
 
-    /**
-     * @param $path
-     * @param $type
-     * @return string
-     */
-    protected function computeCacheId($path, $type){
-
-        return AbstractCacheDriver::computeIdForNode(new \Pydio\Access\Core\Model\AJXP_Node($path), $type);
-        
-    }
-
     // Keep listing in cache
-    public function dir_opendir($path, $options)
-    {
-        $id = $this->computeCacheId($path, "list");
-        if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
-            $this->currentListingRead = $this->currentListingOrig = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
+    public function dir_opendir($path, $options) {
+
+        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
+
+        if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $options["id"])) {
+            $this->currentListingRead = $this->currentListingOrig = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);
             return true;
         }
-        $this->currentBufferId = $id;
+
+        $this->currentBufferOptions = $options;
         $this->currentBuffer = array();
+
         return parent::dir_opendir($path, $options);
+
     }
 
-    public function dir_readdir()
-    {
-        if($this->currentListingRead !== null){
+    public function dir_readdir() {
+
+        if($this->currentListingRead !== null) {
             if(count($this->currentListingRead)) return array_shift($this->currentListingRead);
             else return false;
         }
+
         $value = parent::dir_readdir();
         if($value !== false){
             $this->currentBuffer[] = $value;
         }
+
         return $value;
     }
 
-    public function dir_closedir()
-    {
-        if($this->currentListingRead !== null){
+    public function dir_closedir() {
+
+        if($this->currentListingRead !== null) {
             $this->currentListingRead = $this->currentListingOrig = null;
             return;
         }
-        if(isSet($this->currentBufferId)){
-            CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->currentBufferId, $this->currentBuffer);
+
+        if(isSet($this->currentBufferOptions)) {
+            CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->currentBufferOptions["id"], $this->currentBuffer, $this->currentBufferOptions["timelimit"]);
         }
+
         parent::dir_closedir();
     }
 
-    public function dir_rewinddir()
-    {
-        if($this->currentListingOrig !== null){
+    public function dir_rewinddir() {
+
+        if($this->currentListingOrig !== null) {
             $this->currentListingRead = $this->currentListingOrig;
             return true;
         }
-        if(isSet($this->currentBuffer)){
+
+        if(isSet($this->currentBuffer)) {
             $this->currentBuffer = array();
         }
+
         return parent::dir_rewinddir();
     }
 
-    public function url_stat($path, $flags)
-    {
-        $id = $this->computeCacheId($path, "stat");
-        if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
-            $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
+    public function url_stat($path, $flags) {
+
+        $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "stat");
+
+        if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $options["id"])) {
+            $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);
             if(is_array($stat)) return $stat;
         }
+
         $stat = parent::url_stat($path, $flags);
-        CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $stat);
+        CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $options["id"], $stat, $options["timelimit"]);
+
         return $stat;
     }
 }
