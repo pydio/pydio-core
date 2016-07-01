@@ -171,6 +171,10 @@
             }
             var updatedData = [];
             if(operation == 'add'){
+                let pluginsConfig = pydio.getPluginConfigs("action.share");
+                if(pluginsConfig.get('WATCHER_SHARES_AUTO_USERS')){
+                    userData['WATCH'] = true;
+                }
                 this._pendingData['entries'].push(userData);
             }else if(operation == 'remove'){
                 this._pendingData['entries'].map(function(entry){
@@ -244,7 +248,12 @@
                 return this._pendingData[name];
             }
             if(name == 'watch') {
-                return this._data["element_watch"] == 'META_WATCH_BOTH';
+                if(this._data["element_watch"] !== undefined){
+                    return this._data["element_watch"] == 'META_WATCH_BOTH';
+                }else{
+                    let pluginConfigs = pydio.getPluginConfigs("action.share");
+                    return pluginConfigs.get('WATCHER_SHARES_AUTO_OWNER');
+                }
             }else{
                 return this._data[name];
             }
