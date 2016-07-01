@@ -401,7 +401,23 @@ class WatchRegister extends AbstractMetaSource
         );
         $userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
 
-        if ($cmd == "watch_stop" && isSet($meta) && isSet($meta[$userId])) {
+        if($node->isRoot() && $node->getRepository()->hasParent() && $cmd == "watch_stop" && !(isSet($meta) && isSet($meta[$userId]))){
+            $usersMeta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_USERS_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY);
+            if(is_array($usersMeta) && array_key_exists(self::$META_WATCH_USERS_CHANGE, $usersMeta) && array_key_exists($userId,$usersMeta[self::$META_WATCH_USERS_CHANGE])) {
+                unset($usersMeta[self::$META_WATCH_USERS_CHANGE][$userId]);
+                $this->metaStore->setMetadata(
+                    $node,
+                    self::$META_WATCH_USERS_NAMESPACE,
+                    $usersMeta,
+                    false,
+                    AJXP_METADATA_SCOPE_REPOSITORY
+                );
+            }
+        } else if ($cmd == "watch_stop" && isSet($meta) && isSet($meta[$userId])) {
             unset($meta[$userId]);
             $this->metaStore->removeMetadata(
                 $node,
@@ -531,6 +547,19 @@ class WatchRegister extends AbstractMetaSource
                 "overlay_icon" => "meta.watch/ICON_SIZE/watch.png",
                 "overlay_class" => "icon-eye-open"
             ), true);
+        }else if($node->isRoot() && $node->getRepository()->hasParent()){
+            $usersMeta = $this->metaStore->retrieveMetadata(
+                $node,
+                self::$META_WATCH_USERS_NAMESPACE,
+                false,
+                AJXP_METADATA_SCOPE_REPOSITORY);
+            if(is_array($usersMeta) && array_key_exists(self::$META_WATCH_USERS_CHANGE, $usersMeta) && array_key_exists($userId,$usersMeta[self::$META_WATCH_USERS_CHANGE])) {
+                $node->mergeMetadata(array(
+                    "meta_watched" => self::$META_WATCH_CHANGE,
+                    "overlay_icon" => "meta.watch/ICON_SIZE/watch.png",
+                    "overlay_class" => "icon-eye-open"
+                ), true);
+            }
         }
     }
 

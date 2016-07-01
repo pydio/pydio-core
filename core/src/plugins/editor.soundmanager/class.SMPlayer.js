@@ -224,16 +224,21 @@ Class.create("SMPlayer", AbstractEditor, {
         var rgxtrim = new RegExp('\/+$');
         crtRoot = crtRoot.replace(rgxtrim, '');
 
-        return new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
-<script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"></script>;\n\
-<script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"></script>\n\
+        return new Template('\
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/soundmanager2/2.97a.20150601/script/soundmanager2-nodebug-jsmin.js"></script>\n\
 <script>\n \
 soundManager.setup({\n\
-      url: "'+crtRoot+'/plugins/editor.soundmanager/sm/swf/",\n\
-      debugMode : false\n\
+      url: "https://cdnjs.cloudflare.com/ajax/libs/soundmanager2/2.97a.20150601/swf/",\n\
+      debugMode : false,\n\
+        onready: function() {\n\
+        var mySound = soundManager.createSound({\n\
+            id: "pydioSound",\n\
+            url: "#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'"\n\
+        });\n\
+        mySound.play();\n\
+    }\n\
 });\n\
-</script>\n\
-<a href="#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'" class="sm2_button">'+node.getLabel()+'</a> '+node.getLabel());
+</script>');
 
     },
 

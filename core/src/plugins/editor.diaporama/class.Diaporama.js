@@ -708,7 +708,7 @@ Class.create("Diaporama", AbstractEditor, {
 	
     getSharedPreviewTemplate : function(node){
 
-        return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
+        return new Template('<img src="#{DL_CT_LINK}">');
 
     },
 

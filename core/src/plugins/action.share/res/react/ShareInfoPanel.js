@@ -151,10 +151,10 @@
 
             let tplString ;
             let messKey = "61";
-            let newlink = this.props.publicLink + (this.props.publicLink.indexOf('?') !== -1 ? '&' : '?') + 'dl=true&ct=true';
+            let newlink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
             let template = global.pydio.UI.getSharedPreviewTemplateForEditor(editors[0], this.props.node);
             if(template){
-                tplString = template.evaluate({WIDTH:480, HEIGHT:260, DL_CT_LINK:newlink});
+                tplString = template.evaluate({WIDTH:350, HEIGHT:350, DL_CT_LINK:newlink});
             }else{
                 tplString = newlink;
                 messKey = "60";
@@ -173,7 +173,7 @@
                 inputValue={data.templateString}
                 inputClassName="share_info_panel_link"
                 getMessage={this.props.getMessage}
-                inputCopyMessage="192"
+                inputCopyMessage="229"
             />;
         }
 
@@ -215,6 +215,7 @@
                 var linkData = this.state.model.getPublicLinks()[0];
                 var isExpired = linkData["is_expired"];
 
+                // Main Link Field
                 var linkField = (<InfoPanelInputRow
                     inputTitle="121"
                     inputValue={linkData['public_link']}
@@ -222,8 +223,23 @@
                     getMessage={this.getMessage}
                     inputCopyMessage="192"
                 />);
+                if(this.props.node.isLeaf() && this.props.pydio.getPluginConfigs("action.share").get("INFOPANEL_DISPLAY_DIRECT_DOWNLOAD")){
+                    // Direct Download Field
+                    var downloadField = <InfoPanelInputRow
+                        inputTitle="60"
+                        inputValue={ReactModel.Share.buildDirectDownloadUrl(this.props.node, linkData['public_link'])}
+                        inputClassName="share_info_panel_link"
+                        getMessage={this.getMessage}
+                        inputCopyMessage="192"
+                    />;
+                }
                 if(this.props.node.isLeaf() && this.props.pydio.getPluginConfigs("action.share").get("INFOPANEL_DISPLAY_HTML_EMBED")){
-                    var templateField = <TemplatePanel {...this.props} getMessage={this.getMessage} publicLink={linkData.public_link} />;
+                    // HTML Code Snippet (may be empty)
+                    var templateField = <TemplatePanel
+                        {...this.props}
+                        getMessage={this.getMessage}
+                        publicLink={linkData.public_link}
+                    />;
                 }
             }
             var users = this.state.model.getSharedUsers();
@@ -282,6 +298,7 @@
             return (
                 <div>
                     {linkField}
+                    {downloadField}
                     {templateField}
                     {sharedUsersBlock}
                 </div>

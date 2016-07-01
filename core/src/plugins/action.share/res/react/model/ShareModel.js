@@ -865,6 +865,11 @@
         static federatedSharingEnabled(){
             return global.pydio.getPluginConfigs("core.ocs").get("ENABLE_FEDERATED_SHARING");
         }
+        
+        static buildDirectDownloadUrl(node, publicLink, contentProvider = false){
+            let ctString = contentProvider ? '&ct=true' : '';
+            return publicLink + (publicLink.indexOf('?') !== -1 ? '&' : '?') + 'dl=true'+ ctString +'&file=/'+encodeURIComponent(node.getLabel());
+        }
 
         prepareEmail(shareType, linkId = null){
             var MessageHash = global.pydio.MessageHash;
