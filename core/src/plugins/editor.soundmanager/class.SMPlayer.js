@@ -225,14 +225,14 @@ Class.create("SMPlayer", AbstractEditor, {
         crtRoot = crtRoot.replace(rgxtrim, '');
 
         return new Template('<link rel="stylesheet" type="text/css" href="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.css" />\n\
-&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"&gt;&lt;/script&gt;\n\
-&lt;script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"&gt;&lt;/script&gt;\n\
-&lt;script&gt;\n \
+<script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/soundmanager2.js"></script>;\n\
+<script type="text/javascript" src="'+crtRoot+'/plugins/editor.soundmanager/sm/shared/mp3-player-button.js"></script>\n\
+<script>\n \
 soundManager.setup({\n\
       url: "'+crtRoot+'/plugins/editor.soundmanager/sm/swf/",\n\
       debugMode : false\n\
 });\n\
-&lt;/script&gt;\n\
+</script>\n\
 <a href="#{DL_CT_LINK}&fake=ext.'+getAjxpMimeType(node)+'" class="sm2_button">'+node.getLabel()+'</a> '+node.getLabel());
 
     },

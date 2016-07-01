@@ -154,14 +154,15 @@ class MinisiteRenderer
 
         if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
             $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repository);
-            PluginsService::getInstance(Context::emptyContext());
+            $dlContext = Context::contextWithObjects($loggedUser, $repoObject);
+            PluginsService::getInstance($dlContext);
             $errMessage = null;
             try {
                 $params = $_GET;
                 $ACTION = "download";
                 if(isset($_GET["ct"])){
                     $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+                    $editors = PluginsService::getInstance($dlContext)->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
                     if (count($editors)) {
                         foreach ($editors as $editor) {
                             $xPath = new DOMXPath($editor->ownerDocument);
@@ -176,11 +177,11 @@ class MinisiteRenderer
                         }
                     }
                 }
-                $ctx = Context::emptyContext();
-                $req =  Controller::executableRequest($ctx, $ACTION, $params);
+                $req =  Controller::executableRequest($dlContext, $ACTION, $params);
                 $response = Controller::run($req);
                 $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();
                 $emitter->emitResponse($req, $response);
+                return;
             } catch (\Exception $e) {
                 $errMessage = $e->getMessage();
             }

@@ -91,6 +91,13 @@ Class.create("PydioUI", {
         }
     },
 
+    getSharedPreviewTemplateForEditor: function(editorData, node){
+        if(Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate) {
+            return Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate(node);
+        }
+        return null;
+    },
+
     registerAsMessageBoxReference: function(element){
         this._messageBoxReference = element;
     },
