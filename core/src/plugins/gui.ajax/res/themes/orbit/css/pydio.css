@@ -1814,6 +1814,36 @@ div.accordion_content div.dialogLegend {
   line-height: 1.4em;
   font-style: italic;
 }
+/***********************/
+/* AUTOCOMPLETION DIV  */
+/***********************/
+div.autocomplete {
+  position: absolute;
+  width: 250px;
+  background-color: white;
+  border: 0;
+  margin: 8px 0 0;
+  padding: 0;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  border-radius: 0;
+  max-height: 180px;
+  overflow-y: auto;
+}
+div.autocomplete ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+div.autocomplete ul li {
+  list-style-type: none;
+  display: block;
+  margin: 0;
+  padding: 7px;
+  cursor: pointer;
+}
+div.autocomplete ul li.selected {
+  background-color: aliceblue !important;
+}
 a.carousel-control {
   border-left: 1px solid #c4c7c1;
   border-right: 1px solid #c4c7c1;
