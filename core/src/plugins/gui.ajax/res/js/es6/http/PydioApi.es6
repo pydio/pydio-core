@@ -508,7 +508,7 @@ class PydioApi{
      * @param post Boolean Whether to POST or GET
      * @param completeCallback Function Callback to be called on complete
      */
-    submitForm(formName, post, completeCallback)
+    submitForm(formName, post = true, completeCallback = null)
     {
         var params = {};
         // TODO: UI IMPLEMENTATION
