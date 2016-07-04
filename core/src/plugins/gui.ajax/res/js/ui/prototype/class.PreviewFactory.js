@@ -87,14 +87,22 @@ Class.create("PreviewFactory", {
    			var loader = function(){
    				var img = oImageToLoad.mainObject.IMAGE_ELEMENT || $(oImageToLoad.index);
    				if(img == null || oImageToLoad.PFacLoader == null) return;
-   				var newImg = oImageToLoad.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
-   				newImg.setAttribute("data-is_loaded", "true");
-   				if(img.parentNode) {
-                    img.parentNode.replaceChild(newImg, img);
+                if(oImageToLoad.editorClass.prototype.getCoveringBackgroundSource && oImageToLoad.mainObject && oImageToLoad.mainObject.hasClassName('background-cover') && Modernizr.backgroundsize){
+                    img.setStyle({display:'none'});
+                    oImageToLoad.mainObject.setStyle({
+                        backgroundImage:'url(' + oImageToLoad.editorClass.prototype.getCoveringBackgroundSource(oImageToLoad.ajxpNode) + ')',
+                        backgroundSize : 'cover'
+                    });
+                }else{
+                    var newImg = oImageToLoad.editorClass.prototype.getPreview(oImageToLoad.ajxpNode);
+                    newImg.setAttribute("data-is_loaded", "true");
+                    if(img.parentNode) {
+                        img.parentNode.replaceChild(newImg, img);
+                    }
+                    oImageToLoad.mainObject.IMAGE_ELEMENT = newImg;
+                    this.resizeThumbnail(newImg);
+                    oImageToLoad.PFacLoader = null;
                 }
-   				oImageToLoad.mainObject.IMAGE_ELEMENT = newImg;
-   				this.resizeThumbnail(newImg);
-                oImageToLoad.PFacLoader = null;
    				this.loadNextImage();
    			}.bind(this);
             oImageToLoad.PFacLoader.src = oImageToLoad.editorClass.prototype.getThumbnailSource(oImageToLoad.ajxpNode);

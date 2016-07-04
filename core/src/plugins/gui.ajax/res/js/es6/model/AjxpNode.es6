@@ -171,6 +171,11 @@ class AjxpNode extends Observable{
         this.notify("child_removed", removePath);
     }
 
+    replaceMetadata(newMeta){
+        this._metadata = newMeta;
+        this.notify("meta_replaced", this);
+    }
+
     /**
      * Replaces the current node by a new one. Copy all properties deeply
      * @param ajxpNode AjxpNode

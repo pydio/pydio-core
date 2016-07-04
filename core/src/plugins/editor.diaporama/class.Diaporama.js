@@ -811,7 +811,11 @@ Class.create("Diaporama", AbstractEditor, {
 		});
 		return div;
 	},
-	
+
+    getCoveringBackgroundSource: function(ajxpNode){
+        return this.getThumbnailSource(ajxpNode);
+    },
+
 	getThumbnailSource : function(ajxpNode){
         var repoString = "";
         if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){

@@ -168,7 +168,7 @@ Class.create("FilesList", SelectableElements, {
         }
         var userDisplay = this.getUserPreference("display");
         if(userDisplay) this._displayMode = userDisplay;
-		this._thumbSize = 64;
+		this._thumbSize = 128;
 		this._crtImageIndex = 0;
         if(this.options.fixedThumbSize){
             this._fixedThumbSize = this.options.fixedThumbSize;
@@ -1914,7 +1914,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToDiv: function(ajxpNode){
 		var newRow = new Element('div', {
-            className:"thumbnail_selectable_cell",
+            className:"thumbnail_selectable_cell background-cover",
             id:"item-"+slugString(ajxpNode.getPath())});
 
 		var innerSpan = new Element('span', {style:"cursor:default;"});
@@ -1963,7 +1963,7 @@ Class.create("FilesList", SelectableElements, {
                 });
                 ovDiv.addClassName('overlay_icon_div');
             }
-            innerSpan.insert({after:ovDiv});
+            label.insert({bottom:ovDiv});
         }
 
 		this._htmlElement.insert(newRow);

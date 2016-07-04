@@ -98,17 +98,18 @@ Class.create("IMagickPreviewer", Diaporama, {
             className:'thumbnail_iconlike_shadow',
             align:'absmiddle',
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
-		});		
-		img.resizePreviewElement = function(dimensionObject){			
+		});
+        var div = new Element('div');
+        div.insert(img);
+		div.resizePreviewElement = function(dimensionObject){
 			var ratio = img.ratio;
 			if(!ratio) {
 				var fakeIm = new Image();
 				fakeIm.onload = function(){	
 					img.ratio = fakeIm.width/fakeIm.height;
-					img.resizePreviewElement(dimensionObject);
+					div.resizePreviewElement(dimensionObject);
 				};
 				fakeIm.src = img.src;
-				//img.onload = function(){img.resizePreviewElement(dimensionObject);};
 				ratio = 1.0;
 			}
 			var imgDim = {
@@ -116,7 +117,14 @@ Class.create("IMagickPreviewer", Diaporama, {
 				height:20/ratio
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
-			img.setStyle(styleObj);
+            img.setStyle(styleObj);
+            div.setStyle({
+                height:styleObj.height,
+                width:styleObj.width,
+                /*position:'relative',*/
+                display:'inline'
+            });
+            if($(div.parentNode)) $(div.parentNode).setStyle({position:"relative"});
         };
 		img.observe("mouseover", function(event){
 			var theImage = event.target;
@@ -159,7 +167,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 			if(theImage.up('.thumbnail_selectable_cell')) return;
 			theImage.previewOpener.setStyle({display:'none'});
 		});		
-		return img;
+		return div;
 	},
 
     getRESTPreviewLinks:function(node){

@@ -392,7 +392,7 @@ class PydioDataModel extends Observable{
         }else{
             if(node.getMetadata().get("original_path") === "/" && node.getPath() === "/"){
                 n = this.getRootNode();
-                n._metadata = node.getMetadata();
+                n.replaceMetadata(node.getMetadata());
                 if(setSelectedAfterUpdate && this.getContextNode() == n) {
                     this.setSelectedNodes([n], {});
                 }
