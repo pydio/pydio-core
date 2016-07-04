@@ -195,8 +195,10 @@ class AuthService
     {
         if (isSet($_SERVER['REMOTE_ADDR'])) {
             $serverAddress = $_SERVER['REMOTE_ADDR'];
-        } else {
+        } else if(isSet($_SERVER['SERVER_ADDR'])) {
             $serverAddress = $_SERVER['SERVER_ADDR'];
+        } else {
+            return TRUE;
         }
         $login = null;
         if (isSet($loginArray[$serverAddress])) {
