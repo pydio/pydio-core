@@ -1785,40 +1785,45 @@ Class.create("FilesList", SelectableElements, {
                     className   :'text_label'+fullview
                 }).update(metaData.get('text'));
 
-                var backgroundPosition = this.options.iconBgPosition || '4px 2px';
-                var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                if(metaData.get('overlay_class') && ajaxplorer.currentThemeUsesIconFonts){
-                    metaData.get('overlay_class').split(',').each(function(c){
-                        textLabel.insert(new Element('span', {className:c+' overlay-class-span'}));
-                    });
-                }else if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
-                    var ovIcs = metaData.get('overlay_icon').split(',');
-                    switch(ovIcs.length){
-                        case 1:
-                            backgroundPosition = '14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 2:
-                            backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 3:
-                            backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 4:
-                        default:
-                            backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
+                if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
+                    textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
+                    if(metaData.get('overlay_class')){
+                        metaData.get('overlay_class').split(',').each(function(c){
+                            textLabel.insert(new Element('span', {className:c+' overlay-class-span'}));
+                        });
                     }
+                }else{
+                    var backgroundPosition = this.options.iconBgPosition || '4px 2px';
+                    var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                    if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
+                        var ovIcs = metaData.get('overlay_icon').split(',');
+                        switch(ovIcs.length){
+                            case 1:
+                                backgroundPosition = '14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 2:
+                                backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 3:
+                                backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 4:
+                            default:
+                                backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                        }
+                    }
+                    textLabel.setStyle({
+                        paddingLeft:'24px',
+                        backgroundRepeat:'no-repeat',
+                        backgroundPosition:backgroundPosition,
+                        backgroundImage:backgroundImage
+                    });
                 }
-                textLabel.setStyle({
-                    paddingLeft:'24px',
-                    backgroundRepeat:'no-repeat',
-                    backgroundPosition:backgroundPosition,
-                    backgroundImage:backgroundImage
-                });
 
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 

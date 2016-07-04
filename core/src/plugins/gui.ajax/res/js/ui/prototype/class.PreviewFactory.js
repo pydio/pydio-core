@@ -152,7 +152,7 @@ Class.create("PreviewFactory", {
         var thumbSize = this._thumbSize;
    		var defaultMargin = 5;
         var tW, tH, mT, mB;
-        if(element.resizePreviewElement && element.getAttribute("data-is_loaded") == "true")
+        if(element.resizePreviewElement /*&& element.getAttribute("data-is_loaded") == "true"*/)
         {
             element.resizePreviewElement({width:thumbSize, height:thumbSize, margin:defaultMargin});
         }
