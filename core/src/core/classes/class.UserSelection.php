@@ -90,7 +90,7 @@ class UserSelection
         $this->files = array();
         $this->inZip = false;
         foreach ($nodes as $n) {
-            $this->files[] = $n->getPath();
+            $this->addFile($n->getPath());
         }
 
     }
@@ -110,7 +110,7 @@ class UserSelection
             if(strpos($v, "base64encoded:") === 0){
                 $v = base64_decode(array_pop(explode(':', $v, 2)));
             }
-            $this->files[] = AJXP_Utils::decodeSecureMagic($v);
+            $this->addFile(AJXP_Utils::decodeSecureMagic($v));
             $this->isUnique = true;
             //return ;
         }
@@ -121,7 +121,7 @@ class UserSelection
                 if(strpos($v, "base64encoded:") === 0){
                     $v = base64_decode(array_pop(explode(':', $v, 2)));
                 }
-                $this->files[] = AJXP_Utils::decodeSecureMagic($v);
+                $this->addFile(AJXP_Utils::decodeSecureMagic($v));
                 $index ++;
             }
             $this->isUnique = false;
@@ -133,7 +133,7 @@ class UserSelection
         if (isSet($array["nodes"]) && is_array($array["nodes"])) {
             $this->files = array();
             foreach($array["nodes"] as $value){
-                $this->files[] = AJXP_Utils::decodeSecureMagic($value);
+                $this->addFile(AJXP_Utils::decodeSecureMagic($value));
             }
             $this->isUnique = count($this->files) == 1;
         }
@@ -152,6 +152,18 @@ class UserSelection
             }
         }
     }
+
+    /**
+     * Add file to selection
+     * @param string $filePath
+     */
+    public function addFile($filePath){
+        if(!in_array($filePath, $this->files)){
+            $this->files[] = $filePath;
+        }
+    }
+
+
     /**
      * Does the selection have one or more items
      * @return bool
@@ -318,9 +330,5 @@ class UserSelection
             $this->nodes = $newNodes;
         }
     }
-
-    public function addFile($file){
-        $this->files[] = $file;
-    }
-
+    
 }

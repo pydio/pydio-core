@@ -31,13 +31,80 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.fs/class.fsAccessWrapper.php");
 class s3AccessWrapper extends fsAccessWrapper
 {
     public static $lastException;
+    protected static $clients = [];
+
+    /**
+     * @param Repository $repoObject
+     * @param boolean $registerStream
+     * @return \AccessS3\S3Client
+     */
+    protected static function getClientForRepository($repoObject, $registerStream = true)
+    {
+        require_once("aws.phar");
+        if (!isSet(self::$clients[$repoObject->getId()])) {
+            // Get a client
+            $options = array(
+                'key' => $repoObject->getOption("API_KEY"),
+                'secret' => $repoObject->getOption("SECRET_KEY")
+            );
+            $signatureVersion = $repoObject->getOption("SIGNATURE_VERSION");
+            if (!empty($signatureVersion)) {
+                $options['signature'] = $signatureVersion;
+            }
+            $baseURL = $repoObject->getOption("STORAGE_URL");
+            if (!empty($baseURL)) {
+                $options["base_url"] = $baseURL;
+            }
+            $region = $repoObject->getOption("REGION");
+            if (!empty($region)) {
+                $options["region"] = $region;
+            }
+            $proxy = $repoObject->getOption("PROXY");
+            if (!empty($proxy)) {
+                $options['request.options'] = array('proxy' => $proxy);
+            }
+            $apiVersion = $repoObject->getOption("API_VERSION");
+            if ($apiVersion === "") {
+                $apiVersion = "latest";
+            }
+            //SDK_VERSION IS A GLOBAL PARAM
+            ConfService::getConfStorageImpl()->_loadPluginConfig("access.s3", $globalOptions);
+            $sdkVersion = $globalOptions["SDK_VERSION"]; //$repoObject->driverInstance->driverConf['SDK_VERSION'];
+            if ($sdkVersion !== "v2" && $sdkVersion !== "v3") {
+                $sdkVersion = "v2";
+            }
+            if ($sdkVersion === "v3") {
+                require_once(__DIR__ . DIRECTORY_SEPARATOR . "class.pydioS3Client.php");
+                $s3Client = new \AccessS3\S3Client([
+                    "version" => $apiVersion,
+                    "region" => $region,
+                    "credentials" => $options
+                ]);
+                $s3Client->registerStreamWrapper($repoObject->getId());
+            } else {
+                $s3Client = Aws\S3\S3Client::factory($options);
+                if ($repoObject->getOption("VHOST_NOT_SUPPORTED")) {
+                    // Use virtual hosted buckets when possible
+                    require_once("ForcePathStyleListener.php");
+                    $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
+                }
+                $s3Client->registerStreamWrapper();
+            }
+            self::$clients[$repoObject->getId()] = $s3Client;
+        }
+        return self::$clients[$repoObject->getId()];
+    }
 
     /**
      * Initialize the stream from the given path.
      * Concretely, transform ajxp.s3:// into s3://
      *
      * @param string $path
+     * @param $streamType
+     * @param bool $storeOpenContext
+     * @param bool $skipZip
      * @return mixed Real path or -1 if currentListing contains the listing : original path converted to real path
+     * @throws Exception
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
@@ -49,12 +116,18 @@ class s3AccessWrapper extends fsAccessWrapper
             self::$lastException = $e;
             throw $e;
         }
+        // Make sure to register s3:// wrapper
+        $client = self::getClientForRepository($repoObject, true);
+        $protocol = "s3://";
+        if ($client instanceof \AccessS3\S3Client) {
+            $protocol = "s3." . $repoId . "://";
+        }
         $basePath = $repoObject->getOption("PATH");
         $baseContainer = $repoObject->getOption("CONTAINER");
         if(!empty($basePath)){
             $baseContainer.=rtrim($basePath, "/");
         }
-        $p = "s3://".$baseContainer.str_replace("//", "/", $url["path"]);
+        $p = $protocol . $baseContainer . str_replace("//", "/", $url["path"]);
         return $p;
     }
 
@@ -64,9 +137,10 @@ class s3AccessWrapper extends fsAccessWrapper
      *
      * @param String $path Maybe in the form "ajxp.fs://repositoryId/pathToFile"
      * @param String $mode
-     * @param unknown_type $options
-     * @param unknown_type $opened_path
-     * @return unknown
+     * @param string $options
+     * @param resource $context
+     * @return resource
+     * @internal param string $opened_path
      */
     public function stream_open($path, $mode, $options, &$context)
     {
@@ -89,9 +163,9 @@ class s3AccessWrapper extends fsAccessWrapper
      * Stats the given path.
      * Fix PEAR by adding S_ISREG mask when file case.
      *
-     * @param unknown_type $path
-     * @param unknown_type $flags
-     * @return unknown
+     * @param string $path
+     * @param integer $flags
+     * @return array
      */
     public function url_stat($path, $flags)
     {
@@ -109,9 +183,6 @@ class s3AccessWrapper extends fsAccessWrapper
             //return null;
         }
         return $stat;
-
-        // Non existing file
-           return null;
     }
 
     /**
@@ -119,9 +190,9 @@ class s3AccessWrapper extends fsAccessWrapper
      * Fix PEAR by being sure it ends up with "/", to avoid
      * adding the current dir to the children list.
      *
-     * @param unknown_type $path
-     * @param unknown_type $options
-     * @return unknown
+     * @param string $path
+     * @param string $options
+     * @return resource
      */
     public function dir_opendir ($path , $options )
     {
@@ -147,17 +218,9 @@ class s3AccessWrapper extends fsAccessWrapper
         if(is_dir($tmpDir)) rmdir($tmpDir);
     }
 
-    protected static function closeWrapper()
-    {
-        if (self::$crtZip != null) {
-            self::$crtZip = null;
-            self::$currentListing  = null;
-            self::$currentListingKeys = null;
-            self::$currentListingIndex = null;
-            self::$currentFileKey = null;
-        }
-    }
-
+    /**
+     * @inheritdoc
+     */
     public static function getRealFSReference($path, $persistent = false)
     {
         $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
@@ -170,12 +233,17 @@ class s3AccessWrapper extends fsAccessWrapper
            return $tmpFile;
     }
 
-
+    /**
+     * @inheritdoc
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public static function copyFileInStream($path, $stream)
     {
         AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Should load ".$path);
@@ -188,9 +256,18 @@ class s3AccessWrapper extends fsAccessWrapper
         fclose($fp);
     }
 
-    public static function changeMode($path, $chmodValue){}
+    /**
+     * @inheritdoc
+     */
+    public static function changeMode($path, $chmodValue)
+    {
+    }
 
-    public function rename($from, $to){
+    /**
+     * @inheritdoc
+     */
+    public function rename($from, $to)
+    {
 
         $fromUrl = parse_url($from);
         $repoId = $fromUrl["host"]; 
@@ -207,7 +284,7 @@ class s3AccessWrapper extends fsAccessWrapper
 
         if($isDir === true || is_dir($from)){
             AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Renaming dir $from to $to");
-            require_once("aws.phar");
+            require_once("aws-v2.phar");
 
             $fromUrl = parse_url($from);
             $repoId = $fromUrl["host"];
@@ -217,52 +294,7 @@ class s3AccessWrapper extends fsAccessWrapper
                 self::$lastException = $e;
                 throw $e;
             }
-            // Get a client
-            $options = array(
-                'key'    => $repoObject->getOption("API_KEY"),
-                'secret' => $repoObject->getOption("SECRET_KEY")
-            );
-            $signatureVersion = $repoObject->getOption("SIGNATURE_VERSION");
-            if(!empty($signatureVersion)){
-                $options['signature'] = $signatureVersion;
-            }
-            $baseURL = $repoObject->getOption("STORAGE_URL");
-            if(!empty($baseURL)){
-                $options["base_url"] = $baseURL;
-            }
-            $region = $repoObject->getOption("REGION");
-            if(!empty($region)){
-                $options["region"] = $region;
-            }
-            $proxy = $repoObject->getOption("PROXY");
-            if(!empty($proxy)){
-                $options['request.options'] = array('proxy' => $proxy);
-            }
-            $apiVersion = $repoObject->getOption("API_VERSION");
-            if ($apiVersion === "") {
-                $apiVersion = "latest";
-            }
-            //SDK_VERSION IS A GLOBAL PARAM
-            $sdkVersion = $repoObject->driverInstance->driverConf['SDK_VERSION'];
-            if ($sdkVersion !== "v2" && $sdkVersion !== "v3") {
-                $sdkVersion = "v2";
-            }
-            if ($sdkVersion === "v3") {
-                require_once ("class.pydioS3Client.php");
-                $s3Client = new AccessS3\S3Client([
-                    "version" => $apiVersion,
-                    "region"  => $region,
-                    "credentials" => $options
-                ]);
-            } else {
-                $s3Client = Aws\S3\S3Client::factory($options);
-                if($repoObject->getOption("VHOST_NOT_SUPPORTED")){
-                    // Use virtual hosted buckets when possible
-                    require_once("ForcePathStyleListener.php");
-                    $s3Client->addSubscriber(new \Aws\S3\ForcePathStyleStyleListener());
-                }
-            }
-
+            $s3Client = self::getClientForRepository($repoObject, false);
             $bucket = $repoObject->getOption("CONTAINER");
             $basePath = $repoObject->getOption("PATH");
             $fromKeyname   = trim(str_replace("//", "/", $basePath.parse_url($from, PHP_URL_PATH)),'/');
@@ -278,6 +310,7 @@ class s3AccessWrapper extends fsAccessWrapper
 
             // Perform a batch of CopyObject operations.
             $batch = array();
+            $failed = array();
             $iterator = $s3Client->getIterator('ListObjects', array(
                 'Bucket'     => $bucket,
                 'Prefix'     => $fromKeyname."/"
@@ -302,6 +335,8 @@ class s3AccessWrapper extends fsAccessWrapper
                 $toDelete[] = $currentFrom;
             }
             AJXP_Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute batch on ".count($batch)." objects");
+            ConfService::getConfStorageImpl()->_loadPluginConfig("access.s3", $globalOptions);
+            $sdkVersion = $globalOptions["SDK_VERSION"];
             if ($sdkVersion === "v3") {
                 foreach ($batch as $command) {
                     $successful = $s3Client->execute($command);

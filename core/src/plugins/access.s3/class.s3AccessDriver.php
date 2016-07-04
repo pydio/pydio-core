@@ -52,7 +52,7 @@ class s3AccessDriver extends fsAccessDriver
      * Override parent to register underlying wrapper (s3) as well
      */
     public function detectStreamWrapper($register = false){
-
+        /*
         if(isSet($this->repository)){
             require_once("aws.phar");
             $options = array(
@@ -99,6 +99,7 @@ class s3AccessDriver extends fsAccessDriver
 
             $this->s3Client->registerStreamWrapper();
         }
+        */
         return parent::detectStreamWrapper($register);
     }
 

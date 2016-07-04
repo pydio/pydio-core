@@ -34,7 +34,6 @@ class PydioDataModel extends Observable{
 		this._bEmpty = true;
         this._globalEvents = !localEvents;
 
-        this._bUnique= false;
         this._bFile= false;
         this._bDir= false;
         this._isRecycle= false;
@@ -391,6 +390,14 @@ class PydioDataModel extends Observable{
                 parent.addChild(node);
             }
         }else{
+            if(node.getMetadata().get("original_path") === "/" && node.getPath() === "/"){
+                n = this.getRootNode();
+                n._metadata = node.getMetadata();
+                if(setSelectedAfterUpdate && this.getContextNode() == n) {
+                    this.setSelectedNodes([n], {});
+                }
+                return;
+            }
             fake = new AjxpNode(original);
             n = fake.findInArbo(this.getRootNode(), undefined);
             if(n && !n.isMoreRecentThan(node)){
@@ -452,10 +459,8 @@ class PydioDataModel extends Observable{
 		this._selectedNodes = ajxpDataNodes;
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
 		this._bFile = this._bDir = this._isRecycle = false;
-        this._bUnique = false;
 		if(!this._bEmpty)
 		{
-			this._bUnique = (ajxpDataNodes.length == 1);
 			for(var i=0; i<ajxpDataNodes.length; i++)
 			{
 				var selectedNode = ajxpDataNodes[i];
@@ -539,7 +544,7 @@ class PydioDataModel extends Observable{
                 }
             });
         }catch(e){}
-
+        return found;
     }
 
 	/**
@@ -547,7 +552,7 @@ class PydioDataModel extends Observable{
 	 * @returns Boolean
 	 */
 	isUnique  (){
-		return this._bUnique;
+		return this._selectedNodes && this._selectedNodes.length === 1;
 	}
 	
 	/**

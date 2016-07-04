@@ -40,7 +40,7 @@
                         };
                         var completeFunction = function(){
                             var value = modal.getForm().down("input#accept_disclaimer").checked ? "true" : "false";
-                            conn = new Connexion();
+                            var conn = new Connexion();
                             conn.addParameter("get_action", "validate_disclaimer");
                             conn.addParameter("validate", value);
                             conn.onComplete = function(transport){

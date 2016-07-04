@@ -1,0 +1,34 @@
+/***********************/
+/* AUTOCOMPLETION DIV  */
+/***********************/
+div.autocomplete
+{
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:0;
+  margin:8px 0 0;
+  padding: 0;
+  box-shadow: @reactBoxShadowDepth1;
+  border-radius: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  ul
+  {
+    list-style-type:none;
+    margin: 0;
+    padding: 0;
+    li
+    {
+      list-style-type:none;
+      display:block;
+      margin:0;
+      padding:7px;
+      cursor:pointer;
+      &.selected
+      {
+        background-color: aliceblue !important;
+      }
+    }
+  }
+}
