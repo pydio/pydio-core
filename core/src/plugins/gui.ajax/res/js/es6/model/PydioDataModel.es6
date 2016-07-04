@@ -539,7 +539,7 @@ class PydioDataModel extends Observable{
                 }
             });
         }catch(e){}
-
+        return found;
     }
 
 	/**

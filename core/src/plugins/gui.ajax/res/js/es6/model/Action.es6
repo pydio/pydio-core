@@ -302,7 +302,7 @@ class Action extends Observable{
 		}
         if(this.options.activeCondition){
             try{
-                var result = this.options.activeCondition();
+                let result = this.options.activeCondition();
                 if(result === false) this.disable();
                 else if(result === true) this.enable();
             }catch(e){
@@ -329,7 +329,7 @@ class Action extends Observable{
 			else this.disable();
 		}
         if(selectionContext.evalMetadata && userSelection && userSelection.isUnique()){
-            var result = this._evalScripts(selectionContext.evalMetadata, userSelection.getUniqueNode().getMetadata());
+            let result = this._evalScripts(selectionContext.evalMetadata, userSelection.getUniqueNode().getMetadata());
             if(!result){
                 if(selectionContext.behaviour == 'hidden') this.hide();
              	else this.disable();
