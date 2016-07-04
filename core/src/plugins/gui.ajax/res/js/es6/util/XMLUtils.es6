@@ -37,7 +37,7 @@ class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectSingleNode(element, query){
-        if(element.selectSingleNode){
+        if(typeof element.selectSingleNode === "function"){
             try{
                 var res = element.selectSingleNode(query);
                 if(res) return res;
@@ -76,7 +76,7 @@ class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectNodes(element, query){
-        if(element.selectNodes){
+        if(typeof element.selectNodes === "function"){
             try{
                 try{
                     if(element.ownerDocument && element.ownerDocument.setProperty){
