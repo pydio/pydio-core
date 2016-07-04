@@ -142,12 +142,13 @@ class AJXP_SqlFeedStore extends AJXP_Plugin implements AJXP_FeedStore, SqlTableP
                 if($filterByPath[strlen($filterByPath)-1]=='/'){
                     //$groupByClause = " GROUP BY [index_path] ";
                 }
-                $index_path = "%://".$filterByRepositories[0].$filterByPath."%";
+                $index_path[] = array("[index_path] LIKE %s","%://".$filterByRepositories[0].$filterByPath."%");
+                $index_path[] = array("[index_path] LIKE %s","%://".$userId."@".$filterByRepositories[0].$filterByPath."%");
                 $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
                 AND
                   ( %or )
                 AND
-                  ([index_path] LIKE %s)
+                  ( %or )
                 AND (
                     [repository_scope] = 'ALL'
                     OR  ([repository_scope] = 'USER' AND [user_id] = %s  )
