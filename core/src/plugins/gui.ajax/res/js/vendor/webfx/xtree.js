@@ -274,6 +274,15 @@ WebFXTreeAbstractNode.prototype.updateLabel = function(label){
 	if($(this.id+'-label')) $(this.id+'-label').update(label);	
 };
 
+WebFXTreeAbstractNode.prototype.updateIcon = function(icon, openIcon, overlayIcon, overlayClasses){
+    if(openIcon) this.openIcon = openIcon;
+    else this.openIcon = icon;
+    this.icon = icon;
+    this.overlayIcon = overlayIcon ? overlayIcon : [];
+    this.overlayClasses = overlayClasses ? overlayClasses : [];
+    this.setLabelIcon((this.open && webFXTreeHandler.behavior != 'classic'?this.openIcon:icon));
+};
+
 WebFXTreeAbstractNode.prototype.setLabelIcon = function(icon){
     if(!$(this.id+'-label')) return;
     var label = $(this.id+'-label');
@@ -559,11 +568,22 @@ WebFXTree.prototype.keydown = function(key) {
 } ;
 
 WebFXTree.prototype.toString = function() {
-		
-	var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
+
+    var d = '';
+    if(this.overlayClasses) {
+
+        d = '<div class="overlay_icon_div">';
+        this.overlayClasses.each(function (c) {
+            d += '<span class="overlay-class-span ' + c + '"></span>';
+        });
+        d += '</div>';
+
+    }
+
+    var str = "<div id=\"" + this.id + "\" ondblclick=\"webFXTreeHandler.toggle(this);\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\">" +
 		"<a href=\"/\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\"  onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +
 		(this.target ? " target=\"" + this.target + "\"" : "") +
-		">" + '<span id=\"' +this.id+ '-label\" style="background-image:url(\''+ ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) +'\');">' + this.text + "</span>" + "</a></div>" +
+		">" + '<span id=\"' +this.id+ '-label\" style="background-image:url(\''+ ((webFXTreeHandler.behavior == 'classic' && this.open)?this.openIcon:this.icon) +'\');">' + this.text + d + "</span>" + "</a></div>" +
 		"<div id=\"" + this.id + "-cont\" class=\"webfx-tree-container first_container\" style=\"display: " + ((this.open)?'block':'none') + ";\">";
 	var sb = [];
 	for (var i = 0; i < this.childNodes.length; i++) {
@@ -592,13 +612,6 @@ function WebFXTreeItem(sText, sAction, eParent, sIcon, sOpenIcon, sOverlayIcon, 
 }
 
 WebFXTreeItem.prototype = new WebFXTreeAbstractNode;
-
-WebFXTreeItem.prototype.updateIcon = function(icon, openIcon){
-	if(openIcon) this.openIcon = openIcon;
-	else this.openIcon = icon;
-	this.icon = icon;
-	this.setLabelIcon((this.open && webFXTreeHandler.behavior != 'classic'?this.openIcon:icon));
-};
 
 
 WebFXTreeItem.prototype.remove = function() {

@@ -96,6 +96,11 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	};
 	this.ajxpNode.observe("force_clear",  clear.bind(this));
 	this.ajxpNode.observe("node_replaced",  clear.bind(this));
+    this.ajxpNode.observe("meta_replaced", function(newNode){
+        var overlayIcon = splitOverlayIcons(newNode);
+        var overlayClasses = splitOverlayClasses(newNode);
+        this.updateIcon(this.icon, this.openIcon, overlayIcon, overlayClasses);
+    }.bind(this));
 	this.attachListeners(this, rootNode);
 	if(oldNode){
 		oldNode.notify("node_replaced");
@@ -136,11 +141,11 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 			if(ajxpNode.getMetadata().get("openicon")){
 				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
 			}
-            if(jsNode.icon != ic || jsNode.openIcon != oic){
-    			jsNode.updateIcon(ic, oic);
+            var overlayIcon = splitOverlayIcons(ajxpNode);
+            var overlayClasses = splitOverlayClasses(ajxpNode);
+            if(jsNode.icon != ic || jsNode.openIcon != oic || jsNode.overlayIcon != overlayIcon || jsNode.overlayClasses != overlayClasses){
+    			jsNode.updateIcon(ic, oic, overlayIcon, overlayClasses);
             }
-            jsNode.overlayIcon = splitOverlayIcons(ajxpNode);
-            jsNode.overlayClasses = splitOverlayClasses(ajxpNode);
 		}
 		if(jsNode.updateLabel && jsNode.text != ajxpNode.getLabel()) {
             jsNode.updateLabel(ajxpNode.getLabel());

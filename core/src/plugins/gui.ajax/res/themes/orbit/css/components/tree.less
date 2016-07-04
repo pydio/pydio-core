@@ -234,11 +234,11 @@ div#tree_container{
 }
 
 div.selected-webfx-tree-item-inactive{
-  background: @tree_item_selected_bg !important;
+  background-color: @tree_item_selected_bg !important;
 }
 
 div.selected-webfx-tree-item, .selected-focus{
-  background: @tree_item_selected_focused_bg !important;
+  background-color: @tree_item_selected_focused_bg !important;
 }
 
 .settings_main_pane div.selected-webfx-tree-item,
@@ -259,6 +259,19 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a
 
 .webfx-tree-item{
   div.overlay_icon_div {
-    display: none;
+    display: inline;
+    span.overlay-class-span {
+      margin: 0 !important;
+      padding: 0 0 0 8px !important;
+      font-size: 11px !important;
+      opacity: 0.73;
+    }
+  }
+  &.selected-webfx-tree-item{
+    div.overlay_icon_div{
+      span.overlay-class-span{
+        color: white !important;
+      }
+    }
   }
 }
