@@ -473,6 +473,9 @@
                             window.ajxpBootstrap.parameters.set("currentLanguage", value);
                         }
 					]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[
+                        pydio.Controller.fireAction("login");
+                    ]]></dialogOnCancel>
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="switch_language_form"><![CDATA[
