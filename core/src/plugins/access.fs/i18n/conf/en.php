@@ -43,4 +43,6 @@ $mess=array(
 "Use php POSIX extension to read files permissions. Only works on *nix systems." => "Use php POSIX extension to read files permissions. Only works on *nix systems.",
 "X-Accel-Redirect Active" => "X-Accel-Redirect Active",
 "Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping" => "Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping",
+"Zip downloading files on the fly" => "Zip downloading files on the fly",
+"Directly write the zip file to an output stream which is connected to the user's browser." => "Directly write the zip file to an output stream which is connected to the user's browser.",
 );

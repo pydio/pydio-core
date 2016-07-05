@@ -195,6 +195,9 @@
     // ----- File descriptor of the zip file
     var $zip_fd = 0;
 
+    // ----- Current position in the zip file
+    var $zip_ftell = 0;
+
     // ----- Internal error handling
     var $error_code = 1;
     var $error_string = '';
@@ -224,6 +227,7 @@
     // ----- Set the attributes
     $this->zipname = $p_zipname;
     $this->zip_fd = 0;
+    $this->zip_ftell = 0;
     $this->magic_quotes_status = -1;
 
     // ----- Return
@@ -1111,6 +1115,7 @@
     if (@is_file($this->zipname))
     {
       // ----- Open the zip file
+      $this->zip_ftell = 0;
       if (($this->zip_fd = @fopen($this->zipname, 'rb')) == 0)
       {
         $this->privSwapBackMagicQuotes();
@@ -2195,11 +2200,13 @@
 
     // ----- Go to beginning of File
     @rewind($this->zip_fd);
+    $this->zip_ftell = 0;
 
     // ----- Creates a temporay file
     $v_zip_temp_name = PCLZIP_TEMPORARY_DIR.uniqid('pclzip-').'.tmp';
 
     // ----- Open the temporary file in write mode
+    $v_zip_temp_ftell = 0;
     if (($v_zip_temp_fd = @fopen($v_zip_temp_name, 'wb')) == 0)
     {
       $this->privCloseFd();
@@ -2214,6 +2221,8 @@
     // ----- Copy the files from the archive to the temporary file
     // TBC : Here I should better append the file and go back to erase the central dir
     $v_size = $v_central_dir['offset'];
+    $this->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -2228,6 +2237,9 @@
     $v_swap = $this->zip_fd;
     $this->zip_fd = $v_zip_temp_fd;
     $v_zip_temp_fd = $v_swap;
+    $v_swap = $this->zip_ftell;
+    $this->zip_ftell = $v_zip_temp_ftell;
+    $v_zip_temp_ftell = $v_swap;
 
     // ----- Add the files
     $v_header_list = array();
@@ -2243,10 +2255,12 @@
     }
 
     // ----- Store the offset of the central dir
-    $v_offset = @ftell($this->zip_fd);
+    $v_offset = $this->zip_ftell;
 
     // ----- Copy the block of file headers from the old archive
     $v_size = $v_central_dir['size'];
+    $this->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -2289,7 +2303,7 @@
     }
 
     // ----- Calculate the size of the central header
-    $v_size = @ftell($this->zip_fd)-$v_offset;
+    $v_size = $this->zip_ftell-$v_offset;
 
     // ----- Create the central dir footer
     if (($v_result = $this->privWriteCentralHeader($v_count+$v_central_dir['entries'], $v_size, $v_offset, $v_comment)) != 1)
@@ -2306,7 +2320,10 @@
     $v_swap = $this->zip_fd;
     $this->zip_fd = $v_zip_temp_fd;
     $v_zip_temp_fd = $v_swap;
-
+    $v_swap = $this->zip_ftell;
+    $this->zip_ftell = $v_zip_temp_ftell;
+    $v_zip_temp_ftell = $v_swap;
+    
     // ----- Close
     $this->privCloseFd();
 
@@ -2350,6 +2367,7 @@
     }
 
     // ----- Open the zip file
+    $this->zip_ftell = 0;
     if (($this->zip_fd = @fopen($this->zipname, $p_mode)) == 0)
     {
       // ----- Error log
@@ -2376,6 +2394,7 @@
     if ($this->zip_fd != 0)
       @fclose($this->zip_fd);
     $this->zip_fd = 0;
+    $this->zip_ftell = 0;
 
     // ----- Return
     return $v_result;
@@ -2409,7 +2428,7 @@
     }
 
     // ----- Store the offset of the central dir
-    $v_offset = @ftell($this->zip_fd);
+    $v_offset = $this->zip_ftell;
 
     // ----- Create the Central Dir files header
     for ($i=0,$v_count=0; $i<sizeof($v_header_list); $i++)
@@ -2434,7 +2453,7 @@
     }
 
     // ----- Calculate the size of the central header
-    $v_size = @ftell($this->zip_fd)-$v_offset;
+    $v_size = $this->zip_ftell-$v_offset;
 
     // ----- Create the central dir footer
     if (($v_result = $this->privWriteCentralHeader($v_count, $v_size, $v_offset, $v_comment)) != 1)
@@ -2703,6 +2722,7 @@
 
         // ----- Write the compressed (or not) content
         @fwrite($this->zip_fd, $v_content, $p_header['compressed_size']);
+        $this->zip_ftell += $p_header['compressed_size'];
 
         }
 
@@ -2741,6 +2761,7 @@
 
         // ----- Write the compressed (or not) content
         @fwrite($this->zip_fd, $v_content, $p_header['compressed_size']);
+        $this->zip_ftell += $p_header['compressed_size'];
       }
 
       // ----- Look for a directory
@@ -2884,6 +2905,7 @@
     // ----- Read the file by PCLZIP_READ_BLOCK_SIZE octets blocks
     fseek($v_file_compressed, 10);
     $v_size = $p_header['compressed_size'];
+    $this->zip_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -3029,7 +3051,7 @@
     $v_result=1;
 
     // ----- Store the offset position of the file
-    $p_header['offset'] = ftell($this->zip_fd);
+    $p_header['offset'] = $this->zip_ftell;
 
     // ----- Transform UNIX mtime to DOS format mdate/mtime
     $v_date = getdate($p_header['mtime']);
@@ -3047,15 +3069,18 @@
 
     // ----- Write the first 148 bytes of the header in the archive
     fputs($this->zip_fd, $v_binary_data, 30);
+    $this->zip_ftell += 30;
 
     // ----- Write the variable fields
     if (strlen($p_header['stored_filename']) != 0)
     {
       fputs($this->zip_fd, $p_header['stored_filename'], strlen($p_header['stored_filename']));
+      $this->zip_ftell += strlen($p_header['stored_filename']);
     }
     if ($p_header['extra_len'] != 0)
     {
       fputs($this->zip_fd, $p_header['extra'], $p_header['extra_len']);
+      $this->zip_ftell += $p_header['extra_len'];
     }
 
     // ----- Return
@@ -3096,19 +3121,23 @@
 
     // ----- Write the 42 bytes of the header in the zip file
     fputs($this->zip_fd, $v_binary_data, 46);
+    $this->zip_ftell += 46;
 
     // ----- Write the variable fields
     if (strlen($p_header['stored_filename']) != 0)
     {
       fputs($this->zip_fd, $p_header['stored_filename'], strlen($p_header['stored_filename']));
+      $this->zip_ftell += strlen($p_header['stored_filename']);
     }
     if ($p_header['extra_len'] != 0)
     {
       fputs($this->zip_fd, $p_header['extra'], $p_header['extra_len']);
+      $this->zip_ftell += $p_header['extra_len'];
     }
     if ($p_header['comment_len'] != 0)
     {
       fputs($this->zip_fd, $p_header['comment'], $p_header['comment_len']);
+      $this->zip_ftell += $p_header['comment_len'];
     }
 
     // ----- Return
@@ -3133,11 +3162,13 @@
 
     // ----- Write the 22 bytes of the header in the zip file
     fputs($this->zip_fd, $v_binary_data, 22);
+    $this->zip_ftell += 22;
 
     // ----- Write the variable fields
     if (strlen($p_comment) != 0)
     {
       fputs($this->zip_fd, $p_comment, strlen($p_comment));
+      $this->zip_ftell += strlen($p_comment);
     }
 
     // ----- Return
@@ -3159,6 +3190,7 @@
     $this->privDisableMagicQuotes();
 
     // ----- Open the zip file
+    $this->zip_ftell = 0;
     if (($this->zip_fd = @fopen($this->zipname, 'rb')) == 0)
     {
       // ----- Magic quotes trick
@@ -3181,6 +3213,7 @@
 
     // ----- Go to beginning of Central Dir
     @rewind($this->zip_fd);
+    $this->zip_ftell = 0;
     if (@fseek($this->zip_fd, $v_central_dir['offset']))
     {
       $this->privSwapBackMagicQuotes();
@@ -3191,6 +3224,7 @@
       // ----- Return
       return PclZip::errorCode();
     }
+    $this->zip_ftell = $v_central_dir['offset'];
 
     // ----- Read each entry
     for ($i=0; $i<$v_central_dir['entries']; $i++)
@@ -3336,6 +3370,7 @@
 
       // ----- Read next Central dir entry
       @rewind($this->zip_fd);
+      $this->zip_ftell = 0;
       if (@fseek($this->zip_fd, $v_pos_entry))
       {
         // ----- Close the zip file
@@ -3348,6 +3383,7 @@
         // ----- Return
         return PclZip::errorCode();
       }
+      $this->zip_ftell = $v_pos_entry;
 
       // ----- Read the file header
       $v_header = array();
@@ -3364,7 +3400,7 @@
       $v_header['index'] = $i;
 
       // ----- Store the file position
-      $v_pos_entry = ftell($this->zip_fd);
+      $v_pos_entry = $this->zip_ftell;
 
       // ----- Look for the specific extract rules
       $v_extract = false;
@@ -3497,6 +3533,7 @@
 
         // ----- Go to the file position
         @rewind($this->zip_fd);
+        $this->zip_ftell = 0;
         if (@fseek($this->zip_fd, $v_header['offset']))
         {
           // ----- Close the zip file
@@ -3510,6 +3547,7 @@
           // ----- Return
           return PclZip::errorCode();
         }
+        $this->zip_ftell = $v_header['offset'];
 
         // ----- Look for extraction as string
         if ($p_options[PCLZIP_OPT_EXTRACT_AS_STRING]) {
@@ -3842,6 +3880,7 @@
 
           // ----- Read the file by PCLZIP_READ_BLOCK_SIZE octets blocks
           $v_size = $p_entry['compressed_size'];
+          $this->zip_ftell += $v_size;
           while ($v_size != 0)
           {
             $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -3888,6 +3927,7 @@
           
             // ----- Read the compressed file in a buffer (one shot)
             $v_buffer = @fread($this->zip_fd, $p_entry['compressed_size']);
+            $this->zip_ftell += $p_entry['compressed_size'];
             
             // ----- Decompress the file
             $v_file_content = @gzinflate($v_buffer);
@@ -3987,6 +4027,7 @@
 
     // ----- Read the file by PCLZIP_READ_BLOCK_SIZE octets blocks
     $v_size = $p_entry['compressed_size'];
+    $this->zip_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -4106,6 +4147,7 @@
 
           // ----- Read the file in a buffer (one shot)
           $v_buffer = @fread($this->zip_fd, $p_entry['compressed_size']);
+          $this->zip_ftell += $p_entry['compressed_size'];
 
           // ----- Send the file to the output
           echo $v_buffer;
@@ -4115,6 +4157,7 @@
 
           // ----- Read the compressed file in a buffer (one shot)
           $v_buffer = @fread($this->zip_fd, $p_entry['compressed_size']);
+          $this->zip_ftell += $p_entry['compressed_size'];
           
           // ----- Decompress the file
           $v_file_content = gzinflate($v_buffer);
@@ -4221,11 +4264,13 @@
   
           // ----- Reading the file
           $p_string = @fread($this->zip_fd, $p_entry['compressed_size']);
+          $this->zip_ftell += $p_entry['compressed_size'];
         }
         else {
   
           // ----- Reading the file
           $v_data = @fread($this->zip_fd, $p_entry['compressed_size']);
+          $this->zip_ftell += $p_entry['compressed_size'];
           
           // ----- Decompress the file
           if (($p_string = @gzinflate($v_data)) === FALSE) {
@@ -4290,6 +4335,7 @@
 
     // ----- Read the 4 bytes signature
     $v_binary_data = @fread($this->zip_fd, 4);
+    $this->zip_ftell += 4;
     $v_data = unpack('Vid', $v_binary_data);
 
     // ----- Check signature
@@ -4305,6 +4351,7 @@
 
     // ----- Read the first 42 bytes of the header
     $v_binary_data = fread($this->zip_fd, 26);
+    $this->zip_ftell += 26;
 
     // ----- Look for invalid block size
     if (strlen($v_binary_data) != 26)
@@ -4324,10 +4371,12 @@
 
     // ----- Get filename
     $p_header['filename'] = fread($this->zip_fd, $v_data['filename_len']);
+    $this->zip_ftell += $v_data['filename_len'];
 
     // ----- Get extra_fields
     if ($v_data['extra_len'] != 0) {
       $p_header['extra'] = fread($this->zip_fd, $v_data['extra_len']);
+      $this->zip_ftell += $v_data['extra_len'];
     }
     else {
       $p_header['extra'] = '';
@@ -4393,6 +4442,7 @@
 
     // ----- Read the 4 bytes signature
     $v_binary_data = @fread($this->zip_fd, 4);
+    $this->zip_ftell += 4;
     $v_data = unpack('Vid', $v_binary_data);
 
     // ----- Check signature
@@ -4408,6 +4458,7 @@
 
     // ----- Read the first 42 bytes of the header
     $v_binary_data = fread($this->zip_fd, 42);
+    $this->zip_ftell += 42;
 
     // ----- Look for invalid block size
     if (strlen($v_binary_data) != 42)
@@ -4426,22 +4477,28 @@
     $p_header = unpack('vversion/vversion_extracted/vflag/vcompression/vmtime/vmdate/Vcrc/Vcompressed_size/Vsize/vfilename_len/vextra_len/vcomment_len/vdisk/vinternal/Vexternal/Voffset', $v_binary_data);
 
     // ----- Get filename
-    if ($p_header['filename_len'] != 0)
+    if ($p_header['filename_len'] != 0) {
       $p_header['filename'] = fread($this->zip_fd, $p_header['filename_len']);
-    else
+      $this->zip_ftell += $p_header['filename_len'];
+    } else {
       $p_header['filename'] = '';
+    }
 
     // ----- Get extra
-    if ($p_header['extra_len'] != 0)
+    if ($p_header['extra_len'] != 0) {
       $p_header['extra'] = fread($this->zip_fd, $p_header['extra_len']);
-    else
+      $this->zip_ftell += $p_header['extra_len'];
+    } else {
       $p_header['extra'] = '';
+    }
 
     // ----- Get comment
-    if ($p_header['comment_len'] != 0)
+    if ($p_header['comment_len'] != 0) {
       $p_header['comment'] = fread($this->zip_fd, $p_header['comment_len']);
-    else
+      $this->zip_ftell += $p_header['comment_len'];
+    } else {
       $p_header['comment'] = '';
+    }
 
     // ----- Extract properties
 
@@ -4538,8 +4595,7 @@
 
     // ----- Go to the end of the zip file
     $v_size = filesize($this->zipname);
-    @fseek($this->zip_fd, $v_size);
-    if (@ftell($this->zip_fd) != $v_size)
+    if (@fseek($this->zip_fd, $v_size))
     {
       // ----- Error log
       PclZip::privErrorLog(PCLZIP_ERR_BAD_FORMAT, 'Unable to go to the end of the archive \''.$this->zipname.'\'');
@@ -4547,13 +4603,13 @@
       // ----- Return
       return PclZip::errorCode();
     }
+    $this->zip_ftell = $v_size;
 
     // ----- First try : look if this is an archive with no commentaries (most of the time)
     // in this case the end of central dir is at 22 bytes of the file end
     $v_found = 0;
     if ($v_size > 26) {
-      @fseek($this->zip_fd, $v_size-22);
-      if (($v_pos = @ftell($this->zip_fd)) != ($v_size-22))
+      if (@fseek($this->zip_fd, $v_size-22))
       {
         // ----- Error log
         PclZip::privErrorLog(PCLZIP_ERR_BAD_FORMAT, 'Unable to seek back to the middle of the archive \''.$this->zipname.'\'');
@@ -4561,9 +4617,12 @@
         // ----- Return
         return PclZip::errorCode();
       }
+      $this->zip_ftell = $v_size-22;
+      $v_pos = $this->zip_ftell;
 
       // ----- Read for bytes
       $v_binary_data = @fread($this->zip_fd, 4);
+      $this->zip_ftell += 4;
       $v_data = @unpack('Vid', $v_binary_data);
 
       // ----- Check signature
@@ -4571,7 +4630,7 @@
         $v_found = 1;
       }
 
-      $v_pos = ftell($this->zip_fd);
+      $v_pos = $this->zip_ftell;
     }
 
     // ----- Go back to the maximum possible size of the Central Dir End Record
@@ -4579,8 +4638,7 @@
       $v_maximum_size = 65557; // 0xFFFF + 22;
       if ($v_maximum_size > $v_size)
         $v_maximum_size = $v_size;
-      @fseek($this->zip_fd, $v_size-$v_maximum_size);
-      if (@ftell($this->zip_fd) != ($v_size-$v_maximum_size))
+      if (@fseek($this->zip_fd, $v_size-$v_maximum_size))
       {
         // ----- Error log
         PclZip::privErrorLog(PCLZIP_ERR_BAD_FORMAT, 'Unable to seek back to the middle of the archive \''.$this->zipname.'\'');
@@ -4588,14 +4646,16 @@
         // ----- Return
         return PclZip::errorCode();
       }
+      $this->zip_ftell = $v_size-$v_maximum_size;
 
       // ----- Read byte per byte in order to find the signature
-      $v_pos = ftell($this->zip_fd);
+      $v_pos = $this->zip_ftell;
       $v_bytes = 0x00000000;
       while ($v_pos < $v_size)
       {
         // ----- Read a byte
         $v_byte = @fread($this->zip_fd, 1);
+        $this->zip_ftell += 1;
 
         // -----  Add the byte
         //$v_bytes = ($v_bytes << 8) | Ord($v_byte);
@@ -4627,6 +4687,7 @@
 
     // ----- Read the first 18 bytes of the header
     $v_binary_data = fread($this->zip_fd, 18);
+    $this->zip_ftell += 18;
 
     // ----- Look for invalid block size
     if (strlen($v_binary_data) != 18)
@@ -4663,6 +4724,7 @@
     // ----- Get comment
     if ($v_data['comment_size'] != 0) {
       $p_central_dir['comment'] = fread($this->zip_fd, $v_data['comment_size']);
+      $this->zip_ftell += $v_data['comment_size'];
     }
     else
       $p_central_dir['comment'] = '';
@@ -4710,12 +4772,11 @@
     }
 
     // ----- Go to beginning of File
-    @rewind($this->zip_fd);
-
     // ----- Scan all the files
     // ----- Start at beginning of Central Dir
     $v_pos_entry = $v_central_dir['offset'];
     @rewind($this->zip_fd);
+    $this->zip_ftell = 0;
     if (@fseek($this->zip_fd, $v_pos_entry))
     {
       // ----- Close the zip file
@@ -4727,6 +4788,7 @@
       // ----- Return
       return PclZip::errorCode();
     }
+    $this->zip_ftell = $v_pos_entry;
 
     // ----- Read each entry
     $v_header_list = array();
@@ -4855,6 +4917,7 @@
 
             // ----- Calculate the position of the header
             @rewind($this->zip_fd);
+            $this->zip_ftell = 0;
             if (@fseek($this->zip_fd,  $v_header_list[$i]['offset'])) {
                 // ----- Close the zip file
                 $this->privCloseFd();
@@ -4867,6 +4930,7 @@
                 // ----- Return
                 return PclZip::errorCode();
             }
+            $this->zip_ftell = $v_header_list[$i]['offset'];
 
             // ----- Read the file header
             $v_local_header = array();
@@ -4899,6 +4963,8 @@
             }
 
             // ----- Read/write the data block
+            $this->zip_ftell += $v_header_list[$i]['compressed_size'];
+            $v_temp_zip->zip_fd += $v_header_list[$i]['compressed_size'];
             if (($v_result = PclZipUtilCopyBlock($this->zip_fd, $v_temp_zip->zip_fd, $v_header_list[$i]['compressed_size'])) != 1) {
                 // ----- Close the zip file
                 $this->privCloseFd();
@@ -4911,7 +4977,7 @@
         }
 
         // ----- Store the offset of the central dir
-        $v_offset = @ftell($v_temp_zip->zip_fd);
+        $v_offset = $v_temp_zip->zip_ftell;
 
         // ----- Re-Create the Central Dir files header
         for ($i=0; $i<sizeof($v_header_list); $i++) {
@@ -4937,7 +5003,7 @@
         }
 
         // ----- Calculate the size of the central header
-        $v_size = @ftell($v_temp_zip->zip_fd)-$v_offset;
+        $v_size = $v_temp_zip->zip_ftell-$v_offset;
 
         // ----- Create the central dir footer
         if (($v_result = $v_temp_zip->privWriteCentralHeader(sizeof($v_header_list), $v_size, $v_offset, $v_comment)) != 1) {
@@ -5097,6 +5163,7 @@
 
     // ----- Go to beginning of File
     @rewind($this->zip_fd);
+    $this->zip_ftell = 0;
 
     // ----- Open the archive_to_add file
     if (($v_result=$p_archive_to_add->privOpenFd('rb')) != 1)
@@ -5119,11 +5186,13 @@
 
     // ----- Go to beginning of File
     @rewind($p_archive_to_add->zip_fd);
+    $p_archive_to_add->zip_ftell = 0;
 
     // ----- Creates a temporay file
     $v_zip_temp_name = PCLZIP_TEMPORARY_DIR.uniqid('pclzip-').'.tmp';
 
     // ----- Open the temporary file in write mode
+    $v_zip_temp_ftell = 0;
     if (($v_zip_temp_fd = @fopen($v_zip_temp_name, 'wb')) == 0)
     {
       $this->privCloseFd();
@@ -5138,6 +5207,8 @@
     // ----- Copy the files from the archive to the temporary file
     // TBC : Here I should better append the file and go back to erase the central dir
     $v_size = $v_central_dir['offset'];
+    $this->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -5148,6 +5219,8 @@
 
     // ----- Copy the files from the archive_to_add into the temporary file
     $v_size = $v_central_dir_to_add['offset'];
+    $p_archive_to_add->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -5157,10 +5230,12 @@
     }
 
     // ----- Store the offset of the central dir
-    $v_offset = @ftell($v_zip_temp_fd);
+    $v_offset = $v_zip_temp_ftell;
 
     // ----- Copy the block of file headers from the old archive
     $v_size = $v_central_dir['size'];
+    $this->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -5171,6 +5246,8 @@
 
     // ----- Copy the block of file headers from the archive_to_add
     $v_size = $v_central_dir_to_add['size'];
+    $p_archive_to_add->zip_ftell += $v_size;
+    $v_zip_temp_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
@@ -5183,7 +5260,7 @@
     $v_comment = $v_central_dir['comment'].' '.$v_central_dir_to_add['comment'];
 
     // ----- Calculate the size of the (new) central header
-    $v_size = @ftell($v_zip_temp_fd)-$v_offset;
+    $v_size = $v_zip_temp_ftell-$v_offset;
 
     // ----- Swap the file descriptor
     // Here is a trick : I swap the temporary fd with the zip fd, in order to use
@@ -5191,7 +5268,10 @@
     $v_swap = $this->zip_fd;
     $this->zip_fd = $v_zip_temp_fd;
     $v_zip_temp_fd = $v_swap;
-
+    $v_swap = $this->zip_ftell;
+    $this->zip_ftell = $v_zip_temp_ftell;
+    $v_zip_temp_ftell = $v_swap;
+    
     // ----- Create the central dir footer
     if (($v_result = $this->privWriteCentralHeader($v_central_dir['entries']+$v_central_dir_to_add['entries'], $v_size, $v_offset, $v_comment)) != 1)
     {
@@ -5199,6 +5279,7 @@
       $p_archive_to_add->privCloseFd();
       @fclose($v_zip_temp_fd);
       $this->zip_fd = null;
+      $this->zip_ftell = 0;
 
       // ----- Reset the file list
       unset($v_header_list);
@@ -5211,7 +5292,10 @@
     $v_swap = $this->zip_fd;
     $this->zip_fd = $v_zip_temp_fd;
     $v_zip_temp_fd = $v_swap;
-
+    $v_swap = $this->zip_ftell;
+    $this->zip_ftell = $v_zip_temp_ftell;
+    $v_zip_temp_ftell = $v_swap;
+    
     // ----- Close
     $this->privCloseFd();
     $p_archive_to_add->privCloseFd();
@@ -5275,6 +5359,7 @@
     // ----- Copy the files from the archive to the temporary file
     // TBC : Here I should better append the file and go back to erase the central dir
     $v_size = filesize($p_archive_filename);
+    $this->zip_ftell += $v_size;
     while ($v_size != 0)
     {
       $v_read_size = ($v_size < PCLZIP_READ_BLOCK_SIZE ? $v_size : PCLZIP_READ_BLOCK_SIZE);
