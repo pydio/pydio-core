@@ -10,8 +10,8 @@
 	</client_settings>
 	<registry_contributions>
         <extensions>
-            <extension mime="download" messageId="httpdownloader.17" icon="httpdownloader_images/ICON_SIZE/kget_list.png"/>
-            <extension mime="dlpart" messageId="httpdownloader.18" icon="exe.png"/>
+            <extension mime="download" messageId="httpdownloader.17" font="cloud-download" icon="httpdownloader_images/ICON_SIZE/kget_list.png"/>
+            <extension mime="dlpart" messageId="httpdownloader.18" font="file-import" icon="exe.png"/>
         </extensions>
 		<actions>
             <action name="external_download">

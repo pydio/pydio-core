@@ -512,6 +512,7 @@
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="messageId" use="required" type="xs:all"/>
             <xs:attribute name="icon" use="required"/>
+            <xs:attribute name="font" type="xs:all"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="processing">

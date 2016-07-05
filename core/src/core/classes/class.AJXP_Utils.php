@@ -497,10 +497,10 @@ class AJXP_Utils
         if (!isSet($mime)) {
             $mime = $EXTENSIONS["ajxp_empty"];
         }
-        if (is_numeric($mime[2]) || array_key_exists($mime[2], $mess)) {
-            $mime[2] = $mess[$mime[2]];
+        if (is_numeric($mime[3]) || array_key_exists($mime[3], $mess)) {
+            $mime[3] = $mess[$mime[3]];
         }
-        return (($mode == "image" ? $mime[1] : $mime[2]));
+        return (($mode == "image" ? $mime[1] : $mime[3]));
     }
 
     public static $registeredExtensions;
@@ -524,7 +524,7 @@ class AJXP_Utils
         if (!isSet($mime)) {
             $mime = self::$registeredExtensions["ajxp_empty"];
         }
-        return array($mime[2], $mime[1]);
+        return array($mime[3], $mime[1], $mime[2]);
 
     }
 

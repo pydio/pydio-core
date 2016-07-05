@@ -1368,7 +1368,12 @@ class ConfService
             $nodes = AJXP_PluginsService::getInstance()->searchAllManifests("//extensions/extension", "nodes", true);
             $res = array();
             foreach ($nodes as $node) {
-                $res[$node->getAttribute("mime")] = array($node->getAttribute("mime"), $node->getAttribute("icon"), $node->getAttribute("messageId"));
+                $res[$node->getAttribute("mime")] = array(
+                    $node->getAttribute("mime"),
+                    $node->getAttribute("icon"),
+                    $node->getAttribute("font"),
+                    $node->getAttribute("messageId")
+                );
             }
             if (count($res)) {
                 $EXTENSIONS = array_merge($EXTENSIONS, $res);

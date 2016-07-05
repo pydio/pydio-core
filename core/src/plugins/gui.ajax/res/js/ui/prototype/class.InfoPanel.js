@@ -605,7 +605,7 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}
 		}
-		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
+		return AbstractEditor.prototype.getPreview(ajxpNode).outerHTML; // '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
 	},
 	/**
 	 * Parses config node

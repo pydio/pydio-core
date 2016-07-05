@@ -11,8 +11,8 @@
 
 	<registry_contributions>
         <extensions>
-            <extension mime="tar" icon="archive.png" messageId="61"/>
-            <extension mime="bz2" icon="archive.png" messageId="61"/>
+            <extension mime="tar" font="archive" icon="archive.png" messageId="61"/>
+            <extension mime="bz2" font="archive" icon="archive.png" messageId="61"/>
         </extensions>
         <actions>
             <action name="compression">

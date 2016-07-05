@@ -120,7 +120,7 @@
             </action>
         </actions>
         <extensions>
-            <extension icon="etherpad/discussion.png" messageId="etherpad.1" mime="pad"/>
+            <extension icon="etherpad/discussion.png" messageId="etherpad.1" font="comment-multiple-outline" mime="pad"/>
         </extensions>
         <hooks>
             <!--<serverCallback methodName="hideExtension" hookName="node.info"/>-->

@@ -1231,6 +1231,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
         if (RecycleBinManager::recycleEnabled() && $ajxpNode->getPath() == RecycleBinManager::getRelativeRecycle()) {
             $recycleIcon = ($this->countFiles($ajxpNode->getUrl(), false, true)>0?"trashcan_full.png":"trashcan.png");
             $metaData["icon"] = $recycleIcon;
+            $metaData["fonticon"] = "delete";
             $metaData["mimestring"] = $mess[122];
             $ajxpNode->setLabel($mess[122]);
             $metaData["ajxp_mime"] = "ajxp_recycle";
@@ -1238,6 +1239,9 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $mimeData = AJXP_Utils::mimeData($ajxpNode->getUrl(), !$isLeaf);
             $metaData["mimestring_id"] = $mimeData[0]; //AJXP_Utils::mimetype($ajxpNode->getUrl(), "type", !$isLeaf);
             $metaData["icon"] = $mimeData[1]; //AJXP_Utils::mimetype($nodeName, "image", !$isLeaf);
+            if(!empty($mimeData[2])){
+                $metaData["fonticon"] = $mimeData[2];
+            }
             if ($metaData["icon"] == "folder.png") {
                 $metaData["openicon"] = "folder_open.png";
             }

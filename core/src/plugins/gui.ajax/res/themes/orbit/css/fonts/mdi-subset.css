@@ -67,3 +67,95 @@
 .mdi-close-circle-outline:before {
     content: "\f250";
 }
+
+.mdi-archive:before {
+    content: "\f13a";
+}
+
+.mdi-drawing-box:before {
+    content: "\f2d4";
+}
+
+.mdi-delete:before {
+    content: "\f2b5";
+}
+
+.mdi-file-document:before {
+    content: "\f30e";
+}
+
+.mdi-file-excel:before {
+    content: "\f310";
+}
+
+.mdi-file-image:before {
+    content: "\f314";
+}
+
+.mdi-file-music:before {
+    content: "\f318";
+}
+.mdi-file-pdf:before {
+    content: "\f31a";
+}
+
+.mdi-file-powerpoint:before {
+    content: "\f31c";
+}
+
+.mdi-file-video:before {
+    content: "\f320";
+}
+
+.mdi-file-word:before {
+    content: "\f321";
+}
+
+.mdi-file-xml:before {
+    content: "\f323";
+}
+
+.mdi-language-css3:before {
+    content: "\f40e";
+}
+
+.mdi-language-html5:before {
+    content: "\f40f";
+}
+
+.mdi-language-javascript:before {
+    content: "\f410";
+}
+
+.mdi-language-php:before {
+    content: "\f411";
+}
+
+.mdi-movie:before {
+    content: "\f472";
+}
+
+.mdi-timer:before {
+    content: "\f609";
+}
+
+.mdi-link:before {
+    content: "\f429";
+}
+
+.mdi-web:before {
+    content: "\f68c";
+}
+
+.mdi-comment-multiple-outline:before {
+    content: "\f277";
+}
+
+.mdi-cloud-download:before {
+    content: "\f258";
+}
+
+.mdi-file-import:before {
+    content: "\f315";
+}
+

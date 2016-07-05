@@ -79,7 +79,7 @@
 
 		</actions>
         <extensions>
-            <extension icon="timestamp_images/mimes/ICON_SIZE/horo.png" messageId="CONF_MESSAGE[timestamp]" mime="ers"/>
+            <extension icon="timestamp_images/mimes/ICON_SIZE/horo.png" font="timer" messageId="CONF_MESSAGE[timestamp]" mime="ers"/>
         </extensions>
 	</registry_contributions>
     <dependencies>
