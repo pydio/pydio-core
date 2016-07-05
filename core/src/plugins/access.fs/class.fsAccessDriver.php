@@ -1822,17 +1822,23 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 return $mess[120];
             }
             $fileToDelete=$this->urlBase.$selectedFile;
+
             if (!file_exists($fileToDelete)) {
                 $logMessages[]=$mess[100]." ".SystemTextEncoding::toUTF8($selectedFile);
                 continue;
             }
+
+            $node = new AJXP_Node($fileToDelete);
+            $node->setLeaf(!is_dir($fileToDelete));
+
             $this->deldir($fileToDelete, $repoData);
-            if (is_dir($fileToDelete)) {
+
+            if ($node->isLeaf()) {
                 $logMessages[]="$mess[38] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
             } else {
                 $logMessages[]="$mess[34] ".SystemTextEncoding::toUTF8($selectedFile)." $mess[44].";
             }
-            AJXP_Controller::applyHook("node.change", array(new AJXP_Node($fileToDelete)));
+            AJXP_Controller::applyHook("node.change", [$node]);
         }
         return null;
     }
