@@ -237,7 +237,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 			}
 			return div;
 		}else{
-			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64)});
+            return AbstractEditor.prototype.getPreview(ajxpNode);
 		}
 	},
 	

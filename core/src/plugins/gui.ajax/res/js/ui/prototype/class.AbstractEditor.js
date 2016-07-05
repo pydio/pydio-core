@@ -488,7 +488,13 @@ Class.create("AbstractEditor" , {
             if(!ajxpNode.isLeaf()) src = resolveImageSource('folder.png', "/images/mimes/ICON_SIZE", 64);
             else src = resolveImageSource('mime_empty.png', "/images/mimes/ICON_SIZE", 64);
         }
-		var imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
+        var svg = AbstractEditor.prototype.getSvgSource(ajxpNode);
+        var imgObject;
+        if(svg){
+            imgObject = new Element("div", {className:"mimefont mdi mdi-"+svg, style:"font-size:28px;", "data-is_loaded": "true"});
+        }else{
+    		imgObject = new Element("img", {src:src, width:28, height:28, align:'absmiddle', border:0});
+        }
 		imgObject.resizePreviewElement = function(dimensionObject){
 			dimensionObject.maxWidth = dimensionObject.maxHeight = 64;
 			var styleObject = fitRectangleToDimension({width:64,height:64},dimensionObject);
@@ -497,8 +503,15 @@ Class.create("AbstractEditor" , {
 				var mT = parseInt((dimensionObject.width - 64)/2) + dimensionObject.margin;
 				var mB = dimensionObject.width+(dimensionObject.margin*2)-newHeight-mT-1;
 				styleObject.marginTop = mT + "px"; 
-				styleObject.marginBottom = mB + "px"; 
-			}
+				styleObject.marginBottom = mB + "px";
+                if(svg){
+                    styleObject.fontSize = styleObject.height;
+                    styleObject.lineHeight = "50px";
+                }
+			}else if(svg){
+                styleObject.fontSize = styleObject.height;
+                styleObject.lineHeight = styleObject.height;
+            }
 			this.setStyle(styleObject);
 		}.bind(imgObject);
 		return imgObject;
@@ -511,6 +524,15 @@ Class.create("AbstractEditor" , {
 	 */
 	getThumbnailSource : function(ajxpNode){
 		return resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 64);
-	}
+	},
+
+    /**
+     * Return SVG Icon if it exists
+     * @param ajxpNode
+     * @returns {V}
+     */
+    getSvgSource: function(ajxpNode){
+        return svg = ajxpNode.getMetadata().get("fonticon");
+    }
 	
 });
