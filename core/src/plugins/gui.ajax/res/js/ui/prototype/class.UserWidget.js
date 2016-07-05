@@ -75,8 +75,13 @@ Class.create("UserWidget", {
                 var img = '';
                 var imgSrc = '';
                 var conn = new Connexion();
-                if(oUser.getPreference("avatar")){
-                    imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+				var avatar = oUser.getPreference("avatar");
+                if(avatar){
+					if(avatar.substring(0, 5) == 'data:') {
+						imgSrc = avatar;
+					} else {
+	                    imgSrc = conn._baseUrl + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+					}
                 } else if(ajaxplorer.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")) {
                     // Get avatar from avatar plugins
                     conn.addParameter('get_action', 'get_avatar_url');

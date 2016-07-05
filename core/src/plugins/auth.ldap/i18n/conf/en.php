@@ -38,7 +38,7 @@ $mess=array(
 "LDAP/AD Directory" => "LDAP/AD Directory",
 "Authentication datas are stored in an LDAP/AD directory." => "Authentication datas are stored in an LDAP/AD directory.",
 "Protocol" => "Protocol",
-"Connect through ldap or ldaps" => "Connect through ldap or ldaps",
+"Connect through ldap, ldaps or ldap + tls" => "Connect through ldap, ldaps or ldap + tls",
 "Groups DN" => "Groups DN",
 "DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature." => "DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.",
 "LDAP Groups Filter" => "LDAP Groups Filter",
@@ -63,4 +63,8 @@ $mess=array(
 "If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema." => "If there is no memberOf attribute/overlay, use this option to create additional memberOf attribute. Enter the groups attribute storing the members ids, can be generally either memberUid or member, depending on the schema.",
 "Role Prefix (for memberof)" => "Role Prefix (for memberof)",
 "Role prefix when you mapping memberof => roleID" => "Role prefix when you mapping memberof => roleID",
+"Fake MemberOf. value of member/memberUid attribute of group" => "Fake MemberOf. value of member/memberUid attribute of group",
+"Value of member/memberUid attribute of group: can be user DN, CN part of DN, or other (specify below). Use with Fake memberOf enabled." => "Value of member/memberUid attribute of group: can be user DN, CN part of DN, or other (specify below). Use with Fake memberOf enabled.",
+"Fake memberOf user attribute" => "Fake memberOf user attribute",
+"The attribute in the user that matches the attribute in the group, if other (see above)" => "The attribute in the user that matches the attribute in the group, if other (see above)",
 );
