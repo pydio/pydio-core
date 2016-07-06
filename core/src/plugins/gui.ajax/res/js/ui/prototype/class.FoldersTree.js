@@ -70,7 +70,7 @@ Class.create("FoldersTree", AjxpPane, {
 		var filter = this.createFilter();
 		var fakeRootNode = new AjxpNode("/", true, MessageHash[391], "folder.png");
 		fakeRootNode._isLoaded = true;
-		this.tree = new AJXPTree(fakeRootNode,  action, filter);		
+		this.tree = new AJXPTree(fakeRootNode,  action, filter, false);
 				
 		this.treeContainer.update(this.tree.toString());
 		$(this.tree.id).ajxpNode = this.tree.ajxpNode;	
