@@ -886,16 +886,15 @@
                 link = this.getPublicLink(linkId);
                 message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
             }else{
+                if(!this._data['repository_url']){
+                    throw new Error(MessageHash['share_center.229']);
+                }
                 s = MessageHash["share_center." + (this.getNode().isLeaf() ? "42" : "43")];
                 if(s) s = s.replace("%s", ApplicationTitle);
                 if(this._data['repository_url']){
                     link = this._data['repository_url'];
                 }
-                //if(this.shareFolderMode == 'workspace'){
                 message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ajaxplorer.appTitle) + "</a>";
-                //}else{
-                //    message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46" + (this.currentNode.isLeaf()?'_file':'_mini')].replace("%s1", this._currentRepositoryLabel) + "</a>";
-                //}
             }
             var usersList = null;
             if(this.shareFolderMode == 'workspace' && oForm) {
