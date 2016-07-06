@@ -21,4 +21,6 @@
 $mess=array(
 "Info Panel..." => "Info-Bereich",
 "Info Panel" => "Auf der rechten Seite wird ein Info-Bereich mit weiteren Infrmationen zum ausgewählten Element angezeigt.",
+"Open in..." => "Open in...",
+"Simple Picker to open any type of file in any available editor." => "Simple Picker to open any type of file in any available editor.",
 );

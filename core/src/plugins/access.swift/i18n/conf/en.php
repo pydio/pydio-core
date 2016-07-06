@@ -32,4 +32,5 @@ $mess=array(
 "Your region identifier" => "Your region identifier",
 "Container" => "Container",
 "Base Container" => "Base Container",
+"Console password" => "Console password",
 );

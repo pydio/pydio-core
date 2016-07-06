@@ -67,4 +67,7 @@ $mess=array(
 "41" => "Удалить",
 "42" => "Другие свойства роли",
 "43" => "Выберите не менее одного",
+"44" => "Plugins Parameters Fine-tuning",
+"45" => "Access Control List",
+"46" => "Disabled Actions",
 );

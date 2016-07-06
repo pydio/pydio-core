@@ -75,4 +75,6 @@ $mess = array(
 "Detected Server Path" => "Detected Server Path",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Make sure this is correct, as it's used to rewrite the htaccess file",
 "Select a language activated by default( users will still be able to switch)" => "Select a language activated by default( users will still be able to switch)",
+"Bootstrap Loader" => "Bootstrap Loader",
+"Core plugin for loading the framework. Do NOT disable this plugin!" => "Core plugin for loading the framework. Do NOT disable this plugin!",
 );

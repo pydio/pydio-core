@@ -21,5 +21,11 @@
 $mess=array(
 "PLUploader" => "PLUploader",
 "PlUpload uploader support. Requires downloading and installing the PLupload sources." => "PlUpload podpora. Vyžaduje stažení a instalaci zdrojů PLupload.",
+"Upload Options" => "Upload Options",
+"Runtimes" => "Runtimes",
+"Defines which runtimes are to be used and in what order, separated by comma. Currently html5,silverlight,flash,html4 are supported." => "Defines which runtimes are to be used and in what order, separated by comma. Currently html5,silverlight,flash,html4 are supported.",
+"Maximum File Size" => "Maximum File Size",
+"Defines maximum size of files to be transferred, such as 4096mb." => "Defines maximum size of files to be transferred, such as 4096mb.",
+"Chunk Size" => "Chunk Size",
+"Defines chunk size to be used, such as 512k, 2mb. If empty then maximum system settings are used." => "Defines chunk size to be used, such as 512k, 2mb. If empty then maximum system settings are used.",
 );
-

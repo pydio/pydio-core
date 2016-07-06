@@ -67,4 +67,7 @@ $mess=array(
 "41" => "Rimuovi",
 "42" => "Dati ruolo personalizzati",
 "43" => "Selezionane uno o più",
+"44" => "Plugins Parameters Fine-tuning",
+"45" => "Access Control List",
+"46" => "Disabled Actions",
 );

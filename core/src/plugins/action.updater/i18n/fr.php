@@ -18,9 +18,6 @@
 *
 * The latest code can be found at <http://pyd.io/>.
 */
-
-defined('AJXP_EXEC') or die( 'Access not allowed');
-
 $mess = array(
     "1" => "Mise à jour",
     "2" => "Mise à jour automatique",
@@ -40,5 +37,6 @@ $mess = array(
     "17" => "Vérification des mises à jours...",
     "18" => "Pas de mise à jour nécessaire, cliquez pour déclencher une nouvelle vérification.",
     "19" => "Cliquer pour vérifier si une mise à jour est nécessaire.",
-    "20" => "Vérifier maintenant"
+    "20" => "Vérifier maintenant",
+    "11" => "Migrer meta.serial",
 );

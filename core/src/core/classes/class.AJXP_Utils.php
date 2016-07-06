@@ -1138,8 +1138,9 @@ class AJXP_Utils
                 self::updateI18nFiles($path, false, $createLanguage);
                 self::updateI18nFiles($path . "/conf", true, $createLanguage);
             } else {
-                self::updateI18nFiles($path, true, $createLanguage);
                 self::updateI18nFiles($path . "/conf", true, $createLanguage);
+                if($nameSpace == "user_home") continue;
+                self::updateI18nFiles($path, true, $createLanguage);
             }
         }
     }

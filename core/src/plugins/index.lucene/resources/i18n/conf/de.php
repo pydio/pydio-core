@@ -43,4 +43,6 @@ $mess=array(
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "Für eine hohe Geschwindigkeit sollten Wildcards erst ab dem dritten Zeichen möglich sein.",
 "Auto-Wildcard" => "Auto-Wildcard",
 "Automatically append a * after the user query to make the search broader" => "Den Suchbegriff des Benutzers immer mit einem * beenden.",
+"Hide 'My Shares'" => "Hide 'My Shares'",
+"Hide My Shares section in the Orbit theme GUI." => "Hide My Shares section in the Orbit theme GUI.",
 );

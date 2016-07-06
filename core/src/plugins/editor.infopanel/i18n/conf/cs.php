@@ -21,4 +21,6 @@
 $mess=array(
 "Open in..." => "Otevřít v...",
 "Simple Picker to open any type of file in any available editor." => "Jednoduchý výběr otevírání jakéhokoliv typu souboru v dostupném editoru.",
+"Info Panel..." => "Info Panel...",
+"Info Panel" => "Info Panel",
 );

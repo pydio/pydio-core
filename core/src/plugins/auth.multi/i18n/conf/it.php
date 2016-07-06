@@ -31,4 +31,6 @@ $mess=array(
 "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features." => "Principale/Secondario assume che il Principale è read-only ed il Secondario è un'alternativa locale per consentire le funzionalità di condivisione.",
 "Listing" => "Listing",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In modalità Principale/Secondario, utilizza questa opzione per limitare il listing degli utenti in amministrazione ad un solo driver (lascia vuoto per vederli tutti)",
+"Cache master users" => "Cache master users",
+"Create a local copy (at login time) of master users inside slave base" => "Create a local copy (at login time) of master users inside slave base",
 );

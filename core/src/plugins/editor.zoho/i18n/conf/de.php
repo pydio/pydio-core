@@ -29,4 +29,6 @@ $mess=array(
 "Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc)." => "Einmalig generierter Public-Key. Dieser muss in die Datei save_zoho.php kopiert werden (siehe Dokumentation).",
 "Z-Agent Key" => "Zoho-Agent-Key",
 "External Z-Agent" => "Externer Zoho-Agent",
+"You can change ZOHO menu language (de, en, fr, it, pt, ru, ...)" => "You can change ZOHO menu language (de, en, fr, it, pt, ru, ...)",
+"Language" => "Language",
 );

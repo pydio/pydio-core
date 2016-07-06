@@ -75,4 +75,8 @@ $mess = array(
 "Detected Server Path" => "Server-Pfad",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => " Stellen Sie sicher, dass dieser Pfad korrekt ist. Er wird zum generieren der htaccess-Datei verwendet.",
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
+"Configurations storage" => "Configurations storage",
+"Select how the configurations will be stored" => "Select how the configurations will be stored",
+"Bootstrap Loader" => "Bootstrap Loader",
+"Core plugin for loading the framework. Do NOT disable this plugin!" => "Core plugin for loading the framework. Do NOT disable this plugin!",
 );

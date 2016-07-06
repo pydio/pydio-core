@@ -14,4 +14,5 @@ $mess=array(
 "Store the path to the list of file that have not been scanned" => "Store the path to the list of file that have not been scanned",
 "Directory path" => "Directory path",
 "Where to store the trace file" => "Where to store the trace file",
+"Enter the antivirus system command. Use $FILE for the file path" => "Enter the antivirus system command. Use $FILE for the file path",
 );

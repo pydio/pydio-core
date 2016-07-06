@@ -39,4 +39,10 @@ $mess=array(
 "Stable" => "Stable",
 "Development" => "Development",
 "Testing (blank)" => "Testing (blank)",
+"Updater Configuration" => "Updater Configuration",
+"Install Enterprise Distribution" => "Install Enterprise Distribution",
+"Authenticated Update Site" => "Authenticated Update Site",
+"Update Site User" => "Update Site User",
+"Required if the update site is requiring credentials." => "Required if the update site is requiring credentials.",
+"Update Site Password" => "Update Site Password",
 );

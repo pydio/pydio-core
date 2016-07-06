@@ -33,4 +33,6 @@ $mess=array(
 "Use an existing user ID and click on Test Connexion to verify it is correctly found" => "Use an existing user ID and click on Test Connexion to verify it is correctly found",
 "Test Connexion" => "Test Connection",
 "Test the SQL connexion" => "Test the SQL connection",
+"Connexion" => "Connexion",
+"The Database Connexion" => "The Database Connexion",
 );

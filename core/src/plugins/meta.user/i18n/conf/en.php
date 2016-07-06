@@ -42,4 +42,5 @@ $mess=array(
 "Set default visibility." => "Set default visibility.",
 "Additional info" => "Additional info",
 "Depending on the field type. Currently used for selection only" => "Depending on the field type. Currently used for selection only",
+"Tags (extensible sets of values)" => "Tags (extensible sets of values)",
 );

@@ -59,4 +59,7 @@ $mess=array(
 "Main page of your Drupal installation that contains a login form. When not logged, accessing Pydio will redirect to this page. It's also used for the API calls for logging in a user from within Pydio. Make sure it does contain a login form." => "Page principale de votre installation de Drupal contenant un formulaire de connexion. Tant que la connexion n'a pas été effectué, accèder à Pydio redirigera vers cette page. Sera également utilisé par l'API pour connecter un utilisateur à Pydio. Vérifiez que la page contienne bien un formulaire de connexion !",
 "Custom Auth Function" => "Fonction d'authentification personnalisée",
 "User-defined function for performing real password check, necessary for REST API (including iOS client). Add this function inside the plugin cms_auth_functions.php file" => "Fonction définie par l'utilisateur pour effectuer la vérification du mot de passe. Requise pour l'API REST (incluant les clients iOS). Ajoutez cette fonction dans le fichier du plugin 'cms_auth_functions.php'",
+"Custom" => "Custom",
+"Back to main page" => "Back to main page",
+"Logout" => "Logout",
 );
