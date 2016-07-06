@@ -12,7 +12,7 @@
             <action name="index">
                 <gui text="core.index.1" title="core.index.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden"
-                             actionBar="true" contextMenu="false" infoPanel="false"
+                             actionBar="true" contextMenu="true" infoPanel="false"
                              actionBarGroup="remote" inZip="false">
                     </context>
                 </gui>

@@ -1812,7 +1812,7 @@ Class.create("FilesList", SelectableElements, {
                         }
                     }
                     textLabel.setStyle({
-                        paddingLeft:'24px',
+                        paddingLeft:'27px',
                         backgroundRepeat:'no-repeat',
                         backgroundPosition:backgroundPosition,
                         backgroundImage:backgroundImage
