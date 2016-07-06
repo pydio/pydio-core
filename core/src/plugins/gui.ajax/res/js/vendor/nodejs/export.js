@@ -14,4 +14,5 @@ window.ReactDND.flow = require('lodash/function/flow');
 window.classNames = require('classnames');
 window.ReactAutoSuggest = require('react-autosuggest');
 window.Clipboard = require('clipboard');
+window.ReactQRCode = require('qrcode.react');
 window.injectTapEventPlugin();

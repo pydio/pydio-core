@@ -79,6 +79,15 @@ div#react_share_form .additional-actions-links a {
   display: inline-block;
   margin-left: 10px;
 }
+div#react_share_form .additional-actions-links a.qrcode-active {
+  color: #333333;
+}
+div#react_share_form .qrCode {
+  text-align: center;
+}
+div#react_share_form .qrCode canvas {
+  margin-top: 10px;
+}
 div#react_share_form .form-legend {
   color: #bbb;
   margin-top: -5px !important;
