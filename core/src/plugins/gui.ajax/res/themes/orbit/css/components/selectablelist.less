@@ -12,15 +12,17 @@
 @filelist_tablerow_font_big:12px;
 @filelist_tablerow_font_small:10px;
 
-@filelist_thumbnail_background:#f9f9f9;
+@filelist_thumbnail_background: #fafafa;
 @filelist_thumbnail_label_background:rgba(237, 237, 237, 0.82);
 @filelist_thumbnail_label_color:#666;
+@thumbnail_mimefont_color: #546E7A;
 
 @filelist_paginator_background:#FFFCE8;
 
 @filelist_resizer_label_selected_bg:rgb(231, 231, 231);
 @filelist_resizer_label_color:rgba(0, 0, 0, 0.87);
 @filelist_resizer_label_size:11px;
+
 
 
 
@@ -110,6 +112,13 @@
       display: inline;
       margin-right: 5px;
     }
+    .mimefont {
+      color: @thumbnail_mimefont_color;
+      line-height: 38px;
+    }
+    &.selected-focus .mimefont{
+      color: @filelist_selection_color;
+    }
     .thumbLabel
     {
       /*overflow: hidden;*/
@@ -197,9 +206,19 @@
 
       span.list_selectable_span span.text_label{
         font-size: @filelist_tablerow_font_big;
-        padding-left: 27px !important;
+        /*padding-left: 27px !important;*/
         background-position: 5px 4px;
         color: @filelist_default_text_color;
+        .mimefont{
+          display: inline-block;
+          float: left;
+          margin: 0 5px 0 2px;
+          font-size: 17px;
+          color: @thumbnail_mimefont_color;
+        }
+      }
+      .selected-focus span.list_selectable_span span.text_label .mimefont {
+        color: @filelist_selection_color;
       }
       span#ajxp_label {
         font-weight: normal;
@@ -222,7 +241,7 @@
 
     div.thumbnail_selectable_cell{
       margin: 1px;
-      background-color: #ECEFF1 /*@filelist_thumbnail_background*/;
+      background-color: @filelist_thumbnail_background;
       border-radius: 0px;
       padding: 0 0 3px;
       background-size: cover;

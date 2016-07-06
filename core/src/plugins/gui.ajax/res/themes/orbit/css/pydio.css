@@ -653,6 +653,13 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: inline;
   margin-right: 5px;
 }
+.class-FilesList .thumbnail_selectable_cell .mimefont {
+  color: #607d8b;
+  line-height: 38px;
+}
+.class-FilesList .thumbnail_selectable_cell.selected-focus .mimefont {
+  color: #ffffff;
+}
 .class-FilesList .thumbnail_selectable_cell .thumbLabel {
   /*overflow: hidden;*/
   white-space: nowrap;
@@ -726,9 +733,19 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 }
 .class-FilesList.fl-displayMode-list .table_rows_container span.list_selectable_span span.text_label {
   font-size: 13px;
-  padding-left: 27px !important;
+  /*padding-left: 27px !important;*/
   background-position: 5px 4px;
   color: rgba(0, 0, 0, 0.87);
+}
+.class-FilesList.fl-displayMode-list .table_rows_container span.list_selectable_span span.text_label .mimefont {
+  display: inline-block;
+  float: left;
+  margin: 0 5px 0 2px;
+  font-size: 17px;
+  color: #607d8b;
+}
+.class-FilesList.fl-displayMode-list .table_rows_container .selected-focus span.list_selectable_span span.text_label .mimefont {
+  color: #ffffff;
 }
 .class-FilesList.fl-displayMode-list .table_rows_container span#ajxp_label {
   font-weight: normal;
@@ -743,7 +760,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell {
   margin: 1px;
-  background-color: #eceff1 /*@filelist_thumbnail_background*/;
+  background-color: #fafafa;
   border-radius: 0px;
   padding: 0 0 3px;
   background-size: cover;
@@ -5116,6 +5133,11 @@ div.menu.rootDirChooser span.rootDirTitle {
   line-height: 1.5em;
   text-align: left;
   word-break: break-all;
+}
+#info_panel .infoPanelImagePreview div.mimefont,
+.form-ip_content_info_panel .infoPanelImagePreview div.mimefont {
+  font-size: 80px !important;
+  color: #607d8b;
 }
 #info_panel .infoPanelTable,
 .form-ip_content_info_panel .infoPanelTable,
