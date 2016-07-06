@@ -84,5 +84,8 @@ $mess=array(
     "69"=> "Sync-Client für Mac OSX herunterladen",
     "70"=> "App für iOS-Geräte",
     "71"=> "App für Android-Geräte",
-    "72"=> "Search all workspaces...",
+    "72" => "Server QRCode",
+    "73" => "Easily connect your mobile applications",
+    "74" => "Scan this QRCode with your mobile application to easily configure the connection",
+    "75"=> "Search all workspaces...",
 );

@@ -708,9 +708,42 @@
 
     });
 
+    var QRCodeDialogLoader = React.createClass({
+
+        closeClicked: function(){
+            this.props.closeAjxpDialog();
+        },
+
+        render: function(){
+
+            let jsonData = {
+                "server"    : global.location.href.split('welcome').shift(),
+                "user"      : global.pydio.user ? global.pydio.user.id : null
+            }
+
+            return (
+                <div>
+                    <div className="home-qrCode-desc">
+                        <h4>{global.pydio.MessageHash['user_home.72']}</h4>
+                        <p>{global.pydio.MessageHash['user_home.74']}</p>
+                    </div>
+                    <div className="home-qrCode">
+                        <ReactQRCode value={JSON.stringify(jsonData)} size={256}/>
+                        <div className="button-panel">
+                            <ReactMUI.FlatButton label="Close" onClick={this.closeClicked}/>
+                        </div>
+                    </div>
+                </div>
+            );
+
+        }
+
+    });
+
     var WelcomeComponents = global.WelcomeComponents || {};
     WelcomeComponents.UserDashboard = UserDashboard;
     WelcomeComponents.TutorialPane = TutorialPane;
+    WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
     global.WelcomeComponents = WelcomeComponents;
 
 })(window);

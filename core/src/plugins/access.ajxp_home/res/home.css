@@ -737,6 +737,22 @@ div.home_search span.suggest-search {
   right: 380px;
   top: 10px;
 }
+.form-qrcode_dialog_form {
+  min-width: 296px;
+}
+.form-qrcode_dialog_form .dialogTitle {
+  display: none;
+}
+.form-qrcode_dialog_form .home-qrCode-desc {
+  padding: 0 20px;
+}
+.form-qrcode_dialog_form .home-qrCode {
+  text-align: center;
+}
+.form-qrcode_dialog_form .button-panel {
+  text-align: right;
+  padding: 10px;
+}
 @media only screen and (max-width: 980px) {
   #notifications_center div.notif_event_container {
     width: 100px;

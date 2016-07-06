@@ -163,3 +163,10 @@
     content: "\f315";
 }
 
+.mdi-qrcode:before {
+    content: "\f521";
+}
+
+.mdi-qrcode-scan:before {
+    content: "\f522";
+}

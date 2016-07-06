@@ -23,9 +23,26 @@
                       label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/products/downloads/pydiosync-desktop-app/"/>
         <global_param name="URL_APP_SYNC_MAC" type="string" expose="true"
                       label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/products/downloads/pydiosync-desktop-app/"/>
-
+        <global_param name="DISPLAY_SERVER_QRCODE_ACTION" type="boolean" label="CONF_MESSAGE[Display Server QRCode]"
+                      description="CONF_MESSAGE[Let users connect easily to the latest mobile applications by displaying a QRCode]" default="false"/>
     </server_settings>
 	<registry_contributions>
+        <actions>
+            <action name="display-server-qrcode">
+                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.73">
+                    <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var dialog = new AjxpReactDialogLoader('WelcomeComponents', 'QRCodeDialogLoader', {});
+                        dialog.openDialog('qrcode_dialog_form', true);
+                    ]]></clientCallback>
+                    <clientForm id="qrcode_dialog_form"><![CDATA[
+                        <div id="qrcode_dialog_form" box_width="296" box_padding="0" class="react-mui-context SF_material"></div>
+                    ]]></clientForm>
+                </processing>
+            </action>
+        </actions>
 		<client_configs>
             <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
                 <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
