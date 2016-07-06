@@ -201,7 +201,6 @@ class AJXP_Notification
             $tpl .= "</ul>";
 
         } else {
-
             $tpl .= $this->replaceVars($mess["notification.tpl.long.".($this->getNode()->isLeaf()?"file":"folder").".".$this->action], $mess);
 
         }

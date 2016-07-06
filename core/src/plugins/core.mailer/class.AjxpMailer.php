@@ -76,9 +76,13 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                     $ajxpAction = $ajxpNotification->getAction();
                     $ajxpAuthor = $ajxpNotification->getAuthor();
                     $ajxpNode = new AJXP_Node($value['url']);
+
                     try{
                         @$ajxpNode->loadNodeInfo();
-                    }catch(Exception $e){}
+                    } catch(Exception $e) {
+                        // do nothing
+                    }
+
                     if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
                         $ajxpContent = $ajxpNode->getParent()->getPath();
                     } else {
@@ -87,20 +91,24 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                             $ajxpContent = '/';
                         }
                     }
-                    if($ajxpNode->getRepository() != null){
+                    if($ajxpNode->getRepository() != null) {
                         $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
-                    }else{
+                    } else {
                         $ajxpNodeWorkspace = "Deleted Workspace";
                     }
+
                     $recipientFormats[$value['recipient']] = ($value["html"] == 1);
                     $ajxpKey = $ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
                     $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
                 }
                 //this $body must be here because we need this css
                 $digestTitle = ConfService::getMessages()["core.mailer.9"];
+
                 foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
+
                     $useHtml = $recipientFormats[$recipient];
                     $body = $useHtml ? "<div id='digest'>" : "";
+
                     foreach ($arrayWorkspace as $workspace => $arrayAjxpKey) {
                         $key = key($arrayAjxpKey);
                         $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
@@ -120,6 +128,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         }
                         $body = $body . '</ul>';
                     }
+
                     $body .= $useHtml ? "</div>" : "";
                     try {
                         $mailer->sendMail(array($recipient),
@@ -134,6 +143,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         $output["error"][] = "Sending email to ".$recipient.": ".$e->getMessage();
                     }
                 }
+
                 try {
                     dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
                 } catch (DibiException $e) {
