@@ -871,6 +871,10 @@
             return publicLink + (publicLink.indexOf('?') !== -1 ? '&' : '?') + 'dl=true'+ ctString +'&file=/'+encodeURIComponent(node.getLabel());
         }
 
+        static qrcodeEnabled(){
+            return global.pydio.getPluginConfigs("action.share").get("CREATE_QRCODE");
+        }
+
         prepareEmail(shareType, linkId = null){
             var MessageHash = global.pydio.MessageHash;
             var ApplicationTitle = global.pydio.appTitle;
