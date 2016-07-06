@@ -2887,9 +2887,9 @@ div.selection_ctrl_key {
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed {
   cursor: pointer;
-  border-radius: 3px;
-  width: 49%;
-  margin: 0.5% 1% 0.5% 0 !important;
+  border-radius: 1px;
+  width: 49.4%;
+  margin: 0.3% 0.6% 0.3% 0!important;
   box-sizing: border-box;
   padding: 8px 16px 16px 5px;
   overflow: hidden;
