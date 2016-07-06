@@ -496,12 +496,6 @@ Class.create("FilesList", SelectableElements, {
                         command = window.actionArguments[0].command;
 					}
                     oThis.switchDisplayMode(command);
-                    /*
-                    window.setTimeout(function(){
-                        var item = this.subMenuItems.staticItems.detect(function(item){return item.command == command;});
-                        this.notify("submenu_active", item);
-                    }.bind(window.listenerContext), 500);
-                    */
                 }
 			},
 			listeners : {

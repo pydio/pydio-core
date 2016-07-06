@@ -1094,7 +1094,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date,ajxp_description" theme="orbit">
+			<infoPanel mime="generic_dir" attributes="basename,icon,fonticon,formated_date,ajxp_description" theme="orbit">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
@@ -1103,7 +1103,7 @@
 				<html><![CDATA[
                     <div class="infoPanelImagePreview">
                         <div class="infoPanelBasenameTitle">#{basename}</div>
-                        <img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+                        <div class="mimefont mdi mdi-#{fonticon}"></div>
                         <br><div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
                         <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
                     </div>
