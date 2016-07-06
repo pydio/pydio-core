@@ -89,6 +89,8 @@ Class.create("PreviewFactory", {
    				if(img == null || oImageToLoad.PFacLoader == null) return;
                 if(oImageToLoad.editorClass.prototype.getCoveringBackgroundSource && oImageToLoad.mainObject && oImageToLoad.mainObject.hasClassName('background-cover') && Modernizr.backgroundsize){
                     img.setStyle({display:'none'});
+                    var bgUrl = oImageToLoad.editorClass.prototype.getCoveringBackgroundSource(oImageToLoad.ajxpNode);
+                    bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
                     oImageToLoad.mainObject.setStyle({
                         backgroundImage:'url(' + oImageToLoad.editorClass.prototype.getCoveringBackgroundSource(oImageToLoad.ajxpNode) + ')',
                         backgroundSize : 'cover'
