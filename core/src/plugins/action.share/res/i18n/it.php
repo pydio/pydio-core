@@ -242,6 +242,7 @@ $mess = array(
 "226" => "Non sei autorizzato per la creazione di link pubblici alle cartelle",
 "227" => "Non sei autorizzato per la condivisione interna di file",
 "228" => "Non sei autorizzato per la condivisione interna delle cartelle",
+    "229" => "Please save before sending an invitation",
 "11" => "Expiration",
 "49" => "create user",
 // will be replaced by the filename to download
