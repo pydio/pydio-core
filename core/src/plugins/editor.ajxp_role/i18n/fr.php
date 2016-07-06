@@ -67,4 +67,7 @@ $mess=array(
 "41" => "Supprimer",
 "42" => "Données du rôle",
 "43" => "Selectionner un ou plusieurs",
+"44" => "Paramètres avançés de plugins",
+"45" => "Contrôle d'accès",
+"46" => "Actions désactivées",
 );

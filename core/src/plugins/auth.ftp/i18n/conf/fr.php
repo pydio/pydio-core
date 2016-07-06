@@ -29,4 +29,5 @@ $mess=array(
 "The ID of an existing admin for Pydio (using conf.serial)" => "ID d'un administrateur Pydio existant (utilise conf.serial)",
 "Test connection" => "Tester la connexion",
 "Test connection to the FTP server" => "Tester la connexion vers le serveur FTP",
+"FTP Login Screen" => "Ecran de login FTP",
 );

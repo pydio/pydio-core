@@ -29,4 +29,11 @@ $mess=array(
 "The ID of an existing admin for Pydio (using conf.serial)" => "L'ID di un utente amministratore esistente per Pydio (conf.serial)",
 "Test Connexion" => "Prova Connessione",
 "Test connexion to the FTP server" => "Prova della connessione al server FTP",
+"FTP authentication" => "FTP authentication",
+"Authenticate users by validating their credentials against an FTP server." => "Authenticate users by validating their credentials against an FTP server.",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Whether to display a generic 'FTP connection' dialog at startup (allowing users to enter their own host/port data) or the standard login dialog.",
+"Workspace" => "Workspace",
+"ID of the workspace used to validate credentials" => "ID of the workspace used to validate credentials",
+"Test connection" => "Test connection",
+"Test connection to the FTP server" => "Test connection to the FTP server",
 );

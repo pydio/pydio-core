@@ -21,4 +21,6 @@
 $mess=array(
 "Comments Feed" => "Feed Commenti",
 "Display a chat-like feed on all nodes" => "Visualizza un feed simile alle chat per tutti i nodi",
+"Comment limit" => "Comment limit",
+"Maximum number of characters for each comment" => "Maximum number of characters for each comment",
 );

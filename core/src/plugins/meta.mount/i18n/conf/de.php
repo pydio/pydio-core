@@ -33,4 +33,10 @@ $mess=array(
 "Used with the -o command option, use AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID" => "Wird mit dem Parameter -o verwendet (benutzbare Variablen: AJXP_USER, AJXP_PASS, AJXP_SERVER_UID, AJXP_SERVER_GID)",
 "Pass Password via environment instead of command line" => "Passwort über Umgebungsvariable statt Kommandozeile",
 "Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly." => "Statt das Passwort durch die AJXP_PASS-Variable an die Mount-Optionen anzuhängen wird es über eine Umgebungsvariable gesetzt. Sudo-Datei muss entsprechend angepasst werden.",
+"Devil" => "Devil",
+"Call the mount/umount commands through devil, must be configured on the server" => "Call the mount/umount commands through devil, must be configured on the server",
+"Additional result codes to accept as success" => "Additional result codes to accept as success",
+"On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes." => "On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes.",
+"Remove mount point on unmount" => "Remove mount point on unmount",
+"Delete mount folder on unmount. Can be required for security reasons." => "Delete mount folder on unmount. Can be required for security reasons.",
 );

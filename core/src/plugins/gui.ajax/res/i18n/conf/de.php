@@ -21,9 +21,9 @@
 
 /* *****************************************************************************
 * Initial translation:  Martin Schaible <martin@martinschaible.ch>
-***************************************************************************** */ 
+***************************************************************************** */
 
-/* Do not use HTML entities! It would mess up everything */ 
+/* Do not use HTML entities! It would mess up everything */
 $mess=array(
 "Client Plugin" => "Desktop-Client",
 "Browser-based rich interface. Contains configurations for theming, custom welcome message, etc." => "Browser-basierte Oberfläche. Beinhaltet die Konfiguraton der Themen, kundenspezifische Willkommens-Mitteilung, usw.",
@@ -100,4 +100,17 @@ $mess=array(
 "Minisite" => "Öffentlicher Link",
 "Minisite Logo" => "Logo",
 "Top-right logo displayed on minisite page" => "Logo, das auf der Seite eines öffentlichen Links angezeigt wird",
+"Set the domain for yuor analytics reports (not mandatory!)" => "Set the domain for yuor analytics reports (not mandatory!)",
+"User Home Logo" => "User Home Logo",
+"Web Session" => "Web Session",
+"Google Analytics Analytics ID" => "Google Analytics Analytics ID",
+"Google Analytics Analytics Domain" => "Google Analytics Analytics Domain",
+"Google Analytics Analytics Events" => "Google Analytics Analytics Events",
+"Low-Resolution Background" => "Low-Resolution Background",
+"Make sure to use a smaller resolution image, otherwise mobile loading is very slow." => "Make sure to use a smaller resolution image, otherwise mobile loading is very slow.",
+"Background Attributes (Low Resolution)" => "Background Attributes (Low Resolution)",
+"Display Branding Tool" => "Display Branding Tool",
+"Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option.",
+"Use configured branding" => "Use configured branding",
+"Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option.",
 );

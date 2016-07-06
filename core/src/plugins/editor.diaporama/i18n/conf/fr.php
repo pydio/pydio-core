@@ -30,5 +30,7 @@ $mess=array(
 "Quality" => "Qualité",
 "Thumbs quality" => "Qualité des miniatures.",
 "Exif Rotation" => "Rotation Exif",
-"Rotate image using exif rotation" => "Faire pivoter l'image en utilisation la rotation exif"
+"Rotate image using exif rotation" => "Faire pivoter l'image en utilisation la rotation exif",
+"Low-res Sizes" => "Tailles low-res",
+"Threshold for low-res versions of images" => "Seuil pour la version low-res des images",
 );

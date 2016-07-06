@@ -21,5 +21,11 @@
 $mess=array(
 "PLUploader" => "Plupload",
 "PlUpload uploader support. Requires downloading and installing the PLupload sources." => "Plupload ist eine HTML5-Komponente von Drittanbietern. Nach dem Aktivieren der Erweiterung muss Plupload auf den Server geladen und installiert werden.",
+"Upload Options" => "Upload Options",
+"Runtimes" => "Runtimes",
+"Defines which runtimes are to be used and in what order, separated by comma. Currently html5,silverlight,flash,html4 are supported." => "Defines which runtimes are to be used and in what order, separated by comma. Currently html5,silverlight,flash,html4 are supported.",
+"Maximum File Size" => "Maximum File Size",
+"Defines maximum size of files to be transferred, such as 4096mb." => "Defines maximum size of files to be transferred, such as 4096mb.",
+"Chunk Size" => "Chunk Size",
+"Defines chunk size to be used, such as 512k, 2mb. If empty then maximum system settings are used." => "Defines chunk size to be used, such as 512k, 2mb. If empty then maximum system settings are used.",
 );
-

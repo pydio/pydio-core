@@ -857,6 +857,10 @@
             return global.pydio.getPluginConfigs("core.ocs").get("ENABLE_FEDERATED_SHARING");
         }
 
+        static qrcodeEnabled(){
+            return global.pydio.getPluginConfigs("action.share").get("CREATE_QRCODE");
+        }
+
         prepareEmail(shareType, linkId = null){
             var MessageHash = global.pydio.MessageHash;
             var ApplicationTitle = global.pydio.appTitle;

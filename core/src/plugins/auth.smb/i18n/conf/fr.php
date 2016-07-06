@@ -21,8 +21,10 @@
 $mess=array(
 "SMB Authentication" => "Authentification SMB",
 "Authenticate user by directly connecting to an SMB share" => "Authentifier les utilisateurs en se connectant directement à un partage SMB",
-"Repository" => "Dépôt",
-"Id of the repository to use for testing connexion" => "Id du dépôt à utiliser pour tester la connexion",
+"Workspace" => "Dépôt",
+"ID of the workspace used to validate credentials" => "Id du dépôt à utiliser pour tester la connexion",
 "Admin user" => "Utilisateur administrateur",
 "The ID of an existing admin for Pydio (using conf.serial)" => "Id d'un utilisateur ayant les droits d'administration sur Pydio (utilisation de conf.serial).",
+"Smbclient" => "Smbclient",
+"Path to smbclient executable, considered to be in the path by default." => "Chemin vers l'executable smbclient sur le serveur. Par défaut, va chercher dans le PATH de l'environnement.",
 );

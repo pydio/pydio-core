@@ -59,4 +59,8 @@ $mess=array(
 "Master Only" => "Master Only",
 "Slave Only" => "Slave Only",
 "Both" => "Both",
+"Disable Brute Force Check (Captcha)" => "Disable Brute Force Check (Captcha)",
+"Disable the check of failed login attempts, will disable the Captcha display" => "Disable the check of failed login attempts, will disable the Captcha display",
+"Multiple Instances Mode" => "Multiple Instances Mode",
+"Secondary Instance Driver" => "Secondary Instance Driver",
 );

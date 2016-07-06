@@ -831,6 +831,10 @@ abstract class AbstractConfDriver extends AJXP_Plugin
                     $userObject->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
                         AuthService::updateUser($userObject);
+                        if(isSet($data["lang"]) && $data["lang"] !== ConfService::getLanguage()){
+                            ConfService::setLanguage($data["lang"]);
+                            $mess = ConfService::getMessages(true);
+                        }
                     }
                 }
 

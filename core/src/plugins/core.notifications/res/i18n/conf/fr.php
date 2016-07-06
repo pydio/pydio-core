@@ -21,4 +21,11 @@
 $mess=array(
 "Activate desktop notifications" => "Activer les notifications sur l'espace de travail",
 "Desktop Notifications" => "Notifications sur l'espace de travail",
+"Notification Center" => "Centre de Notifications",
+"Handle users watches and notifications" => "Gestion des notifications et des alertes.",
+"User events and alerts" => "Notifications et alertes",
+"Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration." => "Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.",
+"Instance Params" => "Paramêtre d'instance",
+"Feed Instance" => "Feed Instance",
+"Choose the plugin" => "Choisir un plugin",
 );

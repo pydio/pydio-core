@@ -854,7 +854,7 @@
             showMailer:React.PropTypes.func
         },
         getInitialState: function(){
-            return {editLink: false, copyMessage:''};
+            return {editLink: false, copyMessage:'', showQRCode: false};
         },
         toggleEditMode: function(){
             if(this.state.editLink && this.state.customLink){
@@ -917,6 +917,10 @@
             this.props.showMailer(mailData.subject, mailData.message, []);
         },
 
+        toggleQRCode: function(){
+            this.setState({showQRCode:!this.state.showQRCode});
+        },
+
         render: function(){
             var publicLink = this.props.linkData['public_link'];
             var editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.context.isReadonly() && this.props.shareModel.currentIsOwner();
@@ -944,12 +948,18 @@
                 if(editAllowed){
                     actionLinks.push(<a key="customize" onClick={this.toggleEditMode}>{this.context.getMessage('193')}</a>);
                 }
+                if(ReactModel.Share.qrcodeEnabled()){
+                    actionLinks.push(<a className={this.state.showQRCode?'qrcode-active':''} key="qrcode" onClick={this.toggleQRCode}>{this.context.getMessage('94')}</a>)
+                }
                 if(actionLinks.length){
                     actionLinks = (
                         <div className="additional-actions-links">{actionLinks}</div>
                     ) ;
                 }else{
                     actionLinks = null;
+                }
+                if(this.state.showQRCode){
+                    var qrCode = <div className="qrCode"><ReactQRCode size={128} value={publicLink} level="Q"/></div>;
                 }
                 return (
                     <div className="public-link-container">
@@ -963,6 +973,7 @@
                         /> {copyButton}
                         <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
                         {actionLinks}
+                        {qrCode}
                     </div>
                 );
             }

@@ -27,4 +27,6 @@ $mess=array(
 "Path to the root folder on the server" => "Chemin du répertoire de base sur le serveur",
 "File Creation Mask" => "Masque de création des fichiers",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionellement, appliquer un chmod operation. La valeur doit-être numérique, tel 0777, 0644, ...",
+"WebDAV" => "WebDAV",
+"Access WebDAV through Guzzle and SabreDAV" => "Accéder à WebDAV via Guzzle et SabreDAV",
 );

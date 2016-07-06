@@ -25,4 +25,8 @@ $mess=array(
 "Id of the repository to use for testing connexion" => "Id of the repository to use for testing connection",
 "Admin user" => "Admin user",
 "The ID of an existing admin for Pydio (using conf.serial)" => "The ID of an existing admin for Pydio (using conf.serial)",
+"Workspace" => "Workspace",
+"ID of the workspace used to validate credentials" => "ID of the workspace used to validate credentials",
+"Smbclient" => "Smbclient",
+"Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
 );

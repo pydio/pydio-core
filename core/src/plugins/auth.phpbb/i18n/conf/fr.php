@@ -32,4 +32,5 @@ $mess=array(
 "Users" => "Utilisateurs",
 "The users list" => "Liste des utilisateurs",
 "PHPBB authentication" => "Authentification PHPBB",
+"Authentication on PHPBB is done remotely (useful in CMS system)." => "Authentication is done remotely (useful in CMS system).",
 );

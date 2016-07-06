@@ -633,6 +633,10 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
 "537" => "File is too large! Maximum authorized size is %i",
 "538" => "Upload error: no file found on server!",
 "539" => "Upload error: file is partial",
@@ -644,7 +648,10 @@ $mess=array(
 "545" => "Remote Share Dialog",
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
-"548" => "Decline"
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
 /* 文章はここまで */
 /* 文章終了 */
 );

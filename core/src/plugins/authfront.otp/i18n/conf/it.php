@@ -32,4 +32,11 @@ $mess=array(
 "Yubico secret key attached to your account" => "Chiave segreta collegata al tuo account Yubico",
 "Yubico Client ID" => "ID Client Yubico",
 "Yubico client id attached to your account" => "Client ID collegato al tuo account Yubico",
+"General" => "General",
+"YubiKey 1" => "YubiKey 1",
+"YubiKey 2" => "YubiKey 2",
+"Google Authenticator" => "Google Authenticator",
+"Google Authenticator Secret" => "Google Authenticator Secret",
+"Google Authenticator Last" => "Google Authenticator Last",
+"Google Authenticator replay protection, do not edit" => "Google Authenticator replay protection, do not edit",
 );

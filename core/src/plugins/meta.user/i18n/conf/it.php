@@ -42,4 +42,5 @@ $mess=array(
 "Set default visibility." => "Imposta visibilità principale.",
 "Additional info" => "Info Addizionali",
 "Depending on the field type. Currently used for selection only" => "In base al tipo di campo. Attualmente utilizzato solo per la selezione.",
+"Tags (extensible sets of values)" => "Tags (extensible sets of values)",
 );

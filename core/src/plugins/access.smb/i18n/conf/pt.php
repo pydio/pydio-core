@@ -35,4 +35,8 @@ $mess=array(
 "Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
 "Enable Zip" => "Enable Zip",
 "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very slow!" => "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!",
+"Default domain to use with session credentials. The domain name ends with '/' or '\' depend on your system. Example: MyDomain\ or YourDomain/. Default is /" => "Default domain to use with session credentials. The domain name ends with '/' or '\' depend on your system. Example: MyDomain\ or YourDomain/. Default is /",
+"Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!" => "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!",
+"Path Tmp" => "Path Tmp",
+"OS Path Temporary if not the default one" => "OS Path Temporary if not the default one",
 );
