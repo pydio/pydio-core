@@ -61,7 +61,7 @@ Class.create("TreeSelector", {
 		if(!rootNode){
 			rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png");
 		}
-		this.treeCopy = new AJXPTree(rootNode, this._nodeActionCallback, this.options.nodeFilter);
+		this.treeCopy = new AJXPTree(rootNode, this._nodeActionCallback, this.options.nodeFilter, true);
 		this.treeContainer.update(this.treeCopy.toString());
 		$(this.treeCopy.id).observe("click", function(e){
 			this.action();

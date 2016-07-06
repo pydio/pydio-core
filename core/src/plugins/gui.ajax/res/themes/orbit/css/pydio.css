@@ -386,6 +386,30 @@ div.dialogBox div#element_overlay {
   font-size: 13px;
   background-size: 16px;
 }
+.webfx-tree-item a span span.treeLabelPaginationWrapper,
+.webfx-tree-item a:active span span.treeLabelPaginationWrapper,
+.webfx-tree-item a:hover span span.treeLabelPaginationWrapper,
+.webfx-tree-item a:link span span.treeLabelPaginationWrapper {
+  display: inline;
+  padding: 0;
+  margin: 0;
+}
+.webfx-tree-item a span span.treeLabelPaginationWrapper span.treeLabelPaginationPadding,
+.webfx-tree-item a:active span span.treeLabelPaginationWrapper span.treeLabelPaginationPadding,
+.webfx-tree-item a:hover span span.treeLabelPaginationWrapper span.treeLabelPaginationPadding,
+.webfx-tree-item a:link span span.treeLabelPaginationWrapper span.treeLabelPaginationPadding {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 0;
+}
+.webfx-tree-item a span span.treeLabelPaginationWrapper a.treeLabelPagination,
+.webfx-tree-item a:active span span.treeLabelPaginationWrapper a.treeLabelPagination,
+.webfx-tree-item a:hover span span.treeLabelPaginationWrapper a.treeLabelPagination,
+.webfx-tree-item a:link span span.treeLabelPaginationWrapper a.treeLabelPagination {
+  display: inline-block;
+  margin: 0 3px;
+  cursor: pointer;
+}
 .webfx-tree-item a.selected-focus,
 .webfx-tree-item a:active.selected-focus,
 .webfx-tree-item a:hover.selected-focus,
