@@ -83,4 +83,7 @@ $mess=array(
 "69"=> "Télécharger l'appli de synchro (Mac)",
 "70"=> "Application pour smartphones iOS",
 "71"=> "Application pour smartphones Android",
+    "72" => "QRCode du serveur",
+    "73" => "Connexion aux applications mobiles",
+    "74" => "Scannez ce QRCode avec votre application mobile pour configurer facilement la connexion.",
 );
