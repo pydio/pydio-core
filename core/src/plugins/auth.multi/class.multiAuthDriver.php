@@ -87,6 +87,11 @@ class multiAuthDriver extends AbstractAuthDriver
         return parent::getRegistryContributions( $extendedVersion );
     }
 
+    public function getStats()
+    {
+        return implode(",", array_keys($this->drivers));
+    }
+
     private function detectCurrentDriver()
     {
         //if(isSet($this->currentDriver)) return;

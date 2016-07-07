@@ -316,6 +316,10 @@ class AbstractAuthDriver extends AJXP_Plugin
     {
         return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
     }
+    
+    public function getStats(){
+        return $this->getId();
+    }
 
     /**
      * @param AbstractAjxpUser $userObject

@@ -319,6 +319,14 @@ class ConfService
     }
 
     /**
+     * Return info about auth plugins
+     * @return string
+     */
+    public static function getInfo(){
+        return "a=".self::getAuthDriverImpl()->getStats();
+    }
+
+    /**
      * Get auth driver implementation
      *
      * @return AbstractCacheDriver
