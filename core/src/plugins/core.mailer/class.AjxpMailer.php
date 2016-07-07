@@ -196,7 +196,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
             $subject = ConfService::getMessages()["core.mailer.9"];
 
             $success = 0;
-            $error = 0;
+            $errors = [];
             foreach ($results as $emailType => $recipients) {
 
                 $isHTML = $emailType == "html";
@@ -208,7 +208,6 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 
                     $body = $this->_buildDigest($workspaces, $emailType);
 
-                    $success++;
                     try {
                         $mailer->sendMail(
                             [$recipient],
@@ -220,9 +219,8 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                         );
 
                         $success++;
-                    } catch (AJXP_Exception $e) {
-                        $error++;
-                        $logInfo("Failed to send email to " . $recipient . ": " . $e->getMessage());
+                    } catch (Exception $e) {
+                        $errors[] = "Failed to send email to " . $recipient . ": " . $e->getMessage();
                     }
                 }
             }
@@ -236,7 +234,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                 throw new AJXP_Exception($e->getMessage());
             }
 
-            $output = array("report" => "Sent ".$success." emails");
+            $output = array("report" => "Sent ".$success." emails", "errors" => $errors);
             echo json_encode($output);
         }
     }
