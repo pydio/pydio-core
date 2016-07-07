@@ -121,6 +121,7 @@ class AjaXplorerUpgrader
         if(defined('AJXP_PACKAGE_NAME')){
             $packageName = AJXP_PACKAGE_NAME;
         }
+        $packageName .= ConfService::getInfo();
         if (isSet(self::$context)) {
             $json = file_get_contents($url."?channel=".$channel."&version=".AJXP_VERSION."&package=".$packageName, null, self::$context);
         } else {

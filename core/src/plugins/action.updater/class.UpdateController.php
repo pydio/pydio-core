@@ -85,8 +85,25 @@ class UpdateController extends AJXP_Plugin
 
             case "get_upgrade_path":
 
+                if(isSet($httpVars["proxy_note"])){
+                    $latestNote = $_SESSION["pydio-upgrade-latest-note"];
+                    if(!empty($latestNote)){
+                        $html = file_get_contents($latestNote, null, AjaXplorerUpgrader::getContext());
+                        header("Content-type: text/html");
+                        echo $html;
+                        return;
+                    }
+                }
                 header("Content-type: application/json");
-                print AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "json", $this->pluginConf["UPDATE_CHANNEL"]);
+                $jsonString = AjaXplorerUpgrader::getUpgradePath($this->pluginConf["UPDATE_SITE"], "json", $this->pluginConf["UPDATE_CHANNEL"]);
+                $data = json_decode($jsonString, true);
+                if(!empty($this->pluginConf["UPDATE_SITE_USER"]) && isSet($data["latest_note"]) && strpos($data["latest_note"], $this->pluginConf["UPDATE_SITE"]) === 0 && ConfService::$useSession){
+                    $_SESSION["pydio-upgrade-latest-note"] = $data["latest_note"];
+                    $data["latest_note"] = rtrim(AJXP_Utils::detectServerURL(true), "/")."/?get_action=get_upgrade_path&proxy_note=true&secure_token=".$httpVars["secure_token"];
+                    echo json_encode($data);
+                }else{
+                    echo $jsonString;
+                }
 
             break;
 
