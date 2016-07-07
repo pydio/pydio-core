@@ -323,7 +323,7 @@ class ConfService
      * @return string
      */
     public static function getInfo(){
-        return "a=".self::getAuthDriverImpl()->getStats();
+        return "&a=".self::getAuthDriverImpl()->getStats();
     }
 
     /**
