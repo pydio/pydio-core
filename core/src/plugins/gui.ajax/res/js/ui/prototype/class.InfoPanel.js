@@ -89,12 +89,15 @@ Class.create("InfoPanel", AjxpPane, {
         document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
         this.htmlElement.up('div.dialogBox').setStyle({width:Math.min(450, document.viewport.getWidth())+'px'});
         this.htmlElement.up('div.dialogContent').setStyle({padding:0});
-        this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});
+        this.contentContainer = this.htmlElement.down('#ip_content_info_panel');
+        this.contentContainer.setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});
         try{
             this.htmlElement.down('#ip_content_modal_action_form').remove();
             this.htmlElement.down('#ip_scroller_modal_action_form').remove();
         }catch (e){}
         modal.refreshDialogPosition();
+        this.options.skipActions = true;
+        this.addActions("unique");
     },
 
 	/**
@@ -148,7 +151,7 @@ Class.create("InfoPanel", AjxpPane, {
 	update : function(objectOrEvent){
 		if(!this.htmlElement) return;
         var passedNode;
-        if(objectOrEvent.__className && objectOrEvent.__className == "AjxpNode"){
+        if(objectOrEvent instanceof AjxpNode){
             passedNode = objectOrEvent;
         }
         this.insertedTemplates = $A();
