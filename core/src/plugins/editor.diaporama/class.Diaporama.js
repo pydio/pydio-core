@@ -275,7 +275,12 @@ Class.create("Diaporama", AbstractEditor, {
 			if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 		}else{
 			if(this.fullScreenMode){
-				fitHeightToBottom(this.imgContainer, this.element);
+                if(this.imgContainer.parentNode !== this.element){
+                    fitHeightToBottom(this.imgContainer.parentNode);
+                    fitHeightToBottom(this.imgContainer);
+                }else{
+    				fitHeightToBottom(this.imgContainer, this.element);
+                }
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.element.getWidth()});
 			}else{
                 if(this.editorOptions.context.elementName){
