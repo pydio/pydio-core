@@ -28,6 +28,23 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 {
 
+    public static $TEMPLATES = [
+        "html" => [
+            "body"        => '<div id="digest">%s</div>',   // Argument section
+            "section"     => '%s%s',                        // Argument title, listWrapper
+            "title"       => '<h1>%s</h1>',                 // Argument %var%
+            "listWrapper" => '<ul>%s</ul>',                 // Argument list
+            "list"        => '<li>%s</li>'                  // Argument %var%
+        ],
+        "plain" => [
+            "body"        => '%s',                          // Argument section
+            "section"     => '%s%s',                        // Argument title, listWrapper
+            "title"       => '%s\n\n',                      // Argument %var%
+            "listWrapper" => '%s',                          // Argument list
+            "list"        => '%s\n'                         // Argument %var%
+        ]
+    ];
+
     public $mailCache;
     protected $_dibiDriver;
 
@@ -50,126 +67,239 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         }
         return $this->_dibiDriver;
     }
+
+    public function getConsumerLock() {
+
+        $workDir = $this->getPluginWorkDir(true);
+        $consumerLockFile = $workDir . DIRECTORY_SEPARATOR . "/consume_mail_queue.lock";
+
+        // Opening the file
+        $consumerLock = fopen($consumerLockFile, "w");
+
+        // Making sure the file gets closed and the lock gets released at the end of the script
+        register_shutdown_function(function () use ($consumerLock) {
+            fflush($consumerLock);
+            flock($consumerLock, LOCK_UN);
+
+            fclose($consumerLock);
+        });
+
+        // Retrieving the lock
+        while (!flock($consumerLock, LOCK_EX)) {
+            sleep(60);
+        }
+
+        // Writing the time the lock was granted
+        $time = time();
+        ftruncate($consumerLock, 0);
+        fwrite($consumerLock, $time);
+
+        return $time;
+    }
+    
     public function mailConsumeQueue ($action, $httpVars, $fileVars) {
 
         if ($action === "consume_mail_queue") {
+
+            $verbose = $httpVars["verbose"];
+
+            $logInfo = function () {};
+            if ($verbose) {
+                $logInfo = function ($str) {
+                    fwrite(STDOUT, $str . "\n");
+                };
+            }
+
+            /** @var AjxpMailer $mailer */
             $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+
             if (!dibi::isConnected()) {
                 dibi::connect($this->getDibiDriver());
             }
+
             if($this->_dibiDriver["driver"] == "postgre"){
                 dibi::query("SET bytea_output=escape");
             }
-            $time = time();
+
+            // Get the queue consumer lock and the time it was given
+            $time = $this->getConsumerLock();
+
             try {
                 $querySQL = dibi::query("SELECT * FROM [ajxp_mail_queue] WHERE [date_event] <= %s", $time);
             } catch (DibiException $e) {
                 throw new AJXP_Exception($e->getMessage());
             }
-            $resultsSQL = $querySQL->fetchAll();
-            $arrayResultsSQL = array();
-            $output = array("success" => [], "error" => []);
-            $recipientFormats = array();
-            if (count($resultsSQL) > 0) {
-                foreach ($resultsSQL as $value) {
-                    $ajxpNotification = unserialize($value["notification_object"]);
-                    $ajxpAction = $ajxpNotification->getAction();
-                    $ajxpAuthor = $ajxpNotification->getAuthor();
-                    $ajxpNode = new AJXP_Node($value['url']);
 
-                    try{
-                        @$ajxpNode->loadNodeInfo();
-                    } catch(Exception $e) {
-                        // do nothing
-                    }
+            //$querySQL->fetch();
+            //$resultsSQL = $querySQL->fetchAll();
+            $numRows = $querySQL->count();
 
-                    if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
-                        $ajxpContent = $ajxpNode->getParent()->getPath();
-                    } else {
-                        $ajxpContent = $ajxpNode->getPath();
-                        if ($ajxpContent === null) {
-                            $ajxpContent = '/';
-                        }
-                    }
-                    if($ajxpNode->getRepository() != null) {
-                        $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
-                    } else {
-                        $ajxpNodeWorkspace = "Deleted Workspace";
-                    }
+            $results = [];
 
-                    $recipientFormats[$value['recipient']] = ($value["html"] == 1);
-                    $ajxpKey = $ajxpAction."|".$ajxpAuthor."|".$ajxpContent;
-                    $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
+            HTMLWriter::charsetHeader("text/json");
+
+            if ($numRows == 0) {
+                $logInfo("Nothing to process");
+                $output = array("report" => "Sent 0 emails", "detail" => "");
+                echo json_encode($output);
+                return;
+            }
+
+            $logInfo("Processing " . $numRows . " rows.");
+
+            // We need to send one email :
+            // - per user
+            // - per email type (HTML or PLAIN)
+            while($value = $querySQL->fetch()) {
+
+                // Retrieving user information
+                $recipient = $value['recipient'];
+
+                // Retrieving Email type information
+                $emailType = ($value["html"] == 1) ? "html" : "plain";
+
+                // Retrieving notification information
+                /** @var AJXP_Notification $notification */
+                $notification = unserialize($value["notification_object"]);
+
+                $action = $notification->getAction();
+                $author = $notification->getAuthor();
+                $node   = $notification->getNode();
+
+                try {
+                    @$node->loadNodeInfo();
+                } catch(Exception $e){
                 }
-                //this $body must be here because we need this css
-                $digestTitle = ConfService::getMessages()["core.mailer.9"];
 
-                foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
-
-                    $useHtml = $recipientFormats[$recipient];
-                    $body = $useHtml ? "<div id='digest'>" : "";
-
-                    foreach ($arrayWorkspace as $workspace => $arrayAjxpKey) {
-                        $key = key($arrayAjxpKey);
-                        $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
-                        foreach ($arrayAjxpKey as $ajxpKey => $arrayNotif) {
-                            $descs = array();
-                            foreach($arrayNotif as $notif){
-                                $desc = $notif->getDescriptionLong(true);
-                                if(array_key_exists($desc, $descs)){
-                                    $descs[$desc] ++;
-                                }else{
-                                    $descs[$desc] = 1;
-                                }
-                            }
-                            foreach($descs as $sentence => $occurences){
-                                $body = $body . '<li>' . $sentence . ($occurences > 1 ? ' ('.count($arrayNotif).')' :'').'</li>';
-                            }
-                        }
-                        $body = $body . '</ul>';
+                if ($node->isLeaf() && !$node->isRoot()) {
+                    $dirName = $node->getParent()->getPath();
+                } else {
+                    $dirName = $node->getPath();
+                    if ($dirName === null) {
+                        $dirName = '/';
                     }
+                }
+                $key = sprintf("%s|%s|%s", $action, $author, $dirName);
 
-                    $body .= $useHtml ? "</div>" : "";
+                // Retrieving workspace information
+                if($node->getRepository() != null) {
+                    $workspace = $node->getRepository()->getDisplay();
+                } else {
+                    $workspace = "Deleted Workspace";
+                }
+
+                $results[$emailType][$recipient][$workspace][$key][] = $notification;
+            }
+
+            $logInfo("Created digest array.");
+
+            $subject = ConfService::getMessages()["core.mailer.9"];
+
+            $success = 0;
+            $error = 0;
+            foreach ($results as $emailType => $recipients) {
+
+                $isHTML = $emailType == "html";
+
+                $i = 0;
+                foreach ($recipients as $recipient => $workspaces) {
+
+                    $logInfo("Processed " . ++$i . " out of " . count($recipients) . " " . $emailType . " emails " . $recipient);
+
+                    $body = $this->_buildDigest($workspaces, $emailType);
+
+                    $success++;
                     try {
-                        $mailer->sendMail(array($recipient),
-                            $digestTitle,
+                        $mailer->sendMail(
+                            [$recipient],
+                            $subject,
                             $body,
                             null,
                             null,
-                            $useHtml
+                            $isHTML
                         );
-                        $output["success"][] = "Email sent to ".$recipient;
+
+                        $success++;
                     } catch (AJXP_Exception $e) {
-                        $output["error"][] = "Sending email to ".$recipient.": ".$e->getMessage();
+                        $error++;
+                        $logInfo("Failed to send email to " . $recipient . ": " . $e->getMessage());
+                    }
+                }
+            }
+
+            // Clearing memory
+            unset($results);
+
+            try {
+                dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
+            } catch (DibiException $e) {
+                throw new AJXP_Exception($e->getMessage());
+            }
+
+            $output = array("report" => "Sent ".$success." emails");
+            echo json_encode($output);
+        }
+    }
+
+    private function _buildDigest($workspaces, $emailType) {
+
+        $template = self::$TEMPLATES[$emailType];
+
+        $sections = [];
+        foreach ($workspaces as $workspace => $keys) {
+
+            $title = "";
+            $li = [];
+
+            foreach ($keys as $key => $notifications) {
+
+                $descriptions = [];
+
+                /** @var AJXP_Notification $notification */
+                foreach ($notifications as $notification) {
+                    if (empty($current)) {
+                        $title = sprintf($template["title"], $notification->getDescriptionLocation());
+                    }
+
+                    $description = $notification->getDescriptionLong(true);
+
+                    if(array_key_exists($description, $descriptions)) {
+                        $descriptions[$description]++;
+                    } else {
+                        $descriptions[$description] = 1;
                     }
                 }
 
-                try {
-                    dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
-                } catch (DibiException $e) {
-                    throw new AJXP_Exception($e->getMessage());
+                foreach ($descriptions as $description => $count){
+                    $li[] = sprintf($template["list"], $description . ($count > 1 ? ' ('.$count.')' : ''));
                 }
             }
-            HTMLWriter::charsetHeader("text/json");
-            $output = array("report" => "Sent ".count($output["success"])." emails", "detail" => $output);
-            echo json_encode($output);
+
+            $listWrapper = sprintf($template["listWrapper"], join("", $li));
+            $sections[] = sprintf($template["section"], $title, $listWrapper);
         }
+
+        return sprintf($template["body"], join("", $sections));
     }
 
     protected function stringify($int){
         return ($int < 10 ? "0".$int : "".$int);
     }
 
-    protected function computeEmailSendDate($frequencyType, $frequencyDetail){
+    protected function computeEmailSendDate($frequencyType, $frequencyDetail) {
 
         $date = new DateTime("now");
-        $year = $date->format("Y");
-        $day = $date->format("d");
+
+        $year  = $date->format("Y");
+        $day   = $date->format("d");
         $month = $date->format("m");
-        $hour = intval($date->format('H'));
+
+        $hour   = intval($date->format('H'));
         $minute = intval($date->format('i'));
+
         $frequency = $frequencyDetail;
         $allMinute = ($hour * 60) + $minute;
+
         $nextFrequency = null;
         switch ($frequencyType) {
             case "M":
@@ -224,6 +354,13 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 
     public function processNotification(AJXP_Notification &$notification)
     {
+        // Inserting the node information.
+        try {
+            $notification->getNode()->loadNodeInfo();
+        } catch (Exception $e) {
+            // Do nothing
+        }
+
         $userExist = AuthService::userExists($notification->getTarget());
         if ($userExist === true) {
             $userObject = ConfService::getConfStorageImpl()->createUserObject($notification->getTarget());
@@ -276,7 +413,9 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
                 $this->logError("[mailer]", "Could not determine email frequency from $frequencyType / $frequencyDetail for send email to user ".$userObject->getId());
             }
         } else {
+
             $mailer = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer", true);
+
             if ($mailer !== false) {
                 try {
                     $mailer->sendMail(
@@ -296,12 +435,12 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
 
     public function sendMail($recipients, $subject, $body, $from = null, $imageLink = null, $useHtml = true)
     {
-        $prepend = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
-        $append = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
+        $prepend      = ConfService::getCoreConf("SUBJECT_PREPEND", "mailer");
+        $append       = ConfService::getCoreConf("SUBJECT_APPEND", "mailer");
         $layoutFolder = ConfService::getCoreConf("LAYOUT_FOLDER", "mailer");
-        $layout = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
-        $forceFrom = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
-        $coreFrom = ConfService::getCoreConf("FROM", "mailer");
+        $layout       = ConfService::getCoreConf("BODY_LAYOUT", "mailer");
+        $forceFrom    = ConfService::getCoreConf("FORCE_UNIQUE_FROM", "mailer");
+        $coreFrom     = ConfService::getCoreConf("FROM", "mailer");
 
         if($forceFrom && $coreFrom != null){
             $coreFromName = ConfService::getCoreConf("FROM_NAME", "mailer");
@@ -350,11 +489,10 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         }
     }
 
-    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true){
+    protected function sendMailImpl($recipients, $subject, $body, $from = null, $images = array(), $useHtml = true) {
     }
 
-    public function sendMailAction($actionName, $httpVars, $fileVars)
-    {
+    public function sendMailAction($actionName, $httpVars, $fileVars) {
         $mess = ConfService::getMessages();
         $mailers = AJXP_PluginsService::getInstance()->getActivePluginsForType("mailer");
         if (!count($mailers)) {
@@ -386,8 +524,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
         }
     }
 
-    public function resolveFrom($fromAdress = null)
-    {
+    public function resolveFrom($fromAdress = null) {
         $fromResult = array();
         if ($fromAdress != null) {
             $arr = $this->resolveAdresses(array($fromAdress));
@@ -409,8 +546,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
      * @return array
      *
      */
-    public function resolveAdresses($recipients)
-    {
+    public function resolveAdresses($recipients) {
         $realRecipients = array();
         foreach ($recipients as $recipient) {
             if (is_string($recipient) && strpos($recipient, "/AJXP_TEAM/") === 0) {
@@ -469,13 +605,11 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
     }
 
 
-    public function validateEmail($email)
-    {
+    public function validateEmail($email) {
         return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     public static function simpleHtml2Text($html){
-
         $html = preg_replace('/<br\>/', "\n", $html);
         $html = preg_replace('/<br>/', "\n", $html);
         $html = preg_replace('/<li>/', "\n * ", $html);
@@ -488,8 +622,7 @@ class AjxpMailer extends AJXP_Plugin implements SqlTableProvider
      * @param $param array("SQL_DRIVER" => $dibiDriverData)
      * @return mixed
      */
-    public function installSQLTables($param)
-    {
+    public function installSQLTables($param) {
         $base = basename($this->getBaseDir());
         if($base == "core.mailer"){
             $p = AJXP_Utils::cleanDibiDriverParameters($param["SQL_DRIVER"]);
