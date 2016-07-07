@@ -253,17 +253,24 @@
             shareModel:React.PropTypes.instanceOf(ReactModel.Share),
             showMailer:React.PropTypes.func
         },
+
         onUserUpdate: function(operation, userId, userData){
             this.props.shareModel.updateSharedUser(operation, userId, userData);
         },
+
         onSaveSelection:function(){
             var label = window.prompt(this.context.getMessage(510, ''));
             if(!label) return;
             this.props.shareModel.saveSelectionAsTeam(label);
         },
+
         sendInvitations:function(userObjects){
-            var mailData = this.props.shareModel.prepareEmail("repository");
-            this.props.showMailer(mailData.subject, mailData.message, userObjects);
+            try{
+                var mailData = this.props.shareModel.prepareEmail("repository");
+                this.props.showMailer(mailData.subject, mailData.message, userObjects);
+            }catch(e){
+                global.alert(e.message);
+            }
         },
 
         render: function(){

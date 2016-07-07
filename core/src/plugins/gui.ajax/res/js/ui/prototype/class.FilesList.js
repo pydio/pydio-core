@@ -1580,6 +1580,7 @@ Class.create("FilesList", SelectableElements, {
 		var scrollTop = 0;
         var addStyle = {fontSize: '12px'};
         var span, posSpan;
+        var smallThumb = false;
         if(this._displayMode == "list"){
             span = item.select('span.text_label')[0];
             posSpan = item.select('span.list_selectable_span')[0];
@@ -1588,10 +1589,20 @@ Class.create("FilesList", SelectableElements, {
             scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
         }else if(this._displayMode == "thumb"){
             span = item.select('div.thumbLabel')[0];
-            posSpan = span;
+            if(item.hasClassName('fl-displayMode-thumbsize-small')){
+                posSpan = item;
+                smallThumb = true;
+            }else{
+                posSpan = span;
+            }
             offset.top=-2;
             offset.left=3;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+            addStyle = {
+                marginTop: item.hasClassName('fl-displayMode-thumbsize-large') ? '10px' : '6px',
+                padding: item.hasClassName('fl-displayMode-thumbsize-large') ? '2px': 0,
+                border: 0
+            };
         }else if(this._displayMode == "detail"){
             span = item.select('div.thumbLabel')[0];
             posSpan = span;
@@ -1682,7 +1693,7 @@ Class.create("FilesList", SelectableElements, {
 			width:'46px',
 			zIndex:2500,
 			left:(pos.left+offset.left+origWidth)+'px',
-			top:((pos.top+offset.top-scrollTop)+1)+'px'
+			top:smallThumb ? '182px' : ((pos.top+offset.top-scrollTop)+1)+'px'
 		});
 		var closeFunc = function(){
 			span.setStyle({color:''});

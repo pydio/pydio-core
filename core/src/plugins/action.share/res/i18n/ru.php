@@ -239,6 +239,7 @@ $mess = array(
 "226" => "You are not allowed to create public links on folders",
 "227" => "You are not allowed to share files internally",
 "228" => "You are not allowed to share folders internally",
+"229" => "Please save before sending an invitation",
 "159" => "Owner",
 "160" => "You are not allowed to delete this shared item",
 "161" => "Deprecated Link",
