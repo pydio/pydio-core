@@ -90,12 +90,12 @@ class AJXP_Utils
      */
     public static function securePath($path)
     {
-        if ($path == null) $path = "";
+        if ($path == null) return "";
         //
         // REMOVE ALL "../" TENTATIVES
         //
         $path = str_replace(chr(0), "", $path);
-        $dirs = explode('/', $path);
+        $dirs = self::safeExplode($path);
         for ($i = 0; $i < count($dirs); $i++) {
             if ($dirs[$i] == '.' or $dirs[$i] == '..') {
                 $dirs[$i] = '';
@@ -113,13 +113,15 @@ class AJXP_Utils
         return $path;
     }
 
-    public static function safeDirname($path)
-    {
+    public static function safeExplode($path) {
+        return (DIRECTORY_SEPARATOR === "\\" ? preg_split('/(\\\|\\/)/', $path) : explode('/', $path));
+    }
+
+    public static function safeDirname($path) {
         return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", dirname($path)): dirname($path));
     }
 
-    public static function safeBasename($path)
-    {
+    public static function safeBasename($path) {
         return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)): basename($path));
     }
 
