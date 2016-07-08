@@ -1,5 +1,141 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+Pydio Core 6.4.2 fixes vulnerabilities discovered in remote download and some specific path filtering on Windows server OS. Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
+
+[Most noticeable changes]
+
+Security issues on remote download and path traversal on Windows.
+UX fixes and improvements (icons, thumbnails view)
+Fix indexation issues for synchronisation
+Italian translations updated (DepaMarco), Czech translations updated (Svetlmodry)
+
+[Detailed Changelog]
+
+Update Italian translation for plugin 'access.ajxp_conf'
+Update Italian translation for plugin 'access.ajxp_home'
+Update Italian translation for plugin 'access.ajxp_user'
+Adding Italian translation for plugin 'access.inbox'
+Adding Italian translation for plugin 'action.disclaimer'
+Update Italian translation for plugin 'action.scheduler'
+Update Italian translation for plugin 'action.share'
+Added test for intl php extension as it is used to localize month names (see IntlDateFormatter in AJXP_Utils::relativeDate)
+Fixed test for detecting php apc extension (postive result even if apc was not loaded)
+Update README.md
+Update Release number
+adding disclaimer on plugin doc
+adding disclaimer on plugin doc and dependancies
+Make sure to invalidate repositories cache after accepting user in DuoSecurity.
+Add minimum characters number on UsersCompleter
+Update hooks extraction
+Update hooks extraction
+Use caching to agressively store directory listings, nodes metadata and nodes stats. Introduced caching namespaces, we could even provide different backends for differents namespaces. Todo: create a user namespace to flush only specific resources.
+Expand Doctrine caches implementation to add "deleteKeyStartingBy" when possible (currently only APC and Redis). If this feature is supported, activate the nodes cache layer (otherwise we cannot prune a full branch of the filesystem tree).
+Confusion possible if overriding private method.
+Fix cache invalidation
+Empty mask filtering on meta.syncable can create an issue with sync downloads.
+Make sure to Normalize_C the filename when uploaded from xhr.
+Feed.sql: index should not be declared unique.
+Delete imagick cache can be deferred.
+Add test for AbstractCacheDriver
+Fix APCIterator namespace Action.share : use ConfService::replaceRepository to trigger cache invalidation CoreCache: hook to workspace.after_update to clear associated cache contents
+New action MigrateLegacyShares
+Catch error on minisite migration
+Add a MetaCacheService on the client side, caching Shared Data and Activity Feed with clever invalidation rules. Keep in memory for the moment, always clearing on workspace switch (and thus on logout).
+Remove log.
+Use new cacheService for workspace.info
+Update README.md
+Like was causing multiple rows to be added to ajxp_index when changing directory pathname
+Correctly change index for children whose ancestors dir name changed
+Fix SMB issue when trying to delete folder with a file named '0' in it
+Rebase and update
+Updated Italian translation for plugin 'action.updater'
+Adding Italian translation for plugin 'auth.custom_db'
+Suggest FIX for English translation of plugin 'auth.custom_db': replace 'connexion' with 'connection' that is more common
+Fix error webdav in root folder
+Fix user's roles update
+Option to zip downloading files on the fly
+Czech translation - plugins editor.webodf
+editor.video czech translation
+editor.text translation to Czech
+editor.soundmanager translation
+editor.infopanel translation
+editor.exif czech translation
+editor.codepress czech translation
+editor.audio czech translation
+editor.ajxp_graphs czech translation
+Fix event on change error when cross-repository copy.
+Fix load users' feed
+Fix mapping to role id
+Adding Italian translation for plugin 'authfront.cyphered'
+Adding Italian translation for plugin 'authfront.duosecurity'
+Adding Italian translation for plugin 'authfront.http_basic'
+Adding Italian translation for plugin 'authfront.http_server'
+Adding Italian translation for plugin 'authfront.keystore'
+Adding Italian translation for plugin 'authfront.otp'
+Adding Italian translation for plugin 'authfront.session_login'
+Updated Italian translation for plugin 'core.ajaxplorer'
+Change S3 clients instanciation.
+SearchEngine: change "more results" messages, we may not know the exact total result count. (cherry picked from commit 58bbd23)
+Set REPO_SYNCABLE on default repositories (cherry picked from commit 86497a8)
+Adding react tap event clear dependency (cherry picked from commit 8c358fe)
+Fix group sorting in orderRoles ( close #1126 )
+Fix URL for plugins documentation
+Set POST by default on client to avoid too long requests.
+Fix root node actions detection. Do not display inbox in cross repo list.
+Missing auto-complete styling for .e.g tags metadata.
+Fix fireContextChange by passing a dataModel: fix right-click instabilities. (cherry picked from commit 9d9851b)
+Fix possible issue in metastore for root node.
+Fix ShutdownScheduler that could skip deferred events when already in deferred loop.
+Dedup files in UserSelection
+Enable "Explore" action on root folder.
+Fix Team and Group listing and filtering by keeping an alt. pregexp value.
+Fix #1108: Caching issues for unoconv-generated previews of office files.
+Fix isUnique() function in datamodel.
+Missing var in disclaimer javascript.
+Refix group sorting. We must compare to 0.
+Fix TeamsList searching
+Css compile
+Adding support for latest versions of ElasticSearch #1184
+Raise filtering level when downloading from remote or extarcting archive.
+Fix strange display in authentication panel by passing smbclient as param instead of global_param
+Get editable value in FormManager. Close #1124
+Imagick: close session to avoid blocking request when generating preview. Fix resize when loading page.
+Multiple DL: get parent base for zip file.
+Making sure node metadata for file info is valid for a deleted file #1127
+Fix thumb positioning for Imagick preview
+Implement font-based mime icons.
+Rework Grid display w/ more space for thumbnails Display overlay icons in tree, that way we can enable some actions on root node (inc. watch on workspaces). (cherry picked from commit 9e0df5b)
+update extensions
+Readapt styles for font-based mimes
+Css details
+Add some extensions
+New plugtype strings
+Reload messages when switching language
+i18n update
+Escape quotes and parenthesis before setting backgroundImage style
+fix FR typo
+Re-implement QRCode feature for shared links
+Add QRCode action for passing user / server name via qrcode to new mobile apps. Disabled by default.
+Performance improvements mail digest
+More detailed info about update sites
+Quick fixes for inlineEdition - Probably to be rewritten properly.
+Add pagination controllers in folders tree (when in Selector mode only) to allow copying/moving data around even if inside another page. Fix #1179
+Make sure to save before trying to send an invitation to internal users. Fix #1166
+Update abstractAuth plugin
+Pass & in string return
+Proxy latest_note to avoid re-asking authentification to update site.
+Revert previous change, we already had the display_upgrade_note action.
+Correcting security potential issue on windows in securePath
+Fix infoPanel action bars initialization when in editor mode. Fix #1145
+Update DL page for Sync Clients
+Fix for #1117: don't remove tmp archive if using XSENDFILE
+Fix resize issues when display images fullscreen in minisite. Fix #1168
+Fix #1176: catching all exceptions when sending mails and adding errors to the end report
+Fix z-index for videojs player, both in editor mode and fullscreen. Fix #1191
+Use double-quotes instead of simple for links. Maybe see #1138
+Fixing again parenthesis in background URL.
+
+-------
 Pydio Core 6.4.1 - Bug Fixes for 6.4
 
 Pydio Core 6.4.1 fixes most blocking issues revealed by the massive upgrade to 6.4.0. Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
@@ -12,36 +148,36 @@ Many issues fixed in shares, linked to the deep refactoring of this feature. Amo
 
 
 [Detailed Changelog]
-Fix GlueCode.php (details)
-Use longer description in api generator. (details)
-Missing media.css file in gruntfile. (details)
-Missing log for ShareNode action (details)
-Fix method signature for PHP7 (details)
-Expand api docs generator (details)
-Rework Share options for folders / files vs. public links / internal sharing - Fix #1143 Better invalid share detection and remove it from meta. Fix many error messages. (details)
-Update i18n (details)
-Core.mailer : add DROP TRIGGER IF EXISTS (details)
-Do not display section title if list is empty - Fix #1154 (details)
-Fix #1148 (details)
-Fix some media CSS (details)
-Fix various glitches on Spanish language. Close #1136 (details)
-Fix #1128 : add the ability to reject a previously accepted share. (details)
-Make sure to transfer an empty DATA_TEMPLATE value to child repository - Fix #1152 Fix broken unsharing. (details)
-Remove legacy share js resources - Discourage people to use old themes for now. (details)
-Add a canWrite attribute on editors declaration, use it in ShareDialog to detect if a file has "writeable" editors and show an additional Edit permission for public links on files. (details)
-Fix various issues with shares lists, especially in My Account & Admin panels. (details)
-Use original_path for header if present in metadata. (details)
-Fix failed remote share: make sure to remove unnecessary data on failure. (details)
-Display close icon for mp3 player. Fix #1156 (details)
-Fix htaccess tpl : replace ocs.php by opencollab.php (details)
-Rewire missing action for deleting user-created workspace. (details)
-Fixing S3 and webdav access (details)
-Fix to #1157: adding support for apcu (details)
-Fix to support mysqli (details)
-Display close icon for versioning plugins (details)
-Updated german translations and unified various words (details)
-Fixed typo (details)
-Fix broken shortener plugins : use a url.shorten hook instead of capturing share action output. Store data in share instead of metadata. (details)
+Fix GlueCode.php
+Use longer description in api generator.
+Missing media.css file in gruntfile.
+Missing log for ShareNode action
+Fix method signature for PHP7
+Expand api docs generator
+Rework Share options for folders / files vs. public links / internal sharing - Fix #1143 Better invalid share detection and remove it from meta. Fix many error messages.
+Update i18n
+Core.mailer : add DROP TRIGGER IF EXISTS
+Do not display section title if list is empty - Fix #1154
+Fix #1148
+Fix some media CSS
+Fix various glitches on Spanish language. Close #1136
+Fix #1128 : add the ability to reject a previously accepted share.
+Make sure to transfer an empty DATA_TEMPLATE value to child repository - Fix #1152 Fix broken unsharing.
+Remove legacy share js resources - Discourage people to use old themes for now.
+Add a canWrite attribute on editors declaration, use it in ShareDialog to detect if a file has "writeable" editors and show an additional Edit permission for public links on files.
+Fix various issues with shares lists, especially in My Account & Admin panels.
+Use original_path for header if present in metadata.
+Fix failed remote share: make sure to remove unnecessary data on failure.
+Display close icon for mp3 player. Fix #1156
+Fix htaccess tpl : replace ocs.php by opencollab.php
+Rewire missing action for deleting user-created workspace.
+Fixing S3 and webdav access
+Fix to #1157: adding support for apcu
+Fix to support mysqli
+Display close icon for versioning plugins
+Updated german translations and unified various words
+Fixed typo
+Fix broken shortener plugins : use a url.shorten hook instead of capturing share action output. Store data in share instead of metadata.
 
 ----
 Pydio 6.4.0 is a stable release introducing many important new features!
@@ -61,390 +197,390 @@ WebDAV access driver was entirely rewritten using Guzzle
 Amazon S3 Access Driver: improved, we now support PHP-SDK v2 and v3. Hook to our Cache Service for better performances.
 
 [DETAILED CHANGELOG]
-Italian translation: fix relative date format (details)
-German translations: New translations for user and role administration (details)
-Catalan & spanish tranlations (details)
-Encoding change from ANSI to UTF-8 in en.php (details)
-Missing comma & bad encoding in en.php (details)
-Bad encoding in en.php (ANSI) (details)
-core.notifications templates ca&es translations (details)
-German translations: New translations for user and role administration [FIX] * Added missing keys to other languages (ecept en and de) (details)
-Czech translation - meta.svn plugin (details)
-access.dropbox plugin translation to Czech (details)
-access.imap plugin translation to Czech (details)
-access.sftp plugin translation to Czech (details)
-auth.basic_http plugin translation to Czech (details)
-auth.cmsms plugin translation to Czech (details)
-log.syslog plugin translation to Czech (details)
-log.text plugin translation to Czech (details)
-mailer.phpmailer-lite plugin translation to Czech (details)
-uploader.plupload plugin translation to Czech (details)
-mq.serial plugin translation to Czech (details)
-mq.sql plugin translation to Czech (details)
-Update cms bridges release note (details)
-Added CA and ES dropzone files in Uploader.html plugin (details)
-core.ajaxplorer translation repair in catalan language (details)
-Initial commit: Uses doctrine cache drivers as main caching system (details)
-Loaded core cache directly from bootstrap.json and moved bootstrap handling to CoreConfLoader - Fixes (details)
-Fixes after scrutinizr run (details)
-Fixing deleted htaccess files (details)
-Fixing typo (details)
-Added translations for Core cache (details)
-Removed default value for bootstrap.json cache (details)
-Removed unnecessary call to deferBuildingRegistry (details)
-Camel casing Doctrine Cache Driver (details)
-Fix pluginInstance (details)
-editor.browser i18 ca & es updates (details)
-core.ajaxplores ca language updates (details)
-meta.watch ca & es translations (details)
-editor.browser ca&es files author fix (details)
-action.disclaimer. spanish and catalan translation (details)
-Start refactoring ShareCenter class (cherry picked from commit 89491d4) (details)
-Fix issues in LegacyPubliclet (details)
-Fix missing repository (details)
-Fix error case / default template. (details)
-Add ability to force PathStyle on S3 driver - Do not use make Custom URL and Region parameters exclusive. (details)
-ForcePathStyle (details)
-(action.compression]add index action at the end of the extraction (details)
-[action.comopression] adding index action at the end of the extraction (details)
-action.share : fix in ca & es files (details)
-Make sure to include zip files when filtering node name in search results (details)
-Massive refactoring of ShareCenter to make it simpler. New methods to collect metadata from children (only with metastore.serial) and avoid breaking links on parent (or other user) rename. (details)
-Declare $shares variable before passing by reference. (details)
-ShareCenter : carry on massive refactoring (details)
-Docs & typing (details)
-Start refactoring createSharedMinisite() function (details)
-Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving. (details)
-Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving. (details)
-collectChildrenWithRepositoryMeta : return relativePath from base node, not absolute in workspace. (details)
-Store share visibility always in shared repo options, not in share object Make moveSharesFromMeta recursive (details)
-Adding core access functionality to simplify addition of new driver through Guzzle, and added new WebDAV driver (details)
-[access.s3] Adding SDKv3 compatibility (details)
-[access.s3] Adding SDK and API version in the plugin (details)
-[access.s3] Overwrite the s3 stream wrapper (details)
-[access.s3] Adding Pydio CacheService to s3 Cache interface (details)
-New class for loading React component inside standard Dialog. (details)
-Add react-autosuggest to core bundle. (details)
-Enrich user_list_authorized_users with alternative format (xml) and more info about the users. (details)
-ignore new react build folder (details)
-Move PydioForm & ReactPydio modules in gui.ajax (details)
-Final refactoring of action.share PHP part (details)
-do not load pydio-mui here - todo : find where to load (details)
-Move mui css files inside gui.ajax (details)
-Small dialog styling evolution to be more compatible with material design widgets. (details)
-New react-based share dialog (details)
-Fix user search engine (details)
-Add missing resources for compilation. (details)
-Load alerts: silently test if file exists. (details)
-Authentification -> Authentication for English (details)
-Fix various UI stuff in ShareDialog Add Clipboard module for copying to clipboard Fix hidden Field in AbstractAjxpUser (details)
-Fix cache.doctrine empty options. (details)
-Fix cache plugtitle french translation (details)
-Cross-copy action: pass Repository object to UserSelection() (details)
-Adding guzzle, reformatting the code and adding the documentation (details)
-Removing guzzle tests from the package (details)
-Fixes to SMB auth: - Registered stream is smbclient://, not smb:// - smbclient binary path could not be set for auth plugin (details)
-Fix default tpl name (details)
-Fix unshare when removing users and no public link active. (details)
-Little Charset Bug in index message (details)
-dir_closedir() has no return value (details)
-Fixes for upload and deletion (details)
-Mitigate update role request (details)
-Fix image magick preview on multiple page office file (details)
-Fix switch to default start repository after loggin in by CAS (details)
-Method updateRepository() on AJXP_Sabre_Node to set repo after authentication succeed. (details)
-Move ContentFilter filterings to AJXP_MetaStreamWrapper instead of UserSelection and fsAccessDriver. (details)
-New ocs access point to implement Open Cloud Specification. DAV implementation working on public links. Update htaccess accordingly. (details)
-Simple skeleton for an "Inbox" workspace displaying all shares received. (details)
-Fixes on S3 new implementation (details)
-Refactor core.ocs to use namespaces and composer autoload. (details)
-Allow string in classname attribute to use backslashes in namespaces. (details)
-Added layer between pydio and pydio.dav to handle auth (details)
-Model implementation using simpleStore for OCS (details)
-Create Server for /shares/ access point. (details)
-Use remoteId as RemoteShare id. (details)
-Client & Server stuff for OCS (details)
-Plugin Sharing and OCS together. Ultra-basic UI for tests. (details)
-Change Core Access Plugin and WebDAV Client to use Scheme Translator Wrapper layers (details)
-Style remote-users-add form (details)
-Added layer between pydio and pydio.dav to handle auth (details)
-Fixing duplicate function name (details)
-Fixing the Meta Stream Wrapper (details)
-Update styling (details)
-fixes stat result handling in case of empty files, according to docs stat should return -1 or text error message small optimizations for handling of alternative stat commands (details)
-Added context handling in Meta Stream Wrapper (details)
-Create CompositeShare object - Change json output format to handle 1 or N links. (details)
-Added OCSClient to interface with OCS API (details)
-Rework OCS Links (details)
-Fixing error (details)
-Fixing OCS Client (details)
-use documentName (details)
-Switch to documentName (details)
-Fix some stuff on OCS (details)
-Fix when no share is enabled (details)
-ConfService: add some includeHooks to contribute with repositories. (details)
-Add a virtual folder at the root of the webdav to make it API-consistent (both folders and files are accessed via /../dav/DocumentName) Store remoteShares by token, not remoteId Ping back on Dav access point when receiving a share. (details)
-Last update of Inbox driver Ping remote when receiving share. (details)
-Fix download right management on public link. (details)
-Fix clearing shares (details)
-New PydioUsersApi in Core to encapsulate users related requests New react-based UsersCompleter component, including user creation form. (details)
-Use generic UsersCompleter and remove from ShareDialog. Use core PydioUsersApi as well. New react-based PydioMailer. (details)
-Move css from action.share to PydioMailer (details)
-Finish wiring mailer. Handle no mailer and force Old school case. (details)
-Wire password strength checker on user creation form and share password form (details)
-Handle custom RW permissions for remote users. (details)
-Mail notification not fully encoded UTF-8 if Win OS (details)
-Fix missing repo_label parameter (details)
-[access.s3]Changing require file name (details)
-Fix OCS Client with non empty base Path (details)
-Replace main share dialog (details)
-Massive i18n for new ShareDialog (details)
-Fix ocs with baseUri (details)
-Renaming (details)
-Renaming (details)
-Make webdav enabled by default Fix contentType detection and remote URL values for invitations. (details)
-Fix unshare Touch user role to trigger repo reload if user is logged. Fix reloadRolesIfRequired to make sure personalRole is in sync (details)
-[access.s3] Fix rename folder for SDK V3 and changing require file name (details)
-Migrate Info Panel modified from ShareCenter to ShareDialog (details)
-Do not list teams in usersOnly (details)
-Expose FEDERATED_SHARING_ENABLED setting Implement Readonly Mode on ShareDialog (details)
-Fix Exception Namespace - Close #1067 (details)
-Move back the remote share /dav/ to root, do not create virtual folder anymore. For files, both the / and the /filename.ext send the same answer (stat of the file). (details)
-Change Invitation IDs from GUID to random Integers (requires one or more db calls). Fix #1065 (details)
-Fix OCS unshare implementation (details)
-Disable Test File (details)
-Added caching of the Path Wrapper functionality and changed the hkey for the Stream Wrapper global caching (details)
-List Teams even if regexp is null and mandatory (details)
-Fix rights management : do not assign minisite-role for remote shares. (details)
-Implement accept / decline remote shares. (details)
-Another pass on inbox driver. Not sure it will be kept as is. (details)
-Adding OAuth Wrapper to the core access for Oauth2 authentification (details)
-Adding doctrine namespace key (details)
-First split of big css into smaller less files (details)
-Lessify (details)
-LESS : refactor / extract variables (details)
-Fixed timeout issue and added local caching to the path wrapper (details)
-Move old screen and xtree to less components (details)
-Update CSS - Change how we handle global_toolbar styling (details)
-Revert unnecessary commit (details)
-Smooth transition to material (details)
-Smooth transition to material (details)
-Add cssmin to package.json (details)
-Typo in package.json - Start fixing admin panel styles (details)
-Fix styling (details)
-Organize fonts - Add a subset of mdi. Will be enriched as needed. LeftNavigation: add user_create_repository action if present. (details)
-Fix fonts imports via less variable. Replace all share icons by new mdi-share-variant. (details)
-Actions, fonts, CSS ... (details)
-Rework Home Panel (details)
-Improve the user dashboard a bit. (details)
-Make the left nav panel open by default, closing after 3s (details)
-Css compil (details)
-Fix mdi icons font - fix top toolbar bg (details)
-Pass hasContentFilter info (details)
-Make LeftNavigation panel more generic (details)
-Use LeftNavigation component for Home page (details)
-Do not commit built form (details)
-Add build/ folder to ignore file (details)
-[core.mailer]Adding the grouped mail and the CRON (details)
-[core.mailer]Adding the user choice in the manifest (details)
-[core.mailer]Adding the mysql create file for the database (details)
-[core.mailer]Adding the postgreSQL create file for the database (details)
-[core.mailer]Adding the SQLite create file for the database (details)
-Fix splash style (details)
-Dashboard, home, login panels Hide tooltips on repo switch Special icon for Inbox workspace (details)
-Minsites: remove all inline style from manifest and put them in a dedicated stylesheet. (details)
-Various fixes on Share Dialog (details)
-Update website in email templates (details)
-Pass page_position parameter when opening search result in paginated context. Fix #1041 (details)
-Check dibi::isConnected() whenever possible. Close #1043 (details)
-Fix #1061 (details)
-Missing resource in core.mailer (details)
-user_list_authorized_users : always send root node (ul). (details)
-Reset Download Counter (details)
-Fix videos in tutorial panel (details)
-Inbox and Share Notification in left menu (details)
-Adding hook to Repository loaded change (details)
-Fix to inbox and CacheService (details)
-Adding local status to the share notification panel (details)
-Observer repository_list_refreshed event (details)
-Stop Share Notification Dispatcher if noone is listening (details)
-Loading on load (details)
-Add two new properties on Repository object (repositoryType and accessStatus), publish them in the XML, parse them in the js model. (details)
-Change to the Left Navigation (details)
-Fix FilesList modifier (details)
-Rework Inbox Driver (details)
-Use the last_history pref to add a repository_last_connected timestamp and send it in repo list. (details)
-Last css compil (details)
-Inbox : replace left panel by a quick filter box (details)
-Left Panel icons (details)
-Count shared files access status (details)
-Fix repository_last_connected flag (details)
-Dialog box for remote shares (details)
-Replace alerts panel (details)
-Fix AjxpPane.parseComponentConfigs Typo in fsTemplatePart (details)
-Adding badge and overlay for the dialog (details)
-Handle empty message (details)
-Fix notifications actions in left panel (details)
-i18n inbox access driver (details)
-inbox: change buttons style (details)
-Adding inbox badge (details)
-Listening to repository refreshed on home page (details)
-Resolve AJXP_Exception deprecation warning (details)
-IE tweaks (details)
-Adding modal on demand instead of inline (details)
-Fix installer style (details)
-[core.mailer]Adding separator in the create sql file (details)
-[core.mailer]Adding character set in the create sql file (details)
-Fix to not display the share notification twice (details)
-AjxpMailer now has SqlTableProvider interface. (details)
-For OwnCloud compat, make sure to always ping the root of webdav, not /DocumentName (details)
-i18n on core.ocs and access.inbox (details)
-Adding owner to the remote share alert box (details)
-Add inbox repository by default (details)
-AjxpMailer install tables only for core plugin (details)
-First draf of 6.3.1 release notes (details)
-Fix mailer digest computes (details)
-Fix consume_mail_queue (details)
-Replace repositories (details)
-Missing resource (details)
-Fix source_path in new package.json files (details)
-Public links were broken by the repo filtering (details)
-Add optional css_path in package.json and force copy at upgrade time to make sure all resources are there before compilation. (details)
-Reorganize ajxp_home to avoid upgrade issue with previously deleted folder. (details)
-Fix "share file with new user" case by adding the inbox repository acl. (details)
-Forgotten console.log (details)
-Quick fix of "edit team" panel. (details)
-Admin fonts (details)
-Add access to inbox in root role during the update. (details)
-Small typos and IE fixes (details)
-Refix auto-completer open / close (details)
-Removing code from index.php, adding dependency in OAuthWrapper (details)
-Fix menu open / close (details)
-Missing resource (details)
-remove the default charset for sqlite table (details)
-remove the default charset for postfre table (details)
-adding 6.4.0 sql table (details)
-Prune some words from captchas ... (details)
-Fix horizontal bar on DL only template (IE / FF) (details)
-Fix #1076 : public link issue on windows server (details)
-Leftpanel overflow : set auto instead of scroll (details)
-Force LeftPanel to avoid scrolling on small lists (fix #1081) (details)
-Fix editor_action_bar buttons fonts (details)
-Fix #1080 - add check on min length when choosing custom link. (details)
-Enhance interactions on sharedialog based on checkbox values and current node type. Fix #1079 (details)
-Small optimizations for file upload handling in rsync based part, no need to copy signature/delta files (details)
-Compile less for more browsers ( --autoprefix="last 2 version, > 10%" ) (details)
-Switch leftpanel typo color to rgb() instead of rgba() for IE8. Error-catching on components load - was breaking ie8 interface. (details)
-WebSocket : listen to onerror / onclose events and fallback to polling. (details)
-Missing form component type "monitor", factorize with "button". (details)
-Set Inbox workspace rw (not only r) and manage various actions by either not importing them or disabling them. Disable "write" in stat based on shared repository permission. (details)
-Add forceComputeFit on codemirror editor to fix fullscreen resize problems. Fix #1083 (details)
-Refix previous commit, force resizing after fullscreen end. (details)
-Fix Breadcrumb for very deep folders. Close #1006 (details)
-Fix public links htaccess file for languages indicators containing dashes. Fix #1050 (details)
-Fix #1078 - use Post instead of Get. (details)
-Fix css for selection cart and searchengine. Close #1082 (details)
-Fix "My Group" sharing (details)
-Ignore error on ldap_sort as it's getting deprecated. Close #1031 (details)
-Tidy up core.mailer : add a parameter to activate queue or not, for backward compat. (details)
-Artificially update setLeaf() on node it's a root of repository with content filter. Should fix #1090 Trigger "node.read" in inbox driver otherwise there is no notification. Fix #1087 (details)
-Fix file name in zoho editor (details)
-Added translations to share dialog and updated german translations (details)
-Hook to workspace.share_metasources to disable repository_keywords on index.lucene for shared workspaces, as path is already resolved. Close #1017 (details)
-Fix various stuff with sharing admin settings, format date, set maximum date, etc. Fix #1095 (details)
-Throw error to prevent dialog closing on force password change action. Close #900 (details)
-Fix scroll to selection when triggering setSelectedNodes from other view. (details)
-Pass an ajxp_im_time in the nodes / nodeDiffs results, allowing the UI to ignore events that are loaded after other modifications. (details)
-MessageExchanger : do not read pending IM's when registering a client on a given channel. (details)
-Fix node.change hook in meta.watch : artificially setting the node->leaf was messing things in other callbacks. Create a simple copy of the node. New dontBreakOnException XML attribute for hooks: ignore exceptions (log them) and don't break the loop for other callbacks. Default behavior stays "breakOnException" for backward compat (permissions exceptions for example). (details)
-Fix share deletion on node deletion : ignore repo-not-found error (details)
-Enable metastore and meta.watch for "inbox" workspace to trigger notifications (details)
-Fix #1099 (details)
-Sharing . When share scope is public, send IM to reload connected UI's . ShareDialog: better indication when link is expired (fix #1101), do not show Stop Sharing if not owner of the share (fix #1102) (details)
-ShareCenter: Unused vars (details)
-Fix ShareDialog when not in a streamWrapper driver. (details)
-Fix styling (details)
-Fix textarea bottom border (details)
-Change target url (details)
-Change Remote Users legend (details)
-Fix multiple smb servers (details)
-Set Federated Sharing false by default. Handle share dialog when not active. Last i18n's in share dialog. (details)
-Add FR translation for OCS (details)
-Fix memory leak : reloading driverInstance may induce mem leaks. Make sure to do it only if necessary. (details)
-Fix strange offset in breadcrumb (details)
-Slug and UUID added as path variables (details)
-Re-enable Folders upload for Chrome / Mac (utf8 issues are now fixed). Rework UI when folders upload is enabled. (details)
-renamed AJXP_USE_UUID_PATH to AJXP_WORKSPACE_UUID AJXP_USE_SLUG to AJXP_WORKSPACE_SLUG (details)
-Update compiled version of ajaxplorer_boot (details)
-Move pyd.io to pydio.com references (details)
-Fix html / no html emails Fix triggers : do not insert original id. (details)
-Fix to #1100 - use AJXP_MetaStreamWrapper (details)
-Fix to #1100 - use AJXP_MetaStreamWrapper - for XACCELREDIRECT too (details)
-Fix to the #1100 issue (details)
-Fix D'n'D issues : conflict between uploaders dnd and ReactDND, create a fake custom backend to remedy. Close #1105 (details)
-Some styling fixes on LeftPanel and WelcomePanel (details)
-Fix pyd.io in Credits file. (details)
-Passing correct options variable to the Doctrine Cache Driver (details)
-Fix Doctrine redis problem by passing correct options to the cache driver (details)
-Fix delete share from My Account (clear metadata) Fix AjxpMailer : renamed recipent to recipient Add tooltip on alerts list Many css fixes Disable bookmarklet action, never used (details)
-Rework tutorial & download panels on Home. (details)
-Remove action open_tutorial_pane (details)
-More styling on welcome page. DL links are optional. (details)
-Transition video panel - Crop video thumb - Autoplay video. (details)
-7s only (details)
-Add space before notifications numbers (details)
-Always pass the CREATE option to shared children, may be necessary for dynamic mounting. See #1098 (details)
-Adding transition effect home panel (details)
-Use Modernizr no-cssreflections to switch svg background to standard image. (details)
-Do not set cache instance driver mandatory. (details)
-Fix focus issues on selection change & drag to select (details)
-Fix to Safari box shadow (details)
-Fixing the build for grunt (details)
-Fix to #1068: removed external users and added Groups instead (details)
-Fix various scrolling issues in UserCompleter for ShareDialog, show loading indicator, fix long group names. (details)
-Css Fixes for Mobile (details)
-Compiled css (details)
-Useless install tables button in mq.sql (using ajxp_simple_store). Close #1106 (details)
-ShareCenter : do not forward events to ocs_remote share. Zoho : do not trigger unnecessary node.change if file was not modified. (details)
-Fix typo in Registry : user object is on _pydioObject, not self. Check for ajxp_readonly to avoid proposing writeable editors. (details)
-ZohoEditor : remove "write" attribute and send mode="view" for opening editor in readonly mode. (details)
-PixlrEditor: bettor error handling, recheck write permission. (details)
-OpenWith : check if node is readonly and do not display "write" editors in the menu. (details)
-Access.inbox : store stat in static variable after all modifications. Add extension to temp name as it is required for some editors. (details)
-Some fix for ZOHO Editor (details)
-Code analysis (details)
-Design for the boxes on the home page and scrutinizr for sqlConfDriver (details)
-Fix missing dependency in package.json (details)
-Fix wrong is_array call. (details)
-Fix logos not clickable on IE (details)
-Reverting to good'ol'blue png for upload progress background. Confusing for the users otherwise. Close #1112 (details)
-Changing the icon on the home page (details)
-Auto rename share label #1111 (details)
-Fixing the quota box home page (details)
-Removing debug delay (details)
-Removing debug (details)
-Adding timeout to the repository switch (details)
-Fix wrong message on group creation (details)
-Fix Getting Started video (details)
-Remove .bak file (details)
-Move breadcrumb height to a specific context to avoid breaking other templates. (details)
-Fix windows encoding issues when moving shares. Should fix #1114 (details)
-Make LabelWithTip more generic (details)
-Rework home page with Material cards (details)
-Additional check on content of configs["REPOSITORIES"] (details)
-Adding inbox card and fixing ocs client issues (details)
-Repository : Nullate the internal driverInstance before serialization. Seems to fix the session corruptions issues. (details)
-UI fixes (details)
-Fix ReplicationPanel removeRow : swap row to remove to last position and let removeLastRow delete it. (details)
-Reload bootstrap_repositories just after clearing the cache, to avoid settings repository issues. Fix Css for replication groups in settings panel. (details)
-Fix #1120 (details)
-Fix text-only emails, add new layouts; Fix useHtml applied to all users (close #1121) (details)
-FilesList : revert previous changes on Focus DataModel : ignore setSelectedNodes() if no changes InfoPanel : loadRepositoryInfo (details)
-Do not over-summarize notifications in email digest. Fix #1123 (details)
-Fix "recipient" in 6.4.0 update sql scripts (details)
-Materialize connexion loader (details)
-Replace icon-remove by mdi.mdi-close wherever possible (details)
-Create 6.4.0 script (details)
+Italian translation: fix relative date format
+German translations: New translations for user and role administration
+Catalan & spanish tranlations
+Encoding change from ANSI to UTF-8 in en.php
+Missing comma & bad encoding in en.php
+Bad encoding in en.php (ANSI)
+core.notifications templates ca&es translations
+German translations: New translations for user and role administration [FIX] * Added missing keys to other languages (ecept en and de)
+Czech translation - meta.svn plugin
+access.dropbox plugin translation to Czech
+access.imap plugin translation to Czech
+access.sftp plugin translation to Czech
+auth.basic_http plugin translation to Czech
+auth.cmsms plugin translation to Czech
+log.syslog plugin translation to Czech
+log.text plugin translation to Czech
+mailer.phpmailer-lite plugin translation to Czech
+uploader.plupload plugin translation to Czech
+mq.serial plugin translation to Czech
+mq.sql plugin translation to Czech
+Update cms bridges release note
+Added CA and ES dropzone files in Uploader.html plugin
+core.ajaxplorer translation repair in catalan language
+Initial commit: Uses doctrine cache drivers as main caching system
+Loaded core cache directly from bootstrap.json and moved bootstrap handling to CoreConfLoader - Fixes
+Fixes after scrutinizr run
+Fixing deleted htaccess files
+Fixing typo
+Added translations for Core cache
+Removed default value for bootstrap.json cache
+Removed unnecessary call to deferBuildingRegistry
+Camel casing Doctrine Cache Driver
+Fix pluginInstance
+editor.browser i18 ca & es updates
+core.ajaxplores ca language updates
+meta.watch ca & es translations
+editor.browser ca&es files author fix
+action.disclaimer. spanish and catalan translation
+Start refactoring ShareCenter class (cherry picked from commit 89491d4)
+Fix issues in LegacyPubliclet
+Fix missing repository
+Fix error case / default template.
+Add ability to force PathStyle on S3 driver - Do not use make Custom URL and Region parameters exclusive.
+ForcePathStyle
+(action.compression]add index action at the end of the extraction
+[action.comopression] adding index action at the end of the extraction
+action.share : fix in ca & es files
+Make sure to include zip files when filtering node name in search results
+Massive refactoring of ShareCenter to make it simpler. New methods to collect metadata from children (only with metastore.serial) and avoid breaking links on parent (or other user) rename.
+Declare $shares variable before passing by reference.
+ShareCenter : carry on massive refactoring
+Docs & typing
+Start refactoring createSharedMinisite() function
+Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving.
+Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving.
+collectChildrenWithRepositoryMeta : return relativePath from base node, not absolute in workspace.
+Store share visibility always in shared repo options, not in share object Make moveSharesFromMeta recursive
+Adding core access functionality to simplify addition of new driver through Guzzle, and added new WebDAV driver
+[access.s3] Adding SDKv3 compatibility
+[access.s3] Adding SDK and API version in the plugin
+[access.s3] Overwrite the s3 stream wrapper
+[access.s3] Adding Pydio CacheService to s3 Cache interface
+New class for loading React component inside standard Dialog.
+Add react-autosuggest to core bundle.
+Enrich user_list_authorized_users with alternative format (xml) and more info about the users.
+ignore new react build folder
+Move PydioForm & ReactPydio modules in gui.ajax
+Final refactoring of action.share PHP part
+do not load pydio-mui here - todo : find where to load
+Move mui css files inside gui.ajax
+Small dialog styling evolution to be more compatible with material design widgets.
+New react-based share dialog
+Fix user search engine
+Add missing resources for compilation.
+Load alerts: silently test if file exists.
+Authentification -> Authentication for English
+Fix various UI stuff in ShareDialog Add Clipboard module for copying to clipboard Fix hidden Field in AbstractAjxpUser
+Fix cache.doctrine empty options.
+Fix cache plugtitle french translation
+Cross-copy action: pass Repository object to UserSelection()
+Adding guzzle, reformatting the code and adding the documentation
+Removing guzzle tests from the package
+Fixes to SMB auth: - Registered stream is smbclient://, not smb:// - smbclient binary path could not be set for auth plugin
+Fix default tpl name
+Fix unshare when removing users and no public link active.
+Little Charset Bug in index message
+dir_closedir() has no return value
+Fixes for upload and deletion
+Mitigate update role request
+Fix image magick preview on multiple page office file
+Fix switch to default start repository after loggin in by CAS
+Method updateRepository() on AJXP_Sabre_Node to set repo after authentication succeed.
+Move ContentFilter filterings to AJXP_MetaStreamWrapper instead of UserSelection and fsAccessDriver.
+New ocs access point to implement Open Cloud Specification. DAV implementation working on public links. Update htaccess accordingly.
+Simple skeleton for an "Inbox" workspace displaying all shares received.
+Fixes on S3 new implementation
+Refactor core.ocs to use namespaces and composer autoload.
+Allow string in classname attribute to use backslashes in namespaces.
+Added layer between pydio and pydio.dav to handle auth
+Model implementation using simpleStore for OCS
+Create Server for /shares/ access point.
+Use remoteId as RemoteShare id.
+Client & Server stuff for OCS
+Plugin Sharing and OCS together. Ultra-basic UI for tests.
+Change Core Access Plugin and WebDAV Client to use Scheme Translator Wrapper layers
+Style remote-users-add form
+Added layer between pydio and pydio.dav to handle auth
+Fixing duplicate function name
+Fixing the Meta Stream Wrapper
+Update styling
+fixes stat result handling in case of empty files, according to docs stat should return -1 or text error message small optimizations for handling of alternative stat commands
+Added context handling in Meta Stream Wrapper
+Create CompositeShare object - Change json output format to handle 1 or N links.
+Added OCSClient to interface with OCS API
+Rework OCS Links
+Fixing error
+Fixing OCS Client
+use documentName
+Switch to documentName
+Fix some stuff on OCS
+Fix when no share is enabled
+ConfService: add some includeHooks to contribute with repositories.
+Add a virtual folder at the root of the webdav to make it API-consistent (both folders and files are accessed via /../dav/DocumentName) Store remoteShares by token, not remoteId Ping back on Dav access point when receiving a share.
+Last update of Inbox driver Ping remote when receiving share.
+Fix download right management on public link.
+Fix clearing shares
+New PydioUsersApi in Core to encapsulate users related requests New react-based UsersCompleter component, including user creation form.
+Use generic UsersCompleter and remove from ShareDialog. Use core PydioUsersApi as well. New react-based PydioMailer.
+Move css from action.share to PydioMailer
+Finish wiring mailer. Handle no mailer and force Old school case.
+Wire password strength checker on user creation form and share password form
+Handle custom RW permissions for remote users.
+Mail notification not fully encoded UTF-8 if Win OS
+Fix missing repo_label parameter
+[access.s3]Changing require file name
+Fix OCS Client with non empty base Path
+Replace main share dialog
+Massive i18n for new ShareDialog
+Fix ocs with baseUri
+Renaming
+Renaming
+Make webdav enabled by default Fix contentType detection and remote URL values for invitations.
+Fix unshare Touch user role to trigger repo reload if user is logged. Fix reloadRolesIfRequired to make sure personalRole is in sync
+[access.s3] Fix rename folder for SDK V3 and changing require file name
+Migrate Info Panel modified from ShareCenter to ShareDialog
+Do not list teams in usersOnly
+Expose FEDERATED_SHARING_ENABLED setting Implement Readonly Mode on ShareDialog
+Fix Exception Namespace - Close #1067
+Move back the remote share /dav/ to root, do not create virtual folder anymore. For files, both the / and the /filename.ext send the same answer (stat of the file).
+Change Invitation IDs from GUID to random Integers (requires one or more db calls). Fix #1065
+Fix OCS unshare implementation
+Disable Test File
+Added caching of the Path Wrapper functionality and changed the hkey for the Stream Wrapper global caching
+List Teams even if regexp is null and mandatory
+Fix rights management : do not assign minisite-role for remote shares.
+Implement accept / decline remote shares.
+Another pass on inbox driver. Not sure it will be kept as is.
+Adding OAuth Wrapper to the core access for Oauth2 authentification
+Adding doctrine namespace key
+First split of big css into smaller less files
+Lessify
+LESS : refactor / extract variables
+Fixed timeout issue and added local caching to the path wrapper
+Move old screen and xtree to less components
+Update CSS - Change how we handle global_toolbar styling
+Revert unnecessary commit
+Smooth transition to material
+Smooth transition to material
+Add cssmin to package.json
+Typo in package.json - Start fixing admin panel styles
+Fix styling
+Organize fonts - Add a subset of mdi. Will be enriched as needed. LeftNavigation: add user_create_repository action if present.
+Fix fonts imports via less variable. Replace all share icons by new mdi-share-variant.
+Actions, fonts, CSS ...
+Rework Home Panel
+Improve the user dashboard a bit.
+Make the left nav panel open by default, closing after 3s
+Css compil
+Fix mdi icons font - fix top toolbar bg
+Pass hasContentFilter info
+Make LeftNavigation panel more generic
+Use LeftNavigation component for Home page
+Do not commit built form
+Add build/ folder to ignore file
+[core.mailer]Adding the grouped mail and the CRON
+[core.mailer]Adding the user choice in the manifest
+[core.mailer]Adding the mysql create file for the database
+[core.mailer]Adding the postgreSQL create file for the database
+[core.mailer]Adding the SQLite create file for the database
+Fix splash style
+Dashboard, home, login panels Hide tooltips on repo switch Special icon for Inbox workspace
+Minsites: remove all inline style from manifest and put them in a dedicated stylesheet.
+Various fixes on Share Dialog
+Update website in email templates
+Pass page_position parameter when opening search result in paginated context. Fix #1041
+Check dibi::isConnected() whenever possible. Close #1043
+Fix #1061
+Missing resource in core.mailer
+user_list_authorized_users : always send root node (ul).
+Reset Download Counter
+Fix videos in tutorial panel
+Inbox and Share Notification in left menu
+Adding hook to Repository loaded change
+Fix to inbox and CacheService
+Adding local status to the share notification panel
+Observer repository_list_refreshed event
+Stop Share Notification Dispatcher if noone is listening
+Loading on load
+Add two new properties on Repository object (repositoryType and accessStatus), publish them in the XML, parse them in the js model.
+Change to the Left Navigation
+Fix FilesList modifier
+Rework Inbox Driver
+Use the last_history pref to add a repository_last_connected timestamp and send it in repo list.
+Last css compil
+Inbox : replace left panel by a quick filter box
+Left Panel icons
+Count shared files access status
+Fix repository_last_connected flag
+Dialog box for remote shares
+Replace alerts panel
+Fix AjxpPane.parseComponentConfigs Typo in fsTemplatePart
+Adding badge and overlay for the dialog
+Handle empty message
+Fix notifications actions in left panel
+i18n inbox access driver
+inbox: change buttons style
+Adding inbox badge
+Listening to repository refreshed on home page
+Resolve AJXP_Exception deprecation warning
+IE tweaks
+Adding modal on demand instead of inline
+Fix installer style
+[core.mailer]Adding separator in the create sql file
+[core.mailer]Adding character set in the create sql file
+Fix to not display the share notification twice
+AjxpMailer now has SqlTableProvider interface.
+For OwnCloud compat, make sure to always ping the root of webdav, not /DocumentName
+i18n on core.ocs and access.inbox
+Adding owner to the remote share alert box
+Add inbox repository by default
+AjxpMailer install tables only for core plugin
+First draf of 6.3.1 release notes
+Fix mailer digest computes
+Fix consume_mail_queue
+Replace repositories
+Missing resource
+Fix source_path in new package.json files
+Public links were broken by the repo filtering
+Add optional css_path in package.json and force copy at upgrade time to make sure all resources are there before compilation.
+Reorganize ajxp_home to avoid upgrade issue with previously deleted folder.
+Fix "share file with new user" case by adding the inbox repository acl.
+Forgotten console.log
+Quick fix of "edit team" panel.
+Admin fonts
+Add access to inbox in root role during the update.
+Small typos and IE fixes
+Refix auto-completer open / close
+Removing code from index.php, adding dependency in OAuthWrapper
+Fix menu open / close
+Missing resource
+remove the default charset for sqlite table
+remove the default charset for postfre table
+adding 6.4.0 sql table
+Prune some words from captchas ...
+Fix horizontal bar on DL only template (IE / FF)
+Fix #1076 : public link issue on windows server
+Leftpanel overflow : set auto instead of scroll
+Force LeftPanel to avoid scrolling on small lists (fix #1081)
+Fix editor_action_bar buttons fonts
+Fix #1080 - add check on min length when choosing custom link.
+Enhance interactions on sharedialog based on checkbox values and current node type. Fix #1079
+Small optimizations for file upload handling in rsync based part, no need to copy signature/delta files
+Compile less for more browsers ( --autoprefix="last 2 version, > 10%" )
+Switch leftpanel typo color to rgb() instead of rgba() for IE8. Error-catching on components load - was breaking ie8 interface.
+WebSocket : listen to onerror / onclose events and fallback to polling.
+Missing form component type "monitor", factorize with "button".
+Set Inbox workspace rw (not only r) and manage various actions by either not importing them or disabling them. Disable "write" in stat based on shared repository permission.
+Add forceComputeFit on codemirror editor to fix fullscreen resize problems. Fix #1083
+Refix previous commit, force resizing after fullscreen end.
+Fix Breadcrumb for very deep folders. Close #1006
+Fix public links htaccess file for languages indicators containing dashes. Fix #1050
+Fix #1078 - use Post instead of Get.
+Fix css for selection cart and searchengine. Close #1082
+Fix "My Group" sharing
+Ignore error on ldap_sort as it's getting deprecated. Close #1031
+Tidy up core.mailer : add a parameter to activate queue or not, for backward compat.
+Artificially update setLeaf() on node it's a root of repository with content filter. Should fix #1090 Trigger "node.read" in inbox driver otherwise there is no notification. Fix #1087
+Fix file name in zoho editor
+Added translations to share dialog and updated german translations
+Hook to workspace.share_metasources to disable repository_keywords on index.lucene for shared workspaces, as path is already resolved. Close #1017
+Fix various stuff with sharing admin settings, format date, set maximum date, etc. Fix #1095
+Throw error to prevent dialog closing on force password change action. Close #900
+Fix scroll to selection when triggering setSelectedNodes from other view.
+Pass an ajxp_im_time in the nodes / nodeDiffs results, allowing the UI to ignore events that are loaded after other modifications.
+MessageExchanger : do not read pending IM's when registering a client on a given channel.
+Fix node.change hook in meta.watch : artificially setting the node->leaf was messing things in other callbacks. Create a simple copy of the node. New dontBreakOnException XML attribute for hooks: ignore exceptions (log them) and don't break the loop for other callbacks. Default behavior stays "breakOnException" for backward compat (permissions exceptions for example).
+Fix share deletion on node deletion : ignore repo-not-found error
+Enable metastore and meta.watch for "inbox" workspace to trigger notifications
+Fix #1099
+Sharing . When share scope is public, send IM to reload connected UI's . ShareDialog: better indication when link is expired (fix #1101), do not show Stop Sharing if not owner of the share (fix #1102)
+ShareCenter: Unused vars
+Fix ShareDialog when not in a streamWrapper driver.
+Fix styling
+Fix textarea bottom border
+Change target url
+Change Remote Users legend
+Fix multiple smb servers
+Set Federated Sharing false by default. Handle share dialog when not active. Last i18n's in share dialog.
+Add FR translation for OCS
+Fix memory leak : reloading driverInstance may induce mem leaks. Make sure to do it only if necessary.
+Fix strange offset in breadcrumb
+Slug and UUID added as path variables
+Re-enable Folders upload for Chrome / Mac (utf8 issues are now fixed). Rework UI when folders upload is enabled.
+renamed AJXP_USE_UUID_PATH to AJXP_WORKSPACE_UUID AJXP_USE_SLUG to AJXP_WORKSPACE_SLUG
+Update compiled version of ajaxplorer_boot
+Move pyd.io to pydio.com references
+Fix html / no html emails Fix triggers : do not insert original id.
+Fix to #1100 - use AJXP_MetaStreamWrapper
+Fix to #1100 - use AJXP_MetaStreamWrapper - for XACCELREDIRECT too
+Fix to the #1100 issue
+Fix D'n'D issues : conflict between uploaders dnd and ReactDND, create a fake custom backend to remedy. Close #1105
+Some styling fixes on LeftPanel and WelcomePanel
+Fix pyd.io in Credits file.
+Passing correct options variable to the Doctrine Cache Driver
+Fix Doctrine redis problem by passing correct options to the cache driver
+Fix delete share from My Account (clear metadata) Fix AjxpMailer : renamed recipent to recipient Add tooltip on alerts list Many css fixes Disable bookmarklet action, never used
+Rework tutorial & download panels on Home.
+Remove action open_tutorial_pane
+More styling on welcome page. DL links are optional.
+Transition video panel - Crop video thumb - Autoplay video.
+7s only
+Add space before notifications numbers
+Always pass the CREATE option to shared children, may be necessary for dynamic mounting. See #1098
+Adding transition effect home panel
+Use Modernizr no-cssreflections to switch svg background to standard image.
+Do not set cache instance driver mandatory.
+Fix focus issues on selection change & drag to select
+Fix to Safari box shadow
+Fixing the build for grunt
+Fix to #1068: removed external users and added Groups instead
+Fix various scrolling issues in UserCompleter for ShareDialog, show loading indicator, fix long group names.
+Css Fixes for Mobile
+Compiled css
+Useless install tables button in mq.sql (using ajxp_simple_store). Close #1106
+ShareCenter : do not forward events to ocs_remote share. Zoho : do not trigger unnecessary node.change if file was not modified.
+Fix typo in Registry : user object is on _pydioObject, not self. Check for ajxp_readonly to avoid proposing writeable editors.
+ZohoEditor : remove "write" attribute and send mode="view" for opening editor in readonly mode.
+PixlrEditor: bettor error handling, recheck write permission.
+OpenWith : check if node is readonly and do not display "write" editors in the menu.
+Access.inbox : store stat in static variable after all modifications. Add extension to temp name as it is required for some editors.
+Some fix for ZOHO Editor
+Code analysis
+Design for the boxes on the home page and scrutinizr for sqlConfDriver
+Fix missing dependency in package.json
+Fix wrong is_array call.
+Fix logos not clickable on IE
+Reverting to good'ol'blue png for upload progress background. Confusing for the users otherwise. Close #1112
+Changing the icon on the home page
+Auto rename share label #1111
+Fixing the quota box home page
+Removing debug delay
+Removing debug
+Adding timeout to the repository switch
+Fix wrong message on group creation
+Fix Getting Started video
+Remove .bak file
+Move breadcrumb height to a specific context to avoid breaking other templates.
+Fix windows encoding issues when moving shares. Should fix #1114
+Make LabelWithTip more generic
+Rework home page with Material cards
+Additional check on content of configs["REPOSITORIES"]
+Adding inbox card and fixing ocs client issues
+Repository : Nullate the internal driverInstance before serialization. Seems to fix the session corruptions issues.
+UI fixes
+Fix ReplicationPanel removeRow : swap row to remove to last position and let removeLastRow delete it.
+Reload bootstrap_repositories just after clearing the cache, to avoid settings repository issues. Fix Css for replication groups in settings panel.
+Fix #1120
+Fix text-only emails, add new layouts; Fix useHtml applied to all users (close #1121)
+FilesList : revert previous changes on Focus DataModel : ignore setSelectedNodes() if no changes InfoPanel : loadRepositoryInfo
+Do not over-summarize notifications in email digest. Fix #1123
+Fix "recipient" in 6.4.0 update sql scripts
+Materialize connexion loader
+Replace icon-remove by mdi.mdi-close wherever possible
+Create 6.4.0 script
 ---------------
 
 Pydio 6.3.1 is a development release introducing many important new features! As its name implies, it is NOT production-ready yet. However, the more you help us testing and you report issues, the quicker we will be able to transform it into a stable 6.4.
@@ -471,245 +607,245 @@ Again, it's a dev release. There are some limitations that you should be aware o
 Internet Explorer Limited support : IE11/Edge should go pretty well, others, mmm, not sure :-)
 Detailed Changelog
 
-Italian translation: fix relative date format (details)
-German translations: New translations for user and role administration (details)
-Catalan & spanish tranlations (details)
-Encoding change from ANSI to UTF-8 in en.php (details)
-Missing comma & bad encoding in en.php (details)
-Bad encoding in en.php (ANSI) (details)
-core.notifications templates ca&es translations (details)
-German translations: New translations for user and role administration [FIX] * Added missing keys to other languages (ecept en and de) (details)
-Czech translation - meta.svn plugin (details)
-access.dropbox plugin translation to Czech (details)
-access.imap plugin translation to Czech (details)
-access.sftp plugin translation to Czech (details)
-auth.basic_http plugin translation to Czech (details)
-auth.cmsms plugin translation to Czech (details)
-log.syslog plugin translation to Czech (details)
-log.text plugin translation to Czech (details)
-mailer.phpmailer-lite plugin translation to Czech (details)
-uploader.plupload plugin translation to Czech (details)
-mq.serial plugin translation to Czech (details)
-mq.sql plugin translation to Czech (details)
-Update cms bridges release note (details)
-Added CA and ES dropzone files in Uploader.html plugin (details)
-core.ajaxplorer translation repair in catalan language (details)
-Initial commit: Uses doctrine cache drivers as main caching system (details)
-Loaded core cache directly from bootstrap.json and moved bootstrap handling to CoreConfLoader - Fixes (details)
-Fixes after scrutinizr run (details)
-Fixing deleted htaccess files (details)
-Fixing typo (details)
-Added translations for Core cache (details)
-Removed default value for bootstrap.json cache (details)
-Removed unnecessary call to deferBuildingRegistry (details)
-Camel casing Doctrine Cache Driver (details)
-Fix pluginInstance (details)
-editor.browser i18 ca & es updates (details)
-core.ajaxplores ca language updates (details)
-meta.watch ca & es translations (details)
-editor.browser ca&es files author fix (details)
-action.disclaimer. spanish and catalan translation (details)
-Start refactoring ShareCenter class (cherry picked from commit 89491d4) (details)
-Fix issues in LegacyPubliclet (details)
-Fix missing repository (details)
-Fix error case / default template. (details)
-Add ability to force PathStyle on S3 driver - Do not use make Custom URL and Region parameters exclusive. (details)
-ForcePathStyle (details)
-(action.compression]add index action at the end of the extraction (details)
-[action.comopression] adding index action at the end of the extraction (details)
-action.share : fix in ca & es files (details)
-Make sure to include zip files when filtering node name in search results (details)
-Massive refactoring of ShareCenter to make it simpler. New methods to collect metadata from children (only with metastore.serial) and avoid breaking links on parent (or other user) rename. (details)
-Declare $shares variable before passing by reference. (details)
-ShareCenter : carry on massive refactoring (details)
-Docs & typing (details)
-Start refactoring createSharedMinisite() function (details)
-Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving. (details)
-Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving. (details)
-collectChildrenWithRepositoryMeta : return relativePath from base node, not absolute in workspace. (details)
-Store share visibility always in shared repo options, not in share object Make moveSharesFromMeta recursive (details)
-Adding core access functionality to simplify addition of new driver through Guzzle, and added new WebDAV driver (details)
-[access.s3] Adding SDKv3 compatibility (details)
-[access.s3] Adding SDK and API version in the plugin (details)
-[access.s3] Overwrite the s3 stream wrapper (details)
-[access.s3] Adding Pydio CacheService to s3 Cache interface (details)
-New class for loading React component inside standard Dialog. (details)
-Add react-autosuggest to core bundle. (details)
-Enrich user_list_authorized_users with alternative format (xml) and more info about the users. (details)
-ignore new react build folder (details)
-Move PydioForm & ReactPydio modules in gui.ajax (details)
-Final refactoring of action.share PHP part (details)
-do not load pydio-mui here - todo : find where to load (details)
-Move mui css files inside gui.ajax (details)
-Small dialog styling evolution to be more compatible with material design widgets. (details)
-New react-based share dialog (details)
-Fix user search engine (details)
-Add missing resources for compilation. (details)
-Load alerts: silently test if file exists. (details)
-Authentification -> Authentication for English (details)
-Fix various UI stuff in ShareDialog Add Clipboard module for copying to clipboard Fix hidden Field in AbstractAjxpUser (details)
-Fix cache.doctrine empty options. (details)
-Fix cache plugtitle french translation (details)
-Cross-copy action: pass Repository object to UserSelection() (details)
-Adding guzzle, reformatting the code and adding the documentation (details)
-Removing guzzle tests from the package (details)
-Fixes to SMB auth: - Registered stream is smbclient://, not smb:// - smbclient binary path could not be set for auth plugin (details)
-Fix default tpl name (details)
-Fix unshare when removing users and no public link active. (details)
-Little Charset Bug in index message (details)
-dir_closedir() has no return value (details)
-Fixes for upload and deletion (details)
-Mitigate update role request (details)
-Fix image magick preview on multiple page office file (details)
-Fix switch to default start repository after loggin in by CAS (details)
-Method updateRepository() on AJXP_Sabre_Node to set repo after authentication succeed. (details)
-Move ContentFilter filterings to AJXP_MetaStreamWrapper instead of UserSelection and fsAccessDriver. (details)
-New ocs access point to implement Open Cloud Specification. DAV implementation working on public links. Update htaccess accordingly. (details)
-Simple skeleton for an "Inbox" workspace displaying all shares received. (details)
-Fixes on S3 new implementation (details)
-Refactor core.ocs to use namespaces and composer autoload. (details)
-Allow string in classname attribute to use backslashes in namespaces. (details)
-Added layer between pydio and pydio.dav to handle auth (details)
-Model implementation using simpleStore for OCS (details)
-Create Server for /shares/ access point. (details)
-Use remoteId as RemoteShare id. (details)
-Client & Server stuff for OCS (details)
-Plugin Sharing and OCS together. Ultra-basic UI for tests. (details)
-Change Core Access Plugin and WebDAV Client to use Scheme Translator Wrapper layers (details)
-Style remote-users-add form (details)
-Added layer between pydio and pydio.dav to handle auth (details)
-Fixing duplicate function name (details)
-Fixing the Meta Stream Wrapper (details)
-Update styling (details)
-fixes stat result handling in case of empty files, according to docs stat should return -1 or text error message small optimizations for handling of alternative stat commands (details)
-Added context handling in Meta Stream Wrapper (details)
-Create CompositeShare object - Change json output format to handle 1 or N links. (details)
-Added OCSClient to interface with OCS API (details)
-Rework OCS Links (details)
-Fixing error (details)
-Fixing OCS Client (details)
-use documentName (details)
-Switch to documentName (details)
-Fix some stuff on OCS (details)
-Fix when no share is enabled (details)
-ConfService: add some includeHooks to contribute with repositories. (details)
-Add a virtual folder at the root of the webdav to make it API-consistent (both folders and files are accessed via /../dav/DocumentName) Store remoteShares by token, not remoteId Ping back on Dav access point when receiving a share. (details)
-Last update of Inbox driver Ping remote when receiving share. (details)
-Fix download right management on public link. (details)
-Fix clearing shares (details)
-New PydioUsersApi in Core to encapsulate users related requests New react-based UsersCompleter component, including user creation form. (details)
-Use generic UsersCompleter and remove from ShareDialog. Use core PydioUsersApi as well. New react-based PydioMailer. (details)
-Move css from action.share to PydioMailer (details)
-Finish wiring mailer. Handle no mailer and force Old school case. (details)
-Wire password strength checker on user creation form and share password form (details)
-Handle custom RW permissions for remote users. (details)
-Fix missing repo_label parameter (details)
-[access.s3]Changing require file name (details)
-Fix OCS Client with non empty base Path (details)
-Replace main share dialog (details)
-Massive i18n for new ShareDialog (details)
-Fix ocs with baseUri (details)
-Renaming (details)
-Renaming (details)
-Make webdav enabled by default Fix contentType detection and remote URL values for invitations. (details)
-Fix unshare Touch user role to trigger repo reload if user is logged. Fix reloadRolesIfRequired to make sure personalRole is in sync (details)
-[access.s3] Fix rename folder for SDK V3 and changing require file name (details)
-Migrate Info Panel modified from ShareCenter to ShareDialog (details)
-Do not list teams in usersOnly (details)
-Expose FEDERATED_SHARING_ENABLED setting Implement Readonly Mode on ShareDialog (details)
-Fix Exception Namespace - Close #1067 (details)
-Move back the remote share /dav/ to root, do not create virtual folder anymore. For files, both the / and the /filename.ext send the same answer (stat of the file). (details)
-Change Invitation IDs from GUID to random Integers (requires one or more db calls). Fix #1065 (details)
-Fix OCS unshare implementation (details)
-Disable Test File (details)
-Added caching of the Path Wrapper functionality and changed the hkey for the Stream Wrapper global caching (details)
-List Teams even if regexp is null and mandatory (details)
-Fix rights management : do not assign minisite-role for remote shares. (details)
-Implement accept / decline remote shares. (details)
-Another pass on inbox driver. Not sure it will be kept as is. (details)
-Adding OAuth Wrapper to the core access for Oauth2 authentification (details)
-Adding doctrine namespace key (details)
-First split of big css into smaller less files (details)
-Lessify (details)
-LESS : refactor / extract variables (details)
-Fixed timeout issue and added local caching to the path wrapper (details)
-Move old screen and xtree to less components (details)
-Update CSS - Change how we handle global_toolbar styling (details)
-Revert unnecessary commit (details)
-Smooth transition to material (details)
-Smooth transition to material (details)
-Add cssmin to package.json (details)
-Typo in package.json - Start fixing admin panel styles (details)
-Fix styling (details)
-Organize fonts - Add a subset of mdi. Will be enriched as needed. LeftNavigation: add user_create_repository action if present. (details)
-Fix fonts imports via less variable. Replace all share icons by new mdi-share-variant. (details)
-Actions, fonts, CSS ... (details)
-Rework Home Panel (details)
-Improve the user dashboard a bit. (details)
-Make the left nav panel open by default, closing after 3s (details)
-Css compil (details)
-Fix mdi icons font - fix top toolbar bg (details)
-Pass hasContentFilter info (details)
-Make LeftNavigation panel more generic (details)
-Use LeftNavigation component for Home page (details)
-Do not commit built form (details)
-Add build/ folder to ignore file (details)
-[core.mailer]Adding the grouped mail and the CRON (details)
-[core.mailer]Adding the user choice in the manifest (details)
-[core.mailer]Adding the mysql create file for the database (details)
-[core.mailer]Adding the postgreSQL create file for the database (details)
-[core.mailer]Adding the SQLite create file for the database (details)
-Fix splash style (details)
-Dashboard, home, login panels Hide tooltips on repo switch Special icon for Inbox workspace (details)
-Minsites: remove all inline style from manifest and put them in a dedicated stylesheet. (details)
-Various fixes on Share Dialog (details)
-Update website in email templates (details)
-Pass page_position parameter when opening search result in paginated context. Fix #1041 (details)
-Check dibi::isConnected() whenever possible. Close #1043 (details)
-Fix #1061 (details)
-Missing resource in core.mailer (details)
-user_list_authorized_users : always send root node (ul). (details)
-Reset Download Counter (details)
-Fix videos in tutorial panel (details)
-Inbox and Share Notification in left menu (details)
-Adding hook to Repository loaded change (details)
-Fix to inbox and CacheService (details)
-Adding local status to the share notification panel (details)
-Observer repository_list_refreshed event (details)
-Stop Share Notification Dispatcher if noone is listening (details)
-Loading on load (details)
-Add two new properties on Repository object (repositoryType and accessStatus), publish them in the XML, parse them in the js model. (details)
-Change to the Left Navigation (details)
-Fix FilesList modifier (details)
-Rework Inbox Driver (details)
-Use the last_history pref to add a repository_last_connected timestamp and send it in repo list. (details)
-Last css compil (details)
-Inbox : replace left panel by a quick filter box (details)
-Left Panel icons (details)
-Count shared files access status (details)
-Fix repository_last_connected flag (details)
-Dialog box for remote shares (details)
-Replace alerts panel (details)
-Fix AjxpPane.parseComponentConfigs Typo in fsTemplatePart (details)
-Adding badge and overlay for the dialog (details)
-Handle empty message (details)
-Fix notifications actions in left panel (details)
-i18n inbox access driver (details)
-inbox: change buttons style (details)
-Adding inbox badge (details)
-Listening to repository refreshed on home page (details)
-IE tweaks (details)
-Adding modal on demand instead of inline (details)
-Fix installer style (details)
-[core.mailer]Adding separator in the create sql file (details)
-[core.mailer]Adding character set in the create sql file (details)
-Fix to not display the share notification twice (details)
-AjxpMailer now has SqlTableProvider interface. (details)
-For OwnCloud compat, make sure to always ping the root of webdav, not /DocumentName (details)
-i18n on core.ocs and access.inbox (details)
-Adding owner to the remote share alert box (details)
-Add inbox repository by default (details)
-AjxpMailer install tables only for core plugin (details)
+Italian translation: fix relative date format
+German translations: New translations for user and role administration
+Catalan & spanish tranlations
+Encoding change from ANSI to UTF-8 in en.php
+Missing comma & bad encoding in en.php
+Bad encoding in en.php (ANSI)
+core.notifications templates ca&es translations
+German translations: New translations for user and role administration [FIX] * Added missing keys to other languages (ecept en and de)
+Czech translation - meta.svn plugin
+access.dropbox plugin translation to Czech
+access.imap plugin translation to Czech
+access.sftp plugin translation to Czech
+auth.basic_http plugin translation to Czech
+auth.cmsms plugin translation to Czech
+log.syslog plugin translation to Czech
+log.text plugin translation to Czech
+mailer.phpmailer-lite plugin translation to Czech
+uploader.plupload plugin translation to Czech
+mq.serial plugin translation to Czech
+mq.sql plugin translation to Czech
+Update cms bridges release note
+Added CA and ES dropzone files in Uploader.html plugin
+core.ajaxplorer translation repair in catalan language
+Initial commit: Uses doctrine cache drivers as main caching system
+Loaded core cache directly from bootstrap.json and moved bootstrap handling to CoreConfLoader - Fixes
+Fixes after scrutinizr run
+Fixing deleted htaccess files
+Fixing typo
+Added translations for Core cache
+Removed default value for bootstrap.json cache
+Removed unnecessary call to deferBuildingRegistry
+Camel casing Doctrine Cache Driver
+Fix pluginInstance
+editor.browser i18 ca & es updates
+core.ajaxplores ca language updates
+meta.watch ca & es translations
+editor.browser ca&es files author fix
+action.disclaimer. spanish and catalan translation
+Start refactoring ShareCenter class (cherry picked from commit 89491d4)
+Fix issues in LegacyPubliclet
+Fix missing repository
+Fix error case / default template.
+Add ability to force PathStyle on S3 driver - Do not use make Custom URL and Region parameters exclusive.
+ForcePathStyle
+(action.compression]add index action at the end of the extraction
+[action.comopression] adding index action at the end of the extraction
+action.share : fix in ca & es files
+Make sure to include zip files when filtering node name in search results
+Massive refactoring of ShareCenter to make it simpler. New methods to collect metadata from children (only with metastore.serial) and avoid breaking links on parent (or other user) rename.
+Declare $shares variable before passing by reference.
+ShareCenter : carry on massive refactoring
+Docs & typing
+Start refactoring createSharedMinisite() function
+Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving.
+Split ShareCenter class again and again: new model ShareLink. Fix issue with metadata moving.
+collectChildrenWithRepositoryMeta : return relativePath from base node, not absolute in workspace.
+Store share visibility always in shared repo options, not in share object Make moveSharesFromMeta recursive
+Adding core access functionality to simplify addition of new driver through Guzzle, and added new WebDAV driver
+[access.s3] Adding SDKv3 compatibility
+[access.s3] Adding SDK and API version in the plugin
+[access.s3] Overwrite the s3 stream wrapper
+[access.s3] Adding Pydio CacheService to s3 Cache interface
+New class for loading React component inside standard Dialog.
+Add react-autosuggest to core bundle.
+Enrich user_list_authorized_users with alternative format (xml) and more info about the users.
+ignore new react build folder
+Move PydioForm & ReactPydio modules in gui.ajax
+Final refactoring of action.share PHP part
+do not load pydio-mui here - todo : find where to load
+Move mui css files inside gui.ajax
+Small dialog styling evolution to be more compatible with material design widgets.
+New react-based share dialog
+Fix user search engine
+Add missing resources for compilation.
+Load alerts: silently test if file exists.
+Authentification -> Authentication for English
+Fix various UI stuff in ShareDialog Add Clipboard module for copying to clipboard Fix hidden Field in AbstractAjxpUser
+Fix cache.doctrine empty options.
+Fix cache plugtitle french translation
+Cross-copy action: pass Repository object to UserSelection()
+Adding guzzle, reformatting the code and adding the documentation
+Removing guzzle tests from the package
+Fixes to SMB auth: - Registered stream is smbclient://, not smb:// - smbclient binary path could not be set for auth plugin
+Fix default tpl name
+Fix unshare when removing users and no public link active.
+Little Charset Bug in index message
+dir_closedir() has no return value
+Fixes for upload and deletion
+Mitigate update role request
+Fix image magick preview on multiple page office file
+Fix switch to default start repository after loggin in by CAS
+Method updateRepository() on AJXP_Sabre_Node to set repo after authentication succeed.
+Move ContentFilter filterings to AJXP_MetaStreamWrapper instead of UserSelection and fsAccessDriver.
+New ocs access point to implement Open Cloud Specification. DAV implementation working on public links. Update htaccess accordingly.
+Simple skeleton for an "Inbox" workspace displaying all shares received.
+Fixes on S3 new implementation
+Refactor core.ocs to use namespaces and composer autoload.
+Allow string in classname attribute to use backslashes in namespaces.
+Added layer between pydio and pydio.dav to handle auth
+Model implementation using simpleStore for OCS
+Create Server for /shares/ access point.
+Use remoteId as RemoteShare id.
+Client & Server stuff for OCS
+Plugin Sharing and OCS together. Ultra-basic UI for tests.
+Change Core Access Plugin and WebDAV Client to use Scheme Translator Wrapper layers
+Style remote-users-add form
+Added layer between pydio and pydio.dav to handle auth
+Fixing duplicate function name
+Fixing the Meta Stream Wrapper
+Update styling
+fixes stat result handling in case of empty files, according to docs stat should return -1 or text error message small optimizations for handling of alternative stat commands
+Added context handling in Meta Stream Wrapper
+Create CompositeShare object - Change json output format to handle 1 or N links.
+Added OCSClient to interface with OCS API
+Rework OCS Links
+Fixing error
+Fixing OCS Client
+use documentName
+Switch to documentName
+Fix some stuff on OCS
+Fix when no share is enabled
+ConfService: add some includeHooks to contribute with repositories.
+Add a virtual folder at the root of the webdav to make it API-consistent (both folders and files are accessed via /../dav/DocumentName) Store remoteShares by token, not remoteId Ping back on Dav access point when receiving a share.
+Last update of Inbox driver Ping remote when receiving share.
+Fix download right management on public link.
+Fix clearing shares
+New PydioUsersApi in Core to encapsulate users related requests New react-based UsersCompleter component, including user creation form.
+Use generic UsersCompleter and remove from ShareDialog. Use core PydioUsersApi as well. New react-based PydioMailer.
+Move css from action.share to PydioMailer
+Finish wiring mailer. Handle no mailer and force Old school case.
+Wire password strength checker on user creation form and share password form
+Handle custom RW permissions for remote users.
+Fix missing repo_label parameter
+[access.s3]Changing require file name
+Fix OCS Client with non empty base Path
+Replace main share dialog
+Massive i18n for new ShareDialog
+Fix ocs with baseUri
+Renaming
+Renaming
+Make webdav enabled by default Fix contentType detection and remote URL values for invitations.
+Fix unshare Touch user role to trigger repo reload if user is logged. Fix reloadRolesIfRequired to make sure personalRole is in sync
+[access.s3] Fix rename folder for SDK V3 and changing require file name
+Migrate Info Panel modified from ShareCenter to ShareDialog
+Do not list teams in usersOnly
+Expose FEDERATED_SHARING_ENABLED setting Implement Readonly Mode on ShareDialog
+Fix Exception Namespace - Close #1067
+Move back the remote share /dav/ to root, do not create virtual folder anymore. For files, both the / and the /filename.ext send the same answer (stat of the file).
+Change Invitation IDs from GUID to random Integers (requires one or more db calls). Fix #1065
+Fix OCS unshare implementation
+Disable Test File
+Added caching of the Path Wrapper functionality and changed the hkey for the Stream Wrapper global caching
+List Teams even if regexp is null and mandatory
+Fix rights management : do not assign minisite-role for remote shares.
+Implement accept / decline remote shares.
+Another pass on inbox driver. Not sure it will be kept as is.
+Adding OAuth Wrapper to the core access for Oauth2 authentification
+Adding doctrine namespace key
+First split of big css into smaller less files
+Lessify
+LESS : refactor / extract variables
+Fixed timeout issue and added local caching to the path wrapper
+Move old screen and xtree to less components
+Update CSS - Change how we handle global_toolbar styling
+Revert unnecessary commit
+Smooth transition to material
+Smooth transition to material
+Add cssmin to package.json
+Typo in package.json - Start fixing admin panel styles
+Fix styling
+Organize fonts - Add a subset of mdi. Will be enriched as needed. LeftNavigation: add user_create_repository action if present.
+Fix fonts imports via less variable. Replace all share icons by new mdi-share-variant.
+Actions, fonts, CSS ...
+Rework Home Panel
+Improve the user dashboard a bit.
+Make the left nav panel open by default, closing after 3s
+Css compil
+Fix mdi icons font - fix top toolbar bg
+Pass hasContentFilter info
+Make LeftNavigation panel more generic
+Use LeftNavigation component for Home page
+Do not commit built form
+Add build/ folder to ignore file
+[core.mailer]Adding the grouped mail and the CRON
+[core.mailer]Adding the user choice in the manifest
+[core.mailer]Adding the mysql create file for the database
+[core.mailer]Adding the postgreSQL create file for the database
+[core.mailer]Adding the SQLite create file for the database
+Fix splash style
+Dashboard, home, login panels Hide tooltips on repo switch Special icon for Inbox workspace
+Minsites: remove all inline style from manifest and put them in a dedicated stylesheet.
+Various fixes on Share Dialog
+Update website in email templates
+Pass page_position parameter when opening search result in paginated context. Fix #1041
+Check dibi::isConnected() whenever possible. Close #1043
+Fix #1061
+Missing resource in core.mailer
+user_list_authorized_users : always send root node (ul).
+Reset Download Counter
+Fix videos in tutorial panel
+Inbox and Share Notification in left menu
+Adding hook to Repository loaded change
+Fix to inbox and CacheService
+Adding local status to the share notification panel
+Observer repository_list_refreshed event
+Stop Share Notification Dispatcher if noone is listening
+Loading on load
+Add two new properties on Repository object (repositoryType and accessStatus), publish them in the XML, parse them in the js model.
+Change to the Left Navigation
+Fix FilesList modifier
+Rework Inbox Driver
+Use the last_history pref to add a repository_last_connected timestamp and send it in repo list.
+Last css compil
+Inbox : replace left panel by a quick filter box
+Left Panel icons
+Count shared files access status
+Fix repository_last_connected flag
+Dialog box for remote shares
+Replace alerts panel
+Fix AjxpPane.parseComponentConfigs Typo in fsTemplatePart
+Adding badge and overlay for the dialog
+Handle empty message
+Fix notifications actions in left panel
+i18n inbox access driver
+inbox: change buttons style
+Adding inbox badge
+Listening to repository refreshed on home page
+IE tweaks
+Adding modal on demand instead of inline
+Fix installer style
+[core.mailer]Adding separator in the create sql file
+[core.mailer]Adding character set in the create sql file
+Fix to not display the share notification twice
+AjxpMailer now has SqlTableProvider interface.
+For OwnCloud compat, make sure to always ping the root of webdav, not /DocumentName
+i18n on core.ocs and access.inbox
+Adding owner to the remote share alert box
+Add inbox repository by default
+AjxpMailer install tables only for core plugin
 
 ----
 Pydio 6.2.2
@@ -727,137 +863,137 @@ Joomla Bridge Compatibility (broken by last Joomla version).
 
 [Detailed Changelog]
 
-Update Italian translation for plugins: 'access.ajxp_conf', 'action.compression', 'action.share', 'core.ajaxplorer', 'core.notifications' (details)
-Take the active mailer plugin , not the first that comes (details)
-[core.mailer] Update the class which takes the active mailer plugin (details)
-[conf.sql / access.ajxp_user] Improve Team management. (details)
-Websocket: if there's an internal BIND address, it's most likely the address the php server will have to connect to. Added a Todo to handle REST auth. (details)
-Unserialization can fail on some systems, make sure to reload role if it's not an object after waking up object. (details)
-Fix SFTP username containing dash character (git issue #1014) (details)
-[gui.user] Fix display & i18n message (details)
-[gui.ajax] Create a "legacy" version of the bundle without ReactDND, and add fallbackCondition and fallbackFile in the js/css ressources to load alternative versions. (details)
-Make test on personalRole stronger if there is an error at deserialization time. (details)
-IE Caching policy is too agressive, we have to add some random ID to force reload sometime. (details)
-Renamed constructor for PHP7 compatibility (details)
-Update CLA URL (details)
-Handle repository with deleted parent. Should fix #1025 (details)
-Typo in getRelatedNotifications() method (not used). (details)
-Update CONTRIBUTING.md (details)
-[core.notifications] fix getRelatedNotifications() (details)
-Fix #1019 (details)
-Util function to get user label either from role directly or from user object. (details)
-Fixed recursive indexation issue with FTP workspaces. (details)
-Wrappers must declare isSeekable() to enable listing optimizations in fsAccessDriver. (details)
-Make sure not to load an indexed document if the meta.change event comes from a "delete" operation. (details)
-Enforce sanitization of user id when sending to error log. (details)
-Update window.MessageHash when changing i18n. Alternative fix #1021 (details)
-Typo in rest parameter for role_update_right (details)
-Pass optional parameters to the node->load() method. (details)
-Pass optional cursor parameter to the logs. SQL logger can use it as a query limiter to only load data starting from a given id. Return cursor attribute in XML as well. (details)
-Use udevil to mount instead of sudo (details)
-Improve performance: caching ldap search result in class static variable (details)
-Improve notifications on shared resources - Separate Location from the notifications - Avoid empty label in Alerts feed. (details)
-Better catch of imagick call error. (details)
-Fix tmp folder for unoconv (details)
-Strip only left space on dirname - Fix #1023 (details)
-Imagick: Parameters should follow convert command. (details)
-Fix rewind on SchemeTranslator wrapper - Prevent editing meta on non-writeable resource. (details)
-[auth.remote] Make sure to keep the initial session.save_handler - Fix Joomla connector. (details)
-Joomla plugin: make sure to switch back to previous session, as the session content is saved in register_shutdown_handler. (details)
-Compute locationType when setting node, so that it can be serialized/unserialized (details)
-Do not cache Sharing configs - Fix #1013 (details)
-Make sure to use === when comparing to constants, or repo 0 can be considered as repo_scope_all. Enable kvcaching in non-rest controller. (details)
-[ShareCenter] Fix unshare workspaces from My Account zone - Fix readonly mode not being switched correctly in some case. (details)
-Registry Cache Key : repo can be null. (details)
-Fix Exif metadata display in InfoPanel when no GPS parameter is defined in the plugin or no GPS data is present in photo. (details)
-Fix regression on contextual menu content and default item display. (details)
-Fix regression on "Remember Me" feature. (details)
-Replace pydio.getController().parseXmlMessage() by PydioApi.getClient().parseXmlMessage. Same for triggerDownload() moved as static method on PydioApi. (details)
-Fix Eml Attachment Download. (details)
-Replace all Controller.parseXmlMessage calls by PydioApi.getClient().parseXmlMessage in manifests. (details)
-Replace ' by " to avoid label truncating on users/teams listing. Better sanitization and error catching on Team creation. (details)
-Prevent editor.browser to open SVG files directly, always force as attachment. (details)
-Pass the $url to isSeekable(), allowing to return different value depending on the path (=> return false for Zip files in fsAccessWrapper, or it's messed up when browsing zip subfolders). (details)
-Declare restParams on compress in action.powerfs, otherwise API is not working for this action when plugin is active. (details)
-Fix ChangesTracker for filter + mask management. Fix indexation issue when copying folders. (details)
-Specific fix for video player for Firefox (details)
-Update sdk generator: do not skip already parsed actions. (details)
-* Setup wizard can now be translated completely * Added german translations for setup wizard (details)
-Fix display quota on FreeBSD (details)
-Fix file/folder message on move. Close and replace PR #1000 ($dirRes is never set in that case) (details)
-Update .travis.yml (details)
-Updated ca/es files (details)
-PHP7 Constructors fixes (details)
-PHP7 Constructor fixes (details)
-Missing Comma in ca.php (details)
-Add Travis Badge (details)
-Fix #1010 Zip Browsing on Windows Server (details)
-Add new parameter for signature - Add Frankfurt & Seoul Regions. Close #846 (details)
-Fix log grouping Fix Copy Selection action (details)
-Fix google shortner api key - Close #1030 (details)
-Make sure to not return an empty value. (details)
-Fix some specific zip extraction case on Windows Server. (details)
-Fix multimode value : check instance_name OR group_switch_value (details)
-Fix MacOS Yosemite / El Capitan Detection (details)
-Fix italian "Invite" button: missing translation strings. (details)
-HTML Base Tag is not correctly applied in IE10 when dynamically inserting "link". Add an data-hrefRebase tag to be processed (prepending the base) on ie10 only. (details)
-Close session when sending binary files. Could create a race condition with tryLogUserFromCookie. (details)
+Update Italian translation for plugins: 'access.ajxp_conf', 'action.compression', 'action.share', 'core.ajaxplorer', 'core.notifications'
+Take the active mailer plugin , not the first that comes
+[core.mailer] Update the class which takes the active mailer plugin
+[conf.sql / access.ajxp_user] Improve Team management.
+Websocket: if there's an internal BIND address, it's most likely the address the php server will have to connect to. Added a Todo to handle REST auth.
+Unserialization can fail on some systems, make sure to reload role if it's not an object after waking up object.
+Fix SFTP username containing dash character (git issue #1014)
+[gui.user] Fix display & i18n message
+[gui.ajax] Create a "legacy" version of the bundle without ReactDND, and add fallbackCondition and fallbackFile in the js/css ressources to load alternative versions.
+Make test on personalRole stronger if there is an error at deserialization time.
+IE Caching policy is too agressive, we have to add some random ID to force reload sometime.
+Renamed constructor for PHP7 compatibility
+Update CLA URL
+Handle repository with deleted parent. Should fix #1025
+Typo in getRelatedNotifications() method (not used).
+Update CONTRIBUTING.md
+[core.notifications] fix getRelatedNotifications()
+Fix #1019
+Util function to get user label either from role directly or from user object.
+Fixed recursive indexation issue with FTP workspaces.
+Wrappers must declare isSeekable() to enable listing optimizations in fsAccessDriver.
+Make sure not to load an indexed document if the meta.change event comes from a "delete" operation.
+Enforce sanitization of user id when sending to error log.
+Update window.MessageHash when changing i18n. Alternative fix #1021
+Typo in rest parameter for role_update_right
+Pass optional parameters to the node->load() method.
+Pass optional cursor parameter to the logs. SQL logger can use it as a query limiter to only load data starting from a given id. Return cursor attribute in XML as well.
+Use udevil to mount instead of sudo
+Improve performance: caching ldap search result in class static variable
+Improve notifications on shared resources - Separate Location from the notifications - Avoid empty label in Alerts feed.
+Better catch of imagick call error.
+Fix tmp folder for unoconv
+Strip only left space on dirname - Fix #1023
+Imagick: Parameters should follow convert command.
+Fix rewind on SchemeTranslator wrapper - Prevent editing meta on non-writeable resource.
+[auth.remote] Make sure to keep the initial session.save_handler - Fix Joomla connector.
+Joomla plugin: make sure to switch back to previous session, as the session content is saved in register_shutdown_handler.
+Compute locationType when setting node, so that it can be serialized/unserialized
+Do not cache Sharing configs - Fix #1013
+Make sure to use === when comparing to constants, or repo 0 can be considered as repo_scope_all. Enable kvcaching in non-rest controller.
+[ShareCenter] Fix unshare workspaces from My Account zone - Fix readonly mode not being switched correctly in some case.
+Registry Cache Key : repo can be null.
+Fix Exif metadata display in InfoPanel when no GPS parameter is defined in the plugin or no GPS data is present in photo.
+Fix regression on contextual menu content and default item display.
+Fix regression on "Remember Me" feature.
+Replace pydio.getController().parseXmlMessage() by PydioApi.getClient().parseXmlMessage. Same for triggerDownload() moved as static method on PydioApi.
+Fix Eml Attachment Download.
+Replace all Controller.parseXmlMessage calls by PydioApi.getClient().parseXmlMessage in manifests.
+Replace ' by " to avoid label truncating on users/teams listing. Better sanitization and error catching on Team creation.
+Prevent editor.browser to open SVG files directly, always force as attachment.
+Pass the $url to isSeekable(), allowing to return different value depending on the path (=> return false for Zip files in fsAccessWrapper, or it's messed up when browsing zip subfolders).
+Declare restParams on compress in action.powerfs, otherwise API is not working for this action when plugin is active.
+Fix ChangesTracker for filter + mask management. Fix indexation issue when copying folders.
+Specific fix for video player for Firefox
+Update sdk generator: do not skip already parsed actions.
+* Setup wizard can now be translated completely * Added german translations for setup wizard
+Fix display quota on FreeBSD
+Fix file/folder message on move. Close and replace PR #1000 ($dirRes is never set in that case)
+Update .travis.yml
+Updated ca/es files
+PHP7 Constructors fixes
+PHP7 Constructor fixes
+Missing Comma in ca.php
+Add Travis Badge
+Fix #1010 Zip Browsing on Windows Server
+Add new parameter for signature - Add Frankfurt & Seoul Regions. Close #846
+Fix log grouping Fix Copy Selection action
+Fix google shortner api key - Close #1030
+Make sure to not return an empty value.
+Fix some specific zip extraction case on Windows Server.
+Fix multimode value : check instance_name OR group_switch_value
+Fix MacOS Yosemite / El Capitan Detection
+Fix italian "Invite" button: missing translation strings.
+HTML Base Tag is not correctly applied in IE10 when dynamically inserting "link". Add an data-hrefRebase tag to be processed (prepending the base) on ie10 only.
+Close session when sending binary files. Could create a race condition with tryLogUserFromCookie.
 
 --------------------------
 Pydio Core 6.2.1 is a bugfix release providing compatibility fixes for non-standard plugins to the core. See complete changelog below.
 
-Some servers do not return the "." value, send a fake stat in that case by grabing the stat from AJXP_DATA_PATH. (details)
-Fix tab char in sql script (details)
-[action.disclaimer] Make sure to invalidateLoadedRepositories() after updating the lock value. (details)
-[access.fs] Fix is_readable call for folders inside API. Fix #988 (details)
-try catch every single file when we extract an archive (details)
-Update website (details)
-Update README.md (details)
-[meta.syncable] Fix a wrong flatten case when deleting/restoring to/from the recycle bin. (details)
-Fix shortcuts disabling on SearchEngine. Fix #994 (details)
-Fix Root Group management issues. (details)
-Change DefaultRights management: update Root Group, do not update personal roles anymore, otherwise it always takes precedency on parent groups/roles. Do not skip the AJXP_CLEAR_VALUE, set to the merged role. (details)
-Fix display in search engine leaving the group headers on empty result. (details)
-Observable: make a copy of observers otherwise if there are many observeOnce ones they are not correctly applied. (details)
-Typo in EmptyNodeProvider Fix user history and ?goTo= mechanism. If skip_user_history is fale, use goTo, otherwise use URL directly. (details)
-User dashboard, switch action bars to dataModelElementId instead of global events. (details)
-Admin Panel: to not list Templates in group/roles ACL - Fix Legacy shares listing not properly filtered. (details)
-Core.* plugins should be appended at the beginning of active lists. Fix compatibility of remote logout with 6.2.X : add a forbidOverride attribute to block further merge in registry, otherwise session_login logout action will always take precedency. (details)
-Fix load binary (details)
-Make too short string smaller in french (details)
-Add include Hook for to load and update user info (details)
-Fix update template label (details)
-Pass a scope string or a repository object to getFilteredOption() to test on the AJXP_REPO_SCOPE_SHARED scope if necessary. (details)
-Fix typo in ENABLE_FOLDER_SHARING value testing Fix check for USER_SHARED_USERS_LIMIT on mergedRole instead of personalRole (details)
-Update getFilteredOption signature (details)
-Unused images - Fix #1001 (details)
-Glob can return false on error, we should check before running a foreach. (details)
-[action.share] Reset max download and max expiration time Fix #1004 (details)
-Fix CAS button in login interface in 6.2 (details)
-Add method groupExists() instead of using listChildrenGroups() as it can create a recursivity in auth.ldap. (details)
-Add method groupExists() implement in serial and sql confdriver (details)
-Fix loop in creation of groupPath (details)
-[editor.pdfjs] Fix for IE when Pydio is inside an iFrame. (details)
-[auth] When guest is enabled, make sure to invalidateLoadedRepositories() at login time, otherwise they are already in the session. Fix #1002 (details)
-[gui.ajax] FilesList: add bulkUpdating mode to avoid triggering initRows() on each child_added event. (details)
-[gui.ajax] Always limit search engine to 100 results by default, use bulkUpdating when parsing results, and display the total count plus a "show all" link. (details)
-[index.lucene] Send a tag in results if limit is set and number of hits is cut. (details)
-Compiled version of css (details)
-[editor.pdfjs] Add fake file name parameter to the file url passed to pdfjs, to have a correct info in the pdfjs properties viewer. (details)
-[phpversion test] Update php version to 5.4. (details)
-[gui.ajax] InfoPanel : display node label instead of basename if set. (details)
-Revert previous core plugins reordering issues (details)
-Fix actions disabling merging (details)
-[core.ajaxplorer] Update default WEBDAV_BASEURI as it was still /ajaxplorer/share. (details)
-[meta.git] Remove dependency to meta.svn plugin (details)
-[css] Fix contrast on history browser (details)
-[action.scheduler] Create simple react dashboard for enterprise admin panel. Just trigger same ol' actions. (details)
-[utils] getWorkspaceShortcutUrl use "?goto=" or "/ws-" depending on the skip_user_history status. (details)
-[AuthService] Avoid error if trying to execute tryToLogUser(). Log to error though. [authfront.webftp] Fix login form not closing after successfull login. (details)
-[ConfService] Use a dedicated UserAlertException to send back OAuth message and avoid removing temporary failing workspace from the list. Use it in access.dropbox driver. (details)
-Update package.json versions (details)
-[action.updater] Point to new update site (details)
-[access.ajxp_conf] Fix strange horizontal scrolling (details)
+Some servers do not return the "." value, send a fake stat in that case by grabing the stat from AJXP_DATA_PATH.
+Fix tab char in sql script
+[action.disclaimer] Make sure to invalidateLoadedRepositories() after updating the lock value.
+[access.fs] Fix is_readable call for folders inside API. Fix #988
+try catch every single file when we extract an archive
+Update website
+Update README.md
+[meta.syncable] Fix a wrong flatten case when deleting/restoring to/from the recycle bin.
+Fix shortcuts disabling on SearchEngine. Fix #994
+Fix Root Group management issues.
+Change DefaultRights management: update Root Group, do not update personal roles anymore, otherwise it always takes precedency on parent groups/roles. Do not skip the AJXP_CLEAR_VALUE, set to the merged role.
+Fix display in search engine leaving the group headers on empty result.
+Observable: make a copy of observers otherwise if there are many observeOnce ones they are not correctly applied.
+Typo in EmptyNodeProvider Fix user history and ?goTo= mechanism. If skip_user_history is fale, use goTo, otherwise use URL directly.
+User dashboard, switch action bars to dataModelElementId instead of global events.
+Admin Panel: to not list Templates in group/roles ACL - Fix Legacy shares listing not properly filtered.
+Core.* plugins should be appended at the beginning of active lists. Fix compatibility of remote logout with 6.2.X : add a forbidOverride attribute to block further merge in registry, otherwise session_login logout action will always take precedency.
+Fix load binary
+Make too short string smaller in french
+Add include Hook for to load and update user info
+Fix update template label
+Pass a scope string or a repository object to getFilteredOption() to test on the AJXP_REPO_SCOPE_SHARED scope if necessary.
+Fix typo in ENABLE_FOLDER_SHARING value testing Fix check for USER_SHARED_USERS_LIMIT on mergedRole instead of personalRole
+Update getFilteredOption signature
+Unused images - Fix #1001
+Glob can return false on error, we should check before running a foreach.
+[action.share] Reset max download and max expiration time Fix #1004
+Fix CAS button in login interface in 6.2
+Add method groupExists() instead of using listChildrenGroups() as it can create a recursivity in auth.ldap.
+Add method groupExists() implement in serial and sql confdriver
+Fix loop in creation of groupPath
+[editor.pdfjs] Fix for IE when Pydio is inside an iFrame.
+[auth] When guest is enabled, make sure to invalidateLoadedRepositories() at login time, otherwise they are already in the session. Fix #1002
+[gui.ajax] FilesList: add bulkUpdating mode to avoid triggering initRows() on each child_added event.
+[gui.ajax] Always limit search engine to 100 results by default, use bulkUpdating when parsing results, and display the total count plus a "show all" link.
+[index.lucene] Send a tag in results if limit is set and number of hits is cut.
+Compiled version of css
+[editor.pdfjs] Add fake file name parameter to the file url passed to pdfjs, to have a correct info in the pdfjs properties viewer.
+[phpversion test] Update php version to 5.4.
+[gui.ajax] InfoPanel : display node label instead of basename if set.
+Revert previous core plugins reordering issues
+Fix actions disabling merging
+[core.ajaxplorer] Update default WEBDAV_BASEURI as it was still /ajaxplorer/share.
+[meta.git] Remove dependency to meta.svn plugin
+[css] Fix contrast on history browser
+[action.scheduler] Create simple react dashboard for enterprise admin panel. Just trigger same ol' actions.
+[utils] getWorkspaceShortcutUrl use "?goto=" or "/ws-" depending on the skip_user_history status.
+[AuthService] Avoid error if trying to execute tryToLogUser(). Log to error though. [authfront.webftp] Fix login form not closing after successfull login.
+[ConfService] Use a dedicated UserAlertException to send back OAuth message and avoid removing temporary failing workspace from the list. Use it in access.dropbox driver.
+Update package.json versions
+[action.updater] Point to new update site
+[access.ajxp_conf] Fix strange horizontal scrolling
 
 -------------------
 
@@ -884,397 +1020,397 @@ For archive deployments, upgrade should be straightforward, but for Linux make s
 
 [Detailed Change Log]
 
-Massive refactoring of AjaXplorer class into various subclasses (Registry & PydioUI). (details)
-Reduce global scope pollution. Fix some destroy implementations missing the cache destruction. (details)
-Massive JS refactoring: Core is now Prototype-independant, fully ECMASCRIPT6, transpiled by Babel. Many refactoring to decouple core Model from UI. Basic tests with WebComponents. (details)
-New resources for ES6 support. (details)
-Fix group listing for shared users when inside a group (details)
-Enable API for load_shared_element_data (details)
-Re-adapt CartManager to new API (details)
-Track ajxpNode.getChildren() usage for new api (Map instead of Hash) (details)
-Missing compat file (details)
-server_message "require_registry_reload" (details)
-More JS modules async loading to avoid loading scripts when they are not necessary (details)
-IE 9 & 10 Tweaks. Not working on IE8 Add JS modules dependencies. (details)
-Test file to be used with WebComponents (details)
-IE8 Support: - TODO: For the moment, disable the protolegacy stuff (drop IE7 support)? - TODO: Add es5 shim & es5 sham. To be detected based on user agent? - Strict usage of window.console, not just console. (details)
-Break is unreachable code. (details)
-Move loadActionsFromRegistry() (details)
-Set forceReload default value (details)
-Remove unnecessary images. Fix global variables Remove global delete calls - Normalize prototype class constructions Remove with calls (details)
-Avoid unnecessary resources on minisite (details)
-UserDashboard: do not load images as iframe. (details)
-Use flexbox instead of JS height computing when possible Buffer infopanel update to avoid blinking Optimize display. Avoid multiple $$ calls, avoid updating tree node label/icon if not necessary Defer AjxpDroppables initialization during tree rendering Remove resize listener on window for Scrollbar Still todo: recheck all editors (details)
-Split scripts into boot, core and ui. Currently boot is compiled old fashioned way, core is compressed & mangled, ui is compressed only. (details)
-Load repositories with a unique query instead of many small queries (details)
-Performances: store loaded repositories in session (details)
-Performance: user queriesCache for exposed properties list (details)
-LangUtils : deepCopy/merge objects, forceJSON array to object. (details)
-es6: fix Registry Loading (details)
-es6: try using GET and pass a ws_id paramter to use http caching on repository (details)
-es6: simple support for web components (details)
-Connexion: switch all requests to post by default. Api: put support for file upload / download directly inside api, implement upload inside Connexion (details)
-FilesList: use display flex instead of bloc if element has vertical_fit className (details)
-Simple React component wrapper inside existing UI. (details)
-Prefix all flexbox stuff (details)
-Index.php : read tmp_repository_id variable from get or post. (details)
-User Dashboard CSS: remove home_account_pane reference (details)
-JS Core: es6 transpiled version (details)
-Sql Log Driver: server many queries at once. (details)
-New parameter frequency on analytics queries (details)
-[ajxp_conf] Add some info in the various responses. Add limit & offset parameters on recursiveSearch New method filterFormElementsFromMeta to post data in a different format that standard form parameters. Delete action: grab parameter from window.actionArguments object (details)
-PydioApi: handle discrete setting FetchedResultPane: update jsdoc (details)
-Insert bundle.js in gui_debug.html (details)
-Add new methods to LangUtils (details)
-Admin: make main menu builder more modular (details)
-Handle Alias in config menus (details)
-ShareCenter: Fix authorization checking for various share types. Make sure to register the REQUIRES_INDEXATION flag on syncable shared workspaces to trigger indexation at first changes API call. (details)
-UserMetaManager: check metadata is not empty. (details)
-Add a MAIL_ENCODING parameter in the phpmailer plugin to eventually switch to 7bit for old Exchange+Outlook configs. (details)
-Reload_registry message: make sure to trigger only if required. This can end up in a loop. LangUtils new method for arrayWithout() (details)
-index.php test SDK: remove webcomponent reference (details)
-Reload_registry message: make sure to trigger only if required. This can end up in a loop. (details)
-React Implementation of UserDashboardHome (details)
-Adapt share action to window.actionArguments passing (details)
-New AjxpReactComponent in _ui list (details)
-All necessary exports (details)
-React Implementation of UserDashboardHome (details)
-Fixed minor layout problems in share dialog: * space for labels in editable_users_header was too small * editable_users_header was moved to left because of the toggle arrow (details)
-Imporved german translations of sharing function and added missing keys to all files (details)
-Make sure to use (details)
-Manifests: make sure to replace keywords not only on label. (details)
-Detect Pydio native apps by user-agent. New function renderSimpleListAsNodes Fix updateDefaultRights (from master) (details)
-New hook sec.access_ws (details)
-Reset content_filter option when saving repository (details)
-Avoid using class_exists() in relativeDate, it's too costly for perfs. (details)
-Group fields differently (details)
-Update client_unregister & client_consume channel actions (details)
-Optional parameter on list repositories to get only a specific template children. Editing template: unchecking boxes is broken, make sure to remove not used options from existing repo. (details)
-Use applyIncludeHook instead of applyHook otherwise it messed up registry loading. (details)
-fseek: $whence parameter is not properly passed to underlying stream. S3 driver: override appendUploadedData() function as the streamWrapper does not support "a+" mode. (details)
-Weird cases using ; instead of : (details)
-Isolate WelcomeComponents scope (details)
-We should get rid of sendSync() wherever possible. (details)
-rename folder (details)
-Remove modernizr & ajxp_utils from booter. Compile bundle into pydio.min.js (details)
-Last compile (details)
-Fix IE issues. (details)
-Update package (details)
-Use correct version of material-ui lib (details)
-New interface SqlTableProvider and use it for first install Detect session handler via conf Rest.php: there should be no reason to start the session here (to recheck) (details)
-Add info inside log table (details)
-Check that class is properly created (could be ignored if php 5.3) (details)
-Call session_write_close to speed up the queries processing (details)
-Create a pool of callbacks if a file is loaded many times at the same instant, otherwise it may reload the file from cache. (details)
-Fix remoteNodeProvider: empty response could end up in the node staying in _loading mode. (details)
-Do not disable session for the moment inside rest. We should instead set up a $useSession flag on ConfService similarly to AuthService - TODO (details)
-Add a $useSession parameter to ConfService and use in rest.php (details)
-Notification: optimize queries for userExists() calls (details)
-Repository: avoid error on parentTemplateObject type (details)
-PluginsService & Plugin Optimizations: -> Optimize requires file -> Load class only if plugin is enabled -> Lazily unserialize XML manifest -> Cache some xpath query results (details)
-New KeyValueCache, following Doctrine/cache interface, we should embed this lib. Currently only supporting APC. Cache plugins_registry always and full xml_registry for rest case only. (details)
-Expand clear_plugins_cache action to empty KVCache and eventually opcache as well. (details)
-Disable many unnecessary plugins by default, avoiding to load them if not really usefull. (details)
-Use $this->getXPath() instead of direct access to $this->xPath as the manifestXML may have to be loaded lazily. (details)
-Disable many unnecessary plugins by default, avoiding to load them if not really usefull. (details)
-Reduce DB query number for loading repository Log driver: get repository ID from context, avoid to trigger another db call. (details)
-Fix es6 (using Map instead of Hash) (details)
-Refactor getFilteredXMLRegistry() function Refactor clearAllCaches() function (details)
-Remove actions property from AJXP_Plugin, it's useless. (details)
-Second call of initActivePlugins() in rest.php seems useless. Commented, to recheck. (details)
-Properly invalidate KV cache when updating user / group / role / workspace (details)
-Re-enable auth.serial & conf.serial for startup (details)
-Remove @internal phpdoc key (details)
-Enable updateAdminRights() for the moment. TODO: we should find a way to pass through that only when required. (details)
-Add constant to ignore KVCache (details)
-Add $admin parameter to the countUsersForRepository function. (details)
-Add iconClass and description_template to drivers client_settings XML tag. (details)
-Edit meta_sources as bulk data (details)
-modified: ca.php modified: cs.php modified: da.php modified: de.php modified: en.php modified: es.php modified: et.php modified: eus.php modified: fi.php modified: gr.php modified: he.php modified: hu.php modified: it.php modified: ja.php modified: kr.php modified: nl.php modified: no.php modified: pl.php modified: pt-br.php modified: pt.php modified: ru.php modified: si.php modified: sv.php modified: tr.php modified: zh-tw.php modified: zh.php (details)
-Optional option "iconClass" for userWidget (details)
-Remove timer on router (details)
-Pass driver label in workspaces list. (details)
-Handle remote sorting when trying to guess the page position. (details)
-Sync ldap group membership, filter groups from group DN (details)
-Documentation authfront.cas (details)
-Send PLUGINS_SCOPE to roles and users as well. Add new filters user / repository_id to the sql log queries. (details)
-New function usersLastConnection on sqlLogger. New sub_action users_bulk_update_roles to avoid multiple query (details)
-Use multiple selector external module New function LangUtils.objectValues() to replace Object.values() (details)
-Typo in new code (details)
-Fix diagram axis redraw by pointing to a specific git repo instead of official release. To be changed when PR is merged and released. (details)
-Fix plugins values instance_name missing parameter. (details)
-Reorganize ldap parameters (details)
-Remove template workspace from the list (details)
-Send query metadata (details)
-PrototypeJS: do not override bind method if already native version. (details)
-Parameters grouping and defaults (details)
-Fix #955 - Clear selection on blur was breaking actions in user dashboard. (details)
-Fix #958 - Reset Password is broken due to URL rewriting when guest user is enabled. (details)
-Force string comparison for md5 checks (not used most of the cases) Exclude other tags from xss detection (details)
-Fix issues in git-log when spaces in folder path. (details)
-Update pdfjs to last version - Close #939 (details)
-Remove all touch events management, simply disable scroller replacement when on mobile context. Should fix scrolling and button issues on mobile. (details)
-Bug video reading issue with the http range Should fix #954 (details)
-fix settings/leftpanel in vision theme (details)
-Add react-dnd to resources (details)
-Add indexes on log table (details)
-Set the disclaimer validation in a group (details)
-Replace ROOT_ROLE concept by AJXP_GRP_/ : applied to the root of the groups. Add support for groups reordering Fix an old bug where a role could be ordered before the group tree. (details)
-Save the roles ordering (details)
-Pass sticky info (details)
-Update default_avatar image Use no_templates & templates_only attributes to identify the scope (details)
-Replace ROOT_ROLE by AJXP_GRP_/ (details)
-Massive refactoring introducing a MetaWrapper to avoid encapsulate all nodes url in the pydio:// form. Wrappers specifics (getRealFSReference, getLastRealSize, isRemote, etc...) have been encapsulated as well and should not be called directly anymore. The MetaWrapper can register many subwrappers, once they are all used it will then translate the url to ajxp.XX SchemeTranslatorWrapper is an extendable wrapper simply translating URL to the next available wrapper from the MetaWrapper. Maybe could be simplified. (details)
-New unit tests (details)
-Fix #952 better logging Fix issue creating a group with same id is not checked Fix #937 Check that file is readable otherwise we cannot compute md5 on it. (details)
-Fix issue with .zip.zip extension #953 (details)
-Fix slug issue - Close #938 (details)
-Better way to detect mount status (details)
-Fix 5.4 syntax Remove creation of .ajxp_mount as it's not need since previous commit. (details)
-Keep up-to-date with develop (details)
-Grab last changes from MetaStreamWrapper branch (details)
-Fix Meta.user error after refactoring (details)
-Add Test Unit on Permission Mask (details)
-Change permission value (details)
-Delete function mergetree2 (details)
-Fix available permission restriction (details)
-Add more assertions (details)
-permission (details)
-Implements JsonSerializable() : warning this is PHP5.4 ONLY! Fix setDeny() (details)
-Fix overrideMethod Init from array with "read", "write", .. object. Implements JsonSerializable, php5.4 ONLY. (details)
-Store masks in roles. (details)
-Manage masks (details)
-Updated ajaxplorer_boot (details)
-Do not load a repository that has a parentId pointing to a non-existing repo. Log an error instead. Do not store reference to this->parentTemplateObject, it can end up storing a null reference in the $_SESSION array. (details)
-Fix recursive listing broken by defaultOrderField mechanism. (details)
-Fix SchemeTranslatorWrapper. Store url instead of path when reading dir. (details)
-Fix PermissionMask & checks (details)
-Invoke is_readable() at some places to dynamically compute permissions (details)
-New method appendMetaWrapper (details)
-rmdir was broken due to wrapper (details)
-fix preview with unoconv of files with russian names (details)
-remove some tests (details)
-Fix max overriding order issue Send repo security scope to UI. (details)
-Fix typo in write2 function that was preventing correct Log In logging for WebUI. (details)
-Allow editing permission mask for non-editable workspace Tweak how we display Root Group role When editing a group, compute a "Parent Role" based on the parent groups (details)
-Use classnames module (details)
-Revert ajxp_home to non-react implementation Declare build and load React bundle separately, to avoid any compatibility issues with older browsers. (details)
-Root group role: do not show "ROLE_..." parameters, even if they have scope "Role". (details)
-Wrong call to React library (details)
-Fix AjxpTabulator layout when using Flexbox Add Roboto fontface. (details)
-Fix vision & umbra theme to make them barely usable. Remove oxygen. (details)
-Call isWriteable() on the root node as well, to send correct ajxp_readonly value. (details)
-Missing reloadOnServerMessage on shares list (details)
-Fix flex issues for minisites (details)
-fix smb streamwrapper name conflict (details)
-Never call the delete method of a Map directly, for backward IE compatibility. (details)
-i18n update (details)
-Fix splitter sizing, node insertion on descending sorting mode, remove unused variables Last booter compiler (details)
-Fix startup.phtml : prototypejs moved. Booter: make set DB conf by default. (details)
-Send also info about the workspaces shared with current user. Fix shares list issue - Ability for admin to list shares of a given user. (details)
-Fix typo in JSON breaking the right info panel initial size. (details)
-Implement Serializable on permission mask. (details)
-Home Dashboard: listen to repository_list_refreshed event and reload the list. (details)
-Remove the method call from the foreach() loop. (details)
-Fix selectAll() action in GUI - was breaking the recycle bin empty action. (details)
-Fix new Image() usage with prototype methods. (details)
-Fix RepositorySelect (details)
-Pass optional nodePathes on instant message to be later on filtered in channel. (details)
-Add many is_readable() checks wherever we send data. Add the logged user id as target for reload_bookmarks and reload_shared_elements messages, otherwise they trigger reload on other users MsObserver: ignore refresh if no repoId change. NotificationLoader: fix comma typo (details)
-Filter Changes, Feed and fork mask on shared folders. (details)
-!!TODO: Update PG & SQLITE tables and drivers. Add last_updated flag on ROLES, allowing the detection to reload a user repositories list inside a running session. Use AuthService::$bufferedMessage to attach an instant message to be sent once the mq plugin is initialized. (details)
-Commit bootstrap_context with KVCACHE_IGNORE by default. (details)
-Ignore kv cache (details)
-Auto-switch graph frequency to avoid super-heavy graphs. (details)
-Create wizard breadcrumb. (details)
-Add a "wizard mode" in FormManager for installer dialog. Rewrok the whole boot.conf installer with that. (details)
-Add optional "depends" attribute on js ressource. (details)
-Update prototypeJS to 1.7.3 - We should remove the legacy version. (details)
-Boot.conf generates a simple server uuid that can be used for various identifier (kvcache should use it) (details)
-Load JSON polyfill for IE7 (details)
-New compression plugin to support TAR, TAR.GZ and TAR.BZ2 archive format (details)
-Fix "Pixlr" plugin because they switch to "https" (details)
-Revert the second call to initActivePlugins() in rest.php, as it can break some additional plugins loading after loading driver. (details)
-Fix share action in rest mode : share worked but metadata was not correctly updated. (details)
-Refactorize method(s) loadDriverRepository() (details)
-Send back the updated role to make sure the update() was working. (details)
-Update i18n messages in action.updater (details)
-writeRepositoriesData: remove unnecessary code Definitely skip the admin rights check, just give the access to ajxp_conf (details)
-Update restParameters and use UserSelection instead of 'file' variable in ShareCenter. (details)
-Remove skip_admin_rights parameter (details)
-Update grid-layout Update compression to new naming (pydio.Controller instead of pydio.actionBar) (details)
-Update manifest.xml (details)
-Fix soundManager load : do not check for registry. (details)
-Imap wrapper: fix stat to make sure it responds correctly to the is_readable test. (details)
-EmlViewer: remove unnecessary autoload (details)
-Fix parseUrl() to detect pydio:// instead of ajxp.xx:// (details)
-Do no use flexbox on dialog content (details)
-Point to new MetaStreamWrapper Fix mobile flex issues (details)
-Massive clean: remove IE7 specific resources plus unused classes or archived classes. (details)
-Change check frequencies to 5s, replace "[]" to "array()" to avoid any problems later (details)
-Fix is_readable() call to root. (details)
-Fix long workspace names (details)
-Fix double share button. (details)
-Fix super long workspace names: limit to 3 letters for badge, fix CSS to adjust display. (details)
-Update gitignore (details)
-Adding Grunt task to compile core UI in gui.ajax (details)
-Replace the ["extension"] to "PATHINFO_EXTENSION" and change the progress number to whole number (details)
-Remove compiled resources. Update move dependencies at top level of gui.ajax. (details)
-Ignore specific resources (details)
-Updating Gruntfile.js (details)
-Add a check if he user try to compress an empty folder to avoid some problems... (details)
-Updating Gruntfile.js (details)
-Update package.json (details)
-Updating Gruntfile.js (details)
-Move grunt to devDependencies (details)
-Remove compiled files (details)
-Ignore core (details)
-AJXP_KEY_VALUE_CACHE (details)
-Mega-merge from deprototype branch (details)
-Double declaration (details)
-Fix lucene indexation when copying files accross workspaces. (details)
-Fix tag block removal (details)
-Add meta watcher by default in access fs (details)
-Fix various details on Share Center: display "view parameters" instead of "change parameters" if panel is in readonly mode. Disable some actions if in ajxp_* workspace. (details)
-Disable kvcaching by default. (details)
-Fix some flexbox issues in IE (details)
-Fix IE horizontal scroller in FetchedResultPane (details)
-Fix wrong shares list for workspace with id 0 : do not use empty(). (details)
-Update Italian translation for plugin 'access.ajxp_conf' (details)
-Update Italian translation for plugin 'access.ajxp_home' (details)
-Update Italian translation for plugin 'access.ajxp_shared' (details)
-Update Italian translation for plugin 'access.ajxp_user' (details)
-Italian translation for plugin 'action.antivirus' (details)
-Update Italian translation for plugin 'action.cart' (details)
-Italian translation for plugin 'action.compression' (details)
-Fix smbclient error if filename contents '#' (details)
-Translate "Root Group" (details)
-Fix tests syntax: use __construct(), remove strange semi-colomn after class creation. (details)
-Use __construct instead of AbstractTest constructor (details)
-Use __construct instead of AbstractTest constructor (details)
-Light revamping of diagnostic tool. (details)
-Add dirname and filename in log table to be able to filter on these. Pass a "files" array to the log method when possible. (details)
-Fork materialUI and create our own branch as we are using Less framework. Update grunt file to build materialUI before bundling. (details)
-Publish permission mask as json. (details)
-Inform that a workspace does have a permission mask. (details)
-Code Inspection (details)
-Update README.md (details)
-Error when removing user from share if the workspace does not have meta.watch. (details)
-Narrow-down textarea selector for submitting comment, otherwise it takes the wrong one (typically if file/folder is shared). (details)
-Fix some notifications issues with shared users. (details)
-Fix login dialog positioning. (details)
-Pass isHidden to createUser function and send to the hook as well. (details)
-Add a small opacity animation on info panel async blocs to avoid heavy blinking. (details)
-PhpDocs (details)
-Revert specificy parameter type as it creates false negative documentation bug. (details)
-Replace run build by babel to avoid dependency to jsx (details)
-Add JS compilation step to the build (details)
-Test an upgrade with new dev version 6.1.0 (details)
-6.1.0 Release Note (details)
-Typo in column name Force updating gui.ajax if any modification detected (details)
-rootGroup can be empty (details)
-Update sql scripts for pg and sqlite, and build script to make sure to include them correctly. (details)
-Fix with pgsql file (details)
-pg and sqlite sql updates (details)
-Fix postgre issues with new fields / indexes. (details)
-Fix mergeNodes: use cloneNode() to avoid reference mess up. (details)
-Fix BackgroundTaskManager initialisation, and make sure to read the node_diff message. (details)
-Tar/gz/bz2 Support : refactor compress action into compress (server) and compress_ui (client): override the latest with the new plugin action. (details)
-Fix 404 error on "plugins" image. (details)
-Fix message id in span (details)
-Some exception can break the search results listing. Catch it. (details)
-RepositoryFilter is wrong in alert feed if repo is 0 (details)
-Fix opener positioning (details)
-Try to skip HTACCESS step : if AJXP_PACKAGING is not zip ( = linux packages ), or if content of the htaccess is already correct. (details)
-Settings and welcome were switched. Put them in the right order to fit with dist .htaccess (details)
-Forgotten console.log (details)
-Chasing Strict Standard issues (details)
-Limit Extract action to tar, gz and bz2 files (details)
-Refactor the awful JS code for triggering download in a PydioApi.downloadSelection() method. (details)
-Add the filename*= header for IE, based on mwehr suggestion. To be tested extensively. (details)
-Fix js errors in comments and info panel detection. Add bootstrap.json to the list of files hidden by default. (details)
-Fix php parsing error in hu.php. Probably fix #930 (details)
-forgotten var_dump (details)
-Unused variable (details)
-Remove var_dump instruction (details)
-Revert the filename*= commit. Definitely not working on IE. (details)
-Fix #931 (details)
-Fix de language file - Close #933 (details)
-Fix EXIF extractor output for XML, and add a format parameter to ask for JSON instead. (details)
-Go through unnecessary todos. (details)
-Add more check on user before modifying a share. (details)
-Refactor minsite_session and download management. (details)
-Fix "discrete" parameter passing. Fix small Open Layer map not showing when panel is hidden. (details)
-Fix setting/unsetting watch on shared folder. Fix notification grouping in alert feed. (details)
-Disable logo click is use is not authorized to switch to the associated workspace ( mostly ajxp_home ). (details)
-Refix IE Overflow (details)
-Fix metadata breaking json when no searchable is set. Fix #973 (details)
-Skip updating embed_code if link is expired (error). Rewrite getFlashVersion() function (removed from Controller) in ajxp_utils. (details)
-Avoid error trying to load binary without any user logged - See #946 (details)
-Make sure to filter search results with access driver hidden configurations. (details)
-Missing translation for desktop notification button. (details)
-Add a new parameter for low-resolution background image, and trigger it if viewport width is smaller than 600px ( => mobile ) (details)
-Fix FoldersTree config for smb driver (details)
-Fix wrong date in search results (details)
-Fix branding styling on legacy links. (details)
-Make sure to pass a variable as reference (details)
-Add english message to the 17th message of the plugin (details)
-Add french message to the 17th message of the plugin (details)
-Add english message to the 17th message of the plugin (details)
-French typo (details)
-Change : Now we catch error by sending them to the progress file (details)
-Plugin doc of action.compression (details)
-Save share after updating watch status for folder sharing (details)
-Append optional bootstrap instructions by scanning once (and caching result) the plugins folders looking for bootstrap.php files. (details)
-Catching some error in the extract part (details)
-Same as previous but for defining / overriding default repositories (details)
-Silently try to write the two new cache files, to avoid errors if data folder is not yet writeable (first screen). (details)
-Overriding CSS properties in ajxp-mobile.css to improve the navigation (details)
-Adding >script< at line 819 to fix JS not interpreted (details)
-Set a manager on git actions (details)
-Update of widget_sample, contributed by Ecappa (details)
-Whitespace breaks git log : do not use --follow option in that case (will not follow renaming). (details)
-Check $ctxId is not 0 (considered empty) (details)
-Clean Code Deprecated Constructors (details)
-Make sure to not throw errors if data/ is not writeable, or it breaks the starting script. (details)
-Wrong test for write permission (details)
-Do not display RootGroup for groupAdmins (details)
-Modularize installer functions. (details)
-Update : the message to display the progress of the exraction is compression.13 not compression.12 (details)
-Turkish translate of the name and the description of the plugin (details)
-Turkish translate of the different messages of the plugin (details)
-Refactor Installer (details)
-Fix special characters in file name # (details)
-Remove oxygen in selector. (details)
-Detect El Capitan (details)
-Fix imagick generate office files (details)
-Fix call to filterNodeName(): pass an "" parameter will trigger the is_file() test. (details)
-Fix Favicon for WebDAV, was still using the old one. (details)
-Although not active by default and properly documented, we remove the sudo option, it's giving too much power to the server. See discussion in #972 (details)
-missing "," character in couple of en.php files - this one is related to my previously submitted PR https://github.com/pydio/pydio-core/pull/851 (details)
-uploader.html Czech translation updated continuing as per the previous PRs opened under https://github.com/pydio/pydio-core/pull/843 (details)
-uploader.html cs-dropzone png picture created manually in Gimp as similar as possible to the other one's available (details)
-Recapitalize result keys for PostgreSQL (details)
-Display a small how-to when upgrade is not possible in-app (because of linux packages). (details)
-In SERVER_DEBUG mode, try to detect if a DB version is necessary, and log it both in the Pydio logs and generic error_log. (details)
-Reorganize some gui.ajax parameters (details)
-editor.pdfjs Czech translation (details)
-core.uploader Czech translation (details)
-Remove react-tap-event, loaded by material-ui (details)
-Add support for authenticated upgrade site. (details)
-Set package name in an external variable. (details)
-Action.compression: fix name stripping on file / folder (details)
-meta.simple_lock Czech translation created (details)
-meta.git Czech translation created (details)
-gui.user Czech translation (details)
-Fix encoding issue, especially on Windows: - Parameters passed via url in rest api gets mangled because of urldecode(), make sure to re-apply toUTF8() - Once decoded, we must make sure to apply the correct encoding before inserting / searching the DB. (details)
-Add composer.json to install OpenStack SDK at last good commit before the project was declared EOL. (details)
-Add some checks - Do not display plugins that are disabled. (details)
-action.powerfs Czech translation (details)
-action.avatar Czech translation (details)
-access.demo Czech translation (details)
-Make sure to use a default value on mandatory group_switch field. (details)
-Rename test scripts from 6.1.0 to 6.2.0 Update 6.2.0.php to re-enable plugins by default to avoid issues. (details)
+Massive refactoring of AjaXplorer class into various subclasses (Registry & PydioUI).
+Reduce global scope pollution. Fix some destroy implementations missing the cache destruction.
+Massive JS refactoring: Core is now Prototype-independant, fully ECMASCRIPT6, transpiled by Babel. Many refactoring to decouple core Model from UI. Basic tests with WebComponents.
+New resources for ES6 support.
+Fix group listing for shared users when inside a group
+Enable API for load_shared_element_data
+Re-adapt CartManager to new API
+Track ajxpNode.getChildren() usage for new api (Map instead of Hash)
+Missing compat file
+server_message "require_registry_reload"
+More JS modules async loading to avoid loading scripts when they are not necessary
+IE 9 & 10 Tweaks. Not working on IE8 Add JS modules dependencies.
+Test file to be used with WebComponents
+IE8 Support: - TODO: For the moment, disable the protolegacy stuff (drop IE7 support)? - TODO: Add es5 shim & es5 sham. To be detected based on user agent? - Strict usage of window.console, not just console.
+Break is unreachable code.
+Move loadActionsFromRegistry()
+Set forceReload default value
+Remove unnecessary images. Fix global variables Remove global delete calls - Normalize prototype class constructions Remove with calls
+Avoid unnecessary resources on minisite
+UserDashboard: do not load images as iframe.
+Use flexbox instead of JS height computing when possible Buffer infopanel update to avoid blinking Optimize display. Avoid multiple $$ calls, avoid updating tree node label/icon if not necessary Defer AjxpDroppables initialization during tree rendering Remove resize listener on window for Scrollbar Still todo: recheck all editors
+Split scripts into boot, core and ui. Currently boot is compiled old fashioned way, core is compressed & mangled, ui is compressed only.
+Load repositories with a unique query instead of many small queries
+Performances: store loaded repositories in session
+Performance: user queriesCache for exposed properties list
+LangUtils : deepCopy/merge objects, forceJSON array to object.
+es6: fix Registry Loading
+es6: try using GET and pass a ws_id paramter to use http caching on repository
+es6: simple support for web components
+Connexion: switch all requests to post by default. Api: put support for file upload / download directly inside api, implement upload inside Connexion
+FilesList: use display flex instead of bloc if element has vertical_fit className
+Simple React component wrapper inside existing UI.
+Prefix all flexbox stuff
+Index.php : read tmp_repository_id variable from get or post.
+User Dashboard CSS: remove home_account_pane reference
+JS Core: es6 transpiled version
+Sql Log Driver: server many queries at once.
+New parameter frequency on analytics queries
+[ajxp_conf] Add some info in the various responses. Add limit & offset parameters on recursiveSearch New method filterFormElementsFromMeta to post data in a different format that standard form parameters. Delete action: grab parameter from window.actionArguments object
+PydioApi: handle discrete setting FetchedResultPane: update jsdoc
+Insert bundle.js in gui_debug.html
+Add new methods to LangUtils
+Admin: make main menu builder more modular
+Handle Alias in config menus
+ShareCenter: Fix authorization checking for various share types. Make sure to register the REQUIRES_INDEXATION flag on syncable shared workspaces to trigger indexation at first changes API call.
+UserMetaManager: check metadata is not empty.
+Add a MAIL_ENCODING parameter in the phpmailer plugin to eventually switch to 7bit for old Exchange+Outlook configs.
+Reload_registry message: make sure to trigger only if required. This can end up in a loop. LangUtils new method for arrayWithout()
+index.php test SDK: remove webcomponent reference
+Reload_registry message: make sure to trigger only if required. This can end up in a loop.
+React Implementation of UserDashboardHome
+Adapt share action to window.actionArguments passing
+New AjxpReactComponent in _ui list
+All necessary exports
+React Implementation of UserDashboardHome
+Fixed minor layout problems in share dialog: * space for labels in editable_users_header was too small * editable_users_header was moved to left because of the toggle arrow
+Imporved german translations of sharing function and added missing keys to all files
+Make sure to use
+Manifests: make sure to replace keywords not only on label.
+Detect Pydio native apps by user-agent. New function renderSimpleListAsNodes Fix updateDefaultRights (from master)
+New hook sec.access_ws
+Reset content_filter option when saving repository
+Avoid using class_exists() in relativeDate, it's too costly for perfs.
+Group fields differently
+Update client_unregister & client_consume channel actions
+Optional parameter on list repositories to get only a specific template children. Editing template: unchecking boxes is broken, make sure to remove not used options from existing repo.
+Use applyIncludeHook instead of applyHook otherwise it messed up registry loading.
+fseek: $whence parameter is not properly passed to underlying stream. S3 driver: override appendUploadedData() function as the streamWrapper does not support "a+" mode.
+Weird cases using ; instead of :
+Isolate WelcomeComponents scope
+We should get rid of sendSync() wherever possible.
+rename folder
+Remove modernizr & ajxp_utils from booter. Compile bundle into pydio.min.js
+Last compile
+Fix IE issues.
+Update package
+Use correct version of material-ui lib
+New interface SqlTableProvider and use it for first install Detect session handler via conf Rest.php: there should be no reason to start the session here (to recheck)
+Add info inside log table
+Check that class is properly created (could be ignored if php 5.3)
+Call session_write_close to speed up the queries processing
+Create a pool of callbacks if a file is loaded many times at the same instant, otherwise it may reload the file from cache.
+Fix remoteNodeProvider: empty response could end up in the node staying in _loading mode.
+Do not disable session for the moment inside rest. We should instead set up a $useSession flag on ConfService similarly to AuthService - TODO
+Add a $useSession parameter to ConfService and use in rest.php
+Notification: optimize queries for userExists() calls
+Repository: avoid error on parentTemplateObject type
+PluginsService & Plugin Optimizations: -> Optimize requires file -> Load class only if plugin is enabled -> Lazily unserialize XML manifest -> Cache some xpath query results
+New KeyValueCache, following Doctrine/cache interface, we should embed this lib. Currently only supporting APC. Cache plugins_registry always and full xml_registry for rest case only.
+Expand clear_plugins_cache action to empty KVCache and eventually opcache as well.
+Disable many unnecessary plugins by default, avoiding to load them if not really usefull.
+Use $this->getXPath() instead of direct access to $this->xPath as the manifestXML may have to be loaded lazily.
+Disable many unnecessary plugins by default, avoiding to load them if not really usefull.
+Reduce DB query number for loading repository Log driver: get repository ID from context, avoid to trigger another db call.
+Fix es6 (using Map instead of Hash)
+Refactor getFilteredXMLRegistry() function Refactor clearAllCaches() function
+Remove actions property from AJXP_Plugin, it's useless.
+Second call of initActivePlugins() in rest.php seems useless. Commented, to recheck.
+Properly invalidate KV cache when updating user / group / role / workspace
+Re-enable auth.serial & conf.serial for startup
+Remove @internal phpdoc key
+Enable updateAdminRights() for the moment. TODO: we should find a way to pass through that only when required.
+Add constant to ignore KVCache
+Add $admin parameter to the countUsersForRepository function.
+Add iconClass and description_template to drivers client_settings XML tag.
+Edit meta_sources as bulk data
+modified: ca.php modified: cs.php modified: da.php modified: de.php modified: en.php modified: es.php modified: et.php modified: eus.php modified: fi.php modified: gr.php modified: he.php modified: hu.php modified: it.php modified: ja.php modified: kr.php modified: nl.php modified: no.php modified: pl.php modified: pt-br.php modified: pt.php modified: ru.php modified: si.php modified: sv.php modified: tr.php modified: zh-tw.php modified: zh.php
+Optional option "iconClass" for userWidget
+Remove timer on router
+Pass driver label in workspaces list.
+Handle remote sorting when trying to guess the page position.
+Sync ldap group membership, filter groups from group DN
+Documentation authfront.cas
+Send PLUGINS_SCOPE to roles and users as well. Add new filters user / repository_id to the sql log queries.
+New function usersLastConnection on sqlLogger. New sub_action users_bulk_update_roles to avoid multiple query
+Use multiple selector external module New function LangUtils.objectValues() to replace Object.values()
+Typo in new code
+Fix diagram axis redraw by pointing to a specific git repo instead of official release. To be changed when PR is merged and released.
+Fix plugins values instance_name missing parameter.
+Reorganize ldap parameters
+Remove template workspace from the list
+Send query metadata
+PrototypeJS: do not override bind method if already native version.
+Parameters grouping and defaults
+Fix #955 - Clear selection on blur was breaking actions in user dashboard.
+Fix #958 - Reset Password is broken due to URL rewriting when guest user is enabled.
+Force string comparison for md5 checks (not used most of the cases) Exclude other tags from xss detection
+Fix issues in git-log when spaces in folder path.
+Update pdfjs to last version - Close #939
+Remove all touch events management, simply disable scroller replacement when on mobile context. Should fix scrolling and button issues on mobile.
+Bug video reading issue with the http range Should fix #954
+fix settings/leftpanel in vision theme
+Add react-dnd to resources
+Add indexes on log table
+Set the disclaimer validation in a group
+Replace ROOT_ROLE concept by AJXP_GRP_/ : applied to the root of the groups. Add support for groups reordering Fix an old bug where a role could be ordered before the group tree.
+Save the roles ordering
+Pass sticky info
+Update default_avatar image Use no_templates & templates_only attributes to identify the scope
+Replace ROOT_ROLE by AJXP_GRP_/
+Massive refactoring introducing a MetaWrapper to avoid encapsulate all nodes url in the pydio:// form. Wrappers specifics (getRealFSReference, getLastRealSize, isRemote, etc...) have been encapsulated as well and should not be called directly anymore. The MetaWrapper can register many subwrappers, once they are all used it will then translate the url to ajxp.XX SchemeTranslatorWrapper is an extendable wrapper simply translating URL to the next available wrapper from the MetaWrapper. Maybe could be simplified.
+New unit tests
+Fix #952 better logging Fix issue creating a group with same id is not checked Fix #937 Check that file is readable otherwise we cannot compute md5 on it.
+Fix issue with .zip.zip extension #953
+Fix slug issue - Close #938
+Better way to detect mount status
+Fix 5.4 syntax Remove creation of .ajxp_mount as it's not need since previous commit.
+Keep up-to-date with develop
+Grab last changes from MetaStreamWrapper branch
+Fix Meta.user error after refactoring
+Add Test Unit on Permission Mask
+Change permission value
+Delete function mergetree2
+Fix available permission restriction
+Add more assertions
+permission
+Implements JsonSerializable() : warning this is PHP5.4 ONLY! Fix setDeny()
+Fix overrideMethod Init from array with "read", "write", .. object. Implements JsonSerializable, php5.4 ONLY.
+Store masks in roles.
+Manage masks
+Updated ajaxplorer_boot
+Do not load a repository that has a parentId pointing to a non-existing repo. Log an error instead. Do not store reference to this->parentTemplateObject, it can end up storing a null reference in the $_SESSION array.
+Fix recursive listing broken by defaultOrderField mechanism.
+Fix SchemeTranslatorWrapper. Store url instead of path when reading dir.
+Fix PermissionMask & checks
+Invoke is_readable() at some places to dynamically compute permissions
+New method appendMetaWrapper
+rmdir was broken due to wrapper
+fix preview with unoconv of files with russian names
+remove some tests
+Fix max overriding order issue Send repo security scope to UI.
+Fix typo in write2 function that was preventing correct Log In logging for WebUI.
+Allow editing permission mask for non-editable workspace Tweak how we display Root Group role When editing a group, compute a "Parent Role" based on the parent groups
+Use classnames module
+Revert ajxp_home to non-react implementation Declare build and load React bundle separately, to avoid any compatibility issues with older browsers.
+Root group role: do not show "ROLE_..." parameters, even if they have scope "Role".
+Wrong call to React library
+Fix AjxpTabulator layout when using Flexbox Add Roboto fontface.
+Fix vision & umbra theme to make them barely usable. Remove oxygen.
+Call isWriteable() on the root node as well, to send correct ajxp_readonly value.
+Missing reloadOnServerMessage on shares list
+Fix flex issues for minisites
+fix smb streamwrapper name conflict
+Never call the delete method of a Map directly, for backward IE compatibility.
+i18n update
+Fix splitter sizing, node insertion on descending sorting mode, remove unused variables Last booter compiler
+Fix startup.phtml : prototypejs moved. Booter: make set DB conf by default.
+Send also info about the workspaces shared with current user. Fix shares list issue - Ability for admin to list shares of a given user.
+Fix typo in JSON breaking the right info panel initial size.
+Implement Serializable on permission mask.
+Home Dashboard: listen to repository_list_refreshed event and reload the list.
+Remove the method call from the foreach() loop.
+Fix selectAll() action in GUI - was breaking the recycle bin empty action.
+Fix new Image() usage with prototype methods.
+Fix RepositorySelect
+Pass optional nodePathes on instant message to be later on filtered in channel.
+Add many is_readable() checks wherever we send data. Add the logged user id as target for reload_bookmarks and reload_shared_elements messages, otherwise they trigger reload on other users MsObserver: ignore refresh if no repoId change. NotificationLoader: fix comma typo
+Filter Changes, Feed and fork mask on shared folders.
+!!TODO: Update PG & SQLITE tables and drivers. Add last_updated flag on ROLES, allowing the detection to reload a user repositories list inside a running session. Use AuthService::$bufferedMessage to attach an instant message to be sent once the mq plugin is initialized.
+Commit bootstrap_context with KVCACHE_IGNORE by default.
+Ignore kv cache
+Auto-switch graph frequency to avoid super-heavy graphs.
+Create wizard breadcrumb.
+Add a "wizard mode" in FormManager for installer dialog. Rewrok the whole boot.conf installer with that.
+Add optional "depends" attribute on js ressource.
+Update prototypeJS to 1.7.3 - We should remove the legacy version.
+Boot.conf generates a simple server uuid that can be used for various identifier (kvcache should use it)
+Load JSON polyfill for IE7
+New compression plugin to support TAR, TAR.GZ and TAR.BZ2 archive format
+Fix "Pixlr" plugin because they switch to "https"
+Revert the second call to initActivePlugins() in rest.php, as it can break some additional plugins loading after loading driver.
+Fix share action in rest mode : share worked but metadata was not correctly updated.
+Refactorize method(s) loadDriverRepository()
+Send back the updated role to make sure the update() was working.
+Update i18n messages in action.updater
+writeRepositoriesData: remove unnecessary code Definitely skip the admin rights check, just give the access to ajxp_conf
+Update restParameters and use UserSelection instead of 'file' variable in ShareCenter.
+Remove skip_admin_rights parameter
+Update grid-layout Update compression to new naming (pydio.Controller instead of pydio.actionBar)
+Update manifest.xml
+Fix soundManager load : do not check for registry.
+Imap wrapper: fix stat to make sure it responds correctly to the is_readable test.
+EmlViewer: remove unnecessary autoload
+Fix parseUrl() to detect pydio:// instead of ajxp.xx://
+Do no use flexbox on dialog content
+Point to new MetaStreamWrapper Fix mobile flex issues
+Massive clean: remove IE7 specific resources plus unused classes or archived classes.
+Change check frequencies to 5s, replace "[]" to "array()" to avoid any problems later
+Fix is_readable() call to root.
+Fix long workspace names
+Fix double share button.
+Fix super long workspace names: limit to 3 letters for badge, fix CSS to adjust display.
+Update gitignore
+Adding Grunt task to compile core UI in gui.ajax
+Replace the ["extension"] to "PATHINFO_EXTENSION" and change the progress number to whole number
+Remove compiled resources. Update move dependencies at top level of gui.ajax.
+Ignore specific resources
+Updating Gruntfile.js
+Add a check if he user try to compress an empty folder to avoid some problems...
+Updating Gruntfile.js
+Update package.json
+Updating Gruntfile.js
+Move grunt to devDependencies
+Remove compiled files
+Ignore core
+AJXP_KEY_VALUE_CACHE
+Mega-merge from deprototype branch
+Double declaration
+Fix lucene indexation when copying files accross workspaces.
+Fix tag block removal
+Add meta watcher by default in access fs
+Fix various details on Share Center: display "view parameters" instead of "change parameters" if panel is in readonly mode. Disable some actions if in ajxp_* workspace.
+Disable kvcaching by default.
+Fix some flexbox issues in IE
+Fix IE horizontal scroller in FetchedResultPane
+Fix wrong shares list for workspace with id 0 : do not use empty().
+Update Italian translation for plugin 'access.ajxp_conf'
+Update Italian translation for plugin 'access.ajxp_home'
+Update Italian translation for plugin 'access.ajxp_shared'
+Update Italian translation for plugin 'access.ajxp_user'
+Italian translation for plugin 'action.antivirus'
+Update Italian translation for plugin 'action.cart'
+Italian translation for plugin 'action.compression'
+Fix smbclient error if filename contents '#'
+Translate "Root Group"
+Fix tests syntax: use __construct(), remove strange semi-colomn after class creation.
+Use __construct instead of AbstractTest constructor
+Use __construct instead of AbstractTest constructor
+Light revamping of diagnostic tool.
+Add dirname and filename in log table to be able to filter on these. Pass a "files" array to the log method when possible.
+Fork materialUI and create our own branch as we are using Less framework. Update grunt file to build materialUI before bundling.
+Publish permission mask as json.
+Inform that a workspace does have a permission mask.
+Code Inspection
+Update README.md
+Error when removing user from share if the workspace does not have meta.watch.
+Narrow-down textarea selector for submitting comment, otherwise it takes the wrong one (typically if file/folder is shared).
+Fix some notifications issues with shared users.
+Fix login dialog positioning.
+Pass isHidden to createUser function and send to the hook as well.
+Add a small opacity animation on info panel async blocs to avoid heavy blinking.
+PhpDocs
+Revert specificy parameter type as it creates false negative documentation bug.
+Replace run build by babel to avoid dependency to jsx
+Add JS compilation step to the build
+Test an upgrade with new dev version 6.1.0
+6.1.0 Release Note
+Typo in column name Force updating gui.ajax if any modification detected
+rootGroup can be empty
+Update sql scripts for pg and sqlite, and build script to make sure to include them correctly.
+Fix with pgsql file
+pg and sqlite sql updates
+Fix postgre issues with new fields / indexes.
+Fix mergeNodes: use cloneNode() to avoid reference mess up.
+Fix BackgroundTaskManager initialisation, and make sure to read the node_diff message.
+Tar/gz/bz2 Support : refactor compress action into compress (server) and compress_ui (client): override the latest with the new plugin action.
+Fix 404 error on "plugins" image.
+Fix message id in span
+Some exception can break the search results listing. Catch it.
+RepositoryFilter is wrong in alert feed if repo is 0
+Fix opener positioning
+Try to skip HTACCESS step : if AJXP_PACKAGING is not zip ( = linux packages ), or if content of the htaccess is already correct.
+Settings and welcome were switched. Put them in the right order to fit with dist .htaccess
+Forgotten console.log
+Chasing Strict Standard issues
+Limit Extract action to tar, gz and bz2 files
+Refactor the awful JS code for triggering download in a PydioApi.downloadSelection() method.
+Add the filename*= header for IE, based on mwehr suggestion. To be tested extensively.
+Fix js errors in comments and info panel detection. Add bootstrap.json to the list of files hidden by default.
+Fix php parsing error in hu.php. Probably fix #930
+forgotten var_dump
+Unused variable
+Remove var_dump instruction
+Revert the filename*= commit. Definitely not working on IE.
+Fix #931
+Fix de language file - Close #933
+Fix EXIF extractor output for XML, and add a format parameter to ask for JSON instead.
+Go through unnecessary todos.
+Add more check on user before modifying a share.
+Refactor minsite_session and download management.
+Fix "discrete" parameter passing. Fix small Open Layer map not showing when panel is hidden.
+Fix setting/unsetting watch on shared folder. Fix notification grouping in alert feed.
+Disable logo click is use is not authorized to switch to the associated workspace ( mostly ajxp_home ).
+Refix IE Overflow
+Fix metadata breaking json when no searchable is set. Fix #973
+Skip updating embed_code if link is expired (error). Rewrite getFlashVersion() function (removed from Controller) in ajxp_utils.
+Avoid error trying to load binary without any user logged - See #946
+Make sure to filter search results with access driver hidden configurations.
+Missing translation for desktop notification button.
+Add a new parameter for low-resolution background image, and trigger it if viewport width is smaller than 600px ( => mobile )
+Fix FoldersTree config for smb driver
+Fix wrong date in search results
+Fix branding styling on legacy links.
+Make sure to pass a variable as reference
+Add english message to the 17th message of the plugin
+Add french message to the 17th message of the plugin
+Add english message to the 17th message of the plugin
+French typo
+Change : Now we catch error by sending them to the progress file
+Plugin doc of action.compression
+Save share after updating watch status for folder sharing
+Append optional bootstrap instructions by scanning once (and caching result) the plugins folders looking for bootstrap.php files.
+Catching some error in the extract part
+Same as previous but for defining / overriding default repositories
+Silently try to write the two new cache files, to avoid errors if data folder is not yet writeable (first screen).
+Overriding CSS properties in ajxp-mobile.css to improve the navigation
+Adding >script< at line 819 to fix JS not interpreted
+Set a manager on git actions
+Update of widget_sample, contributed by Ecappa
+Whitespace breaks git log : do not use --follow option in that case (will not follow renaming).
+Check $ctxId is not 0 (considered empty)
+Clean Code Deprecated Constructors
+Make sure to not throw errors if data/ is not writeable, or it breaks the starting script.
+Wrong test for write permission
+Do not display RootGroup for groupAdmins
+Modularize installer functions.
+Update : the message to display the progress of the exraction is compression.13 not compression.12
+Turkish translate of the name and the description of the plugin
+Turkish translate of the different messages of the plugin
+Refactor Installer
+Fix special characters in file name #
+Remove oxygen in selector.
+Detect El Capitan
+Fix imagick generate office files
+Fix call to filterNodeName(): pass an "" parameter will trigger the is_file() test.
+Fix Favicon for WebDAV, was still using the old one.
+Although not active by default and properly documented, we remove the sudo option, it's giving too much power to the server. See discussion in #972
+missing "," character in couple of en.php files - this one is related to my previously submitted PR https://github.com/pydio/pydio-core/pull/851
+uploader.html Czech translation updated continuing as per the previous PRs opened under https://github.com/pydio/pydio-core/pull/843
+uploader.html cs-dropzone png picture created manually in Gimp as similar as possible to the other one's available
+Recapitalize result keys for PostgreSQL
+Display a small how-to when upgrade is not possible in-app (because of linux packages).
+In SERVER_DEBUG mode, try to detect if a DB version is necessary, and log it both in the Pydio logs and generic error_log.
+Reorganize some gui.ajax parameters
+editor.pdfjs Czech translation
+core.uploader Czech translation
+Remove react-tap-event, loaded by material-ui
+Add support for authenticated upgrade site.
+Set package name in an external variable.
+Action.compression: fix name stripping on file / folder
+meta.simple_lock Czech translation created
+meta.git Czech translation created
+gui.user Czech translation
+Fix encoding issue, especially on Windows: - Parameters passed via url in rest api gets mangled because of urldecode(), make sure to re-apply toUTF8() - Once decoded, we must make sure to apply the correct encoding before inserting / searching the DB.
+Add composer.json to install OpenStack SDK at last good commit before the project was declared EOL.
+Add some checks - Do not display plugins that are disabled.
+action.powerfs Czech translation
+action.avatar Czech translation
+access.demo Czech translation
+Make sure to use a default value on mandatory group_switch field.
+Rename test scripts from 6.1.0 to 6.2.0 Update 6.2.0.php to re-enable plugins by default to avoid issues.
 
 -------------------
 
@@ -1334,41 +1470,41 @@ Security Update
 Pydio 6.0.7 is a Security Update linked to vulnerabilities discovered by Lane Thames. It also fixes various small bugs.
 Upgrade is straightforward and recommended, either in-app (archive deployments) or via Linux repositories (apt-get / yum).
 Contributors: Cdujeu, Lane Thames, C12simple.
-SMB Auth: include domain name to user name (details)
-Get list of repository automatically (details)
-Massive refactoring of ElasticSearch plugin. Keyword search and indexed fields is working. (details)
-AuthService test userExist and create new (details)
-Add new parameter in ShareCenter to force password on public links. (details)
-InfoPanel: catch modifier evaluation error - CSS: hack transparent backgrounds for IE8 using \9 symbol. (details)
-Correct smb path string (details)
-ShareCenter : fix link pointing to a non-existing repository (details)
-ShareCenter.js: forgotten console calls (details)
-ShareCenter: Catch exceptions when forwarding changes, otherwise it stops the loop. (details)
-AjxpUtils::convertBytes : handle comma - Ajxp_VarsFilter::filter : pass an object or an id as resolve user (details)
-Major update of ElasticSearch implementation / Refactor some method to common parent with Lucene. (details)
-Check userExist to create new user for new sharing (details)
-Add a new dependency type phpExtension to avoid loading plugin that have a strong dependency to one or more php extensions. (details)
-Remove (beta) from sync clients buttons (details)
-ShareCenter: Fix "Preview" checkbox being automagically rechecked. Check template is not ajxp_unique_dl. (details)
-Start refactoring major JS resources. Split into subfolders. (details)
-Display admin Search Results with USER_DISPLAY_NAME (details)
-Webdav error on smb workspace (details)
-Shared user watch is not correctly removed when user is removed from "Share with..." list. (details)
-Improve sanitization in Mysql driver and locally in XHRUploader. (details)
-Limit API connection "Login" logs to one per hour, otherwise it fills the log table, and makes the analytics quite slow. (details)
-Better commands sanitization to limit admin rights. (details)
-Fix text logger: was broken due to the clone call on object: refresh the fileHandle resource on clone. (details)
-Fix group listing for shared users when inside a group (cherry picked from commit a9fdc8c) (details)
-Ability to use multiple secure_token in one session, to avoid force reload on new tab. Notify existing windows with <require_registry_reload>. (details)
-IE8 Fixes - Fix #899 : remove tooltip when refreshing templates. (details)
-Make Etherpad more simple: support only .pad extensions, disable hideExtension() hook. (details)
-Refix c0205642045e943c086eb054f3947d5311d9997e : case is different if group listing is allowed on all groups or sub groups only. (details)
-Pass AJXP_VALUE_CLEAR as metadata value to force clearing key after array_merge() (details)
-Fix un-removed notification by checking ACL when listing the watches and updating metadata accordingly. (details)
-Fix Zip options tweaking, by properly separating zipBrowsingEnabled vs. zipCreationEnabled. (details)
-Use Dibi syntax for cross-db limit (details)
-Fix Jumploader not correctly sending node.change event (thus missing indexation) (details)
-Fix PLUploader : new way to get secure_token (details)
+SMB Auth: include domain name to user name
+Get list of repository automatically
+Massive refactoring of ElasticSearch plugin. Keyword search and indexed fields is working.
+AuthService test userExist and create new
+Add new parameter in ShareCenter to force password on public links.
+InfoPanel: catch modifier evaluation error - CSS: hack transparent backgrounds for IE8 using \9 symbol.
+Correct smb path string
+ShareCenter : fix link pointing to a non-existing repository
+ShareCenter.js: forgotten console calls
+ShareCenter: Catch exceptions when forwarding changes, otherwise it stops the loop.
+AjxpUtils::convertBytes : handle comma - Ajxp_VarsFilter::filter : pass an object or an id as resolve user
+Major update of ElasticSearch implementation / Refactor some method to common parent with Lucene.
+Check userExist to create new user for new sharing
+Add a new dependency type phpExtension to avoid loading plugin that have a strong dependency to one or more php extensions.
+Remove (beta) from sync clients buttons
+ShareCenter: Fix "Preview" checkbox being automagically rechecked. Check template is not ajxp_unique_dl.
+Start refactoring major JS resources. Split into subfolders.
+Display admin Search Results with USER_DISPLAY_NAME
+Webdav error on smb workspace
+Shared user watch is not correctly removed when user is removed from "Share with..." list.
+Improve sanitization in Mysql driver and locally in XHRUploader.
+Limit API connection "Login" logs to one per hour, otherwise it fills the log table, and makes the analytics quite slow.
+Better commands sanitization to limit admin rights.
+Fix text logger: was broken due to the clone call on object: refresh the fileHandle resource on clone.
+Fix group listing for shared users when inside a group (cherry picked from commit a9fdc8c)
+Ability to use multiple secure_token in one session, to avoid force reload on new tab. Notify existing windows with <require_registry_reload>.
+IE8 Fixes - Fix #899 : remove tooltip when refreshing templates.
+Make Etherpad more simple: support only .pad extensions, disable hideExtension() hook.
+Refix c0205642045e943c086eb054f3947d5311d9997e : case is different if group listing is allowed on all groups or sub groups only.
+Pass AJXP_VALUE_CLEAR as metadata value to force clearing key after array_merge()
+Fix un-removed notification by checking ACL when listing the watches and updating metadata accordingly.
+Fix Zip options tweaking, by properly separating zipBrowsingEnabled vs. zipCreationEnabled.
+Use Dibi syntax for cross-db limit
+Fix Jumploader not correctly sending node.change event (thus missing indexation)
+Fix PLUploader : new way to get secure_token
 
 
 ------------------
@@ -1387,105 +1523,105 @@ Add a button in settings to clear cache
 Revert the automatic switch to mysqli, which seems to create problems on some systems.
 
 ## Plugins Fixes
-[meta.mount] Remove type strict comparison for mount_env_passwd option. (details)
-[action.powerfs]PowerFS don't works if Command Line "enable" and accent (Windows OS) (details)
-[auth.cas] Fix cas in client mode (click two times for login) (details)
-[scheduler] Form validation for Schedule Task at client side (details)
-[scheduler] Clean scheduler actions - Fix #838 Fix french translation (run current task, not tasks) (details)
-[action.share] Update the plugin JavaScript code for iframe and shared file preview. (details)
-[access.s3] Fix setMetadata() on metastore.s3 plugin, broken for non-ascii chars, the CopySource parameter must be urlencoded. (details)
-[metastore.s3] Use rawurlencode instead of urlencode (details)
-[editor.imagick] Add Illustrator File to Image Magick (details)
-[editor.ckeditor] Adding a delay in CKEditor data loading seems to avoid random blank screen. (details)
-[auth.cyphered_post] Add a switch to active repository (details)
-[authfront.otp] Fix login form display in authfront.otp. (details)
-[editor.etherpad-lite] Big update of the Etherpad-lite integration. Seems like we cannot detect pads with no author, we would have to set up a task to clean orphan pads. Should Fix #865 Fix #867 (details)
-[meta.mount] Set the "use 32 result code as success" via option (default true for non-regression). Close #824 (details)
-[index.lucene] Better error logging when lucene fails to open or create an index. (details)
-[index.lucene] Lucene: detect if the tmp index is currently being modified (last 3 minutes) to avoid multiple indexation tasks loaded concurrently. (details)
-[index.lucene] Fix meta fields indexation issues (on node.change event). (details)
-[action.powerfs] Use DIRECTORY_SEPARATOR in powerfs plugin for operation_id file. (details)
-[mq.sql] Notifications queuing: fix SQL implementation that fails selecting the max value as the column is varchar (use sql CAST expression). Remove unnecessary create.sql scripts. (details)
-[core.index] Do not call is_dir on trigger node.index on the root node. It can create problems with non-fs workspaces like SMB for indexation. (details)
-[access.fs] Internalize setHiddenAttribute in fsAccessDriver instead of AJXP_Utils (details)
-[mq.sql] Feedstore: forward "reload_user_feed" event to parent repository if any. Fix i18n issues for "watch/stop watching" button Ignore notif to delete if already deleted. (details)
-[sync] Detect when update queries are applied on non-indexed items using getAffectedRows() (details)
-[sync] Automatically disable the keystore generate_auth_token action if Session Set Credentials is set in config. This will force systematic basic_auth. (details)
+[meta.mount] Remove type strict comparison for mount_env_passwd option.
+[action.powerfs]PowerFS don't works if Command Line "enable" and accent (Windows OS)
+[auth.cas] Fix cas in client mode (click two times for login)
+[scheduler] Form validation for Schedule Task at client side
+[scheduler] Clean scheduler actions - Fix #838 Fix french translation (run current task, not tasks)
+[action.share] Update the plugin JavaScript code for iframe and shared file preview.
+[access.s3] Fix setMetadata() on metastore.s3 plugin, broken for non-ascii chars, the CopySource parameter must be urlencoded.
+[metastore.s3] Use rawurlencode instead of urlencode
+[editor.imagick] Add Illustrator File to Image Magick
+[editor.ckeditor] Adding a delay in CKEditor data loading seems to avoid random blank screen.
+[auth.cyphered_post] Add a switch to active repository
+[authfront.otp] Fix login form display in authfront.otp.
+[editor.etherpad-lite] Big update of the Etherpad-lite integration. Seems like we cannot detect pads with no author, we would have to set up a task to clean orphan pads. Should Fix #865 Fix #867
+[meta.mount] Set the "use 32 result code as success" via option (default true for non-regression). Close #824
+[index.lucene] Better error logging when lucene fails to open or create an index.
+[index.lucene] Lucene: detect if the tmp index is currently being modified (last 3 minutes) to avoid multiple indexation tasks loaded concurrently.
+[index.lucene] Fix meta fields indexation issues (on node.change event).
+[action.powerfs] Use DIRECTORY_SEPARATOR in powerfs plugin for operation_id file.
+[mq.sql] Notifications queuing: fix SQL implementation that fails selecting the max value as the column is varchar (use sql CAST expression). Remove unnecessary create.sql scripts.
+[core.index] Do not call is_dir on trigger node.index on the root node. It can create problems with non-fs workspaces like SMB for indexation.
+[access.fs] Internalize setHiddenAttribute in fsAccessDriver instead of AJXP_Utils
+[mq.sql] Feedstore: forward "reload_user_feed" event to parent repository if any. Fix i18n issues for "watch/stop watching" button Ignore notif to delete if already deleted.
+[sync] Detect when update queries are applied on non-indexed items using getAffectedRows()
+[sync] Automatically disable the keystore generate_auth_token action if Session Set Credentials is set in config. This will force systematic basic_auth.
 
 ## Core & Performances
-Core performances: . AJXP_Controller: Minimize xPath calls by implementating a hookCache . AJXP_Plugin: reduce serialization - AJXP_PluginService: Try to use cache for softLoad operation (still return a cloned version of the cached plugin) . AJXP_Utils: cache the result of cleanDibiDriverParameters() function as it is called many times. (details)
-Fix OS detection - Add iPad & iPhone (details)
-RunTests: Fix apiPost function() (details)
-If a client is posting bad parameters, it can end up copying a file into itself. (details)
-Revert the automatic switch to MySQLi, add a parameter instead. (details)
-Perfs: avoid reapplying role if already in the user's roles. (details)
-Hard reload node data with clearstatcache() call on node update Add a seed with file modiftime to make sure thumbnail is reloaded on change (details)
-Fix comparison issue for AJXP_METADATA_ALLUSERS value. Could lead to share metadata. (details)
-Typo in mailer, fix #864 (details)
-Fix various issues with Forget Password action - Fix #863 (details)
-Prevent some plugins to be disabled - Close #873 (details)
-Add utils in node for moving meta on node change (details)
-Add a hook on node.change to move bookmarks metadata, should fix #870 We should refactor all the bookmarks management into a proper plugin. At the moment, moving to recycle is not considered deleted. (details)
-Use protocol in runTests script - Fix #871 (details)
-Set nodes as nonLeaf when we know it - Fix #859 (details)
-Add the function filterNodeName() to the AjxpWrapperProvider, and use it in the webdav collection to correctly load the hidden files/folders configurations. Alternative to fix #862 and fix #861 (details)
-Fix edge-case where user cannot change its starting workspace (details)
-Now that we need rewrite rules anyway, set the corresponding option to true by default in action.share (details)
-Switch TRANSMIT_CLEAR_PASS to hidden parameter (don't remove it totally for backward compatibility) - Close #875 (details)
-Add a getOptionAsBool() function abstractAuthDriver and use everywhere we use TRANSMIT_CLEAR_PASS. Handle all possible values (true, "true", 1, etc...). (details)
-Plugin : load global_param and param configs definitions (details)
-Do not override __AJXP_VALUE_SET__ value. Typo in AJXP_SAFE_SECRET_KEY. (details)
-Move decypher function in AJXP_Utils instead of AbstractAjxpUser. Do not override __AJXP_VALUE_SET__ when parsing standard form. New parameter $complexChars in generateRandomString function. (details)
-Unused decodeUserPassword method (use AJXP_Utils instead). (details)
-Use AJXP_Utils function for decyphering password (details)
-Make sure not to use the repositories cache if not yet initialized. (details)
-Meta.quota: make sure to respect hierarchy by trying to get quota of parent repository owner if it exists (can be a template child without owner), then from the currently logged user, then from the repository config. Fix #884 (details)
-Hunting while(!feof(..)) calls missing a test on the resource: can trigger an infinite read and a CPU hog. (details)
-Default "Cache Master Users" parameter to False instead of True (details)
-Remove meta_fields, meta_types, meta_labels from node metadata, use exposed plugins configs instead. Fix CSS labels on detailed view. (details)
+Core performances: . AJXP_Controller: Minimize xPath calls by implementating a hookCache . AJXP_Plugin: reduce serialization - AJXP_PluginService: Try to use cache for softLoad operation (still return a cloned version of the cached plugin) . AJXP_Utils: cache the result of cleanDibiDriverParameters() function as it is called many times.
+Fix OS detection - Add iPad & iPhone
+RunTests: Fix apiPost function()
+If a client is posting bad parameters, it can end up copying a file into itself.
+Revert the automatic switch to MySQLi, add a parameter instead.
+Perfs: avoid reapplying role if already in the user's roles.
+Hard reload node data with clearstatcache() call on node update Add a seed with file modiftime to make sure thumbnail is reloaded on change
+Fix comparison issue for AJXP_METADATA_ALLUSERS value. Could lead to share metadata.
+Typo in mailer, fix #864
+Fix various issues with Forget Password action - Fix #863
+Prevent some plugins to be disabled - Close #873
+Add utils in node for moving meta on node change
+Add a hook on node.change to move bookmarks metadata, should fix #870 We should refactor all the bookmarks management into a proper plugin. At the moment, moving to recycle is not considered deleted.
+Use protocol in runTests script - Fix #871
+Set nodes as nonLeaf when we know it - Fix #859
+Add the function filterNodeName() to the AjxpWrapperProvider, and use it in the webdav collection to correctly load the hidden files/folders configurations. Alternative to fix #862 and fix #861
+Fix edge-case where user cannot change its starting workspace
+Now that we need rewrite rules anyway, set the corresponding option to true by default in action.share
+Switch TRANSMIT_CLEAR_PASS to hidden parameter (don't remove it totally for backward compatibility) - Close #875
+Add a getOptionAsBool() function abstractAuthDriver and use everywhere we use TRANSMIT_CLEAR_PASS. Handle all possible values (true, "true", 1, etc...).
+Plugin : load global_param and param configs definitions
+Do not override __AJXP_VALUE_SET__ value. Typo in AJXP_SAFE_SECRET_KEY.
+Move decypher function in AJXP_Utils instead of AbstractAjxpUser. Do not override __AJXP_VALUE_SET__ when parsing standard form. New parameter $complexChars in generateRandomString function.
+Unused decodeUserPassword method (use AJXP_Utils instead).
+Use AJXP_Utils function for decyphering password
+Make sure not to use the repositories cache if not yet initialized.
+Meta.quota: make sure to respect hierarchy by trying to get quota of parent repository owner if it exists (can be a template child without owner), then from the currently logged user, then from the repository config. Fix #884
+Hunting while(!feof(..)) calls missing a test on the resource: can trigger an infinite read and a CPU hog.
+Default "Cache Master Users" parameter to False instead of True
+Remove meta_fields, meta_types, meta_labels from node metadata, use exposed plugins configs instead. Fix CSS labels on detailed view.
 
 ## Authentications & Security
-Strip query string part of the url, otherwise using query like ?xdebug=true appends the query part to the base value. (details)
-Login: empty the fields values only after response is received. (details)
-Pass session credentials to command line via ENV variable. Generate a unique secret key at install for tokenisation of CLI calls instead of using default one. (details)
-Prefix cyphered passwords inside role parameters with a specific string. listParameters() removes prefix by default, can either keep it ($preserveCypheredPasswords) or blur passwords ($blurCypheredPasswords) by replacing with __AJXP_VALUE_SET__ value. (details)
-Massive changes for better handling parameters values in ajxp_conf driver. (details)
-Fix various buttons issues with reset password (fix #885) and handle case insensitive logins. (details)
-Add more logs for various "preview" operations (Imagick, Diaporama, etc) (details)
-Fix pruneTemporaryKeys for PostgreSql (details)
-FINAL_KEY is not used anymore, remove it. (details)
-AJXP_Utils: Make sure to remove = from base64encoded string when generating random string. (details)
+Strip query string part of the url, otherwise using query like ?xdebug=true appends the query part to the base value.
+Login: empty the fields values only after response is received.
+Pass session credentials to command line via ENV variable. Generate a unique secret key at install for tokenisation of CLI calls instead of using default one.
+Prefix cyphered passwords inside role parameters with a specific string. listParameters() removes prefix by default, can either keep it ($preserveCypheredPasswords) or blur passwords ($blurCypheredPasswords) by replacing with __AJXP_VALUE_SET__ value.
+Massive changes for better handling parameters values in ajxp_conf driver.
+Fix various buttons issues with reset password (fix #885) and handle case insensitive logins.
+Add more logs for various "preview" operations (Imagick, Diaporama, etc)
+Fix pruneTemporaryKeys for PostgreSql
+FINAL_KEY is not used anymore, remove it.
+AJXP_Utils: Make sure to remove = from base64encoded string when generating random string.
 
 ## GUI
 In standard List mode, show additional metadata (like in v5) by hovering rows with mouse. Permanent display can be customized by CSS.
-Change place of "Set as default workspace" checkbox as it was no more accessible. (details)
-Missing fitParent creates resizing issue in IE for My Account pane. (details)
-Rework of the SearchEngine ergonomy: better list reloading, direct access to advanced mode, better handling of advanced external metadatas. New filters feature in FilesList to dynamic filter contents. In table mode, adds headers with input texts. In standard List mode, show additional metadata (like in v5) by hovering rows with mouse. (details)
-Activate the new filter action in datagrid for logs (details)
-Add a "filter" button using the new FilesList feature in ajxp_datagrid : applicable to logs directly. (details)
-Fix Search input opening when media queries are applied (details)
-Reset MetaSource selector after adding (to focus on the new instance). (details)
-Fix scroller issue (details)
-Fix message box blinking and style. (details)
-User.js Detect and log circular references Fix circular references in AjxpTabulator (init Tab with object clone). (details)
-Fix small glitch in PreviewFactory (details)
+Change place of "Set as default workspace" checkbox as it was no more accessible.
+Missing fitParent creates resizing issue in IE for My Account pane.
+Rework of the SearchEngine ergonomy: better list reloading, direct access to advanced mode, better handling of advanced external metadatas. New filters feature in FilesList to dynamic filter contents. In table mode, adds headers with input texts. In standard List mode, show additional metadata (like in v5) by hovering rows with mouse.
+Activate the new filter action in datagrid for logs
+Add a "filter" button using the new FilesList feature in ajxp_datagrid : applicable to logs directly.
+Fix Search input opening when media queries are applied
+Reset MetaSource selector after adding (to focus on the new instance).
+Fix scroller issue
+Fix message box blinking and style.
+User.js Detect and log circular references Fix circular references in AjxpTabulator (init Tab with object clone).
+Fix small glitch in PreviewFactory
 
 ## Internationalisation (i18n)
-Update de.php (details)
-missing "," character in various en.php files (details)
-Fix workspace display when using russian language on IIS. (details)
-Italian translations (details)
-Updated german translations, fixed translation keys and made more plugins translatable (details)
+Update de.php
+missing "," character in various en.php files
+Fix workspace display when using russian language on IIS.
+Italian translations
+Updated german translations, fixed translation keys and made more plugins translatable
 
 Pydio 6.0.5 - Bugfix Release, again
 
 This is fixing some annoying issues introduced by 6.0.4. Upgrade is recommended and simple. Changes described below.
 
-Revert "close search engine on context change" as it breaks results pane in admin (details)
-Move Multi & WebFTP login screen into dedicated authfront plugin, as previous fixes in AJXP_PluginsService changes the plugins loading order. (details)
-Prevent FTP login screen modal closing (details)
-Fix #847: share link with non-ascii filename on windows IIS (details)
-Fix scrolling issue: use a fixed scrolling step instead of a fraction, could make it hardly usable for long listings (details)
+Revert "close search engine on context change" as it breaks results pane in admin
+Move Multi & WebFTP login screen into dedicated authfront plugin, as previous fixes in AJXP_PluginsService changes the plugins loading order.
+Prevent FTP login screen modal closing
+Fix #847: share link with non-ascii filename on windows IIS
+Fix scrolling issue: use a fixed scrolling step instead of a fraction, could make it hardly usable for long listings
 Upgrade instructions
 
 In-app upgrade: automatic.
