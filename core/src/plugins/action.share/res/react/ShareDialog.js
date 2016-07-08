@@ -85,7 +85,6 @@
         showMailer:function(subject, message, users = []){
             if(ReactModel.Share.forceMailerOldSchool()){
                 subject = encodeURIComponent(subject);
-                message = encodeURIComponent(message);
                 global.location.href = "mailto:custom-email@domain.com?Subject="+subject+"&Body="+message;
                 return;
             }
