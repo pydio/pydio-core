@@ -92,7 +92,7 @@ Class.create("PreviewFactory", {
                     var bgUrl = oImageToLoad.editorClass.prototype.getCoveringBackgroundSource(oImageToLoad.ajxpNode);
                     bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
                     oImageToLoad.mainObject.setStyle({
-                        backgroundImage:'url(' + oImageToLoad.editorClass.prototype.getCoveringBackgroundSource(oImageToLoad.ajxpNode) + ')',
+                        backgroundImage:'url(' + bgUrl + ')',
                         backgroundSize : 'cover'
                     });
                 }else{
