@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Auth\Driver;
+namespace Pydio\Auth\Backend;
 
 use dibi;
 use DibiException;
