@@ -124,7 +124,7 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
                 if (!empty($baseDir) || $baseDir != "/") {
                     $crtPath = parse_url($url, PHP_URL_PATH);
                     $crtBase = basename($crtPath);
-                    if (!empty($crtPath) && $crtPath != "/" && $crtBase != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
+                    if (!empty($crtPath) && $crtPath != "/" && fsAccessWrapper::unPatchPathForBaseDir($crtBase) != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
                         throw new Exception("Cannot find file " . $crtBase);
                     }
                     // Prepend baseDir in path
