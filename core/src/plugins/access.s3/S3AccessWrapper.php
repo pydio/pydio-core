@@ -46,13 +46,35 @@ class S3AccessWrapper extends FsAccessWrapper
     protected static $clients = [];
 
     /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        $context = $node->getContext();
+        $repository = $node->getRepository();
+
+        $options = [
+            "TYPE" => "s3"
+        ];
+        $optKeys = ["API_KEY", "SECRET_KEY", "SIGNATURE_VERSION", "STORAGE_URL", "REGION", "PROXY", "API_VERSION", "VHOST_NOT_SUPPORTED"];
+        foreach($optKeys as $key){
+            $options[$key] = $repository->getContextOption($context, $key);
+        }
+        if(empty($options["API_VERSION"])) {
+            $options["API_VERSION"] = "latest";
+        }
+        return $options;
+    }
+
+    /**
      * @param ContextInterface $ctx
      * @param boolean $registerStream
      * @return PydioS3Client
      */
     protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
-        require_once("aws.phar");
+        require_once(dirname(__FILE__)."/aws.phar");
 
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {

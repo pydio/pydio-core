@@ -116,6 +116,30 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
         }
     }
 
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     * @throws \Exception
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        $options = [
+            "TYPE" => "sftp"
+        ];
+        $repoObject = $node->getRepository();
+        $context = $node->getContext();
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($context);
+        $options["USER"] = $credentials["user"];
+        $options["PASSWORD"] = $credentials["password"];
+        $options["SERVER"]  = $repoObject->getContextOption($context, "SFTP_HOST");
+        $options["PORT"]  = intval($repoObject->getContextOption($context, "SFTP_PORT"));
+        $options["PATH"]  = intval($repoObject->getContextOption($context, "PATH"));
+
+        return $options;
+    }
+    
+    
     /**
      * @inheritdoc
      */

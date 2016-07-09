@@ -23,8 +23,10 @@ namespace Pydio\Uploader\Processor;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Http\Message\ExternalUploadedFile;
 
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
@@ -73,8 +75,18 @@ class SimpleUpload extends Plugin
 
         // Mandatory headers
         if (!isset($serverData['CONTENT_LENGTH'], $serverData['HTTP_X_FILE_NAME'])) {
-            throw new \Pydio\Core\Exception\PydioException("Warning, missing headers!");
+            throw new PydioException("Warning, missing headers!");
         }
+
+        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+        $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
+        // Clean up dir name (backward compat)
+        if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
+            $httpVars["dir"] = "/";
+        }
+        $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
+
+        $this->logDebug("SimpleUpload::preProcess", $httpVars);
 
         // Setting the stream data
         if (isset($serverData['HTTP_X_FILE_TMP_LOCATION'])) {
@@ -88,7 +100,25 @@ class SimpleUpload extends Plugin
             // Setting the stream to point to the file location
             $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
             $errorStatus = UPLOAD_ERR_OK;
+            // Update UploadedFile object built on input stream with file name and size
+            $uploadedFile = new \Zend\Diactoros\UploadedFile(
+                $serverData['HTTP_X_FILE_TMP_LOCATION'],
+                $fileSizeH,
+                UPLOAD_ERR_OK,
+                $clientFileName
+            );
+
+
+        } else if(isSet($serverData['HTTP_X_FILE_DIRECT_UPLOAD'])){
+
+            $externalUploadStatus = $serverData['HTTP_X_FILE_DIRECT_UPLOAD'];
+            if(!ExternalUploadedFile::isValidStatus($externalUploadStatus)){
+                throw new PydioException("Unrecognized direct upload status ". $externalUploadStatus);
+            }
+            $uploadedFile = new ExternalUploadedFile($externalUploadStatus, $fileSizeH, $fileNameH);
+
         } else {
+
             // The file is the post data stream
 
             // Checking headers
@@ -100,22 +130,17 @@ class SimpleUpload extends Plugin
 
             // Setting the stream to point to the post data
             $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
-            $errorStatus = $streamOrFile->getError();
+            // Update UploadedFile object built on input stream with file name and size
+            $uploadedFile = new \Zend\Diactoros\UploadedFile(
+                $streamOrFile,
+                $fileSizeH,
+                $streamOrFile->getError(),
+                $clientFileName
+            );
+
+
         }
 
-        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
-        $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
-
-        // Clean up dir name
-        if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
-            $httpVars["dir"] = "/";
-        }
-
-        $this->logDebug("SimpleUpload::preProcess", $httpVars);
-
-        // Update UploadedFile object built on input stream with file name and size
-        $uploadedFile = new \Zend\Diactoros\UploadedFile($streamOrFile, $fileSizeH, $errorStatus, TextEncoder::fromUTF8(basename($fileNameH)));
-        
         $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
     }
 
@@ -131,6 +156,10 @@ class SimpleUpload extends Plugin
         }
         $this->logDebug("SimpleUploadProc is active");
         $result = $request->getAttribute("upload_process_result");
+        if(empty($result)){
+            // Ignore
+            return;
+        }
 
         if (isSet($httpVars["simple_uploader"])) {
             $response = $response->withHeader("Content-type", "text/html; charset=UTF-8");

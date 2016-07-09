@@ -631,4 +631,14 @@ class MetaStreamWrapper implements IAjxpWrapper
 
         return $stat;
     }
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        $finalWrapper = self::actualRepositoryWrapperClass($node);
+        return call_user_func(array($finalWrapper, "getResolvedOptionsForNode"), $node);
+    }
 }

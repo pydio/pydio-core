@@ -99,7 +99,8 @@ class FsAccessWrapper implements IAjxpWrapper
         if($split && $streamType == "dir") $insideZip = true;
         if($skipZip) $insideZip = false;
 
-        $resolvedPath = realpath(TextEncoder::toStorageEncoding($repoObject->getContextOption($node->getContext(), "PATH")));
+        $resolvedOptions = self::getResolvedOptionsForNode($node);
+        $resolvedPath = realpath(TextEncoder::toStorageEncoding($resolvedOptions["PATH"]));
 
         //var_dump($path);
         //var_dump($skipZip);
@@ -195,6 +196,19 @@ class FsAccessWrapper implements IAjxpWrapper
         } else {
             return $resolvedPath.$url["path"];
         }
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        return [
+            "TYPE"      => "fs",
+            "PATH"      => $node->getRepository()->getContextOption($node->getContext(), "PATH"),
+            "CHARSET"   => TextEncoder::getEncoding()
+        ];
     }
 
     public static function patchPathForBaseDir($dirPath)

@@ -22,16 +22,19 @@
 namespace Pydio\Access\Core\Stream;
 use ArrayIterator;
 use GuzzleHttp\Stream\StreamInterface;
+use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Utils\ApplicationState;
 
+use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\PathUtils;
 use React\Promise\Deferred;
 
 
 /**
  * Standard stream wrapper to use files with Pydio streams, supporting "r", "w", "a", "x".
  */
-class StreamWrapper
+class StreamWrapper implements IAjxpWrapper
 {
     /** @var resource */
     public $context;
@@ -88,7 +91,7 @@ class StreamWrapper
         return $this->stream->eof();
     }
 
-    public function stream_seek($offset, $whence) {
+    public function stream_seek($offset, $whence=SEEK_SET) {
         return $this->stream->seek($offset, $whence);
     }
 
@@ -188,7 +191,7 @@ class StreamWrapper
         return $stat;
     }
 
-    public static function isSeekable() {
+    public static function isSeekable($url) {
         return true;
     }
 
@@ -208,7 +211,9 @@ class StreamWrapper
         fclose($tmpHandle);
 
         if (!$persistent) {
-            register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
+            register_shutdown_function(function() use($tmpFile){
+                FileHelper::silentUnlink($tmpFile);
+            }, $tmpFile);
         }
         return $tmpFile;
     }
@@ -248,5 +253,37 @@ class StreamWrapper
         PydioStreamWrapper::getResource($nodeStream);
 
         return $nodeStream;
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        // TODO: Implement getResolvedOptionsForNode() method.
+        // Create a generic HTTP Type inc. Authentication data
+        return ["TYPE" => "php"];
+    }
+
+    /**
+     * Enter description here...
+     *
+     * @return bool
+     */
+    public function stream_flush()
+    {
+        // TODO: Implement stream_flush() method.
+    }
+
+    /**
+     * Enter description here...
+     *
+     * @param string $path
+     * @return bool
+     */
+    public function unlink($path)
+    {
+        // TODO: Implement unlink() method.
     }
 }

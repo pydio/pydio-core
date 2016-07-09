@@ -77,6 +77,17 @@ class SwiftAccessWrapper extends FsAccessWrapper
         return $p;
     }
 
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        return [
+            "TYPE" => "php"
+        ];
+    }
     /**
      * Opens the stream
      * Diff with parent class : do not "securePath", as it removes double slash

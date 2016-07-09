@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Core;
 
+use Pydio\Access\Core\Model\AJXP_Node;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
@@ -37,6 +39,12 @@ interface IAjxpWrapper
      * @param bool $persistent
      */
     public static function getRealFSReference($path, $persistent = false);
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node);
 
     /**
      * Read a file (by chunks) and copy the data directly inside the given stream.

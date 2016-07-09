@@ -423,4 +423,13 @@ class InboxAccessWrapper implements IAjxpWrapper
         return $nodeData["stat"];
     }
 
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        // TODO: Should find node, and return associated repository real resolved options
+        return ["TYPE" => "php"];
+    }
 }

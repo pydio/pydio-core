@@ -26,6 +26,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
@@ -68,6 +69,9 @@ class FileReaderResponse extends AsyncResponseStream
 
     /** @var  callable */
     private $postRead;
+
+    /** @var  boolean */
+    private $unlinkAfterRead;
 
     /**
      * FileReaderResponse constructor.
@@ -140,6 +144,13 @@ class FileReaderResponse extends AsyncResponseStream
     }
 
     /**
+     * Set a flag to trigger an unlink after reading the file.
+     */
+    public function setUnlinkAfterRead(){
+        $this->unlinkAfterRead = true;
+    }
+
+    /**
      * Actually read the data to the output
      * @throws \Exception
      */
@@ -178,8 +189,13 @@ class FileReaderResponse extends AsyncResponseStream
         }
         $confGzip               = ConfService::getGlobalConf("GZIP_COMPRESSION");
         $confGzipLimit          = ConfService::getGlobalConf("GZIP_LIMIT");
-        $confUseXSendFile       = ConfService::getGlobalConf("USE_XSENDFILE");
-        $confUseXAccelRedirect  = ConfService::getGlobalConf("USE_XACCELREDIRECT");
+        $confUseAccelerator     = ConfService::getGlobalConf("USE_DOWNLOAD_ACCELERATOR");
+        if($this->unlinkAfterRead && $filePathOrData !== null && empty($confUseAccelerator)){
+            register_shutdown_function(function () use ($filePathOrData){
+                FileHelper::silentUnlink($filePathOrData);
+            });
+        }
+
         $fakeReq = ServerRequestFactory::fromGlobals();
         $serverParams = $fakeReq->getServerParams();
 
@@ -320,42 +336,9 @@ class FileReaderResponse extends AsyncResponseStream
 
         } else {
 
-            if(($node !== null && !$node->wrapperIsRemote()) || $filePath !== null){
-
-                if ($confUseXSendFile) {
-                    if($node != null) {
-                        $filePathOrData = $node->getRealFile();
-                    }
-                    $filePathOrData = str_replace("\\", "/", $filePathOrData);
-                    $server_name = $serverParams["SERVER_SOFTWARE"];
-                    $regex = '/^(lighttpd\/1.4).([0-9]{2}$|[0-9]{3}$|[0-9]{4}$)+/';
-                    if(preg_match($regex, $server_name))
-                        $header_sendfile = "X-LIGHTTPD-send-file";
-                    else
-                        $header_sendfile = "X-Sendfile";
-
-
-                    header($header_sendfile.": ".TextEncoder::toUTF8($filePathOrData));
-                    header("Content-type: application/octet-stream");
-                    header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
-                    return;
-                }
-                if ($confUseXAccelRedirect && array_key_exists("X-Accel-Mapping", $serverParams)) {
-                    if($node !== null) {
-                        $filePathOrData = $node->getRealFile();
-                    }
-                    $filePathOrData = str_replace("\\", "/", $filePathOrData);
-                    $filePathOrData = TextEncoder::toUTF8($filePathOrData);
-                    $mapping = explode('=',$serverParams['X-Accel-Mapping']);
-                    $replacecount = 0;
-                    $accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
-                    if ($replacecount == 1) {
-                        header("X-Accel-Redirect: $accelfile");
-                        header("Content-type: application/octet-stream");
-                        header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
-                    } else {
-                        $this->logDebug("X-Accel-Redirect: Problem with X-Accel-Mapping for file $filePathOrData");
-                    }
+            if ( !empty($confUseAccelerator)){
+                $requestSent = $this->sendToAccelerator($confUseAccelerator, ($node !== null ? $node : $filePath), $serverParams);
+                if($requestSent){
                     return;
                 }
             }
@@ -400,5 +383,89 @@ class FileReaderResponse extends AsyncResponseStream
         }
     }
 
+    /**
+     * @param string $accelConfiguration
+     * @param string|AJXP_Node $localPathOrNode
+     * @param array $serverParams
+     * @return bool Wether headers were sent and we should interrupt DL now or not.
+     */
+    protected function sendToAccelerator($accelConfiguration, $localPathOrNode, $serverParams){
+
+        $remoteNode = false;
+        if($localPathOrNode instanceof AJXP_Node) {
+            $filePathOrData = $localPathOrNode->getRealFile();
+            $remoteNode = $localPathOrNode->wrapperIsRemote();
+        }else{
+            $filePathOrData = $localPathOrNode;
+        }
+
+        // TRY XSendFile for local FS nodes or local file
+        if (!$remoteNode && $accelConfiguration === "xsendfile") {
+
+            $filePathOrData = str_replace("\\", "/", $filePathOrData);
+            $server_name = $serverParams["SERVER_SOFTWARE"];
+            $regex = '/^(lighttpd\/1.4).([0-9]{2}$|[0-9]{3}$|[0-9]{4}$)+/';
+            if(preg_match($regex, $server_name))
+                $header_sendfile = "X-LIGHTTPD-send-file";
+            else
+                $header_sendfile = "X-Sendfile";
+
+
+            header($header_sendfile.": ".TextEncoder::toUTF8($filePathOrData));
+            header("Content-type: application/octet-stream");
+            header('Content-Disposition: attachment; filename="' . basename($filePathOrData) . '"');
+            return true;
+
+        }
+
+        // TRY XAccelRedirect for local FS nodes or local file
+        if (!$remoteNode && $accelConfiguration === "xaccelredirect" && array_key_exists("HTTP_X_ACCEL_MAPPING", $serverParams)) {
+
+            $filePathOrData = str_replace("\\", "/", $filePathOrData);
+            $filePathOrData = TextEncoder::toUTF8($filePathOrData);
+            $mapping = explode('=',$serverParams['X-Accel-Mapping']);
+            $replacecount = 0;
+            $accelfile = str_replace($mapping[0],$mapping[1],$filePathOrData,$replacecount);
+            if ($replacecount == 1) {
+                header("X-Accel-Redirect: $accelfile");
+                header("Content-type: application/octet-stream");
+                header('Content-Disposition: attachment; filename="' . basename($accelfile) . '"');
+                return true;
+            } else {
+                $this->logDebug("X-Accel-Redirect: Problem with X-Accel-Mapping for file $filePathOrData");
+                return false;
+            }
+
+        }
+
+        // Pydio Agent acceleration - We make sure that request was really proxied by Agent, by checking a specific header.
+        if($accelConfiguration === "pydio" && array_key_exists("HTTP_X_PYDIO_DOWNLOAD_SUPPORTED", $serverParams)) {
+            
+            if ($localPathOrNode instanceof AJXP_Node) {
+                $options = MetaStreamWrapper::getResolvedOptionsForNode($localPathOrNode);
+                if($options["TYPE"] === "php"){
+                    // Not implemented
+                    return false;
+                }
+                $path = $localPathOrNode->getPath();
+            }else{
+                $options = ["TYPE" => "local"];
+                $path = $localPathOrNode;
+            }
+            $data = [
+                "OPTIONS"   => $options,
+                "PATH"      => $path
+            ];
+            if($this->unlinkAfterRead){
+                $data["UNLINK_AFTER_READ"] = true;
+            }
+            header("X-Pydio-Download-Redirect: ".json_encode($data));
+            header("Content-type: application/octet-stream");
+            header('Content-Disposition: attachment; filename="' . basename($path) . '"');
+            return true;
+        }
+
+        return false;
+    }
 
 }

@@ -98,6 +98,38 @@ class SMBAccessWrapper extends FsAccessWrapper
         return $fullPath;
     }
 
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     * @throws \Exception
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        $options = [
+            "TYPE" => "smb"
+        ];
+        $repoObject = $node->getRepository();
+        $context = $node->getContext();
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($context);
+        $options["USER"] = $credentials["user"];
+        $options["PASSWORD"] = $credentials["password"];
+        // Fix if the host is defined as //MY_HOST/path/to/folder
+        $user = $node->getUser();
+        if($user != null){
+            $hostOption = $user->getMergedRole()->filterParameterValue("access.smb", "HOST", $node->getRepositoryId(), null);
+            if(!empty($hostOption)) $hostOption = VarsFilter::filter($hostOption, $node->getContext());
+        }
+        if(empty($hostOption)) {
+            $hostOption = $repoObject->getContextOption($node->getContext(), "HOST");
+        }
+        $options["HOST"]  = $hostOption;
+        $options["DOMAIN"]  = $repoObject->getContextOption($context, "DOMAIN");
+        $options["PATH"]  = $repoObject->getContextOption($context, "PATH");
+
+        return $options;
+    }
+
     /**
      * @inheritdoc
      */

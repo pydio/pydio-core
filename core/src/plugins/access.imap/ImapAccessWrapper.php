@@ -543,4 +543,13 @@ class ImapAccessWrapper implements IAjxpWrapper
     {
         return false;
     }
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        return ["TYPE" => "php"];
+    }
 }

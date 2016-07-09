@@ -497,6 +497,57 @@ class FtpAccessWrapper implements IAjxpWrapper
 
     /**
      * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        /*
+        $context    = $node->getContext();
+        $repository = $node->getRepository();
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($context);
+        $options = [
+            "TYPE"      => "ftp",
+            "USER"      => $credentials["user"],
+            "PASSWORD"  => $credentials["password"]
+        ];
+        $optKeys = ["FTP_HOST", "PATH", "FTP_SECURE", "FTP_PORT", "FTP_DIRECT", "CHARSET"];
+        if ($repository->getContextOption($node->getContext(), "DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])){
+            $sessionData = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
+            foreach($optKeys as $key){
+                $options[$key] = $sessionData[$key];
+            }
+        }else{
+            foreach($optKeys as $key){
+                $options[$key] = $repository->getContextOption($context, $key);
+            }
+        }
+        $options["FTP_SECURE"] = ($options["FTP_SECURE"] === "TRUE");
+        $options["FTP_DIRECT"] = ($options["FTP_DIRECT"] === "TRUE");
+        $options["FTP_PORT"] = ($options["FTP_PORT"] !== null ? intval($options["FTP_PORT"]): $options["FTP_SECURE"] ? 22 : 21);
+
+        // Test Connexion and server features
+        // TODO: not working, we have to make the options more restful
+        global $_SESSION;
+        $cacheKey = $repository->getId()."_ftpCharset";
+        if (!isset($_SESSION[$cacheKey]) || !strlen($_SESSION[$cacheKey]) || $forceLogin) {
+            $features = $this->getServerFeatures($node->getContext());
+            $ctxCharset = SessionService::getContextCharset($node->getRepositoryId());
+            if(empty($ctxCharset)) {
+                SessionService::setContextCharset($node->getRepositoryId(), $features["charset"]);
+                $_SESSION[$cacheKey] = $features["charset"];
+            }else{
+                $_SESSION[$cacheKey] = $ctxCharset;
+            }
+        }
+        */
+
+        return ["TYPE" => "php"];
+    }
+
+
+
+    /**
+     * @param AJXP_Node $node
      * @return array Array(UID, GID) to be used to compute permission
      */
     public function getRemoteUserId($node)

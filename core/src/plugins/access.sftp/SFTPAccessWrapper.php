@@ -146,6 +146,28 @@ class SFTPAccessWrapper extends FsAccessWrapper
     }
 
     /**
+     * @param AJXP_Node $node
+     * @return array
+     * @throws \Exception
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        $options = [
+            "TYPE" => "sftp"
+        ];
+        $repoObject = $node->getRepository();
+        $context = $node->getContext();
+        $credentials = MemorySafe::tryLoadingCredentialsFromSources($context);
+        $options["USER"] = $credentials["user"];
+        $options["PASSWORD"] = $credentials["password"];
+        $options["SERVER"]  = $repoObject->getContextOption($context, "SERV");
+        $options["PORT"]  = intval($repoObject->getContextOption($context, "PORT"));
+        $options["PATH"]  = intval($repoObject->getContextOption($context, "PATH"));
+
+        return $options;
+    }
+
+    /**
      * Opens the stream
      * Diff with parent class : do not "securePath", as it removes double slash
      *

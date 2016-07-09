@@ -778,5 +778,5 @@ function ConvSmbParameterToWinOs($params)
 # Register 'smb' protocol !
 ###################################################################
 
-stream_wrapper_register('smbclient', 'smb_stream_wrapper')
+stream_wrapper_register('smbclient', 'Pydio\Access\Driver\StreamProvider\SMB\smb_stream_wrapper')
     or die ('Failed to register protocol');
