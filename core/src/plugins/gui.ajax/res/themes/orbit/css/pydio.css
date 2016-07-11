@@ -2822,6 +2822,11 @@ div.selection_ctrl_key {
   border-bottom: 1px solid #eee;
   border-right: 1px solid #eee;
 }
+#search_container #search_results_cont span.icon-save {
+  font-size: 0.8em;
+  display: inline-block;
+  margin: 0 5px;
+}
 #search_container #search_results_cont .close_results.icon-remove-sign,
 #search_container #search_results_cont .close_results.mdi-close {
   position: absolute;
@@ -2842,9 +2847,11 @@ div.selection_ctrl_key {
 }
 #search_container #search_results_cont #basic_search span.toggle_button.open,
 #search_container #search_results_cont #basic_search span.toggle_button.close {
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   display: inline-block;
   padding: 5px 16px;
   font-weight: 500;
+  font-size: 14px;
   cursor: pointer;
   border-radius: 1px;
 }
