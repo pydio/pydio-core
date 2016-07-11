@@ -574,6 +574,36 @@ class UsersService
     }
 
     /**
+     * Scroll every registered users and apply a callback
+     *
+     * @param string $baseGroup Where to start from
+     * @param bool $recursive Browse all subgroups and their children
+     * @param callable $userCallback Apply this callback to every user found. Parameters are (userId, userGroup, index, total) where index/total are relative in the current group.
+     * @param callable $groupCallback Apply this callback to every group found. Parameters are (groupPath, groupLabel). Generally for logging purpose.
+     * @param string $baseGroupLabel Pass label of the current group, used by groupCallback.
+     */
+    public static function browseUsersGroupsWithCallback($baseGroup, $userCallback, $recursive = false, $groupCallback = null, $baseGroupLabel = null){
+
+        $authDriver = ConfService::getAuthDriverImpl();
+        $pairs = $authDriver->listUsers($baseGroup, false);
+        if($groupCallback !== null){
+            $groupCallback($baseGroup, $baseGroupLabel);
+        }
+        $currentUsers = array_keys($pairs);
+        $total = count($currentUsers);
+        foreach($currentUsers as $index => $userId){
+            $userCallback($userId, $baseGroup, $index, $total);
+        }
+        if($recursive){
+            $childrenGroups = $authDriver->listChildrenGroups($baseGroup);
+            foreach($childrenGroups as $relativePath => $groupLabel){
+                self::browseUsersGroupsWithCallback(rtrim($baseGroup, "/")."/".$relativePath, $userCallback, true, $groupCallback, $groupLabel);
+            }
+        }
+
+    }
+
+    /**
      * Depending on the plugin, tried to compute the actual page where a given user can be located
      *
      * @param $baseGroup

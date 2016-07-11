@@ -27,12 +27,26 @@ use Pydio\Core\Http\Message\UserMessage;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class SerializableResponseStream
+ * Transport stream for various data types that can be serialized to various formats
+ * @package Pydio\Core\Http\Response
+ */
 class SerializableResponseStream implements StreamInterface
 {
     const SERIALIZER_TYPE_XML = 'xml';
     const SERIALIZER_TYPE_JSON = 'json';
+    const SERIALIZER_TYPE_CLI = 'cli';
 
+    /**
+     * @var string
+     */
     protected $serializer = self::SERIALIZER_TYPE_XML;
+
+    /**
+     * @var array Additional context variable depending on serializer
+     */
+    protected $serializerContext;
     /**
      * @var SerializableResponseChunk[]
      */
@@ -59,10 +73,34 @@ class SerializableResponseStream implements StreamInterface
     }
 
     /**
-     * @param string $serializer SERIALIZER_TYPE_XML|SERIALIZER_TYPE_JSON
+     * @param string $serializer SERIALIZER_TYPE_XML|SERIALIZER_TYPE_JSON|SERIALIZER_TYPE_CLI
+     * @param array $context Additional data for serializer
      */
-    public function setSerializer($serializer){
+    public function setSerializer($serializer, $context = null){
         $this->serializer = $serializer;
+        if($context !== null){
+            $this->serializerContext = $context;
+        }
+    }
+
+    /**
+     * Test if at least one chunk of data can be serialized using this format
+     * @param $serializer
+     * @return bool
+     */
+    public function supportsSerializer($serializer){
+        // We can always JSON serialize output
+        if($serializer === self::SERIALIZER_TYPE_JSON){
+            return true;
+        }
+        foreach($this->data as $chunk){
+            if($serializer === self::SERIALIZER_TYPE_XML && $chunk instanceof XMLSerializableResponseChunk){
+                return true;
+            }else if($serializer === self::SERIALIZER_TYPE_CLI && $chunk instanceof CLISerializableResponseChunk){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -99,7 +137,7 @@ class SerializableResponseStream implements StreamInterface
      */
     protected function serializeData($data, $serializer){
 
-        if($serializer == self::SERIALIZER_TYPE_JSON){
+        if($serializer === self::SERIALIZER_TYPE_JSON){
             $buffer = [];
             foreach ($data as $serializableItem){
                 if($serializableItem instanceof JSONSerializableResponseChunk){
@@ -113,20 +151,24 @@ class SerializableResponseStream implements StreamInterface
                     $buffer[] = $serializableItem;
                 }
             }
+            $pretty = 0;
+            if(isSet($this->serializerContext) && isSet($this->serializerContext["pretty"]) && $this->serializerContext["pretty"] === true){
+                $pretty = JSON_PRETTY_PRINT;
+            }
             if(count($buffer) == 1) {
-                $json = json_encode(array_shift($buffer));
+                $json = json_encode(array_shift($buffer), $pretty);
             }else {
-                $json = json_encode($buffer);
+                $json = json_encode($buffer, $pretty);
             }
             if($json === null){
                 $msg = json_last_error_msg();
                 $error = json_last_error();
                 $message = new UserMessage($msg. " ($error)", LOG_LEVEL_ERROR);
-                return json_encode($message->jsonSerializableData());
+                return json_encode($message->jsonSerializableData(), $pretty);
             }else{
                 return $json;
             }
-        }else if($serializer == self::SERIALIZER_TYPE_XML){
+        }else if($serializer === self::SERIALIZER_TYPE_XML){
             $wrap = true;
             $buffer = "";
             $charset = null;
@@ -140,14 +182,37 @@ class SerializableResponseStream implements StreamInterface
                     $charset = $serializableItem->getCharset();
                 }
             }
+
             if($wrap){
-                return XMLWriter::wrapDocument($buffer);
+                $output = XMLWriter::wrapDocument($buffer);
             }else{
                 if(substr($buffer, 0, 5) !== "<?xml"){
                     $buffer = "<?xml version=\"1.0\" encoding=\"".$charset."\"?>".$buffer;
                 }
-                return $buffer;
+                $output = $buffer;
             }
+            if(isSet($this->serializerContext) && isSet($this->serializerContext["pretty"]) && $this->serializerContext["pretty"] === true){
+                // Rewrite Doc with pretty printing
+                $doc = new \DOMDocument("1.0", $charset);
+                $doc->loadXML($output);
+                $doc->preserveWhiteSpace = false;
+                $doc->formatOutput = true;
+                $output = $doc->saveXML();
+            }
+            return $output;
+
+        }else if($serializer === self::SERIALIZER_TYPE_CLI){
+            $buffer = "";
+            $output = $this->serializerContext["output"];
+            foreach($data as $serializableItem){
+                if($serializableItem instanceof CLISerializableResponseChunk){
+                    $buffer .= $serializableItem->render($output);
+                }else{
+                    // Default to JSON
+                    $buffer .= json_encode($serializableItem);
+                }
+            }
+
         }
         return "";
     }

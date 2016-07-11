@@ -23,14 +23,18 @@ namespace Pydio\Access\Core\Model;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\Response\CLISerializableResponseChunk;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
+use Pydio\Core\Services\LocaleService;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class NodesList
  * @package Pydio\Access\Core\Model
  */
-class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResponseChunk
+class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResponseChunk, CLISerializableResponseChunk
 {
 
     /**
@@ -202,5 +206,68 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     public function getCharset()
     {
         return "UTF-8";
+    }
+
+    /**
+     * @param OutputInterface $output
+     * @return mixed
+     */
+    public function render($output)
+    {
+        // If recursive, back to JSON for the moment
+        $recursive = false;
+        foreach($this->children as $child){
+            if($child instanceof NodesList){
+                $recursive = true;
+            }
+        }
+        if($recursive){
+            $data = $this->jsonSerializableData();
+            $output->writeln(json_encode($data, JSON_PRETTY_PRINT));
+            return;
+        }
+
+        $table      = new Table($output);
+        $headers    = [];
+        $rows       = [];
+
+        // Prepare Headers
+        if(isSet($this->columnsDescription["columns"])){
+            $messages = LocaleService::getMessages();
+            foreach($this->columnsDescription as $column){
+                $colTitle = $messages[$column["messageId"]];
+                $collAttr = $column["attributeName"];
+                $headers[$collAttr] = $colTitle;
+            }
+        }else{
+            /** @var AJXP_Node $firstNode */
+            $firstNode = $this->children[0];
+            $headers["text"] = "Label"; //$firstNode->getLabel();
+            $meta = $firstNode->getNodeInfoMeta();
+            foreach($meta as $attName => $value){
+                if(in_array($attName, ["text", "ajxp_description"])) continue;
+                if($attName === "filename") {
+                    $headers[$attName] = "Path";
+                }else{
+                    $headers[$attName] = ucfirst($attName);
+                }
+            }
+        }
+        $table->setHeaders(array_values($headers));
+
+        // Prepare Rows
+        foreach($this->children as $child){
+            $row = [];
+            foreach($headers as $attName => $label){
+                if($attName === "text") $row[] = $child->getLabel();
+                else if($attName === "is_file") $row[] = $child->isLeaf() ? "True" : "False";
+                else $row[] = $child->$attName;
+            }
+            $rows[] = $row;
+        }
+        $table->setRows($rows);
+
+        // Render
+        $table->render();
     }
 }

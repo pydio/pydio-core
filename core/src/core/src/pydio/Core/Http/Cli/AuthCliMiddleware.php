@@ -26,6 +26,7 @@ use Pydio\Auth\Core\MemorySafe;
 
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -38,7 +39,9 @@ use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\Logger;
+use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Diactoros\Response;
+use Zend\Diactoros\Stream;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -48,6 +51,57 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class AuthCliMiddleware
 {
+
+    /**
+     * @param $options
+     * @return \Pydio\Core\Model\UserInterface
+     * @throws AuthRequiredException
+     */
+    protected static function authenticateFromCliParameters($options){
+
+        $optUser = $options["u"];
+        $optPass = $options["p"];
+
+        if (!empty($options["p"])) {
+
+            $optPass = $options["p"];
+
+        } else {
+            // Consider "u" is a crypted version of u:p
+            $optToken = $options["t"];
+            $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
+            if(empty($cKey)) $cKey = "\1CDAFx¨op#";
+            $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
+            $env = getenv("AJXP_SAFE_CREDENTIALS");
+            if(!empty($env)){
+                $array = MemorySafe::getCredentialsFromEncodedString($env);
+                if(isSet($array["user"]) && $array["user"] == $optUser){
+                    unset($optToken);
+                    $optPass = $array["password"];
+                }
+            }
+
+        }
+
+
+        if (UsersService::usersEnabled() && !empty($optUser)) {
+            $seed = AuthService::generateSeed();
+            if ($seed != -1) {
+                $optPass = md5(md5($optPass).$seed);
+            }
+            try{
+                $loggedUser = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
+            }catch (LoginException $l){
+                throw new AuthRequiredException();
+            }
+
+        } else {
+            throw new AuthRequiredException();
+        }
+
+        return $loggedUser;
+    }
+
     /**
      * @param ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
@@ -60,18 +114,10 @@ class AuthCliMiddleware
         $driverImpl = ConfService::getAuthDriverImpl();
         PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
+        /** @var OutputInterface $output */
+        $output = $requestInterface->getAttribute("cli-output");
         $options = $requestInterface->getAttribute("cli-options");
-        $optUser = $options["u"];
-        $optPass = $options["p"];
         $optRepoId = $options["r"];
-
-        $repository = RepositoryService::getRepositoryById($optRepoId);
-        if ($repository == null) {
-            $repository = RepositoryService::getRepositoryByAlias($optRepoId);
-            if ($repository != null) {
-                $optRepoId =($repository->isWriteable()?$repository->getUniqueId():$repository->getId());
-            }
-        }
 
         $impersonateUsers = false;
         // TODO 1/ REIMPLEMENT parameter queue: to pass a file with many user names?
@@ -117,100 +163,126 @@ class AuthCliMiddleware
         //}
 
 
-
-        if(!empty($options["i"])){
-            if(!is_array($options["i"])) $options["i"] = [$options["i"]];
-            $impersonateUsers = $options["i"];
-        }
-
-        if (!empty($options["p"])) {
-            $optPass = $options["p"];
-        } else {
-            // Consider "u" is a crypted version of u:p
-            $optToken = $options["t"];
-            $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
-            if(empty($cKey)) $cKey = "\1CDAFx¨op#";
-            $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
-            $env = getenv("AJXP_SAFE_CREDENTIALS");
-            if(!empty($env)){
-                $array = MemorySafe::getCredentialsFromEncodedString($env);
-                if(isSet($array["user"]) && $array["user"] == $optUser){
-                    unset($optToken);
-                    $optPass = $array["password"];
-                }
-            }
-        }
-
-
-        if (UsersService::usersEnabled() && !empty($optUser)) {
-            $seed = AuthService::generateSeed();
-            if ($seed != -1) {
-                $optPass = md5(md5($optPass).$seed);
-            }
-            try{
-                $loggedUser = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
-            }catch (LoginException $l){
-                throw new AuthRequiredException();
-            }
-
-        } else {
-            throw new AuthRequiredException();
-        }
+        $loggedUser = self::authenticateFromCliParameters($options);
 
         $requestInterface = $requestInterface->withAttribute("action", $options["a"]);
 
         if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){
+
             RolesService::bootSequence();
+
+        }
+
+        // Output directly to STDOUT
+        $responseInterface = $responseInterface->withBody(new Stream(STDOUT, "w"));
+
+        $applyCallback = function ($userId, $baseGroup, $index, $total) use ($optRepoId, $requestInterface, $output, $next){
+
+            $actionName = $requestInterface->getAttribute("action");
+            $output->writeln("<info>*****************************</info>");
+            $output->writeln("<info>Current User is '".$userId."'</info>");
+            $output->writeln("<info>*****************************</info>");
+            try{
+                $user = UsersService::getUserById($userId);
+
+                if(is_array($optRepoId)){
+                    $repos = [];
+                    foreach($optRepoId as $repoId){
+                        $repoObj = UsersService::getRepositoryWithPermission($user, $repoId);
+                        $repos[$repoObj->getId()] = $repoObj;
+                    }
+                }else if($optRepoId === "*"){
+
+                    $repos = UsersService::getRepositoriesForUser($user, false); // Do not include shared
+                    // Exclude "ajxp_*" repositories and "inbox"
+                    foreach($repos as $id=>$object){
+                        if($id === "inbox" || strpos($id, "ajxp_") === 0) unset($repos[$id]);
+                    }
+
+                }else{
+                    $repoObject = UsersService::getRepositoryWithPermission($user, $optRepoId);
+                    $repos = [$repoObject->getId() => $repoObject];
+                }
+
+                foreach( $repos as $repoId => $repositoryInterface ){
+
+                    try{
+                        $output->writeln("<comment>Applying action '$actionName' on workspace ".$repositoryInterface->getDisplay()." (".$repoId.")</comment>");
+                        $subResponse = new Response();
+                        $ctx = Context::contextWithObjects($user, $repositoryInterface);
+                        $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+                        Logger::updateContext($ctx);
+                        TextEncoder::updateContext($ctx);
+
+                        $subResponse = Server::callNextMiddleWareAndRewind(function($middleware){
+                            return (is_array($middleware) && $middleware["0"] == "Pydio\\Core\\Http\\Cli\\AuthCliMiddleware" && $middleware[1] == "handleRequest");
+                        },
+                            $requestInterface,
+                            $subResponse,
+                            $next
+                        );
+
+                        $body = $subResponse->getBody();
+                        if($body instanceof SerializableResponseStream){
+                            if($requestInterface->getParsedBody()["format"] == "json"){
+                                $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON, ["pretty" => true]);
+                            }else if($requestInterface->getParsedBody()["format"] == "xml"){
+                                $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_XML, ["pretty" => true]);
+                            }else if($body->supportsSerializer(SerializableResponseStream::SERIALIZER_TYPE_CLI)){
+                                $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_CLI, ["output" => $output]);
+                            }
+                        }
+                        $output->writeln( $body->getContents() );
+
+                    }catch (\Exception $repoEx){
+
+                        $output->writeln("<error>".$repoEx->getMessage()."</error>");
+
+                    }
+
+                }
+
+            }catch (\Exception $userEx){
+
+                $output->writeln("<error>".$userEx->getMessage()."</error>");
+
+            }
+
+        };
+
+
+        if(!empty($options["i"])){
+            if(!is_array($options["i"]) && strpos($options["i"], "*") === false){
+                $options["i"] = [$options["i"]];
+            }
+            $impersonateUsers = $options["i"];
         }
 
         if ($impersonateUsers !== false && $loggedUser->isAdmin()) {
 
-            foreach ($impersonateUsers as $impersonateUser){
-                AuthService::disconnect();
-                $responseInterface->getBody()->write("\n--- Impersonating user ".$impersonateUser);
-                try{
-                    $loggedUser = AuthService::logUser($impersonateUser, "empty", true, false, "");
-                    //ConfService::switchRootDir($optRepoId, true);
-                    //Controller::registryReset();
-                    $subResponse = new Response();
-                    $ctx = new Context();
-                    $ctx->setUserObject($loggedUser);
-                    $ctx->setRepositoryId($optRepoId);
-                    $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
-                    Logger::updateContext($ctx);
-
-                    $subResponse = Server::callNextMiddleWareAndRewind(function($middleware){
-                        return (is_array($middleware) && $middleware["0"] == "Pydio\\Core\\Http\\Cli\\AuthCliMiddleware" && $middleware[1] == "handleRequest");
-                    },
-                        $requestInterface,
-                        $subResponse,
-                        $next
-                    );
-                    $responseInterface->getBody()->write("\n". $subResponse->getBody());
-
-                }catch (\Exception $e){
-
-                    $responseInterface->getBody()->write("\nERROR: ".$e->getMessage());
-
+            if(is_array($impersonateUsers)){
+                // Apply to a predefined list of users
+                foreach ($impersonateUsers as $index => $impersonateUser) {
+                    $applyCallback($impersonateUser, "/", $index, count($impersonateUsers));
                 }
+
+            }else if($impersonateUsers === "*"){
+                // Apply to all users of current group
+                UsersService::browseUsersGroupsWithCallback($loggedUser->getGroupPath(), $applyCallback, false);
+
+            }else if($impersonateUsers === "**/*"){
+                // Apply to all users recursively
+                UsersService::browseUsersGroupsWithCallback($loggedUser->getGroupPath(), $applyCallback, true);
+
             }
-            return $responseInterface;
 
         }else{
 
-            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $optRepoId);
-
-            $ctx = new Context();
-            $ctx->setUserObject($loggedUser);
-            $ctx->setRepositoryObject($repoObject);
-            $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
-            Logger::updateContext($ctx);
-            TextEncoder::updateContext($ctx);
-
-            return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+            $applyCallback($loggedUser->getId(), "/", 1, 1);
 
         }
 
+        return $responseInterface;
 
     }
 

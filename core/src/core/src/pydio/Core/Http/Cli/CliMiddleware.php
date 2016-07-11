@@ -34,7 +34,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CliMiddleware
+ * Dedicated Middleware for interacting with Symfony Command
+ * @package Pydio\Core\Http\Cli
+ */
 class CliMiddleware implements ITopLevelMiddleware
 {
     /**
@@ -62,7 +66,7 @@ class CliMiddleware implements ITopLevelMiddleware
 
         } catch (AuthRequiredException $e){
 
-            $output->writeln("ERROR:Authentication Failed.");
+            $output->writeln("<error>Authentication Failed</error>");
             if($statusFile !== false){
                 file_put_contents($statusFile, "ERROR:Authentication Failed.");
             }
@@ -72,7 +76,7 @@ class CliMiddleware implements ITopLevelMiddleware
 
         } catch (PydioException $e){
 
-            $output->writeln("ERROR:".$e->getMessage());
+            $output->writeln("<error>".$e->getMessage()."</error>");
             if($statusFile !== false){
                 file_put_contents($statusFile, "ERROR:".$e->getMessage());
             }
@@ -82,7 +86,7 @@ class CliMiddleware implements ITopLevelMiddleware
 
         } catch (\Exception $e){
 
-            $output->writeln("ERROR:".$e->getMessage());
+            $output->writeln("<error>".$e->getMessage()."</error>");
             if($statusFile !== false){
                 file_put_contents($statusFile, "ERROR:".$e->getMessage());
             }
@@ -96,7 +100,6 @@ class CliMiddleware implements ITopLevelMiddleware
 
     public function emitResponse(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
 
-        $output = $requestInterface->getAttribute("cli-output");
         if($responseInterface !== false && $responseInterface->getBody() && $responseInterface->getBody() instanceof SerializableResponseStream){
             // For the moment, use XML by default
             // Todo: Create A CLI Serializer for pretty printing?
@@ -104,15 +107,11 @@ class CliMiddleware implements ITopLevelMiddleware
                 $responseInterface->getBody()->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
             }
         }
-        $body = "".$responseInterface->getBody();
-        $output->writeln("");
-        $output->writeln("-----------------------------------");
-        $output->writeln("Executing Action" . $requestInterface->getAttribute("action"));
-        $output->writeln("-----------------------------------");
-        if(!empty($body)){
-            $output->writeln("" . $responseInterface->getBody());
+        $output = $requestInterface->getAttribute("cli-output");
+        if(!empty($output)){
+            $output->writeln("".$responseInterface->getBody());
         }else{
-            $output->writeln("No output");
+            echo "".$responseInterface->getBody();
         }
 
     }
