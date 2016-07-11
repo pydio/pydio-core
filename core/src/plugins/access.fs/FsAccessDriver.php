@@ -59,6 +59,7 @@ use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
+use Zend\Diactoros\Response;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
