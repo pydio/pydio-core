@@ -66,7 +66,7 @@ class StatHelper
         if (!isSet($mime)) {
             $mime = $registeredExtensions["ajxp_empty"];
         }
-        return array($mime[2], $mime[1]);
+        return array($mime[3], $mime[1], $mime[2]);
 
     }
 
@@ -95,7 +95,12 @@ class StatHelper
             $res = array();
             /** @var \DOMElement $node */
             foreach ($nodes as $node) {
-                $res[$node->getAttribute("mime")] = array($node->getAttribute("mime"), $node->getAttribute("icon"), $node->getAttribute("messageId"));
+                $res[$node->getAttribute("mime")] = array(
+                    $node->getAttribute("mime"),
+                    $node->getAttribute("icon"),
+                    $node->getAttribute("font"),
+                    $node->getAttribute("messageId")
+                );
             }
             if (count($res)) {
                 $EXTENSIONS = array_merge($EXTENSIONS, $res);
