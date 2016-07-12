@@ -244,6 +244,6 @@ $mess = array(
     "226" => "You are not allowed to create public links on folders",
     "227" => "You are not allowed to share files internally",
     "228" => "You are not allowed to share folders internally",
-    "229" => "Please save before sending an invitation",
-    "230" => "Insert a preview of the file by pasting this code inside an HTML page."
+    "229" => "Insert a preview of the file by pasting this code inside an HTML page.",
+    "230" => "Please save before sending an invitation",
 );

@@ -173,7 +173,7 @@
                 inputValue={data.templateString}
                 inputClassName="share_info_panel_link"
                 getMessage={this.props.getMessage}
-                inputCopyMessage="229"
+                inputCopyMessage="230"
             />;
         }
 
