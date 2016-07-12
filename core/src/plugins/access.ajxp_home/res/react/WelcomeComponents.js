@@ -104,7 +104,7 @@
                 id: 'search-autosuggest',
                 name: 'search-autosuggest',
                 className: 'react-autosuggest__input',
-                placeholder: pydio.MessageHash['user_home.72'],
+                placeholder: pydio.MessageHash['user_home.75'],
                 onBlur: event => pydio.UI.enableAllKeyBindings(),
                 onFocus: event => pydio.UI.disableAllKeyBindings(),
                 value: ''   // Initial value

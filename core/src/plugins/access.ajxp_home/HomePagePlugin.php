@@ -52,6 +52,10 @@ class HomePagePlugin extends AbstractAccessDriver
                 $gettingStartedList->item(0)->appendChild($newCData);
                 $gettingStartedList->item(0)->replaceChild($newCData, $cdata);
             }
+        }else if($contribNode->nodeName == "actions" && $this->getContextualOption($ctx, "DISPLAY_SERVER_QRCODE_ACTION") === false){
+            $actionXpath = new DOMXPath($contribNode->ownerDocument);
+            $actionList = $actionXpath->query('action[@name="display-server-qrcode"]', $contribNode);
+            $contribNode->removeChild($actionList->item(0));
         }
     }
 

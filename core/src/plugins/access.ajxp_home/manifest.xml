@@ -29,7 +29,7 @@
 	<registry_contributions>
         <actions>
             <action name="display-server-qrcode">
-                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.73">
+                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.74">
                     <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
