@@ -380,6 +380,13 @@ class AbstractAuthDriver extends Plugin
     }
 
     /**
+     * @return string
+     */
+    public function getStats(){
+        return $this->getId();
+    }
+
+    /**
      * @param UserInterface $userObject
      */
     public function updateUserObject(&$userObject)
