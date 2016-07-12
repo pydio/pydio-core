@@ -113,6 +113,7 @@ class IMagickPreviewer extends Plugin
             $cache = LocalCache::getItem("imagick_".($this->extractAll?"full":"thumb"), $file, function($masterFile, $targetFile) use ($contextInterface){
                 return $this->generateJpegsCallback($contextInterface, $masterFile, $targetFile);
             });
+            session_write_close();
             $cacheData = $cache->getData();
 
             if (!$this->useOnTheFly && $this->extractAll) { // extract all on first view

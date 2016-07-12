@@ -51,6 +51,23 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class Mailer extends Plugin implements SqlTableProvider
 {
 
+    public static $TEMPLATES = [
+        "html" => [
+            "body"        => '<div id="digest">%s</div>',   // Argument section
+            "section"     => '%s%s',                        // Argument title, listWrapper
+            "title"       => '<h1>%s</h1>',                 // Argument %var%
+            "listWrapper" => '<ul>%s</ul>',                 // Argument list
+            "list"        => '<li>%s</li>'                  // Argument %var%
+        ],
+        "plain" => [
+            "body"        => '%s',                          // Argument section
+            "section"     => '%s%s',                        // Argument title, listWrapper
+            "title"       => '%s\n\n',                      // Argument %var%
+            "listWrapper" => '%s',                          // Argument list
+            "list"        => '%s\n'                         // Argument %var%
+        ]
+    ];
+
     public $mailCache;
     protected $_dibiDriver;
 
@@ -85,6 +102,40 @@ class Mailer extends Plugin implements SqlTableProvider
     }
 
     /**
+     * @return int
+     * @throws Exception
+     */
+    public function getConsumerLock() {
+
+        $workDir = $this->getPluginWorkDir(true);
+        $consumerLockFile = $workDir . DIRECTORY_SEPARATOR . "/consume_mail_queue.lock";
+
+        // Opening the file
+        $consumerLock = fopen($consumerLockFile, "w");
+
+        // Making sure the file gets closed and the lock gets released at the end of the script
+        register_shutdown_function(function () use ($consumerLock) {
+            fflush($consumerLock);
+            flock($consumerLock, LOCK_UN);
+
+            fclose($consumerLock);
+        });
+
+        // Retrieving the lock
+        while (!flock($consumerLock, LOCK_EX)) {
+            sleep(60);
+        }
+
+        // Writing the time the lock was granted
+        $time = time();
+        ftruncate($consumerLock, 0);
+        fwrite($consumerLock, $time);
+
+        return $time;
+    }
+
+
+    /**
      * @param $action
      * @param $httpVars
      * @param $fileVars
@@ -96,6 +147,16 @@ class Mailer extends Plugin implements SqlTableProvider
 
         if ($action === "consume_mail_queue") {
 
+            $verbose = $httpVars["verbose"];
+
+            $logInfo = function () {};
+            if ($verbose) {
+                $logInfo = function ($str) {
+                    fwrite(STDOUT, $str . "\n");
+                };
+            }
+
+
             $mailer = PluginsService::getInstance($ctx)->getActivePluginsForType("mailer", true);
             if (!$mailer instanceof Mailer) {
                 throw new PydioException("Cannot find active mailer!");
@@ -106,94 +167,173 @@ class Mailer extends Plugin implements SqlTableProvider
             if ($this->_dibiDriver["driver"] == "postgre") {
                 dibi::query("SET bytea_output=escape");
             }
-            $time = time();
+
+            // Get the queue consumer lock and the time it was given
+            $time = $this->getConsumerLock();
+
             try {
                 $querySQL = dibi::query("SELECT * FROM [ajxp_mail_queue] WHERE [date_event] <= %s", $time);
             } catch (DibiException $e) {
                 throw new PydioException($e->getMessage());
             }
-            $resultsSQL = $querySQL->fetchAll();
-            $arrayResultsSQL = array();
-            $output = array("success" => [], "error" => []);
-            $recipientFormats = array();
-            if (count($resultsSQL) > 0) {
-                foreach ($resultsSQL as $value) {
-                    $ajxpNotification = unserialize($value["notification_object"]);
-                    $ajxpAction = $ajxpNotification->getAction();
-                    $ajxpAuthor = $ajxpNotification->getAuthor();
-                    $ajxpNode = new AJXP_Node($value['url']);
-                    try {
-                        @$ajxpNode->loadNodeInfo();
-                    } catch (Exception $e) {
-                    }
-                    if ($ajxpNode->isLeaf() && !$ajxpNode->isRoot()) {
-                        $ajxpContent = $ajxpNode->getParent()->getPath();
-                    } else {
-                        $ajxpContent = $ajxpNode->getPath();
-                        if ($ajxpContent === null) {
-                            $ajxpContent = '/';
-                        }
-                    }
-                    if ($ajxpNode->getRepository() != null) {
-                        $ajxpNodeWorkspace = $ajxpNode->getRepository()->getDisplay();
-                    } else {
-                        $ajxpNodeWorkspace = "Deleted Workspace";
-                    }
-                    $recipientFormats[$value['recipient']] = ($value["html"] == 1);
-                    $ajxpKey = $ajxpAction . "|" . $ajxpAuthor . "|" . $ajxpContent;
-                    $arrayResultsSQL[$value['recipient']][$ajxpNodeWorkspace][$ajxpKey][] = $ajxpNotification;
+            //$querySQL->fetch();
+            //$resultsSQL = $querySQL->fetchAll();
+            $numRows = $querySQL->count();
+
+            $results = [];
+
+            HTMLWriter::charsetHeader("text/json");
+
+            if ($numRows == 0) {
+                $logInfo("Nothing to process");
+                $output = array("report" => "Sent 0 emails", "detail" => "");
+                echo json_encode($output);
+                return;
+            }
+
+            $logInfo("Processing " . $numRows . " rows.");
+
+            // We need to send one email :
+            // - per user
+            // - per email type (HTML or PLAIN)
+            while($value = $querySQL->fetch()) {
+
+                // Retrieving user information
+                $recipient = $value['recipient'];
+
+                // Retrieving Email type information
+                $emailType = ($value["html"] == 1) ? "html" : "plain";
+
+                // Retrieving notification information
+                /** @var Notification $notification */
+                $notification = unserialize($value["notification_object"]);
+
+                $action = $notification->getAction();
+                $author = $notification->getAuthor();
+                $node   = $notification->getNode();
+
+                try {
+                    @$node->loadNodeInfo();
+                } catch(Exception $e){
                 }
-                //this $body must be here because we need this css
-                $digestTitle = LocaleService::getMessages()["core.mailer.9"];
-                foreach ($arrayResultsSQL as $recipient => $arrayWorkspace) {
-                    $useHtml = $recipientFormats[$recipient];
-                    $body = $useHtml ? "<div id='digest'>" : "";
-                    foreach ($arrayWorkspace as $workspace => $arrayAjxpKey) {
-                        $key = key($arrayAjxpKey);
-                        $body = $body . '<h1>' . $arrayAjxpKey[$key][0]->getDescriptionLocation() . ', </h1><ul>';
-                        foreach ($arrayAjxpKey as $ajxpKey => $arrayNotif) {
-                            $descs = array();
-                            foreach ($arrayNotif as $notif) {
-                                $desc = $notif->getDescriptionLong(true);
-                                if (array_key_exists($desc, $descs)) {
-                                    $descs[$desc]++;
-                                } else {
-                                    $descs[$desc] = 1;
-                                }
-                            }
-                            foreach ($descs as $sentence => $occurences) {
-                                $body = $body . '<li>' . $sentence . ($occurences > 1 ? ' (' . count($arrayNotif) . ')' : '') . '</li>';
-                            }
-                        }
-                        $body = $body . '</ul>';
+
+                if ($node->isLeaf() && !$node->isRoot()) {
+                    $dirName = $node->getParent()->getPath();
+                } else {
+                    $dirName = $node->getPath();
+                    if ($dirName === null) {
+                        $dirName = '/';
                     }
-                    $body .= $useHtml ? "</div>" : "";
+                }
+                $key = sprintf("%s|%s|%s", $action, $author, $dirName);
+
+                // Retrieving workspace information
+                if($node->getRepository() != null) {
+                    $workspace = $node->getRepository()->getDisplay();
+                } else {
+                    $workspace = "Deleted Workspace";
+                }
+
+                $results[$emailType][$recipient][$workspace][$key][] = $notification;
+            }
+
+            $logInfo("Created digest array.");
+
+            $subject = LocaleService::getMessages()["core.mailer.9"];
+
+            $success = 0;
+            $errors = [];
+            foreach ($results as $emailType => $recipients) {
+
+                $isHTML = $emailType == "html";
+
+                $i = 0;
+                foreach ($recipients as $recipient => $workspaces) {
+
+                    $logInfo("Processed " . ++$i . " out of " . count($recipients) . " " . $emailType . " emails " . $recipient);
+
+                    $body = $this->_buildDigest($workspaces, $emailType);
+
+                    $success++;
                     try {
                         $mailer->sendMail(
                             $ctx,
-                            array($recipient),
-                            $digestTitle,
+                            [$recipient],
+                            $subject,
                             $body,
                             null,
                             null,
-                            $useHtml
+                            $isHTML
                         );
-                        $output["success"][] = "Email sent to " . $recipient;
-                    } catch (PydioException $e) {
-                        $output["error"][] = "Sending email to " . $recipient . ": " . $e->getMessage();
+
+                        $success++;
+                    } catch (\Exception $e) {
+                        $errors[] = "Failed to send email to " . $recipient . ": " . $e->getMessage();
                     }
                 }
-                try {
-                    dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
-                } catch (DibiException $e) {
-                    throw new PydioException($e->getMessage());
-                }
             }
-            HTMLWriter::charsetHeader("text/json");
-            $output = array("report" => "Sent " . count($output["success"]) . " emails", "detail" => $output);
+
+            // Clearing memory
+            unset($results);
+
+            try {
+                dibi::query('DELETE FROM [ajxp_mail_queue] WHERE [date_event] <= %s', $time);
+            } catch (DibiException $e) {
+                throw new PydioException($e->getMessage());
+            }
+
+            $output = array("report" => "Sent ".$success." emails", "errors" => $errors);
             echo json_encode($output);
         }
     }
+
+    /**
+     * @param $workspaces
+     * @param $emailType
+     * @return string
+     */
+    private function _buildDigest($workspaces, $emailType) {
+
+        $template = self::$TEMPLATES[$emailType];
+
+        $sections = [];
+        foreach ($workspaces as $workspace => $keys) {
+
+            $title = "";
+            $li = [];
+
+            foreach ($keys as $key => $notifications) {
+
+                $descriptions = [];
+
+                /** @var Notification $notification */
+                foreach ($notifications as $notification) {
+                    if (empty($current)) {
+                        $title = sprintf($template["title"], $notification->getDescriptionLocation());
+                    }
+
+                    $description = $notification->getDescriptionLong(true);
+
+                    if(array_key_exists($description, $descriptions)) {
+                        $descriptions[$description]++;
+                    } else {
+                        $descriptions[$description] = 1;
+                    }
+                }
+
+                foreach ($descriptions as $description => $count){
+                    $li[] = sprintf($template["list"], $description . ($count > 1 ? ' ('.$count.')' : ''));
+                }
+            }
+
+            $listWrapper = sprintf($template["listWrapper"], join("", $li));
+            $sections[] = sprintf($template["section"], $title, $listWrapper);
+        }
+
+        return sprintf($template["body"], join("", $sections));
+    }
+
+
 
     /**
      * @param $int
@@ -279,6 +419,13 @@ class Mailer extends Plugin implements SqlTableProvider
      */
     public function processNotification(Notification &$notification)
     {
+            // Inserting the node information.
+        try {
+            $notification->getNode()->loadNodeInfo();
+        } catch (Exception $e) {
+            // Do nothing
+        }
+
         try {
             $userObject = UsersService::getUserById($notification->getTarget());
         } catch (\Pydio\Core\Exception\UserNotFoundException $e) {
