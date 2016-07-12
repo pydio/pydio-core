@@ -887,7 +887,7 @@
                 message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
             }else{
                 if(!this._data['repository_url']){
-                    throw new Error(MessageHash['share_center.229']);
+                    throw new Error(MessageHash['share_center.230']);
                 }
                 s = MessageHash["share_center." + (this.getNode().isLeaf() ? "42" : "43")];
                 if(s) s = s.replace("%s", ApplicationTitle);
