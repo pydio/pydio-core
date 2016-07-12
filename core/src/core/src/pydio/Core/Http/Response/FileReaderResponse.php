@@ -27,6 +27,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
@@ -201,7 +202,7 @@ class FileReaderResponse extends AsyncResponseStream
 
         if ($node !== null  && !$node->wrapperIsRemote()) {
             $originalFilePath = $filePathOrData;
-            $filePathOrData = FsAccessWrapper::patchPathForBaseDir($filePathOrData);
+            $filePathOrData = PathUtils::patchPathForBaseDir($filePathOrData);
         }
         session_write_close();
 

@@ -20,9 +20,12 @@
  */
 namespace Pydio\Uploader\Processor;
 
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
@@ -53,6 +56,8 @@ class HttpDownload extends Plugin
         //$this->logInfo("DL file", $httpVars);
         $httpVars = $request->getParsedBody();
         $action = $request->getAttribute("action");
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
         $userSelection = UserSelection::fromContext($request->getAttribute("ctx"), $httpVars);
         $dir = InputFilter::decodeSecureMagic($httpVars["dir"]);
         $currentDirUrl = $userSelection->currentBaseUrl().$dir."/";
@@ -73,6 +78,9 @@ class HttpDownload extends Plugin
         }else{
             throw new \Exception("Missing argument, either file or dlfile");
         }
+        /** @var AbstractAccessDriver $fsDriver */
+        $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
+        $fsDriver->filterUserSelectionToHidden($ctx, array($basename));
 
         switch ($action) {
             case "external_download":

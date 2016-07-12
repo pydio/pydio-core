@@ -50,5 +50,28 @@ class PathUtils
         return (DIRECTORY_SEPARATOR === "\\" ? str_replace("\\", "/", basename($path)) : basename($path));
     }
 
+    /**
+     * Fix openbasedir issue when browsing zip content as a normal folder
+     * @param string $dirPath
+     * @return string
+     */
+    public static function patchPathForBaseDir($dirPath)
+    {
+        if (!ini_get("open_basedir") || !preg_match('/\.zip/i', $dirPath)) return $dirPath;
+        return str_replace(".zip", "__ZIP_EXTENSION__", $dirPath);
+
+    }
+
+    /**
+     * Fix openbasedir issue when browsing zip content as a normal folder
+     * @param string $dirPath
+     * @return string
+     */
+    public static function unPatchPathForBaseDir($dirPath)
+    {
+        if (!ini_get("open_basedir")) return $dirPath;
+        return str_replace("__ZIP_EXTENSION__", ".zip", $dirPath);
+    }
+
 
 }

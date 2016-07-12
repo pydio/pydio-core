@@ -28,6 +28,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\Vars\PathUtils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -164,7 +165,7 @@ class MetaStreamWrapper implements IAjxpWrapper
                         $crtPath = "/";
                     }
                     $crtBase = basename($crtPath);
-                    if (!empty($crtPath) && $crtPath != "/" && $crtBase != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
+                    if (!empty($crtPath) && $crtPath != "/" && PathUtils::unPatchPathForBaseDir($crtBase) != $contentFilter->getUniquePath() && $crtBase != ".ajxp_meta") {
                         throw new \Exception("Cannot find file " . $crtBase);
                     }
                     $url = $node->getContext()->getUrlBase().rtrim($baseDir.$crtPath, "/");

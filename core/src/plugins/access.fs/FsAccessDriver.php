@@ -381,7 +381,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
         if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($ctx->getUrlBase())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
-            $dir = FsAccessWrapper::patchPathForBaseDir($dir);
+            $dir = PathUtils::patchPathForBaseDir($dir);
         }
         $dir = InputFilter::securePath($dir);
         $selection = UserSelection::fromContext($ctx, $httpVars);
@@ -635,6 +635,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if(isset($httpVars["dir"])){
                         $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
                     }
+                    $base = basename(dirname($selection->getUniqueFile()));
                     $zip = true;
                 }
                 if ($zip) {
@@ -1200,7 +1201,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $patch = false;
                 if (MetaStreamWrapper::actualRepositoryWrapperClass(new AJXP_Node($selection->currentBaseUrl())) === "Pydio\\Access\\Driver\\StreamProvider\\FS\\FsAccessWrapper") {
-                    $dir = FsAccessWrapper::patchPathForBaseDir($dir);
+                    $dir = PathUtils::patchPathForBaseDir($dir);
                     $patch = true;
                 }
                 $dir = InputFilter::securePath($dir);
@@ -1220,7 +1221,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $path = $selection->nodeForPath(($dir!= ""?($dir[0]=="/"?"":"/").$dir:""))->getUrl();
                 $nonPatchedPath = $path;
                 if ($patch) {
-                    $nonPatchedPath = FsAccessWrapper::unPatchPathForBaseDir($path);
+                    $nonPatchedPath = PathUtils::unPatchPathForBaseDir($path);
                 }
                 $testPath = @stat($path);
                 if($testPath === null || $testPath === false){
@@ -1872,6 +1873,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $fullname = $data['filename'];
         $realBase = MetaStreamWrapper::getRealFSReference($crtUrlBase);
         $repoName = str_replace($realBase, "", $fullname);
+        try{
+            $this->filterUserSelectionToHidden(AJXP_Node::contextFromUrl($crtUrlBase), [$repoName]);
+        }catch(\Exception $e){
+            @unlink($this->urlBase.$repoName);
+            return 1;
+        }
         if($taskId !== null){
             TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Extracted file ".$repoName);
         }
@@ -2157,7 +2164,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 continue;
             }
             $this->deldir($fileUrl, $repoData, $taskId);
-            if (is_dir($fileUrl)) {
+            if ($selectedNode->isLeaf()) {
                 $logMessages[]="$mess[38] ".TextEncoder::toUTF8($filePath)." $mess[44].";
             } else {
                 $logMessages[]="$mess[34] ".TextEncoder::toUTF8($filePath)." $mess[44].";

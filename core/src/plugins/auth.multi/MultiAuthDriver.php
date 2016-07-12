@@ -129,6 +129,14 @@ class MultiAuthDriver extends AbstractAuthDriver
     }
 
     /**
+     * @return string
+     */
+    public function getStats()
+    {
+        return implode(",", array_keys($this->drivers));
+    }
+
+    /**
      * @return bool|AbstractAuthDriver
      */
     protected function getCurrentDriver()

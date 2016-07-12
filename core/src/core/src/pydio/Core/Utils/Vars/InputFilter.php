@@ -48,12 +48,14 @@ class InputFilter
      */
     public static function securePath($path)
     {
-        if ($path == null) $path = "";
+        if ($path == null) {
+            return "";
+        }
         //
         // REMOVE ALL "../" TENTATIVES
         //
         $path = str_replace(chr(0), "", $path);
-        $dirs = explode('/', $path);
+        $dirs = self::safeExplode($path);
         $count = count($dirs);
         for ($i = 0; $i < $count; $i++) {
             if ($dirs[$i] == '.' or $dirs[$i] == '..') {
@@ -70,6 +72,14 @@ class InputFilter
             $path = str_replace('//', '/', $path);
         }
         return $path;
+    }
+
+    /**
+     * @param $path
+     * @return array
+     */
+    public static function safeExplode($path) {
+        return (DIRECTORY_SEPARATOR === "\\" ? preg_split('/(\\\|\\/)/', $path) : explode('/', $path));
     }
 
 
