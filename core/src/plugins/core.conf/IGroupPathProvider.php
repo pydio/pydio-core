@@ -38,8 +38,9 @@ interface IGroupPathProvider
     /**
      * @abstract
      * @param String $groupPath
+     * @param bool $update Save use after setting groupPath
      * @return void
      */
-    public function setGroupPath($groupPath);
+    public function setGroupPath($groupPath, $update=true);
 
 }

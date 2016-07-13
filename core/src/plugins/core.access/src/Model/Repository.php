@@ -587,7 +587,7 @@ class Repository implements RepositoryInterface
     /**
      * @param String $groupPath
      */
-    public function setGroupPath($groupPath)
+    public function setGroupPath($groupPath, $update = true)
     {
         if(strlen($groupPath) > 1) $groupPath = rtrim($groupPath, "/");
         $this->groupPath = $groupPath;

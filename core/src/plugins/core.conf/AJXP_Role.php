@@ -553,7 +553,7 @@ class AJXP_Role implements IGroupPathProvider
         return $ret;
     }
 
-    public function setGroupPath($groupPath)
+    public function setGroupPath($groupPath, $update = true)
     {
         $this->groupPath = $groupPath;
     }
