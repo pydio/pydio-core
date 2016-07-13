@@ -29,7 +29,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
-use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -83,7 +83,7 @@ class RepositoriesManager extends AbstractManager
                 $buffer = "<drivers allowed='".($this->currentUserIsGroupAdmin() ? "false" : "true")."'>";
                 $buffer .= XMLWriter::replaceAjxpXmlKeywords(self::availableDriversToXML("param", "", true));
                 $buffer .= "</drivers>";
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
 
                 break;
 
@@ -106,7 +106,7 @@ class RepositoriesManager extends AbstractManager
                     $buffer .= "</template>";
                 }
                 $buffer .= "</repository_templates>";
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
 
                 break;
 
@@ -210,11 +210,7 @@ class RepositoriesManager extends AbstractManager
                 $loggedUser->recomputeMergedRole();
                 $loggedUser->save("superuser");
                 AuthService::updateUser($loggedUser);
-
-                XMLWriter::sendMessage($mess["ajxp_conf.52"], null);
-                XMLWriter::reloadDataNode("", $newRep->getUniqueId());
-                XMLWriter::reloadRepositoryList();
-
+                
                 $message = new UserMessage($mess["ajxp_conf.52"]);
                 $reload = new ReloadMessage("", $newRep->getUniqueId());
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
@@ -252,7 +248,7 @@ class RepositoriesManager extends AbstractManager
                 }
                 $nested = array();
                 $definitions = $plug->getConfigsDefinitions();
-                $buffer = "<repository index=\"$repId\" securityScope=\"".$repository->securityScope()."\"";
+                $buffer .= "<repository index=\"$repId\" securityScope=\"".$repository->securityScope()."\"";
                 foreach ($repository as $name => $option) {
                     if(strstr($name, " ")>-1) continue;
                     if ($name == "driverInstance") continue;
@@ -348,7 +344,7 @@ class RepositoriesManager extends AbstractManager
                 }
                 $buffer .= "</admin_data>";
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
 
                 break;
 
@@ -605,7 +601,7 @@ class RepositoriesManager extends AbstractManager
                 }
                 $mess = LocaleService::getMessages();
                 $responseInterface = new JsonResponse(["LEGEND" => $mess["ajxp_conf.150"], "LIST" => $repoOut]);
-                
+
                 break;
 
             default:

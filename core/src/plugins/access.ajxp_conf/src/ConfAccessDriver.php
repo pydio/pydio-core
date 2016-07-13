@@ -19,20 +19,14 @@
  * The latest code can be found at <http://pyd.io/>.
  *
  */
-namespace Pydio\Access\Driver\DataProvider;
+namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
-require_once(dirname(__FILE__)."/vendor/autoload.php");
+require_once(dirname(__FILE__)."/../vendor/autoload.php");
 
 use DOMXPath;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Driver\DataProvider\Provisioning\DocumentationManager;
-use Pydio\Access\Driver\DataProvider\Provisioning\PluginsManager;
-use Pydio\Access\Driver\DataProvider\Provisioning\RepositoriesManager;
-use Pydio\Access\Driver\DataProvider\Provisioning\RolesManager;
-use Pydio\Access\Driver\DataProvider\Provisioning\TreeManager;
-use Pydio\Access\Driver\DataProvider\Provisioning\UsersManager;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
@@ -250,6 +244,7 @@ class ConfAccessDriver extends AbstractAccessDriver
             case "user_set_lock":
             case "change_admin_right":
             case "user_add_role":
+            case "create_user":
             case "user_delete_role":
             case "user_reorder_roles":
             case "user_bulk_update_roles":
@@ -258,6 +253,9 @@ class ConfAccessDriver extends AbstractAccessDriver
             case "update_user_pwd":
                 $this->usersAction($requestInterface, $responseInterface);
                 break;
+            case "edit_repository":
+            case "create_repository":
+            case "edit_repository_label":
             case "edit_repository_data":
             case "get_drivers_definition":
             case "get_templates_definition":
@@ -274,6 +272,7 @@ class ConfAccessDriver extends AbstractAccessDriver
      */
     public function deleteAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
+        $httpVars = $requestInterface->getParsedBody();
         // REST API mapping
         if (isSet($httpVars["data_type"])) {
             switch ($httpVars["data_type"]) {

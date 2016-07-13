@@ -30,6 +30,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -381,7 +382,7 @@ class UsersManager extends AbstractManager
                 $buffer .= "</ajxp_roles>";
                 $buffer .= "</admin_data>";
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
                 break;
 
             case "save_custom_user_params" :
@@ -501,9 +502,8 @@ class UsersManager extends AbstractManager
 
                 break;
 
-            // Action for update all Pydio's user from ldap in CLI mode
             case "cli_update_user_list":
-
+                // Action for updating all Pydio's user from ldap in CLI mode
                 if((php_sapi_name() == "cli")){
                     // TODO : UPGRADE THIS TO NEW CLI FORMAT
                     $progressBar = new ProgressBarCLI();

@@ -121,5 +121,5 @@
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="actions/*"/>
 		<external_file filename="plugins/access.ajxp_conf/ajxp_confActions.xml" include="client_configs/*"/>
 	</registry_contributions>
-	<class_definition filename="plugins/access.ajxp_conf/ConfAccessDriver.php" classname="Pydio\Access\Driver\DataProvider\ConfAccessDriver"/>
+	<class_definition filename="plugins/access.ajxp_conf/src/ConfAccessDriver.php" classname="Pydio\Access\Driver\DataProvider\Provisioning\ConfAccessDriver"/>
 </ajxpdriver>

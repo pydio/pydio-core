@@ -539,17 +539,17 @@
         </action>
         <action name="list_all_plugins_actions">
             <processing>
-                <serverCallback methodName="pluginsActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available actions"/>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available actions"/>
             </processing>
         </action>
         <action name="list_all_plugins_parameters">
             <processing>
-                <serverCallback methodName="pluginsActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available parameter"/>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available parameter"/>
             </processing>
         </action>
         <action name="parameters_to_form_definitions">
             <processing>
-                <serverCallback methodName="pluginsActions" restParams="/" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
             </processing>
         </action>
 

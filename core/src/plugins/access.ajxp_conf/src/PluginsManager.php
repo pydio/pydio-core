@@ -27,6 +27,7 @@ use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\PluginFramework\Plugin;
@@ -305,8 +306,8 @@ class PluginsManager extends AbstractManager
                     }
                     $buffer .= "</repoScope>";
                 }
-                $buffer = "</standard_form>";
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                $buffer .= "</standard_form>";
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
                 break;
 
             default:
