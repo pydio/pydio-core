@@ -54,9 +54,11 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
 
     /**
      * NodesList constructor.
+     * @param string $rootPath
      */
-    public function __construct(){
-        $this->parentNode = new AJXP_Node("/");
+    public function __construct($rootPath = "/"){
+        // Create a fake parent node by default, without label
+        $this->parentNode = new AJXP_Node($rootPath, ["text" => "", "is_file" => false]);
     }
 
     /**
@@ -80,6 +82,16 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      */
     public function getChildren(){
         return $this->children;
+    }
+
+    /**
+     * @param $path
+     * @return AJXP_Node
+     */
+    public function findChildByPath( $path ){
+        return array_shift(array_filter($this->children, function($child) use ($path){
+            return ($child instanceof AJXP_Node && $child->getPath() == $path);
+        }));
     }
 
     /**
@@ -146,12 +158,14 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      * @param string $switchGridMode
      * @param string $switchDisplayMode
      * @param string $templateName
+     * @return $this
      */
     public function initColumnsData($switchGridMode='', $switchDisplayMode='', $templateName=''){
         $this->columnsDescription = [
             'description' => ['switchGridMode' => $switchGridMode, 'switchDisplayMode' => $switchDisplayMode, 'template_name' => $templateName],
             'columns'     => []
         ];
+        return $this;
     }
 
     /**
@@ -159,6 +173,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      * @param string $attributeName
      * @param string $sortType
      * @param string $width
+     * @return $this
      */
     public function appendColumn($messageId, $attributeName, $sortType='String', $width=''){
         $this->columnsDescription['columns'][] = [
@@ -167,6 +182,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
             'sortType'      => $sortType,
             'width'         => $width
         ];
+        return $this;
     }
 
     /**
@@ -234,7 +250,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         // Prepare Headers
         if(isSet($this->columnsDescription["columns"])){
             $messages = LocaleService::getMessages();
-            foreach($this->columnsDescription as $column){
+            foreach($this->columnsDescription["columns"] as $column){
                 $colTitle = $messages[$column["messageId"]];
                 $collAttr = $column["attributeName"];
                 $headers[$collAttr] = $colTitle;
@@ -259,7 +275,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         foreach($this->children as $child){
             $row = [];
             foreach($headers as $attName => $label){
-                if($attName === "text") $row[] = $child->getLabel();
+                if($attName === "text" || $attName === "ajxp_label") $row[] = $child->getLabel();
                 else if($attName === "is_file") $row[] = $child->isLeaf() ? "True" : "False";
                 else $row[] = $child->$attName;
             }
