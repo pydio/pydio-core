@@ -247,7 +247,7 @@ class ConfAccessDriver extends AbstractAccessDriver
             case "create_user":
             case "user_delete_role":
             case "user_reorder_roles":
-            case "user_bulk_update_roles":
+            case "users_bulk_update_roles":
             case "save_custom_user_params":
             case "save_repository_user_params":
             case "update_user_pwd":
