@@ -26,6 +26,7 @@ use dibi;
 use DibiDateTime;
 use DibiException;
 use Exception;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\DBHelper;
@@ -348,16 +349,26 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         $log_month = date('m', $log_unixtime);
         $log_date = date("m-d-y", $log_unixtime);
 
-        // Some actions or parameters can contain characters that need to be encoded, especially when a piece of code raises a notification or error.
-        $action = StringHelper::xmlEntities($action);
-        $params = StringHelper::xmlEntities($params);
-        $source = StringHelper::xmlEntities($source);
-        $rowIdString = "";
-        if ($rowId !== null) {
-            $rowIdString = "cursor=\"{$rowId}\"";
+        $meta = [
+            "icon" => $icon,
+            "date" => $log_datetime,
+            "ajxp_modiftime" => $log_unixtime,
+            "is_file" => true,
+            "filename" => "{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}",
+            "ajxp_mime" => "log",
+            "ip" => $remote_ip,
+            "level" => $log_level,
+            "user" => $user,
+            "action" => $action,
+            "source" => $source,
+            "params" => $params
+        ];
+        if($rowId !== null){
+            $meta["cursor"] = $rowId;
         }
 
-        return "<$node $rowIdString icon=\"{$icon}\" date=\"{$log_datetime}\" ajxp_modiftime=\"{$log_unixtime}\" is_file=\"true\" filename=\"{$rootPath}/{$log_year}/{$log_month}/{$log_date}/{$log_datetime}\" ajxp_mime=\"log\" ip=\"{$remote_ip}\" level=\"{$log_level}\" user=\"{$user}\" action=\"{$action}\" source=\"{$source}\" params=\"{$params}\"/>";
+        return $meta;
+
     }
 
     /**
@@ -425,13 +436,14 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
      * @param null $year
      * @param null $month
      * @param string $rootPath
-     * @param bool $print
-     * @return array|String[]
-     * @throws \Pydio\Core\Exception\PydioException
+     * @return array|\String[]
+     * @throws DibiException
+     * @throws PydioException
+     * @internal param bool $print
      */
-    public function xmlListLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs", $print = true)
+    public function listLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs")
     {
-        $xml_strings = array();
+        $data = array();
 
         switch ($this->sqlDriver["driver"]) {
             case "sqlite":
@@ -452,7 +464,7 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $dFunc = "DATE([logdate])";
                 break;
             default:
-                throw new \Pydio\Core\Exception\PydioException("ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__");
+                throw new PydioException("ERROR!, DB driver " . $this->sqlDriver["driver"] . " not supported yet in __FUNCTION__");
         }
 
         try {
@@ -472,22 +484,21 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     $log_time = strtotime($r['logdate']);
 
                     $fullYear = date('Y', $log_time);
-                    $fullMonth = date('F', $log_time);
                     $logM = date('m', $log_time);
                     $date = $r['logdate'];
                     if ($date instanceof DibiDateTime) {
                         $date = $date->format("Y-m-d");
                     }
-                    $path = "$rootPath/$fullYear/$logM/$date";
-                    $metadata = array(
-                        "icon" => "toggle_log.png",
-                        "date" => $date,
-                        "ajxp_mime" => "datagrid",
-                        "grid_datasource" => "get_action=ls&dir=" . urlencode($path),
+                    $key = "$rootPath/$fullYear/$logM/$date";
+                    $data[$key] = [
+                        "icon"              => "toggle_log.png",
+                        "date"              => $date,
+                        "is_file"           => false,
+                        "ajxp_mime"         => "datagrid",
+                        "grid_datasource"   => "get_action=ls&dir=" . urlencode($key),
                         "grid_header_title" => "Application Logs for $date",
-                        "grid_actions" => "refresh,filter,copy_as_text"
-                    );
-                    $xml_strings[$date] = XMLWriter::renderNode($path, $date, true, $metadata, true, false);
+                        "grid_actions"      => "refresh,filter,copy_as_text"
+                    ];
                 }
 
             } else if ($year != null) { // Get months
@@ -507,28 +518,31 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     $month_time = mktime(0, 0, 0, $r['month'], 1, $r['year']);
 
                     $fullYear = date('Y', $month_time);
-                    $fullMonth = date('F', $month_time);
                     $logMDisplay = date('F', $month_time);
                     $logM = date('m', $month_time);
 
-                    $xml_strings[$r['month']] = $this->formatXmlLogList($nodeName, 'x-office-calendar.png', $logM, $logMDisplay, $logMDisplay, "$rootPath/$fullYear/$logM");
-                    //"<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"/logs/$fullYear/$fullMonth\"/>";
+                    //"<$node icon=\"{$icon}\" date=\"{$dateattrib}\" display=\"{$display}\" text=\"{$text}\" is_file=\"{$is_file}\" filename=\"{$filename}\"/>";
+                    //$data[$r['month']] = $this->formatXmlLogList($nodeName, 'x-office-calendar.png', $logM, $logMDisplay, $logMDisplay, "$rootPath/$fullYear/$logM");
+                    $key = "$rootPath/$fullYear/$logM";
+                    $data[$key] = [
+                        "icon"      => "x-office-calendar.png",
+                        "text"      => $logMDisplay,
+                        "date"      => $logM,
+                        "display"   => $logMDisplay,
+                        "is_file"   => false
+                    ];
+
                 }
 
             } else {
 
                 // Append Analytics Node
-                $xml_strings['0000'] = XMLWriter::renderNode($rootPath . "/all_analytics",
-                    "Analytics Dashboard",
-                    true,
-                    array(
-                        "icon" => "graphs_viewer/ICON_SIZE/analytics.png",
-                        "ajxp_mime" => "ajxp_graphs",
-                    ),
-                    true,
-                    false
-                );
-
+                $data[$rootPath . "/0000_all_analytics"] = [
+                    "icon" => "graphs_viewer/ICON_SIZE/analytics.png",
+                    "ajxp_mime" => "ajxp_graphs",
+                    "is_file"   => true,
+                    "text"      => "Analytics Dashboard"
+                ];
 
                 // Get years
                 $q = 'SELECT
@@ -537,36 +551,40 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $result = dibi::query($q);
 
                 foreach ($result as $r) {
-                    $year_time = mktime(0, 0, 0, 1, 1, $r['year']);
                     $fullYear = $r['year'];
+                    $nodeKey = "$rootPath/$fullYear";
+                    $data[$nodeKey] = [
+                        "icon"      => "x-office-calendar.png",
+                        "text"      => $fullYear,
+                        "date"      => $fullYear,
+                        "display"   => $fullYear,
+                        "is_file"   => false
+                    ];
 
-                    $xml_strings[$r['year']] = $this->formatXmlLogList($nodeName, 'x-office-calendar.png', $fullYear, $fullYear, $fullYear, "$rootPath/$fullYear");
-                    //"<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" filename=\"/logs/$fullYear\"/>";
                 }
             }
         } catch (DibiException $e) {
             throw $e;
         }
 
-        if ($print) {
-            foreach ($xml_strings as $s) {
-                print($s);
-            }
-        }
-
-        return $xml_strings;
+        return $data;
     }
 
     /**
      * List log contents in XML
      *
+     * @param $parentDir
      * @param String $date Assumed to be m-d-y format.
-     * @param String [optional] $nodeName
+     * @param string $nodeName
+     * @param string $rootPath
+     * @param int $cursor
+     * @return \array[]
      */
-    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1)
+    public function listLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1)
     {
         $start_time = strtotime($date);
         $end_time = mktime(0, 0, 0, date('m', $start_time), date('d', $start_time) + 1, date('Y', $start_time));
+        $logs = [];
 
         try {
             if ($cursor != -1) {
@@ -576,7 +594,6 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                 $q = 'SELECT * FROM [ajxp_log] WHERE [logdate] BETWEEN %t AND %t ORDER BY [logdate] DESC';
                 $result = dibi::query($q, $start_time, $end_time);
             }
-            $log_items = "";
             $currentCount = 1;
             foreach ($result as $r) {
 
@@ -585,7 +602,7 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     continue;
                 }
                 if (isSet($buffer)) {
-                    $log_items .= TextEncoder::toUTF8($this->formatXmlLogItem(
+                    $meta = $this->formatXmlLogItem(
                         $nodeName,
                         'toggle_log.png',
                         $buffer['logdate'],
@@ -598,10 +615,10 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                         $buffer['params'],
                         $rootPath,
                         $buffer['id']
-                    )
                     );
+                    $logs[$meta["filename"]] = $meta;
                 }
-                $log_items .= TextEncoder::toUTF8($this->formatXmlLogItem(
+                $meta = $this->formatXmlLogItem(
                     $nodeName,
                     'toggle_log.png',
                     $r['logdate'],
@@ -613,21 +630,19 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
                     $r['message'],
                     $r['params'],
                     $rootPath,
-                    $r['id'])
+                    $r['id']
                 );
+                $logs[$meta["filename"]] = $meta;
 
                 $currentCount = 1;
-
                 $buffer = $r;
 
             }
 
-            print($log_items);
-
         } catch (DibiException $e) {
-            echo get_class($e), ': ', $e->getMessage(), "\n";
-            exit(1);
+            //echo get_class($e), ': ', $e->getMessage(), "\n";
         }
+        return $logs;
     }
 
     // IPV4/6 <--> DEC Lovingly lifted from stackoverflow, credit to Sander Marechal

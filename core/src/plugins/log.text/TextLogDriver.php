@@ -218,12 +218,15 @@ class TextLogDriver extends AbstractLogDriver
      * @param String $nodeName Name of the XML node to use as response.
      * @param Integer $year The year to list.
      * @param Integer $month The month to list.
+     * @param string $rootPath
      * @return null
      */
-    public function xmlListLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs", $print = true)
+    public function listLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs")
     {
-        if (!is_dir($this->storageDir)) return "";
         $logs = array();
+        if (!is_dir($this->storageDir)) {
+            return $logs;
+        }
         $years = array();
         $months = array();
         if (($handle = opendir($this->storageDir)) !== false) {
@@ -238,13 +241,37 @@ class TextLogDriver extends AbstractLogDriver
                 $display = date("l d", $time);
                 $fullYear = date("Y", $time);
                 $fullMonth = date("F", $time);
-                $logY = $fullYear;
                 $logM = $fullMonth;
                 if ($year != null && $fullYear != $year) continue;
                 if ($month != null && $fullMonth != $month) continue;
-                $logs[$time] = "<$nodeName icon=\"toggle_log.png\" date=\"$display\" display=\"$display\" text=\"$date\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth/$date\"/>";
-                $years[$logY] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullYear\" display=\"$fullYear\" text=\"$fullYear\" is_file=\"0\" filename=\"$rootPath/$fullYear\"/>";
-                $months[$logM] = "<$nodeName icon=\"x-office-calendar.png\" date=\"$fullMonth\" display=\"$logM\" text=\"$fullMonth\" is_file=\"0\" filename=\"$rootPath/$fullYear/$fullMonth\"/>";
+                $key = "$rootPath/$fullYear/$fullMonth/$date";
+                $logs[$key] = [
+                    "icon" => "toggle_log.png",
+                    "date" => $display,
+                    "text" => $date,
+                    "is_file" => false,
+                    "filename" => $key,
+                    "ajxp_mime"         => "datagrid",
+                    "grid_datasource"   => "get_action=ls&dir=" . urlencode($key),
+                    "grid_header_title" => "Application Logs for $date",
+                    "grid_actions"      => "refresh,filter,copy_as_text"
+                ];
+                $years["$rootPath/$fullYear"] = [
+                    "icon" => "x-office-calendar.png",
+                    "date" => $fullYear,
+                    "display" => $fullYear,
+                    "text" => $fullYear,
+                    "is_file" => false,
+                    "filename" => "$rootPath/$fullYear"
+                ];
+                $months["$rootPath/$fullYear/$fullMonth"] = [
+                    "icon" => "x-office-calendar.png",
+                    "date" => $fullMonth,
+                    "display" => $logM,
+                    "text" => $fullMonth,
+                    "is_file" => false,
+                    "filename" => "$rootPath/$fullYear/$fullMonth"
+                ];
             }
             closedir($handle);
         }
@@ -256,22 +283,26 @@ class TextLogDriver extends AbstractLogDriver
             }
         }
         krsort($result, SORT_STRING);
-        if ($print) foreach ($result as $log) print($log);
         return $result;
     }
 
     /**
      * Get a log in XML format.
      *
+     * @param $parentDir
      * @param String $date Date in m-d-y format.
      * @param String $nodeName The name of the node to use for each log item.
+     * @param string $rootPath
+     * @param int $cursor
      * @return null
      */
-    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
+    public function listLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1)
     {
+        $logs = [];
         $fName = $this->storageDir . "log_" . $date . ".txt";
-
-        if (!is_file($fName) || !is_readable($fName)) return;
+        if (!is_file($fName) || !is_readable($fName)) {
+            return $logs;
+        }
 
         $lines = file($fName);
         foreach ($lines as $line) {
@@ -286,7 +317,6 @@ class TextLogDriver extends AbstractLogDriver
             if (count($matches) == 7) {
                 $fileName = $parentDir . "/" . $matches[0];
                 foreach ($matches as $key => $match) {
-                    $match = StringHelper::xmlEntities($match);
                     $match = str_replace("\"", "'", $match);
                     $matches[$key] = $match;
                 }
@@ -295,9 +325,22 @@ class TextLogDriver extends AbstractLogDriver
                 $date = $matches[0];
                 list($m, $d, $Y, $h, $i, $s) = sscanf($date, "%i-%i-%i %i:%i:%i");
                 $tStamp = mktime($h, $i, $s, $m, $d, $Y);
-                print(TextEncoder::toUTF8("<$nodeName is_file=\"1\" ajxp_modiftime=\"$tStamp\" filename=\"$fileName\" ajxp_mime=\"log\" date=\"$matches[0]\" ip=\"$matches[1]\" level=\"$matches[2]\" user=\"$matches[3]\" source=\"$matches[4]\" action=\"$matches[5]\" params=\"$matches[6]\" icon=\"toggle_log.png\" />", false));
+                $logs[$fileName] = [
+                    "is_file" => true,
+                    "ajxp_modiftime" => $tStamp,
+                    "filename" => $fileName,
+                    "ajxp_mime" => "log",
+                    "date" => $matches[0],
+                    "ip" => $matches[1],
+                    "level" => $matches[2],
+                    "user" => $matches[3],
+                    "source"=> $matches[4],
+                    "action" => $matches[5],
+                    "params" => $matches[6],
+                    "icon" => "toggle_log.png"
+                ];
             }
         }
-        return;
+        return $logs;
     }
 }

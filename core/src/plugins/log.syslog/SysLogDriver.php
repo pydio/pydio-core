@@ -193,18 +193,15 @@ class SysLogDriver extends TextLogDriver
      * @param Integer $year The year to list.
      * @param Integer $month The month to list.
      * @param string $rootPath
-     * @param bool $print
      * @return null
+     * @internal param bool $print
      */
-    public function xmlListLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs", $print = true)
+    public function listLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs")
     {
-        $xml = "<$nodeName icon=\"toggle_log.png\" date=\"\"
-        display=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
-        text=\"Logs are not readable via this GUI, they are sent directly to your system logger daemon.\"
-        is_file=\"1\"
-        filename=\"$rootPath/see\"/>";
-        if ($print) print $xml;
-        return array($xml);
+        return ["$rootPath/see" => [
+            "date" => "", "icon" => "", "display" => "Logs are not readable via this GUI, they are sent directly to your system logger daemon.",
+            "text" => "Logs are not readable via this GUI, they are sent directly to your system logger daemon.", "is_file" => 1, "filename" => "$rootPath/see"
+        ]];
     }
 
     /**
@@ -214,9 +211,10 @@ class SysLogDriver extends TextLogDriver
      * @param String $date Date in m-d-y format.
      * @param String $nodeName The name of the node to use for each log item.
      * @param string $rootPath
+     * @param int $cursor
      * @return null
      */
-    public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs")
+    public function listLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1)
     {
     }
 }

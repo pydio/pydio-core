@@ -76,9 +76,9 @@ abstract class AbstractLogDriver extends Plugin
      * @param null $year
      * @param null $month
      * @param string $rootPath
-     * @return String[]
+     * @return \String[]
      */
-    abstract public function xmlListLogFiles($nodeName="file", $year=null, $month=null, $rootPath = "/logs", $print = true);
+    abstract public function listLogFiles($nodeName = "file", $year = null, $month = null, $rootPath = "/logs");
 
     /**
      * List log contents in XML
@@ -87,8 +87,9 @@ abstract class AbstractLogDriver extends Plugin
      * @param String $date Assumed to be m-d-y format.
      * @param string $nodeName
      * @param string $rootPath
-     * @return void
+     * @param int $cursor
+     * @return
      */
-    abstract public function xmlLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs");
+    abstract public function listLogs($parentDir, $date, $nodeName = "log", $rootPath = "/logs", $cursor = -1);
 
 }
