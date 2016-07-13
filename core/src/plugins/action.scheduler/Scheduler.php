@@ -24,6 +24,8 @@ namespace Pydio\Action\Scheduler;
 use DOMNode;
 use DOMXPath;
 use Exception;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -420,24 +422,29 @@ class Scheduler extends Plugin
     }
 
     /**
-     * @param $nodeName
-     * @param $baseDir
+     * @param $httpVars
+     * @param $rootPath
+     * @param $relativePath
+     * @param null $paginationHash
+     * @param null $findNodePosition
+     * @param null $aliasedDir
+     * @return NodesList
      * @throws Exception
      */
-    public function listTasks($nodeName, $baseDir)
+    public function listTasks($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition=null, $aliasedDir=null)
     {
         $mess = LocaleService::getMessages();
-        XMLWriter::renderHeaderNode("/$baseDir/$nodeName", "Scheduler", false, array("icon" => "scheduler/ICON_SIZE/player_time.png"));
-        XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="list"  template_name="action.scheduler_list">
-                 <column messageId="action.scheduler.12" attributeName="ajxp_label" sortType="String"/>
-                 <column messageId="action.scheduler.2" attributeName="schedule" sortType="String"/>
-                 <column messageId="action.scheduler.1" attributeName="action_name" sortType="String"/>
-                 <column messageId="action.scheduler.4s" attributeName="repository_id" sortType="String"/>
-                 <column messageId="action.scheduler.17" attributeName="user_id" sortType="String"/>
-                 <column messageId="action.scheduler.3" attributeName="NEXT_EXECUTION" sortType="String"/>
-                 <column messageId="action.scheduler.14" attributeName="LAST_EXECUTION" sortType="String"/>
-                 <column messageId="action.scheduler.13" attributeName="STATUS" sortType="String"/>
-        </columns>');
+        $nodesList = new NodesList("/$rootPath/$relativePath");
+        $nodesList->initColumnsData("filelist", "list", "action.scheduler_list")
+            ->appendColumn("action.scheduler.12", "ajxp_label")
+            ->appendColumn("action.scheduler.2", "schedule")
+            ->appendColumn("action.scheduler.1", "action_name")
+            ->appendColumn("action.scheduler.4s", "repository_id")
+            ->appendColumn("action.scheduler.17", "user_id")
+            ->appendColumn("action.scheduler.3", "NEXT_EXECUTION")
+            ->appendColumn("action.scheduler.14", "LAST_EXECUTION")
+            ->appendColumn("action.scheduler.13", "STATUS");
+
         $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         foreach ($tasks as $task) {
 
@@ -456,14 +463,12 @@ class Scheduler extends Plugin
                 $task["STATUS"] = "n/a";
                 $task["LAST_EXECUTION"] = "n/a";
             }
-
-            XMLWriter::renderNode("/admin/scheduler/" . $task["task_id"],
-                (isSet($task["label"]) ? $task["label"] : "Action " . $task["action_name"]),
-                true,
-                $task
-            );
+            $task["text"] = (isSet($task["label"]) ? $task["label"] : "Action " . $task["action_name"]);
+            $key = "/$rootPath/$relativePath/".$task["task_id"];
+            $nodesList->addBranch(new AJXP_Node($key, $task));
         }
-        XMLWriter::close();
+
+        return $nodesList;
 
     }
 

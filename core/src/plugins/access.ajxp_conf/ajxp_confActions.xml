@@ -29,7 +29,7 @@
 						ajaxplorer.updateContextData(path);
 					}
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/dir+" developerComment="List the content of the config. Depending on the path, will return users, workspaces, roles, etc..">
+				<serverCallback methodName="listAction" restParams="/dir+" developerComment="List the content of the config. Depending on the path, will return users, workspaces, roles, etc..">
                     <input_param name="dir" type="path" description="Path to config data to list. See URIs in webapp to guess the correct path."/>
 				</serverCallback>
 			</processing>

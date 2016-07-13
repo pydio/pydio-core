@@ -21,6 +21,8 @@
  */
 namespace Pydio\Access\Driver\DataProvider;
 
+require_once(dirname(__FILE__)."/vendor/autoload.php");
+
 use DOMXPath;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,8 +30,10 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Driver\DataProvider\Provisioning\TreeManager;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Exception\UserNotFoundException;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
@@ -86,20 +90,22 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.3",
                     "DESCRIPTION" => "ajxp_conf.138",
                     "ICON" => "hdd_external_unmount.png",
-                    "LIST" => "listRepositories"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RepositoriesManager"
+                ),
                 "users" => array(
                     "AJXP_MIME" => "users_zone",
                     "LABEL" => "ajxp_conf.2",
                     "DESCRIPTION" => "ajxp_conf.139",
                     "ICON" => "users-folder.png",
-                    "LIST" => "listUsers"
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\UsersManager"
                 ),
                 "roles" => array(
                     "AJXP_MIME" => "roles_zone",
                     "LABEL" => "ajxp_conf.69",
                     "DESCRIPTION" => "ajxp_conf.140",
                     "ICON" => "user-acl.png",
-                    "LIST" => "listRoles"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RolesManager"
+                ),
             )
         ),
         "config" => array(
@@ -113,19 +119,22 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.98",
                     "DESCRIPTION" => "ajxp_conf.133",
                     "ICON" => "preferences_desktop.png",
-                    "LIST" => "listPlugins"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
+                ),
                 "plugins"	   => array(
                     "AJXP_MIME" => "plugins_zone",
                     "LABEL" => "ajxp_conf.99",
                     "DESCRIPTION" => "ajxp_conf.134",
                     "ICON" => "folder_development.png",
-                    "LIST" => "listPlugins"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
+                ),
                 "core_plugins" => array(
                     "AJXP_MIME" => "plugins_zone",
                     "LABEL" => "ajxp_conf.123",
                     "DESCRIPTION" => "ajxp_conf.135",
                     "ICON" => "folder_development.png",
-                    "LIST" => "listPlugins"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
+                ),
             )
         ),
         "admin" => array(
@@ -137,11 +146,14 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.4",
                     "DESCRIPTION" => "ajxp_conf.142",
                     "ICON" => "toggle_log.png",
-                    "LIST" => "listLogFiles"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\LogsManager"
+                ),
                 "diagnostic" => array(
                     "LABEL" => "ajxp_conf.5",
                     "DESCRIPTION" => "ajxp_conf.143",
-                    "ICON" => "susehelpcenter.png", "LIST" => "printDiagnostic")
+                    "ICON" => "susehelpcenter.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DiagnosticManager"
+                )
             )
         ),
         "developer" => array(
@@ -153,25 +165,17 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.146",
                     "DESCRIPTION" => "ajxp_conf.147",
                     "ICON" => "book.png",
-                    "LIST" => "listActions"),
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\ActionsManager"
+                ),
                 "hooks" => array(
                     "LABEL" => "ajxp_conf.148",
                     "DESCRIPTION" => "ajxp_conf.149",
                     "ICON" => "book.png",
-                    "LIST" => "listHooks")
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\HooksManager"
+                )
             )
         )
     );
-
-
-    /**
-     * Do not display AJXP_GRP_/ and AJXP_USR_/ roles if not in server debug mode
-     * @param $key
-     * @return bool
-     */
-    protected function filterReservedRoles($key){
-        return (strpos($key, "AJXP_GRP_/") === FALSE && strpos($key, "AJXP_USR_/") === FALSE);
-    }
 
     /**
      * @param ContextInterface $ctx
@@ -495,40 +499,17 @@ class ConfAccessDriver extends AbstractAccessDriver
     }
 
     /**
-     * Render a bookmark node
-     * @param $path
-     * @param $data
-     * @param $messages
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    protected function renderNode($path, $data, $messages){
-        if(isSet($messages[$data["LABEL"]])) $data["LABEL"] = $messages[$data["LABEL"]];
-        if(isSet($messages[$data["DESCRIPTION"]])) $data["DESCRIPTION"] = $messages[$data["DESCRIPTION"]];
-        $nodeLabel = $data["LABEL"];
-        $attributes = array(
-            "description" => $data["DESCRIPTION"],
-            "icon"        => $data["ICON"]
-        );
-        if(in_array($path, $this->currentBookmarks)) {
-            $attributes["ajxp_bookmarked"]="true";
-            $attributes["overlay_icon"] = "bookmark.png";
-        }
-        if(basename($path) == "users") {
-            $attributes["remote_indexation"] = "admin_search";
-        }
-        if(isSet($data["AJXP_MIME"])) {
-            $attributes["ajxp_mime"] = $data["AJXP_MIME"];
-        }
-        if(isSet($data["METADATA"]) && is_array($data["METADATA"])){
-            $attributes = array_merge($attributes, $data["METADATA"]);
-        }
-        $hasChildren = isSet($data["CHILDREN"]);
-        XMLWriter::renderNode($path, $nodeLabel, false, $attributes, false);
-        if($hasChildren){
-            foreach($data["CHILDREN"] as $cKey => $cData){
-                $this->renderNode($path."/".$cKey, $cData, $messages);
-            }
-        }
-        XMLWriter::close();
+    public function listAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        $treeManager = new TreeManager($ctx, $this->getName(), $this->getMainTree($ctx));
+        $nodesList = $treeManager->dispatchList($requestInterface->getParsedBody());
+        $responseInterface = $responseInterface->withBody(new SerializableResponseStream($nodesList));
+        
     }
 
     /**
@@ -572,89 +553,6 @@ class ConfAccessDriver extends AbstractAccessDriver
 
 
         switch ($action) {
-            //------------------------------------
-            //	BASIC LISTING
-            //------------------------------------
-            case "ls":
-                $this->currentContext = $ctx;
-                $rootNodes = $this->getMainTree($ctx);
-                $rootAttributes = array();
-                if(isSet($rootNodes["__metadata__"])){
-                    $rootAttributes = $rootNodes["__metadata__"];
-                    unset($rootNodes["__metadata__"]);
-                }
-                $parentName = "";
-                $dir = trim(InputFilter::decodeSecureMagic((isset($httpVars["dir"]) ? $httpVars["dir"] : "")), " /");
-                if ($dir != "") {
-                    $hash = null;
-                    if (strstr(urldecode($dir), "#") !== false) {
-                        list($dir, $hash) = explode("#", urldecode($dir));
-                    }
-                    $splits = explode("/", $dir);
-                    $root = array_shift($splits);
-                    if (count($splits)) {
-                        $returnNodes = false;
-                        if (isSet($httpVars["file"])) {
-                            $returnNodes = true;
-                        }
-                        $child = $splits[0];
-                        if (isSet($rootNodes[$root]["CHILDREN"][$child])) {
-                            $atts = array();
-                            if ($child == "users") {
-                                $atts["remote_indexation"] = "admin_search";
-                            }
-                            $childData = $rootNodes[$root]["CHILDREN"][$child];
-                            $callback = $childData["LIST"];
-                            if(isSet($childData["ALIAS"])){
-                                $reSplits = explode("/", ltrim($childData["ALIAS"], "/"));
-                                $root = array_shift($reSplits);
-                                // additional part?
-                                array_shift($splits);
-                                foreach($splits as $vS) $reSplits[] = $vS;
-                                $splits = $reSplits;
-                            }
-                            if (is_string($callback) && method_exists($this, $callback)) {
-                                if(!$returnNodes) XMLWriter::header("tree", $atts);
-                                $res = call_user_func(array($this, $callback), implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir, $httpVars);
-                                if(!$returnNodes) XMLWriter::close();
-                            } else if (is_array($callback)) {
-                                $res = call_user_func($callback, implode("/", $splits), $root, $hash, $returnNodes, isSet($httpVars["file"])?$httpVars["file"]:'', "/".$dir, $httpVars);
-                            }
-                            if ($returnNodes) {
-                                XMLWriter::header("tree", $atts);
-                                if (isSet($res["/".$dir."/".$httpVars["file"]])) {
-                                    print $res["/".$dir."/".$httpVars["file"]];
-                                }
-                                XMLWriter::close();
-                            }
-                            return;
-                        }
-                    } else {
-                        $parentName = "/".$root."/";
-                        $nodes = $rootNodes[$root]["CHILDREN"];
-                    }
-                } else {
-                    $parentName = "/";
-                    $nodes = $rootNodes;
-                    if($currentUserIsGroupAdmin){
-                        $rootAttributes["group_admin"]  = "1";
-                    }
-                }
-                if (isSet($httpVars["file"])) {
-                    $parentName = $httpVars["dir"]."/";
-                    $nodes = array(basename($httpVars["file"]) =>  array("LABEL" => basename($httpVars["file"])));
-                }
-                if (isSet($nodes)) {
-                    XMLWriter::header("tree", $rootAttributes);
-                    if(!isSet($httpVars["file"])) XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail"><column messageId="ajxp_conf.1" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.102" attributeName="description" sortType="String"/></columns>');
-                    foreach ($nodes as $key => $data) {
-                        $this->renderNode($parentName.$key, $data, $mess);
-                    }
-                    XMLWriter::close();
-
-                }
-
-            break;
 
             case "stat" :
 
@@ -2246,390 +2144,6 @@ class ConfAccessDriver extends AbstractAccessDriver
     }
 
     /**
-     * List available plugins
-     * @param $dir
-     * @param null $root
-     * @param null $hash
-     * @param bool $returnNodes
-     * @param string $file
-     * @param null $aliasedDir
-     * @return array
-     * @throws \Pydio\Core\Exception\PydioException
-     */
-    public function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false, $file="", $aliasedDir=null)
-    {
-        $dir = "/$dir";
-        if($aliasedDir != null && $aliasedDir != "/".$root.$dir){
-            $baseDir = $aliasedDir;
-        }else{
-            $baseDir = "/".$root.$dir;
-        }
-        $allNodes = array();
-        $this->logInfo("Listing plugins",""); // make sure that the logger is started!
-        $pServ = PluginsService::getInstance($this->currentContext);
-        $types = $pServ->getDetectedPlugins();
-        $mess = LocaleService::getMessages();
-        $uniqTypes = array("core");
-        $coreTypes = array("auth", "conf", "boot", "feed", "log", "mailer", "mq");
-        if ($dir == "/plugins" || $dir == "/core_plugins" || $dir=="/all") {
-            if($dir == "/core_plugins") $uniqTypes = $coreTypes;
-            else if($dir == "/plugins") $uniqTypes = array_diff(array_keys($types), $coreTypes);
-            else if($dir == "/all") $uniqTypes = array_keys($types);
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins_folder">
-            <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
-            <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
-            <column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
-            </columns>');
-            ksort($types);
-            foreach ($types as $t => $tPlugs) {
-                if(!in_array($t, $uniqTypes))continue;
-                if($t == "core") continue;
-                $nodeKey = $baseDir."/".$t;
-                $meta = array(
-                    "icon" 		=> "folder_development.png",
-                    "plugin_id" => $t,
-                    "text" => $mess["plugtype.title.".$t],
-                    "plugin_description" => $mess["plugtype.desc.".$t]
-                );
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                $xml = XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
-                if($returnNodes) $allNodes[$nodeKey] = $xml;
-                else print($xml);
-            }
-        } else if ($dir == "/core") {
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="detail"  template_name="ajxp_conf.plugins">
-            <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
-            <column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String"/>
-            <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String"/>
-            </columns>');
-            $all =  $first = "";
-            foreach ($uniqTypes as $type) {
-                if(!isset($types[$type])) continue;
-                /** @var Plugin $pObject */
-                foreach ($types[$type] as $pObject) {
-                    $isMain = ($pObject->getId() == "core.ajaxplorer");
-                    $meta = array(
-                        "icon" 		=> ($isMain?"preferences_desktop.png":"desktop.png"),
-                        "ajxp_mime" => "ajxp_plugin",
-                        "plugin_id" => $pObject->getId(),
-                        "plugin_description" => $pObject->getManifestDescription()
-                    );
-                    // Check if there are actually any parameters to display!
-                    if($pObject->getManifestRawContent("server_settings", "xml")->length == 0) continue;
-                    $label =  $pObject->getManifestLabel();
-                    $nodeKey = $baseDir."/".$pObject->getId();
-                    if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                    $nodeString =XMLWriter::renderNode($nodeKey, $label, true, $meta, true, false);
-                    if($returnNodes) $allNodes[$nodeKey] = $nodeString;
-                    if ($isMain) {
-                        $first = $nodeString;
-                    } else {
-                        $all .= $nodeString;
-                    }
-                }
-            }
-            if(!$returnNodes) print($first.$all);
-        } else {
-            $split = explode("/", $dir);
-            if(empty($split[0])) array_shift($split);
-            $type = $split[1];
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" switchDisplayMode="full" template_name="ajxp_conf.plugin_detail">
-            <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
-            <column messageId="ajxp_conf.102" attributeName="plugin_id" sortType="String" defaultWidth="10%"/>
-            <column messageId="ajxp_conf.103" attributeName="plugin_description" sortType="String" defaultWidth="60%"/>
-            <column messageId="ajxp_conf.104" attributeName="enabled" sortType="String" defaultWidth="10%"/>
-            <column messageId="ajxp_conf.105" attributeName="can_active" sortType="String" defaultWidth="10%"/>
-            </columns>');
-            $mess = LocaleService::getMessages();
-            /** @var Plugin $pObject */
-            foreach ($types[$type] as $pObject) {
-                $errors = "OK";
-                try {
-                    $pObject->performChecks();
-                } catch (\Exception $e) {
-                    $errors = "ERROR : ".$e->getMessage();
-                }
-                $meta = array(
-                    "icon" 		=> "preferences_plugin.png",
-                    "ajxp_mime" => "ajxp_plugin",
-                    "can_active"	=> $errors,
-                    "enabled"	=> ($pObject->isEnabled()?$mess[440]:$mess[441]),
-                    "plugin_id" => $pObject->getId(),
-                    "plugin_description" => $pObject->getManifestDescription()
-                );
-                $nodeKey = $baseDir."/".$pObject->getId();
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                $xml = XMLWriter::renderNode($nodeKey, $pObject->getManifestLabel(), true, $meta, true, false);
-                if($returnNodes) $allNodes[$nodeKey] = $xml;
-                else print $xml;
-            }
-        }
-        return $allNodes;
-    }
-
-    /**
-     * List users for a given group
-     * @param $root
-     * @param $child
-     * @param null $hashValue
-     * @param bool $returnNodes
-     * @param null $findNodePosition
-     * @return array
-     */
-    public function listUsers($root, $child, $hashValue = null, $returnNodes = false, $findNodePosition=null)
-    {
-        $USER_PER_PAGE = 50;
-        if($root == "users") $baseGroup = "/";
-        else $baseGroup = substr($root, strlen("users"));
-        if($this->currentContext->hasUser()){
-            $baseGroup = $this->currentContext->getUser()->getRealGroupPath($baseGroup);
-        }
-        if ($findNodePosition != null && $hashValue == null) {
-
-            // Add groups offset
-            $groups = UsersService::listChildrenGroups($baseGroup);
-            $offset = 0;
-            if(count($groups)){
-                $offset = count($groups);
-            }
-            $position = UsersService::findUserPage($baseGroup, $findNodePosition, $USER_PER_PAGE);
-            if($position != -1){
-
-                $key = "/data/".$root."/".$findNodePosition;
-                $data =  array($key => XMLWriter::renderNode($key, $findNodePosition, true, array(
-                        "page_position" => $position
-                    ), true, false));
-                return $data;
-
-            }else{
-                // Loop on each page to find the correct page.
-                $count = UsersService::authCountUsers($baseGroup);
-                $pages = ceil($count / $USER_PER_PAGE);
-                for ($i = 0; $i < $pages ; $i ++) {
-
-                    $tests = $this->listUsers($root, $child, $i+1, true, $findNodePosition);
-                    if (is_array($tests) && isSet($tests["/data/".$root."/".$findNodePosition])) {
-                        return array("/data/".$root."/".$findNodePosition => str_replace("ajxp_mime", "page_position='".($i+1)."' ajxp_mime", $tests["/data/".$root."/".$findNodePosition]));
-                    }
-
-                }
-            }
-
-
-            return array();
-
-        }
-
-        $allNodes = array();
-        $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users">
-                    <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
-                    <column messageId="ajxp_conf.102" attributeName="object_id" sortType="String" defaultWidth="10%"/>
-                    <column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="10%"/>
-                    <column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
-                    <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
-                    </columns>';
-        if (UsersService::driverSupportsAuthSchemes()) {
-            $columns = '<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.users_authscheme">
-                        <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String" defaultWidth="40%"/>
-                        <column messageId="ajxp_conf.102" attributeName="object_id" sortType="String" defaultWidth="10%"/>
-                        <column messageId="ajxp_conf.115" attributeName="auth_scheme" sortType="String" defaultWidth="5%"/>
-                        <column messageId="ajxp_conf.7" attributeName="isAdmin" sortType="String" defaultWidth="5%"/>
-                        <column messageId="ajxp_conf.70" attributeName="ajxp_roles" sortType="String" defaultWidth="15%"/>
-                        <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String" defaultWidth="15%"/>
-            </columns>';
-        }
-        if(!$returnNodes) XMLWriter::sendFilesListComponentConfig($columns);
-        if(!UsersService::usersEnabled()) return array();
-        if(empty($hashValue)) $hashValue = 1;
-
-        //$ctxUser = $this->currentContext->getUser();
-        //if(!empty($ctxUser)) $baseGroup = $ctxUser->getRealGroupPath($baseGroup);
-        $count = UsersService::authCountUsers($baseGroup, "", null, null, false);
-        if (UsersService::authSupportsPagination() && $count >= $USER_PER_PAGE) {
-            $offset = ($hashValue - 1) * $USER_PER_PAGE;
-            if(!$returnNodes) XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$USER_PER_PAGE));
-            $users = UsersService::listUsers($baseGroup, "", $offset, $USER_PER_PAGE, true, false);
-            if ($hashValue == 1) {
-                $groups = UsersService::listChildrenGroups($baseGroup);
-            } else {
-                $groups = array();
-            }
-        } else {
-            $users = UsersService::listUsers($baseGroup, "", -1, -1, true, false);
-            $groups = UsersService::listChildrenGroups($baseGroup);
-        }
-        $groupAdmin = ($this->currentContext->hasUser() && $this->currentContext->getUser()->getGroupPath() != "/");
-        if($this->getName() == "ajxp_admin" && $baseGroup == "/" && $hashValue == 1 && !$groupAdmin){
-            $nodeKey = "/data/".$root."/";
-            $meta = array(
-                "icon" => "users-folder.png",
-                "icon_class" => "icon-home",
-                "ajxp_mime" => "group",
-                "object_id" => "/"
-            );
-            $mess = LocaleService::getMessages();
-            $xml = XMLWriter::renderNode($nodeKey, $mess["ajxp_conf.151"], true, $meta, true, false);
-            if(!$returnNodes) print($xml);
-            else $allNodes[$nodeKey] = $xml;
-        }
-
-        foreach ($groups as $groupId => $groupLabel) {
-
-            $nodeKey = "/data/".$root."/".ltrim($groupId,"/");
-            $meta = array(
-                "icon" => "users-folder.png",
-                "icon_class" => "icon-folder-close",
-                "ajxp_mime" => "group",
-                "object_id" => $groupId
-            );
-            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = XMLWriter::renderNode($nodeKey,
-                $groupLabel, false, $meta, true, false);
-            if(!$returnNodes) print($xml);
-            else $allNodes[$nodeKey] = $xml;
-
-        }
-        $mess = LocaleService::getMessages();
-        $loggedUser = $this->currentContext->getUser();
-        $userArray = array();
-        $logger = Logger::getInstance();
-        if(method_exists($logger, "usersLastConnection")){
-            $allUserIds = array();
-        }
-        foreach ($users as $userObject) {
-            $label = $userObject->getId();
-            if(isSet($allUserIds)) $allUserIds[] = $label;
-            if ($userObject->hasParent()) {
-                $label = $userObject->getParent()."000".$label;
-            }else{
-                $children = ConfService::getConfStorageImpl()->getUserChildren($label);
-                foreach($children as $addChild){
-                    $userArray[$label."000".$addChild->getId()] = $addChild;
-                }
-            }
-            $userArray[$label] = $userObject;
-        }
-        if(isSet($allUserIds) && count($allUserIds)){
-            $connections = $logger->usersLastConnection($allUserIds);
-        }
-        ksort($userArray);
-        foreach ($userArray as $userObject) {
-            $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
-            $isAdmin = $userObject->isAdmin();
-            $userId = $userObject->getId();
-            $icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
-            $iconClass = "icon-user";
-            if ($userObject->hasParent()) {
-                $icon = "user_child";
-                $iconClass = "icon-angle-right";
-            }
-            if ($isAdmin) {
-                $rightsString = $mess["ajxp_conf.63"];
-            } else {
-                $r = array();
-                foreach ($repos as $repoId => $repository) {
-                    if($repository->getAccessType() == "ajxp_shared") continue;
-                    if(!$userObject->canRead($repoId) && !$userObject->canWrite($repoId)) continue;
-                    $rs = ($userObject->canRead($repoId) ? "r" : "");
-                    $rs .= ($userObject->canWrite($repoId) ? "w" : "");
-                    $r[] = $repository->getDisplay()." (".$rs.")";
-                }
-                $rightsString = implode(", ", $r);
-            }
-            $nodeLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-            $scheme = UsersService::getAuthScheme($userId);
-            $nodeKey = "/data/$root/".$userId;
-            $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
-            $meta = array(
-                "isAdmin" => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
-                "icon" => $icon.".png",
-                "icon_class" => $iconClass,
-                "object_id" => $userId,
-                "auth_scheme" => ($scheme != null? $scheme : ""),
-                "rights_summary" => $rightsString,
-                "ajxp_roles" => implode(", ", $roles),
-                "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$loggedUser->getId())?"_editable":""),
-                "json_merged_role" => json_encode($userObject->mergedRole->getDataArray(true))
-            );
-            if($userObject->hasParent()) $meta["shared_user"] = "true";
-            if(isSet($connections) && isSet($connections[$userObject->getId()]) && !empty($connections[$userObject->getId()])) {
-                $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
-                $meta["last_connection_readable"] = StatHelper::relativeDate($meta["last_connection"], $mess);
-            }
-            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = XMLWriter::renderNode($nodeKey, $nodeLabel, true, $meta, true, false);
-            if(!$returnNodes) print($xml);
-            else $allNodes[$nodeKey] = $xml;
-        }
-        return $allNodes;
-    }
-
-    /**
-     * List Roles
-     * @param $root
-     * @param $child
-     * @param null $hashValue
-     * @param bool $returnNodes
-     * @return array
-     */
-    public function listRoles($root, $child, $hashValue = null, $returnNodes = false)
-    {
-        $allNodes = array();
-        if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.roles">
-            <column messageId="ajxp_conf.6" attributeName="ajxp_label" sortType="String"/>
-            <column messageId="ajxp_conf.114" attributeName="is_default" sortType="String"/>
-            <column messageId="ajxp_conf.62" attributeName="rights_summary" sortType="String"/>
-            </columns>');
-        if(!UsersService::usersEnabled()) return array();
-        $ctxUser = $this->currentContext->getUser();
-        $currentUserIsGroupAdmin = ($ctxUser != null && $ctxUser->getGroupPath() != "/");
-        $roles = RolesService::getRolesList(array(), !$this->listSpecialRoles);
-        ksort($roles);
-        $mess = LocaleService::getMessages();
-        if(!$this->listSpecialRoles && $this->getName() != "ajxp_admin" && !$currentUserIsGroupAdmin){
-            $rootGroupRole = RolesService::getOrCreateRole("AJXP_GRP_/", empty($ctxUser) ? "/" : $ctxUser->getGroupPath());
-            if($rootGroupRole->getLabel() == "AJXP_GRP_/"){
-                $rootGroupRole->setLabel($mess["ajxp_conf.151"]);
-                RolesService::updateRole($rootGroupRole);
-            }
-            array_unshift($roles, $rootGroupRole);
-        }
-        foreach ($roles as $roleObject) {
-            //if(strpos($roleId, "AJXP_GRP_") === 0 && !$this->listSpecialRoles) continue;
-            $r = array();
-            if(!empty($ctxUser) && !$ctxUser->canAdministrate($roleObject)) continue;
-            $count = 0;
-            $repos = RepositoryService::listRepositoriesWithCriteria(array("role" => $roleObject), $count);
-            foreach ($repos as $repoId => $repository) {
-                if($repository->getAccessType() == "ajxp_shared") continue;
-                if(!$roleObject->canRead($repoId) && !$roleObject->canWrite($repoId)) continue;
-                $rs = ($roleObject->canRead($repoId) ? "r" : "");
-                $rs .= ($roleObject->canWrite($repoId) ? "w" : "");
-                $r[] = $repository->getDisplay()." (".$rs.")";
-            }
-            $rightsString = implode(", ", $r);
-            $nodeKey = "/data/roles/".$roleObject->getId();
-            $appliesToDefault = implode(",", $roleObject->listAutoApplies());
-            if($roleObject->getId() == "AJXP_GRP_/"){
-                $appliesToDefault = $mess["ajxp_conf.153"];
-            }
-            $meta = array(
-                "icon" => "user-acl.png",
-                "rights_summary" => $rightsString,
-                "is_default"    => $appliesToDefault, //($roleObject->autoAppliesTo("standard") ? $mess[440]:$mess[441]),
-                "ajxp_mime" => "role",
-                "role_id"   => $roleObject->getId(),
-                "text"      => $roleObject->getLabel()
-            );
-            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = XMLWriter::renderNode($nodeKey, $roleObject->getId(), true, $meta, true, false);
-            if(!$returnNodes) echo $xml;
-            else $allNodes[$nodeKey] = $xml;
-        }
-        return $allNodes;
-    }
-
-    /**
      * @param $name
      * @return bool
      */
@@ -2639,415 +2153,6 @@ class ConfAccessDriver extends AbstractAccessDriver
         return $count > 0;
     }
 
-    /**
-     * @param Repository $a
-     * @param Repository $b
-     * @return integer
-     */
-    public function sortReposByLabel($a, $b)
-    {
-        return strcasecmp($a->getDisplay(), $b->getDisplay());
-    }
-
-    /**
-     * Get label for an access.* plugin
-     * @param $pluginId
-     * @param $labels
-     * @return mixed|string
-     */
-    protected function getDriverLabel($pluginId, &$labels){
-        if(isSet($labels[$pluginId])){
-            return $labels[$pluginId];
-        }
-        $plugin = PluginsService::getInstance(Context::emptyContext())->getPluginById("access.".$pluginId);
-        if(!is_object($plugin)) {
-            $label = "access.$plugin (plugin disabled!)";
-        }else{
-            $label = $plugin->getManifestLabel();
-        }
-        $labels[$pluginId] = $label;
-        return $label;
-    }
-
-
-    /**
-     * List all workspaces
-     * @param $root
-     * @param $child
-     * @param null $hashValue
-     * @param bool $returnNodes
-     * @param string $file
-     * @param null $aliasedDir
-     * @param $httpVars
-     */
-    public function listRepositories($root, $child, $hashValue = null, $returnNodes = false, $file="", $aliasedDir=null, $httpVars){
-        $REPOS_PER_PAGE = 50;
-        $allNodes = array();
-        if($hashValue == null) $hashValue = 1;
-        $offset = ($hashValue - 1) * $REPOS_PER_PAGE;
-
-        $count = null;
-        // Load all repositories = normal, templates, and templates children
-        $criteria = array(
-            "ORDERBY"       => array("KEY" => "display", "DIR"=>"ASC"),
-            "CURSOR"        => array("OFFSET" => $offset, "LIMIT" => $REPOS_PER_PAGE)
-        );
-        $ctxUser = $this->currentContext->getUser();
-        $currentUserIsGroupAdmin = ($ctxUser != null && $ctxUser->getGroupPath() != "/");
-        if($currentUserIsGroupAdmin){
-            $criteria = array_merge($criteria, array(
-                    "owner_user_id" => AJXP_FILTER_EMPTY,
-                    "groupPath"     => "regexp:/^".str_replace("/", "\/", $ctxUser->getGroupPath()).'/',
-                ));
-        }else{
-            $criteria["parent_uuid"] = AJXP_FILTER_EMPTY;
-        }
-        if(isSet($httpVars) && is_array($httpVars) && isSet($httpVars["template_children_id"])){
-            $criteria["parent_uuid"] = InputFilter::sanitize($httpVars["template_children_id"], InputFilter::SANITIZE_ALPHANUM);
-        }
-        $repos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
-        if(!$returnNodes){
-            XMLWriter::renderPaginationData($count, $hashValue, ceil($count/$REPOS_PER_PAGE));
-            XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist" template_name="ajxp_conf.repositories">
-                <column messageId="ajxp_conf.8" attributeName="ajxp_label" sortType="String"/>
-                <column messageId="ajxp_conf.9" attributeName="accessType" sortType="String"/>
-                <column messageId="ajxp_conf.125" attributeName="slug" sortType="String"/>
-            </columns>');
-        }
-
-        $driverLabels = array();
-
-        foreach ($repos as $repoIndex => $repoObject) {
-
-            if($repoObject->getAccessType() == "ajxp_conf" || $repoObject->getAccessType() == "ajxp_shared") continue;
-            if (!empty($ctxUser) && !$ctxUser->canAdministrate($repoObject))continue;
-            if(is_numeric($repoIndex)) $repoIndex = "".$repoIndex;
-
-            $icon = "hdd_external_unmount.png";
-            $editable = $repoObject->isWriteable();
-            if ($repoObject->isTemplate) {
-                $icon = "hdd_external_mount.png";
-                if ($ctxUser != null && $ctxUser->getGroupPath() != "/") {
-                    $editable = false;
-                }
-            }
-            $accessType = $repoObject->getAccessType();
-            $accessLabel = $this->getDriverLabel($accessType, $driverLabels);
-            $meta = array(
-                "repository_id" => $repoIndex,
-                "accessType"	=> ($repoObject->isTemplate?"Template for ":"").$repoObject->getAccessType(),
-                "accessLabel"	=> $accessLabel,
-                "icon"			=> $icon,
-                "owner"			=> ($repoObject->hasOwner()?$repoObject->getOwner():""),
-                "openicon"		=> $icon,
-                "slug"          => $repoObject->getSlug(),
-                "parentname"	=> "/repositories",
-                "ajxp_mime" 	=> "repository".($editable?"_editable":""),
-                "is_template"   => ($repoObject->isTemplate?"true":"false")
-            );
-
-            $nodeKey = "/data/repositories/$repoIndex";
-            $label = $repoObject->getDisplay();
-            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = XMLWriter::renderNode(
-                $nodeKey,
-                StringHelper::xmlEntities(TextEncoder::toUTF8($label)),
-                true,
-                $meta,
-                true,
-                false
-            );
-            if($returnNodes) $allNodes[$nodeKey] = $xml;
-            else print($xml);
-
-            if ($repoObject->isTemplate) {
-                // Now Load children for template repositories
-                $children = RepositoryService::listRepositoriesWithCriteria(array("parent_uuid" => $repoIndex . ""), $count);
-                foreach($children as $childId => $childObject){
-                    if (!empty($ctxUser) && !$ctxUser->canAdministrate($childObject))continue;
-                    if(is_numeric($childId)) $childId = "".$childId;
-                    $meta = array(
-                        "repository_id" => $childId,
-                        "accessType"	=> $childObject->getAccessType(),
-                        "accessLabel"	=> $this->getDriverLabel($childObject->getAccessType(), $driverLabels),
-                        "icon"			=> "repo_child.png",
-                        "slug"          => $childObject->getSlug(),
-                        "owner"			=> ($childObject->hasOwner()?$childObject->getOwner():""),
-                        "openicon"		=> "repo_child.png",
-                        "parentname"	=> "/repositories",
-                        "ajxp_mime" 	=> "repository_editable",
-                        "template_name" => $label
-                    );
-                    $cNodeKey = "/data/repositories/$childId";
-                    if(in_array($cNodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                    $xml = XMLWriter::renderNode(
-                        $cNodeKey,
-                        StringHelper::xmlEntities(TextEncoder::toUTF8($childObject->getDisplay())),
-                        true,
-                        $meta,
-                        true,
-                        false
-                    );
-                    if($returnNodes) $allNodes[$cNodeKey] = $xml;
-                    else print($xml);
-                }
-            }
-        }
-
-    }
-
-    /**
-     * List actions
-     * @param $dir
-     * @param null $root
-     * @param null $hash
-     * @param bool $returnNodes
-     * @return array
-     * @throws \Pydio\Core\Exception\PydioException
-     */
-    public function listActions($dir, $root = NULL, $hash = null, $returnNodes = false)
-    {
-        $allNodes = array();
-        $parts = explode("/",$dir);
-        $pServ = PluginsService::getInstance($this->currentContext);
-        //$activePlugins = $pServ->getActivePlugins();
-        $types = $pServ->getDetectedPlugins();
-        if (count($parts) == 1) {
-            // list all types
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist" template_name="ajxp_conf.plugins_folder">
-            <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
-            </columns>');
-            ksort($types);
-            foreach ($types as $t => $tPlugs) {
-                $meta = array(
-                    "icon" 		=> "folder_development.png",
-                    "plugin_id" => $t
-                );
-                $nodeKey = "/$root/actions/".$t;
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                $xml = XMLWriter::renderNode($nodeKey, ucfirst($t), false, $meta, true, false);
-                if($returnNodes) $allNodes[$nodeKey] = $xml;
-                else print($xml);
-            }
-
-        } else if (count($parts) == 2) {
-            // list plugs
-            $type = $parts[1];
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="detail" template_name="ajxp_conf.plugins_folder">
-                <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String"/>
-                <column messageId="ajxp_conf.103" attributeName="actions" sortType="String"/>
-            </columns>');
-            /** @var Plugin $pObject */
-            foreach ($types[$type] as $pObject) {
-                $actions = $pObject->getManifestRawContent("//action/@name", "xml", true);
-                $actLabel = array();
-                if ($actions->length) {
-                    foreach ($actions as $node) {
-                        $actLabel[] = $node->nodeValue;
-                    }
-                }
-                $meta = array(
-                    "icon" 		=> "preferences_plugin.png",
-                    "plugin_id" => $pObject->getId(),
-                    "actions"   => implode(", ", $actLabel)
-                );
-                $nodeKey = "/$root/actions/$type/".$pObject->getName();
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                $xml = XMLWriter::renderNode($nodeKey, $pObject->getManifestLabel(), false, $meta, true, false);
-                if($returnNodes) $allNodes[$nodeKey] = $xml;
-                else print($xml);
-
-            }
-
-        } else if (count($parts) == 3) {
-            // list actions
-            $type = $parts[1];
-            $name = $parts[2];
-            $mess = LocaleService::getMessages();
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="full" template_name="ajxp_conf.plugins_folder">
-                <column messageId="ajxp_conf.101" attributeName="ajxp_label" sortType="String" defaultWidth="10%"/>
-                <column messageId="ajxp_conf.103" attributeName="parameters" sortType="String" fixedWidth="30%"/>
-            </columns>');
-            /** @var Plugin $pObject */
-            $pObject = $types[$type][$name];
-
-            $actions = $pObject->getManifestRawContent("//action", "xml", true);
-            $allNodesAcc = array();
-            if ($actions->length) {
-                foreach ($actions as $node) {
-                    $xPath = new DOMXPath($node->ownerDocument);
-                    $callbacks = $xPath->query("processing/serverCallback", $node);
-                    if(!$callbacks->length) continue;
-                    /** @var \DOMElement $callback */
-                    $callback = $callbacks->item(0);
-
-                    $actName = $actLabel = $node->attributes->getNamedItem("name")->nodeValue;
-                    $text = $xPath->query("gui/@text", $node);
-                    if ($text->length) {
-                        $actLabel = $actName ." (" . $mess[$text->item(0)->nodeValue].")";
-                    }
-                    $params = $xPath->query("processing/serverCallback/input_param", $node);
-                    $paramLabel = array();
-                    if ($callback->getAttribute("developerComment") != "") {
-                        $paramLabel[] = "<span class='developerComment'>".$callback->getAttribute("developerComment")."</span>";
-                    }
-                    $restPath = "";
-                    if ($callback->getAttribute("restParams")) {
-                        $restPath = "/api/$actName/". ltrim($callback->getAttribute("restParams"), "/");
-                    }
-                    if ($restPath != null) {
-                        $paramLabel[] = "<span class='developerApiAccess'>"."API Access : ".$restPath."</span>";
-                    }
-                    if ($params->length) {
-                        $paramLabel[] = "Expected Parameters :";
-                        /** @var \DOMElement $param */
-                        foreach ($params as $param) {
-                            $paramLabel[]= '. ['.$param->getAttribute("type").'] <b>'.$param->getAttribute("name").($param->getAttribute("mandatory") == "true" ? '*':'').'</b> : '.$param->getAttribute("description");
-                        }
-                    }
-                    $meta = array(
-                        "icon" 		=> "preferences_plugin.png",
-                        "action_id" => $actName,
-                        "parameters"=> '<div class="developerDoc">'.implode("<br/>", $paramLabel).'</div>',
-                        "rest_params"=> $restPath
-                    );
-                    $nodeKey = "/$root/actions/$type/".$pObject->getName()."/$actName";
-                    if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                    $allNodes[$nodeKey] = $allNodesAcc[$actName] = XMLWriter::renderNode(
-                        $nodeKey,
-                        $actLabel,
-                        true,
-                        $meta,
-                        true,
-                        false
-                    );
-                }
-                ksort($allNodesAcc);
-                if(!$returnNodes) print(implode("", array_values($allNodesAcc)));
-            }
-
-        }
-        return $allNodes;
-    }
-
-    /**
-     * @param $dir
-     * @param null $root
-     * @param null $hash
-     * @param bool $returnNodes
-     * @return array
-     */
-    public function listHooks($dir, $root = NULL, $hash = null, $returnNodes = false)
-    {
-        $jsonContent = json_decode(file_get_contents(DocsParser::getHooksFile()), true);
-        $config = '<columns switchDisplayMode="full" template_name="hooks.list">
-                <column messageId="ajxp_conf.17" attributeName="ajxp_label" sortType="String" defaultWidth="20%"/>
-                <column messageId="ajxp_conf.18" attributeName="description" sortType="String" defaultWidth="20%"/>
-                <column messageId="ajxp_conf.19" attributeName="triggers" sortType="String" defaultWidth="25%"/>
-                <column messageId="ajxp_conf.20" attributeName="listeners" sortType="String" defaultWidth="25%"/>
-                <column messageId="ajxp_conf.21" attributeName="sample" sortType="String" defaultWidth="10%"/>
-            </columns>';
-        if(!$returnNodes) XMLWriter::sendFilesListComponentConfig($config);
-        $allNodes = array();
-        foreach ($jsonContent as $hookName => $hookData) {
-            $metadata = array(
-                "icon"          => "preferences_plugin.png",
-                "description"   => $hookData["DESCRIPTION"],
-                "sample"        => $hookData["PARAMETER_SAMPLE"],
-            );
-            $trigs = array();
-            foreach ($hookData["TRIGGERS"] as $trigger) {
-                $trigs[] = "<span>".$trigger["FILE"]." (".$trigger["LINE"].")</span>";
-            }
-            $metadata["triggers"] = implode("<br/>", $trigs);
-            $listeners = array();
-            foreach ($hookData["LISTENERS"] as $listener) {
-                $listeners[] = "<span>Plugin ".$listener["PLUGIN_ID"].", in method ".$listener["METHOD"]."</span>";
-            }
-            $metadata["listeners"] = implode("<br/>", $listeners);
-            $nodeKey = "/$root/hooks/$hookName/$hookName";
-            if(in_array($nodeKey, $this->currentBookmarks)) $metadata = array_merge($metadata, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $xml = XMLWriter::renderNode($nodeKey, $hookName, true, $metadata, true, false);
-            if($returnNodes) $allNodes[$nodeKey] = $xml;
-            else print($xml);
-        }
-        return $allNodes;
-    }
-
-    /**
-     * List all log files
-     * @param $dir
-     * @param null $root
-     * @param null $hash
-     * @param bool $returnNodes
-     * @return array
-     */
-    public function listLogFiles($dir, $root = NULL, $hash = null, $returnNodes = false)
-    {
-        $dir = "/$dir";
-        $allNodes = array();
-        $logger = Logger::getInstance();
-        $parts = explode("/", $dir);
-        if (count($parts)>4) {
-            $config = '<columns switchDisplayMode="list" switchGridMode="list" template_name="ajxp_conf.logs">
-                <column messageId="ajxp_conf.17" attributeName="date" sortType="MyDate" defaultWidth="18%"/>
-                <column messageId="ajxp_conf.18" attributeName="ip" sortType="String" defaultWidth="5%"/>
-                <column messageId="ajxp_conf.19" attributeName="level" sortType="String" defaultWidth="10%"/>
-                <column messageId="ajxp_conf.20" attributeName="user" sortType="String" defaultWidth="5%"/>
-                <column messageId="ajxp_conf.124" attributeName="source" sortType="String" defaultWidth="5%"/>
-                <column messageId="ajxp_conf.21" attributeName="action" sortType="String" defaultWidth="7%"/>
-                <column messageId="ajxp_conf.22" attributeName="params" sortType="String" defaultWidth="50%"/>
-            </columns>';
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig($config);
-            $date = $parts[count($parts)-1];
-            $logger->xmlLogs($dir, $date, "tree", "/".$root."/logs", isSet($_POST["cursor"])?intval($_POST["cursor"]):-1);
-        } else {
-            if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchGridMode="filelist"><column messageId="ajxp_conf.16" attributeName="ajxp_label" sortType="String"/></columns>');
-            $nodes = $logger->xmlListLogFiles("tree", (count($parts)>2?$parts[2]:null), (count($parts)>3?$parts[3]:null), "/".$root."/logs", false);
-            foreach ($nodes as $last => $nodeXML) {
-                if(is_numeric($last) && $last < 10) $last = "0".$last;
-                $key = "/$root$dir/$last";
-                if (in_array($key, $this->currentBookmarks)) {
-                    $nodeXML = str_replace("/>", ' ajxp_bookmarked="true" overlay_icon="bookmark.png"/>', $nodeXML);
-                }
-                $allNodes[$key] = $nodeXML;
-                if (!$returnNodes) {
-                    print($nodeXML);
-                }
-            }
-        }
-        return $allNodes;
-    }
-
-    /**
-     * Output the tests results
-     * @param $dir
-     * @param null $root
-     * @param null $hash
-     * @param bool $returnNodes
-     * @return array
-     */
-    public function printDiagnostic($dir, $root = NULL, $hash = null, $returnNodes = false)
-    {
-        $outputArray = array();
-        $testedParams = array();
-        $allNodes = array();
-        DiagnosticRunner::runTests($outputArray, $testedParams);
-        DiagnosticRunner::testResultsToFile($outputArray, $testedParams);
-        if(!$returnNodes) XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="fileList" template_name="ajxp_conf.diagnostic" defaultWidth="20%"><column messageId="ajxp_conf.23" attributeName="ajxp_label" sortType="String"/><column messageId="ajxp_conf.24" attributeName="data" sortType="String"/></columns>');
-        if (is_file(TESTS_RESULT_FILE)) {
-            include_once(TESTS_RESULT_FILE);
-            if (isset($diagResults)) {
-                foreach ($diagResults as $id => $value) {
-                    $value = StringHelper::xmlEntities($value);
-                    $xml =  "<tree icon=\"susehelpcenter.png\" is_file=\"1\" filename=\"/$dir/$id\" text=\"$id\" data=\"$value\" ajxp_mime=\"testResult\"/>";
-                    if(!$returnNodes) print($xml);
-                    else $allNodes["/$dir/$id"] = $xml;
-                }
-            }
-        }
-        return $allNodes;
-    }
 
     /**
      * Reorder meta sources 
