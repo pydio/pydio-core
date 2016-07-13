@@ -120,7 +120,7 @@ class TreeManager extends AbstractManager
         );
         $this->appendBookmarkMeta($path, $attributes);
         if(basename($path) == "users") {
-            $attributes["remote_indexation"] = "admin_search";
+            $attributes["remote_indexation"] = "admin_search_users";
         }
         if(isSet($data["AJXP_MIME"])) {
             $attributes["ajxp_mime"] = $data["AJXP_MIME"];

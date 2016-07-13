@@ -20,9 +20,13 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Utils\Reflection\DocsParser;
+use Pydio\Core\Utils\Reflection\PydioSdkGenerator;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -31,8 +35,20 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * Class HooksManager
  * @package Pydio\Access\Driver\DataProvider\Provisioning
  */
-class HooksManager extends AbstractManager
+class DocumentationManager extends AbstractManager
 {
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
+     */
+    public function docActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
+
+        PydioSdkGenerator::analyzeRegistry(isSet($httpVars["version"])?$httpVars["version"]:AJXP_VERSION);
+
+        return new JsonResponse(["result"=>"ok"]);
+    }
 
     /**
      * @param array $httpVars Full set of query parameters

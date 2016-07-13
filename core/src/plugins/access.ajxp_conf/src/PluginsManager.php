@@ -20,11 +20,23 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\Message\ReloadMessage;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -34,6 +46,275 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class PluginsManager extends AbstractManager
 {
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
+     */
+    public function pluginsActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
+
+        $action     = $requestInterface->getAttribute("action");
+        $ctx        = $requestInterface->getAttribute("ctx");
+        $httpVars   = $requestInterface->getParsedBody();
+        $mess       = LocaleService::getMessages();
+
+        switch ($action){
+            // PLUGINS
+            case "clear_plugins_cache":
+
+                ConfService::clearAllCaches();
+                $userMessage = new UserMessage($mess["ajxp_conf." . (AJXP_SKIP_CACHE ? "132" : "131")]);
+                $reloadMessage = new ReloadMessage();
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage, $reloadMessage]));
+
+                break;
+
+            case "get_plugin_manifest" :
+
+                $ajxpPlugin     = PluginsService::getInstance($ctx)->getPluginById($httpVars["plugin_id"]);
+                $buffer = "<admin_data>";
+                //XMLWriter::header("admin_data");
+
+                $fullManifest = $ajxpPlugin->getManifestRawContent("", "xml");
+                $xPath = new \DOMXPath($fullManifest->ownerDocument);
+                $addParams = "";
+                $instancesDefinitions = array();
+                $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
+                /** @var \DOMElement $pInstNode */
+                foreach ($pInstNodes as $pInstNode) {
+                    $type = $pInstNode->getAttribute("type");
+                    $instType = str_replace("plugin_instance:", "", $type);
+                    $fieldName = $pInstNode->getAttribute("name");
+                    $pInstNode->setAttribute("type", "group_switch:" . $fieldName);
+                    $typePlugs = PluginsService::getInstance($ctx)->getPluginsByType($instType);
+                    foreach ($typePlugs as $typePlug) {
+                        if (!$typePlug->isEnabled()) continue;
+                        if ($typePlug->getId() == "auth.multi") continue;
+                        $checkErrorMessage = "";
+                        try {
+                            $typePlug->performChecks();
+                        } catch (\Exception $e) {
+                            $checkErrorMessage = " (Warning : " . $e->getMessage() . ")";
+                        }
+                        $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[not(@group_switch_name)]"));
+                        $addParams .= '<global_param group_switch_name="' . $fieldName . '" name="instance_name" group_switch_label="' . $typePlug->getManifestLabel() . $checkErrorMessage . '" group_switch_value="' . $typePlug->getId() . '" default="' . $typePlug->getId() . '" type="hidden"/>';
+                        $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"" . $typePlug->getManifestLabel() . $checkErrorMessage . "\" group_switch_value=\"" . $typePlug->getId() . "\" ", $tParams);
+                        $addParams .= str_replace("<param", "<global_param", XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[@group_switch_name]")));
+                        $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
+                        $instancesDefs = $typePlug->getConfigsDefinitions();
+                        if (!empty($instancesDefs) && is_array($instancesDefs)) {
+                            foreach ($instancesDefs as $defKey => $defData) {
+                                $instancesDefinitions[$fieldName . "/" . $defKey] = $defData;
+                            }
+                        }
+                    }
+                }
+                $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
+                $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
+                $allParams = str_replace("</server_settings>", $addParams . "</server_settings>", $allParams);
+
+                $buffer .= $allParams ;
+                $definitions = $instancesDefinitions;
+                $configsDefs = $ajxpPlugin->getConfigsDefinitions();
+                if (is_array($configsDefs)) {
+                    $definitions = array_merge($configsDefs, $instancesDefinitions);
+                }
+                $values = $ajxpPlugin->getConfigs();
+                if (!is_array($values)) $values = array();
+                $buffer .= "<plugin_settings_values>";
+                // First flatten keys
+                $flattenedKeys = array();
+                foreach ($values as $key => $value) {
+                    $type = $definitions[$key]["type"];
+                    if ((strpos($type, "group_switch:") === 0 || strpos($type, "plugin_instance:") === 0) && is_array($value)) {
+                        $res = array();
+                        $this->flattenKeyValues($res, $definitions, $value, $key);
+                        $flattenedKeys += $res;
+                        // Replace parent key by new flat value
+                        $values[$key] = $flattenedKeys[$key];
+                    }
+                }
+                $values += $flattenedKeys;
+
+                foreach ($values as $key => $value) {
+                    $attribute = true;
+                    $type = $definitions[$key]["type"];
+                    if ($type == "array" && is_array($value)) {
+                        $value = implode(",", $value);
+                    } else if ($type == "boolean") {
+                        $value = ($value === true || $value === "true" || $value == 1 ? "true" : "false");
+                    } else if ($type == "textarea") {
+                        $attribute = false;
+                    } else if ($type == "password" && !empty($value)) {
+                        $value = "__AJXP_VALUE_SET__";
+                    }
+                    if ($attribute) {
+                        $buffer .= "<param name=\"$key\" value=\"" . StringHelper::xmlEntities($value) . "\"/>";
+                    } else {
+                        $buffer .= "<param name=\"$key\" cdatavalue=\"true\"><![CDATA[" . $value . "]]></param>";
+                    }
+                }
+                if ($ajxpPlugin->getType() != "core") {
+                    $buffer .= "<param name=\"AJXP_PLUGIN_ENABLED\" value=\"" . ($ajxpPlugin->isEnabled() ? "true" : "false") . "\"/>";
+                }
+                $buffer .= "</plugin_settings_values>";
+                $buffer .= "<plugin_doc><![CDATA[<p>" . $ajxpPlugin->getPluginInformationHTML("Charles du Jeu", "https://pydio.com/en/docs/references/plugins/") . "</p>";
+                if (file_exists($ajxpPlugin->getBaseDir() . "/plugin_doc.html")) {
+                    $buffer .= file_get_contents($ajxpPlugin->getBaseDir() . "/plugin_doc.html");
+                }
+                $buffer .= "]]></plugin_doc>";
+                $buffer .= "</admin_data>";
+
+                $responseInterface = $responseInterface->withHeader("Content-type", "text/xml");
+                $responseInterface->getBody()->write($buffer);
+
+                break;
+
+            case "run_plugin_action":
+
+                $options = array();
+                $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
+                $this->parseParameters($ctx, $httpVars, $options, true);
+                $pluginId = $httpVars["action_plugin_id"];
+                if (isSet($httpVars["button_key"])) {
+                    $options = $options[$httpVars["button_key"]];
+                }
+                $plugin = PluginsService::getInstance($ctx)->softLoad($pluginId, $options);
+                if (method_exists($plugin, $httpVars["action_plugin_method"])) {
+                    try {
+                        $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
+                        $response = $res;
+                    } catch (\Exception $e) {
+                        $response = "ERROR:" . $e->getMessage();
+                    }
+                } else {
+                    $response = 'ERROR: Plugin ' . $httpVars["action_plugin_id"] . ' does not implement ' . $httpVars["action_plugin_method"] . ' method!';
+                }
+                $responseInterface->getBody()->write($response);
+
+                break;
+
+            case "edit_plugin_options":
+
+                $options = array();
+                $this->parseParameters($ctx, $httpVars, $options, true);
+                $confStorage = ConfService::getConfStorageImpl();
+                $pluginId = InputFilter::sanitize($httpVars["plugin_id"], InputFilter::SANITIZE_ALPHANUM);
+                list($pType, $pName) = explode(".", $pluginId);
+                $existing = $confStorage->loadPluginConfig($pType, $pName);
+                $this->mergeExistingParameters($options, $existing);
+                $confStorage->savePluginConfig($pluginId, $options);
+                ConfService::clearAllCaches();
+                XMLWriter::header();
+                XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
+                XMLWriter::close();
+
+
+                break;
+
+            case "list_all_plugins_actions":
+
+                if($this->currentUserIsGroupAdmin()){
+                    // Group admin : do not allow actions edition
+                    return new JsonResponse(["LIST" => array(), "HAS_GROUPS" => true]);
+                }
+
+                if(isSet($_SESSION["ALL_ACTIONS_CACHE"])){
+
+                    $actions = $_SESSION["ALL_ACTIONS_CACHE"];
+
+                }else{
+
+                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//action", "node", false, true, true);
+                    $actions = array();
+                    foreach ($nodes as $node) {
+                        $xPath = new \DOMXPath($node->ownerDocument);
+                        $proc = $xPath->query("processing", $node);
+                        if(!$proc->length) continue;
+                        $txt = $xPath->query("gui/@text", $node);
+                        if ($txt->length) {
+                            $messId = $txt->item(0)->nodeValue;
+                        } else {
+                            $messId = "";
+                        }
+                        $parentPlugin = $node->parentNode->parentNode->parentNode;
+                        $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
+                        if (empty($pId)) {
+                            $pId = $parentPlugin->nodeName .".";
+                            if($pId == "ajxpdriver.") $pId = "access.";
+                            $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
+                        }
+                        if(!is_array($actions[$pId])) $actions[$pId] = array();
+                        $actionName = $node->attributes->getNamedItem("name")->nodeValue;
+                        $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
+
+                    }
+                    ksort($actions, SORT_STRING);
+                    foreach ($actions as $actPid => $actionGroup) {
+                        ksort($actionGroup, SORT_STRING);
+                        $actions[$actPid] = array();
+                        foreach ($actionGroup as $v) {
+                            $actions[$actPid][] = $v;
+                        }
+                    }
+                    $_SESSION["ALL_ACTIONS_CACHE"] = $actions;
+                }
+                $responseInterface = new JsonResponse(["LIST" => $actions, "HAS_GROUPS" => true]);
+                break;
+
+            case "list_all_plugins_parameters":
+
+                if(isSet($_SESSION["ALL_PARAMS_CACHE"])){
+                    $actions = $_SESSION["ALL_PARAMS_CACHE"];
+                }else{
+                    $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
+                    $actions = $this->getEditableParameters($ctx, $currentUserIsGroupAdmin, true);
+                    $_SESSION["ALL_PARAMS_CACHE"] = $actions;
+                }
+                $responseInterface = new JsonResponse(["LIST" => $actions, "HAS_GROUPS" => true]);
+                break;
+
+            case "parameters_to_form_definitions" :
+
+                $data = json_decode(TextEncoder::magicDequote($httpVars["json_parameters"]), true);
+                $buffer = "<standard_form>";
+                foreach ($data as $repoScope => $pluginsData) {
+                    $buffer .= "<repoScope id='$repoScope'>";
+                    foreach ($pluginsData as $pluginId => $paramData) {
+                        foreach ($paramData as $paramId => $paramValue) {
+                            $query = "//param[@name='$paramId']|//global_param[@name='$paramId']";
+                            $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
+                            if(!count($nodes)) continue;
+                            $n = $nodes[0];
+                            if ($n->attributes->getNamedItem("group") != null) {
+                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
+                            } else {
+                                $n->appendChild($n->ownerDocument->createAttribute("group"));
+                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
+                            }
+                            if(is_bool($paramValue)) $paramValue = ($paramValue ? "true" : "false");
+                            if ($n->attributes->getNamedItem("default") != null) {
+                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
+                            } else {
+                                $n->appendChild($n->ownerDocument->createAttribute("default"));
+                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
+                            }
+                            $buffer .= XMLWriter::replaceAjxpXmlKeywords($n->ownerDocument->saveXML($n));
+                        }
+                    }
+                    $buffer .= "</repoScope>";
+                }
+                $buffer = "</standard_form>";
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLMessage($buffer)));
+                break;
+
+            default:
+                break;
+        }
+
+        return $responseInterface;
+    }
 
     /**
      * @param array $httpVars Full set of query parameters
@@ -167,4 +448,34 @@ class PluginsManager extends AbstractManager
         return $nodesList;
 
     }
+
+    /**
+     * @param $result
+     * @param $definitions
+     * @param $values
+     * @param string $parent
+     */
+    protected function flattenKeyValues(&$result, &$definitions, $values, $parent = "")
+    {
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
+                $this->flattenKeyValues($result, $definitions, $value, $parent."/".$key);
+            } else {
+                if ($key == "instance_name") {
+                    $result[$parent] = $value;
+                }
+                if ($key == "group_switch_value") {
+                    $result[$parent] = $value;
+                } else {
+                    $result[$parent.'/'.$key] = $value;
+                    if(isSet($definitions[$key])){
+                        $definitions[$parent.'/'.$key] = $definitions[$key];
+                    }else if(isSet($definitions[dirname($parent)."/".$key])){
+                        $definitions[$parent.'/'.$key] = $definitions[dirname($parent)."/".$key];
+                    }
+                }
+            }
+        }
+    }
+
 }

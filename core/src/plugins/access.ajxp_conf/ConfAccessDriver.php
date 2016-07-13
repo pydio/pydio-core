@@ -27,39 +27,17 @@ use DOMXPath;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Filter\AJXP_PermissionMask;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Access\Driver\DataProvider\Provisioning\DocumentationManager;
+use Pydio\Access\Driver\DataProvider\Provisioning\PluginsManager;
+use Pydio\Access\Driver\DataProvider\Provisioning\RepositoriesManager;
+use Pydio\Access\Driver\DataProvider\Provisioning\RolesManager;
 use Pydio\Access\Driver\DataProvider\Provisioning\TreeManager;
-use Pydio\Conf\Core\AbstractUser;
-use Pydio\Core\Exception\UserNotFoundException;
+use Pydio\Access\Driver\DataProvider\Provisioning\UsersManager;
 use Pydio\Core\Http\Response\SerializableResponseStream;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Model\UserInterface;
-use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Services\AuthService;
-use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
-use Pydio\Core\Controller\ProgressBarCLI;
-use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\Reflection\DiagnosticRunner;
-use Pydio\Core\Utils\Reflection\DocsParser;
-use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Utils\Vars\OptionsHelper;
-use Pydio\Core\Utils\Vars\PathUtils;
-use Pydio\Core\Utils\Vars\StatHelper;
-use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Controller\HTMLWriter;
-use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\Reflection\PydioSdkGenerator;
-use Pydio\Core\Utils\TextEncoder;
-use Pydio\Log\Core\Logger;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -70,14 +48,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ConfAccessDriver extends AbstractAccessDriver
 {
-
-    protected $listSpecialRoles = AJXP_SERVER_DEBUG;
-    protected $currentBookmarks = array();
-
-    /**
-     * @var ContextInterface
-     */
-    protected $currentContext;
 
     protected $rootNodes = array(
         "data" => array(
@@ -171,313 +141,11 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.148",
                     "DESCRIPTION" => "ajxp_conf.149",
                     "ICON" => "book.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\HooksManager"
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DocumentationManager"
                 )
             )
         )
     );
-
-    /**
-     * @param ContextInterface $ctx
-     * @param $currentUserIsGroupAdmin
-     * @param bool $withLabel
-     * @return array
-     */
-    protected function getEditableParameters($ctx, $currentUserIsGroupAdmin, $withLabel = false){
-
-        $query = "//param|//global_param";
-        if($currentUserIsGroupAdmin){
-            $query = "//param[@scope]|//global_param[@scope]";
-        }
-
-        $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
-        $actions = array();
-        foreach ($nodes as $node) {
-            if($node->parentNode->nodeName != "server_settings") continue;
-            $parentPlugin = $node->parentNode->parentNode;
-            $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
-            if (empty($pId)) {
-                $pId = $parentPlugin->nodeName .".";
-                if($pId == "ajxpdriver.") $pId = "access.";
-                $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
-            }
-            if(!is_array($actions[$pId])) $actions[$pId] = array();
-            $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-            $attributes = array();
-            for( $i = 0; $i < $node->attributes->length; $i ++){
-                $att = $node->attributes->item($i);
-                $value = $att->nodeValue;
-                if(in_array($att->nodeName, array("choices", "description", "group", "label"))) {
-                    $value = XMLWriter::replaceAjxpXmlKeywords($value);
-                }
-                $attributes[$att->nodeName] = $value;
-            }
-            if($withLabel){
-                $actions[$pId][$actionName] = array(
-                    "parameter" => $actionName ,
-                    "label" => $attributes["label"],
-                    "attributes" => $attributes
-                );
-            }else{
-                $actions[$pId][] = $actionName;
-            }
-
-        }
-        foreach ($actions as $actPid => $actionGroup) {
-            ksort($actionGroup, SORT_STRING);
-            $actions[$actPid] = array();
-            foreach ($actionGroup as $v) {
-                $actions[$actPid][] = $v;
-            }
-        }
-        return $actions;
-    }
-
-    /**
-     * List actions
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     * @param ContextInterface $ctx
-     */
-    public function listAllActions($action, $httpVars, $fileVars, ContextInterface $ctx)
-    {
-        $loggedUser = $ctx->getUser();
-        if(UsersService::usersEnabled() && !$loggedUser->isAdmin()) return ;
-        switch ($action) {
-            //------------------------------------
-            //	BASIC LISTING
-            //------------------------------------
-            case "list_all_repositories_json":
-
-                $repositories = RepositoryService::listAllRepositories();
-                $repoOut = array();
-                foreach ($repositories as $repoObject) {
-                    $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
-                }
-                HTMLWriter::charsetHeader("application/json");
-                $mess = LocaleService::getMessages();
-                echo json_encode(array("LEGEND" => $mess["ajxp_conf.150"], "LIST" => $repoOut));
-
-            break;
-
-            case "list_all_plugins_actions":
-
-                $currentUserIsGroupAdmin = ($loggedUser != null && $loggedUser->getGroupPath() != "/");
-                if($currentUserIsGroupAdmin){
-                    // Group admin : do not allow actions edition
-                    HTMLWriter::charsetHeader("application/json");
-                    echo json_encode(array("LIST" => array(), "HAS_GROUPS" => true));
-                    return;
-                }
-                if(isSet($_SESSION["ALL_ACTIONS_CACHE"])){
-                    $actions = $_SESSION["ALL_ACTIONS_CACHE"];
-                }else{
-
-                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//action", "node", false, true, true);
-                    $actions = array();
-                    foreach ($nodes as $node) {
-                        $xPath = new DOMXPath($node->ownerDocument);
-                        $proc = $xPath->query("processing", $node);
-                        if(!$proc->length) continue;
-                        $txt = $xPath->query("gui/@text", $node);
-                        if ($txt->length) {
-                            $messId = $txt->item(0)->nodeValue;
-                        } else {
-                            $messId = "";
-                        }
-                        $parentPlugin = $node->parentNode->parentNode->parentNode;
-                        $pId = $parentPlugin->attributes->getNamedItem("id")->nodeValue;
-                        if (empty($pId)) {
-                            $pId = $parentPlugin->nodeName .".";
-                            if($pId == "ajxpdriver.") $pId = "access.";
-                            $pId .= $parentPlugin->attributes->getNamedItem("name")->nodeValue;
-                        }
-                        //echo($pId." : ". $node->attributes->getNamedItem("name")->nodeValue . " (".$messId.")<br>");
-                        if(!is_array($actions[$pId])) $actions[$pId] = array();
-                        $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-                        $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
-
-                    }
-                    ksort($actions, SORT_STRING);
-                    foreach ($actions as $actPid => $actionGroup) {
-                        ksort($actionGroup, SORT_STRING);
-                        $actions[$actPid] = array();
-                        foreach ($actionGroup as $v) {
-                            $actions[$actPid][] = $v;
-                        }
-                    }
-                    $_SESSION["ALL_ACTIONS_CACHE"] = $actions;
-                }
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
-                break;
-
-            case "list_all_plugins_parameters":
-
-                if(isSet($_SESSION["ALL_PARAMS_CACHE"])){
-                    $actions = $_SESSION["ALL_PARAMS_CACHE"];
-                }else{
-                    $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
-                    $actions = $this->getEditableParameters($ctx, $currentUserIsGroupAdmin, true);
-                    $_SESSION["ALL_PARAMS_CACHE"] = $actions;
-                }
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode(array("LIST" => $actions, "HAS_GROUPS" => true));
-                break;
-
-            case "parameters_to_form_definitions" :
-
-                $data = json_decode(TextEncoder::magicDequote($httpVars["json_parameters"]), true);
-                XMLWriter::header("standard_form");
-                foreach ($data as $repoScope => $pluginsData) {
-                    echo("<repoScope id='$repoScope'>");
-                    foreach ($pluginsData as $pluginId => $paramData) {
-                        foreach ($paramData as $paramId => $paramValue) {
-                            $query = "//param[@name='$paramId']|//global_param[@name='$paramId']";
-                            $nodes = PluginsService::getInstance($ctx)->searchAllManifests($query, "node", false, true, true);
-                            if(!count($nodes)) continue;
-                            $n = $nodes[0];
-                            if ($n->attributes->getNamedItem("group") != null) {
-                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
-                            } else {
-                                $n->appendChild($n->ownerDocument->createAttribute("group"));
-                                $n->attributes->getNamedItem("group")->nodeValue = "$pluginId";
-                            }
-                            if(is_bool($paramValue)) $paramValue = ($paramValue ? "true" : "false");
-                            if ($n->attributes->getNamedItem("default") != null) {
-                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
-                            } else {
-                                $n->appendChild($n->ownerDocument->createAttribute("default"));
-                                $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
-                            }
-                            echo(XMLWriter::replaceAjxpXmlKeywords($n->ownerDocument->saveXML($n)));
-                        }
-                    }
-                    echo("</repoScope>");
-                }
-                XMLWriter::close("standard_form");
-                break;
-
-            default:
-                break;
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
-    {
-        parent::parseSpecificContributions($ctx, $contribNode);
-        if($contribNode->nodeName != "actions") return;
-        $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
-        if(!$currentUserIsGroupAdmin) return;
-        $actionXpath=new DOMXPath($contribNode->ownerDocument);
-        $publicUrlNodeList = $actionXpath->query('action[@name="create_repository"]/subMenu', $contribNode);
-        if ($publicUrlNodeList->length) {
-            $publicUrlNode = $publicUrlNodeList->item(0);
-            $publicUrlNode->parentNode->removeChild($publicUrlNode);
-        }
-    }
-
-    /**
-     * Bookmark any page for the admin interface
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     */
-    public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response)
-    {
-
-        $httpVars = $request->getParsedBody();
-        /** @var ContextInterface $ctx */
-        $ctx = $request->getAttribute("ctx");
-        if (isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && UsersService::usersEnabled()) {
-            $bmUser = $ctx->getUser();
-            $repositoryId = $ctx->getRepositoryId();
-            $bookmarks = $bmUser->getBookmarks($repositoryId);
-            foreach ($bookmarks as $bm) {
-                if ($bm["PATH"] == $httpVars["bm_path"]) {
-                    $httpVars["bm_action"] = "delete_bookmark";
-                    $request = $request->withParsedBody($httpVars);
-                    break;
-                }
-            }
-        }
-
-    }
-
-    /**
-     * @param ContextInterface $ctx
-     * @param $baseGroup
-     * @param $term
-     * @param int $offset
-     * @param int $limit
-     */
-    public function recursiveSearchGroups(ContextInterface $ctx, $baseGroup, $term, $offset=-1, $limit=-1)
-    {
-        if($ctx->hasUser()){
-            $baseGroup = $ctx->getUser()->getRealGroupPath($baseGroup);
-        }
-        $groups = UsersService::listChildrenGroups($baseGroup);
-        foreach ($groups as $groupId => $groupLabel) {
-
-            if (preg_match("/$term/i", $groupLabel) == TRUE ) {
-                $trimmedG = trim($baseGroup, "/");
-                if(!empty($trimmedG)) $trimmedG .= "/";
-                $nodeKey = "/data/users/".$trimmedG.ltrim($groupId,"/");
-                $meta = array(
-                    "icon" => "users-folder.png",
-                    "ajxp_mime" => "group_editable"
-                );
-                if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-                echo XMLWriter::renderNode($nodeKey, $groupLabel, false, $meta, true, false);
-            }
-            $this->recursiveSearchGroups($ctx, rtrim($baseGroup, "/")."/".ltrim($groupId, "/"), $term);
-
-        }
-
-        $users = UsersService::listUsers($baseGroup, $term, $offset, $limit);
-        foreach ($users as $userId => $userObject) {
-            $gPath = $userObject->getGroupPath();
-            $realGroup = $ctx->getUser()->getRealGroupPath($ctx->getUser()->getGroupPath());
-            if(strlen($realGroup) > 1 && strpos($gPath, $realGroup) === 0){
-                $gPath = substr($gPath, strlen($realGroup));
-            }
-            $trimmedG = trim($gPath, "/");
-            if(!empty($trimmedG)) $trimmedG .= "/";
-
-            $nodeKey = "/data/users/".$trimmedG.$userId;
-            $meta = array(
-                "icon" => "user.png",
-                "ajxp_mime" => "user_editable"
-            );
-            if(in_array($nodeKey, $this->currentBookmarks)) $meta = array_merge($meta, array("ajxp_bookmarked" => "true", "overlay_icon" => "bookmark.png"));
-            $userDisplayName = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-            echo XMLWriter::renderNode($nodeKey, $userDisplayName, true, $meta, true, false);
-        }
-
-    }
-
-    /**
-     * Search users
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     * @param ContextInterface $ctx
-     */
-    public function searchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
-    {
-        if(!InputFilter::decodeSecureMagic($httpVars["dir"]) == "/data/users") return;
-        $query = InputFilter::decodeSecureMagic($httpVars["query"]);
-        $limit = $offset = -1;
-        if(isSet($httpVars["limit"])) $limit = intval(InputFilter::sanitize($httpVars["limit"], InputFilter::SANITIZE_ALPHANUM));
-        if(isSet($httpVars["offset"])) $offset = intval(InputFilter::sanitize($httpVars["offset"], InputFilter::SANITIZE_ALPHANUM));
-        XMLWriter::header();
-        $this->recursiveSearchGroups($ctx, "/", $query, $offset, $limit);
-        XMLWriter::close();
-
-    }
 
     /**
      * Called internally to populate left menu
@@ -504,1798 +172,201 @@ class ConfAccessDriver extends AbstractAccessDriver
      */
     public function listAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
+        if($requestInterface->getAttribute("action") === "stat"){
+            $responseInterface = new JsonResponse(["mode" => true]);
+            return;
+        }
+
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $treeManager = new TreeManager($ctx, $this->getName(), $this->getMainTree($ctx));
         $nodesList = $treeManager->dispatchList($requestInterface->getParsedBody());
         $responseInterface = $responseInterface->withBody(new SerializableResponseStream($nodesList));
-        
+
     }
 
     /**
-     * Main switch for actions
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     * @param ContextInterface $ctx
-     * @throws UserNotFoundException
-     * @throws \Exception
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
-    {
-        //parent::accessPreprocess($action, $httpVars, $fileVars);
-        $loggedUser = $ctx->getUser();
-        if(UsersService::usersEnabled() && !$loggedUser->isAdmin()) {
-            return ;
-        }
-        if (UsersService::usersEnabled()) {
-            $currentBookmarks = $loggedUser->getBookmarks($ctx->getRepositoryId());
-            // FLATTEN
-            foreach ($currentBookmarks as $bm) {
-                $this->currentBookmarks[] = $bm["PATH"];
-            }
-        }
-
-        if ($action == "edit") {
-            if (isSet($httpVars["sub_action"])) {
-                $action = $httpVars["sub_action"];
-            }
-        }
-        $mess = LocaleService::getMessages();
-        $currentUserIsGroupAdmin = ($loggedUser != null && $loggedUser->getGroupPath() != "/");
-        if ($currentUserIsGroupAdmin && ConfService::getAuthDriverImpl()->isAjxpAdmin($loggedUser->getId())) {
-            $currentUserIsGroupAdmin = false;
-        }
-        $currentAdminBasePath = "/";
-        if ($loggedUser!=null && $loggedUser->getGroupPath()!=null) {
-            $currentAdminBasePath = $loggedUser->getGroupPath();
-        }
-
-
-        switch ($action) {
-
-            case "stat" :
-
-                header("Content-type:application/json");
-                print '{"mode":true}';
-                return;
-
-            break;
-
-            case "clear_plugins_cache":
-                XMLWriter::header();
-                ConfService::clearAllCaches();
-                XMLWriter::sendMessage($mess["ajxp_conf.".(AJXP_SKIP_CACHE?"132":"131")], null);
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
-                break;
-
-
-            case "create_group":
-
-                if (isSet($httpVars["group_path"])) {
-                    $basePath = PathUtils::forwardSlashDirname($httpVars["group_path"]);
-                    if(empty($basePath)) $basePath = "/";
-                    $gName = InputFilter::sanitize(InputFilter::decodeSecureMagic(basename($httpVars["group_path"])), InputFilter::SANITIZE_ALPHANUM);
-                } else {
-                    $basePath = substr($httpVars["dir"], strlen("/data/users"));
-                    $gName    = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["group_name"]), InputFilter::SANITIZE_ALPHANUM);
-                }
-                $gLabel   = InputFilter::decodeSecureMagic($httpVars["group_label"]);
-                $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
-
-                UsersService::createGroup($basePath, $gName, $gLabel);
-                
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.160"], null);
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
-
-            break;
-
-            case "create_role":
-                $roleId = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["role_id"]), InputFilter::SANITIZE_HTML_STRICT);
-                if (!strlen($roleId)) {
-                    throw new \Exception($mess[349]);
-                }
-                if (RolesService::getRole($roleId) !== false) {
-                    throw new \Exception($mess["ajxp_conf.65"]);
-                }
-                $r = new AJXP_Role($roleId);
-                $user = $ctx->getUser();
-                if ($user !=null && $user->getGroupPath()!=null) {
-                    $r->setGroupPath($user->getGroupPath());
-                }
-                RolesService::updateRole($r);
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.66"], null);
-                XMLWriter::reloadDataNode("", $httpVars["role_id"]);
-                XMLWriter::close();
-            break;
-
-            case "edit_role" :
-
-                $roleId = TextEncoder::magicDequote($httpVars["role_id"]);
-                $roleGroup = false;
-                $userObject = null;
-                $groupLabel = null;
-                $currentMainUser = $ctx->getUser();
-
-                if (strpos($roleId, "AJXP_GRP_") === 0) {
-                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
-                    $filteredGroupPath = (!empty($currentMainUser) ? $currentMainUser->getRealGroupPath($groupPath) : $groupPath);
-                    if($filteredGroupPath == "/"){
-                        $roleId = "AJXP_GRP_/";
-                        $groupLabel = $mess["ajxp_conf.151"];
-                        $roleGroup = true;
-                    }else{
-                        $groups = UsersService::listChildrenGroups(PathUtils::forwardSlashDirname($filteredGroupPath));
-                        $key = "/".basename($groupPath);
-                        if (!array_key_exists($key, $groups)) {
-                            throw new \Exception("Cannot find group with this id!");
-                        }
-                        $roleId = "AJXP_GRP_".$filteredGroupPath;
-                        $groupLabel = $groups[$key];
-                        $roleGroup = true;
-                    }
-                }
-                if (strpos($roleId, "AJXP_USR_") === 0) {
-                    $usrId = str_replace("AJXP_USR_/", "", $roleId);
-                    $userObject = UsersService::getUserById($usrId);
-                    if(!empty($currentMainUser) && !$currentMainUser->canAdministrate($userObject)){
-                        throw new \Exception("Cant find user!");
-                    }
-                    $role = $userObject->getPersonalRole();
-                } else {
-                    if($roleGroup){
-                        $role = RolesService::getOrCreateRole($roleId, $ctx->hasUser() ? $ctx->getUser()->getGroupPath() : "/");
-                    }else{
-                        $role = RolesService::getRole($roleId);
-                    }
-                }
-                if ($role === false) {
-                    throw new \Exception("Cant find role! ");
-                }
-                if (isSet($httpVars["format"]) && $httpVars["format"] == "json") {
-                    HTMLWriter::charsetHeader("application/json");
-                    $roleData = $role->getDataArray(true);
-                    $allReps = RepositoryService::listAllRepositories();
-                    $sharedRepos = array();
-                    if(isSet($userObject)){
-                        // Add User shared Repositories as well
-                        $acls = $userObject->getMergedRole()->listAcls();
-                        if(count($acls)) {
-                            $sharedRepos = RepositoryService::listRepositoriesWithCriteria(array(
-                                "uuid" => array_keys($acls),
-                                "parent_uuid" => AJXP_FILTER_NOT_EMPTY,
-                                "owner_user_id" => AJXP_FILTER_NOT_EMPTY
-                                ), $count);
-                            $allReps = array_merge($allReps, $sharedRepos);
-                        }
-                    }
-
-                    $repos = array();
-                    $repoDetailed = array();
-                    // USER
-                    foreach ($allReps as $repositoryId => $repositoryObject) {
-                        if (!empty($userObject) &&
-                            (
-                                !$userObject->canSee($repositoryObject) || $repositoryObject->isTemplate
-                                || ($repositoryObject->getAccessType()=="ajxp_conf" && !$userObject->isAdmin())
-                                || ($repositoryObject->getUniqueUser() != null && $repositoryObject->getUniqueUser() != $userObject->getId())
-                            )
-                        ){
-                            continue;
-                        }else if(empty($userObject) && (
-                                (empty($currentMainUser) && !$currentMainUser->canAdministrate($repositoryObject)) || $repositoryObject->isTemplate
-                            )){
-                            continue;
-                        }
-                        $meta = array();
-                        try{
-                            $metaSources = $repositoryObject->getContextOption($ctx, "META_SOURCES");
-                            if($metaSources !== null){
-                                $meta = array_keys($metaSources);
-                            }
-                        }catch(\Exception $e){
-                            if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
-                            $this->logError("Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
-                            continue;
-                        }
-                        $repoDetailed[$repositoryId] = array(
-                            "label"  => TextEncoder::toUTF8($repositoryObject->getDisplay()),
-                            "driver" => $repositoryObject->getAccessType(),
-                            "scope"  => $repositoryObject->securityScope(),
-                            "meta"   => $meta
-                        );
-
-                        if(array_key_exists($repositoryId, $sharedRepos)){
-                            $sharedRepos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
-                            $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
-                            $repoOwnerId = $repositoryObject->getOwner();
-                            if(isSet($allReps[$repoParentId])){
-                                $repoParentLabel = TextEncoder::toUTF8($allReps[$repoParentId]->getDisplay());
-                            }
-                            $repoOwnerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
-                            $repoDetailed[$repositoryId]["share"] = array(
-                                "parent_user" => $repoOwnerId,
-                                "parent_user_label" => $repoOwnerLabel,
-                                "parent_repository" => $repoParentId,
-                                "parent_repository_label" => $repoParentLabel
-                            );
-                        }else{
-                            $repos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
-                        }
-
-                    }
-                    // Make sure it's utf8
-                    $data = array(
-                        "ROLE" => $roleData,
-                        "ALL"  => array(
-                            "PLUGINS_SCOPES" => array(
-                                "GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui", "sec"),
-                                "GLOBAL_PLUGINS" => array("action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater")
-                            ),
-                            "REPOSITORIES" => $repos,
-                            "SHARED_REPOSITORIES" => $sharedRepos,
-                            "REPOSITORIES_DETAILS" => $repoDetailed,
-                            "PROFILES" => array("standard|".$mess["ajxp_conf.156"],"admin|".$mess["ajxp_conf.157"],"shared|".$mess["ajxp_conf.158"],"guest|".$mess["ajxp_conf.159"])
-                        )
-                    );
-                    if (isSet($userObject)) {
-                        $data["USER"] = array();
-                        $data["USER"]["LOCK"] = $userObject->getLock();
-                        $data["USER"]["PROFILE"] = $userObject->getProfile();
-                        $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
-                        $rolesList = RolesService::getRolesList(array(), true);
-                        $data["ALL"]["ROLES"] = array_keys($rolesList);
-                        $data["ALL"]["ROLES_DETAILS"] = array();
-                        foreach($rolesList as $rId => $rObj){
-                            $data["ALL"]["ROLES_DETAILS"][$rId] = array("label" => $rObj->getLabel(), "sticky" => $rObj->alwaysOverrides());
-                        }
-                        if ($userObject instanceof AbstractUser && isSet($userObject->parentRole)) {
-                            $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
-                        }
-                    } else if (isSet($groupPath)) {
-                        $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
-                        if($roleId != "AJXP_GRP_/"){
-                            $parentGroupRoles = array();
-                            $parentPath = PathUtils::forwardSlashDirname($roleId);
-                            while($parentPath != "AJXP_GRP_"){
-                                $parentRole = RolesService::getRole($parentPath);
-                                if($parentRole != null) {
-                                    array_unshift($parentGroupRoles, $parentRole);
-                                }
-                                $parentPath = PathUtils::forwardSlashDirname($parentPath);
-                            }
-                            $rootGroup = RolesService::getRole("AJXP_GRP_/");
-                            if($rootGroup != null) array_unshift($parentGroupRoles, $rootGroup);
-                            if(count($parentGroupRoles)){
-                                $parentRole = clone array_shift($parentGroupRoles);
-                                foreach($parentGroupRoles as $pgRole){
-                                    $parentRole = $pgRole->override($parentRole);
-                                }
-                                $data["PARENT_ROLE"] = $parentRole->getDataArray();
-                            }
-                        }
-                    }
-
-
-                    $scope = "role";
-                    if($roleGroup) {
-                        $scope = "group";
-                        if($roleId == "AJXP_GRP_/") $scope = "role";
-                    }
-                    else if(isSet($userObject)) $scope = "user";
-                    $data["SCOPE_PARAMS"] = array();
-                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
-                    foreach ($nodes as $node) {
-                        $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
-                        $origName = $node->attributes->getNamedItem("name")->nodeValue;
-                        if($roleId == "AJXP_GRP_/" && strpos($origName, "ROLE_") ===0 ) continue;
-                        $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
-                        $nArr = array();
-                        foreach ($node->attributes as $attrib) {
-                            $nArr[$attrib->nodeName] = XMLWriter::replaceAjxpXmlKeywords($attrib->nodeValue);
-                        }
-                        $data["SCOPE_PARAMS"][] = $nArr;
-                    }
-
-                    echo json_encode($data);
-                }
-            break;
-
-            case "post_json_role" :
-
-                $roleId = TextEncoder::magicDequote($httpVars["role_id"]);
-                $roleGroup = false;
-                $currentMainUser = $ctx->getUser();
-                $userObject = $usrId = $filteredGroupPath = null;
-                if (strpos($roleId, "AJXP_GRP_") === 0) {
-                    $groupPath = substr($roleId, strlen("AJXP_GRP_"));
-                    $filteredGroupPath = (!empty($currentMainUser) ? $currentMainUser->getRealGroupPath($groupPath) : $groupPath);
-                    $roleId = "AJXP_GRP_".$filteredGroupPath;
-                    if($roleId != "AJXP_GRP_/"){
-                        $groups = UsersService::listChildrenGroups(PathUtils::forwardSlashDirname($filteredGroupPath));
-                        $key = "/".basename($groupPath);
-                        if (!array_key_exists($key, $groups)) {
-                            throw new \Exception("Cannot find group with this id!");
-                        }
-                        $groupLabel = $groups[$key];
-                    }else{
-                        $groupLabel = $mess["ajxp_conf.151"];
-                    }
-                    $roleGroup = true;
-                }
-                if (strpos($roleId, "AJXP_USR_") === 0) {
-                    $usrId = str_replace("AJXP_USR_/", "", $roleId);
-                    $userObject = UsersService::getUserById($usrId);
-                    $ctxUser = $ctx->getUser();
-                    if(!empty($ctxUser) && !$ctxUser->canAdministrate($userObject)){
-                        throw new \Exception("Cannot post role for user ".$usrId);
-                    }
-                    $originalRole = $userObject->getPersonalRole();
-                } else {
-                    // second param = create if not exists.
-                    if($roleGroup){
-                        $originalRole = RolesService::getOrCreateRole($roleId, $ctx->hasUser() ? $ctx->getUser()->getGroupPath() : "/");
-                    }else{
-                        $originalRole = RolesService::getRole($roleId);
-                    }
-                }
-                if ($originalRole === false) {
-                    throw new \Exception("Cant find role! ");
-                }
-
-                $jsonData = TextEncoder::magicDequote($httpVars["json_data"]);
-                $data = json_decode($jsonData, true);
-                $roleData = $data["ROLE"];
-                $binariesContext = array();
-                $parseContext = $ctx;
-                if (isset($userObject)) {
-                    $parseContext = new Context(null, $ctx->getRepositoryId());
-                    $parseContext->setUserObject($userObject);
-                    $binariesContext = array("USER" => $userObject->getId());
-                }
-                if(isSet($data["FORMS"])){
-                    $forms = $data["FORMS"];
-                    foreach ($forms as $repoScope => $plugData) {
-                        foreach ($plugData as $plugId => $formsData) {
-                            $parsed = array();
-                            OptionsHelper::parseStandardFormParameters(
-                                $parseContext,
-                                $formsData,
-                                $parsed,
-                                "ROLE_PARAM_",
-                                $binariesContext,
-                                AJXP_Role::$cypheredPassPrefix
-                            );
-                            $roleData["PARAMETERS"][$repoScope][$plugId] = $parsed;
-                        }
-                    }
-                }else{
-                    OptionsHelper::filterFormElementsFromMeta(
-                        $data["METADATA"],
-                        $roleData,
-                        ($userObject != null ? $usrId : null),
-                        $binariesContext,
-                        AJXP_Role::$cypheredPassPrefix
-                    );
-                }
-                $existingParameters = $originalRole->listParameters(true);
-                $this->mergeExistingParameters($roleData["PARAMETERS"], $existingParameters);
-                if (isSet($userObject) && isSet($data["USER"]) && isSet($data["USER"]["PROFILE"])) {
-                    $userObject->setAdmin(($data["USER"]["PROFILE"] == "admin"));
-                    $userObject->setProfile($data["USER"]["PROFILE"]);
-                }
-                if (isSet($data["GROUP_LABEL"]) && isSet($groupLabel) && $groupLabel != $data["GROUP_LABEL"]) {
-                    ConfService::getConfStorageImpl()->relabelGroup($filteredGroupPath, $data["GROUP_LABEL"]);
-                }
-
-                if($currentUserIsGroupAdmin){
-                    // FILTER DATA FOR GROUP ADMINS
-                    $params = $this->getEditableParameters($ctx, true, false);
-                    foreach($roleData["PARAMETERS"] as $scope => &$plugsParameters){
-                        foreach($plugsParameters as $paramPlugin => &$parameters){
-                            foreach($parameters as $pName => $pValue){
-                                if(!isSet($params[$paramPlugin]) || !in_array($pName, $params[$paramPlugin])){
-                                    unset($parameters[$pName]);
-                                }
-                            }
-                            if(!count($parameters)){
-                                unset($plugsParameters[$paramPlugin]);
-                            }
-                        }
-                        if(!count($plugsParameters)){
-                            unset($roleData["PARAMETERS"][$scope]);
-                        }
-                    }
-                    // Remerge from parent
-                    $roleData["PARAMETERS"] = $originalRole->array_merge_recursive2($originalRole->listParameters(), $roleData["PARAMETERS"]);
-                    // Changing Actions is not allowed
-                    $roleData["ACTIONS"] = $originalRole->listActionsStates();
-                }
-
-                if(isSet($roleData["MASKS"])){
-                    foreach($roleData["MASKS"] as $repoId => $serialMask){
-                        $roleData["MASKS"][$repoId] = new AJXP_PermissionMask($serialMask);
-                    }
-                }
-
-                try {
-                    $originalRole->bunchUpdate($roleData);
-                    if (isSet($userObject)) {
-                        $userObject->updatePersonalRole($originalRole);
-                        $userObject->save("superuser");
-                    } else {
-                        RolesService::updateRole($originalRole);
-                    }
-                    // Reload Role
-                    $savedValue = RolesService::getRole($originalRole->getId());
-                    $output = array("ROLE" => $savedValue->getDataArray(true), "SUCCESS" => true);
-                } catch (\Exception $e) {
-                    $output = array("ERROR" => $e->getMessage());
-                }
-                HTMLWriter::charsetHeader("application/json");
-                echo(json_encode($output));
-
-            break;
-
-
-            case "user_set_lock" :
-
-                $userId = InputFilter::decodeSecureMagic($httpVars["user_id"]);
-                $lock = ($httpVars["lock"] == "true" ? true : false);
-                $lockType = $httpVars["lock_type"];
-                $ctxUser = $ctx->getUser();
-                if (UsersService::userExists($userId)) {
-                    $userObject = UsersService::getUserById($userId, false);
-                    if( !empty($ctxUser) && !$ctxUser->canAdministrate($userObject)){
-                        throw new \Exception("Cannot update user data for ".$userId);
-                    }
-                    if ($lock) {
-                        $userObject->setLock($lockType);
-                        XMLWriter::header();
-                        XMLWriter::sendMessage("Successfully set lock on user ($lockType)", null);
-                        XMLWriter::close();
-                    } else {
-                        $userObject->removeLock();
-                        XMLWriter::header();
-                        XMLWriter::sendMessage("Successfully unlocked user", null);
-                        XMLWriter::close();
-                    }
-                    $userObject->save("superuser");
-                }
-
-            break;
-
-            case "create_user" :
-
-                if (!isset($httpVars["new_user_login"]) || $httpVars["new_user_login"] == "" ||!isset($httpVars["new_user_pwd"]) || $httpVars["new_user_pwd"] == "") {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-                    XMLWriter::close();
-                    return;
-                }
-                $original_login = TextEncoder::magicDequote($httpVars["new_user_login"]);
-                $new_user_login = InputFilter::sanitize($original_login, InputFilter::SANITIZE_EMAILCHARS);
-                if($original_login != $new_user_login){
-                    throw new \Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
-                }
-                if (UsersService::userExists($new_user_login, "w") || UsersService::isReservedUserId($new_user_login)) {
-                    throw new \Exception($mess["ajxp_conf.43"]);
-                }
-
-                $newUser = UsersService::createUser($new_user_login, $httpVars["new_user_pwd"]);
-                if (!empty($httpVars["group_path"])) {
-                    $newUser->setGroupPath(rtrim($currentAdminBasePath, "/")."/".ltrim($httpVars["group_path"], "/"));
-                } else {
-                    $newUser->setGroupPath($currentAdminBasePath);
-                }
-
-                $newUser->save("superuser");
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.44"], null);
-                XMLWriter::reloadDataNode("", $new_user_login);
-                XMLWriter::close();
-
-            break;
-
-            case "change_admin_right" :
-                $userId = $httpVars["user_id"];
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
-                $user->setAdmin(($httpVars["right_value"]=="1"?true:false));
-                $user->save("superuser");
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.45"].$httpVars["user_id"], null);
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
-
-            break;
-
-            case "role_update_right" :
-                if(!isSet($httpVars["role_id"])
-                    || !isSet($httpVars["repository_id"])
-                    || !isSet($httpVars["right"]))
-                {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-                    XMLWriter::close();
-                    break;
-                }
-                $rId = InputFilter::sanitize($httpVars["role_id"]);
-                $role = RolesService::getRole($rId);
-                if($role === false){
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]."(".$rId.")");
-                    XMLWriter::close();
-                    break;
-                }
-                $role->setAcl(InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM), InputFilter::sanitize($httpVars["right"], InputFilter::SANITIZE_ALPHANUM));
-                RolesService::updateRole($role);
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.46"].$httpVars["role_id"], null);
-                XMLWriter::close();
-
-            break;
-
-            case "user_update_right" :
-                if(!isSet($httpVars["user_id"])
-                    || !isSet($httpVars["repository_id"])
-                    || !isSet($httpVars["right"])
-                    || !UsersService::userExists($httpVars["user_id"])
-                )
-                {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-                    print("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
-                    XMLWriter::close();
-                    return;
-                }
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
-                $user->getPersonalRole()->setAcl(InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM), InputFilter::sanitize($httpVars["right"], InputFilter::SANITIZE_ALPHANUM));
-                $user->save();
-                $loggedUser = $ctx->getUser();
-                if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.46"].$httpVars["user_id"], null);
-                print("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$user->canRead($httpVars["repository_id"])."\" write=\"".$user->canWrite($httpVars["repository_id"])."\"/>");
-                XMLWriter::reloadRepositoryList();
-                XMLWriter::close();
-                return ;
-            break;
-
-            case "user_update_group":
-
-                $userSelection = UserSelection::fromContext($ctx, $httpVars);
-                $dir = $httpVars["dir"];
-                $dest = $httpVars["dest"];
-                if (isSet($httpVars["group_path"])) {
-                    // API Case
-                    $groupPath = $httpVars["group_path"];
-                } else {
-                    if (strpos($dir, "/data/users",0)!==0 || strpos($dest, "/data/users",0)!==0) {
-                        break;
-                    }
-                    $groupPath = substr($dest, strlen("/data/users"));
-                }
-
-                $userId = null;
-                $usersMoved = array();
-
-                if (!empty($groupPath)) {
-                    $targetPath = rtrim($currentAdminBasePath, "/")."/".ltrim($groupPath, "/");
-                } else {
-                    $targetPath = $currentAdminBasePath;
-                }
-
-                foreach ($userSelection->getFiles() as $selectedUser) {
-                    $userId = basename($selectedUser);
-                    try{
-                        $user = UsersService::getUserById($userId);
-                    }catch (UserNotFoundException $u){
-                        continue;
-                    }
-                    if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                        continue;
-                    }
-                    $user->setGroupPath($targetPath, true);
-                    $user->save("superuser");
-                    $usersMoved[] = $user->getId();
-                }
-                XMLWriter::header();
-                if(count($usersMoved)){
-                    XMLWriter::sendMessage(count($usersMoved)." user(s) successfully moved to ".$targetPath, null);
-                    XMLWriter::reloadDataNode($dest, $userId);
-                    XMLWriter::reloadDataNode();
-                }else{
-                    XMLWriter::sendMessage(null, "No users moved, there must have been something wrong.");
-                }
-                XMLWriter::close();
-
-                break;
-
-            case "user_add_role" :
-            case "user_delete_role":
-
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !UsersService::userExists($httpVars["user_id"]) || !RolesService::getRole($httpVars["role_id"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
-                }
-                if ($action == "user_add_role") {
-                    $act = "add";
-                    $messId = "73";
-                } else {
-                    $act = "remove";
-                    $messId = "74";
-                }
-                $this->updateUserRole($ctx->getUser(), InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS), $httpVars["role_id"], $act);
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"], null);
-                XMLWriter::close();
-
-            break;
-
-            case "user_reorder_roles":
-
-                if (!isSet($httpVars["user_id"]) || !UsersService::userExists($httpVars["user_id"]) || !isSet($httpVars["roles"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
-                }
-                $roles = json_decode($httpVars["roles"], true);
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user data for ".$userId);
-                }
-                $user->updateRolesOrder($roles);
-                $user->save("superuser");
-                $loggedUser = $ctx->getUser();
-                if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage("Roles reordered for user ".$httpVars["user_id"], null);
-                XMLWriter::close();
-
-            break;
-
-            case "users_bulk_update_roles":
-
-                $data = json_decode($httpVars["json_data"], true);
-                $userIds = $data["users"];
-                $rolesOperations = $data["roles"];
-                foreach($userIds as $userId){
-                    $userId = InputFilter::sanitize($userId, InputFilter::SANITIZE_EMAILCHARS);
-                    if(!UsersService::userExists($userId)) continue;
-                    $userObject = UsersService::getUserById($userId, false);
-                    if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)) continue;
-                    foreach($rolesOperations as $addOrRemove => $roles){
-                        if(!in_array($addOrRemove, array("add", "remove"))) {
-                            continue;
-                        }
-                        foreach($roles as $roleId){
-                            if(strpos($roleId, "AJXP_USR_/") === 0 || strpos($roleId,"AJXP_GRP_/") === 0){
-                                continue;
-                            }
-                            $roleId = InputFilter::sanitize($roleId, InputFilter::SANITIZE_FILENAME);
-                            if ($addOrRemove == "add") {
-                                $roleObject = RolesService::getRole($roleId);
-                                $userObject->addRole($roleObject);
-                            } else {
-                                $userObject->removeRole($roleId);
-                            }
-                        }
-                    }
-                    $userObject->save("superuser");
-                    $loggedUser = $ctx->getUser();
-                    if ($loggedUser->getId() == $userObject->getId()) {
-                        AuthService::updateUser($userObject);
-                    }
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage("Successfully updated roles", null);
-                XMLWriter::close();
-
-            break;
-
-            case "user_update_role" :
-
-                $selection = UserSelection::fromContext($ctx, $httpVars);
-                $files = $selection->getFiles();
-                $detectedRoles = array();
-                $roleId = null;
-
-                if (isSet($httpVars["role_id"]) && isset($httpVars["update_role_action"])) {
-                    $update = $httpVars["update_role_action"];
-                    $roleId = $httpVars["role_id"];
-                    if (RolesService::getRole($roleId) === false) {
-                        throw new \Exception("Invalid role id");
-                    }
-                }
-                foreach ($files as $index => $file) {
-                    $userId = basename($file);
-                    if (isSet($update)) {
-                        $userObject = $this->updateUserRole($ctx->getUser(), $userId, $roleId, $update);
-                    } else {
-                        try{
-                            $userObject = UsersService::getUserById($userId);
-                        }catch(UserNotFoundException $u){
-                            continue;
-                        }
-                        if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)){
-                            continue;
-                        }
-                    }
-                    if ($userObject->hasParent()) {
-                        unset($files[$index]);
-                        continue;
-                    }
-                    $userRoles = $userObject->getRoles();
-                    foreach ($userRoles as $roleIndex => $bool) {
-                        if(!isSet($detectedRoles[$roleIndex])) $detectedRoles[$roleIndex] = 0;
-                        if($bool === true) $detectedRoles[$roleIndex] ++;
-                    }
-                }
-                $count = count($files);
-                XMLWriter::header("admin_data");
-                print("<user><ajxp_roles>");
-                foreach ($detectedRoles as $roleId => $roleCount) {
-                    if($roleCount < $count) continue;
-                    print("<role id=\"$roleId\"/>");
-                }
-                print("</ajxp_roles></user>");
-                print("<ajxp_roles>");
-                foreach (RolesService::getRolesList(array(), !$this->listSpecialRoles) as $roleId => $roleObject) {
-                    print("<role id=\"$roleId\"/>");
-                }
-                print("</ajxp_roles>");
-                XMLWriter::close("admin_data");
-
-            break;
-
-            case "save_custom_user_params" :
-
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $user = $loggedUser;
-                } else {
-                    $user = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
-
-                $custom = $user->getPref("CUSTOM_PARAMS");
-                if(!is_array($custom)) $custom = array();
-
-                $options = $custom;
-                $newCtx = new Context($userId, $ctx->getRepositoryId());
-                $this->parseParameters($newCtx, $httpVars, $options, false, $custom);
-                $custom = $options;
-                $user->setPref("CUSTOM_PARAMS", $custom);
-                $user->save();
-
-                if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.47"].$httpVars["user_id"], null);
-                XMLWriter::close();
-
-            break;
-
-            case "save_repository_user_params" :
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $user = $loggedUser;
-                } else {
-                    $user = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
-
-                $wallet = $user->getPref("AJXP_WALLET");
-                if(!is_array($wallet)) $wallet = array();
-                $repoID = $httpVars["repository_id"];
-                if (!array_key_exists($repoID, $wallet)) {
-                    $wallet[$repoID] = array();
-                }
-                $options = $wallet[$repoID];
-                $existing = $options;
-                $newCtx = new Context($userId, $ctx->getRepositoryId());
-                $this->parseParameters($newCtx, $httpVars, $options, false, $existing);
-                $wallet[$repoID] = $options;
-                $user->setPref("AJXP_WALLET", $wallet);
-                $user->save();
-
-                if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.47"].$httpVars["user_id"], null);
-                XMLWriter::close();
-
-            break;
-
-            case "update_user_pwd" :
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["user_pwd"]) || !UsersService::userExists($httpVars["user_id"]) || trim($httpVars["user_pwd"]) == "") {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-                    XMLWriter::close();
-                    return;
-                }
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user data for ".$userId);
-                }
-                $res = UsersService::updatePassword($userId, $httpVars["user_pwd"]);
-                XMLWriter::header();
-                if ($res === true) {
-                    XMLWriter::sendMessage($mess["ajxp_conf.48"].$userId, null);
-                } else {
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.49"]." : $res");
-                }
-                XMLWriter::close();
-
-            break;
-
-            case "save_user_preference":
-
-                if (!isSet($httpVars["user_id"]) || !UsersService::userExists($httpVars["user_id"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
-                }
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $userObject = $loggedUser;
-                } else {
-                    $userObject = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)){
-                    throw new \Exception("Cannot update user data for ".$userId);
-                }
-
-                $i = 0;
-                while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
-                    $prefName = InputFilter::sanitize($httpVars["pref_name_" . $i], InputFilter::SANITIZE_ALPHANUM);
-                    $prefValue = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["pref_value_" . $i]));
-                    if($prefName == "password") continue;
-                    if ($prefName != "pending_folder" && $userObject == null) {
-                        $i++;
-                        continue;
-                    }
-                    $userObject->setPref($prefName, $prefValue);
-                    $userObject->save("user");
-                    $i++;
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage("Succesfully saved user preference", null);
-                XMLWriter::close();
-
-            break;
-
-            case  "get_drivers_definition":
-
-                XMLWriter::header("drivers", array("allowed" => $currentUserIsGroupAdmin ? "false" : "true"));
-                print(XMLWriter::replaceAjxpXmlKeywords(self::availableDriversToXML("param", "", true)));
-                XMLWriter::close("drivers");
-
-
-            break;
-
-            case  "get_templates_definition":
-
-                XMLWriter::header("repository_templates");
-                $count = 0;
-                $repositories = RepositoryService::listRepositoriesWithCriteria(array(
-                    "isTemplate" => '1'
-                ), $count);
-                foreach ($repositories as $repo) {
-                    if(!$repo->isTemplate) continue;
-                    $repoId = $repo->getUniqueId();
-                    $repoLabel = TextEncoder::toUTF8($repo->getDisplay());
-                    $repoType = $repo->getAccessType();
-                    print("<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">");
-                    foreach ($repo->getOptionsDefined() as $optionName) {
-                        print("<option name=\"$optionName\"/>");
-                    }
-                    print("</template>");
-                }
-                XMLWriter::close("repository_templates");
-
-
-            break;
-
-            case "create_repository" :
-
-                $repDef = $httpVars;
-                $isTemplate = isSet($httpVars["sf_checkboxes_active"]);
-                unset($repDef["get_action"]);
-                unset($repDef["sf_checkboxes_active"]);
-                if (isSet($httpVars["json_data"])) {
-                    $repDef = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
-                    $options = $repDef["DRIVER_OPTIONS"];
-                } else {
-                    $options = array();
-                    $this->parseParameters($ctx, $repDef, $options, true);
-                }
-                if (count($options)) {
-                    $repDef["DRIVER_OPTIONS"] = $options;
-                    unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
-                    if(isSet($options["AJXP_SLUG"])){
-                        $repDef["AJXP_SLUG"] = $options["AJXP_SLUG"];
-                        unset($repDef["DRIVER_OPTIONS"]["AJXP_SLUG"]);
-                    }
-                }
-                if (strstr($repDef["DRIVER"], "ajxp_template_") !== false) {
-                    $templateId = substr($repDef["DRIVER"], 14);
-                    $templateRepo = RepositoryService::getRepositoryById($templateId);
-                    $newRep = $templateRepo->createTemplateChild($repDef["DISPLAY"], $repDef["DRIVER_OPTIONS"], $loggedUser->getId());
-                    if(isSet($repDef["AJXP_SLUG"])){
-                        $newRep->setSlug($repDef["AJXP_SLUG"]);
-                    }
-                } else {
-                    if ($currentUserIsGroupAdmin) {
-                        throw new \Exception("You are not allowed to create a workspace from a driver. Use a template instead.");
-                    }
-                    $pServ = PluginsService::getInstance($ctx);
-                    $driver = $pServ->getPluginByTypeName("access", $repDef["DRIVER"]);
-
-                    $newRep = RepositoryService::createRepositoryFromArray(0, $repDef);
-                    $testFile = $driver->getBaseDir()."/test.".$newRep->getAccessType()."Access.php";
-                    if (!$isTemplate && is_file($testFile)) {
-                        //chdir(AJXP_TESTS_FOLDER."/plugins");
-                        $className = "\\Pydio\\Tests\\".$newRep->getAccessType()."AccessTest";
-                        if (!class_exists($className))
-                            include($testFile);
-                        $class = new $className();
-                        $result = $class->doRepositoryTest($newRep);
-                        if (!$result) {
-                            XMLWriter::header();
-                            XMLWriter::sendMessage(null, $class->failedInfo);
-                            XMLWriter::close();
-                            return;
-                        }
-                    }
-                    // Apply default metasource if any
-                    if ($driver != null && $driver->getConfigs()!=null ) {
-                        $confs = $driver->getConfigs();
-                        if (!empty($confs["DEFAULT_METASOURCES"])) {
-                            $metaIds = InputFilter::parseCSL($confs["DEFAULT_METASOURCES"]);
-                            $metaSourceOptions = array();
-                            foreach ($metaIds as $metaID) {
-                                $metaPlug = $pServ->getPluginById($metaID);
-                                if($metaPlug == null) continue;
-                                $pNodes = $metaPlug->getManifestRawContent("//param[@default]", "nodes");
-                                $defaultParams = array();
-                                /** @var \DOMElement $domNode */
-                                foreach ($pNodes as $domNode) {
-                                    $defaultParams[$domNode->getAttribute("name")] = $domNode->getAttribute("default");
-                                }
-                                $metaSourceOptions[$metaID] = $defaultParams;
-                            }
-                            $newRep->addOption("META_SOURCES", $metaSourceOptions);
-                        }
-                    }
-                }
-
-                if ($this->repositoryExists($newRep->getDisplay())) {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
-                    XMLWriter::close();
-                    return;
-                }
-                if ($isTemplate) {
-                    $newRep->isTemplate = true;
-                }
-                if ($currentUserIsGroupAdmin) {
-                    $newRep->setGroupPath($ctx->getUser()->getGroupPath());
-                } else if (!empty($options["AJXP_GROUP_PATH_PARAMETER"])) {
-                    $value = InputFilter::securePath(rtrim($currentAdminBasePath, "/") . "/" . ltrim($options["AJXP_GROUP_PATH_PARAMETER"], "/"));
-                    $newRep->setGroupPath($value);
-                }
-
-                $res = RepositoryService::addRepository($newRep);
-                XMLWriter::header();
-                if ($res == -1) {
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.51"]);
-                } else {
-                    $defaultRights = $newRep->getDefaultRight();
-                    if(!empty($defaultRights)){
-                        $groupRole = RolesService::getOrCreateRole("AJXP_GRP_" . $currentAdminBasePath, $currentAdminBasePath);
-                        $groupRole->setAcl($newRep->getId(), $defaultRights);
-                    }
-                    $loggedUser = $ctx->getUser();
-                    $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
-                    $loggedUser->recomputeMergedRole();
-                    $loggedUser->save("superuser");
-                    AuthService::updateUser($loggedUser);
-
-                    XMLWriter::sendMessage($mess["ajxp_conf.52"], null);
-                    XMLWriter::reloadDataNode("", $newRep->getUniqueId());
-                    XMLWriter::reloadRepositoryList();
-                }
-                XMLWriter::close();
-
-
-
-            break;
-
-            case "edit_repository" :
-                $repId = $httpVars["repository_id"];
-                $repository = RepositoryService::getRepositoryById($repId);
-                if ($repository == null) {
-                    throw new \Exception("Cannot find workspace with id $repId");
-                }
-                if ($ctx->hasUser() && !$ctx->getUser()->canAdministrate($repository)) {
-                    throw new \Exception("You are not allowed to edit this workspace!");
-                }
-                $pServ = PluginsService::getInstance($ctx);
-                $plug = $pServ->getPluginById("access.".$repository->getAccessType());
-                if ($plug == null) {
-                    throw new \Exception("Cannot find access driver (".$repository->getAccessType().") for workspace!");
-                }
-                XMLWriter::header("admin_data");
-                $slug = $repository->getSlug();
-                if ($slug == "" && $repository->isWriteable()) {
-                    $repository->setSlug();
-                    RepositoryService::replaceRepository($repId, $repository);
-                }
-                $ctxUser = $ctx->getUser();
-                if ($ctxUser!=null && $ctxUser->getGroupPath() != null) {
-                    $rgp = $repository->getGroupPath();
-                    if($rgp == null) $rgp = "/";
-                    if (strlen($rgp) < strlen($ctxUser->getGroupPath())) {
-                        $repository->setWriteable(false);
-                    }
-                }
-                $nested = array();
-                $definitions = $plug->getConfigsDefinitions();
-                print("<repository index=\"$repId\" securityScope=\"".$repository->securityScope()."\"");
-                foreach ($repository as $name => $option) {
-                    if(strstr($name, " ")>-1) continue;
-                    if ($name == "driverInstance") continue;
-                    if (!is_array($option)) {
-                        if (is_bool($option)) {
-                            $option = ($option?"true":"false");
-                        }
-                        print(" $name=\"".TextEncoder::toUTF8(StringHelper::xmlEntities($option))."\" ");
-                    } else if (is_array($option)) {
-                        $nested[] = $option;
-                    }
-                }
-                if (count($nested)) {
-                    print(">");
-                    foreach ($nested as $option) {
-                        foreach ($option as $key => $optValue) {
-                            if (is_array($optValue) && count($optValue)) {
-                                print("<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>");
-                            } else if (is_object($optValue)){
-                                print("<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>");
-                            } else {
-                                if (is_bool($optValue)) {
-                                    $optValue = ($optValue?"true":"false");
-                                } else if(isSet($definitions[$key]) && $definitions[$key]["type"] == "password" && !empty($optValue)){
-                                    $optValue = "__AJXP_VALUE_SET__";
-                                }
-
-                                $optValue = StringHelper::xmlEntities($optValue, true);
-                                print("<param name=\"$key\" value=\"$optValue\"/>");
-                            }
-                        }
-                    }
-                    // Add SLUG
-                    if(!$repository->isTemplate()) print("<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>");
-                    if ($repository->getGroupPath() != null) {
-                        $groupPath = $repository->getGroupPath();
-                        if($currentAdminBasePath != "/") $groupPath = substr($repository->getGroupPath(), strlen($currentAdminBasePath));
-                        print("<param name=\"AJXP_GROUP_PATH_PARAMETER\" value=\"".$groupPath."\"/>");
-                    }
-
-                    print("</repository>");
-                } else {
-                    print("/>");
-                }
-                if ($repository->hasParent()) {
-                    $parent = RepositoryService::getRepositoryById($repository->getParentId());
-                    if (isSet($parent) && $parent->isTemplate()) {
-                        $parentLabel = $parent->getDisplay();
-                        $parentType = $parent->getAccessType();
-                        print("<template repository_id=\"".$repository->getParentId()."\" repository_label=\"$parentLabel\" repository_type=\"$parentType\">");
-                        foreach ($parent->getOptionsDefined() as $parentOptionName) {
-                            print("<option name=\"$parentOptionName\"/>");
-                        }
-                        print("</template>");
-                    }
-                }
-                $manifest = $plug->getManifestRawContent("server_settings/param");
-                $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
-                $clientSettings = $plug->getManifestRawContent("client_settings", "xml");
-                $iconClass = "";$descriptionTemplate = "";
-                if($clientSettings->length){
-                    $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
-                    $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
-                }
-                print("<ajxpdriver name=\"".$repository->getAccessType()."\" label=\"". StringHelper::xmlEntities($plug->getManifestLabel()) ."\" iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" description=\"". StringHelper::xmlEntities($plug->getManifestDescription()) ."\">$manifest</ajxpdriver>");
-                print("<metasources>");
-                $metas = $pServ->getPluginsByType("metastore");
-                $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
-                $metas = array_merge($metas, $pServ->getPluginsByType("index"));
-                /** @var Plugin $metaPlug */
-                foreach ($metas as $metaPlug) {
-                    print("<meta id=\"".$metaPlug->getId()."\" label=\"". StringHelper::xmlEntities($metaPlug->getManifestLabel()) ."\" description=\"". StringHelper::xmlEntities($metaPlug->getManifestDescription()) ."\">");
-                    $manifest = $metaPlug->getManifestRawContent("server_settings/param");
-                    $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
-                    print($manifest);
-                    print("</meta>");
-                }
-                print("</metasources>");
-                if(!$repository->isTemplate()){
-                    print "<additional_info>";
-                    $users = UsersService::countUsersForRepository($ctx, $repId, false, true);
-                    $cursor = ["count"];
-                    $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repId);
-                    print('<users total="'.$users.'"/>');
-                    print('<shares total="'.count($shares).'"/>');
-                    $rootGroup = RolesService::getRole("AJXP_GRP_/");
-                    if($rootGroup !== false && $rootGroup->hasMask($repId)){
-                        print("<mask><![CDATA[".json_encode($rootGroup->getMask($repId))."]]></mask>");
-                    }
-                    print "</additional_info>";
-                }
-                XMLWriter::close("admin_data");
-
-            break;
-
-            case "edit_repository_label" :
-            case "edit_repository_data" :
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
-                $initialDefaultRights = $repo->getDefaultRight();
-                if(!$repo->isWriteable()){
-                    if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
-                        $mask = json_decode($httpVars["permission_mask"], true);
-                        $rootGroup = RolesService::getRole("AJXP_GRP_/");
-                        if(count($mask)){
-                            $perm = new AJXP_PermissionMask($mask);
-                            $rootGroup->setMask($repId, $perm);
-                        }else{
-                            $rootGroup->clearMask($repId);
-                        }
-                        RolesService::updateRole($rootGroup);
-                        XMLWriter::header();
-                        XMLWriter::sendMessage("The permission mask was updated for this workspace", null);
-                        XMLWriter::close();
-                        break;
-                    }else{
-                        throw new \Exception("This workspace is not writeable. Please edit directly the conf/bootstrap_repositories.php file.");
-                    }
-                }
-                $res = 0;
-                if (isSet($httpVars["newLabel"])) {
-                    $newLabel = InputFilter::sanitize(InputFilter::securePath($httpVars["newLabel"]), InputFilter::SANITIZE_HTML);
-                    if ($this->repositoryExists($newLabel)) {
-                         XMLWriter::header();
-                        XMLWriter::sendMessage(null, $mess["ajxp_conf.50"]);
-                        XMLWriter::close();
-                        return;
-                    }
-                    $repo->setDisplay($newLabel);
-                    $res = RepositoryService::replaceRepository($repId, $repo);
-                } else {
-                    $options = array();
-                    $existing = $repo->getOptionsDefined();
-                    $existingValues = array();
-                    if(!$repo->isTemplate()){
-                        foreach($existing as $exK) {
-                            $existingValues[$exK] = $repo->getSafeOption($exK);
-                        }
-                    }
-                    $this->parseParameters($ctx, $httpVars, $options, true, $existingValues);
-                    if (count($options)) {
-                        foreach ($options as $key=>$value) {
-                            if ($key == "AJXP_SLUG") {
-                                $repo->setSlug($value);
-                                continue;
-                            } else if ($key == "WORKSPACE_LABEL" || $key == "TEMPLATE_LABEL"){
-                                $newLabel = InputFilter::sanitize($value, InputFilter::SANITIZE_HTML);
-                                if($repo->getDisplay() != $newLabel){
-                                    if ($this->repositoryExists($newLabel)) {
-                                        throw new \Exception($mess["ajxp_conf.50"]);
-                                    }else{
-                                        $repo->setDisplay($newLabel);
-                                    }
-                                }
-                            } elseif ($key == "AJXP_GROUP_PATH_PARAMETER") {
-                                $value = InputFilter::securePath(rtrim($currentAdminBasePath, "/") . "/" . ltrim($value, "/"));
-                                $repo->setGroupPath($value);
-                                continue;
-                            }
-                            $repo->addOption($key, $value);
-                        }
-                    }
-                    if($repo->isTemplate()){
-                        foreach($existing as $definedOption){
-                            if($definedOption == "META_SOURCES" || $definedOption == "CREATION_TIME" || $definedOption == "CREATION_USER"){
-                                continue;
-                            }
-                            if(!isSet($options[$definedOption]) && isSet($repo->options[$definedOption])){
-                                unset($repo->options[$definedOption]);
-                            }
-                        }
-                    }
-                    if ($repo->getContextOption($ctx, "DEFAULT_RIGHTS")) {
-                        $gp = $repo->getGroupPath();
-                        if (empty($gp) || $gp == "/") {
-                            $defRole = RolesService::getRole("AJXP_GRP_/");
-                        } else {
-                            $defRole = RolesService::getOrCreateRole("AJXP_GRP_" . $gp, $currentAdminBasePath);
-                        }
-                        if ($defRole !== false) {
-                            $defRole->setAcl($repId, $repo->getContextOption($ctx, "DEFAULT_RIGHTS"));
-                            RolesService::updateRole($defRole);
-                        }
-                    }
-                    if (is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php")) {
-                        chdir(AJXP_TESTS_FOLDER."/plugins");
-                        include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php");
-                        $className = "ajxp_".$repo->getAccessType();
-                        $class = new $className();
-                        $result = $class->doRepositoryTest($repo);
-                        if (!$result) {
-                            XMLWriter::header();
-                            XMLWriter::sendMessage(null, $class->failedInfo);
-                            XMLWriter::close();
-                            return;
-                        }
-                    }
-
-                    $rootGroup = RolesService::getOrCreateRole("AJXP_GRP_" . $currentAdminBasePath, $currentAdminBasePath);
-                    if (isSet($httpVars["permission_mask"]) && !empty($httpVars["permission_mask"])){
-                        $mask = json_decode($httpVars["permission_mask"], true);
-                        if(count($mask)){
-                            $perm = new AJXP_PermissionMask($mask);
-                            $rootGroup->setMask($repId, $perm);
-                        }else{
-                            $rootGroup->clearMask($repId);
-                        }
-                        RolesService::updateRole($rootGroup);
-                    }
-                    $defaultRights = $repo->getDefaultRight();
-                    if($defaultRights != $initialDefaultRights){
-                        $currentDefaultRights = $rootGroup->getAcl($repId);
-                        if(!empty($defaultRights) || !empty($currentDefaultRights)){
-                            $rootGroup->setAcl($repId, empty($defaultRights) ? "" : $defaultRights);
-                            RolesService::updateRole($rootGroup);
-                        }
-                    }
-                    RepositoryService::replaceRepository($repId, $repo);
-                }
-                XMLWriter::header();
-                if ($res == -1) {
-                    XMLWriter::sendMessage(null, $mess["ajxp_conf.53"]);
-                } else {
-                    XMLWriter::sendMessage($mess["ajxp_conf.54"], null);
-                    if (isSet($httpVars["newLabel"])) {
-                        XMLWriter::reloadDataNode("", $repId);
-                    }
-                    XMLWriter::reloadRepositoryList();
-                }
-                XMLWriter::close();
-
-            break;
-
-            case "meta_source_add" :
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
-                if (!is_object($repo)) {
-                    throw new \Exception("Invalid workspace id! $repId");
-                }
-                $metaSourceType = InputFilter::sanitize($httpVars["new_meta_source"], InputFilter::SANITIZE_ALPHANUM);
-                if (isSet($httpVars["json_data"])) {
-                    $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
-                } else {
-                    $options = array();
-                    $this->parseParameters($ctx, $httpVars, $options, true);
-                }
-                $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                if (is_array($repoOptions) && isSet($repoOptions[$metaSourceType])) {
-                    throw new \Exception($mess["ajxp_conf.55"]);
-                }
-                if (!is_array($repoOptions)) {
-                    $repoOptions = array();
-                }
-                $repoOptions[$metaSourceType] = $options;
-                uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
-                $repo->addOption("META_SOURCES", $repoOptions);
-                RepositoryService::replaceRepository($repId, $repo);
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.56"],null);
-                XMLWriter::close();
-            break;
-
-            case "meta_source_delete" :
-
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
-                if (!is_object($repo)) {
-                    throw new \Exception("Invalid workspace id! $repId");
-                }
-                $metaSourceId = $httpVars["plugId"];
-                $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                if (is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)) {
-                    unset($repoOptions[$metaSourceId]);
-                    uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
-                    $repo->addOption("META_SOURCES", $repoOptions);
-                    RepositoryService::replaceRepository($repId, $repo);
-                }else{
-                    throw new \Exception("Cannot find meta source ".$metaSourceId);
-                }
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.57"],null);
-                XMLWriter::close();
-
-            break;
-
-            case "meta_source_edit" :
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
-                if (!is_object($repo)) {
-                    throw new \Exception("Invalid workspace id! $repId");
-                }
-                if(isSet($httpVars["plugId"])){
-                    $metaSourceId = $httpVars["plugId"];
-                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                    if (!is_array($repoOptions)) {
-                        $repoOptions = array();
-                    }
-                    if (isSet($httpVars["json_data"])) {
-                        $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
-                    } else {
-                        $options = array();
-                        $this->parseParameters($ctx, $httpVars, $options, true);
-                    }
-                    if(isset($repoOptions[$metaSourceId])){
-                        $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
-                    }
-                    $repoOptions[$metaSourceId] = $options;
-                }else if(isSet($httpVars["bulk_data"])){
-                    $bulkData = json_decode(TextEncoder::magicDequote($httpVars["bulk_data"]), true);
-                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                    if (!is_array($repoOptions)) {
-                        $repoOptions = array();
-                    }
-                    if(isSet($bulkData["delete"]) && count($bulkData["delete"])){
-                        foreach($bulkData["delete"] as $key){
-                            if(isSet($repoOptions[$key])) unset($repoOptions[$key]);
-                        }
-                    }
-                    if(isSet($bulkData["add"]) && count($bulkData["add"])){
-                        foreach($bulkData["add"] as $key => $value){
-                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
-                            $repoOptions[$key] = $value;
-                        }
-                    }
-                    if(isSet($bulkData["edit"]) && count($bulkData["edit"])){
-                        foreach($bulkData["edit"] as $key => $value){
-                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
-                            $repoOptions[$key] = $value;
-                        }
-                    }
-                }
-                uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
-                $repo->addOption("META_SOURCES", $repoOptions);
-                RepositoryService::replaceRepository($repId, $repo);
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.58"],null);
-                XMLWriter::close();
-            break;
-
-
-            case "delete" :
-                // REST API mapping
-                if (isSet($httpVars["data_type"])) {
-                    switch ($httpVars["data_type"]) {
-                        case "repository":
-                            $httpVars["repository_id"] = basename($httpVars["data_id"]);
-                            break;
-                        case "role":
-                            $httpVars["role_id"] = basename($httpVars["data_id"]);
-                            break;
-                        case "user":
-                            $httpVars["user_id"] = basename($httpVars["data_id"]);
-                            break;
-                        case "group":
-                            $httpVars["group"] = "/data/users".$httpVars["data_id"];
-                            break;
-                        default:
-                            break;
-                    }
-                    unset($httpVars["data_type"]);
-                    unset($httpVars["data_id"]);
-                }
-                if (isSet($httpVars["repository_id"])) {
-                    $repId = $httpVars["repository_id"];
-                    $repo = RepositoryService::getRepositoryById($repId);
-                    if(!is_object($repo)){
-                        $res = -1;
-                    }else{
-                        $res = RepositoryService::deleteRepository($repId);
-                    }
-                    XMLWriter::header();
-                    if ($res == -1) {
-                        XMLWriter::sendMessage(null, $mess[427]);
-                    } else {
-                        XMLWriter::sendMessage($mess["ajxp_conf.59"], null);
-                        XMLWriter::reloadDataNode();
-                        XMLWriter::reloadRepositoryList();
-                    }
-                    XMLWriter::close();
-                    return;
-                } else if (isSet($httpVars["role_id"])) {
-                    $roleId = $httpVars["role_id"];
-                    if (RolesService::getRole($roleId) === false) {
-                        throw new \Exception($mess["ajxp_conf.67"]);
-                    }
-                    RolesService::deleteRole($roleId);
-                    XMLWriter::header();
-                    XMLWriter::sendMessage($mess["ajxp_conf.68"], null);
-                    XMLWriter::reloadDataNode();
-                    XMLWriter::close();
-                } else if (isSet($httpVars["group"])) {
-                    $groupPath = $httpVars["group"];
-                    $basePath = substr(PathUtils::forwardSlashDirname($groupPath), strlen("/data/users"));
-                    $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
-                    $gName = basename($groupPath);
-                    UsersService::deleteGroup($basePath, $gName);
-                    XMLWriter::header();
-                    XMLWriter::sendMessage($mess["ajxp_conf.128"], null);
-                    XMLWriter::reloadDataNode();
-                    XMLWriter::close();
-                } else {
-                    if(!isset($httpVars["user_id"]) || $httpVars["user_id"]==""
-                        || UsersService::isReservedUserId($httpVars["user_id"])
-                        || $loggedUser->getId() == $httpVars["user_id"])
-                    {
-                        XMLWriter::header();
-                        XMLWriter::sendMessage(null, $mess["ajxp_conf.61"]);
-                        XMLWriter::close();
-                    }
-                    UsersService::deleteUser($httpVars["user_id"]);
-                    XMLWriter::header();
-                    XMLWriter::sendMessage($mess["ajxp_conf.60"], null);
-                    XMLWriter::reloadDataNode();
-                    XMLWriter::close();
-
-                }
-            break;
-
-            case "get_plugin_manifest" :
-
-                $ajxpPlugin = PluginsService::getInstance($ctx)->getPluginById($httpVars["plugin_id"]);
-                XMLWriter::header("admin_data");
-
-                $fullManifest = $ajxpPlugin->getManifestRawContent("", "xml");
-                $xPath = new DOMXPath($fullManifest->ownerDocument);
-                $addParams = "";
-                $instancesDefinitions = array();
-                $pInstNodes = $xPath->query("server_settings/global_param[contains(@type, 'plugin_instance:')]");
-                /** @var \DOMElement $pInstNode */
-                foreach ($pInstNodes as $pInstNode) {
-                    $type = $pInstNode->getAttribute("type");
-                    $instType = str_replace("plugin_instance:", "", $type);
-                    $fieldName = $pInstNode->getAttribute("name");
-                    $pInstNode->setAttribute("type", "group_switch:".$fieldName);
-                    $typePlugs = PluginsService::getInstance($ctx)->getPluginsByType($instType);
-                    foreach ($typePlugs as $typePlug) {
-                        if(!$typePlug->isEnabled()) continue;
-                        if($typePlug->getId() == "auth.multi") continue;
-                        $checkErrorMessage = "";
-                        try {
-                            $typePlug->performChecks();
-                        } catch (\Exception $e) {
-                            $checkErrorMessage = " (Warning : ".$e->getMessage().")";
-                        }
-                        $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[not(@group_switch_name)]"));
-                        $addParams .= '<global_param group_switch_name="'.$fieldName.'" name="instance_name" group_switch_label="'.$typePlug->getManifestLabel().$checkErrorMessage.'" group_switch_value="'.$typePlug->getId().'" default="'.$typePlug->getId().'" type="hidden"/>';
-                        $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"".$typePlug->getManifestLabel().$checkErrorMessage."\" group_switch_value=\"".$typePlug->getId()."\" ", $tParams);
-                        $addParams .= str_replace("<param", "<global_param", XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[@group_switch_name]")));
-                        $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
-                        $instancesDefs = $typePlug->getConfigsDefinitions();
-                        if(!empty($instancesDefs) && is_array($instancesDefs)) {
-                            foreach($instancesDefs as $defKey => $defData){
-                                $instancesDefinitions[$fieldName."/".$defKey] = $defData;
-                            }
-                        }
-                    }
-                }
-                $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
-                $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
-                $allParams = str_replace("</server_settings>", $addParams."</server_settings>", $allParams);
-
-                echo($allParams);
-                $definitions = $instancesDefinitions;
-                $configsDefs = $ajxpPlugin->getConfigsDefinitions();
-                if(is_array($configsDefs)){
-                    $definitions = array_merge($configsDefs, $instancesDefinitions);
-                }
-                $values = $ajxpPlugin->getConfigs();
-                if(!is_array($values)) $values = array();
-                echo("<plugin_settings_values>");
-                // First flatten keys
-                $flattenedKeys = array();
-                foreach ($values as $key => $value){
-                    $type = $definitions[$key]["type"];
-                    if ((strpos($type, "group_switch:") === 0 || strpos($type, "plugin_instance:") === 0 ) && is_array($value)) {
-                        $res = array();
-                        $this->flattenKeyValues($res, $definitions, $value, $key);
-                        $flattenedKeys += $res;
-                        // Replace parent key by new flat value
-                        $values[$key] = $flattenedKeys[$key];
-                    }
-                }
-                $values += $flattenedKeys;
-
-                foreach ($values as $key => $value) {
-                    $attribute = true;
-                    $type = $definitions[$key]["type"];
-                    if ($type == "array" && is_array($value)) {
-                        $value = implode(",", $value);
-                    } else if ($type == "boolean") {
-                        $value = ($value === true || $value === "true" || $value == 1?"true":"false");
-                    } else if ($type == "textarea") {
-                        $attribute = false;
-                    } else if ($type == "password" && !empty($value)){
-                        $value = "__AJXP_VALUE_SET__";
-                    }
-                    if ($attribute) {
-                        echo("<param name=\"$key\" value=\"". StringHelper::xmlEntities($value) ."\"/>");
-                    } else {
-                        echo("<param name=\"$key\" cdatavalue=\"true\"><![CDATA[".$value."]]></param>");
-                    }
-                }
-                if ($ajxpPlugin->getType() != "core") {
-                    echo("<param name=\"AJXP_PLUGIN_ENABLED\" value=\"".($ajxpPlugin->isEnabled()?"true":"false")."\"/>");
-                }
-                echo("</plugin_settings_values>");
-                echo("<plugin_doc><![CDATA[<p>".$ajxpPlugin->getPluginInformationHTML("Charles du Jeu", "https://pydio.com/en/docs/references/plugins/")."</p>");
-                if (file_exists($ajxpPlugin->getBaseDir()."/plugin_doc.html")) {
-                    echo(file_get_contents($ajxpPlugin->getBaseDir()."/plugin_doc.html"));
-                }
-                echo("]]></plugin_doc>");
-                XMLWriter::close("admin_data");
-
-            break;
-
-            case "run_plugin_action":
-
-                $options = array();
-                $this->parseParameters($ctx, $httpVars, $options, true);
-                $pluginId = $httpVars["action_plugin_id"];
-                if (isSet($httpVars["button_key"])) {
-                    $options = $options[$httpVars["button_key"]];
-                }
-                $plugin = PluginsService::getInstance($ctx)->softLoad($pluginId, $options);
-                if (method_exists($plugin, $httpVars["action_plugin_method"])) {
-                    try {
-                        $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
-                    } catch (\Exception $e) {
-                        echo("ERROR:" . $e->getMessage());
-                        break;
-                    }
-                    echo($res);
-                } else {
-                    echo 'ERROR: Plugin '.$httpVars["action_plugin_id"].' does not implement '.$httpVars["action_plugin_method"].' method!';
-                }
-
-            break;
-
+    public function pluginsAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $pluginManager = new PluginsManager($requestInterface->getAttribute("ctx"), $this->getName());
+        $responseInterface = $pluginManager->pluginsActions($requestInterface, $responseInterface);
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function rolesAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $pluginManager = new RolesManager($requestInterface->getAttribute("ctx"), $this->getName());
+        $responseInterface = $pluginManager->rolesActions($requestInterface, $responseInterface);
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function usersAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $pluginManager = new UsersManager($requestInterface->getAttribute("ctx"), $this->getName());
+        $responseInterface = $pluginManager->usersActions($requestInterface, $responseInterface);
+    }
+
+    /**
+     * Search users
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function searchUsersAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface) {
+        $pluginManager = new UsersManager($requestInterface->getAttribute("ctx"), $this->getName());
+        $responseInterface = $pluginManager->search($requestInterface, $responseInterface);
+    }
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function repositoriesAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $pluginManager = new RepositoriesManager($requestInterface->getAttribute("ctx"), $this->getName());
+        $responseInterface = $pluginManager->repositoriesActions($requestInterface, $responseInterface);
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function editAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        $subAction = $requestInterface->getParsedBody()["sub_action"];
+        $requestInterface = $requestInterface->withAttribute("action", $subAction);
+
+        switch($subAction){
             case "edit_plugin_options":
-
-                $options = array();
-                $this->parseParameters($ctx, $httpVars, $options, true);
-                $confStorage = ConfService::getConfStorageImpl();
-                $pluginId = InputFilter::sanitize($httpVars["plugin_id"], InputFilter::SANITIZE_ALPHANUM);
-                list($pType, $pName) = explode(".", $pluginId);
-                $existing = $confStorage->loadPluginConfig($pType, $pName);
-                $this->mergeExistingParameters($options, $existing);
-                $confStorage->savePluginConfig($pluginId, $options);
-                ConfService::clearAllCaches();
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
-                XMLWriter::close();
-
-
-            break;
-
-            case "generate_api_docs":
-
-                PydioSdkGenerator::analyzeRegistry(isSet($httpVars["version"])?$httpVars["version"]:AJXP_VERSION);
-
-            break;
-
-
-            // Action for update all Pydio's user from ldap in CLI mode
-            case "cli_update_user_list":
-                if((php_sapi_name() == "cli")){
-                    $progressBar = new ProgressBarCLI();
-                    $countCallback  = array($progressBar, "init");
-                    $loopCallback   = array($progressBar, "update");
-                    $bGroup = "/";
-                    if($ctx->hasUser()) $bGroup = $ctx->getUser()->getGroupPath();
-                    UsersService::listUsers($bGroup, null, -1, -1, true, true, $countCallback, $loopCallback);
-                }
+                $this->pluginsAction($requestInterface, $responseInterface);
                 break;
-
+            case "edit_role":
+            case "post_json_role":
+                $this->rolesAction($requestInterface, $responseInterface);
+                break;
+            case "user_set_lock":
+            case "change_admin_right":
+            case "user_add_role":
+            case "user_delete_role":
+            case "user_reorder_roles":
+            case "user_bulk_update_roles":
+            case "save_custom_user_params":
+            case "save_repository_user_params":
+            case "update_user_pwd":
+                $this->usersAction($requestInterface, $responseInterface);
+                break;
+            case "edit_repository_data":
+            case "get_drivers_definition":
+            case "get_templates_definition":
+                $this->repositoriesAction($requestInterface, $responseInterface);
+                break;
             default:
                 break;
         }
-
-        return;
     }
 
     /**
-     * @param $name
-     * @return bool
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    public function repositoryExists($name)
-    {
-        RepositoryService::listRepositoriesWithCriteria(array("display" => $name), $count);
-        return $count > 0;
-    }
+    public function deleteAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
-
-    /**
-     * Reorder meta sources 
-     * @param $key1
-     * @param $key2
-     * @return int
-     */
-    public function metaSourceOrderingFunction($key1, $key2)
-    {
-        $a1 = explode(".", $key1);
-        $t1 = array_shift($a1);
-        $a2 = explode(".", $key2);
-        $t2 = array_shift($a2);
-        if($t1 == "index") return 1;
-        if($t1 == "metastore") return -1;
-        if($t2 == "index") return -1;
-        if($t2 == "metastore") return 1;
-        if($key1 == "meta.git" || $key1 == "meta.svn") return 1;
-        if($key2 == "meta.git" || $key2 == "meta.svn") return -1;
-        return strcmp($key1, $key2);
-    }
-
-    /**
-     * @param UserInterface $ctxUser
-     * @param $userId
-     * @param $roleId
-     * @param $addOrRemove
-     * @param bool $updateSubUsers
-     * @return UserInterface
-     * @throws UserNotFoundException
-     * @throws \Exception
-     */
-    public function updateUserRole(UserInterface $ctxUser, $userId, $roleId, $addOrRemove, $updateSubUsers = false)
-    {
-        $user = UsersService::getUserById($userId);
-        if(!empty($ctxUser) && !$ctxUser->canAdministrate($user)){
-            throw new \Exception("Cannot update user data for ".$userId);
+        // REST API mapping
+        if (isSet($httpVars["data_type"])) {
+            switch ($httpVars["data_type"]) {
+                case "repository":
+                    $httpVars["repository_id"] = basename($httpVars["data_id"]);
+                    break;
+                case "role":
+                    $httpVars["role_id"] = basename($httpVars["data_id"]);
+                    break;
+                case "user":
+                    $httpVars["user_id"] = basename($httpVars["data_id"]);
+                    break;
+                case "group":
+                    $httpVars["group"] = "/data/users".$httpVars["data_id"];
+                    break;
+                default:
+                    break;
+            }
+            unset($httpVars["data_type"]);
+            unset($httpVars["data_id"]);
+            $requestInterface = $requestInterface->withParsedBody($httpVars);
         }
-        if ($addOrRemove == "add") {
-            $roleObject = RolesService::getRole($roleId);
-            $user->addRole($roleObject);
+
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+
+        if (isSet($httpVars["repository_id"])) {
+            $manager = new RepositoriesManager($ctx, $this->getName());
+        } else if (isSet($httpVars["role_id"])) {
+            $manager = new RolesManager($ctx, $this->getName());
         } else {
-            $user->removeRole($roleId);
+            $manager = new UsersManager($ctx, $this->getName());
         }
-        $user->save("superuser");
-        if ($ctxUser->getId() == $user->getId()) {
-            AuthService::updateUser($user);
-        }
-        return $user;
+
+        $responseInterface = $manager->delete($requestInterface, $responseInterface);
 
     }
 
     /**
-     * @param ContextInterface $ctx
-     * @param $repDef
-     * @param $options
-     * @param bool $globalBinaries
-     * @param array $existingValues
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    protected function parseParameters(ContextInterface $ctx, &$repDef, &$options, $globalBinaries = false, $existingValues = array())
+    public function documentationAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface) {
+        $docManager = new DocumentationManager($requestInterface->getAttribute("ctx"), $this->getName());
+        return $docManager->docActions($requestInterface, $responseInterface);
+
+    }
+
+        /**
+     * Bookmark any page for the admin interface
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
+    public function preProcessBookmarkAction(ServerRequestInterface &$request, ResponseInterface $response)
     {
-        OptionsHelper::parseStandardFormParameters($ctx, $repDef, $options, "DRIVER_OPTION_", ($globalBinaries ? array() : null));
-        if(!count($existingValues)){
-            return;
-        }
-        $this->mergeExistingParameters($options, $existingValues);
-    }
 
-    /**
-     * @param array $parsed
-     * @param array $existing
-     */
-    protected function mergeExistingParameters(&$parsed, $existing){
-        foreach($parsed as $k => &$v){
-            if($v === "__AJXP_VALUE_SET__" && isSet($existing[$k])){
-                $parsed[$k] = $existing[$k];
-            }else if(is_array($v) && is_array($existing[$k])){
-                $this->mergeExistingParameters($v, $existing[$k]);
-            }
-        }
-    }
-
-    /**
-     * @param $result
-     * @param $definitions
-     * @param $values
-     * @param string $parent
-     */
-    public function flattenKeyValues(&$result, &$definitions, $values, $parent = "")
-    {
-        foreach ($values as $key => $value) {
-            if (is_array($value)) {
-                $this->flattenKeyValues($result, $definitions, $value, $parent."/".$key);
-            } else {
-                if ($key == "instance_name") {
-                    $result[$parent] = $value;
-                }
-                if ($key == "group_switch_value") {
-                    $result[$parent] = $value;
-                } else {
-                    $result[$parent.'/'.$key] = $value;
-                    if(isSet($definitions[$key])){
-                        $definitions[$parent.'/'.$key] = $definitions[$key];
-                    }else if(isSet($definitions[dirname($parent)."/".$key])){
-                        $definitions[$parent.'/'.$key] = $definitions[dirname($parent)."/".$key];
-                    }
+        $httpVars = $request->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $request->getAttribute("ctx");
+        if (isSet($httpVars["bm_action"]) && $httpVars["bm_action"] == "add_bookmark" && UsersService::usersEnabled()) {
+            $bmUser = $ctx->getUser();
+            $repositoryId = $ctx->getRepositoryId();
+            $bookmarks = $bmUser->getBookmarks($repositoryId);
+            foreach ($bookmarks as $bm) {
+                if ($bm["PATH"] == $httpVars["bm_path"]) {
+                    $httpVars["bm_action"] = "delete_bookmark";
+                    $request = $request->withParsedBody($httpVars);
+                    break;
                 }
             }
         }
+
     }
 
+
+    /********************/
+    /* PLUGIN LIFECYCLE
+    /********************/
     /**
-     * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
-     * @static
-     * @param string $filterByTagName
-     * @param string $filterByDriverName
-     * @param bool $limitToEnabledPlugins
-     * @return string
+     * @inheritdoc
      */
-    public static function availableDriversToXML($filterByTagName = "", $filterByDriverName="", $limitToEnabledPlugins = false)
+    public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-        $nodeList = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//ajxpdriver", "node", false, $limitToEnabledPlugins);
-        $xmlBuffer = "";
-        /** @var \DOMElement $node */
-        foreach ($nodeList as $node) {
-            $dName = $node->getAttribute("name");
-            if($filterByDriverName != "" && $dName != $filterByDriverName) continue;
-            if(strpos($dName, "ajxp_") === 0) continue;
-            if ($filterByTagName == "") {
-                $xmlBuffer .= $node->ownerDocument->saveXML($node);
-                continue;
-            }
-            $q = new DOMXPath($node->ownerDocument);
-            $cNodes = $q->query("//".$filterByTagName, $node);
-            $xmlBuffer .= "<ajxpdriver ";
-            foreach($node->attributes as $attr) $xmlBuffer.= " $attr->name=\"$attr->value\" ";
-            $xmlBuffer .=">";
-            foreach ($cNodes as $child) {
-                $xmlBuffer .= $child->ownerDocument->saveXML($child);
-            }
-            $xmlBuffer .= "</ajxpdriver>";
+        parent::parseSpecificContributions($ctx, $contribNode);
+        if($contribNode->nodeName != "actions") return;
+        $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
+        if(!$currentUserIsGroupAdmin) return;
+        $actionXpath=new DOMXPath($contribNode->ownerDocument);
+        $publicUrlNodeList = $actionXpath->query('action[@name="create_repository"]/subMenu', $contribNode);
+        if ($publicUrlNodeList->length) {
+            $publicUrlNode = $publicUrlNodeList->item(0);
+            $publicUrlNode->parentNode->removeChild($publicUrlNode);
         }
-        return $xmlBuffer;
     }
 
     /**
@@ -2303,4 +374,5 @@ class ConfAccessDriver extends AbstractAccessDriver
      */
     protected function initRepository(ContextInterface $ctx){
     }
+
 }
