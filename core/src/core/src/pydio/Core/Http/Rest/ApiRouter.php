@@ -64,6 +64,8 @@ class ApiRouter
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){
                 $path = str_replace("{path}", "{path:.+}", $path);
+                $path = str_replace("{roleId}", "{roleId:.+}", $path);
+                $path = str_replace("{groupPath}", "{groupPath:.+}", $path);
                 $r->addRoute(strtoupper($method), $this->base . $this->v2Base . $path , $apiData);
             }
         }
@@ -107,13 +109,18 @@ class ApiRouter
                 $apiData = $routeInfo[1];
                 $vars = $routeInfo[2];
                 if(isSet($apiData["api-v1"])){
+                    $apiUri = preg_replace('/^'.preg_quote($this->base.$this->v1Base, '/').'/', '', $uri);
                     $request = $request
                         ->withAttribute("action", $vars["action"])
                         ->withAttribute("repository_id", $vars["repository_id"])
                         ->withAttribute("rest_base", $this->base.$this->v1Base)
                         ->withAttribute("rest_path", $vars["optional"])
-                        ->withAttribute("api", "v1");
+                        ->withAttribute("api", "v1")
+                        ->withAttribute("api_uri", $apiUri)
+                    ;
                 }else{
+                    $apiUri = preg_replace('/^'.preg_quote($this->base.$this->v2Base, '/').'/', '', $uri);
+                    $request = $request->withAttribute("api_uri", $apiUri);
                     $repoId = $this->findRepositoryInParameters($request, $vars);
                     $request = $request
                         ->withAttribute("action", $apiData["x-pydio-action"])
@@ -136,6 +143,8 @@ class ApiRouter
             return $params["workspaceId"];
         }else if(isSet($params["path"]) && strpos($params["path"], "/") !== false){
             return array_shift(explode("/", ltrim($params["path"], "/")));
+        }else if (preg_match('/^\/admin\//', $request->getAttribute("api_uri"))) {
+            return "ajxp_conf";
         }
         // If no repo ID was found, return default repo id "pydio".
         return "pydio";

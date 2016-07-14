@@ -20,6 +20,7 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Model\ContextInterface;
@@ -58,7 +59,7 @@ class TreeManager extends AbstractManager
 
     /**
      * Forward call to dedicated managers, must implement AbstractManager
-     * @param $httpVars
+     * @param ServerRequestInterface $requestInterface
      * @param $childData
      * @param $initialPath
      * @param $rootSegment
@@ -66,7 +67,7 @@ class TreeManager extends AbstractManager
      * @param $hashValue
      * @return NodesList
      */
-    protected function forwardToManagers($httpVars, $childData, $initialPath, $rootSegment, $otherSegments, $hashValue){
+    protected function forwardToManagers(ServerRequestInterface $requestInterface, $childData, $initialPath, $rootSegment, $otherSegments, $hashValue){
 
         if(!isSet($childData["LIST"]) && !isSet($childData["MANAGER"])){
             return new NodesList($initialPath);
@@ -81,6 +82,7 @@ class TreeManager extends AbstractManager
             $otherSegments = $reSplits;
         }
 
+        $httpVars = $requestInterface->getParsedBody();
         if(!isSet($childData["MANAGER"]) && isSet($childData["LIST"]) && is_callable($childData["LIST"])){
             return call_user_func($childData["LIST"], $httpVars, $rootSegment, implode("/", $otherSegments), $hashValue, isSet($httpVars["file"])?$httpVars["file"]:'', $initialPath);
         }
@@ -93,7 +95,7 @@ class TreeManager extends AbstractManager
             $manager = new $callback($this->context, $this->pluginName);
         }
 
-        return $manager->listNodes($httpVars, $rootSegment, implode("/", $otherSegments), $hashValue, isSet($httpVars["file"])?$httpVars["file"]:'', $initialPath);
+        return $manager->listNodes($requestInterface, $rootSegment, implode("/", $otherSegments), $hashValue, isSet($httpVars["file"])?$httpVars["file"]:'', $initialPath);
 
     }
 
@@ -145,14 +147,15 @@ class TreeManager extends AbstractManager
 
 
     /**
-     * @param $httpVars
+     * @param ServerRequestInterface $requestInterface
      * @return NodesList
      */
-    public function dispatchList($httpVars){
+    public function dispatchList(ServerRequestInterface $requestInterface){
 
-        $messages = LocaleService::getMessages();
-        $rootAttributes = array();
-        $rootNodes = $this->mainTree;
+        $httpVars           = $requestInterface->getParsedBody();
+        $messages           = LocaleService::getMessages();
+        $rootAttributes     = array();
+        $rootNodes          = $this->mainTree;
 
         if(isSet($rootNodes["__metadata__"])){
             $rootAttributes = $rootNodes["__metadata__"];
@@ -171,7 +174,7 @@ class TreeManager extends AbstractManager
                 $child = $splits[0];
                 if (isSet($rootNodes[$root]["CHILDREN"][$child])) {
                     $childData = $rootNodes[$root]["CHILDREN"][$child];
-                    return $this->forwardToManagers($httpVars, $childData, "/" . $dir, $root, $splits, $hash);
+                    return $this->forwardToManagers($requestInterface, $childData, "/" . $dir, $root, $splits, $hash);
                 }
             } else {
                 $parentName = "/".$root."/";
@@ -207,16 +210,15 @@ class TreeManager extends AbstractManager
 
 
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param array|ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         return new NodesList();
     }

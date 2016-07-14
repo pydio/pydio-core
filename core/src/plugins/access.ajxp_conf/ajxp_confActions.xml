@@ -504,6 +504,16 @@
                 </serverCallback>
             </processing>
         </action>
+        <action name="edit_role">
+            <processing>
+                <serverCallback methodName="rolesAction"/>
+            </processing>
+        </action>
+        <action name="post_json_role">
+            <processing>
+                <serverCallback methodName="rolesAction"/>
+            </processing>
+        </action>
 
         <!-- PLUGINS ACTIONS -->
         <action name="clear_plugins_cache">

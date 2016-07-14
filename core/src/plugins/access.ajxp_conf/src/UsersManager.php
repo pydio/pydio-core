@@ -589,16 +589,15 @@ class UsersManager extends AbstractManager
     }
 
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $fullBasePath   = "/" . $rootPath . "/" . $relativePath;
         $USER_PER_PAGE  = 50;
@@ -632,7 +631,7 @@ class UsersManager extends AbstractManager
                 $pages = ceil($count / $USER_PER_PAGE);
                 for ($i = 0; $i < $pages ; $i ++) {
 
-                    $newList = $this->listNodes($httpVars, $rootPath, $relativePath, $i+1, true, $findNodePosition);
+                    $newList = $this->listNodes($requestInterface, $rootPath, $relativePath, $i+1, true, $findNodePosition);
                     $foundNode = $newList->findChildByPath($findNodePositionPath);
                     if ($foundNode !== null) {
                         $foundNode->mergeMetadata(["page_position" => $i+1]);
@@ -762,7 +761,7 @@ class UsersManager extends AbstractManager
             $nodeKey = $fullBasePath. "/" .$userId;
             $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
             $mergedRole = $userObject->mergedRole->getDataArray(true);
-            if(!isSet($httpVars["format"]) || $httpVars["format"] !== "json"){
+            if(!isSet($requestInterface["format"]) || $requestInterface["format"] !== "json"){
                 $mergedRole = json_encode($mergedRole);
             }
             $meta = [

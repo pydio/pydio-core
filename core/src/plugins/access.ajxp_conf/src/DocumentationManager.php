@@ -51,16 +51,15 @@ class DocumentationManager extends AbstractManager
     }
 
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $nodesList      = new NodesList("/$rootPath/$relativePath");
         $jsonContent    = json_decode(file_get_contents(DocsParser::getHooksFile()), true);

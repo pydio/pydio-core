@@ -95,7 +95,7 @@ class RepositoriesManager extends AbstractManager
                     "isTemplate" => '1'
                 ), $count);
                 foreach ($repositories as $repo) {
-                    if(!$repo->isTemplate) continue;
+                    if(!$repo->isTemplate()) continue;
                     $repoId = $repo->getUniqueId();
                     $repoLabel = TextEncoder::toUTF8($repo->getDisplay());
                     $repoType = $repo->getAccessType();
@@ -210,7 +210,7 @@ class RepositoriesManager extends AbstractManager
                 $loggedUser->recomputeMergedRole();
                 $loggedUser->save("superuser");
                 AuthService::updateUser($loggedUser);
-                
+
                 $message = new UserMessage($mess["ajxp_conf.52"]);
                 $reload = new ReloadMessage("", $newRep->getUniqueId());
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
@@ -642,16 +642,15 @@ class RepositoriesManager extends AbstractManager
 
 
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $fullBasePath       = "/" . $rootPath . "/" . $relativePath;
         $REPOS_PER_PAGE     = 50;
@@ -674,8 +673,8 @@ class RepositoriesManager extends AbstractManager
         }else{
             $criteria["parent_uuid"] = AJXP_FILTER_EMPTY;
         }
-        if(isSet($httpVars) && is_array($httpVars) && isSet($httpVars["template_children_id"])){
-            $criteria["parent_uuid"] = InputFilter::sanitize($httpVars["template_children_id"], InputFilter::SANITIZE_ALPHANUM);
+        if(isSet($requestInterface) && is_array($requestInterface) && isSet($requestInterface["template_children_id"])){
+            $criteria["parent_uuid"] = InputFilter::sanitize($requestInterface["template_children_id"], InputFilter::SANITIZE_ALPHANUM);
         }
 
         $repos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);

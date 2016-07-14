@@ -171,10 +171,19 @@ class ConfAccessDriver extends AbstractAccessDriver
             return;
         }
 
+        if($requestInterface->getAttribute("api") === "v2"){
+            $uri = $requestInterface->getAttribute("api_uri");
+            $vars = $requestInterface->getParsedBody();
+            if($uri === "/admin/roles") {
+                $vars["dir"] = "/data/roles";
+                $requestInterface = $requestInterface->withParsedBody($vars);
+            }
+        }
+
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $treeManager = new TreeManager($ctx, $this->getName(), $this->getMainTree($ctx));
-        $nodesList = $treeManager->dispatchList($requestInterface->getParsedBody());
+        $nodesList = $treeManager->dispatchList($requestInterface);
         $responseInterface = $responseInterface->withBody(new SerializableResponseStream($nodesList));
 
     }
@@ -215,6 +224,7 @@ class ConfAccessDriver extends AbstractAccessDriver
         $pluginManager = new UsersManager($requestInterface->getAttribute("ctx"), $this->getName());
         $responseInterface = $pluginManager->search($requestInterface, $responseInterface);
     }
+
     /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
@@ -273,7 +283,7 @@ class ConfAccessDriver extends AbstractAccessDriver
     public function deleteAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
         $httpVars = $requestInterface->getParsedBody();
-        // REST API mapping
+        // REST API V1 mapping
         if (isSet($httpVars["data_type"])) {
             switch ($httpVars["data_type"]) {
                 case "repository":
@@ -294,6 +304,15 @@ class ConfAccessDriver extends AbstractAccessDriver
             unset($httpVars["data_type"]);
             unset($httpVars["data_id"]);
             $requestInterface = $requestInterface->withParsedBody($httpVars);
+
+        }else if($requestInterface->getAttribute("api") === "v2"){
+
+            if(isSet($httpVars["roleId"])) {
+                $httpVars["role_id"] = $httpVars["roleId"];
+                unset($httpVars["roleId"]);
+                $requestInterface = $requestInterface->withParsedBody($httpVars);
+            }
+
         }
 
         /** @var ContextInterface $ctx */

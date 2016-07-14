@@ -57,7 +57,18 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class RolesManager extends AbstractManager
 {
-    
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @return ServerRequestInterface
+     */
+    public function preprocessApi2Actions(ServerRequestInterface $requestInterface){
+        $vars = $requestInterface->getParsedBody();
+        if(isSet($vars["roleId"])) $vars["role_id"] = $vars["roleId"];
+        return $requestInterface->withParsedBody($vars);
+
+    }
+
     /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
@@ -66,7 +77,11 @@ class RolesManager extends AbstractManager
      * @throws \Pydio\Core\Exception\UserNotFoundException
      */
     public function rolesActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
-        
+
+        if($requestInterface->getAttribute("api") === "v2"){
+            $requestInterface = $this->preprocessApi2Actions($requestInterface);
+        }
+
         $action     = $requestInterface->getAttribute("action");
         /** @var ContextInterface $ctx */
         $ctx        = $requestInterface->getAttribute("ctx");
@@ -143,148 +158,163 @@ class RolesManager extends AbstractManager
                     throw new \Exception("Cant find role! ");
                 }
 
-                    $roleData = $role->getDataArray(true);
-                    $allReps = RepositoryService::listAllRepositories();
-                    $sharedRepos = array();
-                    if(isSet($userObject)){
-                        // Add User shared Repositories as well
-                        $acls = $userObject->getMergedRole()->listAcls();
-                        if(count($acls)) {
-                            $sharedRepos = RepositoryService::listRepositoriesWithCriteria(array(
-                                "uuid" => array_keys($acls),
-                                "parent_uuid" => AJXP_FILTER_NOT_EMPTY,
-                                "owner_user_id" => AJXP_FILTER_NOT_EMPTY
-                            ), $count);
-                            $allReps = array_merge($allReps, $sharedRepos);
+                $data = [
+                    "ROLE" => $role->getDataArray(true)
+                ];
+
+                if (isSet($userObject)) {
+
+                    $data["USER"] = array();
+                    $data["USER"]["LOCK"] = $userObject->getLock();
+                    $data["USER"]["PROFILE"] = $userObject->getProfile();
+                    $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
+                    $rolesList = RolesService::getRolesList(array(), true);
+                    $data["ALL"]["ROLES"] = array_keys($rolesList);
+                    $data["ALL"]["ROLES_DETAILS"] = array();
+                    foreach($rolesList as $rId => $rObj){
+                        $data["ALL"]["ROLES_DETAILS"][$rId] = array("label" => $rObj->getLabel(), "sticky" => $rObj->alwaysOverrides());
+                    }
+                    if ($userObject instanceof AbstractUser && isSet($userObject->parentRole)) {
+                        $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
+                    }
+
+                } else if (isSet($groupPath)) {
+
+                    $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
+                    if($roleId != "AJXP_GRP_/"){
+                        $parentGroupRoles = array();
+                        $parentPath = PathUtils::forwardSlashDirname($roleId);
+                        while($parentPath != "AJXP_GRP_"){
+                            $parentRole = RolesService::getRole($parentPath);
+                            if($parentRole != null) {
+                                array_unshift($parentGroupRoles, $parentRole);
+                            }
+                            $parentPath = PathUtils::forwardSlashDirname($parentPath);
+                        }
+                        $rootGroup = RolesService::getRole("AJXP_GRP_/");
+                        if($rootGroup != null) array_unshift($parentGroupRoles, $rootGroup);
+                        if(count($parentGroupRoles)){
+                            $parentRole = clone array_shift($parentGroupRoles);
+                            foreach($parentGroupRoles as $pgRole){
+                                $parentRole = $pgRole->override($parentRole);
+                            }
+                            $data["PARENT_ROLE"] = $parentRole->getDataArray();
                         }
                     }
 
-                    $repos = array();
-                    $repoDetailed = array();
-                    // USER
-                    foreach ($allReps as $repositoryId => $repositoryObject) {
-                        if (!empty($userObject) &&
-                            (
-                                !$userObject->canSee($repositoryObject) || $repositoryObject->isTemplate
-                                || ($repositoryObject->getAccessType()=="ajxp_conf" && !$userObject->isAdmin())
-                                || ($repositoryObject->getUniqueUser() != null && $repositoryObject->getUniqueUser() != $userObject->getId())
-                            )
-                        ){
-                            continue;
-                        }else if(empty($userObject) && (
-                                (empty($currentMainUser) && !$currentMainUser->canAdministrate($repositoryObject)) || $repositoryObject->isTemplate
-                            )){
-                            continue;
-                        }
-                        $meta = array();
-                        try{
-                            $metaSources = $repositoryObject->getContextOption($ctx, "META_SOURCES");
-                            if($metaSources !== null){
-                                $meta = array_keys($metaSources);
-                            }
-                        }catch(\Exception $e){
-                            if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
-                            Logger::error("ConfDriver", "Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
-                            continue;
-                        }
-                        $repoDetailed[$repositoryId] = array(
-                            "label"  => TextEncoder::toUTF8($repositoryObject->getDisplay()),
-                            "driver" => $repositoryObject->getAccessType(),
-                            "scope"  => $repositoryObject->securityScope(),
-                            "meta"   => $meta
-                        );
+                }
 
-                        if(array_key_exists($repositoryId, $sharedRepos)){
-                            $sharedRepos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
-                            $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
-                            $repoOwnerId = $repositoryObject->getOwner();
-                            if(isSet($allReps[$repoParentId])){
-                                $repoParentLabel = TextEncoder::toUTF8($allReps[$repoParentId]->getDisplay());
-                            }
-                            $repoOwnerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
-                            $repoDetailed[$repositoryId]["share"] = array(
-                                "parent_user" => $repoOwnerId,
-                                "parent_user_label" => $repoOwnerLabel,
-                                "parent_repository" => $repoParentId,
-                                "parent_repository_label" => $repoParentLabel
-                            );
-                        }else{
-                            $repos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
-                        }
+                if($requestInterface->getAttribute("api") === "v2" && (empty($httpVars["load_fill_values"]) || $httpVars["load_fill_values"] !== "true")){
+                    $responseInterface = new JsonResponse($data);
+                    break;
+                }
 
+                $allReps        = RepositoryService::listAllRepositories();
+                $repos          = array();
+                $repoDetailed   = array();
+                $sharedRepos    = array();
+                if(isSet($userObject)){
+                    // Add User shared Repositories as well
+                    $acls = $userObject->getMergedRole()->listAcls();
+                    if(count($acls)) {
+                        $sharedRepos = RepositoryService::listRepositoriesWithCriteria(array(
+                            "uuid" => array_keys($acls),
+                            "parent_uuid" => AJXP_FILTER_NOT_EMPTY,
+                            "owner_user_id" => AJXP_FILTER_NOT_EMPTY
+                        ), $count);
+                        $allReps = array_merge($allReps, $sharedRepos);
                     }
-                    // Make sure it's utf8
-                    $data = array(
-                        "ROLE" => $roleData,
-                        "ALL"  => array(
-                            "PLUGINS_SCOPES" => array(
-                                "GLOBAL_TYPES" => array("conf", "auth", "authfront", "log", "mq", "notifications", "gui", "sec"),
-                                "GLOBAL_PLUGINS" => array("action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater")
-                            ),
-                            "REPOSITORIES" => $repos,
-                            "SHARED_REPOSITORIES" => $sharedRepos,
-                            "REPOSITORIES_DETAILS" => $repoDetailed,
-                            "PROFILES" => array("standard|".$mess["ajxp_conf.156"],"admin|".$mess["ajxp_conf.157"],"shared|".$mess["ajxp_conf.158"],"guest|".$mess["ajxp_conf.159"])
+                }
+
+                // USER
+                foreach ($allReps as $repositoryId => $repositoryObject) {
+                    if (!empty($userObject) &&
+                        (
+                            !$userObject->canSee($repositoryObject) || $repositoryObject->isTemplate()
+                            || ($repositoryObject->getAccessType()=="ajxp_conf" && !$userObject->isAdmin())
+                            || ($repositoryObject->getUniqueUser() != null && $repositoryObject->getUniqueUser() != $userObject->getId())
                         )
+                    ){
+                        continue;
+                    }else if(empty($userObject) && (
+                            (empty($currentMainUser) && !$currentMainUser->canAdministrate($repositoryObject)) || $repositoryObject->isTemplate()
+                        )){
+                        continue;
+                    }
+                    $meta = array();
+                    try{
+                        $metaSources = $repositoryObject->getContextOption($ctx, "META_SOURCES");
+                        if($metaSources !== null){
+                            $meta = array_keys($metaSources);
+                        }
+                    }catch(\Exception $e){
+                        if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
+                        Logger::error("ConfDriver", "Invalid Share", "Repository $repositoryId has no more parent. Should be deleted.");
+                        continue;
+                    }
+                    $repoDetailed[$repositoryId] = array(
+                        "label"  => TextEncoder::toUTF8($repositoryObject->getDisplay()),
+                        "driver" => $repositoryObject->getAccessType(),
+                        "scope"  => $repositoryObject->securityScope(),
+                        "meta"   => $meta
                     );
-                    if (isSet($userObject)) {
-                        $data["USER"] = array();
-                        $data["USER"]["LOCK"] = $userObject->getLock();
-                        $data["USER"]["PROFILE"] = $userObject->getProfile();
-                        $data["USER"]["ROLES"] = array_keys($userObject->getRoles());
-                        $rolesList = RolesService::getRolesList(array(), true);
-                        $data["ALL"]["ROLES"] = array_keys($rolesList);
-                        $data["ALL"]["ROLES_DETAILS"] = array();
-                        foreach($rolesList as $rId => $rObj){
-                            $data["ALL"]["ROLES_DETAILS"][$rId] = array("label" => $rObj->getLabel(), "sticky" => $rObj->alwaysOverrides());
+
+                    if(array_key_exists($repositoryId, $sharedRepos)){
+                        $sharedRepos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
+                        $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
+                        $repoOwnerId = $repositoryObject->getOwner();
+                        if(isSet($allReps[$repoParentId])){
+                            $repoParentLabel = TextEncoder::toUTF8($allReps[$repoParentId]->getDisplay());
                         }
-                        if ($userObject instanceof AbstractUser && isSet($userObject->parentRole)) {
-                            $data["PARENT_ROLE"] = $userObject->parentRole->getDataArray();
-                        }
-                    } else if (isSet($groupPath)) {
-                        $data["GROUP"] = array("PATH" => $groupPath, "LABEL" => $groupLabel);
-                        if($roleId != "AJXP_GRP_/"){
-                            $parentGroupRoles = array();
-                            $parentPath = PathUtils::forwardSlashDirname($roleId);
-                            while($parentPath != "AJXP_GRP_"){
-                                $parentRole = RolesService::getRole($parentPath);
-                                if($parentRole != null) {
-                                    array_unshift($parentGroupRoles, $parentRole);
-                                }
-                                $parentPath = PathUtils::forwardSlashDirname($parentPath);
-                            }
-                            $rootGroup = RolesService::getRole("AJXP_GRP_/");
-                            if($rootGroup != null) array_unshift($parentGroupRoles, $rootGroup);
-                            if(count($parentGroupRoles)){
-                                $parentRole = clone array_shift($parentGroupRoles);
-                                foreach($parentGroupRoles as $pgRole){
-                                    $parentRole = $pgRole->override($parentRole);
-                                }
-                                $data["PARENT_ROLE"] = $parentRole->getDataArray();
-                            }
-                        }
+                        $repoOwnerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
+                        $repoDetailed[$repositoryId]["share"] = array(
+                            "parent_user" => $repoOwnerId,
+                            "parent_user_label" => $repoOwnerLabel,
+                            "parent_repository" => $repoParentId,
+                            "parent_repository_label" => $repoParentLabel
+                        );
+                    }else{
+                        $repos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
                     }
 
+                }
 
-                    $scope = "role";
-                    if($roleGroup) {
-                        $scope = "group";
-                        if($roleId == "AJXP_GRP_/") $scope = "role";
+                // Make sure it's utf8
+                $data["ALL"] = [
+                    "PLUGINS_SCOPES"    => [
+                        "GLOBAL_TYPES"      => ["conf", "auth", "authfront", "log", "mq", "notifications", "gui", "sec"],
+                        "GLOBAL_PLUGINS"    => ["action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater"]
+                    ],
+                    "REPOSITORIES"          => $repos,
+                    "SHARED_REPOSITORIES"   => $sharedRepos,
+                    "REPOSITORIES_DETAILS"  => $repoDetailed,
+                    "PROFILES"              => [
+                        "standard|".$mess["ajxp_conf.156"],
+                        "admin|".$mess["ajxp_conf.157"],
+                        "shared|".$mess["ajxp_conf.158"],
+                        "guest|".$mess["ajxp_conf.159"]
+                    ]
+                ];
+
+                $scope = "role";
+                if($roleGroup) {
+                    $scope = "group";
+                    if($roleId == "AJXP_GRP_/") $scope = "role";
+                }
+                else if(isSet($userObject)) $scope = "user";
+                $data["SCOPE_PARAMS"] = array();
+                $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
+                foreach ($nodes as $node) {
+                    $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
+                    $origName = $node->attributes->getNamedItem("name")->nodeValue;
+                    if($roleId == "AJXP_GRP_/" && strpos($origName, "ROLE_") ===0 ) continue;
+                    $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
+                    $nArr = array();
+                    foreach ($node->attributes as $attrib) {
+                        $nArr[$attrib->nodeName] = XMLWriter::replaceAjxpXmlKeywords($attrib->nodeValue);
                     }
-                    else if(isSet($userObject)) $scope = "user";
-                    $data["SCOPE_PARAMS"] = array();
-                    $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
-                    foreach ($nodes as $node) {
-                        $pId = $node->parentNode->parentNode->attributes->getNamedItem("id")->nodeValue;
-                        $origName = $node->attributes->getNamedItem("name")->nodeValue;
-                        if($roleId == "AJXP_GRP_/" && strpos($origName, "ROLE_") ===0 ) continue;
-                        $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
-                        $nArr = array();
-                        foreach ($node->attributes as $attrib) {
-                            $nArr[$attrib->nodeName] = XMLWriter::replaceAjxpXmlKeywords($attrib->nodeValue);
-                        }
-                        $data["SCOPE_PARAMS"][] = $nArr;
-                    }
+                    $data["SCOPE_PARAMS"][] = $nArr;
+                }
 
                 $responseInterface = new JsonResponse($data);
 
@@ -332,8 +362,12 @@ class RolesManager extends AbstractManager
                     throw new \Exception("Cant find role! ");
                 }
 
-                $jsonData = TextEncoder::magicDequote($httpVars["json_data"]);
-                $data = json_decode($jsonData, true);
+                if(isSet($httpVars["request_body"])){
+                    $data = $httpVars["request_body"];
+                }else{
+                    $jsonData = TextEncoder::magicDequote($httpVars["json_data"]);
+                    $data = json_decode($jsonData, true);
+                }
                 $roleData = $data["ROLE"];
                 $binariesContext = array();
                 $parseContext = $ctx;
@@ -427,6 +461,7 @@ class RolesManager extends AbstractManager
                 break;
 
             case "role_update_right" :
+
                 if(!isSet($httpVars["role_id"]) || !isSet($httpVars["repository_id"]) || !isSet($httpVars["right"])) {
                     throw new PydioException($mess["ajxp_conf.61"]);
                 }
@@ -473,19 +508,18 @@ class RolesManager extends AbstractManager
         return $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
         
     }
-    
-    
+
+
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $nodesList = new NodesList("/$rootPath/$relativePath");
         $nodesList->initColumnsData("filelist", "list", "ajxp_conf.roles");
@@ -541,6 +575,10 @@ class RolesManager extends AbstractManager
                 "text"              => $roleObject->getLabel()
             );
             $this->appendBookmarkMeta($nodeKey, $meta);
+            if($requestInterface->getAttribute("api") === "v2"){
+                $nodeKey = $roleObject->getId();
+                $meta["role"] = $roleObject->getDataArray(true);
+            }
             $nodesList->addBranch(new AJXP_Node($nodeKey, $meta));
         }
         return $nodesList;

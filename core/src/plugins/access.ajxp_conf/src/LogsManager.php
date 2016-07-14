@@ -20,6 +20,7 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Log\Core\Logger;
@@ -34,16 +35,15 @@ class LogsManager extends AbstractManager
 {
 
     /**
-     * @param array $httpVars Full set of query parameters
+     * @param ServerRequestInterface $requestInterface Full set of query parameters
      * @param string $rootPath Path to prepend to the resulting nodes
      * @param string $relativePath Specific path part for this function
      * @param string $paginationHash Number added to url#2 for pagination purpose.
      * @param string $findNodePosition Path to a given node to try to find it
      * @param string $aliasedDir Aliased path used for alternative url
-     *
      * @return NodesList A populated NodesList object, eventually recursive.
      */
-    public function listNodes($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
+    public function listNodes(ServerRequestInterface $requestInterface, $rootPath, $relativePath, $paginationHash = null, $findNodePosition = null, $aliasedDir = null)
     {
         $relativePath   = "/$relativePath";
         $nodesList      = new NodesList("/".$rootPath.$relativePath);
