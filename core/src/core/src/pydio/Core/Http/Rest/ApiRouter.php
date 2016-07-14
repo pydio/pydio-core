@@ -63,9 +63,14 @@ class ApiRouter
         $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_DOCS_FOLDER . "/api2.json"), true);
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){
-                $path = str_replace("{path}", "{path:.+}", $path);
+                if(preg_match('/\{path\}/', $path)){
+                    if(isset($apiData["parameters"]["0"]['$ref']) &&  preg_match('/Optional$/', $apiData["parameters"]["0"]['$ref'])){
+                        $path = str_replace("{path}", "{path:.*}", $path);
+                    }else{
+                        $path = str_replace("{path}", "{path:.+}", $path);
+                    }
+                }
                 $path = str_replace("{roleId}", "{roleId:.+}", $path);
-                $path = str_replace("{groupPath}", "{groupPath:.+}", $path);
                 $r->addRoute(strtoupper($method), $this->base . $this->v2Base . $path , $apiData);
             }
         }

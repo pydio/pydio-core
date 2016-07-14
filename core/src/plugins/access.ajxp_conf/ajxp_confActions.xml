@@ -469,6 +469,12 @@
                 <serverCallback methodName="searchUsersAction" restParams="/query/dir+" developerComment="Remote search implementation, currently only supporting users search."/>
             </processing>
         </action>
+        <action name="people-create-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
+        <action name="people-delete-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
 
         <!-- ROLES ACTIONS -->
         <action name="create_role">

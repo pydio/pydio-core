@@ -60,6 +60,54 @@ class UsersManager extends AbstractManager
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @return ResponseInterface
+     */
+    public function peopleApiActions(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
+
+        $a = $requestInterface->getAttribute("action");
+        $vars = $requestInterface->getParsedBody();
+        $path = $vars["path"];
+        if($a === "people-create-resource"){
+            if($vars["resourceType"] === "user"){
+                // Create a user
+                $uLogin = basename($path);
+                $gPath  = dirname($path);
+                $requestInterface = $requestInterface
+                    ->withAttribute("action", "create_user")
+                    ->withParsedBody([
+                        "new_user_login" => $uLogin,
+                        "new_user_pwd"   => $vars["userPass"],
+                        "group_path"     => $gPath
+                    ]);
+            }else{
+                // Create a group
+                $requestInterface = $requestInterface
+                    ->withAttribute("action", "create_group")
+                    ->withParsedBody([
+                        "group_path"  => $path,
+                        "group_label" => $vars["groupLabel"]
+                    ]);
+            }
+            return $this->usersActions($requestInterface, $responseInterface);
+            
+        }else if($a === "people-delete-resource"){
+
+            $baseName = basename($path);
+            $vars = [];
+            if(UsersService::userExists($baseName)){
+                $vars["user_id"] = $baseName;
+            }else{
+                $vars["group"] = $path;
+            }
+            return $this->delete($requestInterface->withParsedBody($vars), $responseInterface);
+
+        }
+        return $responseInterface;
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
      * @throws \Exception
      * @throws \Pydio\Core\Exception\UserNotFoundException
      */
@@ -541,7 +589,8 @@ class UsersManager extends AbstractManager
         if (isSet($httpVars["group"])) {
 
             $groupPath = $httpVars["group"];
-            $basePath = substr(PathUtils::forwardSlashDirname($groupPath), strlen("/data/users"));
+            $groupPath = preg_replace('/^\/data\/users/', '', $groupPath);
+            $basePath = PathUtils::forwardSlashDirname($groupPath);
             $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
             $gName = basename($groupPath);
             UsersService::deleteGroup($basePath, $gName);

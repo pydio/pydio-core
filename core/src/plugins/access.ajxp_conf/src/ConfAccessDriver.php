@@ -213,7 +213,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                 if(isSet($vars["path"]) && !empty($vars["path"]) && $vars["path"] !== "/"){
                     $crtPath = $vars["path"];
                 }
-                $vars["dir"] = "/data/users".$crtPath;
+                $vars["dir"] = "/data/users/".ltrim($crtPath, "/");
                 $requestInterface = $requestInterface->withParsedBody($vars);
                 
             }
@@ -251,7 +251,12 @@ class ConfAccessDriver extends AbstractAccessDriver
      */
     public function usersAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
         $pluginManager = new UsersManager($requestInterface->getAttribute("ctx"), $this->getName());
-        $responseInterface = $pluginManager->usersActions($requestInterface, $responseInterface);
+        $action = $requestInterface->getAttribute("action");
+        if(strpos($action, "people-") === 0){
+            $responseInterface = $pluginManager->peopleApiActions($requestInterface, $responseInterface);
+        }else{
+            $responseInterface = $pluginManager->usersActions($requestInterface, $responseInterface);
+        }
     }
 
     /**
