@@ -280,7 +280,7 @@ class RolesManager extends AbstractManager
                 }
 
                 // Make sure it's utf8
-                $data["ALL"] = [
+                $data["ALL"] = array_merge($data["ALL"], [
                     "PLUGINS_SCOPES"    => [
                         "GLOBAL_TYPES"      => ["conf", "auth", "authfront", "log", "mq", "notifications", "gui", "sec"],
                         "GLOBAL_PLUGINS"    => ["action.avatar", "action.disclaimer", "action.scheduler", "action.skeleton", "action.updater"]
@@ -294,7 +294,7 @@ class RolesManager extends AbstractManager
                         "shared|".$mess["ajxp_conf.158"],
                         "guest|".$mess["ajxp_conf.159"]
                     ]
-                ];
+                ]);
 
                 $scope = "role";
                 if($roleGroup) {

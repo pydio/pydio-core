@@ -163,6 +163,34 @@ class ConfAccessDriver extends AbstractAccessDriver
     /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
+     * @return bool
+     */
+    public function preprocessLsApi2(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
+
+        $uri = $requestInterface->getAttribute("api_uri");
+        $vars = $requestInterface->getParsedBody();
+        if($uri === "/admin/roles") {
+            
+            $vars["dir"] = "/data/roles";
+            $requestInterface = $requestInterface->withParsedBody($vars);
+
+        }else if(strpos($uri, "/admin/people") === 0){
+
+            $crtPath = "";
+            if(isSet($vars["path"]) && !empty($vars["path"]) && $vars["path"] !== "/"){
+                $crtPath = $vars["path"];
+            }
+            $vars["dir"] = "/data/users".$crtPath;
+            $requestInterface = $requestInterface->withParsedBody($vars);
+
+        }
+        
+        
+    }
+    
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
     public function listAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
 
@@ -172,11 +200,22 @@ class ConfAccessDriver extends AbstractAccessDriver
         }
 
         if($requestInterface->getAttribute("api") === "v2"){
+            
             $uri = $requestInterface->getAttribute("api_uri");
             $vars = $requestInterface->getParsedBody();
             if($uri === "/admin/roles") {
                 $vars["dir"] = "/data/roles";
                 $requestInterface = $requestInterface->withParsedBody($vars);
+                
+            }else if(strpos($uri, "/admin/people") === 0){
+                
+                $crtPath = "";
+                if(isSet($vars["path"]) && !empty($vars["path"]) && $vars["path"] !== "/"){
+                    $crtPath = $vars["path"];
+                }
+                $vars["dir"] = "/data/users".$crtPath;
+                $requestInterface = $requestInterface->withParsedBody($vars);
+                
             }
         }
 

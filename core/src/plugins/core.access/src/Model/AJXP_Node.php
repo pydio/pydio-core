@@ -600,6 +600,9 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         return !empty($this->urlParts["path"]) ? $this->urlParts["path"] : "/";
     }
 
+    /**
+     * @return bool
+     */
     public function isRoot()
     {
         return !isset($this->urlParts["path"]) || $this->urlParts["path"] == "/";
@@ -794,6 +797,9 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
         $data = $this->_metadata;
         unset($data["filename"]);
         $data["path"] = $this->_metadata["filename"];
+        if(empty($data["path"]) && !empty($this->urlParts["path"])){
+            $data["path"] = $this->urlParts["path"];
+        }
         if(isSet($this->_metadata["is_file"])){
             unset($data["is_file"]);
             $data["type"] = $this->isLeaf() ? "leaf" : "collection";

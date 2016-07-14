@@ -608,6 +608,15 @@ class UsersManager extends AbstractManager
             "is_file" => false,
             "text" => ""
         ]);
+        if(isSet($requestInterface->getParsedBody()["format"])){
+            $format = $requestInterface->getParsedBody()["format"];
+        }else if($requestInterface->getAttribute("api") === "v2"){
+            $format = "json";
+        }else{
+            $format = "xml";
+        }
+
+
         $nodesList->setParentNode($parentNode);
 
         $baseGroup      = ($relativePath === "users" ? "/" : substr($relativePath, strlen("users")));
@@ -678,17 +687,35 @@ class UsersManager extends AbstractManager
 
         }
 
+        if($format === "json" && $baseGroup !== "/"){
+
+            $siblingGroups = UsersService::listChildrenGroups(dirname($baseGroup));
+            $gKey = "/".basename($baseGroup);
+            $baseGroupLabel = isset($siblingGroups[$gKey]) ? $siblingGroups[$gKey] : null;
+            if(!count($users) && !count($groups) && $baseGroupLabel === null){
+                // Group does not seem to exist. Maybe we are getting info about a user here
+                try{
+                    $testUser = UsersService::getUserById(basename($baseGroup));
+                    if($testUser->getGroupPath() === dirname($baseGroup)){
+                        $userMeta = $this->serializeUserMetadata($testUser, $format, $messages);
+                        $nodesList->setParentNode(new AJXP_Node($testUser->getId(), $userMeta));
+                        return $nodesList;
+                    }
+                } catch (UserNotFoundException $unf){}
+            } else if($baseGroupLabel !== null) {
+                $parentNode = new AJXP_Node($baseGroup, $this->serializeGroupMetadata($baseGroup, $baseGroupLabel));
+                $nodesList->setParentNode($parentNode);
+            }
+
+        }
+
+
         // Append Root Group
         if($this->pluginName === "ajxp_admin" && $baseGroup == "/" && $paginationHash == 1 && !$this->currentUserIsGroupAdmin()){
 
-            $rootGroupNode = new AJXP_Node($fullBasePath ."/", [
-                "icon" => "users-folder.png",
-                "icon_class" => "icon-home",
-                "ajxp_mime" => "group",
-                "object_id" => "/",
-                "is_file"   => false,
-                "text"      => $messages["ajxp_conf.151"]
-            ]);
+            $topMeta = $this->serializeGroupMetadata("/", $messages["ajxp_conf.151"]);
+            $topMeta["icon_class"] = "icon-home";
+            $rootGroupNode = new AJXP_Node($fullBasePath ."/", $topMeta);
             $nodesList->addBranch($rootGroupNode);
 
         }
@@ -697,15 +724,12 @@ class UsersManager extends AbstractManager
         foreach ($groups as $groupId => $groupLabel) {
 
             $nodeKey = $fullBasePath ."/".ltrim($groupId,"/");
-            $meta = array(
-                "icon" => "users-folder.png",
-                "icon_class" => "icon-folder-close",
-                "ajxp_mime" => "group",
-                "object_id" => $groupId,
-                "text"      => $groupLabel,
-                "is_file"   => false
-            );
+            $meta = $this->serializeGroupMetadata($groupId, $groupLabel);
             $this->appendBookmarkMeta($nodeKey, $meta);
+            if($requestInterface->getAttribute("api") === "v2"){
+                $meta["group_role_id"] = "/AJXP_GRP_".rtrim($baseGroup, "/")."/".ltrim($groupId, "/");
+                $nodeKey = InputFilter::securePath("/".$baseGroup.$groupId);
+            }
             $nodesList->addBranch(new AJXP_Node($nodeKey, $meta));
         }
 
@@ -731,9 +755,20 @@ class UsersManager extends AbstractManager
         if(isSet($allUserIds) && count($allUserIds)){
             $connections = $logger->usersLastConnection($allUserIds);
         }
+
         ksort($userArray);
 
+        /** @var UserInterface $userObject */
         foreach ($userArray as $userObject) {
+
+            $userId  = $userObject->getId();
+            $bmKey   = $fullBasePath. "/" .$userId;
+            $nodeKey = $format === "json" ? $userId : $bmKey;
+            $meta = $this->serializeUserMetadata($userObject, $format, $messages, $connections);
+            $this->appendBookmarkMeta($bmKey, $meta);
+            $nodesList->addBranch(new AJXP_Node($nodeKey, $meta));
+
+            /*
             $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
             $isAdmin = $userObject->isAdmin();
             $userId = $userObject->getId();
@@ -761,10 +796,17 @@ class UsersManager extends AbstractManager
             $nodeKey = $fullBasePath. "/" .$userId;
             $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
             $mergedRole = $userObject->mergedRole->getDataArray(true);
-            if(!isSet($requestInterface["format"]) || $requestInterface["format"] !== "json"){
+            $meta = [];
+            if($format !== "json"){
                 $mergedRole = json_encode($mergedRole);
+                $currentRoles = implode(", ", $roles);
+                $jsonKey = $nodeKey;
+            }else{
+                $currentRoles = $roles;
+                $meta["personal_role_id"] = "/AJXP_USR_/".$userId;
+                $jsonKey = $userId;
             }
-            $meta = [
+            $meta = array_merge($meta, [
                 "text" => $nodeLabel,
                 "is_file" => true,
                 "isAdmin" => $messages[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
@@ -773,10 +815,10 @@ class UsersManager extends AbstractManager
                 "object_id" => $userId,
                 "auth_scheme" => ($scheme != null? $scheme : ""),
                 "rights_summary" => $rightsString,
-                "ajxp_roles" => implode(", ", $roles),
+                "ajxp_roles" => $currentRoles,
                 "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$this->context->getUser()->getId())?"_editable":""),
                 "json_merged_role" => $mergedRole
-            ];
+            ]);
             if($userObject->hasParent()) {
                 $meta["shared_user"] = "true";
             }
@@ -784,10 +826,96 @@ class UsersManager extends AbstractManager
                 $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
                 $meta["last_connection_readable"] = StatHelper::relativeDate($meta["last_connection"], $messages);
             }
+
             $this->appendBookmarkMeta($nodeKey, $meta);
-            $nodesList->addBranch(new AJXP_Node($nodeKey, $meta));
+            $nodesList->addBranch(new AJXP_Node($jsonKey, $meta));
+            */
         }
         return $nodesList;
+    }
+
+    /**
+     * @param string $groupId
+     * @param string $groupLabel
+     * @return array
+     */
+    protected function serializeGroupMetadata($groupId, $groupLabel){
+        return [
+            "icon" => "users-folder.png",
+            "icon_class" => "icon-folder-close",
+            "ajxp_mime" => "group",
+            "object_id" => $groupId,
+            "text"      => $groupLabel,
+            "is_file"   => false
+        ];
+    }
+
+    /**
+     * @param UserInterface $userObject
+     * @param string $format
+     * @param array $messages
+     * @param array
+     * @return array
+     */
+    protected function serializeUserMetadata($userObject, $format, $messages, $connections = []){
+
+        $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
+        $isAdmin = $userObject->isAdmin();
+        $userId = $userObject->getId();
+        $icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
+        $iconClass = "icon-user";
+        if ($userObject->hasParent()) {
+            $icon = "user_child";
+            $iconClass = "icon-angle-right";
+        }
+        if ($isAdmin) {
+            $rightsString = $messages["ajxp_conf.63"];
+        } else {
+            $r = array();
+            foreach ($repos as $repoId => $repository) {
+                if($repository->getAccessType() == "ajxp_shared") continue;
+                if(!$userObject->canRead($repoId) && !$userObject->canWrite($repoId)) continue;
+                $rs = ($userObject->canRead($repoId) ? "r" : "");
+                $rs .= ($userObject->canWrite($repoId) ? "w" : "");
+                $r[] = $repository->getDisplay()." (".$rs.")";
+            }
+            $rightsString = implode(", ", $r);
+        }
+        $nodeLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+        $scheme = UsersService::getAuthScheme($userId);
+        $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
+        $mergedRole = $userObject->getMergedRole()->getDataArray(true);
+        $meta = [];
+        if($format !== "json"){
+            $mergedRole = json_encode($mergedRole);
+            $currentRoles = implode(", ", $roles);
+        }else{
+            $currentRoles = $roles;
+            $meta["personal_role_id"] = "/AJXP_USR_/".$userId;
+        }
+        $meta = array_merge($meta, [
+            "text" => $nodeLabel,
+            "is_file" => true,
+            "isAdmin" => $messages[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
+            "icon" => $icon.".png",
+            "icon_class" => $iconClass,
+            "object_id" => $userId,
+            "auth_scheme" => ($scheme != null? $scheme : ""),
+            "rights_summary" => $rightsString,
+            "ajxp_roles" => $currentRoles,
+            "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$this->context->getUser()->getId())?"_editable":""),
+            "json_merged_role" => $mergedRole
+        ]);
+        if($userObject->hasParent()) {
+            $meta["shared_user"] = "true";
+        }
+        if(isSet($connections) && isSet($connections[$userObject->getId()]) && !empty($connections[$userObject->getId()])) {
+            $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
+            $meta["last_connection_readable"] = StatHelper::relativeDate($meta["last_connection"], $messages);
+        }
+
+        return $meta;
+
     }
 
     /**

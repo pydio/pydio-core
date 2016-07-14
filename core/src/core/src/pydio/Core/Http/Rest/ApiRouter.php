@@ -75,6 +75,11 @@ class ApiRouter
 
     }
 
+    /**
+     * Get Path component of the URI, without query parameters
+     * @param ServerRequestInterface $request
+     * @return string
+     */
     public function getURIForRequest(ServerRequestInterface $request){
 
         $uri = $request->getServerParams()['REQUEST_URI'];
@@ -85,6 +90,12 @@ class ApiRouter
         return rawurldecode($uri);
     }
 
+    /**
+     * Find a route in api definitions
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return bool
+     */
     public function route(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $dispatcher = \FastRoute\cachedDispatcher(function(\FastRoute\RouteCollector $r) {
@@ -137,14 +148,21 @@ class ApiRouter
         return false;
     }
 
+    /**
+     * Analyze URI and parameters to guess the current workspace
+     *
+     * @param ServerRequestInterface $request
+     * @param array $pathVars
+     * @return mixed|string
+     */
     protected function findRepositoryInParameters(ServerRequestInterface $request, array $pathVars){
         $params = array_merge($request->getParsedBody(), $pathVars);
         if(isSet($params["workspaceId"])){
             return $params["workspaceId"];
-        }else if(isSet($params["path"]) && strpos($params["path"], "/") !== false){
-            return array_shift(explode("/", ltrim($params["path"], "/")));
         }else if (preg_match('/^\/admin\//', $request->getAttribute("api_uri"))) {
             return "ajxp_conf";
+        }else if(isSet($params["path"]) && strpos($params["path"], "/") !== false){
+            return array_shift(explode("/", ltrim($params["path"], "/")));
         }
         // If no repo ID was found, return default repo id "pydio".
         return "pydio";
