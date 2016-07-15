@@ -413,26 +413,34 @@ class RepositoriesManager extends AbstractManager
 
             case "meta_source_add" :
 
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
+                $repId      = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
+                $metaId     = InputFilter::sanitize(isSet($httpVars["metaId"]) ? $httpVars["metaId"] : $httpVars["new_meta_source"]);
+                $repo       = RepositoryService::getRepositoryById($repId);
+
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
                 }
-                $metaSourceType = InputFilter::sanitize($httpVars["new_meta_source"], InputFilter::SANITIZE_ALPHANUM);
-                if (isSet($httpVars["json_data"])) {
+                list($type, $name) = explode(".", $metaId);
+                if(PluginsService::findPluginWithoutCtxt($type, $name) === false){
+                    throw new PydioException("Cannot find plugin with id $metaId");
+                }
+                if(isSet($httpVars["request_body"])){
+                    $options = $httpVars["request_body"];
+                }else if (isSet($httpVars["json_data"])) {
                     $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
                 } else {
                     $options = array();
                     $this->parseParameters($ctx, $httpVars, $options, true);
                 }
+
                 $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                if (is_array($repoOptions) && isSet($repoOptions[$metaSourceType])) {
+                if (is_array($repoOptions) && isSet($repoOptions[$metaId])) {
                     throw new PydioException($mess["ajxp_conf.55"]);
                 }
                 if (!is_array($repoOptions)) {
                     $repoOptions = array();
                 }
-                $repoOptions[$metaSourceType] = $options;
+                $repoOptions[$metaId] = $options;
                 uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                 $repo->addOption("META_SOURCES", $repoOptions);
                 RepositoryService::replaceRepository($repId, $repo);
@@ -443,12 +451,13 @@ class RepositoriesManager extends AbstractManager
 
             case "meta_source_delete" :
 
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
+                $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
+                $metaSourceId = InputFilter::sanitize(isSet($httpVars["metaId"]) ? $httpVars["metaId"] : $httpVars["plugId"]);
+                $repo         = RepositoryService::getRepositoryById($repId);
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
                 }
-                $metaSourceId = $httpVars["plugId"];
+
                 $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                 if (is_array($repoOptions) && array_key_exists($metaSourceId, $repoOptions)) {
                     unset($repoOptions[$metaSourceId]);
@@ -465,50 +474,52 @@ class RepositoriesManager extends AbstractManager
 
             case "meta_source_edit" :
 
-                $repId = $httpVars["repository_id"];
-                $repo = RepositoryService::getRepositoryById($repId);
+                $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
+                $repo         = RepositoryService::getRepositoryById($repId);
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
                 }
-                if(isSet($httpVars["plugId"])){
-                    $metaSourceId = $httpVars["plugId"];
-                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
-                    if (!is_array($repoOptions)) {
-                        $repoOptions = array();
-                    }
-                    if (isSet($httpVars["json_data"])) {
-                        $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
-                    } else {
-                        $options = array();
-                        $this->parseParameters($ctx, $httpVars, $options, true);
-                    }
-                    if(isset($repoOptions[$metaSourceId])){
-                        $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
-                    }
-                    $repoOptions[$metaSourceId] = $options;
-                }else if(isSet($httpVars["bulk_data"])){
+                if (isSet($httpVars["bulk_data"])) {
                     $bulkData = json_decode(TextEncoder::magicDequote($httpVars["bulk_data"]), true);
                     $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                     if (!is_array($repoOptions)) {
                         $repoOptions = array();
                     }
-                    if(isSet($bulkData["delete"]) && count($bulkData["delete"])){
-                        foreach($bulkData["delete"] as $key){
-                            if(isSet($repoOptions[$key])) unset($repoOptions[$key]);
+                    if (isSet($bulkData["delete"]) && count($bulkData["delete"])) {
+                        foreach ($bulkData["delete"] as $key) {
+                            if (isSet($repoOptions[$key])) unset($repoOptions[$key]);
                         }
                     }
-                    if(isSet($bulkData["add"]) && count($bulkData["add"])){
-                        foreach($bulkData["add"] as $key => $value){
-                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
+                    if (isSet($bulkData["add"]) && count($bulkData["add"])) {
+                        foreach ($bulkData["add"] as $key => $value) {
+                            if (isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
                             $repoOptions[$key] = $value;
                         }
                     }
-                    if(isSet($bulkData["edit"]) && count($bulkData["edit"])){
-                        foreach($bulkData["edit"] as $key => $value){
-                            if(isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
+                    if (isSet($bulkData["edit"]) && count($bulkData["edit"])) {
+                        foreach ($bulkData["edit"] as $key => $value) {
+                            if (isSet($repoOptions[$key])) $this->mergeExistingParameters($value, $repoOptions[$key]);
                             $repoOptions[$key] = $value;
                         }
                     }
+                } else {
+                    $metaSourceId = InputFilter::sanitize(isSet($httpVars["metaId"]) ? $httpVars["metaId"] : $httpVars["plugId"]);
+                    $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
+                    if (!is_array($repoOptions)) {
+                        $repoOptions = array();
+                    }
+                    if(isSet($httpVars["request_body"])){
+                        $options = $httpVars["request_body"];
+                    }else if (isSet($httpVars["json_data"])) {
+                        $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
+                    } else {
+                        $options = array();
+                        $this->parseParameters($ctx, $httpVars, $options, true);
+                    }
+                    if (isset($repoOptions[$metaSourceId])) {
+                        $this->mergeExistingParameters($options, $repoOptions[$metaSourceId]);
+                    }
+                    $repoOptions[$metaSourceId] = $options;
                 }
                 uksort($repoOptions, array($this,"metaSourceOrderingFunction"));
                 $repo->addOption("META_SOURCES", $repoOptions);
