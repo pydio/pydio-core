@@ -205,7 +205,7 @@ class RolesManager extends AbstractManager
                 }
 
                 if($requestInterface->getAttribute("api") === "v2" && (empty($httpVars["load_fill_values"]) || $httpVars["load_fill_values"] !== "true")){
-                    $responseInterface = new JsonResponse($data);
+                    $responseInterface = new JsonResponse($data["ROLE"]);
                     break;
                 }
 

@@ -204,9 +204,15 @@ class ConfAccessDriver extends AbstractAccessDriver
             $uri = $requestInterface->getAttribute("api_uri");
             $vars = $requestInterface->getParsedBody();
             if($uri === "/admin/roles") {
+                
                 $vars["dir"] = "/data/roles";
                 $requestInterface = $requestInterface->withParsedBody($vars);
                 
+            }else if($uri === "/admin/workspaces") {
+
+                $vars["dir"] = "/data/repositories";
+                $requestInterface = $requestInterface->withParsedBody($vars);
+
             }else if(strpos($uri, "/admin/people") === 0){
                 
                 $crtPath = "";

@@ -1046,11 +1046,13 @@ class UsersManager extends AbstractManager
         }else{
             $currentRoles = $roles;
             $meta["personal_role_id"] = "/AJXP_USR_/".$userId;
+            $meta["lock"] = $userObject->getLock();
+            $meta["profile"] = $userObject->getProfile();
         }
         $meta = array_merge($meta, [
             "text" => $nodeLabel,
             "is_file" => true,
-            "isAdmin" => $messages[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
+            "isAdmin" => ($format === "json" ? $isAdmin : $messages[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")]),
             "icon" => $icon.".png",
             "icon_class" => $iconClass,
             "object_id" => $userId,
