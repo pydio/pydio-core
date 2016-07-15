@@ -475,6 +475,9 @@
         <action name="people-delete-resource">
             <processing><serverCallback methodName="usersAction"/></processing>
         </action>
+        <action name="people-patch-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
 
         <!-- ROLES ACTIONS -->
         <action name="create_role">

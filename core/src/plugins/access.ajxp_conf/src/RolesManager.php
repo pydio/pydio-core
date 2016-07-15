@@ -363,12 +363,17 @@ class RolesManager extends AbstractManager
                 }
 
                 if(isSet($httpVars["request_body"])){
-                    $data = $httpVars["request_body"];
+                    // This is API V2 : only the role is passed as json body
+                    $roleData = $httpVars["request_body"];
+                    $data = ["METADATA" => []];
+                    $outputRoleOnly = true;
                 }else{
+                    // Other apis: a more complex
                     $jsonData = TextEncoder::magicDequote($httpVars["json_data"]);
                     $data = json_decode($jsonData, true);
+                    $roleData = $data["ROLE"];
+                    $outputRoleOnly = false;
                 }
-                $roleData = $data["ROLE"];
                 $binariesContext = array();
                 $parseContext = $ctx;
                 if (isset($userObject)) {
@@ -451,7 +456,11 @@ class RolesManager extends AbstractManager
                     }
                     // Reload Role
                     $savedValue = RolesService::getRole($originalRole->getId());
-                    $output = array("ROLE" => $savedValue->getDataArray(true), "SUCCESS" => true);
+                    if($outputRoleOnly){
+                        $output = $savedValue->getDataArray(true);
+                    }else{
+                        $output = array("ROLE" => $savedValue->getDataArray(true), "SUCCESS" => true);
+                    }
                 } catch (\Exception $e) {
                     $output = array("ERROR" => $e->getMessage());
                 }

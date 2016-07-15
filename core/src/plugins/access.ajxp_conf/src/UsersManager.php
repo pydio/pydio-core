@@ -100,7 +100,75 @@ class UsersManager extends AbstractManager
             }
             return $this->delete($requestInterface->withParsedBody($vars), $responseInterface);
 
+        }else if($a === "people-patch-resource"){
+
+            $path =  $vars["path"];
+            $resType = $vars["request_body"]["resourceType"];
+            $paramName = $vars["request_body"]["parameterName"];
+            $paramValue = $vars["request_body"]["parameterValue"];
+            if($resType === "group" && $paramName === "groupLabel"){
+
+                $requestInterface = $requestInterface
+                    ->withAttribute("action", "update_group_label")
+                    ->withParsedBody(["group_label" => $paramValue, "group_path" => $path])
+                ;
+
+            }else if($resType === "user"){
+
+                $newVars = ["user_id" => basename($path)];
+                switch($paramName){
+                    case "userPass":
+                        $newVars["user_pwd"] = $paramValue;
+                        $newAction = "update_user_pwd";
+                        break;
+                    case "userProfile":
+                        $newAction = "update_user_profile";
+                        $newVars["profile"] = $paramValue;
+                        break;
+                    case "userLock":
+                        list($lockType, $lockValue) = explode(":", $paramValue);
+                        $newVars["lock_type"] = $lockType;
+                        $newVars["lock"] = $lockValue;
+                        $newAction = "user_set_lock";
+                        break;
+                    case "userAddRole":
+                        $newVars["role_id"] = $paramValue;
+                        $newAction = "user_add_role";
+                        break;
+                    case "userRemoveRole":
+                        $newVars["role_id"] = $paramValue;
+                        $newAction = "user_delete_role";
+                        break;
+                    case "userRoles":
+                        $newVars["roles"] = json_encode($paramValue); // REENCODE JSON LIST OF ROLES
+                        $newAction = "user_reorder_roles";
+                        break;
+                    case "userPreferences":
+                        $newAction = "save_user_preference";
+                        $i = 0;
+                        foreach ($paramValue as $key => $val){
+                            $newVars["pref_name_".$i] = $key;
+                            $newVars["pref_value_".$i] = $val;
+                            $i++;
+                        }
+                        break;
+                    default:
+                        throw new PydioException("Arguments mismatch");
+                        break;
+                }
+                $requestInterface = $requestInterface
+                    ->withAttribute("action", $newAction)
+                    ->withParsedBody($newVars);
+
+            }else{
+
+                throw new PydioException("Arguments mismatch");
+
+            }
+            return $this->usersActions($requestInterface, $responseInterface);
+
         }
+
         return $responseInterface;
     }
 
@@ -177,6 +245,32 @@ class UsersManager extends AbstractManager
                 $reloadMessage  = new ReloadMessage();
                 $userMessage    = new UserMessage($mess["ajxp_conf.160"]);
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$reloadMessage, $userMessage]));
+
+                break;
+
+            case "update_group_label":
+
+                $currentMainUser = $ctx->getUser();
+                $groupPath = InputFilter::securePath(InputFilter::sanitize($httpVars["group_path"], InputFilter::SANITIZE_DIRNAME));
+                $filteredGroupPath = (!empty($currentMainUser) ? $currentMainUser->getRealGroupPath($groupPath) : $groupPath);
+                ConfService::getConfStorageImpl()->relabelGroup($filteredGroupPath, InputFilter::sanitize($httpVars["group_label"], InputFilter::SANITIZE_FILENAME));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Updated label for group ".$filteredGroupPath)));
+
+                break;
+
+            case "update_user_profile":
+
+                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["profile"]) || !UsersService::userExists($httpVars["user_id"]) || trim($httpVars["profile"]) == "") {
+                    throw new PydioException($mess["ajxp_conf.61"]);
+                }
+                $profile = InputFilter::sanitize($httpVars["profile"], InputFilter::SANITIZE_ALPHANUM);
+                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $user = UsersService::getUserById($userId);
+                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
+                    throw new PydioException("Cannot update user data for ".$userId);
+                }
+                $user->setProfile($profile);
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Updated profile for user ".$userId)));
 
                 break;
 
@@ -328,6 +422,17 @@ class UsersManager extends AbstractManager
                 if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
                     throw new \Exception("Cannot update user data for ".$userId);
                 }
+
+
+                // UPDATE ROLES
+                $currentRoles = array_filter(array_keys($user->getRoles()), function($rId){return strpos($rId, "AJXP_GRP_/")!==0 && strpos($rId, "AJXP_USR_/")!==0;});
+                $newRoles = array_diff($roles, $currentRoles);
+                foreach($newRoles as $r) $user->addRole(RolesService::getRole($r));
+                $removeRoles = array_diff($currentRoles, $roles);
+                foreach($removeRoles as $r) {
+                    $user->removeRole($r);
+                }
+                // REORDER ROLES
                 $user->updateRolesOrder($roles);
                 $user->save("superuser");
                 $loggedUser = $ctx->getUser();
