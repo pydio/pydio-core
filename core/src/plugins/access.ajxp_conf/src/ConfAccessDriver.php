@@ -204,7 +204,7 @@ class ConfAccessDriver extends AbstractAccessDriver
             $uri = $requestInterface->getAttribute("api_uri");
             $vars = $requestInterface->getParsedBody();
             if($uri === "/admin/roles") {
-                
+
                 $vars["dir"] = "/data/roles";
                 $requestInterface = $requestInterface->withParsedBody($vars);
                 
@@ -355,24 +355,21 @@ class ConfAccessDriver extends AbstractAccessDriver
             unset($httpVars["data_id"]);
             $requestInterface = $requestInterface->withParsedBody($httpVars);
 
-        }else if($requestInterface->getAttribute("api") === "v2"){
-
-            if(isSet($httpVars["roleId"])) {
-                $httpVars["role_id"] = $httpVars["roleId"];
-                unset($httpVars["roleId"]);
-                $requestInterface = $requestInterface->withParsedBody($httpVars);
-            }
-
         }
 
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 
-        if (isSet($httpVars["repository_id"])) {
+        if (isSet($httpVars["repository_id"]) || isSet($httpVars["workspaceId"])) {
+
             $manager = new RepositoriesManager($ctx, $this->getName());
-        } else if (isSet($httpVars["role_id"])) {
+
+        } else if (isSet($httpVars["role_id"]) || isSet($httpVars["roleId"])) {
+
             $manager = new RolesManager($ctx, $this->getName());
+
         } else {
+
             $manager = new UsersManager($ctx, $this->getName());
         }
 

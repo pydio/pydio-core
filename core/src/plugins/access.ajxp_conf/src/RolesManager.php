@@ -505,7 +505,7 @@ class RolesManager extends AbstractManager
         $mess = LocaleService::getMessages();
         $httpVars = $requestInterface->getParsedBody();
 
-        $roleId = $httpVars["role_id"];
+        $roleId = InputFilter::sanitize(isSet($httpVars["roleId"]) ? $httpVars["roleId"] : $httpVars["role_id"], InputFilter::SANITIZE_DIRNAME);
         if (RolesService::getRole($roleId) === false) {
             throw new PydioException($mess["ajxp_conf.67"]);
         }

@@ -220,59 +220,6 @@ class RepositoriesManager extends AbstractManager
 
                 break;
 
-            case "edit_repository" :
-
-                if(isSet($httpVars["workspaceId"])){
-                    $repId = $httpVars["workspaceId"];
-                }else{
-                    $repId = $httpVars["repository_id"];
-                }
-                $format = isSet($httpVars["format"]) && $httpVars["format"] == "json" ? "json" : "xml";
-
-                $repository = RepositoryService::getRepositoryById($repId);
-                if ($repository == null) {
-                    throw new \Exception("Cannot find workspace with id $repId");
-                }
-                if ($ctx->hasUser() && !$ctx->getUser()->canAdministrate($repository)) {
-                    throw new \Exception("You are not allowed to edit this workspace!");
-                }
-                $pServ = PluginsService::getInstance($ctx);
-                /** @var AbstractAccessDriver $plug */
-                $plug = $pServ->getPluginById("access.".$repository->getAccessType());
-                if ($plug == null) {
-                    throw new \Exception("Cannot find access driver (".$repository->getAccessType().") for workspace!");
-                }
-                $slug = $repository->getSlug();
-                if ($slug == "" && $repository->isWriteable()) {
-                    $repository->setSlug();
-                    RepositoryService::replaceRepository($repId, $repository);
-                }
-                $ctxUser = $ctx->getUser();
-                if ($ctxUser!=null && $ctxUser->getGroupPath() != null) {
-                    $rgp = $repository->getGroupPath();
-                    if($rgp == null) $rgp = "/";
-                    if (strlen($rgp) < strlen($ctxUser->getGroupPath())) {
-                        $repository->setWriteable(false);
-                    }
-                }
-
-                $definitions = $plug->getConfigsDefinitions();
-                if($format === "json"){
-                    $data = $this->serializeRepositoryToJSON($ctx, $repository, $definitions, $currentAdminBasePath);
-                    if(isSet($httpVars["load_fill_values"]) && $httpVars["load_fill_values"] === "true"){
-                        $data["PARAMETERS_INFO"] = $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
-                    }
-                    $responseInterface = new JsonResponse($data);
-                }else{
-                    $buffer = "<admin_data>";
-                    $buffer .= $this->serializeRepositoryToXML($ctx, $repository, $definitions, $currentAdminBasePath);
-                    $buffer .= $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
-                    $buffer .= "</admin_data>";
-                    $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
-                }
-
-                break;
-
             case "edit_repository_label" :
             case "edit_repository_data" :
 
@@ -354,6 +301,8 @@ class RepositoriesManager extends AbstractManager
                             }
                         }
                     }
+                    /*
+                     * THIS SEEM TO BE DUPLICATED LOWER IN THE CODE!
                     if ($repo->getContextOption($ctx, "DEFAULT_RIGHTS")) {
                         $gp = $repo->getGroupPath();
                         if (empty($gp) || $gp == "/") {
@@ -366,6 +315,7 @@ class RepositoriesManager extends AbstractManager
                             RolesService::updateRole($defRole);
                         }
                     }
+                    */
                     if (is_file(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php")) {
                         chdir(AJXP_TESTS_FOLDER."/plugins");
                         include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php");
@@ -411,11 +361,64 @@ class RepositoriesManager extends AbstractManager
 
                 break;
 
+            case "edit_repository" :
+
+                if(isSet($httpVars["workspaceId"])){
+                    $repId = $httpVars["workspaceId"];
+                }else{
+                    $repId = $httpVars["repository_id"];
+                }
+                $format = isSet($httpVars["format"]) && $httpVars["format"] == "json" ? "json" : "xml";
+
+                $repository = RepositoryService::findRepositoryByIdOrAlias($repId);
+                if ($repository == null) {
+                    throw new \Exception("Cannot find workspace with id $repId");
+                }
+                if ($ctx->hasUser() && !$ctx->getUser()->canAdministrate($repository)) {
+                    throw new \Exception("You are not allowed to edit this workspace!");
+                }
+                $pServ = PluginsService::getInstance($ctx);
+                /** @var AbstractAccessDriver $plug */
+                $plug = $pServ->getPluginById("access.".$repository->getAccessType());
+                if ($plug == null) {
+                    throw new \Exception("Cannot find access driver (".$repository->getAccessType().") for workspace!");
+                }
+                $slug = $repository->getSlug();
+                if ($slug == "" && $repository->isWriteable()) {
+                    $repository->setSlug();
+                    RepositoryService::replaceRepository($repId, $repository);
+                }
+                $ctxUser = $ctx->getUser();
+                if ($ctxUser!=null && $ctxUser->getGroupPath() != null) {
+                    $rgp = $repository->getGroupPath();
+                    if($rgp == null) $rgp = "/";
+                    if (strlen($rgp) < strlen($ctxUser->getGroupPath())) {
+                        $repository->setWriteable(false);
+                    }
+                }
+
+                $definitions = $plug->getConfigsDefinitions();
+                if($format === "json"){
+                    $data = $this->serializeRepositoryToJSON($ctx, $repository, $definitions, $currentAdminBasePath);
+                    if(isSet($httpVars["load_fill_values"]) && $httpVars["load_fill_values"] === "true"){
+                        $data["PARAMETERS_INFO"] = $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
+                    }
+                    $responseInterface = new JsonResponse($data);
+                }else{
+                    $buffer = "<admin_data>";
+                    $buffer .= $this->serializeRepositoryToXML($ctx, $repository, $definitions, $currentAdminBasePath);
+                    $buffer .= $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
+                    $buffer .= "</admin_data>";
+                    $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
+                }
+
+                break;
+
             case "meta_source_add" :
 
                 $repId      = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
                 $metaId     = InputFilter::sanitize(isSet($httpVars["metaId"]) ? $httpVars["metaId"] : $httpVars["new_meta_source"]);
-                $repo       = RepositoryService::getRepositoryById($repId);
+                $repo       = RepositoryService::findRepositoryByIdOrAlias($repId);
 
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
@@ -453,7 +456,7 @@ class RepositoriesManager extends AbstractManager
 
                 $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
                 $metaSourceId = InputFilter::sanitize(isSet($httpVars["metaId"]) ? $httpVars["metaId"] : $httpVars["plugId"]);
-                $repo         = RepositoryService::getRepositoryById($repId);
+                $repo         = RepositoryService::findRepositoryByIdOrAlias($repId);
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
                 }
@@ -475,7 +478,7 @@ class RepositoriesManager extends AbstractManager
             case "meta_source_edit" :
 
                 $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
-                $repo         = RepositoryService::getRepositoryById($repId);
+                $repo         = RepositoryService::findRepositoryByIdOrAlias($repId);
                 if (!is_object($repo)) {
                     throw new PydioException("Invalid workspace id! $repId");
                 }
@@ -559,8 +562,8 @@ class RepositoriesManager extends AbstractManager
         $mess = LocaleService::getMessages();
         $httpVars = $requestInterface->getParsedBody();
 
-        $repId = $httpVars["repository_id"];
-        $repo = RepositoryService::getRepositoryById($repId);
+        $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
+        $repo         = RepositoryService::findRepositoryByIdOrAlias($repId);
         if(!is_object($repo)){
             $res = -1;
         }else{
@@ -766,7 +769,7 @@ class RepositoriesManager extends AbstractManager
         }
         foreach ($repository as $name => $option) {
             if(strstr($name, " ")>-1) continue;
-            if ($name == "driverInstance") continue;
+            if (in_array($name, ["driverInstance", "id", "uuid", "path", "recycle", "create", "enabled"])) continue;
             if(is_array($option)) {
                 $nested[] = $option;
             } else{
@@ -784,13 +787,15 @@ class RepositoriesManager extends AbstractManager
                     $buffer["PARAMETERS"][$key] = $optValue;
                 }
             }
-            // Add SLUG
+            // Add SLUG?
+            /*
             if(!empty($buffer["slug"])) {
                 $buffer["PARAMETERS"]["AJXP_SLUG"] = $buffer["slug"];
             }
             if(!empty($buffer["groupPath"])) {
                 $buffer["PARAMETERS"]["AJXP_GROUP_PATH_PARAMETER"] = $buffer["groupPath"];
             }
+            */
         }
         if(!$repository->isTemplate()){
             $buffer["INFO"]= [];
