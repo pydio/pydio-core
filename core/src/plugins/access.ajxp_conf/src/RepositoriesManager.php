@@ -219,7 +219,11 @@ class RepositoriesManager extends AbstractManager
 
             case "edit_repository" :
 
-                $repId = $httpVars["repository_id"];
+                if(isSet($httpVars["workspaceId"])){
+                    $repId = $httpVars["workspaceId"];
+                }else{
+                    $repId = $httpVars["repository_id"];
+                }
                 $repository = RepositoryService::getRepositoryById($repId);
                 if ($repository == null) {
                     throw new \Exception("Cannot find workspace with id $repId");
@@ -659,6 +663,7 @@ class RepositoriesManager extends AbstractManager
         $count              = null;
         $ctxUser            = $this->context->getUser();
         $nodesList          = new NodesList($fullBasePath);
+        $v2Api              = $requestInterface->getAttribute("api") === "v2";
 
         // Load all repositories = normal, templates, and templates children
         $criteria = array(
@@ -720,7 +725,7 @@ class RepositoriesManager extends AbstractManager
 
             $nodeKey = "/data/repositories/$repoIndex";
             $this->appendBookmarkMeta($nodeKey, $meta);
-            $repoNode = new AJXP_Node($nodeKey, $meta);
+            $repoNode = new AJXP_Node($v2Api ? (string)$repoIndex : $nodeKey, $meta);
             $nodesList->addBranch($repoNode);
 
             if ($repoObject->isTemplate) {
@@ -744,7 +749,7 @@ class RepositoriesManager extends AbstractManager
                     );
                     $cNodeKey = "/data/repositories/$childId";
                     $this->appendBookmarkMeta($cNodeKey, $meta);
-                    $repoNode = new AJXP_Node($cNodeKey, $meta);
+                    $repoNode = new AJXP_Node($v2Api ? $childId : $cNodeKey, $meta);
                     $nodesList->addBranch($repoNode);
                 }
             }

@@ -245,6 +245,11 @@
                 </serverCallback>
             </processing>
         </action>
+		<action name="edit_repository">
+			<processing>
+				<serverCallback methodName="repositoriesAction" developerComment="Load Repository." restParams="/repository_id"/>
+			</processing>
+		</action>
 		<action name="meta_source_edit">
 			<processing>
 				<serverCallback methodName="repositoriesAction" developerComment="Edit an existing meta source parameters." restParams="/repository_id/plugId/json_data">

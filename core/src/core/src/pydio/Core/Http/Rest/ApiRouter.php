@@ -162,10 +162,10 @@ class ApiRouter
      */
     protected function findRepositoryInParameters(ServerRequestInterface $request, array $pathVars){
         $params = array_merge($request->getParsedBody(), $pathVars);
-        if(isSet($params["workspaceId"])){
-            return $params["workspaceId"];
-        }else if (preg_match('/^\/admin\//', $request->getAttribute("api_uri"))) {
+        if (preg_match('/^\/admin\//', $request->getAttribute("api_uri"))) {
             return "ajxp_conf";
+        }else if(isSet($params["workspaceId"])){
+            return $params["workspaceId"];
         }else if(isSet($params["path"]) && strpos($params["path"], "/") !== false){
             return array_shift(explode("/", ltrim($params["path"], "/")));
         }
