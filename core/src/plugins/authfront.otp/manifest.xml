@@ -49,7 +49,7 @@
                         var newField = clone.down('input[name="password"]');
                         newField.writeAttribute('name', 'otp_code');
                         newField.writeAttribute('data-ajxpLoginAdditionalParameter', 'true');
-                        clone.down('div.SF_label').update('Unique Code (6 digits)');
+                        clone.down('div.SF_label').update('Unique Code');
                     }catch(e){
                         if(console) console.log('Error while replacing OTP field', e);
                     }
