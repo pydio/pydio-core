@@ -22,9 +22,11 @@ namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
@@ -33,6 +35,7 @@ use Pydio\Core\Http\Message\XMLDocMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\AuthService;
@@ -224,6 +227,8 @@ class RepositoriesManager extends AbstractManager
                 }else{
                     $repId = $httpVars["repository_id"];
                 }
+                $format = isSet($httpVars["format"]) && $httpVars["format"] == "json" ? "json" : "xml";
+
                 $repository = RepositoryService::getRepositoryById($repId);
                 if ($repository == null) {
                     throw new \Exception("Cannot find workspace with id $repId");
@@ -232,11 +237,11 @@ class RepositoriesManager extends AbstractManager
                     throw new \Exception("You are not allowed to edit this workspace!");
                 }
                 $pServ = PluginsService::getInstance($ctx);
+                /** @var AbstractAccessDriver $plug */
                 $plug = $pServ->getPluginById("access.".$repository->getAccessType());
                 if ($plug == null) {
                     throw new \Exception("Cannot find access driver (".$repository->getAccessType().") for workspace!");
                 }
-                $buffer = "<admin_data>";
                 $slug = $repository->getSlug();
                 if ($slug == "" && $repository->isWriteable()) {
                     $repository->setSlug();
@@ -250,105 +255,21 @@ class RepositoriesManager extends AbstractManager
                         $repository->setWriteable(false);
                     }
                 }
-                $nested = array();
+
                 $definitions = $plug->getConfigsDefinitions();
-                $buffer .= "<repository index=\"$repId\" securityScope=\"".$repository->securityScope()."\"";
-                foreach ($repository as $name => $option) {
-                    if(strstr($name, " ")>-1) continue;
-                    if ($name == "driverInstance") continue;
-                    if (!is_array($option)) {
-                        if (is_bool($option)) {
-                            $option = ($option?"true":"false");
-                        }
-                        $buffer .= " $name=\"".TextEncoder::toUTF8(StringHelper::xmlEntities($option))."\" ";
-                    } else if (is_array($option)) {
-                        $nested[] = $option;
+                if($format === "json"){
+                    $data = $this->serializeRepositoryToJSON($ctx, $repository, $definitions, $currentAdminBasePath);
+                    if(isSet($httpVars["load_fill_values"]) && $httpVars["load_fill_values"] === "true"){
+                        $data["PARAMETERS_INFO"] = $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
                     }
+                    $responseInterface = new JsonResponse($data);
+                }else{
+                    $buffer = "<admin_data>";
+                    $buffer .= $this->serializeRepositoryToXML($ctx, $repository, $definitions, $currentAdminBasePath);
+                    $buffer .= $this->serializeRepositoryDriverInfos($pServ, $format, $plug, $repository);
+                    $buffer .= "</admin_data>";
+                    $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
                 }
-                if (count($nested)) {
-                    $buffer .= ">" ;
-                    foreach ($nested as $option) {
-                        foreach ($option as $key => $optValue) {
-                            if (is_array($optValue) && count($optValue)) {
-                                $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>" ;
-                            } else if (is_object($optValue)){
-                                $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>";
-                            } else {
-                                if (is_bool($optValue)) {
-                                    $optValue = ($optValue?"true":"false");
-                                } else if(isSet($definitions[$key]) && $definitions[$key]["type"] == "password" && !empty($optValue)){
-                                    $optValue = "__AJXP_VALUE_SET__";
-                                }
-
-                                $optValue = StringHelper::xmlEntities($optValue, true);
-                                $buffer .= "<param name=\"$key\" value=\"$optValue\"/>";
-                            }
-                        }
-                    }
-                    // Add SLUG
-                    if(!$repository->isTemplate()) {
-                        $buffer .= "<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>";
-                    }
-                    if ($repository->getGroupPath() != null) {
-                        $groupPath = $repository->getGroupPath();
-                        if($currentAdminBasePath != "/") $groupPath = substr($repository->getGroupPath(), strlen($currentAdminBasePath));
-                        $buffer .= "<param name=\"AJXP_GROUP_PATH_PARAMETER\" value=\"".$groupPath."\"/>";
-                    }
-
-                    $buffer .= "</repository>";
-                } else {
-                    $buffer .= "/>";
-                }
-                if ($repository->hasParent()) {
-                    $parent = RepositoryService::getRepositoryById($repository->getParentId());
-                    if (isSet($parent) && $parent->isTemplate()) {
-                        $parentLabel = $parent->getDisplay();
-                        $parentType = $parent->getAccessType();
-                        $buffer .= "<template repository_id=\"".$repository->getParentId()."\" repository_label=\"$parentLabel\" repository_type=\"$parentType\">";
-                        foreach ($parent->getOptionsDefined() as $parentOptionName) {
-                            $buffer .= "<option name=\"$parentOptionName\"/>";
-                        }
-                        $buffer .= "</template>";
-                    }
-                }
-                $manifest = $plug->getManifestRawContent("server_settings/param");
-                $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
-                $clientSettings = $plug->getManifestRawContent("client_settings", "xml");
-                $iconClass = "";$descriptionTemplate = "";
-                if($clientSettings->length){
-                    $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
-                    $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
-                }
-                $buffer .= "<ajxpdriver name=\"".$repository->getAccessType()."\" label=\"". StringHelper::xmlEntities($plug->getManifestLabel()) ."\" iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" description=\"". StringHelper::xmlEntities($plug->getManifestDescription()) ."\">$manifest</ajxpdriver>";
-                $buffer .= "<metasources>";
-                $metas = $pServ->getPluginsByType("metastore");
-                $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
-                $metas = array_merge($metas, $pServ->getPluginsByType("index"));
-                /** @var Plugin $metaPlug */
-                foreach ($metas as $metaPlug) {
-                    $buffer .= "<meta id=\"".$metaPlug->getId()."\" label=\"". StringHelper::xmlEntities($metaPlug->getManifestLabel()) ."\" description=\"". StringHelper::xmlEntities($metaPlug->getManifestDescription()) ."\">";
-                    $manifest = $metaPlug->getManifestRawContent("server_settings/param");
-                    $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
-                    $buffer .= $manifest;
-                    $buffer .= "</meta>";
-                }
-                $buffer .= "</metasources>";
-                if(!$repository->isTemplate()){
-                    $buffer .= "<additional_info>";
-                    $users = UsersService::countUsersForRepository($ctx, $repId, false, true);
-                    $cursor = ["count"];
-                    $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repId);
-                    $buffer .= '<users total="'.$users.'"/>';
-                    $buffer .= '<shares total="'.count($shares).'"/>';
-                    $rootGroup = RolesService::getRole("AJXP_GRP_/");
-                    if($rootGroup !== false && $rootGroup->hasMask($repId)){
-                        $buffer .= "<mask><![CDATA[".json_encode($rootGroup->getMask($repId))."]]></mask>";
-                    }
-                    $buffer .= "</additional_info>";
-                }
-                $buffer .= "</admin_data>";
-
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
 
                 break;
 
@@ -809,6 +730,248 @@ class RepositoriesManager extends AbstractManager
         return strcmp($key1, $key2);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param RepositoryInterface $repository
+     * @param array $definitions
+     * @param string $currentAdminBasePath
+     * @return array
+     */
+    protected function serializeRepositoryToJSON(ContextInterface $ctx, $repository, $definitions, $currentAdminBasePath){
+        $nested = [];
+        $buffer = [
+            "id"            => $repository->getId(),
+            "securityScope" => $repository->securityScope()
+        ];
+        if(!$repository->isTemplate()){
+            $buffer["slug"] = $repository->getSlug();
+        }
+        $groupPath = $repository->getGroupPath();
+        if ($groupPath != null) {
+            if($currentAdminBasePath != "/") {
+                $groupPath = substr($repository->getGroupPath(), strlen($currentAdminBasePath));
+            }
+            $buffer["groupPath"]= $groupPath;
+        }
+        foreach ($repository as $name => $option) {
+            if(strstr($name, " ")>-1) continue;
+            if ($name == "driverInstance") continue;
+            if(is_array($option)) {
+                $nested[] = $option;
+            } else{
+                $buffer[$name] = $option;
+            }
+        }
+        if (count($nested)) {
+            $buffer["PARAMETERS"]= [];
+
+            foreach ($nested as $option) {
+                foreach ($option as $key => $optValue) {
+                    if(isSet($definitions[$key]) && $definitions[$key]["type"] == "password" && !empty($optValue)){
+                        $optValue = "__AJXP_VALUE_SET__";
+                    }
+                    $buffer["PARAMETERS"][$key] = $optValue;
+                }
+            }
+            // Add SLUG
+            if(!empty($buffer["slug"])) {
+                $buffer["PARAMETERS"]["AJXP_SLUG"] = $buffer["slug"];
+            }
+            if(!empty($buffer["groupPath"])) {
+                $buffer["PARAMETERS"]["AJXP_GROUP_PATH_PARAMETER"] = $buffer["groupPath"];
+            }
+        }
+        if(!$repository->isTemplate()){
+            $buffer["INFO"]= [];
+            $users = UsersService::countUsersForRepository($ctx, $repository->getId(), false, true);
+            $cursor = ["count"];
+            $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repository->getId());
+            $buffer["INFO"] = [
+                "users" => $users,
+                "shares" => count($shares)
+            ];
+            $rootGroup = RolesService::getRole("AJXP_GRP_/");
+            if($rootGroup !== false && $rootGroup->hasMask($repository->getId())){
+                $buffer["MASK"]= $rootGroup->getMask($repository->getId());
+            }
+        }
+        if ($repository->hasParent()) {
+            $parent = RepositoryService::getRepositoryById($repository->getParentId());
+            if (isSet($parent) && $parent->isTemplate()) {
+                $parentLabel = $parent->getDisplay();
+                $parentType = $parent->getAccessType();
+                $buffer["TEMPLATE"] = [
+                    "id"    => $repository->getParentId(),
+                    "label" => $parentLabel,
+                    "type"  => $parentType,
+                    "DEFINED_PARAMETERS" => []
+                ];
+                foreach ($parent->getOptionsDefined() as $parentOptionName) {
+                    $buffer["TEMPLATE"]["DEFINED_PARAMETERS"][] = $parentOptionName;
+                }
+            }
+        }
+        return $buffer;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param RepositoryInterface $repository
+     * @param array $definitions
+     * @param string $currentAdminBasePath
+     * @return string
+     */
+    protected function serializeRepositoryToXML(ContextInterface $ctx, $repository, $definitions, $currentAdminBasePath){
+        $nested = [];
+        $buffer = "<repository index=\"".$repository->getId()."\" securityScope=\"".$repository->securityScope()."\"";
+        foreach ($repository as $name => $option) {
+            if(strstr($name, " ")>-1) continue;
+            if ($name == "driverInstance") continue;
+            if (!is_array($option)) {
+                if (is_bool($option)) {
+                    $option = ($option?"true":"false");
+                }
+                $buffer .= " $name=\"".TextEncoder::toUTF8(StringHelper::xmlEntities($option))."\" ";
+            } else if (is_array($option)) {
+                $nested[] = $option;
+            }
+        }
+        if (count($nested)) {
+            $buffer .= ">" ;
+            foreach ($nested as $option) {
+                foreach ($option as $key => $optValue) {
+                    if (is_array($optValue) && count($optValue)) {
+                        $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>" ;
+                    } else if (is_object($optValue)){
+                        $buffer .= "<param name=\"$key\"><![CDATA[".json_encode($optValue)."]]></param>";
+                    } else {
+                        if (is_bool($optValue)) {
+                            $optValue = ($optValue?"true":"false");
+                        } else if(isSet($definitions[$key]) && $definitions[$key]["type"] == "password" && !empty($optValue)){
+                            $optValue = "__AJXP_VALUE_SET__";
+                        }
+
+                        $optValue = StringHelper::xmlEntities($optValue, true);
+                        $buffer .= "<param name=\"$key\" value=\"$optValue\"/>";
+                    }
+                }
+            }
+            // Add SLUG
+            if(!$repository->isTemplate()) {
+                $buffer .= "<param name=\"AJXP_SLUG\" value=\"".$repository->getSlug()."\"/>";
+            }
+            if ($repository->getGroupPath() != null) {
+                $groupPath = $repository->getGroupPath();
+                if($currentAdminBasePath != "/") $groupPath = substr($repository->getGroupPath(), strlen($currentAdminBasePath));
+                $buffer .= "<param name=\"AJXP_GROUP_PATH_PARAMETER\" value=\"".$groupPath."\"/>";
+            }
+
+            $buffer .= "</repository>";
+        } else {
+            $buffer .= "/>";
+        }
+        if ($repository->hasParent()) {
+            $parent = RepositoryService::getRepositoryById($repository->getParentId());
+            if (isSet($parent) && $parent->isTemplate()) {
+                $parentLabel = $parent->getDisplay();
+                $parentType = $parent->getAccessType();
+                $buffer .= "<template repository_id=\"".$repository->getParentId()."\" repository_label=\"$parentLabel\" repository_type=\"$parentType\">";
+                foreach ($parent->getOptionsDefined() as $parentOptionName) {
+                    $buffer .= "<option name=\"$parentOptionName\"/>";
+                }
+                $buffer .= "</template>";
+            }
+        }
+        if(!$repository->isTemplate()){
+            $buffer .= "<additional_info>";
+            $users = UsersService::countUsersForRepository($ctx, $repository->getId(), false, true);
+            $cursor = ["count"];
+            $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repository->getId());
+            $buffer .= '<users total="'.$users.'"/>';
+            $buffer .= '<shares total="'.count($shares).'"/>';
+            $rootGroup = RolesService::getRole("AJXP_GRP_/");
+            if($rootGroup !== false && $rootGroup->hasMask($repository->getId())){
+                $buffer .= "<mask><![CDATA[".json_encode($rootGroup->getMask($repository->getId()))."]]></mask>";
+            }
+            $buffer .= "</additional_info>";
+        }
+        return $buffer;
+    }
+
+    /**
+     * @param PluginsService $pServ
+     * @param string $format
+     * @param AbstractAccessDriver $plug
+     * @param RepositoryInterface $repository
+     * @return string|array
+     */
+    protected function serializeRepositoryDriverInfos(PluginsService $pServ, $format, $plug, $repository){
+        $manifest = $plug->getManifestRawContent("server_settings/param");
+        $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
+        $clientSettings = $plug->getManifestRawContent("client_settings", "xml");
+        $iconClass = "";$descriptionTemplate = "";
+        if($clientSettings->length){
+            $iconClass = $clientSettings->item(0)->getAttribute("iconClass");
+            $descriptionTemplate = $clientSettings->item(0)->getAttribute("description_template");
+        }
+        $metas = $pServ->getPluginsByType("metastore");
+        $metas = array_merge($metas, $pServ->getPluginsByType("meta"));
+        $metas = array_merge($metas, $pServ->getPluginsByType("index"));
+
+        if($format === "xml"){
+            $buffer = "<ajxpdriver name=\"".$repository->getAccessType()."\" label=\"". StringHelper::xmlEntities($plug->getManifestLabel()) ."\" 
+            iconClass=\"$iconClass\" description_template=\"$descriptionTemplate\" 
+            description=\"". StringHelper::xmlEntities($plug->getManifestDescription()) ."\">$manifest</ajxpdriver>";
+
+            $buffer .= "<metasources>";
+            /** @var Plugin $metaPlug */
+            foreach ($metas as $metaPlug) {
+                $buffer .= "<meta id=\"".$metaPlug->getId()."\" label=\"". StringHelper::xmlEntities($metaPlug->getManifestLabel()) ."\" description=\"". StringHelper::xmlEntities($metaPlug->getManifestDescription()) ."\">";
+                $manifest = $metaPlug->getManifestRawContent("server_settings/param");
+                $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
+                $buffer .= $manifest;
+                $buffer .= "</meta>";
+            }
+            $buffer .= "</metasources>";
+            return $buffer;
+        }else{
+            $dData = [
+                "name" => $repository->getAccessType(),
+                "label" => $plug->getManifestLabel(),
+                "description" => $plug->getManifestDescription(),
+                "iconClass" => $iconClass,
+                "descriptionTemplate" => $descriptionTemplate,
+                "parameters" => $this->xmlServerParamsToArray($manifest)
+            ];
+            $metaSources = [];
+            /** @var Plugin $metaPlug */
+            foreach($metas as $metaPlug){
+                $metaSources[$metaPlug->getId()] = [
+                    "id" => $metaPlug->getId(),
+                    "label" => $metaPlug->getManifestLabel(),
+                    "description" => $metaPlug->getManifestDescription(),
+                    "parameters" => $this->xmlServerParamsToArray(XMLWriter::replaceAjxpXmlKeywords($metaPlug->getManifestRawContent("server_settings/param")))
+                ];
+            }
+            $data = ["driver" => $dData, "metasources" => $metaSources];
+            return $data;
+        }
+    }
+
+    /**
+     * @param string $xmlParamsString
+     * @return array
+     */
+    protected function xmlServerParamsToArray($xmlParamsString){
+        $doc = new \DOMDocument();
+        $doc->loadXML("<parameters>$xmlParamsString</parameters>");
+        $result = XMLWriter::xmlToArray($doc, ["attributePrefix" => ""]);
+        if(isSet($result["parameters"]["param"])){
+            return $result["parameters"]["param"];
+        }else{
+            return [];
+        }
+    }
 
     /**
      * Search the manifests declaring ajxpdriver as their root node. Remove ajxp_* drivers
