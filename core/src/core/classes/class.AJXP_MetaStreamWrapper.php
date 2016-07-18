@@ -241,6 +241,10 @@ class AJXP_MetaStreamWrapper implements AjxpWrapper
     {
         $wrapper = self::findSubWrapperClassName($path);
         call_user_func(array($wrapper, "copyFileInStream"), self::translateScheme($path), $stream);
+        $meta = stream_get_meta_data($stream);
+        if(isSet($meta["uri"]) && $meta["uri"] === "php://output" && intval(ini_get("output_buffering")) > 0){
+            ob_end_flush();
+        }
     }
 
     /**
