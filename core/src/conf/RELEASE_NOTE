@@ -5,7 +5,7 @@ Pydio Core 6.4.2 fixes vulnerabilities discovered in remote download and some sp
 [Most noticeable changes]
 
 Security issues on remote download and path traversal on Windows.
-UX fixes and improvements (icons, thumbnails view)
+Meterial Design follow-up : Icons, thumbnails view, search engine results
 Fix indexation issues for synchronisation
 Italian translations updated (DepaMarco), Czech translations updated (Svetlmodry)
 
@@ -134,6 +134,14 @@ Fix #1176: catching all exceptions when sending mails and adding errors to the e
 Fix z-index for videojs player, both in editor mode and fullscreen. Fix #1191
 Use double-quotes instead of simple for links. Maybe see #1138
 Fixing again parenthesis in background URL.
+Metarialize search engine results
+Adding composer.json to elasticsearch plugin
+Do not encodeURIComponent for oldSchoolMailer - Should fix #1138
+Fix #1180: Unpatch the path for zip files before we check against the…  …
+Force overriding conf/extensions.conf.php during upgrade, as output f… …
+Init new release note.
+FIx JSPacker static function call.
+
 
 -------
 Pydio Core 6.4.1 - Bug Fixes for 6.4
