@@ -31,30 +31,7 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
         <client_configs>
             <template element="ajxp_desktop" name="otp_script" position="bottom"><![CDATA[
-            <script>
-                  document.observe("ajaxplorer:afterApply-login", function(){
-                    var f= modal.getForm();
-
-                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
-
-                    if(!enableModifyGUI) return;
-
-                    if(f.down('input[name="otp_code"]')){
-                        return;
-                    }
-                    try{
-                        var el = f.down('input[name="password"]').up("div.SF_element");
-                        var clone = el.cloneNode(true);
-                        el.insert({after:clone});
-                        var newField = clone.down('input[name="password"]');
-                        newField.writeAttribute('name', 'otp_code');
-                        newField.writeAttribute('data-ajxpLoginAdditionalParameter', 'true');
-                        clone.down('div.SF_label').update('Unique Code (6 digits)');
-                    }catch(e){
-                        if(console) console.log('Error while replacing OTP field', e);
-                    }
-                  });
-            </script>
+            <script></script>
             ]]></template>
         </client_configs>
     </registry_contributions>
