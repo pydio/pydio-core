@@ -575,6 +575,49 @@
             </processing>
         </action>
         <action name="share_react" forbidOverride="true"></action>
+        <action name="display_enterprise">
+            <gui text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-lightbulb" src="download_manager.png" hasAccessKey="false">
+                <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                         actionBar="false" contextMenu="false" infoPanel="false" inZip="false">
+                </context>
+            </gui>
+            <processing>
+                <clientCallback prepareModal="false" dialogOpenForm="enterprise_advertise_block" dialogOkButtonOnly="true" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+                        var lang = "en";
+                        if(pydio && pydio.currentLanguage === "fr") lang = "fr";
+                        else if(pydio && pydio.currentLanguage === "de") lang = "de";
+                        $(oForm).down("iframe").src = "https://pydio.com/"+lang+"/switch-pydio-enterprise";
+                        pydio.Controller.DISPLAY_ENTERPRISE_PING = true;
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[]]></dialogOnComplete>
+                </clientCallback>
+                <clientForm id="enterprise_advertise_block"><![CDATA[
+                        <div id="enterprise_advertise_block" box_width="70%" box_padding="0" box_height="80%" box_resize="true" style="height:100%;" class="vertical_layout">
+                            <iframe style="width: 100%; height: 90%; border: 0px solid #ddd;" class="vertical_fit"></iframe>
+                            <div style="padding:20px;">&nbsp;</div>
+                        </div>
+                    ]]></clientForm>
+                <clientListener name="init"><![CDATA[
+                    var conn = new Connexion();
+                    conn.addParameter("get_action", "display_enterprise");
+                    conn.onComplete = function(transport){
+                        var response = transport.responseJSON;
+                        if(response && response.display){
+                            pydio.Controller.fireAction("display_enterprise");
+                        }else if(response && !response.display){
+                            pydio.Controller.DISPLAY_ENTERPRISE_PING = true;
+                        }
+                    };
+                    window.setTimeout(function(){
+                        if(!pydio.Controller.DISPLAY_ENTERPRISE_PING){
+                            conn.sendAsync();
+                        }
+                    }, 5000);
+                    ]]></clientListener>
+                <serverCallback methodName="displayEnterprise"/>
+            </processing>
+        </action>
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

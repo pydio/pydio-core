@@ -2106,7 +2106,39 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
         return;
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @throws Exception
+     */
+    public function displayEnterprise($actionName, $httpVars, $fileVars){
 
+        $touchFile = $this->getPluginWorkDir(true).DIRECTORY_SEPARATOR."enterprise-display";
+        HTMLWriter::charsetHeader("application/json");
+        if(file_exists($touchFile)){
+            $lastDisplay = intval(file_get_contents($touchFile));
+            if(time() - $lastDisplay > 60 * 60 * 24 * 15){
+                echo json_encode(["display" => true]);
+                file_put_contents($touchFile, time());
+            }else{
+                echo json_encode(["display" => false]);
+            }
+        }else{
+            echo json_encode(["display" => true]);
+            file_put_contents($touchFile, time());
+        }
+    }
+
+    /**
+     * @param $dir
+     * @param null $root
+     * @param null $hash
+     * @param bool $returnNodes
+     * @param string $file
+     * @param null $aliasedDir
+     * @return array
+     */
     public function listPlugins($dir, $root = NULL, $hash = null, $returnNodes = false, $file="", $aliasedDir=null)
     {
         $dir = "/$dir";
