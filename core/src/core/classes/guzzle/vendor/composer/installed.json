@@ -1,51 +1,5 @@
 [
     {
-        "name": "react/promise",
-        "version": "v2.2.1",
-        "version_normalized": "2.2.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/reactphp/promise.git",
-            "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/reactphp/promise/zipball/3b6fca09c7d56321057fa8867c8dbe1abf648627",
-            "reference": "3b6fca09c7d56321057fa8867c8dbe1abf648627",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.4.0"
-        },
-        "time": "2015-07-03 13:48:55",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "React\\Promise\\": "src/"
-            },
-            "files": [
-                "src/functions_include.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Jan Sorgalla",
-                "email": "jsorgalla@gmail.com"
-            }
-        ],
-        "description": "A lightweight implementation of CommonJS Promises/A for PHP"
-    },
-    {
         "name": "guzzlehttp/streams",
         "version": "3.0.0",
         "version_normalized": "3.0.0.0",
@@ -151,66 +105,6 @@
         "description": "Provides a simple API and specification that abstracts away the details of HTTP into a single PHP function."
     },
     {
-        "name": "guzzlehttp/guzzle",
-        "version": "5.3.0",
-        "version_normalized": "5.3.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/guzzle/guzzle.git",
-            "reference": "f3c8c22471cb55475105c14769644a49c3262b93"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/f3c8c22471cb55475105c14769644a49c3262b93",
-            "reference": "f3c8c22471cb55475105c14769644a49c3262b93",
-            "shasum": ""
-        },
-        "require": {
-            "guzzlehttp/ringphp": "^1.1",
-            "php": ">=5.4.0"
-        },
-        "require-dev": {
-            "ext-curl": "*",
-            "phpunit/phpunit": "^4.0",
-            "psr/log": "^1.0"
-        },
-        "time": "2015-05-20 03:47:55",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "5.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "GuzzleHttp\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Michael Dowling",
-                "email": "mtdowling@gmail.com",
-                "homepage": "https://github.com/mtdowling"
-            }
-        ],
-        "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
-        "homepage": "http://guzzlephp.org/",
-        "keywords": [
-            "client",
-            "curl",
-            "framework",
-            "http",
-            "http client",
-            "rest",
-            "web service"
-        ]
-    },
-    {
         "name": "guzzlehttp/command",
         "version": "0.7.1",
         "version_normalized": "0.7.1.0",
@@ -308,27 +202,27 @@
     },
     {
         "name": "symfony/yaml",
-        "version": "v2.8.2",
-        "version_normalized": "2.8.2.0",
+        "version": "v3.1.2",
+        "version_normalized": "3.1.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/yaml.git",
-            "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8"
+            "reference": "2884c26ce4c1d61aebf423a8b912950fe7c764de"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/yaml/zipball/34c8a4b51e751e7ea869b8262f883d008a2b81b8",
-            "reference": "34c8a4b51e751e7ea869b8262f883d008a2b81b8",
+            "url": "https://api.github.com/repos/symfony/yaml/zipball/2884c26ce4c1d61aebf423a8b912950fe7c764de",
+            "reference": "2884c26ce4c1d61aebf423a8b912950fe7c764de",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.9"
+            "php": ">=5.5.9"
         },
-        "time": "2016-01-13 10:28:07",
+        "time": "2016-06-29 05:41:56",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.8-dev"
+                "dev-master": "3.1-dev"
             }
         },
         "installation-source": "dist",
@@ -359,27 +253,27 @@
     },
     {
         "name": "symfony/filesystem",
-        "version": "v2.8.2",
-        "version_normalized": "2.8.2.0",
+        "version": "v3.1.2",
+        "version_normalized": "3.1.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/filesystem.git",
-            "reference": "637b64d0ee10f44ae98dbad651b1ecdf35a11e8c"
+            "reference": "322da5f0910d8aa0b25fa65ffccaba68dbddb890"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/filesystem/zipball/637b64d0ee10f44ae98dbad651b1ecdf35a11e8c",
-            "reference": "637b64d0ee10f44ae98dbad651b1ecdf35a11e8c",
+            "url": "https://api.github.com/repos/symfony/filesystem/zipball/322da5f0910d8aa0b25fa65ffccaba68dbddb890",
+            "reference": "322da5f0910d8aa0b25fa65ffccaba68dbddb890",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.9"
+            "php": ">=5.5.9"
         },
-        "time": "2016-01-13 10:28:07",
+        "time": "2016-06-29 05:41:56",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.8-dev"
+                "dev-master": "3.1-dev"
             }
         },
         "installation-source": "dist",
@@ -410,28 +304,31 @@
     },
     {
         "name": "symfony/config",
-        "version": "v2.8.2",
-        "version_normalized": "2.8.2.0",
+        "version": "v3.1.2",
+        "version_normalized": "3.1.2.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/config.git",
-            "reference": "41ee6c70758f40fa1dbf90d019ae0a66c4a09e74"
+            "reference": "bcf5aebabc95b56e370e13d78565f74c7d8726dc"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/config/zipball/41ee6c70758f40fa1dbf90d019ae0a66c4a09e74",
-            "reference": "41ee6c70758f40fa1dbf90d019ae0a66c4a09e74",
+            "url": "https://api.github.com/repos/symfony/config/zipball/bcf5aebabc95b56e370e13d78565f74c7d8726dc",
+            "reference": "bcf5aebabc95b56e370e13d78565f74c7d8726dc",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.3.9",
-            "symfony/filesystem": "~2.3|~3.0.0"
+            "php": ">=5.5.9",
+            "symfony/filesystem": "~2.8|~3.0"
         },
-        "time": "2016-01-03 15:33:41",
+        "suggest": {
+            "symfony/yaml": "To use the yaml reference dumper"
+        },
+        "time": "2016-06-29 05:41:56",
         "type": "library",
         "extra": {
             "branch-alias": {
-                "dev-master": "2.8-dev"
+                "dev-master": "3.1-dev"
             }
         },
         "installation-source": "dist",
@@ -462,25 +359,25 @@
     },
     {
         "name": "gimler/guzzle-description-loader",
-        "version": "v0.0.2",
-        "version_normalized": "0.0.2.0",
+        "version": "v0.0.4",
+        "version_normalized": "0.0.4.0",
         "source": {
             "type": "git",
             "url": "https://github.com/gimler/guzzle-description-loader.git",
-            "reference": "71f8519fdde29c5729469e9f26a707360d63f109"
+            "reference": "d1384a65ffb1a10a7e9e17c427e77b281ae38498"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/gimler/guzzle-description-loader/zipball/71f8519fdde29c5729469e9f26a707360d63f109",
-            "reference": "71f8519fdde29c5729469e9f26a707360d63f109",
+            "url": "https://api.github.com/repos/gimler/guzzle-description-loader/zipball/d1384a65ffb1a10a7e9e17c427e77b281ae38498",
+            "reference": "d1384a65ffb1a10a7e9e17c427e77b281ae38498",
             "shasum": ""
         },
         "require": {
-            "php": ">=5.4.0",
-            "symfony/config": "~2.7",
-            "symfony/yaml": "~2.7"
+            "php": ">=5.5.0",
+            "symfony/config": "~3.0",
+            "symfony/yaml": "~3.0"
         },
-        "time": "2015-12-15 08:22:42",
+        "time": "2016-01-27 06:35:21",
         "type": "library",
         "installation-source": "dist",
         "autoload": {
@@ -503,5 +400,198 @@
             }
         ],
         "description": "Load guzzle service description from various file formats"
+    },
+    {
+        "name": "react/promise",
+        "version": "v2.4.1",
+        "version_normalized": "2.4.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/reactphp/promise.git",
+            "reference": "8025426794f1944de806618671d4fa476dc7626f"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/reactphp/promise/zipball/8025426794f1944de806618671d4fa476dc7626f",
+            "reference": "8025426794f1944de806618671d4fa476dc7626f",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.4.0"
+        },
+        "time": "2016-05-03 17:50:52",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "React\\Promise\\": "src/"
+            },
+            "files": [
+                "src/functions_include.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Jan Sorgalla",
+                "email": "jsorgalla@gmail.com"
+            }
+        ],
+        "description": "A lightweight implementation of CommonJS Promises/A for PHP"
+    },
+    {
+        "name": "firebase/php-jwt",
+        "version": "v2.2.0",
+        "version_normalized": "2.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/firebase/php-jwt.git",
+            "reference": "e0a75bfb6413f22092c99b70f310ccb2cca3efa5"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/firebase/php-jwt/zipball/e0a75bfb6413f22092c99b70f310ccb2cca3efa5",
+            "reference": "e0a75bfb6413f22092c99b70f310ccb2cca3efa5",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.2.0"
+        },
+        "time": "2015-06-22 23:26:39",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "Authentication/",
+                "Exceptions/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Neuman Vong",
+                "email": "neuman+pear@twilio.com",
+                "role": "Developer"
+            },
+            {
+                "name": "Anant Narayanan",
+                "email": "anant@php.net",
+                "role": "Developer"
+            }
+        ],
+        "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
+        "homepage": "https://github.com/firebase/php-jwt"
+    },
+    {
+        "name": "guzzlehttp/guzzle",
+        "version": "5.3.1",
+        "version_normalized": "5.3.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/guzzle/guzzle.git",
+            "reference": "70f1fa53b71c4647bf2762c09068a95f77e12fb8"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/guzzle/guzzle/zipball/70f1fa53b71c4647bf2762c09068a95f77e12fb8",
+            "reference": "70f1fa53b71c4647bf2762c09068a95f77e12fb8",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/ringphp": "^1.1",
+            "php": ">=5.4.0"
+        },
+        "require-dev": {
+            "ext-curl": "*",
+            "phpunit/phpunit": "^4.0"
+        },
+        "time": "2016-07-15 19:28:39",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "GuzzleHttp\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Dowling",
+                "email": "mtdowling@gmail.com",
+                "homepage": "https://github.com/mtdowling"
+            }
+        ],
+        "description": "Guzzle is a PHP HTTP client library and framework for building RESTful web service clients",
+        "homepage": "http://guzzlephp.org/",
+        "keywords": [
+            "client",
+            "curl",
+            "framework",
+            "http",
+            "http client",
+            "rest",
+            "web service"
+        ]
+    },
+    {
+        "name": "commerceguys/guzzle-oauth2-plugin",
+        "version": "v2.1.1",
+        "version_normalized": "2.1.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/commerceguys/guzzle-oauth2-plugin.git",
+            "reference": "f7ed19171c3c5accfb6f0b3d1209eb5815ef8148"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/commerceguys/guzzle-oauth2-plugin/zipball/f7ed19171c3c5accfb6f0b3d1209eb5815ef8148",
+            "reference": "f7ed19171c3c5accfb6f0b3d1209eb5815ef8148",
+            "shasum": ""
+        },
+        "require": {
+            "firebase/php-jwt": "~2.0",
+            "guzzlehttp/guzzle": "~5.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.5"
+        },
+        "time": "2015-12-12 23:27:25",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "CommerceGuys\\Guzzle\\Oauth2\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Bojan Zivanovic"
+            },
+            {
+                "name": "Damien Tournoud"
+            },
+            {
+                "name": "Patrick Dawkins"
+            }
+        ],
+        "description": "An OAuth2 plugin (subscriber) for Guzzle"
     }
 ]

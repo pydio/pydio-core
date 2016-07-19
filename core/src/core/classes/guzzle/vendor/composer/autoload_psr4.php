@@ -16,4 +16,5 @@ return array(
     'GuzzleHttp\\Command\\Guzzle\\' => array($vendorDir . '/guzzlehttp/guzzle-services/src'),
     'GuzzleHttp\\Command\\' => array($vendorDir . '/guzzlehttp/command/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),
+    'CommerceGuys\\Guzzle\\Oauth2\\' => array($vendorDir . '/commerceguys/guzzle-oauth2-plugin/src'),
 );
