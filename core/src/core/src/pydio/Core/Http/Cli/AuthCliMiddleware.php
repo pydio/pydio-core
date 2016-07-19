@@ -39,6 +39,8 @@ use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Utils;
 use Pydio\Log\Core\Logger;
+use Pydio\Tasks\Task;
+use Pydio\Tasks\TaskService;
 use Symfony\Component\Console\Output\OutputInterface;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\Stream;
@@ -179,6 +181,7 @@ class AuthCliMiddleware
         $applyCallback = function ($userId, $baseGroup, $index, $total) use ($optRepoId, $requestInterface, $output, $next){
 
             $actionName = $requestInterface->getAttribute("action");
+            $taskId     = $requestInterface->getAttribute("pydio-task-id");
             $output->writeln("<info>*****************************</info>");
             $output->writeln("<info>Current User is '".$userId."'</info>");
             $output->writeln("<info>*****************************</info>");
@@ -236,7 +239,10 @@ class AuthCliMiddleware
 
                     }catch (\Exception $repoEx){
 
-                        $output->writeln("<error>".$repoEx->getMessage()."</error>");
+                        $output->writeln("<error>$taskId: ".$repoEx->getMessage()."</error>");
+                        if(!empty($taskId)){
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $repoEx->getMessage());
+                        }
 
                     }
 
@@ -244,7 +250,10 @@ class AuthCliMiddleware
 
             }catch (\Exception $userEx){
 
-                $output->writeln("<error>".$userEx->getMessage()."</error>");
+                $output->writeln("<error>USER: ".$userEx->getMessage()."</error>");
+                if(!empty($taskId)){
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $userEx->getMessage());
+                }
 
             }
 

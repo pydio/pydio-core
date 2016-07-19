@@ -97,6 +97,11 @@ class Task
     public $parameters;
 
     /**
+     * @var string
+     */
+    private $impersonateUsers;
+
+    /**
      * @var array
      */
     public $nodes = [];
@@ -320,9 +325,29 @@ class Task
         $this->parameters = $parameters;
     }
 
+    /**
+     * @param $nodePath
+     */
     public function attachToNode($nodePath){
         $this->nodes[] = $nodePath;
     }
+
+    /**
+     * @return string
+     */
+    public function getImpersonateUsers()
+    {
+        return $this->impersonateUsers;
+    }
+
+    /**
+     * @param string $impersonateUsers
+     */
+    public function setImpersonateUsers($impersonateUsers)
+    {
+        $this->impersonateUsers = $impersonateUsers;
+    }
+
 
 
 }

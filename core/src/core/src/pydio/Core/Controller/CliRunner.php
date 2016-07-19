@@ -49,7 +49,7 @@ class CliRunner
         $parameters = $task->getParameters();
         $task->setStatus(Task::STATUS_RUNNING);
         TaskService::getInstance()->updateTask($task);
-        self::applyActionInBackground($task->getContext(), $task->getAction(), $parameters, "", $task->getId());
+        self::applyActionInBackground($task->getContext(), $task->getAction(), $parameters, "", $task->getId(), $task->getImpersonateUsers());
 
     }
 
@@ -61,9 +61,10 @@ class CliRunner
      * @param array $parameters
      * @param string $statusFile
      * @param string $taskId
+     * @param string $impersonateUsers
      * @return null|UnixProcess
      */
-    public static function applyActionInBackground(ContextInterface $ctx, $actionName, $parameters, $statusFile = "", $taskId = null)
+    public static function applyActionInBackground(ContextInterface $ctx, $actionName, $parameters, $statusFile = "", $taskId = null, $impersonateUsers = null)
     {
         $repositoryId = $ctx->getRepositoryId();
         $user = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
@@ -82,6 +83,9 @@ class CliRunner
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
+        if($impersonateUsers !== null){
+            $cmd .= "-i=".$impersonateUsers;
+        }
         /* Inserted next 3 lines to quote the command if in windows - rmeske*/
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
             $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . chr(34) . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php" . chr(34) . " -u=$user -t=$token -a=$actionName -r=$repositoryId";
