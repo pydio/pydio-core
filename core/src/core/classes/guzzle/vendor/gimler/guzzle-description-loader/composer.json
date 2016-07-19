@@ -2,9 +2,9 @@
     "name": "gimler/guzzle-description-loader",
     "description": "Load guzzle service description from various file formats",
     "require": {
-        "php": ">=5.4.0",
-        "symfony/config": "~2.7",
-        "symfony/yaml": "~2.7"
+        "php": ">=5.5.0",
+        "symfony/config": "~3.0",
+        "symfony/yaml": "~3.0"
     },
     "license": "MIT",
     "authors": [

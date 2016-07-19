@@ -332,9 +332,7 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
      */
     protected function remapXml($value)
     {
-        foreach ($this->xmlRemappings as $transformation) {
-            list($singular, $plural) = $transformation;
-
+        foreach ($this->xmlRemappings as list($singular, $plural)) {
             if (!isset($value[$singular])) {
                 continue;
             }
@@ -349,8 +347,8 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     /**
      * Merges values together.
      *
-     * @param mixed $leftSide  The left side to merge.
-     * @param mixed $rightSide The right side to merge.
+     * @param mixed $leftSide  The left side to merge
+     * @param mixed $rightSide The right side to merge
      *
      * @return mixed The merged values
      *

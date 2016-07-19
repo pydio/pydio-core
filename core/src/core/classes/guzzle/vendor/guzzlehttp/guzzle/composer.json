@@ -18,7 +18,6 @@
     },
     "require-dev": {
         "ext-curl": "*",
-        "psr/log": "^1.0",
         "phpunit/phpunit": "^4.0"
     },
     "autoload": {
@@ -29,11 +28,6 @@
     "autoload-dev": {
         "psr-4": {
             "GuzzleHttp\\Tests\\": "tests/"
-        }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "5.0-dev"
         }
     }
 }

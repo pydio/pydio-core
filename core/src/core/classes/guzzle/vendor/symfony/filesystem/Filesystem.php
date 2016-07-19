@@ -24,18 +24,18 @@ class Filesystem
     /**
      * Copies a file.
      *
-     * This method only copies the file if the origin file is newer than the target file.
+     * If the target file is older than the origin file, it's always overwritten.
+     * If the target file is newer, it is overwritten only when the
+     * $overwriteNewerFiles option is set to true.
      *
-     * By default, if the target already exists, it is not overridden.
-     *
-     * @param string $originFile The original filename
-     * @param string $targetFile The target filename
-     * @param bool   $override   Whether to override an existing file or not
+     * @param string $originFile          The original filename
+     * @param string $targetFile          The target filename
+     * @param bool   $overwriteNewerFiles If true, target files newer than origin files are overwritten
      *
      * @throws FileNotFoundException When originFile doesn't exist
      * @throws IOException           When copy fails
      */
-    public function copy($originFile, $targetFile, $override = false)
+    public function copy($originFile, $targetFile, $overwriteNewerFiles = false)
     {
         if (stream_is_local($originFile) && !is_file($originFile)) {
             throw new FileNotFoundException(sprintf('Failed to copy "%s" because file does not exist.', $originFile), 0, null, $originFile);
@@ -44,7 +44,7 @@ class Filesystem
         $this->mkdir(dirname($targetFile));
 
         $doCopy = true;
-        if (!$override && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
+        if (!$overwriteNewerFiles && null === parse_url($originFile, PHP_URL_HOST) && is_file($targetFile)) {
             $doCopy = filemtime($originFile) > filemtime($targetFile);
         }
 
@@ -115,6 +115,10 @@ class Filesystem
     public function exists($files)
     {
         foreach ($this->toIterator($files) as $file) {
+            if ('\\' === DIRECTORY_SEPARATOR && strlen($file) > 258) {
+                throw new IOException('Could not check if file exist because path length exceeds 258 characters.', 0, null, $file);
+            }
+
             if (!file_exists($file)) {
                 return false;
             }
@@ -151,30 +155,29 @@ class Filesystem
      */
     public function remove($files)
     {
-        $files = iterator_to_array($this->toIterator($files));
+        if ($files instanceof \Traversable) {
+            $files = iterator_to_array($files, false);
+        } elseif (!is_array($files)) {
+            $files = array($files);
+        }
         $files = array_reverse($files);
         foreach ($files as $file) {
-            if (!file_exists($file) && !is_link($file)) {
-                continue;
-            }
-
-            if (is_dir($file) && !is_link($file)) {
-                $this->remove(new \FilesystemIterator($file));
-
-                if (true !== @rmdir($file)) {
-                    throw new IOException(sprintf('Failed to remove directory "%s".', $file), 0, null, $file);
+            if (is_link($file)) {
+                // See https://bugs.php.net/52176
+                if (!@(unlink($file) || '\\' !== DIRECTORY_SEPARATOR || rmdir($file)) && file_exists($file)) {
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to remove symlink "%s": %s.', $file, $error['message']));
                 }
-            } else {
-                // https://bugs.php.net/bug.php?id=52176
-                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
-                    if (true !== @rmdir($file)) {
-                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
-                    }
-                } else {
-                    if (true !== @unlink($file)) {
-                        throw new IOException(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
-                    }
+            } elseif (is_dir($file)) {
+                $this->remove(new \FilesystemIterator($file, \FilesystemIterator::CURRENT_AS_PATHNAME | \FilesystemIterator::SKIP_DOTS));
+
+                if (!@rmdir($file) && file_exists($file)) {
+                    $error = error_get_last();
+                    throw new IOException(sprintf('Failed to remove directory "%s": %s.', $file, $error['message']));
                 }
+            } elseif (!@unlink($file) && file_exists($file)) {
+                $error = error_get_last();
+                throw new IOException(sprintf('Failed to remove file "%s": %s.', $file, $error['message']));
             }
         }
     }
@@ -268,13 +271,29 @@ class Filesystem
     public function rename($origin, $target, $overwrite = false)
     {
         // we check that target does not exist
-        if (!$overwrite && is_readable($target)) {
+        if (!$overwrite && $this->isReadable($target)) {
             throw new IOException(sprintf('Cannot rename because the target "%s" already exists.', $target), 0, null, $target);
         }
 
         if (true !== @rename($origin, $target)) {
             throw new IOException(sprintf('Cannot rename "%s" to "%s".', $origin, $target), 0, null, $target);
         }
+    }
+
+    /**
+     * Tells whether a file exists and is readable.
+     *
+     * @param string $filename Path to the file
+     *
+     * @throws IOException When windows path is longer than 258 characters
+     */
+    private function isReadable($filename)
+    {
+        if ('\\' === DIRECTORY_SEPARATOR && strlen($filename) > 258) {
+            throw new IOException('Could not check if file is readable because path length exceeds 258 characters.', 0, null, $filename);
+        }
+
+        return is_readable($filename);
     }
 
     /**
@@ -288,10 +307,15 @@ class Filesystem
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        if ('\\' === DIRECTORY_SEPARATOR && $copyOnWindows) {
-            $this->mirror($originDir, $targetDir);
+        if ('\\' === DIRECTORY_SEPARATOR) {
+            $originDir = strtr($originDir, '/', '\\');
+            $targetDir = strtr($targetDir, '/', '\\');
 
-            return;
+            if ($copyOnWindows) {
+                $this->mirror($originDir, $targetDir);
+
+                return;
+            }
         }
 
         $this->mkdir(dirname($targetDir));
@@ -413,7 +437,7 @@ class Filesystem
             $target = str_replace($originDir, $targetDir, $file->getPathname());
 
             if ($copyOnWindows) {
-                if (is_link($file) || is_file($file)) {
+                if (is_file($file)) {
                     $this->copy($file, $target, isset($options['override']) ? $options['override'] : false);
                 } elseif (is_dir($file)) {
                     $this->mkdir($target);
@@ -455,23 +479,23 @@ class Filesystem
     /**
      * Creates a temporary file with support for custom stream wrappers.
      *
-     * @param string $dir    The directory where the temporary filename will be created.
-     * @param string $prefix The prefix of the generated temporary filename.
-     *                       Note: Windows uses only the first three characters of prefix.
+     * @param string $dir    The directory where the temporary filename will be created
+     * @param string $prefix The prefix of the generated temporary filename
+     *                       Note: Windows uses only the first three characters of prefix
      *
-     * @return string The new temporary filename (with path), or throw an exception on failure.
+     * @return string The new temporary filename (with path), or throw an exception on failure
      */
     public function tempnam($dir, $prefix)
     {
         list($scheme, $hierarchy) = $this->getSchemeAndHierarchy($dir);
 
-        // If no scheme or scheme is "file" create temp file in local filesystem
-        if (null === $scheme || 'file' === $scheme) {
+        // If no scheme or scheme is "file" or "gs" (Google Cloud) create temp file in local filesystem
+        if (null === $scheme || 'file' === $scheme || 'gs' === $scheme) {
             $tmpFile = tempnam($hierarchy, $prefix);
 
             // If tempnam failed or no scheme return the filename otherwise prepend the scheme
             if (false !== $tmpFile) {
-                if (null !== $scheme) {
+                if (null !== $scheme && 'gs' !== $scheme) {
                     return $scheme.'://'.$tmpFile;
                 }
 
@@ -507,14 +531,12 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to.
-     * @param string   $content  The data to write into the file.
-     * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
-     *                           Deprecated since version 2.3.12, to be removed in 3.0.
+     * @param string $filename The file to be written to
+     * @param string $content  The data to write into the file
      *
      * @throws IOException If the file cannot be written to.
      */
-    public function dumpFile($filename, $content, $mode = 0666)
+    public function dumpFile($filename, $content)
     {
         $dir = dirname($filename);
 
@@ -524,19 +546,16 @@ class Filesystem
             throw new IOException(sprintf('Unable to write to the "%s" directory.', $dir), 0, null, $dir);
         }
 
+        // Will create a temp file with 0600 access rights
+        // when the filesystem supports chmod.
         $tmpFile = $this->tempnam($dir, basename($filename));
 
         if (false === @file_put_contents($tmpFile, $content)) {
             throw new IOException(sprintf('Failed to write file "%s".', $filename), 0, null, $filename);
         }
 
-        if (null !== $mode) {
-            if (func_num_args() > 2) {
-                @trigger_error('Support for modifying file permissions is deprecated since version 2.3.12 and will be removed in 3.0.', E_USER_DEPRECATED);
-            }
-
-            $this->chmod($tmpFile, $mode);
-        }
+        // Ignore for filesystems that do not support umask
+        @chmod($tmpFile, 0666);
         $this->rename($tmpFile, $filename, true);
     }
 
@@ -557,7 +576,7 @@ class Filesystem
     /**
      * Gets a 2-tuple of scheme (may be null) and hierarchical part of a filename (e.g. file:///tmp -> array(file, tmp)).
      *
-     * @param string $filename The filename to be parsed.
+     * @param string $filename The filename to be parsed
      *
      * @return array The filename scheme and hierarchical part
      */
