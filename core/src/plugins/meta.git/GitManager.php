@@ -178,6 +178,9 @@ class GitManager extends AbstractMetaSource
                     $outputStream = fopen("php://output", "a");
                     $this->executeCommandInStreams($git, $commandLine, $outputStream);
                     fclose($outputStream);
+                    if(intval(ini_get("output_buffering")) > 0){
+                        ob_end_flush();
+                    }
                 };
 
                 $async = new \Pydio\Core\Http\Response\AsyncResponseStream($reader);
