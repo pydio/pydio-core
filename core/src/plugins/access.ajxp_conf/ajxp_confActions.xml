@@ -59,19 +59,9 @@
                 <serverCallback methodName="listAllActions" restParams="/" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
             </processing>
         </action>
-        <action name="list_all_repositories">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all repository (output format is XML)"/>
-            </processing>
-        </action>
         <action name="list_all_repositories_json">
             <processing>
                 <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
-            </processing>
-        </action>
-        <action name="list_all_users">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all users"/>
             </processing>
         </action>
         <action name="generate_api_docs">
