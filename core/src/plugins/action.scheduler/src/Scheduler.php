@@ -104,9 +104,6 @@ class Scheduler extends Plugin
         if (!ConfService::backgroundActionsSupported()) {
             throw new Exception("The command line must be supported. See 'Pydio Core Options'.");
         }
-        if (!is_dir(dirname($this->getDbFile()))) {
-            throw new Exception("Could not create the db folder!");
-        }
     }
 
     /**
@@ -134,71 +131,6 @@ class Scheduler extends Plugin
         if (!$paramList->length) return;
         $paramNode = $paramList->item(0);
         $paramNode->attributes->getNamedItem("default")->nodeValue = $ctx->getUser()->getId();
-    }
-
-    /**
-     * @param $tId
-     * @return mixed
-     * @throws Exception
-     */
-    public function getTaskById($tId)
-    {
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-        foreach ($tasks as $task) {
-            if (!empty($task["task_id"]) && $task["task_id"] == $tId) {
-                return $task;
-            }
-        }
-        throw new Exception("Cannot find task");
-    }
-
-    /**
-     * @param $taskId
-     * @param $status
-     * @param string $statusMessage
-     */
-    public function setTaskStatus($taskId, $status, $statusMessage)
-    {
-        $tData = $this->getTaskById($taskId);
-        if(isSet($tData["job_id"])){
-            $runningTask = TaskService::getInstance()->getTaskById($tData["job_id"]);
-            $runningTask->setStatus($status);
-            $runningTask->setStatusMessage($statusMessage);
-            TaskService::getInstance()->updateTask($runningTask);
-        }
-    }
-
-    /**
-     * @param $taskId
-     * @return array|bool
-     */
-    public function getTaskStatus($taskId)
-    {
-        $tData = $this->getTaskById($taskId);
-        if(isSet($tData["job_id"])) {
-            $runningTask = TaskService::getInstance()->getTaskById($tData["job_id"]);
-            if($runningTask === null){
-                return [Task::STATUS_PENDING, "Pending"];
-            }
-            return [$runningTask->getStatus(), $runningTask->getStatusMessage()];
-        }
-        return [Task::STATUS_PENDING, "Pending"];
-    }
-
-    /**
-     * @return int
-     */
-    public function countCurrentlyRunning()
-    {
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-        $count = 0;
-        foreach ($tasks as $task) {
-            $s = $this->getTaskStatus($task["task_id"]);
-            if ($s !== false && $s[0] == "RUNNING") {
-                $count++;
-            }
-        }
-        return $count;
     }
 
     /**
@@ -274,6 +206,7 @@ class Scheduler extends Plugin
             case "scheduler_runAll":
 
                 $message = "";
+                $this->migrateLegacyTasks();
                 $tasks = TaskService::getInstance()->getScheduledTasks();
                 foreach($tasks as $task){
                     $res = $this->runTask($ctx, $task->getId());
@@ -365,7 +298,7 @@ class Scheduler extends Plugin
                     $task->setId(StringHelper::createGUID());
                     $task->setType(Task::TYPE_ADMIN);
                 }
-                $task->setStatus(Task::STATUS_PENDING);
+                $task->setStatus(Task::STATUS_TEMPLATE);
                 $task->setStatusMessage("Scheduled");
                 $task->setAction($actionName);
                 $task->setParameters($parameters);
@@ -516,6 +449,7 @@ class Scheduler extends Plugin
             ->appendColumn("action.scheduler.13", "STATUS");
 
         $basePath = "/$rootPath/$relativePath";
+        $this->migrateLegacyTasks();
         $tasks = TaskService::getInstance()->getScheduledTasks();
         foreach($tasks as $task){
 
@@ -582,6 +516,30 @@ class Scheduler extends Plugin
     }
 
     /**
+     * Migrate old JSON file format to TaskService
+     */
+    protected function migrateLegacyTasks(){
+        $dbFile = $this->getDbFile();
+        if(!file_exists($dbFile)) return;
+        $tasks = FileHelper::loadSerialFile($dbFile, false, "json");
+        foreach ($tasks as $tData){
+            $t = new Task();
+            $t->setId(StringHelper::createGUID());
+            $t->setLabel($tData["label"]);
+            $t->setAction($tData["action_name"]);
+            $t->setParameters($tData["PARAMS"]);
+            $t->setSchedule(new Schedule(Schedule::TYPE_RECURRENT, $tData["schedule"]));
+            $t->setUserId($tData["user_id"]);
+            $t->setWsId($tData["repository_id"]);
+            $t->setType(Task::TYPE_ADMIN);
+            $t->setStatus(Task::STATUS_TEMPLATE);
+            $t->setStatusMessage("Scheduled");
+            TaskService::getInstance()->createTask($t, $t->getSchedule());
+        }
+        @unlink($dbFile);
+    }
+
+    /**
      * @param $taskId
      * @param $label
      * @param $schedule
@@ -618,20 +576,5 @@ class Scheduler extends Plugin
 
     }
 
-    /**
-     * @param $taskId
-     * @throws Exception
-     */
-    public function removeTask($taskId)
-    {
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-        foreach ($tasks as $index => $task) {
-            if ($task["task_id"] == $taskId) {
-                unset($tasks[$index]);
-                break;
-            }
-        }
-        FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
-    }
 
 }

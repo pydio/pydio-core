@@ -117,6 +117,9 @@ class TaskService implements ITasksProvider
      */
     protected function publishTaskUpdate(Task $task){
 
+        if($task->getStatus() === Task::STATUS_TEMPLATE){
+            return;
+        }
         $json = StringHelper::xmlEntities(json_encode($task));
         if(count($task->nodes)){
             $nodesDiff = new NodesDiff();

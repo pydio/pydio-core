@@ -26,6 +26,10 @@ use Pydio\Core\Model\ContextInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class Task
+ * @package Pydio\Tasks
+ */
 class Task
 {
     const TYPE_USER     = 1;
@@ -36,6 +40,7 @@ class Task
     const STATUS_COMPLETE = 4;
     const STATUS_FAILED = 8;
     const STATUS_PAUSED = 16;
+    const STATUS_TEMPLATE = 32;
 
     const FLAG_STOPPABLE    = 1;
     const FLAG_RESUMABLE    = 2;
