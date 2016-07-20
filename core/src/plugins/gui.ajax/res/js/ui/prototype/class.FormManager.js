@@ -428,7 +428,11 @@ Class.create("FormManager", {
                                 var opt = new Element("OPTGROUP", {label:key});
                                 element.insert(opt);
                                 for (var index=0;index<json.LIST[key].length;index++){
-                                    element.insert(new Element("OPTION").update(json.LIST[key][index].action));
+                                    var option = new Element("OPTION").update(json.LIST[key][index].action);
+                                    if(json.LIST[key][index].action == defaultValue) {
+                                        option.setAttribute("selected", "true");
+                                    }
+                                    element.insert(option);
                                 }
                             }
                         }
@@ -436,7 +440,9 @@ Class.create("FormManager", {
                         for (key in json.LIST){
                             if(json.LIST.hasOwnProperty(key)){
                                 var option = new Element("OPTION", {value:key}).update(json.LIST[key]);
-                                if(key == defaultValue) option.setAttribute("selected", "true");
+                                if(key == defaultValue) {
+                                    option.setAttribute("selected", "true");
+                                }
                                 element.insert(option);
                             }
                         }
