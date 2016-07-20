@@ -283,7 +283,7 @@
         </action>
         <action name="list_all_repositories_json">
             <processing>
-                <serverCallback methodName="repositoriesActions" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
+                <serverCallback methodName="repositoriesAction" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
             </processing>
         </action>
 
