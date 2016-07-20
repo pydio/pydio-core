@@ -4,19 +4,9 @@
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
             <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
-            <js className="Scheduler" file="plugins/action.scheduler/build/Scheduler.js" depends="React"/>
         </resources>
     </client_settings>
     <registry_contributions>
-        <client_configs>
-            <template element="ajxp_desktop" name="scheduler_style" position="after"><![CDATA[
-            <style>
-                .scheduler-list .mui-toolbar-group.mui-left {
-                    width: 88% !important;
-                }
-            </style>
-            ]]></template>
-        </client_configs>
         <actions>
             <action name="scheduler_menu">
                 <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
@@ -263,7 +253,7 @@
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
-                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task,scheduler_error_task"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
@@ -284,6 +274,27 @@
                     <serverCallback methodName="handleTasks" developerComment="Remove a given task from scheduler">
                         <input_param description="Id of the task to delete" name="task_id" type="string" mandatory="true"/>
                     </serverCallback>
+                </processing>
+            </action>
+            <action name="scheduler_stopRunningTask">
+                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="get"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_running_task"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var userSelection;
+                        if(window.actionArguments && window.actionArguments.length){
+                            userSelection = window.actionArguments[0];
+                        }else{
+                            userSelection =  pydio.getUserSelection();
+                        }
+                        var taskId = userSelection.getUniqueNode().getMetadata().get("task_id");
+                        var task = new PydioTasks.Task({id:taskId});
+                        task.stop();
+                    ]]></clientCallback>
                 </processing>
             </action>
             <action name="scheduler_fakeLongTask">

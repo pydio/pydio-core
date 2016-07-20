@@ -58,4 +58,6 @@ $mess = array(
     "22" => "Agendamento Genérico para correr tarefas de forma regular. Requer a activação de CLI e de uma Tabela Cronológica ou de um sistema semelhante.",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

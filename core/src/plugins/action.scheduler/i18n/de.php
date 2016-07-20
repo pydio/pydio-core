@@ -58,4 +58,6 @@ $mess = array(
     "22" => "Aufgabenplanung, um bestimmte Aufgaben regelmäßig zu starten. Benötigt die PHP-Kommandozeile und Crontab oder ein ähnliches System.",
     "23" => "Grundeinstellungen",
     "24" => "Parameter",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

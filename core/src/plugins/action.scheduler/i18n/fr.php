@@ -57,4 +57,6 @@ $mess = array(
     "22" => "Planificateur permettant l'exécution récurrente de tâches. Nécessite l'activation de la ligne de commande et un système type CRONTAB.",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

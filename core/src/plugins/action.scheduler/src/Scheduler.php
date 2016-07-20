@@ -494,11 +494,12 @@ class Scheduler extends Plugin
     protected function taskToNode(Task $task, $basePath, $dateFormat, $isChild = false){
 
         if($isChild){
-            $label = ($task->getStatus() === Task::STATUS_FAILED ? " --- ERROR" : " --- JOB RUNNING");
+            $label = ($task->getStatus() === Task::STATUS_FAILED ? "JOB ERROR" : "JOB RUNNING");
+            $mime = ($task->getStatus() === Task::STATUS_FAILED ? "scheduler_error_task" : "scheduler_running_task");
             $meta = [
                 "task_id"       => $task->getId(),
                 "icon"          => "scheduler/ICON_SIZE/task.png",
-                "ajxp_mime"     => "scheduler_task", // TODO: introduce a different mime for jobs?
+                "ajxp_mime"     => $mime,
                 "text"          => $label,
                 "label"         => $label,
                 "schedule"      => $task->getStatusMessage(),

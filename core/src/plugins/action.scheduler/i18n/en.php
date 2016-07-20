@@ -58,4 +58,6 @@ $mess = array(
     "22" => "Generic scheduler to perform tasks on a regular basis. Requires CLI activation and a CRONTAB or similar system.",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );
