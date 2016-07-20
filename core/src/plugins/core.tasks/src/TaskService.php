@@ -31,6 +31,8 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Vars\StringHelper;
 
@@ -262,13 +264,33 @@ class TaskService implements ITasksProvider
     }
 
     /**
-     * @param AbstractUser $user
-     * @param Repository $repository
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @param int $status
-     * @return Task[]
+     * @param int $scheduleType
+     * @param int $taskType
+     * @param string $parentUid
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getTasks($user = null, $repository = null, $status = -1)
+    public function getTasks($user = null, $repository = null, $status = -1, $scheduleType = -1, $taskType = Task::TYPE_USER, $parentUid = "")
     {
         return $this->realProvider->getTasks($user, $repository, $status);
     }
+
+    /**
+     * @return Task[]
+     */
+    public function getScheduledTasks()
+    {
+        return $this->realProvider->getScheduledTasks();
+    }
+
+    /**
+     * @param string $taskId
+     * @return Task[]
+     */
+    public function getChildrenTasks($taskId){
+        return $this->realProvider->getChildrenTasks($taskId);
+    }
+
 }

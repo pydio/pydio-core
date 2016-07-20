@@ -28,6 +28,9 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 class Task
 {
+    const TYPE_USER     = 1;
+    const TYPE_ADMIN    = 2;
+
     const STATUS_PENDING = 1;
     const STATUS_RUNNING = 2;
     const STATUS_COMPLETE = 4;
@@ -97,6 +100,26 @@ class Task
     public $parameters;
 
     /**
+     * @var int
+     */
+    public $type = self::TYPE_USER;
+
+    /**
+     * @var string Uid of parent task
+     */
+    public $parentId;
+
+    /**
+     * @var int
+     */
+    public $statusChangeDate;
+
+    /**
+     * @var int
+     */
+    public $creationDate;
+
+    /**
      * @var string
      */
     private $impersonateUsers;
@@ -106,12 +129,22 @@ class Task
      */
     public $nodes = [];
 
+    /**
+     * Task constructor.
+     */
     public function __construct()
     {
         $this->status = self::STATUS_PENDING;
         $this->parameters = [];
         $this->flags = 0;
         $this->schedule = Schedule::scheduleNow();
+    }
+
+    /**
+     * @return Task[]
+     */
+    public function getChildrenTasks(){
+        return TaskService::getInstance()->getChildrenTasks($this->id);
     }
 
     /**
@@ -146,14 +179,23 @@ class Task
         $this->flags = $flags;
     }
 
+    /**
+     * @return int
+     */
     public function isStoppable(){
         return $this->flags & Task::FLAG_STOPPABLE;
     }
 
+    /**
+     * @return int
+     */
     public function isResumable(){
         return $this->flags & Task::FLAG_RESUMABLE;
     }
 
+    /**
+     * @return int
+     */
     public function hasProgress(){
         return $this->flags & Task::FLAG_HAS_PROGRESS;
     }
@@ -346,6 +388,82 @@ class Task
     public function setImpersonateUsers($impersonateUsers)
     {
         $this->impersonateUsers = $impersonateUsers;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getParentId()
+    {
+        return $this->parentId;
+    }
+
+    /**
+     * @param string $parentId
+     */
+    public function setParentId($parentId)
+    {
+        $this->parentId = $parentId;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getStatusChangeDate()
+    {
+        if(!empty($this->statusChangeDate)){
+            $dTime = new \DateTime();
+            $dTime->setTimestamp($this->statusChangeDate);
+            return $dTime;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * @param int $statusChangeDate
+     */
+    public function setStatusChangeDate($statusChangeDate)
+    {
+        $this->statusChangeDate = $statusChangeDate;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getCreationDate()
+    {
+        if(!empty($this->creationDate)){
+            $dTime = new \DateTime();
+            $dTime->setTimestamp($this->creationDate);
+            return $dTime;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * @param int $creationDate
+     */
+    public function setCreationDate($creationDate)
+    {
+        $this->creationDate = $creationDate;
     }
 
 

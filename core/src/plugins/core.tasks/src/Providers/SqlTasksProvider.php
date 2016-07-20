@@ -21,40 +21,52 @@
 namespace Pydio\Tasks\Providers;
 
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractUser;
-
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
-
-
+/**
+ * Class SqlTasksProvider
+ * @package Pydio\Tasks\Providers
+ */
 class SqlTasksProvider implements ITasksProvider
 {
-
+    /**
+     * Serialize task for storing in ajxp_tasks
+     * @param Task $task
+     * @param bool $removeId
+     * @return array
+     */
     protected function taskToDBValues(Task $task, $removeId = false){
         $values = [
-            "flags"     => $task->getFlags(),
-            "label"     => $task->getLabel(),
-            "userId"    => $task->getUserId(),
-            "wsId"      => $task->getWsId(),
-            "status"    => $task->getStatus(),
-            "status_msg"=> $task->getStatusMessage(),
-            "progress"  => $task->getProgress(),
-            "schedule"  => json_encode($task->getSchedule()),
-            "action"    => $task->getAction(),
-            "parameters"=> json_encode($task->getParameters()),
-            "nodes"     => ""
+            "type"              => $task->getType(),
+            "parent_uid"        => $task->getParentId(),
+            "flags"             => $task->getFlags(),
+            "label"             => $task->getLabel(),
+            "userId"            => $task->getUserId(),
+            "wsId"              => $task->getWsId(),
+            "status"            => $task->getStatus(),
+            "status_msg"        => $task->getStatusMessage(),
+            "progress"          => $task->getProgress(),
+            "schedule"          => $task->getSchedule()->getType(),
+            "schedule_value"    => $task->getSchedule()->getValue(),
+            "action"            => $task->getAction(),
+            "parameters"        => json_encode($task->getParameters()),
+            "nodes"             => ""
         ];
         if(count($task->nodes)){
             $values["nodes"] = "|||".implode("|||", $task->nodes)."|||";
         }
         if(!$removeId){
+            // This is a creation
+            $values["creation_date"] = time();
             $values = array_merge(["uid" => $task->getId()], $values);
+        }else{
+            $values["status_update"] = time();
         }
         return $values;
     }
@@ -66,6 +78,10 @@ class SqlTasksProvider implements ITasksProvider
     protected function taskFromDBValues(\DibiRow $values){
         $task = new Task();
         $task->setId($values["uid"]);
+        $task->setType($values["type"]);
+        if(!empty($values["parent_uid"])){
+            $task->setParentId($values["parent_uid"]);
+        }
         $task->setFlags($values["flags"]);
         $task->setLabel($values["label"]);
         $task->setUserId($values["userId"]);
@@ -73,8 +89,10 @@ class SqlTasksProvider implements ITasksProvider
         $task->setStatus($values["status"]);
         $task->setStatusMessage($values["status_msg"]);
         $task->setProgress($values["progress"]);
-        $task->setSchedule(Schedule::fromJson($values["schedule"]));
+        $task->setSchedule(new Schedule($values["schedule"], $values["schedule_value"]));
         $task->setAction($values["action"]);
+        $task->setCreationDate($values["creation_date"]);
+        $task->setStatusChangeDate($values["status_update"]);
         $task->setParameters(json_decode($values["parameters"], true));
         $nodes = explode("|||", trim($values["nodes"], "|||"));
         foreach ($nodes as $node) {
@@ -103,6 +121,7 @@ class SqlTasksProvider implements ITasksProvider
         foreach ($res->fetchAll() as $row) {
             return $this->taskFromDBValues($row);
         }
+        return null;
     }
 
     /**
@@ -136,8 +155,31 @@ class SqlTasksProvider implements ITasksProvider
     }
 
     /**
-     * @param AbstractUser $user
-     * @param Repository $repository
+     * @return Task[]
+     */
+    public function getScheduledTasks(){
+        return $this->getTasks(null, null, -1, Schedule::TYPE_RECURRENT, Task::TYPE_ADMIN, AJXP_FILTER_EMPTY);
+    }
+
+    /**
+     * @param string $taskId
+     * @return Task[]
+     */
+    public function getChildrenTasks($taskId){
+        $tasks = [];
+        $where = [];
+        $where[] = array("[parent_uid] = %s", $taskId);
+        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
+        foreach ($res->fetchAll() as $row) {
+            $tasks[] = $this->taskFromDBValues($row);
+        }
+        return $tasks;
+    }
+
+
+    /**
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @return Task[]
      */
     public function getCurrentRunningTasks($user, $repository)
@@ -156,7 +198,6 @@ class SqlTasksProvider implements ITasksProvider
 
     /**
      * @param AJXP_Node $node
-     * @param $active
      * @return \Pydio\Tasks\Task[]
      */
     public function getActiveTasksForNode(AJXP_Node $node)
@@ -174,12 +215,15 @@ class SqlTasksProvider implements ITasksProvider
     }
 
     /**
-     * @param AbstractUser $user
-     * @param Repository $repository
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @param int $status
-     * @return Task[]
+     * @param int $scheduleType
+     * @param int $taskType
+     * @param string $parentUid
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getTasks($user = null, $repository = null, $status = -1)
+    public function getTasks($user = null, $repository = null, $status = -1, $scheduleType = -1, $taskType = Task::TYPE_USER, $parentUid = "")
     {
         $tasks = [];
         $where = [];
@@ -191,6 +235,19 @@ class SqlTasksProvider implements ITasksProvider
         }
         if($status !== -1){
             $where[] = array("[status] = %i", $status);
+        }
+        if($scheduleType !== -1){
+            $where[] = array("[schedule] = %i", $scheduleType);
+        }
+        if($taskType !== -1){
+            $where[] = array("[type] = %i", $taskType);
+        }
+        if(!empty($parentUid)){
+            if($parentUid === AJXP_FILTER_EMPTY){
+                $where[] = array("[parent_uid] IS NULL");
+            }else{
+                $where[] = array("[parent_uid] = %s", $parentUid);
+            }
         }
         $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
         foreach ($res->fetchAll() as $row) {

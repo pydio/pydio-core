@@ -29,6 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Controller\CliRunner;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
@@ -39,12 +40,13 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 
 use Cron\CronExpression;
+use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use Zend\Diactoros\Response\JsonResponse;
@@ -175,9 +177,12 @@ class Scheduler extends Plugin
         $tData = $this->getTaskById($taskId);
         if(isSet($tData["job_id"])) {
             $runningTask = TaskService::getInstance()->getTaskById($tData["job_id"]);
+            if($runningTask === null){
+                return [Task::STATUS_PENDING, "Pending"];
+            }
             return [$runningTask->getStatus(), $runningTask->getStatusMessage()];
         }
-        return [Task::STATUS_PENDING, "Not started"];
+        return [Task::STATUS_PENDING, "Pending"];
     }
 
     /**
@@ -207,86 +212,37 @@ class Scheduler extends Plugin
      */
     public function runTask(ContextInterface $ctx, $taskId, $status = null, &$currentlyRunning = -1, $forceStart = false)
     {
-        $data = $this->getTaskById($taskId);
-        $cron = CronExpression::factory($data["schedule"]);
-
         // TODO : Set MasterInterval as config, or detect last execution?
         $masterInterval = 1;
         $maximumProcesses = 2;
 
-        $now = time();
-        $nowDate = new \DateTime();
-        $nowDate->setTimestamp($now);
+        $task = TaskService::getInstance()->getTaskById($taskId);
+        $runningChildren = array_filter($task->getChildrenTasks(), function($child){
+            return ($child->getStatus() !== Task::STATUS_COMPLETE && $child->getStatus() !== Task::STATUS_FAILED);
+        });
+        $shouldRunNow = $task->getSchedule()->shouldRunNow($masterInterval);
+        $alreadyRunning = count($runningChildren) > 0;
 
-        $lastExec = time() - 60 * $masterInterval;
-        $lastExecDate = new \DateTime();
-        $lastExecDate->setTimestamp($lastExec);
+        if (($shouldRunNow && !$alreadyRunning) || $forceStart) {
 
-        $res = $cron->getNextRunDate($lastExecDate);
-
-
-        $alreadyRunning = false;
-        $queued = false;
-        if ($status == null) $status = $this->getTaskStatus($taskId);
-        if ($status !== false) {
-            if ($status[0] == "RUNNING") {
-                $alreadyRunning = true;
-            } else if (in_array("QUEUED", $status)) {
-                $queued = true; // Run now !
+            $job = clone $task;
+            $job->setId(StringHelper::createGUID());
+            $job->setParentId($task->getId());
+            $job->setStatus(Task::STATUS_PENDING);
+            $job->setStatusMessage("Starting...");
+            TaskService::getInstance()->createTask($job, new Schedule(Schedule::TYPE_ONCE_NOW));
+            if($job->getUserId() !== $ctx->getUser()->getId()){
+                $uId = $job->getUserId();
+                $job->setUserId($ctx->getUser()->getId());
+                $job->setImpersonateUsers($uId);
             }
-        }
-        if ($res >= $lastExecDate && $res < $nowDate && !$alreadyRunning && $currentlyRunning >= $maximumProcesses) {
-            $this->setTaskStatus($taskId, Task::STATUS_PENDING, "Queued");
-            $alreadyRunning = true;
-            $queued = false;
-        }
-        if (($res >= $lastExecDate && $res < $nowDate && !$alreadyRunning) || $queued || $forceStart) {
-            $job = TaskService::actionAsTask($ctx->withRepositoryId($data["repository_id"]), $data["action_name"], $data["PARAMS"]);
-            if(isSet($data["user_id"]) && $data["user_id"] !== $ctx->getUser()->getId()){
-                $job->setImpersonateUsers($data["user_id"]);
-            }
-            $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-            foreach($tasks as $tId => $tData){
-                if ($tData["task_id"] === $taskId){
-                    $tasks[$tId]["job_id"] = $job->getId();
-                }
-            }
-            FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
-
             CliRunner::applyTaskInBackground($job);
+
             $currentlyRunning++;
             return true;
         }
         return false;
     }
-
-    /**
-     * @param string $baseGroup
-     * @return array
-     */
-    protected function listUsersIds($baseGroup = "/")
-    {
-        $authDriver = ConfService::getAuthDriverImpl();
-        $pairs = $authDriver->listUsers($baseGroup);
-        return array_keys($pairs);
-    }
-
-    /**
-     * @param $users
-     * @param string $startGroup
-     */
-    protected function gatherUsers(&$users, $startGroup = "/")
-    {
-        $u = $this->listUsersIds($startGroup);
-        $users = array_merge($users, $u);
-        $g = UsersService::listChildrenGroups($startGroup);
-        if (count($g)) {
-            foreach ($g as $gName => $gLabel) {
-                $this->gatherUsers($users, $startGroup . $gName);
-            }
-        }
-    }
-
 
     /**
      * @param $data1
@@ -317,41 +273,25 @@ class Scheduler extends Plugin
             //------------------------------------
             case "scheduler_runAll":
 
-                $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
                 $message = "";
-                $startRunning = $this->countCurrentlyRunning();
-                foreach ($tasks as $index => $task) {
-                    $tasks[$index]["status"] = $this->getTaskStatus($task["task_id"]);
-                }
-                usort($tasks, array($this, "sortTasksByPriorityStatus"));
-                foreach ($tasks as $task) {
-                    if (isSet($task["task_id"])) {
-                        $res = $this->runTask($ctx, $task["task_id"], $task["status"], $startRunning);
-                        if ($res) {
-                            $message .= "Running " . $task["label"] . " \n ";
-                        }
+                $tasks = TaskService::getInstance()->getScheduledTasks();
+                foreach($tasks as $task){
+                    $res = $this->runTask($ctx, $task->getId());
+                    if($res){
+                        $message .= "Launching " . $task->getLabel() . " \n ";
                     }
                 }
                 if (empty($message)) $message = "Nothing to do";
-
-                if (ConfService::currentContextIsCommandLine()) {
-                    print(date("Y-m-d H:i:s") . "\t" . $message . "\n");
-                } else {
-                    XMLWriter::header();
-                    XMLWriter::sendMessage($message, null);
-                    XMLWriter::reloadDataNode();
-                    XMLWriter::close();
-                }
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($message), new ReloadMessage()]));
 
                 break;
 
             case "scheduler_runTask":
 
                 $err = -1;
-                $this->runTask($ctx, $requestInterface->getParsedBody()["task_id"], null, $err, true);
-                XMLWriter::header();
-                XMLWriter::reloadDataNode();
-                XMLWriter::close();
+                $tId = InputFilter::sanitize($requestInterface->getParsedBody()["task_id"], InputFilter::SANITIZE_ALPHANUM);
+                $this->runTask($ctx, $tId, null, $err, true);
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Launching task now"), new ReloadMessage()]));
 
                 break;
 
@@ -379,39 +319,29 @@ class Scheduler extends Plugin
      */
     public function handleTasks(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
         $action     = $requestInterface->getAttribute("action");
+        $ctx        = $requestInterface->getAttribute("ctx");
         $httpVars   = $requestInterface->getParsedBody();
 
         switch ($action) {
 
             case "scheduler_addTask":
 
-                if (isSet($httpVars["task_id"])) {
-                    foreach ($tasks as $index => $task) {
-                        if ($task["task_id"] == $httpVars["task_id"]) {
-                            $data = $task;
-                            $theIndex = $index;
-                        }
-                    }
-                }
-                if (!isSet($theIndex)) {
-                    $data = array();
-                    $data["task_id"] = substr(md5(time()), 0, 16);
-                }
-                $data["label"] = $httpVars["label"];
-                $data["schedule"] = $httpVars["schedule"];
-                $data["action_name"] = $httpVars["action_name"];
-                $data["repository_id"] = $httpVars["repository_id"];
+                $taskLabel = $httpVars["label"];
+                $cronValue = $httpVars["schedule"];
+                // Should throw an error if cron format is invalid
+                CronExpression::factory($cronValue);
+                $actionName = $httpVars["action_name"];
+                $repositoryId = $httpVars["repository_id"];
                 $i = 1;
                 while (array_key_exists("repository_id_" . $i, $httpVars)) {
-                    $data["repository_id"] .= "," . $httpVars["repository_id_" . $i];
+                    $repositoryId .= "," . $httpVars["repository_id_" . $i];
                     $i++;
                 }
-                $data["user_id"] = $httpVars["user_id"];
-                $data["PARAMS"] = array();
+                $userId = $httpVars["user_id"];
+                $parameters = array();
                 if (!empty($httpVars["param_name"]) && !empty($httpVars["param_value"])) {
-                    $data["PARAMS"][$httpVars["param_name"]] = $httpVars["param_value"];
+                    $parameters[$httpVars["param_name"]] = $httpVars["param_value"];
                 }
                 foreach ($httpVars as $key => $value) {
                     if (preg_match('/^param_name_/', $key)) {
@@ -419,51 +349,89 @@ class Scheduler extends Plugin
                         if (preg_match('/ajxptype/', $paramIndex)) continue;
                         if (preg_match('/replication/', $paramIndex)) continue;
                         if (isSet($httpVars["param_value_" . $paramIndex])) {
-                            $data["PARAMS"][$value] = $httpVars["param_value_" . $paramIndex];
+                            $parameters[$value] = $httpVars["param_value_" . $paramIndex];
                         }
                     }
                 }
-                if (isSet($theIndex)) $tasks[$theIndex] = $data;
-                else $tasks[] = $data;
-                FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
+
+                if(isSet($httpVars["task_id"])){
+                    $edit = true;
+                    $task = TaskService::getInstance()->getTaskById(InputFilter::sanitize($httpVars["task_id"], InputFilter::SANITIZE_ALPHANUM));
+                    $task->setAction($actionName);
+                    $task->setParameters($parameters);
+                }else{
+                    $edit = false;
+                    $task = new Task();
+                    $task->setId(StringHelper::createGUID());
+                    $task->setType(Task::TYPE_ADMIN);
+                }
+                $task->setStatus(Task::STATUS_PENDING);
+                $task->setStatusMessage("Scheduled");
+                $task->setAction($actionName);
+                $task->setParameters($parameters);
+                $task->setLabel($taskLabel);
+                $task->setWsId($repositoryId);
+                $task->setUserId($userId);
+                $task->setSchedule(new Schedule(Schedule::TYPE_RECURRENT, $cronValue));
+                if($edit) {
+                    TaskService::getInstance()->updateTask($task);
+                }else{
+                    TaskService::getInstance()->createTask($task, $task->getSchedule());
+                }
 
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Successfully added/edited task"), new ReloadMessage()]));
                 break;
 
             case "scheduler_removeTask" :
 
-                $this->removeTask($httpVars["task_id"]);
+                $task = TaskService::getInstance()->getTaskById(InputFilter::sanitize($httpVars["task_id"], InputFilter::SANITIZE_ALPHANUM));
+                if($task !== null){
+                    $children = $task->getChildrenTasks();
+                    if(!empty($children)){
+                        throw new PydioException("This task has currently jobs running, please wait that they are finished");
+                    }
+                    TaskService::getInstance()->deleteTask($task->getId());
+                }
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage("Successfully removed task"), new ReloadMessage()]));
                 break;
 
             case "scheduler_loadTask":
 
-                $tData = [];
-                foreach ($tasks as $task) {
-                    if ($task["task_id"] == $httpVars["task_id"]) {
-                        $index = 0;
-                        foreach ($task["PARAMS"] as $pName => $pValue) {
-                            if ($index == 0) {
-                                $task["param_name"] = $pName;
-                                $task["param_value"] = $pValue;
-                            } else {
-                                $task["param_name_" . $index] = $pName;
-                                $task["param_value_" . $index] = $pValue;
-                            }
-                            $index++;
-                        }
-                        unset($task["PARAMS"]);
-                        if (strpos($task["repository_id"], ",") !== false) {
-                            $ids = explode(",", $task["repository_id"]);
-                            $task["repository_id"] = $ids[0];
-                            for ($i = 1; $i < count($ids); $i++) {
-                                $task["repository_id_" . $i] = $ids[$i];
-                            }
-                        }
-                        $tData = $task;
-                        break;
-                    }
+                $task = TaskService::getInstance()->getTaskById(InputFilter::sanitize($httpVars["task_id"], InputFilter::SANITIZE_ALPHANUM));
+                if(empty($task)){
+                    throw new PydioException("Cannot find task");
                 }
+                $tData = [
+                    "task_id"       => $task->getId(),
+                    "action_name"   => $task->getAction(),
+                    "label"         => $task->getLabel(),
+                    "schedule"      => $task->getSchedule()->getValue(),
+                    "user_id"       => $task->getUserId()
+                ];
+                $parameters = $task->getParameters();
+                $repoId = $task->getWsId();
+
+                $index = 0;
+                foreach ($parameters as $pName => $pValue) {
+                    if ($index == 0) {
+                        $tData["param_name"] = $pName;
+                        $tData["param_value"] = $pValue;
+                    } else {
+                        $tData["param_name_" . $index] = $pName;
+                        $tData["param_value_" . $index] = $pValue;
+                    }
+                    $index++;
+                }
+                if (strpos($repoId, ",") !== false) {
+                    $ids = explode(",", $repoId);
+                    $tData["repository_id"] = $ids[0];
+                    for ($i = 1; $i < count($ids); $i++) {
+                        $tData["repository_id_" . $i] = $ids[$i];
+                    }
+                }else{
+                    $tData["repository_id"] = $repoId;
+                }
+
                 $responseInterface = new JsonResponse($tData);
 
                 break;
@@ -471,7 +439,6 @@ class Scheduler extends Plugin
             default:
                 break;
         }
-        //var_dump($tasks);
 
     }
 
@@ -536,7 +503,7 @@ class Scheduler extends Plugin
      */
     public function listTasks($httpVars, $rootPath, $relativePath, $paginationHash = null, $findNodePosition=null, $aliasedDir=null)
     {
-        $mess = LocaleService::getMessages();
+        $dateFormat = LocaleService::getMessages()["date_format"];
         $nodesList = new NodesList("/$rootPath/$relativePath");
         $nodesList->initColumnsData("filelist", "list", "action.scheduler_list")
             ->appendColumn("action.scheduler.12", "ajxp_label")
@@ -548,31 +515,70 @@ class Scheduler extends Plugin
             ->appendColumn("action.scheduler.14", "LAST_EXECUTION")
             ->appendColumn("action.scheduler.13", "STATUS");
 
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-        foreach ($tasks as $task) {
+        $basePath = "/$rootPath/$relativePath";
+        $tasks = TaskService::getInstance()->getScheduledTasks();
+        foreach($tasks as $task){
 
-            $cron = CronExpression::factory($task["schedule"]);
-            $next = $cron->getNextRunDate();
-            $task["NEXT_EXECUTION"] = $next->format($mess["date_format"]);
-            $task["PARAMS"] = implode(", ", $task["PARAMS"]);
-            $task["icon"] = "scheduler/ICON_SIZE/task.png";
-            $task["ajxp_mime"] = "scheduler_task";
-            $sFile = AJXP_CACHE_DIR . "/cmd_outputs/task_" . $task["task_id"] . ".status";
-            if (is_file($sFile)) {
-                $s = $this->getTaskStatus($task["task_id"]);
-                $task["STATUS"] = implode(":", $s);
-                $task["LAST_EXECUTION"] = date($mess["date_format"], filemtime($sFile));
-            } else {
-                $task["STATUS"] = "n/a";
-                $task["LAST_EXECUTION"] = "n/a";
+            $node = $this->taskToNode($task, $basePath, $dateFormat);
+            $children = $task->getChildrenTasks();
+            $running = [];
+            /** @var \DateTime $lastRunDate */
+            $lastRunDate = null;
+            foreach ($children as $child){
+                if($child->getStatus() !== Task::STATUS_COMPLETE){
+                    $running[] = $child;
+                }
+                $runDate = $child->getStatusChangeDate();
+                if($runDate !== null && $lastRunDate <= $runDate){
+                    $lastRunDate = $runDate;
+                }
             }
-            $task["text"] = (isSet($task["label"]) ? $task["label"] : "Action " . $task["action_name"]);
-            $key = "/$rootPath/$relativePath/".$task["task_id"];
-            $nodesList->addBranch(new AJXP_Node($key, $task));
+            if(count($running)){
+                $node->mergeMetadata(["LAST_EXECUTION" => "Jobs running"]);
+            }
+            $nodesList->addBranch($node);
+            if($lastRunDate !== null){
+                $node->mergeMetadata(["LAST_EXECUTION" => $lastRunDate->format($dateFormat)]);
+            }
+            foreach($running as $cTask){
+                $nodesList->addBranch($this->taskToNode($cTask, $basePath, $dateFormat, true));
+            }
+
         }
 
         return $nodesList;
 
+    }
+
+    /**
+     * @param Task $task
+     * @param $basePath
+     * @param $dateFormat
+     * @param bool $isChild
+     * @return AJXP_Node
+     */
+    protected function taskToNode(Task $task, $basePath, $dateFormat, $isChild = false){
+
+        $s = $task->getSchedule()->getValue();
+        $meta = [
+            "task_id"       => $task->getId(),
+            "icon"          => "scheduler/ICON_SIZE/task.png",
+            "ajxp_mime"     => ($isChild ? "scheduler_task":"scheduler_task"), // TODO: introduce a different mime for jobs?
+            "schedule"      => $s,
+            "text"          => ($isChild ? " ---- job running" : $task->getLabel()),
+            "label"         => ($isChild ? " ---- job running" : $task->getLabel()),
+            "action_name"   => $task->getAction(),
+            "repository_id" => $task->getWsId(),
+            "user_id"       => $task->getUserId(),
+            "STATUS"        => $task->getStatusMessage()
+        ];
+        $cron = CronExpression::factory($s);
+        $next = $cron->getNextRunDate();
+        $meta["NEXT_EXECUTION"] = ($isChild ? "-" : $next->format($dateFormat));
+        $meta["LAST_EXECUTION"] = "-";
+
+        $key = $basePath."/".$task->getId();
+        return new AJXP_Node($key, $meta);
     }
 
     /**

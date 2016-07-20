@@ -28,6 +28,10 @@ use Pydio\Core\Model\UserInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface ITasksProvider
+ * @package Pydio\Tasks
+ */
 interface ITasksProvider
 {
     /**
@@ -63,6 +67,11 @@ interface ITasksProvider
     public function getPendingTasks();
 
     /**
+     * @return Task[]
+     */
+    public function getScheduledTasks();
+
+    /**
      * @param UserInterface $user
      * @param RepositoryInterface $repository
      * @return Task[]
@@ -71,7 +80,6 @@ interface ITasksProvider
 
     /**
      * @param AJXP_Node $node
-     * @param $active
      * @return Task[]
      */
     public function getActiveTasksForNode(AJXP_Node $node);
@@ -80,7 +88,16 @@ interface ITasksProvider
      * @param UserInterface $user
      * @param RepositoryInterface $repository
      * @param int $status
+     * @param int $scheduleType
+     * @param int $taskType
+     * @param string $parentUid
+     * @return \Pydio\Tasks\Task[]
+     */
+    public function getTasks($user = null, $repository = null, $status = -1, $scheduleType = -1, $taskType = Task::TYPE_USER, $parentUid = "");
+
+    /**
+     * @param string $taskId
      * @return Task[]
      */
-    public function getTasks($user = null, $repository = null, $status = -1);
+    public function getChildrenTasks($taskId);
 }

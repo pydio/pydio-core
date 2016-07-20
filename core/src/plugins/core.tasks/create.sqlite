@@ -1,5 +1,7 @@
 CREATE TABLE ajxp_tasks (
   uid text NOT NULL ,
+  type INTEGER NOT NULL,
+  parent_uid text DEFAULT NULL,
   flags integer NOT NULL,
   label text NOT NULL,
   userId text NOT NULL,
@@ -7,13 +9,18 @@ CREATE TABLE ajxp_tasks (
   status INTEGER NOT NULL,
   status_msg text NOT NULL,
   progress INTEGER NOT NULL,
-  schedule text NOT NULL,
+  schedule INTEGER NOT NULL,
+  schedule_value text DEFAULT NULL,
   action text NOT NULL,
   parameters text NOT NULL,
-  nodes text NOT NULL
+  nodes text NOT NULL,
+  creation_date INTEGER NOT NULL DEFAULT 0,
+  status_update INTEGER NOT NULL DEFAULT 0,
 );
 
 CREATE INDEX ajxp_task_idx ON ajxp_tasks (uid);
 CREATE INDEX ajxp_task_usr_idx ON ajxp_tasks (userId);
 CREATE INDEX ajxp_task_status_idx ON ajxp_tasks (status);
+CREATE INDEX ajxp_task_type ON ajxp_tasks (type);
+CREATE INDEX ajxp_task_schedule ON ajxp_tasks (schedule);
 CREATE INDEX ajxp_task_nodes_idx ON ajxp_tasks (nodes);

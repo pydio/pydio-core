@@ -20,9 +20,14 @@
  */
 namespace Pydio\Tasks;
 
+use Cron\CronExpression;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class Schedule
+ * @package Pydio\Tasks
+ */
 class Schedule implements \JsonSerializable
 {
     const TYPE_RECURRENT = 1;
@@ -49,22 +54,74 @@ class Schedule implements \JsonSerializable
         $this->value = $value;
     }
 
-    public function shouldRunNow(){
-        return $this->type === self::TYPE_ONCE_NOW;
+    /**
+     * Detect if a task should run now
+     * @param int $recurringTimeInterval
+     * @return bool
+     */
+    public function shouldRunNow($recurringTimeInterval = 0){
+
+        if($this->type === self::TYPE_ONCE_NOW){
+            return true;
+        }
+        if($this->type !== self::TYPE_RECURRENT){
+            return false;
+        }
+
+        // Recurring task case : check CRON expression
+        $cron = CronExpression::factory($this->value);
+
+        $nowDate = new \DateTime();
+        $nowDate->setTimestamp(time());
+
+        $lastExecDate = new \DateTime();
+        $lastExecDate->setTimestamp($lastExec = time() - 60 * $recurringTimeInterval);
+
+        $nextRunDate = $cron->getNextRunDate($lastExecDate);
+        return ($nextRunDate >= $lastExecDate && $nextRunDate < $nowDate);
+
     }
 
+    /**
+     * @return Schedule
+     */
     public static function scheduleNow(){
         return new Schedule(self::TYPE_ONCE_NOW);
     }
 
+    /**
+     * @return Schedule
+     */
     public static function scheduleDeferred(){
         return new Schedule(self::TYPE_ONCE_DEFER);
     }
 
+    /**
+     * @param $recurringDescriptor
+     * @return Schedule
+     */
     public static function scheduleRecurring($recurringDescriptor){
         return new Schedule(self::TYPE_RECURRENT, $recurringDescriptor);
     }
 
+    /**
+     * @return int
+     */
+    public function getType(){
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getValue(){
+        return $this->value;
+    }
+
+    /**
+     * @param $data
+     * @return Schedule
+     */
     public static function fromJson($data){
         if(is_array($data)){
             return new Schedule($data["type"], $data["value"]);

@@ -24,6 +24,8 @@ namespace Pydio\Tasks\Providers;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Conf\Core\AbstractUser;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\Schedule;
 
@@ -99,12 +101,15 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     }
 
     /**
-     * @param \Pydio\Conf\Core\AbstractUser $user
-     * @param \Pydio\Access\Core\Model\Repository $repository
+     * @param UserInterface $user
+     * @param RepositoryInterface $repository
      * @param int $status
-     * @return Task[]
+     * @param int $scheduleType
+     * @param int $taskType
+     * @param string $parentUid
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getTasks($user = null, $repository = null, $status = -1)
+    public function getTasks($user = null, $repository = null, $status = -1, $scheduleType = -1, $taskType = Task::TYPE_USER, $parentUid = "")
     {
         $t1 = new Task();
         $t1->setAction("fake-task-action");
@@ -121,4 +126,21 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     {
         // TODO: Implement getCurrentRunningTasks() method.
     }
+
+    /**
+     * @return Task[]
+     */
+    public function getScheduledTasks()
+    {
+        // TODO: Implement getScheduledTasks() method.
+    }
+
+    /**
+     * @param string $taskId
+     * @return Task[]
+     */
+    public function getChildrenTasks($taskId){
+
+    }
+
 }

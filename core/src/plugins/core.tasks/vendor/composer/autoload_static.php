@@ -20,11 +20,22 @@ class ComposerStaticInita70dbed78c5597d01c3b1c65fccf4574
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'C' => 
+        array (
+            'Cron' => 
+            array (
+                0 => __DIR__ . '/..' . '/mtdowling/cron-expression/src',
+            ),
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInita70dbed78c5597d01c3b1c65fccf4574::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInita70dbed78c5597d01c3b1c65fccf4574::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInita70dbed78c5597d01c3b1c65fccf4574::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

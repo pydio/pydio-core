@@ -7,8 +7,5 @@
     "psr-4": {
       "Pydio\\Action\\Scheduler\\": "./src"
     }
-  },
-  "require": {
-    "mtdowling/cron-expression": "^1.1"
   }
 }

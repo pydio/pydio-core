@@ -6,6 +6,7 @@
 /plugins/access.inbox/res/build
 /plugins/core.mailer/js/build
 /plugins/gui.ajax/res/js/ui/reactjs/build/
+/plugins/core.tasks/vendor
 .idea/
 data/cache/*
 data/files/*
