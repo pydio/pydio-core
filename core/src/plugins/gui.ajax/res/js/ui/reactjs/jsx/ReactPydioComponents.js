@@ -1127,6 +1127,9 @@
             }
             if(this.props.node){
                 additionalClassName += ' listentry' + this.props.node.getPath().replace(/\//g, '_') + ' ' + ' ajxp_node_' + (this.props.node.isLeaf()?'leaf':'collection') + ' ';
+                if(this.props.node.getAjxpMime()){
+                    additionalClassName += ' ajxp_mime_' + this.props.node.getAjxpMime() + ' ';
+                }
             }
             return (
                 <div onClick={this.onClick} className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}>
@@ -1567,8 +1570,8 @@
         },
 
         getActionsForNode: function(dm, node){
-            var cacheKey = node.isLeaf() ? 'file':'dir';
-
+            var cacheKey = node.isLeaf() ? 'file-' + node.getAjxpMime() :'folder';
+            var selectionType = node.isLeaf() ? 'file' : 'dir';
             var nodeActions = [];
             if(this.actionsCache[cacheKey]) {
                 nodeActions = this.actionsCache[cacheKey];
@@ -1576,9 +1579,9 @@
                 dm.setSelectedNodes([node]);
                 global.pydio.Controller.actions.forEach(function(a){
                     a.fireContextChange(dm, true, global.pydio.user);
-                    //a.fireSelectionChange(dm);
-                    if(a.context.selection && a.context.actionBar && a.selectionContext[cacheKey] && !a.deny && a.options.icon_class
+                    if(a.context.selection && a.context.actionBar && a.selectionContext[selectionType] && !a.deny && a.options.icon_class
                         && (!this.props.actionBarGroups || this.props.actionBarGroups.indexOf(a.context.actionBarGroup) !== -1)
+                        && (!a.selectionContext.allowedMimes.length || a.selectionContext.allowedMimes.indexOf(node.getAjxpMime()) !== -1)
                     ) {
                         nodeActions.push(a);
                         if(node.isLeaf() &&  a.selectionContext.unique === false) {
@@ -1588,7 +1591,6 @@
                 }.bind(this));
                 this.actionsCache[cacheKey] = nodeActions;
             }
-
             return nodeActions;
         },
 
