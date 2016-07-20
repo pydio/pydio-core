@@ -493,23 +493,41 @@ class Scheduler extends Plugin
      */
     protected function taskToNode(Task $task, $basePath, $dateFormat, $isChild = false){
 
-        $s = $task->getSchedule()->getValue();
-        $meta = [
-            "task_id"       => $task->getId(),
-            "icon"          => "scheduler/ICON_SIZE/task.png",
-            "ajxp_mime"     => ($isChild ? "scheduler_task":"scheduler_task"), // TODO: introduce a different mime for jobs?
-            "schedule"      => $s,
-            "text"          => ($isChild ? " ---- job running" : $task->getLabel()),
-            "label"         => ($isChild ? " ---- job running" : $task->getLabel()),
-            "action_name"   => $task->getAction(),
-            "repository_id" => $task->getWsId(),
-            "user_id"       => $task->getUserId(),
-            "STATUS"        => $task->getStatusMessage()
-        ];
-        $cron = CronExpression::factory($s);
-        $next = $cron->getNextRunDate();
-        $meta["NEXT_EXECUTION"] = ($isChild ? "-" : $next->format($dateFormat));
-        $meta["LAST_EXECUTION"] = "-";
+        if($isChild){
+            $label = ($task->getStatus() === Task::STATUS_FAILED ? " --- ERROR" : " --- JOB RUNNING");
+            $meta = [
+                "task_id"       => $task->getId(),
+                "icon"          => "scheduler/ICON_SIZE/task.png",
+                "ajxp_mime"     => "scheduler_task", // TODO: introduce a different mime for jobs?
+                "text"          => $label,
+                "label"         => $label,
+                "schedule"      => $task->getStatusMessage(),
+                "action_name"   => "",
+                "repository_id" => "",
+                "user_id"       => "",
+                "STATUS"        => "",
+                "NEXT_EXECUTION"     => "",
+                "LAST_EXECUTION"     => "Started on ". $task->getCreationDate()->format($dateFormat),
+            ];
+        }else{
+            $s = $task->getSchedule()->getValue();
+            $meta = [
+                "task_id"       => $task->getId(),
+                "icon"          => "scheduler/ICON_SIZE/task.png",
+                "ajxp_mime"     =>  "scheduler_task",
+                "schedule"      => $s,
+                "text"          => $task->getLabel(),
+                "label"         => $task->getLabel(),
+                "action_name"   => $task->getAction(),
+                "repository_id" => $task->getWsId(),
+                "user_id"       => $task->getUserId(),
+                "STATUS"        => $task->getStatusMessage()
+            ];
+            $cron = CronExpression::factory($s);
+            $next = $cron->getNextRunDate();
+            $meta["NEXT_EXECUTION"] = $next->format($dateFormat);
+            $meta["LAST_EXECUTION"] = "-";
+        }
 
         $key = $basePath."/".$task->getId();
         return new AJXP_Node($key, $meta);
@@ -538,43 +556,5 @@ class Scheduler extends Plugin
         }
         @unlink($dbFile);
     }
-
-    /**
-     * @param $taskId
-     * @param $label
-     * @param $schedule
-     * @param $actionName
-     * @param $repositoryIds
-     * @param $userId
-     * @param $paramsArray
-     * @throws Exception
-     */
-    public function addOrUpdateTask($taskId, $label, $schedule, $actionName, $repositoryIds, $userId, $paramsArray)
-    {
-        $tasks = FileHelper::loadSerialFile($this->getDbFile(), false, "json");
-        if (isSet($taskId)) {
-            foreach ($tasks as $index => $task) {
-                if ($task["task_id"] == $taskId) {
-                    $data = $task;
-                    $theIndex = $index;
-                }
-            }
-        }
-        if (!isSet($theIndex)) {
-            $data = array();
-            $data["task_id"] = substr(md5(time()), 0, 16);
-        }
-        $data["label"] = $label;
-        $data["schedule"] = $schedule;
-        $data["action_name"] = $actionName;
-        $data["repository_id"] = $repositoryIds;
-        $data["user_id"] = $userId;
-        $data["PARAMS"] = $paramsArray;
-        if (isSet($theIndex)) $tasks[$theIndex] = $data;
-        else $tasks[] = $data;
-        FileHelper::saveSerialFile($this->getDbFile(), $tasks, true, false, "json");
-
-    }
-
 
 }
