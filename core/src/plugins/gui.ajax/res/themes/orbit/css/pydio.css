@@ -1954,6 +1954,25 @@ div.react-autosuggest input#users-autosuggest {
   padding-bottom: 9px !important;
   padding-left: 4px !important;
 }
+div.react-autosuggest input#pydioform-autosuggest {
+  font-size: 16px;
+  padding-bottom: 5px !important;
+  border-bottom: 1px solid #e0e0e0;
+}
+div.react-autosuggest input#pydioform-autosuggest:focus {
+  border-bottom: 2px solid #009688;
+}
+div.pydioform_autocomplete .suggest-search {
+  position: absolute;
+  right: 36px;
+  padding-top: 2px;
+  color: #e0e0e0;
+}
+div.pydioform_autocomplete .react-autosuggest__suggestions li {
+  padding: 8px 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
 a.carousel-control {
   border-left: 1px solid #c4c7c1;
   border-right: 1px solid #c4c7c1;

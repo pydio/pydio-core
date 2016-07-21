@@ -349,6 +349,79 @@
 
     });
 
+    var AutocompleteBox = React.createClass({
+
+        mixins:[FormMixin],
+
+        onSuggestionSelected: function(value, event){
+            this.onChange(event, value);
+        },
+
+        getInitialState:function(){
+            return {loading : 0};
+        },
+
+        suggestionLoader:function(input, callback) {
+
+            this.setState({loading:true});
+            let values = {};
+            if(this.state.choices){
+                this.state.choices.forEach(function(v){
+                    if(v.indexOf(input) === 0){
+                        values[v] = v;
+                    }
+                });
+            }
+            callback(null, LangUtils.objectValues(values));
+            this.setState({loading:false});
+
+        },
+
+        getSuggestions(input, callback){
+            bufferCallback('suggestion-loader-search', 350, function(){
+                this.suggestionLoader(input, callback);
+            }.bind(this));
+        },
+
+        suggestionValue: function(suggestion){
+            return '';
+        },
+
+        renderSuggestion(value){
+            return <span>{value}</span>;
+        },
+
+        render: function(){
+
+            const inputAttributes = {
+                id: 'pydioform-autosuggest',
+                name: 'pydioform-autosuggest',
+                className: 'react-autosuggest__input',
+                placeholder: this.props.attributes['label'],
+                /*onBlur: event => pydio.UI.enableAllKeyBindings(),*/
+                onFocus: event => pydio.UI.disableAllKeyBindings(),
+                value: this.state.value   // Initial value
+            };
+            return (
+                <div className="pydioform_autocomplete">
+                    <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
+                    <ReactAutoSuggest
+                        ref="autosuggest"
+                        cache={true}
+                        showWhen = {input => true }
+                        inputAttributes={inputAttributes}
+                        suggestions={this.getSuggestions}
+                        suggestionRenderer={this.renderSuggestion}
+                        suggestionValue={this.suggestionValue}
+                        onSuggestionSelected={this.onSuggestionSelected}
+                    />
+                </div>
+
+            );
+        }
+
+    });
+
     /**
      * Select box input conforming to Pydio standard form parameter.
      */
@@ -1212,6 +1285,7 @@
                 return (
                     <PydioFormPanel
                         {...this.props}
+                        tabs={null}
                         key={index}
                         values={subValues}
                         onChange={null}
@@ -1277,6 +1351,7 @@
                 bottom:React.PropTypes.array
             }),
             tabs:React.PropTypes.array,
+            onTabChange:React.PropTypes.func,
             accordionizeIfGroupsMoreThan:React.PropTypes.number,
             onScrollCallback:React.PropTypes.func,
 
@@ -1285,6 +1360,16 @@
             checkHasHelper:React.PropTypes.func,
             helperTestFor:React.PropTypes.string
 
+        },
+
+        externallySelectTab:function(index){
+            try{
+                let t = this.refs.tabs;
+                let c = this.refs.tabs.props.children[index];
+                t.handleTouchTap(index, c);
+            }catch(e){
+                if(global.console) global.console.log(e);
+            }
         },
 
         getDefaultProps:function(){
@@ -1596,9 +1681,14 @@
 
             if(this.props.tabs){
                 var className = this.props.className;
+                let initialSelectedIndex = 0;
+                let i = 0;
                 var tabs = this.props.tabs.map(function(tDef){
                     var label = tDef['label'];
                     var groups = tDef['groups'];
+                    if(tDef['selected']){
+                        initialSelectedIndex = i;
+                    }
                     var panes = groups.map(function(gId){
                         if(groupPanes[gId]){
                             return groupPanes[gId];
@@ -1606,6 +1696,7 @@
                             return null;
                         }
                     });
+                    i++;
                     return(
                         <ReactMUI.Tab label={label} key={label}>
                             <div className={(className?className+' ':' ') + 'pydio-form-panel' + (panes.length % 2 ? ' form-panel-odd':'')}>
@@ -1613,10 +1704,10 @@
                             </div>
                         </ReactMUI.Tab>
                     );
-                });
+                }.bind(this));
                 return (
                     <div className="layout-fill vertical-layout tab-vertical-layout">
-                        <ReactMUI.Tabs>
+                        <ReactMUI.Tabs ref="tabs" initialSelectedIndex={initialSelectedIndex} onChange={this.props.onTabChange}>
                             {tabs}
                         </ReactMUI.Tabs>
                     </div>
@@ -1728,6 +1819,9 @@
                     break;
                 case 'select':
                     value = <InputSelectBox {...props}/>;
+                    break;
+                case 'autocomplete':
+                    value = <AutocompleteBox {...props}/>;
                     break;
                 case 'legend':
                     value = null;
@@ -1892,6 +1986,7 @@
     PydioForm.InputButton = InputButton;
     PydioForm.MonitoringLabel = MonitoringLabel;
     PydioForm.InputSelectBox = InputSelectBox;
+    PydioForm.AutocompleteBox = AutocompleteBox;
     PydioForm.InputImage = InputImage;
     PydioForm.FormPanel = PydioFormPanel;
     PydioForm.PydioHelper = PydioFormHelper;

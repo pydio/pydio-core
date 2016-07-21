@@ -15,4 +15,5 @@ window.classNames = require('classnames');
 window.ReactAutoSuggest = require('react-autosuggest');
 window.Clipboard = require('clipboard');
 window.ReactQRCode = require('qrcode.react');
+window.PrettyCron = require("prettycron");
 window.injectTapEventPlugin();

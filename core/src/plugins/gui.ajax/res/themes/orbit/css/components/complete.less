@@ -64,4 +64,26 @@ div.react-autosuggest {
     padding-bottom: 9px !important;
     padding-left: 4px !important;
   }
+  input#pydioform-autosuggest{
+    font-size: 16px;
+    padding-bottom: 5px !important;
+    border-bottom: 1px solid #e0e0e0;
+    &:focus{
+      border-bottom: 2px solid @primary-1-color;
+    }
+  }
+}
+
+div.pydioform_autocomplete{
+  .suggest-search{
+    position: absolute;
+    right:36px;
+    padding-top: 2px;
+    color: #e0e0e0;
+  }
+  .react-autosuggest__suggestions li{
+    padding: 8px 6px;
+    font-size: 16px;
+    cursor: pointer;
+  }
 }
