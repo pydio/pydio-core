@@ -140,8 +140,8 @@ Do not encodeURIComponent for oldSchoolMailer - Should fix #1138
 Fix #1180: Unpatch the path for zip files before we check against the…  …
 Force overriding conf/extensions.conf.php during upgrade, as output f… …
 Init new release note.
-FIx JSPacker static function call.
-
+Fix JSPacker static function call.
+Fix FormManager when setting default value inside group-based selectors
 
 -------
 Pydio Core 6.4.1 - Bug Fixes for 6.4
