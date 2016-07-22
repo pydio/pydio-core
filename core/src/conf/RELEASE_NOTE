@@ -5,6 +5,7 @@ Pydio Core 6.4.2 fixes vulnerabilities discovered in remote download and some sp
 [Most noticeable changes]
 
 Security issues on remote download and path traversal on Windows.
+Fix Httpoxy by updating Guzzle library
 Meterial Design follow-up : Icons, thumbnails view, search engine results
 Fix indexation issues for synchronisation
 Italian translations updated (DepaMarco), Czech translations updated (Svetlmodry)
