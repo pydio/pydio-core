@@ -1,0 +1,58 @@
+{
+  "operations": {
+    "certificates.add": {
+      "httpMethod": "POST",
+      "uri": "certificates",
+      "description": "The Add Management Certificate operation adds a management certificate to the specified subscription.",
+      "data": {
+        "xmlEncoding": "utf-8",
+        "xmlRoot": {
+          "name": "SubscriptionCertificate",
+          "namespaces": [
+            "http://schemas.microsoft.com/windowsazure"
+          ]
+        }
+      },
+      "parameters": {
+        "publicKey": {
+          "type": "string",
+          "location": "xml",
+          "sentAs": "SubscriptionCertificatePublicKey",
+          "required": true
+        },
+        "thumbprint": {
+          "type": "string",
+          "location": "xml",
+          "sentAs": "SubscriptionCertificateThumbprint",
+          "required": true
+        },
+        "data": {
+          "type": "string",
+          "location": "xml",
+          "sentAs": "SubscriptionCertificateData",
+          "required": true
+        }
+      }
+    }
+  },
+  "models": {
+    "CertificateList": {
+      "type": "array",
+      "name": "certificates",
+      "sentAs": "SubscriptionCertificate",
+      "location": "xml",
+      "items": {
+        "type": "object"
+      }
+    },
+    "Certificate": {
+      "type": "object",
+      "additionalProperties": {
+        "location": "xml"
+      }
+    }
+  },
+  "imports": [
+    "description_import_import.json"
+  ]
+}

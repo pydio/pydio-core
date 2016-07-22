@@ -1,0 +1,35 @@
+operations:
+    certificates.add:
+        httpMethod: "POST"
+        uri: "services/storageservices"
+        description: "The Create Storage Account asynchronous operation creates a new storage account in Microsoft Azure."
+        data:
+            xmlEncoding: "utf-8"
+            xmlRoot:
+                name: "CreateStorageServiceInput"
+                namespaces:
+                    - "http://schemas.microsoft.com/windowsazure"
+        parameters:
+            name:
+                type: "string"
+                location: "xml"
+                sentAs: "ServiceName"
+                required: true
+        thumbprint:
+                type: "string"                
+                location: "xml"                
+                sentAs: "SubscriptionCertificateThumbprint"                
+                required: true
+        data:
+                type: "string"                
+                location: "xml"                
+                sentAs: "SubscriptionCertificateData"                
+                required: true
+models:
+    Storage:
+        type: "object"
+        additionalProperties:
+            location: "xml"
+
+imports:
+    - description_import.yml

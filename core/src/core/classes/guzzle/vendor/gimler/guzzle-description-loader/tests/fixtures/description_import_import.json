@@ -1,0 +1,25 @@
+{
+  "operations": {
+    "certificates.get": {
+      "httpMethod": "GET",
+      "uri": "certificates/{thumbprint}",
+      "description": "Gets information about the management certificate with the specified thumbprint.",
+      "responseModel": "Certificate",
+      "parameters": {
+        "thumbprint": {
+          "type": "string",
+          "location": "uri",
+          "required": true
+        }
+      }
+    }
+  },
+  "models": {
+    "Certificate": {
+      "type": "object",
+      "additionalProperties": {
+        "location": "xml"
+      }
+    }
+  }
+}
