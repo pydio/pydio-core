@@ -1,0 +1,4 @@
+/bin/
+/build/
+/vendor/
+phpunit.xml

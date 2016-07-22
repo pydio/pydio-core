@@ -1,0 +1,23 @@
+operations:
+    certificates.list:
+        httpMethod: "GET"
+        uri: "services/storageservices"
+        description: "The List Storage Accounts operation lists the storage accounts that are available in the specified subscription."
+        responseModel: "StorageList"
+
+models:
+    StorageList:
+        type: "array"
+        name: "certificates"
+        sentAs: "SubscriptionCertificate"
+        location: "xml"
+        items:
+            type: "object"
+
+    Storage:
+        type: "object"
+        additionalProperties:
+            location: "xml"
+
+imports:
+    - description_import_import.yml

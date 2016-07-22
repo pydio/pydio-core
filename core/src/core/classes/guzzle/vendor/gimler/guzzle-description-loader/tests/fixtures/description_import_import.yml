@@ -1,0 +1,10 @@
+operations:
+    certificates.delete:
+        httpMethod: "DELETE"
+        uri: "services/storageservices/{name}"
+        description: "The Delete Storage Account asynchronous operation deletes the specified storage account."
+        parameters:
+            name:
+                type: "string"
+                location: "query"
+                required: true
