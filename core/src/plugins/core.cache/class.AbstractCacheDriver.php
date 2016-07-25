@@ -86,6 +86,7 @@ abstract class AbstractCacheDriver extends AJXP_Plugin
      */
     public function supportsPatternDelete($namespace)
     {
+        return false;
         $cacheDriver = $this->getCacheDriver($namespace);
         return $cacheDriver instanceof Pydio\Plugins\Cache\Doctrine\Ext\PatternClearableCache;
         //return is_a($cacheDriver, "PatternClearableCache");
