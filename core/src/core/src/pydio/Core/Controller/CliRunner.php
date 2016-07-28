@@ -84,7 +84,7 @@ class CliRunner
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
         if($impersonateUsers !== null){
-            $cmd .= "-i=".$impersonateUsers;
+            $cmd .= " -i=".$impersonateUsers;
         }
         /* Inserted next 3 lines to quote the command if in windows - rmeske*/
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
