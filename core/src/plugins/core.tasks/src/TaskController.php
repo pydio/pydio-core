@@ -32,6 +32,8 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
 
 
+use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StringHelper;
@@ -57,6 +59,7 @@ class TaskController extends Plugin implements SqlTableProvider
     protected function initTaskFromApi(ServerRequestInterface $request, Task &$task){
         $params = $request->getParsedBody();
         $taskData = json_decode($params["task"], true);
+        /** @var Task $task */
         $task = SimpleRestResourceRouter::cast($task, $taskData);
         if(isSet($params["taskId"])) {
             $task->setId($params["taskId"]);
@@ -65,8 +68,15 @@ class TaskController extends Plugin implements SqlTableProvider
         }
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
-        $task->setUserId($ctx->getUser()->getId());
-        $task->setWsId($ctx->getRepositoryId());
+
+        if(isSet($params["target-users"]) && isSet($params["target-repositories"]) && $ctx->getUser()->isAdmin()){
+            $task->setUserId($ctx->getUser()->getId());
+            $task->setImpersonateUsers($params["target-users"]);
+            $task->setWsId($params["target-repositories"]);
+        }else{
+            $task->setUserId($ctx->getUser()->getId());
+            $task->setWsId($ctx->getRepositoryId());
+        }
         if(count($task->nodes)){
             foreach($task->nodes as $index => $path){
                 $task->nodes[$index] = "pydio://".$task->getWsId().$path;
@@ -86,17 +96,30 @@ class TaskController extends Plugin implements SqlTableProvider
         switch ($action){
 
             case "tasks_list":
-
-                $tasks = $taskService->getCurrentRunningTasks($ctx->getUser(), $ctx->getRepository());
+                
+                $params = $request->getParsedBody();
+                if(isSet($params["scope"]) && $ctx->getUser()->isAdmin()){
+                    $userObject = $repoObject = null;
+                    if($params["scope"] === "repository" && !empty($params["repository_id"])){
+                        $repoObject = RepositoryService::getRepositoryById($params["repository_id"]);
+                    }else if($params["scope"] === "user" && !empty($params["user_id"])){
+                        $userObject = UsersService::getUserById($params["user_id"]);
+                    }
+                    $tasks = $taskService->getCurrentRunningTasks($userObject, $repoObject);
+                }else{
+                    $tasks = $taskService->getCurrentRunningTasks($ctx->getUser(), $ctx->getRepository());
+                }
                 $response = new JsonResponse($tasks);
                 break;
 
             case "task_info":
+                
                 $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 $response = new JsonResponse($task);
                 break;
 
             case "task_create":
+                
                 $newTask = new Task();
                 $this->initTaskFromApi($request, $newTask);
                 $taskService->createTask($newTask, $newTask->getSchedule());
@@ -107,6 +130,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 break;
 
             case "task_update":
+                
                 $taskData = $request->getParsedBody()["request_body"];
                 $newTask = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 $newTask = SimpleRestResourceRouter::cast($newTask, $taskData);
@@ -115,6 +139,7 @@ class TaskController extends Plugin implements SqlTableProvider
                 break;
 
             case "task_toggle_status":
+                
                 $task = $taskService->getTaskById($request->getParsedBody()["taskId"]);
                 if(!empty($task)){
                     $status = intval($request->getParsedBody()["status"]);

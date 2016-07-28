@@ -10,6 +10,14 @@
             return this._internal['id'];
         }
 
+        getUserId(){
+            return this._internal['userId'];
+        }
+
+        getWorkspaceId(){
+            return this._internal['wsId'];
+        }
+
         isStoppable(){
             return this._internal['flags'] & Task.FLAG_STOPPABLE;
         }
@@ -64,25 +72,47 @@
 
     class TaskAPI{
         
-        static createTask(task){
-            PydioApi.getClient().request({
+        static createTask(task, targetUsers = null, targetRepositories = null){
+            let params = {
                 "get_action":"task_create",
                 "task":JSON.stringify(task.getData())
-            });
+            };
+            if(targetUsers && targetRepositories){
+                params['target-users'] = targetUsers;
+                params['target-repositories'] = targetRepositories;
+            }
+            console.log(params);
+            PydioApi.getClient().request(params);
         }
 
-        static loadTasks(callback){
-            PydioApi.getClient().request({
-                "get_action":"tasks_list"
-            }, function(transport){
+        static loadTasks(callback, params = null){
+            if(params){
+                params['get_action'] = 'tasks_list';
+            }else{
+                params = {get_action:'tasks_list'};
+            }
+            PydioApi.getClient().request(params, function(transport){
                 if(transport.responseJSON){
                     let tasks = transport.responseJSON.map(function(taskData){
                         return new Task(taskData);
                     });
                     callback(tasks);
                 }
-            }.bind(this));
+            }.bind(this), null, {discrete: true});
+        }
 
+        static loadAdminTasks(userScope = null, repoScope = null, callback){
+            let params = {get_action:"tasks_list"};
+            if(userScope){
+                params["scope"] = "user";
+                params["user_id"] = userScope;
+            }else if(repoScope){
+                params["scope"] = "repository";
+                params["repo_id"] = repoScope;
+            }else{
+                params["scope"] = "global";
+            }
+            TaskAPI.loadTasks(callback, params);
         }
 
         static updateTaskStatus(task, status){
@@ -172,7 +202,7 @@
             return this._tasksList;
         }
 
-        static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE){
+        static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE, targetUsers = null, targetRepositories = null){
             let task = {
                 label: label,
                 flags: flags,
@@ -182,7 +212,7 @@
                 parameters: parameters,
                 nodes: nodes
             };
-            TaskAPI.createTask(new Task(task));
+            TaskAPI.createTask(new Task(task), targetUsers, targetRepositories);
         }
 
         static enqueueLocalTask(task){
@@ -232,9 +262,19 @@
     });
 
     var TaskEntry = React.createClass({
+
+        propTypes: {
+            task: React.PropTypes.instanceOf(Task),
+            adminDisplayScope: React.PropTypes.bool
+        },
+
         render: function(){
             let t = this.props.task;
             let actions;
+            let scopeInfo;
+            if(this.props['adminDisplayScope'] && this.props.adminDisplayScope === 'repository'){
+                scopeInfo = "["+ this.props.task.getUserId() +"] ";
+            }
             if(t.getStatus() == Task.STATUS_RUNNING){
                 if(t.isStoppable()){
                     actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
@@ -252,7 +292,7 @@
             return (
                 <div className="task">
                     <div className="task_texts">
-                        <div className="task_label">{t.getLabel()}</div>
+                        <div className="task_label">{scopeInfo}{t.getLabel()}</div>
                         <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
                     </div>
                     <TaskAction task={t}/>
@@ -311,7 +351,9 @@
     var ns = global.PydioTasks || {};
     ns.Store = TaskStore;
     ns.Task = Task;
+    ns.API = TaskAPI;
     ns.Panel = TasksPanel;
+    ns.TaskEntry = TaskEntry;
     global.PydioTasks = ns;
 
 })(window);

@@ -180,14 +180,18 @@ class SqlTasksProvider implements ITasksProvider
     /**
      * @param UserInterface $user
      * @param RepositoryInterface $repository
-     * @return Task[]
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getCurrentRunningTasks($user, $repository)
+    public function getCurrentRunningTasks($user = null, $repository = null)
     {
         $tasks = [];
         $where = [];
-        $where[] = array("[userId] = %s", $user->getId());
-        $where[] = array("[wsId] = %s", $repository->getId());
+        if($user !== null){
+            $where[] = array("[userId] = %s", $user->getId());
+        }
+        if($repository !== null){
+            $where[] = array("[wsId] = %s", $repository->getId());
+        }
         $where[] = array("[status] IN (1,2,8,16)");
         $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
         foreach ($res->fetchAll() as $row) {

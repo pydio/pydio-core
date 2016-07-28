@@ -252,7 +252,7 @@ class TaskService implements ITasksProvider
     /**
      * @inheritdoc
      */
-    public function getCurrentRunningTasks($user, $repository)
+    public function getCurrentRunningTasks($user = null, $repository = null)
     {
         return $this->realProvider->getCurrentRunningTasks($user, $repository);
     }

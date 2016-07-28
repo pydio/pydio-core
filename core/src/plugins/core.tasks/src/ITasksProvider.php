@@ -76,7 +76,7 @@ interface ITasksProvider
      * @param RepositoryInterface $repository
      * @return Task[]
      */
-    public function getCurrentRunningTasks($user, $repository);
+    public function getCurrentRunningTasks($user = null, $repository = null);
 
     /**
      * @param AJXP_Node $node

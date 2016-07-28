@@ -120,9 +120,9 @@ class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
     /**
      * @param AbstractUser $user
      * @param Repository $repository
-     * @return Task[]
+     * @return \Pydio\Tasks\Task[]
      */
-    public function getCurrentRunningTasks($user, $repository)
+    public function getCurrentRunningTasks($user = null, $repository = null)
     {
         // TODO: Implement getCurrentRunningTasks() method.
     }
