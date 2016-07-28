@@ -522,6 +522,7 @@ class Scheduler extends Plugin
                 "action_name"   => $task->getAction(),
                 "repository_id" => $task->getWsId(),
                 "user_id"       => $task->getUserId(),
+                "parameters"    => json_encode($task->getParameters()),
                 "STATUS"        => $task->getStatusMessage()
             ];
             $cron = CronExpression::factory($s);

@@ -248,8 +248,26 @@ class PluginsManager extends AbstractManager
                         }
                         if(!is_array($actions[$pId])) $actions[$pId] = array();
                         $actionName = $node->attributes->getNamedItem("name")->nodeValue;
-                        $actions[$pId][$actionName] = array( "action" => $actionName , "label" => $messId);
-
+                        $actionData = [
+                            "action" => $actionName ,
+                            "label" => $messId,
+                            "server_processing" => $xPath->query("processing/serverCallback", $node)->length ? true : false
+                        ];
+                        // Parse parameters if they are defined
+                        $params = $xPath->query("processing/serverCallback/input_param", $node);
+                        if($params->length){
+                            $actionParameters = [];
+                            /** @var \DOMElement $pNode */
+                            foreach($params as $pNode){
+                                $actionParameters[] = [
+                                    "type" => $pNode->getAttribute("type"),
+                                    "name" => $pNode->getAttribute("name"),
+                                    "description" => $pNode->getAttribute("description")
+                                ];
+                            }
+                            $actionData["parameters"] = $actionParameters;
+                        }
+                        $actions[$pId][$actionName] = $actionData;
                     }
                     ksort($actions, SORT_STRING);
                     foreach ($actions as $actPid => $actionGroup) {
