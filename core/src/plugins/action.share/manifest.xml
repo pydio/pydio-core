@@ -21,19 +21,6 @@
         <global_param name="FORK_EVENT_FORWARDING" group="CONF_MESSAGE[Internal Sharing]" type="boolean" label="CONF_MESSAGE[Fork Events Forwarding]" description="CONF_MESSAGE[If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.]" default="false"/>
         <global_param name="WATCHER_SHARES_AUTO_OWNER" group="CONF_MESSAGE[Notifications]" type="boolean" label="CONF_MESSAGE[Shares Owner]" description="CONF_MESSAGE[When sharing with some internal users, choose whether the owner will be notified by default of any event happening on this share]" default="false" expose="true"/>
         <global_param name="WATCHER_SHARES_AUTO_USERS" group="CONF_MESSAGE[Notifications]" type="boolean" label="CONF_MESSAGE[Shares Target users]" description="CONF_MESSAGE[When sharing with some internal users, choose whether these users will be notified by default of any event happening on this share]" default="false" expose="true"/>
-        <global_param name="CUSTOM_SHAREPAGE_TITLE" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Page Title]" description="CONF_MESSAGE[Share page title. Use AJXP_FILENAME keyword to display the file name.]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_SHAREPAGE_LEGEND" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text]" description="CONF_MESSAGE[Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_SHAREPAGE_LEGEND_PASS" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Download text w/ Pass]" description="CONF_MESSAGE[Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title.]" mandatory="false" default=""/>
-        <global_param name="CUSTOM_SHAREPAGE_BUTTON" group="CONF_MESSAGE[Weblink Page]" type="image" label="CONF_MESSAGE[Download Button]" description="CONF_MESSAGE[Image used as a button for downloading the file]" mandatory="false"
-                      editable="true"
-                      uploadAction="store_binary_temp"
-                      loadAction="get_global_binary_param"
-                      defaultImage="plugins/action.share/res/dl.png"
-                      expose="true"
-        />
-        <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Background Color]" description="CONF_MESSAGE[Share page background color.]" mandatory="false" default="#FFFFFF"/>
-        <global_param name="CUSTOM_SHAREPAGE_TEXT_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Color]" description="CONF_MESSAGE[Share page text color.]" mandatory="false" default="#399c9b"/>
-        <global_param name="CUSTOM_SHAREPAGE_TEXTSHADOW_COLOR" group="CONF_MESSAGE[Weblink Page]" type="string" label="CONF_MESSAGE[Text Shadow]" description="CONF_MESSAGE[Share page text shadow color.]" mandatory="false" default="#FFFFFF"/>
     </server_settings>
     <client_settings>
         <resources>
