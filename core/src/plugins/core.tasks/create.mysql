@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS `ajxp_tasks` (
   KEY `userId` (`userId`,`status`),
   KEY `type` (`type`),
   KEY `schedule` (`schedule`),
-  FULLTEXT KEY `nodes` (`nodes`)
+  KEY `nodes` (`nodes`)
 ) DEFAULT CHARSET=utf8 COMMENT='Task persistence layer';
