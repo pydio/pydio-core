@@ -57,6 +57,16 @@ interface IFeedStore
     public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId);
 
     /**
+     * Delete feed data
+     * @param string $types
+     * @param null $userId
+     * @param null $repositoryId
+     * @param int $count
+     * @return mixed
+     */
+    public function deleteFeed($types='event', $userId = null, $repositoryId = null, &$count = 0);
+
+    /**
      * @abstract
      * @param Notification $notif
      * @return mixed

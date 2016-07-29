@@ -968,9 +968,10 @@ class ShareCenter extends Plugin
                 $itemsPerPage   = 50;
                 $crtPage        = 1;
                 $crtOffset      = 0;
-                $parentRepoId = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
-                $userContext = $httpVars["user_context"];
-                $currentUser = $ctx->getUser()->getId();
+                $parentRepoId   = isset($httpVars["parent_repository_id"]) ? $httpVars["parent_repository_id"] : "";
+                $userContext    = $httpVars["user_context"];
+                $currentUser    = $ctx->getUser()->getId();
+                $clearBroken    = (isSet($httpVars["clear_broken_links"]) && $httpVars["clear_broken_links"] === "true") ? 0 : -1;
                 if($userContext == "global" && $ctx->getUser()->isAdmin()){
                     $currentUser = false;
                 }else if($userContext == "user" && $ctx->getUser()->isAdmin() && !empty($httpVars["user_id"])){
@@ -982,7 +983,14 @@ class ShareCenter extends Plugin
                     $crtOffset = ($crtPage - 1) * $itemsPerPage;
                 }
                 $cursor = [$crtOffset, $itemsPerPage];
-                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId, $cursor);
+                if($clearBroken > -1) {
+                    $cursor = null;
+                }
+                $nodes = $this->listSharesAsNodes($ctx, "/data/repositories/$parentRepoId/shares", $currentUser, $parentRepoId, $cursor, $clearBroken);
+                if($clearBroken > -1){
+                    $responseInterface = new JsonResponse(["cleared_count" => $clearBroken]);
+                    break;
+                }
                 $total = $cursor["total"];
 
                 $nodesList = new NodesList();
@@ -1848,10 +1856,10 @@ class ShareCenter extends Plugin
      * @param bool|string $currentUser if true, currently logged user. if false all users. If string, user ID.
      * @param string $parentRepositoryId
      * @param null $cursor
-     * @param bool $xmlPrint
+     * @param int $clearBroken
      * @return AJXP_Node[]
      */
-    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", &$cursor = null, $xmlPrint = false){
+    public function listSharesAsNodes(ContextInterface $ctx, $rootPath, $currentUser, $parentRepositoryId = "", &$cursor = null, &$clearBroken = -1){
 
         $shares =  $this->listShares($currentUser, $parentRepositoryId, $cursor);
         $nodes = array();
@@ -1876,6 +1884,10 @@ class ShareCenter extends Plugin
                 $repoObject = RepositoryService::getRepositoryById($repoId);
                 if($repoObject == null){
                     $meta["text"] = "Invalid link";
+                    if($clearBroken > -1){
+                        $this->getShareStore($ctx)->deleteShare($shareType, $hash, false, true);
+                        $clearBroken ++;
+                    }
                     continue;
                 }
                 $meta["text"] = $repoObject->getDisplay();
@@ -1929,6 +1941,20 @@ class ShareCenter extends Plugin
                 if(!empty($parentPath) &&  strpos($meta["original_path"], $parentPath) === 0){
                     $meta["original_path"] = substr($meta["original_path"], strlen($parentPath));
                 }
+                try{
+                    // Test node really exists
+                    $originalNode = new AJXP_Node("pydio://".$meta["owner"]."@".$meta["shared_element_parent_repository"].$meta["original_path"]);
+                    $test = @file_exists($originalNode->getUrl());
+                    if(!$test){
+                        if($clearBroken > -1){
+                            $this->getShareStore($ctx)->deleteShare($shareType, $hash);
+                            $clearBroken ++;
+                        }else{
+                            $meta["broken_link"] = true;
+                            $meta["original_path"] .= " (BROKEN)";
+                        }
+                    }
+                }catch(\Exception $e){}
 
             }else if($shareData["REPOSITORY"] instanceof Repository && !empty($shareData["FILE_PATH"])){
 
@@ -1946,12 +1972,8 @@ class ShareCenter extends Plugin
                 continue;
 
             }
+            $nodes[] = new AJXP_Node($rootPath."/".$hash, $meta);
 
-            if($xmlPrint){
-                XMLWriter::renderAjxpNode(new AJXP_Node($rootPath."/".$hash, $meta));
-            }else{
-                $nodes[] = new AJXP_Node($rootPath."/".$hash, $meta);
-            }
         }
 
         return $nodes;

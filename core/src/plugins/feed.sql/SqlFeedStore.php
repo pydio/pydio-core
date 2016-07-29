@@ -432,4 +432,32 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         return DBHelper::runCreateTablesQuery($p, $this->getBaseDir() . "/create.sql");
     }
 
+    /**
+     * Delete feed data
+     * @param array|string $types
+     * @param null $userId
+     * @param null $repositoryId
+     * @param int $count
+     * @return mixed
+     */
+    public function deleteFeed($types = 'event', $userId = null, $repositoryId = null, &$count = 0)
+    {
+        $wheres = [];
+        if($types !== 'both') {
+            $wheres[] = ['etype = %s', $types];
+        }
+        if($userId != null) {
+            $wheres[] = ['user_id = %s OR index_path LIKE %s', $userId, '%pydio://'.$userId.'@%'];
+        }
+        if($repositoryId != null) {
+            $wheres[] = ['repository_id = %s OR index_path LIKE %s', $repositoryId, '%pydio://%@'.$repositoryId.'/%'];
+        }
+        if(count($wheres)){
+            $count = dibi::query("SELECT count(*) FROM [ajxp_feed] WHERE %and ", $wheres)->fetchSingle();
+            dibi::query("DELETE FROM [ajxp_feed] WHERE %and", $wheres);
+        }else{
+            $count = dibi::query("SELECT count(*) FROM [ajxp_feed]")->fetchSingle();
+            dibi::query("DELETE FROM [ajxp_feed]");
+        }
+    }
 }

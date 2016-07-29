@@ -20,17 +20,22 @@
  */
 namespace Pydio\Notification\Core;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
 use \DOMXPath as DOMXPath;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -325,6 +330,27 @@ class NotificationCenter extends Plugin
             echo("</ul>");
             $responseInterface->getBody()->write("</ul>");
         }
+
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws PydioException
+     */
+    public function clearUserFeed(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        if(!$this->eventStore){
+            return;
+        }
+        $data = $requestInterface->getParsedBody();
+        $contextType = $data["context_type"];
+        if(!in_array($contextType, ["all", "user", "repository"])){
+            throw new PydioException("Invalid Arguments");
+        }
+        $contextValue = InputFilter::sanitize($data["context_value"], InputFilter::SANITIZE_ALPHANUM);
+        $this->eventStore->deleteFeed('event', $contextType === 'user' ? $contextValue : null, $contextType === 'repository' ? $contextValue : null, $count);
+        $responseInterface = new JsonResponse(["cleared_rows" => $count]);
 
     }
 
