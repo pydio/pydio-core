@@ -641,7 +641,7 @@ class ConfService
             }
 
             if ($labelOnly) {
-                $result[$repositoryId] = $repositoryObject->getDisplay();
+                $result[$repositoryId] = SystemTextEncoding::toUTF8($repositoryObject->getDisplay());
             } else {
                 $result[$repositoryId] = $repositoryObject;
             }
