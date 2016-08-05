@@ -309,7 +309,7 @@ class AJXP_Controller
                     $cmd .= " --file_".$index."=".escapeshellarg($v);
                     $index++;
                 }
-            }else{
+            } else if ($key != "file") {
                 $cmd .= " --$key=".escapeshellarg($value);
             }
         }
