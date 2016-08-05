@@ -37,6 +37,6 @@ Please read the Developer doc located at https://pydio.com/en/docs/developer-gui
 
 New in latest build, in the Settings panel, you can find a new "Developer" node where all actions contributed by all plugins are listed. These can be called either by http, or via the CLI API. At the same location, you will find all "hooks" registered and triggered in the server, that are VERY useful when you want your plugin to be really sandboxed.  
 
-#### Signing the CLA
+#### Sign the CLA
 
 Please [sign the Contributor License Agreement](https://pydio.com/en/community/contribute/contributor-license-agreement-cla) before contributing.
