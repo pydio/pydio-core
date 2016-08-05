@@ -57,6 +57,7 @@ var config_runtimes = '<?php echo $pluginConfigs["RUNTIMES"]; ?>';
 var config_max_file_size = '<?php echo $pluginConfigs["MAX_FILE_SIZE"]; ?>';
 var config_chunk_size = '<?php echo (!empty($pluginConfigs["CHUNK_SIZE"]) ? $pluginConfigs["CHUNK_SIZE"] : (($UploadMaxSize/1048576) - 1)."mb"); ?>';
 var currentDir = parent.ajaxplorer.getContextNode().getPath();
+var preurl = '<?php print($_SERVER["SCRIPT_NAME"]); ?>?get_action=nodeChangeCheck&secure_token=<?php echo $httpVars["secure_token"];?>&ajxp_sessid=<?php echo session_id(); ?>&dir='+currentDir;
 
 $(function() {
 	$("#plupload_uploader").pluploadQueue({
@@ -84,6 +85,25 @@ $(function() {
 	
 	// attach callbacks for FileUploaded
 	function attachCallbacks(Uploader) {
+                Uploader.bind('FilesAdded', function(up, files) {
+                   plupload.each(files, function(file) {
+			var responseObject = new DOMParser();
+			var xhr = new XMLHttpRequest();
+			xhr.onreadystatechange = function(e) {
+				// Documentation for ready state states 4 is when the request is finished
+				// http://www.w3schools.com/ajax/ajax_xmlhttprequest_onreadystatechange.asp
+				if(xhr.readyState == 4 && xhr.responseText && xhr.responseText != 'OK') {
+					alert(responseObject.parseFromString(xhr.responseText, "text/xml").childNodes[0].innerHTML);
+					Uploader.removeFile(file);
+				}
+			}.bind(this);
+			xhr.open("POST", preurl, true);
+			var formData = new FormData();
+			formData.append("name", file.name);
+			xhr.send(formData);
+                   });
+                });
+
 		Uploader.bind('UploadFile', function(up, file, res) {
             parent.document.fire("ajaxplorer:longtask_starting");
 		});

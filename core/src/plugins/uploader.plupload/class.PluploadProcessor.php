@@ -43,6 +43,26 @@ class PluploadProcessor extends AJXP_Plugin
 // Uncomment this one to fake upload time
 // usleep(5000);
 
+    public function nodeChangeCheck($action, &$httpVars, &$fileVars)
+    {
+        $this->logDebug("Preprocessing nodeChangeCheck");
+        $repository = ConfService::getRepository();
+        $plugin = AJXP_PluginsService::findPlugin("access", $repository->getAccessType());
+        $streamData = $plugin->detectStreamWrapper(true);
+	$dir = AJXP_Utils::securePath($httpVars["dir"]);
+	$file = AJXP_Utils::decodeSecureMagic($httpVars["name"]);
+        $destStreamURL = $streamData["protocol"]."://".$repository->getId().$dir."/".$file;
+
+        if(file_exists($destStreamURL)) {
+             try {
+                 AJXP_Controller::applyHook("node.before_change", array(new AJXP_Node($destStreamURL)));
+             }
+             catch (Exception $e) {
+                 return $e->getMessage();
+             }
+        }
+    }
+
     public function unifyChunks($action, &$httpVars, &$fileVars)
     {
 
