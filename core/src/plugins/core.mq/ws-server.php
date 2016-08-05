@@ -1,169 +1,8 @@
-#!/php -q
 <?php
-// Run from command prompt > php demo.php
-require_once("vendor/phpws/websocket.server.php");
-require_once("../../core/classes/class.HttpClient.php");
-/**
- * This demo resource handler will respond to all messages sent to /echo/ on the socketserver below
- *
- * All this handler does is echoing the responds to the user
- * @author Cdujeu
- * @package AjaXplorer_Plugins
- * @subpackage Core
- */
-class AjaXplorerHandler extends WebSocketUriHandler
-{
-    public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg)
-    {
-        $this->say("[AJXP] " . strlen($msg->getData()) . " bytes");
-        $data = $msg->getData();
-        if (strpos($data, "register:") === 0) {
-            $regId = substr($data, strlen("register:"));
-            if (is_array($user->ajxpRepositories) && in_array($regId, $user->ajxpRepositories)) {
-                $user->currentRepository = $regId;
-                $this->say("User is registered on channel ".$user->currentRepository);
-            }
-        } else if (strpos($data, "unregister:") === 0) {
-            unset($user->currentRepository);
-        }
-    }
 
-    public function onAdminMessage(IWebSocketConnection $user, IWebSocketMessage $msg)
-    {
-        $this->say("[AJXP] Admin message received!");
+require_once(__DIR__ . '/vendor/phpws/autoload.php');
 
-        // Echo
-        // $user->sendMessage($msg);
-        $data = unserialize($msg->getData());
-        $repoId = $data["REPO_ID"];
-        $userId = isSet($data["USER_ID"]) ? $data["USER_ID"] : false;
-        $userGroupPath = isSet($data["GROUP_PATH"]) ? $data["GROUP_PATH"] : false;
-        $msg->setData($data["CONTENT"]);
-        foreach ($this->getConnections() as $conn) {
-            if($conn == $user) continue;
-            if ($repoId != "AJXP_REPO_SCOPE_ALL" && (!isSet($conn->currentRepository) || $conn->currentRepository != $repoId)) {
-                $this->say("Skipping, not the same repository");
-                continue;
-            }
-            if ($userId !== false && $conn->ajxpId != $userId) {
-                $this->say("Skipping, not the same userId");
-                continue;
-            }
-            if ($userGroupPath != false && (!isSet($conn->ajxpGroupPath) || $conn->ajxpGroupPath!=$userGroupPath)) {
-                $this->say("Skipping, not the same groupPath");
-                continue;
-            }
-            $this->say("Should dispatch to user ".$conn->ajxpId);
-            $conn->sendMessage($msg);
-        }
-
-
-        //$frame = WebSocketFrame::create(WebSocketOpcode::PongFrame);
-        //$user->sendFrame($frame);
-    }
-
-}
-
-/**
- * Demo socket server. Implements the basic eventlisteners and attaches a resource handler for /echo/ urls.
- *
- *
- * @author Chris
- *
- */
-class AjaxplorerSocketServer implements IWebSocketServerObserver
-{
-    protected $debug = true;
-    protected $server;
-    public static $ADMIN_KEY = "adminsecretkey";
-    protected $host;
-    protected $port;
-    protected $path;
-
-    public function __construct($host, $port, $path)
-    {
-        $this->host = $host;
-        $this->port = $port;
-        $this->path =  trim($path, "/");
-        $this->server = new WebSocketServer("tcp://{$host}:{$port}", self::$ADMIN_KEY);
-        $this->server->addObserver($this);
-        $this->server->addUriHandler($this->path, new AjaXplorerHandler());
-    }
-
-    public function onConnect(IWebSocketConnection $user)
-    {
-        if ($user->getAdminKey() == self::$ADMIN_KEY) {
-            $this->say("[ECHO] Admin user connected");
-            return;
-        }
-
-        $h = $user->getHeaders();
-        /*
-         * @todo
-         * Handle a REST auth instead of cookie based.
-         */
-        $c = WebSocketFunctions::cookie_parse($h["Cookie"]);
-
-        $client = new HttpClient($this->host);
-        $client->cookies = $c;
-        $client->get("/{$this->path}/?get_action=ws_authenticate&key=".self::$ADMIN_KEY);
-        $registry = $client->getContent();
-        //$this->say("[ECHO] Registry loaded".$registry);
-        $xml = new DOMDocument();
-        $xml->loadXML($registry);
-        $xPath = new DOMXPath($xml);
-        $err = $xPath->query("//message[@type='ERROR']");
-        if ($err->length) {
-            $this->say($err->item(0)->firstChild->nodeValue);
-            $user->disconnect();
-        } else {
-            $userRepositories = array();
-            $repos = $xPath->query("/tree/user/repositories/repo");
-            foreach ($repos as $repo) {
-                $repoId = $repo->attributes->getNamedItem("id")->nodeValue;
-                $userRepositories[] = $repoId;
-            }
-            $user->ajxpRepositories = $userRepositories;
-            $user->ajxpId = $xPath->query("/tree/user/@id")->item(0)->nodeValue;
-            if ($xPath->query("/tree/user/@groupPath")->length) {
-                $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
-                if(!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
-            }
-        }
-        $this->say("[ECHO] User '".$user->ajxpId."' connected with ".count($user->ajxpRepositories)." registered repositories "/*. print_r($user->ajxpRepositories, true)*/);
-    }
-
-    public function onMessage(IWebSocketConnection $user, IWebSocketMessage $msg)
-    {
-        //$this->say("[ECHO] {$user->getId()} says '{$msg->getData()}'");
-    }
-
-    public function onDisconnect(IWebSocketConnection $user)
-    {
-        //$this->say("[ECHO] {$user->getId()} disconnected");
-    }
-
-    public function onAdminMessage(IWebSocketConnection $user, IWebSocketMessage $msg)
-    {
-        //$this->say("[ECHO] Admin Message received!");
-    }
-
-    public function say($msg)
-    {
-        echo "$msg \r\n";
-    }
-
-    public function run()
-    {
-        $this->server->run();
-    }
-
-}
-
-function usage()
-{
-    echo "You must use the following command: \n > php ws-server.php -host=HOST_IP -port=HOST_PORT [-path=PATH]\n\n";
-}
+$ADMIN_KEY = 'adminsecretkey';
 
 $optArgs = array();
 $options = array();
@@ -180,9 +19,148 @@ foreach ($argv as $key => $argument) {
 }
 
 if (!isSet($options["host"]) || !isSet($options["port"])) {
-    usage();
+    echo 'You must use the following command: \n > php ws-server.php -host=HOST_IP -port=HOST_PORT [-path=PATH]\n\n';
     exit(0);
 }
-// Start server
-$server = new AjaxplorerSocketServer($options["host"], $options["port"], $options["path"]);
-$server->run();
+
+class AjaXplorerHandler extends \Devristo\Phpws\Server\UriHandler\WebSocketUriHandler {
+
+    private $ADMIN_KEY;
+
+    public function __construct($logger, $ADMIN_KEY)
+    {
+        parent::__construct($logger);
+        $this->ADMIN_KEY = $ADMIN_KEY;
+    }
+
+    public function onMessage(Devristo\Phpws\Protocol\WebSocketTransportInterface $user, Devristo\Phpws\Messaging\WebSocketMessageInterface $msg) {
+        $this->logger->notice('got message from client');
+        $h = $user->getHandshakeRequest()->getHeaders()->toArray();
+        if (array_key_exists('Admin-Key',$h) && $h['Admin-Key'] == $this->ADMIN_KEY) {
+
+            $data = unserialize($msg->getData());
+            $repoId = $data['REPO_ID'];
+            $userId = isSet($data['USER_ID']) ? $data['USER_ID'] : false;
+            $userGroupPath = isSet($data['GROUP_PATH']) ? $data['GROUP_PATH'] : false;
+            foreach ($this->getConnections() as $conn) {
+                if($conn == $user) continue;
+                if ($repoId != 'AJXP_REPO_SCOPE_ALL' && (!isSet($conn->currentRepository) || $conn->currentRepository != $repoId)) {
+                    $this->logger->notice('Skipping, not the same repository');
+                    continue;
+                }
+                if ($userId !== false && $conn->ajxpId != $userId) {
+                    $this->logger->notice('Skipping, not the same userId');
+                    continue;
+                }
+                if ($userGroupPath != false && (!isSet($conn->ajxpGroupPath) || $conn->ajxpGroupPath!=$userGroupPath)) {
+                    $this->logger->notice('Skipping, not the same groupPath');
+                    continue;
+                }
+                $this->logger->notice('Should dispatch to user '.$conn->ajxpId);
+                $conn->sendString($data['CONTENT']);
+            }
+        }else{
+            $data = $msg->getData();
+            if (strpos($data, 'register:') === 0) {
+                $regId = substr($data, strlen('register:'));
+                if (is_array($user->ajxpRepositories) && in_array($regId, $user->ajxpRepositories)) {
+                    $user->currentRepository = $regId;
+                    $this->logger->notice('User is registered on channel '.$user->currentRepository);
+                }
+            } else if (strpos($data, 'unregister:') === 0) {
+                unset($user->currentRepository);
+            }
+        }
+    }
+}
+
+$loop = \React\EventLoop\Factory::create();
+
+$logger = new \Zend\Log\Logger();
+if (array_key_exists('verbose', $options) && isSet($options["verbose"])) {
+    $writer = new Zend\Log\Writer\Stream("php://output");
+}else {
+    $writer = new Zend\Log\Writer\Noop;
+}
+$logger->addWriter($writer);
+
+$server = new \Devristo\Phpws\Server\WebSocketServer("tcp://{$options["host"]}:{$options["port"]}", $loop, $logger);
+$router = new \Devristo\Phpws\Server\UriHandler\ClientRouter($server, $logger);
+$router->addRoute('#^'.$options["path"].'$#i', new AjaXplorerHandler($logger, $ADMIN_KEY));
+
+$server->on('connect', function(Devristo\Phpws\Protocol\WebSocketTransportHybi $user) use ($logger,$options, $ADMIN_KEY){
+
+	$originHeader  = $user->getHandshakeRequest()->getHeader('Origin', null);
+    $host = $user->getHandshakeRequest()->getHeader('Host')->getFieldValue();
+
+    if ($originHeader != null) {
+        $address = "https://".$host;
+        if (strpos($address, $originHeader->getFieldValue()) !== 0) {
+            $logger->err('CSRF protection in connection: detected invalid Origin header: '.$originHeader->getFieldValue());
+            $user->close();
+            return;
+        }
+    }
+    
+    $h = $user->getHandshakeRequest()->getHeaders()->toArray();
+    if (array_key_exists('Admin-Key',$h) && $h['Admin-Key'] == $ADMIN_KEY) {
+        $logger->notice('[ECHO] Admin user connected');
+        return;
+    }
+
+    /*
+     * @todo
+     * Handle a REST auth instead of cookie based.
+     */
+    if($user->getHandshakeRequest()->getCookie() === false){
+        return;
+    }
+    $c = $user->getHandshakeRequest()->getCookie()->getArrayCopy();
+
+    $registry= null;
+    //prefer curl if installed
+    if(function_exists('curl_version')) {
+        // make local call
+        $curl = curl_init('http://'.$options['host'].'/index.php?get_action=ws_authenticate&key='.$ADMIN_KEY);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_COOKIESESSION, true);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $h);
+        curl_setopt($curl, CURLOPT_COOKIE, 'AjaXplorer='.$c['AjaXplorer']);
+        $registry = curl_exec($curl);
+        curl_close($curl);
+    }else{
+        require_once('../../core/classes/class.HttpClient.php');
+        $client = new HttpClient($options['host']);
+        $client->cookies = $c;
+        $client->get('/index.php/?get_action=ws_authenticate&key='.$ADMIN_KEY);
+        $registry = $client->getContent();
+    }
+    $xml = new DOMDocument();
+    $xml->loadXML($registry);
+    $xPath = new DOMXPath($xml);
+    $err = $xPath->query("//message[@type='ERROR']");
+    if ($err->length) {
+        //$this->say($err->item(0)->firstChild->nodeValue);
+        $user->close();
+    } else {
+        $userRepositories = array();
+        $repos = $xPath->query('/tree/user/repositories/repo');
+        foreach ($repos as $repo) {
+            $repoId = $repo->attributes->getNamedItem("id")->nodeValue;
+            $userRepositories[] = $repoId;
+        }
+        $user->ajxpRepositories = $userRepositories;
+        $user->ajxpId = $xPath->query("/tree/user/@id")->item(0)->nodeValue;
+        if ($xPath->query("/tree/user/@groupPath")->length) {
+            $groupPath = $xPath->query("/tree/user/@groupPath")->item(0)->nodeValue;
+            if (!empty($groupPath)) $user->ajxpGroupPath = $groupPath;
+        }
+        $logger->notice('[ECHO] User \'' . $user->ajxpId . '\' connected with ' . count($user->ajxpRepositories) . ' registered repositories ');
+    }
+});
+
+// Bind the server
+$server->bind();
+
+// Start the event loop
+$loop->run();
