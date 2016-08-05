@@ -1401,6 +1401,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                     $options = array();
                     $this->parseParameters($repDef, $options, null, true);
                 }
+                $repDef["DISPLAY"] = SystemTextEncoding::toUTF8($repDef["DISPLAY"]);
                 if (count($options)) {
                     $repDef["DRIVER_OPTIONS"] = $options;
                     unset($repDef["DRIVER_OPTIONS"]["AJXP_GROUP_PATH_PARAMETER"]);
@@ -1658,7 +1659,7 @@ class ajxp_confAccessDriver extends AbstractAccessDriver
                         AJXP_XMLWriter::close();
                         return;
                     }
-                    $repo->setDisplay($newLabel);
+                    $repo->setDisplay(SystemTextEncoding::toUTF8($newLabel));
                     $res = ConfService::replaceRepository($repId, $repo);
                 } else {
                     $options = array();
