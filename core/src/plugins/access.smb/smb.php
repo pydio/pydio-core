@@ -195,93 +195,98 @@ class smb
             $env = array("LC_ALL" => AJXP_LOCALE);
         }
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
-        if (is_resource($process)) {
-            fclose($pipes[0]);
-            $error = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-            if ($error != "") {
-                $error = strtolower($error);
-                // common error
-                if (strstr($error, "command not found")!==false) {
-                    fclose($pipes[1]);
-                    throw new Exception($error);
-                } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
-                    self::debug("Smbclient alternate stream : ".$error);
-                } else {
-                    AJXP_Logger::error(__CLASS__,"Smbclient error",$error);
-                }
-            }
-            $output = $pipes[1];
-        }
-
-        if (isset($output) && is_resource($output)) {
-
-            while ($line = fgets ($output, 4096)) {
-			
-                if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-                    $line = SystemTextEncoding::fromUTF8($line);
+        try {
+            if (is_resource($process)) {
+                fclose($pipes[0]);
+                $error = stream_get_contents($pipes[2]);
+                fclose($pipes[2]);
+                if ($error != "") {
+                    $error = strtolower($error);
+                    // common error
+                    if (strstr($error, "command not found")!==false) {
+                        fclose($pipes[1]);
+                        throw new Exception($error);
+                    } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
+                        self::debug("Smbclient alternate stream : ".$error);
+                    } else {
+                        AJXP_Logger::error(__CLASS__,"Smbclient error",$error);
                     }
-
-                list ($tag, $regs, $i) = array ('skip', array (), array ());
-                reset ($regexp);
-                foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
-                    $tag = $t;
-                    break;
                 }
-                switch ($tag) {
-                    case 'skip':    continue;
-                    case 'shares':  $mode = 'shares';     break;
-                    case 'servers': $mode = 'servers';    break;
-                    case 'workg':   $mode = 'workgroups'; break;
-                    case 'share':
-                        list($name, $type) = array (
-                            trim(substr($line, 1, 15)),
-                            trim(strtolower(substr($line, 17, 10)))
-                        );
-                        $i = ($type <> 'disk' && preg_match('/^(.*) Disk/', $line, $regs))
-                            ? array(trim($regs[1]), 'disk')
-                            : array($name, 'disk');
-                        break;
-                    case 'srvorwg':
-                        list ($name, $master) = array (
-                            strtolower(trim(substr($line,1,21))),
-                            strtolower(trim(substr($line, 22)))
-                        );
-                        $i = ($mode == 'servers') ? array ($name, "server") : array ($name, "workgroup", $master);
-                        break;
-                    case 'files':
-                        list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R|N]+)$/", trim ($regs[1]), $regs2)
-                            ? array (trim ($regs2[2]), trim ($regs2[1]))
-                            : array ('', trim ($regs[1]));
-                        list ($his, $im) = array (
-                        explode(':', $regs[6]), 1 + strpos("JanFebMarAprMayJunJulAugSepOctNovDec", $regs[4]) / 3);
-                        $i = ($name <> '.' && $name <> '..')
-                            ? array (
-                                $name,
-                                (strpos($attr,'D') === FALSE) ? 'file' : 'folder',
-                                'attr' => $attr,
-                                'size' => intval($regs[2]),
-                                'time' => mktime ($his[0], $his[1], $his[2], $im, $regs[5], $regs[7])
-                              )
-                            : array();
-                        break;
-                    case 'error':
-                        if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
-                            return "NOT_FOUND";
-                        }
-                        trigger_error($regs[1], E_USER_ERROR);
-                }
-                if ($i) switch ($i[1]) {
-                    case 'file':
-                    case 'folder':    $info['info'][$i[0]] = $i;
-                    case 'disk':
-                    case 'server':
-                    case 'workgroup': $info[$i[1]][] = $i[0];
-                }
+                $output = $pipes[1];
             }
-            //pclose($output);
-            fclose($output);
-
+    
+            if (isset($output) && is_resource($output)) {
+    
+                while ($line = fgets ($output, 4096)) {
+    			
+                    if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+                        $line = SystemTextEncoding::fromUTF8($line);
+                        }
+    
+                    list ($tag, $regs, $i) = array ('skip', array (), array ());
+                    reset ($regexp);
+                    foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
+                        $tag = $t;
+                        break;
+                    }
+                    switch ($tag) {
+                        case 'skip':    continue;
+                        case 'shares':  $mode = 'shares';     break;
+                        case 'servers': $mode = 'servers';    break;
+                        case 'workg':   $mode = 'workgroups'; break;
+                        case 'share':
+                            list($name, $type) = array (
+                                trim(substr($line, 1, 15)),
+                                trim(strtolower(substr($line, 17, 10)))
+                            );
+                            $i = ($type <> 'disk' && preg_match('/^(.*) Disk/', $line, $regs))
+                                ? array(trim($regs[1]), 'disk')
+                                : array($name, 'disk');
+                            break;
+                        case 'srvorwg':
+                            list ($name, $master) = array (
+                                strtolower(trim(substr($line,1,21))),
+                                strtolower(trim(substr($line, 22)))
+                            );
+                            $i = ($mode == 'servers') ? array ($name, "server") : array ($name, "workgroup", $master);
+                            break;
+                        case 'files':
+                            list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R|N]+)$/", trim ($regs[1]), $regs2)
+                                ? array (trim ($regs2[2]), trim ($regs2[1]))
+                                : array ('', trim ($regs[1]));
+                            list ($his, $im) = array (
+                            explode(':', $regs[6]), 1 + strpos("JanFebMarAprMayJunJulAugSepOctNovDec", $regs[4]) / 3);
+                            $i = ($name <> '.' && $name <> '..')
+                                ? array (
+                                    $name,
+                                    (strpos($attr,'D') === FALSE) ? 'file' : 'folder',
+                                    'attr' => $attr,
+                                    'size' => intval($regs[2]),
+                                    'time' => mktime ($his[0], $his[1], $his[2], $im, $regs[5], $regs[7])
+                                  )
+                                : array();
+                            break;
+                        case 'error':
+                            if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
+                                return "NOT_FOUND";
+                            }
+                            trigger_error($regs[1], E_USER_ERROR);
+                    }
+                    if ($i) switch ($i[1]) {
+                        case 'file':
+                        case 'folder':    $info['info'][$i[0]] = $i;
+                        case 'disk':
+                        case 'server':
+                        case 'workgroup': $info[$i[1]][] = $i[0];
+                    }
+                }
+                //pclose($output);
+                fclose($output);
+    
+            }
+        } finally {
+            if (is_resource($process))
+                proc_close($process);
         }
         //self::debug(print_r($info, true));
         return $info;
