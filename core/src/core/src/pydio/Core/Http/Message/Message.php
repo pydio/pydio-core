@@ -18,32 +18,36 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Http\Rest;
+namespace Pydio\Core\Http\Message;
 
-use \Psr\Http\Message\ServerRequestInterface;
-use \Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Http\Middleware\SapiMiddleware;
+use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
+use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
-class RestApiMiddleware extends SapiMiddleware
+class Message implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
-    protected $base;
 
-    public function __construct($base)
+    private $message;
+
+    public function __construct($message)
     {
-        $this->base = $base;
+        $this->message = $message;
     }
 
-    protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
-
-        $router = new ApiRouter($this->base);
-        if(!$router->route($request, $response)){
-            throw new PydioException("Could not find any endpoint for this URI");
-        }
-
+    public function toXML()
+    {
+        return XMLWriter::sendMessage($this->message, $this->message);
     }
 
+    public function jsonSerializableData()
+    {
+        return $this->message;
+    }
+
+    public function jsonSerializableKey()
+    {
+        return 'message';
+    }
 }

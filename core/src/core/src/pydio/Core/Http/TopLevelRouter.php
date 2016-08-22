@@ -20,7 +20,8 @@
  */
 namespace Pydio\Core\Http;
 
-use Psr\Http\Message\ResponseInterface;
+use FastRoute\Dispatcher;
+use FastRoute\RouteCollector;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 
@@ -61,7 +62,7 @@ class TopLevelRouter
      * @param string $base Base URI (empty string if "/").
      * @param \FastRoute\RouteCollector $r
      */
-    public function configureRoutes($base, \FastRoute\RouteCollector &$r){
+    public function configureRoutes($base, RouteCollector &$r){
         
         $allMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH', 'PROPFIND', 'PROPPATCH', 'MKCOL', 'COPY', 'MOVE', 'LOCK', 'UNLOCK'];
         $file = AJXP_DATA_PATH."/".AJXP_PLUGINS_FOLDER."/boot.conf/routes.json";
@@ -102,7 +103,7 @@ class TopLevelRouter
         $request = ServerRequestFactory::fromGlobals();
         $this->base = rtrim(dirname($request->getServerParams()["SCRIPT_NAME"]), "/");
 
-        $dispatcher = \FastRoute\cachedDispatcher(function(\FastRoute\RouteCollector $r) {
+        $dispatcher = \FastRoute\cachedDispatcher(function(RouteCollector $r) {
             $this->configureRoutes($this->base, $r);
         }, $this->cacheOptions);
 
@@ -111,14 +112,14 @@ class TopLevelRouter
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
         switch ($routeInfo[0]) {
-            case \FastRoute\Dispatcher::FOUND:
+            case Dispatcher::FOUND:
                 $data = $routeInfo[1];
                 if(isSet($data["path"])){
                     require_once (AJXP_INSTALL_PATH."/".$data["path"]);
                 }
                 call_user_func(array($data["class"], $data["method"]), $this->base, $data["short"], $routeInfo[2]);
                 break;
-            case \FastRoute\Dispatcher::NOT_FOUND:
+            case Dispatcher::NOT_FOUND:
             default:
                 throw new PydioException("Oups, could not find any valid route for ".$uri.", method was was ".$httpMethod);
                 break;

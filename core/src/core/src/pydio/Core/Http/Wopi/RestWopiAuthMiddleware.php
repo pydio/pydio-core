@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace Pydio\Core\Http\Rest;
+namespace Pydio\Core\Http\Wopi;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -45,7 +45,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * Authentication middleware used in Rest context
  * @package Pydio\Core\Http\Rest
  */
-class RestAuthMiddleware
+class RestWopiAuthMiddleware
 {
 
     /**

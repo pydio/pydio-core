@@ -34,25 +34,20 @@ class Base
      */
     public static function handleRoute($base, $route){
 
-        if($route === "/api") {
-
-            $server = new Rest\RestServer($base.$route);
-
-        }else if($route === "/user") {
-
+        if ($route === "/api") {
+            $server = new Rest\RestApiServer($base.$route);
+        } else if ($route == "/wopi") {
+            $server = new Wopi\RestWopiServer($base.$route);
+        } else if ($route === "/user") {
             $_GET["get_action"] = "user_access_point";
             $server = new Server($base);
-
-        }else if($route == "/favicon"){
-
+        } else if ($route == "/favicon"){
             $_GET["get_action"] = "serve_favicon";
             $server = new Server($base);
-
-        }else{
-
+        } else {
             $server = new Server($base);
-            
         }
+
         $server->registerCatchAll();
 
         ConfService::init();
