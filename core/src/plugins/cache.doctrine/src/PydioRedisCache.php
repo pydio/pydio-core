@@ -46,7 +46,7 @@ class PydioRedisCache extends RedisCache implements PatternClearableCache
      *
      * @return void
      */
-    public function setRedis($redis){
+    public function setRedis(Redis $redis){
         parent::setRedis($redis);
         $this->internalRedis = $redis;
     }
