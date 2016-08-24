@@ -515,8 +515,8 @@ class MqManager extends Plugin
             $hosts[$key] = array_merge(
                 (array)$hosts[$key],
                 [
-                    "pydioauth" => [$path, $authURL, $tokenURL . "&device=websocket"],
-                    "pydiows" => [$path]
+                    "pydioauth " . $path => [$authURL, $tokenURL . "&device=websocket"],
+                    "pydiows " . $path => []
                 ]
             );
         }
@@ -534,7 +534,7 @@ class MqManager extends Plugin
             $hosts[$key] = array_merge(
                 (array)$hosts[$key],
                 [
-                    "header" => [$path, "{\n" .
+                    "header " . $path => ["{\n" .
                         "\tAccess-Control-Allow-Origin " . $serverURL . "\n" .
                         "\tAccess-Control-Request-Headers *\n" .
                         "\tAccess-Control-Allow-Methods POST\n" .
@@ -542,8 +542,8 @@ class MqManager extends Plugin
                         "\tAccess-Control-Allow-Credentials true\n" .
                         "}"
                     ],
-                    "pydioauth" => [$path, $authURL, $tokenURL . "&device=upload"],
-                    "pydioupload" => [$path]
+                    "pydioauth " . $path => [$authURL, $tokenURL . "&device=upload"],
+                    "pydioupload " . $path => []
                 ]
             );
         }
