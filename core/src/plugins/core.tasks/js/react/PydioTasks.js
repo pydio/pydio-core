@@ -81,7 +81,6 @@
                 params['target-users'] = targetUsers;
                 params['target-repositories'] = targetRepositories;
             }
-            console.log(params);
             PydioApi.getClient().request(params);
         }
 
