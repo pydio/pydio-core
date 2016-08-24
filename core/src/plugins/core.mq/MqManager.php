@@ -500,12 +500,14 @@ class MqManager extends Plugin
         // Getting URLs of the Pydio system
         $serverURL = ApplicationState::detectServerURL();
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
-        $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
 
         // Websocket Server Config
         $active = $params["WS_ACTIVE"];
 
         if ($active) {
+
+            $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
+
             $host = $params["WS_HOST"];
             $port = $params["WS_PORT"];
             $secure = $params["WS_SECURE"];
@@ -525,6 +527,9 @@ class MqManager extends Plugin
         $active = $params["UPLOAD_ACTIVE"];
 
         if ($active) {
+
+            $authURL = $serverURL . "/api/{repo}/upload/put";
+
             $host = $params["UPLOAD_HOST"];
             $port = $params["UPLOAD_PORT"];
             $secure = $params["UPLOAD_SECURE"];
@@ -535,12 +540,12 @@ class MqManager extends Plugin
                 (array)$hosts[$key],
                 [
                     "header " . $path => ["{\n" .
-                        "\tAccess-Control-Allow-Origin " . $serverURL . "\n" .
-                        "\tAccess-Control-Request-Headers *\n" .
-                        "\tAccess-Control-Allow-Methods POST\n" .
-                        "\tAccess-Control-Allow-Headers Range\n" .
-                        "\tAccess-Control-Allow-Credentials true\n" .
-                        "}"
+                        "\t\tAccess-Control-Allow-Origin " . $serverURL . "\n" .
+                        "\t\tAccess-Control-Request-Headers *\n" .
+                        "\t\tAccess-Control-Allow-Methods POST\n" .
+                        "\t\tAccess-Control-Allow-Headers Range\n" .
+                        "\t\tAccess-Control-Allow-Credentials true\n" .
+                        "\t}"
                     ],
                     "pydioauth " . $path => [$authURL, $tokenURL . "&device=upload"],
                     "pydioupload " . $path => []

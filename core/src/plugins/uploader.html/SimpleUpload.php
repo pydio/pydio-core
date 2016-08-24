@@ -73,19 +73,6 @@ class SimpleUpload extends Plugin
             return;
         }
 
-        // Mandatory headers
-        if (!isset($serverData['CONTENT_LENGTH'], $serverData['HTTP_X_FILE_NAME'])) {
-            throw new PydioException("Warning, missing headers!");
-        }
-
-        $fileNameH = $serverData['HTTP_X_FILE_NAME'];
-        $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
-        // Clean up dir name (backward compat)
-        if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
-            $httpVars["dir"] = "/";
-        }
-        $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
-
         $this->logDebug("SimpleUpload::preProcess", $httpVars);
 
         // Setting the stream data
@@ -96,6 +83,16 @@ class SimpleUpload extends Plugin
             if (!isset($serverData['HTTP_X_FILE_SIZE'])) {
                 exit('Warning, wrong headers');
             }
+
+            $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+            $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
+
+            // Clean up dir name (backward compat)
+            if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
+                $httpVars["dir"] = "/";
+            }
+
+            $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
 
             // Setting the stream to point to the file location
             $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
@@ -111,15 +108,32 @@ class SimpleUpload extends Plugin
 
         } else if(isSet($serverData['HTTP_X_FILE_DIRECT_UPLOAD'])){
 
+            // Mandatory headers
             $externalUploadStatus = $serverData['HTTP_X_FILE_DIRECT_UPLOAD'];
             if(!ExternalUploadedFile::isValidStatus($externalUploadStatus)){
                 throw new PydioException("Unrecognized direct upload status ". $externalUploadStatus);
             }
-            $uploadedFile = new ExternalUploadedFile($externalUploadStatus, $fileSizeH, $fileNameH);
+            $uploadedFile = new ExternalUploadedFile($externalUploadStatus, 1, "fake-name");
 
         } else {
 
             // The file is the post data stream
+
+            // Mandatory headers
+            if (!isset($serverData['CONTENT_LENGTH'], $serverData['HTTP_X_FILE_NAME'])) {
+                throw new PydioException("Warning, missing headers!");
+            }
+
+            $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+            $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
+
+            // Clean up dir name (backward compat)
+            if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
+                $httpVars["dir"] = "/";
+            }
+
+            $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
+
 
             // Checking headers
             if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
