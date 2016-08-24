@@ -649,5 +649,7 @@ $mess=array(
     "549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
     "550" => "Rejeter ce partage",
     "551" => "Rejeter",
+    "552" => "Please provide a password.",
+    "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!"
 /* END SENTENCE */
 );

@@ -656,4 +656,6 @@ $mess=array(
 "549" => "Sie haben die Freigabe des Benutzers %%OWNER%% von einem entfernten System bereits akzeptiert. Möchten Sie diese nun ablehnen?",
 "550" => "Freigabe ablehnen",
 "551" => "Ablehnen",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
 );

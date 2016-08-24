@@ -649,4 +649,6 @@ $mess=array(
 "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
 "550" => "Reject this share",
 "551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!"
 ); 

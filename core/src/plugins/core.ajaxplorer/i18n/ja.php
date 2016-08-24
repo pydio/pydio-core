@@ -648,7 +648,12 @@ $mess=array(
 "545" => "Remote Share Dialog",
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
-"548" => "Decline"
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
 /* 文章はここまで */
 /* 文章終了 */
 );
