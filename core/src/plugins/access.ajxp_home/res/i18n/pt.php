@@ -87,5 +87,5 @@ $mess=array(
     "72" => "Server QRCode",
     "73" => "Easily connect your mobile applications",
     "74" => "Scan this QRCode with your mobile application to easily configure the connection",
-    "75"=> "Search all workspaces...",
+    "75"=> "Search all files...",
 );
