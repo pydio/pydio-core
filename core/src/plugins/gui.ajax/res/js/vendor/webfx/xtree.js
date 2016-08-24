@@ -156,12 +156,13 @@ WebFXCookie.prototype.getCookie = function (key) {
  */
 
 function WebFXTreeAbstractNode(sText, sAction) {
-	this.childNodes  = [];
-	this.id     = webFXTreeHandler.getId();
-	this.text   = sText || webFXTreeConfig.defaultText;
-	this.action = sAction || null;
-	this.url 	= "/";
-	this._last  = false;
+	this.childNodes         = [];
+    this.childrenPathes     = {};
+	this.id             = webFXTreeHandler.getId();
+	this.text           = sText || webFXTreeConfig.defaultText;
+	this.action         = sAction || null;
+	this.url 	        = "/";
+	this._last          = false;
 	webFXTreeHandler.all[this.id] = this;
 }
 
@@ -192,7 +193,10 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		node.action = node.parentNode.action;
 	}
 	
-	this.childNodes[this.childNodes.length] = node;
+	this.childNodes.push(node);
+    if(node.ajxpNode){
+        this.childrenPathes[node.ajxpNode.getPath()] = node.id;
+    }
 	var root = this;
 	if (this.childNodes.length >= 2) {
 		this.childNodes[this.childNodes.length - 2]._last = false;
@@ -216,7 +220,20 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		$(this.id + '-cont').insert(node.toString());
-		$(node.id).ajxpNode = node.ajxpNode;
+        var addedBloc = $(this.id + '-cont').down('#' + node.id);
+        if(this.childNodes.length > 2 && node.ajxpNode){
+            var sorted = Object.keys(this.childrenPathes).sort(function(a,b){
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
+            var sortedIndex = sorted.indexOf(node.ajxpNode.getPath());
+            if(sortedIndex < sorted.length-1){
+                var nextId = this.childrenPathes[sorted[sortedIndex + 1]];
+                if($(this.id + '-cont').down('#' + nextId)){
+                    $(this.id + '-cont').down('#' + nextId).insert({before: addedBloc});
+                }
+            }
+        }
+		addedBloc.ajxpNode = node.ajxpNode;
 		if(!node.inZip){
             window.setTimeout(function(){
                 if(!$(node.id)) return;
@@ -225,19 +242,19 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		}
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
-			Event.observe(node.id+'','contextmenu', function(event){
+			Event.observe(addedBloc,'contextmenu', function(event){
 				this.select();
 				this.action();
 				Event.stop(event);
 			}.bind(node));
 			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'');
 		}
-		Event.observe(node.id,'click', function(event){
+		Event.observe(addedBloc,'click', function(event){
 			this.select();
 			this.action();
 			Event.stop(event);
 		}.bind(node));
-		Event.observe(node.id,'dblclick', function(event){
+		Event.observe(addedBloc,'dblclick', function(event){
 			this.toggle();
 			Event.stop(event);
 		}.bind(node));
@@ -660,6 +677,9 @@ WebFXTreeItem.prototype._remove = function() {
 			break;
 	}	}
 	//webFXTreeHandler.all[this.id] = null;
+    if(this.ajxpNode && this.parentNode.childrenPathes[this.ajxpNode.getPath()]){
+       delete this.parentNode.childrenPathes[this.ajxpNode.getPath()];
+    }
 	delete(webFXTreeHandler.all[this.id]);
 	var tmp = $(this.id);
 	if (tmp) { tmp.parentNode.removeChild(tmp); }
