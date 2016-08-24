@@ -42,4 +42,6 @@ $mess = array(
     "18" => "Keine Aktualisierungen gefunden. Klicken, um erneut zu prüfen.",
     "19" => "Klicken um auf Aktualisierungen zu prüfen",
     "20" => "Nun prüfen",
+    "21" => "Currently in development mode.",
+    "22" => "Current version is %1 (%2).",
 );

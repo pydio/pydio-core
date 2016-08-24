@@ -40,5 +40,7 @@ $mess = array(
     "17" => "Vérification des mises à jours...",
     "18" => "Pas de mise à jour nécessaire, cliquez pour déclencher une nouvelle vérification.",
     "19" => "Cliquer pour vérifier si une mise à jour est nécessaire.",
-    "20" => "Vérifier maintenant"
+    "20" => "Vérifier maintenant",
+    "21" => "Currently in development mode.",
+    "22" => "Current version is %1 (%2).",
 );
