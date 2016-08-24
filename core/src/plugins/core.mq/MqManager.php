@@ -503,41 +503,50 @@ class MqManager extends Plugin
         $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
 
         // Websocket Server Config
-        $host = $params["WS_HOST"];
-        $port = $params["WS_PORT"];
-        $secure = $params["WS_SECURE"];
-        $path = "/" . trim($params["WS_PATH"], "/");
+        $active = $params["WS_ACTIVE"];
 
-        $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
-        $hosts[$key] = array_merge(
-            (array) $hosts[$key],
-            [
-                "pydioauth" => [$path, $authURL, $tokenURL. "&device=websocket"],
-                "pydiows" => [$path]
-            ]
-        );
+        if ($active) {
+            $host = $params["WS_HOST"];
+            $port = $params["WS_PORT"];
+            $secure = $params["WS_SECURE"];
+            $path = "/" . trim($params["WS_PATH"], "/");
+
+            $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
+            $hosts[$key] = array_merge(
+                (array)$hosts[$key],
+                [
+                    "pydioauth" => [$path, $authURL, $tokenURL . "&device=websocket"],
+                    "pydiows" => [$path]
+                ]
+            );
+        }
 
         // Upload Server Config
-        $host = $params["UPLOAD_HOST"];
-        $port = $params["UPLOAD_PORT"];
-        $secure = $params["UPLOAD_SECURE"];
-        $path = "/" . trim($params["UPLOAD_PATH"], "/");
+        $active = $params["UPLOAD_ACTIVE"];
 
-        $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
-        $hosts[$key] = array_merge(
-            (array) $hosts[$key],
-            [
-                "header" => [$path, "{\n" .
-                    "\tAccess-Control-Allow-Origin ". $serverURL ."\n" .
-                    "\tAccess-Control-Request-Headers *\n" .
-                    "\tAccess-Control-Allow-Methods POST\n" .
-                    "\tAccess-Control-Allow-Headers Range\n" .
-                    "\tAccess-Control-Allow-Credentials true\n" .
-                    "}"
-                ],
-                "pydioupload" => [$path, $tokenURL . "&device=upload"]
-            ]
-        );
+        if ($active) {
+            $host = $params["UPLOAD_HOST"];
+            $port = $params["UPLOAD_PORT"];
+            $secure = $params["UPLOAD_SECURE"];
+            $path = "/" . trim($params["UPLOAD_PATH"], "/");
+
+            $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
+            $hosts[$key] = array_merge(
+                (array)$hosts[$key],
+                [
+                    "header" => [$path, "{\n" .
+                        "\tAccess-Control-Allow-Origin " . $serverURL . "\n" .
+                        "\tAccess-Control-Request-Headers *\n" .
+                        "\tAccess-Control-Allow-Methods POST\n" .
+                        "\tAccess-Control-Allow-Headers Range\n" .
+                        "\tAccess-Control-Allow-Credentials true\n" .
+                        "}"
+                    ],
+                    "pydioauth" => [$path, $authURL, $tokenURL . "&device=upload"],
+                    "pydioupload" => [$path]
+                ]
+            );
+        }
 
         foreach ($hosts as $host => $config) {
             $data .= $host . " {\n";
