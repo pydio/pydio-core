@@ -7,6 +7,14 @@
     "class": "Pydio\\Core\\Http\\Base",
     "method": "handleRoute"
   },
+  "/wopi": {
+    "methods": "*",
+    "routes": [
+      "/wopi[{optional:.+}]"
+    ],
+    "class": "Pydio\\Core\\Http\\Base",
+    "method": "handleRoute"
+  },
   "/user":{
     "methods": "*",
     "routes": [
