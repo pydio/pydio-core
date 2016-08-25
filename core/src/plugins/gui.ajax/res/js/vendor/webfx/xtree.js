@@ -221,6 +221,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		}
 		$(this.id + '-cont').insert(node.toString());
         var addedBloc = $(this.id + '-cont').down('#' + node.id);
+        var addedCont = $(this.id + '-cont').down('#' + node.id + '-cont');
         if(this.childNodes.length > 2 && node.ajxpNode){
             var sorted = Object.keys(this.childrenPathes).sort(function(a,b){
                 return a.toLowerCase().localeCompare(b.toLowerCase());
@@ -230,6 +231,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
                 var nextId = this.childrenPathes[sorted[sortedIndex + 1]];
                 if($(this.id + '-cont').down('#' + nextId)){
                     $(this.id + '-cont').down('#' + nextId).insert({before: addedBloc});
+                    if(addedCont) addedBloc.insert({after: addedCont});
                 }
             }
         }
