@@ -142,7 +142,9 @@ abstract class AbstractUser implements UserInterface
     public function addRole($roleObject)
     {
         if (isSet($this->roles[$roleObject->getId()])) {
-            // NOTHING SPECIAL TO DO !
+            // Role may have been updated, but ajxp.roles does not need reload.
+            $this->roles[$roleObject->getId()] = $roleObject;
+            $this->recomputeMergedRole();
             return;
         }
         if(!isSet($this->rights["ajxp.roles"])) $this->rights["ajxp.roles"] = array();
