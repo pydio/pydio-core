@@ -21,8 +21,12 @@
 namespace Pydio\Auth\Frontend;
 
 use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
@@ -32,6 +36,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\HTMLWriter;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -74,16 +79,12 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
             //$this->logDebug(__FUNCTION__, "Empty token", $_POST);
             return false;
         }
-        $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
 
-        $data = null;
-        $this->storage->simpleStoreGet("keystore", $token, "serial", $data);
-        if (empty($data)) {
-            //$this->logDebug(__FUNCTION__, "Cannot find token in keystore");
+        $data = ApiKeysService::loadDataForPair($token);
+        if($data === false){
+            $this->logDebug(__FUNCTION__, "Cannot find token in keystore");
             return false;
         }
-        //$this->logDebug(__FUNCTION__, "Found token in keystore");
         $userId = $data["USER_ID"];
         $private = $data["PRIVATE"];
         $explode = explode("?", $_SERVER["REQUEST_URI"]);
@@ -118,31 +119,24 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
      */
     public function revokeUserTokens(ContextInterface $ctx, $userId)
     {
-
-        $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
-        $cursor = null;
-        $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"USER_ID";s:' . strlen($userId) . ':"' . $userId . '"%');
-        foreach ($keys as $keyId => $keyData) {
-            $this->storage->simpleStoreClear("keystore", $keyId);
-        }
-        if (count($keys)) {
-            $this->logInfo(__FUNCTION__, "Revoking " . count($keys) . " keys for user '" . $userId . "' on password change action.");
-        }
-        return null;
+        try{
+            $count = ApiKeysService::revokeTokens($userId);
+            $this->logInfo(__FUNCTION__, "Revoking " . $count . " keys for user '" . $userId . "' on user modification action.");
+        }catch (PydioException $e){}
     }
 
     /**
-     * @param String $action
-     * @param array $httpVars
-     * @param array $fileVars
-     * @param ContextInterface $ctx
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @return String
-     * @throws Exception
      */
-    function authTokenActions($action, $httpVars, $fileVars, ContextInterface $ctx)
+    function authTokenActions(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-
+        /** @var ContextInterface $ctx */
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $action         = $requestInterface->getAttribute("action");
+        $httpVars       = $requestInterface->getParsedBody();
+        
         if (!$ctx->hasUser()) {
             return null;
         }
@@ -164,29 +158,9 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                     echo "";
                     break;
                 }
-
-                $token = StringHelper::generateRandomString();
-                $private = StringHelper::generateRandomString();
-                $data = array("USER_ID" => $user, "PRIVATE" => $private);
-                if (!empty($httpVars["device"])) {
-                    // Revoke previous tokens for this device
-                    $device = $httpVars["device"];
-                    $cursor = null;
-                    $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"DEVICE_ID";s:' . strlen($device) . ':"' . $device . '"%');
-                    foreach ($keys as $keyId => $keyData) {
-                        if ($keyData["USER_ID"] != $user) continue;
-                        $this->storage->simpleStoreClear("keystore", $keyId);
-                    }
-                    $data["DEVICE_ID"] = $device;
-                }
-                $data["DEVICE_UA"] = $_SERVER['HTTP_USER_AGENT'];
-                $data["DEVICE_IP"] = $_SERVER['REMOTE_ADDR'];
-                $this->storage->simpleStoreSet("keystore", $token, $data, "serial");
-                HTMLWriter::charsetHeader("application/json");
-                echo(json_encode(array(
-                        "t" => $token,
-                        "p" => $private)
-                ));
+                $device = (isSet($httpVars["device"]) ? InputFilter::sanitize($httpVars["device"], InputFilter::SANITIZE_ALPHANUM) : "");
+                $tokenPair = ApiKeysService::generatePairForAuthfront($user, $device, $_SERVER["HTTP_USER_AGENT"], $_SERVER["REMOTE_ADDR"]);
+                $responseInterface = new JsonResponse($tokenPair);
 
                 break;
 
@@ -196,45 +170,19 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
                 $mess = LocaleService::getMessages();
                 $passedKeyId = "";
                 if (isSet($httpVars["key_id"])) $passedKeyId = $httpVars["key_id"];
-                $cursor = null;
-                $keys = $this->storage->simpleStoreList("keystore", $cursor, $passedKeyId, "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
-                foreach ($keys as $keyId => $keyData) {
-                    $this->storage->simpleStoreClear("keystore", $keyId);
-                }
-                $message = array(
+                $r = ApiKeysService::revokeTokens($user, $passedKeyId);
+                $responseInterface = new JsonResponse([
                     "result" => "SUCCESS",
                     "message" => $mess["keystore.8"]
-                );
-                HTMLWriter::charsetHeader("application/json");
-                echo json_encode($message);
+                ]);
                 break;
 
             case "keystore_list_tokens":
+                
                 if (!isSet($user)) break;
-                $cursor = null;
-                $keys = $this->storage->simpleStoreList("keystore", $cursor, "", "serial", '%"USER_ID";s:' . strlen($user) . ':"' . $user . '"%');
-                foreach ($keys as $keyId => &$keyData) {
-                    unset($keyData["PRIVATE"]);
-                    unset($keyData["USER_ID"]);
-                    $deviceDesc = "Web Browser";
-                    $deviceOS = "Unkown";
-                    if (isSet($keyData["DEVICE_UA"])) {
-                        $agent = $keyData["DEVICE_UA"];
-                        if (strpos($agent, "python-requests") !== false) {
-                            $deviceDesc = "PydioSync";
-                            if (strpos($agent, "Darwin") !== false) $deviceOS = "Mac OS X";
-                            else if (strpos($agent, "Windows/7") !== false) $deviceOS = "Windows 7";
-                            else if (strpos($agent, "Windows/8") !== false) $deviceOS = "Windows 8";
-                            else if (strpos($agent, "Linux") !== false) $deviceOS = "Linux";
-                        } else {
-                            $deviceOS = UserAgent::osFromUserAgent($agent);
-                        }
-                    }
-                    $keyData["DEVICE_DESC"] = $deviceDesc;
-                    $keyData["DEVICE_OS"] = $deviceOS;
-                }
-                header("Content-type: application/json;");
-                echo json_encode($keys);
+
+                $keys = ApiKeysService::listPairsForUser($user);
+                $responseInterface = new JsonResponse($keys);
 
                 break;
 

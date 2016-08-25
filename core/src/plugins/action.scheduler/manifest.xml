@@ -45,7 +45,7 @@
                     <clientForm id="scheduler_cronExpression"><![CDATA[
                          <div id="scheduler_cronExpression" box_width="420">
                              <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
-                             <textarea class="dialogFocus" style="width:400px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
+                             <textarea class="dialogFocus" style="width:350px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
                          </div>
                     ]]></clientForm>
                     <serverCallback methodName="switchAction" developerComment="Generate a correct expression to be inserted in Crontab, in order to trigger the {runAll} action on a regular basis."/>
