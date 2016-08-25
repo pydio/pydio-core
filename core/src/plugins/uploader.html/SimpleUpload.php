@@ -110,10 +110,23 @@ class SimpleUpload extends Plugin
 
             // Mandatory headers
             $externalUploadStatus = $serverData['HTTP_X_FILE_DIRECT_UPLOAD'];
+            $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+            $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
+
+            // Faking data if not present
+            if (empty($fileNameH)) {
+                $fileNameH = "fake-name";
+            }
+
+            if (empty($fileSieH)) {
+                $fileSizeH = 1;
+            }
+
             if(!ExternalUploadedFile::isValidStatus($externalUploadStatus)){
                 throw new PydioException("Unrecognized direct upload status ". $externalUploadStatus);
             }
-            $uploadedFile = new ExternalUploadedFile($externalUploadStatus, 1, "fake-name");
+
+            $uploadedFile = new ExternalUploadedFile($externalUploadStatus, $fileSizeH, $fileNameH);
 
         } else {
 

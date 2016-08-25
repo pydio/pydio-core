@@ -517,7 +517,8 @@ class MqManager extends Plugin
             $hosts[$key] = array_merge(
                 (array)$hosts[$key],
                 [
-                    "pydioauth " . $path => [$authURL, $tokenURL . "&device=websocket"],
+                    "pydioauth " . $path => [$tokenURL . "&device=websocket"],
+                    "pydiopre " . $path => [$authURL],
                     "pydiows " . $path => []
                 ]
             );
@@ -528,7 +529,7 @@ class MqManager extends Plugin
 
         if ($active) {
 
-            $authURL = $serverURL . "/api/{repo}/upload/put";
+            $authURL = $serverURL . "/api/{repo}/upload/put?xhr_uploader=true";
 
             $host = $params["UPLOAD_HOST"];
             $port = $params["UPLOAD_PORT"];
@@ -547,8 +548,16 @@ class MqManager extends Plugin
                         "\t\tAccess-Control-Allow-Credentials true\n" .
                         "\t}"
                     ],
-                    "pydioauth " . $path => [$authURL, $tokenURL . "&device=upload"],
-                    "pydioupload " . $path => []
+                    "pydioauth " . $path => [$tokenURL . "&device=upload"],
+                    "pydiopre " . $path => [$authURL, "{\n" .
+                        "\t\theader X-File-Direct-Upload request-options\n" .
+                        "\t}"
+                    ],
+                    "pydioupload " . $path => [],
+                    "pydiopost " . $path => [$authURL, "{\n" .
+                        "\t\theader X-File-Direct-Upload upload-finished\n" .
+                        "\t}"
+                    ],
                 ]
             );
         }
