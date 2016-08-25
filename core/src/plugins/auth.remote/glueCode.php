@@ -54,6 +54,13 @@ include_once($FRAMEWORK_PATH."/base.conf.php");
 if (!class_exists("SessionSwitcher")) {
     require_once("$CURRENTPATH/sessionSwitcher.php");
 }
+if (!function_exists("auth_remote_debug")){
+    function auth_remote_debug($str){
+        if(AJXP_SERVER_DEBUG){
+            error_log('[Pydio Auth Remote] '.$str);
+        }
+    }
+}
 $pServ = PluginsService::getInstance();
 ConfService::init($FRAMEWORK_PATH);
 ConfService::start();
@@ -73,9 +80,11 @@ if ($authPlug->getOption("SECRET") == "") {
        die("This file must be included and cannot be called directly");
     }
     if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")) {
-       $plugInAction = "WRONG_URL";
+        auth_remote_debug("No secret provided, comparing current URL and login URL parameter is wrong. Please set up a secret key.");
+        $plugInAction = "WRONG_URL";
     }
 } else if ($secret != $authPlug->getOption("SECRET")) {
+    auth_remote_debug("Secret keys are not corresponding. Make sure to setup secret in both CMS plugin and Pydio plugin.");
     $plugInAction = "WRONG_SECRET";
 }
 
@@ -87,6 +96,7 @@ if(!function_exists("ajxp_gluecode_updateRole")){
 
     function ajxp_gluecode_updateRole($loginData, &$userObject)
     {
+        auth_remote_debug("Updating user roles based on mappings");
         $authPlug = ConfService::getAuthDriverImpl();
         if(property_exists($authPlug, "drivers") && is_array($authPlug->drivers) && $authPlug->drivers["remote"]){
             $authPlug = $authPlug->drivers["remote"];
@@ -120,11 +130,14 @@ if(!function_exists("ajxp_gluecode_updateRole")){
 
 switch ($plugInAction) {
     case 'login':
+        auth_remote_debug("Entering 'login' case in glueCode");
         $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
         if (is_array($login)) {
             $newSession = new SessionSwitcher("AjaXplorer");
+            auth_remote_debug("Entering 'login' case in glueCode");
             $creation = false;
             if ($autoCreate && !UsersService::userExists($login["name"], "w")) {
+                auth_remote_debug("Automatically creating user in Pydio");
                 $creation = true;
                 $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
                 UsersService::createUser($login["name"], $login["password"], $isAdmin);
@@ -136,9 +149,12 @@ switch ($plugInAction) {
                     $userObject = AuthService::logUser($login["name"], $login["password"], true);
                 }
                 $userObject = AuthService::getLoggedUser();
+                auth_remote_debug("User logged to pydio succesfully");
                 if ($userObject->isAdmin()) {
+                    auth_remote_debug("User is admin, updating admin rights");
                     RolesService::updateAdminRights($userObject);
                 } else {
+                    auth_remote_debug("User is standard, updating default rights");
                     RolesService::updateDefaultRights($userObject);
                 }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
@@ -149,12 +165,14 @@ switch ($plugInAction) {
         }
         break;
     case 'logout':
+        auth_remote_debug("Entering 'logout' case in glueCode. Should kill pydio session");
         $newSession = new SessionSwitcher("AjaXplorer");
         global $_SESSION;
         $_SESSION = array();
         $result = TRUE;
         break;
     case 'addUser':
+        auth_remote_debug("Entering 'addUser' case in glueCode. Create user in pydio");
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
             $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
@@ -167,6 +185,7 @@ switch ($plugInAction) {
         }
         break;
     case 'delUser':
+        auth_remote_debug("Entering 'delUser' case in glueCode. Delete user from pydio");
         $userName = $AJXP_GLUE_GLOBALS["userName"];
         if (strlen($userName)) {
             UsersService::deleteUser($userName);
@@ -174,6 +193,7 @@ switch ($plugInAction) {
         }
         break;
     case 'updateUser':
+        auth_remote_debug("Entering 'updateUser' case in glueCode. Update user in pydio");
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
             if (UsersService::userExists($user["name"]) && UsersService::updatePassword($user["name"], $user["password"])) {

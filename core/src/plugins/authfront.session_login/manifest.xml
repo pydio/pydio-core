@@ -56,6 +56,9 @@
 						        oForm.addClassName('ajxp_password_auth');
 						        authConfs.set('SECURE_LOGIN_FORM', true);
 						        authConfs.set('ENABLE_FORGOT_PASSWORD', false);
+						        oForm.down('.dialogLegend').update(pydio.MessageHash[552]);
+                            }else{
+                                oForm.down('.dialogLegend').update(pydio.MessageHash[180]);
                             }
 						    $("generic_dialog_box").down(".titleString").hide();
 						    $("generic_dialog_box").down("#modalCloseBtn").hide();
@@ -133,6 +136,9 @@
                                     hideLightBox(true);
         						}else{
         						    var errorId = PydioApi.getClient().LAST_ERROR_ID;
+        						    if(errorId == '285' && window.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
+        						        errorId = '553';
+        						    }
                                     if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
                                         ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                     }

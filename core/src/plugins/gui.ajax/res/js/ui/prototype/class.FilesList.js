@@ -2284,7 +2284,7 @@ Class.create("FilesList", SelectableElements, {
 		elList.each(function(element){
 
             try{
-                var image_element = element.IMAGE_ELEMENT || element.down('img');
+                var image_element = element.IMAGE_ELEMENT /*|| element.down('img')*/;
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
             }catch(e){
                 return;

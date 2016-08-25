@@ -29,6 +29,7 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\PasswordEncoder;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -228,10 +229,10 @@ class RemoteAuthDriver extends AbstractAuthDriver
             $crtSessionId = session_id();
             session_write_close();
 
-            if (isSet($this->options["MASTER_HOST"])) {
+            if (!empty($this->options["MASTER_HOST"])) {
                 $host = $this->options["MASTER_HOST"];
             } else {
-                $host = parse_url($_SERVER["SERVER_ADDR"], PHP_URL_HOST);
+                $host = $_SERVER["HTTP_HOST"];
             }
             $formId = "";
             if (isSet($this->options["MASTER_AUTH_FORM_ID"])) {
@@ -241,6 +242,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
             $funcName = $this->options["MASTER_AUTH_FUNCTION"];
             require_once 'cms_auth_functions.php';
             if (function_exists($funcName)) {
+                Logger::debug("auth.remote", "Requesting authentication from remote CMS using function ".$funcName);
                 $sessCookies = call_user_func($funcName, $host, $uri, $login, $pass, $formId);
                 if ($sessCookies != "") {
                     if (is_array($sessCookies)) {
@@ -257,6 +259,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
                         session_id($sessCookies);
                         session_start();
                     }
+                    Logger::debug("auth.remote", "Got cookies from remote authentication");
                     return true;
                 }
 
@@ -267,6 +270,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
                     return true;
                 }
             }
+            Logger::debug("auth.remote", "No remote authentication from CMS succeeded, checking in local directory");
             // NOW CHECK IN LOCAL USERS LIST
             $userStoredPass = $this->getUserPass($login);
             if (!$userStoredPass) return false;

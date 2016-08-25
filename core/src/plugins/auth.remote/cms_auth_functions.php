@@ -61,6 +61,10 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
         "wp-submit" => "Log In",
         "testcookie" => 1)
     );
+    $err = $client->getError();
+    if(!empty($err)){
+        throw new \Pydio\Core\Exception\PydioException($err);
+    }
     $newCookies = extractResponseCookies($client);
     if (isSet($newCookies["AjaXplorer"])) {
         return $newCookies;

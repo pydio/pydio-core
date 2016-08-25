@@ -86,5 +86,5 @@ $mess=array(
     "72" => "QRCode du serveur",
     "73" => "Connexion aux applications mobiles",
     "74" => "Scannez ce QRCode avec votre application mobile pour configurer facilement la connexion.",
-    "75"=> "Chercher dans tous les workspaces...",
+    "75"=> "Chercher dans tous les fichiers...",
 );

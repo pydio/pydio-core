@@ -23,6 +23,7 @@ namespace Pydio\OCS;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Cache\Core\CacheStreamLayer;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -51,13 +52,15 @@ class ActionsController
                 $remoteShareId = InputFilter::sanitize($httpVars["remote_share_id"], InputFilter::SANITIZE_ALPHANUM);
                 $store = new SQLStore();
                 $remoteShare = $store->remoteShareById($remoteShareId);
-                if($remoteShare !== null){
-                    $client = new OCSClient();
-                    $client->acceptInvitation($remoteShare);
-                    $remoteShare->setStatus(OCS_INVITATION_STATUS_ACCEPTED);
-                    $store->storeRemoteShare($remoteShare);
+                if($remoteShare === null){
+                    throw new PydioException("Cannot find remote share with ID ".$remoteShareId);
                 }
-                
+
+                $client = new OCSClient();
+                $client->acceptInvitation($remoteShare);
+                $remoteShare->setStatus(OCS_INVITATION_STATUS_ACCEPTED);
+                $store->storeRemoteShare($remoteShare);
+
                 $urlBase = $ctx->getUrlBase();
                 
                 CacheStreamLayer::clearDirCache($urlBase);
@@ -73,17 +76,19 @@ class ActionsController
                 $remoteShareId = InputFilter::sanitize($httpVars["remote_share_id"], InputFilter::SANITIZE_ALPHANUM);
                 $store = new SQLStore();
                 $remoteShare = $store->remoteShareById($remoteShareId);
-                if($remoteShare !== null){
-                    $client = new OCSClient();
-                    try {
-                        $client->declineInvitation($remoteShare);
-                    } catch (\Exception $e) {
-                        // If the reject fails, we still want the share to be removed from the db
-                        Logger::error(__CLASS__,"Exception",$e->getMessage());
-                    }
-                    $store->deleteRemoteShare($remoteShare);
-                    ConfService::getInstance()->invalidateLoadedRepositories();
+                if($remoteShare === null){
+                    throw new PydioException("Cannot find remote share with ID ".$remoteShareId);
                 }
+
+                $client = new OCSClient();
+                try {
+                    $client->declineInvitation($remoteShare);
+                } catch (\Exception $e) {
+                    // If the reject fails, we still want the share to be removed from the db
+                    Logger::error(__CLASS__,"Exception",$e->getMessage());
+                }
+                $store->deleteRemoteShare($remoteShare);
+                ConfService::getInstance()->invalidateLoadedRepositories();
 
                 $urlBase = $ctx->getUrlBase();
 

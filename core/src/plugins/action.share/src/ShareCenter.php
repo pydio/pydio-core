@@ -618,12 +618,12 @@ class ShareCenter extends Plugin
                                 "OWNER_ID" => $ctx->getUser()->getId()), "repository");
                         }
 
-                        Controller::applyHook( ($isUpdate ? "node.share.update" : "node.share.create"), array(
+                        Controller::applyHook( ($isUpdate ? "node.share.update" : "node.share.create"), [$ajxpNode, array(
                             'type' => 'repository',
                             'repository' => &$this->repository,
                             'accessDriver' => &$this->accessDriver,
                             'new_repository' => &$result
-                        ));
+                        )]);
 
                         if ($ajxpNode->hasMetaStore() && !$ajxpNode->isRoot()) {
                             $this->getShareStore()->getMetaManager()->addShareInMeta(
@@ -1618,14 +1618,14 @@ class ShareCenter extends Plugin
             "limit" => $data['DOWNLOAD_LIMIT'],
             "repo_uuid" => $this->repository->getId()
         ));
-        Controller::applyHook("node.share.".($update?"update":"create"), array(
+        Controller::applyHook("node.share.".($update?"update":"create"), [$userSelection->getUniqueNode(), array(
             'type' => 'minisite',
             'repository' => &$this->repository,
             'accessDriver' => &$this->accessDriver,
             'data' => &$data,
             'url' => $url,
             'new_repository' => &$newRepo
-        ));
+        )]);
 
         return array($hash, $url);
     }
