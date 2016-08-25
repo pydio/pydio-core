@@ -703,6 +703,9 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Perform search
 	 */
 	search : function(limit, skipClear){
+        if(this._state === 'searching' || this._state === 'interrupt'){
+            return;
+        }
         if(!limit){
             this.currentLimitDefault = true;
             limit = 100;
