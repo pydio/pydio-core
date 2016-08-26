@@ -765,6 +765,7 @@ Class.create("XHRUploader", {
             uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;
         }
 
+
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
 			if (!e.lengthComputable) return;
