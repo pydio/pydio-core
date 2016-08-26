@@ -92,6 +92,14 @@
                     <serverCallback restParams="/" methodName="wsAuthenticate"/>
                 </processing>
             </action>
+            <action name="tail_booster_log">
+                <processing>
+                    <serverCallback methodName="tailBoosterLogs" restParams="/offset">
+                        <input_param name="offset" type="integer"
+                                     description="Offset where to start tail, other last 20 lines"/>
+                    </serverCallback>
+                </processing>
+            </action>
         </actions>
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>

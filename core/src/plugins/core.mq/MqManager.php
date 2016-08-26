@@ -47,6 +47,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Controller\UnixProcess;
 use Pydio\Notification\Core\IMessageExchanger;
 use Pydio\Notification\Core\Notification;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -485,6 +486,84 @@ class MqManager extends Plugin
         restore_error_handler();
 
         return $error;
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws \Exception
+     */
+    public function tailBoosterLogs(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        $httpVars = $requestInterface->getParsedBody();
+        $offset = (isSet($httpVars["offset"]) && is_numeric($httpVars["offset"])) ? intval($httpVars["offset"]) : 0;
+        $fileName = $this->getPluginWorkDir()."/pydio.out";
+
+        if(!file_exists($fileName)){
+            $responseInterface = new JsonResponse([
+                "output" => "File was not created yet",
+                "offset" => 0
+            ]);
+        }
+
+        if($offset > 0){
+            $f = fopen($fileName, "rb");
+            $output = stream_get_contents($f, -1, $offset);
+            fclose($f);
+        }else{
+            $output = $this->tail($fileName, 20, true);
+        }
+        $responseInterface = new JsonResponse([
+            "output" => explode("\n", $output),
+            "offset" => filesize($fileName)
+        ]);
+
+    }
+
+    /**
+     * @param $filepath
+     * @param int $lines
+     * @param bool $adaptive
+     * @return bool|string
+     */
+    protected function tail($filepath, $lines = 1, $adaptive = true) {
+        // Open file
+        $f = @fopen($filepath, "rb");
+        if ($f === false) return false;
+        // Sets buffer size
+        if (!$adaptive) $buffer = 4096;
+        else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
+        // Jump to last character
+        fseek($f, -1, SEEK_END);
+        // Read it and adjust line number if necessary
+        // (Otherwise the result would be wrong if file doesn't end with a blank line)
+        if (fread($f, 1) != "\n") $lines -= 1;
+
+        // Start reading
+        $output = '';
+        $chunk = '';
+        // While we would like more
+        while (ftell($f) > 0 && $lines >= 0) {
+            // Figure out how far back we should jump
+            $seek = min(ftell($f), $buffer);
+            // Do the jump (backwards, relative to where we are)
+            fseek($f, -$seek, SEEK_CUR);
+            // Read a chunk and prepend it to our output
+            $output = ($chunk = fread($f, $seek)) . $output;
+            // Jump back to where we started reading
+            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
+            // Decrease our line counter
+            $lines -= substr_count($chunk, "\n");
+        }
+        // While we have too many lines
+        // (Because of buffer size we might have read too many)
+        while ($lines++ < 0) {
+            // Find first newline and remove all text before that
+            $output = substr($output, strpos($output, "\n") + 1);
+        }
+        // Close file and return
+        fclose($f);
+        return trim($output);
     }
 
     /**
