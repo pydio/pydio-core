@@ -24,6 +24,8 @@ use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
+use Pydio\Core\Services\ApiKeysService;
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
@@ -440,7 +442,8 @@ class FileReaderResponse extends AsyncResponseStream
         }
 
         // Pydio Agent acceleration - We make sure that request was really proxied by Agent, by checking a specific header.
-        if($accelConfiguration === "pydio" && array_key_exists("HTTP_X_PYDIO_DOWNLOAD_SUPPORTED", $serverParams)) {
+        if($accelConfiguration === "pydio" && array_key_exists("HTTP_X_PYDIO_DOWNLOAD_SUPPORTED", $serverParams)
+            && ApiKeysService::requestHasValidHeadersForAdminTask($serverParams, "go-upload", AuthService::getLoggedUser()->getId())) {
             
             if ($localPathOrNode instanceof AJXP_Node) {
                 $options = MetaStreamWrapper::getResolvedOptionsForNode($localPathOrNode);

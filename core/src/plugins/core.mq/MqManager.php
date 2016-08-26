@@ -34,6 +34,7 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Serializer\UserXML;
+use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
@@ -536,6 +537,13 @@ class MqManager extends Plugin
             $secure = $params["UPLOAD_SECURE"];
             $path = "/" . trim($params["UPLOAD_PATH"], "/");
 
+            // WE SHOULD HAVE A CONTEXT AT THIS POINT, INSTEAD OF CALLING ::getLoggedUser()
+            $adminKey = ApiKeysService::findPairForAdminTask("go-upload", AuthService::getLoggedUser()->getId());
+            if($adminKey === null){
+                $adminKey = ApiKeysService::generatePairForAdminTask("go-upload", AuthService::getLoggedUser()->getId(), $host);
+            }
+            $adminKeyString = $adminKey["t"].":".$adminKey["p"];
+
             $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
             $hosts[$key] = array_merge(
                 (array)$hosts[$key],
@@ -551,6 +559,7 @@ class MqManager extends Plugin
                     "pydioauth " . $path => [$tokenURL . "&device=upload"],
                     "pydiopre " . $path => [$authURL, "{\n" .
                         "\t\theader X-File-Direct-Upload request-options\n" .
+                        "\t\theader X-Pydio-Admin-Auth $adminKeyString\n" .
                         "\t}"
                     ],
                     "pydioupload " . $path => [],

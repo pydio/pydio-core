@@ -46,12 +46,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class KeystoreAuthFrontend extends AbstractAuthFrontend
 {
-
-    /**
-     * @var SqlConfDriver $storage
-     */
-    var $storage;
-
+    
     /**
      * @param $httpVars
      * @param $varName
@@ -140,8 +135,6 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
         if (!$ctx->hasUser()) {
             return null;
         }
-        $this->storage = ConfService::getConfStorageImpl();
-        if (!($this->storage instanceof \Pydio\Conf\Sql\SqlConfDriver)) return false;
 
         $u = $ctx->getUser();
         $user = $u->getId();

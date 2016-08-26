@@ -23,7 +23,10 @@ namespace Pydio\Uploader\Processor;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Http\Message\ExternalUploadedFile;
@@ -124,6 +127,17 @@ class SimpleUpload extends Plugin
 
             if(!ExternalUploadedFile::isValidStatus($externalUploadStatus)){
                 throw new PydioException("Unrecognized direct upload status ". $externalUploadStatus);
+            }
+
+            if($externalUploadStatus === ExternalUploadedFile::STATUS_REQUEST_OPTIONS){
+
+                /** @var ContextInterface $ctx */
+                $ctx = $request->getAttribute("ctx");
+                $uId = $ctx->getUser()->getId();
+                if(!ApiKeysService::requestHasValidHeadersForAdminTask($request->getServerParams(), "go-upload", $uId)){
+                    throw new AuthRequiredException();
+                }
+
             }
 
             $uploadedFile = new ExternalUploadedFile($externalUploadStatus, $fileSizeH, $fileNameH);

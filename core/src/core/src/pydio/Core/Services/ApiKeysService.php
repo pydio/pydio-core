@@ -20,10 +20,13 @@
  */
 namespace Pydio\Core\Services;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Conf\Sql\SqlConfDriver;
+use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -79,21 +82,21 @@ class ApiKeysService
 
     /**
      * @param $userId
-     * @param $deviceId
+     * @param $adminTaskId
      * @param string $restrictToIP
      * @return array
      * @throws PydioException
      * @throws \Exception
      */
-    public static function generatePairForAdminTasks($userId, $deviceId, $restrictToIP = ""){
+    public static function generatePairForAdminTask($adminTaskId, $userId, $restrictToIP = ""){
 
         $store = self::getStore();
         $token = StringHelper::generateRandomString();
         $private = StringHelper::generateRandomString();
         $data = [
-            "USER_ID" => $userId,
-            "PRIVATE" => $private,
-            "DEVICE_ID" => $deviceId
+            "USER_ID"       => $userId,
+            "PRIVATE"       => $private,
+            "ADMIN_TASK_ID" => $adminTaskId
         ];
         if(!empty($restrictToIP)){
             $data["RESTRICT_TO_IP"] = $restrictToIP;
@@ -101,6 +104,45 @@ class ApiKeysService
         $store->simpleStoreSet("keystore", $token, $data, "serial");
         return ["t" => $token, "p" => $private];
 
+    }
+
+    /**
+     * @param $adminTaskId
+     * @param $userId
+     * @return array|null
+     * @throws PydioException
+     */
+    public static function findPairForAdminTask($adminTaskId, $userId){
+
+        $keys = self::getStore()->simpleStoreList("keystore", $cursor, "", "serial", '%"ADMIN_TASK_ID";s:' . strlen($adminTaskId) . ':"' . $adminTaskId . '"%');
+        foreach($keys as $kId => $kData){
+            if($kData["USER_ID"] === $userId){
+                return ["t" => $kId, "p" => $kData["PRIVATE"]];
+            }
+        }
+        return null;
+
+    }
+
+    /**
+     * @param $serverData
+     * @param $adminTaskId
+     * @param $userId
+     * @return bool
+     */
+    public static function requestHasValidHeadersForAdminTask($serverData, $adminTaskId, $userId){
+        if(!isSet($serverData['HTTP_X_PYDIO_ADMIN_AUTH'])){
+            Logger::error(__CLASS__, __FUNCTION__,"Invalid tokens for admin task $adminTaskId");
+            return false;
+        }
+        list($t, $p) = explode(":", trim($serverData['HTTP_X_PYDIO_ADMIN_AUTH']));
+        $existingKey = self::findPairForAdminTask("go-upload", $userId);
+        if($existingKey === null || $existingKey['p'] !== $p || $existingKey['t'] !== $t){
+            Logger::error(__CLASS__, __FUNCTION__, "Invalid tokens for admin task $adminTaskId");
+            return false;
+        }
+        Logger::debug(__CLASS__, "Valid tokens for admin task $adminTaskId");
+        return true;
     }
 
     /**
