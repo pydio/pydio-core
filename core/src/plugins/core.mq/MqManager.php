@@ -530,7 +530,7 @@ class MqManager extends Plugin
 
         if ($active) {
 
-            $authURL = $serverURL . "/api/{repo}/upload/put?xhr_uploader=true";
+            $authURL = $serverURL . "/api/{repo}/upload/put/{nodedir}?xhr_uploader=true";
 
             $host = $params["UPLOAD_HOST"];
             $port = $params["UPLOAD_PORT"];
@@ -565,6 +565,7 @@ class MqManager extends Plugin
                     "pydioupload " . $path => [],
                     "pydiopost " . $path => [$authURL, "{\n" .
                         "\t\theader X-File-Direct-Upload upload-finished\n" .
+                        "\t\theader X-File-Name {nodename}\n" .
                         "\t}"
                     ],
                 ]
