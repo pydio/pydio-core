@@ -222,7 +222,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		$(this.id + '-cont').insert(node.toString());
         var addedBloc = $(this.id + '-cont').down('#' + node.id);
         var addedCont = $(this.id + '-cont').down('#' + node.id + '-cont');
-        if(this.childNodes.length > 2 && node.ajxpNode){
+        if(this.childNodes.length > 2 && node.ajxpNode && node.ajxpNode.getAjxpMime() !== 'ajxp_recycle'){
             var sorted = Object.keys(this.childrenPathes).sort(function(a,b){
                 return a.toLowerCase().localeCompare(b.toLowerCase());
             });
