@@ -493,7 +493,7 @@ class ftpAccessWrapper implements AjxpWrapper
             $parts = AJXP_Utils::safeParseUrl($url);
         }
         $serverPath = AJXP_Utils::securePath("/$this->path/".$parts["path"]);
-        return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;
+        return "ftp".($this->secure?"s":"")."://$this->user:".urlencode($this->password)."@$this->host:$this->port".$serverPath;
     }
 
     /** This method retrieves the FTP server features as described in RFC2389
