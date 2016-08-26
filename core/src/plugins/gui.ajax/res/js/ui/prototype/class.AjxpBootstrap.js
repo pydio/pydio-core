@@ -41,7 +41,7 @@ Class.create("AjxpBootstrap", {
 			this.insertBasicSkeleton(this.parameters.get('MAIN_ELEMENT'));
             var startedFromOpener = false;
             try{
-                if(window.opener && window.opener.ajxpBootstrap){
+                if(window.opener && window.opener.ajxpBootstrap && this.parameters.get('serverAccessPath') === window.opener.ajxpBootstrap.parameters.get('serverAccessPath')){
                     this.parameters = window.opener.ajxpBootstrap.parameters;
                     // Handle queryString case, as it's not passed via get_boot_conf
                     var qParams = document.location.href.toQueryParams();
