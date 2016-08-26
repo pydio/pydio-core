@@ -123,7 +123,7 @@ class FilesystemMounter extends AJXP_AbstractMetaSource
         $repo = $this->repository;
 
         if(isset($this->options["MOUNT_DEVIL"]) && !empty($this->options["MOUNT_DEVIL"]) && $this->options["MOUNT_DEVIL"]) {
-            $udevil = "udevil ";
+            $udevil = "udevil --quiet";
         }else{
             $udevil = "";
         }
