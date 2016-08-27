@@ -184,7 +184,7 @@ class PluginsManager extends AbstractManager
                 $plugin = PluginsService::getInstance($ctx)->softLoad($pluginId, $options);
                 if (method_exists($plugin, $httpVars["action_plugin_method"])) {
                     try {
-                        $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options);
+                        $res = call_user_func(array($plugin, $httpVars["action_plugin_method"]), $options, $ctx);
                         $response = $res;
                     } catch (\Exception $e) {
                         $response = "ERROR:" . $e->getMessage();
