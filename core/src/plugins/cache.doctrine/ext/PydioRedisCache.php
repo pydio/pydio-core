@@ -35,7 +35,7 @@ class PydioRedisCache extends \Doctrine\Common\Cache\RedisCache implements Patte
     protected $internalNamespaceVersion;
 
 
-    public function setRedis($redis){
+    public function setRedis(Redis $redis){
         parent::setRedis($redis);
         $this->internalRedis = $redis;
     }
