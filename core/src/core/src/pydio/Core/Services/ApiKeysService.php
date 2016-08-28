@@ -112,11 +112,11 @@ class ApiKeysService
      * @return array|null
      * @throws PydioException
      */
-    public static function findPairForAdminTask($adminTaskId, $userId){
+    public static function findPairForAdminTask($adminTaskId, $userId = ""){
 
         $keys = self::getStore()->simpleStoreList("keystore", $cursor, "", "serial", '%"ADMIN_TASK_ID";s:' . strlen($adminTaskId) . ':"' . $adminTaskId . '"%');
         foreach($keys as $kId => $kData){
-            if($kData["USER_ID"] === $userId){
+            if(empty($userId) || $kData["USER_ID"] === $userId){
                 return ["t" => $kId, "p" => $kData["PRIVATE"]];
             }
         }

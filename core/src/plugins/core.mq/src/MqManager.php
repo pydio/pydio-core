@@ -29,6 +29,7 @@ use Pydio\Access\Core\Filter\AJXP_Permission;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
@@ -45,6 +46,9 @@ use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Controller\UnixProcess;
+use Pydio\Core\Utils\Vars\VarsFilter;
+use Pydio\Mq\Core\Booster\BoosterManager;
+use Pydio\Mq\Core\Message\ConsumeChannelMessage;
 use Pydio\Notification\Core\IMessageExchanger;
 use Pydio\Notification\Core\Notification;
 use Zend\Diactoros\Response\JsonResponse;
@@ -75,6 +79,9 @@ class MqManager extends Plugin
     private $msgExchanger = false;
     private $useQueue = false ;
     private $hasPendingMessage = false;
+
+    /** @var BoosterManager */
+    private $boosterManager = null;
 
 
     /**
@@ -249,6 +256,12 @@ class MqManager extends Plugin
         $this->_sendMessage($ctx, 'task', json_encode($content));
     }
 
+    /**
+     * Send a message to NSQ
+     * @param ContextInterface $ctx
+     * @param $topic
+     * @param $content
+     */
     private function _sendMessage(ContextInterface $ctx, $topic, $content) {
 
         $host = $this->getContextualOption($ctx, "NSQ_HOST");
@@ -294,7 +307,6 @@ class MqManager extends Plugin
             $responseInterface = $responseInterface->withBody($respType);
         }
         if($respType instanceof SerializableResponseStream){
-            require_once("ConsumeChannelMessage.php");
             $respType->addChunk(new ConsumeChannelMessage());
         }
     }
@@ -391,9 +403,9 @@ class MqManager extends Plugin
     {
         $this->logDebug("Entering wsAuthenticate");
 
-        $configs = $this->getConfigs();
+        $apiKeyString = $this->getAdminKeyString();
         $httpVars = $request->getQueryParams();
-        if (!isSet($httpVars["key"]) || $httpVars["key"] != $configs["WS_SERVER_ADMIN"]) {
+        if (!isSet($httpVars["key"]) || $httpVars["key"] !== $apiKeyString) {
             throw new \Exception("Cannot authentify admin key");
         }
 
@@ -421,32 +433,73 @@ class MqManager extends Plugin
     }
 
     /**
+     * @return BoosterManager
+     * @throws \Exception
+     */
+    protected function getBoosterManager(){
+        if(!isSet($this->boosterManager)){
+            $this->boosterManager = new BoosterManager(
+                $this->getConfigs(),
+                $this->getPluginWorkDir(true),
+                $this->getPluginCacheDir()
+            );
+        }
+        return $this->boosterManager;
+    }
+
+    /**
+     * @param string $writeForUserId
+     * @param string $restrictToIp
+     * @throws PydioException
+     * @return string
+     */
+    protected function getAdminKeyString($writeForUserId = "", $restrictToIp = ""){
+
+        if($writeForUserId){
+            $adminKey = ApiKeysService::findPairForAdminTask("go-upload", $writeForUserId);
+            if($adminKey === null){
+                $adminKey = ApiKeysService::generatePairForAdminTask("go-upload", $writeForUserId, $restrictToIp);
+            }
+            $adminKeyString = $adminKey["t"].":".$adminKey["p"];
+        }else{
+            $adminKey = ApiKeysService::findPairForAdminTask("go-upload");
+            if($adminKey === null){
+                throw new PydioException("Cannot find any key pair for admin access, something went wrong!");
+            }
+            $adminKeyString = $adminKey["t"].":".$adminKey["p"];
+        }
+        return $adminKeyString;
+
+    }
+
+    /********************************************/
+    /* ACTIONS CALLED VIA run_plugin_action API */
+    /********************************************/
+    /**
      * @param $params
+     * @param ContextInterface $ctx
      * @return string
      * @throws \Exception
      */
-    public function switchWorkerOn($params)
+    public function switchWorkerOn($params, $ctx)
     {
-        $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."worker-pid";
-        if (file_exists($pidFile)) {
-            $pId = file_get_contents($pidFile);
-            $unixProcess = new UnixProcess();
-            $unixProcess->setPid($pId);
-            $status = $unixProcess->status();
-            if ($status) {
-                throw new \Exception("Worker seems to already be running!");
-            }
-        }
-        $cmd = ConfService::getGlobalConf("CLI_PHP")." worker.php";
-        chdir(AJXP_INSTALL_PATH);
-        $process = CliRunner::runCommandInBackground($cmd, AJXP_CACHE_DIR . "/cmd_outputs/worker.log");
-        if ($process != null) {
-            $pId = $process->getPid();
-            file_put_contents($pidFile, $pId);
-            return "SUCCESS: Started worker with process ID $pId";
-        }
-        return "SUCCESS: Started worker Server";
+        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
+        $res = $this->getBoosterManager()->switchWorkerOn($params, $adminKeyString);
+        return "SUCCESS: ".$res;
+    }
+
+    /**
+     * @param $params
+     * @param ContextInterface $ctx
+     * @return string
+     * @throws \Exception
+     */
+    public function switchPydioBoosterOn($params, $ctx) {
+
+        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
+        $params["CLI_PYDIO"] = VarsFilter::filter($params["CLI_PYDIO"], $ctx);
+        $res = $this->getBoosterManager()->switchPydioBoosterOn($params, $adminKeyString);
+        return "SUCCESS: ".$res;
     }
 
     /**
@@ -455,7 +508,7 @@ class MqManager extends Plugin
      * @throws \Exception
      */
     public function switchWorkerOff($params){
-        return $this->switchOff($params, "worker");
+        return $this->getBoosterManager()->switchWorkerOff($params);
     }
 
     /**
@@ -463,30 +516,26 @@ class MqManager extends Plugin
      * @return string
      */
     public function getWorkerStatus($params){
-        return $this->getStatus($params, "worker");
+        return $this->getBoosterManager()->getWorkerStatus($params);
     }
 
-    // Handler testing the generation of the caddy file to spot any error
+    /**
+     * @param $params
+     * @return string
+     * @throws \Exception
+     */
+    public function switchPydioBoosterOff($params){
+        return $this->getBoosterManager()->switchPydioBoosterOff($params);
+    }
+
     /**
      * @param $params
      * @return string
      */
-    public function getCaddyFile($params) {
-        $error = "OK";
-
-        set_error_handler(function ($e) use (&$error) {
-            $error = $e;
-        }, E_WARNING);
-
-        $data = $this->generateCaddyFile($params);
-
-        // Generate the caddyfile
-        file_put_contents("/tmp/testcaddy", $data);
-
-        restore_error_handler();
-
-        return $error;
+    public function getPydioBoosterStatus($params){
+        return $this->getBoosterManager()->getPydioBoosterStatus($params);
     }
+
 
     /**
      * @param ServerRequestInterface $requestInterface
@@ -497,282 +546,9 @@ class MqManager extends Plugin
 
         $httpVars = $requestInterface->getParsedBody();
         $offset = (isSet($httpVars["offset"]) && is_numeric($httpVars["offset"])) ? intval($httpVars["offset"]) : 0;
-        $fileName = $this->getPluginWorkDir()."/pydio.out";
-
-        if(!file_exists($fileName)){
-            $responseInterface = new JsonResponse([
-                "output" => "File was not created yet",
-                "offset" => 0
-            ]);
-        }
-
-        if($offset > 0){
-            $f = fopen($fileName, "rb");
-            $output = stream_get_contents($f, -1, $offset);
-            fclose($f);
-        }else{
-            $output = $this->tail($fileName, 20, true);
-        }
-        $responseInterface = new JsonResponse([
-            "output" => explode("\n", $output),
-            "offset" => filesize($fileName)
-        ]);
+        $output = $this->getBoosterManager()->tailLogs($offset);
+        $responseInterface = new JsonResponse($output);
 
     }
 
-    /**
-     * @param $filepath
-     * @param int $lines
-     * @param bool $adaptive
-     * @return bool|string
-     */
-    protected function tail($filepath, $lines = 1, $adaptive = true) {
-        // Open file
-        $f = @fopen($filepath, "rb");
-        if ($f === false) return false;
-        // Sets buffer size
-        if (!$adaptive) $buffer = 4096;
-        else $buffer = ($lines < 2 ? 64 : ($lines < 10 ? 512 : 4096));
-        // Jump to last character
-        fseek($f, -1, SEEK_END);
-        // Read it and adjust line number if necessary
-        // (Otherwise the result would be wrong if file doesn't end with a blank line)
-        if (fread($f, 1) != "\n") $lines -= 1;
-
-        // Start reading
-        $output = '';
-        $chunk = '';
-        // While we would like more
-        while (ftell($f) > 0 && $lines >= 0) {
-            // Figure out how far back we should jump
-            $seek = min(ftell($f), $buffer);
-            // Do the jump (backwards, relative to where we are)
-            fseek($f, -$seek, SEEK_CUR);
-            // Read a chunk and prepend it to our output
-            $output = ($chunk = fread($f, $seek)) . $output;
-            // Jump back to where we started reading
-            fseek($f, -mb_strlen($chunk, '8bit'), SEEK_CUR);
-            // Decrease our line counter
-            $lines -= substr_count($chunk, "\n");
-        }
-        // While we have too many lines
-        // (Because of buffer size we might have read too many)
-        while ($lines++ < 0) {
-            // Find first newline and remove all text before that
-            $output = substr($output, strpos($output, "\n") + 1);
-        }
-        // Close file and return
-        fclose($f);
-        return trim($output);
-    }
-
-    /**
-     * @param $params
-     * @return string
-     */
-    public function generateCaddyFile($params) {
-        $data = "";
-
-        $hosts = [];
-
-        $configs = $this->getConfigs();
-
-        // Getting URLs of the Pydio system
-        $serverURL = ApplicationState::detectServerURL();
-        $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
-
-        // Websocket Server Config
-        $active = $params["WS_ACTIVE"];
-
-        if ($active) {
-
-            $authURL = $serverURL . "/api/pydio/ws_authenticate?key=" . $configs["WS_SERVER_ADMIN"];
-
-            $host = $params["WS_HOST"];
-            $port = $params["WS_PORT"];
-            $secure = $params["WS_SECURE"];
-            $path = "/" . trim($params["WS_PATH"], "/");
-
-            $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
-            $hosts[$key] = array_merge(
-                (array)$hosts[$key],
-                [
-                    "pydioauth " . $path => [$tokenURL . "&device=websocket"],
-                    "pydiopre " . $path => [$authURL],
-                    "pydiows " . $path => []
-                ]
-            );
-        }
-
-        // Upload Server Config
-        $active = $params["UPLOAD_ACTIVE"];
-
-        if ($active) {
-
-            $authURL = $serverURL . "/api/{repo}/upload/put/{nodedir}?xhr_uploader=true";
-
-            $host = $params["UPLOAD_HOST"];
-            $port = $params["UPLOAD_PORT"];
-            $secure = $params["UPLOAD_SECURE"];
-            $path = "/" . trim($params["UPLOAD_PATH"], "/");
-
-            // WE SHOULD HAVE A CONTEXT AT THIS POINT, INSTEAD OF CALLING ::getLoggedUser()
-            $adminKey = ApiKeysService::findPairForAdminTask("go-upload", AuthService::getLoggedUser()->getId());
-            if($adminKey === null){
-                $adminKey = ApiKeysService::generatePairForAdminTask("go-upload", AuthService::getLoggedUser()->getId(), $host);
-            }
-            $adminKeyString = $adminKey["t"].":".$adminKey["p"];
-
-            $key = "http" . ($secure ? "s" : "") . "://" . $host . ":" . $port;
-            $hosts[$key] = array_merge(
-                (array)$hosts[$key],
-                [
-                    "header " . $path => ["{\n" .
-                        "\t\tAccess-Control-Allow-Origin " . $serverURL . "\n" .
-                        "\t\tAccess-Control-Request-Headers *\n" .
-                        "\t\tAccess-Control-Allow-Methods POST\n" .
-                        "\t\tAccess-Control-Allow-Headers Range\n" .
-                        "\t\tAccess-Control-Allow-Credentials true\n" .
-                        "\t}"
-                    ],
-                    "pydioauth " . $path => [$tokenURL . "&device=upload"],
-                    "pydiopre " . $path => [$authURL, "{\n" .
-                        "\t\theader X-File-Direct-Upload request-options\n" .
-                        "\t\theader X-Pydio-Admin-Auth $adminKeyString\n" .
-                        "\t}"
-                    ],
-                    "pydioupload " . $path => [],
-                    "pydiopost " . $path => [$authURL, "{\n" .
-                        "\t\theader X-File-Direct-Upload upload-finished\n" .
-                        "\t\theader X-File-Name {nodename}\n" .
-                        "\t}"
-                    ],
-                ]
-            );
-        }
-
-        foreach ($hosts as $host => $config) {
-            $data .= $host . " {\n";
-
-            foreach ($config as $key => $value) {
-                $data .= "\t" . $key . " " . join($value, " ") . "\n";
-            }
-
-            $data .= "}\n";
-        }
-
-        return $data;
-    }
-
-    /**
-     * @param $params
-     * @return string
-     * @throws \Exception
-     */
-    public function saveCaddyFile($params) {
-        $data = $this->generateCaddyFile($params);
-
-        $wDir = $this->getPluginWorkDir(true);
-        $caddyFile = $wDir.DIRECTORY_SEPARATOR."pydiocaddy";
-
-        // Generate the caddyfile
-        file_put_contents($caddyFile, $data);
-
-        return $caddyFile;
-    }
-
-    /**
-     * @param $params
-     * @return string
-     * @throws \Exception
-     */
-    public function switchCaddyOn($params) {
-
-        $caddyFile = $this->saveCaddyFile($params);
-
-        $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."caddy-pid";
-        if (file_exists($pidFile)) {
-            $pId = file_get_contents($pidFile);
-            $unixProcess = new UnixProcess();
-            $unixProcess->setPid($pId);
-            $status = $unixProcess->status();
-            if ($status) {
-                throw new \Exception("Caddy server seems to already be running!");
-            }
-        }
-
-        chdir($wDir);
-
-        $cmd = "env TMPDIR=/tmp ". ConfService::getGlobalConf("CLI_PYDIO")." -conf ".$caddyFile . " 2>&1 | tee pydio.out";
-
-        $process = CliRunner::runCommandInBackground($cmd, null);
-        if ($process != null) {
-            $pId = $process->getPid();
-            file_put_contents($pidFile, $pId);
-            return "SUCCESS: Started WebSocket Server with process ID $pId";
-        }
-        return "SUCCESS: Started WebSocket Server";
-    }
-
-    /**
-     * @param $params
-     * @return string
-     * @throws \Exception
-     */
-    public function switchCaddyOff($params){
-        return $this->switchOff($params, "caddy");
-    }
-
-    /**
-     * @param $params
-     * @return string
-     */
-    public function getCaddyStatus($params){
-        return $this->getStatus($params, "caddy");
-    }
-
-    /**
-     * @param $params
-     * @param string $type
-     * @return string
-     * @throws \Exception
-     */
-    public function switchOff($params, $type = "ws")
-    {
-        $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
-        if (!file_exists($pidFile)) {
-            throw new \Exception("No information found about $type server");
-        } else {
-            $pId = file_get_contents($pidFile);
-            $unixProcess = new UnixProcess();
-            $unixProcess->setPid($pId);
-            $unixProcess->stop();
-            unlink($pidFile);
-        }
-        return "SUCCESS: Killed $type Server";
-    }
-
-    /**
-     * @param $params
-     * @param string $type
-     * @return string
-     * @throws \Exception
-     */
-    public function getStatus($params, $type = "ws")
-    {
-        $wDir = $this->getPluginWorkDir(true);
-        $pidFile = $wDir.DIRECTORY_SEPARATOR."$type-pid";
-        if (!file_exists($pidFile)) {
-            return "OFF";
-        } else {
-            $pId = file_get_contents($pidFile);
-            $unixProcess = new UnixProcess();
-            $unixProcess->setPid($pId);
-            $status = $unixProcess->status();
-            if($status) return "ON";
-            else return "OFF";
-        }
-    }
 }

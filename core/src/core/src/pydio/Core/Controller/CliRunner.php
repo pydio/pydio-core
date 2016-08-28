@@ -129,12 +129,13 @@ class CliRunner
     /**
      * @param $cmd
      * @param $logFile
+     * @param $forceLog
      * @return UnixProcess|null
      */
-    public static function runCommandInBackground($cmd, $logFile)
+    public static function runCommandInBackground($cmd, $logFile, $forceLog = false)
     {
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-            if (AJXP_SERVER_DEBUG) $cmd .= " > " . $logFile;
+            if (AJXP_SERVER_DEBUG || $forceLog) $cmd .= " > " . $logFile;
             if (class_exists("COM") && ConfService::getGlobalConf("CLI_USE_COM")) {
                 $WshShell = new \COM("WScript.Shell");
                 $WshShell->Run("cmd /C $cmd", 0, false);
@@ -149,7 +150,7 @@ class CliRunner
             }
             return null;
         } else {
-            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG ? $logFile : null));
+            $process = new UnixProcess($cmd, (AJXP_SERVER_DEBUG || $forceLog ? $logFile : null));
             Logger::debug("Starting process and sending output dev null");
             return $process;
         }
