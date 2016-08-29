@@ -81,7 +81,16 @@ Class.create("PydioInstantMessenger", {
                 }
             }else{
                 if(repoId){
-                    var url = "ws"+(this.configs.get("WS_SECURE")?"s":"")+"://"+this.configs.get("WS_HOST")+":"+this.configs.get("WS_PORT")+"/"+this.configs.get("WS_PATH");
+                    var host = this.configs.get("BOOSTER_MAIN_HOST");
+                    if(this.configs.get("BOOSTER_WS_ADVANCED") && this.configs.get("BOOSTER_WS_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_WS_ADVANCED")['WS_HOST']){
+                        host = this.configs.get("BOOSTER_WS_ADVANCED")['WS_HOST'];
+                    }
+                    var port = this.configs.get("BOOSTER_MAIN_PORT");
+                    if(this.configs.get("BOOSTER_WS_ADVANCED") && this.configs.get("BOOSTER_WS_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_WS_ADVANCED")['WS_PORT']){
+                        port = this.configs.get("BOOSTER_WS_ADVANCED")['WS_PORT'];
+                    }
+
+                    var url = "ws"+(this.configs.get("WS_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("WS_PATH");
 
                     this.ws = new WebSocket(url);
                     this.ws.onmessage = function(event){

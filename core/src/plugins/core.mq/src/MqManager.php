@@ -105,6 +105,29 @@ class MqManager extends Plugin
         } catch (\Exception $e) {}
     }
 
+    /**
+     * Override parent method
+     * @param $configName
+     * @param $configValue
+     */
+    public function exposeConfigInManifest($configName, $configValue)
+    {
+        // Do not expose those
+        if(in_array($configName, ["WS_HOST", "WS_PORT", "UPLOAD_HOST", "UPLOAD_PORT"])){
+            return;
+        }
+        if(is_array($configValue)){
+            $newValue = [];
+            foreach($configValue as $key => $val){
+                if(strpos($key, "INTERNAL") !== false) continue;
+                $newValue[$key] = $val;
+            }
+            parent::exposeConfigInManifest($configName, $newValue);
+        }else{
+            parent::exposeConfigInManifest($configName, $configValue);
+        }
+    }
+
 
     /**
      * @param Notification $notification

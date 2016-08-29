@@ -123,7 +123,7 @@ class BoosterManager
         $hosts = [];
 
         // Getting URLs of the Pydio system
-        $serverURL = ApplicationState::detectServerURL();
+        $serverURL = ApplicationState::detectServerURL(true);
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
 
         // Websocket Server Config

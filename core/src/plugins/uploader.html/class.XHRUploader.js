@@ -760,6 +760,16 @@ Class.create("XHRUploader", {
                 uri += '&' + queryStringParam;
             }
         } else {
+
+            var host = this.configs.get("BOOSTER_MAIN_HOST");
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST']){
+                host = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST'];
+            }
+            var port = this.configs.get("BOOSTER_MAIN_PORT");
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT']){
+                port = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT'];
+            }
+
             xhr.withCredentials = true;
 
             uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+this.configs.get("UPLOAD_HOST")+":"+this.configs.get("UPLOAD_PORT")+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;
