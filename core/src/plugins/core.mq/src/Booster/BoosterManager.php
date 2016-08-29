@@ -42,7 +42,8 @@ class BoosterManager
     private $pluginWorkDir;
     private $pluginCacheDir;
 
-    private $configFileName = "pydiocaddy";
+    private $configFileJson = "pydioconf";
+    private $configFileCaddy = "pydiocaddy";
     private $logFileName    = "pydio.out";
     private $pidFileName    = "caddy-pid";
 
@@ -108,6 +109,29 @@ class BoosterManager
         return [
             "output" => explode("\n", $output),
             "offset" => filesize($fileName)
+        ];
+
+    }
+
+    /**
+     * @param array $params
+     * @param string $adminKeyString
+     * @return array
+     */
+    public function generatePydioBoosterJson($params, $adminKeyString){
+
+        list($tokenP, $tokenS) = explode(":", $adminKeyString);
+        return [
+            "scheduler" => [
+                "host"      => ApplicationState::detectServerURL(true),
+                "tokenP"    => $tokenP,
+                "tokenS"    => $tokenS,
+                "minutes"   => 2
+            ],
+            "nsq"       => [
+                "host"      => "0.0.0.0",
+                "port"      => intval($params["NSQ_PORT"])
+            ]
         ];
 
     }
@@ -227,6 +251,8 @@ class BoosterManager
         return $data;
     }
 
+
+
     /**
      * @param array $params
      * @param string $adminKeyString
@@ -234,15 +260,18 @@ class BoosterManager
      * @throws \Exception
      */
     public function savePydioBoosterFile($params, $adminKeyString) {
-        $data = $this->generatePydioBoosterFile($params, $adminKeyString);
 
         $wDir = $this->pluginWorkDir;
-        $caddyFile = $wDir.DIRECTORY_SEPARATOR.$this->configFileName;
-
-        // Generate the caddyfile
+        $caddyFile = $wDir.DIRECTORY_SEPARATOR.$this->configFileCaddy;
+        $data = $this->generatePydioBoosterFile($params, $adminKeyString);
         file_put_contents($caddyFile, $data);
 
-        return $caddyFile;
+        $jsonFile = $wDir.DIRECTORY_SEPARATOR.$this->configFileJson;
+        $jsonData = $this->generatePydioBoosterJson($params, $adminKeyString);
+        $jsonData["caddyFilePath"] = $caddyFile;
+        file_put_contents($jsonFile, json_encode($jsonData, JSON_PRETTY_PRINT));
+
+        return $jsonFile;
     }
 
     /**
