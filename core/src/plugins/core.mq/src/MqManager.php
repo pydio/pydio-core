@@ -30,7 +30,6 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\XMLMessage;
-use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -44,12 +43,9 @@ use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\Vars\VarsFilter;
-use Pydio\Mq\Core\Booster\BoosterManager;
 use Pydio\Mq\Core\Message\ConsumeChannelMessage;
 use Pydio\Notification\Core\IMessageExchanger;
 use Pydio\Notification\Core\Notification;
-use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -77,10 +73,6 @@ class MqManager extends Plugin
     private $msgExchanger = false;
     private $useQueue = false ;
     private $hasPendingMessage = false;
-
-    /** @var BoosterManager */
-    private $boosterManager = null;
-
 
     /**
      * @param ContextInterface $ctx
@@ -454,21 +446,6 @@ class MqManager extends Plugin
     }
 
     /**
-     * @return BoosterManager
-     * @throws \Exception
-     */
-    protected function getBoosterManager(){
-        if(!isSet($this->boosterManager)){
-            $this->boosterManager = new BoosterManager(
-                $this->getConfigs(),
-                $this->getPluginWorkDir(true),
-                $this->getPluginCacheDir()
-            );
-        }
-        return $this->boosterManager;
-    }
-
-    /**
      * @param string $writeForUserId
      * @param string $restrictToIp
      * @throws PydioException
@@ -504,23 +481,9 @@ class MqManager extends Plugin
      */
     public function switchWorkerOn($params, $ctx)
     {
-        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
-        $res = $this->getBoosterManager()->switchWorkerOn($params, $adminKeyString);
-        return "SUCCESS: ".$res;
-    }
-
-    /**
-     * @param $params
-     * @param ContextInterface $ctx
-     * @return string
-     * @throws \Exception
-     */
-    public function switchPydioBoosterOn($params, $ctx) {
-
-        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
-        $params["CLI_PYDIO"] = VarsFilter::filter($params["CLI_PYDIO"], $ctx);
-        $res = $this->getBoosterManager()->switchPydioBoosterOn($params, $adminKeyString);
-        return "SUCCESS: ".$res;
+        //$adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
+        //$res = $this->getBoosterManager()->switchWorkerOn($params, $adminKeyString);
+        return  "NOT IMPLEMENTED";//"SUCCESS: ".$res;
     }
 
     /**
@@ -529,7 +492,7 @@ class MqManager extends Plugin
      * @throws \Exception
      */
     public function switchWorkerOff($params){
-        return $this->getBoosterManager()->switchWorkerOff($params);
+        return "NOT IMPLEMENTED"; //$this->getBoosterManager()->switchWorkerOff($params);
     }
 
     /**
@@ -537,72 +500,7 @@ class MqManager extends Plugin
      * @return string
      */
     public function getWorkerStatus($params){
-        return $this->getBoosterManager()->getWorkerStatus($params);
-    }
-
-    /**
-     * @param $params
-     * @return string
-     * @throws \Exception
-     */
-    public function switchPydioBoosterOff($params){
-        return $this->getBoosterManager()->switchPydioBoosterOff($params);
-    }
-
-    /**
-     * @param $params
-     * @return string
-     */
-    public function getPydioBoosterStatus($params){
-        return $this->getBoosterManager()->getPydioBoosterStatus($params);
-    }
-
-    /**
-     * @param ServerRequestInterface $requestInterface
-     * @param ResponseInterface $responseInterface
-     * @throws AuthRequiredException
-     */
-    public function pydioBoosterDownloadConf(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
-
-        /** @var ContextInterface $ctx */
-        $ctx = $requestInterface->getAttribute("ctx");
-        if(!$ctx->hasUser() || !$ctx->getUser()->isAdmin()){
-            // Additional check, should never get there.
-            throw new AuthRequiredException();
-        }
-        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
-        $jsonFile = $this->getBoosterManager()->savePydioBoosterFile($this->getConfigs(), $adminKeyString);
-        $baseDir = dirname($jsonFile);
-        $caddyFile = $baseDir. DIRECTORY_SEPARATOR . "pydiocaddy";
-        require_once (AJXP_INSTALL_PATH ."/". AJXP_BIN_FOLDER_REL . "/lib/pclzip.lib.php");
-        $zipFile = $baseDir.DIRECTORY_SEPARATOR."configs.zip";
-        if(file_exists($zipFile)){
-            @unlink($zipFile);
-        }
-        $zip = new \PclZip($baseDir.DIRECTORY_SEPARATOR."configs.zip");
-        $zip->add([$jsonFile, $caddyFile], PCLZIP_OPT_REMOVE_ALL_PATH);
-        $reader = new FileReaderResponse($baseDir.DIRECTORY_SEPARATOR."configs.zip");
-        $reader->setPostReadCallback(function () use ($zipFile){
-            @unlink($zipFile);
-        });
-        $reader->setHeaderType("force-download");
-        $responseInterface = $responseInterface->withBody($reader);
-
+        return "OFF"; //$this->getBoosterManager()->getWorkerStatus($params);
     }
     
-
-    /**
-     * @param ServerRequestInterface $requestInterface
-     * @param ResponseInterface $responseInterface
-     * @throws \Exception
-     */
-    public function tailBoosterLogs(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
-
-        $httpVars = $requestInterface->getParsedBody();
-        $offset = (isSet($httpVars["offset"]) && is_numeric($httpVars["offset"])) ? intval($httpVars["offset"]) : 0;
-        $output = $this->getBoosterManager()->tailLogs($offset);
-        $responseInterface = new JsonResponse($output);
-
-    }
-
 }

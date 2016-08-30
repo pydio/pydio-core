@@ -8,21 +8,14 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="legend" name="PYDIO_BOOSTER_DESCRIPTION" label="CONF_MESSAGE[Legend]" description="CONF_MESSAGE[Pydio Booster is a dedicated binary built to power-up your application. It must be downloaded and installed manually.]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="button" name="PYDIO_BOOSTER_SWITCH_ON" choices="run_plugin_action:core.mq:switchPydioBoosterOn" label="CONF_MESSAGE[Start Process]" description="CONF_MESSAGE[Switch Booster ON]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="button" name="PYDIO_BOOSTER_SWITCH_OFF" choices="run_plugin_action:core.mq:switchPydioBoosterOff" label="CONF_MESSAGE[Stop Process]" description="CONF_MESSAGE[Switch Booster OFF]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="monitor" name="PYDIO_BOOSTER_STATUS" choices="run_plugin_action:core.mq:getPydioBoosterStatus" label="CONF_MESSAGE[Process Status]" description="CONF_MESSAGE[Process is running or not]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" name="CLI_PYDIO" type="string" label="CONF_MESSAGE[Command-line Pydio]" description="CONF_MESSAGE[On specific hosts, you may have to use a specific path to access the pydio command line]" mandatory="false" default="pydio"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="true" expose="true"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" name="UPLOAD_ACTIVE" description="CONF_MESSAGE[Pydio Upload Server is a unique feature used to delegate file uploads to our dedicated binary, that will send the files directly to the storage.]" label="CONF_MESSAGE[Upload Server]" type="boolean" expose="true"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="legend" name="PYDIO_BOOSTER_DOWNLOAD_LEGEND" label="CONF_MESSAGE[Legend]" description="CONF_MESSAGE[Configuration files are generated each time your start the process, using the options saved in this plugin. If you handle the process manually, use the button below to download updated version of the files, and start process using '-conf /path/to/pydioconf' parameter.]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[Pydio Booster]" type="button" name="PYDIO_BOOSTER_DOWNLOAD_CONF" choices="run_client_action:download_booster_conf" label="CONF_MESSAGE[Regenerate Config files and Download]" description="CONF_MESSAGE[Regenerate Config files and Download]" mandatory="false"/>
 
-        <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_MAIN_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host]" expose="true" default="127.0.0.1"/>
-        <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_MAIN_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port]" expose="true" default="8090"/>
-        <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_MAIN_SECURE" type="boolean" label="CONF_MESSAGE[SSL]" description="CONF_MESSAGE[Use secure connection]" expose="true" default="true"/>
-        <global_param group="CONF_MESSAGE[Network Main Configurations]" name="NSQ_PORT" type="string" label="CONF_MESSAGE[NSQ Port]" description="CONF_MESSAGE[NSQ Port]" default="4150"/>
-        <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_INTERNAL_CONNECTION" type="group_switch:booster_internal_connection" label="CONF_MESSAGE[Internal Connection]" description="CONF_MESSAGE[If different from default host/port]" default="same" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="true" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="UPLOAD_ACTIVE" description="CONF_MESSAGE[Pydio Upload Server is a unique feature used to delegate file uploads to our dedicated binary, that will send the files directly to the storage.]" label="CONF_MESSAGE[Upload Server]" type="boolean" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host]" expose="true" default="127.0.0.1"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port]" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_SECURE" type="boolean" label="CONF_MESSAGE[SSL]" description="CONF_MESSAGE[Use secure connection]" expose="true" default="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="NSQ_PORT" type="string" label="CONF_MESSAGE[NSQ Port]" description="CONF_MESSAGE[NSQ Port]" default="4150"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_INTERNAL_CONNECTION" type="group_switch:booster_internal_connection" label="CONF_MESSAGE[Internal Connection]" description="CONF_MESSAGE[If different from default host/port]" default="same" mandatory="true"/>
         <global_param group_switch_name="booster_internal_connection" group_switch_label="Same as external" group_switch_value="same" name="booster_internal_connection" type="hidden" label="same" description="custom" default="same"/>
         <global_param group_switch_name="booster_internal_connection" group_switch_label="Custom" group_switch_value="custom" name="booster_internal_connection" type="hidden" label="custom" description="custom" default="custom"/>
         <global_param group_switch_name="booster_internal_connection" group_switch_label="Custom" group_switch_value="custom" name="BOOSTER_INTERNAL_HOST" type="string" label="CONF_MESSAGE[Internal Host (if LAN IP is different from outside-world IP).]" description="CONF_MESSAGE[Internal Host]" default="127.0.0.1"/>
@@ -113,28 +106,6 @@
             <action name="ws_authenticate" skipSecureToken="true">
                 <processing>
                     <serverCallback restParams="/" methodName="wsAuthenticate"/>
-                </processing>
-            </action>
-            <action name="tail_booster_log">
-                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="false"/>
-                <processing>
-                    <serverCallback methodName="tailBoosterLogs" restParams="/offset">
-                        <input_param name="offset" type="integer"
-                                     description="Offset where to start tail, other last 20 lines"/>
-                    </serverCallback>
-                </processing>
-            </action>
-            <action name="download_booster_conf">
-                <gui src="" text="" title="">
-                    <context dir="true" recycle="false" selection="false"/>
-                </gui>
-                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="false"/>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var url = pydio.Parameters.get("ajxpServerAccess") + '&get_action=download_booster_conf';
-                        document.location.href = url;
-                    ]]></clientCallback>
-                    <serverCallback methodName="pydioBoosterDownloadConf" restParams="/"/>
                 </processing>
             </action>
         </actions>
