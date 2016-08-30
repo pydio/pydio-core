@@ -281,6 +281,9 @@
         <action name="patch_repository">
             <processing><serverCallback methodName="repositoriesAction"/></processing>
         </action>
+        <action name="post_repository">
+            <processing><serverCallback methodName="repositoriesAction"/></processing>
+        </action>
         <action name="list_all_repositories_json">
             <processing>
                 <serverCallback methodName="repositoriesAction" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
