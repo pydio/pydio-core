@@ -15,6 +15,8 @@
         <global_param group="CONF_MESSAGE[Pydio Booster]" name="CLI_PYDIO" type="string" label="CONF_MESSAGE[Command-line Pydio]" description="CONF_MESSAGE[On specific hosts, you may have to use a specific path to access the pydio command line]" mandatory="false" default="pydio"/>
         <global_param group="CONF_MESSAGE[Pydio Booster]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="true" expose="true"/>
         <global_param group="CONF_MESSAGE[Pydio Booster]" name="UPLOAD_ACTIVE" description="CONF_MESSAGE[Pydio Upload Server is a unique feature used to delegate file uploads to our dedicated binary, that will send the files directly to the storage.]" label="CONF_MESSAGE[Upload Server]" type="boolean" expose="true"/>
+        <global_param group="CONF_MESSAGE[Pydio Booster]" type="legend" name="PYDIO_BOOSTER_DOWNLOAD_LEGEND" label="CONF_MESSAGE[Legend]" description="CONF_MESSAGE[Configuration files are generated each time your start the process, using the options saved in this plugin. If you handle the process manually, use the button below to download updated version of the files, and start process using '-conf /path/to/pydioconf' parameter.]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Pydio Booster]" type="button" name="PYDIO_BOOSTER_DOWNLOAD_CONF" choices="run_client_action:download_booster_conf" label="CONF_MESSAGE[Regenerate Config files and Download]" description="CONF_MESSAGE[Regenerate Config files and Download]" mandatory="false"/>
 
         <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_MAIN_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host]" expose="true" default="127.0.0.1"/>
         <global_param group="CONF_MESSAGE[Network Main Configurations]" name="BOOSTER_MAIN_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port]" expose="true" default="8090"/>
@@ -114,11 +116,25 @@
                 </processing>
             </action>
             <action name="tail_booster_log">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="tailBoosterLogs" restParams="/offset">
                         <input_param name="offset" type="integer"
                                      description="Offset where to start tail, other last 20 lines"/>
                     </serverCallback>
+                </processing>
+            </action>
+            <action name="download_booster_conf">
+                <gui src="" text="" title="">
+                    <context dir="true" recycle="false" selection="false"/>
+                </gui>
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="false"/>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var url = pydio.Parameters.get("ajxpServerAccess") + '&get_action=download_booster_conf';
+                        document.location.href = url;
+                    ]]></clientCallback>
+                    <serverCallback methodName="pydioBoosterDownloadConf" restParams="/"/>
                 </processing>
             </action>
         </actions>

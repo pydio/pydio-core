@@ -99,6 +99,10 @@ class BoosterManager
             ];
         }
 
+        if($offset > 0 && filesize($fileName) < $offset){
+            $offset = 0;
+        }
+
         if($offset > 0){
             $f = fopen($fileName, "rb");
             $output = stream_get_contents($f, -1, $offset);
@@ -123,7 +127,7 @@ class BoosterManager
         list($tokenP, $tokenS) = explode(":", $adminKeyString);
         return [
             "scheduler" => [
-                "host"      => ApplicationState::detectServerURL(true),
+                "host"      => rtrim(ApplicationState::detectServerURL(true, true), "/"),
                 "tokenP"    => $tokenP,
                 "tokenS"    => $tokenS,
                 "minutes"   => 2
@@ -147,7 +151,7 @@ class BoosterManager
         $hosts = [];
 
         // Getting URLs of the Pydio system
-        $serverURL = ApplicationState::detectServerURL(true);
+        $serverURL = rtrim(ApplicationState::detectServerURL(true, true), "/");
         $tokenURL = $serverURL . "?get_action=keystore_generate_auth_token";
 
         // Websocket Server Config

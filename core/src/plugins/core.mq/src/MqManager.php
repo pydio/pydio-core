@@ -26,11 +26,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
-use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -40,12 +40,10 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Controller\UnixProcess;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Mq\Core\Booster\BoosterManager;
 use Pydio\Mq\Core\Message\ConsumeChannelMessage;
@@ -559,6 +557,39 @@ class MqManager extends Plugin
         return $this->getBoosterManager()->getPydioBoosterStatus($params);
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws AuthRequiredException
+     */
+    public function pydioBoosterDownloadConf(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        if(!$ctx->hasUser() || !$ctx->getUser()->isAdmin()){
+            // Additional check, should never get there.
+            throw new AuthRequiredException();
+        }
+        $adminKeyString = $this->getAdminKeyString($ctx->getUser()->getId());
+        $jsonFile = $this->getBoosterManager()->savePydioBoosterFile($this->getConfigs(), $adminKeyString);
+        $baseDir = dirname($jsonFile);
+        $caddyFile = $baseDir. DIRECTORY_SEPARATOR . "pydiocaddy";
+        require_once (AJXP_INSTALL_PATH ."/". AJXP_BIN_FOLDER_REL . "/lib/pclzip.lib.php");
+        $zipFile = $baseDir.DIRECTORY_SEPARATOR."configs.zip";
+        if(file_exists($zipFile)){
+            @unlink($zipFile);
+        }
+        $zip = new \PclZip($baseDir.DIRECTORY_SEPARATOR."configs.zip");
+        $zip->add([$jsonFile, $caddyFile], PCLZIP_OPT_REMOVE_ALL_PATH);
+        $reader = new FileReaderResponse($baseDir.DIRECTORY_SEPARATOR."configs.zip");
+        $reader->setPostReadCallback(function () use ($zipFile){
+            @unlink($zipFile);
+        });
+        $reader->setHeaderType("force-download");
+        $responseInterface = $responseInterface->withBody($reader);
+
+    }
+    
 
     /**
      * @param ServerRequestInterface $requestInterface
