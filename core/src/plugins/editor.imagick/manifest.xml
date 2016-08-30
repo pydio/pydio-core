@@ -19,6 +19,7 @@
         <global_param name="ADDITIONAL_ENV_PATH" type="string" label="CONF_MESSAGE[Environment Path]" description="CONF_MESSAGE[Additional path to put in the environment PATH variable before calling the command. Can be necessary for Ghostscript on Mac for example.]" default=""/>
 		<global_param name="ONTHEFLY_THRESHOLD" type="integer" label="CONF_MESSAGE[Pregeneration Threshold]" description="CONF_MESSAGE[Threshold (in MegaByte) under which the pages are all generated when opening the document, and over which pages are generated on-demand only]" default="5"/>
 		<global_param name="UNOCONV" type="string" label="CONF_MESSAGE[Unoconv Path]" description="CONF_MESSAGE[Full path on the server to the 'unoconv' binary (see docs)]" default="" mandatory="false"/>
+                <global_param name="PDFINFO" type="string" label="CONF_MESSAGE[Pdfinfo Path]" description="CONF_MESSAGE[Full path on the server to the 'pdfinfo' binary (see docs)]" default="" mandatory="false"/>
 	</server_settings>
 	<registry_contributions>
 		<hooks>

@@ -16,3 +16,8 @@
         <p>Examples to install the packages on CentOS : yum install unoconv openoffice.org-headless openoffice.org-writer openoffice.org-calc openoffice.org-impress<br>
         Or on Debian : apt-get install unoconv openoffice.org-headless openoffice.org-writer openoffice.org-calc openoffice.org-impress</p>
         <p>Remark : once installed, you can check the index.lucene plugin that can also make use of UNOCONV to extract textual information from office files into PDF, and the use PDF2TXT to extract and index this information for search.</p>
+
+        <p><b>PDFINFO INTEGRATION</b></p>
+        <p>On complex pdf's the page counter sometimes fails, returning 0 instead of the correct number of pages. In this case we would use pdfinfo in order to get the correct number of pages.</p>
+        <p>To install it on Debian or Ubuntu: aptitude install poppler-utils</p>
+        <p>This will install it under /usr/bin/pdfinfo</p>
