@@ -272,7 +272,8 @@ class BoosterManager
 
         $jsonFile = $wDir.DIRECTORY_SEPARATOR.$this->configFileJson;
         $jsonData = $this->generatePydioBoosterJson($params, $adminKeyString);
-        $jsonData["caddyFilePath"] = $caddyFile;
+        // Use "./pydiocaddy" to indicate it in the same folder as main config file
+        $jsonData["caddyFilePath"] = "./".$this->configFileCaddy;
         file_put_contents($jsonFile, json_encode($jsonData, JSON_PRETTY_PRINT));
 
         return $jsonFile;
