@@ -100,14 +100,15 @@ class ApplicationState
 
     /**
      * Build the current server URL
-     * @param bool $withURI
+     * @param bool $withURI Wether to return the "path" part in scheme://host[/path]
+     * @param bool $forceInternal Wether to force server local IP detection, or to use external URL if it is set in the configuration
      * @static
      * @return string
      */
-    public static function detectServerURL($withURI = false)
+    public static function detectServerURL($withURI = false, $forceInternal = false)
     {
         $setUrl = ConfService::getGlobalConf("SERVER_URL");
-        if (!empty($setUrl)) {
+        if (!empty($setUrl) && !$forceInternal) {
             return (string)$setUrl;
         }
         if (php_sapi_name() == "cli") {
