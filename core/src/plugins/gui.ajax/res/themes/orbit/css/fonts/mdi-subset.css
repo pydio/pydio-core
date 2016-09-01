@@ -170,3 +170,7 @@
 .mdi-qrcode-scan:before {
     content: "\f522";
 }
+
+.mdi-server-plus:before {
+    content: "\f57f";
+}

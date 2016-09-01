@@ -283,17 +283,14 @@ class MqManager extends Plugin
         if(!empty($host) && !empty($port)){
 
             if(empty($this->nsqClient)){
-
                 // Publish on NSQ
                 $this->nsqClient = new nsqphp;
                 $this->nsqClient->publishTo(join(":", [$host, $port]), 1);
-
-                $this->logInfo("core.mq", "Published to NSQ " .$topic." :". $content);
             }
-
             set_error_handler(function ($errNo, $str) use (&$msg) { $msg = $str; });
             try {
                 $this->nsqClient->publish($topic, new Message($content));
+                $this->logDebug("core.mq", "Published to NSQ " .$topic." :". $content);
             } catch (\Exception $e) {
 
                 $this->logError("core.mq", "sendMessage " . $topic, $e->getMessage());
