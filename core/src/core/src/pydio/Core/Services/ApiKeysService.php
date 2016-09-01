@@ -125,6 +125,26 @@ class ApiKeysService
     }
 
     /**
+     * @param string $adminTaskId
+     * @param string $userId
+     * @return integer number of deleted keys
+     * @throws PydioException
+     */
+    public static function revokePairForAdminTask($adminTaskId, $userId = ""){
+
+        $keys = self::getStore()->simpleStoreList("keystore", $cursor, "", "serial", '%"ADMIN_TASK_ID";s:' . strlen($adminTaskId) . ':"' . $adminTaskId . '"%');
+        $c = 0;
+        foreach($keys as $kId => $kData){
+            if(empty($userId) || $kData["USER_ID"] === $userId){
+                self::getStore()->simpleStoreClear("keystore", $kId);
+                $c++;
+            }
+        }
+        return $c;
+
+    }
+
+    /**
      * @param $serverData
      * @param $adminTaskId
      * @param $userId

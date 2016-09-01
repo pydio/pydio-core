@@ -55,6 +55,10 @@
         <global_param group="CONF_MESSAGE[Server Internals]" type="button" name="MQ_WORKER_SWITCH_ON" choices="run_plugin_action:core.mq:switchWorkerOn" label="CONF_MESSAGE[Start Worker]" description="CONF_MESSAGE[Switch a worker ON]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Server Internals]" type="button" name="MQ_WORKER_SWITCH_OFF" choices="run_plugin_action:core.mq:switchWorkerOff" label="CONF_MESSAGE[Stop Worker]" description="CONF_MESSAGE[Switch a worker OFF]" mandatory="false"/>
 
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="legend" name="MQ_LEGEND_ADMIN_KEY" description="CONF_MESSAGE[Pydio Booster uses an administrative API key pair to communicate with the server. If you start it manually, use the buttons below to generate or revoke key pairs. If you start using the admin dashboard, you should not need that.]" label="CONF_MESSAGE[Generate Key]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="button" name="MQ_GENERATE_ADMIN_KEY" choices="run_plugin_action:core.mq:generateAdminKey" label="CONF_MESSAGE[Generate API Key]" description="CONF_MESSAGE[Generate Key]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="button" name="MQ_REVOKE_ADMIN_KEY" choices="run_plugin_action:core.mq:revokeAdminKey" label="CONF_MESSAGE[Revoke existing API Key(s)]" description="CONF_MESSAGE[Revoke Key]" mandatory="false"/>
+
     </server_settings>
     <class_definition classname="Pydio\Mq\Core\MqManager" filename="plugins/core.mq/vendor/autoload.php"/>
     <registry_contributions>

@@ -90,7 +90,9 @@ class Mailer extends Plugin implements SqlTableProvider
         if (!empty($pConf)) {
             $pService = PluginsService::getInstance($ctx);
             $p = ConfService::instanciatePluginFromGlobalParams($pConf, "Pydio\\Mailer\\Core\\Mailer", $pService);
-            $pService->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
+            if($p !== false){
+                $pService->setPluginUniqueActiveForType($p->getType(), $p->getName(), $p);
+            }
         }
     }
 

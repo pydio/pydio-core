@@ -442,6 +442,53 @@ class MqManager extends Plugin
 
     }
 
+
+    /**
+     * Save an admin key to a file
+     * @param array $params
+     * @param ContextInterface $ctx
+     * @return string
+     */
+    public function generateAdminKey($params, $ctx){
+        $u = $ctx->getUser();
+        if(!$u->isAdmin()){
+            return "ERROR: You are not administrator";
+        }
+        try{
+            $this->getAdminKeyString();
+            return "SUCCESS: Nothing to do, a pair already exists";
+        }catch(PydioException $e){
+            $adminPair = $this->getAdminKeyString($u->getId());
+            $pairFile = $this->getPluginWorkDir(true)."/apikey";
+            $r = file_put_contents($pairFile, $adminPair);
+            if($r === false){
+                return "ERROR: Something went wrong";
+            }else{
+                return "SUCCESS: An API key pair has been written in $pairFile on the server. You can now use it to configure PydioBooster.";
+            }
+        }
+    }
+
+    /**
+     * Save an admin key to a file
+     * @param array $params
+     * @param ContextInterface $ctx
+     * @return string
+     */
+    public function revokeAdminKey($params, $ctx){
+        $u = $ctx->getUser();
+        if(!$u->isAdmin()){
+            return "ERROR: You are not administrator";
+        }
+        $c = ApiKeysService::revokePairForAdminTask("go-upload", $u->getId());
+        if($c > 0){
+            return "SUCCESS: Successfully revoked $c pair of keys. You may have to generate new ones and reload PydioBooster.";
+        }else{
+            return "SUCCESS: Nothing to do, there is no admin key";
+        }
+    }
+
+
     /**
      * @param string $writeForUserId
      * @param string $restrictToIp
