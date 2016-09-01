@@ -349,7 +349,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
     public function recursiveIndexation($url)
     {
         //print("Indexing $url \n");
-        $this->logDebug("Indexing content of folder ".$url);
+        $this->logDebug("Indexing content of folder ".SystemTextEncoding::toUTF8($url));
         if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
             print("Indexing content of ".$url."\n");
         }
@@ -362,7 +362,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                 if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
                     print("Indexing node ".$newUrl."\n");
                 }
-                $this->logDebug("Indexing Node ".$newUrl);
+                $this->logDebug("Indexing Node ".SystemTextEncoding::toUTF8($newUrl));
                 try {
                     $newNode = new AJXP_Node($newUrl);
                     $this->updateNodeIndex(null, $newNode, false, true);
@@ -371,12 +371,12 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
                     if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
                         print("Error indexing node ".$newUrl." (".$e->getMessage().") \n");
                     }
-                    $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
+                    $this->logDebug("Error Indexing Node ".SystemTextEncoding::toUTF8($newUrl)." (".$e->getMessage().")");
                 }
             }
             closedir($handle);
         } else {
-            $this->logDebug("Cannot open $url!!");
+            $this->logDebug("Cannot open ".SystemTextEncoding::toUTF8($url)." !!");
         }
     }
 
@@ -435,9 +435,9 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             if(file_exists($node->getUrl())){
                 $this->createIndexedDocument($node, $index);
             }
-            $this->logDebug(__FILE__, "Indexation passed ".$node->getUrl());
+            $this->logDebug(__FILE__, "Indexation passed ".SystemTextEncoding::toUTF8($node->getUrl()));
         } catch (Exception $e){
-            $this->logError(__FILE__, "Lucene indexation failed for ".$node->getUrl()." (".$e->getMessage().")");
+            $this->logError(__FILE__, "Lucene indexation failed for ".SystemTextEncoding::toUTF8($node->getUrl())." (".$e->getMessage().")");
         }
     }
 
@@ -758,7 +758,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try{
                 $index = Zend_Search_Lucene::open($iPath);
             }catch (Zend_Search_Lucene_Exception $se){
-                $this->logError(__FUNCTION__, "Error while trying to load lucene index at path ".$iPath."! Maybe a permission issue?");
+                $this->logError(__FUNCTION__, "Error while trying to load lucene index at path ".SystemTextEncoding::toUTF8($iPath)."! Maybe a permission issue?");
                 throw $se;
             }
         } else {
@@ -769,7 +769,7 @@ class AjxpLuceneIndexer extends AbstractSearchEngineIndexer
             try{
                 $index = Zend_Search_Lucene::create($iPath);
             }catch (Zend_Search_Lucene_Exception $se){
-                $this->logError(__FUNCTION__, "Error while trying to create lucene index at path ".$iPath."! Maybe a permission issue?");
+                $this->logError(__FUNCTION__, "Error while trying to create lucene index at path ".SystemTextEncoding::toUTF8($iPath)."! Maybe a permission issue?");
                 throw $se;
             }
         }

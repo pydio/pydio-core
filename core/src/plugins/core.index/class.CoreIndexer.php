@@ -53,7 +53,7 @@ class CoreIndexer extends AJXP_Plugin {
             if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
                 AJXP_Controller::applyActionInBackground($repositoryId, "index", $httpVars);
                 AJXP_XMLWriter::header();
-                AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repositoryId), sprintf($messages["core.index.8"], $nodes[0]->getPath()), true, 2);
+                AJXP_XMLWriter::triggerBgAction("check_index_status", array("repository_id" => $repositoryId), sprintf($messages["core.index.8"], SystemTextEncoding::toUTF8($nodes[0]->getPath())), true, 2);
                 if(!isSet($httpVars["inner_apply"])){
                     AJXP_XMLWriter::close();
                 }
@@ -69,16 +69,16 @@ class CoreIndexer extends AJXP_Plugin {
                 // SIMPLE FILE
                 if(!$dir){
                     try{
-                        $this->debug("Indexing - node.index ".$node->getUrl());
+                        $this->debug("Indexing - node.index ".SystemTextEncoding::toUTF8($node->getUrl()));
                         AJXP_Controller::applyHook("node.index", array($node));
                     }catch (Exception $e){
-                        $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
+                        $this->debug("Error Indexing Node ".SystemTextEncoding::toUTF8($node->getUrl())." (".$e->getMessage().")");
                     }
                 }else{
                     try{
                         $this->recursiveIndexation($node);
                     }catch (Exception $e){
-                        $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
+                        $this->debug("Indexation of ".SystemTextEncoding::toUTF8($node->getUrl())." interrupted by error: (".$e->getMessage().")");
                     }
                 }
 
@@ -118,7 +118,7 @@ class CoreIndexer extends AJXP_Plugin {
             AJXP_Controller::applyHook("node.index.recursive.start", array($node));
         }else{
             if($this->isInterruptRequired($repository, $user)){
-                $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
+                $this->debug("Interrupting indexation! - node.index.recursive.end - ". SystemTextEncoding::toUTF8($node->getUrl()));
                 AJXP_Controller::applyHook("node.index.recursive.end", array($node));
                 $this->releaseStatus($repository, $user);
                 throw new Exception("User interrupted");
@@ -127,13 +127,13 @@ class CoreIndexer extends AJXP_Plugin {
 
         if(!ConfService::currentContextIsCommandLine()) @set_time_limit(120);
         $url = $node->getUrl();
-        $this->debug("Indexing Node parent node ".$url);
+        $this->debug("Indexing Node parent node ".SystemTextEncoding::toUTF8($url));
         $this->setIndexStatus("RUNNING", str_replace("%s", SystemTextEncoding::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
         if($node->getPath() != "/"){
             try {
                 AJXP_Controller::applyHook("node.index", array($node));
             } catch (Exception $e) {
-                $this->debug("Error Indexing Node ".$url." (".$e->getMessage().")");
+                $this->debug("Error Indexing Node ".SystemTextEncoding::toUTF8($url)." (".$e->getMessage().")");
             }
         }
 
@@ -144,14 +144,14 @@ class CoreIndexer extends AJXP_Plugin {
                 $childNode = new AJXP_Node(rtrim($url, "/")."/".$child);
                 $childUrl = $childNode->getUrl();
                 if(is_dir($childUrl)){
-                    $this->debug("Entering recursive indexation for ".$childUrl);
+                    $this->debug("Entering recursive indexation for ".SystemTextEncoding::toUTF8($childUrl));
                     $this->recursiveIndexation($childNode, $depth + 1);
                 }else{
                     try {
-                        $this->debug("Indexing Node ".$childUrl);
+                        $this->debug("Indexing Node ".SystemTextEncoding::toUTF8($childUrl));
                         AJXP_Controller::applyHook("node.index", array($childNode));
                     } catch (Exception $e) {
-                        $this->debug("Error Indexing Node ".$childUrl." (".$e->getMessage().")");
+                        $this->debug("Error Indexing Node ".SystemTextEncoding::toUTF8($childUrl)." (".$e->getMessage().")");
                     }
                 }
             }
@@ -160,11 +160,11 @@ class CoreIndexer extends AJXP_Plugin {
             $this->debug("Cannot open $url!!");
         }
         if($depth == 0){
-            $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
+            $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". SystemTextEncoding::toUTF8($node->getUrl()));
             $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user);
             AJXP_Controller::applyHook("node.index.recursive.end", array($node));
             $this->releaseStatus($repository, $user);
-            $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
+            $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". SystemTextEncoding::toUTF8($node->getUrl()));
         }
     }
 

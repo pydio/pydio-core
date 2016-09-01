@@ -212,14 +212,14 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
             $orig_files = $selection->files;
         elseif (is_string($selection))
             // As passed by destination parameter
-            return $this->repository->slug.$selection;
+            return SystemTextEncoding::toUTF8($this->repository->slug.$selection);
         else
             // Unrecognized
             return $selection;
 
         $files = array();
         foreach ($orig_files as $file)
-            $files[] = $this->repository->slug.$file;
+            $files[] = SystemTextEncoding::toUTF8($this->repository->slug.$file);
         return $files;
     }
 
@@ -587,7 +587,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 if($dest == null) $dest = AJXP_Utils::safeDirname($file);
                 $nodesDiffs["UPDATE"][$file] = new AJXP_Node($this->urlBase.$dest."/".$filename_new);
-                $this->logInfo("Rename", array("files"=>$this->addSlugToPath($file), "original"=>$this->addSlugToPath($file), "new"=>$filename_new));
+                $this->logInfo("Rename", array("files"=>$this->addSlugToPath($file), "original"=>$this->addSlugToPath($file), "new"=>SystemTextEncoding::toUTF8($filename_new)));
 
             break;
 
@@ -627,7 +627,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                     $messages[] = $messtmp;
                     $newNode = new AJXP_Node($this->urlBase.$parentDir."/".$basename);
                     array_push($nodesDiffs["ADD"], $newNode);
-                    $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($parentDir)."/".$basename, "files"=>$this->addSlugToPath($parentDir)."/".$basename));
+                    $this->logInfo("Create Dir", array("dir"=>$this->addSlugToPath($parentDir)."/".SystemTextEncoding::toUTF8($basename), "files"=>$this->addSlugToPath($parentDir)."/".SystemTextEncoding::toUTF8($basename)));
                 }
                 if(count($errors)){
                     if(!count($messages)){
@@ -671,7 +671,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                 $logMessage = $messtmp;
                 //$reloadContextNode = true;
                 //$pendingSelection = $dir."/".$filename;
-                $this->logInfo("Create File", array("files"=>$this->addSlugToPath($dir)."/".$filename));
+                $this->logInfo("Create File", array("files"=>$this->addSlugToPath($dir)."/".SystemTextEncoding::toUTF8($filename)));
                 $newNode = new AJXP_Node($this->urlBase.$dir."/".$filename);
                 if(!isSet($nodesDiffs)) $nodesDiffs = $this->getNodesDiffArray();
                 array_push($nodesDiffs["ADD"], $newNode);
@@ -805,7 +805,7 @@ class fsAccessDriver extends AbstractAccessDriver implements AjxpWrapperProvider
                         clearstatcache(true, $createdNode->getUrl());
                         $createdNode->loadNodeInfo(true);
                         $logMessage.="$mess[34] ".SystemTextEncoding::toUTF8($userfile_name)." $mess[35] $dir";
-                        $logFile = $this->addSlugToPath(SystemTextEncoding::fromUTF8($dir))."/".$userfile_name;
+                        $logFile = $this->addSlugToPath($dir)."/".SystemTextEncoding::toUTF8($userfile_name);
                         $this->logInfo("Upload File", array("file"=>$logFile, "files"=> $logFile ) );
 
                         if($partialUpload){

@@ -112,7 +112,7 @@ class PixlrEditor extends AJXP_Plugin
             $selectedNode->loadNodeInfo();
 
             if(!is_writeable($selectedNode->getUrl())){
-                $this->logError("Pixlr Editor", "Trying to edit an unauthorized file ".$selectedNode->getUrl());
+                $this->logError("Pixlr Editor", "Trying to edit an unauthorized file ".SystemTextEncoding::toUTF8($selectedNode->getUrl()));
                 return false;
             }
 
