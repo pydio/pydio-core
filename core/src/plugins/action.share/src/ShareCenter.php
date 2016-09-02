@@ -34,6 +34,7 @@ use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Meta\Watch\WatchRegister;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Base;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\Context;
@@ -44,6 +45,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
@@ -53,6 +55,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
+use Pydio\Share\Http\MinisiteServer;
 use Pydio\Share\Legacy\LegacyPubliclet;
 use Pydio\Share\Model\CompositeShare;
 use Pydio\Share\Model\ShareLink;
@@ -141,6 +144,10 @@ class ShareCenter extends Plugin
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
         parent::parseSpecificContributions($ctx, $contribNode);
+        if(!$ctx->getRepository()){
+            return;
+        }
+
         $disableSharing = false;
         $xpathesToRemove = array();
         $selectionContext = false;
@@ -210,9 +217,17 @@ class ShareCenter extends Plugin
      */
     public static function publicRoute($serverBase, $route, $params){
 
-        if(isSet($params["hash"])){
+        if(isSet($_GET['minisite_session'])){
 
-            $hash = $params["hash"];
+            $base = new Base();
+            $h = $_GET['minisite_session'];
+            SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
+
+            $base->handleRoute($serverBase, "/");
+
+        }else{
+
+            $hash = isSet($params["hash"])? $params["hash"] : "";
             if(strpos($hash, "--") !== false){
                 list($hash, $lang) = explode("--", $hash);
             }
@@ -222,27 +237,49 @@ class ShareCenter extends Plugin
             if(isSet($lang)){
                 $_GET["lang"] = $lang;
             }
+            if(isSet($params["download_file"])){
+                $_GET["dl"] = true;
+                $_GET["file"] = "/".$params["download_file"];
+            }
             ConfService::getAuthDriverImpl();
 
-            ShareCenter::loadShareByHash($hash);
-
-        }else if(isSet($_GET['minisite_session'])){
-
-            $base = new \Pydio\Core\Http\Base();
-            $h = $_GET['minisite_session'];
-            \Pydio\Core\Services\SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
-
-            $base->handleRoute($serverBase, "/");
-
-        }else{
-
-            ConfService::init();
-            ConfService::start();
-            $mess = LocaleService::getMessages();
-            ShareCenter::loadMinisite([], null, $mess["share_center.166"]);
+            $minisiteServer = new MinisiteServer($serverBase, $hash, isSet($params["download_file"]));
+            $minisiteServer->registerCatchAll();
+            $minisiteServer->listen();
 
         }
     }
+
+    /**************************/
+    /* BOOTLOADERS FOR LINKS
+    /**************************/
+    /**
+     * Loader for minisites
+     * @param array $data
+     * @param string $hash
+     * @param null $error
+     */
+    public static function loadMinisite($data, $hash = '', $error = null)
+    {
+        $base = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/");
+        $id = pathinfo($_SERVER["SCRIPT_NAME"], PATHINFO_FILENAME);
+        self::publicRoute($base, "/proxy", ["hash" => $id]);
+    }
+
+    /**
+     * Loader for legacy publiclets
+     * @static
+     * @param array $data
+     * @return void
+     */
+    public static function loadPubliclet($data)
+    {
+        $shareCenter = self::getShareCenter(Context::emptyContext());
+        $options = $shareCenter->getConfigs();
+        $shareStore = $shareCenter->getShareStore();
+        LegacyPubliclet::render($data, $options, $shareStore);
+    }
+
 
 
     /**************************/
@@ -1328,76 +1365,6 @@ class ShareCenter extends Plugin
             }
         }
     }
-
-
-    /**************************/
-    /* BOOTLOADERS FOR LINKS
-    /**************************/
-    /**
-     * Loader for minisites
-     * @param array $data
-     * @param string $hash
-     * @param null $error
-     */
-    public static function loadMinisite($data, $hash = '', $error = null)
-    {
-        MinisiteRenderer::loadMinisite($data, $hash, $error);
-    }
-
-    /**
-     * Loader used by the generic loader.
-     * @param string $hash
-     */
-    public static function loadShareByHash($hash){
-        Logger::debug(__CLASS__, __FUNCTION__, "Do something");
-        if(isSet($_GET["lang"])){
-            LocaleService::setLanguage($_GET["lang"]);
-        }
-        PluginsService::getInstance()->initActivePlugins();
-        $shareCenter = self::getShareCenter(Context::emptyContext());
-        $data = $shareCenter->getShareStore()->loadShare($hash);
-        $mess = LocaleService::getMessages();
-        if($data === false){
-            AuthService::disconnect();
-            self::loadMinisite([], $hash, $mess["share_center.166"]);
-            return;
-        }
-        if(ShareLink::isShareExpired($data)){
-            AuthService::disconnect();
-            self::loadMinisite($data, $hash, $mess["share_center.165"]);
-            return;
-        }
-        if(!empty($data) && is_array($data)){
-            if($data["SHARE_TYPE"] == "minisite"){
-                self::loadMinisite($data, $hash);
-            }else{
-                self::loadPubliclet($data);
-            }
-        }else{
-            $setUrl = ConfService::getGlobalConf("SERVER_URL");
-            $data = array();
-            if (!empty($setUrl)) {
-                $data["AJXP_APPLICATION_BASE"] = $setUrl;
-            }
-            self::loadMinisite($data, $hash, $mess["share_center.166"]);
-        }
-
-    }
-
-    /**
-     * Loader for legacy publiclets
-     * @static
-     * @param array $data
-     * @return void
-     */
-    public static function loadPubliclet($data)
-    {
-        $shareCenter = self::getShareCenter(Context::emptyContext());
-        $options = $shareCenter->getConfigs();
-        $shareStore = $shareCenter->getShareStore();
-        LegacyPubliclet::render($data, $options, $shareStore);
-    }
-
 
     /**************************/
     /* CREATE / EDIT SHARES

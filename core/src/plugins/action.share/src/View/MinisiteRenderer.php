@@ -22,7 +22,12 @@ namespace Pydio\Share\View;
 
 
 use DOMXPath;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -35,6 +40,7 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Share\ShareCenter;
+use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -48,6 +54,39 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class MinisiteRenderer
 {
     /**
+     * Called as a middleware
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
+     */
+    public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
+
+        $hash       = $requestInterface->getAttribute("hash");
+        $data       = $requestInterface->getAttribute("data");
+        $params     = $requestInterface->getParsedBody();
+
+        if(isSet($params["dl"]) && isSet($params["file"])){
+            $responseInterface = self::triggerDownload($requestInterface, $responseInterface);
+        }else{
+            $responseInterface = self::writeHtml($responseInterface, $requestInterface->getAttribute("ctx"), $data, $hash);
+        }
+        return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
+
+    }
+
+    /**
+     * @param array $data
+     * @param null|string $error
+     * @return string
+     */
+    protected static function computeTemplateName($data, $error = null){
+        if($error !== null){
+            return "ajxp_unique_strip";
+        }
+
+    }
+
+    /**
      * Render a simple error instead of the minisite
      * @param $data
      * @param string $hash
@@ -58,8 +97,53 @@ class MinisiteRenderer
     }
 
     /**
-     * Load the minisite
-     *
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
+     * @throws PydioException
+     * @throws \Pydio\Core\Exception\ActionNotFoundException
+     * @throws \Pydio\Core\Exception\AuthRequiredException
+     */
+    private static function triggerDownload(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
+
+        /** @var ContextInterface $ctx */
+        $ctx        = $requestInterface->getAttribute("ctx");
+        $data       = $requestInterface->getAttribute("data");
+        $params     = $requestInterface->getParsedBody();
+        if(isSet($data["DOWNLOAD_DISABLED"]) && $data["DOWNLOAD_DISABLED"] === true){
+            throw new PydioException("You are not allowed to download this file");
+        }
+        if(!$ctx->hasRepository()){
+            throw new PydioException("No active repository");
+        }
+
+        $errMessage = null;
+        $ACTION = "download";
+        if(isset($params["ct"])){
+            $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
+            $editors = PluginsService::getInstance($ctx)->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
+            if (count($editors)) {
+                foreach ($editors as $editor) {
+                    $xPath = new DOMXPath($editor->ownerDocument);
+                    $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
+                    if ($callbacks->length) {
+                        $ACTION = $callbacks->item(0)->getAttribute("name");
+                        if($ACTION == "audio_proxy") {
+                            $params["file"] = "base64encoded:".base64_encode($params["file"]);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+        $req =  Controller::executableRequest($ctx, $ACTION, $params);
+        return Controller::run($req);
+
+    }
+
+    /**
+     * [LEGACY] Load the minisite
+     * @deprecated 
      * @param $data
      * @param string $hash
      * @param null $error
@@ -69,14 +153,35 @@ class MinisiteRenderer
      */
     public static function loadMinisite($data, $hash = '', $error = null)
     {
-        $repository = $data["REPOSITORY"];
+        $resp = new Response();
+        $context = Context::emptyContext();
+        HTMLWriter::internetExplorerMainDocumentHeader();
+        HTMLWriter::charsetHeader();
+        $resp = self::writeHtml($resp, $context, $data, $hash, $error);
+        $b = $resp->getBody();
+        $b->rewind();
+        echo $b->getContents();
+    }
+
+
+    /**
+     * @param ResponseInterface $responseInterface
+     * @param ContextInterface $context
+     * @param $data
+     * @param string $hash
+     * @param null $error
+     * @return ResponseInterface
+     * @throws \Exception
+     */
+    public static function writeHtml(ResponseInterface $responseInterface, ContextInterface $context, $data, $hash = '', $error = null){
+
         $confs = [];
-        $ctx = Context::emptyContext();
-        PluginsService::getInstance($ctx)->initActivePlugins();
-        $shareCenter = ShareCenter::getShareCenter($ctx);
+        $shareCenter = ShareCenter::getShareCenter($context);
         if($shareCenter !== false){
             $confs = $shareCenter->getConfigs();
         }
+        $repoObject = $context->getRepository();
+
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
         if(!empty($confs["CUSTOM_MINISITE_LOGO"])){
             $logoPath = $confs["CUSTOM_MINISITE_LOGO"];
@@ -93,15 +198,6 @@ class MinisiteRenderer
                 $templateName = "ajxp_shared_folder";
             }
         }
-        if(isSet($repository)){
-            $repoObject = RepositoryService::getRepositoryById($repository);
-            if(!is_object($repoObject)){
-                $mess = LocaleService::getMessages();
-                $error = $mess["share_center.166"];
-                $templateName = "ajxp_unique_strip";
-                $repoObject = null;
-            }
-        }
         if(!isSet($templateName) && isSet($repoObject)){
             $filter = $repoObject->getContentFilter();
             if(!empty($filter) && count($filter->virtualPaths) == 1){
@@ -115,86 +211,27 @@ class MinisiteRenderer
         }
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
-        Controller::applyHook("tpl.filter_html", [$ctx, &$html]);
+        Controller::applyHook("tpl.filter_html", [$context, &$html]);
         $html = XMLWriter::replaceAjxpXmlKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
-        if(isSet($repository) && isSet($repoObject)){
-            $html = str_replace("AJXP_START_REPOSITORY", $repository, $html);
-            $html = str_replace("AJXP_REPOSITORY_LABEL", RepositoryService::getRepositoryById($repository)->getDisplay(), $html);
+        if(isSet($repoObject)){
+            $html = str_replace("AJXP_START_REPOSITORY", $repoObject->getId(), $html);
+            $html = str_replace("AJXP_REPOSITORY_LABEL", $repoObject->getDisplay(), $html);
         }
         $html = str_replace('AJXP_HASH_LOAD_ERROR', isSet($error)?$error:'', $html);
         $html = str_replace("AJXP_TEMPLATE_NAME", $templateName, $html);
         $html = str_replace("AJXP_LINK_HASH", $hash, $html);
-        $guiConfigs = PluginsService::getInstance($ctx)->getPluginById("gui.ajax")->getConfigs();
+        $guiConfigs = PluginsService::getInstance($context)->getPluginById("gui.ajax")->getConfigs();
         $html = str_replace("AJXP_THEME", $guiConfigs["GUI_THEME"] , $html);
 
-        if(isSet($_GET["dl"]) && isSet($_GET["file"])){
-            AuthService::$useSession = false;
-        }else{
-            session_name("AjaXplorer_Shared".str_replace(".","_",$hash));
-            session_start();
-            AuthService::disconnect();
-        }
-        $loggedUser = null;
         if (!empty($data["PRELOG_USER"])) {
-            $loggedUser = AuthService::logUser($data["PRELOG_USER"], "", true);
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_preloged_user", $html);
         } else if(isSet($data["PRESET_LOGIN"])) {
-            $_SESSION["PENDING_REPOSITORY_ID"] = $repository;
-            $_SESSION["PENDING_FOLDER"] = "/";
             $html = str_replace("AJXP_PRELOGED_USER", $data["PRESET_LOGIN"], $html);
         } else{
             $html = str_replace("AJXP_PRELOGED_USER", "ajxp_legacy_minisite", $html);
-        }
-        if(isSet($hash)){
-            $_SESSION["CURRENT_MINISITE"] = $hash;
-        }
-
-        if(isSet($_GET["dl"]) && isSet($_GET["file"]) && (!isSet($data["DOWNLOAD_DISABLED"]) || $data["DOWNLOAD_DISABLED"] === false)){
-            $repoObject = UsersService::getRepositoryWithPermission($loggedUser, $repository);
-            $dlContext = Context::contextWithObjects($loggedUser, $repoObject);
-            PluginsService::getInstance($dlContext);
-            $errMessage = null;
-            try {
-                $params = $_GET;
-                $ACTION = "download";
-                if(isset($_GET["ct"])){
-                    $mime = pathinfo($params["file"], PATHINFO_EXTENSION);
-                    $editors = PluginsService::getInstance($dlContext)->searchAllManifests("//editor[contains(@mimes,'$mime') and @previewProvider='true']", "node", true, true, false);
-                    if (count($editors)) {
-                        foreach ($editors as $editor) {
-                            $xPath = new DOMXPath($editor->ownerDocument);
-                            $callbacks = $xPath->query("//action[@contentTypedProvider]", $editor);
-                            if ($callbacks->length) {
-                                $ACTION = $callbacks->item(0)->getAttribute("name");
-                                if($ACTION == "audio_proxy") {
-                                    $params["file"] = "base64encoded:".base64_encode($params["file"]);
-                                }
-                                break;
-                            }
-                        }
-                    }
-                }
-                $req =  Controller::executableRequest($dlContext, $ACTION, $params);
-                $response = Controller::run($req);
-                $emitter = new \Pydio\Core\Http\Middleware\SapiMiddleware();
-                $emitter->emitResponse($req, $response);
-                return;
-            } catch (\Exception $e) {
-                $errMessage = $e->getMessage();
-            }
-            if($errMessage == null) return;
-            $html = str_replace('AJXP_HASH_LOAD_ERROR', $errMessage, $html);
-        }
-
-        if (isSet($_GET["lang"])) {
-            if ($loggedUser != null) {
-                $loggedUser->setPref("lang", $_GET["lang"]);
-            } else {
-                setcookie("AJXP_lang", $_GET["lang"]);
-            }
         }
 
         if (!empty($data["AJXP_APPLICATION_BASE"])) {
@@ -223,9 +260,12 @@ class MinisiteRenderer
         }else{
             $html = str_replace("AJXP_PATH_TO_ROOT", rtrim($tPath, "/")."/", $html);
         }
-        HTMLWriter::internetExplorerMainDocumentHeader();
-        HTMLWriter::charsetHeader();
-        echo($html);
+
+        HTMLWriter::internetExplorerMainDocumentHeader($responseInterface);
+        $responseInterface = $responseInterface->withHeader("Content-type", "text/html; charset:UTF-8");
+        $responseInterface->getBody()->write($html);
+        return $responseInterface;
+
     }
 
 }

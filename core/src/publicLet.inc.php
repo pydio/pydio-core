@@ -30,6 +30,7 @@ ConfService::init();
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
 require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/vendor/autoload.php");
+class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
 
 $fakes = '
 // Non working exception class
