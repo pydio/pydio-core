@@ -699,6 +699,7 @@
 							<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
 						</div>
 						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
+						<a id="selector_create_folder"><span class="mdi mdi-folder-plus"></span></a>
 					</div>
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[

@@ -6067,9 +6067,18 @@ div#copymove_form div#treeCopy {
 }
 div#copymove_form > input {
   box-sizing: border-box;
-  width: 100% !important;
+  width: 338px !important;
   background-color: #fff;
   padding: 5px;
+  border: 0 !important;
+  border-bottom: 1px solid #cccccc !important;
+}
+div#copymove_form a#selector_create_folder {
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 6px 2px;
+  border: 0px solid #cccccc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
 }
 div#external_download > div {
   padding: 10px 24px 52px !important;
