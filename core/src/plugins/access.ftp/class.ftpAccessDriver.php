@@ -213,6 +213,20 @@ class ftpAccessDriver extends fsAccessDriver
 
     }
 
+    // Checks if a file belongs to currently logged in FTP user
+    private function isFileOwner($path)
+    {
+        $ftp = new ftpAccessWrapper();
+        $stat = $ftp->url_stat($path, 2);
+        $urlParts = AJXP_Utils::safeParseUrl($path);
+        $repository = ConfService::getRepositoryById($urlParts["host"]);
+        $credentials = AJXP_Safe::tryLoadingCredentialsFromSources($urlParts, $repository);
+        if (empty($credentials["user"]))
+            return is_writable($path);
+        if ((string)$stat["uid"] == $credentials["user"])
+            return true;
+    }
+
     public function isWriteable($path, $type="dir")
     {
         $parts = parse_url($path);
@@ -220,9 +234,15 @@ class ftpAccessDriver extends fsAccessDriver
         if ($type == "dir" && ($dir == "" || $dir == "/" || $dir == "\\")) { // ROOT, WE ARE NOT SURE TO BE ABLE TO READ THE PARENT
             return true;
         } else {
-            return is_writable($path);
+            $perms = substr(decoct(fileperms($path)), -3);
+            // World writable files
+            if (preg_match("/..[2367]$/", $perms))
+                return true;
+            // Files belonging to currently logged in FTP user that are writable by owner
+            if ((preg_match("/^[2367]/", $perms)) && ($this->isFileOwner($path)))
+                return true;
         }
-
+        return false;
     }
 
     public function deldir($location, $repoData)
