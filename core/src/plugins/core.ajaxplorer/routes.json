@@ -23,10 +23,10 @@
     "class": "Pydio\\Core\\Http\\Base",
     "method": "handleRoute"
   },
-  "/shares": {
+  "%WEBDAV_BASEURI%": {
     "methods": "*",
     "routes": [
-      "/shares[{optional:.+}]"
+      "%WEBDAV_BASEURI%[{optional:.+}]"
     ],
     "class": "Pydio\\Core\\Http\\Dav\\DAVServer",
     "method": "handleRoute"
@@ -47,12 +47,12 @@
     "class": "Pydio\\OCS\\OCSPlugin",
     "method": "startServer"
   },
-  "/public":{
+  "%PUBLIC_BASEURI%":{
     "methods": "*",
     "routes": [
-      "/public/{hash}/dl/[{optional:.+}]",
-      "/public/{hash}",
-      "/public[{optional:.+}]"
+      "%PUBLIC_BASEURI%/{hash}/dl/[{optional:.+}]",
+      "%PUBLIC_BASEURI%/{hash}",
+      "%PUBLIC_BASEURI%[{optional:.+}]"
     ],
     "class": "Pydio\\Share\\ShareCenter",
     "path" : "plugins/action.share/src/ShareCenter.php",

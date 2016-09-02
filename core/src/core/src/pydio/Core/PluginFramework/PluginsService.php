@@ -29,6 +29,7 @@ use Pydio\Conf\Core\CoreConfLoader;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Exception\RepositoryLoadException;
+use Pydio\Core\Http\TopLevelRouter;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
@@ -105,6 +106,7 @@ class PluginsService
         @unlink(AJXP_PLUGINS_REQUIRES_FILE);
         @unlink(AJXP_PLUGINS_QUERIES_CACHE);
         @unlink(AJXP_PLUGINS_BOOTSTRAP_CACHE);
+        @unlink(AJXP_CACHE_DIR."/".TopLevelRouter::ROUTE_CACHE_FILENAME);
         if(@unlink(AJXP_PLUGINS_REPOSITORIES_CACHE)){
             $content = "<?php \n";
             $boots = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/*/repositories.php");

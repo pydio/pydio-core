@@ -25,6 +25,7 @@ use FastRoute\RouteCollector;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 
+use Pydio\Core\Services\ConfService;
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -46,6 +47,8 @@ class TopLevelRouter
 
     private $base = "";
 
+    const ROUTE_CACHE_FILENAME = "plugins_toplevel_routes.php";
+
     /**
      * TopLevelRouter constructor.
      * @param array $cacheOptions
@@ -53,7 +56,7 @@ class TopLevelRouter
     public function __construct($cacheOptions = []){
         $this->cacheOptions = array_merge([
             "cacheDisabled" => AJXP_SKIP_CACHE,
-            "cacheFile" => AJXP_DATA_PATH."/cache/plugins_toplevel_routes.php"
+            "cacheFile" => AJXP_CACHE_DIR."/".TopLevelRouter::ROUTE_CACHE_FILENAME
         ], $cacheOptions);
     }
 
@@ -65,11 +68,11 @@ class TopLevelRouter
     public function configureRoutes($base, RouteCollector &$r){
         
         $allMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH', 'PROPFIND', 'PROPPATCH', 'MKCOL', 'COPY', 'MOVE', 'LOCK', 'UNLOCK'];
-        $file = AJXP_DATA_PATH."/".AJXP_PLUGINS_FOLDER."/boot.conf/routes.json";
-        if(!file_exists($file)){
-            $file = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/routes.json";
-        }
-        $routes = json_decode(file_get_contents($file), true);
+        $file = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/routes.json";
+        $textContent = file_get_contents($file);
+        $textContent = str_replace("%PUBLIC_BASEURI%", ConfService::getGlobalConf("PUBLIC_BASEURI"), $textContent);
+        $textContent = str_replace("%WEBDAV_BASEURI%", ConfService::getGlobalConf("WEBDAV_BASEURI"), $textContent);
+        $routes = json_decode($textContent, true);
         foreach ($routes as $short => $data){
             $methods = $data["methods"] == "*" ? $allMethods : $data["methods"];
             foreach($data["routes"] as $route){
@@ -121,8 +124,10 @@ class TopLevelRouter
                 break;
             case Dispatcher::NOT_FOUND:
             default:
-                throw new PydioException("Oups, could not find any valid route for ".$uri.", method was was ".$httpMethod);
-                break;
+                //throw new PydioException("Oups, could not find any valid route for ".$uri.", method was was ".$httpMethod);
+                header("HTTP/1.0 404 Not Found");
+                echo file_get_contents(AJXP_INSTALL_PATH . "/plugins/gui.ajax/res/html/404.html");
+                die();
         }
 
     }

@@ -153,7 +153,7 @@ class ConfService
             $globalsArray = array("instance_name" => $globalsArray);
         }
 
-        if (!isSet($globalsArray["instance_name"]) && isSet($globalsArray["group_switch_value"])){
+        if (is_array($globalsArray) &&  !isSet($globalsArray["instance_name"]) && isSet($globalsArray["group_switch_value"])){
             $globalsArray["instance_name"] = $globalsArray["group_switch_value"];
         }
 

@@ -75,7 +75,7 @@ class PublicAccessManager
             }
         } else {
             $fullUrl = ApplicationState::detectServerURL(true);
-            return str_replace("\\", "/", rtrim($fullUrl, "/")."/".trim(ConfService::getGlobalConf("PUBLIC_BASE_URI"), "/"));
+            return str_replace("\\", "/", rtrim($fullUrl, "/")."/".trim(ConfService::getGlobalConf("PUBLIC_BASEURI"), "/"));
         }
     }
 

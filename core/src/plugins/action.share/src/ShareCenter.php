@@ -246,7 +246,7 @@ class ShareCenter extends Plugin
             }
             ConfService::getAuthDriverImpl();
 
-            $minisiteServer = new MinisiteServer($serverBase, $hash, isSet($params["download_file"]));
+            $minisiteServer = new MinisiteServer($serverBase, $hash, isSet($params["optional"]));
             $minisiteServer->registerCatchAll();
             $minisiteServer->listen();
 
