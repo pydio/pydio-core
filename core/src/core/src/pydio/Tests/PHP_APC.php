@@ -29,20 +29,23 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class PHP_APC extends AbstractTest
 {
-    public function __construct() { parent::__construct("PHP APC extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+    public function __construct() { parent::__construct("PHP Opcode Cache extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
     public function doTest()
     {
         $this->failedLevel = "warning";
         $v = @extension_loaded('apc');
         if (isSet($v) && (is_numeric($v) || strtolower($v) == "on")) {
             $this->testedParams["PHP APC extension loaded"] = "No";
-            return FALSE;
+            $v = false;
         } else if (!isSet($v)) {
+            $v = false;
+        }
+        if(!$v && !@extension_loaded("opcache")){
             $this->failedInfo = "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
             return FALSE;
         }
-        $this->failedInfo = "PHP APC extension detected, this is good for better performances";
-        $this->testedParams["PHP APC extension loaded"] = "Yes";
+        $this->failedInfo = "PHP accelerator extension detected, this is good for performances";
+        $this->testedParams["PHP Opcode Cache extension loaded"] = "Yes";
         return TRUE;
     }
 }
