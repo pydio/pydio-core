@@ -231,15 +231,18 @@ class ShareCenter extends Plugin
             if(strpos($hash, "--") !== false){
                 list($hash, $lang) = explode("--", $hash);
             }
+            if(strpos($hash, ".php") !== false){
+                $hash = array_shift(explode(".php", $hash));
+            }
 
             ConfService::init();
             ConfService::start();
             if(isSet($lang)){
                 $_GET["lang"] = $lang;
             }
-            if(isSet($params["download_file"])){
+            if(isSet($params["optional"])){
                 $_GET["dl"] = true;
-                $_GET["file"] = "/".$params["download_file"];
+                $_GET["file"] = "/".$params["optional"];
             }
             ConfService::getAuthDriverImpl();
 

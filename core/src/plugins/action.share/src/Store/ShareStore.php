@@ -38,14 +38,18 @@ use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
+use Pydio\Share\ShareCenter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-
+/**
+ * Class ShareStore
+ * @package Pydio\Share\Store
+ */
 class ShareStore {
 
     var $sqlSupported = false;
-    var $downloadFolder;
+    var $legacyPublicFolder;
     /**
      * @var int
      */
@@ -70,7 +74,7 @@ class ShareStore {
      */
     public function __construct(ContextInterface $context, $downloadFolder, $hashMinLength = 32){
         $this->context = $context;
-        $this->downloadFolder = $downloadFolder;
+        $this->legacyPublicFolder = $downloadFolder;
         $this->hashMinLength = $hashMinLength;
         $storage = ConfService::getConfStorageImpl();
         if($storage->getId() == "conf.sql") {
@@ -79,6 +83,9 @@ class ShareStore {
         }
     }
 
+    /**
+     * @return int
+     */
     public function getHashMinLength(){
         return $this->hashMinLength;
     }
@@ -111,7 +118,7 @@ class ShareStore {
         if($existingHash){
             $hash = $existingHash;
         }else{
-            $hash = $this->computeHash($data, $this->downloadFolder);
+            $hash = $this->computeHash($data, $this->legacyPublicFolder);
         }
         
         $shareData["SHARE_TYPE"] = $type;
@@ -164,7 +171,7 @@ class ShareStore {
      */
     public function loadShare($hash){
 
-        $dlFolder = $this->downloadFolder;
+        $dlFolder = $this->legacyPublicFolder;
         $file = $dlFolder."/".$hash.".php";
         if(!is_file($file)) {
             if($this->sqlSupported){
@@ -175,6 +182,7 @@ class ShareStore {
             }
             return [];
         }
+        class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
         $lines = file($file);
         $inputData = '';
         // Necessary for the eval
@@ -188,19 +196,8 @@ class ShareStore {
         $code = $lines[3] . $lines[4] . $lines[5];
         eval($code);
         if(empty($inputData)) return false;
-        $dataModified = !$this->checkHash($inputData, $hash); //(md5($inputData) != $id);
         $publicletData = @unserialize($inputData);
         $publicletData["PUBLICLET_PATH"] = $file;
-        /*
-        if($this->sqlSupported){
-            // Move old file to DB-storage
-            $type = (isset($publicletData["REPOSITORY"]) ? "minisite" : "publiclet");
-            $this->createGenericLoader();
-            $shareData["SHARE_TYPE"] = $type;
-            $this->confStorage->simpleStoreSet("share", $hash, $publicletData, "serial");
-            unlink($file);
-        }
-        */
 
         return $publicletData;
 
@@ -212,7 +209,7 @@ class ShareStore {
      * @return bool
      */
     public function shareIsLegacy($hash){
-        $dlFolder = $this->downloadFolder;
+        $dlFolder = $this->legacyPublicFolder;
         $file = $dlFolder."/".$hash.".php";
         return is_file($file);
     }
@@ -282,28 +279,6 @@ class ShareStore {
                 (!empty($limitToUser)?'%"OWNER_ID";s:'.strlen($limitToUser).':"'.$limitToUser.'"%':''),
                 $parentRepository);
         }
-
-        // Get hardcoded files
-        /*
-        $files = glob(ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER")."/*.php");
-        if($files === false) return $dbLets;
-        foreach ($files as $file) {
-            if(basename($file) == "share.php") continue;
-            $ar = explode(".", basename($file));
-            $id = array_shift($ar);
-            $publicletData = $this->loadShare($id);
-            if($publicletData === false) continue;
-            if (!empty($limitToUser) && ( !isSet($publicletData["OWNER_ID"]) || $publicletData["OWNER_ID"] != $limitToUser )) {
-                continue;
-            }
-            if(!empty($parentRepository) && ( (is_string($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"] != $parentRepository)
-                    || (is_object($publicletData["REPOSITORY"]) && $publicletData["REPOSITORY"]->getUniqueId() != $parentRepository ) )){
-                continue;
-            }
-            $publicletData["SHARE_TYPE"] = "file";
-            $dbLets[$id] = $publicletData;
-        }
-        */
 
         // Update share_type and filter if necessary
         foreach($dbLets as $id => &$shareData){
@@ -685,7 +660,7 @@ class ShareStore {
         } else if($type == "ocs_remote"){
             return true;
         } else if ($type == "file" || $type == "minisite") {
-            $fileExists = is_file($this->downloadFolder."/".$element.".php");
+            $fileExists = is_file($this->legacyPublicFolder."/".$element.".php");
             if($fileExists) {
                 return true;
             }
@@ -755,7 +730,7 @@ class ShareStore {
     }
 
     /**
-     * Find all expired legacy publiclets and remove them.
+     * Delete an expired publiclets.
      * @param $elementId
      * @param $data
      * @throws \Exception

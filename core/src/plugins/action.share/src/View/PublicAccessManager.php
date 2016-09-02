@@ -64,7 +64,6 @@ class PublicAccessManager
      */
     public function buildPublicDlURL()
     {
-        $downloadFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
         $dlURL = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_URL");
         if (!empty($dlURL)) {
             $parts = parse_url($dlURL);
@@ -76,7 +75,7 @@ class PublicAccessManager
             }
         } else {
             $fullUrl = ApplicationState::detectServerURL(true);
-            return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
+            return str_replace("\\", "/", rtrim($fullUrl, "/")."/".trim(ConfService::getGlobalConf("PUBLIC_BASE_URI"), "/"));
         }
     }
 
@@ -88,35 +87,6 @@ class PublicAccessManager
         $minisite = parse_url($this->buildPublicDlURL(), PHP_URL_PATH) ."/a.php";
         $server = rtrim(parse_url( ApplicationState::detectServerURL(true), PHP_URL_PATH), "/");
         return ApplicationState::getTravelPath($minisite, $server);
-    }
-
-    /**
-     * Get download folder path from configuration
-     * @return string
-     */
-    public function getPublicDownloadFolder(){
-        return ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
-    }
-
-    /**
-     * Build download folder URL from configuration and current URL
-     * @return string|null
-     */
-    public function getPublicDownloadUrl(){
-        $downloadFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
-        $dlURL = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_URL");
-        if (!empty($dlURL)) {
-            $parts = parse_url($dlURL);
-            if($parts['scheme']) {
-                return rtrim($dlURL, "/");
-            } else {
-                $host = ApplicationState::detectServerURL();
-                return rtrim($host, "/")."/".trim($dlURL, "/");
-            }
-        } else {
-            $fullUrl = ApplicationState::detectServerURL(true);
-            return str_replace("\\", "/", rtrim($fullUrl, "/").rtrim(str_replace(AJXP_INSTALL_PATH, "", $downloadFolder), "/"));
-        }
     }
 
 }
