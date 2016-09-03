@@ -15,6 +15,12 @@
                 </serverCallback>
             </processing>
         </action>
+        <action name="user_state">
+            <!-- Alias to "state" for API V2 -->
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
 		<action name="switch_repository">
 			<processing>
 				<serverCallback methodName="switchAction"/>

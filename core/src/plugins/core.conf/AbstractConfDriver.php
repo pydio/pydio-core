@@ -631,7 +631,16 @@ abstract class AbstractConfDriver extends Plugin
             //------------------------------------
             case "get_xml_registry" :
             case "state" :
-                
+            case "user_state" :
+
+                if($action === "user_state"){
+                    // Build xPath manually
+                    $uri = $requestInterface->getServerParams()["REQUEST_URI"];
+                    if(strpos($uri, "/user/workspaces") !== false) $xPath = "user/repositories";
+                    else if(strpos($uri, "/user/preferences") !== false) $xPath = "user/preferences";
+                    else $xPath = "user";
+                    $httpVars["xPath"] = $xPath;
+                }
                 
                 $clone = PluginsService::getInstance($ctx)->getFilteredXMLRegistry(true, true);
                 $clonePath = new \DOMXPath($clone);
