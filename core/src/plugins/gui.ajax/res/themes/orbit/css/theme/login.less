@@ -45,8 +45,11 @@ div.form-reset-password-ask
 
     div.dialogLegend {
       text-align: center;
-      font-style: italic;
-      color: #ddd;
+      font-size: 15px;
+      font-weight: 500;
+      color: rgba(255,255,255,1);
+      padding:0 40px;
+      line-height: 18px;
     }
     #switch_language_form div.dialogLegend{
       font-style: normal;
@@ -55,15 +58,25 @@ div.form-reset-password-ask
       margin-bottom: 5px;
     }
 
-    a.forgot-password-link {
-      color: white !important;
-      margin-right: 45px;
-      margin-top: 6px;
-      text-decoration: underline;
+    div.SF_element{
+
+      padding-left: 20px;
       font-size: 13px;
-      text-align: right;
-      display: block;
-      float: right;
+      color: rgba(255,255,255,0.93);
+      div.SF_label{
+        padding-left: 4px;
+        font-size:13px;
+        font-weight: 500;
+        text-transform: uppercase;
+        color: rgba(255,255,255,1);
+      }
+      span.icon-question-sign{
+        display: inline-block;
+        margin: 0 6px 0 13px;
+      }
+      a.forgot-password-link {
+        color: rgba(255,255,255,0.93) !important;
+      }
     }
 
     .captcha_container {
@@ -84,15 +97,6 @@ div.form-reset-password-ask
 
     .ajxp_password_auth div.SF_element:first-of-type{
       display: none !important;
-    }
-
-    div.SF_element{
-      padding-left: 20px;
-
-      div.SF_label{
-        padding-left: 4px;
-        text-transform: uppercase;
-      }
     }
 
     div.dialogButtons
@@ -133,7 +137,7 @@ div.dialogBox.form-login_form_dynamic{
   form {
     margin: 0 40px;
     font-size: 15px;
-    padding-top: 20px;
+    padding-top: 0;
     padding-bottom: 20px;
     &.no_placeholder div.SF_label {
       display: block;

@@ -5866,8 +5866,11 @@ div.form-switch_language_form div.dialogContent div.dialogLegend,
 div.form-reset-password div.dialogContent div.dialogLegend,
 div.form-reset-password-ask div.dialogContent div.dialogLegend {
   text-align: center;
-  font-style: italic;
-  color: #ddd;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  padding: 0 40px;
+  line-height: 18px;
 }
 div.form-login_form div.dialogContent #switch_language_form div.dialogLegend,
 div.form-login_form_dynamic div.dialogContent #switch_language_form div.dialogLegend,
@@ -5879,19 +5882,40 @@ div.form-reset-password-ask div.dialogContent #switch_language_form div.dialogLe
   margin-top: 16px;
   margin-bottom: 5px;
 }
-div.form-login_form div.dialogContent a.forgot-password-link,
-div.form-login_form_dynamic div.dialogContent a.forgot-password-link,
-div.form-switch_language_form div.dialogContent a.forgot-password-link,
-div.form-reset-password div.dialogContent a.forgot-password-link,
-div.form-reset-password-ask div.dialogContent a.forgot-password-link {
-  color: white !important;
-  margin-right: 45px;
-  margin-top: 6px;
-  text-decoration: underline;
+div.form-login_form div.dialogContent div.SF_element,
+div.form-login_form_dynamic div.dialogContent div.SF_element,
+div.form-switch_language_form div.dialogContent div.SF_element,
+div.form-reset-password div.dialogContent div.SF_element,
+div.form-reset-password-ask div.dialogContent div.SF_element {
+  padding-left: 20px;
   font-size: 13px;
-  text-align: right;
-  display: block;
-  float: right;
+  color: rgba(255, 255, 255, 0.93);
+}
+div.form-login_form div.dialogContent div.SF_element div.SF_label,
+div.form-login_form_dynamic div.dialogContent div.SF_element div.SF_label,
+div.form-switch_language_form div.dialogContent div.SF_element div.SF_label,
+div.form-reset-password div.dialogContent div.SF_element div.SF_label,
+div.form-reset-password-ask div.dialogContent div.SF_element div.SF_label {
+  padding-left: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+div.form-login_form div.dialogContent div.SF_element span.icon-question-sign,
+div.form-login_form_dynamic div.dialogContent div.SF_element span.icon-question-sign,
+div.form-switch_language_form div.dialogContent div.SF_element span.icon-question-sign,
+div.form-reset-password div.dialogContent div.SF_element span.icon-question-sign,
+div.form-reset-password-ask div.dialogContent div.SF_element span.icon-question-sign {
+  display: inline-block;
+  margin: 0 6px 0 13px;
+}
+div.form-login_form div.dialogContent div.SF_element a.forgot-password-link,
+div.form-login_form_dynamic div.dialogContent div.SF_element a.forgot-password-link,
+div.form-switch_language_form div.dialogContent div.SF_element a.forgot-password-link,
+div.form-reset-password div.dialogContent div.SF_element a.forgot-password-link,
+div.form-reset-password-ask div.dialogContent div.SF_element a.forgot-password-link {
+  color: rgba(255, 255, 255, 0.93) !important;
 }
 div.form-login_form div.dialogContent .captcha_container,
 div.form-login_form_dynamic div.dialogContent .captcha_container,
@@ -5925,21 +5949,6 @@ div.form-switch_language_form div.dialogContent .ajxp_password_auth div.SF_eleme
 div.form-reset-password div.dialogContent .ajxp_password_auth div.SF_element:first-of-type,
 div.form-reset-password-ask div.dialogContent .ajxp_password_auth div.SF_element:first-of-type {
   display: none !important;
-}
-div.form-login_form div.dialogContent div.SF_element,
-div.form-login_form_dynamic div.dialogContent div.SF_element,
-div.form-switch_language_form div.dialogContent div.SF_element,
-div.form-reset-password div.dialogContent div.SF_element,
-div.form-reset-password-ask div.dialogContent div.SF_element {
-  padding-left: 20px;
-}
-div.form-login_form div.dialogContent div.SF_element div.SF_label,
-div.form-login_form_dynamic div.dialogContent div.SF_element div.SF_label,
-div.form-switch_language_form div.dialogContent div.SF_element div.SF_label,
-div.form-reset-password div.dialogContent div.SF_element div.SF_label,
-div.form-reset-password-ask div.dialogContent div.SF_element div.SF_label {
-  padding-left: 4px;
-  text-transform: uppercase;
 }
 div.form-login_form div.dialogContent div.dialogButtons,
 div.form-login_form_dynamic div.dialogContent div.dialogButtons,
@@ -5995,7 +6004,7 @@ div.dialogBox.form-login_form form,
 div.dialogBox.form-login_form_dynamic form {
   margin: 0 40px;
   font-size: 15px;
-  padding-top: 20px;
+  padding-top: 0;
   padding-bottom: 20px;
 }
 div.dialogBox.form-login_form form.no_placeholder div.SF_label,
