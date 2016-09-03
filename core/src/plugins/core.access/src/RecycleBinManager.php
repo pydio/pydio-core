@@ -107,6 +107,7 @@ class RecycleBinManager
             $originalRep = self::getFileOrigin($selection->getUniqueFile());
             if ($originalRep != "") {
                 $action = "move";
+                $httpVars["recycle_restore"] = true;
                 $httpVars["dest"] = $originalRep; // CHECK UTF8 HANDLING HERE
             }
         }

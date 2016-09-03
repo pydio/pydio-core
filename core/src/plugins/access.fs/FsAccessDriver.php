@@ -1003,6 +1003,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
                     $targetBaseName = $httpVars["targetBaseName"];
                 }
+                if(!file_exists($destPath) && isSet($httpVars["recycle_restore"])){
+                    $this->mkDir($selection->nodeForPath(dirname($destPath)), basename($destPath), false, true);
+                }
                 $this->filterUserSelectionToHidden($ctx, [$httpVars["dest"]]);
                 if ($selection->inZip()) {
                     // Set action to copy anycase (cannot move from the zip).
@@ -1127,7 +1130,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         continue;
                     }
                     try{
-                        $newNode = $this->mkDir($parentNode, $basename, isSet($httpVars["ignore_exists"])?true:false);
+                        $newNode = $this->mkDir(
+                            $parentNode,
+                            $basename,
+                            (isSet($httpVars["ignore_exists"]) && $httpVars["ignore_exists"] === "true"),
+                            (isSet($httpVars["recursive"]) && $httpVars["recursive"] === "true")
+                        );
                     }catch(PydioException $ex){
                         $errors[] = $ex->getMessage();
                         continue;
@@ -2099,11 +2107,16 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      * @param AJXP_Node $parentNode
      * @param String $newDirName
      * @param bool $ignoreExists
+     * @param bool $createRecursive
      * @return AJXP_Node
+     * @throws PydioException
      * @throws \Exception
      */
-    public function mkDir($parentNode, $newDirName, $ignoreExists = false)
+    public function mkDir($parentNode, $newDirName, $ignoreExists = false, $createRecursive = false)
     {
+        if(!file_exists($parentNode->getUrl()) && $createRecursive){
+            $this->mkDir($parentNode->getParent(), basename($parentNode->getUrl()), $ignoreExists, true);
+        }
         Controller::applyHook("node.before_change", [&$parentNode]);
 
         $mess = LocaleService::getMessages();

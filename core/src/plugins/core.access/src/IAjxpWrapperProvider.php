@@ -45,8 +45,11 @@ interface IAjxpWrapperProvider
      * Creates a directory
      * @param String $path
      * @param String $newDirName
+     * @param bool $ignoreExists
+     * @param bool $recursive
+     * @return
      */
-    public function mkDir($path, $newDirName);
+    public function mkDir($path, $newDirName, $ignoreExists=false, $recursive=false);
 
     /**
      * Creates an empty file
