@@ -346,12 +346,16 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $newAction = "copy";
             }
         }else{
-            if(substr_compare($path, "/", strlen($path)-1, 1) === 0){
+            $qPath = $params["path"];
+            if(substr_compare($qPath, "/", strlen($qPath)-1, 1) === 0){
                 // Ends with slash => mkdir
                 $newAction = "mkdir";
                 $newVars["file"] = $notDecodedPath;
                 if(!empty($params["override"])) {
                     $newVars["ignore_exists"] = $params["override"];
+                }
+                if(!empty($params["recursive"])) {
+                    $newVars["recursive"] = $params["recursive"];
                 }
             }else{
                 $newAction = "mkfile";
@@ -2129,8 +2133,11 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
             throw new PydioException($mess[40]);
         }
+        if (!file_exists($parentNode->getUrl())){
+            throw new PydioException($mess[103]." ".$parentNode->getPath());
+        }
         if (!$this->isWriteable($parentNode)) {
-            throw new PydioException($mess[38]." $parentNode->getPath() ".$mess[99]);
+            throw new PydioException($mess[38]." ".$parentNode->getPath()." ".$mess[99]);
         }
 
         $dirMode = 0775;
