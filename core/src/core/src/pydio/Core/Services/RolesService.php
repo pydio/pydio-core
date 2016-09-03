@@ -123,12 +123,12 @@ class RolesService
      * @param string $groupPath GroupPath to be applied
      * @return AJXP_Role
      */
-    public static function getOrCreateRole($roleId, $groupPath)
+    public static function getOrCreateRole($roleId, $groupPath = "/")
     {
         $roles = self::getRolesList(array($roleId));
         if (isSet($roles[$roleId])) return $roles[$roleId];
         $role = new AJXP_Role($roleId);
-        $role->setGroupPath("/");
+        $role->setGroupPath($groupPath);
         self::updateRole($role);
         return $role;
     }
