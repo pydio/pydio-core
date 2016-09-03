@@ -255,7 +255,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                 $collAttr = $column["attributeName"];
                 $headers[$collAttr] = $colTitle;
             }
-        }else{
+        }else if(count($this->children)){
             /** @var AJXP_Node $firstNode */
             $firstNode = $this->children[0];
             $headers["text"] = "Label"; //$firstNode->getLabel();
@@ -268,6 +268,8 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                     $headers[$attName] = ucfirst($attName);
                 }
             }
+        }else{
+            $headers["h"] = "No results found";
         }
         $table->setHeaders(array_values($headers));
 

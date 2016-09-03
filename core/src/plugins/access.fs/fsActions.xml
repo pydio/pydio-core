@@ -195,18 +195,26 @@
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" iconClass="icon-ban-circle" accessKey="empty_recycle_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="only" actionBar="true"
+				<context selection="true" dir="true" recycle="only" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="change_main"/>
+                <selectionContext dir="false" file="false" recycle="true" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
+                <serverCallback methodName="switchAction" restParams="/"/>
 				<clientCallback prepareModal="false"><![CDATA[
-				    ajaxplorer.getContextHolder().selectAll();
-					window.setTimeout(function(){
-						pydio.getController().fireAction('delete');
-					}, 200);
-					]]></clientCallback>
-				</processing>
+					modal.showDialogForm('EmptyRecycle', 'empty_recycle_form', null, function(){
+						PydioApi.getClient().request({get_action:'empty_recycle'});
+						hideLightBox(true);
+						return false;
+					});
+                ]]></clientCallback>
+                <clientForm id="empty_recycle_form"><![CDATA[
+                    <div id="empty_recycle_form" action="empty_recycle" box_width="200">
+                        <span ajxp_message_id="177">AJXP_MESSAGE[177]</span>
+                    </div>
+				]]></clientForm>
+            </processing>
 		</action>
 		<action name="download" fileDefault="false">
 			<gui text="88" title="88" src="download_manager.png" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">

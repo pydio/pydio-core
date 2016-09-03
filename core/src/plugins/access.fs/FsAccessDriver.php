@@ -919,6 +919,46 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
             break;
 
+            case "empty_recycle":
+
+                $taskId = $request->getAttribute("pydio-task-id");
+                if($taskId === null && !ConfService::currentContextIsCommandLine()){
+                    $task = TaskService::actionAsTask($ctx, $action, $httpVars);
+                    $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
+                    break;
+                }
+                // List recycle content
+                $fakeResp = new Response();
+                $recycleBin = RecycleBinManager::getRelativeRecycle();
+                $newRequest = $request->withAttribute("action", "ls");
+                $newRequest = $newRequest->withParsedBody(["dir" => $recycleBin]);
+                $this->switchAction($newRequest, $fakeResp);
+                $b = $fakeResp->getBody();
+                if($b instanceof SerializableResponseStream){
+                    foreach($b->getChunks() as $chunk){
+                        if($chunk instanceof NodesList){
+                            $list = $chunk;
+                        }
+                    }
+                }
+                if(!isSet($list)){
+                    throw new PydioException("Could not retrieve recycle bin content");
+                }
+                $selection = UserSelection::fromContext($ctx, []);
+                $selection->initFromNodes($list->getChildren());
+                $logMessages = [];
+                $errorMessage = $this->delete($selection, $logMessages, $taskId);
+                if (count($logMessages)) {
+                    $logMessage = new UserMessage(join("\n", $logMessages));
+                }
+                if($errorMessage) {
+                    throw new PydioException(TextEncoder::toUTF8($errorMessage));
+                }
+                $this->logInfo("Delete", ["files"=>$this->addSlugToPath($selection)]);
+                $nodesDiffs->remove($selection->getFiles());
+
+                break;
+
             //------------------------------------
             //	COPY / MOVE
             //------------------------------------
