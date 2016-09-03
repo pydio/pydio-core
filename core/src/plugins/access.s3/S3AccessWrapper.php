@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\S3;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
@@ -70,12 +71,10 @@ class S3AccessWrapper extends FsAccessWrapper
     /**
      * @param ContextInterface $ctx
      * @param boolean $registerStream
-     * @return PydioS3Client
+     * @return S3Client
      */
     protected static function getClientForContext(ContextInterface $ctx, $registerStream = true)
     {
-        require_once(dirname(__FILE__)."/aws.phar");
-
         $repoObject = $ctx->getRepository();
         if (!isSet(self::$clients[$repoObject->getId()])) {
             // Get a client
@@ -105,13 +104,13 @@ class S3AccessWrapper extends FsAccessWrapper
             }
             //SDK_VERSION IS A GLOBAL PARAM
             ConfService::getConfStorageImpl()->_loadPluginConfig("access.s3", $globalOptions);
-            $sdkVersion = $globalOptions["SDK_VERSION"]; //$repoObject->driverInstance->driverConf['SDK_VERSION'];
+            $sdkVersion = $globalOptions["SDK_VERSION"];
             if ($sdkVersion !== "v2" && $sdkVersion !== "v3") {
                 $sdkVersion = "v2";
             }
             if ($sdkVersion === "v3") {
-                require_once("PydioS3Client.php");
-                $s3Client = new PydioS3Client([
+                require_once("S3Client.php");
+                $s3Client = new S3Client([
                     "version" => $apiVersion,
                     "region" => $region,
                     "credentials" => $options
@@ -156,7 +155,7 @@ class S3AccessWrapper extends FsAccessWrapper
         // Make sure to register s3:// wrapper
         $client = self::getClientForContext($node->getContext(), true);
         $protocol = "s3://";
-        if ($client instanceof PydioS3Client) {
+        if ($client instanceof S3Client) {
             $protocol = "s3." . $repoId . "://";
         }
         $basePath       = $repoObject->getContextOption($node->getContext(), "PATH");
@@ -213,13 +212,41 @@ class S3AccessWrapper extends FsAccessWrapper
         if ($stat["mode"] == 0666) {
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
+        if($stat["mode"] === 0040777){
+            $node       = new AJXP_Node($path);
+            $ctx = $node->getContext();
+            $repoObject = $node->getRepository();
+            $result = $this->getClientForContext($ctx)->listObjects([
+                'Bucket'  => $repoObject->getContextOption($ctx, "CONTAINER"),
+                'Prefix'  => ltrim($node->getPath(), "/"). '/',
+                'MaxKeys' => 1
+            ]);
+            if (isSet($result['Contents']) && isSet($result['Contents'][0]['LastModified'])) {
+                $stat = $this->statForDir($result['Contents'][0]['LastModified']);
+            }
 
-        $parsed = parse_url($path);
-        if ($stat["mtime"] == $stat["ctime"] && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
-            //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
-            //return null;
         }
         return $stat;
+    }
+
+    protected function statForDir($lastModified){
+        $time = strtotime($lastModified);
+        return [
+            0  => 0,  'dev'     => 0,
+            1  => 0,  'ino'     => 0,
+            2  => 0040777,  'mode'    => 0040777,
+            3  => 0,  'nlink'   => 0,
+            4  => 0,  'uid'     => 0,
+            5  => 0,  'gid'     => 0,
+            6  => -1, 'rdev'    => -1,
+            7  => 0,  'size'    => 0,
+            8  => $time,  'atime'   => $time,
+            9  => $time,  'mtime'   => $time,
+            10 => $time,  'ctime'   => $time,
+            11 => -1, 'blksize' => -1,
+            12 => -1, 'blocks'  => -1,
+        ];
+
     }
 
     /**
@@ -246,9 +273,12 @@ class S3AccessWrapper extends FsAccessWrapper
     }
 
 
-    // DUPBLICATE STATIC FUNCTIONS TO BE SURE
-    // NOT TO MESS WITH self:: CALLS
-
+    /**
+     * DUPLICATE STATIC FUNCTIONS TO BE SURE
+     * NOT TO MESS WITH self:: CALLS
+     * @param $tmpDir
+     * @param $tmpFile
+     */
     public static function removeTmpFile($tmpDir, $tmpFile)
     {
         if (is_file($tmpFile)) unlink($tmpFile);

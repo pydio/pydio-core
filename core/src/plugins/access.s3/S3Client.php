@@ -26,7 +26,7 @@ use Aws\S3\StreamWrapper;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "S3CacheService.php";
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-class PydioS3Client extends AwsS3Client
+class S3Client extends AwsS3Client
 {
     /**
      * Register a new stream wrapper who overwrite the Amazon S3 stream wrapper with this client instance.
@@ -35,7 +35,6 @@ class PydioS3Client extends AwsS3Client
      */
     public function registerStreamWrapper($repositoryId)
     {
-        /* S3Client + s3 protocol +  cacheInterface */
         StreamWrapper::register($this, "s3.".$repositoryId, new S3CacheService());
     }
 }

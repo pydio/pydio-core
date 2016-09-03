@@ -16,7 +16,8 @@
     "nikic/fast-route":"~1.0",
     "symfony/console":"^3.0",
     "davegardnerisme/nsqphp": "dev-master",
-    "sabre/dav":"1.8.10"
+    "sabre/dav":"1.8.10",
+    "aws/aws-sdk-php": "^3.19.4"
   }
 
 }
