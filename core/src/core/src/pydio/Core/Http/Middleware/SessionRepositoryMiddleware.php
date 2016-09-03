@@ -100,7 +100,7 @@ class SessionRepositoryMiddleware
             LocaleService::setLanguage(SessionService::getLanguage());
         }
 
-        if(UsersService::usersEnabled() && ApplicationState::detectApplicationFirstRun()){
+        if(UsersService::usersEnabled()){
             try{
                 RolesService::bootSequence();
             }catch (PydioException $e){
