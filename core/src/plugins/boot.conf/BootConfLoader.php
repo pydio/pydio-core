@@ -25,6 +25,7 @@ use dibi;
 use DOMXPath;
 use Exception;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
@@ -475,7 +476,9 @@ class BootConfLoader extends AbstractConfDriver
                     mkdir(dirname($dbFile), 0755, true);
                 }
             }
-
+            if(empty($p["password"])){
+                throw new PydioException("Although it's technically possible, for security reasons please do not use blank password for your DB connection.");
+            }
             // Should throw an exception if there was a problem.
             dibi::connect($p);
             dibi::disconnect();
