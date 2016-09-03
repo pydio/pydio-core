@@ -339,7 +339,15 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if(isSet($params["copy_source"])){
             $newVars["dest"] = PathUtils::forwardSlashDirname($notDecodedPath);
             $newVars["targetBaseName"] = PathUtils::forwardSlashBasename($notDecodedPath);
-            $newVars["file"] = "/".implode("/", array_slice(explode("/", trim($params["copy_source"], "/")), 1));
+
+            $sourceParts = explode("/", trim($params["copy_source"], "/"));
+            $sourceRepo  = array_shift($sourceParts);
+            $newVars["file"] = "/".implode("/", $sourceParts);
+            $currentRepo = $ctx->getRepositoryId()."";
+            if($currentRepo !== $sourceRepo){
+                // Cross repo, invert parameters and forward to parent method!
+                throw new PydioException("Cross Repository copy is not implemented on this api.");
+            }
             if(isSet($params["delete_source"]) && $params["delete_source"] == "true"){
                 $newAction = "move";
             }else{
