@@ -149,9 +149,15 @@ class BootConfLoader extends AbstractConfDriver
         $uri = $_SERVER["REQUEST_URI"];
         if (strpos($uri, '.php') !== false) $uri = PathUtils::forwardSlashDirname($uri);
         if (empty($uri)) $uri = "/";
+        $tryFullLocale = setlocale(LC_CTYPE, 0);
+        $locale = TextEncoder::getEncoding();
+        if(strpos($tryFullLocale, ".") !== false)$locale = $tryFullLocale;
+        if(defined('AJXP_LOCALE')) $locale = AJXP_LOCALE;
+        $apcCache = function_exists('apc_fetch') || function_exists('apcu_fetch');
         $loadedValues = array(
-            "ENCODING" => (defined('AJXP_LOCALE') ? AJXP_LOCALE : TextEncoder::getEncoding()),
-            "SERVER_URI" => $uri
+            "ENCODING" => $locale,
+            "SERVER_URI" => $uri,
+            "APC_CACHE_ENABLE" => $apcCache ? "true" : "false"
         );
         foreach ($loadedValues as $pName => $pValue) {
             $vNodes = $xPath->query("server_settings/global_param[@name='$pName']");
@@ -328,7 +334,19 @@ class BootConfLoader extends AbstractConfDriver
             "group_switch_value" => "auth.sql",
             "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
         ));
-        $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
+        if($data["APC_CACHE_ENABLE"]){
+            $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array(
+                "instance_name" => "cache.doctrine",
+                "group_switch_value" => "cache.doctrine",
+                "CACHE_PREFIX" => StringHelper::slugify("pydio-".$data["SERVER_URI"]),
+                "DRIVER" => [
+                    "group_switch_value" => "apc",
+                    "driver" => "apc",
+                ]
+            ));
+        }else{
+            $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array());
+        }
 
         // DETECT REQUIRED SQL TABLES AND INSTALL THEM
         $registry = PluginsService::getInstance(Context::emptyContext())->getDetectedPlugins();

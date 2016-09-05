@@ -275,6 +275,9 @@ abstract class AbstractCacheDriver extends Plugin
      */
     public function getStats($namespace){
         $cacheDriver = $this->getCacheDriver($namespace);
+        if(empty($cacheDriver) || !method_exists($cacheDriver, "getStats")){
+            return null;
+        }
         return $cacheDriver->getStats();
     }
 

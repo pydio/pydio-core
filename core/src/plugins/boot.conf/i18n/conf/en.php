@@ -75,4 +75,6 @@ $mess = array(
 "Detected Server Path" => "Detected Server Path",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Make sure this is correct, as it's used to rewrite the htaccess file",
 "Select a language activated by default( users will still be able to switch)" => "Select a language activated by default( users will still be able to switch)",
+"Enable cache (recommended)" => "Enable cache (recommended)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
 );

@@ -1750,24 +1750,26 @@ div.shadow_class {
 }
 .simple_tooltip {
   position: absolute;
-  width: 150px;
+  width: 210px;
   z-index: 10000;
-  font-size: 13px;
-  padding: 5px 10px;
+  font-weight: 300;
+  line-height: 19px;
+  font-size: 12px;
+  padding: 8px 11px;
 }
 .simple_tooltip_observer {
   cursor: help;
 }
 .simple_tooltip_title {
-  padding-top: 2px;
-  padding-bottom: 1px;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1.1em;
+  padding-top: 1px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 .down_arrow_tip,
 .top_arrow_tip {
-  background: rgba(69, 77, 85, 0.86);
+  background: rgba(69, 77, 85, 0.72);
   color: #ffffff;
   border: 0;
   border-radius: 2px;
@@ -1781,7 +1783,7 @@ div.shadow_class {
   position: absolute;
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
-  border-top-color: rgba(69, 77, 85, 0.86);
+  border-top-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -1800,7 +1802,7 @@ div.shadow_class {
 }
 .top_arrow_tip:after {
   border-color: rgba(111, 123, 136, 0);
-  border-bottom-color: rgba(69, 77, 85, 0.86);
+  border-bottom-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -1811,7 +1813,7 @@ div.shadow_class {
 .right_arrow_tip {
   color: #ffffff;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: rgba(69, 77, 85, 0.72);
   border: 0;
 }
 .right_arrow_tip:after,
@@ -1826,14 +1828,14 @@ div.shadow_class {
 }
 .right_arrow_tip:after {
   border-color: rgba(0, 0, 0, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-left-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
 }
 .right_arrow_tip:before {
   border-color: rgba(0, 0, 0, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-left-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
@@ -1841,7 +1843,7 @@ div.shadow_class {
 .left_arrow_tip {
   color: #ffffff;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: rgba(69, 77, 85, 0.72);
   border: 0;
 }
 .left_arrow_tip:after,
@@ -1856,7 +1858,7 @@ div.shadow_class {
 }
 .left_arrow_tip:before {
   border-color: rgba(0, 0, 0, 0);
-  border-right-color: rgba(69, 77, 85, 0.86);
+  border-right-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   left: -10px;

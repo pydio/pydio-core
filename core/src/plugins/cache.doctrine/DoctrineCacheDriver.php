@@ -123,8 +123,12 @@ class doctrineCacheDriver extends AbstractCacheDriver
         $driverOptions  = $this->getContextualOption($emptyContext, "DRIVER");
         $cachePrefix    = $this->getContextualOption($emptyContext, "CACHE_PREFIX");
 
-        if(!is_array($driverOptions) || !isset($driverOptions['driver'])){
+        if(!is_array($driverOptions) || (!isset($driverOptions["driver"]) && !isSet($driverOptions["group_switch_value"]))){
             return null;
+        }else{
+            if(!isSet($driverOptions["driver"]) && isSet($driverOptions["group_switch_value"])){
+                $driverOptions["driver"] = $driverOptions["group_switch_value"];
+            }
         }
 
         switch ($driverOptions['driver']) {
