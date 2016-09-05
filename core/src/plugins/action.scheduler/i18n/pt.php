@@ -49,6 +49,7 @@ $mess = array(
     "17" => "Utilizador(es)",
     "17d" => "Introduza uma lista de utilizadores separados por virgulas, ou um Wildcard * Tarefa recursiva para todos os utilizadores.",
     "18"  => "Agenda",
+    "18e"  => "Agenda (disabled)",
     "18d" => "Agenda Cronológica de acções",
     "19" => "Apagar Tarefa",
     "19d" => "Remover entrada da agenda e remover as tarefas seleccionadas",

@@ -50,6 +50,7 @@ $mess = array(
     "17d" => "Kommagetrennte Liste mit Benutzern oder Wildcard * damit die Aufgabe für alle Benutzer ausgeführt wird.",
     "18"  => "Aufgabenplanung",
     "18d" => "Cron-ähnliche Aufgabenplanung",
+    "18e" => "Aufgabenplanung (disabled)",
     "19" => "Aufgabe löschen",
     "19d" => "Aufgabe nicht mehr ausführen und löschen",
     "20" => "Crontab-Eintrag generieren",

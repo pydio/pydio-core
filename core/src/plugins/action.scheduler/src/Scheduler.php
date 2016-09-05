@@ -102,7 +102,7 @@ class Scheduler extends Plugin
     public function performChecks()
     {
         if (!ConfService::backgroundActionsSupported()) {
-            throw new Exception("The command line must be supported. See 'Pydio Core Options'.");
+            //throw new Exception("The command line must be supported. See 'Pydio Core Options'.");
         }
     }
 
@@ -175,7 +175,7 @@ class Scheduler extends Plugin
         }
         return false;
     }
-
+    
     /**
      * @param $data1
      * @param $data2
@@ -236,6 +236,12 @@ class Scheduler extends Plugin
                 $cronTiming = "*/5 * * * *";
                 HTMLWriter::charsetHeader("text/plain", "UTF-8");
                 print "$cronTiming $phpCmd $rootInstall -r=ajxp_conf -u=" . $ctx->getUser()->getId() . " -p=YOUR_PASSWORD_HERE -a=scheduler_runAll >> $logFile";
+
+                break;
+
+            case "scheduler_checkConfig":
+
+                $responseInterface = new JsonResponse(["OK" => ConfService::backgroundActionsSupported()]);
 
                 break;
 
@@ -401,10 +407,9 @@ class Scheduler extends Plugin
     {
         $mess = LocaleService::getMessages();
         if (isSet($configTree["parameters"])) {
-
             $configTree["parameters"]["CHILDREN"]["scheduler"] = array(
                 "AJXP_MIME" => "scheduler_zone",
-                "LABEL" => "action.scheduler.18",
+                "LABEL" => "action.scheduler.18".(ConfService::backgroundActionsSupported()?"":"e"),
                 "DESCRIPTION" => "action.scheduler.22",
                 "ICON" => "preferences_desktop.png",
                 "METADATA" => array(
@@ -416,7 +421,7 @@ class Scheduler extends Plugin
 
         } else if (isSet($configTree["admin"])) {
             $configTree["admin"]["CHILDREN"]["scheduler"] = array(
-                "LABEL" => $mess["action.scheduler.18"],
+                "LABEL" => $mess["action.scheduler.18".(ConfService::backgroundActionsSupported()?"":"e")],
                 "AJXP_MIME" => "scheduler_zone",
                 "DESCRIPTION" => $mess["action.scheduler.22"],
                 "ICON" => "scheduler/ICON_SIZE/player_time.png",

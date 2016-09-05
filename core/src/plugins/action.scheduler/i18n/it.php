@@ -49,6 +49,7 @@ $mess = array(
     "17" => "Utente(i)",
     "17d" => "Inserisci un elenco di utenti, separati dalla virgola, o il  wildcard * per eseguire l'azione per ogni utente.",
     "18"  => "Schedulatore",
+    "18e"  => "Schedulatore (disabled)",
     "18d" => "Azioni in stile 'Cron'",
     "19" => "Cancella Azione",
     "19d" => "De-Schedula e rimuovi l'azione selezionata",

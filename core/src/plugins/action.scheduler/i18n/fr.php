@@ -49,6 +49,7 @@ $mess = array(
     "17d" => "Entrer une liste d'utilisateurs séparés par des virgules, ou un joker (*) pour lancer la tâche sur chaque utilisateur.",
     "18"  => "Planificateur",
     "18d" => "Actions du planificateur (type cron)",
+    "18e" => "Planificateur (inactif)",
     "19" => "Supprimer la tâche",
     "19d" => "Déplanifier et supprimer la tâche sélectionnée",
     "20" => "Expression Cron",

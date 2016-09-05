@@ -50,6 +50,7 @@ $mess = array(
     "17d" => "Enter a comma separated list of users, or wildcard * to recurse the task on all users.",
     "18"  => "Scheduler",
     "18d" => "Cron-like scheduler actions",
+    "18e" => "Scheduler (disabled)",
     "19" => "Delete Task",
     "19d" => "Unschedule and remove the selected task",
     "20" => "Cron Expression",
