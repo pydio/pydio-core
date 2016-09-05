@@ -81,23 +81,29 @@ class NotificationCenter extends Plugin
      */
     protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
     {
-           parent::parseSpecificContributions($ctx, $contribNode);
-
-           // DISABLE STUFF
-           if (empty($this->pluginConf["USER_EVENTS"])) {
-               if($contribNode->nodeName == "actions"){
-                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                   $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
-                   $publicUrlNode = $publicUrlNodeList->item(0);
-                   $contribNode->removeChild($publicUrlNode);
-               }else if($contribNode->nodeName == "client_configs"){
-                   $actionXpath=new DOMXPath($contribNode->ownerDocument);
-                   $children = $actionXpath->query('component_config', $contribNode);
-                   foreach($children as $child){
-                       $contribNode->removeChild($child);
-                   }
+        parent::parseSpecificContributions($ctx, $contribNode);
+        $disableWsActivity = $this->getContextualOption($ctx, "SHOW_WORKSPACES_ACTIVITY") === false;
+        $disableUserEvents = $this->getContextualOption($ctx, "USER_EVENTS") === false;
+        if(!$disableUserEvents && !$disableWsActivity){
+            return;
+        }
+        // DISABLE STUFF AS NEEDED
+       if($contribNode->nodeName == "actions" && $disableUserEvents){
+           $actionXpath=new DOMXPath($contribNode->ownerDocument);
+           $publicUrlNodeList = $actionXpath->query('action[@name="get_my_feed"]', $contribNode);
+           $publicUrlNode = $publicUrlNodeList->item(0);
+           $contribNode->removeChild($publicUrlNode);
+       }else if($contribNode->nodeName == "client_configs"){
+           $actionXpath=new DOMXPath($contribNode->ownerDocument);
+           $children = $actionXpath->query('component_config', $contribNode);
+           /** @var \DOMElement $child */
+           foreach($children as $child){
+               if($child->getAttribute("className") !== "InfoPanel" && !$disableUserEvents){
+                   continue;
                }
+               $contribNode->removeChild($child);
            }
+       }
     }
 
     /**
