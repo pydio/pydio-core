@@ -33,13 +33,13 @@ Class.create("AjxpInstaller", AjxpPane, {
 
     initLanguageSwitcher: function(){
         var selector = this.htmlElement.down("#installer_lang");
-        $H(ajxpBootstrap.parameters.get('availableLanguages')).each(function(pair){
-            var option = new Element('option', {value:pair.key}).update(pair.value);
-            if(pair.key == ajaxplorer.currentLanguage){
-                option.writeAttribute("selected", "true");
-            }
-            selector.insert(option);
-        });
+        if(!selector.down('option')){
+            pydio.listLanguagesWithCallback(function(key, label, selected){
+                var option = new Element('option', {value:key}).update(label);
+                if(selected) option.writeAttribute("selected", "true");
+                selector.insert(option);
+            });
+        }
         selector.observe("change", function(){
             pydio.fire("language_changed");
             pydio.currentLanguage = selector.getValue();

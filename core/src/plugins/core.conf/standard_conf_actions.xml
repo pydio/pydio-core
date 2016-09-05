@@ -446,10 +446,9 @@
 					    if(pydio.user) var userLang = pydio.user.getPreference("lang");
 						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
 						var selector = $(oForm).select('select[id="language_selector"]')[0];
-						var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
-						languages.each(function(pair){
-							var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
-							option.update(pair.value);
+						pydio.listLanguagesWithCallback(function(key, label){
+							var option = new Element('option', {value:key,id:'lang_'+key});
+							option.update(label);
 							selector.insert(option);
 						});
 						selector.setValue(userLang);

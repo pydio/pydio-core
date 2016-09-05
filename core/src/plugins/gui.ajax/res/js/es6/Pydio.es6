@@ -342,6 +342,14 @@ class Pydio extends Observable{
         return this.Registry.getPluginConfigs(pluginQuery);
     }
 
+    listLanguagesWithCallback(callback){
+        let langs = this.Parameters.get("availableLanguages") || {"en":"Default"};
+        let current = this.currentLanguage;
+        Object.keys(langs).sort().map(function(key){
+            callback(key, langs[key], (current === key));
+        });
+    }
+
     /**
      * Reload all messages from server and trigger updateI18nTags
      * @param newLanguage String

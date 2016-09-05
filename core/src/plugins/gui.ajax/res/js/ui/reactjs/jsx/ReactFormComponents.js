@@ -143,12 +143,9 @@
                     this.setState({choices:newOutput});
                 }.bind(this));
             }else if(choices == "AJXP_AVAILABLE_LANGUAGES"){
-                var object = global.pydio.Parameters.get("availableLanguages");
-                for(var key in object){
-                    if(object.hasOwnProperty(key)){
-                        output.set(key, object[key]);
-                    }
-                }
+                global.pydio.listLanguagesWithCallback(function(key, label){
+                    output.set(key, label);
+                });
             }else if(choices == "AJXP_AVAILABLE_REPOSITORIES"){
                 if(global.pydio.user){
                     global.pydio.user.repositories.forEach(function(repository){
