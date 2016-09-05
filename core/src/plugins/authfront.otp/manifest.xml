@@ -35,7 +35,7 @@
                   document.observe("ajaxplorer:afterApply-login", function(){
                     var f= modal.getForm();
 
-                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
+                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp").get('MODIFY_LOGIN_SCREEN');
 
                     if(!enableModifyGUI) return;
 
