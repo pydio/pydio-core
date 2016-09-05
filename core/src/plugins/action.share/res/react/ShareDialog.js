@@ -188,9 +188,11 @@
         render: function(){
 
             let nodePath = this.props.shareModel.getNode().getPath();
+            /*
             if(this.props.shareModel.getNode().getMetadata().get("original_path")){
                 nodePath = this.props.shareModel.getNode().getMetadata().get("original_path");
             }
+            */
             return (
                 <div className="headerPanel">
                     <div
