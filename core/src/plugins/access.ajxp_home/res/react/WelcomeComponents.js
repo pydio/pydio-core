@@ -326,7 +326,8 @@
                 )
             }
 
-            var gettingStartedBlock = '';
+            let gettingStartedBlock = null;
+            let adminAccessBlock = null;
             var gettingStartedPanel;
             if(this.props.enableGettingStarted){
                 var dgs = function(){
@@ -340,7 +341,15 @@
                 }.bind(this);
                 gettingStartedPanel = <TutorialPane closePane={close} open={this.state.showGettingStarted}/>;
             }
-
+            let a = this.props.controller.getActionByName('switch_to_settings');
+            if(!a.deny){
+                let func = function(){
+                    this.props.controller.fireAction('switch_to_settings');
+                }.bind(this);
+                let sentenceParts = MessageHash['user_home.76'].split("%1");
+                let dashName = MessageHash['user_home.77'];
+                adminAccessBlock = <small> {sentenceParts[0]} <a onClick={func}>{dashName}</a> {sentenceParts.length > 1 ? sentenceParts[1] : null}</small>;
+            }
 
             return (
                 <div id="welcome">
@@ -349,6 +358,7 @@
                     <p>
                         {loginLink}
                         {gettingStartedBlock}
+                        {adminAccessBlock}
                     </p>
                 </div>
             )

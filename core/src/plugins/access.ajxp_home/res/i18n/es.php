@@ -92,4 +92,6 @@ $mess=array(
     "73" => "Easily connect your mobile applications",
     "74" => "Scan this QRCode with your mobile application to easily configure the connection",
     "75"=> "Search all files...",
+    "76" => "Access the %1 through the top-right menu",
+    "77" => "admin dashboard",
 );
