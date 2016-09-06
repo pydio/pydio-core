@@ -100,7 +100,13 @@ class MultiAuthDriver extends AbstractAuthDriver
     public function getRegistryContributions(\Pydio\Core\Model\ContextInterface $ctx, $extendedVersion = true)
     {
         $this->loadRegistryContributions($ctx);
-        return parent::getRegistryContributions($ctx, $extendedVersion);
+        $contribs = parent::getRegistryContributions($ctx, $extendedVersion);
+        if(count($this->drivers)){
+            foreach($this->drivers as $dPlugin){
+                $contribs = array_merge($contribs, $dPlugin->getRegistryContributions($ctx));
+            }
+        }
+        return $contribs; // parent::getRegistryContributions($ctx, $extendedVersion);
     }
 
     private function detectCurrentDriver()
