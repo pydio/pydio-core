@@ -296,7 +296,7 @@ class PluginsManager extends AbstractManager
 
             case "parameters_to_form_definitions" :
 
-                $data = json_decode(TextEncoder::magicDequote($httpVars["json_parameters"]), true);
+                $data = json_decode(InputFilter::magicDequote($httpVars["json_parameters"]), true);
                 $buffer = "<standard_form>";
                 foreach ($data as $repoScope => $pluginsData) {
                     $buffer .= "<repoScope id='$repoScope'>";

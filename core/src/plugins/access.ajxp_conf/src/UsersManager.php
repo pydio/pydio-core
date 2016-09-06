@@ -203,7 +203,7 @@ class UsersManager extends AbstractManager
                     throw new PydioException($mess["ajxp_conf.61"]);
 
                 }
-                $original_login = TextEncoder::magicDequote($httpVars["new_user_login"]);
+                $original_login = InputFilter::magicDequote($httpVars["new_user_login"]);
                 $new_user_login = InputFilter::sanitize($original_login, InputFilter::SANITIZE_EMAILCHARS);
                 if($original_login != $new_user_login){
                     throw new \Exception(str_replace("%s", $new_user_login, $mess["ajxp_conf.127"]));
@@ -235,7 +235,7 @@ class UsersManager extends AbstractManager
                     $gName = InputFilter::sanitize(InputFilter::decodeSecureMagic(basename($httpVars["group_path"])), InputFilter::SANITIZE_ALPHANUM);
                 } else {
                     $basePath = substr($httpVars["dir"], strlen("/data/users"));
-                    $gName    = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["group_name"]), InputFilter::SANITIZE_ALPHANUM);
+                    $gName    = InputFilter::sanitize(InputFilter::magicDequote($httpVars["group_name"]), InputFilter::SANITIZE_ALPHANUM);
                 }
                 $gLabel   = InputFilter::decodeSecureMagic($httpVars["group_label"]);
                 $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
@@ -640,7 +640,7 @@ class UsersManager extends AbstractManager
                 $i = 0;
                 while (isSet($httpVars["pref_name_".$i]) && isSet($httpVars["pref_value_".$i])) {
                     $prefName = InputFilter::sanitize($httpVars["pref_name_" . $i], InputFilter::SANITIZE_ALPHANUM);
-                    $prefValue = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["pref_value_" . $i]));
+                    $prefValue = InputFilter::sanitize(InputFilter::magicDequote($httpVars["pref_value_" . $i]));
                     if($prefName == "password") continue;
                     if ($prefName != "pending_folder" && $userObject == null) {
                         $i++;

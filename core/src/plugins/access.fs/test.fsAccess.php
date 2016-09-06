@@ -22,6 +22,7 @@ namespace Pydio\Tests;
 
 
 use Pydio\Core\Model\Context;
+use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -52,8 +53,7 @@ class fsAccessTest extends AbstractTest
         $path       = $repo->getContextOption($ctx, "PATH");
         $createOpt  = $repo->getContextOption($ctx, "CREATE");
         $create     = (($createOpt=="true"||$createOpt===true)?true:false);
-
-        if (!$create && !@is_dir($path)) {
+        if (!$create && !is_dir(TextEncoder::toStorageEncoding($path))) {
             $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE;
         }
         return TRUE;

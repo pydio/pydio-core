@@ -94,7 +94,7 @@ class RolesManager extends AbstractManager
             // ROLES
             case "create_role":
 
-                $roleId = InputFilter::sanitize(TextEncoder::magicDequote($httpVars["role_id"]), InputFilter::SANITIZE_HTML_STRICT);
+                $roleId = InputFilter::sanitize(InputFilter::magicDequote($httpVars["role_id"]), InputFilter::SANITIZE_HTML_STRICT);
                 if (!strlen($roleId)) {
                     throw new \Exception($mess[349]);
                 }
@@ -116,7 +116,7 @@ class RolesManager extends AbstractManager
 
             case "edit_role" :
 
-                $roleId = TextEncoder::magicDequote($httpVars["role_id"]);
+                $roleId = InputFilter::magicDequote($httpVars["role_id"]);
                 $roleGroup = false;
                 $userObject = null;
                 $groupLabel = null;
@@ -322,7 +322,7 @@ class RolesManager extends AbstractManager
 
             case "post_json_role" :
 
-                $roleId = TextEncoder::magicDequote($httpVars["role_id"]);
+                $roleId = InputFilter::magicDequote($httpVars["role_id"]);
                 $roleGroup = false;
                 $currentMainUser = $ctx->getUser();
                 $userObject = $usrId = $filteredGroupPath = null;
@@ -369,7 +369,7 @@ class RolesManager extends AbstractManager
                     $outputRoleOnly = true;
                 }else{
                     // Other apis: a more complex
-                    $jsonData = TextEncoder::magicDequote($httpVars["json_data"]);
+                    $jsonData = InputFilter::magicDequote($httpVars["json_data"]);
                     $data = json_decode($jsonData, true);
                     $roleData = $data["ROLE"];
                     $outputRoleOnly = false;

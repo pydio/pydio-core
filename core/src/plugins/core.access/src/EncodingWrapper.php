@@ -45,7 +45,7 @@ class EncodingWrapper extends SchemeTranslatorWrapper
      * @param $path
      * @return string
      */
-    protected function encode($path){
+    protected static function encode($path){
         return TextEncoder::fromStorageEncoding($path);
     }
 
@@ -53,7 +53,7 @@ class EncodingWrapper extends SchemeTranslatorWrapper
      * @param $path
      * @return string
      */
-    protected function decode($path){
+    protected static function decode($path){
         return TextEncoder::toStorageEncoding($path);
     }
 
@@ -164,6 +164,7 @@ class EncodingWrapper extends SchemeTranslatorWrapper
 
     /**
      * Get a "usable" reference to a file : the real file or a tmp copy.
+     * Return the "storage-encoded" version of the path.
      *
      * @param string $path
      * @param bool $persistent
@@ -172,9 +173,8 @@ class EncodingWrapper extends SchemeTranslatorWrapper
      */
     public static function getRealFSReference($path, $persistent = false)
     {
-        $wrapper = self::findSubWrapperClassName(self::decode($path));
-        $newPath = call_user_func(array($wrapper, "getRealFSReference"), self::translateScheme($path), $persistent);
-        return self::encode($newPath);
+        $wrapper = self::findSubWrapperClassName($path);
+        return call_user_func(array($wrapper, "getRealFSReference"), self::translateScheme(self::decode($path)), $persistent);
     }
 
     /**

@@ -107,36 +107,36 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         }
         $repository = $contextInterface->getRepository();
         $create = $repository->getContextOption($contextInterface, "CREATE");
-        $path = TextEncoder::toStorageEncoding($repository->getContextOption($contextInterface, "PATH"));
+        $path = $repository->getContextOption($contextInterface, "PATH");
+        $storagePath = TextEncoder::toStorageEncoding($path);
         $recycle = $repository->getContextOption($contextInterface, "RECYCLE_BIN");
         $chmod = $repository->getContextOption($contextInterface, "CHMOD_VALUE");
         $this->urlBase = $contextInterface->getUrlBase();
 
-        //$encodingWrapper = new EncodingWrapper("UTF-8");
         MetaStreamWrapper::appendMetaWrapper("pydio.encoding", "Pydio\\Access\\Core\\EncodingWrapper");
 
         if ($create == true) {
-            if(!is_dir($path)) @mkdir($path, 0755, true);
-            if (!is_dir($path)) {
+            if(!is_dir($storagePath)) @mkdir($storagePath, 0755, true);
+            if (!is_dir($storagePath)) {
                 throw new PydioException("Cannot create root path for repository (".$repository->getDisplay()."). Please check repository configuration or that your folder is writeable!");
             }
-            if ($recycle!= "" && !is_dir($path."/".$recycle)) {
-                @mkdir($path."/".$recycle);
-                if (!is_dir($path."/".$recycle)) {
+            if ($recycle!= "" && !is_dir($storagePath."/".$recycle)) {
+                @mkdir($storagePath."/".$recycle);
+                if (!is_dir($storagePath."/".$recycle)) {
                     throw new PydioException("Cannot create recycle bin folder. Please check repository configuration or that your folder is writeable!");
                 } else {
                     $this->setHiddenAttribute(new AJXP_Node($contextInterface->getUrlBase() ."/".$recycle));
                 }
             }
-            $dataTemplate = $repository->getContextOption($contextInterface, "DATA_TEMPLATE");
-            if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($path."/.ajxp_template")) {
+            $dataTemplate = TextEncoder::toStorageEncoding($repository->getContextOption($contextInterface, "DATA_TEMPLATE"));
+            if (!empty($dataTemplate) && is_dir($dataTemplate) && !is_file($storagePath."/.ajxp_template")) {
                 $errs = [];$succ = [];
                 $repoData = ['base_url' => $contextInterface->getUrlBase(), 'chmod' => $chmod, 'recycle' => $recycle];
-                $this->dircopy($dataTemplate, $path, $succ, $errs, false, false, $repoData, $repoData);
-                touch($path."/.ajxp_template");
+                $this->dircopy($dataTemplate, $storagePath, $succ, $errs, false, false, $repoData, $repoData);
+                touch($storagePath."/.ajxp_template");
             }
         } else {
-            if (!is_dir($path)) {
+            if (!is_dir($storagePath)) {
                 throw new PydioException("Cannot find base path for your repository! Please check the configuration!");
             }
         }
@@ -442,7 +442,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             InputFilter::parseFileDataErrors($uploadedFile, true);
 
             // FIND PROPER FILE NAME / FILTER IF NECESSARY
-            $userfile_name= InputFilter::sanitize(TextEncoder::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME);
+            $userfile_name= InputFilter::sanitize(InputFilter::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME);
             if (isSet($httpVars["urlencoded_filename"])) {
                 $userfile_name = InputFilter::sanitize(urldecode($httpVars["urlencoded_filename"]), InputFilter::SANITIZE_FILENAME);
             }
@@ -635,9 +635,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if (is_dir($selection->getUniqueNode()->getUrl())) {
                         $zip = true;
                         $base = basename($selection->getUniqueFile());
-                        $uniqDir = dirname($selection->getUniqueFile());
+                        $uniqDir = PathUtils::forwardSlashDirname($selection->getUniqueFile());
                         if(!empty($uniqDir) && $uniqDir != "/"){
-                            $dir = dirname($selection->getUniqueFile());
+                            $dir = PathUtils::forwardSlashDirname($selection->getUniqueFile());
                         }
                     } else {
                         if (!file_exists($selection->getUniqueNode()->getUrl())) {
@@ -649,7 +649,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if(isset($httpVars["dir"])){
                         $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
                     }
-                    $base = basename(dirname($selection->getUniqueFile()));
+                    $base = basename(PathUtils::forwardSlashDirname($selection->getUniqueFile()));
                     $zip = true;
                 }
                 if ($zip) {
@@ -866,7 +866,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if (isSet($httpVars["encode"]) && $httpVars["encode"] == "base64") {
                     $code = base64_decode($code);
                 } else {
-                    $code=str_replace("&lt;","<",TextEncoder::magicDequote($code));
+                    $code=str_replace("&lt;","<", InputFilter::magicDequote($code));
                 }
                 $response = $response->withHeader("Content-Type", "text/plain");
                 try {
@@ -1018,7 +1018,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $targetBaseName = $httpVars["targetBaseName"];
                 }
                 if(!file_exists($destPath) && isSet($httpVars["recycle_restore"])){
-                    $this->mkDir($selection->nodeForPath(dirname($destPath)), basename($destPath), false, true);
+                    $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
                 }
                 $this->filterUserSelectionToHidden($ctx, [$httpVars["dest"]]);
                 if ($selection->inZip()) {
@@ -1332,7 +1332,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                         }
                         $node->loadNodeInfo(false, false, ($lsOptions["l"]?"all":"minimal"));
                         if (!empty($node->metaData["nodeName"]) && $node->metaData["nodeName"] != $nodeName) {
-                            $node->setUrl(dirname($node->getUrl())."/".$node->metaData["nodeName"]);
+                            $node->setUrl(PathUtils::forwardSlashDirname($node->getUrl())."/".$node->metaData["nodeName"]);
                         }
                         if (!empty($node->metaData["hidden"]) && $node->metaData["hidden"] === true) {
                             continue;
@@ -2030,8 +2030,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         ];
         foreach ($selectedNodes as $selectedNode) {
             $selectedFile = $selectedNode->getPath();
-            if ($move && !$this->isWriteable($selection->nodeForPath(dirname($selectedFile)))) {
-                $error[] = "\n".$mess[38]." ".dirname($selectedFile)." ".$mess[99];
+            if ($move && !$this->isWriteable($selection->nodeForPath(PathUtils::forwardSlashDirname($selectedFile)))) {
+                $error[] = "\n".$mess[38]." ".PathUtils::forwardSlashDirname($selectedFile)." ".$mess[99];
                 continue;
             }
             if( !empty ($targetBaseName)){
@@ -2060,7 +2060,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $mess = LocaleService::getMessages();
 
         if(!empty($filename_new)){
-            $filename_new= InputFilter::sanitize(TextEncoder::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME);
+            $filename_new= InputFilter::sanitize(InputFilter::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME);
             $filename_new = substr($filename_new, 0, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
         }
 

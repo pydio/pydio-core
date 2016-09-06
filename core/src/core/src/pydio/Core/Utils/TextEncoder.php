@@ -23,6 +23,7 @@ namespace Pydio\Core\Utils;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\SessionService;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -131,29 +132,6 @@ class TextEncoder
         return TextEncoder::changeCharset("UTF-8", $enc, $filesystemElement);
     }
 
-    /**
-     * This function is used when the server's PHP configuration is using magic quote
-     * @param string $text
-     * @return string
-     */
-    public static function magicDequote($text)
-    {
-        // If the PHP server enables magic quotes, remove them
-        if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
-            return stripslashes($text);
-        return $text;
-    }
-
-    /**
-     * call fromUTF8
-     * @static
-     * @param string $filesystemElement
-     * @return string
-     */
-    public static function fromPostedFileName($filesystemElement)
-    {
-        return TextEncoder::magicDequote($filesystemElement);
-    }
 
     /**
      * Transform a string from current charset to utf8

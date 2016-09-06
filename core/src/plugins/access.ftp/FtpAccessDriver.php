@@ -132,7 +132,7 @@ class FtpAccessDriver extends FsAccessDriver
                 $destPath = $ctx->getUrlBase().base64_decode($fData['destination'])."/".$fData['name'];
                 //$destPath = AJXP_Utils::decodeSecureMagic($destPath);
                 // DO NOT "SANITIZE", THE URL IS ALREADY IN THE FORM ajxp.ftp://repoId/filename
-                $destPath = TextEncoder::fromPostedFileName($destPath);
+                $destPath = InputFilter::fromPostedFileName($destPath);
                 $node = new AJXP_Node($destPath);
                 $this->logDebug("Copying file to server", array("from"=>$fData["tmp_name"], "to"=>$destPath, "name"=>$fData["name"]));
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Uploading file ".$fData["name"]);

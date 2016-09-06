@@ -287,5 +287,29 @@ class InputFilter
         return $assoc;
     }
 
+    /**
+     * This function is used when the server's PHP configuration is using magic quote
+     * @param string $text
+     * @return string
+     */
+    public static function magicDequote($text)
+    {
+        // If the PHP server enables magic quotes, remove them
+        if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc())
+            return stripslashes($text);
+        return $text;
+    }
+
+    /**
+     * call fromUTF8
+     * @static
+     * @param string $filesystemElement
+     * @return string
+     */
+    public static function fromPostedFileName($filesystemElement)
+    {
+        return InputFilter::magicDequote($filesystemElement);
+    }
+
 
 }
