@@ -58,7 +58,7 @@ class SessionService implements RepositoriesCache
      * @param callable|null $next
      * @return mixed|ResponseInterface
      */
-    public static function handleRequest(ServerRequestInterface &$request, ResponseInterface $response, callable $next = null){
+    public static function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
 
         $getParams = $request->getQueryParams();
         if (isSet($getParams[PYDIO_SESSION_QUERY_PARAM])) {
