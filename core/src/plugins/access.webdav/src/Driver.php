@@ -52,9 +52,9 @@ class Driver extends FsAccessDriver
      * @param $repository
      * @param array $options
      */
-    public function init($repository, $options = array())
+    public function init(ContextInterface $ctx, $options = array())
     {
-        parent::init($repository, $options);
+        parent::init($ctx, $options);
     }
 
     /**

@@ -52,7 +52,7 @@ class SessionRepositoryMiddleware
      * @param callable|null $next
      * @throws PydioException
      */
-    public static function handleRequest(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface, callable $next = null) {
+    public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null) {
 
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");

@@ -57,9 +57,9 @@ class PixlrEditor extends Plugin
     /**
      * @param ContextInterface $context
      */
-    public function init(\Pydio\Core\Model\ContextInterface $context) {
+    public function init(\Pydio\Core\Model\ContextInterface $ctx, $options = []) {
 
-        parent::init($context);
+        parent::init($ctx, $options);
 
         $this->client = new Client([
             'base_url' => "https://pixlr.com/editor/"

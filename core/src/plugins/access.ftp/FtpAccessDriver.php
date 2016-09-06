@@ -261,7 +261,7 @@ class FtpAccessDriver extends FsAccessDriver
      * @param array $repoData
      * @throws \Exception
      */
-    public function deldir($location, $repoData)
+    public function deldir($location, $repoData, $taskId = NULL)
     {
         if (is_dir($location)) {
             $dirsToRecurse = array();
