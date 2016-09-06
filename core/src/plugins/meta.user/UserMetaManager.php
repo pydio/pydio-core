@@ -33,6 +33,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -237,6 +238,8 @@ class UserMetaManager extends AbstractMetaSource
 
         $result = array();
         foreach ($arrF as $index => $value) {
+            //make sure value does not contain spaces or things like that
+            $value = StringHelper::slugify($value);
             if (isSet($arrL[$index])) {
                 $result[$value] = array("label" => $arrL[$index], "type" => $arrT[$index]);
             } else {
