@@ -98,17 +98,17 @@ class RichClient extends Plugin
                 $loggedUser = $ctx->getUser();
                 if ($loggedUser != null && $loggedUser->canSwitchTo($parameters["repository_id"])) {
                     $output["FORCE_REGISTRY_RELOAD"] = true;
-                    $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
+                    $output["EXT_REP"] = urldecode($parameters["folder"]);
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
-                    $loggedUser->setPref("pending_folder", TextEncoder::toUTF8(InputFilter::decodeSecureMagic($parameters["folder"])));
+                    $loggedUser->setPref("pending_folder", InputFilter::decodeSecureMagic($parameters["folder"]));
                     AuthService::updateUser($loggedUser);
                 } else {
                     $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
-                    $session["PENDING_FOLDER"] = TextEncoder::toUTF8(InputFilter::decodeSecureMagic($parameters["folder"]));
+                    $session["PENDING_FOLDER"] = InputFilter::decodeSecureMagic($parameters["folder"]);
                 }
             } else {
                 //ConfService::switchRootDir($parameters["repository_id"]);
-                $output["EXT_REP"] = TextEncoder::toUTF8(urldecode($parameters["folder"]));
+                $output["EXT_REP"] = urldecode($parameters["folder"]);
             }
         }
 

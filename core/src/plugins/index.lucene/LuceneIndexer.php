@@ -240,13 +240,13 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                     if(isSet($meta["ajxp_modiftime"])){
                         $meta["ajxp_relativetime"] = $meta["ajxp_description"] = $messages[4]." ". StatHelper::relativeDate($meta["ajxp_modiftime"], $messages);
                     }
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node($hit->node_url, $meta);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
                     }
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
+                    $tmpNode = new AJXP_Node($hit->node_url, []);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_scope === "user" && $hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
@@ -326,13 +326,13 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 $hit->node_url = preg_replace("#ajxp\.[a-z_]+://#", "pydio://", $hit->node_url);
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node($hit->node_url, $meta);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
                     }
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
+                    $tmpNode = new AJXP_Node($hit->node_url, []);
                     if(!$tmpNode->hasUser()){
                         if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
                         else $tmpNode->setUserId($ctx->getUser()->getId());
@@ -476,7 +476,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             \Zend_Search_Lucene_Analysis_Analyzer::setDefault( new \Zend_Search_Lucene_Analysis_Analyzer_Common_TextNum_CaseInsensitive());
 
             if (UsersService::usersEnabled() && $node->getContext()->hasUser()) {
-                $term = new \Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($node->getUrl()), "node_url");
+                $term = new \Zend_Search_Lucene_Index_Term($node->getUrl(), "node_url");
                 $hits = $index->termDocs($term);
                 foreach ($hits as $hitId) {
                     $hit = $index->getDocument($hitId);
@@ -572,10 +572,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 if ($copy == false) {
                     $oldIndex->delete($hit->id);
                 }
-                $newChildURL = str_replace(TextEncoder::toUTF8($oldNode->getUrl()),
-                                           TextEncoder::toUTF8($newNode->getUrl()),
-                                           $oldChildURL);
-                $newChildURL = TextEncoder::fromUTF8($newChildURL);
+                $newChildURL = str_replace($oldNode->getUrl(),$newNode->getUrl(),$oldChildURL);
                 $this->createIndexedDocument(new AJXP_Node($newChildURL), $oldIndex);
             }
         }
@@ -682,7 +679,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
      */
     public function getIndexedDocumentId($index, $ajxpNode)
     {
-        $term = new \Zend_Search_Lucene_Index_Term(TextEncoder::toUTF8($ajxpNode->getUrl()), "node_url");
+        $term = new \Zend_Search_Lucene_Index_Term($ajxpNode->getUrl(), "node_url");
         $docIds = $index->termDocs($term);
         if(!count($docIds)) return null;
         return $docIds[0];
@@ -697,7 +694,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
     public function getIndexedChildrenDocuments($index, $ajxpNode)
     {
         // Try getting doc by url
-        $testQ = str_replace("/", "AJXPFAKESEP", TextEncoder::toUTF8($ajxpNode->getPath()));
+        $testQ = str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath());
         $pattern = new \Zend_Search_Lucene_Index_Term($testQ .'*', 'node_path');
         $query = new \Zend_Search_Lucene_Search_Query_Wildcard($pattern);
         $hits = $index->find($query);

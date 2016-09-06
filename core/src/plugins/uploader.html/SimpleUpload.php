@@ -95,7 +95,7 @@ class SimpleUpload extends Plugin
                 $httpVars["dir"] = "/";
             }
 
-            $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
+            $clientFileName = basename($fileNameH);
 
             // Setting the stream to point to the file location
             $streamOrFile = $serverData['HTTP_X_FILE_TMP_LOCATION'];
@@ -159,7 +159,7 @@ class SimpleUpload extends Plugin
                 $httpVars["dir"] = "/";
             }
 
-            $clientFileName = TextEncoder::fromUTF8(basename($fileNameH));
+            $clientFileName = basename($fileNameH);
 
 
             // Checking headers

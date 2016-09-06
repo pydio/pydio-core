@@ -124,14 +124,17 @@ class ContentFilter {
     public function toArray(){
         $data = array("filters" => array(), "virtualPaths" => array());
         foreach($this->filters as $k => $v){
-            $data["filters"][\Pydio\Core\Utils\TextEncoder::toUTF8($k)] = \Pydio\Core\Utils\TextEncoder::toUTF8($v);
+            $data["filters"][$k] = $v;
         }
         foreach($this->virtualPaths as $k => $v){
-            $data["virtualPaths"][\Pydio\Core\Utils\TextEncoder::toUTF8($k)] = TextEncoder::toUTF8($v);
+            $data["virtualPaths"][$k] = $v;
         }
         return $data;
     }
 
+    /**
+     * @param $filters
+     */
     public function fromFilterArray($filters){
         $this->filters = $filters;
         $this->virtualPaths = array_flip($this->filters);

@@ -265,9 +265,9 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
 
                 if ($source["serialized_metadata"] != null) {
                     $meta = unserialize(base64_decode($source["serialized_metadata"]));
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), $meta);
+                    $tmpNode = new AJXP_Node($source["node_url"], $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($source["node_url"]), []);
+                    $tmpNode = new AJXP_Node($source["node_url"], []);
                     $tmpNode->loadNodeInfo();
                 }
 
@@ -327,9 +327,9 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
 
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), $meta);
+                    $tmpNode = new AJXP_Node($hit->node_url, $meta);
                 } else {
-                    $tmpNode = new AJXP_Node(TextEncoder::fromUTF8($hit->node_url), []);
+                    $tmpNode = new AJXP_Node($hit->node_url, []);
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
@@ -481,10 +481,9 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                     if ($copy == false) {
                         $this->currentType->deleteById($hit->getId());
                     }
-                    $newChildURL = str_replace(TextEncoder::toUTF8($oldNode->getUrl()),
-                        TextEncoder::toUTF8($newNode->getUrl()),
+                    $newChildURL = str_replace($oldNode->getUrl(),
+                        $newNode->getUrl(),
                         $oldChildURL);
-                    $newChildURL = TextEncoder::fromUTF8($newChildURL);
                     $this->createIndexedDocument(new AJXP_Node($newChildURL));
                 }
             }
@@ -633,7 +632,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
      */
     public function getIndexedChildrenDocuments($ajxpNode)
     {
-        $testQ = str_replace("/", "AJXPFAKESEP", TextEncoder::toUTF8($ajxpNode->getPath()."/"));
+        $testQ = str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()."/");
 
         /* we use a wildcard query to fetch all children documents relatively to their paths */
         $query = new Elastica\Query\Wildcard("node_path", $testQ."*");

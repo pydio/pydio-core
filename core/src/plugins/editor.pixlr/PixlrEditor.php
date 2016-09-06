@@ -99,7 +99,7 @@ class PixlrEditor extends Plugin
 
             $target = rtrim(base64_decode($httpVars["parent_url"]), '/') ."/plugins/editor.pixlr";
             $tmp = MetaStreamWrapper::getRealFSReference($selectedNodeUrl);
-            $tmp = TextEncoder::fromUTF8($tmp);
+            //$tmp = TextEncoder::fromUTF8($tmp);
             $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
             Controller::applyHook("node.read", array($selectedNode));
 

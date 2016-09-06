@@ -185,7 +185,7 @@ class FileHasher extends AbstractMetaSource implements IFileHasher
                     }
                     $stat[13] = $stat["hash"] = $hash;
                 }
-                $responseData[TextEncoder::toUTF8($path)] = $stat;
+                $responseData[$path] = $stat;
             }
 
         }

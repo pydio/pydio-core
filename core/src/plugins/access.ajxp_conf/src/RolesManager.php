@@ -253,18 +253,18 @@ class RolesManager extends AbstractManager
                         continue;
                     }
                     $repoDetailed[$repositoryId] = array(
-                        "label"  => TextEncoder::toUTF8($repositoryObject->getDisplay()),
+                        "label"  => $repositoryObject->getDisplay(),
                         "driver" => $repositoryObject->getAccessType(),
                         "scope"  => $repositoryObject->securityScope(),
                         "meta"   => $meta
                     );
 
                     if(array_key_exists($repositoryId, $sharedRepos)){
-                        $sharedRepos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
+                        $sharedRepos[$repositoryId] = $repositoryObject->getDisplay();
                         $repoParentLabel = $repoParentId = $repositoryObject->getParentId();
                         $repoOwnerId = $repositoryObject->getOwner();
                         if(isSet($allReps[$repoParentId])){
-                            $repoParentLabel = TextEncoder::toUTF8($allReps[$repoParentId]->getDisplay());
+                            $repoParentLabel = $allReps[$repoParentId]->getDisplay();
                         }
                         $repoOwnerLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $repoOwnerId, "core.conf", $repoOwnerId);
                         $repoDetailed[$repositoryId]["share"] = array(
@@ -274,7 +274,7 @@ class RolesManager extends AbstractManager
                             "parent_repository_label" => $repoParentLabel
                         );
                     }else{
-                        $repos[$repositoryId] = TextEncoder::toUTF8($repositoryObject->getDisplay());
+                        $repos[$repositoryId] = $repositoryObject->getDisplay();
                     }
 
                 }

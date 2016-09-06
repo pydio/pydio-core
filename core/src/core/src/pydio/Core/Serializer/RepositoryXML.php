@@ -166,7 +166,7 @@ class RepositoryXML
             }
         }
         $clientSettings = (!$isActive ? "" : $this->repositoryClientSettings($repoObject, $ctx));
-        return "<repo access_type=\"".$repoObject->getAccessType()."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".TextEncoder::toUTF8(StringHelper::xmlEntities($repoObject->getDisplay()))."</label>".$descTag.$clientSettings."</repo>";
+        return "<repo access_type=\"".$repoObject->getAccessType()."\" id=\"".$repoId."\"$statusString $streamString $slugString $isSharedString $roleString><label>".StringHelper::xmlEntities($repoObject->getDisplay())."</label>".$descTag.$clientSettings."</repo>";
 
     }
 

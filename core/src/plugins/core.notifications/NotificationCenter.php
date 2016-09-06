@@ -292,9 +292,8 @@ class NotificationCenter extends Plugin
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
-                    $node->event_description = TextEncoder::fromUTF8($node->event_description);
                     $node->event_description_long = $notif->getDescriptionLong(true);
-                    $node->event_date = TextEncoder::fromUTF8(StatHelper::relativeDate($notif->getDate(), $mess));
+                    $node->event_date = StatHelper::relativeDate($notif->getDate(), $mess);
                     $node->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
@@ -471,9 +470,8 @@ class NotificationCenter extends Plugin
                 }
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
-                $node->event_description = TextEncoder::fromUTF8($node->event_description);
                 $node->event_description_long = $notification->getDescriptionLong(true);
-                $node->event_date = TextEncoder::fromUTF8(StatHelper::relativeDate($notification->getDate(), $mess));
+                $node->event_date = StatHelper::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
                 if ($node->getRepository() != null) {

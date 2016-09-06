@@ -334,24 +334,24 @@ abstract class AbstractAccessDriver extends Plugin
         if ($move) {
             // Now delete original
             // $this->deldir($realSrcFile); // both file and dir
-            $messagePart = $mess[74]." ".TextEncoder::toUTF8($destDir);
+            $messagePart = $mess[74]." ".$destDir;
             if (RecycleBinManager::recycleEnabled() && $destDir == RecycleBinManager::getRelativeRecycle()) {
                 RecycleBinManager::fileToRecycle($srcFile);
                 $messagePart = $mess[123]." ".$mess[122];
             }
             if (is_dir($destFile)) {
-                $successMessage = $mess[117]." ". TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[117]." ". basename($srcFile)." ".$messagePart;
             } else {
-                $successMessage = $mess[34]." ". TextEncoder::toUTF8(basename($srcFile))." ".$messagePart;
+                $successMessage = $mess[34]." ". basename($srcFile)." ".$messagePart;
             }
         } else {
             if (RecycleBinManager::recycleEnabled() && $destDir == "/".$srcRecycle) {
                 RecycleBinManager::fileToRecycle($srcFile);
             }
             if (isSet($dirRes)) {
-                $successMessage = $mess[117]." ".TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ".TextEncoder::toUTF8($destDir)." (".TextEncoder::toUTF8($dirRes)." ".$mess[116].")";
+                $successMessage = $mess[117]." ".basename($destFile)." ".$mess[73]." ".$destDir." (".$dirRes." ".$mess[116].")";
             } else {
-                $successMessage = $mess[34]." ". TextEncoder::toUTF8(basename($destFile))." ".$mess[73]." ". TextEncoder::toUTF8($destDir);
+                $successMessage = $mess[34]." ". basename($destFile)." ".$mess[73]." ". $destDir;
             }
         }
         $success[] = $successMessage;

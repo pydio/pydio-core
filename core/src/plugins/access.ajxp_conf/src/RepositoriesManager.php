@@ -100,7 +100,7 @@ class RepositoriesManager extends AbstractManager
                 foreach ($repositories as $repo) {
                     if(!$repo->isTemplate()) continue;
                     $repoId = $repo->getUniqueId();
-                    $repoLabel = TextEncoder::toUTF8($repo->getDisplay());
+                    $repoLabel = $repo->getDisplay();
                     $repoType = $repo->getAccessType();
                     $buffer .= "<template repository_id=\"$repoId\" repository_label=\"$repoLabel\" repository_type=\"$repoType\">";
                     foreach ($repo->getOptionsDefined() as $optionName) {
@@ -847,7 +847,7 @@ class RepositoriesManager extends AbstractManager
                 if (is_bool($option)) {
                     $option = ($option?"true":"false");
                 }
-                $buffer .= " $name=\"".TextEncoder::toUTF8(StringHelper::xmlEntities($option))."\" ";
+                $buffer .= " $name=\"".StringHelper::xmlEntities($option, true)."\" ";
             } else if (is_array($option)) {
                 $nested[] = $option;
             }

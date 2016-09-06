@@ -221,8 +221,8 @@ class smb
             while ($line = fgets ($output, 4096)) {
 			
                 if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-                    $line = \Pydio\Core\Utils\TextEncoder::fromUTF8($line);
-                    }
+                    //$line = \Pydio\Core\Utils\TextEncoder::fromUTF8($line);
+                }
 
                 list ($tag, $regs, $i) = array ('skip', array (), array ());
                 reset ($regexp);

@@ -152,7 +152,7 @@ class TextEncoder
      */
     public static function fromPostedFileName($filesystemElement)
     {
-        return TextEncoder::fromUTF8(TextEncoder::magicDequote($filesystemElement));
+        return TextEncoder::magicDequote($filesystemElement);
     }
 
     /**

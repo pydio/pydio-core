@@ -116,10 +116,20 @@ class MetaStreamWrapper implements IAjxpWrapper
         self::register();
     }
 
+    /**
+     * @param $scheme
+     * @return array
+     */
     protected static function getMetaWrappers($scheme) {
         return array_merge((array) self::$metaWrappers['core'], (array) self::$metaWrappers[$scheme]);
     }
 
+    /**
+     * @param $url
+     * @param string $context
+     * @return mixed
+     * @throws \Exception
+     */
     protected static function getNextScheme($url, $context='core'){
         $parts = parse_url($url);
         $metaWrapperKeys = array_keys(self::getMetaWrappers($context));
@@ -180,6 +190,13 @@ class MetaStreamWrapper implements IAjxpWrapper
         return $newUrl;
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $scheme
+     * @param string $context
+     * @return mixed|string
+     * @throws \Exception
+     */
     protected static function findWrapperClassName(ContextInterface $ctx, $scheme, $context = "core"){
 
         $metaWrappers = self::getMetaWrappers($context);
@@ -195,6 +212,11 @@ class MetaStreamWrapper implements IAjxpWrapper
         return $wrapper;
     }
 
+    /**
+     * @param $url
+     * @return mixed|string
+     * @throws \Exception
+     */
     protected static function findSubWrapperClassName($url){
         $context = self::actualRepositoryWrapperProtocol(new AJXP_Node($url));
         $nextScheme = self::getNextScheme($url, $context);
@@ -338,6 +360,11 @@ class MetaStreamWrapper implements IAjxpWrapper
         return call_user_func(array(self::actualRepositoryWrapperClass(new AJXP_Node($url)), "isSeekable"), $url);
     }
 
+    /**
+     * @param $url1
+     * @param $url2
+     * @return bool
+     */
     public static function nodesUseSameWrappers($url1, $url2){
         $w1 = self::actualRepositoryWrapperClass(new AJXP_Node($url1));
         $w2 = self::actualRepositoryWrapperClass(new AJXP_Node($url2));

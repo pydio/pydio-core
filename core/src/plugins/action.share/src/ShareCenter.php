@@ -1412,7 +1412,7 @@ class ShareCenter extends Plugin
         }
         if(!isSet($httpVars["repo_label"])){
             $first = $userSelection->getUniqueNode();
-            $httpVars["repo_label"] = TextEncoder::toUTF8($first->getLabel());
+            $httpVars["repo_label"] = $first->getLabel();
         }
 
     }
@@ -1430,7 +1430,7 @@ class ShareCenter extends Plugin
             $httpVars["nodes"] = array("/");
         }
         if(!isSet($httpVars["repo_label"])){
-            $httpVars["repo_label"] = TextEncoder::toUTF8($ajxpNode->getLabel());
+            $httpVars["repo_label"] = $ajxpNode->getLabel();
         }
     }
 

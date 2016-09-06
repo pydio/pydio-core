@@ -557,14 +557,14 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                 $repoId = $this->computeIdentifier($refNode->getContext());
                 // DELETE
                 $this->logDebug('DELETE', $oldNode->getUrl());
-                dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                dibi::query("DELETE FROM [ajxp_index] WHERE [node_path] LIKE %like~ AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
             } else if ($oldNode == null || $copy) {
                 // CREATE
                 $stat = stat($newNode->getUrl());
                 $newNode->setLeaf(!($stat['mode'] & 040000));
                 $this->logDebug('INSERT', $newNode->getUrl());
                 dibi::query("INSERT INTO [ajxp_index]", [
-                    "node_path" => TextEncoder::toUTF8($newNode->getPath()),
+                    "node_path" => $newNode->getPath(),
                     "bytesize"  => $stat["size"],
                     "mtime"     => $stat["mtime"],
                     "md5"       => $newNode->isLeaf()? md5_file($newNode->getUrl()):"directory",
@@ -589,7 +589,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                         "bytesize"  => $stat["size"],
                         "mtime"     => $stat["mtime"],
                         "md5"       => md5_file($newNode->getUrl())
-                    ], "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                    ], "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
                     try{
                         $rowCount = dibi::getAffectedRows();
                         if($rowCount === 0){
@@ -604,8 +604,8 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                     if ($newNode->isLeaf()) {
                         $this->logDebug('UPDATE LEAF PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET ", [
-                            "node_path"  => TextEncoder::toUTF8($newNode->getPath()),
-                        ], "WHERE [node_path] = %s AND [repository_identifier] = %s", TextEncoder::toUTF8($oldNode->getPath()), $repoId);
+                            "node_path"  => $newNode->getPath(),
+                        ], "WHERE [node_path] = %s AND [repository_identifier] = %s", $oldNode->getPath(), $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();
                             if($rowCount === 0){
@@ -616,11 +616,11 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                     } else {
                         $this->logDebug('UPDATE FOLDER PATH', $newNode->getUrl());
                         dibi::query("UPDATE [ajxp_index] SET [node_path]=REPLACE( REPLACE(CONCAT('$$$',[node_path]), CONCAT('$$$', %s), CONCAT('$$$', %s)) , '$$$', '') ",
-                            TextEncoder::toUTF8($oldNode->getPath()),
-                            TextEncoder::toUTF8($newNode->getPath()),
+                            $oldNode->getPath(),
+                            $newNode->getPath(),
                             "WHERE ([node_path] = %s OR [node_path] LIKE %like~) AND [repository_identifier] = %s",
-                            TextEncoder::toUTF8($oldNode->getPath()),
-                            rtrim(TextEncoder::toUTF8($oldNode->getPath()), '/') . '/',
+                            $oldNode->getPath(),
+                            rtrim($oldNode->getPath(), '/') . '/',
                             $repoId);
                         try{
                             $rowCount = dibi::getAffectedRows();

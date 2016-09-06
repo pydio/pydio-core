@@ -216,7 +216,7 @@ class InputFilter
      */
     public static function decodeSecureMagic($data, $sanitizeLevel = InputFilter::SANITIZE_HTML)
     {
-        return TextEncoder::fromUTF8(InputFilter::sanitize(InputFilter::securePath($data), $sanitizeLevel));
+        return InputFilter::sanitize(InputFilter::securePath($data), $sanitizeLevel);
     }
 
     /**

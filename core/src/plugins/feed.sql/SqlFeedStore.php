@@ -21,6 +21,7 @@
 namespace Pydio\Notification\Feed;
 
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
@@ -85,6 +86,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             dibi::connect($this->sqlDriver);
         }
         try {
+            /** @var AJXP_Node $node */
             $node = null;
             if(is_object($data[1]) && $data[1] instanceof \Pydio\Access\Core\Model\AJXP_Node && $data[1]->getContext()->getRepositoryId() === $repositoryId) {
                 $node = $data[1];
@@ -101,7 +103,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
                 $userGroup,
                 ($repositoryScope !== false ? $repositoryScope : "ALL"),
                 serialize($data),
-                ($node!=null ? TextEncoder::toUTF8($node->getUrl()):'')
+                ($node!=null ? $node->getUrl():'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist event", $e->getMessage());
@@ -223,7 +225,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
                 $userId,
                 $repositoryId,
                 serialize($notif),
-                ($notif->getNode()!=null ? TextEncoder::toUTF8($notif->getNode()->getUrl()):'')
+                ($notif->getNode()!=null ? $notif->getNode()->getUrl():'')
             );
         } catch (DibiException $e) {
             $this->logError("DibiException", "trying to persist alert", $e->getMessage());

@@ -596,8 +596,8 @@ class ShareStore {
             }
 
             if(isSet($repo)){
-                $oldNodeLabel = TextEncoder::toUTF8($oldNode->getLabel());
-                $newNodeLabel = TextEncoder::toUTF8($newNode->getLabel());
+                $oldNodeLabel = $oldNode->getLabel();
+                $newNodeLabel = $newNode->getLabel();
                 if($newNode != null && $newNodeLabel != $oldNodeLabel && $repo->getDisplay() == $oldNodeLabel){
                     $repo->setDisplay($newNodeLabel);
                 }
@@ -614,8 +614,8 @@ class ShareStore {
                     $save = true;
                 }else if(!empty($path)){
 
-                    $oldNodePath = TextEncoder::toUTF8($oldNode->getPath());
-                    $newNodePath = TextEncoder::toUTF8($newNode->getPath());
+                    $oldNodePath = $oldNode->getPath();
+                    $newNodePath = $newNode->getPath();
 
                     $path = preg_replace("#".preg_quote($oldNodePath, "#")."$#", $newNodePath, $path);
                     $repo->addOption("PATH", $path);
@@ -636,8 +636,8 @@ class ShareStore {
             } else {
 
                 if(isset($publicLink) && is_array($publicLink) && isSet($publicLink["FILE_PATH"])){
-                    $oldNodePath = TextEncoder::toUTF8($oldNode->getPath());
-                    $newNodePath = TextEncoder::toUTF8($newNode->getPath());
+                    $oldNodePath = $oldNode->getPath();
+                    $newNodePath = $newNode->getPath();
                     $publicLink["FILE_PATH"] = str_replace($oldNodePath, $newNodePath, $publicLink["FILE_PATH"]);
                     $this->deleteShare("file", $id);
                     $this->storeShare($newNode->getRepositoryId(), $publicLink, "file", $id);

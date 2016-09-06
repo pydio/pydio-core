@@ -133,7 +133,7 @@ class CoreIndexer extends Plugin {
         $user = $ctx->getUser();
         if($depth == 0){
             $this->debug("Starting indexation - node.index.recursive.start  - ". memory_get_usage(true) ."  - ". $node->getUrl());
-            $this->setIndexStatus("RUNNING", str_replace("%s", TextEncoder::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
+            $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);
             Controller::applyHook("node.index.recursive.start", array($node));
         }else{
             if($this->isInterruptRequired($repository, $user)){
@@ -147,7 +147,7 @@ class CoreIndexer extends Plugin {
         if(!ConfService::currentContextIsCommandLine()) @set_time_limit(120);
         $url = $node->getUrl();
         $this->debug("Indexing Node parent node ".$url);
-        $this->setIndexStatus("RUNNING", str_replace("%s", TextEncoder::toUTF8($node->getPath()), $messages["core.index.8"]), $repository, $user);
+        $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);
         if($node->getPath() != "/"){
             try {
                 Controller::applyHook("node.index", array($node));

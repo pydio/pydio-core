@@ -29,6 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\EncodingWrapper;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
@@ -111,6 +112,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $chmod = $repository->getContextOption($contextInterface, "CHMOD_VALUE");
         $this->urlBase = $contextInterface->getUrlBase();
 
+        //$encodingWrapper = new EncodingWrapper("UTF-8");
+        MetaStreamWrapper::appendMetaWrapper("pydio.encoding", "Pydio\\Access\\Core\\EncodingWrapper");
 
         if ($create == true) {
             if(!is_dir($path)) @mkdir($path, 0755, true);
@@ -332,13 +335,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             throw new PydioException("Empty resource");
         }
         $path = $selection->getUniqueFile();
-        $notDecodedPath = TextEncoder::toUTF8($path);
         $params = $request->getParsedBody();
         $newAction = null;
         $newVars = [];
         if(isSet($params["copy_source"])){
-            $newVars["dest"] = PathUtils::forwardSlashDirname($notDecodedPath);
-            $newVars["targetBaseName"] = PathUtils::forwardSlashBasename($notDecodedPath);
+            $newVars["dest"] = PathUtils::forwardSlashDirname($path);
+            $newVars["targetBaseName"] = PathUtils::forwardSlashBasename($path);
 
             $sourceParts = explode("/", trim($params["copy_source"], "/"));
             $sourceRepo  = array_shift($sourceParts);
@@ -358,7 +360,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             if(substr_compare($qPath, "/", strlen($qPath)-1, 1) === 0){
                 // Ends with slash => mkdir
                 $newAction = "mkdir";
-                $newVars["file"] = $notDecodedPath;
+                $newVars["file"] = $path;
                 if(!empty($params["override"])) {
                     $newVars["ignore_exists"] = $params["override"];
                 }
@@ -367,7 +369,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
             }else{
                 $newAction = "mkfile";
-                $newVars["node"] = $notDecodedPath;
+                $newVars["node"] = $path;
                 if(!empty($params["content"])) {
                     $newVars["content"] = $params["content"];
                 }
@@ -416,7 +418,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $this->logDebug("Upload inside", ["destination"=>$this->addSlugToPath($destNode->getUrl())]);
         if (!$this->isWriteable($destNode)) {
             $errorCode = 412;
-            $errorMessage = "$mess[38] ".TextEncoder::toUTF8($dir)." $mess[99].";
+            $errorMessage = "$mess[38] ".$dir." $mess[99].";
             $this->logDebug("Upload error 412", ["destination"=>$this->addSlugToPath($destination)]);
             $this->writeUploadError($request, $errorMessage, $errorCode);
             return;
@@ -442,7 +444,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             // FIND PROPER FILE NAME / FILTER IF NECESSARY
             $userfile_name= InputFilter::sanitize(TextEncoder::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME);
             if (isSet($httpVars["urlencoded_filename"])) {
-                $userfile_name = InputFilter::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["urlencoded_filename"])), InputFilter::SANITIZE_FILENAME);
+                $userfile_name = InputFilter::sanitize(urldecode($httpVars["urlencoded_filename"]), InputFilter::SANITIZE_FILENAME);
             }
             $userfile_name = substr($userfile_name, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
             $this->logDebug("User filename ".$userfile_name);
@@ -510,7 +512,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
             // PARTIAL UPLOAD - PART II: APPEND DATA TO EXISTING PART
             if (isSet($httpVars["appendto_urlencoded_part"])) {
-                $appendTo = InputFilter::sanitize(TextEncoder::fromUTF8(urldecode($httpVars["appendto_urlencoded_part"])), InputFilter::SANITIZE_FILENAME);
+                $appendTo = InputFilter::sanitize(urldecode($httpVars["appendto_urlencoded_part"]), InputFilter::SANITIZE_FILENAME);
                 if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true'){
                     $originalAppendTo = $appendTo;
                     $appendTo .= ".dlpart";
@@ -562,7 +564,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $this->changeMode($createdNode->getUrl(),["chmod" => $chmodValue]);
         clearstatcache(true, $createdNode->getUrl());
         $createdNode->loadNodeInfo(true);
-        $logFile = $this->addSlugToPath(TextEncoder::fromUTF8($createdNode->getParent()->getPath()))."/".$createdNode->getLabel();
+        $logFile = $this->addSlugToPath($createdNode->getParent()->getPath())."/".$createdNode->getLabel();
         $this->logInfo("Upload File", ["file"=>$logFile, "files"=> $logFile]);
 
         if($partialUpload){
@@ -924,7 +926,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $logMessage = new UserMessage(join("\n", $logMessages));
                 }
                 if($errorMessage) {
-                    throw new PydioException(TextEncoder::toUTF8($errorMessage));
+                    throw new PydioException($errorMessage);
                 }
                 $this->logInfo("Delete", ["files"=>$this->addSlugToPath($selection)]);
                 $nodesDiffs->remove($selection->getFiles());
@@ -964,7 +966,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $logMessage = new UserMessage(join("\n", $logMessages));
                 }
                 if($errorMessage) {
-                    throw new PydioException(TextEncoder::toUTF8($errorMessage));
+                    throw new PydioException($errorMessage);
                 }
                 $this->logInfo("Delete", ["files"=>$this->addSlugToPath($selection)]);
                 $nodesDiffs->remove($selection->getFiles());
@@ -1033,16 +1035,16 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
 
                 if (count($error)) {
-                    if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while copy/move: ".TextEncoder::toUTF8(join("\n", $error)));
-                    throw new PydioException(TextEncoder::toUTF8(join("\n", $error)));
+                    if(!empty($taskId)) TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while copy/move: ".join("\n", $error));
+                    throw new PydioException(join("\n", $error));
                 } else {
                     if (isSet($httpVars["force_copy_delete"])) {
                         $errorMessage = $this->delete($selection, $logMessages, $taskId);
                         if($errorMessage) {
                             if(!empty($taskId)) {
-                                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while deleting data: ".TextEncoder::toUTF8($errorMessage));
+                                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "Error while deleting data: ".$errorMessage);
                             }
-                            throw new PydioException(TextEncoder::toUTF8($errorMessage));
+                            throw new PydioException($errorMessage);
                         }
                         $this->logInfo("Copy/Delete", ["files"=>$this->addSlugToPath($selection), "destination" => $this->addSlugToPath($destPath)]);
                     } else {
@@ -1103,7 +1105,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $renamedNode = $this->rename($originalNode, $destNode, $filename_new);
 
-                $logMessage = new UserMessage(TextEncoder::toUTF8($originalNode->getLabel())." $mess[41] ".TextEncoder::toUTF8($renamedNode->getLabel()));
+                $logMessage = new UserMessage($originalNode->getLabel()." $mess[41] ".$renamedNode->getLabel());
                 $nodesDiffs->update($renamedNode, $originalNode->getPath());
                 $this->logInfo("Rename", [
                     "files"     => $this->addSlugToPath($originalNode->getUrl()),
@@ -1155,8 +1157,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if(empty($newNode)){
                         continue;
                     }
-                    $messtmp.="$mess[38] ".TextEncoder::toUTF8($basename)." $mess[39] ";
-                    if ($parentDir=="") {$messtmp.="/";} else {$messtmp.= TextEncoder::toUTF8($parentDir);}
+                    $messtmp.="$mess[38] ".$basename." $mess[39] ";
+                    if ($parentDir=="") {$messtmp.="/";} else {$messtmp.= $parentDir;}
                     $messages[] = $messtmp;
                     $nodesDiffs->add($newNode);
                     $this->logInfo("Create Dir", ["dir"=>$this->addSlugToPath($parentDir)."/".$basename, "files"=>$this->addSlugToPath($parentDir)."/".$basename]);
@@ -1509,7 +1511,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                             continue;
                         }
                         $newBody = [
-                            "dir" => TextEncoder::toUTF8($nodeDir->getPath()),
+                            "dir" => $nodeDir->getPath(),
                             "options"=> $httpVars["options"],
                             "recursive" => "true",
                             "max_depth"=> $max_depth,
@@ -2228,14 +2230,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $filePath = $selectedNode->getPath();
 
             if (!file_exists($fileUrl)) {
-                $logMessages[]=$mess[100]." ".TextEncoder::toUTF8($filePath);
+                $logMessages[]=$mess[100]." ".$filePath;
                 continue;
             }
             $this->deldir($fileUrl, $repoData, $taskId);
             if ($selectedNode->isLeaf()) {
-                $logMessages[]="$mess[38] ".TextEncoder::toUTF8($filePath)." $mess[44].";
+                $logMessages[]="$mess[38] ".$filePath." $mess[44].";
             } else {
-                $logMessages[]="$mess[34] ".TextEncoder::toUTF8($filePath)." $mess[44].";
+                $logMessages[]="$mess[34] ".$filePath." $mess[44].";
             }
             Controller::applyHook("node.change", [$selectedNode]);
         }
