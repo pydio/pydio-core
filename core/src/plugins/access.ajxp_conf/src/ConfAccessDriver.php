@@ -319,6 +319,9 @@ class ConfAccessDriver extends AbstractAccessDriver
             case "edit_repository_data":
             case "get_drivers_definition":
             case "get_templates_definition":
+            case "meta_source_add":
+            case "meta_source_edit":
+            case "meta_source_delete":
                 $this->repositoriesAction($requestInterface, $responseInterface);
                 break;
             default:
