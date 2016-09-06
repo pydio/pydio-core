@@ -212,7 +212,7 @@ class ZohoEditor extends Plugin
                     'apikey'        => $this->getContextualOption($ctx, "ZOHO_API_KEY"),
                     'output'        => 'url',
                     'lang'          => $this->getContextualOption($ctx, "ZOHO_LANGUAGE"),
-                    'filename'      => TextEncoder::toUTF8(basename($file)),
+                    'filename'      => basename($file),
                     'persistence'   => 'false',
                     'format'        => $extension,
                     'mode'          => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',

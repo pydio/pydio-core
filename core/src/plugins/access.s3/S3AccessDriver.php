@@ -165,7 +165,7 @@ class S3AccessDriver extends FsAccessDriver
      * @param string $type
      * @return bool
      */
-    public function isWriteable($dir, $type="dir")
+    public function isWriteable(AJXP_Node $node)
     {
         return true;
     }

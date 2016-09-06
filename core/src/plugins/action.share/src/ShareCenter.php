@@ -1229,7 +1229,6 @@ class ShareCenter extends Plugin
                     }
                     $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
                     $relative = substr($currentRoot, strlen($parentRoot));
-                    $relative = TextEncoder::toStorageEncoding($relative);
                     $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
@@ -1519,9 +1518,6 @@ class ShareCenter extends Plugin
                 $newRepo->setGroupPath($gPath);
             }
             $newRepo->setDescription($description);
-            // Smells like dirty hack!
-            $newRepo->options["PATH"] = TextEncoder::fromStorageEncoding($newRepo->options["PATH"]);
-
             if(isSet($httpVars["filter_nodes"])){
                 $newRepo->setContentFilter(new ContentFilter($httpVars["filter_nodes"]));
             }

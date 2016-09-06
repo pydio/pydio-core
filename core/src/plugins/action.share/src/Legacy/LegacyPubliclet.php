@@ -255,9 +255,6 @@ class LegacyPubliclet
                                         $newRepo->setGroupPath($gPath);
                                     }
                                     $newRepo->setDescription("");
-                                    // Smells like dirty hack!
-                                    $newRepo->options["PATH"] = TextEncoder::fromStorageEncoding($newRepo->options["PATH"]);
-
                                     $newRepo->setContentFilter(new ContentFilter([new AJXP_Node("pydio://".$ctx->getUser()->getId()."@".$parentRepositoryObject->getId().$filePath)]));
                                     if(!$dryRun){
                                         RepositoryService::addRepository($newRepo);

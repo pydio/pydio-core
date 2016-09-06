@@ -96,18 +96,11 @@ class MysqlAccessDriver extends AbstractAccessDriver
             $$getName = InputFilter::securePath($getValue);
         }
         $selection = UserSelection::fromContext($ctx, $httpVars);
-        if (isSet($dir) && $action != "upload") {
-            $safeDir = $dir;
-            $dir = TextEncoder::fromUTF8($dir);
-        }
         // FILTER DIR PAGINATION ANCHOR
         if (isSet($dir) && strstr($dir, "%23")!==false) {
             $parts = explode("%23", $dir);
             $dir = $parts[0];
             $page = $parts[1];
-        }
-        if (isSet($dest)) {
-            $dest = TextEncoder::fromUTF8($dest);
         }
 
         // Sanitize all httpVars entries
@@ -138,7 +131,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     $index = 0;
                     foreach ($arrValues as $k=>$v) {
                         // CHECK IF AUTO KEY!!!
-                        $string .= "'".addslashes(TextEncoder::fromUTF8($v))."'";
+                        $string .= "'".addslashes($v)."'";
                         if($index < count($arrValues)-1) $string.=",";
                         $index++;
                     }
@@ -150,7 +143,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         if ($k == $pkName) {
                             $pkValue = $v;
                         } else {
-                            $string .= $k."='".addslashes(TextEncoder::fromUTF8($v))."'";
+                            $string .= $k."='".addslashes($v)."'";
                             if($index<count($arrValues)-1) $string.=",";
                         }
                         $index++;
@@ -428,7 +421,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                                 $value = str_replace("\"", "", $value);
                                 if(InputFilter::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
                                 $value = StringHelper::xmlEntities($value);
-                                print $key.'="'.TextEncoder::toUTF8($value).'" ';
+                                print $key.'="'.$value.'" ';
                                 if ($result["HAS_PK"]>0) {
                                     if (in_array($key, $result["PK_FIELDS"])) {
                                         $pkString .= $key."__".$value.".";
