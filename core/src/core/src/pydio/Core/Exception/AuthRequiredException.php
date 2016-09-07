@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Exception;
 
+use Pydio\Core\Http\Message\LoggingResult;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
@@ -28,14 +29,28 @@ use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AuthRequiredException
+ * @package Pydio\Core\Exception
+ */
 class AuthRequiredException extends PydioException implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
-    public function __construct($messageId = "", $messageString = "")
+    private $loginResult;
+
+    /**
+     * AuthRequiredException constructor.
+     * @param string $messageId
+     * @param string $messageString
+     * @param null $loginResult
+     */
+    public function __construct($messageId = "", $messageString = "", $loginResult = null)
     {
         if(!empty($messageId)){
             $mess = LocaleService::getMessages();
             if(isSet($mess[$messageId])) $messageString = $mess[$messageId];
+        }
+        if(!empty($loginResult)){
+            $this->loginResult = $loginResult;
         }
         parent::__construct($messageString, $messageId);
     }
@@ -61,10 +76,15 @@ class AuthRequiredException extends PydioException implements XMLSerializableRes
      */
     public function toXML()
     {
-        $xml = "<require_auth/>";
-        if($this->getMessage()){
-            $error = new UserMessage($this->getMessage(), LOG_LEVEL_ERROR);
-            $xml.= $error->toXML();
+        if(!empty($this->loginResult)){
+            $res = new LoggingResult($this->loginResult, "", "", "");
+            $xml = $res->toXML();
+        }else{
+            $xml = "<require_auth/>";
+            if($this->getMessage()){
+                $error = new UserMessage($this->getMessage(), LOG_LEVEL_ERROR);
+                $xml.= $error->toXML();
+            }
         }
         return $xml;
     }

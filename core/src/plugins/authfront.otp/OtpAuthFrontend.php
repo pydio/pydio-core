@@ -26,8 +26,18 @@ use PEAR;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
+use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\StringHelper;
+use Sabre\DAV\StringUtil;
+use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -40,10 +50,39 @@ class OtpAuthFrontend extends AbstractAuthFrontend
 
     private $yubicoSecretKey;
     private $yubicoClientId;
+
+    private $googleEnabled;
     private $google;
     private $googleLast;
+
     private $yubikey1;
     private $yubikey2;
+
+    /**
+     * @param array $configData
+     */
+    function loadConfigs($configData){
+        parent::loadConfigs($configData);
+        if(isSet($this->pluginConf["google_enabled_admin"]) && $this->pluginConf["google_enabled_admin"] === true){
+            $this->pluginConf["google_enabled"] = true;
+        }
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param bool $extendedVersion
+     * @return \DOMElement[]
+     */
+    function getRegistryContributions(ContextInterface $ctx, $extendedVersion = true){
+        if($ctx->hasUser() && $ctx->getUser()->getPersonalRole()->filterParameterValue("authfront.otp", "google_enabled_admin", AJXP_REPO_SCOPE_ALL, false)){
+            if(!$this->manifestLoaded) $this->unserializeManifest();
+            /** @var \DOMElement $param */
+            $param = $this->getXPath()->query('server_settings/param[@name="google_enabled"]')->item(0);
+            $param->setAttribute("expose", "false");
+            $this->reloadXPath();
+        }
+        return parent::getRegistryContributions($ctx, $extendedVersion);
+    }
 
     /**
      * Try to authenticate the user based on various external parameters
@@ -62,14 +101,15 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         if (empty($httpVars) || empty($httpVars["userid"])) {
             return false;
         } else {
-            $userid = $httpVars["userid"];
-            $this->loadConfig($userid);
+            $userid = InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS);
+            $this->loadConfig(UsersService::getUserById($userid));
             // if there is no configuration for OTP, this means that this user don't have OTP
-            if ((empty($this->google) &&
-                empty($this->googleLast) &&
-                empty($this->yubikey1) &&
-                empty($this->yubikey2))
-            ) {
+            if ((empty($this->googleEnabled) && empty($this->google) && empty($this->googleLast) && empty($this->yubikey1) && empty($this->yubikey2))) {
+                return false;
+            }
+
+            if(!empty($this->googleEnabled) && empty($this->google)){
+                $this->showSetupScreen($userid);
                 return false;
             }
 
@@ -136,32 +176,94 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 }
             }
         }
+        return false;
     }
 
     /**
      * @param $exceptionMsg
      * @throws \Pydio\Core\Exception\AuthRequiredException
      */
-    protected function breakAndSendError($exceptionMsg)
-    {
-
-        throw new \Pydio\Core\Exception\AuthRequiredException($exceptionMsg);
-
+    protected function breakAndSendError($exceptionMsg) {
+        throw new AuthRequiredException($exceptionMsg, "", -1);
     }
 
 
+
     /**
-     * @param $userid
+     * @param $userId
      * @throws \Pydio\Core\Exception\UserNotFoundException
      */
-    private function loadConfig($userid)
+    private function showSetupScreen($userId){
+        $userObject = UsersService::getUserById($userId);
+        $userObject->setLock("otp_show_setup_screen");
+        $userObject->save("superuser");
+    }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws AuthRequiredException
+     * @throws PydioException
+     */
+    public function getConfigurationCode(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+        if(!$ctx->hasUser()){
+            throw new AuthRequiredException();
+        }
+        $mess = LocaleService::getMessages();
+        $uObject = $ctx->getUser();
+        $params  = $requestInterface->getParsedBody();
+        if(isSet($params["step"]) && $params["step"] === "verify"){
+
+            $this->loadConfig($uObject);
+            if(empty($this->google)){
+                throw new PydioException($mess["authfront.otp.8"]);
+            }
+            $otp = $requestInterface->getParsedBody()["otp"];
+            if($this->checkGooglePass($uObject->getId(), $otp, $this->google, $this->googleLast)){
+                $responseInterface = new JsonResponse(["RESULT" => "OK"]);
+                $uObject->removeLock();
+                $uObject->save("superuser");
+            }else{
+                throw new PydioException($mess["authfront.otp.7"]);
+            }
+
+        }else{
+            $googleKey = $uObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
+            if(!empty($googleKey)){
+                $newKey = $googleKey;
+            }else{
+                $newKey = StringHelper::generateRandomString(16);
+                $newKey = str_replace([0,1,2,3,4,5,6,7,8,9], ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'], $newKey);
+                $newKey = strtoupper($newKey);
+            }
+
+            $uObject->getPersonalRole()->setParameterValue("authfront.otp", "google", $newKey);
+            ConfService::getConfStorageImpl()->updateRole($uObject->getPersonalRole(), $uObject);
+
+            $responseInterface = new JsonResponse([
+                "key" => $newKey,
+                "qrcode" => "otpauth://totp/User:%20".$uObject->getId()."?secret=".$newKey."&issuer=".urlencode(ConfService::getGlobalConf("APPLICATION_TITLE"))
+            ]);
+        }
+
+    }
+
+    /**
+     * @param UserInterface $userObject
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
+    private function loadConfig($userObject)
     {
 
-        $userObject = UsersService::getUserById($userid);
-
         if ($userObject != null) {
-            $this->google = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
-            $this->googleLast = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
+
+            $this->googleEnabled    = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_enabled", AJXP_REPO_SCOPE_ALL, false);
+            $this->google           = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
+            $this->googleLast       = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
+
             $this->yubikey1 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey1", AJXP_REPO_SCOPE_ALL, '');
             $this->yubikey2 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey2", AJXP_REPO_SCOPE_ALL, '');
         }
