@@ -958,17 +958,17 @@ class RepositoriesManager extends AbstractManager
             unset($buffer["parameters"]["META_SOURCES"]);
         }
         if(!$repository->isTemplate()){
-            $buffer["INFO"]= [];
+            $buffer["info"]= [];
             $users = UsersService::countUsersForRepository($ctx, $repository->getId(), false, true);
             $cursor = ["count"];
             $shares = ConfService::getConfStorageImpl()->simpleStoreList("share", $cursor, "", "serial", '', $repository->getId());
-            $buffer["INFO"] = [
+            $buffer["info"] = [
                 "users" => $users,
                 "shares" => count($shares)
             ];
             $rootGroup = RolesService::getRole("AJXP_GRP_/");
             if($rootGroup !== false && $rootGroup->hasMask($repository->getId())){
-                $buffer["MASK"]= $rootGroup->getMask($repository->getId());
+                $buffer["mask"]= $rootGroup->getMask($repository->getId());
             }
         }
         if ($repository->hasParent()) {
