@@ -271,16 +271,16 @@ class RepositoriesManager extends AbstractManager
                             $metaSourceOptions[$metaID] = $defaultParams;
                         }
                     }
-                    if(isSet($jsonDataCreateWorkspace["features"]["META_SOURCES"])) {
+                    if(isSet($jsonDataCreateWorkspace["features"])) {
                         foreach($arrayDefaultMetasources as $defaultPluginName) {
-                            foreach($jsonDataCreateWorkspace["features"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
+                            foreach($jsonDataCreateWorkspace["features"] as $pluginName => $arrayPluginValue) {
                                 if ($defaultPluginName === $pluginName) {
                                     $arrayPluginToOverWrite[$pluginName] = $arrayPluginValue;
-                                    unset($jsonDataCreateWorkspace["features"]["META_SOURCES"][$pluginName]);
+                                    unset($jsonDataCreateWorkspace["features"][$pluginName]);
                                 }
                             }
                         }
-                        $arrayPluginToAdd = $jsonDataCreateWorkspace["features"]["META_SOURCES"];
+                        $arrayPluginToAdd = $jsonDataCreateWorkspace["features"];
                         foreach($arrayPluginToOverWrite as $pluginName => $arrayPlugin) {
                             if(!empty($arrayPlugin)) {
                                 foreach($arrayPlugin as $name => $value) {
@@ -348,16 +348,16 @@ class RepositoriesManager extends AbstractManager
                     $arrayPluginToOverWrite = array();
                     $arrayPluginToAdd = array();
                     $arrayWorkspaceMetasources = $repo->getSafeOption("META_SOURCES");
-                    if(isSet($jsonDataEditWorkspace["features"]["META_SOURCES"])) {
+                    if(isSet($jsonDataEditWorkspace["features"])) {
                         foreach($arrayWorkspaceMetasources as $metaSourcePluginName => $metaSourcePluginArray) {
-                            foreach($jsonDataEditWorkspace["features"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
+                            foreach($jsonDataEditWorkspace["features"] as $pluginName => $arrayPluginValue) {
                                 if ($metaSourcePluginName === $pluginName) {
                                     $arrayPluginToOverWrite[$pluginName] = $arrayPluginValue;
-                                    unset($jsonDataEditWorkspace["features"]["META_SOURCES"][$pluginName]);
+                                    unset($jsonDataEditWorkspace["features"][$pluginName]);
                                 }
                             }
                         }
-                        $arrayPluginToAdd = $jsonDataEditWorkspace["features"]["META_SOURCES"];
+                        $arrayPluginToAdd = $jsonDataEditWorkspace["features"];
                         foreach($arrayPluginToOverWrite as $pluginName => $arrayPlugin) {
                             if(!empty($arrayPlugin)) {
                                 foreach($arrayPlugin as $name => $value) {
