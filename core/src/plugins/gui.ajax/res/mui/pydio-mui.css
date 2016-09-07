@@ -2788,7 +2788,9 @@
   border-color: #009688 !important;
 }
 .react-mui-context .mui-text-field .mui-text-field-error {
-  right: 0;
+  bottom: auto;
+  line-height: 15px;
+  margin-top: -2px;
 }
 .react-mui-context .main-layout-nav-to-stack,
 .react-mui-context .horizontal-layout,
@@ -3061,6 +3063,9 @@
 .react-mui-context .pydio-form-panel .form-legend .icon-question-sign:hover {
   color: rgba(0, 0, 0, 0.53);
 }
+.react-mui-context .pydio-form-panel .form-legend.warning-message {
+  color: #009788;
+}
 .react-mui-context .pydio-form-panel .form-entry-string .form-legend,
 .react-mui-context .pydio-form-panel .form-entry-integer .form-legend,
 .react-mui-context .pydio-form-panel .form-entry-textarea .form-legend {
@@ -3070,7 +3075,7 @@
 .react-mui-context .pydio-form-panel .form-entry-string .form-legend.mandatory-missing,
 .react-mui-context .pydio-form-panel .form-entry-integer .form-legend.mandatory-missing,
 .react-mui-context .pydio-form-panel .form-entry-textarea .form-legend.mandatory-missing {
-  margin-top: 12px;
+  opacity: 0;
 }
 .react-mui-context .pydio-form-panel .form-entry-button {
   display: inline-block;

@@ -6,7 +6,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Absolute path to the folder on the server. You can use AJXP_DATA_PATH and AJXP_INSTALL_PATH to point to Pydio default data path and root install path.]" mandatory="true"/>
 		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>
         <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
         <param name="PURGE_AFTER" type="integer" label="CONF_MESSAGE[Purge Days (Hard limit)]" description="CONF_MESSAGE[Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.]" default="0"/>

@@ -1552,13 +1552,16 @@
                         }
                         var mandatoryMissing = false;
                         var classLegend = "form-legend";
-                        if( attributes['mandatory'] && (attributes['mandatory'] === "true" || attributes['mandatory'] === true) ){
+                        if(attributes['errorText']) {
+                            classLegend = "form-legend mandatory-missing";
+                        }else if(attributes['warningText']){
+                            classLegend = "form-legend warning-message";
+                        }else if( attributes['mandatory'] && (attributes['mandatory'] === "true" || attributes['mandatory'] === true) ){
                             if(['string', 'textarea', 'image', 'integer'].indexOf(attributes['type']) !== -1 && !values[paramName]){
                                 mandatoryMissing = true;
                                 classLegend = "form-legend mandatory-missing";
                             }
                         }
-
 
                         var props = {
                             ref:"formElement",
@@ -1573,13 +1576,13 @@
                             binary_context:this.props.binary_context,
                             displayContext:'form',
                             applyButtonAction:this.applyButtonAction,
-                            errorText:mandatoryMissing?'Field cannot be empty':null
+                            errorText:mandatoryMissing?'Field cannot be empty':(attributes.errorText?attributes.errorText:null)
                         };
 
                         field = (
                             <div key={paramName} className={'form-entry-' + attributes['type']}>
                                 {PydioForm.createFormElement(props)}
-                                <div className={classLegend}>{attributes['description']} {helperMark}</div>
+                                <div className={classLegend}>{attributes['warningText'] ? attributes['warningText'] : attributes['description']} {helperMark}</div>
                             </div>
                         );
                     }else{
