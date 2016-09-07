@@ -222,6 +222,9 @@ class RepositoriesManager extends AbstractManager
 
             case "post_repository":
                 $jsonDataCreateWorkspace = json_decode($httpVars["payload"], true);
+                if ($jsonDataCreateWorkspace === null) {
+                    throw new PydioException("Invalid JSON !!");
+                }
                 if(!isSet($jsonDataCreateWorkspace["isTemplate"])) {
                     $jsonDataCreateWorkspace["isTemplate"] = false;
                 }
