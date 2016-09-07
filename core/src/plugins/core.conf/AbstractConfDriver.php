@@ -823,7 +823,7 @@ abstract class AbstractConfDriver extends Plugin
                     $pluginId = $parameter["PLUGIN_ID"];
                     $name     = $parameter["NAME"];
                     if (isSet($data[$name]) || $data[$name] === "") {
-                        if($data[$name] == "__AJXP_VALUE_SET__") continue;
+                        if($data[$name] === "__AJXP_VALUE_SET__") continue;
                         $pRole = null;
                         $persRole = $userObject->getPersonalRole();
                         if($userObject instanceof AbstractUser) $pRole = $userObject->parentRole;
