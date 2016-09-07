@@ -114,7 +114,7 @@ class DuoSecurityFrontend extends SessionLoginFrontend
         $verif = Duo::verifyResponse($iKey, $sKey, $appUnique, $sigResponse);
 
         if ($verif != null && $verif == $u->getId()) {
-            $u->removeLock();
+            $u->removeLock("duo_show_iframe");
             $u->save("superuser");
             $u->recomputeMergedRole();
             AuthService::updateUser($u);

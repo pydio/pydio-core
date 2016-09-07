@@ -104,7 +104,10 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             $userid = InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS);
             $this->loadConfig(UsersService::getUserById($userid));
             // if there is no configuration for OTP, this means that this user don't have OTP
-            if ((empty($this->googleEnabled) && empty($this->google) && empty($this->googleLast) && empty($this->yubikey1) && empty($this->yubikey2))) {
+            if(empty($this->googleEnabled)){
+                return false;
+            }
+            if (empty($this->google) && empty($this->googleLast) && empty($this->yubikey1) && empty($this->yubikey2)) {
                 return false;
             }
 
@@ -224,7 +227,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             $otp = $requestInterface->getParsedBody()["otp"];
             if($this->checkGooglePass($uObject->getId(), $otp, $this->google, $this->googleLast)){
                 $responseInterface = new JsonResponse(["RESULT" => "OK"]);
-                $uObject->removeLock();
+                $uObject->removeLock("otp_show_setup_screen");
                 $uObject->save("superuser");
             }else{
                 throw new PydioException($mess["authfront.otp.7"]);

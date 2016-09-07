@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Blocca Utente",
 "27" => "Riattiva Utente",
 "28" => "Forza cambio",
+"28b"=> "Cancel password change",
 "29" => "Inserisci la nuova password per questo utente",
 "30" => "Conferma",
 "31" => "ID Ruolo",

@@ -95,7 +95,13 @@ interface UserInterface extends IGroupPathProvider
     /**
      * @throws \Exception
      */
-    public function removeLock();
+    public function removeLock($lockAction);
+
+    /**
+     * @param $lockAction
+     * @return string|false
+     */
+    public function hasLockByName($lockAction);
 
     /**
      * @return string|false

@@ -178,8 +178,9 @@ class Pydio extends Observable{
             if(!repositoryObject){
                 if(this.user.lock){
                     this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
+                    let lock = this.user.lock.split(",").shift();
                     window.setTimeout(function(){
-                        this.Controller.fireAction(this.user.lock);
+                        this.Controller.fireAction(lock);
                     }.bind(this), 50);
                     return;
                 }

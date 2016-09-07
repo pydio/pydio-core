@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Lock out user",
 "27" => "Reactivate user",
 "28" => "Force password change",
+"28b"=> "Cancel password change",
 "29" => "Enter new password for this user",
 "30" => "Confirm",
 "31" => "Role ID",

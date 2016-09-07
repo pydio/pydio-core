@@ -125,7 +125,7 @@ class AuthService
         }
 
 
-        if ($user->getLock() === "logout") {
+        if ($user->hasLockByName("logout")) {
             Logger::warning(__CLASS__, "Login failed", array("user" => InputFilter::sanitize($user_id, InputFilter::SANITIZE_EMAILCHARS), "error" => "Locked user"));
             throw new LoginException(-1);
         }

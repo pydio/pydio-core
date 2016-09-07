@@ -58,6 +58,7 @@ $mess=array(
 "26" => "Benutzer sperren",
 "27" => "Benutzer aktivieren",
 "28" => "Passwort&auml;nderung erzwingen",
+"28b"=> "Cancel password change",
 "29" => "Geben Sie ein neues Passwort f&uuml;r den Benutzer ein",
 "30" => "Wiederholen",
 "31" => "Rollen-ID",

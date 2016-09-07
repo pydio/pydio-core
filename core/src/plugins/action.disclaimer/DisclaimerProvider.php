@@ -65,7 +65,7 @@ class DisclaimerProvider extends Plugin
 
         if ($httpVars["validate"] == "true") {
 
-            $u->removeLock();
+            $u->removeLock("validate_disclaimer");
             $u->save("superuser");
             AuthService::updateUser($u);
             $repo = SessionRepositoryMiddleware::switchUserToRepository($u, $request);
@@ -116,7 +116,7 @@ class DisclaimerProvider extends Plugin
      */
     public function updateSharedUser(ContextInterface $ctx, UserInterface $userObject){
         if($userObject->isHidden() && !$this->getContextualOption($ctx, "DISCLAIMER_ENABLE_SHARED")){
-            $userObject->removeLock();
+            $userObject->removeLock("validate_disclaimer");
             $userObject->getPersonalRole()->setParameterValue("action.disclaimer", "DISCLAIMER_ACCEPTED", "yes", AJXP_REPO_SCOPE_SHARED);
             $userObject->save("superuser");
         }
@@ -131,6 +131,13 @@ class DisclaimerProvider extends Plugin
      * @param UserInterface $userObject
      */
     public function updateSharedUserLogin(ContextInterface $ctx, UserInterface $userObject){
+        if(!$userObject->isHidden()){
+            $param = $userObject->getPersonalRole()->filterParameterValue("action.disclaimer", "DISCLAIMER_ACCEPTED", AJXP_REPO_SCOPE_ALL, "no");
+            if($param === "no"){
+                $userObject->setLock("validate_disclaimer");
+                $userObject->save("superuser");
+            }
+        }
         if($userObject->isHidden() && $this->getContextualOption($ctx, "DISCLAIMER_ENABLE_SHARED")){
             $userObject->setLock("validate_disclaimer");
             $userObject->getPersonalRole()->setParameterValue("action.disclaimer", "DISCLAIMER_ACCEPTED", "no", AJXP_REPO_SCOPE_SHARED);

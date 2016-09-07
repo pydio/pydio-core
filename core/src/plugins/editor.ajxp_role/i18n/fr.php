@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Exclure l'utilisateur",
 "27" => "Réactiver l'utilisateur",
 "28" => "Forcer une mise à jour du mot de passe",
+"28b"=> "Annuler la mise à jour forcée du mot de passe",
 "29" => "Entrez le nouveau mot de passe pour cet utilisateur",
 "30" => "Confirmez",
 "31" => "ID rôle",

@@ -290,7 +290,7 @@ class UsersManager extends AbstractManager
                         $userMessage    = new UserMessage("Successfully set lock on user ($lockType)");
                         $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage]));
                     } else {
-                        $userObject->removeLock();
+                        $userObject->removeLock($lockType);
                         $userMessage    = new UserMessage("Successfully unlocked user");
                         $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage]));
                     }

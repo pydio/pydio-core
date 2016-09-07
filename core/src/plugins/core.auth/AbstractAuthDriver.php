@@ -90,8 +90,8 @@ class AbstractAuthDriver extends Plugin
                 }
                 if (UsersService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)) {
                     UsersService::updatePassword($userObject->getId(), $newPass);
-                    if ($userObject->getLock() == "pass_change") {
-                        $userObject->removeLock();
+                    if ($userObject->hasLockByName("pass_change")) {
+                        $userObject->removeLock("pass_change");
                         $userObject->save("superuser");
                     }
                 } else {

@@ -247,17 +247,31 @@ abstract class AbstractUser implements UserInterface
      */
     public function setLock($lockAction)
     {
-        //$this->rights["ajxp.lock"] = $lockAction;
-        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', $lockAction);
+        $sLock = $this->getLock();
+        $currentLocks = !empty($sLock) ? explode(",", $sLock) : [] ;
+        if(!in_array($lockAction, $currentLocks)){
+            array_unshift($currentLocks, $lockAction);
+        }
+        $locks = implode(",", $currentLocks);
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', $locks);
         $this->recomputeMergedRole();
     }
 
-    public function removeLock()
+    /**
+     * @param $lockAction
+     * @throws \Exception
+     */
+    public function removeLock($lockAction)
     {
-        if(isSet($this->rights['ajxp.lock'])){
-            $this->rights["ajxp.lock"] = false;
+        $sLock = $this->getLock();
+        $currentLocks = !empty($sLock) ? explode(",", $sLock) : [] ;
+        $pos = array_search($lockAction, $currentLocks);
+        if($pos !== false){
+            unset($currentLocks[$pos]);
         }
-        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_VALUE_CLEAR);
+        $this->rights["ajxp.lock"] = !count($currentLocks) ? false: implode(",", $currentLocks);
+        $newValue = !count($currentLocks) ? AJXP_VALUE_CLEAR : implode(",", $currentLocks);
+        $this->personalRole->setParameterValue('core.conf', 'USER_LOCK_ACTION', $newValue);
         $this->recomputeMergedRole();
     }
 
@@ -266,12 +280,23 @@ abstract class AbstractUser implements UserInterface
      */
     public function getLock()
     {
-        if(AJXP_SERVER_DEBUG && $this->isAdmin() && $this->getGroupPath() == "/") return false;
+        if(AJXP_SERVER_DEBUG && $this->isAdmin() && $this->getGroupPath() === "/") return false;
         if (!empty($this->rights["ajxp.lock"])) {
             return $this->rights["ajxp.lock"];
         }
         return $this->mergedRole->filterParameterValue('core.conf', 'USER_LOCK_ACTION', AJXP_REPO_SCOPE_ALL, false);
     }
+
+    /**
+     * @param $lockAction
+     * @return string|false
+     */
+    public function hasLockByName($lockAction){
+        $sLock = $this->getLock();
+        $currentLocks = !empty($sLock) ? explode(",", $sLock) : [] ;
+        return array_search($lockAction, $currentLocks) !== false;
+    }
+
 
     /**
      * @return bool
