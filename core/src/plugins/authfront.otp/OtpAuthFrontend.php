@@ -104,15 +104,14 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             $userid = InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS);
             $this->loadConfig(UsersService::getUserById($userid));
             // if there is no configuration for OTP, this means that this user don't have OTP
-            if(empty($this->googleEnabled)){
+            if(empty($this->googleEnabled) || $this->googleEnabled === false){
                 return false;
-            }
-            if (empty($this->google) && empty($this->googleLast) && empty($this->yubikey1) && empty($this->yubikey2)) {
+            }else if(empty($this->google)){
+                $this->showSetupScreen($userid);
                 return false;
             }
 
-            if(!empty($this->googleEnabled) && empty($this->google)){
-                $this->showSetupScreen($userid);
+            if (empty($this->google) && empty($this->googleLast) && empty($this->yubikey1) && empty($this->yubikey2)) {
                 return false;
             }
 
@@ -264,6 +263,9 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         if ($userObject != null) {
 
             $this->googleEnabled    = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_enabled", AJXP_REPO_SCOPE_ALL, false);
+            if($this->googleEnabled === "false") {
+                $this->googleEnabled = false;
+            }
             $this->google           = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
             $this->googleLast       = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
 
