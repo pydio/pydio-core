@@ -231,14 +231,12 @@ class RepositoriesManager extends AbstractManager
                 if(!isSet($jsonDataCreateWorkspace["id"])) {
                     $jsonDataCreateWorkspace["id"] = 0;
                 }
-                if(!isSet($jsonDataCreateWorkspace["PARAMETERS"]["CREATE"])) {
-                    $jsonDataCreateWorkspace["PARAMETERS"]["CREATE"] = true;
+                if(!isSet($jsonDataCreateWorkspace["parameters"]["CREATE"])) {
+                    $jsonDataCreateWorkspace["parameters"]["CREATE"] = true;
                 }
                 $repo = new Repository($jsonDataCreateWorkspace["id"], $jsonDataCreateWorkspace["display"], $jsonDataCreateWorkspace["accessType"]);
-                foreach($jsonDataCreateWorkspace["PARAMETERS"] as $name => $value) {
-                    if($name !== "META_SOURCES") {
-                        $repo->addOption($name, $value);
-                    }
+                foreach($jsonDataCreateWorkspace["parameters"] as $name => $value) {
+                    $repo->addOption($name, $value);
                 }
                 $pluginService = PluginsService::getInstance($ctx);
                 $driver = $pluginService->getPluginByTypeName("access", $jsonDataCreateWorkspace["accessType"]);
@@ -273,16 +271,16 @@ class RepositoriesManager extends AbstractManager
                             $metaSourceOptions[$metaID] = $defaultParams;
                         }
                     }
-                    if(isSet($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"])) {
+                    if(isSet($jsonDataCreateWorkspace["features"]["META_SOURCES"])) {
                         foreach($arrayDefaultMetasources as $defaultPluginName) {
-                            foreach($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
+                            foreach($jsonDataCreateWorkspace["features"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
                                 if ($defaultPluginName === $pluginName) {
                                     $arrayPluginToOverWrite[$pluginName] = $arrayPluginValue;
-                                    unset($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"][$pluginName]);
+                                    unset($jsonDataCreateWorkspace["features"]["META_SOURCES"][$pluginName]);
                                 }
                             }
                         }
-                        $arrayPluginToAdd = $jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"];
+                        $arrayPluginToAdd = $jsonDataCreateWorkspace["features"]["META_SOURCES"];
                         foreach($arrayPluginToOverWrite as $pluginName => $arrayPlugin) {
                             if(!empty($arrayPlugin)) {
                                 foreach($arrayPlugin as $name => $value) {
