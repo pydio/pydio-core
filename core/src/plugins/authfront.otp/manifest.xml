@@ -14,14 +14,14 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="13"/>
-        <global_param name="PROTOCOL_TYPE" type="select"
+        <global_param group="CONF_MESSAGE[Options]" name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="13"/>
+        <global_param group="CONF_MESSAGE[Options]" name="PROTOCOL_TYPE" type="select"
                       choices="session_only|CONF_MESSAGE[Sessions Only]"
                       label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only" editable="false"/>
-        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="CONF_MESSAGE[Modify login page]"
+        <global_param  group="CONF_MESSAGE[Options]" expose="true" name="MODIFY_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[Modify login page]"
                        description="CONF_MESSAGE[Login page will be modified to give user a OTP textbox.]" default="true"/>
-        <global_param name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
-        <global_param name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Options]" name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Options]" name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
         <param name="yubikey1" type="string" label="CONF_MESSAGE[YubiKey 1]"  description="CONF_MESSAGE[YubiKey 1]" mandatory="false"/>
         <param name="yubikey2" type="string" label="CONF_MESSAGE[YubiKey 2]"  description="CONF_MESSAGE[YubiKey 2]" mandatory="false"/>
         <param name="google_enabled_admin" group="CONF_MESSAGE[Google Authenticator]" type="boolean" label="CONF_MESSAGE[Force Google Authenticator]"  description="CONF_MESSAGE[Force Google Auth usage without letting the choice to the user.]" mandatory="false" default="false" scope="user,group"/>
