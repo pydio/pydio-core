@@ -220,6 +220,110 @@ class RepositoriesManager extends AbstractManager
 
                 break;
 
+            case "post_repository":
+                $jsonDataCreateWorkspace = json_decode($httpVars["payload"], true);
+                if(!isSet($jsonDataCreateWorkspace["isTemplate"])) {
+                    $jsonDataCreateWorkspace["isTemplate"] = false;
+                }
+                if(!isSet($jsonDataCreateWorkspace["id"])) {
+                    $jsonDataCreateWorkspace["id"] = 0;
+                }
+                if(!isSet($jsonDataCreateWorkspace["PARAMETERS"]["CREATE"])) {
+                    $jsonDataCreateWorkspace["PARAMETERS"]["CREATE"] = true;
+                }
+                $repo = new Repository($jsonDataCreateWorkspace["id"], $jsonDataCreateWorkspace["display"], $jsonDataCreateWorkspace["accessType"]);
+                foreach($jsonDataCreateWorkspace["PARAMETERS"] as $name => $value) {
+                    if($name !== "META_SOURCES") {
+                        $repo->addOption($name, $value);
+                    }
+                }
+                $pluginService = PluginsService::getInstance($ctx);
+                $driver = $pluginService->getPluginByTypeName("access", $jsonDataCreateWorkspace["accessType"]);
+                $testFile = $driver->getBaseDir()."/test.".$repo->getAccessType()."Access.php";
+                if (!$jsonDataCreateWorkspace["isTemplate"] && is_file($testFile)) {
+                    $className = "\\Pydio\\Tests\\".$repo->getAccessType()."AccessTest";
+                    if (!class_exists($className))
+                        include($testFile);
+                    $class = new $className();
+                    $result = $class->doRepositoryTest($repo);
+                    if (!$result) {
+                        throw new PydioException($class->failedInfo);
+                    }
+                }
+                if ($driver != null && $driver->getConfigs() != null) {
+                    $arrayDefaultMetasources = array();
+                    $arrayPluginToOverWrite = array();
+                    $arrayPluginToAdd = array();
+                    $metaSourceOptions = array();
+                    $configsDriver = $driver->getConfigs();
+                    if (!empty($configsDriver["DEFAULT_METASOURCES"])) {
+                        $arrayDefaultMetasources = InputFilter::parseCSL($configsDriver["DEFAULT_METASOURCES"]);
+                        foreach ($arrayDefaultMetasources as $metaID) {
+                            $metaPlug = $pluginService->getPluginById($metaID);
+                            if($metaPlug == null) continue;
+                            $pNodes = $metaPlug->getManifestRawContent("//param[@default]", "nodes");
+                            $defaultParams = array();
+                            /** @var \DOMElement $domNode */
+                            foreach ($pNodes as $domNode) {
+                                $defaultParams[$domNode->getAttribute("name")] = $domNode->getAttribute("default");
+                            }
+                            $metaSourceOptions[$metaID] = $defaultParams;
+                        }
+                    }
+                    if(isSet($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"])) {
+                        foreach($arrayDefaultMetasources as $defaultPluginName) {
+                            foreach($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
+                                if ($defaultPluginName === $pluginName) {
+                                    $arrayPluginToOverWrite[$pluginName] = $arrayPluginValue;
+                                    unset($jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"][$pluginName]);
+                                }
+                            }
+                        }
+                        $arrayPluginToAdd = $jsonDataCreateWorkspace["PARAMETERS"]["META_SOURCES"];
+                        foreach($arrayPluginToOverWrite as $pluginName => $arrayPlugin) {
+                            if(!empty($arrayPlugin)) {
+                                foreach($arrayPlugin as $name => $value) {
+                                    $metaSourceOptions[$pluginName][$name] = $value;
+                                }
+                            }
+                        }
+                        $metaSourceOptions = array_merge($metaSourceOptions, $arrayPluginToAdd);
+                    }
+                    $repo->addOption("META_SOURCES", $metaSourceOptions);
+                }
+                if ($this->repositoryExists($repo->getDisplay())) {
+                    throw new PydioException($mess["ajxp_conf.50"]);
+                }
+                if ($jsonDataCreateWorkspace["isTemplate"]) {
+                    $repo->isTemplate = true;
+                }
+                if ($this->currentUserIsGroupAdmin()) {
+                    $repo->setGroupPath($ctx->getUser()->getGroupPath());
+                } else if (!empty($options["AJXP_GROUP_PATH_PARAMETER"])) {
+                    $value = InputFilter::securePath(rtrim($currentAdminBasePath, "/") . "/" . ltrim($options["AJXP_GROUP_PATH_PARAMETER"], "/"));
+                    $repo->setGroupPath($value);
+                }
+                $res = RepositoryService::addRepository($repo);
+                if ($res == -1) {
+                    throw new PydioException($mess["ajxp_conf.51"]);
+                }
+                $defaultRights = $repo->getDefaultRight();
+                if(!empty($defaultRights)){
+                    $groupRole = RolesService::getOrCreateRole("AJXP_GRP_" . $currentAdminBasePath, $currentAdminBasePath);
+                    $groupRole->setAcl($repo->getId(), $defaultRights);
+                }
+                $loggedUser = $ctx->getUser();
+                $loggedUser->getPersonalRole()->setAcl($repo->getUniqueId(), "rw");
+                $loggedUser->recomputeMergedRole();
+                $loggedUser->save("superuser");
+                AuthService::updateUser($loggedUser);
+                #@TODO: create different message because this action is doing via API
+                $message = new UserMessage($mess["ajxp_conf.52"]);
+                $reload = new ReloadMessage("", $repo->getUniqueId());
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
+                break;
+
+
             case "edit_repository_label" :
             case "edit_repository_data" :
 

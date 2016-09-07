@@ -772,7 +772,7 @@ Class.create("XHRUploader", {
 
             xhr.withCredentials = true;
 
-            uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir;
+            uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir + item.file.name;
         }
 
 
