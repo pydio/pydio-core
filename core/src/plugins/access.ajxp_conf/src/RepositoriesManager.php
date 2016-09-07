@@ -884,14 +884,14 @@ class RepositoriesManager extends AbstractManager
             }
         }
         if (count($nested)) {
-            $buffer["PARAMETERS"]= [];
+            $buffer["parameters"]= [];
 
             foreach ($nested as $option) {
                 foreach ($option as $key => $optValue) {
                     if(isSet($definitions[$key]) && $definitions[$key]["type"] == "password" && !empty($optValue)){
                         $optValue = "__AJXP_VALUE_SET__";
                     }
-                    $buffer["PARAMETERS"][$key] = $optValue;
+                    $buffer["parameters"][$key] = $optValue;
                 }
             }
             // Add SLUG?
@@ -903,6 +903,10 @@ class RepositoriesManager extends AbstractManager
                 $buffer["PARAMETERS"]["AJXP_GROUP_PATH_PARAMETER"] = $buffer["groupPath"];
             }
             */
+        }
+        if(isSet($buffer["parameters"]) && isSet($buffer["parameters"]["META_SOURCES"])){
+            $buffer["features"] = $buffer["parameters"]["META_SOURCES"];
+            unset($buffer["parameters"]["META_SOURCES"]);
         }
         if(!$repository->isTemplate()){
             $buffer["INFO"]= [];
