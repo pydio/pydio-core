@@ -326,6 +326,57 @@ class RepositoriesManager extends AbstractManager
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
                 break;
 
+            case "patch_repository":
+                $jsonDataEditWorkspace = json_decode($httpVars["payload"], true);
+                if ($jsonDataEditWorkspace === null) {
+                    throw new PydioException("Invalid JSON !!");
+                }
+                $workspaceId = $httpVars["workspaceId"];
+                $repo = RepositoryService::findRepositoryByIdOrAlias($workspaceId);
+                if ($repo === null) {
+                    throw new PydioException("Workspace not found !!");
+                }
+                foreach ($jsonDataEditWorkspace as $name => $value) {
+                    if($name !== "parameters" && $name !== "features") {
+                        $repo->$name = $value;
+                    }
+                }
+                foreach($jsonDataEditWorkspace["parameters"] as $name => $value) {
+                    $repo->addOption($name, $value);
+                }
+                $pluginService = PluginsService::getInstance($ctx);
+                $driver = $pluginService->getPluginByTypeName("access", $repo->getAccessType());
+                if ($driver != null && $driver->getConfigs() != null) {
+                    $arrayPluginToOverWrite = array();
+                    $arrayPluginToAdd = array();
+                    $arrayWorkspaceMetasources = $repo->getSafeOption("META_SOURCES");
+                    if(isSet($jsonDataEditWorkspace["features"]["META_SOURCES"])) {
+                        foreach($arrayWorkspaceMetasources as $metaSourcePluginName => $metaSourcePluginArray) {
+                            foreach($jsonDataEditWorkspace["features"]["META_SOURCES"] as $pluginName => $arrayPluginValue) {
+                                if ($metaSourcePluginName === $pluginName) {
+                                    $arrayPluginToOverWrite[$pluginName] = $arrayPluginValue;
+                                    unset($jsonDataEditWorkspace["features"]["META_SOURCES"][$pluginName]);
+                                }
+                            }
+                        }
+                        $arrayPluginToAdd = $jsonDataEditWorkspace["features"]["META_SOURCES"];
+                        foreach($arrayPluginToOverWrite as $pluginName => $arrayPlugin) {
+                            if(!empty($arrayPlugin)) {
+                                foreach($arrayPlugin as $name => $value) {
+                                    $arrayWorkspaceMetasources[$pluginName][$name] = $value;
+                                }
+                            }
+                        }
+                        $arrayWorkspaceMetasources = array_merge($arrayWorkspaceMetasources, $arrayPluginToAdd);
+                    }
+                    $repo->addOption("META_SOURCES", $arrayWorkspaceMetasources);
+                }
+                RepositoryService::replaceRepository($workspaceId, $repo);
+                $message = new UserMessage("Workspace successfully edited !!");
+                $reload = new ReloadMessage("", $repo->getUniqueId());
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
+                $varToDelete = "EOF";
+                break;
 
             case "edit_repository_label" :
             case "edit_repository_data" :
