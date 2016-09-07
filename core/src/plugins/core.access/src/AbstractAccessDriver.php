@@ -196,7 +196,7 @@ abstract class AbstractAccessDriver extends Plugin
         $errorMessages = array();
         foreach ($files as $file) {
 
-            $destFile = InputFilter::decodeSecureMagic($httpVars["dest"]) ."/". PathUtils::forwardSlashBasename($file);
+            $destFile = rtrim(InputFilter::decodeSecureMagic($httpVars["dest"]), "/") ."/". PathUtils::forwardSlashBasename($file);
             $this->copyOrMoveFile(
                 $destFile,
                 $file, $errorMessages, $messages, isSet($httpVars["moving_files"]) ? true: false,
