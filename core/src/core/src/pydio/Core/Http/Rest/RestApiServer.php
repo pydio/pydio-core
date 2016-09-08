@@ -30,9 +30,9 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class RestApiServer extends Server
 {
     
-    public function __construct($base)
+    public function __construct($base, $requestAttributes = [])
     {
-        parent::__construct($base);
+        parent::__construct($base, $requestAttributes);
         ConfService::currentContextIsRestAPI($base);
     }
 

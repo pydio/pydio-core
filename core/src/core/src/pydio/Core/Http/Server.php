@@ -37,6 +37,10 @@ use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Pydio HTTP Server
+ * @package Pydio\Core\Http
+ */
 class Server
 {
     /**
@@ -64,7 +68,17 @@ class Server
      */
     protected static $middleWareInstance;
 
-    public function __construct($base){
+    /**
+     * @var array Additional attributes will be added to the initial Request object
+     */
+    private $requestAttributes;
+
+    /**
+     * Server constructor.
+     * @param $base
+     * @param $requestAttributes
+     */
+    public function __construct($base, $requestAttributes = []){
 
         $this->middleWares = new \SplStack();
         $this->middleWares->setIteratorMode(\SplDoublyLinkedList::IT_MODE_LIFO | \SplDoublyLinkedList::IT_MODE_KEEP);
@@ -74,7 +88,8 @@ class Server
         $this->stackMiddleWares();
 
         self::$middleWareInstance = &$this->middleWares;
-        
+
+        $this->requestAttributes = $requestAttributes;
     }
 
     protected function stackMiddleWares(){
@@ -98,6 +113,9 @@ class Server
         }
     }
 
+    /**
+     * @return ServerRequestInterface
+     */
     public function getRequest(){
         if(!isSet($this->request)){
             $this->request = $this->initServerRequest();
@@ -105,6 +123,9 @@ class Server
         return $this->request;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     */
     public function updateRequest(ServerRequestInterface $request){
         $this->request = $request;
     }
@@ -160,7 +181,9 @@ class Server
         return $responseInterface;
     }
 
-
+    /**
+     * @param callable $middleWareCallable
+     */
     public function addMiddleware(callable $middleWareCallable){
         $this->middleWares->push($middleWareCallable);
         self::$middleWareInstance = $this->middleWares;
@@ -182,6 +205,11 @@ class Server
 
         $request = ServerRequestFactory::fromGlobals();
         $request = $request->withAttribute("ctx", Context::emptyContext());
+        if(!empty($this->requestAttributes) && count($this->requestAttributes)){
+            foreach($this->requestAttributes as $attName => $attValue){
+                $request = $request->withAttribute($attName, $attValue);
+            }
+        }
         return $request;
 
     }

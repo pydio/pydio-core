@@ -24,28 +24,32 @@ use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Very Top Level Routing
+ * @package Pydio\Core\Http
+ */
 class Base
 {
 
     /**
      * @param string $base
      * @param string $route
+     * @param array $additionalAttributes
      */
-    public static function handleRoute($base, $route){
+    public static function handleRoute($base, $route, $additionalAttributes = []){
 
         if ($route === "/api") {
-            $server = new Rest\RestApiServer($base.$route);
+            $server = new Rest\RestApiServer($base.$route, $additionalAttributes);
         } else if ($route == "/wopi") {
-            $server = new Wopi\RestWopiServer($base.$route);
+            $server = new Wopi\RestWopiServer($base.$route, $additionalAttributes);
         } else if ($route === "/user") {
             $_GET["get_action"] = "user_access_point";
-            $server = new Server($base);
+            $server = new Server($base, $additionalAttributes);
         } else if ($route == "/favicon"){
             $_GET["get_action"] = "serve_favicon";
-            $server = new Server($base);
+            $server = new Server($base, $additionalAttributes);
         } else {
-            $server = new Server($base);
+            $server = new Server($base, $additionalAttributes);
         }
 
         $server->registerCatchAll();

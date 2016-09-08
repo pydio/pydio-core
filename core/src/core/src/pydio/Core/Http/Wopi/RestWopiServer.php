@@ -26,13 +26,21 @@ use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RestWopiServer
+ * Dedicated server for Wopi implementation (must start with /wopi).
+ * @package Pydio\Core\Http\Wopi
+ */
 class RestWopiServer extends Server
 {
-    
-    public function __construct($base)
+    /**
+     * RestWopiServer constructor.
+     * @param $base
+     * @param array $additionalAttributes
+     */
+    public function __construct($base, $additionalAttributes = [])
     {
-        parent::__construct($base);
+        parent::__construct($base, $additionalAttributes);
         ConfService::currentContextIsRestAPI($base);
     }
 
