@@ -86,7 +86,9 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
         }
         if (!empty($this->xPath)) {
 
-            $xml = "<ajxp_registry_part xPath=\"".$this->xPath."\">";
+            // Warning dirty hack for legacy iOS application : leave the space
+            // after the xPath value (before closing >).
+            $xml = "<ajxp_registry_part xPath=\"".$this->xPath."\" >";
             if(empty($this->xPathObject)){
                 $this->xPathObject = new \DOMXPath($this->registry);
             }
