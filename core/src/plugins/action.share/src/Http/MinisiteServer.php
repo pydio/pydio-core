@@ -57,7 +57,7 @@ class MinisiteServer extends Server
     {
         $this->crtLinkHash = $linkHash;
         $this->rest = $rest;
-        parent::__construct($base);
+        parent::__construct($base, []);
         if($rest){
             ConfService::currentContextIsRestAPI($base);
         }

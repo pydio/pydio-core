@@ -91,7 +91,9 @@ class TaskService implements ITasksProvider
             return $response;
         }
 
-        if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+        $minisite = $request !== null && $request->getAttribute("minisite");
+
+        if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !$minisite) {
 
             CliRunner::applyTaskInBackground($task);
             return $response;

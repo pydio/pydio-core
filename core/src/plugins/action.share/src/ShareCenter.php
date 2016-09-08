@@ -222,8 +222,7 @@ class ShareCenter extends Plugin
             $base = new Base();
             $h = $_GET['minisite_session'];
             SessionService::setSessionName("AjaXplorer_Shared".str_replace(".","_",$h));
-
-            $base->handleRoute($serverBase, "/");
+            $base->handleRoute($serverBase, "/", ["minisite" => true]);
 
         }else{
 

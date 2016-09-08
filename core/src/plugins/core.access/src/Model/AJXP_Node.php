@@ -358,7 +358,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function getParent(){
 
-        if(empty($this->urlParts["path"]) || $this->urlParts["path"] == "/"){
+        if(empty($this->urlParts["path"]) || $this->urlParts["path"] === "/"){
             return null;
         }
         $parent = new AJXP_Node(dirname($this->_url));

@@ -901,7 +901,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 }
                 $size = 0;
                 $nodes = $selection->buildNodes();
-                $bgSizeThreshold = 1*1024*1024;
+                $bgSizeThreshold = 10*1024*1024;
                 $bgWorkerThreshold = 80*1024*1024;
                 if(!MetaStreamWrapper::wrapperIsRemote($selection->currentBaseUrl())){
                     foreach($nodes as $node){
