@@ -278,20 +278,6 @@ div#overlay.form-login_form_dynamic {
     padding: inherit !important;
   }
 }
-#ajxp_shared_folder {
-  width: 100%;
-  text-align: left;
-  /* THESE ONE ARE IMPORTANT */
-  overflow: hidden;
-  position: relative;
-}
-#ajxp_shared_folder .widget_logo {
-  height: 43px;
-  padding-top: 0 !important;
-}
-#ajxp_shared_folder #content_pane {
-  background-color: white;
-}
 #ajxp_unique_strip #browser {
   background-color: #345e79;
 }
@@ -619,6 +605,20 @@ div#overlay.form-login_form_dynamic {
 #ajxp_film_strip .fl-displayMode-thumb div.thumbnail_selectable_cell {
   background-color: transparent;
 }
+#ajxp_shared_folder {
+  width: 100%;
+  text-align: left;
+  /* THESE ONE ARE IMPORTANT */
+  overflow: hidden;
+  position: relative;
+}
+#ajxp_shared_folder .widget_logo {
+  height: 43px;
+  padding-top: 0 !important;
+}
+#ajxp_shared_folder #content_pane {
+  background-color: white;
+}
 #ajxp_shared_folder div#overlay.form-login_form_dynamic {
   opacity: 1;
 }
@@ -665,4 +665,8 @@ div#overlay.form-login_form_dynamic {
   right: 0;
   top: 5px !important;
   left: inherit !important;
+}
+#ajxp_shared_folder div.thumbnail_selectable_cell.detailed .mimefont {
+  font-size: 38px !important;
+  line-height: 58px;
 }
