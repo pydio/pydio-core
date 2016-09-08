@@ -612,11 +612,14 @@
             });
         }
 
-        load(){
+        load(replaceCache = false){
             if(this._status == 'loading') return;
             this._setStatus('loading');
             let cacheService = MetaCacheService.getInstance();
             cacheService.registerMetaStream('action.share', MetaCacheService.EXPIRATION_LOCAL_NODE);
+            if(replaceCache){
+                cacheService.invalidateMetaForKeys('action.share', this._node.getPath());
+            }
 
             let remoteLoader = function(transport){
                 if(transport.responseJSON){
@@ -754,7 +757,7 @@
             };
             ShareModel.prepareShareActionParameters(this.getNode(), params);
             PydioApi.getClient().request(params, function(){
-                this.load();
+                this.load(true);
                 callback();
             }.bind(this));
         }
