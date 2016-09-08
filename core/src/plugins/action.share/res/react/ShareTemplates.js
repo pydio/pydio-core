@@ -70,16 +70,8 @@
                 fileDetails = (
                     <div className="dl-details">
                         <div className="row">
-                            <span className="label">{this.props.pydio.MessageHash[413]}</span>
-                            <span className="value">{owner}</span>
-                        </div>
-                        <div className="row">
                             <span className="label">{this.props.pydio.MessageHash[503]}</span>
                             <span className="value">{this.state.node.getMetadata().get('filesize')}</span>
-                        </div>
-                        <div className="row">
-                            <span className="label">{this.props.pydio.MessageHash[3]}</span>
-                            <span className="value">{this.state.node.getMetadata().get('mimestring')}</span>
                         </div>
                         <div className="click-legend">{this.props.pydio.MessageHash['share_center.231']}</div>
                     </div>

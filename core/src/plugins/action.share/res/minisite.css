@@ -392,16 +392,33 @@ div#overlay.form-login_form_dynamic {
   height: 90px !important;
   width: auto;
 }
-#ajxp_unique_dl #reactDLTemplate {
+#ajxp_unique_dl div.vertical-align {
   position: absolute;
   width: 100%;
-  height: 90%;
+  height: 100%;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
+}
+#ajxp_unique_dl div.vertical-align div.vertical-align-center {
+  margin: 0 auto;
+}
+#ajxp_unique_dl div#share_toolbar {
+  margin-top: 10px;
+  text-align: center;
+}
+#ajxp_unique_dl div#share_toolbar a#share_current_page_button {
+  display: block !important;
+  text-align: center;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+}
+#ajxp_unique_dl div#share_toolbar a#share_current_page_button span.ajxp_icon_span {
+  display: none;
 }
 #ajxp_unique_dl #reactDLTemplate .download-block {
   cursor: pointer;
@@ -485,23 +502,6 @@ div#overlay.form-login_form_dynamic {
 }
 #ajxp_unique_dl #reactDLTemplate .download-block.dl-started span.mdi.mdi-download {
   opacity: 0.3;
-}
-#ajxp_unique_dl div#share_toolbar {
-  position: absolute;
-  right: 0;
-  left: 0;
-  width: 100%;
-  bottom: 20px;
-  text-align: center;
-}
-#ajxp_unique_dl div#share_toolbar a#share_current_page_button {
-  display: block !important;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
-}
-#ajxp_unique_dl div#share_toolbar a#share_current_page_button span.ajxp_icon_span {
-  display: none;
 }
 #ajxp_film_strip #minisite_toolbar span.actionbar_button_label,
 #ajxp_film_strip #inline_toolbar span.actionbar_button_label {
