@@ -218,10 +218,9 @@ class CustomDbAuthDriver extends AbstractAuthDriver
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
      */
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         $userStoredPass = $this->getUserPass($login);
         if (!$userStoredPass) return false;

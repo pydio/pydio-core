@@ -307,10 +307,10 @@ class UsersService
      * @param $userId
      * @param $userPass
      * @param bool $cookieString
-     * @param string $returnSeed
      * @return bool|void
+     * @throws UserNotFoundException
      */
-    public static function checkPassword($userId, $userPass, $cookieString = false, $returnSeed = "")
+    public static function checkPassword($userId, $userPass, $cookieString = false)
     {
         if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") return true;
         $userId = self::filterUserSensitivity($userId);
@@ -320,10 +320,7 @@ class UsersService
             $res = CookiesHelper::checkCookieString($userObject, $userPass);
             return $res;
         }
-        if (!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            if ($authDriver->getSeed(false) != $returnSeed) return false;
-        }
-        return $authDriver->checkPassword($userId, $userPass, $returnSeed);
+        return $authDriver->checkPassword($userId, $userPass);
     }
 
     /**
@@ -346,17 +343,9 @@ class UsersService
         Controller::applyHook("user.before_password_change", array($ctx, $userId));
         $authDriver->changePassword($userId, $userPass);
         Controller::applyHook("user.after_password_change", array($ctx, $userId));
-        if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            // We can directly update the HA1 version of the WEBDAV Digest
-            $realm = ConfService::getGlobalConf("WEBDAV_DIGESTREALM");
-            $ha1 = md5("{$userId}:{$realm}:{$userPass}");
-            $zObj = self::getUserById($userId);
-            $wData = $zObj->getPref("AJXP_WEBDAV_DATA");
-            if (!is_array($wData)) $wData = array();
-            $wData["HA1"] = $ha1;
-            $zObj->setPref("AJXP_WEBDAV_DATA", $wData);
-            $zObj->save();
-        }
+
+        self::storeWebdavDigestForUser(self::getUserById($userId), $userPass);
+
         Logger::info(__CLASS__, "Update Password", array("user_id" => $userId));
         return true;
     }
@@ -390,18 +379,30 @@ class UsersService
             $user->setHidden(true);
             $user->save("superuser");
         }
-        if ($authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $realm = ConfService::getGlobalConf("WEBDAV_DIGESTREALM");
-            $ha1 = md5("{$userId}:{$realm}:{$userPass}");
-            $wData = $user->getPref("AJXP_WEBDAV_DATA");
-            if (!is_array($wData)) $wData = array();
-            $wData["HA1"] = $ha1;
-            $user->setPref("AJXP_WEBDAV_DATA", $wData);
-            $user->save();
-        }
+
+        self::storeWebdavDigestForUser($user, $userPass);
+
         Controller::applyHook("user.after_create", array($localContext, $user));
         Logger::info(__CLASS__, "Create User", array("user_id" => $userId));
         return $user;
+    }
+
+    /**
+     * Store the HA1 digest for Digest Authentication in WebDAV
+     * @param UserInterface $userObject
+     * @param string $password
+     * @throws UserNotFoundException
+     */
+    private static function storeWebdavDigestForUser($userObject, $password){
+
+        $realm = ConfService::getGlobalConf("WEBDAV_DIGESTREALM");
+        $ha1 = md5("{$userObject->getId()}:{$realm}:{$password}");
+        $wData = $userObject->getPref("AJXP_WEBDAV_DATA");
+        if (!is_array($wData)) $wData = array();
+        $wData["HA1"] = $ha1;
+        $userObject->setPref("AJXP_WEBDAV_DATA", $wData);
+        $userObject->save();
+
     }
 
     /**

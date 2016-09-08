@@ -109,7 +109,6 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
                     "USER_BASE_DRIVER" => $baseName,
                     "USER_ID_SEPARATOR" => $separator,
                     "CACHE_MASTER_USERS_TO_SLAVE" => $cacheMasters,
-                    "TRANSMIT_CLEAR_PASS" => $this->pluginConf["TRANSMIT_CLEAR_PASS"],
                     "DRIVERS" => array(
                         $masterName => array(
                             "NAME" => $masterName,
@@ -125,7 +124,7 @@ class CoreAuthLoader extends Plugin implements CoreInstanceProvider
                 );
                 // MERGE BASIC AUTH OPTIONS FROM MASTER
                 $masterMainAuthOptions = array();
-                $keys = array("TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER", "LOGIN_REDIRECT", "AJXP_ADMIN_LOGIN");
+                $keys = array("AUTOCREATE_AJXPUSER", "LOGIN_REDIRECT", "AJXP_ADMIN_LOGIN");
                 if (is_array($this->pluginConf["MASTER_INSTANCE_CONFIG"])) {
                     foreach ($keys as $key) {
                         if (isSet($this->pluginConf["MASTER_INSTANCE_CONFIG"][$key])) {

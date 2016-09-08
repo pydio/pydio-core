@@ -51,7 +51,7 @@ class RadiusAuthDriver extends AbstractAuthDriver
             return "ERROR: PHP radius extension is missing. Do NOT enable RADIUS authentication unless you installed the extension!";
         }
         $res = radius_auth_open();
-        $this->prepareRequest($res, $options["RADIUS Test-User"], $options["RADIUS Test-Password"], -1);
+        $this->prepareRequest($res, $options["RADIUS Test-User"], $options["RADIUS Test-Password"]);
         $req = radius_send_request($res);
         if (!$req) {
             return "ERROR: Could not send RADIUS request to server";
@@ -94,7 +94,7 @@ class RadiusAuthDriver extends AbstractAuthDriver
         $responseInterface = $responseInterface->withBody($x);
     }
 
-    public function prepareRequest($res, $login, $pass, $seed)
+    public function prepareRequest($res, $login, $pass)
     {
         if (!radius_add_server($res, $this->radiusServer, $this->radiusPort, $this->radiusSecret, 3, 3)) {
             Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not add server (" . radius_strerror($res) . ")");
@@ -155,14 +155,14 @@ class RadiusAuthDriver extends AbstractAuthDriver
         }
     }
 
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         if (!extension_loaded('radius')) {
             Logger::logAction("RADIUS: php radius extension is missing, please install it.");
             return false;
         }
         $res = radius_auth_open();
-        $this->prepareRequest($res, $login, $pass, $seed);
+        $this->prepareRequest($res, $login, $pass);
         $req = radius_send_request($res);
         if (!$req) {
             Logger::debug(__CLASS__, __FUNCTION__, "RADIUS: Could not send request (" . radius_strerror($res) . ")");

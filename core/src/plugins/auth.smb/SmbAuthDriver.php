@@ -82,10 +82,10 @@ class SmbAuthDriver extends AbstractAuthDriver
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
+     * @throws Exception
      */
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         if (!defined('SMB4PHP_SMBCLIENT')) {
             define('SMB4PHP_SMBCLIENT', $this->options["SMBCLIENT"]);

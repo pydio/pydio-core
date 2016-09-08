@@ -82,8 +82,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
      */
     protected function validateUserPass($username, $password)
     {
-        // Warning, this can only work if TRANSMIT_CLEAR_PASS is true;
-        return UsersService::checkPassword($username, $password, false, -1);
+        return UsersService::checkPassword($username, $password, false);
     }
 
     /**
@@ -114,7 +113,11 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
         }
         
         $webdavData = $userObject->getPref("AJXP_WEBDAV_DATA");
-        if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true) {
+        $active = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
+        if(!empty($webdavData) && isSet($webdavData["ACTIVE"]) && $webdavData["ACTIVE"] === false){
+            $active = false;
+        }
+        if (!$active) {
             Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "WebDAV user not found or disabled"));
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
@@ -154,6 +157,9 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
                 throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
             }catch (\Exception $e){
                 throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }
+            if($repoObject->getContextOption($this->context, "AJXP_WEBDAV_DISABLED", false)){
+                throw new Sabre\DAV\Exception\NotAuthenticated('WebDAV access is disabled for this workspace');
             }
             $this->context->setRepositoryObject($repoObject);
         }

@@ -66,7 +66,6 @@ class MultiAuthDriver extends AbstractAuthDriver
         foreach ($this->driversDef as $def) {
             $name = $def["NAME"];
             $options = $def["OPTIONS"];
-            $options["TRANSMIT_CLEAR_PASS"] = $this->options["TRANSMIT_CLEAR_PASS"];
             $options["LOGIN_REDIRECT"] = $this->options["LOGIN_REDIRECT"];
             $instance = PluginsService::getInstance($ctx)->getPluginByTypeName("auth", $name);
             if (!is_object($instance)) {
@@ -406,15 +405,15 @@ class MultiAuthDriver extends AbstractAuthDriver
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
+     * @throws Exception
      */
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         if ($this->masterSlaveMode) {
             if ($this->drivers[$this->masterName]->userExists($login)) {
                 // check master, and refresh slave if necessary
-                if ($this->drivers[$this->masterName]->checkPassword($login, $pass, $seed)) {
+                if ($this->drivers[$this->masterName]->checkPassword($login, $pass)) {
                     if ($this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE")) {
                         if ($this->drivers[$this->slaveName]->userExists($login)) {
                             $this->drivers[$this->slaveName]->changePassword($login, $pass);
@@ -426,12 +425,12 @@ class MultiAuthDriver extends AbstractAuthDriver
                 } else {
                     if (!$this->getContextualOption(\Pydio\Core\Model\Context::emptyContext(), "CACHE_MASTER_USERS_TO_SLAVE") && $this->drivers[$this->slaveName]->userExists($login)) {
                         // User may in fact be a SLAVE user
-                        return $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
+                        return $this->drivers[$this->slaveName]->checkPassword($login, $pass);
                     }
                     return false;
                 }
             } else {
-                $res = $this->drivers[$this->slaveName]->checkPassword($login, $pass, $seed);
+                $res = $this->drivers[$this->slaveName]->checkPassword($login, $pass);
                 return $res;
             }
         }
@@ -439,7 +438,7 @@ class MultiAuthDriver extends AbstractAuthDriver
         $login = $this->extractRealId($login);
         $this->logDebug("check pass " . $login);
         if ($this->getCurrentDriver()) {
-            return $this->getCurrentDriver()->checkPassword($login, $pass, $seed);
+            return $this->getCurrentDriver()->checkPassword($login, $pass);
         } else {
             throw new Exception("No driver instanciated in multi driver!");
         }
@@ -447,6 +446,7 @@ class MultiAuthDriver extends AbstractAuthDriver
 
     /**
      * @return bool
+     * @throws Exception
      */
     public function usersEditable()
     {

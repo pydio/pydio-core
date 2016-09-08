@@ -79,7 +79,11 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
             throw new Sabre\DAV\Exception\NotAuthenticated();
         }
         $webdavData = $user->getPref("AJXP_WEBDAV_DATA");
-        if (empty($webdavData) || !isset($webdavData["ACTIVE"]) || $webdavData["ACTIVE"] !== true || (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"]) ) ) {
+        $active = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
+        if(!empty($webdavData) && isSet($webdavData["ACTIVE"]) && $webdavData["ACTIVE"] === false){
+            $active = false;
+        }
+        if (!$active || (!isSet($webdavData["PASS"]) && !isset($webdavData["HA1"]) ) ) {
             return false;
         }
         if (isSet($webdavData["HA1"])) {
@@ -139,6 +143,9 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
                 throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
             }catch (\Exception $e){
                 throw new Sabre\DAV\Exception\NotAuthenticated('Error while loading workspace');
+            }
+            if($repoObject->getContextOption($this->context, "AJXP_WEBDAV_DISABLED", false)){
+                throw new Sabre\DAV\Exception\NotAuthenticated('WebDAV access is disabled for this workspace');
             }
             $this->context->setRepositoryObject($repoObject);
         }

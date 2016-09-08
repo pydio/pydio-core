@@ -100,8 +100,7 @@ class DAVServer
 
         }
 
-        if((AuthBackendBasic::detectBasicHeader() || ConfService::getGlobalConf("WEBDAV_FORCE_BASIC"))
-            && ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")){
+        if((AuthBackendBasic::detectBasicHeader() || ConfService::getGlobalConf("WEBDAV_FORCE_BASIC"))){
             $authBackend = new AuthBackendBasic(self::$context);
         } else {
             $authBackend = new AuthBackendDigest(self::$context);

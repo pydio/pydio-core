@@ -919,7 +919,7 @@ abstract class AbstractConfDriver extends Plugin
                 $digestSet = isSet($davData["HA1"]);
                 if (isSet($httpVars["activate"]) || isSet($httpVars["webdav_pass"])) {
                     if (!empty($httpVars["activate"])) {
-                        $activate = ($httpVars["activate"]=="true" ? true:false);
+                        $activate = ($httpVars["activate"]==="true" ? true:false);
                         if (empty($davData)) {
                             $davData = [];
                         }
@@ -938,7 +938,7 @@ abstract class AbstractConfDriver extends Plugin
                     $loggedUser->save("user");
                 }
                 if (!empty($davData)) {
-                    $webdavActive = (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true);
+                    $webdavActive = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL") || (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true);
                     $passSet = (isSet($davData["PASS"]));
                 }
                 $repoList = UsersService::getRepositoriesForUser($ctx->getUser());

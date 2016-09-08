@@ -140,7 +140,7 @@ class MinisiteAuthMiddleware
 
         try {
 
-            $loggedUser = AuthService::logUser($presetLogin, $localHttpPassw, false, false, "-1");
+            $loggedUser = AuthService::logUser($presetLogin, $localHttpPassw, false, false);
             $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
             return $responseInterface;
 

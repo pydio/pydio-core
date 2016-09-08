@@ -24,6 +24,7 @@ use dibi;
 use DibiException;
 use Exception;
 use Pydio\Auth\Core\AbstractAuthDriver;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
@@ -213,19 +214,13 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
      */
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         $userStoredPass = $this->getUserPass($login);
         if (!$userStoredPass) return false;
-
-        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) { // Seed = -1 means that password is not encoded.
-            return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
-        } else {
-            return (md5($userStoredPass . $seed) === $pass);
-        }
+        return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);
     }
 
     /**
@@ -252,11 +247,7 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     {
         if ($this->userExists($login)) return;
         $userData = array("login" => $login);
-        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $userData["password"] = PasswordEncoder::pbkdf2_create_hash($passwd); //md5($passwd);
-        } else {
-            $userData["password"] = $passwd;
-        }
+        $userData["password"] = PasswordEncoder::pbkdf2_create_hash($passwd);
         $userData['groupPath'] = '/';
         dibi::query('INSERT INTO [ajxp_users]', $userData);
     }
@@ -264,16 +255,15 @@ class SqlAuthDriver extends AbstractAuthDriver implements SqlTableProvider
     /**
      * @param $login
      * @param $newPass
+     * @throws PydioException
      */
     public function changePassword($login, $newPass)
     {
-        if (!$this->userExists($login)) throw new Exception("User does not exists!");
-        $userData = array("login" => $login);
-        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $userData["password"] = PasswordEncoder::pbkdf2_create_hash($newPass); //md5($newPass);
-        } else {
-            $userData["password"] = $newPass;
+        if (!$this->userExists($login)) {
+            throw new PydioException("User does not exists!");
         }
+        $userData = array("login" => $login);
+        $userData["password"] = PasswordEncoder::pbkdf2_create_hash($newPass);
         dibi::query("UPDATE [ajxp_users] SET ", $userData, "WHERE [login]=%s", $login);
     }
 

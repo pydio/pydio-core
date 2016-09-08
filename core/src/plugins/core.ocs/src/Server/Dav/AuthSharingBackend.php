@@ -72,7 +72,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
     {
         try{
             if(isSet($this->shareData["PRESET_LOGIN"])){
-                AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
+                AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false);
             }else{
                 AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
             }

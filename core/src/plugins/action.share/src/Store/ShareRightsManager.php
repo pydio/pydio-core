@@ -527,11 +527,6 @@ class ShareRightsManager
     public function createNewUser($parentUser, $userName, $password, $isHidden, $display){
 
         $confDriver = ConfService::getConfStorageImpl();
-        if (ConfService::getAuthDriverImpl()->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $pass = $password;
-        } else {
-            $pass = md5($password);
-        }
         if(!$isHidden){
             // This is an explicit user creation - check possible limits
             Controller::applyHook("user.before_create", array($this->context, $userName, null, false, false));
@@ -545,7 +540,7 @@ class ShareRightsManager
             }
         }
 
-        $userObject = UsersService::createUser($userName, $pass, false, $isHidden);
+        $userObject = UsersService::createUser($userName, $password, false, $isHidden);
         $userObject->getPersonalRole()->clearAcls();
         $userObject->setParent($parentUser->getId());
         $userObject->setGroupPath($parentUser->getGroupPath());

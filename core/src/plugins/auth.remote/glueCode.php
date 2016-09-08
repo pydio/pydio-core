@@ -144,7 +144,7 @@ switch ($plugInAction) {
             }
             try{
                 if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
-                    $userObject = AuthService::logUser($login["name"], $login["password"], false, false, -1);
+                    $userObject = AuthService::logUser($login["name"], $login["password"], false, false);
                 } else {
                     $userObject = AuthService::logUser($login["name"], $login["password"], true);
                 }

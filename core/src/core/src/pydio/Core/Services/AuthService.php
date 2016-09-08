@@ -42,18 +42,7 @@ class AuthService
     public static $useSession = true;
     private static $currentUser;
     public static $bufferedMessage = null;
-
-
-    /**
-     * Get a unique seed from the current auth driver
-     * @static
-     * @return int|string
-     */
-    public static function generateSeed()
-    {
-        $authDriver = ConfService::getAuthDriverImpl();
-        return $authDriver->getSeed(true);
-    }
+    
     /**
      * Get the currently logged user object
      * @return AbstractUser
@@ -78,11 +67,12 @@ class AuthService
      * @param string $pwd The password
      * @param bool $bypass_pwd Ignore password or not
      * @param bool $cookieLogin Is it a logging from the remember me cookie?
-     * @param string $returnSeed The unique seed
      * @return UserInterface
      * @throws LoginException
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\UserNotFoundException
      */
-    public static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false, $returnSeed="")
+    public static function logUser($user_id, $pwd, $bypass_pwd = false, $cookieLogin = false)
     {
         $user_id = UsersService::filterUserSensitivity($user_id);
         $authDriver = ConfService::getAuthDriverImpl();
@@ -100,7 +90,7 @@ class AuthService
             }
         }
         if (!$bypass_pwd) {
-            if (!UsersService::checkPassword($user_id, $pwd, $cookieLogin, $returnSeed)) {
+            if (!UsersService::checkPassword($user_id, $pwd, $cookieLogin)) {
                 Logger::warning(__CLASS__, "Login failed", array("user" => InputFilter::sanitize($user_id, InputFilter::SANITIZE_EMAILCHARS), "error" => "Invalid password"));
                 if ($bruteForceLogin === FALSE) {
                     throw new LoginException(-4);

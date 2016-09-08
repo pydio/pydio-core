@@ -129,7 +129,7 @@ class FtpAuthDriver extends AbstractAuthDriver
         return "SUCCESS: Could succesfully connect to the FTP server!";
     }
 
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         require_once($this->getBaseDir() . "/FtpSonWrapper.php");
         $wrapper = new \Pydio\Access\Driver\StreamProvider\FTP\FtpSonWrapper();

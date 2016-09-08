@@ -558,7 +558,7 @@ class BootConfLoader extends AbstractConfDriver
     protected function authLegacyToBootConf($legacy)
     {
         $data = array();
-        $kOpts = array("LOGIN_REDIRECT", "TRANSMIT_CLEAR_PASS", "AUTOCREATE_AJXPUSER");
+        $kOpts = array("LOGIN_REDIRECT", "AUTOCREATE_AJXPUSER");
         foreach ($kOpts as $k) {
             if (isSet($legacy["OPTIONS"][$k])) $data[$k] = $legacy["OPTIONS"][$k];
         }

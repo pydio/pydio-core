@@ -350,36 +350,5 @@ class RolesService
         }
         file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
 
-        // Legacy, should never happen
-        /*
-        $adminCount = UsersService::countAdminUsers();
-        if ($adminCount == 0) {
-            $authDriver = ConfService::getAuthDriverImpl();
-            $adminPass = ADMIN_PASSWORD;
-            if (!$authDriver->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-                $adminPass = md5(ADMIN_PASSWORD);
-            }
-            $userObject = UsersService::createUser("admin", $adminPass, true);
-            if (ADMIN_PASSWORD == INITIAL_ADMIN_PASSWORD) {
-                $userObject->setAdmin(true);
-                RolesService::updateAdminRights($userObject);
-                if (UsersService::changePasswordEnabled()) {
-                    $userObject->setLock("pass_change");
-                }
-                $userObject->save("superuser");
-                AuthService::updateUser($userObject);
-                file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
-                throw new PydioException("Warning! User 'admin' was created with the initial password '" . INITIAL_ADMIN_PASSWORD . "'. \\nPlease log in as admin and change the password now!");
-            }
-        } else if ($adminCount == -1) {
-            // Here we may come from a previous version! Check the "admin" user and set its right as admin.
-            $adminUser = UsersService::getUserById("admin");
-            $adminUser->setAdmin(true);
-            $adminUser->save("superuser");
-            file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
-            throw new PydioException("There is an admin user, but without admin right. Now any user can have the administration rights, \\n your 'admin' user was set with the admin rights. Please check that this suits your security configuration.");
-        }
-        */
-
     }
 }

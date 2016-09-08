@@ -82,13 +82,12 @@ class AbstractAuthDriver extends Plugin
                 }
                 $oldPass = $httpVars["old_pass"];
                 $newPass = $httpVars["new_pass"];
-                $passSeed = $httpVars["pass_seed"];
                 if (strlen($newPass) < ConfService::getContextConf($ctx, "PASSWORD_MINLENGTH", "auth")) {
                     header("Content-Type:text/plain");
                     print "PASS_ERROR";
                     break;
                 }
-                if (UsersService::checkPassword($userObject->getId(), $oldPass, false, $passSeed)) {
+                if (UsersService::checkPassword($userObject->getId(), $oldPass, false)) {
                     UsersService::updatePassword($userObject->getId(), $newPass);
                     if ($userObject->hasLockByName("pass_change")) {
                         $userObject->removeLock("pass_change");
@@ -226,10 +225,9 @@ class AbstractAuthDriver extends Plugin
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
      */
-    public function checkPassword($login, $pass, $seed){}
+    public function checkPassword($login, $pass){}
 
     /**
      * @param string $login
@@ -340,22 +338,6 @@ class AbstractAuthDriver extends Plugin
         $opt = $this->getOption("AUTOCREATE_AJXPUSER");
         if($opt === true) return true;
         return false;
-    }
-
-    /**
-     * @param bool $new
-     * @return int|string
-     */
-    public function getSeed($new=true)
-    {
-        if($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) return -1;
-        if ($new) {
-            $seed = md5(time());
-            $_SESSION["AJXP_CURRENT_SEED"] = $seed;
-            return $seed;
-        } else {
-            return (isSet($_SESSION["AJXP_CURRENT_SEED"])?$_SESSION["AJXP_CURRENT_SEED"]:0);
-        }
     }
 
     /**

@@ -563,7 +563,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         return $res;
     }
 
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         if (empty($pass)) return false;
         $entries = $this->getUserEntries($login);

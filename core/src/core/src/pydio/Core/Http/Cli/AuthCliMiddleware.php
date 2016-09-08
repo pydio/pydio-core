@@ -87,12 +87,8 @@ class AuthCliMiddleware
 
 
         if (UsersService::usersEnabled() && !empty($optUser)) {
-            $seed = AuthService::generateSeed();
-            if ($seed != -1) {
-                $optPass = md5(md5($optPass).$seed);
-            }
             try{
-                $loggedUser = AuthService::logUser($optUser, $optPass, isSet($optToken), false, $seed);
+                $loggedUser = AuthService::logUser($optUser, $optPass, isSet($optToken), false);
             }catch (LoginException $l){
                 throw new AuthRequiredException();
             }

@@ -210,21 +210,16 @@ class RemoteAuthDriver extends AbstractAuthDriver
     /**
      * @param string $login
      * @param string $pass
-     * @param string $seed
      * @return bool
      */
-    public function checkPassword($login, $pass, $seed)
+    public function checkPassword($login, $pass)
     {
         if (UsersService::ignoreUserCase()) $login = strtolower($login);
         global $AJXP_GLUE_GLOBALS;
         if (isSet($AJXP_GLUE_GLOBALS) || (!empty($this->options["LOCAL_PREFIX"]) && strpos($login, $this->options["LOCAL_PREFIX"]) === 0)) {
             $userStoredPass = $this->getUserPass($login);
             if (!$userStoredPass) return false;
-            if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-                return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
-            } else {
-                return (md5($userStoredPass . $seed) === $pass);
-            }
+            return PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);// ($userStoredPass == md5($pass));
         } else {
             $crtSessionId = session_id();
             session_write_close();
@@ -274,11 +269,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
             // NOW CHECK IN LOCAL USERS LIST
             $userStoredPass = $this->getUserPass($login);
             if (!$userStoredPass) return false;
-            if ($seed == "-1") { // Seed = -1 means that password is not encoded.
-                $res = PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass); //($userStoredPass == md5($pass));
-            } else {
-                $res = (md5($userStoredPass . $seed) === $pass);
-            }
+            $res = PasswordEncoder::pbkdf2_validate_password($pass, $userStoredPass);
             if ($res) {
                 session_id($crtSessionId);
                 session_start();
@@ -324,11 +315,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
         $users = $this->listUsers();
         if (!is_array($users)) $users = array();
         if (array_key_exists($login, $users)) return;
-        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = PasswordEncoder::pbkdf2_create_hash($passwd);
-        } else {
-            $users[$login] = $passwd;
-        }
+        $users[$login] = PasswordEncoder::pbkdf2_create_hash($passwd);
         FileHelper::saveSerialFile($this->usersSerFile, $users);
     }
 
@@ -341,11 +328,7 @@ class RemoteAuthDriver extends AbstractAuthDriver
         if (UsersService::ignoreUserCase()) $login = strtolower($login);
         $users = $this->listUsers();
         if (!is_array($users) || !array_key_exists($login, $users)) return;
-        if ($this->getOptionAsBool("TRANSMIT_CLEAR_PASS")) {
-            $users[$login] = PasswordEncoder::pbkdf2_create_hash($newPass);
-        } else {
-            $users[$login] = $newPass;
-        }
+        $users[$login] = PasswordEncoder::pbkdf2_create_hash($newPass);
         FileHelper::saveSerialFile($this->usersSerFile, $users);
     }
 

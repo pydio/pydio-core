@@ -129,7 +129,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
             try {
 
-                $loggedUser = AuthService::logUser($userId, $userPass, false, $cookieLogin, $httpVars["login_seed"]);
+                $loggedUser = AuthService::logUser($userId, $userPass, false, $cookieLogin);
                 $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
 
             } catch (\Pydio\Core\Exception\LoginException $l) {
@@ -220,7 +220,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
             case "get_seed" :
 
-                $seed = AuthService::generateSeed();
+                $seed = -1;
                 if (BruteForceHelper::suspectBruteForceLogin()) {
                     $responseInterface = new \Zend\Diactoros\Response\JsonResponse(["seed" => $seed, "captcha" => true]);
                 } else {

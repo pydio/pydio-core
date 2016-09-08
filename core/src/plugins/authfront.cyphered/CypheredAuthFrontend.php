@@ -167,7 +167,7 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
             }
         }
         try {
-            $loggedUser = AuthService::logUser($data["user_id"], $data["user_pwd"], false, false, -1);
+            $loggedUser = AuthService::logUser($data["user_id"], $data["user_pwd"], false, false);
             $this->logDebug(__FUNCTION__, "Success");
             if ($checkNonce) {
                 $keys[$userId] = $tokenInc;
