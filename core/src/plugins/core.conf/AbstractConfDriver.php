@@ -912,7 +912,7 @@ abstract class AbstractConfDriver extends Plugin
                 if (ConfService::getGlobalConf("WEBDAV_BASEHOST") != "") {
                     $baseURL = ConfService::getGlobalConf("WEBDAV_BASEHOST");
                 } else {
-                    $baseURL = ApplicationState::detectServerURL();
+                    $baseURL = ApplicationState::detectServerURL(true);
                 }
                 $webdavBaseUrl = $baseURL.ConfService::getGlobalConf("WEBDAV_BASEURI")."/";
                 $davData = $loggedUser->getPref("AJXP_WEBDAV_DATA");
