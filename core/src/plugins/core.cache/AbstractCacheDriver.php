@@ -157,7 +157,6 @@ abstract class AbstractCacheDriver extends Plugin
         }
 
         $result = $cacheDriver->contains($id);
-
         return $result;
     }
 
@@ -178,6 +177,7 @@ abstract class AbstractCacheDriver extends Plugin
           return false;
         }
 
+        error_log("Saving ".$id);
         $result = $cacheDriver->save($id, $data, $lifeTime);
 
         return $result;
@@ -192,6 +192,7 @@ abstract class AbstractCacheDriver extends Plugin
      */
     public function delete($namespace, $id){
 
+        error_log("Clearing ".$namespace." - ".$id);
         $cacheDriver = $this->getCacheDriver($namespace);
         if($this->requiresHttpForwarding($cacheDriver)){
             $this->httpDeletion[$namespace.$id.'key'] = ["namespace"=>$namespace, "key" => $id];
@@ -258,6 +259,7 @@ abstract class AbstractCacheDriver extends Plugin
             return false;
         }
         Logger::debug("CacheDriver::Http", "Clear Pattern ".$id, ["namespace" => $namespace]);
+        error_log("Clear pattern ".$id);
         return $cacheDriver->deleteKeysStartingWith($id);
     }
 

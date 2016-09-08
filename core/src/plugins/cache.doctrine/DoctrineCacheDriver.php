@@ -163,7 +163,7 @@ class doctrineCacheDriver extends AbstractCacheDriver
 
         // Using chained array for nodes
         if ($namespace == AJXP_CACHE_SERVICE_NS_NODES) {
-            $arrayCache = new ArrayCache();
+            $arrayCache = new Ext\PydioArrayCache();
 
             $cacheDriver = new PydioChainCache([
                 $arrayCache,

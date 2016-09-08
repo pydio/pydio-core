@@ -182,7 +182,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
             $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "stat")["id"]);
             // Clear parent listing
             if($node->getParent() !== null){
-                $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node->getParent(), "list"))["id"];
+                $cacheDriver->delete(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node->getParent(), "list")["id"]);
             }
         }else {
             // Delete node data and all its children
