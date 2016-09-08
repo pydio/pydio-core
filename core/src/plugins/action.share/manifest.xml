@@ -27,6 +27,7 @@
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
+            <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
         </resources>
@@ -370,34 +371,10 @@
                     <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
                         <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
-                        </div>
-                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
-                        <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
                     </div>
-				</div>
-				<script>
-				    document.observe("ajaxplorer:user_logged", function(){
-                        try{
-
-                            var p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var first = dm.getRootNode().getFirstChildIfExists();
-                                if(first){
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){
-                            if (console) console.log(e);
-                        }
-                    });
-				</script>
+                    <div id="reactDLTemplate" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"ShareTemplates","componentName":"DLTemplate"}'></div>
+                    <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
+                </div>
 			]]></template>
             <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>

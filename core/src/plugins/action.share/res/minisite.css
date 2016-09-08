@@ -375,74 +375,133 @@ div#overlay.form-login_form_dynamic {
 #ajxp_unique_dl div#overlay.form-login_form_dynamic {
   opacity: 1;
 }
-#ajxp_unique_dl #browser {
-  background-color: #000;
-  width: 102%;
-  -webkit-font-smoothing: antialiased;
-}
-#ajxp_unique_dl #cpane_container {
-  float: none;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  top: 0;
-  height: 100%;
-  overflow: hidden;
-}
 #ajxp_unique_dl #background_container {
   position: absolute;
-  width: 102%;
-  top: -5px;
-  left: -5px;
-  bottom: -5px;
-  right: -5px;
-}
-#ajxp_unique_dl div#dl_toolbar {
-  margin: 27% auto;
-  display: block;
-  width: 400px;
-  font-size: 52px;
-  text-align: center;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 #ajxp_unique_dl div.widget_logo {
   height: 90px;
   background-position: 86px 76px;
 }
-#ajxp_unique_dl div#widget_title {
-  color: rgba(255, 255, 255, 0.8);
-  position: absolute;
-  margin-top: 0px;
-  padding: 23px 30px 20px;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-}
-#ajxp_unique_dl div#inline_toolbar a {
-  display: none;
-}
-#ajxp_unique_dl a#download_button,
-#ajxp_unique_dl a#share_current_page_button {
-  display: block !important;
-  text-align: center;
-  color: rgba(255, 255, 255, 0.8);
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 20px 10px;
-  border-radius: 5px;
-}
-#ajxp_unique_dl a#download_button span.ajxp_icon {
-  display: inline-block;
-  margin-right: 10px;
-}
-#ajxp_unique_dl div#share_toolbar {
-  position: absolute;
-  right: 48px;
-  bottom: 37px;
-  font-size: 21px;
-}
-#ajxp_unique_dl img.custom_logo_image {
+#ajxp_unique_dl div.widget_logo img.custom_logo_image {
   right: 6px !important;
   left: inherit !important;
   height: 90px !important;
   width: auto;
+}
+#ajxp_unique_dl #reactDLTemplate {
+  position: absolute;
+  width: 100%;
+  height: 90%;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block {
+  cursor: pointer;
+  width: auto;
+  max-width: 400px;
+  min-width: 220px;
+  margin: 0 auto;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.91);
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+#ajxp_unique_dl #reactDLTemplate .download-block .dl-filename {
+  font-size: 22px;
+  line-height: 22px;
+  word-break: break-all;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block .dl-owner {
+  font-size: 14px;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block > span {
+  display: block;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-icon {
+  width: 220px;
+  margin: 0 auto;
+  position: relative;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-icon span.mdi.mdi-file {
+  font-size: 180px;
+  color: rgba(0, 0, 0, 0.33);
+  color: #009688;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-icon span.mdi.mdi-download {
+  position: absolute;
+  top: 90px;
+  left: 80px;
+  font-size: 60px;
+  color: #f4f4f4;
+  transition: all 1500ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-details {
+  font-size: 13px;
+  line-height: 18px;
+  color: rgba(0, 0, 0, 0.43);
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-details .row {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-details .row .label {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  text-align: right;
+  padding-right: 6px;
+  color: rgba(0, 0, 0, 0.43);
+  font-weight: 500;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-details .row .value {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  text-align: left;
+  color: rgba(0, 0, 0, 0.73);
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div.dl-details div.click-legend {
+  font-size: 12px;
+  margin-top: 10px;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block div#share_page_button {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  color: rgba(255, 255, 255, 0.73);
+  left: 0;
+  font-size: 13px;
+  font-weight: bold;
+}
+#ajxp_unique_dl #reactDLTemplate .download-block.dl-started span.mdi.mdi-download {
+  opacity: 0.3;
+}
+#ajxp_unique_dl div#share_toolbar {
+  position: absolute;
+  right: 0;
+  left: 0;
+  width: 100%;
+  bottom: 20px;
+  text-align: center;
+}
+#ajxp_unique_dl div#share_toolbar a#share_current_page_button {
+  display: block !important;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+}
+#ajxp_unique_dl div#share_toolbar a#share_current_page_button span.ajxp_icon_span {
+  display: none;
 }
 #ajxp_film_strip #minisite_toolbar span.actionbar_button_label,
 #ajxp_film_strip #inline_toolbar span.actionbar_button_label {

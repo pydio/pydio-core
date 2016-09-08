@@ -247,4 +247,5 @@ $mess = array(
     "228" => "Sie dürfen keine internen Freigaben auf Ordner erstellen.",
     "229" => "Insert a preview of the file by pasting this code inside an HTML page.",
     "230" => "Please save before sending an invitation",
+    "231" => "Click to start downloading",
 );

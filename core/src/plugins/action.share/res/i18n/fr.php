@@ -246,4 +246,5 @@ $mess = array(
     "228" => "Vous n'êtes pas autorisé à partager des répertoires en interne",
     "229" => "Collez ce code dans une page HTML pour insérer une prévisualisation du fichier.",
     "230" => "Veuillez sauver ce partage avant de pouvoir envoyer une invitation.",
+    "231" => "Cliquez pour télécharger",
 );
