@@ -9,7 +9,7 @@
     </client_settings>
     <server_settings>
 
-        <global_param group="CONF_MESSAGE[Main Configurations]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="true" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="false" expose="true"/>
         <global_param group="CONF_MESSAGE[Main Configurations]" name="UPLOAD_ACTIVE" description="CONF_MESSAGE[Pydio Upload Server is a unique feature used to delegate file uploads to our dedicated binary, that will send the files directly to the storage.]" label="CONF_MESSAGE[Upload Server]" type="boolean" expose="true"/>
         <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host]" expose="true" default="127.0.0.1"/>
         <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port]" expose="true" default="8090"/>
