@@ -70,8 +70,8 @@ class UserGuiController extends Plugin
                 $key = InputFilter::sanitize($httpVars["key"], InputFilter::SANITIZE_ALPHANUM);
                 try {
 
-                    $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $key);
-                    if ($key == null || $key["user_id"] === false) {
+                    $keyData = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $key);
+                    if ($keyData === null || $keyData["user_id"] === false) {
                         throw new Exception("Invalid password reset key! Did you make sure to copy the correct link?");
                     }
 
@@ -106,7 +106,7 @@ class UserGuiController extends Plugin
                         $mailer = PluginsService::getInstance($context)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
-                            $link = ApplicationState::detectServerURL(true) . "/user/reset-password/" . $uuid;
+                            $link = rtrim(ApplicationState::detectServerURL(true), "/") . "/user/reset-password/" . $uuid;
                             $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"] . "<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';
@@ -125,8 +125,9 @@ class UserGuiController extends Plugin
                 ConfService::getConfStorageImpl()->pruneTemporaryKeys("password-reset", 20);
                 // This is a reset password
                 if (isSet($httpVars["key"]) && isSet($httpVars["user_id"])) {
-                    $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $httpVars["key"]);
-                    ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $httpVars["key"]);
+                    $keyString = InputFilter::sanitize($httpVars["key"], InputFilter::SANITIZE_ALPHANUM);
+                    $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $keyString);
+                    ConfService::getConfStorageImpl()->deleteTemporaryKey("password-reset", $keyString);
                     $uId = $httpVars["user_id"];
                     if (UsersService::ignoreUserCase()) {
                         $uId = strtolower($uId);
@@ -137,9 +138,12 @@ class UserGuiController extends Plugin
                         echo 'PASS_ERROR';
                         break;
                     }
+                    AuthService::disconnect();
+                    echo 'SUCCESS';
+                }else{
+                    AuthService::disconnect();
+                    echo 'ERROR';
                 }
-                AuthService::disconnect();
-                echo 'SUCCESS';
 
                 break;
             default:
