@@ -237,7 +237,11 @@ class MinisiteRenderer
         if (!empty($data["AJXP_APPLICATION_BASE"])) {
             $tPath = $data["AJXP_APPLICATION_BASE"];
         } else {
-            $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : "../..");
+            // Replace base uri by .. : /path/to/uri should give ../../..
+            $defaultTPath = implode("/", array_map(function ($v) {
+                return "..";
+            }, explode("/", trim(ConfService::getGlobalConf("PUBLIC_BASEURI"), "/"))));
+            $tPath = (!empty($data["TRAVEL_PATH_TO_ROOT"]) ? $data["TRAVEL_PATH_TO_ROOT"] : $defaultTPath);
         }
 
         $serverBaseUrl = ApplicationState::detectServerURL(true);
