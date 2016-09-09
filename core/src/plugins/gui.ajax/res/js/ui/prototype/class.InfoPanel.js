@@ -460,7 +460,7 @@ Class.create("InfoPanel", AjxpPane, {
 					} else if(attName == 'preview_simple'){
                         if(multipleNodes){
                             var s ='';
-                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview">#{preview}</div><div class="tile_label">#{label}</div></div>');
+                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview_container"><div class="tile_preview">#{preview}</div></div><div class="tile_label">#{label}</div></div>');
                             multipleNodes.each(function(n){
                                 var p = oThis.getPreviewElement(n, false, false);
                                 var args = {label:getBaseName(n.getMetadata().get('filename'))};
