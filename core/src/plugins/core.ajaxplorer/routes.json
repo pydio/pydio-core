@@ -16,9 +16,9 @@
     "method": "handleRoute"
   },
   "/user":{
-    "methods": "*",
+    "methods": "GET",
     "routes": [
-      "/user[{optional:.+}]"
+      "/user/reset-password/{key}"
     ],
     "class": "Pydio\\Core\\Http\\Base",
     "method": "handleRoute"

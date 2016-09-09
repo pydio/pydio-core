@@ -44,6 +44,7 @@ class Base
             $server = new Wopi\RestWopiServer($base.$route, $additionalAttributes);
         } else if ($route === "/user") {
             $_GET["get_action"] = "user_access_point";
+            $_GET["key"] = $additionalAttributes["key"];
             $server = new Server($base, $additionalAttributes);
         } else if ($route == "/favicon"){
             $_GET["get_action"] = "serve_favicon";

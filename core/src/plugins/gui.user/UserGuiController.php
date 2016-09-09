@@ -49,33 +49,6 @@ class UserGuiController extends Plugin
 {
 
     /**
-     * Parse
-     * @param DOMNode $contribNode
-     */
-    protected function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode)
-    {
-        parent::parseSpecificContributions($ctx, $contribNode);
-        if (substr($_SERVER["REQUEST_URI"], 0, strlen('/user')) != '/user') {
-            if ($contribNode->nodeName == "client_configs") {
-                $children = $contribNode->childNodes;
-                foreach ($children as $child) {
-                    if ($child->nodeType == XML_ELEMENT_NODE) $contribNode->removeChild($child);
-                }
-            } else if ($contribNode->nodeName == "actions") {
-                $children = $contribNode->childNodes;
-                foreach ($children as $child) {
-                    if ($child->nodeType == XML_ELEMENT_NODE && $child->nodeName == "action" && $child->getAttribute("name") == "login") {
-                        $contribNode->removeChild($child);
-                    }
-                }
-
-            }
-        }
-
-    }
-
-
-    /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      * @throws Exception
@@ -90,19 +63,18 @@ class UserGuiController extends Plugin
         $context = $requestInterface->getAttribute("ctx");
 
         switch ($action) {
+            
             case "user_access_point":
-                $setUrl = ConfService::getGlobalConf("SERVER_URL");
-                $realUri = "/";
-                if (!empty($setUrl)) {
-                    $realUri = parse_url(ConfService::getGlobalConf("SERVER_URL"), PHP_URL_PATH);
-                }
-                $requestURI = str_replace("//", "/", $_SERVER["REQUEST_URI"]);
-                $uri = trim(str_replace(rtrim($realUri, "/") . "/user", "", $requestURI), "/");
-                $uriParts = explode("/", $uri);
-                $action = array_shift($uriParts);
-                $key = ($action == "reset-password" && count($uriParts)) ? array_shift($uriParts) : "";
+                
+                $action = "reset-password";
+                $key = InputFilter::sanitize($httpVars["key"], InputFilter::SANITIZE_ALPHANUM);
                 try {
-                    $this->processSubAction($action, $uriParts);
+
+                    $key = ConfService::getConfStorageImpl()->loadTemporaryKey("password-reset", $key);
+                    if ($key == null || $key["user_id"] === false) {
+                        throw new Exception("Invalid password reset key! Did you make sure to copy the correct link?");
+                    }
+
                     $_SESSION['OVERRIDE_GUI_START_PARAMETERS'] = array(
                         "REBASE" => "../../",
                         "USER_GUI_ACTION" => $action,
@@ -118,6 +90,7 @@ class UserGuiController extends Plugin
                 unset($_SESSION['OVERRIDE_GUI_START_PARAMETERS']);
 
                 break;
+            
             case "reset-password-ask":
 
                 // This is a reset password request, generate a token and store it.
@@ -133,7 +106,7 @@ class UserGuiController extends Plugin
                         $mailer = PluginsService::getInstance($context)->getUniqueActivePluginForType("mailer");
                         if ($mailer !== false) {
                             $mess = LocaleService::getMessages();
-                            $link = ApplicationState::detectServerURL() . "/user/reset-password/" . $uuid;
+                            $link = ApplicationState::detectServerURL(true) . "/user/reset-password/" . $uuid;
                             $mailer->sendMail($context, array($email), $mess["gui.user.1"], $mess["gui.user.7"] . "<a href=\"$link\">$link</a>");
                         } else {
                             echo 'ERROR: There is no mailer configured, please contact your administrator';
@@ -146,6 +119,7 @@ class UserGuiController extends Plugin
                 echo "SUCCESS";
 
                 break;
+            
             case "reset-password":
 
                 ConfService::getConfStorageImpl()->pruneTemporaryKeys("password-reset", 20);

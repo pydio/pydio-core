@@ -31,4 +31,5 @@ $mess=array(
     "5" => "E-Mail erfolgreich versendet. Klicken Sie auf den Link in der Nachricht, um ein neues Passwort zu vergeben.",
     "6" => "Vielen Dank. Sie k&ouml;nnen sich jetzt anmelden.",
     "7" => "Für das Konto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes angefordert. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie die E-Mail ignorieren. Ansonsten klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:", /* No HTML entities, might be the body of the mail */
+    "8" => "Use the form below to reset your password. Please enter your login and the new password twice.",
 );
