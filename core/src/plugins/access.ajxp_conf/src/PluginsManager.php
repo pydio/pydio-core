@@ -20,6 +20,7 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
+use Doctrine\Common\Cache\Cache;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -32,6 +33,7 @@ use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\TextEncoder;
@@ -221,9 +223,9 @@ class PluginsManager extends AbstractManager
                     return new JsonResponse(["LIST" => array(), "HAS_GROUPS" => true]);
                 }
 
-                if(isSet($_SESSION["ALL_ACTIONS_CACHE"])){
+                if(CacheService::contains(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_ACTIONS_CACHE")){
 
-                    $actions = $_SESSION["ALL_ACTIONS_CACHE"];
+                    $actions = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_ACTIONS_CACHE");
 
                 }else{
 
@@ -277,21 +279,21 @@ class PluginsManager extends AbstractManager
                             $actions[$actPid][] = $v;
                         }
                     }
-                    $_SESSION["ALL_ACTIONS_CACHE"] = $actions;
+                    CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_ACTIONS_CACHE", $actions);
                 }
                 $responseInterface = new JsonResponse(["LIST" => $actions, "HAS_GROUPS" => true]);
                 break;
 
             case "list_all_plugins_parameters":
 
-                if(isSet($_SESSION["ALL_PARAMS_CACHE"])){
-                    $actions = $_SESSION["ALL_PARAMS_CACHE"];
+                if(CacheService::contains(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_PARAMS_CACHE")){
+                    $parameters = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_PARAMS_CACHE");
                 }else{
                     $currentUserIsGroupAdmin = ($ctx->hasUser() && $ctx->getUser()->getGroupPath() != "/");
-                    $actions = $this->getEditableParameters($ctx, $currentUserIsGroupAdmin, true);
-                    $_SESSION["ALL_PARAMS_CACHE"] = $actions;
+                    $parameters = $this->getEditableParameters($ctx, $currentUserIsGroupAdmin, true);
+                    CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "ALL_PARAMS_CACHE", $parameters);
                 }
-                $responseInterface = new JsonResponse(["LIST" => $actions, "HAS_GROUPS" => true]);
+                $responseInterface = new JsonResponse(["LIST" => $parameters, "HAS_GROUPS" => true]);
                 break;
 
             case "parameters_to_form_definitions" :
