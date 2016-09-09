@@ -44,9 +44,9 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Tests\AbstractTest;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -120,7 +120,7 @@ class RepositoriesManager extends AbstractManager
                 unset($repDef["get_action"]);
                 unset($repDef["sf_checkboxes_active"]);
                 if (isSet($httpVars["json_data"])) {
-                    $repDef = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
+                    $repDef = json_decode(InputFilter::magicDequote($httpVars["json_data"]), true);
                     $options = $repDef["DRIVER_OPTIONS"];
                 } else {
                     $options = array();
@@ -245,6 +245,7 @@ class RepositoriesManager extends AbstractManager
                     $className = "\\Pydio\\Tests\\".$repo->getAccessType()."AccessTest";
                     if (!class_exists($className))
                         include($testFile);
+                    /** @var AbstractTest $class */
                     $class = new $className();
                     $result = $class->doRepositoryTest($repo);
                     if (!$result) {
@@ -254,7 +255,6 @@ class RepositoriesManager extends AbstractManager
                 if ($driver != null && $driver->getConfigs() != null) {
                     $arrayDefaultMetasources = array();
                     $arrayPluginToOverWrite = array();
-                    $arrayPluginToAdd = array();
                     $metaSourceOptions = array();
                     $configsDriver = $driver->getConfigs();
                     if (!empty($configsDriver["DEFAULT_METASOURCES"])) {
@@ -346,7 +346,6 @@ class RepositoriesManager extends AbstractManager
                 $driver = $pluginService->getPluginByTypeName("access", $repo->getAccessType());
                 if ($driver != null && $driver->getConfigs() != null) {
                     $arrayPluginToOverWrite = array();
-                    $arrayPluginToAdd = array();
                     $arrayWorkspaceMetasources = $repo->getSafeOption("META_SOURCES");
                     if(isSet($jsonDataEditWorkspace["features"])) {
                         foreach($arrayWorkspaceMetasources as $metaSourcePluginName => $metaSourcePluginArray) {
@@ -373,7 +372,6 @@ class RepositoriesManager extends AbstractManager
                 $message = new UserMessage("Workspace successfully edited !!");
                 $reload = new ReloadMessage("", $repo->getUniqueId());
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$message, $reload]));
-                $varToDelete = "EOF";
                 break;
 
             case "edit_repository_label" :
@@ -476,6 +474,7 @@ class RepositoriesManager extends AbstractManager
                         chdir(AJXP_TESTS_FOLDER."/plugins");
                         include(AJXP_TESTS_FOLDER."/plugins/test.ajxp_".$repo->getAccessType().".php");
                         $className = "ajxp_".$repo->getAccessType();
+                        /** @var AbstractTest $class */
                         $class = new $className();
                         $result = $class->doRepositoryTest($repo);
                         if (!$result) {
@@ -586,7 +585,7 @@ class RepositoriesManager extends AbstractManager
                 if(isSet($httpVars["request_body"])){
                     $options = $httpVars["request_body"];
                 }else if (isSet($httpVars["json_data"])) {
-                    $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
+                    $options = json_decode(InputFilter::magicDequote($httpVars["json_data"]), true);
                 } else {
                     $options = array();
                     $this->parseParameters($ctx, $httpVars, $options, true);
@@ -639,7 +638,7 @@ class RepositoriesManager extends AbstractManager
                     throw new PydioException("Invalid workspace id! $repId");
                 }
                 if (isSet($httpVars["bulk_data"])) {
-                    $bulkData = json_decode(TextEncoder::magicDequote($httpVars["bulk_data"]), true);
+                    $bulkData = json_decode(InputFilter::magicDequote($httpVars["bulk_data"]), true);
                     $repoOptions = $repo->getContextOption($ctx, "META_SOURCES");
                     if (!is_array($repoOptions)) {
                         $repoOptions = array();
@@ -670,7 +669,7 @@ class RepositoriesManager extends AbstractManager
                     if(isSet($httpVars["request_body"])){
                         $options = $httpVars["request_body"];
                     }else if (isSet($httpVars["json_data"])) {
-                        $options = json_decode(TextEncoder::magicDequote($httpVars["json_data"]), true);
+                        $options = json_decode(InputFilter::magicDequote($httpVars["json_data"]), true);
                     } else {
                         $options = array();
                         $this->parseParameters($ctx, $httpVars, $options, true);
