@@ -1,3 +1,4 @@
+/plugins/access.ajxp_user/build
 /plugins/core.mq/vendor
 /plugins/action.scheduler/vendor
 /plugins/access.s3/aws-v3.phar

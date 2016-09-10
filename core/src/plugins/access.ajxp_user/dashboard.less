@@ -1,0 +1,275 @@
+@bezier_transition:all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+@break1: 40px;
+@break2: 200px;
+@break3: 240px;
+
+#userdashboard_main_tab{
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+
+  div.header_resizer div.header_label {
+    padding-top: 7px;
+  }
+
+  div.class-FetchedResultPane{
+    background-color: #ffffff;
+    div.thumbnail_selectable_cell.detailed{
+      padding: 8px 4px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+      div.thumbLabel{
+        padding-top: 7px;
+        font-size: 14px;
+      }
+    }
+    div.thumbnail_selectable_cell.selected-focus{
+      background-color: #fb725c !important;
+    }
+  }
+
+
+  &.horizontal_tabulator {
+    display: block;
+    position: relative;
+
+    div.tabulatorContainer{
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: @break3;
+      padding-top: 10px;
+      background-color: #444;
+      z-index: 1;
+      box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+      transition: @bezier_transition;
+      span.toggleHeader{
+
+        padding: 16px;
+        font-size: 13px;
+        color: #ff7043 !important;
+        background-color: transparent !important;
+        &.toggleInactive{
+          color: white !important;
+        }
+        span[class^="icon-"], span[class*=" icon-"]{
+          display: inline;
+          float: right;
+          font-size: 18px;
+          margin-right: 0;
+        }
+      }
+    }
+
+    div.tabulatorPanelsContainer{
+      transition: @bezier_transition;
+
+      position: absolute;
+      left: @break3;
+      top: 0;
+      bottom: 0;
+      right:0;
+      padding:16px;
+      background-color: #f4f4f4;
+      > div{
+        position: relative;
+        background-color: #ffffff;
+        border-radius: 2px;
+        box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+        &#account_pane{
+          overflow-y: auto;
+          .title-flex{
+            display: flex;
+            h3{
+              flex: 1;
+            }
+            div.actionBar{
+              margin: 20px 20px 0 0;
+            }
+          }
+
+
+        }
+        .action_bar, #buttons_bar{
+          background-color: white !important;
+          border-bottom: 0;
+        }
+        h3.dashboard_panel_title{
+          position: absolute;
+          top: 18px;
+          left: 16px;
+          font-size: 28px;
+          font-weight: 300;
+          margin: 0;
+          color: rgba(0,0,0,0.83);
+        }
+      }
+    }
+
+    @media only screen
+    and (max-width : 800px){
+      div.tabulatorContainer{
+        width: @break2;
+      }
+      div.tabulatorPanelsContainer{
+        left: @break2;
+      }
+    }
+    @media only screen
+    and (max-width : 630px){
+      div.tabulatorContainer{
+        width: @break1;
+        span.tab_label{
+          display: none;
+        }
+      }
+      div.tabulatorPanelsContainer{
+        left: @break1;
+      }
+    }
+  }
+
+}
+
+
+div#userdashboard_myparams_title{
+
+  position: absolute;
+  color: #ffffff;
+  padding: 25px 16px;
+  height: 63px;
+  font-size: 12px;
+  width: @break3;
+  box-sizing: border-box;
+  bottom: 0;
+  z-index: 2;
+  letter-spacing: 1px;
+  font-weight: 500;
+
+  white-space: nowrap;
+  overflow-x: hidden;
+
+  span#dash_title{
+      display: none;
+  }
+
+  a#dash_back_workspace{
+      display: block;
+      cursor: pointer;
+  }
+
+  @media only screen
+  and (max-width : 800px){
+    &{
+      width: @break2 !important;
+    }
+  }
+  @media only screen
+  and (max-width : 630px){
+    &{
+      width: @break1 !important;
+    }
+    a#dash_back_workspace{
+      display: block;
+      span.icon-chevron-left{
+        display: inline-block;
+        margin-right: 20px;
+      }
+    }
+  }
+
+}
+
+div#team_edit_container {
+  max-height: 200px;
+  overflow: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  z-index: 10;
+  ul {
+    li{
+      list-style: none;
+      padding: 8px;
+      color: rgba(0,0,0,0.87);
+      &.selected{
+        background-color: #eee !important;
+      }
+    }
+  }
+
+}
+
+#team_edit_entries {
+
+  .user_entry{
+      padding: 8px;
+      border-bottom: 1px solid rgba(0,0,0,0.03);
+    .delete_user_entry{
+        float: right;
+        cursor: pointer;
+    }
+  }
+
+}
+
+/****************************************/
+/* WEBDAV PREFERENCES                    */
+/****************************************/
+#webdav_pane{
+  #webdav_main_access{
+      font-size: 20px;
+      padding: 5px;
+      text-align: center;
+      border-radius: 3px;
+      background-color: white;
+      width: 97%;
+      margin-bottom: 5px;
+      color: rgb(111, 121, 131);
+  }
+
+  #perworkspace-urls-toggle{
+    cursor: pointer;
+    span{
+        font-size: 13px;
+        margin: 0 7px;
+        text-decoration: none;
+    }
+  }
+
+  #webdav_repo_list{
+    height: auto !important;
+    background-color: white;
+    div{
+        padding: 7px;
+    }
+
+    span{
+        display: inline-block;
+        width: 24%;
+    }
+
+    input {
+        width: 92% !important;
+        margin-top: 11px;
+    }
+  }
+
+  input#webdav_password{
+      height: 22px !important;
+  }
+}
+
+
+@media only screen
+and (max-width : 630px){
+
+}
+
+@media only screen
+and (max-width : 400px){
+
+    #logo_div img{
+        width: 100px;
+    }
+
+}

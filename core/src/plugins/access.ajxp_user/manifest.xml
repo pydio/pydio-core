@@ -6,6 +6,7 @@
             <css file="plugins/editor.ajxp_role/rolesEditor.css" />
             <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js"/>
             <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js"/>
+            <js className="UserAccount" file="plugins/access.ajxp_user/build/UserAccount.js" depends="React,PydioForm"/>
             <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
@@ -133,7 +134,8 @@
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
                 </div>
                 <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false,"events":{}, "tabsTips":"middle right", "defaultTabId": "parameters","tabInfos" : [{"id":"parameters","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
-                    <div id="account_pane" ajxpClass="UserProfileEditor" class="tabbed_editor" ajxpOptions='{"fit":"height"}'>
+                    <div id="account_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"ProfilePane"}'>
+
                         <div class="action_bar" id="buttons_bar">
                             <div class="toolbarGroup"></div>
                         </div>

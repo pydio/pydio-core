@@ -1,285 +1,225 @@
-#userdashboard_main_tab{
-    font-family: Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
+#userdashboard_main_tab {
+  font-family: Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
-
-#userdashboard_main_tab h3{
-    font-weight: 500;
-}
-
-#userdashboard_main_tab #content_pane.droparea{
-    background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
-    background-position: 50%;
-    border: 5px dashed #5c5c5c !important;
-    border-radius: 5px !important;
-    margin: 5px !important;
-}
-
-#userdashboard_main_tab div.tabbed_editor{
-    border:0;
-}
-
 #userdashboard_main_tab div.header_resizer div.header_label {
-    padding-top: 7px;
+  padding-top: 7px;
 }
-
-#userdashboard_main_tab div.class-FetchedResultPane{
-    background-color: #ffffff;
+#userdashboard_main_tab div.class-FetchedResultPane {
+  background-color: #ffffff;
 }
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
-    padding: 8px 4px;
-    border-bottom: 1px solid rgba(0,0,0,0.03);
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
+  padding: 8px 4px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
-
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel{
-    padding-top: 7px;
-    font-size: 14px;
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
+  padding-top: 7px;
+  font-size: 14px;
 }
-
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus{
-    background-color: #fb725c !important;
+#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus {
+  background-color: #fb725c !important;
 }
-
-#userdashboard_main_tab #content_pane.dropareaHover{
-    border-color: #e35d52 !important;
+#userdashboard_main_tab.horizontal_tabulator {
+  display: block;
+  position: relative;
 }
-
-#userdashboard_main_tab span.toggleHeader span[class^="icon-"],
-#userdashboard_main_tab span.toggleHeader span[class*=" icon-"]{
-    display: inline;
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 240px;
+  padding-top: 10px;
+  background-color: #444;
+  z-index: 1;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-
-
-div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer{
-    padding-top: 63px;
-    background-color: #444;
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader {
+  padding: 16px;
+  font-size: 13px;
+  color: #ff7043 !important;
+  background-color: transparent !important;
 }
-
-div#userdashboard_main_tab.horizontal_tabulator div.tabbed_editor{
-    background-color: #ffffff;
-    box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader.toggleInactive {
+  color: white !important;
 }
-
-div#userdashboard_myparams_title{
-    position: absolute;
-    color: #ffffff;
-    font-weight: 300;
-    padding: 25px 16px;
-    height: 63px;
-    font-size: 13px;
-    width: 100%;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    box-sizing: border-box;
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span[class^="icon-"],
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span[class*=" icon-"] {
+  display: inline;
+  float: right;
+  font-size: 18px;
+  margin-right: 0;
 }
-
-div#userdashboard_myparams_title span#dash_title{
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer {
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  position: absolute;
+  left: 240px;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  padding: 16px;
+  background-color: #f4f4f4;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div {
+  position: relative;
+  background-color: #ffffff;
+  border-radius: 2px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane {
+  overflow-y: auto;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex h3 {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex div.actionBar {
+  margin: 20px 20px 0 0;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .action_bar,
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div #buttons_bar {
+  background-color: white !important;
+  border-bottom: 0;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div h3.dashboard_panel_title {
+  position: absolute;
+  top: 18px;
+  left: 16px;
+  font-size: 28px;
+  font-weight: 300;
+  margin: 0;
+  color: rgba(0, 0, 0, 0.83);
+}
+@media only screen and (max-width: 800px) {
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+    width: 200px;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer {
+    left: 200px;
+  }
+}
+@media only screen and (max-width: 630px) {
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
+    width: 40px;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.tab_label {
     display: none;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer {
+    left: 40px;
+  }
 }
-
-div#userdashboard_myparams_title a#dash_back_workspace{
+div#userdashboard_myparams_title {
+  position: absolute;
+  color: #ffffff;
+  padding: 25px 16px;
+  height: 63px;
+  font-size: 12px;
+  width: 240px;
+  box-sizing: border-box;
+  bottom: 0;
+  z-index: 2;
+  letter-spacing: 1px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+div#userdashboard_myparams_title span#dash_title {
+  display: none;
+}
+div#userdashboard_myparams_title a#dash_back_workspace {
+  display: block;
+  cursor: pointer;
+}
+@media only screen and (max-width: 800px) {
+  div#userdashboard_myparams_title {
+    width: 200px !important;
+  }
+}
+@media only screen and (max-width: 630px) {
+  div#userdashboard_myparams_title {
+    width: 40px !important;
+  }
+  div#userdashboard_myparams_title a#dash_back_workspace {
     display: block;
-    cursor: pointer;
+  }
+  div#userdashboard_myparams_title a#dash_back_workspace span.icon-chevron-left {
+    display: inline-block;
+    margin-right: 20px;
+  }
 }
-
-div#userdashboard_myparams_title a#dash_back_workspace:hover{
-    color:rgb(204, 204, 204);
-}
-
-div#userdashboard_main_tab div#team_pane,
-div#userdashboard_main_tab div#my-users-pane,
-div#userdashboard_main_tab div#account_pane,
-div#userdashboard_main_tab div#webdav_pane,
-div#userdashboard_main_tab div#shared_files_pane,
-div#userdashboard_main_tab div#shared_pane,
-div#userdashboard_main_tab div#shared_pane2,
-div#userdashboard_main_tab div#home_account_pane{
-    position: relative;
-}
-
-div#userdashboard_main_tab h3.dashboard_panel_title{
-    position: absolute;
-    top: 18px;
-    left: 16px;
-    font-size: 24px;
-    font-weight: 500;
-    margin: 0;
-    color: #444;
-}
-
-
 div#team_edit_container {
-    max-height: 200px;
-    overflow: auto;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 2px;
-    z-index: 10;
+  max-height: 200px;
+  overflow: auto;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  z-index: 10;
 }
-
-#team_edit_container ul {
-    margin: 0;
-    padding: 0;
+div#team_edit_container ul li {
+  list-style: none;
+  padding: 8px;
+  color: rgba(0, 0, 0, 0.87);
 }
-
-#team_edit_container ul li{
-    list-style: none;
-    padding: 8px;
-    color: rgba(0,0,0,0.87);
+div#team_edit_container ul li.selected {
+  background-color: #eee !important;
 }
-
-#team_edit_container ul li.selected{
-    background-color: #eee !important;
+#team_edit_entries .user_entry {
+  padding: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
-
-#team_edit_entries .user_entry{
-    padding: 8px;
-    border-bottom: 1px solid rgba(0,0,0,0.03);
+#team_edit_entries .user_entry .delete_user_entry {
+  float: right;
+  cursor: pointer;
 }
-#team_edit_entries .user_entry .delete_user_entry{
-    float: right;
-    cursor: pointer;
-}
-
-.wallet_pane{
-    /*
-       background-color:#EFEFEF;
-       border-left:1px solid;
-       */
-    margin-left:2px;
-    margin-right:2px;
-    padding:0 10px 0 0;
-}
-.wallet_pane div.driver_form{
-    width:215px;
-}
-.wallet_pane input.dialogButton{
-    float:right;
-    border: 1px solid #676965;
-}
-
 /****************************************/
 /* WEBDAV PREFERENCES                    */
 /****************************************/
-#webdav_main_access{
-    font-size: 20px;
-    padding: 5px;
-    text-align: center;
-    border-radius: 3px;
-    background-color: white;
-    width: 97%;
-    margin-bottom: 5px;
-    color: rgb(111, 121, 131);
+#webdav_pane #webdav_main_access {
+  font-size: 20px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 3px;
+  background-color: white;
+  width: 97%;
+  margin-bottom: 5px;
+  color: #6f7983;
 }
-
-#perworkspace-urls-toggle{
-    cursor: pointer;
+#webdav_pane #perworkspace-urls-toggle {
+  cursor: pointer;
 }
-#perworkspace-urls-toggle span{
-    font-size: 13px;
-    margin: 0 7px;
-    text-decoration: none;
+#webdav_pane #perworkspace-urls-toggle span {
+  font-size: 13px;
+  margin: 0 7px;
+  text-decoration: none;
 }
-
-#webdav_repo_list{
-    height: auto !important;
-    background-color: white;
+#webdav_pane #webdav_repo_list {
+  height: auto !important;
+  background-color: white;
 }
-
-#webdav_repo_list div{
-    padding: 7px;
+#webdav_pane #webdav_repo_list div {
+  padding: 7px;
 }
-
-#webdav_repo_list span{
-    display: inline-block;
-    width: 24%;
+#webdav_pane #webdav_repo_list span {
+  display: inline-block;
+  width: 24%;
 }
-
-#webdav_repo_list input {
-    width: 92% !important;
-    margin-top: 11px;
+#webdav_pane #webdav_repo_list input {
+  width: 92% !important;
+  margin-top: 11px;
 }
-
-input#webdav_password{
-    height: 22px !important;
+#webdav_pane input#webdav_password {
+  height: 22px !important;
 }
-
-
-@media only screen
-and (max-width : 980px){
-    #notifications_center div.notif_event_container{
-        width: 100px;
-    }
-}
-
-@media only screen
-and (max-width : 800px){
-
-    #notifications_center li{
-        text-align: center;
-    }
-
-    #notifications_center li > div:first-of-type{
-        float: none !important;
-        position: absolute;
-        bottom: 5px;
-        left: 45%;
-    }
-
-    #notifications_center li > img{
-        float: none !important;
-        margin: auto;
-    }
-
-    #notifications_center div.notif_event_container{
-        float: none;
-        margin-bottom: 2px;
-        width: 100%;
-        text-align: center;
-    }
-
-    #notifications_center div[data-is_loaded]{
-        margin: 0 auto;
-        float: none !important;
-        min-height: 70px;
-    }
-
-    #notifications_center div.notif_event_label{
-        font-size: 11px;
-    }
-
-    .tutorial_legend{
-        clear: left;
-        width: 97%;
-    }
-
-    .tutorial_video{
-        width: 94%;
-        height: 300px;
-        margin-right: 3%;
-        margin-left: 3%;
-    }
-    #dl_pydio_cont{
-        width: 400px !important;
-    }
-    #dl_pydio_for{
-        display: none;
-    }
-
-
-}
-
-@media only screen
-and (max-width : 400px){
-
-    #notifications_center li > div:first-of-type,
-    #notifications_center div.notif_event_repository,
-    #notifications_center div.notif_event_description,
-    #notifications_center div.notif_event_date{
-        display: none;
-    }
-
-    #logo_div img{
-        width: 100px;
-    }
-
+@media only screen and (max-width: 400px) {
+  #logo_div img {
+    width: 100px;
+  }
 }
