@@ -83,15 +83,20 @@ class LocaleExtractor
      * Browse the i18n libraries and update the languages with the strings missing
      * @static
      * @param string $createLanguage
+     * @param string $pluginId
      * @return void
      */
-    public static function updateAllI18nLibraries($createLanguage = "")
+    public static function updateAllI18nLibraries($createLanguage = "", $pluginId = "")
     {
         // UPDATE EN => OTHER LANGUAGES
         $nodes = PluginsService::getInstance(Context::emptyContext())->searchAllManifests("//i18n", "nodes");
         /** @var \DOMElement $node */
         foreach ($nodes as $node) {
             $nameSpace = $node->getAttribute("namespace");
+            if(!empty($pluginId)){
+                $plug = $node->parentNode->parentNode->parentNode->getAttribute("id");
+                if($plug !== $pluginId) continue;
+            }
             $path = AJXP_INSTALL_PATH . "/" . $node->getAttribute("path");
             if ($nameSpace == "") {
                 self::updateI18nFiles($path, false, $createLanguage);

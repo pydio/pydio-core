@@ -123,7 +123,7 @@ class RichClient extends Plugin
             if (isSet($parameters["extract"])) {
                 LocaleExtractor::extractConfStringsFromManifests();
             }
-            LocaleExtractor::updateAllI18nLibraries((isSet($parameters["create"]) ? $parameters["create"] : ""));
+            LocaleExtractor::updateAllI18nLibraries((isSet($parameters["create"]) ? $parameters["create"] : ""), (isSet($parameters["plugin"]) ? $parameters["plugin"] : ""));
         }
         if (ConfService::getConf("JS_DEBUG") && isSet($parameters["clear_plugins_cache"])) {
             @unlink(AJXP_PLUGINS_CACHE_FILE);
