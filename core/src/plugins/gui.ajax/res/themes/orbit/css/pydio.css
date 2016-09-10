@@ -1320,6 +1320,9 @@ select.SF_input {
   max-height: 80px;
   max-width: 80px;
 }
+.SF_image.small[src*="default_avatar"] {
+  background-color: #B0BEC5;
+}
 #user_profile_form img.SF_image.small {
   border-radius: 40px;
 }
@@ -2687,9 +2690,12 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   cursor: pointer;
 }
 #logging_string {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.98);
   float: right;
   margin-top: 12px;
+}
+#logging_string:hover {
+  color: #ffffff;
 }
 #logging_string div.inlineBarButtonLeft {
   display: none;
@@ -2735,17 +2741,17 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   display: inline-block;
   font-size: 13px;
   font-weight: 300;
-  padding: 6px 0 0 8px;
-  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 0 0 8px;
+  color: rgba(255, 255, 255, 0.98);
 }
 #logging_string .user_widget_label.withImage i:hover {
-  color: white;
+  color: #ffffff;
 }
 #logging_string div.user_widget_mini {
   float: right;
   width: 39px;
   height: 39px;
-  margin-top: -14px;
+  margin-top: -12px;
   margin-left: 14px;
   border-radius: 100%;
   background-position: center center;
@@ -5815,7 +5821,7 @@ div.pydio-tasks-panel div.task .task_actions > span {
 /* tooltips */
 /* tree */
 /* uploaders */
-/* user widget */
+/* user widget && top toolbar actions */
 /* menus */
 /* InfoPanel */
 /* Left PAnel */
@@ -6267,10 +6273,14 @@ div.dialogButtons.inlineEdition input {
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
   font-size: 13px;
-  padding: 7px 24px;
+  padding: 5px 20px;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.98);
   display: inline-block;
+}
+#ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a:hover,
+#ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a:hover {
+  color: #ffffff;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_span,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_span,
@@ -6278,7 +6288,7 @@ div.dialogButtons.inlineEdition input {
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_arrow {
   font-size: 1.0em;
   display: inline-block;
-  padding: 0 4px;
+  padding: 0 8px;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a img,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a img {
