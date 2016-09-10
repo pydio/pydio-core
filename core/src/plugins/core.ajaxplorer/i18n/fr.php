@@ -650,6 +650,7 @@ $mess=array(
     "550" => "Rejeter ce partage",
     "551" => "Rejeter",
     "552" => "Please provide a password.",
-    "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!"
+    "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+    "554" => "%s résultat(s) dans la Corbeille",
 /* END SENTENCE */
 );

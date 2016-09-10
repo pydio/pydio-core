@@ -1362,7 +1362,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $metaData = [];
                 if (RecycleBinManager::recycleEnabled() && $dir == "") {
-                    $metaData["repo_has_recycle"] = "true";
+                    $metaData["repo_has_recycle"] = RecycleBinManager::getRelativeRecycle();
                 }
                 $parentAjxpNode = new AJXP_Node($nonPatchedPath, $metaData);
                 $parentAjxpNode->loadNodeInfo(false, true, ($lsOptions["l"]?"all":"minimal"));

@@ -257,7 +257,13 @@ Class.create("FilesList", SelectableElements, {
 	getDomNode : function(){
 		return this.htmlElement;
 	},
-	
+
+    reSort: function(){
+        if(this._sortableTable){
+            this._sortableTable.sort(0, !!this.descending);
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
@@ -1403,9 +1409,7 @@ Class.create("FilesList", SelectableElements, {
     flushBulkUpdatingMode:function(){
         this.bulkUpdating = false;
         this.initRows();
-        if(this._sortableTable){
-            this._sortableTable.sort(0);
-        }
+        this.reSort();
     },
 
     getRenderer : function(){
@@ -2399,6 +2403,9 @@ Class.create("FilesList", SelectableElements, {
 				rows[i].remove();
 			}
 		}
+        this.htmlElement.select("div[data-groupByValue] > h3").map(function(head){
+            head.remove();
+        });
 		if(!skipFireChange) this.fireChange();
         this.notify("rows:didClear");
 	},

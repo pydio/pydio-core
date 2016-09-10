@@ -2860,7 +2860,7 @@ div.selection_ctrl_key {
 #search_container #search_results_cont span.results_string {
   display: none;
 }
-#search_container #search_results_cont div#search_show_all {
+#search_container #search_results_cont div.results-parser-filter {
   text-align: center;
   font-size: 12px;
   color: #747474;
@@ -2868,7 +2868,7 @@ div.selection_ctrl_key {
   display: inline-block;
   margin-left: 10px;
 }
-#search_container #search_results_cont div#search_show_all a {
+#search_container #search_results_cont div.results-parser-filter a {
   text-decoration: underline;
   color: #393939;
   cursor: pointer;

@@ -593,7 +593,6 @@ $mess=array(
 "534" => "Contrasenya emprada per acceder",
 "535" => "Enviar contrasenya per correu electrònic",
 "536" => "Enviar un correu electrònic de benvinguda incloent la contrasenya per al nou usuari",
-
 "plugtype.title.access" => "Drivers de repositori",
 "plugtype.desc.access" => "Plugins que defineixen com un repositori accedirà tant al seu back-end (sistema d'arxius o similar) i a les principals accions y dissenys.",
 "plugtype.title.action" => "Plugins d'acció",
@@ -653,4 +652,6 @@ $mess=array(
 "551" => "Reject",
 "552" => "Please provide password.",
 "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+
 );

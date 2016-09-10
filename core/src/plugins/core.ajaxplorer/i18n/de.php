@@ -24,7 +24,7 @@
 *   + update: Axel Otterstätter <axel.otterstaetter@googlemail.com>
 *   + update: Stefan Huber <sh@signalwerk.ch>
 *   + update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/  
+*******************************************************************************/
 $mess=array(
 "languageLabel" => "Deutsch",
 "date_intl_locale" => "de_DE",
@@ -264,7 +264,6 @@ $mess=array(
 "204" => "Die Datei \"",
 "205" => "\" ist größer als die maximal erlaubte Dateigröße (",
 "206" => "Mb).\\nDie Datei konnte nicht hochgeladen werden.",
-/* END SENTENCE */
 "207" => "Sie haben keine Schreibrechte in diesem Ordner",
 "208" => "Sie haben keine Leserechte in diesem Ordner",
 "209" => "Ein interner Serverfehler ist aufgetreten. Wenden Sie sich bitte an den Systemadministrator!",
@@ -440,7 +439,6 @@ $mess=array(
 "375" => "Achtung, Inaktivität seit mehr als __IDLE__. Ein automatischer Logout erfolgt in __LOGOUT__.",
 "376" => "Zum Zurücksetzen irgendwo klicken",
 "378" => "Achtung! Sie haben entweder ein leeres oder ein zu kurzes Passwort eingegeben!",
-/* password strength tester */
 "379" => "Unsicheres Passwort!",
 "380" => "Zu kurz",
 "381" => "Sehr unsicher",
@@ -658,4 +656,7 @@ $mess=array(
 "551" => "Ablehnen",
 "552" => "Please provide password.",
 "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+/* END SENTENCE */
+/* password strength tester */
 );
