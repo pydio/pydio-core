@@ -27,8 +27,10 @@
                                 tabInfo='{"id":"my-api-data","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="apikeys_pane" ajxpClass="ApikeysPane" ajxpOptions='{}' class="tabbed_editor" style="position:relative;">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
-                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[keystore.1]</h3>
+                        <div class="title-flex">
+                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[keystore.1]</h3>
+                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
+                        </div>
                         <div id="token_results"><span class="mdi mdi-close"></span><div id="token_results_content"></div></div>
                         <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
                             <h2>AJXP_MESSAGE[keystore.9]</h2>

@@ -11,21 +11,6 @@
     padding-top: 7px;
   }
 
-  div.class-FetchedResultPane{
-    background-color: #ffffff;
-    div.thumbnail_selectable_cell.detailed{
-      padding: 8px 4px;
-      border-bottom: 1px solid rgba(0,0,0,0.03);
-      div.thumbLabel{
-        padding-top: 7px;
-        font-size: 14px;
-      }
-    }
-    div.thumbnail_selectable_cell.selected-focus{
-      background-color: #fb725c !important;
-    }
-  }
-
 
   &.horizontal_tabulator {
     display: block;
@@ -51,7 +36,7 @@
         &.toggleInactive{
           color: white !important;
         }
-        span[class^="icon-"], span[class*=" icon-"]{
+        span[class^="icon-"], span[class*=" icon-"], span.mdi{
           display: inline;
           float: right;
           font-size: 18px;
@@ -77,30 +62,87 @@
         box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
         &#account_pane{
           overflow-y: auto;
-          .title-flex{
-            display: flex;
-            h3{
-              flex: 1;
-            }
-            div.actionBar{
-              margin: 20px 20px 0 0;
-            }
+        }
+        .title-flex{
+          display: flex;
+          h3{
+            flex: 1;
           }
-
-
+          div.actionBar, div.action_bar{
+            margin: 20px 20px 0 0;
+          }
         }
         .action_bar, #buttons_bar{
           background-color: white !important;
+          padding-bottom: 20px;
           border-bottom: 0;
+          a{
+            box-shadow:0 1px 4px rgba(0, 0, 0, 0.24), 0 1px 6px rgba(0, 0, 0, 0.12);
+            margin: 0 3px;
+            display: inline-block;
+            border-radius: 2px !important;
+            padding: 7px 16px;
+            height: auto;
+            span.actionbar_button_label{
+              font-size: 14px;
+            }
+            @media only screen and (max-width: 720px){
+              span.ajxp_icon_span {
+                display: block !important;
+                margin: 0 0 10px;
+              }
+            }
+          }
         }
         h3.dashboard_panel_title{
-          position: absolute;
-          top: 18px;
-          left: 16px;
-          font-size: 28px;
-          font-weight: 300;
-          margin: 0;
-          color: rgba(0,0,0,0.83);
+          margin-top: 16px;
+          padding-left: 20px;
+          font-size: 24px;
+          line-height: 32px;
+          font-weight: 400;
+          color: rgba(0, 0, 0, 0.87);
+        }
+        div.class-FetchedResultPane{
+          border-top: 1px solid rgb(250,250,250);
+          &#shared_files_list{
+            border-top:1px solid #eaeaea;
+          }
+          background-color: #ffffff;
+          div.thumbnail_selectable_cell.detailed{
+            padding: 10px 5px;
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+            transition: @bezier_transition;
+            div.thumbLabel{
+              padding-top: 7px;
+              font-size: 14px;
+            }
+            div.thumbnail_selectable_cell{
+              padding-right: 11px;
+            }
+          }
+          div.thumbnail_selectable_cell.selected-focus{
+            background-color: lighten(#ff5722, 5) !important;
+          }
+
+          .sort-table tr{
+            background-color: white !important;
+            td{
+              border-bottom: 1px solid rgb(234,234,234);
+              padding: 10px ;
+            }
+            &.selected-focus{
+              background-color: lighten(#ff5722, 5) !important;
+              td{
+                border-bottom: 0;
+              }
+            }
+            h3 {
+              padding: 5px 5px 10px;
+              font-size: 1em;
+              color: #00897B;
+              border-bottom: 0;
+            }
+          }
         }
       }
     }

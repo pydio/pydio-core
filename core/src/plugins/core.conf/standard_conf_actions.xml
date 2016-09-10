@@ -634,8 +634,10 @@
                             tabInfo='{"id":"my-webdav-data","iconClass":"icon-cog","element":"webdav_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":3}'
                             paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" class="tabbed_editor">
-                    <div class="action_bar" style="height: 33px;">&nbsp;</div>
-                    <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
+                    <div class="title-flex">
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
+                        <div class="action_bar" style="height: 33px;">&nbsp;</div>
+                    </div>
                     <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
                         <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
                         <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>

@@ -5,20 +5,6 @@
 #userdashboard_main_tab div.header_resizer div.header_label {
   padding-top: 7px;
 }
-#userdashboard_main_tab div.class-FetchedResultPane {
-  background-color: #ffffff;
-}
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
-  padding: 8px 4px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
-}
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  padding-top: 7px;
-  font-size: 14px;
-}
-#userdashboard_main_tab div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus {
-  background-color: #fb725c !important;
-}
 #userdashboard_main_tab.horizontal_tabulator {
   display: block;
   position: relative;
@@ -45,7 +31,8 @@
   color: white !important;
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span[class^="icon-"],
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span[class*=" icon-"] {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span[class*=" icon-"],
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader span.mdi {
   display: inline;
   float: right;
   font-size: 18px;
@@ -70,32 +57,94 @@
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane {
   overflow-y: auto;
 }
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex h3 {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex h3 {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane .title-flex div.actionBar {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex div.actionBar,
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex div.action_bar {
   margin: 20px 20px 0 0;
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .action_bar,
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div #buttons_bar {
   background-color: white !important;
+  padding-bottom: 20px;
   border-bottom: 0;
 }
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .action_bar a,
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div #buttons_bar a {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.24), 0 1px 6px rgba(0, 0, 0, 0.12);
+  margin: 0 3px;
+  display: inline-block;
+  border-radius: 2px !important;
+  padding: 7px 16px;
+  height: auto;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .action_bar a span.actionbar_button_label,
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div #buttons_bar a span.actionbar_button_label {
+  font-size: 14px;
+}
+@media only screen and (max-width: 720px) {
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .action_bar a span.ajxp_icon_span,
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div #buttons_bar a span.ajxp_icon_span {
+    display: block !important;
+    margin: 0 0 10px;
+  }
+}
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div h3.dashboard_panel_title {
-  position: absolute;
-  top: 18px;
-  left: 16px;
-  font-size: 28px;
-  font-weight: 300;
-  margin: 0;
-  color: rgba(0, 0, 0, 0.83);
+  margin-top: 16px;
+  padding-left: 20px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.87);
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane {
+  border-top: 1px solid #fafafa;
+  background-color: #ffffff;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane#shared_files_list {
+  border-top: 1px solid #eaeaea;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
+  padding: 10px 5px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
+  padding-top: 7px;
+  font-size: 14px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
+  padding-right: 11px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus {
+  background-color: #ff6a3c !important;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr {
+  background-color: white !important;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr td {
+  border-bottom: 1px solid #eaeaea;
+  padding: 10px ;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr.selected-focus {
+  background-color: #ff6a3c !important;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr.selected-focus td {
+  border-bottom: 0;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr h3 {
+  padding: 5px 5px 10px;
+  font-size: 1em;
+  color: #00897B;
+  border-bottom: 0;
 }
 @media only screen and (max-width: 800px) {
   #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {

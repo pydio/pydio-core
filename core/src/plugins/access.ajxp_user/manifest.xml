@@ -98,37 +98,6 @@
                 </script>
 			]]></template_part>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="orbit"><![CDATA[
-                <style>
-                div.flat_tabulator span.toggleHeader{
-                    background-color: #fb725c;
-                }
-                .largeButton, .SF_input.SF_inlineButton{
-                    background-color: #fb725c;
-                }
-                #account_pane .action_bar{
-                    text-align: right;
-                }
-                .action_bar a{
-                    cursor: pointer;
-                }
-                div.class-FetchedResultPane{
-                    background-color: #f8f8f8;
-                }
-                .action_bar, #buttons_bar{
-                    background-color: #f8f8f8;
-                    height: 32px;
-                    border-bottom: 1px solid rgba(0,0,0,0.08);
-                    padding:18px 14px 12px;
-                    text-align: right;
-                }
-                .action_bar span.actionbar_button_label{
-                    font-size: 11px;
-                }
-                .flat_tabulator div.panelHeader.tabulatorContainer{
-                    background-color: #30383A;
-                    padding-top: 10px;
-                }
-                </style>
                 <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
@@ -149,8 +118,10 @@
                                 tabInfo='{"id":"info","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
+                        <div class="title-flex">
+                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]</h3>
+                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                        </div>
                         <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>
                 ]]></additional_tab>
