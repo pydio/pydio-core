@@ -2,9 +2,6 @@
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-#userdashboard_main_tab div.header_resizer div.header_label {
-  padding-top: 7px;
-}
 #userdashboard_main_tab.horizontal_tabulator {
   display: block;
   position: relative;
@@ -54,7 +51,8 @@
   border-radius: 2px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#account_pane,
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div#webdav_pane {
   overflow-y: auto;
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex {
@@ -117,6 +115,9 @@
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.mimefont {
+  line-height: 28px;
+}
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   padding-top: 7px;
   font-size: 14px;
@@ -127,12 +128,22 @@
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.thumbnail_selectable_cell.selected-focus {
   background-color: #ff6a3c !important;
 }
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane div.header_resizer div.header_label {
+  padding-left: 10px;
+  padding-top: 7px;
+}
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr {
   background-color: white !important;
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr td {
   border-bottom: 1px solid #eaeaea;
-  padding: 10px ;
+  padding: 10px 0;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr td:first-of-type {
+  padding: 10px 5px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr td:first-of-type span.mimefont {
+  margin-right: 10px;
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr.selected-focus {
   background-color: #ff6a3c !important;
@@ -140,11 +151,45 @@
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr.selected-focus td {
   border-bottom: 0;
 }
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr h3 {
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr[data-groupByValue].selected-focus {
+  background-color: white !important;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr[data-groupByValue].selected-focus td {
+  border-bottom: 1px solid #eaeaea;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane .sort-table tr[data-groupByValue] h3 {
   padding: 5px 5px 10px;
   font-size: 1em;
   color: #00897B;
   border-bottom: 0;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-url {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-url div.mui-text-field {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  width: auto;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-url button.mui-icon-button {
+  margin-top: 30px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-url button.mui-icon-button span.mui-font-icon {
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.33);
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-url button.mui-icon-button span.mui-font-icon:hover {
+  color: rgba(0, 0, 0, 0.73);
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.copy_legend {
+  color: #00897B;
+  margin-top: -10px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer div#webdav_pane div.dav-password-legend {
+  color: rgba(0, 0, 0, 0.33);
 }
 @media only screen and (max-width: 800px) {
   #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
@@ -157,6 +202,9 @@
 @media only screen and (max-width: 630px) {
   #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
     width: 40px;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.toggleHeader {
+    padding-right: 11px !important;
   }
   #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer span.tab_label {
     display: none;
@@ -204,7 +252,16 @@ div#userdashboard_myparams_title a#dash_back_workspace {
     margin-right: 20px;
   }
 }
-div#team_edit_container {
+div#team_edit_form span.user_entry_label {
+  color: rgba(0, 0, 0, 0.87);
+}
+div#team_edit_form span.user_entry_label::before {
+  content: "\f007";
+  font-family: FontAwesome;
+  display: inline-block;
+  margin-right: 5px;
+}
+div#team_edit_form div#team_edit_container {
   max-height: 200px;
   overflow: auto;
   background-color: white;
@@ -212,60 +269,25 @@ div#team_edit_container {
   border-radius: 2px;
   z-index: 10;
 }
-div#team_edit_container ul li {
+div#team_edit_form div#team_edit_container ul {
+  margin: 0;
+  padding-left: 0;
+}
+div#team_edit_form div#team_edit_container ul li {
   list-style: none;
   padding: 8px;
   color: rgba(0, 0, 0, 0.87);
 }
-div#team_edit_container ul li.selected {
+div#team_edit_form div#team_edit_container ul li.selected {
   background-color: #eee !important;
 }
-#team_edit_entries .user_entry {
+div#team_edit_form #team_edit_entries .user_entry {
   padding: 8px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
 }
-#team_edit_entries .user_entry .delete_user_entry {
+div#team_edit_form #team_edit_entries .user_entry .delete_user_entry {
   float: right;
   cursor: pointer;
-}
-/****************************************/
-/* WEBDAV PREFERENCES                    */
-/****************************************/
-#webdav_pane #webdav_main_access {
-  font-size: 20px;
-  padding: 5px;
-  text-align: center;
-  border-radius: 3px;
-  background-color: white;
-  width: 97%;
-  margin-bottom: 5px;
-  color: #6f7983;
-}
-#webdav_pane #perworkspace-urls-toggle {
-  cursor: pointer;
-}
-#webdav_pane #perworkspace-urls-toggle span {
-  font-size: 13px;
-  margin: 0 7px;
-  text-decoration: none;
-}
-#webdav_pane #webdav_repo_list {
-  height: auto !important;
-  background-color: white;
-}
-#webdav_pane #webdav_repo_list div {
-  padding: 7px;
-}
-#webdav_pane #webdav_repo_list span {
-  display: inline-block;
-  width: 24%;
-}
-#webdav_pane #webdav_repo_list input {
-  width: 92% !important;
-  margin-top: 11px;
-}
-#webdav_pane input#webdav_password {
-  height: 22px !important;
 }
 @media only screen and (max-width: 400px) {
   #logo_div img {

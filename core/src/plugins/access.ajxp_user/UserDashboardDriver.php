@@ -227,6 +227,7 @@ class UserDashboardDriver extends AbstractAccessDriver
             $metaData = [
                 "text" => $team["LABEL"],
                 "icon" => "users-folder.png",
+                "fonticon" => "account-multiple",
                 "ajxp_mime" => "ajxp_team",
                 "users"     => "<span class='icon-groups'></span> ".implode(",", array_values($team["USERS"])),
                 "users_labels"     => "<span class='icon-groups'></span> ".implode(", ", $team["USERS_LABELS"])
@@ -285,6 +286,7 @@ class UserDashboardDriver extends AbstractAccessDriver
                 "text"      => $label,
                 "isAdmin"   => $mess[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
                 "icon"      => "user_shared.png",
+                "fonticon"  => "account-circle",
                 "openicon"  => "user_shared.png",
                 "repo_accesses" => count($repoAccesses) ? $this->metaIcon("share-sign"). implode(", ", $repoAccesses):"",
                 "parentname"    => "/users",

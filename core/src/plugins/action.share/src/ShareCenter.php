@@ -1896,10 +1896,12 @@ class ShareCenter extends Plugin
                 if($repoObject->hasContentFilter()){
                     $meta["ajxp_shared_minisite"] = "file";
                     $meta["icon"] = "mime_empty.png";
+                    $meta["fonticon"] = "file";
                     $meta["original_path"] = array_pop(array_keys($repoObject->getContentFilter()->filters));
                 }else{
                     $meta["ajxp_shared_minisite"] = "public";
                     $meta["icon"] = "folder.png";
+                    $meta["fonticon"] = "folder";
                     $ctx = $ctx->withRepositoryId($repoObject->getId());
                     $meta["original_path"] = $repoObject->getContextOption($ctx, "PATH");
                 }
@@ -1927,6 +1929,7 @@ class ShareCenter extends Plugin
                 $meta["share_type_readable"] = "Publiclet (legacy)";
                 $meta["text"] = basename($shareData["FILE_PATH"]);
                 $meta["icon"] = "mime_empty.png";
+                $meta["fonticon"] = "file";
                 $meta["share_data"] = $meta["copy_url"] = $this->getPublicAccessManager()->buildPublicLink($hash);
                 $meta["share_link"] = true;
                 $meta["shared_element_hash"] = $hash;

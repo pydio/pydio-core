@@ -938,7 +938,11 @@ abstract class AbstractConfDriver extends Plugin
                     $loggedUser->save("user");
                 }
                 if (!empty($davData)) {
-                    $webdavActive = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL") || (isSet($davData["ACTIVE"]) && $davData["ACTIVE"]===true);
+                    $webdavActive = ConfService::getGlobalConf("WEBDAV_ACTIVE_ALL");
+                    // override with local value if set.
+                    if(isSet($davData["ACTIVE"]) && is_bool($davData["ACTIVE"])){
+                        $webdavActive = $davData["ACTIVE"];
+                    }
                     $passSet = (isSet($davData["PASS"]));
                 }
                 $repoList = UsersService::getRepositoriesForUser($ctx->getUser());

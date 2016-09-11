@@ -7,11 +7,6 @@
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 
-  div.header_resizer div.header_label {
-    padding-top: 7px;
-  }
-
-
   &.horizontal_tabulator {
     display: block;
     position: relative;
@@ -60,7 +55,7 @@
         background-color: #ffffff;
         border-radius: 2px;
         box-shadow:0 3px 6px rgba(0,0,0,.16),0 3px 6px rgba(0,0,0,.23);
-        &#account_pane{
+        &#account_pane, &#webdav_pane{
           overflow-y: auto;
         }
         .title-flex{
@@ -112,6 +107,9 @@
             padding: 10px 5px;
             border-bottom: 1px solid rgba(0,0,0,0.03);
             transition: @bezier_transition;
+            div.mimefont{
+              line-height: 28px;
+            }
             div.thumbLabel{
               padding-top: 7px;
               font-size: 14px;
@@ -124,11 +122,21 @@
             background-color: lighten(#ff5722, 5) !important;
           }
 
+          div.header_resizer div.header_label {
+            padding-left: 10px;
+            padding-top: 7px;
+          }
           .sort-table tr{
             background-color: white !important;
             td{
               border-bottom: 1px solid rgb(234,234,234);
-              padding: 10px ;
+              padding: 10px 0;
+              &:first-of-type{
+                padding: 10px 5px;
+                span.mimefont{
+                  margin-right: 10px;
+                }
+              }
             }
             &.selected-focus{
               background-color: lighten(#ff5722, 5) !important;
@@ -136,13 +144,47 @@
                 border-bottom: 0;
               }
             }
-            h3 {
-              padding: 5px 5px 10px;
-              font-size: 1em;
-              color: #00897B;
-              border-bottom: 0;
+            &[data-groupByValue]{
+              &.selected-focus{
+                background-color: white !important;
+                td{
+                  border-bottom: 1px solid rgb(234,234,234);
+                }
+              }
+              h3 {
+                padding: 5px 5px 10px;
+                font-size: 1em;
+                color: #00897B;
+                border-bottom: 0;
+              }
             }
           }
+        }
+      }
+      div#webdav_pane{
+        div.dav-url{
+          display: flex;
+          div.mui-text-field{
+            flex: 1;
+            width: auto;
+          }
+          button.mui-icon-button{
+            margin-top: 30px;
+            span.mui-font-icon{
+              font-size: 16px;
+              color: rgba(0,0,0,0.33);
+              &:hover{
+                color: rgba(0,0,0,0.73);
+              }
+            }
+          }
+        }
+        div.copy_legend{
+          color: #00897B;
+          margin-top: -10px;
+        }
+        div.dav-password-legend{
+          color: rgba(0,0,0,0.33);
         }
       }
     }
@@ -160,6 +202,9 @@
     and (max-width : 630px){
       div.tabulatorContainer{
         width: @break1;
+        span.toggleHeader{
+          padding-right: 11px !important;
+        }
         span.tab_label{
           display: none;
         }
@@ -221,86 +266,57 @@ div#userdashboard_myparams_title{
 
 }
 
-div#team_edit_container {
-  max-height: 200px;
-  overflow: auto;
-  background-color: white;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  z-index: 10;
-  ul {
-    li{
-      list-style: none;
-      padding: 8px;
-      color: rgba(0,0,0,0.87);
-      &.selected{
-        background-color: #eee !important;
+div#team_edit_form{
+
+  span.user_entry_label{
+    color: rgba(0,0,0,0.87);
+    &::before {
+      content: "\f007";
+      font-family: FontAwesome;
+      display: inline-block;
+      margin-right: 5px;
+    }
+  }
+
+  div#team_edit_container {
+    max-height: 200px;
+    overflow: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+    z-index: 10;
+    ul {
+      margin: 0;
+      padding-left: 0;
+      li{
+        list-style: none;
+        padding: 8px;
+        color: rgba(0,0,0,0.87);
+        &.selected{
+          background-color: #eee !important;
+        }
       }
     }
+
   }
+
+
+
+  #team_edit_entries {
+
+    .user_entry{
+        padding: 8px;
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+      .delete_user_entry{
+          float: right;
+          cursor: pointer;
+      }
+    }
+
+  }
+
 
 }
-
-#team_edit_entries {
-
-  .user_entry{
-      padding: 8px;
-      border-bottom: 1px solid rgba(0,0,0,0.03);
-    .delete_user_entry{
-        float: right;
-        cursor: pointer;
-    }
-  }
-
-}
-
-/****************************************/
-/* WEBDAV PREFERENCES                    */
-/****************************************/
-#webdav_pane{
-  #webdav_main_access{
-      font-size: 20px;
-      padding: 5px;
-      text-align: center;
-      border-radius: 3px;
-      background-color: white;
-      width: 97%;
-      margin-bottom: 5px;
-      color: rgb(111, 121, 131);
-  }
-
-  #perworkspace-urls-toggle{
-    cursor: pointer;
-    span{
-        font-size: 13px;
-        margin: 0 7px;
-        text-decoration: none;
-    }
-  }
-
-  #webdav_repo_list{
-    height: auto !important;
-    background-color: white;
-    div{
-        padding: 7px;
-    }
-
-    span{
-        display: inline-block;
-        width: 24%;
-    }
-
-    input {
-        width: 92% !important;
-        margin-top: 11px;
-    }
-  }
-
-  input#webdav_password{
-      height: 22px !important;
-  }
-}
-
 
 @media only screen
 and (max-width : 630px){
