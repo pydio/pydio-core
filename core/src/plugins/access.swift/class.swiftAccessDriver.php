@@ -36,6 +36,8 @@ class swiftAccessDriver extends fsAccessDriver
     public $driverConf;
     protected $wrapperClassName;
     protected $urlBase;
+    protected $store;
+    protected $bucket;
 
     public function performChecks()
     {
@@ -58,8 +60,36 @@ class swiftAccessDriver extends fsAccessDriver
             $this->driverConf = array();
         }
 
-        require_once($this->getBaseDir()."/openstack-sdk-php/vendor/autoload.php");
-
+        require_once $this->getBaseDir().'/loader.php';
+        $loader = new \AccessSwift\Psr4AutoloaderClass();
+        $loader->addClasses();
+        /* Per user bucket */
+        $this->bucket = AuthService::getLoggedUser()->getId();
+        $username = $this->repository->getOption("USERNAME");
+        $password = $this->repository->getOption("PASSWORD");
+        $tenantId = $this->repository->getOption("TENANT_ID");
+        $endpoint = $this->repository->getOption("ENDPOINT"); 
+        $region = $this->repository->getOption("REGION");
+        $idService = new \OpenStack\Identity\v2\IdentityService($endpoint);
+        $token = $idService->authenticateAsUser($username, $password, $tenantId);
+        $catalog = $idService->serviceCatalog();
+        $this->store = \OpenStack\ObjectStore\v1\ObjectStorage::newFromServiceCatalog($catalog, $token, $region);
+        if(!$this->store->hasContainer($this->bucket)) {
+            $this->store->createContainer($this->bucket);
+            $container = $this->store->container($this->bucket);
+            $recycle = $this->repository->getOption("RECYCLE_BIN");
+            if ($recycle != "") {
+                if ($recycle[strlen($recycle)-1] != '/') {
+                    $recycle .= '/';
+                }
+                $name = $recycle . '.marker';
+                $content = '';
+                $mime = 'text/plain';
+                $localObject = new \OpenStack\ObjectStore\v1\Resource\Object($name, $content, $mime);
+                $container->save($localObject);
+            }
+        }
+        /* End per user bucket */
         Bootstrap::useStreamWrappers();
 
         Bootstrap::setConfiguration(array(
@@ -122,5 +152,14 @@ class swiftAccessDriver extends fsAccessDriver
         $newOptions["CONTAINER"] = $this->repository->getOption("CONTAINER");
         return $newOptions;
     }
+    
+    /**
+     *  !This returns the top-level bucket bytesize and ignores the directoryPath.
+     */
+    public function directoryUsage($directoryPath, $repositoryResolvedOptions)
+    {
+        $container = $this->store->container($this->bucket);
 
+        return $container->bytes();
+    }
 }
