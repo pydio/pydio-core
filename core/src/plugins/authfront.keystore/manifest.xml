@@ -28,13 +28,16 @@
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="apikeys_pane" ajxpClass="ApikeysPane" ajxpOptions='{}' class="tabbed_editor" style="position:relative;">
                         <div class="title-flex">
-                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[keystore.1]</h3>
+                            <h3 class="dashboard_panel_title">
+                                AJXP_MESSAGE[keystore.1]
+                                <div style="font-size: 12px;font-weight: 300;line-height: 1.3em;margin-top: 3px;">AJXP_MESSAGE[keystore.2]</div>
+                            </h3>
                             <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
                         </div>
                         <div id="token_results"><span class="mdi mdi-close"></span><div id="token_results_content"></div></div>
-                        <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
-                            <h2>AJXP_MESSAGE[keystore.9]</h2>
-                            <ul></ul>
+                        <div style="padding:0 20px;overflow: auto;" class="fit_me_to_bottom react-mui-context">
+                            <h4>AJXP_MESSAGE[keystore.9]</h4>
+                            <ul style="list-style-type: none;"></ul>
                         </div>
                     </div>
                     ]]></additional_tab>
