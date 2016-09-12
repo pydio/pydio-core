@@ -907,6 +907,8 @@ class UsersManager extends AbstractManager
         }
         if(isSet($allUserIds) && count($allUserIds)){
             $connections = $logger->usersLastConnection($allUserIds);
+        }else{
+            $connections = [];
         }
 
         ksort($userArray);
@@ -921,68 +923,6 @@ class UsersManager extends AbstractManager
             $this->appendBookmarkMeta($bmKey, $meta);
             $nodesList->addBranch(new AJXP_Node($nodeKey, $meta));
 
-            /*
-            $repos = ConfService::getConfStorageImpl()->listRepositories($userObject);
-            $isAdmin = $userObject->isAdmin();
-            $userId = $userObject->getId();
-            $icon = "user".($userId=="guest"?"_guest":($isAdmin?"_admin":""));
-            $iconClass = "icon-user";
-            if ($userObject->hasParent()) {
-                $icon = "user_child";
-                $iconClass = "icon-angle-right";
-            }
-            if ($isAdmin) {
-                $rightsString = $messages["ajxp_conf.63"];
-            } else {
-                $r = array();
-                foreach ($repos as $repoId => $repository) {
-                    if($repository->getAccessType() == "ajxp_shared") continue;
-                    if(!$userObject->canRead($repoId) && !$userObject->canWrite($repoId)) continue;
-                    $rs = ($userObject->canRead($repoId) ? "r" : "");
-                    $rs .= ($userObject->canWrite($repoId) ? "w" : "");
-                    $r[] = $repository->getDisplay()." (".$rs.")";
-                }
-                $rightsString = implode(", ", $r);
-            }
-            $nodeLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-            $scheme = UsersService::getAuthScheme($userId);
-            $nodeKey = $fullBasePath. "/" .$userId;
-            $roles = array_filter(array_keys($userObject->getRoles()), array($this, "filterReservedRoles"));
-            $mergedRole = $userObject->mergedRole->getDataArray(true);
-            $meta = [];
-            if($format !== "json"){
-                $mergedRole = json_encode($mergedRole);
-                $currentRoles = implode(", ", $roles);
-                $jsonKey = $nodeKey;
-            }else{
-                $currentRoles = $roles;
-                $meta["personal_role_id"] = "/AJXP_USR_/".$userId;
-                $jsonKey = $userId;
-            }
-            $meta = array_merge($meta, [
-                "text" => $nodeLabel,
-                "is_file" => true,
-                "isAdmin" => $messages[($isAdmin?"ajxp_conf.14":"ajxp_conf.15")],
-                "icon" => $icon.".png",
-                "icon_class" => $iconClass,
-                "object_id" => $userId,
-                "auth_scheme" => ($scheme != null? $scheme : ""),
-                "rights_summary" => $rightsString,
-                "ajxp_roles" => $currentRoles,
-                "ajxp_mime" => "user".(($userId!="guest"&&$userId!=$this->context->getUser()->getId())?"_editable":""),
-                "json_merged_role" => $mergedRole
-            ]);
-            if($userObject->hasParent()) {
-                $meta["shared_user"] = "true";
-            }
-            if(isSet($connections) && isSet($connections[$userObject->getId()]) && !empty($connections[$userObject->getId()])) {
-                $meta["last_connection"] = strtotime($connections[$userObject->getId()]);
-                $meta["last_connection_readable"] = StatHelper::relativeDate($meta["last_connection"], $messages);
-            }
-
-            $this->appendBookmarkMeta($nodeKey, $meta);
-            $nodesList->addBranch(new AJXP_Node($jsonKey, $meta));
-            */
         }
         return $nodesList;
     }

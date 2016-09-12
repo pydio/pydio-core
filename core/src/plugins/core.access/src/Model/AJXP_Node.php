@@ -122,7 +122,7 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
      */
     public function __sleep()
     {
-        $t = array_diff(array_keys(get_class_vars("AJXP_Node")), ["_accessDriver", "_repository", "_metaStore"]);
+        $t = array_diff(array_keys(get_class_vars("Pydio\\Access\\Core\\Model\\AJXP_Node")), ["_accessDriver", "_repository", "_metaStore"]);
         return $t;
     }
 

@@ -310,6 +310,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
      */
     public function oath_truncate($hash, $length = 6)
     {
+        $hmac_result = [];
         // Convert to dec
         foreach (str_split($hash, 2) as $hex) {
             $hmac_result[] = hexdec($hex);

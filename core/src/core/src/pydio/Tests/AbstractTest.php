@@ -20,6 +20,9 @@
  */
 namespace Pydio\Tests;
 
+use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Model\RepositoryInterface;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 global $MAIN_testsArray;
@@ -72,7 +75,7 @@ abstract class AbstractTest
 
     /**
      * Perform the test on a given repository object, should be overwritten in concrete classes
-     * @param \Pydio\Access\Core\Model\Repository $repository
+     * @param Repository|RepositoryInterface $repository
      * @return Boolean
      */
     public function doRepositoryTest($repository) { return FALSE; }

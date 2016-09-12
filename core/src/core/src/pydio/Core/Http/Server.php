@@ -24,7 +24,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 
-use Pydio\Core\Http\Message\PromptMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Middleware\ITopLevelMiddleware;
 use Pydio\Core\Http\Middleware\SapiMiddleware;

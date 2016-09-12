@@ -10,7 +10,7 @@
         <directory>core/src/pydio</directory>
         <directory>plugins</directory>
         <ignore>*phpseclib*</ignore>
-        <ignore>*vendor/composer*</ignore>
+        <ignore>*vendor*</ignore>
         <ignore>*vendor/phpmailer*</ignore>
         <ignore>*lib/class.phpmailer-lite.php</ignore>
         <ignore>*openstack-sdk-php*</ignore>

@@ -408,7 +408,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
                         $db_database = "mysql:" . "dbname=" . $dbconfig->sqlDriver["database"] . ";host=" . $dbconfig->sqlDriver["host"];
                         $db_table = "ajxp_cas_pgt";
                         Logger::info(__CLASS__, __FUNCTION__, $db_database);
-                        phpCAS::setPGTStorageDB($db_database, $db_username, $db_password, $db_table, "");
+                        phpCAS::setPGTStorageDb($db_database, $db_username, $db_password, $db_table, "");
                     }
                 }
                 break;

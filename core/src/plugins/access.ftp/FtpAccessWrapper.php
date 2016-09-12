@@ -512,6 +512,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         $vinfo = preg_split("/[\s]+/", $entry);
         Logger::debug(__CLASS__,__FUNCTION__,"RAW LIST", $entry);
         $statValue = array();
+        $fileperms = '';
         if ($vinfo[0] !== "total") {
             $fileperms = $vinfo[0];
             $info['num']   = $vinfo[1];
