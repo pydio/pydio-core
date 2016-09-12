@@ -53,6 +53,13 @@ class PydioStreamWrapper
         }
     }
 
+    /**
+     * @param $path
+     * @param $mode
+     * @param $options
+     * @param $opened_path
+     * @return bool
+     */
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         $options = stream_context_get_options($this->context);
@@ -67,32 +74,54 @@ class PydioStreamWrapper
         return true;
     }
 
+    /**
+     * @param $count
+     * @return string
+     */
     public function stream_read($count)
     {
         $data = $this->stream->read($count);
         return $data;
     }
 
+    /**
+     * @param $data
+     * @return int
+     */
     public function stream_write($data)
     {
         return (int) $this->stream->write($data);
     }
 
+    /**
+     * @return bool|int
+     */
     public function stream_tell()
     {
         return $this->stream->tell();
     }
 
+    /**
+     * @return bool
+     */
     public function stream_eof()
     {
         return $this->stream->eof();
     }
 
+    /**
+     * @param $offset
+     * @param $whence
+     * @return bool
+     */
     public function stream_seek($offset, $whence)
     {
         return $this->stream->seek($offset, $whence);
     }
 
+    /**
+     * @return array|bool
+     */
     public function stream_stat()
     {
         $isFile = $this->stream->isFile();

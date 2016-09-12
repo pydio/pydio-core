@@ -82,6 +82,12 @@ class Driver extends FsAccessDriver
         return true;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Exception
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
         $httpVars = $request->getParsedBody();
 
@@ -116,6 +122,11 @@ class Driver extends FsAccessDriver
         return "";
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return string
+     */
     public static function convertToJSON($key, $value) {
         $key = '' . $key->getName();
         $value = '' . $value;

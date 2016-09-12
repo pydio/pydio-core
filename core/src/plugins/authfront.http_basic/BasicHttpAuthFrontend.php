@@ -26,7 +26,10 @@ use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class BasicHttpAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
 class BasicHttpAuthFrontend extends AbstractAuthFrontend
 {
 

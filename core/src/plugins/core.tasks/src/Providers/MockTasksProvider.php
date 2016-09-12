@@ -32,6 +32,10 @@ use Pydio\Tasks\Schedule;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class MockTasksProvider
+ * @package Pydio\Tasks\Providers
+ */
 class MockTasksProvider implements \Pydio\Tasks\ITasksProvider
 {
 

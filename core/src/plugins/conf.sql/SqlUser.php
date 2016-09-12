@@ -209,6 +209,10 @@ class SqlUser extends AbstractUser
 
     }
 
+    /**
+     * @param $prefName
+     * @return mixed|string
+     */
     public function getPref($prefName)
     {
         $p = parent::getPref($prefName);
@@ -551,6 +555,11 @@ class SqlUser extends AbstractUser
         FileHelper::saveSerialFile($dirPath . "/" . $id . "/temp-" . $key . ".ser", $value);
     }
 
+    /**
+     * @param String $groupPath
+     * @param bool $update
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function setGroupPath($groupPath, $update = false)
     {
         if ($update &&  isSet($this->groupPath) && $groupPath != $this->groupPath) {

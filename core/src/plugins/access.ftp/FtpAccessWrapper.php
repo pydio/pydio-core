@@ -72,6 +72,11 @@ class FtpAccessWrapper implements IAjxpWrapper
 
     private $monthes = array("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Juil", "Aug", "Sep", "Oct", "Nov", "Dec");
 
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return string
+     */
     public static function getRealFSReference($path, $persistent = false)
     {
         $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
@@ -86,16 +91,29 @@ class FtpAccessWrapper implements IAjxpWrapper
         return $tmpFile;
     }
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url)
     {
         return true;
     }
 
+    /**
+     * @param string $path
+     * @param resource $stream
+     * @throws PydioException
+     * @throws \Exception
+     */
     public static function copyFileInStream($path, $stream)
     {
         $fake = new FtpAccessWrapper();
@@ -106,6 +124,12 @@ class FtpAccessWrapper implements IAjxpWrapper
         ftp_fget($link, $stream, $serverPath, FTP_BINARY);
     }
 
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     * @throws PydioException
+     * @throws \Exception
+     */
     public static function changeMode($path, $chmodValue)
     {
         $fake = new FtpAccessWrapper();
@@ -115,6 +139,15 @@ class FtpAccessWrapper implements IAjxpWrapper
         ftp_chmod($link, $chmodValue, $serverPath);
     }
 
+    /**
+     * @param string $url
+     * @param string $mode
+     * @param int $options
+     * @param string $context
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function stream_open($url, $mode, $options, &$context)
     {
         if (stripos($mode, "w") !== false) {
@@ -139,32 +172,53 @@ class FtpAccessWrapper implements IAjxpWrapper
         return ($this->fp !== false);
     }
 
+    /**
+     * @return array
+     */
     public function stream_stat()
     {
         return fstat($this->fp);
     }
 
+    /**
+     * @param int $offset
+     * @param int $whence
+     */
     public function stream_seek($offset , $whence = SEEK_SET)
     {
         fseek($this->fp, $offset, SEEK_SET);
     }
 
+    /**
+     * @return int
+     */
     public function stream_tell()
     {
         return ftell($this->fp);
     }
 
+    /**
+     * @param int $count
+     * @return string
+     */
     public function stream_read($count)
     {
         return fread($this->fp, $count);
     }
 
+    /**
+     * @param string $data
+     * @return int
+     */
     public function stream_write($data)
     {
         fwrite($this->fp, $data, strlen($data));
         return strlen($data);
     }
 
+    /**
+     * @return bool
+     */
     public function stream_eof()
     {
         return feof($this->fp);
@@ -178,6 +232,14 @@ class FtpAccessWrapper implements IAjxpWrapper
     }
 
     // PHP bug #62035
+    /**
+     * @param $errno
+     * @param $errstr
+     * @param $errfile
+     * @param $errline
+     * @param $errcontext
+     * @throws PydioException
+     */
     public static function fput_quota_hack($errno, $errstr, $errfile, $errline, $errcontext)
     {
       if (strpos($errstr, "Opening BINARY mode data connection") !== false)
@@ -185,6 +247,9 @@ class FtpAccessWrapper implements IAjxpWrapper
         throw new PydioException("$errno - $errstr");
     }
 
+    /**
+     *
+     */
     public function stream_flush()
     {
         if (isSet($this->fp) && $this->fp!=-1 && $this->fp!==false) {
@@ -201,26 +266,53 @@ class FtpAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param string $url
+     * @return bool
+     */
     public function unlink($url)
     {
         return unlink($this->buildRealUrl($url));
     }
 
+    /**
+     * @param string $url
+     * @param int $options
+     * @return bool
+     */
     public function rmdir($url, $options)
     {
         return rmdir($this->buildRealUrl($url));
     }
 
+    /**
+     * @param string $url
+     * @param int $mode
+     * @param int $options
+     * @return bool
+     */
     public function mkdir($url, $mode, $options)
     {
         return mkdir($this->buildRealUrl($url), $mode);
     }
 
+    /**
+     * @param string $from
+     * @param string $to
+     * @return bool
+     */
     public function rename($from, $to)
     {
         return rename($this->buildRealUrl($from), $this->buildRealUrl($to));
     }
 
+    /**
+     * @param string $path
+     * @param int $flags
+     * @return array|mixed|null
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function url_stat($path, $flags)
     {
         // We are in an opendir loop
@@ -280,6 +372,13 @@ class FtpAccessWrapper implements IAjxpWrapper
         return null;
     }
 
+    /**
+     * @param string $url
+     * @param int $options
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function dir_opendir ($url , $options )
     {
         if(isSet(self::$dirContent[$url])){
@@ -315,6 +414,9 @@ class FtpAccessWrapper implements IAjxpWrapper
         return true;
     }
 
+    /**
+     *
+     */
     public function dir_closedir  ()
     {
         Logger::debug(__CLASS__,__FUNCTION__,"CLOSEDIR");
@@ -325,6 +427,9 @@ class FtpAccessWrapper implements IAjxpWrapper
         //self::$dirContentKeys[$loopPath] = null;
     }
 
+    /**
+     * @return bool
+     */
     public function dir_readdir ()
     {
         $loopPath = self::$dirContentLoopPath[count(self::$dirContentLoopPath)-1];
@@ -337,12 +442,22 @@ class FtpAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     *
+     */
     public function dir_rewinddir ()
     {
         $loopPath = self::$dirContentLoopPath[count(self::$dirContentLoopPath)-1];
         self::$dirContentIndex[$loopPath] = 0;
     }
 
+    /**
+     * @param $link
+     * @param $serverPath
+     * @param string $target
+     * @param bool $retry
+     * @return array
+     */
     protected function rawList($link, $serverPath, $target = 'd', $retry = true)
     {
         if ($target == 'f') {
@@ -385,6 +500,11 @@ class FtpAccessWrapper implements IAjxpWrapper
         return $contents;
     }
 
+    /**
+     * @param $entry
+     * @param bool $filterStatPerms
+     * @return array
+     */
     protected function rawListEntryToStat($entry, $filterStatPerms = false)
     {
         $info = array();
@@ -445,6 +565,13 @@ class FtpAccessWrapper implements IAjxpWrapper
         return array("name"=>$file, "stat"=>$statValue, "dir"=>$isDir);
     }
 
+    /**
+     * @param $url
+     * @param bool $forceLogin
+     * @return array
+     * @throws PydioException
+     * @throws \Exception
+     */
     protected function parseUrl($url, $forceLogin = false)
     {
         // URL MAY BE ajxp.ftp://username:password@host/path
@@ -518,6 +645,12 @@ class FtpAccessWrapper implements IAjxpWrapper
         return array($this->user, "-1");
     }
 
+    /**
+     * @param $url
+     * @return string
+     * @throws PydioException
+     * @throws \Exception
+     */
     protected function buildRealUrl($url)
     {
         if (!isSet($this->user)) {
@@ -613,6 +746,11 @@ class FtpAccessWrapper implements IAjxpWrapper
         return $link;
     }
 
+    /**
+     * @param $permissions
+     * @param bool $filterForStat
+     * @return int
+     */
     protected function convertingChmod($permissions, $filterForStat = false)
     {
         $mode = 0;

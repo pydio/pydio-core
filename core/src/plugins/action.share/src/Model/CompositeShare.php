@@ -35,7 +35,11 @@ use Pydio\Share\View\PublicAccessManager;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CompositeShare
+ * Object containing a repository and one or many links
+ * @package Pydio\Share\Model
+ */
 class CompositeShare
 {
     /**
@@ -58,6 +62,11 @@ class CompositeShare
      */
     protected $shareLinks = array();
 
+    /**
+     * CompositeShare constructor.
+     * @param $node
+     * @param $repositoryId
+     */
     public function __construct($node, $repositoryId)
     {
         $this->node = $node;

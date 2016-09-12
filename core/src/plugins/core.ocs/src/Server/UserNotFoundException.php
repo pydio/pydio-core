@@ -23,8 +23,16 @@ namespace Pydio\OCS\Server;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class UserNotFoundException
+ * @package Pydio\OCS\Server
+ */
 class UserNotFoundException extends InvalidArgumentsException
 {
+    /**
+     * InvalidArgumentsException constructor.
+     * @param \Exception|null $previous
+     */
     public function __construct(\Exception $previous = null)
     {
         parent::__construct($previous);

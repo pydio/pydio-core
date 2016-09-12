@@ -48,6 +48,15 @@ function extractResponseCookies($client)
     return $cookies;
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ * @throws \Pydio\Core\Exception\PydioException
+ */
 function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
     require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
@@ -72,6 +81,14 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
     return "";
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ */
 function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
     require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
@@ -128,6 +145,14 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
     return "";
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ */
 function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
     require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");

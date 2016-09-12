@@ -26,15 +26,37 @@ use Pydio\OCS\Model\ShareInvitation;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Interface IFederated
+ * @package Pydio\OCS\Client
+ */
 interface IFederated
 {
     // Sender to Remote
+    /**
+     * @param ShareInvitation $invitation
+     * @return mixed
+     */
     public function sendInvitation(ShareInvitation $invitation);
+
+    /**
+     * @param ShareInvitation $invitation
+     * @return mixed
+     */
     public function cancelInvitation(ShareInvitation $invitation);
 
 
     // Remote from sender
+    /**
+     * @param RemoteShare $remoteShare
+     * @return mixed
+     */
     public function acceptInvitation(RemoteShare $remoteShare);
+
+    /**
+     * @param RemoteShare $remoteShare
+     * @return mixed
+     */
     public function declineInvitation(RemoteShare $remoteShare);
 
 }

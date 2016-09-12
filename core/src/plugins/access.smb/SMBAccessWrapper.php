@@ -177,13 +177,19 @@ class SMBAccessWrapper extends FsAccessWrapper
 
     // DUPBLICATE STATIC FUNCTIONS TO BE SURE
     // NOT TO MESS WITH self:: CALLS
-
+    /**
+     * @param string $tmpDir
+     * @param string $tmpFile
+     */
     public static function removeTmpFile($tmpDir, $tmpFile)
     {
         if(is_file($tmpFile)) unlink($tmpFile);
         if(is_dir($tmpDir)) rmdir($tmpDir);
     }
 
+    /**
+     * Close wrapper
+     */
     protected static function closeWrapper()
     {
         if (self::$crtZip != null) {
@@ -195,6 +201,12 @@ class SMBAccessWrapper extends FsAccessWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return mixed|string
+     * @throws \Exception
+     */
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
@@ -209,11 +221,18 @@ class SMBAccessWrapper extends FsAccessWrapper
         }
     }
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @param string $path
+     * @param resource $stream
+     */
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");
@@ -225,6 +244,10 @@ class SMBAccessWrapper extends FsAccessWrapper
         fclose($fp);
     }
 
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     */
     public static function changeMode($path, $chmodValue){
     }
 }

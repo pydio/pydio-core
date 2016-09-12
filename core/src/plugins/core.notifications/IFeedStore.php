@@ -100,7 +100,28 @@ interface IFeedStore
      * @return void
      */
     public function persistMetaObject($indexPath, $data, $repositoryId, $repositoryScope, $repositoryOwner, $userId, $userGroup);
+
+    /**
+     * @param $repositoryId
+     * @param $indexPath
+     * @param $userId
+     * @param $userGroup
+     * @param int $offset
+     * @param int $limit
+     * @param string $orderBy
+     * @param string $orderDir
+     * @param bool $recurring
+     * @return mixed
+     */
     public function findMetaObjectsByIndexPath($repositoryId, $indexPath, $userId, $userGroup, $offset = 0, $limit = 20, $orderBy = "date", $orderDir = "desc", $recurring=true);
+
+    /**
+     * @param $repositoryId
+     * @param $oldPath
+     * @param null $newPath
+     * @param bool $copy
+     * @return mixed
+     */
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false);
 
 }

@@ -31,6 +31,10 @@ use Pydio\OCS\Model\ShareInvitation;
 use GuzzleHttp\Client as GuzzleClient;
 
 
+/**
+ * Class OCSClient
+ * @package Pydio\OCS\Client
+ */
 class OCSClient implements IFederated, IServiceDiscovery
 {
     /**

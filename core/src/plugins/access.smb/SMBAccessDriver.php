@@ -87,6 +87,11 @@ class SMBAccessDriver extends FsAccessDriver
 
     }
 
+    /**
+     * @param bool $register
+     * @param ContextInterface|null $ctx
+     * @return array|bool
+     */
     public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if ($register) {
@@ -107,6 +112,11 @@ class SMBAccessDriver extends FsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
+    /**
+     * @param \Pydio\Access\Core\Model\AJXP_Node $dir
+     * @param string $type
+     * @return bool
+     */
     public function isWriteable($dir, $type="dir")
     {
         if(substr_count($dir, '/') <= 3) $rc = true;

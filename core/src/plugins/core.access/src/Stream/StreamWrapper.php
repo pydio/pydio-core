@@ -60,6 +60,13 @@ class StreamWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @param string $mode
+     * @param int $options
+     * @param string $opened_path
+     * @return bool
+     */
     public function stream_open($path, $mode, $options, &$opened_path) {
         $this->stream = self::createStream($path, $mode);
 
@@ -70,26 +77,48 @@ class StreamWrapper implements IAjxpWrapper
         return true;
     }
 
+    /**
+     * @return mixed
+     */
     public function stream_stat() {
         return $this->stream->stat();
     }
 
+    /**
+     * @param string $data
+     * @return int
+     */
     public function stream_write($data) {
         return (int) $this->stream->write($data);
     }
 
+    /**
+     * @param int $count
+     * @return string
+     */
     public function stream_read($count) {
         return $this->stream->read($count);
     }
 
+    /**
+     * @return bool|int
+     */
     public function stream_tell() {
         return $this->stream->tell();
     }
 
+    /**
+     * @return bool
+     */
     public function stream_eof() {
         return $this->stream->eof();
     }
 
+    /**
+     * @param int $offset
+     * @param int $whence
+     * @return bool
+     */
     public function stream_seek($offset, $whence=SEEK_SET) {
         return $this->stream->seek($offset, $whence);
     }
@@ -174,6 +203,11 @@ class StreamWrapper implements IAjxpWrapper
         return $stream->rmdir();
     }
 
+    /**
+     * @param string $oldName
+     * @param string $newName
+     * @return bool
+     */
     public function rename($oldName, $newName) {
 
         $stream = self::createStream($oldName);
@@ -181,6 +215,11 @@ class StreamWrapper implements IAjxpWrapper
         return $stream->rename(new AJXP_Node($newName));
     }
 
+    /**
+     * @param string $path
+     * @param int $flags
+     * @return array
+     */
     public function url_stat($path, $flags) {
         $stream = self::createStream($path);
         $resource = PydioStreamWrapper::getResource($stream);
@@ -190,14 +229,26 @@ class StreamWrapper implements IAjxpWrapper
         return $stat;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url) {
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public static function isRemote() {
         return true;
     }
 
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return string
+     */
     public static function getRealFSReference($path, $persistent = false) {
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
@@ -217,6 +268,10 @@ class StreamWrapper implements IAjxpWrapper
         return $tmpFile;
     }
 
+    /**
+     * @param string $path
+     * @param resource $stream
+     */
     public static function copyFileInStream($path, $stream) {
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
@@ -224,6 +279,10 @@ class StreamWrapper implements IAjxpWrapper
         self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $stream);
     }
 
+    /**
+     * @param $from
+     * @param $to
+     */
     public static function copyStreamInStream($from, $to) {
         while (!feof($from)) {
             $data = fread($from, 4096);
@@ -231,9 +290,19 @@ class StreamWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     */
     public static function changeMode($path, $chmodValue) {
     }
 
+    /**
+     * @param $path
+     * @param string $mode
+     * @return \GuzzleHttp\Stream\Stream|AuthStream|MetadataCachingStream|OAuthStream|Stream|WriteBufferStream
+     * @throws \Exception
+     */
     public static function createStream($path, $mode = "r+") {
         $node = new AJXP_Node($path);
         $repository = $node->getRepository();

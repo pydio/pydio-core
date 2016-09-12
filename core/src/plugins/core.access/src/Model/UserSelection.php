@@ -223,6 +223,9 @@ class UserSelection
         }
     }
 
+    /**
+     * @param string $filePath
+     */
     public function addFile($filePath){
         if(!in_array($filePath, $this->files)){
             $this->files[] = $filePath;
@@ -327,6 +330,10 @@ class UserSelection
 
     }
 
+    /**
+     * @return string
+     * @throws \Exception
+     */
     public function currentBaseUrl(){
         if(!$this->context->hasRepository()){
             throw new \Exception("UserSelection::currentBaseUrl: cannot build nodes URL without a proper repository");
@@ -373,6 +380,9 @@ class UserSelection
         $this->files = $files;
     }
 
+    /**
+     * @param $file
+     */
     public function removeFile($file){
         $newFiles = array();
         foreach($this->files as $k => $f){

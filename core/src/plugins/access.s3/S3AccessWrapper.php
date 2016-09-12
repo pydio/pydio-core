@@ -228,6 +228,10 @@ class S3AccessWrapper extends FsAccessWrapper
         return $stat;
     }
 
+    /**
+     * @param $lastModified
+     * @return array
+     */
     protected function statForDir($lastModified){
         $time = strtotime($lastModified);
         return [

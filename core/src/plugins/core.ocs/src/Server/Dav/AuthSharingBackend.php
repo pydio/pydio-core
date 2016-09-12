@@ -35,6 +35,10 @@ use Sabre\HTTP;
 
 require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
 
+/**
+ * Class AuthSharingBackend
+ * @package Pydio\OCS\Server\Dav
+ */
 class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {
 

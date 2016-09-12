@@ -29,6 +29,11 @@ use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class NodesDiff
+ * Http Response describing a node change in the datamodel
+ * @package Pydio\Access\Core\Model
+ */
 class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
     /**
@@ -46,6 +51,9 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
      */
     private $removed;
 
+    /**
+     * NodesDiff constructor.
+     */
     public function __construct()
     {
         $this->added = [];
@@ -53,6 +61,9 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
         $this->removed = [];
     }
 
+    /**
+     * @return bool
+     */
     public function isEmpty(){
         return !(count($this->added) || count($this->updated) || count($this->removed));
     }

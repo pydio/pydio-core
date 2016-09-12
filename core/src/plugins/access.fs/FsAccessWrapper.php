@@ -212,6 +212,10 @@ class FsAccessWrapper implements IAjxpWrapper
         ];
     }
 
+    /**
+     * @param string $tmpDir
+     * @param string $tmpFile
+     */
     public static function removeTmpFile($tmpDir, $tmpFile)
     {
         if(is_file($tmpFile)) unlink($tmpFile);
@@ -229,34 +233,50 @@ class FsAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return mixed
+     * @throws PydioException
+     * @throws \Exception
+     */
     public static function getRealFSReference($path, $persistent = false)
     {
-        $contextOpened =false;
         if (self::$crtZip != null) {
-            $contextOpened = true;
             $crtZip = self::$crtZip;
             self::$crtZip = null;
         }
         $realPath = self::initPath($path, "file");
-        if (!$contextOpened) {
-            self::closeWrapper();
-        } else {
+        if (isSet($crtZip)) {
             self::$crtZip = $crtZip;
+        } else {
+            self::closeWrapper();
         }
         return $realPath;
     }
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return false;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url)
     {
         if(strpos($url, ".zip/") !== false) return false;
         return true;
     }
 
+    /**
+     * @param string $path
+     * @param resource $stream
+     */
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen(self::getRealFSReference($path), "rb");
@@ -269,6 +289,12 @@ class FsAccessWrapper implements IAjxpWrapper
         fclose($fp);
     }
 
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     * @throws PydioException
+     * @throws \Exception
+     */
     public static function changeMode($path, $chmodValue)
     {
         $realPath = self::initPath($path, "file");
@@ -301,16 +327,27 @@ class FsAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param int $offset
+     * @param int $whence
+     * @return bool
+     */
     public function stream_seek($offset , $whence = SEEK_SET)
     {
-        fseek($this->fp, $offset, $whence);
+        return fseek($this->fp, $offset, $whence);
     }
 
+    /**
+     * @return int
+     */
     public function stream_tell()
     {
         return ftell($this->fp);
     }
 
+    /**
+     * @return array|mixed|null
+     */
     public function stream_stat()
     {
         $PROBE_REAL_SIZE = ConfService::getConf("PROBE_REAL_SIZE");
@@ -331,6 +368,13 @@ class FsAccessWrapper implements IAjxpWrapper
         return null;
     }
 
+    /**
+     * @param string $path
+     * @param int $flags
+     * @return array|null
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function url_stat($path, $flags)
     {
         // File and zip case
@@ -384,22 +428,40 @@ class FsAccessWrapper implements IAjxpWrapper
            return null;
     }
 
+    /**
+     * @param string $from
+     * @param string $to
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function rename($from, $to)
     {
         return rename($this->initPath($from, "file", false, true), $this->initPath($to, "file", false, true));
     }
 
+    /**
+     * @param int $count
+     * @return string
+     */
     public function stream_read($count)
     {
         return fread($this->fp, $count);
     }
 
+    /**
+     * @param string $data
+     * @return int
+     */
     public function stream_write($data)
     {
         fwrite($this->fp, $data, strlen($data));
         return strlen($data);
     }
 
+    /**
+     * @return bool
+     */
     public function stream_eof()
     {
         return feof($this->fp);
@@ -412,6 +474,9 @@ class FsAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * 
+     */
     public function stream_flush()
     {
         if (isSet($this->fp) && $this->fp!=-1 && $this->fp!==false) {
@@ -419,18 +484,39 @@ class FsAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function unlink($path)
     {
         $this->realPath = $this->initPath($path, "file", false, true);
         return unlink($this->realPath);
     }
 
+    /**
+     * @param string $path
+     * @param int $options
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function rmdir($path, $options)
     {
         $this->realPath = $this->initPath($path, "file", false, true);
         return rmdir($this->realPath);
     }
 
+    /**
+     * @param string $path
+     * @param int $mode
+     * @param int $options
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function mkdir($path, $mode, $options)
     {
         return mkdir($this->initPath($path, "file"), $mode);
@@ -453,6 +539,10 @@ class FsAccessWrapper implements IAjxpWrapper
         }
         return $this->dH !== false;
     }
+
+    /**
+     * Close dir handle
+     */
     public function dir_closedir  ()
     {
         $this->closeWrapper();
@@ -462,6 +552,10 @@ class FsAccessWrapper implements IAjxpWrapper
             closedir($this->dH);
         }
     }
+
+    /**
+     * @return bool|string
+     */
     public function dir_readdir ()
     {
         if ($this->dH == -1) {
@@ -475,6 +569,10 @@ class FsAccessWrapper implements IAjxpWrapper
             return readdir($this->dH);
         }
     }
+
+    /**
+     * 
+     */
     public function dir_rewinddir ()
     {
         if ($this->dH == -1) {
@@ -493,6 +591,10 @@ class FsAccessWrapper implements IAjxpWrapper
         return self::$lastRealSize;
     }
 
+    /**
+     * @param $file
+     * @return float|string
+     */
     protected function getTrueSizeOnFileSystem($file)
     {
         if (!(strtoupper(substr(PHP_OS, 0, 3)) == 'WIN')) {

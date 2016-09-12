@@ -38,6 +38,10 @@ class RadiusAuthDriver extends AbstractAuthDriver
             $this->radiusAuthType = $options["RADIUS Auth Type"];
     }
 
+    /**
+     * @param $options
+     * @return string
+     */
     public function testRADIUSConnection($options)
     {
         $this->radiusServer = $options["RADIUS Server"];
@@ -69,6 +73,11 @@ class RadiusAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param string $baseGroup
+     * @param bool $recursive
+     * @return array
+     */
     public function listUsers($baseGroup = "/", $recursive = true)
     {
         $adminUser = $this->options["AJXP_ADMIN_LOGIN"];
@@ -77,12 +86,20 @@ class RadiusAuthDriver extends AbstractAuthDriver
         );
     }
 
+    /**
+     * @param $login
+     * @return bool
+     */
     public function userExists($login)
     {
         return true;
     }
 
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     */
     public function logoutCallback(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
         MemorySafe::clearCredentials();
@@ -94,6 +111,12 @@ class RadiusAuthDriver extends AbstractAuthDriver
         $responseInterface = $responseInterface->withBody($x);
     }
 
+    /**
+     * @param $res
+     * @param $login
+     * @param $pass
+     * @return bool
+     */
     public function prepareRequest($res, $login, $pass)
     {
         if (!radius_add_server($res, $this->radiusServer, $this->radiusPort, $this->radiusSecret, 3, 3)) {
@@ -155,6 +178,11 @@ class RadiusAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param string $login
+     * @param string $pass
+     * @return bool
+     */
     public function checkPassword($login, $pass)
     {
         if (!extension_loaded('radius')) {
@@ -184,28 +212,49 @@ class RadiusAuthDriver extends AbstractAuthDriver
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function usersEditable()
     {
         return false;
     }
 
+    /**
+     * @return bool
+     */
     public function passwordsEditable()
     {
         return false;
     }
 
+    /**
+     * @param $login
+     * @param $passwd
+     */
     public function createUser($login, $passwd)
     {
     }
 
+    /**
+     * @param $login
+     * @param $newPass
+     */
     public function changePassword($login, $newPass)
     {
     }
 
+    /**
+     * @param $login
+     */
     public function deleteUser($login)
     {
     }
 
+    /**
+     * @param $login
+     * @return string
+     */
     public function getUserPass($login)
     {
         return "";

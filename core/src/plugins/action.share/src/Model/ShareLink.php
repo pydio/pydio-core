@@ -82,7 +82,11 @@ class ShareLink
         $this->internal["SHORT_FORM_URL"] = $shortFormUrl;
     }
 
-
+    /**
+     * ShareLink constructor.
+     * @param $store
+     * @param array $storeData
+     */
     public function __construct($store, $storeData = array()){
         $this->store = $store;
         $this->internal = $storeData;
@@ -119,10 +123,16 @@ class ShareLink
         $this->internal["REPOSITORY"] = $repositoryId;
     }
 
+    /**
+     * @return bool
+     */
     public function isAttachedToRepository(){
         return isSet($this->internal["REPOSITORY"]);
     }
 
+    /**
+     * @return string
+     */
     public function getRepositoryId(){
         return $this->internal["REPOSITORY"];
     }
@@ -278,6 +288,9 @@ class ShareLink
         }
     }
 
+    /**
+     * @return string
+     */
     public function getOwnerId(){
         return $this->internal["OWNER_ID"];
     }
@@ -369,31 +382,54 @@ class ShareLink
         return $this->newHash;
     }
 
+    /**
+     * @return bool
+     */
     public function isExpired(){
         return self::isShareExpired($this->internal);
     }
 
+    /**
+     * @return bool
+     */
     public function hasDownloadLimit(){
         return isSet($this->internal["DOWNLOAD_LIMIT"]) && $this->internal["DOWNLOAD_LIMIT"] > 0;
     }
 
+    /**
+     * @return int|null
+     */
     public function getDownloadLimit(){
-        $this->internal["DOWNLOAD_LIMIT"];
+        return $this->internal["DOWNLOAD_LIMIT"];
     }
 
+    /**
+     * @param $data
+     * @return bool
+     */
     public static function isShareExpired($data){
         return (isSet($data["EXPIRE_TIME"]) && time() > $data["EXPIRE_TIME"]) ||
             ($data["DOWNLOAD_LIMIT"] && $data["DOWNLOAD_LIMIT"]> 0 && isSet($data["DOWNLOAD_COUNT"]) &&  $data["DOWNLOAD_LIMIT"] <= $data["DOWNLOAD_COUNT"]);
     }
 
+    /**
+     * Number of times the link has been download
+     * @return int|mixed
+     */
     public function getDownloadCount(){
         return isSet($this->internal["DOWNLOAD_COUNT"]) ? $this->internal["DOWNLOAD_COUNT"] : 0;
     }
 
+    /**
+     * Increments internal counter
+     */
     public function incrementDownloadCount(){
         $this->internal["DOWNLOAD_COUNT"] = $this->getDownloadCount() + 1;
     }
 
+    /**
+     * Set internal counter to 0
+     */
     public function resetDownloadCount(){
         $this->internal["DOWNLOAD_COUNT"] = 0;
     }

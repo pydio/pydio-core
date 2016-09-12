@@ -71,6 +71,11 @@ class SftpPSLAccessDriver extends FsAccessDriver
         $this->urlBase = $contextInterface->getUrlBase();
     }
 
+    /**
+     * @param bool $register
+     * @param ContextInterface|null $ctx
+     * @return array|bool
+     */
     public function detectStreamWrapper($register = false, ContextInterface $ctx = null)
     {
         if ($register) {

@@ -27,14 +27,25 @@ use Pydio\Core\Services\CacheService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CacheStreamLayer
+ * StreamWrapper using CacheService to cache data
+ * @package Pydio\Cache\Core
+ */
 class CacheStreamLayer extends SchemeTranslatorWrapper
 {
+    /**
+     * @param $path
+     */
     public static function clearStatCache($path) {
         $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "stat");
 
         CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $options["id"]);
     }
+
+    /**
+     * @param $path
+     */
     public static function clearDirCache($path) {
         $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
 
@@ -47,7 +58,11 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
     private $currentBufferOptions = null;
     private $currentBuffer = array();
 
-    // Keep listing in cache
+    /**
+     * @param string $path
+     * @param int $options
+     * @return bool
+     */
     public function dir_opendir($path, $options) {
 
         $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "list");
@@ -64,6 +79,9 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
 
     }
 
+    /**
+     * @return bool|mixed|string
+     */
     public function dir_readdir() {
 
         if($this->currentListingRead !== null) {
@@ -79,6 +97,9 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
         return $value;
     }
 
+    /**
+     * Close handle
+     */
     public function dir_closedir() {
 
         if($this->currentListingRead !== null) {
@@ -93,6 +114,10 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
         parent::dir_closedir();
     }
 
+    /**
+     * Rewind handle
+     * @return bool
+     */
     public function dir_rewinddir() {
 
         if($this->currentListingOrig !== null) {
@@ -107,6 +132,11 @@ class CacheStreamLayer extends SchemeTranslatorWrapper
         return parent::dir_rewinddir();
     }
 
+    /**
+     * @param string $path
+     * @param int $flags
+     * @return array|bool|mixed
+     */
     public function url_stat($path, $flags) {
 
         $options = AbstractCacheDriver::getOptionsForNode(new AJXP_Node($path), "stat");

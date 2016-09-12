@@ -21,6 +21,10 @@ use Pydio\Core\Services\CacheService;
 use Pydio\Core\Utils\FileHelper;
 
 
+/**
+ * Class OAuthStream
+ * @package Pydio\Access\Core\Stream
+ */
 class OAuthStream implements StreamInterface
 {
     use StreamDecoratorTrait;
@@ -140,6 +144,10 @@ class OAuthStream implements StreamInterface
         }
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     */
     public function getOptions(ContextInterface $ctx) {
         $repository = $ctx->getRepository();
 
@@ -153,6 +161,10 @@ class OAuthStream implements StreamInterface
         ];
     }
 
+    /**
+     * @param array $options
+     * @return string
+     */
     public function getAuthURI(array $options) {
         $uri = '?client_id=%s' .
             '&scope=%s' .
@@ -212,6 +224,9 @@ class OAuthStream implements StreamInterface
         return true;
     }
 
+    /**
+     * @return \GuzzleHttp\Ring\Future\FutureInterface|mixed|null|string
+     */
     public function getContents() {
         return $this->stream->getContents();
     }

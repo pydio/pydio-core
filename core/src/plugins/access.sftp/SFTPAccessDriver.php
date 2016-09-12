@@ -99,6 +99,10 @@ class SFTPAccessDriver extends FsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
+    /**
+     * @param String $srcFile url of source file
+     * @param String $destFile url of destination file
+     */
     protected function filecopy($srcFile, $destFile)
     {
         if (MetaStreamWrapper::nodesUseSameWrappers($srcFile, $destFile)) {
@@ -155,7 +159,11 @@ class SFTPAccessDriver extends FsAccessDriver
         return $vList;
     }
 
-    public function full_copy( $source, $destination )
+    /**
+     * @param $source
+     * @param $destination
+     */
+    public function full_copy($source, $destination )
     {
         if ( is_dir( $source ) ) {
             @mkdir( $destination );
@@ -178,6 +186,10 @@ class SFTPAccessDriver extends FsAccessDriver
         }
     }
 
+    /**
+     * @param $path
+     * @return bool
+     */
     public function recursiveRmdir($path)
     {
         if (is_dir($path)) {

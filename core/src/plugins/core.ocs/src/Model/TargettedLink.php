@@ -26,6 +26,11 @@ use Pydio\Share\View\PublicAccessManager;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
+
+/**
+ * Class TargettedLink
+ * @package Pydio\OCS\Model
+ */
 class TargettedLink extends ShareLink
 {
     /**
@@ -33,6 +38,11 @@ class TargettedLink extends ShareLink
      */
     protected $pendingInvitation;
 
+    /**
+     * TargettedLink constructor.
+     * @param $store
+     * @param array $storeData
+     */
     public function __construct($store, $storeData = array()){
         parent::__construct($store, $storeData);
         $this->store = $store;

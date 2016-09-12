@@ -22,8 +22,16 @@ namespace Pydio\OCS\Server;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class InvalidArgumentsException
+ * @package Pydio\OCS\Server
+ */
 class InvalidArgumentsException extends \Exception
 {
+    /**
+     * InvalidArgumentsException constructor.
+     * @param \Exception|null $previous
+     */
     public function __construct(\Exception $previous = null)
     {
         parent::__construct("Invalid Arguments", 400, $previous);

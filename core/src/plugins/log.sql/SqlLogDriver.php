@@ -85,6 +85,11 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         }
     }
 
+    /**
+     * Find users last connections from log table
+     * @param array $userIds
+     * @return array
+     */
     public function usersLastConnection($userIds)
     {
         $res = dibi::query("SELECT [user], MAX([logdate]) AS date_max FROM [ajxp_log] WHERE [user] IN (%s) GROUP BY [user]", $userIds);
@@ -92,6 +97,11 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         return $all;
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     */
     public function exposeQueries($actionName, &$httpVars, &$fileVars)
     {
 
@@ -100,6 +110,10 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 
     }
 
+    /**
+     * @param $queryName
+     * @return bool
+     */
     private function getQuery($queryName)
     {
         foreach ($this->queries as $q) {
@@ -108,6 +122,15 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         return false;
     }
 
+    /**
+     * @param $queryName
+     * @param $start
+     * @param $count
+     * @param string $frequency
+     * @param array $additionalFilters
+     * @return array|\DibiRow[]
+     * @throws Exception
+     */
     protected function processOneQuery($queryName, $start, $count, $frequency = "auto", $additionalFilters = array())
     {
 
@@ -222,6 +245,12 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
 
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @throws Exception
+     */
     public function processQuery($actionName, &$httpVars, &$fileVars)
     {
 
@@ -732,6 +761,11 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
         */
     }
 
+    /**
+     * @param array $param
+     * @return string
+     * @throws Exception
+     */
     public function installSQLTables($param)
     {
         $p = OptionsHelper::cleanDibiDriverParameters($param["SQL_DRIVER"]);

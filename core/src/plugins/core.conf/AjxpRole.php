@@ -154,11 +154,17 @@ class AjxpRole implements IGroupPathProvider
         $this->rights["ajxp.actions"][$rootDirId][$actionName] = $allowed;
     }
 
+    /**
+     * @param $default
+     */
     public function setDefault($default)
     {
         $this->default = $default;
     }
 
+    /**
+     * @return bool
+     */
     public function isDefault()
     {
         return $this->default;
@@ -166,8 +172,9 @@ class AjxpRole implements IGroupPathProvider
 
     /**
      * @param String $groupPath
+     * @param bool $update
      */
-    public function setGroupPath($groupPath)
+    public function setGroupPath($groupPath, $update = true)
     {
         $this->groupPath = $groupPath;
     }

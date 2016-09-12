@@ -210,6 +210,13 @@ class SwiftAccessWrapper extends FsAccessWrapper
         return $this->dH !== false;
     }
 
+    /**
+     * @param string $path
+     * @param int $mode
+     * @param int $options
+     * @return bool
+     * @throws \Exception
+     */
     public function mkdir($path, $mode, $options)
     {
         $this->realPath = $this->initPath($path, "dir", true);
@@ -220,6 +227,10 @@ class SwiftAccessWrapper extends FsAccessWrapper
     // DUPBLICATE STATIC FUNCTIONS TO BE SURE
     // NOT TO MESS WITH self:: CALLS
 
+    /**
+     * @param $tmpDir
+     * @param $tmpFile
+     */
     public static function removeTmpFile($tmpDir, $tmpFile)
     {
         if(is_file($tmpFile)) unlink($tmpFile, self::$cloudContext);
@@ -237,6 +248,11 @@ class SwiftAccessWrapper extends FsAccessWrapper
         }
     }
 
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return string
+     */
     public static function getRealFSReference($path, $persistent = false)
     {
         $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
@@ -252,16 +268,27 @@ class SwiftAccessWrapper extends FsAccessWrapper
     }
 
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url)
     {
         return false;
     }
 
+    /**
+     * @param string $path
+     * @param resource $stream
+     */
     public static function copyFileInStream($path, $stream)
     {
         $fp = fopen($path, "r", null, self::$cloudContext);
@@ -273,6 +300,10 @@ class SwiftAccessWrapper extends FsAccessWrapper
         fclose($fp);
     }
 
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     */
     public static function changeMode($path, $chmodValue)
     {
         // DO NOTHING!

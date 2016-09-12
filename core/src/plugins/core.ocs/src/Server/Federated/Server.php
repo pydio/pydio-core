@@ -33,8 +33,18 @@ use Pydio\OCS\Server\UserNotFoundException;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class Server
+ * @package Pydio\OCS\Server\Federated
+ */
 class Server extends Dummy
 {
+    /**
+     * @param $uriParts
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     * @throws UserNotFoundException
+     */
     public function run($uriParts, $parameters){
 
         if(!count($uriParts)){
@@ -60,6 +70,11 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     * @throws UserNotFoundException
+     */
     protected function actionReceive($parameters){
 
         $targetUser = InputFilter::sanitize($parameters["shareWith"], InputFilter::SANITIZE_EMAILCHARS);
@@ -107,6 +122,12 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionAccept($remoteId, $token, $parameters){
 
         $store = new SQLStore();
@@ -125,6 +146,12 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionDecline($remoteId, $token, $parameters){
 
         $store = new SQLStore();
@@ -142,6 +169,12 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionUnshare($remoteId, $token, $parameters){
 
         $token          = InputFilter::sanitize($token, InputFilter::SANITIZE_ALPHANUM);
@@ -168,6 +201,10 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function validateReceiveShareParameters($parameters){
 
         $keys = array("shareWith", "token", "name", "remoteId", "owner", "remote");

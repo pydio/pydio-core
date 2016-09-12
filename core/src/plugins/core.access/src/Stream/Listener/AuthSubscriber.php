@@ -21,16 +21,26 @@ class AuthSubscriber implements SubscriberInterface
 {
     private $digest;
 
+    /**
+     * AuthSubscriber constructor.
+     * @param $digest
+     */
     public function __construct($digest)
     {
         $this->digest = $digest;
     }
 
+    /**
+     * @return array
+     */
     public function getEvents()
     {
         return ['before' => ['sign', RequestEvents::SIGN_REQUEST]];
     }
 
+    /**
+     * @param BeforeEvent $e
+     */
     public function sign(BeforeEvent $e)
     {
         //$e->getClient()->setDefaultOptions

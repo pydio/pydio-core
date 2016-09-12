@@ -43,6 +43,11 @@ use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class TaskController
+ * Main controller for TaskService actions
+ * @package Pydio\Tasks
+ */
 class TaskController extends Plugin implements SqlTableProvider
 {
 
@@ -56,6 +61,10 @@ class TaskController extends Plugin implements SqlTableProvider
         TaskService::getInstance()->setProvider(new SqlTasksProvider());
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param Task $task
+     */
     protected function initTaskFromApi(ServerRequestInterface $request, Task &$task){
         $params = $request->getParsedBody();
         $taskData = json_decode($params["task"], true);
@@ -84,6 +93,11 @@ class TaskController extends Plugin implements SqlTableProvider
         }
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws \Pydio\Core\Exception\UserNotFoundException
+     */
     public function route(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $action = $request->getAttribute("action");

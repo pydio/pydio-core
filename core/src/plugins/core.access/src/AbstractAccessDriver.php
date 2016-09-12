@@ -600,11 +600,7 @@ abstract class AbstractAccessDriver extends Plugin
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"FIXED PERM DATA ($fixPermPolicy)",sprintf("%o", ($p & 000777)));
         }
     }
-
-    protected function resetAllPermission($value)
-    {
-    }
-
+    
     /**
      * Test if userSelection is containing a hidden file, which should not be the case!
      * @param ContextInterface $ctx

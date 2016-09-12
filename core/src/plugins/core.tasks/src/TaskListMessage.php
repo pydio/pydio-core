@@ -25,7 +25,11 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class TaskListMessage
+ * Serializable message for http response
+ * @package Pydio\Tasks
+ */
 class TaskListMessage implements JSONSerializableResponseChunk, XMLSerializableResponseChunk
 {
 

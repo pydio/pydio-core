@@ -32,6 +32,13 @@ die("You are not allowed to see this page (comment first line of the file to acc
 require_once("base.conf.php");
 require_once AJXP_BIN_FOLDER."/lib/HttpClient.php";
 
+/**
+ * @param $baseData
+ * @param $url
+ * @param $parameters
+ * @param $private
+ * @return HttpClient
+ */
 function apiPost($baseData, $url, $parameters, $private){
 
     $nonce = substr(md5(microtime()), 0, 6);

@@ -24,6 +24,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Sabre\HTTP;
 
+/**
+ * Class BasicAuthNoPass
+ * Implements OCS Spec to log user with "empty_user:password"
+ * @package Pydio\OCS\Server\Dav
+ */
 class BasicAuthNoPass extends HTTP\BasicAuth
 {
     /**
@@ -43,6 +48,10 @@ class BasicAuthNoPass extends HTTP\BasicAuth
 
     }
 
+    /**
+     * @param HTTP\Request $httpRequest
+     * @return array|bool
+     */
     public static function parseUserPass(HTTP\Request $httpRequest){
 
         // Apache and mod_php

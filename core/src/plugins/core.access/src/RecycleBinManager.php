@@ -36,6 +36,9 @@ class RecycleBinManager
     private static $rbmRecycle;
     private static $rbmRelativeRecycle;
 
+    /**
+     * @return bool
+     */
     public static function recycleEnabled()
     {
         return (isSet(self::$rbmRecycle) && self::$rbmRecycle != null && is_string(self::$rbmRecycle));

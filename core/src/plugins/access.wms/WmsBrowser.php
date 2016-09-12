@@ -39,6 +39,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class WmsBrowser extends AbstractAccessDriver
 {
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         parent::accessPreprocess($requestInterface);
@@ -120,6 +124,11 @@ class WmsBrowser extends AbstractAccessDriver
 
     }
 
+    /**
+     * @param $key
+     * @param $metaData
+     * @return mixed
+     */
     public function replaceStyle($key, $metaData)
     {
         if(!is_string($key)) return $metaData ;

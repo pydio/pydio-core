@@ -55,6 +55,9 @@ if (!class_exists("SessionSwitcher")) {
     require_once("$CURRENTPATH/sessionSwitcher.php");
 }
 if (!function_exists("auth_remote_debug")){
+    /**
+     * @param $str
+     */
     function auth_remote_debug($str){
         if(AJXP_SERVER_DEBUG){
             error_log('[Pydio Auth Remote] '.$str);
@@ -94,6 +97,10 @@ if ($authPlug->getOption("SECRET") == "") {
  */
 if(!function_exists("ajxp_gluecode_updateRole")){
 
+    /**
+     * @param $loginData
+     * @param $userObject
+     */
     function ajxp_gluecode_updateRole($loginData, &$userObject)
     {
         auth_remote_debug("Updating user roles based on mappings");

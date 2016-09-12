@@ -23,6 +23,10 @@ namespace Pydio\OCS\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface IStore
+ * @package Pydio\OCS\Model
+ */
 interface IStore
 {
 

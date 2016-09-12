@@ -62,6 +62,9 @@ class MetadataCachingStream implements StreamInterface
         $this->stat();
     }
 
+    /**
+     * @return int|null
+     */
     public function getSize() {
         $stat = $this->stat();
 
@@ -72,6 +75,9 @@ class MetadataCachingStream implements StreamInterface
         return null;
     }
 
+    /**
+     * @return int|null
+     */
     public function getLastModifiedTime() {
         $stat = $this->stat();
 
@@ -82,6 +88,9 @@ class MetadataCachingStream implements StreamInterface
         return null;
     }
 
+    /**
+     * @return bool|null
+     */
     public function isFile() {
         $stat = $this->stat();
         if (isset($stat["type"])) {
@@ -91,10 +100,16 @@ class MetadataCachingStream implements StreamInterface
         return null;
     }
 
+    /**
+     * @return string
+     */
     public function getContents() {
         return $this->stream->getContents();
     }
 
+    /**
+     * @return bool|mixed
+     */
     public function stat() {
 
         $stat = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);

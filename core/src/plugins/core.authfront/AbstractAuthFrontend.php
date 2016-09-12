@@ -25,6 +25,10 @@ use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class AbstractAuthFrontend
+ * @package Pydio\Auth\Frontend\Core
+ */
 abstract class AbstractAuthFrontend extends Plugin {
 
     /**

@@ -29,6 +29,11 @@ use Pydio\Share\Model\ShareLink;
 defined('AJXP_EXEC') or die('Access not allowed');
 define('AJXP_SHARED_META_NAMESPACE', 'ajxp_shared');
 
+/**
+ * Class ShareMetaManager
+ * Metadata manager for shares data
+ * @package Pydio\Share\Store
+ */
 class ShareMetaManager
 {
     /**

@@ -24,6 +24,12 @@ namespace Pydio\Access\Driver\StreamProvider\S3;
 use Pydio\Core\Services\CacheService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+
+/**
+ * Class S3CacheService
+ * Pydio Connector between AWS Cache and pydio CacheService
+ * @package Pydio\Access\Driver\StreamProvider\S3
+ */
 class S3CacheService implements \Aws\CacheInterface
 {
     /**

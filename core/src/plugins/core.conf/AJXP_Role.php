@@ -75,11 +75,20 @@ class AJXP_Role implements IGroupPathProvider
 
     static $cypheredPassPrefix = '$pydio_password$';
 
+    /**
+     * AJXP_Role constructor.
+     * @param string $id
+     */
     public function __construct($id)
     {
         $this->roleId = $id;
     }
 
+    /**
+     * Migrates an old AjxpRole object to AJXP_Role
+     * @param $repositoriesList
+     * @param AjxpRole $oldRole
+     */
     public function migrateDeprecated($repositoriesList, AjxpRole $oldRole)
     {
         $repositoriesList["ajxp.all"] = "";
@@ -103,10 +112,17 @@ class AJXP_Role implements IGroupPathProvider
         }
     }
 
+    /**
+     * @return bool
+     */
     public function isGroupRole()
     {
         return strpos($this->roleId, "AJXP_GRP_") === 0;
     }
+
+    /**
+     * @return bool
+     */
     public function isUserRole()
     {
         return strpos($this->roleId, "AJXP_USER_") === 0;
@@ -346,6 +362,9 @@ class AJXP_Role implements IGroupPathProvider
         return $copy;
     }
 
+    /**
+     * @return array
+     */
     public function listAutoApplies()
     {
         return $this->autoApplies;
@@ -372,6 +391,9 @@ class AJXP_Role implements IGroupPathProvider
         return;
     }
 
+    /**
+     * @return array
+     */
     public function listActionsStates()
     {
         return $this->actions;
@@ -553,26 +575,42 @@ class AJXP_Role implements IGroupPathProvider
         return $ret;
     }
 
+    /**
+     * @param String $groupPath
+     * @param bool $update
+     */
     public function setGroupPath($groupPath, $update = true)
     {
         $this->groupPath = $groupPath;
     }
 
+    /**
+     * @return String
+     */
     public function getGroupPath()
     {
         return $this->groupPath;
     }
 
+    /**
+     * @return String
+     */
     public function getId()
     {
         return $this->roleId;
     }
 
+    /**
+     * @param string $roleLabel
+     */
     public function setLabel($roleLabel)
     {
         $this->setParameterValue("core.conf", "ROLE_DISPLAY_NAME", $roleLabel);
     }
 
+    /**
+     * @return String
+     */
     public function getLabel()
     {
         $test = $this->filterParameterValue("core.conf", "ROLE_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, $this->roleId);
@@ -580,6 +618,9 @@ class AJXP_Role implements IGroupPathProvider
         return $this->roleId;
    }
 
+    /**
+     * @return mixed
+     */
     public function alwaysOverrides()
     {
         return $this->filterParameterValue("core.conf", "ROLE_FORCE_OVERRIDE", AJXP_REPO_SCOPE_ALL, false);
@@ -602,10 +643,16 @@ class AJXP_Role implements IGroupPathProvider
         return in_array($specificRight, $this->autoApplies);
     }
 
+    /**
+     * @return int
+     */
     public function getLastUpdated(){
         return $this->lastUpdated;
     }
 
+    /**
+     * @param $time
+     */
     public function setLastUpdated($time){
         $this->lastUpdated = $time;
     }

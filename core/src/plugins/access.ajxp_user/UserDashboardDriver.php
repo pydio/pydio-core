@@ -58,6 +58,10 @@ class UserDashboardDriver extends AbstractAccessDriver
         require_once AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php";
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param \DOMNode $contribNode
+     */
     public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
         $disableAddressBook = $this->getContextualOption($ctx, "DASH_DISABLE_ADDRESS_BOOK") === true;
         if($contribNode->nodeName == "client_configs" && $disableAddressBook){
@@ -70,6 +74,11 @@ class UserDashboardDriver extends AbstractAccessDriver
         parent::parseSpecificContributions($ctx, $contribNode);
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         parent::accessPreprocess($requestInterface);
@@ -196,6 +205,10 @@ class UserDashboardDriver extends AbstractAccessDriver
         return $minisites;
     }
 
+    /**
+     * @param $metaIcon
+     * @return string
+     */
     private function metaIcon($metaIcon)
     {
         return "<span class='icon-".$metaIcon." meta-icon'></span> ";

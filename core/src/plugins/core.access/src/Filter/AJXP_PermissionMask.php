@@ -273,6 +273,9 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
         //echo "\n";
     }
 
+    /**
+     * @param int $number
+     */
     public function printSpace($number){
         for ($i = 0; $i < $number; $i++){
             echo "--";

@@ -34,6 +34,10 @@ use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class OCSPlugin
+ * @package Pydio\OCS
+ */
 class OCSPlugin extends Plugin {
 
     /**
@@ -52,6 +56,9 @@ class OCSPlugin extends Plugin {
         Controller::registerIncludeHook("repository.search", array($this, "remoteRepositoryById"));
     }
 
+    /**
+     * @return ActionsController
+     */
     protected function getController(){
         if($this->controller == null){
             require_once("ActionsController.php");
@@ -60,10 +67,19 @@ class OCSPlugin extends Plugin {
         return $this->controller;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return null
+     * @throws \Pydio\Core\Exception\PydioException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
         return $this->getController()->switchAction($request, $response);
     }
 
+    /**
+     * @return bool
+     */
     public function federatedEnabled(){
         return $this->getConfigs()["ENABLE_FEDERATED_SHARING"] === true;
     }
@@ -86,6 +102,13 @@ class OCSPlugin extends Plugin {
 
     }
 
+    /**
+     * @param $baseUri
+     * @param $endpoint
+     * @param $uriParts
+     * @param $parameters
+     * @throws Server\InvalidArgumentsException
+     */
     public function route($baseUri, $endpoint, $uriParts, $parameters){
 
         if($endpoint == "dav" && $this->federatedEnabled()) {
@@ -129,6 +152,11 @@ class OCSPlugin extends Plugin {
         }
     }
 
+    /**
+     * @param $repositoryId
+     * @param $repoObject
+     * @throws \Exception
+     */
     public function remoteRepositoryById($repositoryId, &$repoObject){
         if(strpos($repositoryId, "ocs_remote_share_") !== 0){
             return;
@@ -149,6 +177,10 @@ class OCSPlugin extends Plugin {
     }
 
 
+    /**
+     * @param $base
+     * @param $route
+     */
     public static function startServer($base, $route) {
         
         $pServ = PluginsService::getInstance(Context::emptyContext());

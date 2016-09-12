@@ -45,6 +45,10 @@ class ContentFilter {
         $this->virtualPaths = array_flip($this->filters);
     }
 
+    /**
+     * @param $path
+     * @return string
+     */
     private function getVirtualPath($path){
         return "/".substr(md5($path), 0, 10)."/".basename($path);
     }
@@ -73,10 +77,17 @@ class ContentFilter {
         }
     }
 
+    /**
+     * @return mixed|string
+     */
     function getBaseDir(){
         return PathUtils::forwardSlashDirname(array_keys($this->filters)[0]);
     }
 
+    /**
+     * Retrieves the path of the first object
+     * @return mixed|string
+     */
     function getUniquePath(){
         return PathUtils::forwardSlashBasename(array_keys($this->filters)[0]);
     }

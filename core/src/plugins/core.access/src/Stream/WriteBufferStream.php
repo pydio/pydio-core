@@ -48,6 +48,9 @@ class WriteBufferStream implements StreamInterface {
         $this->hwm = $hwm;
     }
 
+    /**
+     * @return string
+     */
     public function getContents() {
         return $this->stream->getContents();
     }

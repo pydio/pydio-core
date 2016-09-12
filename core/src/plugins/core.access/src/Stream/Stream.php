@@ -116,6 +116,12 @@ class Stream implements StreamInterface
         $this->client = $client;
     }
 
+    /**
+     * @param string $resource
+     * @param string $mode
+     * @param array $options
+     * @return GuzzleStream|Stream
+     */
     public static function factory($resource = '', $mode = "r+", array $options = []) {
         if ($resource instanceof AJXP_Node) {
 
@@ -130,6 +136,10 @@ class Stream implements StreamInterface
         return GuzzleStream::factory($resource, $options);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param array $arr
+     */
     public static function addContextOption(ContextInterface $ctx, array $arr) {
 
         $default = stream_context_get_options(stream_context_get_default());
@@ -151,6 +161,12 @@ class Stream implements StreamInterface
         stream_context_set_default($default);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param null $key
+     * @param null $default
+     * @return null
+     */
     public static function getContextOption(ContextInterface $ctx, $key = null, $default = null) {
         $options = stream_context_get_options(stream_context_get_default());
 
@@ -165,6 +181,9 @@ class Stream implements StreamInterface
         return $default;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         if (!$this->resource) {
@@ -176,6 +195,9 @@ class Stream implements StreamInterface
         return (string) stream_get_contents($this->resource);
     }
 
+    /**
+     * @return \GuzzleHttp\Ring\Future\FutureInterface|mixed|null
+     */
     public function getContents()
     {
         $uri = $this->getMetadata("uri");
@@ -196,6 +218,9 @@ class Stream implements StreamInterface
         $this->detach();
     }
 
+    /**
+     * @return mixed
+     */
     public function detach()
     {
         $result = $this->resource;
@@ -205,6 +230,9 @@ class Stream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @param resource $stream
+     */
     public function attach($stream) {
         $this->resource = $stream;
         $meta = stream_get_meta_data($this->resource);
@@ -272,6 +300,9 @@ class Stream implements StreamInterface
         return null;
     }
 
+    /**
+     * @return bool|null
+     */
     public function isFile() {
         if (!$this->resource) {
             return null;
@@ -291,18 +322,30 @@ class Stream implements StreamInterface
         return null;
     }
 
+    /**
+     * @return bool|mixed
+     */
     public function isReadable() {
         return $this->readable;
     }
 
+    /**
+     * @return bool|mixed
+     */
     public function isWritable() {
         return $this->writable;
     }
 
+    /**
+     * @return bool
+     */
     public function isSeekable() {
         return $this->seekable;
     }
 
+    /**
+     * @return bool
+     */
     public function eof() {
         return !$this->resource || feof($this->resource);
     }
@@ -327,10 +370,18 @@ class Stream implements StreamInterface
         return $this->resource ? ftell($this->resource) : false;
     }
 
+    /**
+     * @param int $length
+     * @return bool|string
+     */
     public function read($length) {
         return $this->readable ? fread($this->resource, $length) : false;
     }
 
+    /**
+     * @param string $buffer
+     * @return int|null
+     */
     public function write($buffer) {
         // We can't know the size after writing anything
         $this->detach();
@@ -361,6 +412,10 @@ class Stream implements StreamInterface
         return $stream->getSize();
     }
 
+    /**
+     * @param null $key
+     * @return array|mixed|null
+     */
     public function getMetadata($key = null) {
         if (!$this->resource) {
             return $key ? null : [];
@@ -373,6 +428,10 @@ class Stream implements StreamInterface
         }
     }
 
+    /**
+     * @param null $cmdName
+     * @throws Exception
+     */
     private function prepare($cmdName = null) {
 
         $options = self::getContextOption($this->node->getContext());
@@ -395,6 +454,9 @@ class Stream implements StreamInterface
         ]);
     }
 
+    /**
+     * @return \GuzzleHttp\Ring\Future\FutureInterface|mixed|null
+     */
     private function ls() {
 
         $this->prepare('Ls');
@@ -404,6 +466,9 @@ class Stream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @return \GuzzleHttp\Ring\Future\FutureInterface|mixed|null
+     */
     private function get() {
 
         $this->prepare('Get');
@@ -416,6 +481,9 @@ class Stream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @return \GuzzleHttp\Ring\Future\FutureInterface|mixed|null
+     */
     public function stat() {
 
         $this->prepare('Stat');
@@ -429,6 +497,9 @@ class Stream implements StreamInterface
         return $result;
     }
 
+    /**
+     * @return bool
+     */
     public function mkdir() {
 
         $this->prepare('Mkdir');
@@ -438,6 +509,9 @@ class Stream implements StreamInterface
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function rmdir() {
 
         $this->prepare('Rmdir');
@@ -447,6 +521,10 @@ class Stream implements StreamInterface
         return true;
     }
 
+    /**
+     * @param $newNode
+     * @return bool
+     */
     public function rename($newNode) {
         $this->client->getCommand('Rename', [
             'path'    => $this->node,

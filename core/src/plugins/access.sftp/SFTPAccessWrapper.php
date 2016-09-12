@@ -50,18 +50,32 @@ function disconnectedSftp($code, $message, $language)
     throw new \Exception('SSH2.FTP : disconnected'.$message, $code);
 }
 
+/**
+ * @param $message
+ * @throws \Exception
+ */
 function ignoreSftp($message)
 {
     Logger::info(__CLASS__,"SSH2.FTP.ignore",$message);
     throw new \Exception('SSH2.FTP : ignore'.$message);
 }
 
+/**
+ * @param $message
+ * @param $language
+ * @param $always_display
+ * @throws \Exception
+ */
 function debugSftp($message, $language, $always_display)
 {
     Logger::info(__CLASS__,"SSH2.FTP.debug",$message);
     throw new \Exception('SSH2.FTP : debug'.$message);
 }
 
+/**
+ * @param $packet
+ * @throws \Exception
+ */
 function macerrorSftp($packet)
 {
     Logger::info(__CLASS__,"SSH2.FTP.macerror","");
@@ -286,11 +300,18 @@ class SFTPAccessWrapper extends FsAccessWrapper
         }
     }
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url)
     {
         return false;
@@ -314,6 +335,11 @@ class SFTPAccessWrapper extends FsAccessWrapper
     }
 
 
+    /**
+     * @param string $path
+     * @return bool
+     * @throws \Exception
+     */
     public function unlink($path)
     {
         // Male sur to return true on success.
@@ -340,6 +366,10 @@ class SFTPAccessWrapper extends FsAccessWrapper
         ssh2_exec($connection,'chmod '.decoct($chmodValue).' '.$remote_base_path.$node->getPath());
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     */
     public static function getSshConnection(ContextInterface $ctx)
     {
         $repoObject  = $ctx->getRepository();

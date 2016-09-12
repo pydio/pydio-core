@@ -23,9 +23,21 @@ namespace Pydio\OCS\Client;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Interface IServiceDiscovery
+ * @package Pydio\OCS\Client
+ */
 interface IServiceDiscovery
 {
+    /**
+     * @param $url
+     * @return mixed
+     */
     public static function findEndpointsForURL($url);
 
+    /**
+     * @param $client
+     * @return mixed
+     */
     public static function findEndpointsForClient($client);
 }

@@ -48,11 +48,18 @@ require_once(AJXP_INSTALL_PATH."/plugins/access.sftp_psl/phpseclib/SSH2.php");
 class SftpPSLAccessWrapper extends FsAccessWrapper
 {
 
+    /**
+     * @return bool
+     */
     public static function isRemote()
     {
         return true;
     }
 
+    /**
+     * @param String $url
+     * @return bool
+     */
     public static function isSeekable($url)
     {
         return false;
@@ -183,6 +190,12 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
         return $this->dH !== false;
     }
 
+    /**
+     * @param string $path
+     * @return bool
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function unlink($path)
     {
         $this->realPath = $this->initPath($path, "file", false, true);

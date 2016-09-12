@@ -47,6 +47,13 @@ class EncfsMounter extends Plugin
         return $contextInterface->getRepository()->getContextOption($contextInterface, "PATH");
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     * @throws Exception
+     */
     public function cypherAllMounted($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)
     {
         $dirs = glob($this->getWorkingPath($ctx) . "/ENCFS_CLEAR_*/.ajxp_mount");
@@ -59,6 +66,12 @@ class EncfsMounter extends Plugin
         }
     }
 
+    /**
+     * @param $actionName
+     * @param $httpVars
+     * @param $fileVars
+     * @param ContextInterface $ctx
+     */
     public function preProcessMove($actionName, &$httpVars, &$fileVars, ContextInterface $ctx)
     {
         $destO = InputFilter::decodeSecureMagic($httpVars["dest"]);
@@ -92,6 +105,11 @@ class EncfsMounter extends Plugin
         }
     }
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @throws Exception
+     */
     public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
 
@@ -193,6 +211,14 @@ class EncfsMounter extends Plugin
         }
     }
 
+    /**
+     * @param $raw
+     * @param $originalXML
+     * @param $originalSecret
+     * @param $secret
+     * @return bool
+     * @throws Exception
+     */
     public static function initEncFolder($raw, $originalXML, $originalSecret, $secret)
     {
         copy($originalXML, $raw . "/" . basename($originalXML));
@@ -229,6 +255,13 @@ class EncfsMounter extends Plugin
     }
 
 
+    /**
+     * @param $raw
+     * @param $clear
+     * @param $secret
+     * @param $uid
+     * @throws Exception
+     */
     public static function mountFolder($raw, $clear, $secret, $uid)
     {
         $descriptorspec = array(
@@ -264,6 +297,10 @@ class EncfsMounter extends Plugin
         }
     }
 
+    /**
+     * @param $clear
+     * @throws Exception
+     */
     public static function umountFolder($clear)
     {
         $descriptorspec = array(

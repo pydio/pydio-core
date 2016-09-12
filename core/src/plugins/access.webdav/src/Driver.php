@@ -114,6 +114,10 @@ class Driver extends FsAccessDriver
         return $basePath;
     }
 
+    /**
+     * @param $date
+     * @return int
+     */
     public static function convertTime($date) {
         $date = date_create($date);
 

@@ -26,6 +26,10 @@ use Aws\S3\StreamWrapper;
 require_once __DIR__ . DIRECTORY_SEPARATOR . "S3CacheService.php";
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class S3Client
+ * @package Pydio\Access\Driver\StreamProvider\S3
+ */
 class S3Client extends AwsS3Client
 {
     /**

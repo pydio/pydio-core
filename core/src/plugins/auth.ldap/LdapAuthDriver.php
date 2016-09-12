@@ -138,6 +138,11 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * @param array $options
+     * @param array $optionsNames
+     * @return array
+     */
     public function parseReplicatedParams($options, $optionsNames)
     {
         $i = 0;

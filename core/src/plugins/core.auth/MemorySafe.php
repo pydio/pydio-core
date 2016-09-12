@@ -201,11 +201,18 @@ class MemorySafe
         return $inst->getCredentials();
     }
 
+    /**
+     * @return mixed
+     */
     public static function getEncodedCredentialString()
     {
         return $_SESSION["AJXP_SAFE_CREDENTIALS"];
     }
 
+    /**
+     * @param $encoded
+     * @return array|bool
+     */
     public static function getCredentialsFromEncodedString($encoded)
     {
         $tmpInstance = new MemorySafe();

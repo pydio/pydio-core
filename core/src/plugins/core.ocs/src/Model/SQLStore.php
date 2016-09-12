@@ -29,6 +29,10 @@ define('OCS_SQLSTORE_FORMAT', 'serial');
 define('OCS_SQLSTORE_NS_INVITATION', 'ocs_invitation');
 define('OCS_SQLSTORE_NS_REMOTE_SHARE', 'ocs_remote_share');
 
+/**
+ * Class SQLStore
+ * @package Pydio\OCS\Model
+ */
 class SQLStore implements IStore
 {
     /**
@@ -36,6 +40,9 @@ class SQLStore implements IStore
      */
     protected $storage;
 
+    /**
+     * SQLStore constructor.
+     */
     public function __construct()
     {
         $storage = ConfService::getConfStorageImpl();
@@ -44,6 +51,10 @@ class SQLStore implements IStore
         }
     }
 
+    /**
+     * @param ShareInvitation $invitation
+     * @return int
+     */
     public function generateInvitationId(ShareInvitation &$invitation){
         if(empty($id)){
             $id = $this->findAvailableID(OCS_SQLSTORE_NS_INVITATION);
@@ -142,6 +153,10 @@ class SQLStore implements IStore
         return $data;
     }
 
+    /**
+     * @param $ocsRemoteId
+     * @return mixed|null
+     */
     public function remoteShareForOcsRemoteId($ocsRemoteId){
         $searchString = 's:11:"ocsRemoteId";s:'.strlen($ocsRemoteId).':"'.$ocsRemoteId.'"';
         $cursor = null;
@@ -164,6 +179,10 @@ class SQLStore implements IStore
         return true;
     }
 
+    /**
+     * @param $namespace
+     * @return int
+     */
     protected function findAvailableID($namespace){
         $id = 0;
         while(true){
@@ -176,6 +195,9 @@ class SQLStore implements IStore
         return $id;
     }
 
+    /**
+     * @return string
+     */
     protected function getGUID(){
         if (function_exists('com_create_guid')){
             return com_create_guid();

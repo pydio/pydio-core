@@ -33,6 +33,10 @@ if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_REJECTED', 4);
 }
 
+/**
+ * Class RemoteShare
+ * @package Pydio\OCS\Model
+ */
 class RemoteShare
 {
     /**
@@ -115,6 +119,9 @@ class RemoteShare
         return $this->id;
     }
 
+    /**
+     * @param $id
+     */
     public function setId($id){
         $this->id = $id;
     }
@@ -156,6 +163,9 @@ class RemoteShare
         return $repo;
     }
 
+    /**
+     * @return bool
+     */
     public function pingRemoteDAVPoint(){
 
         $fullPath = rtrim($this->getOcsDavUrl(), "/")."/".$this->getDocumentName();

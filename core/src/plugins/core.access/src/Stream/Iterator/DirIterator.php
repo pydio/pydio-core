@@ -21,6 +21,10 @@
 
 namespace Pydio\Access\Core\Stream\Iterator;
 
+/**
+ * Class DirIterator
+ * @package Pydio\Access\Core\Stream\Iterator
+ */
 class DirIterator implements \Iterator {
 
     private $position = 0;

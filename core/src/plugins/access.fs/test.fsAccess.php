@@ -32,6 +32,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class fsAccessTest extends AbstractTest
 {
+    /**
+     * fsAccessTest constructor.
+     */
     public function __construct() { parent::__construct("Filesystem Plugin", ""); }
 
     /**

@@ -33,7 +33,11 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class HomePagePlugin extends AbstractAccessDriver
 {
-    
+
+    /**
+     * @param ContextInterface $ctx
+     * @param \DOMNode $contribNode
+     */
     public function parseSpecificContributions(ContextInterface $ctx, \DOMNode &$contribNode){
         parent::parseSpecificContributions($ctx, $contribNode);
         if($contribNode->nodeName == "client_configs"){

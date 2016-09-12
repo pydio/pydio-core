@@ -22,9 +22,15 @@ namespace Pydio\OCS\Server;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Dummy Server for not active Federated Sharing
+ * @package Pydio\OCS\Server
+ */
 class Dummy
 {
-
+    /**
+     * Dummy constructor.
+     */
     public function __construct()
     {
         set_exception_handler(array($this, "handleException"));

@@ -22,16 +22,25 @@ namespace Pydio\Auth\Frontend;
 
 use data;
 use dencrypted;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 
-
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CypheredAuthFrontend
+ * @package Pydio\Auth\Frontend
+ */
 class CypheredAuthFrontend extends AbstractAuthFrontend
 {
 
+    /**
+     * @param $httpVars
+     * @param $varName
+     * @return string
+     */
     function detectVar(&$httpVars, $varName)
     {
         if (isSet($httpVars[$varName])) return $httpVars[$varName];
@@ -39,6 +48,10 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
         return "";
     }
 
+    /**
+     * @return array|mixed
+     * @throws \Exception
+     */
     function getLastKeys()
     {
         $file = $this->getPluginWorkDir(false) . "/last_inc";
@@ -50,6 +63,10 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
         return array();
     }
 
+    /**
+     * @param $data
+     * @throws \Exception
+     */
     function storeLastKeys($data)
     {
         $file = $this->getPluginWorkDir(true) . "/last_inc";
@@ -60,8 +77,8 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
      * decrypt AES 256
      *
      * @param string $password
-     * @param data $edata
-     * @return dencrypted data
+     * @param string $edata
+     * @return string data
      */
     public function decrypt($password, $edata)
     {
@@ -121,7 +138,16 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
     }
 
 
-    function tryToLogUser(\Psr\Http\Message\ServerRequestInterface &$request, \Psr\Http\Message\ResponseInterface &$response, $isLast = false)
+    /**
+     * Try to authenticate the user based on various external parameters
+     * Return true if user is now logged.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param bool $isLast Whether this is is the last plugin called.
+     * @return bool
+     */
+    function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false)
     {
 
         $httpVars = $request->getParsedBody();

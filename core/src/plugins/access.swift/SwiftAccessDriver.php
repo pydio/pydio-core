@@ -102,6 +102,11 @@ class SwiftAccessDriver extends FsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
+    /**
+     * @param AJXP_Node $dir
+     * @param string $type
+     * @return bool
+     */
     public function isWriteable($dir, $type="dir")
     {
         return true;
@@ -120,6 +125,9 @@ class SwiftAccessDriver extends FsAccessDriver
         }
     }
 
+    /**
+     * @return bool
+     */
     public function isRemote()
     {
         return true;

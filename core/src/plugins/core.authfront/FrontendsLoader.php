@@ -30,6 +30,10 @@ use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
+/**
+ * Class FrontendsLoader
+ * @package Pydio\Auth\Frontend\Core
+ */
 class FrontendsLoader extends Plugin {
 
     /**

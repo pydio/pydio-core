@@ -42,6 +42,13 @@ class DemoAccessDriver extends FsAccessDriver
     */
     public $repository;
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     * @return array|void
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         $errorMessage = "This is a demo, all 'write' actions are disabled!";

@@ -27,6 +27,10 @@ if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_REJECTED', 4);
 }
 
+/**
+ * Class ShareInvitation
+ * @package Pydio\OCS\Model
+ */
 class ShareInvitation implements \JsonSerializable
 {
     /**
@@ -70,6 +74,9 @@ class ShareInvitation implements \JsonSerializable
         return $this->id;
     }
 
+    /**
+     * @param string $id
+     */
     public function setId($id){
         $this->id = $id;
     }
@@ -82,6 +89,9 @@ class ShareInvitation implements \JsonSerializable
         return $this->documentName;
     }
 
+    /**
+     * @param string $documentName
+     */
     public function setDocumentName($documentName){
         $this->documentName = $documentName;
     }

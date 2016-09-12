@@ -36,8 +36,19 @@ use Pydio\OCS\Model\SQLStore;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class ActionsController
+ * @package Pydio\OCS
+ */
 class ActionsController
 {
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return null
+     * @throws PydioException
+     * @throws \Exception
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response) {
 
         /** @var ContextInterface $ctx */

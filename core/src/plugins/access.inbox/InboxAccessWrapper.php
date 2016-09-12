@@ -120,6 +120,11 @@ class InboxAccessWrapper implements IAjxpWrapper
         return $key;
     }
 
+    /**
+     * @param $path
+     * @return mixed|null|string
+     * @throws \Exception
+     */
     public static function translateURL($path){
 
         $pydioScheme = false;

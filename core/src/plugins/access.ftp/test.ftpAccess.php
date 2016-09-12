@@ -28,8 +28,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class ftpAccessTest extends AbstractTest
 {
+    /**
+     * ftpAccessTest constructor.
+     */
     public function __construct() { parent::__construct("Remote FTP Filesystem Plugin", ""); }
 
+    /**
+     * @param \Pydio\Access\Core\Model\Repository $repo
+     * @return bool|int
+     */
     public function doRepositoryTest($repo)
     {
         if($repo->accessType != "ftp") return -1;

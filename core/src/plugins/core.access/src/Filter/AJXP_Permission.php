@@ -179,6 +179,9 @@ class AJXP_Permission implements \JsonSerializable
         return $newPerm;
     }
 
+    /**
+     * @return string
+     */
     function __toString(){
         if($this->denies()) {
             return "DENY";
