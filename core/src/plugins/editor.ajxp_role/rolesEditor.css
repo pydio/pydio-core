@@ -1,25 +1,25 @@
-#role_edit_box {
+#editor_tabs {
   /* ORBIT THEME */
 }
-#role_edit_box div#meta_source_button_add {
+#editor_tabs div#meta_source_button_add {
   margin-top: 20px;
 }
-#role_edit_box div.tabbed_editor {
+#editor_tabs div.tabbed_editor {
   background-color: #194172;
   font-size: 13px;
   border-left: 1px solid #bbbbbb;
   border-right: 1px solid #bbbbbb;
   line-height: initial;
 }
-#role_edit_box div.tabbed_editor {
+#editor_tabs div.tabbed_editor {
   background-color: #f8f8f8;
   border: 0;
 }
-#role_edit_box div.tabbed_editor div.accordion_content {
+#editor_tabs div.tabbed_editor div.accordion_content {
   padding-bottom: 20px;
 }
-#role_edit_box div.tabbed_editor input[type="text"],
-#role_edit_box div.tabbed_editor input[type="password"] {
+#editor_tabs div.tabbed_editor input[type="text"],
+#editor_tabs div.tabbed_editor input[type="password"] {
   font-size: 13px;
   line-height: 21px;
   padding: 0 0 0 5px !important;
@@ -28,31 +28,31 @@
   border: 1px solid #C8CCD3;
   box-sizing: border-box;
 }
-#role_edit_box div.tabbed_editor input:focus,
-#role_edit_box div.tabbed_editor textarea:focus,
-#role_edit_box div.tabbed_editor select:focus {
+#editor_tabs div.tabbed_editor input:focus,
+#editor_tabs div.tabbed_editor textarea:focus,
+#editor_tabs div.tabbed_editor select:focus {
   border: 1px solid #4dc5c3;
 }
-#role_edit_box div.tabbed_editor select,
-#role_edit_box div.tabbed_editor textarea {
+#editor_tabs div.tabbed_editor select,
+#editor_tabs div.tabbed_editor textarea {
   border: 1px solid #C8CCD3;
   font-size: 13px;
 }
-#role_edit_box div.tabbed_editor select {
+#editor_tabs div.tabbed_editor select {
   height: 30px;
   border: 1px solid #C8CCD3;
 }
-#role_edit_box div.tabbed_editor select[multiple='true'] {
+#editor_tabs div.tabbed_editor select[multiple='true'] {
   height: auto;
 }
-#role_edit_box div.tabbed_editor textarea {
+#editor_tabs div.tabbed_editor textarea {
   font-size: 13px;
   margin: 3px;
 }
-#role_edit_box div.tabbed_editor div.SF_input {
+#editor_tabs div.tabbed_editor div.SF_input {
   padding-top: 5px !important;
 }
-#role_edit_box div.tabbed_editor div.SF_image_block {
+#editor_tabs div.tabbed_editor div.SF_image_block {
   max-width: 80px !important;
   float: left;
   margin-left: 11px;
@@ -62,75 +62,75 @@
   font-size: 11px;
   text-align: center;
 }
-#role_edit_box div.tabbed_editor div.SF_label {
+#editor_tabs div.tabbed_editor div.SF_label {
   padding-right: 0;
   font-size: 14px !important;
   line-height: 22px;
   color: #6f7b88;
 }
-#role_edit_box div.tabbed_editor label {
+#editor_tabs div.tabbed_editor label {
   color: #6f7b88;
 }
-#role_edit_box div.tabbed_editor div.SF_element {
+#editor_tabs div.tabbed_editor div.SF_element {
   padding-top: 15px;
 }
-#role_edit_box div#actions-selector div.SF_element,
-#role_edit_box div#parameters-selector div.SF_element {
+#editor_tabs div#actions-selector div.SF_element,
+#editor_tabs div#parameters-selector div.SF_element {
   padding-top: 5px;
 }
-#role_edit_box div#actions-selector,
-#role_edit_box div#parameters-selector {
+#editor_tabs div#actions-selector,
+#editor_tabs div#parameters-selector {
   margin-bottom: 20px;
 }
-#role_edit_box div.tabbed_editor div.SF_input.SF_inlineButton {
+#editor_tabs div.tabbed_editor div.SF_input.SF_inlineButton {
   margin-left: 10px !important;
   width: 56% !important;
   padding: 7px 3px !important;
   box-sizing: border-box;
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.26);
 }
-#role_edit_box .ajxp_theme_vision div.tabbed_editor {
+#editor_tabs .ajxp_theme_vision div.tabbed_editor {
   background-color: #ffffff;
   padding: 0;
   border-radius: 4px;
   border: 0;
 }
-#role_edit_box div.tabbed_editor div.editor_header {
+#editor_tabs div.tabbed_editor div.editor_header {
   display: none;
   height: 0;
 }
-#role_edit_box .ajxp_theme_vision div.tabbed_editor div.editor_header {
+#editor_tabs .ajxp_theme_vision div.tabbed_editor div.editor_header {
   color: #666666;
 }
-#role_edit_box div.editor_header a {
+#editor_tabs div.editor_header a {
   padding: 3px 10px 5px;
   background-color: rgba(255, 255, 255, 0.93);
   box-shadow: 1px 1px 8px black;
   margin-right: 7px;
 }
-#role_edit_box .ajxp_theme_vision div.editor_header a {
+#editor_tabs .ajxp_theme_vision div.editor_header a {
   padding: 3px 10px 5px;
   background-color: #4dc5c3;
   box-shadow: none;
   margin-right: 7px;
   color: white !important;
 }
-#role_edit_box div.editor_header a:hover {
+#editor_tabs div.editor_header a:hover {
   border: none;
   margin: 5px 7px 0px 1px;
 }
-#role_edit_box div.editor_header a.disabled:hover {
+#editor_tabs div.editor_header a.disabled:hover {
   background-color: rgba(255, 255, 255, 0.93);
 }
-#role_edit_box .ajxp_theme_vision div.editor_header a.disabled:hover {
+#editor_tabs .ajxp_theme_vision div.editor_header a.disabled:hover {
   background-color: #4dc5c3;
 }
-#role_edit_box div.editor_header img.actionbar_button_icon {
+#editor_tabs div.editor_header img.actionbar_button_icon {
   float: left;
   width: 18px;
   height: 18px;
 }
-#role_edit_box div.editor_header span.actionbar_button_label {
+#editor_tabs div.editor_header span.actionbar_button_label {
   font-size: 12px;
   color: black;
   text-shadow: none;
@@ -138,29 +138,29 @@
   text-align: left;
   padding-left: 23px;
 }
-#role_edit_box .ajxp_theme_vision div.editor_header span.actionbar_button_label {
+#editor_tabs .ajxp_theme_vision div.editor_header span.actionbar_button_label {
   color: white;
   padding-left: 5px;
 }
-#role_edit_box .ajxp_theme_vision div.editor_header > div.editor_action_bar {
+#editor_tabs .ajxp_theme_vision div.editor_header > div.editor_action_bar {
   border-bottom: 0;
 }
-#role_edit_box div.tabbed_editor span.inherited,
-#role_edit_box div.tabbed_editor div.inherited {
+#editor_tabs div.tabbed_editor span.inherited,
+#editor_tabs div.tabbed_editor div.inherited {
   color: #AAAAAA;
 }
-#role_edit_box div#actions-selector,
-#role_edit_box div#parameters-selector,
-#role_edit_box div#pane-acls > div.dialogLegend {
+#editor_tabs div#actions-selector,
+#editor_tabs div#parameters-selector,
+#editor_tabs div#pane-acls > div.dialogLegend {
   padding: 10px;
 }
-#role_edit_box div#pane-infos > div {
+#editor_tabs div#pane-infos > div {
   clear: both;
 }
-#role_edit_box div#pane-docs {
+#editor_tabs div#pane-docs {
   padding: 0 !important;
 }
-#role_edit_box div.tabbed_editor div.innerTitle {
+#editor_tabs div.tabbed_editor div.innerTitle {
   font-size: 13px;
   margin: 3px 9px 10px;
   border-bottom: 1px solid #6f7b88;
@@ -171,7 +171,7 @@
   letter-spacing: 0px;
   font-size: 15px;
 }
-#role_edit_box span#user_roles_update_button {
+#editor_tabs span#user_roles_update_button {
   padding: 2px 6px;
   border: 1px solid #C50707;
   color: #C50707;
@@ -180,59 +180,59 @@
   display: inline-block;
   cursor: pointer;
 }
-#role_edit_box div#account_actions {
+#editor_tabs div#account_actions {
   background: none;
   text-align: right;
   padding: 12px 5% 18px;
 }
-#role_edit_box div#actions-selected,
-#role_edit_box div#acls-selected {
+#editor_tabs div#actions-selected,
+#editor_tabs div#acls-selected {
   margin: 20px;
   overflow-y: auto;
   padding: 2px;
   font-size: 12px;
 }
-#role_edit_box div#parameters-selected {
+#editor_tabs div#parameters-selected {
   font-size: 12px;
 }
-#role_edit_box div#actions-selected > div {
+#editor_tabs div#actions-selected > div {
   padding: 13px 12px;
 }
-#role_edit_box div#actions-selected > span.list_remove_item {
+#editor_tabs div#actions-selected > span.list_remove_item {
   margin-top: -8px;
 }
-#role_edit_box div#acls-selected div.repositoryEntry {
+#editor_tabs div#acls-selected div.repositoryEntry {
   clear: both;
   height: 17px;
   padding: 11px 8px 11px;
 }
-#role_edit_box div#acls-selected div.repositoryLabel {
+#editor_tabs div#acls-selected div.repositoryLabel {
   float: left;
 }
-#role_edit_box div#acls-selected div.repositoryRights {
+#editor_tabs div#acls-selected div.repositoryRights {
   float: right;
 }
-#role_edit_box div#actions-selected > div:nth-child(even),
-#role_edit_box div#acls-selected > div:nth-child(even),
-#role_edit_box table.repository > tbody > tr:nth-child(even) {
+#editor_tabs div#actions-selected > div:nth-child(even),
+#editor_tabs div#acls-selected > div:nth-child(even),
+#editor_tabs table.repository > tbody > tr:nth-child(even) {
   background: #F7F7F7;
 }
-#role_edit_box div#acls-selected input[type="checkbox"] {
+#editor_tabs div#acls-selected input[type="checkbox"] {
   width: 20px;
   margin-right: 0;
 }
-#role_edit_box div#acls-selected label {
+#editor_tabs div#acls-selected label {
   cursor: pointer;
   margin-right: 5px;
   text-align: left;
   min-width: 28px;
 }
-#role_edit_box #actions-selector div.SF_element,
-#role_edit_box #parameters-selector div.SF_element {
+#editor_tabs #actions-selector div.SF_element,
+#editor_tabs #parameters-selector div.SF_element {
   width: 64%;
 }
-#role_edit_box div.add_button,
-#role_edit_box span.list_remove_item {
+#editor_tabs div.add_button,
+#editor_tabs span.list_remove_item {
   display: inline-block;
   cursor: pointer;
   background-color: #4dc5c3;
@@ -240,44 +240,44 @@
   text-decoration: none;
   border-radius: 4px;
 }
-#role_edit_box div.add_button {
+#editor_tabs div.add_button {
   padding: 5px;
   position: absolute;
   right: 16%;
 }
-#role_edit_box span.list_remove_item {
+#editor_tabs span.list_remove_item {
   cursor: pointer;
   top: 16px;
   right: 0;
   padding: 6px 8px;
   margin-right: 5px;
 }
-#role_edit_box div.add_button.disabled {
+#editor_tabs div.add_button.disabled {
   opacity: 0.5;
 }
-#role_edit_box div.role_edit-params-form {
+#editor_tabs div.role_edit-params-form {
   padding: 10px;
   border: 1px solid #ebedf0;
   border-radius: 4px;
 }
-#role_edit_box div#parameters-selected {
+#editor_tabs div#parameters-selected {
   overflow-y: hidden;
 }
-#role_edit_box div#parameters-selected.non_empty {
+#editor_tabs div#parameters-selected.non_empty {
   border: 0;
 }
-#role_edit_box div#parameters-selected div.SF_element {
+#editor_tabs div#parameters-selected div.SF_element {
   position: relative;
 }
-#role_edit_box div#parameters-selected .SF_input {
+#editor_tabs div#parameters-selected .SF_input {
   width: 45% !important;
 }
-#role_edit_box div#parameters-selected span.list_remove_item {
+#editor_tabs div#parameters-selected span.list_remove_item {
   position: absolute;
   top: 16px;
   right: 0;
 }
-#role_edit_box span.m-2 {
+#editor_tabs span.m-2 {
   display: inline-block;
   font-size: 11px;
   padding: 5px 12px 7px 12px;
@@ -291,102 +291,102 @@
   letter-spacing: 1px;
   cursor: pointer;
 }
-#role_edit_box .pluginfo_list {
+#editor_tabs .pluginfo_list {
   padding: 0 !important;
   margin: 10px 20px;
 }
-#role_edit_box .pluginfo_list li:nth-child(2n+1) {
+#editor_tabs .pluginfo_list li:nth-child(2n+1) {
   background-color: #F7F7F7;
 }
-#role_edit_box .pluginfo_list li {
+#editor_tabs .pluginfo_list li {
   list-style: none;
   padding: 10px 7px;
   overflow: hidden;
 }
-#role_edit_box .pluginfo_key {
+#editor_tabs .pluginfo_key {
   display: inline-block;
   width: 90px;
 }
-#role_edit_box div.documentation {
+#editor_tabs div.documentation {
   padding: 0 20px !important;
 }
-#role_edit_box .shares-list {
+#editor_tabs .shares-list {
   margin: 10px 15px 15px;
 }
-#role_edit_box .shares-list div.header_cell:first-child {
+#editor_tabs .shares-list div.header_cell:first-child {
   border-radius: 4px 0 0 0;
 }
-#role_edit_box .shares-list div.header_cell:last-child {
+#editor_tabs .shares-list div.header_cell:last-child {
   border-radius: 0 4px 0 0;
 }
-#role_edit_box .shares-list div.header_label {
+#editor_tabs .shares-list div.header_label {
   padding: 7px 6px 4px;
 }
-#role_edit_box .shares-list div.header_resizer {
+#editor_tabs .shares-list div.header_resizer {
   max-height: 30px;
 }
-#role_edit_box .shares-list div.paginator {
+#editor_tabs .shares-list div.paginator {
   height: 23px;
   padding-top: 6px;
 }
-#role_edit_box #shares-toolbar a {
+#editor_tabs #shares-toolbar a {
   display: inline-block;
   margin-left: 15px;
 }
-#role_edit_box #shares-toolbar a span.ajxp_icon_span {
+#editor_tabs #shares-toolbar a span.ajxp_icon_span {
   display: inline-block;
   margin-right: 5px;
 }
-#role_edit_box #shares-toolbar {
+#editor_tabs #shares-toolbar {
   padding: 18px 0 0 24px;
   position: absolute;
   right: 0;
 }
-#role_edit_box .innerContainer {
+#editor_tabs .innerContainer {
   background-color: #FFFFFF;
   border-radius: 3px;
   border: 1px solid #F1F1F1;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.25);
 }
-#role_edit_box .innerTabRow {
+#editor_tabs .innerTabRow {
   border-radius: 3px;
   margin: 0 10px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15);
 }
-.ajxp_theme_orbit #role_edit_box .innerContainer {
+.ajxp_theme_orbit #editor_tabs .innerContainer {
   border: 0;
   box-shadow: none;
 }
-.ajxp_theme_orbit #role_edit_box #metaTabulator .innerContainer {
+.ajxp_theme_orbit #editor_tabs #metaTabulator .innerContainer {
   background-color: transparent;
   margin: 0 !important;
   padding: 10px !important;
   padding-bottom: 20px !important;
 }
-.ajxp_theme_orbit #role_edit_box .innerTabRow {
+.ajxp_theme_orbit #editor_tabs .innerTabRow {
   border-radius: 0;
   margin: 0;
   box-shadow: none;
 }
-.ajxp_theme_orbit #role_edit_box div.tabbed_editor input[type="text"],
-.ajxp_theme_orbit #role_edit_box div.tabbed_editor input[type="password"] {
+.ajxp_theme_orbit #editor_tabs div.tabbed_editor input[type="text"],
+.ajxp_theme_orbit #editor_tabs div.tabbed_editor input[type="password"] {
   width: inherit !important;
 }
-.ajxp_theme_orbit #role_edit_box div.tabbed_editor div.chosen-search input[type="text"] {
+.ajxp_theme_orbit #editor_tabs div.tabbed_editor div.chosen-search input[type="text"] {
   width: 100% !important;
   padding: 4px 20px 4px 5px !important;
   border-radius: 2px;
 }
-.ajxp_theme_orbit #role_edit_box div#parameters-selected span.list_remove_item {
+.ajxp_theme_orbit #editor_tabs div#parameters-selected span.list_remove_item {
   top: 42px;
   left: 400px;
   right: inherit;
 }
-.ajxp_theme_orbit #role_edit_box div#account_actions {
+.ajxp_theme_orbit #editor_tabs div#account_actions {
   text-align: left;
   padding: 12px 40px 18px;
 }
-.ajxp_theme_orbit #role_edit_box div.meta_plugin_new_form {
+.ajxp_theme_orbit #editor_tabs div.meta_plugin_new_form {
   background-color: white;
   margin: 8px 0 0 2%;
   border-radius: 5px;
@@ -395,13 +395,13 @@
   max-width: 447px;
   width: 93%;
 }
-.ajxp_theme_orbit #role_edit_box div.meta_plugin_new_form.empty {
+.ajxp_theme_orbit #editor_tabs div.meta_plugin_new_form.empty {
   display: none;
 }
-.ajxp_theme_orbit #role_edit_box div.meta_source_new_empty_params {
+.ajxp_theme_orbit #editor_tabs div.meta_source_new_empty_params {
   margin: 11px 11px 0;
   font-style: italic;
 }
-.ajxp_theme_orbit #role_edit_box div#parameters-selected {
+.ajxp_theme_orbit #editor_tabs div#parameters-selected {
   border-radius: 0 !important;
 }
