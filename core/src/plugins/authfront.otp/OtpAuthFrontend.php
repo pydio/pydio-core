@@ -55,6 +55,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     private $google;
     private $googleLast;
 
+    private $yubikeyEnabled;
     private $yubikey1;
     private $yubikey2;
 
@@ -103,10 +104,10 @@ class OtpAuthFrontend extends AbstractAuthFrontend
         } else {
             $userid = InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS);
             $this->loadConfig(UsersService::getUserById($userid));
-            // if there is no configuration for OTP, this means that this user don't have OTP
-            if(empty($this->googleEnabled) || $this->googleEnabled === false){
+
+            if( ( empty($this->googleEnabled) || $this->googleEnabled === false) && (empty($this->yubikeyEnabled) || $this->yubikeyEnabled === false)){
                 return false;
-            }else if(empty($this->google)){
+            }else if($this->googleEnabled && empty($this->google)){
                 $this->showSetupScreen($userid);
                 return false;
             }
@@ -115,13 +116,9 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 return false;
             }
 
-            // load Yubico class
-            if (!empty($this->yubikey1)) {
-                require_once 'Auth/Yubico.php';
-            }
-
             // cut off password and otp in pass field
             $cutPassword = false;
+            $codeOTP = "";
             if (isSet($httpVars["otp_code"]) && !empty($httpVars["otp_code"])) {
                 $codeOTP = $httpVars["otp_code"];
             } else if (strlen($httpVars["password"]) > 6) {
@@ -132,10 +129,7 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             }
 
             //Just the Google Authenticator set
-            if (!empty($this->google) &&
-                empty($this->yubikey1) &&
-                empty($this->yubikey2)
-            ) {
+            if (!empty($this->google) &&  empty($this->yubikey1) && empty($this->yubikey2) ) {
                 if ($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)) {
                     $this->logDebug(__CLASS__, __FUNCTION__, "Check OTP: matched");
                     //return false and cut off otp from password for next authfront.
@@ -147,20 +141,13 @@ class OtpAuthFrontend extends AbstractAuthFrontend
                 } else {
                     $this->breakAndSendError($exceptionMsg);
                 }
-            } elseif
-                // YubiKey1 or YubiKey2 set
-            (empty($this->google) &&
-                (!empty($this->yubikey1) || !empty($this->yubikey2))
-            ) {
+            } elseif (empty($this->google) && (!empty($this->yubikey1) || !empty($this->yubikey2)) ) {
                 if ($this->checkYubiOTP($httpVars["otp_code"], $this->yubikey1, $this->yubikey2)) {
                     return false;
                 } else {
                     $this->breakAndSendError($exceptionMsg);
                 }
-            } elseif
-                // Both Yubikey and Google Authenticator set
-                // If the last character of the password is digit, it is Google Authenticator
-            (ctype_digit(substr($httpVars["password"], -1))) {
+            } elseif (ctype_digit(substr($httpVars["password"], -1))) {
                 if ($this->checkGooglePass($userid, $codeOTP, $this->google, $this->googleLast)) {
                     if ($cutPassword) {
                         $httpVars["password"] = substr($httpVars["password"], 0, strlen($httpVars["password"]) - 6);
@@ -269,8 +256,19 @@ class OtpAuthFrontend extends AbstractAuthFrontend
             $this->google           = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google", AJXP_REPO_SCOPE_ALL, '');
             $this->googleLast       = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "google_last", AJXP_REPO_SCOPE_ALL, '');
 
+            $this->yubikeyEnabled    = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey_enabled", AJXP_REPO_SCOPE_ALL, false);
+            if($this->yubikeyEnabled === "false") {
+                $this->yubikeyEnabled = false;
+            }
             $this->yubikey1 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey1", AJXP_REPO_SCOPE_ALL, '');
+            if(!empty($this->yubikey1) && strlen($this->yubikey1) >  12) {
+                $this->yubikey1 = substr($this->yubikey1, 0, 12);
+            }
             $this->yubikey2 = $userObject->getMergedRole()->filterParameterValue("authfront.otp", "yubikey2", AJXP_REPO_SCOPE_ALL, '');
+            if(!empty($this->yubikey2) && strlen($this->yubikey2) >  12) {
+                $this->yubikey2 = substr($this->yubikey2, 0, 12);
+            }
+
         }
         if (!empty($this->pluginConf["YUBICO_CLIENT_ID"])) {
             $this->yubicoClientId = trim($this->pluginConf["YUBICO_CLIENT_ID"]);
@@ -420,18 +418,17 @@ class OtpAuthFrontend extends AbstractAuthFrontend
     public function checkYubiOTP($otp_code, $yubikey1, $yubikey2)
     {
 
+        require_once 'Auth/Yubico.php';
+
         // yubikey generates 44 character, identity is the first 12 character
         $yubi1_identity = substr($yubikey1, 0, 12);
         $yubi2_identity = substr($yubikey2, 0, 12);
         $otp_identity = substr($otp_code, -44, 12);
         if (($otp_identity != $yubi1_identity) and ($otp_identity != $yubi2_identity)) {
-            // YubiKey not listed in account
             return false;
         }
 
         $yotp = substr($otp_code, -44);
-        $otp_code = substr($otp_code, 0, strlen($otp_code) - 44);
-
         $yubi = new Auth_Yubico($this->yubicoClientId, $this->yubicoSecretKey);
         $auth = $yubi->verify($yotp);
 
