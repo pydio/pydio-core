@@ -34,7 +34,6 @@
     </client_settings>
     <registry_contributions>
         <actions>
-            <!-- TODO : handle action names and authorization (and disable sharing mask) -->
             <action name="share_react">
                 <gui text="292" title="292" src="share.png" iconClass="mdi mdi-share-variant" hasAccessKey="false">
                     <context selection="true" dir="true" recycle="hidden" actionBar="true" actionBarGroup="get,info_panel_share" contextMenu="true"/>

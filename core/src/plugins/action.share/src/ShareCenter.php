@@ -995,7 +995,7 @@ class ShareCenter extends Plugin
                         $this->getShareStore()->getMetaManager()->setNodeMeta($ajxpNode, $metadata, true);
                     }
                 }else{
-                    // TODO: testUserCanEditShare ?
+                    $this->getShareStore()->testUserCanEditShare(($ctx->hasUser()?$ctx->getUser()->getId():null), $hash);
                     $this->getShareStore()->updateShareProperty($hash, $httpVars["p_name"], $httpVars["p_value"]);
                 }
 

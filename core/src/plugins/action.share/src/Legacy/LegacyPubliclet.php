@@ -147,9 +147,7 @@ class LegacyPubliclet
     public static function migrateLegacyMeta(ContextInterface $ctx, $shareCenter, $shareStore, $shareRightManager, $dryRun = true){
         $metaStoreDir = AJXP_DATA_PATH."/plugins/metastore.serial";
         $publicFolder = ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER");
-        // TODO 1: Check all metastores of all repositories?
-        // TODO 2: load $publicFolder/.ajxp_publiclet_counters.ser and reassign download counts
-        $metastores = glob($metaStoreDir."/ajxp_meta_0");
+        $metastores = glob($metaStoreDir."/ajxp_meta_*");
         if($dryRun){
             print("RUNNING A DRY RUN FOR META MIGRATION");
         }
@@ -162,8 +160,6 @@ class LegacyPubliclet
 
             $data = unserialize(file_get_contents($store));
             foreach($data as $filePath => &$metadata){
-
-
 
                 foreach($metadata as $userName => &$meta){
                     if(!UsersService::userExists($userName)){
