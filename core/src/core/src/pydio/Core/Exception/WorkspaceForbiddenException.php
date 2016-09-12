@@ -22,9 +22,16 @@ namespace Pydio\Core\Exception;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class WorkspaceForbiddenException
+ * @package Pydio\Core\Exception
+ */
 class WorkspaceForbiddenException extends PydioException
 {
+    /**
+     * WorkspaceForbiddenException constructor.
+     * @param string $wsId
+     */
     public function __construct($wsId)
     {
         parent::__construct("Cannot access to workspace with id/alias ".$wsId, null);

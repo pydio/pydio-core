@@ -24,9 +24,17 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
 
+/**
+ * Class XMLDocMessage
+ * XML Message, represented as a whole XML Document
+ * @package Pydio\Core\Http\Message
+ */
 class XMLDocMessage extends \DOMDocument implements XMLDocSerializableResponseChunk
 {
-
+    /**
+     * XMLDocMessage constructor.
+     * @param string $xmlString
+     */
     public function __construct($xmlString = null)
     {
         parent::__construct("1.0", "UTF-8");
@@ -35,6 +43,9 @@ class XMLDocMessage extends \DOMDocument implements XMLDocSerializableResponseCh
         }
     }
 
+    /**
+     * @return string
+     */
     public function getCharset()
     {
         return  'UTF-8';

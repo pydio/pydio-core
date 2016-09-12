@@ -22,10 +22,15 @@ namespace Pydio\Core\Exception;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
-
+/**
+ * Class DBConnectionException
+ * @package Pydio\Core\Exception
+ */
 class DBConnectionException extends PydioException
 {
+    /**
+     * DBConnectionException constructor.
+     */
     public function __construct()
     {
         $messageString = "There was an error trying to connect to your database! Did you change any configuration for the core connection? Or maybe your database is down?";

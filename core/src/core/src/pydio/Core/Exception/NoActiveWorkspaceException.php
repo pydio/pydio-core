@@ -23,8 +23,15 @@ namespace Pydio\Core\Exception;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class NoActiveWorkspaceException
+ * @package Pydio\Core\Exception
+ */
 class NoActiveWorkspaceException extends PydioException
 {
+    /**
+     * NoActiveWorkspaceException constructor.
+     */
     public function __construct()
     {
         parent::__construct("No active workspace found for user!", false, 423);

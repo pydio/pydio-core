@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -29,7 +29,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class Zlib extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Zlib extension (ZIP)", "Extension enabled : ".((function_exists('gzopen')||function_exists('gzopen64'))?"1":"0")); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->testedParams["Zlib Enabled"] = ((function_exists('gzopen')||function_exists('gzopen64'))?"Yes":"No");

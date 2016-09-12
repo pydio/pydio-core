@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,12 +24,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check whether mcrypt is enabled
- * @package Pydio
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHP_magic_quotes extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Magic quotes disabled", "Magic quotes need to be disabled, only relevent for php 5.3"); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "error";

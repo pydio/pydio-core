@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -46,6 +46,12 @@ abstract class AbstractTest
     /** The test parameters */
     public $params;
 
+    /**
+     * AbstractTest constructor.
+     * @param $name
+     * @param $failedInfo
+     * @param null $params
+     */
     public function __construct($name, $failedInfo, $params = NULL)
     {
         $this->name = $name;

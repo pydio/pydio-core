@@ -33,14 +33,15 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
 use Pydio\Core\Services\ConfService;
-
-
-use Pydio\Log\Core\Logger;
 use Zend\Diactoros\Response\EmptyResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AuthMiddleware
+ * PSR7 Middleware that encapsulates the call to pydio authfront plugins
+ * @package Pydio\Core\Http\Middleware
+ */
 class AuthMiddleware
 {
 

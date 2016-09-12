@@ -38,10 +38,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 namespace Pydio\Core\Http\Cli;
 use Symfony\Component\Console\Input\ArgvInput;
 
+/**
+ * Class FreeArgvOptions
+ * Options parser for Pydio
+ * @package Pydio\Core\Http\Cli
+ */
 class FreeArgvOptions extends ArgvInput
 {
     private $freeParsed;
 
+    /**
+     * FreeArgvOptions constructor.
+     * @param array $argv
+     */
     public function __construct($argv = array()){
         $arr = $_SERVER["argv"];
         $script = array_shift($arr);

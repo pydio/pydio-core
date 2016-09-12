@@ -23,7 +23,10 @@ namespace Pydio\Core\Http\Cli;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class CliServer
+ * @package Pydio\Core\Http\Cli
+ */
 class CliServer extends \Pydio\Core\Http\Server
 {
     protected function stackMiddleWares()

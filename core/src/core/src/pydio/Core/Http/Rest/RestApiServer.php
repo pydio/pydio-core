@@ -26,10 +26,18 @@ use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RestApiServer
+ * REST API listener
+ * @package Pydio\Core\Http\Rest
+ */
 class RestApiServer extends Server
 {
-    
+    /**
+     * RestApiServer constructor.
+     * @param $base
+     * @param array $requestAttributes
+     */
     public function __construct($base, $requestAttributes = [])
     {
         parent::__construct($base, $requestAttributes);

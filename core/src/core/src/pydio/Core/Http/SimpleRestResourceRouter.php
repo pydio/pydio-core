@@ -25,7 +25,12 @@ use Psr\Http\Message\ServerRequestInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class SimpleRestResourceRouter
+ * FastRoute encapsuler that can be used to make a simple CRUD Rest API on an existing 
+ * route of the application.
+ * @package Pydio\Core\Http
+ */
 class SimpleRestResourceRouter
 {
     /**
@@ -66,6 +71,11 @@ class SimpleRestResourceRouter
         $this->callbacksContext = $callbacksContext;
     }
 
+    /**
+     * @param $method
+     * @param $uri
+     * @param $callable
+     */
     public function addRoute($method, $uri, $callable){
         $this->config["additional_routes"][] = ["method" => $method, "uri" => $uri, "callable" => $callable];
     }
@@ -114,6 +124,10 @@ class SimpleRestResourceRouter
 
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @return string
+     */
     public function getURIForRequest(ServerRequestInterface $request){
 
         $uri = $request->getServerParams()['REQUEST_URI'];
@@ -124,6 +138,11 @@ class SimpleRestResourceRouter
         return rawurldecode($uri);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return bool
+     */
     public function route(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $dispatcher = \FastRoute\cachedDispatcher(function(\FastRoute\RouteCollector $r) {
@@ -159,6 +178,11 @@ class SimpleRestResourceRouter
         return false;
     }
 
+    /**
+     * @param callable $callback
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
     protected function simpleHandler($callback, ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
         $data = $this->callbacksContext->$callback($requestInterface, $responseInterface);
@@ -167,7 +191,11 @@ class SimpleRestResourceRouter
         $responseInterface->getBody()->write(json_encode($data));
     }
 
-
+    /**
+     * @param callable $callback
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
     protected function bodyHandler($callback, ServerRequestInterface &$request, ResponseInterface &$response){
 
         $postedObject = json_decode($request->getBody()->getContents());

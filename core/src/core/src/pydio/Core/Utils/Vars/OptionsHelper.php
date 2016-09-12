@@ -24,8 +24,6 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
-use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Utils\Vars\VarsFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

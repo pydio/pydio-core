@@ -20,11 +20,12 @@
  */
 namespace Pydio\Core\Model;
 
-use Pydio\Access\Core\AbstractAccessDriver;
-
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Interface ContextInterface
+ * @package Pydio\Core\Model
+ */
 interface ContextInterface
 {
     /**

@@ -27,7 +27,6 @@ use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

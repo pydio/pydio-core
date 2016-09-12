@@ -25,6 +25,11 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class BgActionTrigger
+ * An XML response triggering a background action in Pydio UI.
+ * @package Pydio\Core\Http\Message
+ */
 class BgActionTrigger implements XMLSerializableResponseChunk
 {
     private $actionName;
@@ -48,6 +53,13 @@ class BgActionTrigger implements XMLSerializableResponseChunk
         $this->delay = $delay;
     }
 
+    /**
+     * Factory for BgActionTrigger
+     * @param string $jsCode
+     * @param string $messageId
+     * @param int $delay
+     * @return BgActionTrigger
+     */
     public static function createForJsAction($jsCode, $messageId, $delay = 0){
         $newOne = new BgActionTrigger("javascript_action", [], $messageId, $delay);
         $newOne->javascriptCode = $jsCode;

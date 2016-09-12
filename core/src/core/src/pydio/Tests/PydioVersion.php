@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -23,14 +23,20 @@ namespace Pydio\Tests;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package AjaXplorer
- * @subpackage Tests
- * @class AJXPVersion
+ * Class AJXPVersion
  * Get the current ajaxplorer version
+ * @package Pydio\Tests
  */
-class AJXPVersion extends AbstractTest
+class PydioVersion extends AbstractTest
 {
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Pydio version", "Version : ".AJXP_VERSION); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "info";

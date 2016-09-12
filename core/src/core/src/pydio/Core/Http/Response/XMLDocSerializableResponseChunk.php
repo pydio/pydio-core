@@ -23,7 +23,15 @@ namespace Pydio\Core\Http\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface XMLDocSerializableResponseChunk
+ * Piece of response that will be serialized as a whole XML document
+ * @package Pydio\Core\Http\Response
+ */
 interface XMLDocSerializableResponseChunk extends XMLSerializableResponseChunk
 {
+    /**
+     * @return string
+     */
     public function getCharset();
 }

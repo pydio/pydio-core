@@ -98,6 +98,11 @@ class CliMiddleware implements ITopLevelMiddleware
 
     }
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return void
+     */
     public function emitResponse(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
 
         if($responseInterface !== false && $responseInterface->getBody() && $responseInterface->getBody() instanceof SerializableResponseStream){

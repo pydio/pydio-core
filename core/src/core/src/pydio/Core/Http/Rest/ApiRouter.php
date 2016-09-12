@@ -25,7 +25,13 @@ use Psr\Http\Message\ServerRequestInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class ApiRouter
+ * Router used for REST API v1 and REST API v2.
+ * Based on fast-route, creates route for api/v1 using XML declaration, and routes for api/v2 using
+ * swagger file.
+ * @package Pydio\Core\Http\Rest
+ */
 class ApiRouter
 {
     /**

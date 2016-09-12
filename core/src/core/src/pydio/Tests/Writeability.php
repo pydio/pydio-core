@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -32,7 +32,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class Writeability extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Required writeable folder", "One of the following folder should be writeable and is not : "); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $checks = array();

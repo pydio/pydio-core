@@ -22,7 +22,6 @@ namespace Pydio\Core\Http\Response;
 
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;

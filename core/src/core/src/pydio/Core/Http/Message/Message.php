@@ -26,26 +26,46 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class Message
+ * Generic user message serialized either as XML or JSON.
+ * @package Pydio\Core\Http\Message
+ */
 class Message implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
-
+    /**
+     * @var string
+     */
     private $message;
 
+    /**
+     * Message constructor.
+     * @param string $message
+     */
     public function __construct($message)
     {
         $this->message = $message;
     }
 
+    /**
+     * @return string
+     */
     public function toXML()
     {
         return XMLWriter::sendMessage($this->message, $this->message);
     }
 
+    /**
+     * @return string
+     */
     public function jsonSerializableData()
     {
         return $this->message;
     }
 
+    /**
+     * @return string
+     */
     public function jsonSerializableKey()
     {
         return 'message';

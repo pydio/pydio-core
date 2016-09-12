@@ -25,6 +25,10 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
+/**
+ * XML result sent after successful or failed login.
+ * @package Pydio\Core\Http\Message
+ */
 class LoggingResult implements XMLSerializableResponseChunk
 {
     /**
@@ -44,7 +48,13 @@ class LoggingResult implements XMLSerializableResponseChunk
      */
     private $secureToken;
 
-
+    /**
+     * LoggingResult constructor.
+     * @param $result
+     * @param string $rememberLogin
+     * @param string $rememberPass
+     * @param string $secureToken
+     */
     public function __construct($result, $rememberLogin="", $rememberPass = "", $secureToken="")
     {
         $this->result = $result;

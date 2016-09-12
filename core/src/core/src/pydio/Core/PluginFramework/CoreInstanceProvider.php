@@ -22,7 +22,10 @@ namespace Pydio\Core\PluginFramework;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Interface CoreInstanceProvider
+ * @package Pydio\Core\PluginFramework
+ */
 interface CoreInstanceProvider
 {
     /**

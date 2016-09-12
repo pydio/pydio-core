@@ -28,7 +28,11 @@ use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class FilteredRepositoriesList
+ * Set of repositories filtered on a specific scope
+ * @package Pydio\Core\Model
+ */
 class FilteredRepositoriesList
 {
 
@@ -54,10 +58,16 @@ class FilteredRepositoriesList
         }
     }
 
+    /**
+     * @param $bool
+     */
     public function setDetails($bool){
         $this->details = $bool;
     }
 
+    /**
+     * @param $bool
+     */
     public function setIncludeShared($bool){
         $this->includeShared = $bool;
     }

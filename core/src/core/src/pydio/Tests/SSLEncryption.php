@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -29,7 +29,15 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class SSLEncryption extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("SSL Encryption", "You are not using SSL encryption, or it was not detected by the server. Be aware that it is strongly recommended to secure all communication of data over the network."); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         // Get the locale

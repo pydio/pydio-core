@@ -20,13 +20,16 @@
  */
 namespace Pydio\Core\Http\Response;
 
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Zend\Diactoros\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class AsyncResponseStream
+ * Response Stream built with a callable that will be called when the stream is read. 
+ * @package Pydio\Core\Http\Response
+ */
 class AsyncResponseStream implements StreamInterface
 {
     /**

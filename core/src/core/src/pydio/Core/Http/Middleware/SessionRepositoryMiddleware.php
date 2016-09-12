@@ -33,7 +33,6 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');

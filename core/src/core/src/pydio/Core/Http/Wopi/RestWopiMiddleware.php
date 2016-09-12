@@ -23,20 +23,32 @@ namespace Pydio\Core\Http\Wopi;
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Http\Wopi\WopiMiddleware;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RestWopiMiddleware
+ * Specific middleware to handle Wopi actions
+ * @package Pydio\Core\Http\Wopi
+ */
 class RestWopiMiddleware extends WopiMiddleware
 {
     protected $base;
 
+    /**
+     * RestWopiMiddleware constructor.
+     * @param $base
+     */
     public function __construct($base)
     {
         $this->base = $base;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     */
     protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $router = new WopiRouter($this->base);

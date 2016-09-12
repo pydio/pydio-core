@@ -22,6 +22,11 @@ namespace Pydio\Core\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface ContextProviderInterface
+ * Objects that implement this interface can provide a valid context
+ * @package Pydio\Core\Model
+ */
 interface ContextProviderInterface
 {
     /**

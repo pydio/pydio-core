@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>, Cyril Russo
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>, Cyril Russo
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -23,7 +23,6 @@ namespace Pydio\Core\Utils;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\SessionService;
-use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**

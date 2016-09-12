@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -20,7 +20,6 @@
  */
 namespace Pydio\Core\Http\Dav;
 
-use Pydio\Core\Exception\PydioException;
 use \Sabre;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
@@ -236,6 +235,11 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
 
     }
 
+    /**
+     * Metadata manager
+     * @param $array
+     * @param null $newURL
+     */
     protected function putResourceData($array, $newURL = null)
     {
         $metaStore = $this->getMetastore();
@@ -244,8 +248,11 @@ class Node implements Sabre\DAV\INode, Sabre\DAV\IProperties
         }
 
     }
-
-
+    
+    /**
+     * Metadata manager
+     * @return array
+     */
     protected function getResourceData()
     {
         $metaStore = $this->getMetastore();

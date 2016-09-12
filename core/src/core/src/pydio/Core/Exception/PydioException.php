@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,15 +24,21 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
+
 /**
- * Custom exception (legacy from php4 when there were no exceptions)
- * @package Pydio
- * @subpackage Core
+ * Class PydioException
+ * @package Pydio\Core\Exception
  */
 class PydioException extends \Exception
 {
     private $errorCode;
 
+    /**
+     * PydioException constructor.
+     * @param string $messageString
+     * @param bool $messageId
+     * @param null $errorCode
+     */
     public function __construct($messageString, $messageId = false, $errorCode = null)
     {
         if ($messageId !== false && class_exists("ConfService")) {
@@ -49,6 +55,10 @@ class PydioException extends \Exception
         parent::__construct($messageString);
     }
 
+    /**
+     * @param $mixed
+     * @throws PydioException
+     */
     public function errorToXml($mixed)
     {
         if ($mixed instanceof \Exception) {
@@ -58,14 +68,23 @@ class PydioException extends \Exception
         }
     }
 
+    /**
+     * @return bool
+     */
     public function hasErrorCode(){
         return isSet($this->errorCode);
     }
 
+    /**
+     * @return null
+     */
     public function getErrorCode(){
         return $this->errorCode;
     }
 
+    /**
+     * @return string
+     */
     public static function buildDebugBackTrace(){
 
         $message = "";

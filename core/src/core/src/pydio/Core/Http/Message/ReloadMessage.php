@@ -26,12 +26,21 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class ReloadMessage
+ * Sends a Reload instruction to the UI
+ * @package Pydio\Core\Http\Message
+ */
 class ReloadMessage implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
     private $dataNode = '';
     private $pendingSelection = '';
 
+    /**
+     * ReloadMessage constructor.
+     * @param string $dataNode
+     * @param string $pendingSelection
+     */
     public function __construct($dataNode = "", $pendingSelection = ""){
         $this->dataNode = $dataNode;
         $this->pendingSelection = $pendingSelection;
@@ -39,7 +48,7 @@ class ReloadMessage implements XMLSerializableResponseChunk, JSONSerializableRes
 
 
     /**
-     * @return mixed
+     * @return array
      */
     public function jsonSerializableData()
     {

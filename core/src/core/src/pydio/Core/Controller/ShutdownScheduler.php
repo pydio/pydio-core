@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -47,12 +47,20 @@ class ShutdownScheduler
         return self::$instance;
     }
 
-     public function __construct()
-     {
-         $this->callbacks = array();
-         register_shutdown_function(array($this, 'callRegisteredShutdown'));
-         ob_start();
-     }
+    /**
+     * ShutdownScheduler constructor.
+     */
+    public function __construct()
+    {
+        $this->callbacks = array();
+        register_shutdown_function(array($this, 'callRegisteredShutdown'));
+        ob_start();
+    }
+
+    /**
+     * @return bool
+     * @throws \Exception
+     */
     public function registerShutdownEventArray()
     {
         $callback = func_get_args();
@@ -71,20 +79,28 @@ class ShutdownScheduler
         $this->callbacks[] = $flattenArray;
         return true;
     }
-     public function registerShutdownEvent()
-     {
-         $callback = func_get_args();
 
-         if (empty($callback)) {
-             throw new \Exception('No callback passed to '.__FUNCTION__.' method');
-         }
-         if (!is_callable($callback[0])) {
-             throw new \Exception('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
-         }
-         $this->callbacks[] = $callback;
-         return true;
-     }
+    /**
+     * @return bool
+     * @throws \Exception
+     */
+    public function registerShutdownEvent()
+    {
+        $callback = func_get_args();
 
+        if (empty($callback)) {
+            throw new \Exception('No callback passed to '.__FUNCTION__.' method');
+        }
+        if (!is_callable($callback[0])) {
+            throw new \Exception('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
+        }
+        $this->callbacks[] = $callback;
+        return true;
+    }
+
+    /**
+     * Trigger the schedulers
+     */
     public function callRegisteredShutdown()
     {
         session_write_close();

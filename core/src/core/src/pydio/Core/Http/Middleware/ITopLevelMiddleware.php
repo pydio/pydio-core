@@ -26,6 +26,10 @@ use Pydio\Core\Exception\WorkspaceNotFoundException;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface ITopLevelMiddleware
+ * @package Pydio\Core\Http\Middleware
+ */
 interface ITopLevelMiddleware
 {
     /**

@@ -20,9 +20,7 @@
  */
 namespace Pydio\Core\Services;
 
-use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Conf\Sql\SqlConfDriver;
-use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Utils\Vars\StringHelper;

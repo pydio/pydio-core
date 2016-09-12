@@ -21,16 +21,28 @@
 namespace Pydio\Core\Http\Middleware;
 
 use Pydio\Core\Http\Server;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * SessionMiddleware launches a working session
+ * @package Pydio\Core\Http\Middleware
+ */
 class SessionMiddleware
 {
-
+    /**
+     * @var \Pydio\Enterprise\Session\PydioSessionHandler $sessionHandler
+     */ 
     private static $sessionHandler;
 
+    /**
+     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
+     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @param callable|null $next
+     * @return \Psr\Http\Message\ResponseInterface
+     */
     public static function handleRequest(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface, callable $next = null){
 
         $getParams = $requestInterface->getQueryParams();
@@ -49,6 +61,7 @@ class SessionMiddleware
             require_once(AJXP_SESSION_HANDLER_PATH);
             if(class_exists(AJXP_SESSION_HANDLER_CLASSNAME, false)){
                 $sessionHandlerClass = AJXP_SESSION_HANDLER_CLASSNAME;
+                /** @var \Pydio\Enterprise\Session\PydioSessionHandler $sessionHandler */
                 $sessionHandler = new $sessionHandlerClass();
                 self::$sessionHandler = $sessionHandler;
                 $sessionHandler->updateContext($requestInterface->getAttribute("ctx"));
@@ -66,6 +79,9 @@ class SessionMiddleware
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     */
     public static function updateContext($ctx){
         if(self::$sessionHandler){
             self::$sessionHandler->updateContext($ctx);

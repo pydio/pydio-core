@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,12 +24,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check current php error level
- * @package Pydio
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHPErrorLevel extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("PHP error level", PHPErrorLevel::error2string(error_reporting())); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         if (error_reporting() & E_NOTICE) {
@@ -40,7 +47,10 @@ class PHPErrorLevel extends AbstractTest
         $this->failedLevel = "info";
         return FALSE;
     }
-
+    
+    /**
+     * @inheritdoc
+     */
     public function error2string($value)
     {
         $level_names = array(

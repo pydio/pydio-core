@@ -24,7 +24,11 @@ namespace Pydio\Core\Http\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Interface JSONSerializableResponseChunk
+ * Piece of response that can be serialized into JSON. Must return a "key" and additional data to be serialized.
+ * @package Pydio\Core\Http\Response
+ */
 interface JSONSerializableResponseChunk extends SerializableResponseChunk
 {
     /**

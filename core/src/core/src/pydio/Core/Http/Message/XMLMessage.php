@@ -24,6 +24,10 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class XMLMessage serialized as a piece of XML
+ * @package Pydio\Core\Http\Message
+ */
 class XMLMessage implements XMLSerializableResponseChunk
 {
     /**

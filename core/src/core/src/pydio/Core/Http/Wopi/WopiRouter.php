@@ -27,6 +27,11 @@ use Psr\Http\Message\ServerRequestInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class WopiRouter
+ * Simple router for /wopi/ endpoints
+ * @package Pydio\Core\Http\Wopi
+ */
 class WopiRouter
 {
     /**

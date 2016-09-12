@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,14 +24,21 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check that Exif extension is enabled
- * @package Pydio
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHPExif extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() {
         parent::__construct("Exif Extension enabled", "Installing php-exif extension is recommended if you plan to handle images");
     }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "warning";

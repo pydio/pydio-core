@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -23,14 +23,20 @@ namespace Pydio\Tests;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package Pydio
- * @subpackage Tests
- * @class Client
- * Test client browser
+ * Class Client
+ * Display Client Browser User Agent
+ * @package Pydio\Tests
  */
 class Client extends AbstractTest
 {
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Client Browser", "Current client ".$_SERVER['HTTP_USER_AGENT']); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->testedParams["Client"] = $_SERVER['HTTP_USER_AGENT'];

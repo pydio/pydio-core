@@ -24,7 +24,10 @@ use Pydio\Core\Model\RepositoryInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Interface RepositoriesCache
+ * @package Pydio\Core\Services
+ */
 interface RepositoriesCache
 {
     /**

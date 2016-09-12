@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,14 +24,21 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Test Server Encoding
- * @package Pydio
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class ServerEncoding extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("Server charset encoding", "You must set a correct charset encoding
         in your locale definition in the form: en_us.UTF-8. Please refer to setlocale man page.
         If your detected locale is C, simply type echo \$LANG on your server command line to read the correct value."); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         // Get the locale

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,12 +24,19 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check current PHP Version
- * @package Pydio
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHPVersion extends AbstractTest
 {
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.4.0"); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $version = phpversion();

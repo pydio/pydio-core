@@ -22,9 +22,17 @@ namespace Pydio\Core\Exception;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class ActionNotFoundException
+ * Exception thrown when a requests is calling an unknown (or disabled) action.
+ * @package Pydio\Core\Exception
+ */
 class ActionNotFoundException extends PydioException
 {
+    /**
+     * ActionNotFoundException constructor.
+     * @param string $action
+     */
     public function __construct($action)
     {
         parent::__construct("Could not find action ".$action, null);

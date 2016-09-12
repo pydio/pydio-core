@@ -27,16 +27,29 @@ use Pydio\Core\Http\Middleware\SapiMiddleware;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class RestApiMiddleware
+ * Main middleware for routing REST API.
+ * @package Pydio\Core\Http\Rest
+ */
 class RestApiMiddleware extends SapiMiddleware
 {
     protected $base;
 
+    /**
+     * RestApiMiddleware constructor.
+     * @param string $base
+     */
     public function __construct($base)
     {
         $this->base = $base;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     */
     protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
 
         $router = new ApiRouter($this->base);

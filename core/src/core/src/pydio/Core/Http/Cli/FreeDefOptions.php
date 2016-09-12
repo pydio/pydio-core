@@ -25,12 +25,24 @@ defined('AJXP_EXEC') or die('Access not allowed');
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputOption;
 
+/**
+ * Class FreeDefOptions
+ * @package Pydio\Core\Http\Cli
+ */
 class FreeDefOptions extends InputDefinition
 {
+    /**
+     * @param string $optionName
+     * @return bool
+     */
     public function hasOption($optionName){
         return true;
     }
 
+    /**
+     * @param string $optionName
+     * @return InputOption
+     */
     public function getOption($optionName){
         if(!parent::hasOption($optionName)){
             return new InputOption($optionName, null, InputOption::VALUE_OPTIONAL);

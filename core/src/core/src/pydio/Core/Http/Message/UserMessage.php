@@ -26,28 +26,47 @@ use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class UserMessage
+ * User message displayed on the UI
+ * @package Pydio\Core\Http\Message
+ */
 class UserMessage implements XMLSerializableResponseChunk, JSONSerializableResponseChunk
 {
 
     private $level;
     private $message;
 
+    /**
+     * UserMessage constructor.
+     * @param $message
+     * @param string $level
+     */
     public function __construct($message, $level=LOG_LEVEL_INFO)
     {
         $this->message = $message;
         $this->level = $level;
     }
 
+    /**
+     * @return string
+     */
     public function toXML()
     {
         return XMLWriter::sendMessage($this->level == LOG_LEVEL_INFO?$this->message:null, $this->level == LOG_LEVEL_ERROR?$this->message:null, false);
     }
 
+    /**
+     * @return array
+     */
     public function jsonSerializableData()
     {
         return ['level'=>$this->level, 'message' => $this->message];
     }
 
+    /**
+     * @return string
+     */
     public function jsonSerializableKey()
     {
         return 'message';

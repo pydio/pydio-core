@@ -22,6 +22,11 @@ namespace Pydio\Core\Http\Response;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface SerializableResponseChunk
+ * Generic piece of response that can be serialized.
+ * @package Pydio\Core\Http\Response
+ */
 interface SerializableResponseChunk
 {
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -29,8 +29,8 @@ use Pydio\Core\PluginFramework\PluginsService;
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
- * @package Pydio
- * @subpackage SabreDav
+ * Class RootCollection
+ * @package Pydio\Core\Http\Dav
  */
 class RootCollection extends Sabre\DAV\SimpleCollection
 {
@@ -51,7 +51,9 @@ class RootCollection extends Sabre\DAV\SimpleCollection
         return $this->context = $context;
     }
 
-
+    /**
+     * @return Node[]
+     */
     public function getChildren()
     {
         $this->children = array();
@@ -71,12 +73,20 @@ class RootCollection extends Sabre\DAV\SimpleCollection
         return $this->children;
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     public function childExists($name)
     {
         $c = $this->getChildren();
         return array_key_exists($name, $c);
     }
 
+    /**
+     * @param string $name
+     * @return Node
+     */
     public function getChild($name)
     {
         $c = $this->getChildren();

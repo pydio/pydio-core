@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -21,12 +21,6 @@
  *
  */
 
-/**
- * Class PydioSdkGenerator
- * Generate a Swagger file for Rest APIs documentation
- * @package Pydio
- * @subpackage Core
- */
 namespace Pydio\Core\Utils\Reflection;
 
 //define("JSON_DIR", AJXP_INSTALL_PATH."/core/doc/api");
@@ -37,6 +31,11 @@ define("JSON_DIR", AJXP_INSTALL_PATH."/../api");
 define("JSON_URL", "https://pydio.com/static-docs/api");
 define("API_DOC_PAGE", "https://pydio.com/en/docs/references/pydio-api#!/");
 
+/**
+ * Class PydioSdkGenerator
+ * Generate a Swagger file for Rest APIs v1 documentation
+ * @package Pydio\Core\Utils\Reflection
+ */
 class PydioSdkGenerator
 {
     static $apiGroups = [
@@ -55,7 +54,11 @@ class PydioSdkGenerator
         "misc" => "Other plugins actions."
     ];
 
-    public static function findApiGroupForPlugin($pluginId){
+    /**
+     * @param $pluginId
+     * @return int|string
+     */
+    private static function findApiGroupForPlugin($pluginId){
         list($pType, $pName) = explode(".", $pluginId);
         foreach(self::$apiGroups as $groupName => $pluginPatterns){
             foreach($pluginPatterns as $pattern){
@@ -67,6 +70,9 @@ class PydioSdkGenerator
         return "misc";
     }
 
+    /**
+     * @param string $versionString
+     */
     public static function analyzeRegistry($versionString)
     {
         if(!AJXP_SERVER_DEBUG) {
@@ -211,7 +217,7 @@ class PydioSdkGenerator
      * @param array $apis
      * @return string
      */
-    static public function makeMarkdown($plugin, $apis){
+    private static function makeMarkdown($plugin, $apis){
 
         $md = "\n\n";
         $md .= "## ".$plugin->getManifestLabel()."  ";

@@ -26,7 +26,11 @@ use Pydio\Core\Services\UsersService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-
+/**
+ * Class Context
+ * Main implementation of ContextInterface, propagating a user and a repository all along the application
+ * @package Pydio\Core\Model
+ */
 class Context implements ContextInterface
 {
 
@@ -50,6 +54,11 @@ class Context implements ContextInterface
      */
     private $repositoryObject;
 
+    /**
+     * Context constructor.
+     * @param string $userId
+     * @param string $repositoryId
+     */
     public function __construct($userId = null, $repositoryId = null)
     {
         if($userId !== null) {
@@ -148,11 +157,18 @@ class Context implements ContextInterface
         }
     }
 
+    /**
+     * Set userId and userObject to null
+     */
     public function resetUser(){
         $this->userId = null;
         $this->userObject = null;
     }
 
+    /**
+     * Builds pydio://user@repository url
+     * @return string
+     */
     public function getUrlBase()
     {
         $uId = $this->hasUser() ? $this->getUser()->getId() : null;

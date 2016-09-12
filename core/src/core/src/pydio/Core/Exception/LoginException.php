@@ -23,6 +23,10 @@ namespace Pydio\Core\Exception;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Class LoginException
+ * @package Pydio\Core\Exception
+ */
 class LoginException extends PydioException
 {
     private $loginError;

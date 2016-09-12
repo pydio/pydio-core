@@ -22,7 +22,6 @@ namespace Pydio\Core\Utils\Vars;
 
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

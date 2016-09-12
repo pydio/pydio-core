@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,12 +24,18 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check that DOMXml is enabled
- * @package AjaXplorer
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHP_APC extends AbstractTest
 {
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("PHP Opcode Cache extension", "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded."); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "warning";

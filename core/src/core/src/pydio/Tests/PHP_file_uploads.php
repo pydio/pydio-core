@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * Copyright 2007-2016 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
  * This file is part of Pydio.
  *
  * Pydio is free software: you can redistribute it and/or modify
@@ -24,14 +24,20 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * Check that file uploads is enabled
- * @package AjaXplorer
- * @subpackage Tests
+ * @package Pydio\Tests
  */
 class PHP_file_uploads extends AbstractTest
 {
     protected static $testKey = 'PHP File Uploads enabled';
-    
+
+    /**
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct(self::$testKey, "You should enable php file_uploads parameter for uploading files with Pydio."); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "warning";

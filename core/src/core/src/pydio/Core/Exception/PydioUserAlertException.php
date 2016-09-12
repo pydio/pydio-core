@@ -20,10 +20,12 @@
  */
 namespace Pydio\Core\Exception;
 
-
-
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class PydioUserAlertException
+ * @package Pydio\Core\Exception
+ */
 class PydioUserAlertException extends  PydioException{
 
 }
