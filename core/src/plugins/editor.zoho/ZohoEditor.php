@@ -175,7 +175,6 @@ class ZohoEditor extends Plugin
             }
 
             $target = base64_decode($httpVars["parent_url"]);
-            $tmp = MetaStreamWrapper::getRealFSReference($nodeUrl);
 
             $node = new AJXP_Node($nodeUrl);
             Controller::applyHook("node.read", array($node));
@@ -203,6 +202,8 @@ class ZohoEditor extends Plugin
                 $service = "exportwriter";
             }
 
+            $contentHandle = fopen($nodeUrl, 'r');
+
             $postResponse = $this->client->post("https://".$service.".zoho.com/remotedoc.im", [
                 'headers' => [
                     'User-Agent' => $request->getHeader('User-Agent')
@@ -217,7 +218,7 @@ class ZohoEditor extends Plugin
                     'format'        => $extension,
                     'mode'          => $repoWriteable && is_writeable($nodeUrl) ? 'normaledit' : 'view',
                     'saveurl'       => $saveUrl."?signature=".$b64Sig."&XDEBUG_SESSION_START=phpstorm",
-                    'content'       => fopen($tmp, 'r')
+                    'content'       => fopen($nodeUrl, 'r')
                 ]
             ]);
 
@@ -235,6 +236,8 @@ class ZohoEditor extends Plugin
             if (!isset($result["RESULT"]) || $result["RESULT"] !== "TRUE" || !isset($result["URL"])) {
                 throw new FileNotFoundException("Could not open file");
             }
+
+            fclose($contentHandle);
 
             $response = $response
                 ->withStatus(302)

@@ -135,7 +135,7 @@ class ExifMetaManager extends AbstractMetaSource
         $ctx            = $requestInterface->getAttribute("ctx");
         $userSelection  = UserSelection::fromContext($ctx, $httpVars);
         $selectedNode   = $userSelection->getUniqueNode();
-        $realFile       = MetaStreamWrapper::getRealFSReference($selectedNode->getUrl());
+        $realFile       = $selectedNode->getRealFile();
 
         ApplicationState::safeIniSet('exif.encode_unicode', 'UTF-8');
         $exifData = @exif_read_data($realFile, 0, TRUE);

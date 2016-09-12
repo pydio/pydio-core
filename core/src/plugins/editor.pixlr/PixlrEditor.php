@@ -98,8 +98,6 @@ class PixlrEditor extends Plugin
             }
 
             $target = rtrim(base64_decode($httpVars["parent_url"]), '/') ."/plugins/editor.pixlr";
-            $tmp = MetaStreamWrapper::getRealFSReference($selectedNodeUrl);
-            //$tmp = TextEncoder::fromUTF8($tmp);
             $this->logInfo('Preview', 'Sending content of '.$selectedNodeUrl.' to Pixlr server.', array("files" => $selectedNodeUrl));
             Controller::applyHook("node.read", array($selectedNode));
 
@@ -108,8 +106,8 @@ class PixlrEditor extends Plugin
                 $saveTarget = $target."/fake_save_pixlr_".md5($httpVars["secure_token"]).".php";
             }
 
-            $type = pathinfo($tmp, PATHINFO_EXTENSION);
-            $data = file_get_contents($tmp);
+            $type = pathinfo($selectedNodeUrl, PATHINFO_EXTENSION);
+            $data = file_get_contents($selectedNodeUrl);
             $rawData = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
             $params = [
