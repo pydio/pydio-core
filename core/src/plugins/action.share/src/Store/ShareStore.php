@@ -737,12 +737,11 @@ class ShareStore {
      */
     private function deleteExpiredPubliclet($elementId, $data){
 
-        // TODO: REWRITE THIS FUNCTION
-
-        if($this->context->hasUser() ||  $this->context->getUser()->getId() != $data["OWNER_ID"]){
-
+        /**
+        if(!$this->context->hasUser() ||  $this->context->getUser()->getId() !== $data["OWNER_ID"]){
             AuthService::logUser($data["OWNER_ID"], "", true);
         }
+         **/
         $repoObject = $data["REPOSITORY"];
         if(!($repoObject instanceof Repository)) {
             $repoObject = RepositoryService::getRepositoryById($data["REPOSITORY"]);
@@ -758,19 +757,20 @@ class ShareStore {
                 // Cannot load this repository anymore.
             }
         }
-        if($repoLoaded && isSet($data["FILE_PATH"])){
-            // @TODO : ADD USER IN URL
-            $ajxpNode = new AJXP_Node("pydio://".$repoObject->getId().$data["FILE_PATH"]);
-        }
-        $this->deleteShare($data['SHARE_TYPE'], $elementId, false, true);
-        if(isSet($ajxpNode)){
-            try{
-                $this->getMetaManager()->removeShareFromMeta($ajxpNode, $elementId);
-            }catch (\Exception $e){
-
+        $ajxpNode = null;
+        if($repoLoaded && $repoObject->hasParent()){
+            if(isSet($data["FILE_PATH"])){
+                $filePath = $data["FILE_PATH"];
+                $ajxpNode = new AJXP_Node("pydio://".$data["OWNER_ID"]."@".$repoObject->getParentId().$filePath);
+            }else if($repoObject->hasContentFilter()){
+                $filePath = $data["FILE_PATH"] = $repoObject->getContentFilter()->getUniquePath();
+                $ajxpNode = new AJXP_Node("pydio://".$data["OWNER_ID"]."@".$repoObject->getParentId().'/'.$filePath);
             }
-            gc_collect_cycles();
         }
+        Logger::debug("sharestore", "Delete share now !");
+        $this->deleteShare($data['SHARE_TYPE'], $elementId, false, true, $ajxpNode);
+
+        gc_collect_cycles();
 
     }
 

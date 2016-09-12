@@ -79,7 +79,7 @@ class TaskController extends Plugin implements SqlTableProvider
         }
         if(count($task->nodes)){
             foreach($task->nodes as $index => $path){
-                $task->nodes[$index] = "pydio://".$task->getWsId().$path;
+                $task->nodes[$index] = "pydio://".$task->getUserId()."@".$task->getWsId().$path;
             }
         }
     }

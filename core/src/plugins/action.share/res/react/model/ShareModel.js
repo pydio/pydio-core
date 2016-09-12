@@ -870,8 +870,9 @@
         }
         
         static buildDirectDownloadUrl(node, publicLink, contentProvider = false){
-            let ctString = contentProvider ? '&ct=true' : '';
-            return publicLink + (publicLink.indexOf('?') !== -1 ? '&' : '?') + 'dl=true'+ ctString +'&file=/'+encodeURIComponent(node.getLabel());
+            let ctString = contentProvider ? '?ct=true' : '';
+            let link = publicLink.split('--').shift();
+            return link + (link.endsWith('/')? '' : '/') + 'dl/'+encodeURIComponent(node.getLabel()) + ctString;
         }
 
         static qrcodeEnabled(){

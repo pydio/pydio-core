@@ -24,6 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Share\Model\CompositeShare;
+use Pydio\Share\Model\ShareLink;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 define('AJXP_SHARED_META_NAMESPACE', 'ajxp_shared');
@@ -174,6 +175,15 @@ class ShareMetaManager
             $composite = new CompositeShare($node, $repoId);
             foreach($repoData["links"] as $link){
                 $composite->addLink($link);
+            }
+            if($composite->isInvalid()){
+                // Clear meta and skip
+                $this->removeShareFromMeta($node, $repoId);
+                /** @var ShareLink[] $link */
+                foreach ($repoData['links'] as $link){
+                    $this->removeShareFromMeta($node, $link->getHash());
+                }
+                continue;
             }
             $composites[] = $composite;
         }
