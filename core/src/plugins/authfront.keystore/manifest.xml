@@ -30,7 +30,7 @@
                         <div class="title-flex">
                             <h3 class="dashboard_panel_title">
                                 AJXP_MESSAGE[keystore.1]
-                                <div style="font-size: 12px;font-weight: 300;line-height: 1.3em;margin-top: 3px;">AJXP_MESSAGE[keystore.2]</div>
+                                <div class="legend">AJXP_MESSAGE[keystore.2]</div>
                             </h3>
                             <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
                         </div>

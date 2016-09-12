@@ -73,7 +73,10 @@
             return (
                 <div className="react-mui-context">
                     <div className="title-flex">
-                        <h3 style={{paddingLeft:20}}>{pydio.MessageHash['user_dash.43']}</h3>
+                        <h3 style={{paddingLeft:20}}>
+                            {pydio.MessageHash['user_dash.43']}
+                            <div className="legend">{pydio.MessageHash['user_dash.43t']}</div>
+                        </h3>
                         <div className="actionBar">
                             {saveButton}&nbsp;&nbsp;
                             {this.getButton('pass_change', 194)}
@@ -260,16 +263,20 @@
             return (
                 <div className="react-mui-context">
                     <div className="title-flex">
-                        <h3 style={{paddingLeft:20}}>{this.getMessage(403)}</h3>
+                        <h3 style={{paddingLeft:20}}>
+                            {this.getMessage(403)}
+                            <div className="legend">{this.getMessage(404)}</div>
+                        </h3>
                     </div>
                     <div style={{padding:20}}>
                         <ReactMUI.Toggle
                             label={this.getMessage(406)}
                             toggled={webdavActive}
                             onToggle={this.onToggleChange}/>
-                        <div style={{paddingTop: 20}}>{this.getMessage(404)}</div>
-                        {webdavActive ? this.renderPasswordField() : null}
-                        {webdavActive ? this.renderURLList() : null}
+                        <div style={{paddingTop: 20}}>
+                            {webdavActive ? this.renderPasswordField() : null}
+                            {webdavActive ? this.renderURLList() : null}
+                        </div>
                     </div>
                 </div>
             );

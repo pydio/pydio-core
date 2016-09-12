@@ -124,7 +124,7 @@
                                 paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="team_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div class="title-flex">
-                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]</h3>
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]<div class="legend">AJXP_MESSAGE[user_dash.51]</div></h3>
                         <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"team_panel","toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor display_metadata"></div>

@@ -65,6 +65,20 @@
       -ms-flex: 1;
           flex: 1;
 }
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex h3 .legend {
+  font-size: 12px;
+  font-weight: 300;
+  line-height: 1.3em;
+  margin-top: 3px;
+}
+#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex h3.dashboard_panel_title {
+  margin-top: 16px;
+  padding-left: 20px;
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.87);
+}
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex div.actionBar,
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div .title-flex div.action_bar {
   margin: 20px 20px 0 0;
@@ -94,14 +108,6 @@
     display: block !important;
     margin: 0 0 10px;
   }
-}
-#userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div h3.dashboard_panel_title {
-  margin-top: 16px;
-  padding-left: 20px;
-  font-size: 24px;
-  line-height: 32px;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.87);
 }
 #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer > div div.class-FetchedResultPane {
   border-top: 1px solid #fafafa;

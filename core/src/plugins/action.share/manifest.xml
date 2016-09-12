@@ -432,7 +432,7 @@
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="shared_pane2" ajxpClass="AjxpPane" class="tabbed_editor">
                         <div class="title-flex">
-                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[share_center.98]</h3>
+                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[share_center.98]<div class="legend">AJXP_MESSAGE[share_center.99]</div></h3>
                             <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
                         </div>
                         <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"displayMode":"list", "fixedDisplayMode":"list", "groupByData":"1", "fit":"height","selectionChangeCallback":false,"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"sharelist-load","user_context":"current"}}'></div>

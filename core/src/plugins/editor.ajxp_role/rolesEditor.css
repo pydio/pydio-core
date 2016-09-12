@@ -1,3 +1,6 @@
+#role_edit_box {
+  /* ORBIT THEME */
+}
 #role_edit_box div#meta_source_button_add {
   margin-top: 20px;
 }
@@ -8,7 +11,7 @@
   border-right: 1px solid #bbbbbb;
   line-height: initial;
 }
-#role_edit_box .ajxp_theme_orbit div.tabbed_editor {
+#role_edit_box div.tabbed_editor {
   background-color: #f8f8f8;
   border: 0;
 }
@@ -350,41 +353,40 @@
   margin: 0 10px;
   box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15);
 }
-.ajxp_theme_orbit .innerContainer {
+.ajxp_theme_orbit #role_edit_box .innerContainer {
   border: 0;
   box-shadow: none;
 }
-.ajxp_theme_orbit #metaTabulator .innerContainer {
+.ajxp_theme_orbit #role_edit_box #metaTabulator .innerContainer {
   background-color: transparent;
   margin: 0 !important;
   padding: 10px !important;
   padding-bottom: 20px !important;
 }
-.ajxp_theme_orbit .innerTabRow {
+.ajxp_theme_orbit #role_edit_box .innerTabRow {
   border-radius: 0;
   margin: 0;
   box-shadow: none;
 }
-/* ORBIT THEME */
-.ajxp_theme_orbit div.tabbed_editor input[type="text"],
-.ajxp_theme_orbit div.tabbed_editor input[type="password"] {
+.ajxp_theme_orbit #role_edit_box div.tabbed_editor input[type="text"],
+.ajxp_theme_orbit #role_edit_box div.tabbed_editor input[type="password"] {
   width: inherit !important;
 }
-.ajxp_theme_orbit div.tabbed_editor div.chosen-search input[type="text"] {
+.ajxp_theme_orbit #role_edit_box div.tabbed_editor div.chosen-search input[type="text"] {
   width: 100% !important;
   padding: 4px 20px 4px 5px !important;
   border-radius: 2px;
 }
-.ajxp_theme_orbit div#parameters-selected span.list_remove_item {
+.ajxp_theme_orbit #role_edit_box div#parameters-selected span.list_remove_item {
   top: 42px;
   left: 400px;
   right: inherit;
 }
-.ajxp_theme_orbit div#account_actions {
+.ajxp_theme_orbit #role_edit_box div#account_actions {
   text-align: left;
   padding: 12px 40px 18px;
 }
-.ajxp_theme_orbit div.meta_plugin_new_form {
+.ajxp_theme_orbit #role_edit_box div.meta_plugin_new_form {
   background-color: white;
   margin: 8px 0 0 2%;
   border-radius: 5px;
@@ -393,13 +395,13 @@
   max-width: 447px;
   width: 93%;
 }
-.ajxp_theme_orbit div.meta_plugin_new_form.empty {
+.ajxp_theme_orbit #role_edit_box div.meta_plugin_new_form.empty {
   display: none;
 }
-.ajxp_theme_orbit div.meta_source_new_empty_params {
+.ajxp_theme_orbit #role_edit_box div.meta_source_new_empty_params {
   margin: 11px 11px 0;
   font-style: italic;
 }
-.ajxp_theme_orbit div#parameters-selected {
+.ajxp_theme_orbit #role_edit_box div#parameters-selected {
   border-radius: 0 !important;
 }
