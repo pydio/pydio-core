@@ -29,7 +29,6 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;

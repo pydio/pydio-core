@@ -26,7 +26,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
-use GuzzleHttp\Command\Guzzle\Parameter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Stream\Listener\PathSubscriber;
 use Pydio\Access\Core\Stream\Stream;

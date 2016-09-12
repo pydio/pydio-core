@@ -26,7 +26,6 @@ define('AJXP_CACHE_SERVICE_NS_SHARED', 'shared');
 define('AJXP_CACHE_SERVICE_NS_NODES', 'nodes');
 
 use Doctrine\Common\Cache;
-use Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 

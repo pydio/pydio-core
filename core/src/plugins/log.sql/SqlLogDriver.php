@@ -34,11 +34,7 @@ use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\PathUtils;
-use Pydio\Core\Utils\Vars\StringHelper;
-
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
 defined('AJXP_EXEC') or die('Access not allowed');

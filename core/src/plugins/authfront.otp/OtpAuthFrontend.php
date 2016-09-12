@@ -36,7 +36,6 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
-use Sabre\DAV\StringUtil;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die('Access not allowed');

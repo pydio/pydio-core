@@ -29,7 +29,6 @@ use Pydio\Core\Http\Dav\Collection;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Services\RepositoryService;
 use Pydio\Log\Core\Logger;
 use Pydio\Share\Store\ShareStore;
 use Sabre;

@@ -34,7 +34,6 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;

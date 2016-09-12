@@ -20,11 +20,9 @@
  */
 namespace Pydio\Gui;
 
-use DOMNode;
 use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;

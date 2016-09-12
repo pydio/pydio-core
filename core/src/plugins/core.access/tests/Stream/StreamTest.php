@@ -5,10 +5,6 @@ require __DIR__ . '/../../../../core/vendor/autoload.php';
 
 include_once(__DIR__ . "/../../../../base.conf.php");
 
-use Guzzle\Service\Loader\JsonLoader;
-use GuzzleHttp\Client;
-use GuzzleHttp\Command\Guzzle\Description;
-use GuzzleHttp\Command\Guzzle\GuzzleClient;
 use PHPUnit_Framework_TestCase;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Stream\Stream;

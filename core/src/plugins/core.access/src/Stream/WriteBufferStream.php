@@ -5,7 +5,6 @@ namespace Pydio\Access\Core\Stream;
 use GuzzleHttp\Stream\Stream as GuzzleStream;
 use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
-use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 
 /**

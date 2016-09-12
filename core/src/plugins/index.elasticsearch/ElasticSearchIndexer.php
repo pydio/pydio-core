@@ -30,7 +30,6 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\VarsFilter;
-use Pydio\Core\Utils\TextEncoder;
 use \Elastica;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

@@ -18,11 +18,8 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-
-
 namespace Pydio\Action\Avatar;
 
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\UsersService;
 

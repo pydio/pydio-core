@@ -22,7 +22,6 @@
 namespace Pydio\Access\Meta\Exif;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\MetaStreamWrapper;
 
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;

@@ -31,8 +31,6 @@ define('REDIS_EXTENSION_LOADED', extension_loaded('redis'));
 define('XCACHE_EXTENSION_LOADED', extension_loaded('xcache'));
 
 use \Doctrine\Common\Cache;
-use Doctrine\Common\Cache\ArrayCache;
-use Doctrine\Common\Cache\ChainCache;
 use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Cache\Doctrine\Ext\PydioChainCache;
 use Pydio\Core\Model\Context;

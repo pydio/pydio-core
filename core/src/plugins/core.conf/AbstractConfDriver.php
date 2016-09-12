@@ -54,7 +54,6 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\TextEncoder;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

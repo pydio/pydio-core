@@ -21,7 +21,6 @@
 namespace Pydio\Access\Meta\Mount;
 
 use Pydio\Access\Core\AbstractAccessDriver;
-use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Vars\VarsFilter;

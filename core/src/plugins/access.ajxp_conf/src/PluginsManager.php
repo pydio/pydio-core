@@ -20,7 +20,6 @@
  */
 namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
-use Doctrine\Common\Cache\Cache;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -29,14 +28,12 @@ use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Message\XMLDocMessage;
-use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\CacheService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 use Zend\Diactoros\Response\JsonResponse;

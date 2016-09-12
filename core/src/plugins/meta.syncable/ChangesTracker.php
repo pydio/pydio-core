@@ -32,7 +32,6 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\SqlTableProvider;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Tasks\Schedule;

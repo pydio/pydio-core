@@ -35,8 +35,6 @@ use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;

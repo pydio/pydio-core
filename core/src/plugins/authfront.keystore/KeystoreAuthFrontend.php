@@ -20,7 +20,6 @@
  */
 namespace Pydio\Auth\Frontend;
 
-use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
@@ -30,11 +29,8 @@ use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
-use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\HTMLWriter;
 use Zend\Diactoros\Response\JsonResponse;
 

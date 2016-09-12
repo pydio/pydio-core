@@ -31,7 +31,6 @@ use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Notification\Core\IFeedStore;
 use Pydio\Notification\Core\Notification;
 

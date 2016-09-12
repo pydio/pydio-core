@@ -23,8 +23,6 @@ namespace Pydio\Auth\Frontend;
 require_once dirname(__FILE__)."/../authfront.session_login/SessionLoginFrontend.php";
 
 use Duo;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 

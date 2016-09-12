@@ -29,7 +29,6 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

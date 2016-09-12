@@ -30,8 +30,6 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Services\UsersService;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');

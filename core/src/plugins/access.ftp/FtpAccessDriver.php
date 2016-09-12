@@ -36,7 +36,6 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\XMLWriter;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 

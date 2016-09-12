@@ -23,8 +23,6 @@ namespace Pydio\OCS\Server\Dav;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 use Pydio\Core\Exception\LoginException;
-use Pydio\Core\Http\Dav\Collection;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;

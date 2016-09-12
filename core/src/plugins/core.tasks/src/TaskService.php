@@ -24,8 +24,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesDiff;
-use Pydio\Access\Core\Model\Repository;
-use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;

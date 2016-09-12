@@ -25,7 +25,6 @@ namespace Pydio\Editor\Office;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
@@ -35,7 +34,6 @@ use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
 
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 
 use GuzzleHttp\Client;

@@ -21,7 +21,6 @@
 namespace Pydio\Share\Http;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Core\Http\Middleware\SapiMiddleware;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\ConfService;

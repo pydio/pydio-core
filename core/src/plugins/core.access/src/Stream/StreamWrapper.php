@@ -27,7 +27,6 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Utils\ApplicationState;
 
 use Pydio\Core\Utils\FileHelper;
-use Pydio\Core\Utils\Vars\PathUtils;
 use React\Promise\Deferred;
 
 

@@ -27,7 +27,6 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\Utils\Vars\VarsFilter;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\AbstractLogDriver;
 
 defined('AJXP_EXEC') or die('Access not allowed');

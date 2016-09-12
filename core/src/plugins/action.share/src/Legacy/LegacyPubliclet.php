@@ -36,7 +36,6 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\TextEncoder;
 
 use Pydio\Share\Model\ShareLink;
 use Pydio\Share\ShareCenter;

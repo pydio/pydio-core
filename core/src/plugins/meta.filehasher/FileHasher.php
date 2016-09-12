@@ -34,7 +34,6 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Utils\ApplicationState;
 
 use Pydio\Core\PluginFramework\PluginsService;
-use Pydio\Core\Utils\TextEncoder;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
 use Zend\Diactoros\Response\JsonResponse;

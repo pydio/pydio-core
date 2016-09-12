@@ -33,7 +33,6 @@ use Pydio\Core\Http\Message\ExternalUploadedFile;
 
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\TextEncoder;
 use Zend\Diactoros\Response\TextResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');

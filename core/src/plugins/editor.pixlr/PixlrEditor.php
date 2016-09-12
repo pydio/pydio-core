@@ -22,7 +22,6 @@ namespace Pydio\Editor\Image;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
@@ -34,7 +33,6 @@ use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 
 use Pydio\Core\PluginFramework\Plugin;
-use Pydio\Core\Utils\TextEncoder;
 
 use GuzzleHttp\Client;
 

@@ -20,7 +20,6 @@
  */
 namespace Pydio\Uploader\Processor;
 
-use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;

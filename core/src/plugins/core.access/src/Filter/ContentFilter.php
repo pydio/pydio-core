@@ -23,7 +23,6 @@ namespace Pydio\Access\Core\Filter;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Utils\Vars\PathUtils;
-use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

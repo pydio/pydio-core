@@ -31,7 +31,6 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\StatHelper;
-use Pydio\Core\Utils\TextEncoder;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 

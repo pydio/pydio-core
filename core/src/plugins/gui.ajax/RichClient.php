@@ -38,7 +38,6 @@ use Pydio\Core\Utils\Reflection\DocsParser;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Reflection\JSPacker;
 use Pydio\Core\Utils\Reflection\LocaleExtractor;
-use Pydio\Core\Utils\TextEncoder;
 
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Controller\HTMLWriter;
