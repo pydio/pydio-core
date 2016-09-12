@@ -218,6 +218,16 @@
   #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer {
     left: 40px;
   }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer .title-flex {
+    display: block !important;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer .title-flex h3 {
+    padding-right: 20px;
+  }
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer .title-flex .actionBar,
+  #userdashboard_main_tab.horizontal_tabulator div.tabulatorPanelsContainer .title-flex .action_bar {
+    text-align: right !important;
+  }
 }
 div#userdashboard_myparams_title {
   position: absolute;

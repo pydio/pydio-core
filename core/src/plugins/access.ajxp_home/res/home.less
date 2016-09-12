@@ -615,7 +615,8 @@ div#tutorial_dl_apps_pane{
   }
 
   div#dl_pydio_cont{
-    width: 750px; margin: 0 auto;
+    width: 750px;
+    margin: 0 auto;
     background-color: transparent;
   }
   div#dl_pydio_for{
@@ -798,10 +799,13 @@ and (max-width : 980px){
 }
 
 @media only screen
-and (max-width : 800px){
+and (max-width : 800px) and (min-width: 420px){
 
-    #logo_div img{
-        width: 210px;
+    #logo_div{
+      margin-top: 25% !important;
+      img{
+          width: 210px;
+      }
     }
 
     .tutorial_legend{
@@ -815,15 +819,30 @@ and (max-width : 800px){
         margin-right: 3%;
         margin-left: 3%;
     }
-    #dl_pydio_cont{
-        width: 400px !important;
+    div#dl_pydio_cont {
+      width: 650px !important;
     }
+    div.home_search{
+      width: 650px !important;
+      span.suggest-search{
+        right:320px;
+      }
+    }
+
     #dl_pydio_for{
         display: none;
     }
 
-    #home_left_bar{
-        width: 380px;
+    #home_account_pane{
+      #home_left_bar{
+        width: 300px;
+        .workspace-entry{
+          padding: 8px 10px 8px 23px !important;
+          span.workspace-badge{
+            display: none !important;
+          }
+        }
+      }
     }
 
     #welcome{
@@ -843,9 +862,9 @@ and (max-width : 800px){
 }
 
 @media only screen
-and (max-width : 400px){
+and (max-width : 420px){
   #home_left_bar{
-    width: 100%;
+    width: 100% !important;
     position: absolute;
     top:0;
     height: 100%;
