@@ -1,4 +1,4 @@
 We pass the base.conf.php file as the PHPUnit "bootstrap" file. For example, running a given
-test suite, knowing AjaXplorer is installed at /var/www/ajaxplorer :
+test suite, knowing Pydio is installed at /var/www/pydio :
 
-> phpunit --bootstrap /var/www/ajaxplorer/base.conf.php AJXP_Suite_Atomics
+> phpunit --bootstrap /var/www/pydio/base.conf.php Pydio_Tests_Suite_Atomics

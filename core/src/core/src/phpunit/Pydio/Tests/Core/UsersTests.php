@@ -18,26 +18,36 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Suite;
+namespace Pydio\Tests\Core;
 
-class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite
+class UsersTests extends \PHPUnit_Framework_TestCase
 {
-    public static function suite()
+
+    public function testUsersStorage()
     {
-        $s =  new AJXP_Suite_CoreStorages();
-        $s->addTestFile("AJXP/Core/Conf/StoragesTest.php");
-        return $s;
+        $this->markTestIncomplete('Not implemented');
     }
 
-    protected function setUp()
+    public function testPassChange()
     {
-        ConfService::init();
-        ConfService::start();
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testUsersForRepositories()
+    {
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testGroupsStorage()
+    {
+        $this->markTestIncomplete('Not implemented');
+    }
+
+    public function testGroupsRights()
+    {
+        $this->markTestIncomplete('Not implemented');
     }
 
 
-    protected function tearDown()
-    {
-    }
 
 }

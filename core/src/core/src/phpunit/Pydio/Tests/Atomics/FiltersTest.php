@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Atomics;
+namespace Pydio\Tests\Atomics;
 
 class FiltersTest extends \PHPUnit_Framework_TestCase
 {

@@ -18,13 +18,26 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Atomics;
+namespace Pydio\Tests\Suite;
 
-class MemStoresTest extends \PHPUnit_Framework_TestCase
+class AJXP_Suite_CoreStorages extends PHPUnit_Framework_TestSuite
 {
-    public function testAjxpSafe()
+    public static function suite()
     {
-        $this->markTestIncomplete('not impl');
+        $s =  new AJXP_Suite_CoreStorages();
+        $s->addTestFile("Pydio/Core/Conf/StoragesTest.php");
+        return $s;
+    }
+
+    protected function setUp()
+    {
+        ConfService::init();
+        ConfService::start();
+    }
+
+
+    protected function tearDown()
+    {
     }
 
 }

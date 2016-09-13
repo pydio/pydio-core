@@ -18,18 +18,26 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Atomics;
+namespace Pydio\Tests\Suite;
 
-class UtilsTest extends \PHPUnit_Framework_TestCase
+class Atomics extends \PHPUnit_Framework_TestSuite
 {
-    public function testPHPUnitIsWorking()
+    public static function suite()
     {
-        $this->assertTrue(true);
+        $s =  new Atomics();
+        $s->addTestFile("Pydio/Tests/Atomics/RolesTest.php");
+        $s->addTestFile("Pydio/Tests/Atomics/UtilsTest.php");
+        $s->addTestFile("Pydio/Tests/Atomics/PermissionMaskTest.php");
+        return $s;
+
     }
 
-    public function testFrameworkLoads()
+    protected function setUp()
     {
-        $this->assertEquals(\AJXP_Utils::convertBytes("2M"), 2097152);
+    }
+
+    protected function tearDown()
+    {
     }
 
 }

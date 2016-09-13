@@ -18,7 +18,7 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Core;
+namespace Pydio\Tests\Core;
 
 class StoragesTest extends \PHPUnit_Framework_TestCase
 {

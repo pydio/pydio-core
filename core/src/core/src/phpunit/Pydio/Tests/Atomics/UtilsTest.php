@@ -18,36 +18,20 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Core;
+namespace Pydio\Tests\Atomics;
 
-class UsersTests extends \PHPUnit_Framework_TestCase
+use Pydio\Core\Utils\Vars\StatHelper;
+
+class UtilsTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testUsersStorage()
+    public function testPHPUnitIsWorking()
     {
-        $this->markTestIncomplete('Not implemented');
+        $this->assertTrue(true);
     }
 
-    public function testPassChange()
+    public function testFrameworkLoads()
     {
-        $this->markTestIncomplete('Not implemented');
+        $this->assertEquals(StatHelper::convertBytes("2M"), 2097152);
     }
-
-    public function testUsersForRepositories()
-    {
-        $this->markTestIncomplete('Not implemented');
-    }
-
-    public function testGroupsStorage()
-    {
-        $this->markTestIncomplete('Not implemented');
-    }
-
-    public function testGroupsRights()
-    {
-        $this->markTestIncomplete('Not implemented');
-    }
-
-
 
 }

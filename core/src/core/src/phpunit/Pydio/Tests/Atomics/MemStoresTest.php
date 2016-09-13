@@ -18,26 +18,13 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
-namespace AJXP\Tests\Suite;
+namespace Pydio\Tests\Atomics;
 
-class Atomics extends \PHPUnit_Framework_TestSuite
+class MemStoresTest extends \PHPUnit_Framework_TestCase
 {
-    public static function suite()
+    public function testAjxpSafe()
     {
-        $s =  new Atomics();
-        $s->addTestFile("AJXP/Tests/Atomics/RolesTest.php");
-        $s->addTestFile("AJXP/Tests/Atomics/UtilsTest.php");
-        $s->addTestFile("AJXP/Tests/Atomics/PermissionMaskTest.php");
-        return $s;
-
-    }
-
-    protected function setUp()
-    {
-    }
-
-    protected function tearDown()
-    {
+        $this->markTestIncomplete('not impl');
     }
 
 }

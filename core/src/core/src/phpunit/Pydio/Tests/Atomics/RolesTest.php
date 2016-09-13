@@ -19,15 +19,17 @@
  * The latest code can be found at <http://pyd.io/>.
  */
 
-namespace AJXP\Tests\Atomics;
+namespace Pydio\Tests\Atomics;
+
+use Pydio\Conf\Core\AJXP_Role;
 
 class RolesTest extends \PHPUnit_Framework_TestCase
 {
 
     public function testRolesNumericKeys()
     {
-        $r1 = new \AJXP_Role("role1");
-        $r2 = new \AJXP_Role("role2");
+        $r1 = new AJXP_Role("role1");
+        $r2 = new AJXP_Role("role2");
 
         $r1->setAcl(1, "rw");
         $r3 = $r2->override($r1);
@@ -37,8 +39,8 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     public function testRolesAclAdditivity()
     {
-        $r1 = new \AJXP_Role("role1");
-        $r2 = new \AJXP_Role("role2");
+        $r1 = new AJXP_Role("role1");
+        $r2 = new AJXP_Role("role2");
 
         $r1->setAcl("repository_id", "");
         $r2->setAcl("repository_id", "w");
@@ -58,14 +60,14 @@ class RolesTest extends \PHPUnit_Framework_TestCase
         $r1->setAcl("repository_id", "r");
         $r2->setAcl("repository_id", AJXP_VALUE_CLEAR);
         $r3 = $r2->override($r1);
-        $this->assertEquals("", $r3->getAcl("repository_id"));
+        $this->assertEquals(AJXP_VALUE_CLEAR, $r3->getAcl("repository_id"));
 
     }
 
     public function testRolesParametersAdditivity()
     {
-        $r1 = new \AJXP_Role("role1");
-        $r2 = new \AJXP_Role("role2");
+        $r1 = new AJXP_Role("role1");
+        $r2 = new AJXP_Role("role2");
 
         $r1->setParameterValue("type.id", "param_name", "param_value1", "repository_id");
         $this->assertEquals("param_value1", $r1->filterParameterValue("type.id", "param_name", "repository_id", "anyvalue1"));
@@ -88,8 +90,8 @@ class RolesTest extends \PHPUnit_Framework_TestCase
 
     public function testRolesActionsAdditivity()
     {
-        $r1 = new \AJXP_Role("role1");
-        $r2 = new \AJXP_Role("role2");
+        $r1 = new AJXP_Role("role1");
+        $r2 = new AJXP_Role("role2");
 
         $r1->setActionState("type.id", "action_name", "repository_id", "disabled");
         $this->assertFalse($r1->actionEnabled("type.id", "action_name", "repository_id", true));
