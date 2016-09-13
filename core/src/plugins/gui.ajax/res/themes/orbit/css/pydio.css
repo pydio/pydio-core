@@ -5229,13 +5229,9 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.folded_icons {
   display: none;
 }
-#info_panel div.class-FetchedResultPane,
-.form-ip_content_info_panel div.class-FetchedResultPane {
-  font-size: 13px;
-}
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
-  padding: 0;
+  padding: 0 0 16px;
   cursor: default;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell,
@@ -5244,12 +5240,11 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  font-size: 1.1em;
-  color: #222222;
+  font-size: 15px;
+  color: #666666;
   white-space: normal;
-  line-height: 1.5em;
   padding-top: 0;
-  padding-bottom: 8px;
+  font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
@@ -5257,6 +5252,31 @@ div.menu.rootDirChooser span.rootDirTitle {
   display: block;
   font-size: 0.8em;
   line-height: 15px;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
+  display: block;
+  opacity: 0.9;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description {
+  font-size: 12px;
+  opacity: 1 !important;
+  color: #666666 !important;
+  white-space: normal;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard {
+  display: none;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata {
+  opacity: 0.9;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel {
+  color: #666666;
+  font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {

@@ -6,7 +6,7 @@
 @infopanel_values_color:#555;
 @infopanel_quick_button_border:1px dotted #999;
 
-@infopanel_fetchedpane_text_color: #222;
+@infopanel_fetchedpane_text_color: #666;
 @infopanel_fetchedpane_legend_color: #666;
 
 @infopanel_toolbar_buttons_radius:0;
@@ -119,25 +119,45 @@
 
   div.class-FetchedResultPane{
 
-    font-size: 13px;
     div.thumbnail_selectable_cell.detailed{
-      padding: 0;
+      padding: 0 0 16px;
       cursor: default;
       div.thumbnail_selectable_cell{
         display: none;
       }
       div.thumbLabel{
-        font-size: 1.1em;
+        font-size: 15px;
         color: @infopanel_fetchedpane_text_color;
         white-space: normal;
-        line-height: 1.5em;
         padding-top: 0;
-        padding-bottom: 8px;
+        font-weight: 400;
         small {
           color: @infopanel_fetchedpane_legend_color;
           display: block;
           font-size: 0.8em;
           line-height: 15px;
+        }
+      }
+      div.thumbnail_cell_metadata{
+        display: block;
+        opacity: 0.9;
+        .metadata_chunk.metadata_chunk_description{
+          font-size: 12px;
+          opacity: 1 !important;
+          color: @infopanel_fetchedpane_legend_color !important;
+          white-space: normal;
+        }
+        .metadata_chunk.metadata_chunk_standard{
+          display: none;
+        }
+      }
+      &.selected-focus{
+        div.thumbnail_cell_metadata{
+          opacity: 0.9;
+        }
+        div.thumbLabel{
+          color: @infopanel_fetchedpane_text_color;
+          font-weight: 400;
         }
       }
     }

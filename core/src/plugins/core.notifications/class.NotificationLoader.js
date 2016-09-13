@@ -338,7 +338,8 @@ Class.create("NotificationLoader", {
             "columnsDef":[
                 {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
                 {"attributeName":"event_time", "messageString":"Time", "sortType":"Number"},
-                {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
+                {"attributeName":"event_description", "messageString":"Description", "sortType":"String"}
+            ],
             "silentLoading":true,
             "fixedSortColumn":"event_time",
             "fixedSortDirection":"desc",

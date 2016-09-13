@@ -291,7 +291,7 @@ class NotificationCenter extends Plugin
                         continue;
                     }
                     $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
-                    $node->event_description_long = $notif->getDescriptionLong(true);
+                    $node->event_description_long = strip_tags($notif->getDescriptionLong(true));
                     $node->event_date = StatHelper::relativeDate($notif->getDate(), $mess);
                     $node->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
@@ -311,7 +311,9 @@ class NotificationCenter extends Plugin
                         if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
                             $node->setLabel($node->event_description." ".$node->event_date);
                         }else{
-                            $node->setLabel(basename($node->getPath())." <small class='notif_desc'>".$node->event_description." ".$node->event_date."</small>");
+                            $node->setLabel(basename($node->getPath()));
+                            $node->ajxp_description = $node->event_description .' ' . $node->event_date;
+                            //$node->setLabel(basename($node->getPath())." ".$node->event_description." ".$node->event_date);
                         }
                     }
                     $url = parse_url($node->getUrl());
@@ -469,7 +471,7 @@ class NotificationCenter extends Plugin
                 }
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
-                $node->event_description_long = $notification->getDescriptionLong(true);
+                $node->event_description_long = strip_tags($notification->getDescriptionLong(true));
                 $node->event_date = StatHelper::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
