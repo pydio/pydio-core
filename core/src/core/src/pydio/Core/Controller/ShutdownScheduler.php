@@ -122,8 +122,8 @@ class ShutdownScheduler
                 Logger::error(__CLASS__, __FUNCTION__, array("context" => "Applying hook " . get_class($callback[0]) . "::" . $callback[1], "message" => $e->getMessage()));
             }
             $index++;
-            if($index > 200) {
-                Logger::error(__CLASS__, __FUNCTION__, "Breaking ShutdownScheduler loop, seems too big (200)");
+            if($index > 100000) {
+                Logger::error(__CLASS__, __FUNCTION__, "Breaking ShutdownScheduler loop, seems too big (100000)");
                 break;
             }
         }
