@@ -218,7 +218,7 @@ class RichClient extends Plugin
         $httpVars = $request->getParsedBody();
         HTMLWriter::internetExplorerMainDocumentHeader($response);
 
-        if (!is_file(TESTS_RESULT_FILE)) {
+        if (!is_file(TESTS_RESULT_FILE) && !is_file(TESTS_RESULT_FILE_LEGACY)) {
             $outputArray = array();
             $testedParams = array();
             $passed = DiagnosticRunner::runTests($outputArray, $testedParams);

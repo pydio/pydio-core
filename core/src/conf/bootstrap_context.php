@@ -59,7 +59,8 @@ define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/src");
 define("AJXP_VENDOR_FOLDER", AJXP_INSTALL_PATH."/core/vendor");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
-define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
+define("TESTS_RESULT_FILE", AJXP_DATA_PATH."/plugins/boot.conf/diag_result.php");
+define("TESTS_RESULT_FILE_LEGACY", AJXP_CACHE_DIR."/diag_result.php");
 define("AJXP_TESTS_FOLDER", AJXP_BIN_FOLDER."/pydio/Tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 // Startup admin password (used at first creation). Once

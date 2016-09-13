@@ -367,7 +367,10 @@ class BootConfLoader extends AbstractConfDriver
         }
         $newBootstrap = array("core.conf" => $coreConf, "core.auth" => $coreAuth, "core.cache" => $coreCache);
         FileHelper::saveSerialFile($oldBoot, $newBootstrap, true, false, "json", true);
-        @unlink(AJXP_CACHE_DIR . "/admin_counted");
+        @unlink($this->getPluginWorkDir(true) . "/admin_counted");
+        if(is_file(AJXP_CACHE_DIR . "/admin_counted")){
+            @unlink(AJXP_CACHE_DIR . "/admin_counted");
+        }
 
         // Write new bootstrap and reload conf plugin!
         $coreConf["UNIQUE_INSTANCE_CONFIG"]["SQL_DRIVER"] = $coreConf["DIBI_PRECONFIGURATION"];
@@ -607,7 +610,10 @@ class BootConfLoader extends AbstractConfDriver
                 AuthService::disconnect();
             } else if ($pluginId == "core.auth") {
                 // DELETE admin_counted file and DISCONNECT
-                @unlink(AJXP_CACHE_DIR . "/admin_counted");
+                @unlink($this->getPluginWorkDir(true) . "/admin_counted");
+                if(is_file(AJXP_CACHE_DIR . "/admin_counted")){
+                    @unlink(AJXP_CACHE_DIR . "/admin_counted");
+                }
             }
         }
     }

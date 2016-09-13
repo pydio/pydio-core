@@ -256,7 +256,8 @@ class RolesService
      */
     public static function bootSequence()
     {
-        if (file_exists(AJXP_CACHE_DIR . "/admin_counted")) return;
+        $bootConfDir = AJXP_DATA_PATH. "/plugins/boot.conf";
+        if (file_exists(AJXP_CACHE_DIR . "/admin_counted") || file_exists($bootConfDir."/admin_counted")) return;
         $rootRole = RolesService::getRole("AJXP_GRP_/");
         if ($rootRole === false) {
             $rootRole = new AJXP_Role("AJXP_GRP_/");
@@ -348,7 +349,10 @@ class RolesService
             }
             RolesService::updateRole($rootRole);
         }
-        file_put_contents(AJXP_CACHE_DIR . "/admin_counted", "true");
+        if(!file_exists($bootConfDir)){
+            mkdir($bootConfDir, 0666, true);
+        }
+        file_put_contents($bootConfDir . "/admin_counted", "true");
 
     }
 }

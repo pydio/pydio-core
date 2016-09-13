@@ -58,8 +58,12 @@ class DiagnosticManager extends AbstractManager
         $nodesList->appendColumn("ajxp_conf.23", "ajxp_label");
         $nodesList->appendColumn("ajxp_conf.24", "data");
 
-        if (is_file(TESTS_RESULT_FILE)) {
-            include_once(TESTS_RESULT_FILE);
+        if (is_file(TESTS_RESULT_FILE) || is_file(TESTS_RESULT_FILE_LEGACY)) {
+            if(is_file(TESTS_RESULT_FILE_LEGACY)){
+                include_once(TESTS_RESULT_FILE_LEGACY);
+            }else{
+                include_once(TESTS_RESULT_FILE);
+            }
             if (isset($diagResults)) {
                 foreach ($diagResults as $id => $value) {
                     $nodeKey = $path."/".$id;

@@ -38,7 +38,7 @@ class ApplicationState
      */
     public static function detectApplicationFirstRun()
     {
-        return !file_exists(AJXP_CACHE_DIR . "/first_run_passed");
+        return !file_exists(AJXP_CACHE_DIR . "/first_run_passed") &&  !file_exists(AJXP_DATA_PATH . "/plugins/boot.conf/first_run_passed");
     }
 
     /**
@@ -46,7 +46,7 @@ class ApplicationState
      */
     public static function setApplicationFirstRunPassed()
     {
-        @file_put_contents(AJXP_CACHE_DIR . "/first_run_passed", "true");
+        @file_put_contents(AJXP_DATA_PATH . "/plugins/boot.conf/first_run_passed", "true");
     }
 
     /**

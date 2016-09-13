@@ -106,7 +106,7 @@ class Server
     }
 
     public function registerCatchAll(){
-        if (is_file(TESTS_RESULT_FILE)) {
+        if (is_file(TESTS_RESULT_FILE) || is_file(TESTS_RESULT_FILE_LEGACY)) {
             set_error_handler(array($this, "catchError"), E_ALL & ~E_NOTICE & ~E_STRICT );
             set_exception_handler(array($this, "catchException"));
         }
