@@ -58,7 +58,7 @@
 			</action>
 		</actions>
 		<client_configs>
-			<template theme="umbra" name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
+			<template theme="orbit" name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
 				<div id="toolbars">
 					<div id="action_bar">
 						<div id="locationbar_cont">

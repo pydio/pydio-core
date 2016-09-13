@@ -55,14 +55,6 @@ a.m-2 {
   width: 100%;
   position: absolute;
 }
-.umbra div#search_panel {
-  margin: 5px;
-}
-.ajxp_theme_vision a.m-2 {
-  margin: 3px 1px;
-  padding: 3px 5px;
-  background-color: #4dc5c3 !important;
-}
 #uploadBrowseButton {
   display: none !important;
 }

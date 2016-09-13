@@ -20,7 +20,7 @@
 var currentLink;
 function parseLinks(){
     var bmlink1 = '<a id="ajxp_bm_link_dl1" title="Send to Pydio">\
-                Download <img ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/umbra/images/actions/22/forward_22.png" align="absmiddle"><img align="absmiddle" ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/umbra/images/actions/32/hdd_external_unmount.png"></a>';
+                Download <img ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/orbit/images/actions/22/forward_22.png" align="absmiddle"><img align="absmiddle" ajxp_image="true" src="'+window.ajxp_bm_target+'/plugins/gui.ajax/res/themes/orbit/images/actions/32/hdd_external_unmount.png"></a>';
 	jQuery('body').append('<link rel="stylesheet" type="text/css" href="'+ajxp_bm_target+'plugins/uploader.http/bookmarklet/ajxp.css"></link>');
 	jQuery('body').append('<div id="ajxp_bm_main" style="display:none;" class="ajxp_bm_menu" ><div><a id="ajxp_bm_close" style="float:right;font-size:12px;cursor:pointer;border-left:1px solid #fff;padding-left: 10px;">X</a>Pydio direct download</div><div class="ajxp_bm_menu_legend">Click on any link or image to send the link directly to your Pydio account.</div><div style="display:none" id="ajxp_bm_frame_div"><iframe frameborder="0" id="ajxp_bm_iframe"></iframe></div></div><div style="position:absolute;" class="ajxp_bm_menu" id="ajxp_bm_link_menu">'+bmlink1+'<a id="ajxp_bm_link_dl2">Process link normally</a></div>').click(function(){jQuery('#ajxp_bm_link_menu').slideUp();}) ;
 

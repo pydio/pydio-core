@@ -23,26 +23,6 @@
 				    <a href="#" id="showLowResButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 10px;"><span message_id="526">AJXP_MESSAGE[526]</span></a>
 				    <a href="#" id="showOriginalButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 14px;"><span message_id="525">AJXP_MESSAGE[525]</span></a>
 					<input id="zoomValue" type="text" style="text-align: center;width: 40px;height: 16px;padding: 2px;border: 1px solid #222;padding-right: 1px;background-color: #666;color: #fff;margin-top: -2px;"/>
-					<a href="#" class="icon-screenshot" id="actualSizeButton" style="float: none;padding: 0 !important;margin-top: 0;font-size: 14px;" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/zoom-original.png" alt="" border="0"><br><span message_id="327">AJXP_MESSAGE[327]</span></a>
-				</div>
-				<a href="#" class="icon-arrow-left" id="prevButton" onclick="return false;"><img  width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/back_22.png" alt="" border="0"><br><span message_id="178">AJXP_MESSAGE[178]</span></a>
-				<a href="#" class="icon-stop" access_key="s" id="stopButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_stop.png" alt="AJXP_MESSAGE[233]" border="0"><br><span message_id="232">AJXP_MESSAGE[232]</span></a>
-                <input id="time" type="text" value="3 s" style="text-align: center;width: 26px;height: 17px;padding: 0px 2px 2px 2px;background-color: #666;color: #fff;margin: 6px 1px;float: left;border: 1px solid #222;border-radius: 2px;"/>
-				<a href="#" class="icon-play" access_key="p" id="playButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/player_play.png" alt="AJXP_MESSAGE[231]" border="0"><br><span message_id="230">AJXP_MESSAGE[230]</span></a>
-				<a href="#" class="icon-arrow-right" id="nextButton" onclick="return false;"><img width="22" height="22" src="AJXP_THEME_FOLDER/images/actions/22/forward_22.png" alt="" border="0"><br><span message_id="179">AJXP_MESSAGE[179]</span></a>
-			</div>
-            <div style="text-align:center; vertical-align:center;overflow:auto; background-color:rgb(85,85,85);" id="imageContainer">
-                <div id="imageBorder" style="background-color:transparent;-webkit-box-shadow:rgb(51, 51, 51) 2px 2px 6px;-moz-box-shadow:rgb(51, 51, 51) 2px 2px 6px;box-shadow:rgb(51, 51, 51) 2px 2px 6px;"><img id="mainImage" src=""></div>
-            </div>
-		</div>
-	]]></clientForm>
-	<clientForm id="diaporama_box" theme="orbit"><![CDATA[
-		<div id="diaporama_box" action="view_diapo" box_width="90%" box_height="90%" box_resize="true" box_padding="0">
-			<div class="action_bar full_width_action_bar" style="width: 100%;" title="AJXP_MESSAGE[414]">
-				<div align="right" id="diaporama_input_boxes" style="float:right; padding-top: 1px; padding-right: 5px; height: 21px;margin-top:28px;margin-left:30px;">
-				    <a href="#" id="showLowResButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 10px;"><span message_id="526">AJXP_MESSAGE[526]</span></a>
-				    <a href="#" id="showOriginalButton" class="icon-picture" style="float: none; display:none;padding: 0 !important;margin-top: 0;font-size: 14px;"><span message_id="525">AJXP_MESSAGE[525]</span></a>
-					<input id="zoomValue" type="text" style="text-align: center;width: 40px;height: 16px;padding: 2px;border: 1px solid #222;padding-right: 1px;background-color: #666;color: #fff;margin-top: -2px;"/>
 					<a href="#" class="icon-screenshot" id="actualSizeButton" style="float: none;padding: 0 !important;margin-top: 0;font-size: 14px;" onclick="return false;"><span message_id="327">AJXP_MESSAGE[327]</span></a>
 				</div>
 				<a href="#" class="icon-arrow-left" id="prevButton" onclick="return false;"><span message_id="178">AJXP_MESSAGE[178]</span></a>
@@ -112,28 +92,6 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="image_width,image_height,image_type" theme="oxygen,umbra,vision">
-					<messages>
-						<message key="type_string" id="134"/>
-						<message key="dim_string" id="135"/>
-						<message key="header_string" id="343"/>
-					</messages>
-					<html><![CDATA[
-						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-picture" data-ajxpAction="no-action"></span> #{header_string}</div>
-							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-								<tr>
-									<td class="infoPanelLabel">#{dim_string}</td>
-									<td class="infoPanelValue">#{image_width}px X #{image_height}px</td>
-								</tr>
-								<tr class="even">
-									<td class="infoPanelLabel">#{type_string}</td>
-									<td class="infoPanelValue">#{image_type}</td>
-								</tr>
-							</table>
-						</div>
-					]]></html>
-				</infoPanelExtension>
 				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" theme="orbit" primary="true">
                     <messages>
                         <message key="name_string" id="133"/>

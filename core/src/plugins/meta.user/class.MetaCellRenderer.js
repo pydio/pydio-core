@@ -439,7 +439,7 @@ Class.create("MetaCellRenderer", {
 	},
 
     linkEditableDiv : function(div){
-        div.saver = new Element("img", {src:"plugins/gui.ajax/res/themes/umbra/images/actions/22/dialog_ok_apply.png"}).setStyle({
+        div.saver = new Element("img", {src:"plugins/gui.ajax/res/themes/orbit/images/actions/22/dialog_ok_apply.png"}).setStyle({
             float:"left",
             width: "22px",
             height:"22px",

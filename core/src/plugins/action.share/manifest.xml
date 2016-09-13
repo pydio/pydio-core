@@ -258,7 +258,7 @@
             </action>
         </actions>
         <client_configs>
-            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153" theme="orbit"><![CDATA[
+            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
@@ -277,7 +277,7 @@
                 });
                 </script>
 			]]></template>
-            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154" theme="orbit"><![CDATA[
+            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
                     <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
