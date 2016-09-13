@@ -22,7 +22,7 @@ namespace Pydio\Core\Utils\Http;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-include_once(AJXP_BIN_FOLDER."/lib/securimage/securimage.php");
+//include_once(AJXP_BIN_FOLDER."/lib/securimage/securimage.php");
 
 /**
  * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.
@@ -36,13 +36,9 @@ class CaptchaProvider
      */
     public static function sendCaptcha()
     {
-        $libPath = AJXP_BIN_FOLDER."/lib/securimage";
-
         $img = new \Securimage();
-        $img->wordlist_file = $libPath."/words/words.txt";
-        $img->gd_font_file = $libPath."/gdfonts/automatic.gdf";
-        $img->signature_font = $img->ttf_file = $libPath."/AHGBold.ttf";
 
+        $img->wordlist_file = dirname(__FILE__).DIRECTORY_SEPARATOR.'captcha_words.txt';
         $img->image_height = 80;
         $img->image_width = 170;
         $img->perturbation = 0.85;
@@ -67,7 +63,6 @@ class CaptchaProvider
             $img->use_transparent_text = false;
             $img->use_multi_text = false;
         }
-        //$img->show($libPath."/backgrounds/bg3.jpg");
         $img->show();
     }
 
