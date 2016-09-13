@@ -102,6 +102,14 @@ Class.create("AjxpTabulator", AjxpPane, {
             document.observe("ajaxplorer:user_logged", this.loadState.bind(this));
             this.loadState();
         }
+        if(this.options.route){
+            var routeOptions = this.options.route;
+            if(pydio.Router) {
+                this._bindToRouter(routeOptions);
+            } else pydio.observeOnce("loaded", function(){
+                if(pydio.Router) this._bindToRouter(routeOptions);
+            }.bind(this));
+        }
 
 	},
 
@@ -484,7 +492,29 @@ Class.create("AjxpTabulator", AjxpPane, {
         this._eventPath = cNode.getPath();
     },
 
-	/**
+    _bindToRouter: function(routeOptions){
+        this.observe("switch", function(tabId){
+            if(tabId){
+                pydio.Router.router.navigate(routeOptions.base + "/" + tabId);
+            }
+        });
+        this._routerObserver = function(object){
+            if('/' + object.workspace === routeOptions.base){
+                var tabId = PathUtils.getBasename(object.path);
+                if(tabId) {
+                    this.switchTabulator(tabId);
+                }else{
+                    this.switchTabulator(this.tabulatorData.first().id);
+                }
+            }
+        }.bind(this);
+        pydio.observe("routechange", this._routerObserver);
+        window.setTimeout(function(){
+            this.notify("switch", this.tabulatorData.first().id);
+        }.bind(this), 500);
+    },
+
+    /**
 	 * Resizes the widget
 	 */
 	resize : function(size, loop){
@@ -604,6 +634,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.htmlElement.update("");
         try{pydio.UI.removeInstanceFromCache(this.htmlElement.id);}catch(e){}
 		this.htmlElement = null;
+        if(this._routerObserver){
+            pydio.stopObserving("routechange", this._routerObserver);
+        }
 	},
 	
 	

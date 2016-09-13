@@ -427,7 +427,7 @@
             </component_config>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="shared_pane2"
-                                tabInfo='{"id":"my-shared2","iconClass":"mdi mdi-share-variant","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
+                                tabInfo='{"id":"shares","iconClass":"mdi mdi-share-variant","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="shared_pane2" ajxpClass="AjxpPane" class="tabbed_editor">
                         <div class="title-flex">

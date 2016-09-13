@@ -24,7 +24,7 @@
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="apikeys_pane"
-                                tabInfo='{"id":"my-api-data","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
+                                tabInfo='{"id":"apikeys","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="apikeys_pane" ajxpClass="ApikeysPane" ajxpOptions='{}' class="tabbed_editor" style="position:relative;">
                         <div class="title-flex">
