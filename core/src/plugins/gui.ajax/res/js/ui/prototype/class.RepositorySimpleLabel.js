@@ -69,9 +69,9 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
             if(repositoryList && repositoryList.size()){
                 var repoObject = repositoryList.get(repositoryId);
                 if(repoObject){
-                    this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
+                    this.htmlElement.down("div.repository_title").update(He.escape(repoObject.getLabel()));
                     if(this.options.displayWorkspaceDescription){
-                        this.htmlElement.down("div.repository_description").update(repoObject.getDescription());
+                        this.htmlElement.down("div.repository_description").update(He.escape(repoObject.getDescription()));
                     }
                 }
             }

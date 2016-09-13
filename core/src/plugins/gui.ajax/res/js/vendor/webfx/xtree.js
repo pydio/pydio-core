@@ -290,7 +290,7 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 
 
 WebFXTreeAbstractNode.prototype.updateLabel = function(label){
-	if($(this.id+'-label')) $(this.id+'-label').update(label);	
+	if($(this.id+'-label')) $(this.id+'-label').update(He.escape(label));
 };
 
 WebFXTreeAbstractNode.prototype.updateIcon = function(icon, openIcon, overlayIcon, overlayClasses){

@@ -52,7 +52,7 @@ Class.create("BackgroundManagerPane", {
 
     updatePanelMessage : function(message){
         var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" width="16" align="absmiddle">';
-        this.panel.update(imgString+' '+message);
+        this.panel.update(imgString+' '+ He.escape(message));
         Effect.Appear(this.panel);
     },
 
@@ -61,7 +61,7 @@ Class.create("BackgroundManagerPane", {
 	 * @param errorMessage String
 	 */
 	updatePanelError:function(errorMessage){
-		this.panel.update(errorMessage);
+		this.panel.update(He.escape(errorMessage));
 		this.panel.insert(this.makeCloseLink());
 	},
 	/**

@@ -125,6 +125,8 @@ Class.create("AjxpTabulator", AjxpPane, {
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
             var title = MessageHash[tabInfo.title] || label.stripTags();
+            title = He.escape(title);
+            label = He.escape(label);
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
             td = new Element('span', options);
@@ -165,6 +167,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(label && label.innerHTML !== undefined){
             if(label.down('.filenameSpan')){
                 var cont = label.down('.filenameSpan').innerHTML;
+                cont = He.escape(cont);
                 if(cont.length > 25){
                     cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
                     label.down('.filenameSpan').update(cont);
@@ -172,7 +175,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             return label;
         }
-        if(label.stripTags() != label) return label;
+        label = label.stripTags();
         if(!label || !label.length) return '';
         if(label.length > 25){
             return label.substr(0,7)+"[...]"+label.substr(-13);

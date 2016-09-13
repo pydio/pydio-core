@@ -250,7 +250,7 @@ Class.create("FormManager", {
                     }else{
                         selectedString = (defaultValue == cValue ? ' selected' : '');
                     }
-                    element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
+                    element += '<option value="'+cValue+'"'+selectedString+'>'+He.escape(cLabel)+'</option>';
                 }
                 element += '</select><span class="select-styler"></span>';
             }else if(type == "image" && param.get("uploadAction")){

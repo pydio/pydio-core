@@ -282,7 +282,7 @@ Class.create("AbstractEditor" , {
 	 */
 	updateTitle : function(title){
 		if(this.filenameSpan) {
-            this.filenameSpan.update(title);
+            this.filenameSpan.update(He.escape(title));
         }
 		if(this.fullScreenMode){
 			this.refreshFullScreenTitle();

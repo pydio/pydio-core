@@ -349,12 +349,12 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	contextObserver : function(e){
 		if(!this.crtContext || !this.htmlElement) return;
-		//console.log('FILES LIST : FILL');
-        var base = getBaseName(this.crtContext.getLabel());
-        if(!base){
-            try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
-        }
         if(!this.options.muteUpdateTitleEvent){
+            //console.log('FILES LIST : FILL');
+            var base = getBaseName(this.crtContext.getLabel());
+            if(!base){
+                try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
+            }
             this.htmlElement.fire("editor:updateTitle", base);
         }
         this.empty();
@@ -1792,7 +1792,7 @@ Class.create("FilesList", SelectableElements, {
                 var textLabel = new Element("span", {
                     id          :'ajxp_label',
                     className   :'text_label'+fullview
-                }).update(metaData.get('text'));
+                }).update(He.escape(metaData.get('text')));
 
                 if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
                     textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
@@ -1939,7 +1939,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(He.escape(textNode));
 		
 		innerSpan.insert({"bottom":img});
 		innerSpan.insert({"bottom":label});
@@ -2035,7 +2035,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(He.escape(textNode));
 
 		innerSpan.insert({"bottom":img});
 		//newRow.insert({"bottom":label});

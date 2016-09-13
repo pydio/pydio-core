@@ -42,6 +42,9 @@
                                     while(userSelection.fileNameExists(name + extension)){
                                         name = tmpFileName + "-" + compteurFileName;
                                         compteurFileName ++;
+                                        if(compteurFileName > 20){
+                                            break;
+                                        }
                                     }
                                     archive_nameInput.setValue(name + extension);
                                     return name;

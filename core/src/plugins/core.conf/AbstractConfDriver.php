@@ -1048,7 +1048,11 @@ abstract class AbstractConfDriver extends Plugin
                 $tplRepo = RepositoryService::getRepositoryById($tplId);
                 $options = [];
                 OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $options);
-                $newRep = $tplRepo->createTemplateChild(InputFilter::sanitize($httpVars["DISPLAY"]), $options, $loggedUser->getId(), $loggedUser->getId());
+                $display = InputFilter::sanitize($httpVars["DISPLAY"]);
+                if(empty($display)){
+                    throw new PydioException("Cannot create repository with empty label");
+                }
+                $newRep = $tplRepo->createTemplateChild($display, $options, $loggedUser->getId(), $loggedUser->getId());
                 $gPath = $loggedUser->getGroupPath();
                 if (!empty($gPath)) {
                     $newRep->setGroupPath($gPath);

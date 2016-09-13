@@ -92,7 +92,7 @@ Class.create("NotificationLoader", {
             }
             var elLabel = el.getLabel();
             if(!elLabel) elLabel = "/";
-            var block = '<div class="notif_event_label">'+elLabel+'</div>';
+            var block = '<div class="notif_event_label">'+He.escape(elLabel)+'</div>';
             var detail = '';
             if(el.getMetadata().get('event_repository_label')){
                 detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';

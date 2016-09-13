@@ -16,4 +16,5 @@ window.ReactAutoSuggest = require('react-autosuggest');
 window.Clipboard = require('clipboard');
 window.ReactQRCode = require('qrcode.react');
 window.Cronstrue = require("cronstrue");
+window.He = require("he");
 window.injectTapEventPlugin();
