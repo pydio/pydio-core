@@ -46,6 +46,9 @@ class ApplicationState
      */
     public static function setApplicationFirstRunPassed()
     {
+        if(!is_file(AJXP_DATA_PATH . "/plugins/boot.conf")){
+            @mkdir(AJXP_DATA_PATH . "/plugins/boot.conf", 0666, true);
+        }
         @file_put_contents(AJXP_DATA_PATH . "/plugins/boot.conf/first_run_passed", "true");
     }
 

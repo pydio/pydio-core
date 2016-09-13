@@ -173,7 +173,9 @@ class DiagnosticRunner
         echo ';';
         $content = '<?php ' . ob_get_contents() . ' ?>';
         ob_end_clean();
-        //print_r($content);
+        if(!file_exists(dirname(TESTS_RESULT_FILE))){
+            mkdir(dirname(TESTS_RESULT_FILE), 0666, true);
+        }
         file_put_contents(TESTS_RESULT_FILE, $content);
     }
 }
