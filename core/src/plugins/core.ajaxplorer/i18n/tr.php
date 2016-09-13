@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	Turkish translation by: Heron / date: 23 october 2011 (second revision, it feels good to help!)
 //  transilated version: Pydio-core-3.3.2 (release date: 25 septembre 2011)

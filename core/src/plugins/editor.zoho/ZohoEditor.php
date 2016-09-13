@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Description : Zoho plugin. First version by Pawel Wolniewicz http://innodevel.net/ 2011
  * Improved by cdujeu / Https Support now necessary for zoho API.

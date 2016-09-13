@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  Korean translation : minuki@gmail.com
 //  오타, 오역, 어색한 부분은 누구든지 수정하여 재 공유 부탁드립니다.

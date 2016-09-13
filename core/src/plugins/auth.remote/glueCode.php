@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Description : Interface between Pydio and external software. Handle with care!
  * Take care when using this file. It can't be included anywhere, as it's doing global scope pollution.

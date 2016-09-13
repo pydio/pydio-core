@@ -16,13 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\Core\Utils\Http;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
-
-//include_once(AJXP_BIN_FOLDER."/lib/securimage/securimage.php");
 
 /**
  * Encapsulation of the securimage external library, to generate a Captcha Image on brute force login attempt.
