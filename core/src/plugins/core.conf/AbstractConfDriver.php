@@ -1144,7 +1144,8 @@ abstract class AbstractConfDriver extends Plugin
                     if (method_exists($this, "listUserTeams")) {
                         $teams = $this->listUserTeams($ctx->getUser());
                         foreach ($teams as $tId => $tData) {
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                            $label = htmlentities($tData["LABEL"]);
+                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$label."\"><span class='user_entry_label'>[team] ".$label."</span></li>";
                         }
                     }
                     print("<ul>$users</ul>");
@@ -1221,6 +1222,9 @@ abstract class AbstractConfDriver extends Plugin
 
                 $users = "";
                 $index = 0;
+                if(!empty($crtValue)){
+                    $crtValue = InputFilter::sanitize($crtValue, InputFilter::SANITIZE_HTML_STRICT);
+                }
                 if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf") && !$existingOnly) {
                     $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
                 } else if ($existingOnly && !empty($crtValue)) {
