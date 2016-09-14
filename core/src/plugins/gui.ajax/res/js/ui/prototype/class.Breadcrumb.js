@@ -86,15 +86,15 @@ Class.create("Breadcrumb", AjxpPane, {
                         refresh = '<i class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></i>';
                     }
                     var first = pos == 0 ? ' first-bread':'';
-                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+He.escape(pair.key)+"'><em>"+He.escape(pair.value)+"</em></span></li>";
+                    clickPath += "<li><span class='ajxp-goto "+first+"' data-goTo='"+he.escape(pair.key)+"'><em>"+he.escape(pair.value)+"</em></span></li>";
                     if(refresh){
-                        clickPath += "<li><i class='ajxp-goto' data-goTo='"+He.escape(pair.key)+"'>"+refresh+"</i></li>";
+                        clickPath += "<li><i class='ajxp-goto' data-goTo='"+he.escape(pair.key)+"'>"+refresh+"</i></li>";
                     }
                 }else{
                     if(pos == length-1){
                         refresh = '<span class="icon-refresh ajxp-goto-refresh" title="'+MessageHash[149]+'"></span>';
                     }
-                    clickPath += (pair.value != pos == 0 || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+He.escape(pair.key)+"'>"+He.escape(pair.value)+refresh+"</span>";
+                    clickPath += (pair.value != pos == 0 || !this.options['hide_home_icon'] ? chevron : "") + "<span class='ajxp-goto' data-goTo='"+he.escape(pair.key)+"'>"+he.escape(pair.value)+refresh+"</span>";
                 }
                 pos ++;
             }.bind(this));

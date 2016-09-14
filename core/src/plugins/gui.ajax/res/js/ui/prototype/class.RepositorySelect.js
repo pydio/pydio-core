@@ -135,11 +135,11 @@ Class.create("RepositorySelect", {
                     return;
                 }
 
-                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + He.escape(repoObject.getLabel()) + '</span>';
-                var alt = He.escape(repoObject.getLabel());
+                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + he.escape(repoObject.getLabel()) + '</span>';
+                var alt = he.escape(repoObject.getLabel());
                 if(repoObject.getDescription()){
-                    label += '<span class="menu_description">' + He.escape(repoObject.getDescription()) + '</span>';
-                    alt += '-' + He.escape(repoObject.getDescription());
+                    label += '<span class="menu_description">' + he.escape(repoObject.getDescription()) + '</span>';
+                    alt += '-' + he.escape(repoObject.getDescription());
                 }else{
                     alt += (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":"");
                 }
@@ -166,7 +166,7 @@ Class.create("RepositorySelect", {
 					actions.push(actionData);
 				}				
 				if(key == repositoryId){
-					if(this.label) this.label.setValue(He.escape(repoObject.getLabel()));
+					if(this.label) this.label.setValue(he.escape(repoObject.getLabel()));
                     if(this.icon) this.icon.src = repoObject.getIcon();
 				}
 			}.bind(this));

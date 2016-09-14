@@ -133,8 +133,8 @@ Class.create("AjxpTabulator", AjxpPane, {
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
             var title = MessageHash[tabInfo.title] || label.stripTags();
-            title = He.escape(title);
-            label = He.escape(label);
+            title = he.escape(title);
+            label = he.escape(label);
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
             td = new Element('span', options);
@@ -175,7 +175,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(label && label.innerHTML !== undefined){
             if(label.down('.filenameSpan')){
                 var cont = label.down('.filenameSpan').innerHTML;
-                cont = He.escape(cont);
+                cont = he.escape(cont);
                 if(cont.length > 25){
                     cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
                     label.down('.filenameSpan').update(cont);

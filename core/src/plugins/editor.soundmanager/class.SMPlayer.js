@@ -199,7 +199,7 @@ Class.create("SMPlayer", AbstractEditor, {
 
     open : function($super, ajxpNode){
         this.currentRichPreview = this.getPreview(ajxpNode, true);
-        this.element.down(".smplayer_title").update(He.escape(ajxpNode.getLabel()));
+        this.element.down(".smplayer_title").update(he.escape(ajxpNode.getLabel()));
         this.element.down(".smplayer_preview_element").insert(this.currentRichPreview);
         window.setTimeout(function(){
             try{this.currentRichPreview.down('span.sm2-360btn').click();}catch(e){}

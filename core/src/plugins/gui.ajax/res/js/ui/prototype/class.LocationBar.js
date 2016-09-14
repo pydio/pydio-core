@@ -235,7 +235,7 @@ Class.create("LocationBar", {
 		this.realPath = newPath;
 		this.currentLabel = this.realPath;
 		if(getBaseName(newPath) != newNode.getLabel()){
-			this.currentLabel = getRepName(newPath) + '/' + He.escape(newNode.getLabel());
+			this.currentLabel = getRepName(newPath) + '/' + he.escape(newNode.getLabel());
 		}
 		this.label.update(this.currentLabel);
 		this.currentPath.value = this.realPath;

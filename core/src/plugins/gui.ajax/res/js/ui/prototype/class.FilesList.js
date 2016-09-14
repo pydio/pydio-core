@@ -1792,7 +1792,7 @@ Class.create("FilesList", SelectableElements, {
                 var textLabel = new Element("span", {
                     id          :'ajxp_label',
                     className   :'text_label'+fullview
-                }).update(He.escape(metaData.get('text')));
+                }).update(he.escape(metaData.get('text')));
 
                 if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
                     textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
@@ -1939,7 +1939,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(He.escape(textNode));
+		}).update(he.escape(textNode));
 		
 		innerSpan.insert({"bottom":img});
 		innerSpan.insert({"bottom":label});
@@ -2035,7 +2035,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(He.escape(textNode));
+		}).update(he.escape(textNode));
 
 		innerSpan.insert({"bottom":img});
 		//newRow.insert({"bottom":label});

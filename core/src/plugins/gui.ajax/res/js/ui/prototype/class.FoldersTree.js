@@ -286,7 +286,7 @@ Class.create("FoldersTree", AjxpPane, {
 	 * @param newIcon String
 	 */
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	
-		$(nodeId+'-label').update(He.escape(newLabel));
+		$(nodeId+'-label').update(he.escape(newLabel));
 		if(newIcon){
 			var realNode = webFXTreeHandler.all[nodeId];
 			realNode.icon = newIcon;

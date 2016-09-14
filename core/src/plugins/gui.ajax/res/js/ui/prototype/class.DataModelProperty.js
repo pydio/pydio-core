@@ -42,7 +42,7 @@ Class.create("DataModelProperty", {
                     element.update(l?l:'');
                     break;
                 case "root_label":
-                    element.update(He.escape(dm.getRootNode().getLabel()));
+                    element.update(he.escape(dm.getRootNode().getLabel()));
                     break;
                 case "metadata":
                     if(options.metadata_sum){

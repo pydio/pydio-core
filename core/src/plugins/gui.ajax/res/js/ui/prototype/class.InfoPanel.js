@@ -251,7 +251,7 @@ Class.create("InfoPanel", AjxpPane, {
         this._currentObservedNode = uniqNode;
         this._currentObservedNode.observeOnce("node_replaced", this.updateHandler);
 
-        this.updateTitle(He.escape(uniqNode.getLabel()));
+        this.updateTitle(he.escape(uniqNode.getLabel()));
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
         if(!isFile && uniqNode && uniqNode.isRoot()){
@@ -438,9 +438,9 @@ Class.create("InfoPanel", AjxpPane, {
                 }
 				tAttributes.each(function(attName){
 					if(attName == 'basename' && metadata.get('filename')){
-						this[attName] = He.escape(getBaseName(metadata.get('filename')));
+						this[attName] = he.escape(getBaseName(metadata.get('filename')));
                         if(metadata.get('text')){
-                            this[attName] = He.escape(metadata.get('text'));
+                            this[attName] = he.escape(metadata.get('text'));
                         }
 					} else if(attName == 'compute_image_dimensions'){
 						if(metadata.get('image_width') && metadata.get('image_height')){
@@ -463,7 +463,7 @@ Class.create("InfoPanel", AjxpPane, {
                             var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview_container"><div class="tile_preview">#{preview}</div></div><div class="tile_label">#{label}</div></div>');
                             multipleNodes.each(function(n){
                                 var p = oThis.getPreviewElement(n, false, false);
-                                var args = {label:He.escape(PathUtils.getBasename(n.getMetadata().get('filename')))};
+                                var args = {label:he.escape(PathUtils.getBasename(n.getMetadata().get('filename')))};
                                 if(Object.isString(p)) args['preview']=p;
                                 else if(Object.isElement(p) && p.outerHTML) args['preview']= p.outerHTML;
                                 s += simpleTpl.evaluate(args);
@@ -494,7 +494,7 @@ Class.create("InfoPanel", AjxpPane, {
 						}
 						this[attName] = url;
 					} else if(metadata.get(attName)){
-						this[attName] = He.escape(metadata.get(attName));
+						this[attName] = he.escape(metadata.get(attName));
 					} else{
 						this[attName] = '';
 					}

@@ -156,7 +156,7 @@ Class.create("AjxpDraggable", Draggable, {
 			var max = Math.min(nodes.length,5);
 			var maxWidth = 0;
 			for(var i=0;i<max;i++){
-				var text = He.escape(nodes[i].getLabel()) + (i<max-1?",<br>":"");
+				var text = he.escape(nodes[i].getLabel()) + (i<max-1?",<br>":"");
 				maxWidth = Math.max(maxWidth, testStringWidth(text));
 				this._clone.insert(text);
 			}
