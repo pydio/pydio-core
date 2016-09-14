@@ -54,6 +54,7 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Vars\StringHelper;
 use Zend\Diactoros\Response\JsonResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -1226,19 +1227,20 @@ abstract class AbstractConfDriver extends Plugin
                     $crtValue = InputFilter::sanitize($crtValue, InputFilter::SANITIZE_HTML_STRICT);
                 }
                 if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf") && !$existingOnly) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue'><span class='user_entry_label'>$crtValue (".$mess["448"].")</span></li>";
+                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue." (".$mess["448"]).")</span></li>";
                 } else if ($existingOnly && !empty($crtValue)) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label='$crtValue' data-entry_id='$crtValue'><span class='user_entry_label'>$crtValue</span></li>";
+                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\" data-entry_id=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue)."</span></li>";
                 }
                 $mess = LocaleService::getMessages();
                 if (!$usersOnly && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
-                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".$mess["447"]."\"><span class='user_entry_label'>".$mess["447"]."</span></li>";
+                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".StringHelper::xmlEntities($mess["447"])."\"><span class='user_entry_label'>".StringHelper::xmlEntities($mess["447"])."</span></li>";
                 }
                 $indexGroup = 0;
                 if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
                     foreach ($allGroups as $groupId => $groupLabel) {
                         if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"$groupLabel\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
+                            $groupLabel = StringHelper::xmlEntities($groupLabel);
+                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"".$groupLabel."\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
                             $indexGroup++;
                         }
                         if($indexGroup == $limit) break;
@@ -1248,7 +1250,8 @@ abstract class AbstractConfDriver extends Plugin
                     $teams = $this->listUserTeams($ctx->getUser());
                     foreach ($teams as $tId => $tData) {
                         if($regexp == null  ||  preg_match($pregexp, $tData["LABEL"])){
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$tData["LABEL"]."\"><span class='user_entry_label'>[team] ".$tData["LABEL"]."</span></li>";
+                            $teamLabel = StringHelper::xmlEntities($tData["LABEL"]);
+                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$teamLabel."\"><span class='user_entry_label'>[team] ".$teamLabel."</span></li>";
                         }
                     }
                 }
@@ -1263,7 +1266,9 @@ abstract class AbstractConfDriver extends Plugin
                             $userDisplay = $userLabel;
                         }
                         $userIsExternal = $userObject->hasParent() ? "true":"false";
-                        $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"$userLabel\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
+                        $userLabel = StringHelper::xmlEntities($userLabel);
+                        $userDisplay = StringHelper::xmlEntities($userDisplay);
+                        $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"".$userLabel."\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
                         $index ++;
                     }
                     if($index == $limit) break;
