@@ -22,14 +22,11 @@
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use DOMNode;
-
-
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
-
 use Pydio\Core\Model\ContextInterface;
-
 use Pydio\Core\Exception\PydioException;
 
 
@@ -113,12 +110,12 @@ class SMBAccessDriver extends FsAccessDriver
     }
 
     /**
-     * @param \Pydio\Access\Core\Model\AJXP_Node $dir
-     * @param string $type
+     * @param AJXP_Node $node
      * @return bool
      */
-    public function isWriteable($dir, $type="dir")
+    public function isWriteable(AJXP_Node $node)
     {
+        $dir = $node->getPath();
         if(substr_count($dir, '/') <= 3) $rc = true;
     	else $rc = is_writable($dir);
     	return $rc;

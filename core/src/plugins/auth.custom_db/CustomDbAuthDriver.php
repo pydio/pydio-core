@@ -144,7 +144,7 @@ class CustomDbAuthDriver extends AbstractAuthDriver
      * @param int $offset
      * @return int
      */
-    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset)
+    public function findUserPage($baseGroup, $userLogin, $usersPerPage, $offset = 0)
     {
         $this->connect();
         $res = dibi::query("SELECT COUNT(*) FROM [" . $this->customTableName . "] WHERE [" . $this->customTableUid . "] <= %s", $userLogin);

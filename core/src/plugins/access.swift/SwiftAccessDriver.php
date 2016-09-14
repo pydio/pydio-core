@@ -103,11 +103,10 @@ class SwiftAccessDriver extends FsAccessDriver
     }
 
     /**
-     * @param AJXP_Node $dir
-     * @param string $type
+     * @param AJXP_Node $node
      * @return bool
      */
-    public function isWriteable($dir, $type="dir")
+    public function isWriteable(AJXP_Node $node)
     {
         return true;
     }

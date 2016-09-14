@@ -175,16 +175,32 @@ class ImapAccessDriver extends FsAccessDriver
         $this->disableArchiveBrowsingContributions($contribNode);
     }
 
+    /**
+     * @param ContextInterface $contextInterface
+     * @param $nodePath
+     * @param $nodeName
+     * @param $isLeaf
+     * @param $lsOptions
+     * @return bool
+     */
     public function filterNodeName(ContextInterface $contextInterface, $nodePath, $nodeName, &$isLeaf, $lsOptions)
     {
         return true;
     }
 
-    public function countChildren($dirName, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHandle = null)
+    /**
+     * @param AJXP_Node $dirNode
+     * @param bool $foldersOnly
+     * @param bool $nonEmptyCheckOnly
+     * @param null $dirHANDLE
+     * @return int
+     * @throws \Exception
+     */
+    public function countChildren(AJXP_Node $dirNode, $foldersOnly = false, $nonEmptyCheckOnly = false, $dirHANDLE = null)
     {
         if($foldersOnly) return 0;
         $count = 0;
-        if($tmpHandle = opendir($dirName)){
+        if($tmpHandle = opendir($dirNode->getUrl())){
             // WILL USE IMAP FUNCTIONS TO COUNT;
             $this->logDebug("COUNT : ".ImapAccessWrapper::getCurrentDirCount());
             $count = ImapAccessWrapper::getCurrentDirCount();

@@ -48,17 +48,7 @@ class Driver extends FsAccessDriver
     const RESOURCES_FILE = "dropbox.json";
 
     public $driverType = "dropbox";
-
-    /**
-     * Driver Initialization
-     * @param $repository
-     * @param array $options
-     */
-    public function init($repository, $options = array())
-    {
-        parent::init($repository, $options);
-    }
-
+    
     /**
      * Repository Initialization
      * @param ContextInterface $context
