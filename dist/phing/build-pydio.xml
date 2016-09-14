@@ -259,6 +259,12 @@
             </then>
         </if>
 
+        <phingcall target="add_update_triggers">
+            <property name="input_folder" value="${git.local_repository}/dist/php"/>
+            <property name="output_folder" value="${upgrade_export}/UPGRADE"/>
+            <property name="version" value="${build.version}"/>
+        </phingcall>
+
     </target>
 
     <target name="zip" description="Package as Zip archive">
@@ -323,6 +329,15 @@
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
                 ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+    </target>
+
+    <target name="add_update_triggers" description="Look for pre/post triggers and append them to the package">
+        <copy todir="${output_folder}" verbose="true">
+            <fileset dir="${input_folder}">
+                <include name="${version}-*-*.php"/>
+            </fileset>
+            <mapper type="regexp" from="^(.*)-(.*)-(.*).php" to="PHP--\3-\2.php"/>
+        </copy>
     </target>
 
     <target name="build_external_plugins">
