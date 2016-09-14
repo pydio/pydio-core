@@ -361,10 +361,6 @@ class AbstractAuthDriver extends Plugin
         return ConfService::getConfStorageImpl()->getChildrenGroups($baseGroup);
     }
     
-    public function getStats(){
-        return $this->getId();
-    }
-
     /**
      * @return string
      */
