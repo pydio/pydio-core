@@ -18,8 +18,9 @@
  *
  * The latest code can be found at <http://pyd.io/>.
  */
+namespace Pydio\Tests;
+
 defined('AJXP_EXEC') or die( 'Access not allowed');
-require_once('../classes/class.AbstractTest.php');
 
 /**
  * Check that intl is enabled
@@ -28,7 +29,15 @@ require_once('../classes/class.AbstractTest.php');
  */
 class PHP_INTL extends AbstractTest
 {
+    /**
+     * PHP_INTL constructor.
+     * @inheritdoc
+     */
     public function __construct() { parent::__construct("PHP INTL extension", "Pydio used intl to localize month names."); }
+
+    /**
+     * @inheritdoc
+     */
     public function doTest()
     {
         $this->failedLevel = "warning";
