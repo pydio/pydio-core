@@ -201,7 +201,7 @@ Class.create("NotificationLoader", {
                     obje.title,
                     {
                         body: obje.body,
-                        icon: 'plugins/gui.ajax/res/themes/vision/images/mimes/64/mime_empty.png',
+                        icon: 'plugins/gui.ajax/res/themes/orbit/images/mimes/64/mime_empty.png',
                         tag: 'ajaxplorer',
                         dir: 'auto',
                         lang: ajaxplorer.currentLanguage

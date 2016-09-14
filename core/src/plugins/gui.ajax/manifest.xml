@@ -41,7 +41,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/vision/images/white_logo.png"
+                      defaultImage="AJXP_THEME_FOLDER/images/white_logo.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
@@ -58,7 +58,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/01.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/01.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -70,7 +70,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -82,7 +82,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -94,7 +94,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/04.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/04.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -106,7 +106,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -130,7 +130,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03-mobile.jpg"
                       expose="true"
                 />
 
@@ -143,7 +143,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
@@ -154,7 +154,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
@@ -164,7 +164,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
