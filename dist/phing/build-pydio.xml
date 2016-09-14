@@ -147,16 +147,26 @@
         </phingcall>
 
         <!-- RUN COMPOSER IF NECESSARY INSIDE PLUGINS -->
-        <phingcall target="iterate-plugins">
-            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
-            <property name="target" value="composer"/>
-        </phingcall>
+        <if>
+            <not><isset property="skip-plugins-composer"/></not>
+            <then>
+                <phingcall target="iterate-plugins">
+                    <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+                    <property name="target" value="composer"/>
+                </phingcall>
+            </then>
+        </if>
 
     	<!-- BUILD JAVASCRIPT -->
-        <phingcall target="iterate-plugins">
-            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
-            <property name="target" value="grunt"/>
-        </phingcall>
+        <if>
+            <not><isset property="skip-plugins-grunt"/></not>
+            <then>
+                <phingcall target="iterate-plugins">
+                    <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+                    <property name="target" value="grunt"/>
+                </phingcall>
+            </then>
+        </if>
 
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
