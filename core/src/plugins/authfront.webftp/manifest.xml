@@ -7,7 +7,7 @@
         <global_param name="ORDER" type="integer" label="Order"
                       description="Order this plugin with other auth frontends" default="210"/>
     </server_settings>
-    <class_definition classname="FTPAuthFrontend" filename="plugins/authfront.webftp/class.FTPAuthFrontend.php"/>
+    <class_definition classname="Pydio\Auth\Frontend\FTPAuthFrontend" filename="plugins/authfront.webftp/FTPAuthFrontend.php"/>
     <registry_contributions>
         <actions>
             <action name="login">

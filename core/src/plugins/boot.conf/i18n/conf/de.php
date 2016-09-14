@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -75,8 +75,6 @@ $mess = array(
 "Detected Server Path" => "Server-Pfad",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => " Stellen Sie sicher, dass dieser Pfad korrekt ist. Er wird zum generieren der htaccess-Datei verwendet.",
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
-"Configurations storage" => "Configurations storage",
-"Select how the configurations will be stored" => "Select how the configurations will be stored",
-"Bootstrap Loader" => "Bootstrap Loader",
-"Core plugin for loading the framework. Do NOT disable this plugin!" => "Core plugin for loading the framework. Do NOT disable this plugin!",
+"Enable cache (recommended)" => "Enable cache (recommended)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
 );

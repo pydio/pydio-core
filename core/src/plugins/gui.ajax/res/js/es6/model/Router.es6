@@ -35,6 +35,7 @@ class Router{
                         pydioObject.goTo(path);
                     }, 100);
                 }
+                pydio.notify("routechange", {workspace:workspace,path:path});
             }
 
         });

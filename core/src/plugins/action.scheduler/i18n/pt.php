@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     // will be replaced by the application title
@@ -49,6 +49,7 @@ $mess = array(
     "17" => "Utilizador(es)",
     "17d" => "Introduza uma lista de utilizadores separados por virgulas, ou um Wildcard * Tarefa recursiva para todos os utilizadores.",
     "18"  => "Agenda",
+    "18e"  => "Agenda (disabled)",
     "18d" => "Agenda Cronológica de acções",
     "19" => "Apagar Tarefa",
     "19d" => "Remover entrada da agenda e remover as tarefas seleccionadas",
@@ -58,4 +59,6 @@ $mess = array(
     "22" => "Agendamento Genérico para correr tarefas de forma regular. Requer a activação de CLI e de uma Tabela Cronológica ou de um sistema semelhante.",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

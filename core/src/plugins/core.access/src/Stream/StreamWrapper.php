@@ -16,692 +16,342 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\Access\Core\Stream;
+use ArrayIterator;
+use GuzzleHttp\Stream\StreamInterface;
+use Pydio\Access\Core\IAjxpWrapper;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Utils\ApplicationState;
 
-use AJXP_Utils;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
-use Pydio\Access\Core\Stream\Exception\NotFoundException;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
-use Pydio\Access\Core\Stream\ClientInterface;
-use GuzzleHttp\Stream\Stream;
-use GuzzleHttp\Stream\CachingStream;
+use Pydio\Core\Utils\FileHelper;
+use React\Promise\Deferred;
+
 
 /**
- * Standard stream wrapper to use files with PHP streams, supporting "r", "w", "a", "x".
- *
- * # Supported stream related PHP functions:
- * - fopen, fclose, fread, fwrite, fseek, ftell, feof, fflush
- * - opendir, closedir, readdir, rewinddir
- * - copy, rename, unlink
- * - mkdir, rmdir, rmdir (recursive)
- * - file_get_contents, file_put_contents
- * - file_exists, filesize, is_file, is_dir
- *
+ * Standard stream wrapper to use files with Pydio streams, supporting "r", "w", "a", "x".
  */
-class StreamWrapper
+class StreamWrapper implements IAjxpWrapper
 {
-    /**
-     * @var AbstractClient Client used to send requests
-     */
-    protected static $client;
+    /** @var resource */
+    public $context;
+
+    /** @var StreamInterface */
+    private $stream;
+
+    /** @var string r, r+, or w */
+    private $mode;
+
+    /** @var Deferred */
+    private $deferred;
+
+    /** @var ArrayIterator */
+    private $iterator;
 
     /**
-     * @var string Mode the stream was opened with
+     * Registers the stream wrapper if needed
+     * @param $protocol
      */
-    protected $mode;
-
-    /**
-     * @var EntityBody Underlying stream resource
-     */
-    protected $body;
-
-    /**
-     * @var array Current parameters to use with the flush operation
-     */
-    protected $params;
-
-    /**
-     * @var DirIterator Iterator used with opendir() and subsequent readdir() calls
-     */
-    protected $objectIterator;
-
-    /**
-     * @var string the current protocol
-     */
-    private $protocol;
-
-    /**
-     * @var array The next key to retrieve when using a directory iterator. Helps for fast directory traversal.
-     */
-    protected static $nextStat = array();
-
-    /**
-     * @var array The list of files not found received as response
-     * If we receive a 404 once, we should be able to tell if we created the file after that
-     */
-    protected static $filesNotFound = array();
-
-    /**
-     * Register the stream wrapper
-     *
-     * @param Client $client to use with the stream wrapper
-     */
-    public static function register (
-        ClientInterface $client,
-        $protocol
-    ) {
-        if (in_array($protocol, stream_get_wrappers())) {
-            stream_wrapper_unregister($protocol);
+    public static function register($protocol) {
+        if (!in_array($protocol, stream_get_wrappers())) {
+            stream_wrapper_register($protocol, __CLASS__);
         }
-
-        // Set the client passed in as the default stream context client
-        stream_wrapper_register($protocol, get_called_class(), STREAM_IS_URL);
-
-        $default = stream_context_get_options(stream_context_get_default());
-        $default[$protocol]['client'] = $client;
-        stream_context_set_default($default);
-    }
-
-    public static function applyInitPathHook($url) {
-        // Do nothing
-    }
-
-    /**
-     * Close the stream
-     */
-    public function stream_close()
-    {
-        $this->body = null;
     }
 
     /**
      * @param string $path
      * @param string $mode
-     * @param int    $options
+     * @param int $options
      * @param string $opened_path
-     *
      * @return bool
      */
-    public function stream_open($path, $mode, $options, &$opened_path)
-    {
-        $this->mode = $mode = rtrim($mode, 'bt');
-        $this->params = $params = $this->getParams($path);
-        $errors = array();
+    public function stream_open($path, $mode, $options, &$opened_path) {
+        $this->stream = self::createStream($path, $mode);
 
-        if (!in_array($mode, array('r', 'w', 'a', 'x', '+'))) {
-            $errors[] = "Mode not supported: {$mode}. Use one 'r', 'w', 'a', or 'x'.";
+        if ($this->stream->isWritable() && !$this->stream->isReadable()) {
+            $a = 1;
         }
-
-        if (!$errors) {
-            if ($mode == 'r') {
-                return $this->openReadStream($params, $errors);
-            } elseif ($mode == 'a') {
-                return $this->openAppendStream($params, $errors);
-            } else {
-                return $this->openWriteStream($params, $errors);
-            }
-        }
-
-        return $this->triggerError($errors);
-    }
-
-    /**
-     * @return bool
-     */
-    public function stream_eof()
-    {
-        return $this->body->eof();
-    }
-
-    /**
-     * @return bool
-     */
-    public function stream_flush()
-    {
-        if ($this->mode == 'r') {
-            return false;
-        }
-
-        $this->body->seek(0);
-
-        $params = $this->params;
-        $params['body'] = $this->body;
-
-        try {
-            $this->getClient()->put($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to write content : " . $e->getMessage());
-            return false;
-        }
-
-        $this->clearStatInfo($params['path/key']);
 
         return true;
     }
 
     /**
-     * Read data from the underlying stream
-     *
-     * @param int $count Amount of bytes to read
-     *
-     * @return string
+     * @return mixed
      */
-    public function stream_read($count)
-    {
-        return $this->body->read($count);
+    public function stream_stat() {
+        return $this->stream->stat();
     }
 
     /**
-     * Seek to a specific byte in the stream
+     * @param string $data
+     * @return int
+     */
+    public function stream_write($data) {
+        return (int) $this->stream->write($data);
+    }
+
+    /**
+     * @param int $count
+     * @return string
+     */
+    public function stream_read($count) {
+        return $this->stream->read($count);
+    }
+
+    /**
+     * @return bool|int
+     */
+    public function stream_tell() {
+        return $this->stream->tell();
+    }
+
+    /**
+     * @return bool
+     */
+    public function stream_eof() {
+        return $this->stream->eof();
+    }
+
+    /**
+     * @param int $offset
+     * @param int $whence
+     * @return bool
+     */
+    public function stream_seek($offset, $whence=SEEK_SET) {
+        return $this->stream->seek($offset, $whence);
+    }
+
+    public function stream_close() {
+        $this->stream->close();
+    }
+
+    /**
+     * @param $path
+     * @param $options
+     * @return bool
+     */
+    public function dir_opendir($path, $options) {
+        $this->stream = self::createStream($path);
+
+        // TODO - do that asynchronously
+        $contents = $this->stream->getContents();
+        $this->iterator = new ArrayIterator($contents);
+
+        return true;
+    }
+    
+    /**
+     * @return bool
+     */
+    public function dir_readdir() {
+        if (!$this->iterator->valid()) {
+            return false;
+        }
+
+        $current =  $this->iterator->current();
+
+        $this->iterator->next();
+
+        return $current["name"];
+    }
+    /**
+     * @return bool
+     */
+    public function dir_closedir() {
+        $this->iterator = null;
+        $this->stream->close();
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function dir_rewinddir() {
+        if (isset($this->iterator)) {
+            $this->iterator->rewind();
+        }
+
+        return true;
+    }
+
+    /**
+     * Enter description here...
      *
-     * @param int $offset Seek offset
-     * @param int $whence Whence (SEEK_SET, SEEK_CUR, SEEK_END)
+     * @param string $path
+     * @param int $mode
+     * @param int $options
+     * @return bool
+     */
+    public function mkdir($path, $mode, $options) {
+        $stream = self::createStream($path);
+        
+        return $stream->mkdir();
+    }
+
+    /**
+     * Enter description here...
+     *
+     * @param string $path
+     * @param int $options
+     * @return bool
+     */
+    public function rmdir($path, $options) {
+        $stream = self::createStream($path);
+
+        return $stream->rmdir();
+    }
+
+    /**
+     * @param string $oldName
+     * @param string $newName
+     * @return bool
+     */
+    public function rename($oldName, $newName) {
+
+        $stream = self::createStream($oldName);
+
+        return $stream->rename(new AJXP_Node($newName));
+    }
+
+    /**
+     * @param string $path
+     * @param int $flags
+     * @return array
+     */
+    public function url_stat($path, $flags) {
+        $stream = self::createStream($path);
+        $resource = PydioStreamWrapper::getResource($stream);
+        $stat = fstat($resource);
+        fclose($resource);
+
+        return $stat;
+    }
+
+    /**
+     * @param String $url
+     * @return bool
+     */
+    public static function isSeekable($url) {
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isRemote() {
+        return true;
+    }
+
+    /**
+     * @param string $path
+     * @param bool $persistent
+     * @return string
+     */
+    public static function getRealFSReference($path, $persistent = false) {
+        $nodeStream = self::createStream($path);
+        $nodeStream->getContents();
+
+        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpHandle = fopen($tmpFile, "wb");
+
+        self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $tmpHandle);
+
+        fclose($tmpHandle);
+
+        if (!$persistent) {
+            register_shutdown_function(function() use($tmpFile){
+                FileHelper::silentUnlink($tmpFile);
+            }, $tmpFile);
+        }
+        return $tmpFile;
+    }
+
+    /**
+     * @param string $path
+     * @param resource $stream
+     */
+    public static function copyFileInStream($path, $stream) {
+        $nodeStream = self::createStream($path);
+        $nodeStream->getContents();
+
+        self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $stream);
+    }
+
+    /**
+     * @param $from
+     * @param $to
+     */
+    public static function copyStreamInStream($from, $to) {
+        while (!feof($from)) {
+            $data = fread($from, 4096);
+            fwrite($to, $data, strlen($data));
+        }
+    }
+
+    /**
+     * @param string $path
+     * @param number $chmodValue
+     */
+    public static function changeMode($path, $chmodValue) {
+    }
+
+    /**
+     * @param $path
+     * @param string $mode
+     * @return \GuzzleHttp\Stream\Stream|AuthStream|MetadataCachingStream|OAuthStream|Stream|WriteBufferStream
+     * @throws \Exception
+     */
+    public static function createStream($path, $mode = "r+") {
+        $node = new AJXP_Node($path);
+        $repository = $node->getRepository();
+        $ctx = $node->getContext();
+
+        $useOAuthStream = $repository->getContextOption($ctx, "USE_OAUTH_STREAM", false);
+        $useAuthStream = $repository->getContextOption($ctx, "USE_AUTH_STREAM", !$useOAuthStream);
+
+        $nodeStream = Stream::factory($node, $mode);
+        if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
+        if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
+
+        $nodeStream = new MetadataCachingStream($nodeStream, $node);
+        $nodeStream = new WriteBufferStream($nodeStream, $node);
+
+        PydioStreamWrapper::getResource($nodeStream);
+
+        return $nodeStream;
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return array
+     */
+    public static function getResolvedOptionsForNode($node)
+    {
+        // TODO: Implement getResolvedOptionsForNode() method.
+        // Create a generic HTTP Type inc. Authentication data
+        return ["TYPE" => "php"];
+    }
+
+    /**
+     * Enter description here...
      *
      * @return bool
      */
-    public function stream_seek($offset, $whence = SEEK_SET)
+    public function stream_flush()
     {
-        return $this->body->seek($offset, $whence);
+        // TODO: Implement stream_flush() method.
     }
 
     /**
-     * Get the current position of the stream
-     *
-     * @return int Returns the current position in the stream
-     */
-    public function stream_tell()
-    {
-        return $this->body->ftell();
-    }
-
-    /**
-     * Write data the to the stream
-     *
-     * @param string $data
-     *
-     * @return int Returns the number of bytes written to the stream
-     */
-    public function stream_write($data)
-    {
-        return $this->body->write($data);
-    }
-
-    /**
-     * Delete a specific object
+     * Enter description here...
      *
      * @param string $path
      * @return bool
      */
     public function unlink($path)
     {
-        $params = $this->getParams($path);
-
-        try {
-            $this->clearStatInfo($path);
-            $this->getClient()->delete($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to delete item : " . $e->getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @return array
-     */
-    public function stream_stat()
-    {
-        $stat = @fstat($this->body);
-
-        // Add the size of the underlying stream if it is known
-        if ($this->mode == 'r' && $this->body->getSize()) {
-            $stat[7] = $stat['size'] = $this->body->getSize();
-        }
-
-        return $stat;
-    }
-
-    /*
-     * Wrapper around stat
-     */
-    public function file_exists($path) {
-        $params = $this->getParams($path);
-
-        $key = $params['path/key'];
-
-        if (isset(static::$filesNotFound[$key])) {
-            return false;
-        }
-
-        return file_exists($path);
-    }
-
-    /**
-     * Provides information for is_dir, is_file, filesize, etc. Works on buckets, keys, and prefixes
-     *
-     * @param string $path
-     * @param int    $flags
-     *
-     * @return array Returns an array of stat data
-     * @link http://www.php.net/manual/en/streamwrapper.url-stat.php
-     */
-    public function url_stat($path, $flags)
-    {
-        $params = $this->getParams($path);
-
-        $key = $params['path/key'];
-
-        if (isset(static::$nextStat[$key])) {
-            return static::$nextStat[$key];
-        }
-
-        try {
-            $result = $this->getClient()->stat($params);
-
-            if ($result) {
-                $result = $this->getClient()->formatUrlStat($result);
-
-                static::$nextStat[$key] = $result;
-            }
-        } catch (ClientException $e) {
-            if ($e->getCode() == 404) {
-                static::$nextStat[$key] = false;
-                return false;
-            }
-        } catch (\Exception $e) {
-            static::$nextStat[$key] = false;
-            return $this->triggerError('Cannot access file ' . $e->getMessage(), $flags);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Support for mkdir().
-     *
-     * @param string $path    Directory which should be created.
-     * @param int    $mode    Permissions. 700-range permissions map to ACL_PUBLIC. 600-range permissions map to
-     *                        ACL_AUTH_READ. All other permissions map to ACL_PRIVATE. Expects octal form.
-     * @param int    $options A bitwise mask of values, such as STREAM_MKDIR_RECURSIVE.
-     *
-     * @return bool
-     * @link http://www.php.net/manual/en/streamwrapper.mkdir.php
-     */
-    public function mkdir($path, $mode, $options)
-    {
-        $params = $this->getParams($path);
-
-        $key = $params['path/key'];
-
-        $this->clearStatInfo($key);
-
-        try {
-            $result = $this->getClient()->mkdir($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to create directory : " . $e->getMessage());
-            return false;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Support for rmdir().
-     *
-     * @param string $path the directory path
-     * @param int    $options A bitwise mask of values
-     *
-     * @return bool true if directory was successfully removed
-     * @link http://www.php.net/manual/en/streamwrapper.rmdir.php
-     */
-    public function rmdir($path, $options)
-    {
-        $params = $this->getParams($path);
-
-        $key = $params['path/key'];
-
-        $this->clearStatInfo($key);
-
-        try {
-            $result = $this->getClient()->rmdir($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to remove directory : " . $e->getMessage());
-            return false;
-        }
-
-        return $result;
-    }
-
-    /**
-     * Support for opendir().
-     *
-     * @param string $path    The path to the directory (e.g. "s3://dir[</prefix>]")
-     * @param string $options Whether or not to enforce safe_mode (0x04). Unused.
-     *
-     * @return bool true on success
-     * @see http://www.php.net/manual/en/function.opendir.php
-     */
-    public function dir_opendir($path, $options)
-    {
-        $params = $this->getParams($path);
-
-        try {
-            $result = $this->getClient()->ls($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to list directory : " . $e->getMessage());
-        }
-
-        $this->objectIterator = $this->getClient()->getIterator($result, $params);
-
-        return true;
-    }
-
-    /**
-     * Close the directory listing handles
-     *
-     * @return bool true on success
-     */
-    public function dir_closedir()
-    {
-        $this->objectIterator = null;
-
-        return true;
-    }
-
-    /**
-     * This method is called in response to rewinddir()
-     *
-     * @return boolean true on success
-     */
-    public function dir_rewinddir()
-    {
-        $this->objectIterator->rewind();
-
-        return true;
-    }
-
-    /**
-     * This method is called in response to readdir()
-     *
-     * @return string Should return a string representing the next filename, or false if there is no next file.
-     *
-     * @link http://www.php.net/manual/en/function.readdir.php
-     */
-    public function dir_readdir()
-    {
-        // Skip empty result keys
-        if (!$this->objectIterator->valid()) {
-            return false;
-        }
-
-        $current = $this->objectIterator->current();
-
-        $this->objectIterator->next();
-
-        static::$nextStat[$current[1]] = $current[2];
-
-        return $current[0];
-    }
-
-    /**
-     * Called in response to rename() to rename a file or directory. Currently only supports renaming objects.
-     *
-     * @param string $path_from the path to the file to rename
-     * @param string $path_to   the new path to the file
-     *
-     * @return bool true if file was successfully renamed
-     * @link http://www.php.net/manual/en/function.rename.php
-     */
-    public function rename($path_from, $path_to)
-    {
-        $paramsTo = $this->getParams($path_to, "to");
-        $paramsFrom = $this->getParams($path_from, "from");
-
-        $params = $paramsTo + $paramsFrom;
-
-        $this->clearStatInfo($path_from);
-        $this->clearStatInfo($path_to);
-
-        try {
-            $result = $this->getClient()->rename($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to rename item : " . $e->getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Get the params from the passed path
-     *
-     * @param string $path Path passed to the stream wrapper
-     *
-     * @return array Hash of custom params
-     */
-    protected function getParams($path, $mainPrefix = "")
-    {
-        $parts = explode('://', $path, 2);
-        $this->protocol = $parts[0];
-
-        $default = stream_context_get_options(stream_context_get_default());
-        $default['core']['currentProtocol'] = $this->protocol;
-        stream_context_set_default($default);
-
-        $parts = AJXP_Utils::safeParseUrl($path);
-
-        $params = [];
-
-        $default = stream_context_get_options(stream_context_get_default());
-
-        $it = new RecursiveArrayIterator($default[$this->protocol]);
-
-        foreach ($it as $k => $v) {
-            $prefix = $mainPrefix . $k . "/";
-
-            $itChild = new RecursiveArrayIterator($default[$this->protocol][$k]);
-
-            foreach ($itChild as $kChild => $vChild) {
-                $params[$prefix . $kChild] = $vChild;
-            }
-        }
-
-        // TODO - add call to parent client
-        $params["parentReference"] = [
-            "path" => "/drive/root:" . dirname($parts['path'])
-        ];
-
-        $params[$mainPrefix . 'path/itemname'] = basename($parts['path']);
-        $params[$mainPrefix . 'path/path']     = dirname($parts['path']);
-        $params[$mainPrefix . 'path/fullpath'] = rtrim(dirname($parts['path']), '/') . '/' . basename($parts['path']);
-        $params[$mainPrefix . 'path/fulluri'] = $params[$mainPrefix . 'path/basepath'] . '/' . $params[$mainPrefix . 'path/fullpath'];
-
-        return $params;
-    }
-
-    /**
-     * Initialize the stream wrapper for a read only stream
-     *
-     * @param array $params Operation parameters
-     * @param array $errors Any encountered errors to append to
-     *
-     * @return bool
-     */
-    protected function openReadStream(array $params, array &$errors)
-    {
-        // Create the command and serialize the request
-        try {
-            $response = $this->getClient()->open($params);
-        } catch (\Exception $e) {
-            $this->triggerError("Unable to open stream : " . $e->getMessage());
-            return false;
-        }
-
-        $this->body = $response->getBody();
-
-        return true;
-    }
-
-    /**
-     * Initialize the stream wrapper for a write only stream
-     *
-     * @param array $params Operation parameters
-     * @param array $errors Any encountered errors to append to
-     *
-     * @return bool
-     */
-    protected function openWriteStream(array $params, array &$errors)
-    {
-        $this->body = Stream::factory(fopen('php://temp', 'r+'));
-
-        return true;
-    }
-
-    /**
-     * Initialize the stream wrapper for an append stream
-     *
-     * @param array $params Operation parameters
-     * @param array $errors Any encountered errors to append to
-     *
-     * @return bool
-     */
-    protected function openAppendStream(array $params, array &$errors)
-    {
-        try {
-            $this->body->seek(0, SEEK_END);
-        } catch (\Exception $e) {
-            // The object does not exist, so use a simple write stream
-            $this->openWriteStream($params, $errors);
-        }
-
-        return true;
-    }
-
-    /**
-     * Trigger one or more errors
-     *
-     * @param string|array $errors Errors to trigger
-     * @param mixed        $flags  If set to STREAM_URL_STAT_QUIET, then no error or exception occurs
-     *
-     * @return bool Returns false
-     * @throws RuntimeException if throw_errors is true
-     */
-    protected function triggerError($errors, $flags = null)
-    {
-        if ($flags & STREAM_URL_STAT_QUIET) {
-          // This is triggered with things like file_exists()
-
-          if ($flags & STREAM_URL_STAT_LINK) {
-            // This is triggered for things like is_link()
-            return $this->getClient()->formatUrlStat([]);
-          }
-          return false;
-        }
-
-        // This is triggered when doing things like lstat() or stat()
-        trigger_error(implode("\n", (array) $errors), E_USER_WARNING);
-
-        return false;
-    }
-
-    /**
-     * Clear the next stat result from the cache
-     *
-     * @param string $path If a path is specific, clearstatcache() will be called
-     */
-    protected function clearStatInfo($path = null)
-    {
-        if ($path) {
-            unset(static::$nextStat[$path]);
-            clearstatcache(true, $path);
-        } else {
-            static::$nextStat = array();
-            clearstatcache(true);
-        }
-    }
-
-    /**
-     * Determine the most appropriate ACL based on a file mode.
-     *
-     * @param int $mode File mode
-     *
-     * @return string
-     */
-    private function determineAcl($mode)
-    {
-        $mode = decoct($mode);
-
-        if ($mode >= 700 && $mode <= 799) {
-            return 'public-read';
-        }
-
-        if ($mode >= 600 && $mode <= 699) {
-            return 'authenticated-read';
-        }
-
-        return 'private';
-    }
-
-    public static function getRealFSReference($path, $persistent = false)
-    {
-        $tmpFile = AJXP_Utils::getAjxpTmpDir()."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
-        $tmpHandle = fopen($tmpFile, "wb");
-
-        self::copyFileInStream($path, $tmpHandle);
-
-        fclose($tmpHandle);
-
-        if (!$persistent) {
-            register_shutdown_function(array("AJXP_Utils", "silentUnlink"), $tmpFile);
-        }
-        return $tmpFile;
-    }
-
-    public static function copyFileInStream($path, $stream)
-    {
-        $fp = fopen($path, "r");
-        if(!is_resource($fp)) return;
-        while (!feof($fp)) {
-            $data = fread($fp, 4096);
-            fwrite($stream, $data, strlen($data));
-        }
-        fclose($fp);
-    }
-
-    public static function changeMode($path, $chmodValue)
-    {
-        @chmod($path, $chmodValue);
-    }
-
-    public static function isSeekable($url) {
-        return true;
-    }
-
-    public static function isRemote() {
-        return true;
-    }
-
-    /**
-     * Gets the client from the stream context
-     *
-     * @return Client
-     * @throws Exception if no client has been configured
-     */
-    private function getClient()
-    {
-        $default = stream_context_get_options(stream_context_get_default());
-
-        if (!$client = $default[$this->protocol]['client']) {
-            throw new \Exception('No client defined for '. $this->protocol);
-        }
-
-        return $client;
+        // TODO: Implement unlink() method.
     }
 }

@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
- */
+* Copyright 2007-2014 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <https://pydio.com>.
+*/
 $mess=array(
 "languageLabel" => "Čeština",
 "date_intl_locale" => "cs_CZ",
@@ -57,7 +57,7 @@ $mess=array(
 "22" => "PHP skript",
 "23" => "Soubor",
 "24" => "Nadřazený adresář",
-"25" => "Nahrát jeden nebo více souborů (max. \".ConfService::getConf('UPLOAD_MAX_NUMBER').\") do adresáře : ",
+"25" => "Nahrát jeden nebo více souborů (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") do adresáře : ",
 "26" => "Vytvořit nový adresář v : ",
 "27" => "Nahrát",
 "28" => "Vytvořit nový soubor v : ",
@@ -257,7 +257,6 @@ $mess=array(
 "204" => "Velikost souboru \"",
 "205" => "\" překračuje povolený limit (",
 "206" => "Mb).\\nSoubor nebude nahrán.",
-/* END SENTENCE */
 "207" => "Nemáte právo zápisu na tento adresář",
 "208" => "Nemáte právo čtení z tohoto adresáře",
 "209" => "Vnitřní chyba serveru, kontaktujte prosím svého administrátora!",
@@ -433,7 +432,6 @@ $mess=array(
 "375" => "Varování: nebyli jste aktivní více než __IDLE__, budete odhlášeni za __LOGOUT__",
 "376" => "Klikněte kamkoliv pro aktivaci",
 "378" => "Varování: heslo je prázdné nebo příliš krátké!",
-/* password strength tester */
 "379" => "Nespolehlivé slovo!",
 "380" => "Příliš krátké",
 "381" => "Velmi slabé",
@@ -646,7 +644,10 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
 );

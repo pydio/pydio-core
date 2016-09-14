@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  French Translation by Charles du Jeu, corrected by GravuTrad
 $mess=array(
@@ -58,7 +58,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "Fichier",
 "24" => "Dossier parent",
-"25" => "Transférer un ou plusieurs fichiers (max ".ConfService::getConf('UPLOAD_MAX_NUMBER').") dans : ",
+"25" => "Transférer un ou plusieurs fichiers (max ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") dans : ",
 "26" => "Créer un nouveau répertoire dans : ",
 "27" => "Transférer",
 "28" => "Créer un nouveau fichier dans : ",
@@ -649,5 +649,8 @@ $mess=array(
     "549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
     "550" => "Rejeter ce partage",
     "551" => "Rejeter",
+    "552" => "Please provide a password.",
+    "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+    "554" => "%s résultat(s) dans la Corbeille",
 /* END SENTENCE */
 );

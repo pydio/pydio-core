@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("AjxpInstaller", AjxpPane, {
 
@@ -33,13 +33,13 @@ Class.create("AjxpInstaller", AjxpPane, {
 
     initLanguageSwitcher: function(){
         var selector = this.htmlElement.down("#installer_lang");
-        $H(ajxpBootstrap.parameters.get('availableLanguages')).each(function(pair){
-            var option = new Element('option', {value:pair.key}).update(pair.value);
-            if(pair.key == ajaxplorer.currentLanguage){
-                option.writeAttribute("selected", "true");
-            }
-            selector.insert(option);
-        });
+        if(!selector.down('option')){
+            pydio.listLanguagesWithCallback(function(key, label, selected){
+                var option = new Element('option', {value:key}).update(label);
+                if(selected) option.writeAttribute("selected", "true");
+                selector.insert(option);
+            });
+        }
         selector.observe("change", function(){
             pydio.fire("language_changed");
             pydio.currentLanguage = selector.getValue();

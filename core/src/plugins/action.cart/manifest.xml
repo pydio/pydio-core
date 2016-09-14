@@ -290,5 +290,5 @@
         </actions>
     </registry_contributions>
 
-    <class_definition classname="CartManager" filename="plugins/action.cart/class.CartManager.php"/>
+    <class_definition classname="Pydio\Action\Cart\CartManager" filename="plugins/action.cart/CartManager.php"/>
 </ajxp_plugin>

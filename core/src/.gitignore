@@ -1,7 +1,14 @@
+/plugins/access.ajxp_user/build
+/plugins/core.mq/vendor
+/plugins/action.scheduler/vendor
+/plugins/access.s3/aws-v3.phar
+/plugins/access.s3/aws.phar
+/plugins/index.elasticsearch/vendor
 /plugins/access.ajxp_home/res/build
 /plugins/access.inbox/res/build
 /plugins/core.mailer/js/build
 /plugins/gui.ajax/res/js/ui/reactjs/build/
+/plugins/core.tasks/vendor
 .idea/
 data/cache/*
 data/files/*
@@ -16,3 +23,4 @@ node_modules/
 .jshintrc
 /plugins/gui.ajax/res/mui/mui-sources
 .validate.json
+composer.lock

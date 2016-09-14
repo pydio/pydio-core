@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Indexation]" description="CONF_MESSAGE[Indexation plugins]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="CoreIndexer" filename="plugins/core.index/class.CoreIndexer.php"/>
+    <class_definition classname="Pydio\Access\Indexer\Core\CoreIndexer" filename="plugins/core.index/CoreIndexer.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core.index" path="plugins/core.index/i18n"/>
@@ -25,22 +25,12 @@
                         if(!pydio.getUserSelection().isEmpty()){
                             crtDir = pydio.getUserSelection().getUniqueNode().getPath();
                         }
-						var bgManager = pydio.getController().getBackgroundTasksManager();
-						bgManager.queueAction("index", {file:crtDir}, MessageHash["index.lucene.8"].replace('%s', crtDir));
-						bgManager.next();
+						PydioApi.getClient().request({"get_action":"index", "file":crtDir}, function(transport){});
 					]]></clientCallback>
                     <serverCallback methodName="applyAction" restParams="/file+" developerComment="Trigger re-indexation of a directory, recursively">
                         <input_param name="file" type="string" description="Folder to index (can be empty for root)"/>
                         <input_param name="verbose" type="boolean" description="Print out some info about indexation"/>
                     </serverCallback>
-                </processing>
-            </action>
-            <action name="check_index_status">
-                <rightsContext noUser="true" userLogged="only" read="true"
-                               write="false" adminOnly="false">
-                </rightsContext>
-                <processing>
-                    <serverCallback methodName="applyAction" restParams="/" sdkMethodName="checkIndexStatus" developerComment="Check the indexation process status."/>
                 </processing>
             </action>
         </actions>

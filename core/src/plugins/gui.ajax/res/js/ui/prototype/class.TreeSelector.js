@@ -15,13 +15,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
  * Independant widget for opening a form with a Tree in it
  */
 Class.create("TreeSelector", {
+
+    _selectedNode: null,
 	/**
 	 * Constructor
 	 * @param oElement HTMLElement
@@ -34,6 +36,7 @@ Class.create("TreeSelector", {
 			targetField : 'input[name="dest"]',
 			targetNode: 'input[name="dest_node"]',
 			treeContainer : '.treeCopyContainer',
+            createFolder:'a#selector_create_folder',
             nodeFilter : function(ajxpNode){
                 return (!ajxpNode.isLeaf());
             }
@@ -47,13 +50,19 @@ Class.create("TreeSelector", {
 		if(webFXTreeHandler && webFXTreeHandler.selected){
 			this.__initialWebFXSelection = webFXTreeHandler.selected;
 		}
-		this.filterSelector = this.htmlElement.select(this.options.filterSelectorId)[0];
-		var target = this.targetField = this.htmlElement.select(this.options.targetField)[0];
-		var targetNode = this.targetNode = this.htmlElement.select(this.options.targetNode)[0];
-		this.treeContainer = this.htmlElement.select(this.options.treeContainer)[0];
+		this.filterSelector = this.htmlElement.down(this.options.filterSelectorId);
+		var target = this.targetField = this.htmlElement.down(this.options.targetField);
+		var targetNode = this.targetNode = this.htmlElement.down(this.options.targetNode);
+        var createButton = this.htmlElement.down(this.options.createFolder);
+        if(createButton){
+            this.bindFolderCreateButton(createButton);
+        }
+		this.treeContainer = this.htmlElement.down(this.options.treeContainer);
 		this.filterSelector.hide();
+        var oThis = this;
 		this._nodeActionCallback = function(e){
 			// Warning, this is the tree object
+            oThis._selectedNode = this.ajxpNode;
 			target.value = this.ajxpNode.getPath();
 			targetNode.value = this.ajxpNode.getPath();
  			this.select();			
@@ -71,6 +80,40 @@ Class.create("TreeSelector", {
 		this.treeCopy.setAjxpRootNode(rootNode);
 		
 	},
+
+    bindFolderCreateButton: function(button){
+        this._createListener = function(){
+            var currentNode = this._selectedNode || this.treeCopy.ajxpNode;
+            currentNode.load();
+            var currentPath = currentNode.getPath();
+
+            var newFolderName = window.prompt(pydio.MessageHash[155], "New Folder");
+            if(!newFolderName) return;
+            if(currentNode.getChildren().get(currentPath + "/" + newFolderName)){
+                pydio.displayMessage("ERROR", pydio.MessageHash[40]);
+                return;
+            }
+
+            var parameters = {
+                get_action:'mkdir',
+                dir:currentPath,
+                dirname:newFolderName
+            };
+            if(this.treeCopy.ajxpNode._iNodeProvider && this.treeCopy.ajxpNode._iNodeProvider.properties.get('tmp_repository_id')){
+                parameters["tmp_repository_id"] = this.treeCopy.ajxpNode._iNodeProvider.properties.get('tmp_repository_id');
+            }
+
+            PydioApi.getClient().request(parameters, function(){
+                var newFullPath = currentPath + "/" + newFolderName;
+                currentNode.addChild(new AjxpNode(newFullPath, false, newFolderName));
+                window.setTimeout(function(){
+                    this.htmlElement.down('div[data-node-path="'+newFullPath+'"]').click();
+                }.bind(this), 250);
+            }.bind(this));
+        }.bind(this);
+        button.observe("click", this._createListener);
+    },
+
 	/**
 	 * Clear the widget
 	 */

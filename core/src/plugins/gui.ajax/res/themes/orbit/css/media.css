@@ -164,32 +164,6 @@ and (max-width : 420px){
         width: 37px;
     }
 
-    #userdashboard_myparams_title{
-        display: none;
-    }
-
-    #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
-        width: 40px !important;
-        flex: 0 0 40px;
-        -webkit-flex: 0 0 40px;
-    }
-
-    div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
-        padding-top: 0;
-    }
-
-    div#userdashboard_main_tab.horizontal_tabulator span.toggleHeader {
-        text-align: left;
-        padding: 8px 12px;
-        color: #ffffff !important;
-        border: 0;
-        display: block;
-        font-size: 20px;
-        font-weight: lighter;
-        text-transform: uppercase;
-        margin: 0 0;
-    }
-
     div.dialogBox{
         min-width: 99%;
     }

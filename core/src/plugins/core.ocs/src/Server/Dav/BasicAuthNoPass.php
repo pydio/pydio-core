@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Server\Dav;
 
@@ -24,6 +24,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 
 use Sabre\HTTP;
 
+/**
+ * Class BasicAuthNoPass
+ * Implements OCS Spec to log user with "empty_user:password"
+ * @package Pydio\OCS\Server\Dav
+ */
 class BasicAuthNoPass extends HTTP\BasicAuth
 {
     /**
@@ -43,6 +48,10 @@ class BasicAuthNoPass extends HTTP\BasicAuth
 
     }
 
+    /**
+     * @param HTTP\Request $httpRequest
+     * @return array|bool
+     */
     public static function parseUserPass(HTTP\Request $httpRequest){
 
         // Apache and mod_php

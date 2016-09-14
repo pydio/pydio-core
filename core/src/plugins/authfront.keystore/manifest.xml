@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="authfront.keystore" label="CONF_MESSAGE[API Keystore]" enabled="true" description="CONF_MESSAGE[Store API keys/token to simplify REST connection]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.keystore/class.KeystoreAuthFrontend.php" classname="KeystoreAuthFrontend"/>
+	<class_definition filename="plugins/authfront.keystore/KeystoreAuthFrontend.php" classname="Pydio\Auth\Frontend\KeystoreAuthFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.keystore" path="plugins/authfront.keystore/i18n"/>
@@ -24,22 +24,27 @@
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="apikeys_pane"
-                                tabInfo='{"id":"my-api-data","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
+                                tabInfo='{"id":"apikeys","iconClass":"icon-key","element":"apikeys_pane","closeable":false,"label":"keystore.1","title":"keystore.2","dontFocus":true,"position":6}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="apikeys_pane" ajxpClass="ApikeysPane" ajxpOptions='{}' class="tabbed_editor" style="position:relative;">
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
-                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[keystore.1]</h3>
+                        <div class="title-flex">
+                            <h3 class="dashboard_panel_title">
+                                AJXP_MESSAGE[keystore.1]
+                                <div class="legend">AJXP_MESSAGE[keystore.2]</div>
+                            </h3>
+                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["keystore_bar"]}'></div>
+                        </div>
                         <div id="token_results"><span class="mdi mdi-close"></span><div id="token_results_content"></div></div>
-                        <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
-                            <h2>AJXP_MESSAGE[keystore.9]</h2>
-                            <ul></ul>
+                        <div style="padding:0 20px;overflow: auto;" class="fit_me_to_bottom react-mui-context">
+                            <h4>AJXP_MESSAGE[keystore.9]</h4>
+                            <ul style="list-style-type: none;"></ul>
                         </div>
                     </div>
                     ]]></additional_tab>
             </component_config>
         </client_configs>
         <actions>
-            <action name="keystore_generate_auth_token">
+            <action name="keystore_generate_auth_token" skipSecureToken="true">
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
                     <serverCallback methodName="authTokenActions" restParams="/device" sdkMethodName="generateAuthToken" developerComment="Generate and store a authentication key that can be used by the currently logged user. Used by SDKs talking to REST API to avoid renegociating basic auth on each query.">

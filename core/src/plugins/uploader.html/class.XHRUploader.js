@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : Class for simple XHR multiple upload, HTML5 only
  */
 Class.create("XHRUploader", {
@@ -31,11 +31,14 @@ Class.create("XHRUploader", {
     // Copy get/setUserPrefs from AjxpPane
     getUserPreference: AjxpPane.prototype.getUserPreference,
     setUserPreference: AjxpPane.prototype.setUserPreference,
+    configs: null,
 
 
 	initialize : function( formObject, mask ){
 
         window.UploaderInstanceRunning = true;
+
+        this.configs = pydio.getPluginConfigs("mq");
 
 		formObject = $(formObject);
 		// Main form
@@ -742,16 +745,36 @@ Class.create("XHRUploader", {
         return false;
     },
 	
-	initializeXHR : function(item, queryStringParam, forceDir){
+	initializeXHR : function(item, queryStringParam, forceDir, callback){
 
         var currentDir = this.contextNode.getPath();
         if(forceDir) currentDir = forceDir;
 
 		var xhr = new XMLHttpRequest();
-		var uri = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=upload&xhr_uploader=true&dir="+encodeURIComponent(currentDir);
-		if(queryStringParam){
-			uri += '&' + queryStringParam;
-		}
+        var uri;
+
+        if (!this.configs.get("UPLOAD_ACTIVE")) {
+            uri = ajxpBootstrap.parameters.get('ajxpServerAccess') + "&get_action=upload&xhr_uploader=true&dir=" + encodeURIComponent(currentDir);
+
+            if (queryStringParam) {
+                uri += '&' + queryStringParam;
+            }
+        } else {
+
+            var host = this.configs.get("BOOSTER_MAIN_HOST");
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST']){
+                host = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST'];
+            }
+            var port = this.configs.get("BOOSTER_MAIN_PORT");
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT']){
+                port = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT'];
+            }
+
+            xhr.withCredentials = true;
+
+            uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir + item.file.name;
+        }
+
 
 		var upload = xhr.upload;
 		upload.addEventListener("progress", function(e){
@@ -759,6 +782,7 @@ Class.create("XHRUploader", {
 			item.updateProgress(e);
         	this.updateTotalData();
 		}.bind(this), false);
+
 		xhr.onreadystatechange = function() {  
 			if (xhr.readyState == 4) {
 				item.updateProgress(null, 100);
@@ -776,14 +800,23 @@ Class.create("XHRUploader", {
 			}
 		}.bind(this);        
         
-        upload.onerror = function(){
+        upload.onerror = function() {
+            if (this.configs.get("UPLOAD_ACTIVE")) {
+                this.configs.set("UPLOAD_ACTIVE", false);
+                return this.initializeXHR(item, queryStringParam, forceDir, callback);
+            }
+
 			item.updateStatus('error');
-        };		
+        }.bind(this);
 
 		xhr.open("POST", uri, true);
-        try {if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document'; } catch(e){}
-        return xhr;
-		
+
+        try {
+            if(Prototype.Browser.IE10) xhr.responseType =  'msxml-document';
+        } catch(e){
+        }
+
+        return callback(xhr);
 	},
 	
 	sendFileMultipart : function(item){
@@ -853,24 +886,32 @@ Class.create("XHRUploader", {
 		}else{
 			// 'overwrite' : do nothing!
 		}
-		
-		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir);
-		var file = item.file;
+
+		var xhr = this.initializeXHR(item, (auto_rename?"auto_rename=true":""), currentDir, function (item) {
+            return function (xhr) {
+
+                var file = item.file;
+
+                if(window.FormData){
+                    this.sendFileUsingFormData(xhr, file);
+                } else if(window.FileReader) {
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(e){
+                        this.xhrSendAsBinary(xhr, file.name, e.target.result, item)
+                    }.bind(this);
+                    fileReader.readAsBinaryString(file);
+                }else if(file.getAsBinary){
+                    window.testFile = file;
+                    var data = file.getAsBinary();
+                    this.xhrSendAsBinary(xhr, file.name, data, item)
+                }
+
+                return xhr;
+            }
+        }(item).bind(this));
+
         item.updateProgress(null, 0);
-		item.updateStatus('loading');		
-		if(window.FormData){
-			this.sendFileUsingFormData(xhr, file);
-		}else if(window.FileReader){
-			var fileReader = new FileReader();
-			fileReader.onload = function(e){
-				this.xhrSendAsBinary(xhr, file.name, e.target.result, item)
-			}.bind(this);
-			fileReader.readAsBinaryString(file);
-		}else if(file.getAsBinary){
-			window.testFile = file;
-			var data = file.getAsBinary();
-			this.xhrSendAsBinary(xhr, file.name, data, item)
-		}
+        item.updateStatus('loading');
 	},
 	
 	sendFileUsingFormData : function(xhr, file){

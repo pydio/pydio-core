@@ -16,22 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Client;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
 
-require_once(AJXP_BIN_FOLDER . '/guzzle/vendor/autoload.php');
+use Pydio\Core\Utils\ApplicationState;
 
-use AJXP_Utils;
 use GuzzleHttp\Exception\RequestException;
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\ShareInvitation;
 use GuzzleHttp\Client as GuzzleClient;
 
 
+/**
+ * Class OCSClient
+ * @package Pydio\OCS\Client
+ */
 class OCSClient implements IFederated, IServiceDiscovery
 {
     /**
@@ -55,7 +58,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             'name' => $invitation->getDocumentName(),
             'remoteId' => $invitation->getId(),
             'owner' => $invitation->getOwner(),
-            'remote' => AJXP_Utils::detectServerUrl(true)
+            'remote' => ApplicationState::detectServerURL(true)
         ];
 
         $response = $client->post(ltrim($endpoints['share'], '/'), [
@@ -152,7 +155,9 @@ class OCSClient implements IFederated, IServiceDiscovery
     /**
      *
      * Retrieves the OCS Provider endpoints for the URL
+     * @param string $url
      *
+     * @return array
      */
     public static function findEndpointsForURL($url) {
         $client = self::getClient($url);
@@ -173,7 +178,7 @@ class OCSClient implements IFederated, IServiceDiscovery
             // WARNING - This needs to be relative... :/
             $response = $client->get('ocs-provider/');
         } catch (RequestException $e) {
-            throw new \Exception('Failed to communicate with ocs provider');
+            throw new \Exception('Failed to communicate with ocs provider : '. $e->getMessage());
         }
 
         if ($response->getStatusCode() != 200) {
@@ -209,13 +214,4 @@ class OCSClient implements IFederated, IServiceDiscovery
         ]);
     }
 
-    /**
-     * @param $url
-     * @return mixed|string
-     */
-    private static function getPath($url) {
-        $path = parse_url($url, PHP_URL_PATH);
-        if($path == "/" || $path === $url) return "";
-        return $path;
-    }
 }

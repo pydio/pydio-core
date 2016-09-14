@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "title" => "Page d'accueil",
@@ -86,4 +86,7 @@ $mess=array(
     "72" => "QRCode du serveur",
     "73" => "Connexion aux applications mobiles",
     "74" => "Scannez ce QRCode avec votre application mobile pour configurer facilement la connexion.",
+    "75"=> "Chercher dans tous les fichiers...",
+    "76" => "Utilisez le menu en haut à droite pour acceder au %1.",
+    "77" => "panneau d'administration",
 );

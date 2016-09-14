@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -235,7 +235,7 @@ Class.create("LocationBar", {
 		this.realPath = newPath;
 		this.currentLabel = this.realPath;
 		if(getBaseName(newPath) != newNode.getLabel()){
-			this.currentLabel = getRepName(newPath) + '/' + newNode.getLabel();
+			this.currentLabel = getRepName(newPath) + '/' + he.escape(newNode.getLabel());
 		}
 		this.label.update(this.currentLabel);
 		this.currentPath.value = this.realPath;

@@ -2347,7 +2347,7 @@ Rework "regexp" in listUsersPaginated / getUsersCount in class.sqlAuthDriver.php
 Use HTML base tag instead of the previous complicated "travel_path_to_root" mechanism...
 New access point for managing users self-service operations (currently reset password)
 Make custom sort function to make sure users are sorted (fix #279)
-New variable AJXP_SANITIZE_FILENAME, to be less restrictive on the allowed characters than AJXP_SANITIZE_HTML_STRICT. Particularly, allow commas in filename.
+New variable InputFilter::SANITIZE_FILENAME, to be less restrictive on the allowed characters than InputFilter::SANITIZE_HTML_STRICT. Particularly, allow commas in filename.
 Login: trim username and password to avoid trailing and ending white space problems
 Better API for get_my_feed. Ability to force recycle_bin creation in workspace share
 Add node.share.create hooks
@@ -2564,7 +2564,7 @@ preg_replace(): The /e modifier is deprecated in PHP5.5
 Fix #404
 Fix #392, by adding PRE and POST callbacks to PclZip
 skipSecureToken actions were not taken into accounts in external files.
-Disable at last native autocompletion on share dialog, by removing name attribute. Styling of the Minisite, customize Logo Always sanitize user names as AJXP_SANITIZE_EMAILCHARS Users dashboard, revert styling of FetchedResultPane, was ugly. To be improved still.
+Disable at last native autocompletion on share dialog, by removing name attribute. Styling of the Minisite, customize Logo Always sanitize user names as InputFilter::SANITIZE_EMAILCHARS Users dashboard, revert styling of FetchedResultPane, was ugly. To be improved still.
 Detect if minisite logo is a binary or a real filepath
 Fix log.sql for ipv6 logging
 Add a paddingBottom when FilesList is in gridMode, to avoid hiding last line with scrollbar, fix #172
@@ -2861,7 +2861,7 @@ serialized data can contain null bytes, store them in blob (details)
 New functions in to be implemented by conf plugins (save/load/clearTemporaryKey, pruneTemporaryKeys) (details)
 Replace AJXP_REBASE if present in the html templates and passed in START_PARAMETERS (details)
 FS: Pass __AJXP_ZIP_FLAT__ to makeZip function to force all files to be at level 0 Fix tabulator et splitter resizing issues Download Cart. (details)
-New variable AJXP_SANITIZE_FILENAME, to be less restrictive on the allowed characters than AJXP_SANITIZE_HTML_STRICT. Particularly, allow commas in filename. (details)
+New variable InputFilter::SANITIZE_FILENAME, to be less restrictive on the allowed characters than InputFilter::SANITIZE_HTML_STRICT. Particularly, allow commas in filename. (details)
 New invisibleBar, and autoFoldOnEvent options on Splitter New tabsTips option on Tabulator Fix simpleTooltip positioning and style Rework layout here and there, implements the new behaviours, still to be tested and validated. (details)
 Expand and fix widgets, add a mode for horizontal tabulator positioning. (details)
 

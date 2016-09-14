@@ -1,22 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxp_plugin id="action.scheduler" enabled="false" label="CONF_MESSAGE[Tasks Scheduler]" description="CONF_MESSAGE[Register tasks to be run on a regular basis instead of writing them one by one in cron tab.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxp_plugin id="action.scheduler" enabled="true" label="CONF_MESSAGE[Tasks Scheduler]" description="CONF_MESSAGE[Register tasks to be run on a regular basis instead of writing them one by one in cron tab.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
             <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
-            <js className="Scheduler" file="plugins/action.scheduler/build/Scheduler.js" depends="React"/>
         </resources>
     </client_settings>
     <registry_contributions>
-        <client_configs>
-            <template element="ajxp_desktop" name="scheduler_style" position="after"><![CDATA[
-            <style>
-                .scheduler-list .mui-toolbar-group.mui-left {
-                    width: 88% !important;
-                }
-            </style>
-            ]]></template>
-        </client_configs>
         <actions>
             <action name="scheduler_menu">
                 <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
@@ -55,7 +45,7 @@
                     <clientForm id="scheduler_cronExpression"><![CDATA[
                          <div id="scheduler_cronExpression" box_width="420">
                              <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
-                             <textarea class="dialogFocus" style="width:400px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
+                             <textarea class="dialogFocus" style="width:350px;height:80px; margin-top: 5px;" id="cron_expression"></textarea>
                          </div>
                     ]]></clientForm>
                     <serverCallback methodName="switchAction" developerComment="Generate a correct expression to be inserted in Crontab, in order to trigger the {runAll} action on a regular basis."/>
@@ -76,7 +66,7 @@
                         };
                         connexion.sendAsync();
                     ]]></clientCallback>
-                    <serverCallback methodName="switchAction" developerComment="Run the scheduler: check if some tasks must be run now, and launch them. Generally launched from command line."/>
+                    <serverCallback methodName="switchAction" restParams="/" developerComment="Run the scheduler: check if some tasks must be run now, and launch them. Generally launched from command line."/>
                 </processing>
             </action>
             <action name="scheduler_loadTask">
@@ -263,7 +253,7 @@
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
-                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task,scheduler_error_task"/>
                 </gui>
                 <processing>
                     <clientCallback><![CDATA[
@@ -286,9 +276,36 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="scheduler_stopRunningTask">
+                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
+                             actionBar="true" contextMenu="true" infoPanel="true"
+                             actionBarGroup="get"/>
+                    <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_running_task"/>
+                </gui>
+                <processing>
+                    <clientCallback><![CDATA[
+                        var userSelection;
+                        if(window.actionArguments && window.actionArguments.length){
+                            userSelection = window.actionArguments[0];
+                        }else{
+                            userSelection =  pydio.getUserSelection();
+                        }
+                        var taskId = userSelection.getUniqueNode().getMetadata().get("task_id");
+                        var task = new PydioTasks.Task({id:taskId});
+                        task.stop();
+                    ]]></clientCallback>
+                </processing>
+            </action>
             <action name="scheduler_fakeLongTask">
                 <processing>
                     <serverCallback methodName="fakeLongTask" developerComment="Launch a fake long task."/>
+                </processing>
+            </action>
+            <action name="scheduler_checkConfig">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="true" write="true"/>
+                <processing>
+                    <serverCallback methodName="switchAction" developerComment="Check scheduler configuration"/>
                 </processing>
             </action>
         </actions>
@@ -297,7 +314,7 @@
             <serverCallback methodName="placeConfigNode" hookName="admin.list_config_nodes"/>
         </hooks>
     </registry_contributions>
-    <class_definition filename="plugins/action.scheduler/class.AjxpScheduler.php" classname="AjxpScheduler"/>
+    <class_definition filename="plugins/action.scheduler/vendor/autoload.php" classname="Pydio\Action\Scheduler\Scheduler"/>
     <dependencies>
         <activePlugin pluginName="access.ajxp_conf|access.ajxp_admin"/>
     </dependencies>

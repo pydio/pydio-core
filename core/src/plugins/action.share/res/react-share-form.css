@@ -284,10 +284,8 @@ div#react_share_form div.user-badge .user-badge-label {
   -webkit-flex: 5;
       -ms-flex: 5;
           flex: 5;
-  padding: 13px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 9px 0;
+  line-height: 25px;
 }
 div#react_share_form div.user-badge:last-of-type {
   border-bottom: 0;

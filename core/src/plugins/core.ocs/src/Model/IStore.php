@@ -16,13 +16,17 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\OCS\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Interface IStore
+ * @package Pydio\OCS\Model
+ */
 interface IStore
 {
 

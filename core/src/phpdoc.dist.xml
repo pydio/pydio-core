@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <parser>
+        <target>core/doc/php</target>
+    </parser>
+    <transformer>
+        <target>core/doc/php</target>
+    </transformer>
+    <files>
+        <directory>core/src/pydio</directory>
+        <directory>plugins</directory>
+        <ignore>*phpseclib*</ignore>
+        <ignore>*vendor*</ignore>
+        <ignore>*vendor/phpmailer*</ignore>
+        <ignore>*lib/class.phpmailer-lite.php</ignore>
+        <ignore>*openstack-sdk-php*</ignore>
+        <ignore>*CAS*</ignore>
+        <ignore>*duo_php*</ignore>
+        <ignore>*Elastica*</ignore>
+        <ignore>*Zend*</ignore>
+        <ignore>*i18n*</ignore>
+        <ignore>*dropbox-php*</ignore>
+        <ignore>*dibi*</ignore>
+        <ignore>*phpws*</ignore>
+        <ignore>*etherpad-client*</ignore>
+        <ignore>*SFTPPSL_StreamWrapper*</ignore>
+    </files>
+</phpdoc>

@@ -16,23 +16,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Description : Specific inclusion to run publiclet scripts
  */
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\PluginFramework\PluginsService;
+
 require_once("base.conf.php");
 
-$pServ = AJXP_PluginsService::getInstance();
+$pServ = PluginsService::getInstance();
 ConfService::init();
 ConfService::start();
 $authDriver = ConfService::getAuthDriverImpl();
-$confDriver = ConfService::getConfStorageImpl();
-require_once($confDriver->getUserClassFileName());
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareCenter.php");
+require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/vendor/autoload.php");
+class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
 
 $fakes = '
 // Non working exception class
-class AJXP_Exception extends Exception
+class PydioException extends Exception
 {
     public function __construct($msg) { echo "$msg"; exit(); }
 }';

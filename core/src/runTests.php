@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Re-run the diagnostic tests
  */
@@ -25,9 +25,20 @@
  * If you want to run the tests, first comment this line!
  * It is disabled for security purpose
  */
+use Pydio\Core\Utils\Reflection\DiagnosticRunner;
+use Pydio\Core\Controller\HTMLWriter;
+
 die("You are not allowed to see this page (comment first line of the file to access it!)");
 require_once("base.conf.php");
+require_once AJXP_BIN_FOLDER."/lib/HttpClient.php";
 
+/**
+ * @param $baseData
+ * @param $url
+ * @param $parameters
+ * @param $private
+ * @return HttpClient
+ */
 function apiPost($baseData, $url, $parameters, $private){
 
     $nonce = substr(md5(microtime()), 0, 6);
@@ -242,8 +253,8 @@ if(isSet($_GET["api"])){
     $outputArray = array();
     $testedParams = array();
     $passed = true;
-    $passed = AJXP_Utils::runTests($outputArray, $testedParams);
-    AJXP_Utils::testResultsToTable($outputArray, $testedParams, true);
-    AJXP_Utils::testResultsToFile($outputArray, $testedParams);
+    $passed = DiagnosticRunner::runTests($outputArray, $testedParams);
+    DiagnosticRunner::testResultsToFile($outputArray, $testedParams);
+    echo DiagnosticRunner::testResultsToTable($outputArray, $testedParams, true);
 
 }

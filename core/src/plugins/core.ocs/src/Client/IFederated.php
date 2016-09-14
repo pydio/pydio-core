@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Client;
 
@@ -26,15 +26,37 @@ use Pydio\OCS\Model\ShareInvitation;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Interface IFederated
+ * @package Pydio\OCS\Client
+ */
 interface IFederated
 {
     // Sender to Remote
+    /**
+     * @param ShareInvitation $invitation
+     * @return mixed
+     */
     public function sendInvitation(ShareInvitation $invitation);
+
+    /**
+     * @param ShareInvitation $invitation
+     * @return mixed
+     */
     public function cancelInvitation(ShareInvitation $invitation);
 
 
     // Remote from sender
+    /**
+     * @param RemoteShare $remoteShare
+     * @return mixed
+     */
     public function acceptInvitation(RemoteShare $remoteShare);
+
+    /**
+     * @param RemoteShare $remoteShare
+     * @return mixed
+     */
     public function declineInvitation(RemoteShare $remoteShare);
 
 }

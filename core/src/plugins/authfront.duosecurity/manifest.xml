@@ -2,7 +2,7 @@
 <ajxpcore id="authfront.duosecurity" enabled="false" label="CONF_MESSAGE[Dual-form Authentication]"
           description="CONF_MESSAGE[Dual-form authentication using the DuoSecurity web service]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.duosecurity/class.DuoSecurityFrontend.php" classname="DuoSecurityFrontend"/>
+	<class_definition filename="plugins/authfront.duosecurity/DuoSecurityFrontend.php" classname="Pydio\Auth\Frontend\DuoSecurityFrontend"/>
     <client_settings>
         <resources>
             <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js"/>

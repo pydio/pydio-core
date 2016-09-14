@@ -1,0 +1,11 @@
+{
+  "name": "Pydio Scheduler",
+  "description": "Perform some jobs on a regular basis (cron-based expression).",
+  "homepage": "https://pydio.com/",
+  "license":"AGPL-3.0",
+  "autoload": {
+    "psr-4": {
+      "Pydio\\Action\\Scheduler\\": "./src"
+    }
+  }
+}

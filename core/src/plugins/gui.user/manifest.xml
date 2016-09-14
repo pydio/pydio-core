@@ -9,7 +9,7 @@
         </resources>
     </client_settings>
 
-    <class_definition classname="UserGuiController" filename="plugins/gui.user/class.UserGuiController.php"/>
+    <class_definition classname="Pydio\Gui\UserGuiController" filename="plugins/gui.user/UserGuiController.php"/>
 
     <registry_contributions>
         <actions>
@@ -109,14 +109,15 @@
                     </clientCallback>
                     <clientForm id="reset-password"><![CDATA[
     				    <div id="reset-password" box_width="320" style="font-size: 15px;">
+    				        <div class="dialogLegend" ajxp_message_id="gui.user.8">AJXP_MESSAGE[gui.user.8]</div>
                             <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="gui.user.4">AJXP_MESSAGE[gui.user.4] : </div><input id="user_id" value="" type="text" class="SF_input"/>
+                                <div class="SF_label" ajxp_message_id="gui.user.4">AJXP_MESSAGE[gui.user.4] : </div><input style="width:90%;" id="user_id" value="" type="text" class="SF_input"/>
                             </div>
                             <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input id="user_change_ownpass1" value="" type="password" class="SF_input"/>
+                                <div class="SF_label" ajxp_message_id="198">AJXP_MESSAGE[198] : </div><input style="width:90%;" id="user_change_ownpass1" value="" type="password" class="SF_input"/>
                             </div>
                             <div class="SF_element">
-                                <div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input id="user_change_ownpass2" value="" type="password" class="SF_input"/>
+                                <div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input style="width:90%;" id="user_change_ownpass2" value="" type="password" class="SF_input"/>
                             </div>
                             <div class="SF_element" id="pwd_strength_container"></div>
     				    </div>
@@ -124,35 +125,11 @@
                     <serverCallback methodName="processUserAccessPoint"/>
                 </processing>
             </action>
-            <action name="login">
-                <processing></processing>
-            </action>
         </actions>
-        <client_configs>
-            <template element="ajxp_desktop" name="main_vision" position="top"><![CDATA[
-				<div id="toolbars">
-					<div id="global_toolbar" ajxpClass="LogoWidget"></div>
-				</div>
-				<div id="user-gui-controller" ajxpClass="AjxpPane" ajxpOptions='{}' style="background:url('plugins/gui.ajax/res/themes/vision/images/grid_t.png')"></div>
-				<!--
-				<div id="notifications" ajxpClass="FetchedResultPane" ajxpOptions='{"fit":"height", "fitParent": "window", "fixedDisplayMode":"thumb", "displayMode":"thumb", "selectable":"false", "nodeProviderProperties":{"get_action":"get_my_feed", "format":"xml", "connexion_discrete":true}}'></div>
-				-->
-				<script type="text/javascript">
-                    document.observe('ajaxplorer:loaded', function(){
-                        if(!ajaxplorer.UIG) {
-                            ResourcesManager.prototype.loadJSResource('plugins/gui.user/class.UserGuiController.js', 'UserGuiController', function(){
-                                ajaxplorer.UIG = new UserGuiController($('user-gui-controller'));
-                            }, true);
-                        }
-                    });
-				    pydio.UI.disableAllKeyBindings();
-				</script>
-            ]]></template>
-        </client_configs>
     </registry_contributions>
 
     <dependencies>
-        <activePlugin pluginName="gui.ajax|gui.mobile|gui.ios"/>
+        <activePlugin pluginName="gui.ajax|gui.mobile|gui.ios|core.auth"/>
     </dependencies>
 
 </ajxp_plugin>

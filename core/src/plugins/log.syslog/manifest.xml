@@ -4,7 +4,7 @@
         <plugin_author>Charles du Jeu</plugin_author>
         <core_relation packaged="true" tested_version="4.2.0"/>
     </plugin_info>
-    <class_definition filename="plugins/log.syslog/class.sysLogDriver.php" classname="sysLogDriver"/>
+    <class_definition filename="plugins/log.syslog/SysLogDriver.php" classname="Pydio\Log\Implementation\SysLogDriver"/>
     <client_settings>
         <resources>
             <i18n namespace="syslog_logger" path="plugins/log.syslog/i18n"/>

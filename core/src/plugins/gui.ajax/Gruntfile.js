@@ -39,6 +39,7 @@ var gui_ajax_core = [
     'res/js/vendor/webfx/ajxptree.js',
     'res/js/vendor/chosen/event.simulate.js',
     'res/js/vendor/chosen/chosen.proto.js',
+    'node_modules/he/he.js',
     'res/js/core/model/User.js',
     'res/js/core/http/ResourcesManager.js',
     'res/js/core/model/RemoteNodeProvider.js',

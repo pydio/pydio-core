@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -286,7 +286,7 @@ Class.create("FoldersTree", AjxpPane, {
 	 * @param newIcon String
 	 */
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	
-		$(nodeId+'-label').update(newLabel);
+		$(nodeId+'-label').update(he.escape(newLabel));
 		if(newIcon){
 			var realNode = webFXTreeHandler.all[nodeId];
 			realNode.icon = newIcon;

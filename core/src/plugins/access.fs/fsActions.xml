@@ -46,6 +46,12 @@
 				</serverCallback>
 			</processing>
 		</action>
+        <action name="fs_create_resource">
+            <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="true"/>
+            <processing>
+                <serverCallback methodName="createResourceAction"/>
+            </processing>
+        </action>
         <action name="mkdir">
             <gui text="154" title="155" src="folder_new.png" iconClass="mdi mdi-folder-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
@@ -178,7 +184,7 @@
 						modal.showDialogForm('Upload', uploader.formId, dialogOpen, null, dialogOnComplete, true, true);
 					}
 				]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
+				<serverCallback methodName="uploadAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
                     <input_param description="Target path in the workspace of the file to upload" name="node" type="string" mandatory="true"/>
                     <input_param description="Flag that the file content is passed via the php://input stream instead of standard $_FILES data" name="input_upload" type="boolean" default="false"/>
                     <input_param description="Automatically detect if there is an existing file with that name, and add a number suffix to the new file." name="auto_rename" type="boolean"/>
@@ -189,18 +195,26 @@
 		</action>
 		<action name="empty_recycle">
 			<gui text="220" title="221" src="trashcan_empty.png" iconClass="icon-ban-circle" accessKey="empty_recycle_access_key" hasAccessKey="true">
-				<context selection="false" dir="true" recycle="only" actionBar="true"
+				<context selection="true" dir="true" recycle="only" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="change_main"/>
+                <selectionContext dir="false" file="false" recycle="true" unique="true"/>
 			</gui>
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
+                <serverCallback methodName="switchAction" restParams="/"/>
 				<clientCallback prepareModal="false"><![CDATA[
-				    ajaxplorer.getContextHolder().selectAll();
-					window.setTimeout(function(){
-						pydio.getController().fireAction('delete');
-					}, 200);
-					]]></clientCallback>
-				</processing>
+					modal.showDialogForm('EmptyRecycle', 'empty_recycle_form', null, function(){
+						PydioApi.getClient().request({get_action:'empty_recycle'});
+						hideLightBox(true);
+						return false;
+					});
+                ]]></clientCallback>
+                <clientForm id="empty_recycle_form"><![CDATA[
+                    <div id="empty_recycle_form" action="empty_recycle" box_width="200">
+                        <span ajxp_message_id="177">AJXP_MESSAGE[177]</span>
+                    </div>
+				]]></clientForm>
+            </processing>
 		</action>
 		<action name="download" fileDefault="false">
 			<gui text="88" title="88" src="download_manager.png" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
@@ -272,7 +286,7 @@
 						}
 					}
 					]]></clientListener>
-				<serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
+				<serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                     <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <output type="stream"/>
 				</serverCallback>
@@ -519,7 +533,7 @@
 		<action name="get_content">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
 			<processing>
-				<serverCallback methodName="switchAction" restParams="/node+" developerComment="Alternative to Download, without attachment headers but more in a stream-like format, depending on file type (image, audio, video, plain text).">
+				<serverCallback methodName="downloadAction" restParams="/node+" developerComment="Alternative to Download, without attachment headers but more in a stream-like format, depending on file type (image, audio, video, plain text).">
                     <input_param description="Path of the node" name="node" type="path" mandatory="true"/>
 				</serverCallback>
 			</processing>
@@ -607,6 +621,11 @@
                 </serverCallback>
 				</processing>
 		</action>
+        <action name="cross_copy">
+            <processing>
+                <serverCallback methodName="crossRepositoryCopy"/>
+            </processing>
+        </action>
 		<action name="copy" ctrlDragndropDefault="true">
 			<gui text="66" title="159" src="editcopy.png" iconClass="icon-copy" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
@@ -652,7 +671,7 @@
 							if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
 							this.treeSelector.setFilterSelectedIndex(0);
 							this.treeSelector.setFilterChangeCallback(function(e){
-								externalRepo = this.filterSelector.getValue();
+								var externalRepo = this.filterSelector.getValue();
 								var nodeProvider = new RemoteNodeProvider();
 								nodeProvider.initProvider({tmp_repository_id:externalRepo});
 								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
@@ -688,6 +707,7 @@
 							<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
 						</div>
 						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
+						<a id="selector_create_folder"><span class="mdi mdi-folder-plus"></span></a>
 					</div>
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[
@@ -814,8 +834,8 @@
 				<clientCallback prepareModal="true"><![CDATA[
 					var onLoad = function(oForm){
 				    	var message = MessageHash[177];
-				    	var repoHasRecycle = ajaxplorer.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
-				    	if(repoHasRecycle && repoHasRecycle == "true" && ajaxplorer.getContextNode().getAjxpMime() != "ajxp_recycle"){
+				    	var repoHasRecycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
+				    	if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
 				    		message = MessageHash[176];
 				    	}
 		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
@@ -880,7 +900,7 @@
         <action name="prepare_chunk_dl">
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
             <processing>
-                <serverCallback methodName="switchAction" restParams="/chunk_count/node+" developerComment="Use the filesize of the file to generate an list of pieces to be downloaded using {download_chunk} action. Will generate a unique file_id to be used later.">
+                <serverCallback methodName="downloadAction" restParams="/chunk_count/node+" developerComment="Use the filesize of the file to generate an list of pieces to be downloaded using {download_chunk} action. Will generate a unique file_id to be used later.">
                     <input_param description="Selected node" name="node" type="path" mandatory="true"/>
                     <input_param description="Number of pieces to create for the file" name="chunk_count" type="integer"/>
                     <output type="application/json"/>
@@ -948,7 +968,7 @@
 					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>
 					</div>]]>
                 </clientForm>
-                <serverCallback methodName="switchAction" restParams="/chunk_index/file_id" developerComment="Chunk file into pieces before downloading the pieces. Can be handy for problematic and limited servers.">
+                <serverCallback methodName="downloadAction" restParams="/chunk_index/file_id" developerComment="Chunk file into pieces before downloading the pieces. Can be handy for problematic and limited servers.">
                     <input_param description="Unique key generated during the {prepare_chunk_dl} action." name="file_id" type="string"/>
                     <input_param description="Position of the file to download" name="chunk_index" type="integer"/>
                 </serverCallback>
@@ -993,43 +1013,6 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date" theme="oxygen,umbra,vision">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="341"/>
-				</messages>
-				<html><![CDATA[
-                <div class="infoPanelImagePreview">
-                    #{preview_rich}
-                </div>
-				<div class="infoPanelAllMetadata">
-				    <div>
-                        <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="no-action"></span> #{header_string}</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                            <tr>
-                                <td class="infoPanelLabel">#{name_string}</td>
-                                <td class="infoPanelValue">#{basename}</td>
-                            </tr>
-                            <tr class="even">
-                                <td class="infoPanelLabel">#{size_string}</td>
-                                <td class="infoPanelValue">#{filesize}</td>
-                            </tr>
-                            <tr>
-                                <td class="infoPanelLabel">#{modif_string}</td>
-                                <td class="infoPanelValue">#{formated_date}</td>
-                            </tr>
-                            <tr class="even">
-                                <td class="infoPanelLabel">#{type_string}</td>
-                                <td class="infoPanelValue">#{mimestring}</td>
-                            </tr>
-                        </table>
-                    </div>
-				</div>
-				]]></html>
-			</infoPanel>
 			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" theme="orbit" primary="true">
 				<messages>
 					<message key="name_string" id="133"/>
@@ -1065,33 +1048,6 @@
                         </table>
                     </div>
 				</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon,formated_date" theme="oxygen,umbra,vision">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="342"/>
-				</messages>
-				<html><![CDATA[
-                    <div class="folderImage infoPanelImagePreview">
-                        <img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
-                    </div>
-					<div class="infoPanelAllMetadata">
-					    <div>
-                            <div class="panelHeader infoPanelGroup"><span class="icon-info" data-ajxpAction="no-action"></span> #{header_string}</div>
-                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                                <tr>
-                                    <td class="infoPanelLabel">#{name_string}</td>
-                                    <td class="infoPanelValue">#{basename}</td>
-                                </tr>
-                                <tr class="even">
-                                    <td class="infoPanelLabel">#{modif_string}</td>
-                                    <td class="infoPanelValue">#{formated_date}</td>
-                                </tr>
-                            </table>
-						</div>
-					</div>
 				]]></html>
 			</infoPanel>
 			<infoPanel mime="generic_dir" attributes="basename,icon,fonticon,formated_date,ajxp_description" theme="orbit">

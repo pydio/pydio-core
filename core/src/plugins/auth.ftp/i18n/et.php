@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  Estonian translation by Ardi Jürgens <ardi (at) zone.ee>
 //  + updates/fixes by Kain Väljaots <kain (at) zone.ee>

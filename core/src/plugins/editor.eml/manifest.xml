@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.eml" openable="true" text="editor.eml.name" iconClass="icon-envelope-alt" title="editor.eml.title" icon="mail_generic.png" className="EmlViewer" mimes="eml" formId="emlviewer_box" label="CONF_MESSAGE[Email Viewer]" description="CONF_MESSAGE[Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/editor.eml/class.EmlParser.php" classname="EmlParser"/>
+	<class_definition filename="plugins/editor.eml/EmlParser.php" classname="Pydio\Editor\EML\EmlParser"/>
     <client_settings>
         <resources>
             <js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer"/>
@@ -37,32 +37,32 @@
 		<actions>
 			<action name="eml_get_xml_structure">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_get_bodies">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_dl_attachment">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="eml_cp_attachment">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
 			<action name="ls" dirDefault="true">
 				<post_processing>
-					<serverCallback methodName="lsPostProcess" capture="true"></serverCallback>
+					<serverCallback methodName="lsPostProcess" capture="true"/>
 				</post_processing>
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMimeHeaders"></serverCallback>
+			<serverCallback hookName="node.info" methodName="extractMimeHeaders"/>
 		</hooks>
 	</registry_contributions>
 	<dependencies>

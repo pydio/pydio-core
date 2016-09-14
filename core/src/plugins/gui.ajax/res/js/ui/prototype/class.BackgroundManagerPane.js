@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -52,7 +52,7 @@ Class.create("BackgroundManagerPane", {
 
     updatePanelMessage : function(message){
         var imgString = '<img src="'+ajxpResourcesFolder+'/images/loadingImage.gif" width="16" align="absmiddle">';
-        this.panel.update(imgString+' '+message);
+        this.panel.update(imgString+' '+ he.escape(message));
         Effect.Appear(this.panel);
     },
 
@@ -61,7 +61,7 @@ Class.create("BackgroundManagerPane", {
 	 * @param errorMessage String
 	 */
 	updatePanelError:function(errorMessage){
-		this.panel.update(errorMessage);
+		this.panel.update(he.escape(errorMessage));
 		this.panel.insert(this.makeCloseLink());
 	},
 	/**

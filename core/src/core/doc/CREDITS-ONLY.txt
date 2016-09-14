@@ -1,0 +1,57 @@
+<h4>Pydio Core License</h4>
+<u>Pydio Core</u> is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+Pydio Core is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+You should have received a copy of the GNU Affero General Public License along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+
+<h4>Contributors</h4>
+Cyril Russo : public links generation
+Panni (support for folder upload using jumploader, support for contextmenu in Opera)
+German : panzaeron
+Catalon : Joan
+Other translators : see mention in translation files
+Shorten.multi plugin by Miguelon
+Ultreia many fixes
+Thomas Nicot (UX or Orbit Theme): http://resetandplay.com/
+Others bugfixes and translations:
+Tran The Cuong, Nicolas Pouliquen, Pär Strindevall, Martin Schaible, Lawrence Ho,
+Arnold van Blanken, Marco De Pardi, Anael Mobilia, Dmitri Bosenko, Florian Vogt,
+Gerrit Pannek, Max Ruman, Stefan Huber, Christian Foellmann, John Regan, Sylvain Mandon,
+Gerald Me, Matthieu Simon, Florian Huwyler, Aaron Guggisberg, Stefan Wüthrich, Teki Imai,
+Nicola Mustone, Mike Rhuner, Mike Smorul, Pablo Daniel Rey, Steve Ludovicy, Lukasz Lis.
+Garnetius
+
+<h4>Third Party Library</h4>
+<h5>Amazon S3</h5>
+    S3 Stream Wrapper is released under the BSD license, Copyright 2011 P'unk Avenue LLC http://punkave.com/
+
+<h5>JavaScript</h5>
+	Prototype, Scriptaculous http://www.prototypejs.org/, http://script.aculo.us/ (MIT)
+	Modernizr 	http://modernizr.com (BSD / MIT)
+	Webfx widgets (selectable, sortable, xtree) : http://webfx.eae.net/ (Apache 2)
+	Chosen selector by Patrick Filler for Harvest (MIT): https://github.com/harvesthq/chosen
+	PDFJS library is provided by the Mozilla Foundation (Apache 2): http://mozilla.github.io/pdf.js/
+
+<h5>Images and Fonts</h5>
+	Oxygen : http://www.oxygen-icons.org/ (Creative Common SA 3.0 / LGPL)
+	Font Awesome by Dave Gandy : http://fortawesome.github.com/Font-Awesome/ (SIL Open Font License)
+	Open Sans by Steve Matteson : http://www.opensans.com/ (Apache Licence v2)
+	Background Photos : from http://unsplash.com/,
+	Embedded photos credits: http://www.gratisography.com/, Nick West, Martin Staněk, Sonja Langford
+	Folders & Files icons in Orbit Theme, by Ionic : http://ionicons.com/ (MIT License)
+
+<h5>Core PHP Classes</h5>
+    Dibi ORM: Copyright (c) 2004, 2014 David Grudl (http://davidgrudl.com) All rights reserved. (New BSD)
+	SabreDAV Library http://code.google.com/p/sabredav (New BSD)
+	SECURIMAGE http://www.phpcaptcha.org/ (LGPL)
+	Pclzip : http://www.phpconcept.net/pclzip/ (LGPL)
+
+<h5>Plugins</h5>
+	PThumb.php http://www.phpclasses.org (LPGL)
+	OpenLayers http://www.openlayers.org (BSD)
+	Video-js http://www.videojs.com/ (LGPL)
+	Zend Lucene http://www.zend.com/ (New BSD)
+	svn_lib.inc (LGPL)
+	PhpMailer-Lite http://phpmailer.sourceforge.net (LGPL)
+	Mp3 Player : http://www.alsacreations.fr/mp3-dewplayer.html
+	SoundManager : http://www.schillmania.com/projects/soundmanager2/ (BSD)
+	CAS Driver (Apache 2): https://github.com/Jasig/phpCAS

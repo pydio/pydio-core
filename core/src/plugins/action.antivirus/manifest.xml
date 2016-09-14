@@ -2,7 +2,7 @@
 <ajxp_plugin enabled="false" id="antivirus" label="CONF_MESSAGE[Antivirus]" description="CONF_MESSAGE[antivirus plugin adaptor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 
 	<!-- class file -->
-	<class_definition filename="plugins/action.antivirus/class.AntivirusScanner.php" classname="AntivirusScanner"/>
+	<class_definition filename="plugins/action.antivirus/AntivirusScanner.php" classname="Pydio\Action\Antivirus\AntivirusScanner"/>
 
 	<!-- plugin information -->
 	<plugin_info>

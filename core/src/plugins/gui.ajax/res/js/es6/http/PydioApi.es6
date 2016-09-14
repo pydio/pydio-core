@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 /**
  * API Client
@@ -486,16 +486,22 @@ class PydioApi{
                     var paramChild = childs[i].childNodes[j];
                     if(paramChild.tagName == 'param'){
                         parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
+                    }else if(paramChild.tagName == 'clientCallback' && paramChild.firstChild && paramChild.firstChild.nodeValue){
+                        var callbackCode = paramChild.firstChild.nodeValue;
+                        var callback = new Function(callbackCode);
                     }
                 }
-                var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
-                if(bgManager){
+                if(name == "javascript_instruction" && callback){
+                    callback();
+                }else{
+                    var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
                     bgManager.queueAction(name, parameters, messageId);
                     bgManager.next();
                 }
             }
 
         }
+        this._pydioObject.notify("response.xml", xmlResponse);
         if(reloadNodes.length){
             this._pydioObject.getContextHolder().multipleNodesReload(reloadNodes);
         }

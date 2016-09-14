@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	Turkish translation by: Heron / date: 23 october 2011 (second revision, it feels good to help!)
 //  transilated version: Pydio-core-3.3.2 (release date: 25 septembre 2011)
@@ -51,7 +51,7 @@ $mess=array(
 "22" => "PHP beti&#287;i",
 "23" => "Dosya",
 "24" => "Ana Klas&#246;r",
-"25" => "Y&uuml;kle bir veya daha fazla dosya (en fazla". ConfService::getConf( 'UPLOAD_MAX_NUMBER').") Klas&#246;r i&#231;inde : ",
+"25" => "Y&uuml;kle bir veya daha fazla dosya (en fazla". \Pydio\Core\Services\ConfService::getConf( 'UPLOAD_MAX_NUMBER').") Klas&#246;r i&#231;inde : ",
 "26" => "Yeni bir klas&#246;r olu&#351;tur : ",
 "27" => "Y&#220;KLE",
 "28" => "yeni bir dosya olu&#351;tur : ",
@@ -647,8 +647,11 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
 /* END SENTENCE */
 );

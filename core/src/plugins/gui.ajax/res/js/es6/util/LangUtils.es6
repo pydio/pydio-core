@@ -143,6 +143,24 @@ class LangUtils{
         return results;
     }
 
+    static trimLeft(string, charlist) {
+        if (charlist === undefined) {
+            charlist = "\s";
+        }
+        return string.replace(new RegExp("^[" + charlist + "]+"), "");
+    };
+
+    static trimRight(string, charlist) {
+        if (charlist === undefined) {
+            charlist = "\s";
+        }
+        return string.replace(new RegExp("[" + charlist + "]+$"), "");
+    };
+
+    static trim(string, charlist){
+        return LangUtils.trimLeft(LangUtils.trimRight(string, charlist), charlist);
+    }
+
 }
 
 LangUtils.slugTable = [

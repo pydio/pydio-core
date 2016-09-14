@@ -15,41 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("WebodfEditor", AbstractEditor, {
 
     padID:null,
     sessionID: null,
     node: null,
-
-	initialize: function($super, oFormObject, options)
-	{
-		$super(oFormObject, options);
-		if(!ajaxplorer.user || ajaxplorer.user.canWrite()){
-			this.canWrite = true;
-			this.actions.get("saveButton").observe('click', function(){
-				this.saveFile();
-				return false;
-			}.bind(this));		
-		}else{
-			this.canWrite = false;
-			this.actions.get("saveButton").hide();
-		}
-        // HIDE SAVE FOR THE MOMENT
-        this.actions.get("saveButton").hide();
-
-        if(options.context.__className == "Modal"){
-            this.actions.get("downloadFileButton").observe('click', function(){
-                if(!this.currentFile) return false;
-                PydioApi.triggerDownload(ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=download&file='+this.currentFile);
-                return false;
-            }.bind(this));
-        }else{
-            this.actions.get("downloadFileButton").hide();
-        }
-	},
-	
+    
 	open : function($super, nodeOrNodes){
 		$super(nodeOrNodes);
         this.node = nodeOrNodes;
@@ -70,7 +43,27 @@ Class.create("WebodfEditor", AbstractEditor, {
 
 
 	},
-	
+
+    resize : function(size){
+        if(size){
+            this.contentMainContainer.setStyle({height:size+'px'});
+            if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.IEorigWidth});
+        }else{
+            if(this.fullScreenMode){
+                fitHeightToBottom(this.contentMainContainer, this.element);
+                if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.element.getWidth()});
+            }else{
+                if(this.editorOptions.context.elementName){
+                    fitHeightToBottom(this.contentMainContainer, $(this.editorOptions.context.elementName), 5);
+                }else{
+                    fitHeightToBottom($(this.element));
+                    fitHeightToBottom($(this.contentMainContainer), $(this.element));
+                }
+                if(this.IEorigWidth) this.contentMainContainer.setStyle({width:this.IEorigWidth});
+            }
+        }
+        this.element.fire("editor:resize", size);
+    },
 
 	saveFile : function(){
         if(!this.padID || !this.node) return;

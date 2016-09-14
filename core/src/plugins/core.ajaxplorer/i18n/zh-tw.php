@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  Traditional Chinese (zh-tw UTF-8) translated by: Tommy Lam (Nov 13, 2008)
 //---------------------------------------------------------------------------------------------------
@@ -51,7 +51,7 @@ $mess=array(
 "22" => "PHP 程式",
 "23" => "檔案",
 "24" => "上一目錄",
-"25" => "上載一個或以上檔案 (最多 ".ConfService::getConf('UPLOAD_MAX_NUMBER')." 個) 到目錄 : ",
+"25" => "上載一個或以上檔案 (最多 ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER')." 個) 到目錄 : ",
 "26" => "建立新目錄於 : ",
 "27" => "上載檔案(U)",
 "28" => "建立新檔案於 : ",
@@ -647,8 +647,11 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
 /* END SENTENCE */
 );

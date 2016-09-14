@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 (function(global) {
 
@@ -56,6 +56,10 @@
                     users = users.filter(function(user){
                         return excludes.indexOf(user.getId()) == -1;
                     });
+                }
+                // Hack : force suggestions display
+                if(this.refs.autosuggest.lastSuggestionsInputValue && this.refs.autosuggest.lastSuggestionsInputValue.indexOf(input) === 0){
+                    this.refs.autosuggest.lastSuggestionsInputValue = input;
                 }
                 callback(null, users);
             }.bind(this), this.props.usersOnly, this.props.existingOnly);

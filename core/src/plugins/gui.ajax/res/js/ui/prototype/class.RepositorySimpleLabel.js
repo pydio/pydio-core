@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -69,9 +69,9 @@ Class.create("RepositorySimpleLabel", AjxpPane, {
             if(repositoryList && repositoryList.size()){
                 var repoObject = repositoryList.get(repositoryId);
                 if(repoObject){
-                    this.htmlElement.down("div.repository_title").update(repoObject.getLabel());
+                    this.htmlElement.down("div.repository_title").update(he.escape(repoObject.getLabel()));
                     if(this.options.displayWorkspaceDescription){
-                        this.htmlElement.down("div.repository_description").update(repoObject.getDescription());
+                        this.htmlElement.down("div.repository_description").update(he.escape(repoObject.getDescription()));
                     }
                 }
             }

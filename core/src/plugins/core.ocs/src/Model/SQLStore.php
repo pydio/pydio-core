@@ -16,9 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Model;
+
+use Pydio\Core\Services\ConfService;
+use Pydio\Conf\Sql\SqlConfDriver;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -26,21 +29,32 @@ define('OCS_SQLSTORE_FORMAT', 'serial');
 define('OCS_SQLSTORE_NS_INVITATION', 'ocs_invitation');
 define('OCS_SQLSTORE_NS_REMOTE_SHARE', 'ocs_remote_share');
 
+/**
+ * Class SQLStore
+ * @package Pydio\OCS\Model
+ */
 class SQLStore implements IStore
 {
     /**
-     * @var \sqlConfDriver
+     * @var SqlConfDriver
      */
     protected $storage;
 
+    /**
+     * SQLStore constructor.
+     */
     public function __construct()
     {
-        $storage = \ConfService::getConfStorageImpl();
+        $storage = ConfService::getConfStorageImpl();
         if($storage->getId() == "conf.sql") {
             $this->storage = $storage;
         }
     }
 
+    /**
+     * @param ShareInvitation $invitation
+     * @return int
+     */
     public function generateInvitationId(ShareInvitation &$invitation){
         if(empty($id)){
             $id = $this->findAvailableID(OCS_SQLSTORE_NS_INVITATION);
@@ -74,7 +88,8 @@ class SQLStore implements IStore
      */
     public function invitationsForLink($linkToken)
     {
-        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_INVITATION, null, "", OCS_SQLSTORE_FORMAT, "", $linkToken);
+        $cursor = null;
+        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_INVITATION, $cursor, "", OCS_SQLSTORE_FORMAT, "", $linkToken);
     }
 
     /**
@@ -123,7 +138,8 @@ class SQLStore implements IStore
      */
     public function remoteSharesForUser($userName)
     {
-        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, null, "", OCS_SQLSTORE_FORMAT, "", $userName);
+        $cursor = null;
+        return $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, $cursor, "", OCS_SQLSTORE_FORMAT, "", $userName);
     }
 
     /**
@@ -137,9 +153,14 @@ class SQLStore implements IStore
         return $data;
     }
 
+    /**
+     * @param $ocsRemoteId
+     * @return mixed|null
+     */
     public function remoteShareForOcsRemoteId($ocsRemoteId){
         $searchString = 's:11:"ocsRemoteId";s:'.strlen($ocsRemoteId).':"'.$ocsRemoteId.'"';
-        $l = $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, null,  "", OCS_SQLSTORE_FORMAT, "%$searchString%");
+        $cursor = null;
+        $l = $this->storage->simpleStoreList(OCS_SQLSTORE_NS_REMOTE_SHARE, $cursor,  "", OCS_SQLSTORE_FORMAT, "%$searchString%");
         if(count($l)){
             return array_shift(array_values($l));
         }else{
@@ -158,6 +179,10 @@ class SQLStore implements IStore
         return true;
     }
 
+    /**
+     * @param $namespace
+     * @return int
+     */
     protected function findAvailableID($namespace){
         $id = 0;
         while(true){
@@ -170,6 +195,9 @@ class SQLStore implements IStore
         return $id;
     }
 
+    /**
+     * @return string
+     */
     protected function getGUID(){
         if (function_exists('com_create_guid')){
             return com_create_guid();
