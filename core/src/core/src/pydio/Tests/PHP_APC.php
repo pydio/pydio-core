@@ -46,7 +46,7 @@ class PHP_APC extends AbstractTest
         } else if (!isSet($v)) {
             $v = false;
         }
-        if(!$v && !@extension_loaded("opcache")){
+        if(!$v && !@extension_loaded("Zend OPcache")){
             $this->failedInfo = "Pydio framework loads a lot of PHP files at each query, and using a PHP accelerator is greatly recommanded.";
             return FALSE;
         }
