@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="swift" enabled="false" label="CONF_MESSAGE[Open Stack (Swift)]" description="CONF_MESSAGE[Access Open Stack Object Storage via Swift API]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/access.swift/class.swiftAccessDriver.php" classname="swiftAccessDriver"/>
     <client_settings icon="plugins/access.fs/icon.png" description_template="{ENDPOINT}{REGION}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="swift_access" path="plugins/access.swift/i18n"/>
@@ -25,5 +24,6 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.swift/class.swiftAccessWrapper.php" classname="swiftAccessWrapper" protocol="ajxp.swift"/>
+    <class_definition filename="plugins/access.swift/SwiftAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\Swift\SwiftAccessDriver"/>
+    <class_stream_wrapper filename="plugins/access.swift/SwiftAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\Swift\SwiftAccessWrapper" protocol="ajxp.swift"/>
 </ajxpdriver>

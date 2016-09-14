@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     // will be replaced by the application title
@@ -50,6 +50,7 @@ $mess = array(
     "17d" => "Kommagetrennte Liste mit Benutzern oder Wildcard * damit die Aufgabe für alle Benutzer ausgeführt wird.",
     "18"  => "Aufgabenplanung",
     "18d" => "Cron-ähnliche Aufgabenplanung",
+    "18e" => "Aufgabenplanung (disabled)",
     "19" => "Aufgabe löschen",
     "19d" => "Aufgabe nicht mehr ausführen und löschen",
     "20" => "Crontab-Eintrag generieren",
@@ -58,4 +59,6 @@ $mess = array(
     "22" => "Aufgabenplanung, um bestimmte Aufgaben regelmäßig zu starten. Benötigt die PHP-Kommandozeile und Crontab oder ein ähnliches System.",
     "23" => "Grundeinstellungen",
     "24" => "Parameter",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

@@ -1,0 +1,11 @@
+{
+    "name": "AccessDropBox",
+    "description": "Pydio DropBox access wrapper",
+    "homepage": "http://pydio.com/",
+    "autoload": {
+        "psr-4": {
+            "Pydio\\Access\\Core\\": "../core.access/src",
+            "Pydio\\Access\\DropBox\\": "./src/"
+        }
+    }
+}

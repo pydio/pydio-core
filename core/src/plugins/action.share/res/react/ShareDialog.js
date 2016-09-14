@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 (function(global) {
 
@@ -188,9 +188,11 @@
         render: function(){
 
             let nodePath = this.props.shareModel.getNode().getPath();
+            /*
             if(this.props.shareModel.getNode().getMetadata().get("original_path")){
                 nodePath = this.props.shareModel.getNode().getMetadata().get("original_path");
             }
+            */
             return (
                 <div className="headerPanel">
                     <div
@@ -228,7 +230,7 @@
                 );
             }else{
                 var unshareButton;
-                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error'){
+                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error' || global.pydio.user.activeRepository === "ajxp_conf"){
                     unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
@@ -691,8 +693,9 @@
 
         buildLabel: function(){
             var link = this.props.linkData;
-            var host = link.HOST || link.invitation.HOST;
-            var user = link.USER || link.invitation.USER;
+            var host = link.HOST || (link.invitation ? link.invitation.HOST : null);
+            var user = link.USER || (link.invitation ? link.invitation.USER : null);
+            if(!host || !user) return "Error";
             return user + " @ " + host ;
         },
 

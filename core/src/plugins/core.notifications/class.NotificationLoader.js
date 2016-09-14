@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 Class.create("NotificationLoader", {
@@ -92,7 +92,7 @@ Class.create("NotificationLoader", {
             }
             var elLabel = el.getLabel();
             if(!elLabel) elLabel = "/";
-            var block = '<div class="notif_event_label">'+elLabel+'</div>';
+            var block = '<div class="notif_event_label">'+he.escape(elLabel)+'</div>';
             var detail = '';
             if(el.getMetadata().get('event_repository_label')){
                 detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
@@ -201,7 +201,7 @@ Class.create("NotificationLoader", {
                     obje.title,
                     {
                         body: obje.body,
-                        icon: 'plugins/gui.ajax/res/themes/vision/images/mimes/64/mime_empty.png',
+                        icon: 'plugins/gui.ajax/res/themes/orbit/images/mimes/64/mime_empty.png',
                         tag: 'ajaxplorer',
                         dir: 'auto',
                         lang: ajaxplorer.currentLanguage
@@ -338,7 +338,8 @@ Class.create("NotificationLoader", {
             "columnsDef":[
                 {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
                 {"attributeName":"event_time", "messageString":"Time", "sortType":"Number"},
-                {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
+                {"attributeName":"event_description", "messageString":"Description", "sortType":"String"}
+            ],
             "silentLoading":true,
             "fixedSortColumn":"event_time",
             "fixedSortDirection":"desc",

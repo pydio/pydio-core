@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="light" label="CONF_MESSAGE[Light]" description="CONF_MESSAGE[Simple Template for Bookmarklets]">
-    <class_definition filename="plugins/gui.light/class.LightGuiPlugin.php" classname="LightGuiPlugin"/>
+    <class_definition filename="plugins/gui.light/LightGuiPlugin.php" classname="Pydio\Gui\LightGuiPlugin"/>
     <client_settings>
         <resources>
             <i18n namespace="light_gui" path="plugins/gui.light/i18n"/>
@@ -36,21 +36,6 @@
                         top: -34px !important;
 				    }
 				</style>
-			]]></template>
-			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
-				<div id="browser" style="background: white;color: #676965;font-family: Arial, Helvetica;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;">
-					</div>
-				</div>
-			]]></template>
-			<template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
-				<div id="browser" style="background: white;color: #676965;font-family: Arial, Helvetica;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;">
-					</div>
-				</div>
-			]]></template>
-			<template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-                <div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;"></div>
 			]]></template>
 			<template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
                 <div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;"></div>

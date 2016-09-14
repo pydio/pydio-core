@@ -13,6 +13,8 @@
                       description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
         <global_param name="ENABLE_GETTING_STARTED" type="boolean"
                       label="CONF_MESSAGE[Enable Getting Started]" description="CONF_MESSAGE[Enable addition tabulation to access getting started videos]" default="true" expose="true"/>
+        <global_param name="ENABLE_GLOBAL_SEARCH" type="boolean"
+                      label="CONF_MESSAGE[Enable Global Search]" description="CONF_MESSAGE[Enable cross-workspaces search form on home page]" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
                       label="CONF_MESSAGE[iOS App URL]" description="CONF_MESSAGE[URL of the iOS application]" default="https://itunes.apple.com/us/app/pydio/id709275884?mt=8"/>
         <global_param name="URL_APP_ANDROID" type="string" expose="true"
@@ -27,7 +29,7 @@
 	<registry_contributions>
         <actions>
             <action name="display-server-qrcode">
-                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.73">
+                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.74">
                     <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
@@ -42,92 +44,10 @@
             </action>
         </actions>
 		<client_configs>
-            <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
-                <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
-                <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
-            ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
-                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
-                <style>
-                #workspace_toolbar{
-                    display:none;
-                }
-                #browser{
-                    padding:0;
-                    background-color: #ACB2B9;
-                }
-                div.flat_tabulator span.toggleHeader{
-                    background-color: #e35d52;
-                }
-                .largeButton, .SF_input.SF_inlineButton{
-                    background-color: #e35d52;
-                }
-                .action_bar{
-                    background-color: #ebedf0;
-                    padding: 4px;
-                    border-left:1px solid #5C5C5C;
-                }
-                #user_profile_form, div.class-FetchedResultPane{
-                    border-left:1px solid #5C5C5C;
-                }
-                #account_pane .action_bar{
-                    text-align: right;
-                }
-                .action_bar a{
-                    background-color: #e35d52;
-                    margin-top:3px;
-                    cursor: pointer;
-                }
-                div.class-FetchedResultPane{
-                    background-color: #f8f8f8;
-                }
-                #buttons_bar{
-                    padding-bottom: 2px;
-                    text-align: right;
-                }
-                #buttons_bar a {
-                    padding-bottom: 0;
-                    height: 26px;
-                }
-                .action_bar span.actionbar_button_label{
-                    font-size: 11px;
-                }
-                .flat_tabulator div.panelHeader.tabulatorContainer{
-                    background-color: #30383A;
-                    padding-top: 10px;
-                }
-                .flat_tabulator span.toggleHeader:first-of-type {
-                    background-color: #e35d52 !important;
-                }
-                .flat_tabulator span.toggleHeader.toggleInactive {
-                    background-color: rgba(119, 119, 119, 0.35) !important;
-                }
-                </style>
-            ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="browser" ajxpOptions='{"fit":"height"}' theme="vision"><![CDATA[
-                <div id="home_account_pane" ajxpClass="UserDashboardHome" class="vertical_fit horizontal_layout">
-                    <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="welcome"></div>
-                        <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height"}'>
-                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitMarginBottom":100}'>
-                                <ul id="workspaces_list"></ul>
-                            </div>
-                            <div id="workspaces_button">
-                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_home.41]</label>
-                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_home.42]" class="disabled">
-                            </div>
-                        </div>
-                    </div>
-                    <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","flexTo":"browser"}'>
-                        <div id="logo_div"><img src=""></div>
-                        <div id="ws_legend"></div>
-                    </div>
-                </div>
-            ]]></template_part>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
                 <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
 			]]></template_part>
         </client_configs>
 	</registry_contributions>
-    <class_definition filename="plugins/access.ajxp_home/class.HomePagePlugin.php" classname="HomePagePlugin"/>
+    <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>
 </ajxpdriver>

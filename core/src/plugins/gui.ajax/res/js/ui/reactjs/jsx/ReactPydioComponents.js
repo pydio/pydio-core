@@ -1127,6 +1127,9 @@
             }
             if(this.props.node){
                 additionalClassName += ' listentry' + this.props.node.getPath().replace(/\//g, '_') + ' ' + ' ajxp_node_' + (this.props.node.isLeaf()?'leaf':'collection') + ' ';
+                if(this.props.node.getAjxpMime()){
+                    additionalClassName += ' ajxp_mime_' + this.props.node.getAjxpMime() + ' ';
+                }
             }
             return (
                 <div onClick={this.onClick} className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}>
@@ -1192,21 +1195,28 @@
         propTypes:{
             tableKeys:React.PropTypes.object.isRequired,
             loading:React.PropTypes.bool,
-            reload:React.PropTypes.func
+            reload:React.PropTypes.func,
+            dm:React.PropTypes.instanceOf(PydioDataModel),
+            node:React.PropTypes.instanceOf(AjxpNode)
         },
 
         render: function(){
-            var cells = [];
+            let cells = [];
             for(var key in this.props.tableKeys){
                 if(!this.props.tableKeys.hasOwnProperty(key)) continue;
                 var data = this.props.tableKeys[key];
                 var style = data['width']?{width:data['width']}:null;
                 cells.push(<span key={key} className={'cell header_cell cell-' + key} style={style}>{data['label']}</span>);
             }
+            let paginator;
+            if(this.props.node.getMetadata().get("paginationData")){
+                paginator = <ListPaginator dataModel={this.props.dm} node={this.props.node}/>;
+            }
             return (
                 <ReactMUI.Toolbar className="toolbarTableHeader">
                     <ReactMUI.ToolbarGroup float="left">{cells}</ReactMUI.ToolbarGroup>
                     <ReactMUI.ToolbarGroup float="right">
+                        {paginator}
                         <ReactMUI.FontIcon
                             key={1}
                             tooltip={this.context.getMessage('149', '')}
@@ -1560,8 +1570,8 @@
         },
 
         getActionsForNode: function(dm, node){
-            var cacheKey = node.isLeaf() ? 'file':'dir';
-
+            var cacheKey = node.isLeaf() ? 'file-' + node.getAjxpMime() :'folder';
+            var selectionType = node.isLeaf() ? 'file' : 'dir';
             var nodeActions = [];
             if(this.actionsCache[cacheKey]) {
                 nodeActions = this.actionsCache[cacheKey];
@@ -1569,9 +1579,9 @@
                 dm.setSelectedNodes([node]);
                 global.pydio.Controller.actions.forEach(function(a){
                     a.fireContextChange(dm, true, global.pydio.user);
-                    //a.fireSelectionChange(dm);
-                    if(a.context.selection && a.context.actionBar && a.selectionContext[cacheKey] && !a.deny && a.options.icon_class
+                    if(a.context.selection && a.context.actionBar && a.selectionContext[selectionType] && !a.deny && a.options.icon_class
                         && (!this.props.actionBarGroups || this.props.actionBarGroups.indexOf(a.context.actionBarGroup) !== -1)
+                        && (!a.selectionContext.allowedMimes.length || a.selectionContext.allowedMimes.indexOf(node.getAjxpMime()) !== -1)
                     ) {
                         nodeActions.push(a);
                         if(node.isLeaf() &&  a.selectionContext.unique === false) {
@@ -1581,7 +1591,6 @@
                 }.bind(this));
                 this.actionsCache[cacheKey] = nodeActions;
             }
-
             return nodeActions;
         },
 
@@ -1948,6 +1957,8 @@
                     loading={this.state.loading}
                     reload={this.reload}
                     ref="loading_indicator"
+                    dm={this.props.dataModel}
+                    node={this.props.node}
                 />
             }else{
                 toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
@@ -2056,6 +2067,7 @@
                         dataModel={this.state.dataModel}
                         actionBarGroups={this.props.actionBarGroups}
                         skipParentNavigation={true}
+                        observeNodeReload={true}
                     />
                 </div>
             );

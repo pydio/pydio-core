@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
     "1" => "Сброс пароля",
@@ -26,4 +26,5 @@ $mess=array(
     "5" => "Запрос на сброс пароля будет послан на email, который указан в вашей учётной записи. Нажмите на ссылку в письме, чтобы пересоздать пароль.",
     "6" => "Спасибо, теперь Вы можете зайти в систему!",
     "7" => "Запрошен сброс пароля для учётной записи ассоциированной с этим email адресом. Если Вы не автор запроса просто проигнорируйте это письмо. Если Вы хотите сбросить пароль, то нажмите на ссылку:",
+    "8" => "Use the form below to reset your password. Please enter your login and the new password twice.",
 );

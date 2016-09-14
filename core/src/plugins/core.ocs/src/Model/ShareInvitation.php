@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Model;
 
@@ -27,6 +27,10 @@ if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_REJECTED', 4);
 }
 
+/**
+ * Class ShareInvitation
+ * @package Pydio\OCS\Model
+ */
 class ShareInvitation implements \JsonSerializable
 {
     /**
@@ -70,6 +74,9 @@ class ShareInvitation implements \JsonSerializable
         return $this->id;
     }
 
+    /**
+     * @param string $id
+     */
     public function setId($id){
         $this->id = $id;
     }
@@ -82,6 +89,9 @@ class ShareInvitation implements \JsonSerializable
         return $this->documentName;
     }
 
+    /**
+     * @param string $documentName
+     */
     public function setDocumentName($documentName){
         $this->documentName = $documentName;
     }

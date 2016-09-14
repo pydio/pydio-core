@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	Finnish translation by Aleksi Postari
 //	aleksi (at) postari.net
@@ -51,7 +51,7 @@ $mess=array(
 "22" => "PHP skripti",
 "23" => "Tiedosto",
 "24" => "Taaksepäin",
-"25" => "Lähetä yksi tai useampi tiedosto (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") kansioon : ",
+"25" => "Lähetä yksi tai useampi tiedosto (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") kansioon : ",
 "26" => "Luo uusi kansio sijaintiin : ",
 "27" => "Lähetä",
 "28" => "Luo uusi tiedosto sijaintiin : ",
@@ -647,8 +647,11 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
 /* END SENTENCE */
 );

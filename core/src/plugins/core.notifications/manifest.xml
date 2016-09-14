@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Notification Center]" description="CONF_MESSAGE[Handle users watches and notifications]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="AJXP_NotificationCenter" filename="plugins/core.notifications/class.AJXP_NotificationCenter.php"/>
+    <class_definition classname="Pydio\Notification\Core\NotificationCenter" filename="plugins/core.notifications/NotificationCenter.php"/>
     <client_settings>
         <resources>
             <i18n namespace="notification.tpl.short" path="plugins/core.notifications/templates/short"/>
@@ -17,7 +17,8 @@
     </client_settings>
     <server_settings>
         <param name="activate_notifications" scope="user" description="CONF_MESSAGE[Activate desktop notifications]" label="CONF_MESSAGE[Desktop Notifications]" type="button" choices="run_client_action:activateDesktopNotifications" expose="true" editable="true"/>
-        <global_param description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" name="USER_EVENTS" type="boolean" default="false"/>
+        <global_param name="USER_EVENTS" description="CONF_MESSAGE[Display a new entry with all events happening on a user workspaces, and alerts. An SQL database must be setup for the FEED_DRIVER configuration.]" label="CONF_MESSAGE[User events and alerts]" type="boolean" default="false"/>
+        <global_param name="SHOW_WORKSPACES_ACTIVITY" label="CONF_MESSAGE[Display Workspaces Activity]" description="CONF_MESSAGE[Display workspaces activity to the users in the right-hand information panel]" type="boolean" default="true"/>
         <global_param type="plugin_instance:feed" name="UNIQUE_FEED_INSTANCE" group="CONF_MESSAGE[Instance Params]" label="CONF_MESSAGE[Feed Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="true" default="feed.sql"/>
     </server_settings>
     <registry_contributions>
@@ -68,6 +69,12 @@
                                      description="Wether to get activity from current repository (true), or compute all from authorized repositories for user (false)"/>
                     </serverCallback>
                 </processing>
+            </action>
+            <action name="clear_feed">
+                <processing><serverCallback methodName="clearUserFeed" restParams="/context_type/context_value">
+                    <input_param name="context_type" type="string" description="all|repository|user"/>
+                    <input_param name="context_value" type="string" description="Either empty, or a repo ID, or a userId depending on the context_type"/>
+                </serverCallback></processing>
             </action>
             <action name="dismiss_user_alert">
                 <gui text="notification_center.7" title="notification_center.7" iconClass="mdi mdi-close-circle" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("RoleEditor", AbstractEditor, {
 
@@ -364,8 +364,11 @@ Class.create("RoleEditor", AbstractEditor, {
                 });
                 modal.currentLightBoxModal.setStyle({display:'block'});
             }.bind(this));
-            var locked = this.roleData.USER.LOCK ? true : false;
-            var b1 = new Element("span", {className:'m-2'}).update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
+            var locked = this.roleData.USER.LOCK || "";
+            var uLockedOut = locked.indexOf('logout') > 1;
+            var uLockedPass = locked.indexOf('pass_change') > 1;
+
+            var b1 = new Element("span", {className:'m-2'}).update((uLockedOut ?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
             buttonPane.insert(b1);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b1.observe("click", function(){
@@ -374,16 +377,16 @@ Class.create("RoleEditor", AbstractEditor, {
                     get_action:"edit",
                     sub_action:"user_set_lock",
                     user_id : userId,
-                    lock : (locked?"false":"true")
+                    lock_type:"logout",
+                    lock : (uLockedOut?"false":"true")
                 });
-                if(!locked) conn.addParameter("lock_type", "logout");
                 conn.onComplete = function(transport){
-                    locked = !locked;
-                    b1.update((locked?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
+                    uLockedOut = !uLockedOut;
+                    b1.update((uLockedOut?MessageHash["ajxp_role_editor.27"]:MessageHash["ajxp_role_editor.26"]));
                 }.bind(this);
                 conn.sendAsync();
             }.bind(this) );
-            var b2 = new Element("span", {className:'m-2'}).update(MessageHash["ajxp_role_editor.28"]);
+            var b2 = new Element("span", {className:'m-2'}).update(uLockedPass ? MessageHash["ajxp_role_editor.28b"]: MessageHash["ajxp_role_editor.28"]);
             buttonPane.insert(b2);
             var userId = this.roleId.replace("AJXP_USR_/", "");
             b2.observe("click", function(){
@@ -392,9 +395,13 @@ Class.create("RoleEditor", AbstractEditor, {
                     get_action:"edit",
                     sub_action:"user_set_lock",
                     user_id : userId,
-                    lock : "true",
+                    lock : uLockedPass ? "false" : "true",
                     lock_type : "pass_change"
                 });
+                conn.onComplete = function(transport){
+                    uLockedPass = !uLockedPass;
+                    b2.update((uLockedPass?MessageHash["ajxp_role_editor.28b"]:MessageHash["ajxp_role_editor.28"]));
+                }.bind(this);
                 conn.sendAsync();
             });
 

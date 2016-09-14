@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin label="CONF_MESSAGE[Open Cloud API]" description="CONF_MESSAGE[Open Cloud API Implementation]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition classname="Pydio\OCS\OCSPlugin" filename="plugins/core.ocs/OCSPlugin.php"/>
+    <class_definition classname="Pydio\OCS\OCSPlugin" filename="plugins/core.ocs/src/OCSPlugin.php"/>
     <client_settings>
         <resources>
             <i18n namespace="core.ocs" path="plugins/core.ocs/i18n"/>
@@ -15,12 +15,12 @@
         <actions>
             <action name="accept_invitation">
                 <processing>
-                    <serverCallback methodName="applyActions" restParams="/remote_share_id" />
+                    <serverCallback methodName="switchAction" restParams="/remote_share_id" />
                 </processing>
             </action>
             <action name="reject_invitation">
                 <processing>
-                    <serverCallback methodName="applyActions" restParams="/remote_share_id" />
+                    <serverCallback methodName="switchAction" restParams="/remote_share_id" />
                 </processing>
             </action>
         </actions>

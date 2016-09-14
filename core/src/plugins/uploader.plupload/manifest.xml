@@ -5,7 +5,7 @@
         <plugin_author>lmanders</plugin_author>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
-	<class_definition filename="plugins/uploader.plupload/class.PluploadProcessor.php" classname="PluploadProcessor"/>
+	<class_definition filename="plugins/uploader.plupload/Pluploader.php" classname="Pydio\Uploader\Processor\Pluploader"/>
 	<client_settings>
 		<resources>
 	        <i18n namespace="plupload" path="plugins/uploader.plupload/i18n" />
@@ -21,6 +21,11 @@
             <action name="upload_chunks_unify_plupload">
                 <processing>
                     <serverCallback methodName="unifyChunks"/>
+                </processing>
+            </action>
+            <action name="plupload_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
                 </processing>
             </action>
         </actions>
@@ -39,7 +44,7 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=pluploader_tpl.html&pluginName=uploader.plupload&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=plupload_tpl&encode=false';
         modal.getForm().down('#pluploadframe').src = src;
 		]]></dialogOnOpen>
 	</processing>

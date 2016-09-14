@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 /*******************************************************************************
@@ -24,7 +24,7 @@
 *   + update: Axel Otterstätter <axel.otterstaetter@googlemail.com>
 *   + update: Stefan Huber <sh@signalwerk.ch>
 *   + update: Martin Schaible <martin@martinschaible.ch>
-*******************************************************************************/  
+*******************************************************************************/
 $mess=array(
 "languageLabel" => "Deutsch",
 "date_intl_locale" => "de_DE",
@@ -64,7 +64,7 @@ $mess=array(
 "22" => "PHP-Skript",
 "23" => "Datei",
 "24" => "Aufwärts",
-"25" => "Eine oder mehrere Dateien (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") in folgenden Ordner hochladen: ",
+"25" => "Eine oder mehrere Dateien (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") in folgenden Ordner hochladen: ",
 "26" => "Erstelle einen neuen Ordner in: ",
 "27" => "Hochladen",
 "28" => "Erstelle neue Datei in: ",
@@ -264,7 +264,6 @@ $mess=array(
 "204" => "Die Datei \"",
 "205" => "\" ist größer als die maximal erlaubte Dateigröße (",
 "206" => "Mb).\\nDie Datei konnte nicht hochgeladen werden.",
-/* END SENTENCE */
 "207" => "Sie haben keine Schreibrechte in diesem Ordner",
 "208" => "Sie haben keine Leserechte in diesem Ordner",
 "209" => "Ein interner Serverfehler ist aufgetreten. Wenden Sie sich bitte an den Systemadministrator!",
@@ -440,7 +439,6 @@ $mess=array(
 "375" => "Achtung, Inaktivität seit mehr als __IDLE__. Ein automatischer Logout erfolgt in __LOGOUT__.",
 "376" => "Zum Zurücksetzen irgendwo klicken",
 "378" => "Achtung! Sie haben entweder ein leeres oder ein zu kurzes Passwort eingegeben!",
-/* password strength tester */
 "379" => "Unsicheres Passwort!",
 "380" => "Zu kurz",
 "381" => "Sehr unsicher",
@@ -656,4 +654,9 @@ $mess=array(
 "549" => "Sie haben die Freigabe des Benutzers %%OWNER%% von einem entfernten System bereits akzeptiert. Möchten Sie diese nun ablehnen?",
 "550" => "Freigabe ablehnen",
 "551" => "Ablehnen",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+/* END SENTENCE */
+/* password strength tester */
 );

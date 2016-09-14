@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("VideoPreviewer", AbstractEditor, {
 
@@ -83,7 +83,7 @@ Class.create("VideoPreviewer", AbstractEditor, {
         else if(mime == "ogv") cType = "video/ogg";
         else if(mime == "webm") cType = "video/webm";
         return new Template('<link href="http://vjs.zencdn.net/c/video-js.css" rel="stylesheet">\n\
-&lt;script src="http://vjs.zencdn.net/c/video.js"&gt;&lt;/script&gt;\n\
+<script src="http://vjs.zencdn.net/c/video.js"></script>\n\
 <video id="my_video_1" class="video-js vjs-default-skin" controls\n\
 preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 <source src="#{DL_CT_LINK}" type="'+cType+'">\n\
@@ -110,6 +110,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
                     url = document.location.origin + url;
                 }
             }
+            url = LangUtils.trimRight(url, "\/");
 
             var html5proxies = $H({});
 			var mime = ajxpNode.getAjxpMime();

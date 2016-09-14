@@ -6,7 +6,7 @@
 @infopanel_values_color:#555;
 @infopanel_quick_button_border:1px dotted #999;
 
-@infopanel_fetchedpane_text_color: #222;
+@infopanel_fetchedpane_text_color: #666;
 @infopanel_fetchedpane_legend_color: #666;
 
 @infopanel_toolbar_buttons_radius:0;
@@ -119,25 +119,45 @@
 
   div.class-FetchedResultPane{
 
-    font-size: 13px;
     div.thumbnail_selectable_cell.detailed{
-      padding: 0;
+      padding: 0 0 16px;
       cursor: default;
       div.thumbnail_selectable_cell{
         display: none;
       }
       div.thumbLabel{
-        font-size: 1.1em;
+        font-size: 15px;
         color: @infopanel_fetchedpane_text_color;
         white-space: normal;
-        line-height: 1.5em;
         padding-top: 0;
-        padding-bottom: 8px;
+        font-weight: 400;
         small {
           color: @infopanel_fetchedpane_legend_color;
           display: block;
           font-size: 0.8em;
           line-height: 15px;
+        }
+      }
+      div.thumbnail_cell_metadata{
+        display: block;
+        opacity: 0.9;
+        .metadata_chunk.metadata_chunk_description{
+          font-size: 12px;
+          opacity: 1 !important;
+          color: @infopanel_fetchedpane_legend_color !important;
+          white-space: normal;
+        }
+        .metadata_chunk.metadata_chunk_standard{
+          display: none;
+        }
+      }
+      &.selected-focus{
+        div.thumbnail_cell_metadata{
+          opacity: 0.9;
+        }
+        div.thumbLabel{
+          color: @infopanel_fetchedpane_text_color;
+          font-weight: 400;
         }
       }
     }
@@ -175,7 +195,7 @@
   }
   .infopanel_loading{
     opacity: 0;
-    transition: opacity ease 0.2s;
+    transition: opacity ease 0.1s;
   }
   .infopanel_loading_finished{
     opacity: 1;
@@ -262,25 +282,35 @@
       text-align: center;
       border-radius: 0;
       box-shadow: @reactBoxShadowDepthMini;
+      div.tile_preview_container{
+        display: flex;
+        align-items: center;
+        height: 60px;
+        div.tile_preview{
+          margin: auto;
+          .mimefont{
+            color: @thumbnail_mimefont_color;
+          }
+          img {
+            max-width: 90%;
+            max-height: 60px;
+          }
+        }
+      }
+      div.tile_label {
+        position: absolute;
+        bottom: 1px;
+        font-size: 0.7em;
+        overflow: hidden;
+        width: 89%;
+        text-overflow: ellipsis;
+        padding: 2px 2px 0;
+        text-align: center;
+        color: #646464;
+        white-space: nowrap;
+      }
     }
 
-    .info_panel_multiple_tile div.tile_preview img {
-      max-width: 90%;
-      max-height: 60px;
-    }
-
-    .info_panel_multiple_tile div.tile_label {
-      position: absolute;
-      bottom: 1px;
-      font-size: 0.7em;
-      overflow: hidden;
-      width: 89%;
-      text-overflow: ellipsis;
-      padding: 2px 2px 0;
-      text-align: center;
-      color: #646464;
-      white-space: nowrap;
-    }
 
     div.toolbar_placeholder{
       margin-top: 25px;

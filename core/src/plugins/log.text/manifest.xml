@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logdriver name="text" enabled="always" label="CONF_MESSAGE[Text logger]" description="CONF_MESSAGE[Stores the logs as readable tab delimited text.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/log.text/class.textLogDriver.php" classname="textLogDriver"/>
+    <class_definition filename="plugins/log.text/TextLogDriver.php" classname="Pydio\Log\Implementation\TextLogDriver"/>
     <client_settings>
         <resources>
             <i18n namespace="text_logger" path="plugins/log.text/i18n"/>

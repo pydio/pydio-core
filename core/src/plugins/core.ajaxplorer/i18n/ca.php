@@ -17,7 +17,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	Catalan translation: Jose Fco Martinez <josefmc.martinez@gmail.com>
 //	Catalan translation: Salva Gómez <salva.gomez at gmail.com> 2015
@@ -51,7 +51,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "Fitxer",
 "24" => "Directori superior",
-"25" => "Envía un fitxer o més (max ".ConfService::getConf('UPLOAD_MAX_NUMBER').") al directori: ",
+"25" => "Envía un fitxer o més (max ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") al directori: ",
 "26" => "Crear nou arxiu en: ",
 "27" => "Envia",
 "28" => "Crear nou arxiu en: ",
@@ -593,7 +593,6 @@ $mess=array(
 "534" => "Contrasenya emprada per acceder",
 "535" => "Enviar contrasenya per correu electrònic",
 "536" => "Enviar un correu electrònic de benvinguda incloent la contrasenya per al nou usuari",
-
 "plugtype.title.access" => "Drivers de repositori",
 "plugtype.desc.access" => "Plugins que defineixen com un repositori accedirà tant al seu back-end (sistema d'arxius o similar) i a les principals accions y dissenys.",
 "plugtype.title.action" => "Plugins d'acció",
@@ -648,7 +647,11 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+
 );

@@ -37,10 +37,12 @@ class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectSingleNode(element, query){
-        try{
-            var res = element.selectSingleNode(query);
-            if(res) return res;
-        }catch(e){}
+        if(typeof element.selectSingleNode === "function"){
+            try{
+                var res = element.selectSingleNode(query);
+                if(res) return res;
+            }catch(e){}
+        }
 
         if(!XMLUtils.__xpe) {
             try{
@@ -74,17 +76,19 @@ class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectNodes(element, query){
-        try{
+        if(typeof element.selectNodes === "function"){
             try{
-                if(element.ownerDocument){
-                    element.ownerDocument.setProperty("SelectionLanguage", "XPath");
-                }else{
-                    element.setProperty("SelectionLanguage", "XPath");
-                }
+                try{
+                    if(element.ownerDocument && element.ownerDocument.setProperty){
+                        element.ownerDocument.setProperty("SelectionLanguage", "XPath");
+                    }else if(element.setProperty){
+                        element.setProperty("SelectionLanguage", "XPath");
+                    }
+                }catch(e){}
+                var res = Array.from(element.selectNodes(query));
+                if(res) return res;
             }catch(e){}
-            var res = Array.from(element.selectNodes(query));
-            if(res) return res;
-        }catch(e){}
+        }
 
         var xpe = XMLUtils.__xpe;
 

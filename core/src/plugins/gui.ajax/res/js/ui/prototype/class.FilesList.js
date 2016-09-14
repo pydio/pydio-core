@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -257,7 +257,13 @@ Class.create("FilesList", SelectableElements, {
 	getDomNode : function(){
 		return this.htmlElement;
 	},
-	
+
+    reSort: function(){
+        if(this._sortableTable){
+            this._sortableTable.sort(0, !!this.descending);
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
@@ -343,12 +349,12 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	contextObserver : function(e){
 		if(!this.crtContext || !this.htmlElement) return;
-		//console.log('FILES LIST : FILL');
-        var base = getBaseName(this.crtContext.getLabel());
-        if(!base){
-            try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
-        }
         if(!this.options.muteUpdateTitleEvent){
+            //console.log('FILES LIST : FILL');
+            var base = getBaseName(this.crtContext.getLabel());
+            if(!base){
+                try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
+            }
             this.htmlElement.fire("editor:updateTitle", base);
         }
         this.empty();
@@ -1403,9 +1409,7 @@ Class.create("FilesList", SelectableElements, {
     flushBulkUpdatingMode:function(){
         this.bulkUpdating = false;
         this.initRows();
-        if(this._sortableTable){
-            this._sortableTable.sort(0);
-        }
+        this.reSort();
     },
 
     getRenderer : function(){
@@ -1788,7 +1792,7 @@ Class.create("FilesList", SelectableElements, {
                 var textLabel = new Element("span", {
                     id          :'ajxp_label',
                     className   :'text_label'+fullview
-                }).update(metaData.get('text'));
+                }).update(he.escape(metaData.get('text')));
 
                 if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
                     textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
@@ -1935,7 +1939,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 		
 		innerSpan.insert({"bottom":img});
 		innerSpan.insert({"bottom":label});
@@ -2031,7 +2035,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 
 		innerSpan.insert({"bottom":img});
 		//newRow.insert({"bottom":label});
@@ -2284,7 +2288,7 @@ Class.create("FilesList", SelectableElements, {
 		elList.each(function(element){
 
             try{
-                var image_element = element.IMAGE_ELEMENT || element.down('img');
+                var image_element = element.IMAGE_ELEMENT /*|| element.down('img')*/;
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
             }catch(e){
                 return;
@@ -2399,6 +2403,9 @@ Class.create("FilesList", SelectableElements, {
 				rows[i].remove();
 			}
 		}
+        this.htmlElement.select("div[data-groupByValue] > h3").map(function(head){
+            head.remove();
+        });
 		if(!skipFireChange) this.fireChange();
         this.notify("rows:didClear");
 	},

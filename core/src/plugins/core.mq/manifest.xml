@@ -4,27 +4,63 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mq" path="plugins/core.mq/i18n"/>
-            <js className="AjxpMqObserver" file="plugins/core.mq/class.AjxpMqObserver.js"/>
+            <js className="PydioInstantMessenger" file="plugins/core.mq/class.PydioInstantMessenger.js"/>
         </resources>
     </client_settings>
     <server_settings>
-        <global_param group="CONF_MESSAGE[Inner Messaging]" type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin]" mandatory="false" default="mq.serial"/>
-        <global_param group="CONF_MESSAGE[Inner Messaging]" description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
 
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server is running]" label="CONF_MESSAGE[WebSocket]" name="WS_SERVER_ACTIVE" type="boolean" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect address]" label="CONF_MESSAGE[WS Client Address]" name="WS_SERVER_HOST" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client connect port]" label="CONF_MESSAGE[WS Client Port]" name="WS_SERVER_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket client secure connection]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SERVER_SECURE" type="boolean" expose="true" default="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind address]" label="CONF_MESSAGE[WS Server Host]" name="WS_SERVER_BIND_HOST" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket server bind port]" label="CONF_MESSAGE[WS Server Port]" name="WS_SERVER_BIND_PORT" type="string" expose="true" default="8090"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket handler path]" label="CONF_MESSAGE[WS Path]" name="WS_SERVER_PATH" type="string" expose="true"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" description="CONF_MESSAGE[WebSocket admin key]" label="CONF_MESSAGE[WS Key]" name="WS_SERVER_ADMIN" type="string"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="monitor" name="WS_STATUS" choices="run_plugin_action:core.mq:getWebSocketStatus" label="CONF_MESSAGE[WebSocket Server Status]" description="CONF_MESSAGE[Try to detect if the server is running correctly]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_ON" choices="run_plugin_action:core.mq:switchWebSocketOn" label="CONF_MESSAGE[Run WebSocket Server]" description="CONF_MESSAGE[Switch the WS server ON]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="button" name="SWITCH_WS_OFF" choices="run_plugin_action:core.mq:switchWebSocketOff" label="CONF_MESSAGE[Stop WebSocket Server]" description="CONF_MESSAGE[Switch the WS server OFF]" mandatory="false"/>
-        <global_param group="CONF_MESSAGE[WebSocket Server]" type="integer" name="POLLER_FREQUENCY" label="CONF_MESSAGE[Alternative poller frequency]" description="CONF_MESSAGE[If WebSocket server is not running, a polling mechanism will replace it. Fix the frequency of refresh, in seconds.]" mandatory="true" default="15" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="WS_ACTIVE" type="boolean" description="CONF_MESSAGE[WebSocket Server provides a server-to-client messaging feature, avoiding regular polling from browsers and sync applications, thus reducing the server load.]" label="CONF_MESSAGE[WebSocket Server]" default="false" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="UPLOAD_ACTIVE" description="CONF_MESSAGE[Pydio Upload Server is a unique feature used to delegate file uploads to our dedicated binary, that will send the files directly to the storage.]" label="CONF_MESSAGE[Upload Server]" type="boolean" expose="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_HOST" type="string" label="CONF_MESSAGE[Host]" description="CONF_MESSAGE[Host]" expose="true" default="127.0.0.1"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[Port]" expose="true" default="8090"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_MAIN_SECURE" type="boolean" label="CONF_MESSAGE[SSL]" description="CONF_MESSAGE[Use secure connection]" expose="true" default="true"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="NSQ_PORT" type="string" label="CONF_MESSAGE[NSQ Port]" description="CONF_MESSAGE[NSQ Port]" default="4150"/>
+        <global_param group="CONF_MESSAGE[Main Configurations]" name="BOOSTER_INTERNAL_CONNECTION" type="group_switch:booster_internal_connection" label="CONF_MESSAGE[Internal Connection]" description="CONF_MESSAGE[If different from default host/port]" default="same" mandatory="true"/>
+        <global_param group_switch_name="booster_internal_connection" group_switch_label="Same as external" group_switch_value="same" name="booster_internal_connection" type="hidden" label="same" description="custom" default="same"/>
+        <global_param group_switch_name="booster_internal_connection" group_switch_label="Custom" group_switch_value="custom" name="booster_internal_connection" type="hidden" label="custom" description="custom" default="custom"/>
+        <global_param group_switch_name="booster_internal_connection" group_switch_label="Custom" group_switch_value="custom" name="BOOSTER_INTERNAL_HOST" type="string" label="CONF_MESSAGE[Internal Host (if LAN IP is different from outside-world IP).]" description="CONF_MESSAGE[Internal Host]" default="127.0.0.1"/>
+        <global_param group_switch_name="booster_internal_connection" group_switch_label="Custom" group_switch_value="custom" name="BOOSTER_INTERNAL_PORT" type="string" label="CONF_MESSAGE[Internal Port (if LAN Port is different from outside-world Port).]" description="CONF_MESSAGE[Internal Host]" default="8090"/>
+
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" name="BOOSTER_ADV_WS_LEGEND" type="legend" label="" description="Customize URL's depending on the features."/>
+
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" name="BOOSTER_WS_ADVANCED" type="group_switch:booster_ws_advanced" label="CONF_MESSAGE[Websocket Network Configuration]" description="CONF_MESSAGE[Use custom URL's for websocket feature]" expose="true" default="same" mandatory="true"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Use main configurations" group_switch_value="same" name="booster_ws_advanced" type="hidden" label="same" description="same" default="same"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" name="booster_ws_advanced" type="hidden" label="custom" description="custom" default="custom"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[WebSocket host]" label="CONF_MESSAGE[WS Hostname]" name="WS_HOST" type="string" expose="true" default="localhost"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[WebSocket port]" label="CONF_MESSAGE[WS Port]" name="WS_PORT" type="string" expose="true" default="8090"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[WebSocket host]" label="CONF_MESSAGE[WS Hostname]" name="WS_HOST_INTERNAL" type="string" expose="false" default="localhost"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[WebSocket port]" label="CONF_MESSAGE[WS Port]" name="WS_PORT_INTERNAL" type="string" expose="false" default="8090"/>
+        <global_param group_switch_name="booster_ws_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[WebSocket secure]" label="CONF_MESSAGE[WS Client SSL]" name="WS_SECURE" type="boolean" expose="true" default="false"/>
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" description="CONF_MESSAGE[WebSocket path]" label="CONF_MESSAGE[WS Path]" name="WS_PATH" type="string" expose="true" default="ws"/>
+
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" name="BOOSTER_UPLOAD_ADVANCED" type="group_switch:booster_upload_advanced" label="CONF_MESSAGE[Uploader Network Configuration]" description="CONF_MESSAGE[Use custom URL's for uploader feature]" expose="true" default="same" mandatory="true"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Use main configurations" group_switch_value="same" name="booster_upload_advanced" type="hidden" label="same" description="same" default="same"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" name="booster_upload_advanced" type="hidden" label="custom" description="custom" default="custom"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[Upload Server host]" label="CONF_MESSAGE[Upload Server host]" name="UPLOAD_HOST" type="string" expose="true" default="localhost"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[Upload Server port]" label="CONF_MESSAGE[Upload Server port]" name="UPLOAD_PORT" type="string" expose="true" default="8090"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[Upload Server host]" label="CONF_MESSAGE[Upload Server host]" name="UPLOAD_HOST_INTERNAL" type="string" expose="false" default="localhost"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[Upload Server port]" label="CONF_MESSAGE[Upload Server port]" name="UPLOAD_PORT_INTERNAL" type="string" expose="false" default="8090"/>
+        <global_param group_switch_name="booster_upload_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[Upload Server secure]" label="CONF_MESSAGE[Upload Server secure]" name="UPLOAD_SECURE" type="boolean" expose="true" default="false"/>
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" description="CONF_MESSAGE[Upload Server path]" label="CONF_MESSAGE[Upload Server path]" name="UPLOAD_PATH" type="string" expose="true" default="io"/>
+
+        <global_param group="CONF_MESSAGE[Advanced Configurations]" name="BOOSTER_NSQ_ADVANCED" type="group_switch:booster_nsq_advanced" label="CONF_MESSAGE[Messaging Service Network Configuration]" description="CONF_MESSAGE[Use custom URL for nsq service]" default="same" mandatory="true"/>
+        <global_param group_switch_name="booster_nsq_advanced" group_switch_label="Use main configurations" group_switch_value="same" name="booster_nsq_advanced" type="hidden" label="same" description="same" default="same"/>
+        <global_param group_switch_name="booster_nsq_advanced" group_switch_label="Customize" group_switch_value="custom" name="booster_nsq_advanced" type="hidden" label="custom" description="custom" default="custom"/>
+        <global_param group_switch_name="booster_nsq_advanced" group_switch_label="Customize" group_switch_value="custom" description="CONF_MESSAGE[NSQ Host]" label="CONF_MESSAGE[NSQ Host]" name="NSQ_HOST" type="string" default="localhost" />
+
+        <global_param group="CONF_MESSAGE[Server Internals]" type="plugin_instance:mq" name="UNIQUE_MS_INSTANCE" label="CONF_MESSAGE[MQ Instance]" description="CONF_MESSAGE[Choose the plugin, sql should be the default value]" mandatory="false" default="mq.sql"/>
+        <global_param group="CONF_MESSAGE[Server Internals]" description="CONF_MESSAGE[Post the notification in a temporary queue. You must set up the scheduler accordingly to make sure the queue is then consumed on a regularly basis.]" label="CONF_MESSAGE[Queue notifications]" name="USE_QUEUE" type="boolean" default="false"/>
+        <global_param group="CONF_MESSAGE[Server Internals]" type="boolean" name="MQ_USE_WORKERS" label="CONF_MESSAGE[Use Workers (experimental)]" description="CONF_MESSAGE[Send commands in background to workers waiting to execute them]" mandatory="false" default="false"/>
+        <global_param group="CONF_MESSAGE[Server Internals]" type="monitor" name="MQ_WORKER_STATUS" choices="run_plugin_action:core.mq:getWorkerStatus" label="CONF_MESSAGE[Worker Status]" description="CONF_MESSAGE[Try to detect if the worker is responding]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Server Internals]" type="button" name="MQ_WORKER_SWITCH_ON" choices="run_plugin_action:core.mq:switchWorkerOn" label="CONF_MESSAGE[Start Worker]" description="CONF_MESSAGE[Switch a worker ON]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Server Internals]" type="button" name="MQ_WORKER_SWITCH_OFF" choices="run_plugin_action:core.mq:switchWorkerOff" label="CONF_MESSAGE[Stop Worker]" description="CONF_MESSAGE[Switch a worker OFF]" mandatory="false"/>
+
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="legend" name="MQ_LEGEND_ADMIN_KEY" description="CONF_MESSAGE[Pydio Booster uses an administrative API key pair to communicate with the server. If you start it manually, use the buttons below to generate or revoke key pairs. If you start using the admin dashboard, you should not need that.]" label="CONF_MESSAGE[Generate Key]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="button" name="MQ_GENERATE_ADMIN_KEY" choices="run_plugin_action:core.mq:generateAdminKey" label="CONF_MESSAGE[Generate API Key]" description="CONF_MESSAGE[Generate Key]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Administrative API Key]" type="button" name="MQ_REVOKE_ADMIN_KEY" choices="run_plugin_action:core.mq:revokeAdminKey" label="CONF_MESSAGE[Revoke existing API Key(s)]" description="CONF_MESSAGE[Revoke Key]" mandatory="false"/>
+
     </server_settings>
-    <class_definition classname="MqManager" filename="plugins/core.mq/class.MqManager.php"/>
+    <class_definition classname="Pydio\Mq\Core\MqManager" filename="plugins/core.mq/vendor/autoload.php"/>
     <registry_contributions>
         <actions>
             <action name="consume_notification_queue">
@@ -36,11 +72,11 @@
             <action name="client_register_channel">
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(!ajaxplorer.mqObserver && ajaxplorer.user && !ajaxplorer.mqObserverLoading && !window.ajxpMinisite){
-                            ajaxplorer.mqObserverLoading = true;
-                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.AjxpMqObserver.js', 'AjxpMqObserver', function(){
-                                ajaxplorer.mqObserver = new AjxpMqObserver();
+                    <clientListener name="init"><![CDATA[
+                        if(!pydio.mqObserver && !pydio.mqObserverLoading && !window.ajxpMinisite){
+                            pydio.mqObserverLoading = true;
+                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.PydioInstantMessenger.js', 'PydioInstantMessenger', function(){
+                                pydio.mqObserver = new PydioInstantMessenger();
                             }, true);
                         }
                     ]]></clientListener>
@@ -73,14 +109,16 @@
             </action>
             <action name="ws_authenticate" skipSecureToken="true">
                 <processing>
-                    <serverCallback methodName="wsAuthenticate"/>
+                    <serverCallback restParams="/" methodName="wsAuthenticate"/>
                 </processing>
             </action>
         </actions>
         <hooks>
             <serverCallback methodName="publishNodeChange" hookName="node.change" defer="true"/>
             <serverCallback methodName="sendInstantMessage" hookName="msg.instant" />
+            <serverCallback methodName="sendTaskMessage" hookName="msg.task" defer="true" dontBreakOnException="true"/>
             <serverCallback methodName="sendToQueue" hookName="msg.queue_notification" />
+            <serverCallback methodName="appendRefreshInstruction" hookName="response.send" dontBreakOnException="true"/>
         </hooks>
     </registry_contributions>
     <dependencies>

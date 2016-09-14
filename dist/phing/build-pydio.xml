@@ -141,12 +141,18 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
+        <!-- RUN COMPOSER IF NECESSARY INSIDE CORE -->
+        <phingcall target="composer">
+            <property name="plugin_abs_dir" value="${INNER_DIRECTORY}/core"/>
+        </phingcall>
+
+        <!-- RUN COMPOSER IF NECESSARY INSIDE PLUGINS -->
+        <phingcall target="iterate-plugins">
+            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+            <property name="target" value="composer"/>
+        </phingcall>
+
     	<!-- BUILD JAVASCRIPT -->
-        <!--
-    	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-        <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
-	    -->
         <phingcall target="iterate-plugins">
             <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
             <property name="target" value="grunt"/>
@@ -253,6 +259,12 @@
             </then>
         </if>
 
+        <phingcall target="add_update_triggers">
+            <property name="input_folder" value="${git.local_repository}/dist/php"/>
+            <property name="output_folder" value="${upgrade_export}/UPGRADE"/>
+            <property name="version" value="${build.version}"/>
+        </phingcall>
+
     </target>
 
     <target name="zip" description="Package as Zip archive">
@@ -317,6 +329,15 @@
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
                 ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+    </target>
+
+    <target name="add_update_triggers" description="Look for pre/post triggers and append them to the package">
+        <copy todir="${output_folder}" verbose="true">
+            <fileset dir="${input_folder}">
+                <include name="${version}-*-*.php"/>
+            </fileset>
+            <mapper type="regexp" from="^(.*)-(.*)-(.*).php" to="PHP--\3-\2.php"/>
+        </copy>
     </target>
 
     <target name="build_external_plugins">
@@ -543,6 +564,18 @@
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
                 <exec command="grunt" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
+            </then>
+        </if>
+    </target>
+
+    <target name="composer">
+        <if>
+            <available type="file" file="${plugin_abs_dir}/composer.json"/>
+            <then>
+                <exec command="composer install --optimize-autoloader"
+                      dir="${plugin_abs_dir}"
+                      passthru="true"
+                />
             </then>
         </if>
     </target>

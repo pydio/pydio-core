@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 // spanish translation: Ion Rey Bakaikoa <ionrei@gmail.com>, 2010
 // spanish corrections: Cristóbal Sabroe Yde <cristyde at gmail.com>, 2010
@@ -91,5 +91,7 @@ $mess=array(
     "72" => "Server QRCode",
     "73" => "Easily connect your mobile applications",
     "74" => "Scan this QRCode with your mobile application to easily configure the connection",
-
+    "75"=> "Search all files...",
+    "76" => "Access the %1 through the top-right menu",
+    "77" => "admin dashboard",
 );

@@ -5,7 +5,7 @@
         <plugin_author>FDecourt</plugin_author>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
-	<class_definition filename="plugins/action.timestamp/class.TimestampCreator.php" classname="TimestampCreator"/>
+	<class_definition filename="plugins/action.timestamp/TimestampCreator.php" classname="Pydio\Action\Timestamp\TimestampCreator"/>
 	<client_settings>
         <resources>
             <img_library alias="timestamp_images" path="plugins/action.timestamp/images"/>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <indexer id="index.lucene" label="CONF_MESSAGE[Lucene Search Engine]" description="CONF_MESSAGE[Zend_Search_Lucene implementation to index all files and search a whole repository quickly.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/index.lucene/class.AjxpLuceneIndexer.php" classname="AjxpLuceneIndexer"/>
+	<class_definition filename="plugins/index.lucene/LuceneIndexer.php" classname="Pydio\Access\Indexer\Implementation\LuceneIndexer"/>
     <client_settings>
         <resources>
             <img_library alias="lucene_images" path="plugins/index.lucene/resources/images"/>
@@ -54,11 +54,6 @@
 			</action>
 		</actions>
         <client_configs>
-            <template_part ajxpClass="AjxpTabulator" theme="vision" ajxpId="topPane" ajxpOptions='{"defaultTabId": "folders", "tabsTips":"top center", "tabInfos" : [{"id":"folders","label":"130", "title":"480","iconClass":"icon-folder-close","element":"folder_pane"},{"id":"shared","label":"363", "title":"481","iconClass":"mdi mdi-share-variant","element":"shared_elements"},{"id":"flagged","label":"147", "title":"482","iconClass":"icon-bookmark-empty","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'><![CDATA[
-                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
-                <div id="shared_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_shared"},"reloadOnServerMessage":"tree/reload_shared_elements","clearSelectionOnBlur":true}'></div>
-                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"search", "query":"keyword:ajxp_bookmarked"},"reloadOnServerMessage":"tree/reload_bookmarks","clearSelectionOnBlur":true}'></div>
-            ]]></template_part>
             <component_config className="AjxpReactComponent::left_navigator">
                 <additional_content
                         id="navigation_bookmarks"

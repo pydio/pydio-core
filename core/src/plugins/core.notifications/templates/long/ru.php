@@ -16,7 +16,7 @@
     * You should have received a copy of the GNU Affero General Public License
     * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
     *
-    * The latest code can be found at <http://pyd.io/>.
+    * The latest code can be found at <https://pydio.com>.
     */
 $mess=array(
     "file.add" => "Файл AJXP_NODE_LABEL создан пользователем AJXP_USER AJXP_DATE в папке AJXP_PARENT_PATH в рабочем пространстве AJXP_REPOSITORY_LABEL.",

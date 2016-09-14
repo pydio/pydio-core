@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Editeur de rôle",
@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Exclure l'utilisateur",
 "27" => "Réactiver l'utilisateur",
 "28" => "Forcer une mise à jour du mot de passe",
+"28b"=> "Annuler la mise à jour forcée du mot de passe",
 "29" => "Entrez le nouveau mot de passe pour cet utilisateur",
 "30" => "Confirmez",
 "31" => "ID rôle",

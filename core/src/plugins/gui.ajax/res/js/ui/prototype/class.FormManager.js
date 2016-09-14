@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -139,9 +139,9 @@ Class.create("FormManager", {
                     conn.onComplete = function(transport){
                         element.removeClassName('SF_inlineButtonWorking');
                         if(transport.responseText.startsWith('SUCCESS:')){
-                            ajaxplorer.displayMessage("SUCCESS", transport.responseText.replace("SUCCESS:", ""));
+                            pydio.displayMessage("SUCCESS", transport.responseText.replace("SUCCESS:", ""));
                         }else{
-                            ajaxplorer.displayMessage("ERROR", transport.responseText.replace("ERROR:", ""));
+                            pydio.displayMessage("ERROR", transport.responseText.replace("ERROR:", ""));
                         }
                         element.siblings().each(function(el){
                             if(el.pe) el.pe.onTimerEvent();
@@ -215,17 +215,14 @@ Class.create("FormManager", {
                         choices = ["loading|"+MessageHash[466]+"..."];
                         json_file = param.get("choices").split(":")[1];
                     }else if(param.get("choices") == "AJXP_AVAILABLE_LANGUAGES"){
-                        var object = window.ajxpBootstrap.parameters.get("availableLanguages");
                         choices = [];
-                        for(key in object){
-                            if(object.hasOwnProperty(key)){
-                                choices.push(key + "|" + object[key]);
-                            }
-                        }
+                        pydio.listLanguagesWithCallback(function(key, label){
+                            choices.push(key + '|' + label);
+                        });
                     }else if(param.get("choices") == "AJXP_AVAILABLE_REPOSITORIES"){
                         choices = [];
-                        if(ajaxplorer.user){
-                            ProtoCompat.map2hash(ajaxplorer.user.repositories).each(function(pair){
+                        if(pydio.user){
+                            ProtoCompat.map2hash(pydio.user.repositories).each(function(pair){
                                 choices.push(pair.value.getId() + '|' + pair.value.getLabel());
                             });
                         }
@@ -253,7 +250,7 @@ Class.create("FormManager", {
                     }else{
                         selectedString = (defaultValue == cValue ? ' selected' : '');
                     }
-                    element += '<option value="'+cValue+'"'+selectedString+'>'+cLabel+'</option>';
+                    element += '<option value="'+cValue+'"'+selectedString+'>'+he.escape(cLabel)+'</option>';
                 }
                 element += '</select><span class="select-styler"></span>';
             }else if(type == "image" && param.get("uploadAction")){

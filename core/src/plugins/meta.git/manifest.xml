@@ -5,7 +5,7 @@
         <core_relation packaged="true" tested_version="4.2.0"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
-    <class_definition classname="GitManager" filename="plugins/meta.git/class.GitManager.php"/>
+    <class_definition classname="Pydio\Access\Meta\Version\GitManager" filename="plugins/meta.git/GitManager.php"/>
     <client_settings>
         <resources>
             <i18n namespace="meta.git" path="plugins/meta.git/i18n"/>

@@ -16,11 +16,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
-defined('AJXP_EXEC') or die( 'Access not allowed');
+namespace Pydio\Tests;
 
-require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
+
+use Pydio\Core\Model\Context;
+use Pydio\Core\Utils\TextEncoder;
+
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package AjaXplorer_Plugins
@@ -28,12 +32,15 @@ require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
  */
 class fsAccessTest extends AbstractTest
 {
+    /**
+     * fsAccessTest constructor.
+     */
     public function __construct() { parent::__construct("Filesystem Plugin", ""); }
 
     /**
      * Test Repository
      *
-     * @param Repository $repo
+     * @param \Pydio\Access\Core\Model\Repository $repo
      * @return Boolean
      */
     public function doRepositoryTest($repo)
@@ -41,17 +48,17 @@ class fsAccessTest extends AbstractTest
         if ($repo->accessType != 'fs' ) return -1;
         // Check the destination path
         $this->failedInfo = "";
-        $safePath = $repo->getOption("PATH", true);
-        if(strstr($safePath, "AJXP_USER")!==false) return TRUE; // CANNOT TEST THIS CASE!
-        $path = $repo->getOption("PATH", false);
-        $createOpt = $repo->getOption("CREATE");
-        $create = (($createOpt=="true"||$createOpt===true)?true:false);
-        if (!$create && !@is_dir($path)) {
+        $safePath = $repo->getSafeOption("PATH");
+        if(strstr($safePath, "AJXP_USER")!==false) {
+            return TRUE;
+        } // CANNOT TEST THIS CASE!
+        $ctx = Context::emptyContext();
+        $path       = $repo->getContextOption($ctx, "PATH");
+        $createOpt  = $repo->getContextOption($ctx, "CREATE");
+        $create     = (($createOpt=="true"||$createOpt===true)?true:false);
+        if (!$create && !is_dir(TextEncoder::toStorageEncoding($path))) {
             $this->failedInfo .= "Selected repository path ".$path." doesn't exist, and the CREATE option is false"; return FALSE;
-        }/* else if ($create && !is_writeable($path)) {
-            $this->failedInfo .= "Selected repository path ".$path." isn't writeable"; return FALSE;
-        }*/
-        // Do more tests here
+        }
         return TRUE;
     }
 
