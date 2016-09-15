@@ -23,8 +23,10 @@ function updateSharePhpContent($installPath, $publicFolder){
 
     $sharePhpPath = $installPath."/".trim($publicFolder, "/")."/"."share.php";
     if(!is_file($sharePhpPath)){
-        echo "No share.php file was found in public folder. If it does exist, you may have to manually upgrade its content.";
+        echo "No share.php file was found in public folder. If it does exist, you may have to manually upgrade its content.\n";
+        return;
     }
+    echo "Upgrading content of share.php file\n";
     $folders = array_map(function($value){
         return "..";
     }, explode("/", trim($publicFolder, "/")));
@@ -45,8 +47,10 @@ function updateSharePhpContent($installPath, $publicFolder){
 function updateHtAccessContent($htAccessPath){
 
     if(!is_file($htAccessPath)){
-        echo "No htaccess file found. Skipping Htaccess update.";
+        echo "No htaccess file found. Skipping Htaccess update.\n";
+        return;
     }
+    echo "Upgrading content of Htaccess file\n";
     $lines = file($htAccessPath);
     $startRemoving = false;
     // Remove unnecessary lines
@@ -71,10 +75,28 @@ function updateHtAccessContent($htAccessPath){
 
 function awsSdkVersion(){
 
-    $s3Options = \Pydio\Core\Services\ConfService::getConfStorageImpl()->loadPluginConfig("access", "s3");
+    $s3Options = ConfService::getConfStorageImpl()->loadPluginConfig("access", "s3");
     if($s3Options["SDK_VERSION"] === "v2"){
         $s3Options["SDK_VERSION"] = "v3";
-        \Pydio\Core\Services\ConfService::getConfStorageImpl()->savePluginConfig("access.s3", $s3Options);
+        ConfService::getConfStorageImpl()->savePluginConfig("access.s3", $s3Options);
     }
 
 }
+
+function forceRenameConfFile($prefix){
+
+    // FORCE bootstrap_repositories copy
+    if (is_file(AJXP_INSTALL_PATH."/conf/$prefix.php".".new-".date("Ymd"))) {
+        rename(AJXP_INSTALL_PATH."/conf/$prefix.php", AJXP_INSTALL_PATH."/conf/$prefix.php.pre-update");
+        rename(AJXP_INSTALL_PATH."/conf/$prefix.php".".new-".date("Ymd"), AJXP_INSTALL_PATH."/conf/$prefix.php");
+    }
+
+
+}
+
+awsSdkVersion();
+updateHtAccessContent(AJXP_INSTALL_PATH."/.htaccess");
+updateSharePhpContent(AJXP_INSTALL_PATH, ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+forceRenameConfFile("bootstrap_conf");
+forceRenameConfFile("bootstrap_context");
+forceRenameConfFile("extensions.conf");

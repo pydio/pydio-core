@@ -1,16 +1,13 @@
-
-
-
-ALTER TABLE  `ajxp_log` CHANGE  `dirname`  `dirname` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL ,
-CHANGE  `basename`  `basename` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL ;
-
+ALTER TABLE  `ajxp_log` CHANGE  `dirname`  `dirname` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL , CHANGE  `basename`  `basename` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci NOT NULL ;
+/* SEPARATOR */
 ALTER TABLE  `ajxp_log` DROP INDEX `basename`;
+/* SEPARATOR */
 ALTER TABLE  `ajxp_log` DROP INDEX `dirname`;
-
+/* SEPARATOR */
 ALTER TABLE  `ajxp_log` ADD INDEX (  `user` ) ;
+/* SEPARATOR */
 ALTER TABLE  `ajxp_log` ADD INDEX (  `dirname`, `basename` ) ;
-
-
+/* SEPARATOR */
 CREATE TABLE IF NOT EXISTS `ajxp_tasks` (
   `uid` varchar(255) NOT NULL,
   `type` int(11) NOT NULL,

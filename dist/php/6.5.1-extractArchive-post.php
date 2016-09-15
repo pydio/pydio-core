@@ -90,3 +90,11 @@ function checkThemeUsed($themeName){
     }
 
 }
+
+checkPhpVersion('5.6.0');
+checkPluginUsed("conf", "serial");
+checkPluginUsed("auth", "serial");
+checkPluginUsed("auth", "cmsms");
+checkPluginUsed("access", "remote_fs");
+checkThemeUsed("vision");
+checkThemeUsed("umbra");
