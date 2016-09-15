@@ -127,9 +127,12 @@ class ApplicationState
             $uri = dirname($_SERVER["REQUEST_URI"]);
             $api = ConfService::currentContextIsRestAPI();
             if (!empty($api)) {
-                // Keep only before api base
-                $explode = explode($api . "/", $uri);
-                $uri = array_shift($explode);
+                if(strpos($uri, '/api/') === 0){
+                    $uri = '/';
+                }else{
+                    // Keep only before api base
+                    $uri = array_shift(explode("/api/", $uri));
+                }
             }
             return "$protocol://$name$port" . $uri;
         }

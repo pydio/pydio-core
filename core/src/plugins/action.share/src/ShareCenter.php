@@ -607,6 +607,8 @@ class ShareCenter extends Plugin
                     $subAction = "create_minisite";
                     if(!isSet($httpVars["simple_right_read"]) && !isSet($httpVars["simple_right_download"])){
                         $httpVars["simple_right_read"] = $httpVars["simple_right_download"] = "true";
+                    }else if(!isSet($httpVars["simple_right_read"]) && isSet($httpVars["simple_right_download"]) && !isSet($httpVars["simple_right_write"])){
+                        $httpVars["minisite_layout"] = "ajxp_unique_dl";
                     }
                     $httpVars["create_guest_user"] = "true";
                     if($httpVars["simple_share_type"] == "private" && !isSet($httpVars["guest_user_pass"])){
