@@ -588,7 +588,6 @@
                 <available type="dir" file="${upgrade_export}/plugins/${plugin}/src"/>
             </and>
             <then>
-                <pydio-read-package-json file="${plugin_abs_dir}/package.json"/>
                 <copy todir="${upgrade_export}/plugins/${plugin}/src">
                     <fileset dir="${local_repository_root}/plugins/${plugin}/src" defaultexcludes="false">
                         <include name="*/**"/>
