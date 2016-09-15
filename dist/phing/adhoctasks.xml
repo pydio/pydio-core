@@ -147,9 +147,11 @@ class PydioParseGitSummarize extends Task
                       $this->log("-- Skipping ".$path, Project::MSG_INFO);
                       continue;
                   }
-                  $end = str_replace($this->prefixPath, "", $path);
+                  $pref = str_replace("/", "\/", $this->prefixPath);
+                  $end = preg_replace("/^".$pref."/", "", $path);
               } else {
-                  $end = str_replace($this->sourceDir, '', $path);
+                  $pref = str_replace("/", "\/", $this->sourceDir);
+                  $end = preg_replace("/^".$pref."/", "", $path);
               }
               if (in_array($end, $this->ignores)) {
                   continue;
