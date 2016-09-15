@@ -1,5 +1,10 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+TODO : This is a temporary package for testing upgrade from v6 to v7
+
+----
+Pydio Core 6.4.2
+
 Pydio Core 6.4.2 fixes vulnerabilities discovered in remote download and some specific path filtering on Windows server OS. Installation is done via the "Stable" update channel in-app, or via Linux packages manager depending on your installation mode.
 
 [Most noticeable changes]
