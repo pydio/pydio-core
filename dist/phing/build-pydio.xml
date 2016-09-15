@@ -247,44 +247,35 @@
 		</copy>
 
 		<!-- ADDITIONAL UPGRADE SCRIPT -->
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.php"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
-			</then>
-		</if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="php"/>
+            <property name="target_name" value="PHP-SCRIPT"/>
+        </phingcall>
 
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.html"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
-			</then>
-		</if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="html"/>
+            <property name="target_name" value="NOTE-HTML"/>
+        </phingcall>
 
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
-			</then>
-		</if>
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.mysql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.mysql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.mysql"/>
-			</then>
-		</if>
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.pgsql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.pgsql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.pgsql"/>
-			</then>
-		</if>
-        <if>
-            <available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
-            <then>
-                <copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
-            </then>
-        </if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="sql"/>
+            <property name="target_name" value="DB-UPGRADE.sql"/>
+        </phingcall>
+
+        <phingcall target="add_update_script">
+            <property name="extension" value="mysql"/>
+            <property name="target_name" value="DB-UPGRADE.mysql"/>
+        </phingcall>
+
+        <phingcall target="add_update_script">
+            <property name="extension" value="pgsql"/>
+            <property name="target_name" value="DB-UPGRADE.pgsql"/>
+        </phingcall>
+
+        <phingcall target="add_update_script">
+            <property name="extension" value="sqlite"/>
+            <property name="target_name" value="DB-UPGRADE.sqlite"/>
+        </phingcall>
 
         <phingcall target="add_update_triggers">
             <property name="input_folder" value="${git.local_repository}/dist/php"/>
@@ -356,6 +347,15 @@
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
                 ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+    </target>
+
+    <target name="add_update_script" description="Additional upgrade scripts, requires extension and target_name properties">
+        <if>
+            <available type="file" file="${git.local_repository}/dist/php/${build.version}.${extension}"/>
+            <then>
+                <copy file="${git.local_repository}/dist/php/${build.version}.${extension}" toFile="${upgrade_export}/UPGRADE/${target_name}"/>
+            </then>
+        </if>
     </target>
 
     <target name="add_update_triggers" description="Look for pre/post triggers and append them to the package">
