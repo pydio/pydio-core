@@ -199,6 +199,23 @@
         </phingcall>
 
 
+        <!-- RE-RUN CORE COMPOSER IF NECESSARY (Any changes appeared in core/src) -->
+        <if>
+            <or>
+                <!-- There was a change in core/src, rerun to make sure autoloader is up-to-date -->
+                <available type="dir" file="${upgrade_export}/core/src"/>
+                <!-- There was a change in composer.json, rerun to make sure vendor/ is up-to-date -->
+                <available type="file" file="${upgrade_export}/core/composer.json"/>
+            </or>
+            <then>
+                <copy file="${git.local_repository}/core/src/core/composer.json" todir="${upgrade_export}/core" overwrite="true"/>
+                <phingcall target="composer">
+                    <property name="plugin_abs_dir" value="${upgrade_export}/core"/>
+                </phingcall>
+            </then>
+        </if>
+
+        <!-- RE-RUN COMPOSER & GRUNT IF NECESSARY ON PLUGINS -->
         <phingcall target="iterate-plugins">
             <property name="plugins_dir" value="${git.local_repository}/core/src/plugins"/>
             <property name="upgrade_export" value="${upgrade_export}"/>
@@ -517,6 +534,7 @@
 
     <!-- We should have a ${local_repository_root} and ${upgrade_export} from upper scope -->
     <target name="force-update-if-package-json">
+        <!-- Looking for package.json File -->
         <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
@@ -559,6 +577,30 @@
                     </fileset>
                 </copy>
                 <phingcall target="grunt">
+                    <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
+                </phingcall>
+            </then>
+        </if>
+        <!-- Looking for Composer.json File -->
+        <if>
+            <and>
+                <available file="${plugin_abs_dir}/composer.json"/>
+                <available type="dir" file="${upgrade_export}/plugins/${plugin}/src"/>
+            </and>
+            <then>
+                <pydio-read-package-json file="${plugin_abs_dir}/package.json"/>
+                <copy todir="${upgrade_export}/plugins/${plugin}/src">
+                    <fileset dir="${local_repository_root}/plugins/${plugin}/src" defaultexcludes="false">
+                        <include name="*/**"/>
+                    </fileset>
+                </copy>
+                <echo message="RERUN COMPOSER JS FOR PLUGIN ${plugin}"/>
+                <copy todir="${upgrade_export}/plugins/${plugin}">
+                    <fileset dir="${local_repository_root}/plugins/${plugin}">
+                        <include name="composer.json"/>
+                    </fileset>
+                </copy>
+                <phingcall target="composer">
                     <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
                 </phingcall>
             </then>
