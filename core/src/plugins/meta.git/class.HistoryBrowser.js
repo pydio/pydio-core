@@ -66,7 +66,6 @@ Class.create("HistoryBrowser", {
 
         this.toolbarObject = new ActionsToolbar(this.toolbar, {
             buttonRenderer : 'this',
-            skipBubbling: true,
             toolbarsList : $A(['history']),
             dataModelElementId: this.element.id
         });

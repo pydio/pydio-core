@@ -750,7 +750,7 @@ Class.create("SearchEngine", AjxpPane, {
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
                 $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results mdi mdi-close'></span><div id='display_toolbar'></div></div>"});
-                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
+                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],submenuOffsetTop:2});
                 this.tb.actionsLoaded({memo:pydio.getController().actions});
                 this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {

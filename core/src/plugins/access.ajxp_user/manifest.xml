@@ -32,7 +32,7 @@
                     <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
                         <div class="title-flex">
                             <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]<div class="legend">AJXP_MESSAGE[user_dash.49]</div></h3>
-                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"submenuOffsetTop":2}'></div>
                         </div>
                         <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                     </div>

@@ -20,7 +20,6 @@ Proto.Menu = Class.create({
 			pageOffset: 25,
 			topOffset:0,
 			leftOffset:0,
-			submenuArrow:ajxpResourcesFolder+'/images/arrow_right.png',
 			position:'bottom',
 			menuTitle:'',
             detailedItems: false,
@@ -213,10 +212,9 @@ Proto.Menu = Class.create({
 			}
 			if(item.subMenu){
 				var arrowContainer = new Element('div', {
-                    className:'menuActions' + (window.ajaxplorer.currentThemeUsesIconFonts?' icon-caret-right':''),
+                    className:'menuActions icon-caret-right',
                     style:'padding-right:7px;'
                 });
-				arrowContainer.insert(new Element('img', {src:this.options.submenuArrow, width:6,height:10}));
 				newItem.insert(arrowContainer);
                 newItem.setStyle({position:"relative"});
 			}
@@ -230,7 +228,7 @@ Proto.Menu = Class.create({
                 item.title = actionObject.options.title;
             }
             var img = '';
-            if(item.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){
+            if(item.icon_class){
                 img = new Element('span', {
                     className:item.icon_class + ' ajxp_icon_span',
                     title:item.alt

@@ -155,8 +155,6 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
             this.sharesToolbar = new ActionsToolbar(actionPane, {
                 toolbarsList:["share_list_toolbar-selection", "share_list_toolbar"],
-                skipBubbling:true,
-                skipCarousel:true,
                 submenuOffsetTop:2,
                 dataModelElementId:listPaneId
             });

@@ -63,7 +63,7 @@
                     <div id="files_list_pane" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height","fitParent":"cpane_container"}'>
                         <div id="files_list_header" ajxpClass="AjxpPane">
                             <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30}'>
-                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "info_panel_share","put"],"groupOtherToolbars":["more", "change_main", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+                                <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "info_panel_share","put"],"groupOtherToolbars":["more", "change_main", "change", "remote"], "groupOtherLabel":"More","submenuOffsetTop":2}'></div>
                             </div>
                         </div>
                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true},"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>

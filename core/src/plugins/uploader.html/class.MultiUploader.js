@@ -295,9 +295,9 @@ Class.create("MultiUploader", {
 			return;
 		}
 		var stateImg = $(row).select("img")[0];
-		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/yellowled.png';
-		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/greenled.png';
-		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/redled.png';
+		if(state == 'loading') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/yellowled.png';
+		else if(state == 'done') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/greenled.png';
+		else if(state == 'error') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/redled.png';
 	},
 	
 	
