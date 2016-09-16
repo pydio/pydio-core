@@ -85,6 +85,10 @@
         }
 
         static loadTasks(callback, params = null){
+            if(!global.pydio.user){
+                callback([]);
+                return;
+            }
             if(params){
                 params['get_action'] = 'tasks_list';
             }else{
