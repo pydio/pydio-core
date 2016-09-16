@@ -2311,31 +2311,29 @@ div#multiple_download_container div div a:hover {
 /* SLIDER*/
 /*********************************/
 .slider-pane {
-  background-color: #ebedf0;
-  padding: 5px 2px;
+  background-color: #ffffff;
+  padding: 10px 2px;
   position: absolute;
-  width: 11px;
+  width: 22px;
   z-index: 10000;
   border-radius: 2px;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.75);
 }
-.slider-handle,
-.slider-pane div.selected {
-  background-image: url('../images/slider-handle-vert.png') !important;
-  background-position: top center;
-  background-repeat: no-repeat !important;
-  background-color: transparent !important;
-  height: 15px;
+.slider-pane .slider-tracker {
+  background-color: #009688;
+  width: 2px !important;
+  margin-left: 10px;
+}
+.slider-pane .slider-tracker .slider-handle {
+  background-color: #009688 !important;
+  height: 10px;
   width: 10px;
+  margin-left: -4px;
+  border-radius: 50%;
+  cursor: pointer;
 }
-.slider-tracker {
-  background-image: url("../images/slider-track-bottom.png");
-  background-position: bottom center;
-  background-repeat: no-repeat;
-}
-.slider-tracker-top {
-  background-position: top center;
-  background-repeat: no-repeat;
+.slider-pane .slider-tracker .slider-tracker-top {
+  display: none;
 }
 .action_bar {
   line-height: 15px;
@@ -3226,9 +3224,6 @@ div.selection_ctrl_key {
 }
 .hsplitbar {
   height: 4px;
-  background-image: url('../images/hgrabber.gif');
-  background-repeat: no-repeat;
-  background-position: center;
   z-index: 1014;
 }
 .hsplitbar.active {
