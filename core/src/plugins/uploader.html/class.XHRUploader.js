@@ -24,7 +24,6 @@ Class.create("XHRUploader", {
     listTarget : null,
     mainForm: null,
     id : null,
-    rowAsProgressBar: false,
     dataModel: null,
     contextNode: null,
     currentBackgroundPanel: null,
@@ -46,8 +45,6 @@ Class.create("XHRUploader", {
 		
 		// Where to write the list
 		this.listTarget = formObject.down('div.uploadFilesList');
-
-        this.rowAsProgressBar = this.listTarget.hasClassName('rowAsProgressBar');
 
 		// How many elements?
 		this.count = 0;
@@ -273,14 +270,6 @@ Class.create("XHRUploader", {
             <span style="float:left;margin-left:10px;" id="uploadedString">'+MessageHash[256]+' : 0%</span>\
             </div>');
         }
-        var options = {
-            animate		: false,									// Animate the progress? - default: true
-            showText	: false,									// show text with percentage in next to the progressbar? - default : true
-            width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-            boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-            barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-            height		: 4										// Height of the progressbar - don't forget to adjust your image too!!!
-        };
         this.mainForm.down('#clear_list_button').observe("click", function(e){
             pydio.getController().multi_selector.clearList();
             pydio.getController().multi_selector.updateTotalData();
@@ -288,10 +277,6 @@ Class.create("XHRUploader", {
         this.optionPane = this.createOptionsPane();
         this.optionPane.loadData();
 
-        if(this.mainForm.down('#phBar_total')){
-            this.totalProgressBar = new JS_BRAMUS.jsProgressBar($('pgBar_total'), 0, options);
-            this.mainForm.PROGRESSBAR = this.totalProgressBar;
-        }
         this.totalStrings = $('totalStrings');
         this.uploadedString = $('uploadedString');
 
@@ -556,75 +541,13 @@ Class.create("XHRUploader", {
         }
 
 		var id = 'pgBar_' + (this.listTarget.childNodes.length + 1);
-        if(this.rowAsProgressBar){
-            this.createInnerProgressBar(item, id);
-        }else{
-            this.createProgressBar(item, id);
-        }
+        this.createInnerProgressBar(item, id);
 		item.file = file;
 		item.updateStatus('new');
 		this.updateTotalData();
         this.sendButton.removeClassName("disabled");
 	},
-	
-	createProgressBar : function(item, id){
-		var div = new Element('div', {id:id, style:'-moz-border-radius:2px;border-radius:2px;'});
-		div.setStyle({
-			border:'1px solid #ccc', 
-			backgroundColor: 'white',
-			marginTop: '7px',
-			height:'4px',
-			padding:0,
-			width:'154px'
-		});
-		var percentText = new Element('span', {style:"float:right;display:block;width:30px;text-align:center;"});
-		var statusText = new Element('span', {style:"float:right;display:block;width:66px;overflow:hidden;text-align:right;"});
-		var container = new Element('div', {style:'border:none;padding:0;padding-right:5px;color: #777;'});
-		container.insert(statusText);		
-		container.insert(percentText);		
-		container.insert(div);
-		item.insert(container);
-		item.percentText = percentText;
-		var options = {
-			animate		: false,
-			showText	: false,
-			width		: 154,
-			boxImage	: ajxpResourcesFolder+'/images/progress_box.gif',
-			barImage	: ajxpResourcesFolder+'/images/progress_bar.gif',
-			height		: 4
-		};
-		item.pgBar = new JS_BRAMUS.jsProgressBar(div, 0, options);
-		item.statusText = statusText;
-		item.updateProgress = function(computableEvent, percentage){
-			if(percentage == null){
-				percentage = Math.round((computableEvent.loaded * 100) / computableEvent.total);  
-	        	this.bytesLoaded = computableEvent.loaded;				
-			}
-			if(!this.percentValue || this.percentValue != percentage){
-				this.percentText.innerHTML = percentage + '%';
-				this.pgBar.setPercentage(percentage);
-			}
-			this.percentValue = percentage;
-		}.bind(item);
-        var oThis = this;
-		item.updateStatus = function(status){
-			this.status = status;
-            var messageIds = {
-                "new" : 433,
-                "loading":434,
-                "loaded":435,
-                "error":436
-            };
-            try{
-                status = window.MessageHash[messageIds[status]];
-            }catch(e){}
-            if(oThis.currentBackgroundPanel){
-                oThis.currentBackgroundPanel.update(item.file.name.stripTags() + ' ['+status+']');
-            }
-            this.statusText.innerHTML = "["+status+"]";
-		}.bind(item);
-	},
-	
+    
 	createInnerProgressBar : function(item, id){
 		var statusText = new Element('span', {className:"statusText"});
 		var percentText = new Element('span', {className:"percentText"});

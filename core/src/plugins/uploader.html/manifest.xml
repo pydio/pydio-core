@@ -58,7 +58,7 @@
                     </div>
                 </div>
                 <div id="uploader_options_pane"></div>
-                <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
+                <div id="upload_files_list" class="uploadFilesList"></div>
                 <div id="total_files_list"></div>
                 <input type="hidden" name="get_action" value="upload">
                 <input type="hidden" name="simple_uploader" value="true">

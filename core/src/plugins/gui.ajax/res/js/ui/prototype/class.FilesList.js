@@ -2203,16 +2203,7 @@ Class.create("FilesList", SelectableElements, {
 		var percent = parseInt( parseInt(ajxpNode.getMetadata().get("bytesize")) / parseInt(ajxpNode.getMetadata().get("target_bytesize")) * 100  );
 		var uuid = "ajxp_"+(new Date()).getTime();
 		var div = new Element('div', {style:'padding-left:3px;', className:'text_label'}).update('<span class="percent_text" style="line-height:19px;padding-left:5px;">'+percent+'%</span>');
-		var span = new Element('span', {id:uuid}).update('0%');		
-		var options = {
-			animate		: true,										// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 80,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: window.ajxpResourcesFolder+'/images/progress_box_80.gif',			// boxImage : image around the progress bar
-			barImage	: window.ajxpResourcesFolder+'/images/progress_bar_80.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
-            visualStyle : 'position:relative;'
-		};
+		var span = new Element('span', {id:uuid, className:'partSizeRender'}).update('0%');
         if(type == "detail" && element.down(".thumbnail_cell_metadata")){
             element.down(".thumbnail_cell_metadata").update(div);
         }else{
@@ -2243,7 +2234,6 @@ Class.create("FilesList", SelectableElements, {
 		}
 		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
 		window.setTimeout(function(){
-			span.pgBar = new JS_BRAMUS.jsProgressBar(span, percent, options);
 			var pe = new PeriodicalExecuter(function(){
 				if(!$(uuid)){ 
 					pe.stop();
@@ -2261,7 +2251,7 @@ Class.create("FilesList", SelectableElements, {
 						pydio.getController().fireAction("refresh");
 					}else{
 						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('data-target_size'))*100 );
-						$(uuid).pgBar.setPercentage(newPercentage);
+						$(uuid).setStyle({backgroundSize:newPercentage + '% 100%'});
 						$(uuid).next('span.percent_text').update(newPercentage+"%");
 					}
 				};
