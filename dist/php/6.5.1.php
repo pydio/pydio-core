@@ -21,12 +21,13 @@
 
 function updateSharePhpContent($installPath, $publicFolder){
 
+    $publicFolder = preg_replace("/^".str_replace(array("\\","/"), array("\\\\", "\/"), $installPath)."/", "", $publicFolder);
     $sharePhpPath = $installPath."/".trim($publicFolder, "/")."/"."share.php";
     if(!is_file($sharePhpPath)){
         echo "No share.php file was found in public folder. If it does exist, you may have to manually upgrade its content.\n";
         return;
     }
-    echo "Upgrading content of share.php file\n";
+    echo "Upgrading content of $sharePhpPath file\n";
     $folders = array_map(function($value){
         return "..";
     }, explode("/", trim($publicFolder, "/")));
