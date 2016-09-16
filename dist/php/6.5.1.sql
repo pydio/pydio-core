@@ -28,7 +28,6 @@ CREATE TABLE IF NOT EXISTS `ajxp_tasks` (
   `status_update` int(11) NOT NULL DEFAULT '0' COMMENT 'Last time the status was updated',
   PRIMARY KEY (`uid`),
   KEY `userId` (`userId`,`status`),
-  KEY `type` (`type`),
-  FULLTEXT KEY `nodes` (`nodes`)
+  KEY `type` (`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Task persistence layer';
 

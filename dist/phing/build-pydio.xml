@@ -283,6 +283,8 @@
             <property name="version" value="${build.version}"/>
         </phingcall>
 
+        <!-- FINALY, RECHECK CLEAN-FILES AS GIT MAY HAVE REGISTERED SOME DELETIONS THAT WE DO REQUIRE -->
+        <pydio-parse-git-summarize upgradeCleanFile="true" upgradeDir="${upgrade_export}" />
     </target>
 
     <target name="zip" description="Package as Zip archive">

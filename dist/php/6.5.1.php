@@ -51,20 +51,24 @@ function updateHtAccessContent($htAccessPath){
         return;
     }
     echo "Upgrading content of Htaccess file\n";
-    $lines = file($htAccessPath);
-    $startRemoving = false;
+    $lines = file($htAccessPath, FILE_IGNORE_NEW_LINES);
+    $removeFlag = false;
+    $newLines = [];
     // Remove unnecessary lines
     foreach($lines as $index => $line){
-        if(!$startRemoving && strpos($line, "RewriteRule ") !== 0){
-            continue;
-        }
-        if(trim($line) === 'RewriteRule (.*) index.php [L]'){
-            break;
+        if(!$removeFlag){
+            $newLines[] = $line;
+            if(trim($line) === "RewriteCond %{REQUEST_FILENAME} !-d"){
+                $removeFlag = true;
+            }
         }else{
-            unset($lines[$index]);
+            if(trim($line) === 'RewriteRule (.*) index.php [L]'){
+                $newLines[] = $line;
+                $removeFlag = false;
+            }
         }
     }
-    $contents = implode("\n", $lines);
+    $contents = implode("\n", $newLines);
     if(is_writable($htAccessPath)){
         file_put_contents($htAccessPath, $contents);
     }else{

@@ -27,7 +27,7 @@ function checkPhpVersion($version){
     if(version_compare(PHP_VERSION, $version) < 0){
         throw new Exception("For Pydio 7, PHP version must be greater or equal to $version, detected version is ".PHP_VERSION." - Upgrade aborted.");
     }else{
-        echo "Checking Php Version (".PHP_VERSION.") : OK";
+        echo "Checking Php Version (".PHP_VERSION.") : OK\n";
     }
 }
 
@@ -43,7 +43,7 @@ function checkPluginUsed($type, $name){
         if($p->getName() === $name){
             throw new Exception("You are currently using $type.$name as configuration storage. This was deprecated in Pydio 6 and is now removed in Pydio7. Aborting upgrade");
         }else{
-            echo "Checking plugin $type ($name) : OK";
+            echo "Checking plugin $type ($name) : OK\n";
         }
     }else if($type === "auth") {
         $p = ConfService::getAuthDriverImpl();
@@ -55,14 +55,15 @@ function checkPluginUsed($type, $name){
                 if (isSet($drivers[$name])) {
                     throw new Exception("You are currently using $type.$name for authentication backend. This was deprecated in Pydio 6 and is nowremoved in Pydio7. Aborting upgrade");
                 } else {
-                    echo "Checking plugin $type (" . implode(", ", array_keys($drivers)) . ") : OK";
+                    echo "Checking plugin $type (" . implode(", ", array_keys($drivers)) . ") : OK\n";
                 }
             }
-            echo "Checking plugin $type ($name) : OK";
+            echo "Checking plugin $type ($name) : OK\n";
         }
     }else if($type === "access"){
 
         // Check if a workspace is currently using this plugin
+        echo "Should check usage of plugin $type ($name) in active workspaces : TODO\n";
         
 
     }else{
@@ -70,7 +71,7 @@ function checkPluginUsed($type, $name){
         if(isSet($plugs[$name])){
             throw new Exception("You are currently using plugin $type.$name. This is removed in Pydio7. Please disable it before running upgrade. Aborting upgrade");
         }
-        echo "Checking plugin $type ($name) : OK";
+        echo "Checking plugin $type ($name) : OK\n";
     }
 
 }
@@ -86,7 +87,7 @@ function checkThemeUsed($themeName){
     if(isSet($options["GUI_THEME"]) && $options["GUI_THEME"] === $themeName){
         throw new Exception("You are currently using theme ".$options["GUI_THEME"]." which was removed from Pydio 7. If you want to be able to upgrade, you have to switch to Orbit theme. Aborting upgrade.");
     }else{
-        echo "Checking usage of remove theme ($themeName): OK";
+        echo "Checking usage of remove theme ($themeName): OK\n";
     }
 
 }
