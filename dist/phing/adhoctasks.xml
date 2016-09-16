@@ -137,7 +137,7 @@ class PydioParseGitSummarize extends Task
       }
 
       public function setUpgradeCleanFile($clean){
-        if($clean === "true") $this->upgradeCleanFile = true;
+           $this->upgradeCleanFile = true;
       }
 
       public function getUpgradeCleanFile(){
@@ -164,7 +164,7 @@ class PydioParseGitSummarize extends Task
 
       public function main()
       {
-           if($this->upgradeCleanFile){
+           if($this->upgradeCleanFile || empty($this->summarizeFile)){
                 $this->checkCleanFileFalsePositive();
                 return;
            }
