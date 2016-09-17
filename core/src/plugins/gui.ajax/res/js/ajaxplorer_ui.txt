@@ -21,7 +21,6 @@ js/vendor/scriptaculous/src/controls.js
 js/vendor/scriptaculous/src/slider.js
 js/vendor/prototype/cssfx.js
 js/vendor/prototype/proto.scroller.js
-js/vendor/prototype/carousel.js
 js/vendor/prototype/accordion.js
 js/vendor/webfx/xtree.js
 js/vendor/webfx/ajxptree.js

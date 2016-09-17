@@ -33,7 +33,6 @@ var gui_ajax_core = [
     'res/js/vendor/scriptaculous/src/slider.js',
     'res/js/vendor/prototype/cssfx.js',
     'res/js/vendor/prototype/proto.scroller.js',
-    'res/js/vendor/prototype/carousel.js',
     'res/js/vendor/prototype/accordion.js',
     'res/js/vendor/webfx/xtree.js',
     'res/js/vendor/webfx/ajxptree.js',
