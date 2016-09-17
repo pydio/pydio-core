@@ -25,16 +25,6 @@
   font-style: normal;
 }
 @font-face {
-  font-family: 'Open Sans Regular';
-  src: url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.eot');
-  src: url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.eot?iefix') format('eot'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.woff') format('woff'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.ttf') format('truetype'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.svg#webfont') format('svg');
-}
-@font-face {
-  font-family: 'Open Sans Light';
-  src: url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.eot');
-  src: url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.eot?iefix') format('eot'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.woff') format('woff'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.ttf') format('truetype'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.svg#webfont') format('svg');
-}
-@font-face {
   font-family: 'Roboto';
   font-weight: 300;
   src: url('../fonts/roboto-font/roboto-light.woff2') format('woff2'), url('../fonts/roboto-font/roboto-light.woff') format('woff');
@@ -99,7 +89,7 @@ html {
 input,
 textarea,
 .selectable {
-  font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
   -moz-user-select: text;
   -khtml-user-select: auto;
   -webkit-user-select: auto;
@@ -139,7 +129,7 @@ span.letter_badge {
   text-align: center;
   padding: 7px 0;
   font-size: 0.8em;
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 .kbd {
   padding: .1em .6em;
@@ -781,7 +771,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   background-color: #fdfce4;
 }
 .class-FilesList.fl-displayMode-list .table_rows_container span#ajxp_label {
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell {
   margin: 1px;
@@ -2825,7 +2815,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
   text-align: left;
   padding-right: 0;
   font-size: 40px;
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 #search_container.search_active div#search_form a {
   font-size: 1.6em;
@@ -6109,7 +6099,7 @@ textarea#myCode {
   border-left-color: #ccc;
 }
 .create_file_alt_link {
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
   font-style: italic;
   cursor: pointer;
 }
