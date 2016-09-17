@@ -89,12 +89,14 @@ html {
 input,
 textarea,
 .selectable {
-  font-family: Roboto, sans-serif;
   -moz-user-select: text;
   -khtml-user-select: auto;
   -webkit-user-select: auto;
   -ms-user-select: auto;
       user-select: auto;
+}
+input {
+  font-weight: 300;
 }
 *::-moz-focus-inner {
   border: none;
