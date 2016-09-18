@@ -66,6 +66,8 @@
             if(this._relativePath) {
                 fullPath += PathUtils.getDirname(this._relativePath);
             }
+            let currentRepo = global.pydio.user.activeRepository;
+
             let queryString = '&get_action=upload&xhr_uploader=true&dir=' + encodeURIComponent(fullPath);
 
             let dataModel = global.pydio.getContextHolder();
@@ -75,19 +77,26 @@
                 newNode.getMetadata().set("filesize", this._file.size);
             }
             try{
-                dataModel.applyCheckHook(newNode);
+                let params = null;
+                if(currentRepo !== this._repositoryId) {
+                    params = {tmp_repository_id:this._repositoryId};
+                }
+                dataModel.applyCheckHook(newNode, params);
             }catch(e){
                 throw new Error('Error while checking before uploads');
             }
             let overwriteStatus = UploaderConfigs.getInstance().getOption("DEFAULT_EXISTING", "upload_existing");
             if(overwriteStatus === 'rename'){
                 queryString += '&auto_rename=true';
-            }else if(overwriteStatus === 'alert' && !this._relativePath){
+            }else if(overwriteStatus === 'alert' && !this._relativePath && currentRepo === this._repositoryId){
                 if(dataModel.fileNameExists(nodeName, false, this._targetNode)){
                     if(!global.confirm(MessageHash[124])){
                         throw new Error('File already exists');
                     }
                 }
+            }
+            if(currentRepo !== this._repositoryId){
+                queryString += '&tmp_repository_id=' + this._repositoryId;
             }
             return queryString;
         }
@@ -252,6 +261,7 @@
             if(this.getAutoStart() && !this._processing.length) {
                 this.processNext();
             } // Autostart with queue was empty before
+            UploadTask.getInstance().setRunning(this.getQueueSize());
             this.notify('update');
         }
         pushFile(uploadItem){
@@ -263,6 +273,7 @@
             if(this.getAutoStart() && !this._processing.length) {
                 this.processNext();
             } // Autostart with queue was empty before
+            UploadTask.getInstance().setRunning(this.getQueueSize());
             this.notify('update');
         }
         log(){

@@ -124,7 +124,7 @@ div#upload_files_list{
 
   border: 1px solid rgba(0,0,0,0.13);
 
-  div {
+  > div {
     .dotted_container_item_mixin();
     &.header{
       padding: 8px 14px;
@@ -149,7 +149,15 @@ div#upload_files_list{
       display: inline-block;
       margin: 4px 10px;
     }
-
+    div.uploader-pgbar{
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      background-color: @primary-1-color;
+      height: 2px;
+      width: 0;
+      transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+    }
   }
 
   span.item_relative_path{

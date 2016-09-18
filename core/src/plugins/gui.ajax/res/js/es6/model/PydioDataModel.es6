@@ -685,13 +685,13 @@ class PydioDataModel extends Observable{
 
 	}
 
-    applyCheckHook (node){
-        "use strict";
+    applyCheckHook (node, additionalParams = null){
+        
         var client = PydioApi.getClient();
         var result;
         client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function(transport){
             result = client.parseXmlMessage(transport.responseXML);
-        });
+        }, additionalParams);
         if(result === false){
             throw new Error("Check failed");
         }

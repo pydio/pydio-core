@@ -323,13 +323,16 @@ class PydioApi{
 
     }
 
-    applyCheckHook(node, hookName, hookArg, completeCallback){
+    applyCheckHook(node, hookName, hookArg, completeCallback, additionalParams){
         var params = {
             get_action : "apply_check_hook",
             file       : node.getPath(),
             hook_name  : hookName,
             hook_arg   : hookArg
         };
+        if(additionalParams){
+            params = LangUtils.objectMerge(params, additionalParams);
+        }
         this.request(params, completeCallback, null, {async:false});
     }
 

@@ -136,14 +136,15 @@
                 var relativeMessage = <span className="path">{this.props.item.getRelativePath()}</span>;
             }
             if(this.state && this.state.progress){
-                style = {backgroundSize: this.state.progress + '% 100%'};
+                style = {width: this.state.progress + '%'};
             }
             return (
-                <div style={style} className="file-row">
+                <div className="file-row">
                     <span className="mdi mdi-file"/> {this.props.item.getFile().name}
                     {relativeMessage}
                     <span className="status">{statusMessage}</span>
                     {stopButton}
+                    <div className="uploader-pgbar" style={style}/>
                 </div>
             );
         }
@@ -192,20 +193,18 @@
             }
             items.sort(function(a, b){
                 let aType = a instanceof UploaderModel.FolderItem? 'folder' : 'file';
-                let aString = a.getLabel();
                 let bType = b instanceof UploaderModel.FolderItem? 'folder' : 'file';
-                let bString = b.getLabel();
                 if(aType === bType){
-                    return aString.localeCompare(bString);
+                    return 0;
                 }else{
                     return aType === 'folder' ? -1 : 1;
                 }
             });
             items.forEach(function(f){
                 if(f instanceof UploaderModel.FolderItem){
-                    accumulator.push( <TransferFolder item={f} /> );
+                    accumulator.push( <TransferFolder key={f.getLabel()} item={f} /> );
                 }else{
-                    accumulator.push( <TransferFile item={f} /> );
+                    accumulator.push( <TransferFile key={f.getLabel()} item={f} /> );
                 }
             });
         },

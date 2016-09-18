@@ -2114,7 +2114,7 @@ div#total_files_list {
 div#upload_files_list {
   border: 1px solid rgba(0, 0, 0, 0.13);
 }
-div#upload_files_list div {
+div#upload_files_list > div {
   overflow: hidden;
   padding: 16px 14px;
   height: 20px;
@@ -2127,33 +2127,42 @@ div#upload_files_list div {
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
-div#upload_files_list div rect {
+div#upload_files_list > div rect {
   fill: #ffffff;
 }
-div#upload_files_list div.header {
+div#upload_files_list > div.header {
   padding: 8px 14px;
   font-weight: 500;
   font-size: 13px;
   color: #636e75;
   border-bottom: 0;
 }
-div#upload_files_list div span.mdi.mdi-file,
-div#upload_files_list div span.mdi.mdi-folder {
+div#upload_files_list > div span.mdi.mdi-file,
+div#upload_files_list > div span.mdi.mdi-folder {
   margin: 0 8px 0 0;
 }
-div#upload_files_list div span.status,
-div#upload_files_list div span.path {
+div#upload_files_list > div span.status,
+div#upload_files_list > div span.path {
   font-size: 11px;
   display: inline-block;
   margin: 0 6px;
   color: rgba(0, 0, 0, 0.53);
 }
-div#upload_files_list div span.stop-button {
+div#upload_files_list > div span.stop-button {
   cursor: pointer;
   color: #6b7781;
   float: right;
   display: inline-block;
   margin: 4px 10px;
+}
+div#upload_files_list > div div.uploader-pgbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #009688;
+  height: 2px;
+  width: 0;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 div#upload_files_list span.item_relative_path {
   color: #5f5f5f;
