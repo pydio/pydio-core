@@ -899,6 +899,17 @@
             this.refs.fileInput.getDOMNode().click();
         },
 
+        onFolderPicked: function(e){
+            if(this.props.onFolderPicked){
+                this.props.onFolderPicked(e.target.files);
+            }
+        },
+
+        openFolderPicker: function(){
+            this.refs.folderInput.getDOMNode().setAttribute("webkitdirectory", "true");
+            this.refs.folderInput.getDOMNode().click();
+        },
+
         render: function() {
 
             var className = this.props.className || 'dropzone';
@@ -914,10 +925,13 @@
             if(this.props.style){
                 style = LangUtils.objectMerge(this.props.style, style);
             }
-
+            if(this.props.enableFolders){
+                var folderInput = <input style={{display:'none'}} name="userfolder" type="file" ref="folderInput" onChange={this.onFolderPicked}/>;
+            }
             return (
                 <div className={className} style={style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
                     <input style={{display:'none'}} name="userfile" type="file" multiple={this.props.multiple} ref="fileInput" onChange={this.onDrop} accept={this.props.accept}/>
+                    {folderInput}
                 {this.props.children}
                 </div>
             );
@@ -1991,6 +2005,7 @@
     PydioForm.FormPanel = PydioFormPanel;
     PydioForm.PydioHelper = PydioFormHelper;
     PydioForm.HelperMixin = HelperMixin;
+    PydioForm.FileDropZone = FileDropzone;
 
     global.PydioForm = PydioForm;
 

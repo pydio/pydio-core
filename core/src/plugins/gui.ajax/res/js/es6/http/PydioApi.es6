@@ -81,16 +81,26 @@ class PydioApi{
         }
     }
 
+    /**
+     * 
+     * @param file
+     * @param fileParameterName
+     * @param queryStringParams
+     * @param onComplete
+     * @param onError
+     * @param onProgress
+     * @returns XHR Handle to abort transfer
+     */
     uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}){
 
         if(window.Connexion){
             var c = new Connexion();
-            c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
+            return c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
         }else if(window.jQuery){
             var formData = new FormData();
             formData.append(fileParameterName, file);
             queryStringParams += '&secure_token' + this._secureToken;
-            jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
+            return jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
                 method:'POST',
                 data:formData,
                 complete:onComplete,

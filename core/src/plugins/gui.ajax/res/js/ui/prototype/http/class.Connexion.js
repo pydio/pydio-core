@@ -235,7 +235,8 @@ Class.create("Connexion", {
         }else if(file.getAsBinary){
             this.xhrSendAsBinary(xhr, file.name, file.getAsBinary(), fileParameterName)
         }
-
+        return xhr;
+        
     },
 
     initializeXHRForUpload : function(url, onComplete, onError, onProgress){
