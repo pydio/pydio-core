@@ -995,7 +995,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: inline-block;
   width: 80px;
   height: 20px;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
@@ -2024,8 +2024,7 @@ div#multiple_download_container {
   overflow: auto;
   height: 350px;
   text-align: left;
-  border-radius: 2px;
-  background-color: rgba(239, 239, 239, 0.52);
+  border-radius: 1px;
 }
 .droparea {
   background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
@@ -2068,74 +2067,98 @@ div#multiple_download_container {
   cursor: default;
   border-bottom: 3px solid #ff5722;
 }
-div#uploader_options_pane {
+div.upload-options-pane {
   position: absolute;
-  right: 10px;
+  top: 0;
+  right: 0;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16), 0 1px 6px rgba(0, 0, 0, 0.23);
-  background-color: white;
-  font-size: 11px;
-  height: 59px;
-  overflow: hidden;
-  padding: 12px 20px 20px;
-  text-align: right;
-  display: none;
-  margin-bottom: 11px;
-  margin-top: -2px;
-  margin-right: 2px;
-  z-index: 2;
+  padding: 16px;
+}
+div.upload-options-pane .option-row {
+  padding: 8px 0;
+}
+div.upload-options-pane .close-options {
+  float: right;
+  cursor: pointer;
+  display: inline-block;
+}
+div.upload-options-pane .mui-radio-button {
+  margin: 12px 0;
+}
+div.uploader-action-bar {
+  margin-bottom: 10px;
+}
+div.uploader-action-bar > button,
+div.uploader-action-bar > div {
+  margin-right: 5px;
 }
 div#total_files_list {
   display: none !important;
 }
-div#uploader_options_pane input {
-  width: 15px;
-  margin-right: 0;
-  margin-left: 0;
-  margin-top: 5px;
-}
 .dotted_container_item_mixin {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
+  padding: 16px 14px;
   height: 20px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
 .dotted_container_item_mixin rect {
   fill: #ffffff;
 }
+div#upload_files_list {
+  border: 1px solid rgba(0, 0, 0, 0.13);
+}
 div#upload_files_list div {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
+  padding: 16px 14px;
   height: 20px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
 div#upload_files_list div rect {
   fill: #ffffff;
 }
+div#upload_files_list div.header {
+  padding: 8px 14px;
+  font-weight: 500;
+  font-size: 13px;
+  color: #636e75;
+  border-bottom: 0;
+}
+div#upload_files_list div span.mdi.mdi-file,
+div#upload_files_list div span.mdi.mdi-folder {
+  margin: 0 8px 0 0;
+}
+div#upload_files_list div span.status,
+div#upload_files_list div span.path {
+  font-size: 11px;
+  display: inline-block;
+  margin: 0 6px;
+  color: rgba(0, 0, 0, 0.53);
+}
+div#upload_files_list div span.stop-button {
+  cursor: pointer;
+  color: #6b7781;
+  float: right;
+  display: inline-block;
+  margin: 4px 10px;
+}
 div#upload_files_list span.item_relative_path {
   color: #5f5f5f;
   margin-left: 15px;
   font-size: 0.8em;
-}
-div#upload_files_list img {
-  margin-right: 6px;
 }
 div#upload_files_list img.fakeUploadButton {
   display: none;
@@ -2183,17 +2206,15 @@ div#upload_files_list span.mdi-close:hover {
 }
 div#multiple_download_container div {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
+  padding: 16px 14px;
   height: 20px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
 div#multiple_download_container div rect {
@@ -6161,6 +6182,7 @@ div#external_download > div input {
   width: 380px !important;
 }
 div.dialogBox.form-originalUploadForm #modalCloseBtn,
+div.dialogBox.form-upload_main_container #modalCloseBtn,
 div.dialogBox.form-jumploader_form #modalCloseBtn,
 div.dialogBox.form-external_download #modalCloseBtn,
 div.dialogBox.form-smplayer_editor #modalCloseBtn,

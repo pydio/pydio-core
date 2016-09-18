@@ -18,3 +18,4 @@ composer.lock
 /plugins/access.ajxp_home/res/build
 /plugins/access.inbox/res/build
 /plugins/core.mailer/js/build
+/plugins/uploader.html/js/build
