@@ -58,6 +58,11 @@
             TaskAPI.updateTaskStatus(this, Task.STATUS_COMPLETE);
         }
 
+        hasOpenablePane(){
+            return false;
+        }
+        openDetailPane(){}
+
     }
 
     Task.STATUS_PENDING = 1;
@@ -195,14 +200,22 @@
                         global.pydio.notify("poller.frequency", {});
                     }
                 }.bind(this));
-                // Add local tasks
-                if(this._localTasks){
-                    this._localTasks.forEach(function(lT){
-                        this._tasksList.set(lT.getId(), lT);
-                    }.bind(this));
-                }
+            }
+            // Add local tasks
+            if(this._localTasks){
+                this._localTasks.forEach(function(lT){
+                    this._tasksList.set(lT.getId(), lT);
+                }.bind(this));
             }
             return this._tasksList;
+        }
+
+        enqueueLocalTask(task){
+            if(!this._localTasks) {
+                this._localTasks = new Map();
+            }
+            this._localTasks.set(task.getId(), task);
+            this.notify("tasks_updated");
         }
 
         static enqueueActionTask(label, action, parameters = {}, nodes = [], flags = Task.FLAG_STOPPABLE, targetUsers = null, targetRepositories = null){
@@ -216,13 +229,6 @@
                 nodes: nodes
             };
             TaskAPI.createTask(new Task(task), targetUsers, targetRepositories);
-        }
-
-        static enqueueLocalTask(task){
-            if(!this._localTasks) {
-                this._localTasks = new Map();
-            }
-            this._localTasks.set(task.getId(), task);
         }
 
     }
@@ -245,10 +251,8 @@
             let t = this.props.task;
 
             let actions;
-            if(t.getStatus() == Task.STATUS_RUNNING){
-                if(t.isStoppable()){
-                    actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
-                }
+            if(t.getStatus() == Task.STATUS_RUNNING && t.isStoppable()){
+                actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
             }else{
                 actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
             }
@@ -273,28 +277,18 @@
 
         render: function(){
             let t = this.props.task;
-            let actions;
             let scopeInfo;
             if(this.props['adminDisplayScope'] && this.props.adminDisplayScope === 'repository'){
                 scopeInfo = "["+ this.props.task.getUserId() +"] ";
             }
-            if(t.getStatus() == Task.STATUS_RUNNING){
-                if(t.isStoppable()){
-                    actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
-                }
-            }else{
-                actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
-            }
-            if(t.hasProgress()){
-                actions = (
-                    <div className="radial-progress">
-                        <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
-                    </div>
-                );
+            let click, clickStyle;
+            if(this.props.task.hasOpenablePane()){
+                click = this.props.task.openDetailPane.bind(this);
+                clickStyle = {cursor:'pointer'};
             }
             return (
                 <div className="task">
-                    <div className="task_texts">
+                    <div className="task_texts" onClick={click} style={clickStyle}>
                         <div className="task_label">{scopeInfo}{t.getLabel()}</div>
                         <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
                     </div>
