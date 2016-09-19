@@ -140,7 +140,7 @@
                 this.tryAlternativeUpload(complete, progress, function(){
                     // Failed, switch back to normal upload.
                     this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,complete,error,progress);
-                });
+                }.bind(this));
 
             }else{
 
