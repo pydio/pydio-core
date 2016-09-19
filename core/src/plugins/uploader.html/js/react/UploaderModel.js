@@ -180,7 +180,6 @@
                 queryString += 'auto_rename=true';
             }
             try{
-                console.log(url);
                 this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,completeCallback,errorCallback,progressCallback, url, {withCredentials:true});
             }catch(e){
                 errorCallback();
