@@ -91,7 +91,8 @@
     var TransferFile = React.createClass({
 
         propTypes: {
-            item: React.PropTypes.object.isRequired
+            item: React.PropTypes.object.isRequired,
+            className:React.PropTypes.string
         },
 
         componentDidMount: function(){
@@ -139,7 +140,7 @@
                 style = {width: this.state.progress + '%'};
             }
             return (
-                <div className="file-row">
+                <div className={"file-row upload-" + this.props.item.getStatus() + " " + (this.props.className?this.props.className:"")}>
                     <span className="mdi mdi-file"/> {this.props.item.getFile().name}
                     {relativeMessage}
                     <span className="status">{statusMessage}</span>
@@ -162,7 +163,7 @@
                 statusMessage = 'Created';
             }
             return (
-                <div className="folder-row">
+                <div className={"folder-row upload-" + this.props.item.getStatus() + " " + (this.props.className?this.props.className:"")}>
                     <span className="mdi mdi-folder"/> {this.props.item.getPath()} <span className="status">{statusMessage}</span>
                 </div>
             );
@@ -187,9 +188,9 @@
             }
         },
 
-        renderSection: function(accumulator, items, title = ""){
+        renderSection: function(accumulator, items, title = "", className=""){
             if(title && items.length){
-                accumulator.push(<div className="header">{title}</div>);
+                accumulator.push(<div className={className + " header"}>{title}</div>);
             }
             items.sort(function(a, b){
                 let aType = a instanceof UploaderModel.FolderItem? 'folder' : 'file';
@@ -202,9 +203,9 @@
             });
             items.forEach(function(f){
                 if(f instanceof UploaderModel.FolderItem){
-                    accumulator.push( <TransferFolder key={f.getLabel()} item={f} /> );
+                    accumulator.push( <TransferFolder key={f.getId()} item={f} className={className}/> );
                 }else{
-                    accumulator.push( <TransferFile key={f.getLabel()} item={f} /> );
+                    accumulator.push( <TransferFile key={f.getId()} item={f} className={className}/> );
                 }
             });
         },
@@ -212,12 +213,12 @@
         render: function(){
             let items = [];
             if(this.state && this.state.items){
-                this.renderSection(items, this.state.items.processing, 'Processing');
-                this.renderSection(items, this.state.items.pending, 'Pending');
-                this.renderSection(items, this.state.items.processed, 'Processed');
+                this.renderSection(items, this.state.items.processing, 'Processing', 'section-processing');
+                this.renderSection(items, this.state.items.pending, 'Pending', 'section-pending');
+                this.renderSection(items, this.state.items.processed, 'Processed', 'section-processed');
             }
             return (
-                <div id="upload_files_list">
+                <div id="upload_files_list" className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
                     {items}
                 </div>
             )
@@ -249,6 +250,11 @@
                 toggleStart = !toggleStart;
                 this.state.configs.updateOption('upload_auto_close', toggleStart, true);
             }else if(fName === 'existing'){
+                this.state.configs.updateOption('upload_existing', event.target.getSelectedValue());
+            }else if(fName === 'show_processed'){
+                let toggleShowProcessed = this.state.configs.getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false);
+                toggleShowProcessed = !toggleShowProcessed;
+                this.state.configs.updateOption('upload_show_processed', toggleShowProcessed, true);
             }
             this.setState({random: Math.random()});
         },
@@ -264,6 +270,7 @@
             let maxUploadMessage = MessageHash[282] + ':' + PathUtils.roundFileSize(maxUpload, '');
             let toggleStart = this.state.configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send');
             let toggleClose = this.state.configs.getOptionAsBool('DEFAULT_AUTO_CLOSE', 'upload_auto_close');
+            let toggleShowProcessed = this.state.configs.getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false);
             let overwriteType = this.state.configs.getOption('DEFAULT_EXISTING', 'upload_existing');
 
             return (
@@ -272,6 +279,7 @@
                     <div className="option-row">{maxUploadMessage}</div>
                     <div className="option-row"><ReactMUI.Toggle label="Start uploading automatically" labelPosition="right" toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')}/></div>
                     <div className="option-row"><ReactMUI.Toggle label="Close panel after upload is finished" labelPosition="right"  toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')}/></div>
+                    <div className="option-row"><ReactMUI.Toggle label="Show/hide processed files" labelPosition="right"  toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')}/></div>
                     <div className="option-row">
                         <div style={{marginBottom: 10}}>If a file with the same name exists</div>
                         <ReactMUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>

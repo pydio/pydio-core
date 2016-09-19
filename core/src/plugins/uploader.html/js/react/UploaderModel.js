@@ -5,6 +5,10 @@
             super();
             this._status = 'new';
             this._type = type;
+            this._id = Math.random();
+        }
+        getId(){
+            return this._id;
         }
         getLabel(){
 
@@ -24,6 +28,7 @@
         }
         abort(completeCallback){
             if(this._status !== 'loading') return;
+            console.log('Should Stop XHR');
             this._doAbort(completeCallback);
         }
     }
@@ -306,7 +311,7 @@
             let processable = this.getNext();
             if(processable){
                 this._processing.push(processable);
-                UploadTask.getInstance().setRunning(this.getQueueSize() + 1);
+                UploadTask.getInstance().setRunning(this.getQueueSize());
                 processable.process(function(){
                     this._processing = LangUtils.arrayWithout(this._processing, this._processing.indexOf(processable));
                     this._processed.push(processable);
