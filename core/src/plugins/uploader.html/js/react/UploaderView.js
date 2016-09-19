@@ -125,10 +125,10 @@
             };
             let statusMessage = this.props.item.getStatus();
             let stopButton;
-            if(statusMessage === 'new'){
-                stopButton = <span className="stop-button mdi mdi-close" onClick={this.abortTransfer}/>;
-            }else if(statusMessage === 'loading'){
+            if(statusMessage === 'loading'){
                 stopButton = <span className="stop-button icon-stop" onClick={this.abortTransfer}/>;
+            }else{
+                stopButton = <span className="stop-button mdi mdi-close" onClick={this.abortTransfer}/>;
             }
             if(global.pydio.MessageHash[messageIds[statusMessage]]){
                 statusMessage = global.pydio.MessageHash[messageIds[statusMessage]];

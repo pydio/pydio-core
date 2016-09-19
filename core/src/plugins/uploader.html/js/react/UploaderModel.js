@@ -236,8 +236,12 @@
             this._internal['progress'] = progress;
             this.updateStatus(PydioTasks.Task.STATUS_RUNNING);
         }
+        setPending(queueSize){
+            this._internal['statusMessage'] = queueSize + ' files waiting for upload';
+            this.updateStatus(PydioTasks.Task.STATUS_PENDING);
+        }
         setRunning(queueSize){
-            this._internal['statusMessage'] = queueSize + ' files to upload';
+            this._internal['statusMessage'] = 'Uploading ' + queueSize + ' files';
             this.updateStatus(PydioTasks.Task.STATUS_RUNNING);
         }
         setIdle(){
@@ -303,14 +307,15 @@
         }
         pushFolder(folderItem){
             this._folders.push(folderItem);
+            UploadTask.getInstance().setPending(this.getQueueSize());
             if(this.getAutoStart() && !this._processing.length) {
                 this.processNext();
             } // Autostart with queue was empty before
-            UploadTask.getInstance().setRunning(this.getQueueSize());
             this.notify('update');
         }
         pushFile(uploadItem){
             this._uploads.push(uploadItem);
+            UploadTask.getInstance().setPending(this.getQueueSize());
             uploadItem.observe("progress", function(){
                 let pg = this.recomputeGlobalProgress();
                 UploadTask.getInstance().setProgress(pg);
@@ -318,7 +323,6 @@
             if(this.getAutoStart() && !this._processing.length) {
                 this.processNext();
             } // Autostart with queue was empty before
-            UploadTask.getInstance().setRunning(this.getQueueSize());
             this.notify('update');
         }
         log(){
@@ -346,6 +350,7 @@
             this._processing = [];
             this._processed = [];
             this.notify('update');
+            UploadTask.getInstance().setIdle();
         }
         processNext(){
             let processable = this.getNext();
