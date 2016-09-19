@@ -91,22 +91,32 @@ class PydioApi{
      * @param onProgress
      * @returns XHR Handle to abort transfer
      */
-    uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}){
+    uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}, uploadUrl='', xhrSettings={}){
+
+        if(!uploadUrl){
+            uploadUrl = pydio.Parameters.get('ajxpServerAccess');
+        }
+        if(queryStringParams){
+            uploadUrl += (uploadUrl.indexOf('?') === -1 ? '?' : '&') + queryStringParams;
+        }
 
         if(window.Connexion){
+
             var c = new Connexion();
-            return c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
+            return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings);
+
         }else if(window.jQuery){
+
             var formData = new FormData();
             formData.append(fileParameterName, file);
-            queryStringParams += '&secure_token' + this._secureToken;
-            return jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
+            return jQuery.ajax(uploadUrl, {
                 method:'POST',
                 data:formData,
                 complete:onComplete,
                 error:onError,
                 progress:onProgress
             });
+
         }
 
     }

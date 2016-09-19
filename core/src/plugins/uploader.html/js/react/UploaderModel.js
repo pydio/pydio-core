@@ -34,6 +34,7 @@
     }
 
     class UploadItem extends StatusItem{
+
         constructor(file, targetNode, relativePath = null){
             super('file');
             this._file = file;
@@ -42,6 +43,9 @@
             this._targetNode = targetNode;
             this._repositoryId = global.pydio.user.activeRepository;
             this._relativePath = relativePath;
+        }
+        getMqConfigs(){
+            return global.pydio.getPluginConfigs('mq');
         }
         getFile(){
             return this._file;
@@ -130,20 +134,56 @@
                 return;
             }
 
-            this.xhr = PydioApi.getClient().uploadFile(
-                this._file,
-                'userfile_0',
-                queryString,
-                complete,
-                error,
-                progress
-            );
+            // Checks applied.
+            if(this.getMqConfigs().get('UPLOAD_ACTIVE')){
+
+                this.tryAlternativeUpload(complete, progress, function(){
+                    // Failed, switch back to normal upload.
+                    this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,complete,error,progress);
+                });
+
+            }else{
+
+                this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,complete,error,progress);
+
+            }
+
         }
         _doAbort(completeCallback){
             if(this.xhr){
                 try{
                     this.xhr.abort();
                 }catch(e){}
+            }
+        }
+
+        tryAlternativeUpload(completeCallback, progressCallback, errorCallback){
+            let configs = this.getMqConfigs();
+            var host = configs.get("BOOSTER_MAIN_HOST");
+            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST']){
+                host = configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST'];
+            }
+            var port = configs.get("BOOSTER_MAIN_PORT");
+            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT']){
+                port = configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT'];
+            }
+            let fullPath = this._targetNode.getPath();
+            if(this._relativePath) {
+                fullPath += PathUtils.getDirname(this._relativePath);
+            }
+            fullPath += '/' + PathUtils.getBasename(this._file.name);
+
+            let url = "http"+(configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
+            let queryString = '';
+            let overwriteStatus = UploaderConfigs.getInstance().getOption("DEFAULT_EXISTING", "upload_existing");
+            if(overwriteStatus === 'rename') {
+                queryString += 'auto_rename=true';
+            }
+            try{
+                console.log(url);
+                this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,completeCallback,errorCallback,progressCallback, url, {withCredentials:true});
+            }catch(e){
+                errorCallback();
             }
         }
     }

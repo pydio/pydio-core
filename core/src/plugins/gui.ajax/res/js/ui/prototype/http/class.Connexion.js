@@ -217,13 +217,12 @@ Class.create("Connexion", {
 		document.fire("ajaxplorer:server_answer", this);
 	},
 
-    uploadFile: function(file, fileParameterName, queryStringParams, onComplete, onError, onProgress){
+    uploadFile: function(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings={}){
 
         if(!onComplete) onComplete = function(){};
         if(!onError) onError = function(){};
         if(!onProgress) onProgress = function(){};
-        var url = pydio.Parameters.get('ajxpServerAccess') + '&' +  queryStringParams;
-        var xhr = this.initializeXHRForUpload(url, onComplete, onError, onProgress);
+        var xhr = this.initializeXHRForUpload(uploadUrl, onComplete, onError, onProgress, xhrSettings);
         if(window.FormData){
             this.sendFileUsingFormData(xhr, file, fileParameterName);
         }else if(window.FileReader){
@@ -236,12 +235,15 @@ Class.create("Connexion", {
             this.xhrSendAsBinary(xhr, file.name, file.getAsBinary(), fileParameterName)
         }
         return xhr;
-        
+
     },
 
-    initializeXHRForUpload : function(url, onComplete, onError, onProgress){
+    initializeXHRForUpload : function(url, onComplete, onError, onProgress, xhrSettings={}){
         var xhr = new XMLHttpRequest();
         var upload = xhr.upload;
+        if(xhrSettings.withCredentials){
+            xhr.withCredentials = true;
+        }
         upload.addEventListener("progress", function(e){
             if (!e.lengthComputable) return;
             onProgress(e);
