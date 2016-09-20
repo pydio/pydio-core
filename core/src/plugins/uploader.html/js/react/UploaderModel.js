@@ -234,6 +234,10 @@
             };
             PydioApi.getClient().request(params, function(t){
                 this.setStatus('loaded');
+
+                var result = PydioApi.getClient().parseXmlMessage(t.responseXML);
+                if(!result) this.onError('Empty response');
+
                 completeCallback();
             }.bind(this));
         }
