@@ -9,7 +9,6 @@
     <client_settings>
         <resources>
             <js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
-            <js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>
             <js file="plugins/uploader.html/js/build/UploaderView.js" className="UploaderView" depends="React,PydioForm,UploaderModel"/>
             <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel"/>
             <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener"/>

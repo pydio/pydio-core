@@ -101,9 +101,11 @@ class PydioApi{
         }
 
         if(window.Connexion){
-
+            // Warning, avoid double error
+            let errorSent = false;
             let localError = function(xhr){
-                onError('Request failed with status :' + xhr.status);
+                if(!errorSent) onError('Request failed with status :' + xhr.status);
+                errorSent = true;
             };
             var c = new Connexion();
             return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, localError, onProgress, xhrSettings);
