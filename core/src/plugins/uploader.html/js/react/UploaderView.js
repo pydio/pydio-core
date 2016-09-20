@@ -130,6 +130,9 @@
             }else{
                 stopButton = <span className="stop-button mdi mdi-close" onClick={this.abortTransfer}/>;
             }
+            if(statusMessage === 'error' && this.props.item.getErrorMessage()){
+                statusMessage = this.props.item.getErrorMessage();
+            }
             if(global.pydio.MessageHash[messageIds[statusMessage]]){
                 statusMessage = global.pydio.MessageHash[messageIds[statusMessage]];
             }
@@ -267,7 +270,7 @@
         render: function(){
 
             let maxUpload = this.state.configs.getOption('UPLOAD_MAX_SIZE');
-            let maxUploadMessage = MessageHash[282] + ':' + PathUtils.roundFileSize(maxUpload, '');
+            let maxUploadMessage = MessageHash[282] + ': ' + PathUtils.roundFileSize(maxUpload, '');
             let toggleStart = this.state.configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send');
             let toggleClose = this.state.configs.getOptionAsBool('DEFAULT_AUTO_CLOSE', 'upload_auto_close');
             let toggleShowProcessed = this.state.configs.getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false);

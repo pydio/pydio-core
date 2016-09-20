@@ -178,6 +178,7 @@ class Registry{
                 }catch(e){
                     Logger.error("Ignoring Error in extensionOnInit code:");
                     Logger.error(extensionOnInit.firstChild.nodeValue);
+                    Logger.error(e.message);
                 }
             }
             var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');

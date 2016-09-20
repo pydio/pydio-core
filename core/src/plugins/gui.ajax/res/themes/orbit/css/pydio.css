@@ -1654,6 +1654,10 @@ div.shadow_class {
   margin-right: 0;
   width: auto;
 }
+.dialogBox .dialogContent .react-mui-context .mui-enhanced-switch .mui-enhanced-switch-input {
+  width: 100%;
+  height: 100%;
+}
 .dialogBox .dialogContent select {
   border-radius: 0;
   background-color: #ffffff;

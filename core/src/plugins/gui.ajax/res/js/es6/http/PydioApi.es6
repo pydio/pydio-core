@@ -102,8 +102,11 @@ class PydioApi{
 
         if(window.Connexion){
 
+            let localError = function(xhr){
+                onError('Request failed with status :' + xhr.status);
+            };
             var c = new Connexion();
-            return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings);
+            return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, localError, onProgress, xhrSettings);
 
         }else if(window.jQuery){
 

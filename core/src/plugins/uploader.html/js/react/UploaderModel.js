@@ -6,6 +6,7 @@
             this._status = 'new';
             this._type = type;
             this._id = Math.random();
+            this._errorMessage = null;
         }
         getId(){
             return this._id;
@@ -22,6 +23,13 @@
         setStatus(status){
             this._status = status;
             this.notify('status');
+        }
+        getErrorMessage(){
+            return this._errorMessage || '';
+        }
+        onError(errorMessage){
+            this._errorMessage = errorMessage;
+            this.setStatus('error');
         }
         process(completeCallback){
             this._doProcess(completeCallback);
@@ -109,9 +117,19 @@
             }
             return queryString;
         }
+        _parseXHRResponse(){
+            if(!this.xhr) return;
+            if (this.xhr.responseXML){
+                var result = PydioApi.getClient().parseXmlMessage(this.xhr.responseXML);
+                if(!result) this.onError('Empty response');
+            }else if (this.xhr.responseText && this.xhr.responseText != 'OK') {
+                this.onError('Unexpected response: ' + this.xhr.responseText);
+            }
+        }
         _doProcess(completeCallback){
             let complete = function(){
                 this.setStatus('loaded');
+                this._parseXHRResponse();
                 completeCallback();
             }.bind(this);
             let error = function(){
@@ -125,11 +143,18 @@
             }.bind(this);
             this.setStatus('loading');
 
+            let maxUpload = parseFloat(UploaderConfigs.getInstance().getOption('UPLOAD_MAX_SIZE'));
+            if(this.getSize() > maxUpload){
+                this.onError('File is too big: contact your admin to raise the upload value, or use the desktop client.');
+                completeCallback();
+                return;
+            }
+
             let queryString;
             try{
                 queryString = this.buildQueryString();
             }catch(e){
-                this.setStatus('error');
+                this.onError(e.message);
                 completeCallback();
                 return;
             }
@@ -304,6 +329,9 @@
         getAutoStart(){
             return UploaderConfigs.getInstance().getOptionAsBool("DEFAULT_AUTO_START", "upload_auto_send");
         }
+        getAutoClose(){
+            return UploaderConfigs.getInstance().getOptionAsBool("DEFAULT_AUTO_CLOSE", "upload_auto_close");
+        }
         pushFolder(folderItem){
             this._folders.push(folderItem);
             UploadTask.getInstance().setPending(this.getQueueSize());
@@ -364,6 +392,9 @@
                 }.bind(this));
             }else{
                 UploadTask.getInstance().setIdle();
+                if(this.getAutoClose() && pydio.Controller.react_selector){
+                    pydio.UI.modal.dismiss();
+                }
             }
         }
         getNext(){
@@ -508,14 +539,13 @@
 
         getOptionAsBool(name, userPref = '', defaultValue = undefined){
             let o = this.getOption(name, userPref, defaultValue);
-            if(o === 'true') return true;
-            else return false;
+            return (o === true  || o === 'true');
         }
 
         getOption(name, userPref = '', defaultValue = undefined){
             if(userPref){
                 let test = this.getUserPreference('originalUploadForm_XHRUploader', userPref);
-                if(test !== null) return test;
+                if(test !== undefined && test !== null) return test;
             }
             if(this._global.has(name)){
                 return this._global.get(name);

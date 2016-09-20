@@ -159,6 +159,7 @@
 						if(uploader.dialogOnComplete){
 							uploader.resourcesManager.load();
 							var dialogOnComplete = new Function("oForm", uploader.dialogOnComplete);
+							modal.setCloseAction(dialogOnComplete);
 						}
 						var dialogOpen = function(form){
 						    if (form.down('#uploader_chooser')) form.down('#uploader_chooser').remove();

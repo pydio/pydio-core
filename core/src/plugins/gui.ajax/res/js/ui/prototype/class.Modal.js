@@ -808,7 +808,13 @@ Class.create("Modal", {
 			Event.stopObserving(window, "resize", this.currentResizeListener);
             this.currentResizeListener = null;
 		}
-	}
+	},
+    /**
+     * Encapsulate HideLightBox call
+     */
+    dismiss: function(){
+        hideLightBox();
+    }
 });
 	
 var modal = new Modal();
