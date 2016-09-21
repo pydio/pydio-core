@@ -89,9 +89,12 @@ Class.create("PydioInstantMessenger", {
                     if(this.configs.get("BOOSTER_WS_ADVANCED") && this.configs.get("BOOSTER_WS_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_WS_ADVANCED")['WS_PORT']){
                         port = this.configs.get("BOOSTER_WS_ADVANCED")['WS_PORT'];
                     }
+                    var secure = this.configs.get("BOOSTER_MAIN_SECURE");
+                    if(this.configs.get("BOOSTER_WS_ADVANCED") && this.configs.get("BOOSTER_WS_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_WS_ADVANCED")['WS_SECURE']){
+                        secure = this.configs.get("BOOSTER_WS_ADVANCED")['WS_SECURE'];
+                    }
 
-                    var url = "ws"+(this.configs.get("WS_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("WS_PATH");
-
+                    var url = "ws"+(secure?"s":"")+"://"+host+":"+port+"/"+this.configs.get("WS_PATH");
                     this.ws = new WebSocket(url);
                     this.ws.onmessage = function(event){
                         var obj = parseXml(event.data);

@@ -24,22 +24,45 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
-
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\RouteNotFoundException;
 use Pydio\Core\Http\Message\Message;
 use Pydio\Core\Http\Middleware\SapiMiddleware;
 use Pydio\Core\Http\Response\SerializableResponseStream;
-use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\Response\SapiEmitter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Class WopiMiddleware
- * Main Middleware for Wopi requests
- * @package Pydio\Core\Http\Middleware
+ * Class RestWopiMiddleware
+ * Specific middleware to handle Wopi actions
+ * @package Pydio\Core\Http\Wopi
  */
-class WopiMiddleware extends SapiMiddleware
+class Middleware extends SapiMiddleware
 {
+    protected $base;
+
+    /**
+     * RestWopiMiddleware constructor.
+     * @param $base
+     */
+    public function __construct($base)
+    {
+        $this->base = $base;
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     */
+    protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
+
+        $router = new Router($this->base);
+        if(!$router->route($request, $response)) {
+            throw new RouteNotFoundException();
+        }
+    }
 
     /**
      * Output the response to the browser, if no headers were already sent.
@@ -50,32 +73,39 @@ class WopiMiddleware extends SapiMiddleware
     public function emitResponse(ServerRequestInterface $request, ResponseInterface $response) {
 
         if($response !== false && $response->getBody() && $response->getBody() instanceof SerializableResponseStream){
+
             /**
              * @var SerializableResponseStream $body;
              */
+            $status = &$response->getStatusCode();
 
-            $body = &$response->getBody();
+            // Modifying the results
+            if ($status == 200) {
+                $body = &$response->getBody();
 
-            /** @var NodesList $originalData */
-            $originalData = $body->getChunks()[0];
+                /** @var NodesList $originalData */
+                $originalData = $body->getChunks()[0];
 
-            /** @var AJXP_Node $node */
-            $node = $originalData->getChildren()[0];
+                /** @var AJXP_Node $node */
+                $node = $originalData->getChildren()[0];
 
-            // We modify the result to have the correct format required by the api
-            $x = new SerializableResponseStream();
-            $meta = $node->getNodeInfoMeta();
-            $userId = $node->getUser()->getId();
-            $data = [
-                "BaseFileName" => $node->getLabel(),
-                "OwnerId"  => $userId,
-                "Size"     => $meta["bytesize"],
-                "UserId"   => $userId,
-                "Version"  => "" . $meta["ajxp_modiftime"]
-            ];
+                // We modify the result to have the correct format required by the api
+                $x = new SerializableResponseStream();
+                $meta = $node->getNodeInfoMeta();
+                $userId = $node->getUser()->getId();
+                $data = [
+                    "BaseFileName" => $node->getLabel(),
+                    "OwnerId" => $userId,
+                    "Size" => $meta["bytesize"],
+                    "UserId" => $userId,
+                    "Version" => "" . $meta["ajxp_modiftime"]
+                ];
 
-            $x->addChunk(new Message($data));
-            $response = $response->withBody($x);
+                $x->addChunk(new Message($data));
+                $response = $response->withBody($x);
+
+            }
+
             $body = &$response->getBody();
 
             $params = $request->getParsedBody();
@@ -91,9 +121,7 @@ class WopiMiddleware extends SapiMiddleware
             } else {
                 $body->setSerializer(SerializableResponseStream::SERIALIZER_TYPE_JSON);
                 $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
-
             }
-
         }
 
         if($response !== false && ($response->getBody()->getSize() || $response instanceof EmptyResponse) || $response->getStatusCode() != 200) {
