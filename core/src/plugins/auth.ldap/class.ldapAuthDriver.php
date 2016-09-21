@@ -217,10 +217,10 @@ class ldapAuthDriver extends AbstractAuthDriver
             if ($this->ldapAdminUsername === null) {
                 //connecting anonymously
                 $this->logDebug(__FUNCTION__, 'Anonymous LDAP connexion');
-                $ldapbind = @ldap_bind($ldapconn);
+                $ldapbind = ldap_bind($ldapconn);
             } else {
                 $this->logDebug(__FUNCTION__, 'Standard LDAP connexion');
-                $ldapbind = @ldap_bind($ldapconn, $this->ldapAdminUsername, $this->ldapAdminPassword);
+                $ldapbind = ldap_bind($ldapconn, $this->ldapAdminUsername, $this->ldapAdminPassword);
             }
 
             if ($ldapbind) {
@@ -555,7 +555,7 @@ class ldapAuthDriver extends AbstractAuthDriver
         $entries = $this->getUserEntries($login);
         if ($entries['count'] > 0) {
             $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $login);
-            if (@ldap_bind($this->ldapconn, $entries[0]["dn"], $pass)) {
+            if (ldap_bind($this->ldapconn, $entries[0]["dn"], $pass)) {
                 $this->logDebug(__FUNCTION__, 'Ldap Password Check: Got user ' . $entries[0]["cn"][0]);
                 return true;
             }
