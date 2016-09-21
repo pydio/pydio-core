@@ -21,6 +21,7 @@
 namespace Pydio\Core\Utils\Vars;
 
 use Psr\Http\Message\UploadedFileInterface;
+use Pydio\Core\Exception\ForbiddenCharacterException;
 use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -137,14 +138,25 @@ class InputFilter
      * @param string $s
      * @param int $level Can be InputFilter::SANITIZE_ALPHANUM, InputFilter::SANITIZE_EMAILCHARS, InputFilter::SANITIZE_HTML, InputFilter::SANITIZE_HTML_STRICT
      * @param string $expand
+     * @param bool $throwException
      * @return mixed|string
+     * @throws ForbiddenCharacterException
      */
-    public static function sanitize($s, $level = InputFilter::SANITIZE_HTML, $expand = 'script|style|noframes|select|option')
+    public static function sanitize($s, $level = InputFilter::SANITIZE_HTML, $throwException = false, $expand = 'script|style|noframes|select|option')
     {
+        $original = $s;
         if ($level == InputFilter::SANITIZE_ALPHANUM) {
-            return preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
+            $s =  preg_replace("/[^a-zA-Z0-9_\-\.]/", "", $s);
+            if($throwException && $original !== $s){
+                throw new ForbiddenCharacterException($original);
+            }
+            return $s;
         } else if ($level == InputFilter::SANITIZE_EMAILCHARS) {
-            return preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
+            $s = preg_replace("/[^a-zA-Z0-9_\-\.@!%\+=|~\?]/", "", $s);
+            if($throwException && $original !== $s){
+                throw new ForbiddenCharacterException($original);
+            }
+            return $s;
         } else if ($level == InputFilter::SANITIZE_FILENAME || $level == InputFilter::SANITIZE_DIRNAME) {
             // Convert Hexadecimals
             $s = preg_replace_callback('!(&#|\\\)[xX]([0-9a-fA-F]+);?!', function($array){
@@ -157,11 +169,17 @@ class InputFilter
             // Strip whitespace characters
             $s = ltrim($s);
             $s = str_replace(chr(0), "", $s);
-            if ($level == InputFilter::SANITIZE_FILENAME) $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
-            else $s = preg_replace("/[\"\|\?\\\]/", "", $s);
+            if ($level == InputFilter::SANITIZE_FILENAME) {
+                $s = preg_replace("/[\"\/\|\?\\\]/", "", $s);
+            } else {
+                $s = preg_replace("/[\"\|\?\\\]/", "", $s);
+            }
             if (self::detectXSS($s)) {
                 if (strpos($s, "/") === 0) $s = "/XSS Detected - Rename Me";
                 else $s = "XSS Detected - Rename Me";
+            }
+            if($throwException && $original !== $s){
+                throw new ForbiddenCharacterException($original);
             }
             return $s;
         }
@@ -203,6 +221,9 @@ class InputFilter
         } else {
             $s = str_replace(array("<", ">"), array("&lt;", "&gt;"), $s);
         }
+        if($throwException && $original !== $s){
+            throw new ForbiddenCharacterException($original);
+        }
         return ltrim($s);
     }
 
@@ -212,10 +233,11 @@ class InputFilter
      * @param $data
      * @param int $sanitizeLevel
      * @return string
+     * @throws ForbiddenCharacterException
      */
-    public static function decodeSecureMagic($data, $sanitizeLevel = InputFilter::SANITIZE_HTML)
+    public static function decodeSecureMagic($data, $sanitizeLevel = InputFilter::SANITIZE_DIRNAME)
     {
-        return InputFilter::sanitize(InputFilter::securePath($data), $sanitizeLevel);
+        return InputFilter::sanitize(InputFilter::securePath($data), $sanitizeLevel, true);
     }
 
     /**

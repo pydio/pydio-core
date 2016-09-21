@@ -82,7 +82,7 @@ class PowerFSController extends Plugin
 
             case "postcompress_download":
 
-                $archive = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["archive_name"]), InputFilter::SANITIZE_FILENAME);
+                $archive = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
 
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
@@ -101,7 +101,7 @@ class PowerFSController extends Plugin
             case "compress" :
             case "precompress" :
 
-                $archiveName = InputFilter::sanitize(InputFilter::decodeSecureMagic($httpVars["archive_name"]), InputFilter::SANITIZE_FILENAME);
+                $archiveName = InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
                 $taskId = $request->getAttribute("pydio-task-id");
 
                 if ($taskId === null) {

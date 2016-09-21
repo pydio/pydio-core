@@ -440,9 +440,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             InputFilter::parseFileDataErrors($uploadedFile, true);
 
             // FIND PROPER FILE NAME / FILTER IF NECESSARY
-            $userfile_name= InputFilter::sanitize(InputFilter::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME);
             if (isSet($httpVars["urlencoded_filename"])) {
-                $userfile_name = InputFilter::sanitize(urldecode($httpVars["urlencoded_filename"]), InputFilter::SANITIZE_FILENAME);
+                $userfile_name = InputFilter::sanitize(urldecode($httpVars["urlencoded_filename"]), InputFilter::SANITIZE_FILENAME, true);
+            }else{
+                $userfile_name= InputFilter::sanitize(InputFilter::fromPostedFileName($uploadedFile->getClientFileName()), InputFilter::SANITIZE_FILENAME, true);
             }
             $userfile_name = substr($userfile_name, 0, ConfService::getContextConf($ctx, "NODENAME_MAX_LENGTH"));
             $this->logDebug("User filename ".$userfile_name);
@@ -2058,7 +2059,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $mess = LocaleService::getMessages();
 
         if(!empty($filename_new)){
-            $filename_new= InputFilter::sanitize(InputFilter::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME);
+            $filename_new= InputFilter::sanitize(InputFilter::magicDequote($filename_new), InputFilter::SANITIZE_FILENAME, true);
             $filename_new = substr($filename_new, 0, ConfService::getContextConf($originalNode->getContext(), "NODENAME_MAX_LENGTH"));
         }
 
