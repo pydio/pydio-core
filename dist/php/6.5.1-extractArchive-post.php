@@ -92,7 +92,7 @@ function checkThemeUsed($themeName){
 
 }
 
-checkPhpVersion('5.6.0');
+checkPhpVersion('5.5.9');
 checkPluginUsed("conf", "serial");
 checkPluginUsed("auth", "serial");
 checkPluginUsed("auth", "cmsms");
