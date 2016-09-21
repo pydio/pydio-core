@@ -705,7 +705,7 @@
             if(!params['repo_label']){
                 params['repo_label'] = this._node.getLabel();
             }
-
+            this.notify('saving');
             var publicLinks = this.getPublicLinks();
             if(publicLinks.length){
                 var pLinkId = publicLinks[0]['hash'];
@@ -746,7 +746,10 @@
                     // There must have been an error, revert
                     this.load();
                 }
-            }.bind(this), null);
+                this.notify('saved');
+            }.bind(this), function(){
+                this.notify('saved');
+            }.bind(this));
         }
 
 

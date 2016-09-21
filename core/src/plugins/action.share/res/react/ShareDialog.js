@@ -210,6 +210,23 @@
         propTypes: {
             onClick: React.PropTypes.func.isRequired
         },
+        getInitialState: function(){
+            return {disabled: false};
+        },
+        disableSave: function(){
+            this.setState({disabled: true});
+        },
+        enableSave: function(){
+            this.setState({disabled:false});
+        },
+        componentDidMount: function(){
+            this.props.shareModel.observe('saving', this.disableSave);
+            this.props.shareModel.observe('saved', this.enableSave);
+        },
+        componendWillUnmount: function(){
+            this.props.shareModel.stopObserving('saving', this.disableSave);
+            this.props.shareModel.stopObserving('saved', this.enableSave);
+        },
         triggerModelSave: function(){
             this.props.shareModel.save();
         },
@@ -224,14 +241,14 @@
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
                         <a className="revert-button" onClick={this.triggerModelRevert}>{this.context.getMessage('179')}</a>
-                        <ReactMUI.FlatButton secondary={true} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
+                        <ReactMUI.FlatButton secondary={true} disabled={this.state.disabled} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
                         <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
                     </div>
                 );
             }else{
                 var unshareButton;
                 if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error' || global.pydio.user.activeRepository === "ajxp_conf"){
-                    unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
+                    unshareButton = (<ReactMUI.FlatButton  disabled={this.state.disabled} secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
@@ -760,6 +777,21 @@
             showMailer:React.PropTypes.func
         },
 
+        disableSave: function(){
+            this.setState({disabled: true});
+        },
+        enableSave: function(){
+            this.setState({disabled:false});
+        },
+        componentDidMount: function(){
+            this.props.shareModel.observe('saving', this.disableSave);
+            this.props.shareModel.observe('saved', this.enableSave);
+        },
+        componendWillUnmount: function(){
+            this.props.shareModel.stopObserving('saving', this.disableSave);
+            this.props.shareModel.stopObserving('saved', this.enableSave);
+        },
+
         toggleLink: function(){
             var publicLinks = this.props.shareModel.getPublicLinks();
             if(this.state.showTemporaryPassword){
@@ -772,7 +804,7 @@
         },
 
         getInitialState: function(){
-            return {showTemporaryPassword: false, temporaryPassword: null};
+            return {showTemporaryPassword: false, temporaryPassword: null, disabled: false};
         },
 
         updateTemporaryPassword: function(value, event){
@@ -840,7 +872,7 @@
             return (
                 <div style={{padding:16}} className="reset-pydio-forms ie_material_checkbox_fix">
                     <ReactMUI.Checkbox
-                        disabled={this.context.isReadonly() || disableForNotOwner}
+                        disabled={this.context.isReadonly() || disableForNotOwner || this.state.disabled}
                         onCheck={this.toggleLink}
                         checked={!!this.props.linkData || this.state.showTemporaryPassword}
                         label={this.context.getMessage('189')}
