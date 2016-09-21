@@ -41,7 +41,7 @@ class Base
         if ($route === "/api") {
             $server = new Rest\RestApiServer($base.$route, $additionalAttributes);
         } else if ($route == "/wopi") {
-            $server = new Wopi\RestWopiServer($base.$route, $additionalAttributes);
+            $server = new Wopi\Server($base.$route, $additionalAttributes);
         } else if ($route === "/user") {
             $_GET["get_action"] = "user_access_point";
             $_GET["key"] = $additionalAttributes["key"];

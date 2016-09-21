@@ -239,7 +239,9 @@ class Server
         $req = $this->getRequest();
         $resp = new Response();
         $x = new SerializableResponseStream();
-        $resp = $resp->withBody($x);
+        $resp = $resp
+            ->withStatus($code)
+            ->withBody($x);
         $x->addChunk(new UserMessage($message, LOG_LEVEL_ERROR));
         $this->topMiddleware->emitResponse($req, $resp);
         

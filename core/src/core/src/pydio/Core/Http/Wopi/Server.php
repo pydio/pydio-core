@@ -18,43 +18,37 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
 namespace Pydio\Core\Http\Wopi;
 
-use \Psr\Http\Message\ServerRequestInterface;
-use \Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Server as HttpServer;
+use Pydio\Core\Services\ConfService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Class RestWopiMiddleware
- * Specific middleware to handle Wopi actions
+ * Class RestWopiServer
+ * Dedicated server for Wopi implementation (must start with /wopi).
  * @package Pydio\Core\Http\Wopi
  */
-class RestWopiMiddleware extends WopiMiddleware
+class Server extends HttpServer
 {
-    protected $base;
-
     /**
-     * RestWopiMiddleware constructor.
+     * RestWopiServer constructor.
      * @param $base
+     * @param array $additionalAttributes
      */
-    public function __construct($base)
+    public function __construct($base, $additionalAttributes = [])
     {
-        $this->base = $base;
+        parent::__construct($base, $additionalAttributes);
+        ConfService::currentContextIsRestAPI($base);
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @throws PydioException
-     */
-    protected function parseRequestRouteAndParams(ServerRequestInterface &$request, ResponseInterface &$response){
-
-        $router = new WopiRouter($this->base);
-        if(!$router->route($request, $response)){
-            throw new PydioException("Could not find any endpoint for this URI");
-        }
+    protected function stackMiddleWares()
+    {
+        $this->middleWares->push(array("Pydio\\Core\\Controller\\Controller", "registryActionMiddleware"));
+        $this->middleWares->push(array("Pydio\\Core\\Http\\Wopi\\AuthMiddleware", "handleRequest"));
+        $this->topMiddleware = new Middleware($this->base);
+        $this->middleWares->push(array($this->topMiddleware, "handleRequest"));
     }
-
 }

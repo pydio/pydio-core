@@ -32,7 +32,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * Simple router for /wopi/ endpoints
  * @package Pydio\Core\Http\Wopi
  */
-class WopiRouter
+class Router
 {
     /**
      * @var array
@@ -116,7 +116,7 @@ class WopiRouter
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                //$response = $response->withStatus(404);
+                $response = $response->withStatus(404);
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
                 //$allowedMethods = $routeInfo[1];

@@ -45,7 +45,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * Authentication middleware used in Rest context
  * @package Pydio\Core\Http\Rest
  */
-class RestWopiAuthMiddleware
+class AuthMiddleware
 {
 
     /**
@@ -64,6 +64,14 @@ class RestWopiAuthMiddleware
         if($response != null){
             return $response;
         }
+
+        $response = (new AuthFrontend("jwt-auth-frontend", ""))->tryToLogUser($requestInterface, $responseInterface);
+        if(!$response != null) {
+            $responseInterface = $responseInterface->withStatus(401);
+            $responseInterface->getBody()->write('You are not authorized to access this API.');
+            return $responseInterface;
+        }
+        
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
 

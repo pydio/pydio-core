@@ -69,6 +69,7 @@ class SapiMiddleware implements ITopLevelMiddleware
         if(headers_sent()){
             return;
         }
+        
         $this->emitResponse($request, $response);
     }
 
