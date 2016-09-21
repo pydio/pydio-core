@@ -32,7 +32,7 @@ class PHPVersion extends AbstractTest
     /**
      * @inheritdoc
      */
-    public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.4.0"); }
+    public function __construct() { parent::__construct("PHP version", "Minimum required version is PHP 5.5.9"); }
 
     /**
      * @inheritdoc
@@ -41,13 +41,11 @@ class PHPVersion extends AbstractTest
     {
         $version = phpversion();
         $this->testedParams["PHP Version"] = $version;
-        //return false;
-        if (floatval($version) < 5.4) return FALSE;
+        if (version_compare($version, '5.5.9')  < 0 ) return FALSE;
         $locale = setlocale(LC_CTYPE, 0);
         $dirSep = DIRECTORY_SEPARATOR;
         $this->testedParams["Locale"] = $locale;
         $this->testedParams["Directory Separator"] = $dirSep;
-        if (floatval($version) < 5.4 && $locale != "C" && $dirSep != '\\') { $this->failedLevel = "warning"; return FALSE; } // PHP4 doesn't work well with foreign encoding
         return TRUE;
     }
 }
