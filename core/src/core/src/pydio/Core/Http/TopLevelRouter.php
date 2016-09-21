@@ -26,6 +26,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Zend\Diactoros\ServerRequestFactory;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -104,7 +105,7 @@ class TopLevelRouter
     public function route(){
 
         $request = ServerRequestFactory::fromGlobals();
-        $this->base = rtrim(dirname($request->getServerParams()["SCRIPT_NAME"]), "/");
+        $this->base = rtrim(PathUtils::forwardSlashDirname($request->getServerParams()["SCRIPT_NAME"]), "/");
 
         $dispatcher = \FastRoute\cachedDispatcher(function(RouteCollector $r) {
             $this->configureRoutes($this->base, $r);
