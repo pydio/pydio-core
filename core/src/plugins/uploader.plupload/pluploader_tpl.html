@@ -31,7 +31,8 @@ var maxHTML4 = '<?PHP echo $UploadMaxSize; ?>';
 var config_runtimes = '<?php echo $pluginConfigs["RUNTIMES"]; ?>';
 var config_max_file_size = '<?php echo $pluginConfigs["MAX_FILE_SIZE"]; ?>';
 var config_chunk_size = '<?php echo (!empty($pluginConfigs["CHUNK_SIZE"]) ? $pluginConfigs["CHUNK_SIZE"] : (($UploadMaxSize/1048576) - 1)."mb"); ?>';
-var currentDir = parent.ajaxplorer.getContextNode().getPath();
+var currentDir = parent.pydio.getContextNode().getPath();
+var AjxpNode = parent.AjxpNode;
 
 $(function() {
 	$("#plupload_uploader").pluploadQueue({
@@ -59,12 +60,23 @@ $(function() {
 	
 	// attach callbacks for FileUploaded
 	function attachCallbacks(Uploader) {
+        Uploader.bind('FilesAdded', function(up, files){
+            plupload.each(files, function(file){
+                var node = new AjxpNode(currentDir + '/' + file.name);
+                if(file.size) node.getMetadata().set('filesize', file.size);
+                try{
+                    parent.pydio.getContextHolder().applyCheckHook(node);
+                }catch(e){
+                    Uploader.removeFile(file);
+                }
+            });
+        });
 		Uploader.bind('UploadFile', function(up, file, res) {
             parent.document.fire("ajaxplorer:longtask_starting");
 		});
 		Uploader.bind('FileUploaded', function(up, file, res) {
 			if(this.total.queued <= 1) {
-				parent.ajaxplorer.fireContextRefresh();
+				parent.pydio.fireContextRefresh();
                 parent.document.fire("ajaxplorer:longtask_finished");
 			}
 		});
