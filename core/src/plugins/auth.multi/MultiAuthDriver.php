@@ -26,6 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -556,4 +557,21 @@ class MultiAuthDriver extends AbstractAuthDriver
         return array($this->extractRealId($userId), $pwd);
     }
 
+    /**
+     * @param $s
+     * @param int $level
+     * @return mixed|string
+     */
+    public function sanitize($s, $level = InputFilter::SANITIZE_HTML)
+    {
+        /**
+         * Override only for ldap.
+         */
+        if ($this->masterSlaveMode) {
+            if ($this->masterName == 'ldap') {
+                return $this->drivers[$this->masterName]->sanitize($s, $level);
+            }
+        }
+        return parent::sanitize($s, $level);
+    }
 }

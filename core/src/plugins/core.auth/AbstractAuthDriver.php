@@ -32,6 +32,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response\TextResponse;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -381,4 +382,15 @@ class AbstractAuthDriver extends Plugin
         }
     }
 
+    /**
+     * Sanitize user_id and password. Should be implemented by children (auth ldap) to
+     * be able to use login_id with special characters (utf8) such as : ä, é ...
+     * @param $s
+     * @param int $level
+     * @return mixed|string
+     * @throws \Pydio\Core\Exception\ForbiddenCharacterException
+     */
+    public function sanitize($s, $level = InputFilter::SANITIZE_HTML){
+        return InputFilter::sanitize($s, $level);
+    }
 }
