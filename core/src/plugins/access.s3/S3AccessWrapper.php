@@ -85,45 +85,29 @@ class S3AccessWrapper extends FsAccessWrapper
             if (!empty($signatureVersion)) {
                 $options['signature'] = $signatureVersion;
             }
-            $baseURL = $repoObject->getContextOption($ctx, "STORAGE_URL");
-            if (!empty($baseURL)) {
-                $options["base_url"] = $baseURL;
-            }
-            $region = $repoObject->getContextOption($ctx, "REGION");
-            if (!empty($region)) {
-                $options["region"] = $region;
-            }
-            $proxy = $repoObject->getContextOption($ctx, "PROXY");
-            if (!empty($proxy)) {
-                $options['request.options'] = array('proxy' => $proxy);
-            }
             $apiVersion = $repoObject->getContextOption($ctx, "API_VERSION");
             if ($apiVersion === "") {
                 $apiVersion = "latest";
             }
-            //SDK_VERSION IS A GLOBAL PARAM
-            ConfService::getConfStorageImpl()->_loadPluginConfig("access.s3", $globalOptions);
-            $sdkVersion = $globalOptions["SDK_VERSION"];
-            if ($sdkVersion !== "v2" && $sdkVersion !== "v3") {
-                $sdkVersion = "v2";
+            $config = [
+                "version" => $apiVersion,
+                "credentials" => $options
+            ];
+            $region = $repoObject->getContextOption($ctx, "REGION");
+            if (!empty($region)) {
+                $config["region"] = $region;
             }
-            if ($sdkVersion === "v3") {
-                require_once("S3Client.php");
-                $s3Client = new S3Client([
-                    "version" => $apiVersion,
-                    "region" => $region,
-                    "credentials" => $options
-                ]);
-                $s3Client->registerStreamWrapper($repoObject->getId());
-            } else {
-                $s3Client = \Aws\S3\S3Client::factory($options);
-                if ($repoObject->getContextOption($ctx, "VHOST_NOT_SUPPORTED")) {
-                    // Use virtual hosted buckets when possible
-                    require_once("ForcePathStyleListener.php");
-                    $s3Client->addSubscriber(new \Pydio\Access\Driver\StreamProvider\S3\ForcePathStyleStyleListener());
-                }
-                $s3Client->registerStreamWrapper();
+            $proxy = $repoObject->getContextOption($ctx, "PROXY");
+            if (!empty($proxy)) {
+                $config['http'] = array('proxy' => $proxy);
             }
+            $baseURL = $repoObject->getContextOption($ctx, "STORAGE_URL");
+            if (!empty($baseURL)) {
+                $config["endpoint"] = $baseURL;
+            }
+            require_once("S3Client.php");
+            $s3Client = new S3Client($config);
+            $s3Client->registerStreamWrapper($repoObject->getId());
             self::$clients[$repoObject->getId()] = $s3Client;
         }
         return self::$clients[$repoObject->getId()];
@@ -403,31 +387,16 @@ class S3AccessWrapper extends FsAccessWrapper
                 $toDelete[] = $currentFrom;
             }
             Logger::debug(__CLASS__, __FUNCTION__, "S3 Execute batch on " . count($batch) . " objects");
-            ConfService::getConfStorageImpl()->_loadPluginConfig("access.s3", $globalOptions);
-            $sdkVersion = $globalOptions["SDK_VERSION"];
-            if ($sdkVersion === "v3") {
-                foreach ($batch as $command) {
-                    $successful = $s3Client->execute($command);
-                }
-                //We must delete the "/" in $fromKeyname because we want to delete the folder
-                $clear = \Aws\S3\BatchDelete::fromIterator($s3Client, $bucket, $s3Client->getIterator('ListObjects', array(
-                    'Bucket' => $bucket,
-                    'Prefix' => $fromKeyname
-                )));
-                $clear->delete();
-            } else {
-                try {
-                    $successful = $s3Client->execute($batch);
-                    $clear = new \Aws\S3\Model\ClearBucket($s3Client, $bucket);
-                    $iterator->rewind();
-                    $clear->setIterator($iterator);
-                    $clear->clear();
-                    $failed = array();
-                } catch (\Guzzle\Service\Exception\CommandTransferException $e) {
-                    $successful = $e->getSuccessfulCommands();
-                    $failed = $e->getFailedCommands();
-                }
+            foreach ($batch as $command) {
+                $successful = $s3Client->execute($command);
             }
+            //We must delete the "/" in $fromKeyname because we want to delete the folder
+            $clear = \Aws\S3\BatchDelete::fromIterator($s3Client, $bucket, $s3Client->getIterator('ListObjects', array(
+                'Bucket' => $bucket,
+                'Prefix' => $fromKeyname
+            )));
+            $clear->delete();
+
             if (count($failed)) {
                 foreach ($failed as $c) {
                     // $c is a Aws\S3\Command\S3Command

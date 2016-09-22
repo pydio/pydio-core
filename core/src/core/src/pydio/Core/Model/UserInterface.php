@@ -281,4 +281,10 @@ interface UserInterface extends IGroupPathProvider
      * @throws \Exception
      */
     public function reloadRolesIfRequired();
+
+    /**
+     * @return array
+     */
+    public function getRolesKeys();
+
 }

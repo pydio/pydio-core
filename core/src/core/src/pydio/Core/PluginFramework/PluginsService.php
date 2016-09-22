@@ -430,7 +430,10 @@ class PluginsService
     {
         if ($useCache) {
             $cacheKey = $this->getRegistryCacheKey($extendedVersion);
-            $cachedXml = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey);
+            $tStamps = [];
+            if($this->context->hasUser()) $tStamps[] = "pydio:user:".$this->context->getUser()->getId();
+            if($this->context->hasRepository()) $tStamps[] = "pydio:repository:".$this->context->getRepositoryId();
+            $cachedXml = CacheService::fetchWithTimestamps(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $tStamps);
             if ($cachedXml !== false) {
                 $registry = new \DOMDocument("1.0", "utf-8");
                 $registry->loadXML($cachedXml);
@@ -452,7 +455,7 @@ class PluginsService
         }
 
         if ($useCache && isSet($cacheKey)) {
-            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $registry->saveXML());
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, $cacheKey, $registry->saveXML());
         }
 
         if ($clone) {

@@ -82,14 +82,19 @@ class UsersService
             return $self->usersCache[$userId];
         }
         // Try to get from cache
-        $test = CacheService::fetch("shared", "pydio:user:" . $userId);
+        $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId);
         if($test !== false && $test instanceof UserInterface){
-            if($test->getPersonalRole() === null){
-                $test->updatePersonalRole($test->getRoles()["AJXP_USR_/".$userId]);
+            // Second check : if roles were updated in cache
+            $roleCacheIds = array_map(function($k){ return "pydio:role:".$k; }, $test->getRolesKeys());
+            $test = CacheService::fetchWithTimestamps(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:".$userId, $roleCacheIds);
+            if($test !== false){
+                if($test->getPersonalRole() === null){
+                    $test->updatePersonalRole($test->getRoles()["AJXP_USR_/".$userId]);
+                }
+                $test->recomputeMergedRole();
+                $self->usersCache[$userId] = $test;
+                return $test;
             }
-            $test->recomputeMergedRole();
-            $self->usersCache[$userId] = $test;
-            return $test;
         }
         if($checkExists && !self::userExists($userId)){
             throw new UserNotFoundException($userId);
@@ -100,7 +105,7 @@ class UsersService
             // Save in memory
             $self->usersCache[$userId] = $userObject;
             // Save in cache
-            CacheService::save("shared", "pydio:user:" . $userId, $userObject);
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
         }
         return $userObject;
 
@@ -108,12 +113,17 @@ class UsersService
 
     /**
      * @param $userObject UserInterface
+     * @param string $scope
      */
-    public static function updateUser($userObject){
+    public static function updateUser($userObject, $scope = "user"){
         $self = self::instance();
         $userId = $userObject->getId();
         $self->usersCache[$userId] = $userObject;
-        CacheService::save("shared", "pydio:user:" . $userId, $userObject);
+        if($scope === "user"){
+            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
+        }else{
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
+        }
     }
 
     /**
@@ -206,7 +216,6 @@ class UsersService
 
         self::instance()->repositoriesCache = [];
         self::instance()->usersCache = [];
-        CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
         SessionService::invalidateLoadedRepositories();
 
     }

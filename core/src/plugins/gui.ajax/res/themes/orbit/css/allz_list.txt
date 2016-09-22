@@ -1,4 +1,0 @@
-themes/orbit/css/pydio.css
-themes/orbit/css/animate-custom.css
-themes/orbit/css/chosen.css#NO_MINI
-themes/orbit/css/media.css#NO_MINI

@@ -440,7 +440,7 @@ class ShareStore {
                 $owner = $repo->getOwner();
                 $this->testUserCanEditShare($repo->getOwner(), $repo->options);
             }
-            if(!$keepRepository){
+            if($repoId !== null && !$keepRepository){
                 $res = RepositoryService::deleteRepository($repoId);
                 if ($res == -1) {
                     throw new \Exception($mess[427]);

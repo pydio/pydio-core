@@ -517,7 +517,7 @@ abstract class AbstractUser implements UserInterface
      */
     public function save($context = "superuser"){
         $this->_save($context);
-        UsersService::updateUser($this);
+        UsersService::updateUser($this, $context);
     }
 
     /**
@@ -769,6 +769,13 @@ abstract class AbstractUser implements UserInterface
     }
 
     protected $lastSessionSerialization = 0;
+
+    /**
+     * @return array
+     */
+    public function getRolesKeys(){
+        return array_keys($this->roles);
+    }
 
     /**
      * @return array

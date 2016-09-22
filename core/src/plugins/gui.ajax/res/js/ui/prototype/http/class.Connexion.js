@@ -217,7 +217,9 @@ Class.create("Connexion", {
 		document.fire("ajaxplorer:server_answer", this);
 	},
 
-    uploadFile: function(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings={}){
+    uploadFile: function(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings){
+
+        if(xhrSettings === undefined) xhrSettings = {};
 
         if(!onComplete) onComplete = function(){};
         if(!onError) onError = function(){};
@@ -238,7 +240,10 @@ Class.create("Connexion", {
 
     },
 
-    initializeXHRForUpload : function(url, onComplete, onError, onProgress, xhrSettings={}){
+    initializeXHRForUpload : function(url, onComplete, onError, onProgress, xhrSettings){
+
+        if(xhrSettings === undefined) xhrSettings = {};
+
         var xhr = new XMLHttpRequest();
         var upload = xhr.upload;
         if(xhrSettings.withCredentials){
