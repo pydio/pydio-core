@@ -239,9 +239,10 @@ class Server
         $req = $this->getRequest();
         $resp = new Response();
         $x = new SerializableResponseStream();
-        $resp = $resp
-            ->withStatus($code)
-            ->withBody($x);
+        if($code > 100 && $code < 599){
+            $resp = $resp->withStatus($code);
+        }
+        $resp = $resp->withBody($x);
         $x->addChunk(new UserMessage($message, LOG_LEVEL_ERROR));
         $this->topMiddleware->emitResponse($req, $resp);
         
