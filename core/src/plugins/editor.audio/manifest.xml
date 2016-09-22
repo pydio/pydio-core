@@ -9,7 +9,7 @@
     </client_settings>
 	<registry_contributions>
 		<actions>
-			<action name="audio_proxy" contentTypedProvider="true">
+			<action name="audio_proxy" contentTypedProvider="true" skipSecureToken="true">
 				<processing>
 					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Server an audio file as a stream">
                         <input_param name="file" type="AJXP_NODE" description="Path to the file"/>

@@ -109,19 +109,16 @@ class CliRunner
             }
         }
 
-        $repoObject = $ctx->getRepository();
-        $clearEnv = false;
-        if ($repoObject->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $encodedCreds = MemorySafe::getEncodedCredentialString();
-            if (!empty($encodedCreds)) {
-                putenv("AJXP_SAFE_CREDENTIALS=" . $encodedCreds);
-                $clearEnv = "AJXP_SAFE_CREDENTIALS";
-            }
+        $envSet = false;
+        if ($ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
+            $envSet = MemorySafe::setEnv();
         }
 
+        // NOW RUN COMMAND
         $res = self::runCommandInBackground($cmd, $logFile);
-        if (!empty($clearEnv)) {
-            putenv($clearEnv);
+
+        if($envSet){
+            MemorySafe::clearEnv();
         }
         return $res;
     }

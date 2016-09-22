@@ -72,15 +72,11 @@ class AuthCliMiddleware
             $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
             if(empty($cKey)) $cKey = "\1CDAFx¨op#";
             $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
-            $env = getenv("AJXP_SAFE_CREDENTIALS");
-            if(!empty($env)){
-                $array = MemorySafe::getCredentialsFromEncodedString($env);
-                if(isSet($array["user"]) && $array["user"] == $optUser){
-                    unset($optToken);
-                    $optPass = $array["password"];
-                }
+            $envPass = MemorySafe::loadPasswordStringFromEnvironment($optUser);
+            if($envPass !== false){
+                unset($optToken);
+                $optPass = $envPass;
             }
-
         }
 
 
