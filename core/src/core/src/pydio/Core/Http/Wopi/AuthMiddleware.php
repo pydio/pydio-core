@@ -61,7 +61,7 @@ class AuthMiddleware
 
         $jwtFrontend = new AuthFrontend("jwt-auth-frontend", "");
         $jwtFrontend->retrieveParams($requestInterface, $responseInterface);
-        
+
         $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
         if($response != null) {
             return $response;

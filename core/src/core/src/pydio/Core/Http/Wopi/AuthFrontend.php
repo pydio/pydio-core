@@ -23,6 +23,7 @@ namespace Pydio\Core\Http\Wopi;
 use JWT;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
@@ -68,7 +69,16 @@ class AuthFrontend extends AbstractAuthFrontend
         $httpVars["auth_token"] = $payload->token;
         $httpVars["auth_hash"] = $payload->hash;
 
-        $request = $request->withParsedBody($httpVars);
+        // NOT GREAT - WE REMOVE /contents from the uri to ensure that the auth_hash works fine
+        $uri = $request->getUri();
+        $path = str_replace("/contents", "", $uri->getPath());
+        $uri = $uri->withPath($path);
+
+        $_SERVER["REQUEST_URI"] = $uri->getPath() . '?' . $uri->getQuery();
+
+        $request = $request
+            ->withUri($uri)
+            ->withParsedBody($httpVars);
     }
 
     /**
@@ -80,10 +90,13 @@ class AuthFrontend extends AbstractAuthFrontend
     function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false) {
 
         // This plugin is depending on other authfront having found the current user
-        $currentUser = AuthService::getLoggedUser();
-        if (!isset($currentUser)) {
+        /** @var ContextInterface $context */
+        $context = $request->getAttribute("ctx");
+        if (!$context->hasUser()) {
             return false;
         }
+
+        $currentUser = $context->getUser();
 
         $httpVars = $request->getParsedBody();
         $jwt = $this->detectVar($httpVars, "access_token");
