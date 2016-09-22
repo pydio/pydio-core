@@ -50,13 +50,6 @@ class JSPacker
                 self::compactEach($list, "Normal");
             }
         }
-        $sList = glob(AJXP_THEME_FOLDER."/css/*_list.txt");
-        foreach ($sList as $list) {
-            $scriptName = str_replace("_list.txt", ".css", $list);
-            JSPacker::concatListAndPack($list,
-                                             $scriptName,
-                                            "None");
-        }
     }
 
     /**
