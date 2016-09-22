@@ -208,7 +208,7 @@ class smb
                     // common error
                     if (strstr($error, "command not found")!==false) {
                         fclose($pipes[1]);
-                        throw new Exception($error);
+                        throw new \Exception($error);
                     } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
                         self::debug("Smbclient alternate stream : ".$error);
                     } else {
