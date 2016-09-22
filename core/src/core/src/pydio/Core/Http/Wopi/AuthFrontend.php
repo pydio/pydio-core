@@ -25,9 +25,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApiKeysService;
-use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Conf\Sql\SqlConfDriver;
+use Zend\Diactoros\UploadedFile;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -57,7 +57,12 @@ class AuthFrontend extends AbstractAuthFrontend
     }
 
     function retrieveParams(ServerRequestInterface &$request, ResponseInterface &$response) {
+
+        /** @var ContextInterface $context */
+        $action = $request->getAttribute("action");
+
         $httpVars = $request->getParsedBody();
+
         $jwt = $this->detectVar($httpVars, "access_token");
         if (empty($jwt)) {
             return false;
@@ -75,6 +80,20 @@ class AuthFrontend extends AbstractAuthFrontend
         $uri = $uri->withPath($path);
 
         $_SERVER["REQUEST_URI"] = $uri->getPath() . '?' . $uri->getQuery();
+
+        // Handle upload case
+        if ($action == "upload") {
+            $stream = $request->getBody();
+
+            $uploadedFile = new UploadedFile(
+                $stream,
+                (int)$request->getHeader("content-length"),
+                0,
+                basename($path)
+            );
+
+            $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
+        }
 
         $request = $request
             ->withUri($uri)

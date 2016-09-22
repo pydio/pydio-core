@@ -126,7 +126,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend
             if ($cookieLogin) {
                 list($userId, $userPass) = CookiesHelper::getRememberCookieData();
             } else {
-                $userId = (isSet($httpVars["userid"]) ? InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS) : null);
+                //$userId = (isSet($httpVars["userid"]) ? InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS) : null);
+                // Auth drivers will do the sanitizing userId.
+                $userId = (isSet($httpVars["userid"]) ? $httpVars["userid"] : null);
                 $userPass = (isSet($httpVars["password"]) ? trim($httpVars["password"]) : null);
             }
             $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true") ? true : false);
