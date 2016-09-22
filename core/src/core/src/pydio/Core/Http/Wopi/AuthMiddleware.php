@@ -27,7 +27,6 @@ use Pydio\Core\Exception\NoActiveWorkspaceException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 
-use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -60,12 +59,15 @@ class AuthMiddleware
         $driverImpl = ConfService::getAuthDriverImpl();
         PluginsService::getInstance(Context::emptyContext())->setPluginUniqueActiveForType("auth", $driverImpl->getName(), $driverImpl);
 
+        $jwtFrontend = new AuthFrontend("jwt-auth-frontend", "");
+        $jwtFrontend->retrieveParams($requestInterface, $responseInterface);
+        
         $response = FrontendsLoader::frontendsAsAuthMiddlewares($requestInterface, $responseInterface);
-        if($response != null){
+        if($response != null) {
             return $response;
         }
 
-        $response = (new AuthFrontend("jwt-auth-frontend", ""))->tryToLogUser($requestInterface, $responseInterface);
+        $response = $jwtFrontend->tryToLogUser($requestInterface, $responseInterface);
         if(!$response != null) {
             $responseInterface = $responseInterface->withStatus(401);
             $responseInterface->getBody()->write('You are not authorized to access this API.');
@@ -108,7 +110,6 @@ class AuthMiddleware
         }
 
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
-
     }
 
 

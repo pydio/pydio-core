@@ -55,6 +55,22 @@ class AuthFrontend extends AbstractAuthFrontend
         return "";
     }
 
+    function retrieveParams(ServerRequestInterface &$request, ResponseInterface &$response) {
+        $httpVars = $request->getParsedBody();
+        $jwt = $this->detectVar($httpVars, "access_token");
+        if (empty($jwt)) {
+            return false;
+        }
+
+        // We have an access token - decode
+        $payload = JWT::decode($jwt);
+
+        $httpVars["auth_token"] = $payload->token;
+        $httpVars["auth_hash"] = $payload->hash;
+
+        $request = $request->withParsedBody($httpVars);
+    }
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -62,6 +78,7 @@ class AuthFrontend extends AbstractAuthFrontend
      * @return bool
      */
     function tryToLogUser(ServerRequestInterface &$request, ResponseInterface &$response, $isLast = false) {
+
         // This plugin is depending on other authfront having found the current user
         $currentUser = AuthService::getLoggedUser();
         if (!isset($currentUser)) {
@@ -86,7 +103,6 @@ class AuthFrontend extends AbstractAuthFrontend
         $task = $payload->task;
 
         $key = ApiKeysService::findPairForAdminTask($task, $currentUser->getId());
-        $signature = self::NOT_FOUND;
 
         if ($key["t"] !== $token) {
             return false;
