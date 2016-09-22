@@ -142,7 +142,7 @@ class RolesService
     public static function updateRole($roleObject, $userObject = null)
     {
         ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
-        //CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
+        CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleObject->getId(), $roleObject);
         ConfService::getInstance()->invalidateLoadedRepositories();
     }
 
@@ -155,7 +155,7 @@ class RolesService
     public static function deleteRole($roleId)
     {
         ConfService::getConfStorageImpl()->deleteRole($roleId);
-        //CacheService::deleteAll(AJXP_CACHE_SERVICE_NS_SHARED);
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleId);
         ConfService::getInstance()->invalidateLoadedRepositories();
     }
 
@@ -230,6 +230,26 @@ class RolesService
         if (self::$useCache && !count($roleIds) && $excludeReserved == true && self::$rolesCache != null) {
             return self::$rolesCache;
         }
+        $searches = array_map(function($k){return "pydio:role:".$k;}, $roleIds);
+        $fetches = CacheService::fetchMultiple(AJXP_CACHE_SERVICE_NS_SHARED, $searches);
+        $missing = [];
+        if(count($fetches)){
+            $found = [];
+            foreach($searches as $cacheKey){
+                $okKey = preg_replace('/^pydio:role:/', "", $cacheKey);
+                if(isSet($fetches[$cacheKey]) && $fetches[$cacheKey] instanceof AJXP_Role){
+                    $found[$okKey] = $fetches[$cacheKey];
+                }else{
+                    $missing[] = $okKey;
+                }
+            }
+            if(!count($missing)){
+                return $found;
+            }else{
+                $roleIds = $missing;
+            }
+        }
+
         $confDriver = ConfService::getConfStorageImpl();
         $roles = $confDriver->listRoles($roleIds, $excludeReserved);
         $repoList = null;
@@ -241,6 +261,13 @@ class RolesService
                 $roles[$roleId] = $newRole;
                 self::updateRole($newRole);
             }
+            if(count($roleIds)){
+                CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleId, $roleObject);
+            }
+        }
+        if(isSet($found) && count($found)){
+            // Add the ones loaded from cache
+            $roles = array_merge($roles, $found);
         }
         if (self::$useCache && !count($roleIds) && $excludeReserved == true) {
             self::$rolesCache = $roles;

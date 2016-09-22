@@ -56,12 +56,32 @@ class CacheService
         $cacheDriver = ConfService::getCacheDriverImpl();
 
         if ($cacheDriver) {
+            //if($namespace === AJXP_CACHE_SERVICE_NS_SHARED) error_log("Saving data for $id");
             return $cacheDriver->save($namespace, $id, $object, $timelimit);
         }
 
         return false;
     }
 
+    /**
+     * @param $namespace
+     * @param $id
+     * @param $object
+     * @param int $timelimit
+     * @return bool
+     */
+    public static function saveWithTimestamp($namespace, $id, $object, $timelimit = 0){
+        $cacheDriver = ConfService::getCacheDriverImpl();
+
+        if ($cacheDriver) {
+            //if($namespace === AJXP_CACHE_SERVICE_NS_SHARED) error_log("Saving data for $id with timestamp");
+            return $cacheDriver->saveWithTimestamp($namespace, $id, $object, $timelimit);
+        }
+
+        return false;
+        
+    }
+    
     /**
      * @param $namespace
      * @param $id
@@ -72,12 +92,51 @@ class CacheService
 
         if ($cacheDriver) {
             $data = $cacheDriver->fetch($namespace, $id);
+            if($data !== false && $namespace === AJXP_CACHE_SERVICE_NS_SHARED){
+                //error_log("Found data for $id");
+            }
             return $data;
         }
 
         return false;
     }
 
+    /**
+     * @param $namespace
+     * @param array $ids
+     * @return bool|mixed
+     */
+    public static function fetchMultiple($namespace, $ids) {
+        $cacheDriver = ConfService::getCacheDriverImpl();
+
+        if ($cacheDriver) {
+            return $cacheDriver->fetchMultiple($namespace, $ids);
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $namespace
+     * @param $id
+     * @param array $idsToCheck
+     * @return bool|false|mixed
+     */
+    public static function fetchWithTimestamps($namespace, $id, $idsToCheck){
+        $cacheDriver = ConfService::getCacheDriverImpl();
+
+        if ($cacheDriver) {
+            $data = $cacheDriver->fetchWithTimestamps($namespace, $id, $idsToCheck);
+            if($data !== false && $namespace === AJXP_CACHE_SERVICE_NS_SHARED){
+                //error_log("Found data for $id after checking timestamps for ".implode(",", $idsToCheck));
+            }
+            return $data;
+        }
+
+        return false;
+
+    }
+    
     /**
      * @param $namespace
      * @param $id

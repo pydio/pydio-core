@@ -360,7 +360,7 @@ class RepositoryService
         if (isSet($this->cache["REPOSITORIES"]) && isSet($this->cache["REPOSITORIES"][$repoId])) {
             return $this->cache["REPOSITORIES"][$repoId];
         }
-        $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId);
+        $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:" . $repoId);
         if($test !== false){
             $this->cache["REPOSITORIES"][$repoId] = $test;
             return $test;
@@ -368,7 +368,7 @@ class RepositoryService
         $test =  ConfService::getConfStorageImpl()->getRepositoryById($repoId);
         if($test != null) {
             $this->cache["REPOSITORIES"][$repoId] = $test;
-            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $test);
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:" . $repoId, $test);
             return $test;
         }
         // Finally try to search in default repositories
@@ -376,7 +376,7 @@ class RepositoryService
         if (isSet($statics[$repoId])) {
             $repo = $statics[$repoId];
             $this->cache["REPOSITORIES"][$repoId] = $test;
-            CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $repoId, $repo);
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:" . $repoId, $repo);
             return $repo;
         }
         $hookedRepo = null;
@@ -440,9 +440,7 @@ class RepositoryService
         }
         Controller::applyHook("workspace.after_create", array(Context::fromGlobalServices(), $oRepository));
         Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
-        CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$oRepository->getId(), $oRepository);
-        // TODO  ?
-        //$this->invalidateLoadedRepositories();
+        CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:".$oRepository->getId(), $oRepository);
         return null;
     }
 
@@ -479,9 +477,7 @@ class RepositoryService
         }
         Controller::applyHook("workspace.after_update", array(Context::fromGlobalServices(), $oRepositoryObject));
         Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
-        // TODO ?
-        //$this->invalidateLoadedRepositories();
-        CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "repository:" . $oRepositoryObject->getId(), $oRepositoryObject);
+        CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:" . $oRepositoryObject->getId(), $oRepositoryObject);
         return 0;
     }
 
@@ -508,9 +504,7 @@ class RepositoryService
         }
         Controller::applyHook("workspace.after_delete", array(Context::fromGlobalServices(), $repoId));
         Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
-        // TODO ?
-        //$this->invalidateLoadedRepositories();
-        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "repository:".$repoId);
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:".$repoId);
         return 0;
     }
 

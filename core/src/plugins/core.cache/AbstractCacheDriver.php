@@ -142,6 +142,23 @@ abstract class AbstractCacheDriver extends Plugin
     }
 
     /**
+     * Fetches many entries from the cache.
+     *
+     * @param $namespace
+     * @param string[] $ids The ids of the cache entry to fetch.
+     * @return mixed The cached data or FALSE, if no cache entry exists for the given id.
+     */
+    public function fetchMultiple($namespace, $ids){
+        $cacheDriver = $this->getCacheDriver($namespace);
+
+        if (isset($cacheDriver)) {
+            return $cacheDriver->fetchMultiple($ids);
+        }
+
+        return false;
+    }
+
+    /**
      * Tests if an entry exists in the cache.
      *
      * @param $namespace
@@ -182,6 +199,61 @@ abstract class AbstractCacheDriver extends Plugin
     }
 
     /**
+     * Puts data into the cache, and store an associated timestamp of current time
+     * @param $namespace
+     * @param $id
+     * @param $data
+     * @param int $lifeTime
+     * @return bool
+     */
+    public function saveWithTimestamp($namespace, $id, $data, $lifeTime = 0){
+
+        $cacheDriver = $this->getCacheDriver($namespace);
+        if(!isSet($cacheDriver)) return false;
+
+        $res = $cacheDriver->save($id, $data, $lifeTime);
+        if(!$res){
+            return false;
+        }
+        $timestamp = time();
+        $cacheDriver->save($this->getTimestampKey($id), $timestamp, $lifeTime);
+        return $res;
+    }
+
+
+    /**
+     * @param $namespace
+     * @param $id
+     * @param $idsToCheck
+     * @return mixed|false
+     */
+    public function fetchWithTimestamps($namespace, $id, $idsToCheck){
+
+        $cacheDriver = $this->getCacheDriver($namespace);
+        if(!isSet($cacheDriver)) return false;
+        if(!count($idsToCheck)){
+            return $cacheDriver->fetch($id);
+        }
+        $idStamp = $cacheDriver->fetch($this->getTimestampKey($id));
+        if(!$idStamp){
+            return false;
+        }
+        $keys = array_map(array($this, "getTimestampKey"), $idsToCheck);
+        $stamps = $cacheDriver->fetchMultiple($keys);
+
+        foreach($stamps as $stampKey => $stampTime){
+            if($stampTime > $idStamp){
+                // One of the object has a more recent timestamp, needs reload
+                $this->delete($namespace, $id);
+                return false;
+            }
+        }
+        return $cacheDriver->fetch($id);
+
+    }
+
+
+    /**
      * Deletes an entry from the cache
      *
      * @param $namespace
@@ -199,6 +271,9 @@ abstract class AbstractCacheDriver extends Plugin
         if (isset($cacheDriver) && $cacheDriver->contains($id)) {
             Logger::debug("CacheDriver::Http", "Clear Key ".$id, ["namespace" => $namespace]);
             $result = $cacheDriver->delete($id);
+            if($cacheDriver->contains($this->getTimestampKey($id))){
+                $cacheDriver->delete($this->getTimestampKey($id));
+            }
             return $result;
         }
 
@@ -277,6 +352,14 @@ abstract class AbstractCacheDriver extends Plugin
             return null;
         }
         return $cacheDriver->getStats();
+    }
+
+    /**
+     * @param string $id
+     * @return string
+     */
+    protected function getTimestampKey($id){
+        return $id . "-PYDIO_CACHE_TIME";
     }
 
     /**
