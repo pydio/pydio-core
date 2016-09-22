@@ -701,13 +701,10 @@ class ShareStore {
         if($currentUser){
             $loggedUser = $this->context->getUser();
             $userId = $loggedUser->getId();
-            $originalUser = null;
         }else{
-            $originalUser = $this->context->getUser()->getId();
             $userId = null;
         }
         $deleted = [];
-        $switchBackToOriginal = false;
 
         $publicLets = $this->listShares($currentUser? $userId: '');
         foreach ($publicLets as $hash => $publicletData) {
@@ -716,14 +713,10 @@ class ShareStore {
                 continue;
             }
             if (ShareLink::isShareExpired($publicletData)){
-                if(!$currentUser) $switchBackToOriginal = true;
                 $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
 
             }
-        }
-        if($switchBackToOriginal){
-            AuthService::logUser($originalUser, "", true);
         }
         return $deleted;
     }

@@ -367,7 +367,7 @@ abstract class AbstractCacheDriver extends Plugin
      * @return bool
      */
     protected function requiresHttpForwarding($cacheDriver){
-        if(!empty($cacheDriver) && $cacheDriver instanceof PydioApcuCache && ConfService::currentContextIsCommandLine()){
+        if(!empty($cacheDriver) && $cacheDriver instanceof PydioApcuCache && ApplicationState::sapiIsCli()){
             return true;
         }
         return false;

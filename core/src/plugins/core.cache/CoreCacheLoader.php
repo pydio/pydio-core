@@ -31,6 +31,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 
 use Pydio\Log\Core\Logger;
@@ -68,7 +69,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
                 $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver", $pluginsService);
             }
             self::$cacheInstance = $pluginInstance;
-            if(!ConfService::currentContextIsCommandLine() && $pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
+            if(!ApplicationState::sapiIsCli() && $pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
                 MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
             }
         }

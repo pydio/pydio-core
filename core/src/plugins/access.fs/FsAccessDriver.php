@@ -935,7 +935,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             case "empty_recycle":
 
                 $taskId = $request->getAttribute("pydio-task-id");
-                if($taskId === null && !ConfService::currentContextIsCommandLine()){
+                if($taskId === null && !ApplicationState::sapiIsCli()){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
@@ -1228,9 +1228,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
             case "lsync" :
 
-                if (!ConfService::currentContextIsCommandLine()) {
-                    //die("This command must be accessed via CLI only.");
-                }
                 $fromNode = null;
                 $toNode = null;
                 $copyOrMove = false;

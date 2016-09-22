@@ -26,6 +26,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -87,14 +88,15 @@ class FrontendsLoader extends Plugin {
         parent::init($ctx, $options);
 
         // Load all enabled frontend plugins
+        $useSessions = ApplicationState::sapiUsesSession();
         $fronts = PluginsService::getInstance($ctx)->getPluginsByType("authfront");
         usort($fronts, array($this, "frontendsSort"));
         foreach($fronts as $front){
             if($front->isEnabled()){
                 $configs = $front->getConfigs();
                 $protocol = $configs["PROTOCOL_TYPE"];
-                if($protocol == "session_only" && !AuthService::$useSession) continue;
-                if($protocol == "no_session" && AuthService::$useSession) continue;
+                if($protocol == "session_only" && !$useSessions) continue;
+                if($protocol == "no_session" && $useSessions) continue;
                 PluginsService::getInstance($ctx)->setPluginActive($front->getType(), $front->getName(), true);
             }
         }

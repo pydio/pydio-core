@@ -24,6 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Share\View\MinisiteRenderer;
 use Zend\Diactoros\Response;
 
@@ -58,7 +59,7 @@ class MinisiteServer extends Server
         $this->rest = $rest;
         parent::__construct($base, []);
         if($rest){
-            ConfService::currentContextIsRestAPI($base);
+            ApplicationState::setSapiRestBase($base);
         }
     }
 

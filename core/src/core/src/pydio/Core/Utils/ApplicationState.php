@@ -33,6 +33,49 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class ApplicationState
 {
     /**
+     * @var null|string
+     */
+    private static $restBase = null;
+
+    /**
+     * @var string
+     */
+    private static $sapiType = "session";
+
+    /**
+     * @param string $restBase
+     */
+    public static function setSapiRestBase($restBase){
+        self::$sapiType = "rest";
+        self::$restBase = $restBase;
+    }
+
+    public static function setSapiTypeCLI(){
+        self::$sapiType = "cli";
+    }
+
+    /**
+     * @return bool
+     */
+    public static function sapiIsCli(){
+        return php_sapi_name() === "cli" || self::$sapiType === "cli";
+    }
+
+    /**
+     * @return null|string
+     */
+    public static function getSapiRestBase(){
+        return self::$restBase;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function sapiUsesSession(){
+        return !self::sapiIsCli() && self::$restBase === null;
+    }
+
+    /**
      * Check if data/cache/first_run_passed file exists or not
      * @return bool
      */
@@ -125,13 +168,14 @@ class ApplicationState
             return "$protocol://$name$port";
         } else {
             $uri = dirname($_SERVER["REQUEST_URI"]);
-            $api = ConfService::currentContextIsRestAPI();
+            $api = self::getSapiRestBase();
             if (!empty($api)) {
-                if(strpos($uri, '/api/') === 0){
+                $api .= '/';
+                if(strpos($uri, $api) === 0){
                     $uri = '/';
                 }else{
                     // Keep only before api base
-                    $uri = array_shift(explode("/api/", $uri));
+                    $uri = array_shift(explode($api, $uri));
                 }
             }
             return "$protocol://$name$port" . $uri;

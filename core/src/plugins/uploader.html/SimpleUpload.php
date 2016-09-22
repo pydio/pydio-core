@@ -130,10 +130,7 @@ class SimpleUpload extends Plugin
 
             if($externalUploadStatus === ExternalUploadedFile::STATUS_REQUEST_OPTIONS){
 
-                /** @var ContextInterface $ctx */
-                $ctx = $request->getAttribute("ctx");
-                $uId = $ctx->getUser()->getId();
-                if(!ApiKeysService::requestHasValidHeadersForAdminTask($request->getServerParams(), "go-upload", $uId)){
+                if(!ApiKeysService::requestHasValidHeadersForAdminTask($request->getServerParams(), "go-upload")){
                     throw new AuthRequiredException();
                 }
 

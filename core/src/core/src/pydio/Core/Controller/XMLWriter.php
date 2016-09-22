@@ -24,6 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\Vars\StringHelper;
@@ -54,7 +55,7 @@ class XMLWriter
     public static function header($docNode="tree", $attributes=array())
     {
         if(self::$headerSent !== false && self::$headerSent == $docNode) return ;
-        if(!ConfService::currentContextIsCommandLine()){
+        if(!ApplicationState::sapiIsCli()){
             header('Content-Type: text/xml; charset=UTF-8');
             header('Cache-Control: no-cache');
         }
@@ -163,7 +164,7 @@ class XMLWriter
      */
     public static function renderHeaderNode($nodeName, $nodeLabel, $isLeaf, $metaData = array())
     {
-        if(!ConfService::currentContextIsCommandLine()) {
+        if(!ApplicationState::sapiIsCli()) {
             header('Content-Type: text/xml; charset=UTF-8');
             header('Cache-Control: no-cache');
         }
@@ -179,7 +180,7 @@ class XMLWriter
      */
     public static function renderAjxpHeaderNode($ajxpNode)
     {
-        if(!ConfService::currentContextIsCommandLine()) {
+        if(!ApplicationState::sapiIsCli()) {
             header('Content-Type: text/xml; charset=UTF-8');
             header('Cache-Control: no-cache');
         }
@@ -256,13 +257,6 @@ class XMLWriter
         $messages = LocaleService::getMessages();
         $confMessages = LocaleService::getConfigMessages();
         $matches = array();
-        if (isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])) {
-            //$xml = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_THEME_FOLDER, $xml);
-            $xml = str_replace("AJXP_SERVER_ACCESS", $_SESSION["AJXP_SERVER_PREFIX_URI"].AJXP_SERVER_ACCESS, $xml);
-        } else {
-            //$xml = str_replace("AJXP_THEME_FOLDER", AJXP_THEME_FOLDER, $xml);
-            $xml = str_replace("AJXP_SERVER_ACCESS", AJXP_SERVER_ACCESS, $xml);
-        }
         $xml = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $xml);
         $xml = str_replace("AJXP_MIMES_EDITABLE", StatHelper::getAjxpMimes("editable"), $xml);
         $xml = str_replace("AJXP_MIMES_IMAGE", StatHelper::getAjxpMimes("image"), $xml);

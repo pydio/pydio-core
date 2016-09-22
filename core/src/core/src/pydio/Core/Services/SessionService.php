@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -36,6 +37,11 @@ define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
  */
 class SessionService implements RepositoriesCache
 {
+    const USER_KEY = "PYDIO_USER";
+    const LANGUAGES_KEY = "PYDIO_LANGUAGES";
+    const CTX_LANGUAGE_KEY = "PYDIO_CTX_LANGUAGE";
+    const CTX_CHARSET_KEY = "PYDIO_CTX_CHARSET";
+
     private static $sessionName = PYDIO_SESSION_NAME;
 
     /**
@@ -50,6 +56,47 @@ class SessionService implements RepositoriesCache
      */
     public static function getSessionName(){
         return self::$sessionName;
+    }
+
+    /**
+     * @param $id
+     * @return null
+     */
+    public static function fetch($id){
+        if(!is_array($_SESSION) || !ApplicationState::sapiUsesSession()) return null;
+        if(isSet($_SESSION[$id]) && !$_SESSION[$id] instanceof \__PHP_Incomplete_Class){
+            return $_SESSION[$id];
+        }
+        return null;
+    }
+
+    /**
+     * @param $id
+     * @param $data
+     * @return bool
+     */
+    public static function save($id, $data){
+        if(!is_array($_SESSION) || !ApplicationState::sapiUsesSession()) return false;
+        $_SESSION[$id] = $data;
+        return true;
+    }
+
+    /**
+     * @param $id string
+     */
+    public static function delete($id){
+        if(!is_array($_SESSION) || !ApplicationState::sapiUsesSession()) return;
+        if(array_key_exists($id, $_SESSION)){
+            unset($_SESSION[$id]);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return bool
+     */
+    public static function has($id){
+        return(is_array($_SESSION) && array_key_exists($id, $_SESSION));
     }
 
     /**
@@ -181,8 +228,10 @@ class SessionService implements RepositoriesCache
      */
     public static function getContextCharset($repositoryId)
     {
-        if (isSet($_SESSION["AJXP_CHARSET"])) return $_SESSION["AJXP_CHARSET"];
-        return null;
+        $arr = self::fetch(self::CTX_CHARSET_KEY);
+        if(!empty($arr) && isSet($arr[$repositoryId])){
+            return $arr[$repositoryId];
+        }
     }
 
     /**
@@ -191,28 +240,23 @@ class SessionService implements RepositoriesCache
      */
     public static function setContextCharset($repositoryId, $value)
     {
-        if (ConfService::$useSession) {
-            $_SESSION["AJXP_CHARSET"] = $value;
-        }
+        $arr = self::fetch(self::CTX_CHARSET_KEY) OR [];
+        $arr[$repositoryId] = $value;
+        self::save(self::CTX_CHARSET_KEY, $arr);
     }
 
     /**
      * @param string $lang
      */
     public static function setLanguage($lang){
-        if(ConfService::$useSession){
-            $_SESSION["AJXP_LANG"] = $lang;
-        }
+        self::save(self::CTX_LANGUAGE_KEY, $lang);
     }
 
     /**
      * @return string|null
      */
     public static function getLanguage(){
-        if(isSet($_SESSION["AJXP_LANG"])){
-            return $_SESSION["AJXP_LANG"];
-        }
-        return null;
+        return self::fetch(self::CTX_LANGUAGE_KEY);
     }
     
 }

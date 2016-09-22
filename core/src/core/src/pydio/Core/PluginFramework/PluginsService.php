@@ -37,7 +37,9 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\CacheService;
 
+use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
@@ -1241,8 +1243,14 @@ class PluginsService
      */
     private function getRegistryCacheKey($extendedVersion = true)
     {
+        $phpContext = 'session';
+        if(ApplicationState::getSapiRestBase() !== null){
+            $phpContext = 'rest';
+        }else if(ApplicationState::sapiIsCli()){
+            $phpContext = 'cli';
+        }
         $v = $extendedVersion ? "extended" : "light";
-        return "xml_registry:" . $v . ":" . $this->context->getStringIdentifier();
+        return "xml_registry:". $phpContext . ":" . $v . ":" . $this->context->getStringIdentifier();
     }
 
     /**

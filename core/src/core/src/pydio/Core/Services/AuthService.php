@@ -20,11 +20,11 @@
  */
 namespace Pydio\Core\Services;
 use Pydio\Auth\Core\MemorySafe;
-use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
 use Pydio\Core\Utils\Http\CookiesHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
@@ -39,26 +39,8 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class AuthService
 {
-    public static $useSession = true;
-    private static $currentUser;
+
     public static $bufferedMessage = null;
-    
-    /**
-     * Get the currently logged user object
-     * @return AbstractUser
-     */
-    public static function getLoggedUser()
-    {
-        if (self::$useSession && isSet($_SESSION["AJXP_USER"])) {
-            if (is_a($_SESSION["AJXP_USER"], "__PHP_Incomplete_Class")) {
-                session_unset();
-                return null;
-            }
-            return $_SESSION["AJXP_USER"];
-        }
-        if(!self::$useSession && isSet(self::$currentUser)) return self::$currentUser;
-        return null;
-    }
 
     /**
      * Log the user from its credentials
@@ -132,10 +114,10 @@ class AuthService
             $user->save("superuser"); // make sure update rights now
         }
 
-        self::updateUser($user);
+        //self::updateSessionUser($user);
         Controller::applyHook("user.after_login", [$tempContext, $user]);
 
-        Logger::info(__CLASS__, "Log In", array("context"=>self::$useSession?"WebUI":"API"));
+        Logger::info(__CLASS__, "Log In", array("context"=> ApplicationState::sapiUsesSession() ?"WebUI":"API"));
         return $user;
     }
 
@@ -145,11 +127,27 @@ class AuthService
      * @param $userObject
      * @return void
      */
-    public static function updateUser($userObject)
-    {
-        if(self::$useSession) $_SESSION["AJXP_USER"] = $userObject;
-        else self::$currentUser = $userObject;
+    public static function updateSessionUser($userObject) {
+        SessionService::save(SessionService::USER_KEY, $userObject);
     }
+
+    /**
+     * Force an acl change for the current session user
+     * @param $repositoryId
+     * @param $acl
+     */
+    public static function updateSessionUserAcl($repositoryId, $acl){
+        /**
+         * @var $u UserInterface
+         */
+        $u = SessionService::fetch(SessionService::USER_KEY);
+        if($u instanceof UserInterface){
+            $u->getPersonalRole()->setAcl($repositoryId, $acl);
+            $u->recomputeMergedRole();
+            self::updateSessionUser($u);
+        }
+    }
+
 
     /**
      * Clear the session
@@ -158,20 +156,19 @@ class AuthService
      */
     public static function disconnect()
     {
-        if (isSet($_SESSION["AJXP_USER"]) || isSet(self::$currentUser)) {
-            $user = isSet($_SESSION["AJXP_USER"]) ? $_SESSION["AJXP_USER"] : self::$currentUser;
-            $userId = $user->id;
-            Controller::applyHook("user.before_disconnect", array(Context::emptyContext(), $user));
-            CookiesHelper::clearRememberCookie($user);
-            Logger::info(__CLASS__, "Log Out", "");
-            unset($_SESSION["AJXP_USER"]);
-            //if(isSet(self::$currentUser)) unset(self::$currentUser);
-            if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
-                MemorySafe::clearCredentials();
-            }
-            Controller::applyHook("user.after_disconnect", array(Context::emptyContext(), $userId));
+        $user = SessionService::fetch(SessionService::USER_KEY);
+        if(empty($user) || !$user instanceof UserInterface){
+            return;
         }
+        $userId = $user->getId();
+        Controller::applyHook("user.before_disconnect", array(Context::emptyContext(), $user));
+        CookiesHelper::clearRememberCookie($user);
+        Logger::info(__CLASS__, "Log Out", "");
+        SessionService::delete(SessionService::USER_KEY);
+        if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
+            MemorySafe::clearCredentials();
+        }
+        Controller::applyHook("user.after_disconnect", array(Context::emptyContext(), $userId));
     }
-
 
 }

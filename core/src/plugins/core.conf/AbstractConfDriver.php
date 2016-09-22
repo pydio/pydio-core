@@ -728,7 +728,7 @@ abstract class AbstractConfDriver extends Plugin
 
                     if (UsersService::usersEnabled() && $loggedUser != null) {
                         $bmUser->save("user");
-                        AuthService::updateUser($bmUser);
+                        AuthService::updateSessionUser($bmUser);
                     } else if (!UsersService::usersEnabled()) {
                         $bmUser->save("user");
                     }
@@ -755,7 +755,7 @@ abstract class AbstractConfDriver extends Plugin
                     }
                     $loggedUser->setPref($prefName, $prefValue);
                     $loggedUser->save("user");
-                    AuthService::updateUser($loggedUser);
+                    AuthService::updateSessionUser($loggedUser);
                     $i++;
                 }
 
@@ -840,7 +840,7 @@ abstract class AbstractConfDriver extends Plugin
                     RolesService::updateRole($userObject->getPersonalRole(), $userObject);
                     $userObject->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
-                        AuthService::updateUser($userObject);
+                        AuthService::updateSessionUser($userObject);
                         $crtLang = LocaleService::getLanguage();
                         $newLang = $userObject->getPersonalRole()->filterParameterValue("core.conf", "lang", AJXP_REPO_SCOPE_ALL, $crtLang);
                         if($newLang !== $crtLang){
@@ -1068,7 +1068,7 @@ abstract class AbstractConfDriver extends Plugin
                 $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                 $loggedUser->save("superuser");
                 $loggedUser->recomputeMergedRole();
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
 
                 $x = new SerializableResponseStream();
                 $responseInterface = $responseInterface->withBody($x);
@@ -1095,7 +1095,7 @@ abstract class AbstractConfDriver extends Plugin
                 $loggedUser->load();
                 $loggedUser->getPersonalRole()->setAcl($repoId, "");
                 $loggedUser->save("superuser");
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
 
                 $x = new SerializableResponseStream();
                 $responseInterface = $responseInterface->withBody($x);

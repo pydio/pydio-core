@@ -212,7 +212,7 @@ class RepositoriesManager extends AbstractManager
                 $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                 $loggedUser->recomputeMergedRole();
                 $loggedUser->save("superuser");
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
 
                 $message = new UserMessage($mess["ajxp_conf.52"]);
                 $reload = new ReloadMessage("", $newRep->getUniqueId());
@@ -317,7 +317,7 @@ class RepositoriesManager extends AbstractManager
                 $loggedUser->getPersonalRole()->setAcl($repo->getUniqueId(), "rw");
                 $loggedUser->recomputeMergedRole();
                 $loggedUser->save("superuser");
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
                 #@TODO: create different message because this action is doing via API
                 $message = new UserMessage($mess["ajxp_conf.52"]);
                 $reload = new ReloadMessage("", $repo->getUniqueId());

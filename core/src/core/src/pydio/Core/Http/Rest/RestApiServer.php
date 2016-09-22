@@ -23,6 +23,7 @@ namespace Pydio\Core\Http\Rest;
 
 use Pydio\Core\Http\Server;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -41,7 +42,7 @@ class RestApiServer extends Server
     public function __construct($base, $requestAttributes = [])
     {
         parent::__construct($base, $requestAttributes);
-        ConfService::currentContextIsRestAPI($base);
+        ApplicationState::setSapiRestBase($base);
     }
 
     protected function stackMiddleWares()

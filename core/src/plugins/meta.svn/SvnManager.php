@@ -100,7 +100,7 @@ class SvnManager extends AbstractMetaSource
                 if (isSet($_SESSION[$sessionKey])) {
                     $file = RecycleBinManager::getRelativeRecycle()."/".RecycleBinManager::getCacheFileName();
                     $realFile = MetaStreamWrapper::getRealFSReference($urlBase.$file);
-                    $this->addIfNotVersionned($file, $realFile);
+                    $this->addIfNotVersionned($ctx, $file, $realFile);
                     $_SESSION[$sessionKey] = true;
                 }
             }
@@ -122,11 +122,12 @@ class SvnManager extends AbstractMetaSource
     }
 
     /**
+     * @param $ctx ContextInterface
      * @param $repoFile
      * @param $realFile
      * @throws \Exception
      */
-    protected function addIfNotVersionned($repoFile, $realFile)
+    protected function addIfNotVersionned(ContextInterface $ctx, $repoFile, $realFile)
     {
         $error = false;
         $res = [];
@@ -138,7 +139,7 @@ class SvnManager extends AbstractMetaSource
         if ($error || (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?")) {
             ExecSvnCmd("svn add", "$realFile");
             $this->commitMessageParams = "Recycle cache file";
-            $this->commitChanges("ADD", array("dir" => dirname($repoFile)), array());
+            $this->commitChanges("ADD", array("dir" => dirname($repoFile)), array(), $ctx);
         }
     }
 
@@ -146,7 +147,7 @@ class SvnManager extends AbstractMetaSource
      * @param String $file URL of the file to commit (probably a metadata)
      * @param \Pydio\Access\Core\Model\AJXP_Node $ajxpNode Optionnal node to commit along.
      */
-    public function commitFile($file, $ajxpNode = null)
+    public function commitFile($file, $ajxpNode)
     {
         $realFile = MetaStreamWrapper::getRealFSReference($file);
 
@@ -154,22 +155,23 @@ class SvnManager extends AbstractMetaSource
         if (count($res[IDX_STDOUT]) && substr($res[IDX_STDOUT][0],0,1) == "?") {
             $res2 = ExecSvnCmd("svn add", "$realFile");
         }
+        $ctx = $ajxpNode->getContext();
         if ($ajxpNode != null) {
             $nodeRealFile = MetaStreamWrapper::getRealFSReference($ajxpNode->getUrl());
             try {
                 ExecSvnCmd("svn propset metachange ".time(), $nodeRealFile);
             } catch (\Exception $e) {
-                $this->commitChanges("COMMIT_META", $realFile, array());
+                $this->commitChanges("COMMIT_META", $realFile, array(), $ctx);
                 return;
             }
             // WILL COMMIT BOTH AT ONCE
             $command = "svn commit";
-            $user = AuthService::getLoggedUser()->getId();
+            $user = $ctx->getUser()->getId();
             $switches = "-m \"Pydio||$user||COMMIT_META||file:".escapeshellarg($file)."\"";
             ExecSvnCmd($command, array($realFile, $nodeRealFile), $switches);
             ExecSvnCmd('svn update', dirname($nodeRealFile), '');
         } else {
-            $this->commitChanges("COMMIT_META", $realFile, array());
+            $this->commitChanges("COMMIT_META", $realFile, array(), $ctx);
         }
     }
 
@@ -245,7 +247,7 @@ class SvnManager extends AbstractMetaSource
                 system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $escapedFile > ".escapeshellarg($targetFile));
             } else {
                 system( (SVNLIB_PATH!=""?SVNLIB_PATH."/":"") ."svn cat -r$revision $escapedFile > $escapedFile");
-                $this->commitChanges($actionName, $realFile, array());
+                $this->commitChanges($actionName, $realFile, array(), $ctx);
             }
 
         } else if ($actionName == "svnswitch") {
@@ -289,7 +291,7 @@ class SvnManager extends AbstractMetaSource
             break;
         }
         if (isSet($res)) {
-            $this->commitChanges($actionName, $httpVars, $filesVars);
+            $this->commitChanges($actionName, $httpVars, $filesVars, $ctx);
         }
     }
 
@@ -320,15 +322,15 @@ class SvnManager extends AbstractMetaSource
             } else {
                 $destFile = $init["DEST_DIR"]."/".basename($selectedFile);
             }
-            $this->addIfNotVersionned(str_replace($init["DIR"], "", $selectedFile), $selectedFile);
-            $res = ExecSvnCmd("svn $action", array($selectedFile,$destFile), '');
+            $this->addIfNotVersionned($ctx, str_replace($init["DIR"], "", $selectedFile), $selectedFile);
+            ExecSvnCmd("svn $action", array($selectedFile,$destFile), '');
         }
         if ($actionName != "rename") {
             $this->commitMessageParams .= "[".implode(",",$init["SELECTION"])."]";
         }
-        $this->commitChanges($actionName, $httpVars, $filesVars);
+        $this->commitChanges($actionName, $httpVars, $filesVars, $ctx);
         if ($actionName != "rename") {
-            $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars);
+            $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars, $ctx);
         }
         $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
 
@@ -363,14 +365,14 @@ class SvnManager extends AbstractMetaSource
                     RecycleBinManager::deleteFromRecycle($file);
                 }
             }
-            $this->commitChanges($actionName, array("dir" => RecycleBinManager::getRelativeRecycle()), $filesVars);
+            $this->commitChanges($actionName, array("dir" => RecycleBinManager::getRelativeRecycle()), $filesVars, $ctx);
             return ;
         }
         foreach ($init["SELECTION"] as $selectedFile) {
             $res = ExecSvnCmd('svn delete', $selectedFile, '--force');
         }
         $this->commitMessageParams = "[".implode(",",$init["SELECTION"])."]";
-        $this->commitChanges($actionName, $httpVars, $filesVars);
+        $this->commitChanges($actionName, $httpVars, $filesVars, $ctx);
         $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
 
         $mess = LocaleService::getMessages();
@@ -400,7 +402,7 @@ class SvnManager extends AbstractMetaSource
             return;
         }
         $command = "svn commit";
-        $user = AuthService::getLoggedUser()->getId();
+        $user = $ctx->getUser()->getId();
         $switches = "-m \"Pydio||$user||$actionName".(isSet($this->commitMessageParams)?"||".$this->commitMessageParams:"")."\"";
         $res = ExecSvnCmd($command, $args, $switches);
         if (is_file($args)) {

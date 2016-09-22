@@ -28,6 +28,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use \Elastica;
@@ -163,7 +164,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             try {
                 $this->loadIndex($ctx, false);
             } catch (\Exception $ex) {
-                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !isSet($httpVars["skip_unindexed"])) {
+                if (ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() && !isSet($httpVars["skip_unindexed"])) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
@@ -350,7 +351,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
     {
         //print("Indexing $url \n");
         $this->logDebug("Indexing content of folder ".$url);
-        if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+        if (ApplicationState::sapiIsCli() && $this->verboseIndexation) {
             print("Indexing content of ".$url."\n");
         }
         @set_time_limit(60);
