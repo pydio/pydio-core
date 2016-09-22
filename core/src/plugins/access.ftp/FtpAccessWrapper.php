@@ -661,7 +661,14 @@ class FtpAccessWrapper implements IAjxpWrapper
             $parts = UrlUtils::safeParseUrl($url);
         }
         $serverPath = InputFilter::securePath("/$this->path/" . $parts["path"]);
-        return "ftp".($this->secure?"s":"")."://$this->user:$this->password@$this->host:$this->port".$serverPath;
+        if($this->secure){
+            $protocol = 'ftps';
+        }
+        else{
+            $protocol = 'ftp';
+        }
+        $url = $protocol.'://'.urlencode($this->user).':'.urlencode($this->password).'@'.$this->host.':'.$this->port.$serverPath;
+        return $url;
     }
 
     /**
