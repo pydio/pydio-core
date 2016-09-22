@@ -928,7 +928,7 @@
 						dObject.insert({before:'\
 							<div id="chunk_dl_form" style="height:36px;"> \
 								<span style="display:inline-block;float:left;margin-top: 11px;margin-left: 4px;margin-right: 4px;">'+MessageHash[400]+'</span> <input type="text" style="float:left;margin-top:5px; text-align:right; width:30px;height:24px;" name="chunk_count" id="chunk_count" value="4"> \
-								<input type="image" style="float:left;" id="dl_form_submit" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" class="dialogButton dialogFocus">\
+								<a id="dl_form_submit" class="dialogButton dialogFocus">OK</a>\
 							</div> \
 						'});
 						$("dl_form_submit").observe("click", function(e){

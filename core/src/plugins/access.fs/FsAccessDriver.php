@@ -47,6 +47,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\PathUtils;
@@ -716,8 +717,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     "total_size"  => $totalSize,
                     "file_id"	  => $sessionKey
                 ];
-
-                $_SESSION[$sessionKey] = array_merge($chunkData, ["file"=>$realFile]);
+                SessionService::save($sessionKey, array_merge($chunkData, ["file" => $realFile]));
                 $response = $response->withHeader("Content-type", "application/json; charset=UTF-8");
                 $response->getBody()->write(json_encode($chunkData));
 
@@ -729,7 +729,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $chunkIndex = intval($httpVars["chunk_index"]);
                 $chunkKey = $httpVars["file_id"];
-                $sessData = $_SESSION[$chunkKey];
+                $sessData = SessionService::fetch($chunkKey);
                 $realFile = $sessData["file"];
                 $chunkSize = $sessData["chunk_size"];
                 $offset = $chunkSize * $chunkIndex;

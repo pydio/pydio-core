@@ -58,7 +58,7 @@
 		var new_row_button = new Element('a');
 		new_row_button.href= this.downloadUrl + fileName;
         var display = he.escape(label?label:getBaseName(fileName));
-		new_row_button.insert('<img src="'+ajxpResourcesFolder+'/images/actions/16/download_manager.png" height="16" width="16" align="absmiddle" border="0"> '+ display);
+		new_row_button.insert('<span class="mdi mdi-download"></span> '+ display);
 
 		new_row_button.multidownloader = this;
 		

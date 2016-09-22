@@ -2030,6 +2030,32 @@ div#multiple_download_container {
   text-align: left;
   border-radius: 1px;
 }
+div#multi_download_form a#dl_form_submit {
+  border-radius: 2px;
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  color: #009688;
+  text-transform: uppercase;
+}
+div#multi_download_form a#dl_form_submit:hover {
+  background-color: #bffff9;
+}
+div#multiple_download_container {
+  width: 100%;
+}
+div#multiple_download_container a {
+  font-size: 16px;
+}
+div#multiple_download_container a span.mdi-download {
+  font-size: 14px;
+  display: inline-block;
+  margin-right: 5px;
+}
 .droparea {
   background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
 }
