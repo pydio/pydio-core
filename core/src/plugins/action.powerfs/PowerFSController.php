@@ -50,7 +50,7 @@ class PowerFSController extends Plugin
 
     public function performChecks()
     {
-        if (class_exists("\\Pydio\\Share\\ShareCenter") && \Pydio\Share\ShareCenter::currentContextIsLinkDownload()) {
+        if(ApplicationState::hasMinisiteHash() && ApplicationState::getSapiRestBase() !== null){
             throw new Exception("Disable during link download");
         }
     }

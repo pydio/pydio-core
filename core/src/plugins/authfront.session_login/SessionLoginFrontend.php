@@ -81,7 +81,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
         }
 
-        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
+        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && !ApplicationState::hasMinisiteHash()) {
 
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {

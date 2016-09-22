@@ -41,6 +41,7 @@ class SessionService implements RepositoriesCache
     const LANGUAGES_KEY = "PYDIO_LANGUAGES";
     const CTX_LANGUAGE_KEY = "PYDIO_CTX_LANGUAGE";
     const CTX_CHARSET_KEY = "PYDIO_CTX_CHARSET";
+    const CTX_MINISITE_HASH = "PYDIO_CTX_MINISITE";
 
     private static $sessionName = PYDIO_SESSION_NAME;
 

@@ -22,6 +22,7 @@
 namespace Pydio\Gui;
 
 use Exception;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Http\UserAgent;
 
 use Pydio\Core\PluginFramework\Plugin;
@@ -37,7 +38,9 @@ class MobileNativeRedirect extends Plugin
 {
     public function performChecks()
     {
-        if (isSet($_SESSION["CURRENT_MINISITE"])) throw new Exception("Disabled for minisites");
+        if (ApplicationState::hasMinisiteHash()) {
+            throw new Exception("Disabled for minisites");
+        }
         if (UserAgent::userAgentIsWindowsPhone()) {
             throw new Exception("No native app for windows phone");
         }

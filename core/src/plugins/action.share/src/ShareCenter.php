@@ -533,17 +533,19 @@ class ShareCenter extends Plugin
      */
     public function preProcessDownload(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface){
 
-        if(isSet($_SESSION["CURRENT_MINISITE"])){
-            $hash = $_SESSION["CURRENT_MINISITE"];
-            $share = $this->getShareStore()->loadShareObject($hash);
-            if(!empty($share)){
-                if($share->isExpired()){
-                    throw new \Exception('Link is expired');
-                }
-                if($share->hasDownloadLimit()){
-                    $share->incrementDownloadCount();
-                    $share->save();
-                }
+        if(!ApplicationState::hasMinisiteHash()) {
+            return;
+        }
+
+        $hash = ApplicationState::getMinisiteHash();
+        $share = $this->getShareStore()->loadShareObject($hash);
+        if(!empty($share)){
+            if($share->isExpired()){
+                throw new \Exception('Link is expired');
+            }
+            if($share->hasDownloadLimit()){
+                $share->incrementDownloadCount();
+                $share->save();
             }
         }
 

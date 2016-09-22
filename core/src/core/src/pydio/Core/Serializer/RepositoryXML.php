@@ -26,6 +26,7 @@ use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -132,9 +133,7 @@ class RepositoryXML
         }
 
         $descTag = "";
-        $public = false;
-        if(!empty($_SESSION["CURRENT_MINISITE"])) $public = true;
-        $description = $repoObject->getDescription($public, $ownerLabel);
+        $description = $repoObject->getDescription(ApplicationState::hasMinisiteHash(), $ownerLabel);
         if (!empty($description)) {
             $descTag = '<description>'. StringHelper::xmlEntities($description, true) .'</description>';
         }

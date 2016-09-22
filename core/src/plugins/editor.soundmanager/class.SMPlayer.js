@@ -243,7 +243,7 @@ soundManager.setup({\n\
     },
 
     getRESTPreviewLinks:function(node){
-        return {"MP3 Stream": "&file=" + encodeURIComponent(node.getPath())};
+        return {"MP3 Stream": ""};
     },
 
 	getPreview : function(ajxpNode, rich){

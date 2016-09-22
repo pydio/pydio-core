@@ -24,6 +24,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -126,7 +127,7 @@ class UserXML
         }
 
         foreach ($accessible as $repoId => $repoObject) {
-            if(!isSet($_SESSION["CURRENT_MINISITE"]) && $repoObject->hasContentFilter()){
+            if(!ApplicationState::hasMinisiteHash() && $repoObject->hasContentFilter()){
                 continue;
             }
             $accessStatus = '';

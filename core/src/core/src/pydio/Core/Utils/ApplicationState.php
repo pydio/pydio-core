@@ -43,6 +43,11 @@ class ApplicationState
     private static $sapiType = "session";
 
     /**
+     * @var string
+     */
+    private static $minisiteHash = null;
+
+    /**
      * @param string $restBase
      */
     public static function setSapiRestBase($restBase){
@@ -73,6 +78,27 @@ class ApplicationState
      */
     public static function sapiUsesSession(){
         return !self::sapiIsCli() && self::$restBase === null;
+    }
+
+    /**
+     * @param $hash
+     */
+    public static function setStateMinisite($hash){
+        self::$minisiteHash = $hash;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function hasMinisiteHash(){
+        return self::$minisiteHash !== null;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getMinisiteHash(){
+        return self::$minisiteHash;
     }
 
     /**

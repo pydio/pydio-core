@@ -165,8 +165,8 @@ class Notification implements ContextProviderInterface
      */
     public function getMainLink()
     {
-        if(isSet($_SESSION["CURRENT_MINISITE"]) && class_exists("\\Pydio\\Share\\ShareCenter")){
-            $hash = $_SESSION["CURRENT_MINISITE"];
+        if(ApplicationState::hasMinisiteHash() && class_exists("\\Pydio\\Share\\ShareCenter")){
+            $hash = ApplicationState::getMinisiteHash();
             $shareCenter = \Pydio\Share\ShareCenter::getShareCenter($this->getContext());
             if(!empty($shareCenter)){
                 return $shareCenter->getPublicAccessManager()->buildPublicLink($hash);
@@ -251,7 +251,7 @@ class Notification implements ContextProviderInterface
         $crtUserId = "shared";
         $crtUser = $this->getNode()->hasUser() ? $this->getNode()->getUser() : null;
         if($crtUser != null) $crtUserId = $crtUser->getId();
-        if(isSet($_SESSION["CURRENT_MINISITE"])){
+        if(ApplicationState::hasMinisiteHash()){
             if($repo->hasContentFilter()){
                 $type = "minisite.file";
             }else{

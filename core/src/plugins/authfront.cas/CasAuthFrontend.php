@@ -32,6 +32,7 @@ use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Log\Core\Logger;
 
@@ -82,7 +83,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
     {
         $httpVars = $request->getParsedBody();
 
-        if (isset($_SESSION["CURRENT_MINISITE"])) {
+        if (ApplicationState::hasMinisiteHash()) {
             return false;
         }
 

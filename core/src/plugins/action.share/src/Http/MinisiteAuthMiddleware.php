@@ -92,7 +92,8 @@ class MinisiteAuthMiddleware
         }
 
         if($sessions){
-            $_SESSION["CURRENT_MINISITE"] = $hash;
+            SessionService::save(SessionService::CTX_MINISITE_HASH, $hash);
+            ApplicationState::setStateMinisite($hash);
         }
         if(!empty($ctx) && $ctx->hasUser() && isSet($shareData["REPOSITORY"])){
             $repoObject = UsersService::getRepositoryWithPermission($ctx->getUser(), $shareData["REPOSITORY"]);
