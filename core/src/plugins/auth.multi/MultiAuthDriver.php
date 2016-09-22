@@ -568,7 +568,7 @@ class MultiAuthDriver extends AbstractAuthDriver
          * Override only for ldap.
          */
         if ($this->masterSlaveMode) {
-            if ($this->masterName == 'ldap') {
+            if (($this->masterName == 'ldap') || ($this->masterName == 'ldapv2')) {
                 return $this->drivers[$this->masterName]->sanitize($s, $level);
             }
         }
