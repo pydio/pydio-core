@@ -988,6 +988,13 @@ class LdapAuthDriver extends AbstractAuthDriver
      */
     public function sanitize($s, $level = InputFilter::SANITIZE_HTML)
     {
-        return $s;
+        $preg = '/[\\/<>\?\*\\\\|;:,+"\]\[]/';
+        /**
+         * These are illegal characters and can break ldap searching.
+         * when we create new user on Windows AD, these illegal characters will be replaced by '_'.
+         * Give a try by replacement of '_'
+         */
+        $newS = preg_replace($preg, '_', $s);
+        return $newS;
     }
 }
