@@ -606,13 +606,13 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
             $doc = @\Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Docx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Pptx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
         } elseif ($parseContent && $ext == "xlsx" && class_exists("\Zend_Search_Lucene_Document_Xlsx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
         } else {
             $doc = new \Zend_Search_Lucene_Document();
