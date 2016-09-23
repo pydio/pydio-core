@@ -104,7 +104,7 @@ Class.create("TextEditor", AbstractEditor, {
 	},
 	
 	parseXml : function(transport){
-		if(parseInt(transport.responseText).toString() == transport.responseText){
+                if(transport.responseText != "The file has been saved successfully"){
 			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
 		}else{
 			this.setModified(false);
