@@ -180,7 +180,7 @@ class ConfService
      */
     public static function backgroundActionsSupported()
     {
-        return function_exists("mcrypt_create_iv") && ConfService::getGlobalConf("CMDLINE_ACTIVE");
+        return ConfService::getGlobalConf("CMDLINE_ACTIVE");
     }
 
     /**

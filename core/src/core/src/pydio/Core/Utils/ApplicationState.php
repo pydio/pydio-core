@@ -183,8 +183,9 @@ class ApplicationState
         if (!empty($setUrl) && !$forceInternal) {
             return (string)$setUrl;
         }
-        if (php_sapi_name() == "cli") {
-            Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");
+        if (self::sapiIsCli()) {
+            Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD IT WHEN WORKING IN CLI");
+            return "";
         }
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
         $port = (($protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443)

@@ -22,6 +22,7 @@ namespace Pydio\Auth\Core;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 
@@ -50,11 +51,7 @@ class MemorySafe
      */
     public function __construct()
     {
-        if (defined('AJXP_SAFE_SECRET_KEY')) {
-            $this->secretKey = AJXP_SAFE_SECRET_KEY;
-        } else {
-            $this->secretKey = "\1CDAFx¨op#";
-        }
+        $this->secretKey = Crypto::getApplicationSecret();
     }
     /**
      * Store the user/password pair. Password will be encoded
@@ -93,11 +90,7 @@ class MemorySafe
      */
     private function _encodePassword($password, $user)
     {
-        if (function_exists('mcrypt_encrypt')) {
-            // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$this->secretKey), $password, MCRYPT_MODE_ECB));
-        }
-        return $password;
+        return Crypto::encrypt($password, md5($user . $this->secretKey));
     }
     /**
      * Use mcrypt functions to decode the password
@@ -107,11 +100,7 @@ class MemorySafe
      */
     private function _decodePassword($encoded, $user)
     {
-        if (function_exists('mcrypt_decrypt')) {
-             // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-             $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB), "\0");
-        }
-        return $encoded;
+        return Crypto::decrypt($encoded, md5($user . $this->secretKey));
     }
     /**
      * Store the password credentials in the session

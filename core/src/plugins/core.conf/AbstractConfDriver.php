@@ -45,6 +45,7 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
@@ -926,13 +927,7 @@ abstract class AbstractConfDriver extends Plugin
                         $davData["ACTIVE"] = $activate;
                     }
                     if (!empty($httpVars["webdav_pass"])) {
-                        $password = $httpVars["webdav_pass"];
-                        if (function_exists('mcrypt_encrypt')) {
-                            $user = $loggedUser->getId();
-                            $secret = (defined("AJXP_SAFE_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
-                            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB));
-                        }
-                        $davData["PASS"] = $password;
+                        $davData["PASS"] = Crypto::encrypt($httpVars["webdav_pass"], md5($loggedUser->getId().Crypto::getApplicationSecret()));
                     }
                     $loggedUser->setPref("AJXP_WEBDAV_DATA", $davData);
                     $loggedUser->save("user");

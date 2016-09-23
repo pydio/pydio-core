@@ -35,6 +35,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
@@ -69,9 +70,7 @@ class AuthCliMiddleware
         } else {
             // Consider "u" is a crypted version of u:p
             $optToken = $options["t"];
-            $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
-            if(empty($cKey)) $cKey = "\1CDAFx¨op#";
-            $optUser = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($optToken.$cKey), base64_decode($optUser), MCRYPT_MODE_ECB), "\0");
+            $optUser = Crypto::decrypt($optUser, md5($optToken.Crypto::getCliSecret()));
             $envPass = MemorySafe::loadPasswordStringFromEnvironment($optUser);
             if($envPass !== false){
                 unset($optToken);
