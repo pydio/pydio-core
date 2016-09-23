@@ -308,7 +308,7 @@ class Repository implements RepositoryInterface
      */
     public function setSlug($slug = null)
     {
-        if ($slug === null) {
+        if (empty($slug)) {
             $this->slug = StringHelper::slugify($this->display);
         } else {
             $this->slug = $slug;

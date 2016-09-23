@@ -304,7 +304,7 @@ class MultiAuthDriver extends AbstractAuthDriver
             $this->addToCache(array_keys($masterUsers), $this->slaveName);
             $slaveUsers = $this->drivers[$this->masterName]->listUsers($baseGroup, $recursive);
             $this->addToCache(array_keys($slaveUsers), $this->masterName);
-            return array_merge($masterUsers, $slaveUsers);
+            return $masterUsers + $slaveUsers;
         }
         if ($this->getCurrentDriver()) {
 //			return $this->getCurrentDriver()->listUsers($baseGroup);
