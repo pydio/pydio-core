@@ -47,8 +47,8 @@ class SqlTasksProvider implements ITasksProvider
             "parent_uid"        => $task->getParentId(),
             "flags"             => $task->getFlags(),
             "label"             => $task->getLabel(),
-            "userId"            => $task->getUserId(),
-            "wsId"              => $task->getWsId(),
+            "user_id"            => $task->getUserId(),
+            "ws_id"              => $task->getWsId(),
             "status"            => $task->getStatus(),
             "status_msg"        => $task->getStatusMessage(),
             "progress"          => $task->getProgress(),
@@ -84,8 +84,8 @@ class SqlTasksProvider implements ITasksProvider
         }
         $task->setFlags($values["flags"]);
         $task->setLabel($values["label"]);
-        $task->setUserId($values["userId"]);
-        $task->setWsId($values["wsId"]);
+        $task->setUserId($values["user_id"]);
+        $task->setWsId($values["ws_id"]);
         $task->setStatus($values["status"]);
         $task->setStatusMessage($values["status_msg"]);
         $task->setProgress($values["progress"]);
@@ -187,10 +187,10 @@ class SqlTasksProvider implements ITasksProvider
         $tasks = [];
         $where = [];
         if($user !== null){
-            $where[] = array("[userId] = %s", $user->getId());
+            $where[] = array("[user_id] = %s", $user->getId());
         }
         if($repository !== null){
-            $where[] = array("[wsId] = %s", $repository->getId());
+            $where[] = array("[ws_id] = %s", $repository->getId());
         }
         $where[] = array("[status] IN (1,2,8,16)");
         $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
@@ -232,10 +232,10 @@ class SqlTasksProvider implements ITasksProvider
         $tasks = [];
         $where = [];
         if($user !== null){
-            $where[] = array("[userId] = %s", $user->getId());
+            $where[] = array("[user_id] = %s", $user->getId());
         }
         if($repository !== null){
-            $where[] = array("[wsId] = %s", $repository->getId());
+            $where[] = array("[ws_id] = %s", $repository->getId());
         }
         if($status !== -1){
             $where[] = array("[status] = %i", $status);
