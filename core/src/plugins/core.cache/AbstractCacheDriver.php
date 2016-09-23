@@ -30,9 +30,10 @@ use Pydio\Access\Core\Model\AJXP_Node;
 
 
 use Pydio\Cache\Doctrine\Ext\PydioApcuCache;
+use Pydio\Cache\Doctrine\Ext\PydioChainCache;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Cache\Doctrine\Ext\PatternClearableCache;
-use Pydio\Core\Services\ConfService;
 use GuzzleHttp\Client;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Log\Core\Logger;
@@ -367,7 +368,10 @@ abstract class AbstractCacheDriver extends Plugin
      * @return bool
      */
     protected function requiresHttpForwarding($cacheDriver){
-        if(!empty($cacheDriver) && $cacheDriver instanceof PydioApcuCache && ApplicationState::sapiIsCli()){
+        if(empty($cacheDriver) || !ApplicationState::sapiIsCli()){
+            return false;
+        }
+        if(($cacheDriver instanceof PydioChainCache && $cacheDriver->oneProviderRequiresHttpDeletion()) || $cacheDriver instanceof PydioApcuCache){
             return true;
         }
         return false;
@@ -375,11 +379,16 @@ abstract class AbstractCacheDriver extends Plugin
 
     /**
      * @return Client
+     * @throws PydioException
      */
     protected function getHttpClient(){
         if(!isSet($this->httpClient)){
+            $baseUrl = ApplicationState::detectServerURL(true);
+            if(empty($baseUrl)){
+                throw new PydioException("Server URL does not seem to be configured, CLI cannot trigger cache deletion commands");
+            }
             $this->httpClient = new Client([
-                'base_url' => ApplicationState::detectServerURL(true)
+                'base_url' => $baseUrl
             ]);
         }
         return $this->httpClient;
@@ -388,7 +397,6 @@ abstract class AbstractCacheDriver extends Plugin
     public function __destruct()
     {
         if(count($this->httpDeletion)){
-            Logger::debug("CacheDriver::CLI", "Sending cache clear to http", $this->httpDeletion);
             $this->getHttpClient()->post('/?get_action=clear_cache_key', [
                 'body' => [
                     'data' => json_encode($this->httpDeletion)

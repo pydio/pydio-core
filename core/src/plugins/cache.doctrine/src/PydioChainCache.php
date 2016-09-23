@@ -76,4 +76,14 @@ class PydioChainCache extends ChainCache implements PatternClearableCache {
             $cache->setNamespace($namespace);
         }
     }
+
+    /**
+     * @return bool
+     */
+    public function oneProviderRequiresHttpDeletion(){
+        foreach($this->cacheProviders as $provider){
+            if($provider instanceof PydioApcuCache) return true;
+        }
+        return false;
+    }
 }
