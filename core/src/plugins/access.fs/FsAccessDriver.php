@@ -485,10 +485,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
 
             // PARTIAL UPLOAD CASE - PREPPEND .dlpart extension
-            if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true' && isSet($httpVars["partial_target_bytesize"])){
+            if(isSet($httpVars["partial_upload"]) && $httpVars["partial_upload"] == 'true' && isSet($httpVars["partial_target_bytesize"])) {
                 $partialUpload = true;
                 $partialTargetSize = intval($httpVars["partial_target_bytesize"]);
-                if(!isSet($httpVars["appendto_urlencoded_part"])){
+                if(!isSet($httpVars["appendto_urlencoded_part"])) {
                     $userfile_name .= ".dlpart";
                     $targetUrl = $destination."/".$userfile_name;
                 }

@@ -70,10 +70,6 @@ class StreamWrapper implements IAjxpWrapper
     public function stream_open($path, $mode, $options, &$opened_path) {
         $this->stream = self::createStream($path, $mode);
 
-        if ($this->stream->isWritable() && !$this->stream->isReadable()) {
-            $a = 1;
-        }
-
         return true;
     }
 
@@ -341,7 +337,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function stream_flush()
     {
-        // TODO: Implement stream_flush() method.
+        //$this->stream->flush();
     }
 
     /**

@@ -349,6 +349,10 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (!empty($this->pluginConf["PHPCAS_MODE"]["casmode"])) {
             $this->cas_mode = $this->pluginConf["PHPCAS_MODE"]["casmode"];
         }
+        else{
+            $this->cas_mode = PHPCAS_MODE_CLIENT;
+        }
+        
         if (!empty($this->pluginConf["CERTIFICATE_PATH"])) {
             $this->cas_certificate_path = trim($this->pluginConf["CERTIFICATE_PATH"]);
         }

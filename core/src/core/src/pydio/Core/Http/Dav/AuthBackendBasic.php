@@ -131,7 +131,6 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
             //AJXP_Logger::debug("Using Cached Password");
         }
 
-
         if (!$cachedPasswordValid && (!$this->validateUserPass($userpass[0],$userpass[1]))) {
             Logger::warning(__CLASS__, "Login failed", array("user" => $userpass[0], "error" => "Invalid WebDAV user or password"));
             $auth->requireLogin();
