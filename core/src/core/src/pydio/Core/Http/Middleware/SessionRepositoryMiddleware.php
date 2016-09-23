@@ -167,43 +167,7 @@ class SessionRepositoryMiddleware
                 $user->setArrayPref("history", "last_repository", $repoObject->getId());
             }
         }
-
-
-        /*
-                if (UsersService::usersEnabled() && $loggedUser !== null && !empty($repoObject)) {
-                    $currentRepoId = $repoObject->getId();
-                    if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
-                        $loggedUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
-                        $loggedUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-                        AuthService::updateUser($loggedUser);
-                        unset($_SESSION["PENDING_REPOSITORY_ID"]);
-                        unset($_SESSION["PENDING_FOLDER"]);
-                    }
-                    $lastRepoId  = $loggedUser->getArrayPref("history", "last_repository");
-                    $defaultRepoId = -1;
-                    // Find default ID from ACLS
-                    $acls = $loggedUser->getMergedRole()->listAcls(true);
-                    foreach($acls as $key => $right){
-                        if (!empty($right) && ConfService::getRepositoryById($key) != null) {
-                            $defaultRepoId= $key;
-                            break;
-                        }
-                    }
-                    if ($defaultRepoId == -1) {
-                        throw new NoActiveWorkspaceException();
-                    } else {
-                        if ($lastRepoId !== "" && $lastRepoId!== $currentRepoId && $restRepositoryId == -1 && $loggedUser->canSwitchTo($lastRepoId)) {
-                            $repoObject = ConfService::switchRootDir($lastRepoId);
-                        } else if ($restRepositoryId !== -1 && $loggedUser->canSwitchTo($restRepositoryId)) {
-                            $repoObject = ConfService::switchRootDir($restRepositoryId);
-                        } else if (!$loggedUser->canSwitchTo($currentRepoId)) {
-                            $repoObject = ConfService::switchRootDir($defaultRepoId);
-                        }
-                    }
-
-                }
-        */
-
+        
         return $repoObject;
 
     }

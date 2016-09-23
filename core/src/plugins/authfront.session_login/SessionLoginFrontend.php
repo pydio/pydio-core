@@ -23,9 +23,11 @@ namespace Pydio\Auth\Frontend;
 use __PHP_Incomplete_Class;
 use Exception;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
@@ -64,20 +66,22 @@ class SessionLoginFrontend extends AbstractAuthFrontend
     protected function logUserFromSession(\Psr\Http\Message\ServerRequestInterface &$request)
     {
 
-        if (isSet($_SESSION["AJXP_USER"]) && !$_SESSION["AJXP_USER"] instanceof __PHP_Incomplete_Class && $_SESSION["AJXP_USER"] instanceof \Pydio\Core\Model\UserInterface) {
-            /**
-             * @var \Pydio\Conf\Core\AbstractUser $u
-             */
-            $u = $_SESSION["AJXP_USER"];
+        /**
+         * @var \Pydio\Conf\Core\AbstractUser $u
+         */
+        $u = SessionService::fetch(SessionService::USER_KEY);
+        if ($u !== null && $u instanceof UserInterface) {
+
             if ($u->reloadRolesIfRequired()) {
                 ConfService::getInstance()->invalidateLoadedRepositories();
                 AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
             }
             $request = $request->withAttribute("ctx", Context::contextWithObjects($u, null));
             return true;
+
         }
 
-        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && !isSet($_SESSION["CURRENT_MINISITE"])) {
+        if (ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && !ApplicationState::hasMinisiteHash()) {
 
             $authDriver = ConfService::getAuthDriverImpl();
             if (!$authDriver->userExists("guest")) {
@@ -86,6 +90,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
             }
             $logged = AuthService::logUser("guest", null);
             $request = $request->withAttribute("ctx", Context::contextWithObjects($logged, null));
+            AuthService::updateSessionUser($logged);
             return true;
         }
         return false;
@@ -121,7 +126,9 @@ class SessionLoginFrontend extends AbstractAuthFrontend
             if ($cookieLogin) {
                 list($userId, $userPass) = CookiesHelper::getRememberCookieData();
             } else {
-                $userId = (isSet($httpVars["userid"]) ? InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS) : null);
+                //$userId = (isSet($httpVars["userid"]) ? InputFilter::sanitize($httpVars["userid"], InputFilter::SANITIZE_EMAILCHARS) : null);
+                // Auth drivers will do the sanitizing userId.
+                $userId = (isSet($httpVars["userid"]) ? $httpVars["userid"] : null);
                 $userPass = (isSet($httpVars["password"]) ? trim($httpVars["password"]) : null);
             }
             $rememberMe = ((isSet($httpVars["remember_me"]) && $httpVars["remember_me"] == "true") ? true : false);
@@ -131,6 +138,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
                 $loggedUser = AuthService::logUser($userId, $userPass, false, $cookieLogin);
                 $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+                AuthService::updateSessionUser($loggedUser);
 
             } catch (\Pydio\Core\Exception\LoginException $l) {
 

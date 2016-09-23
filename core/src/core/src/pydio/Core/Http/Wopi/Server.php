@@ -23,6 +23,7 @@ namespace Pydio\Core\Http\Wopi;
 
 use Pydio\Core\Http\Server as HttpServer;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -41,7 +42,7 @@ class Server extends HttpServer
     public function __construct($base, $additionalAttributes = [])
     {
         parent::__construct($base, $additionalAttributes);
-        ConfService::currentContextIsRestAPI($base);
+        ApplicationState::setSapiRestBase($base);
     }
 
     protected function stackMiddleWares()

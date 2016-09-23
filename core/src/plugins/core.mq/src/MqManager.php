@@ -39,6 +39,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Core\Controller\XMLWriter;
@@ -295,7 +296,7 @@ class MqManager extends Plugin
 
                 $this->logError("core.mq", "sendMessage " . $topic, $e->getMessage());
 
-                if(ConfService::currentContextIsCommandLine()){
+                if(ApplicationState::sapiIsCli()){
                     print("Error while trying to send a ".$topic." message ".$content." : ".$e->getMessage());
                 }
             }

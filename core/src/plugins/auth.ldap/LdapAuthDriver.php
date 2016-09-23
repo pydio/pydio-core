@@ -26,6 +26,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\ProgressBarCLI;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -976,5 +977,24 @@ class LdapAuthDriver extends AbstractAuthDriver
 
         self::$allowedGroupList = $returnArray;
         return $returnArray;
+    }
+
+    /**
+     * By pass sanitizing user id that make sure tha we can use utf8 user_id
+     *
+     * @param $s
+     * @param int $level
+     * @return mixed|string
+     */
+    public function sanitize($s, $level = InputFilter::SANITIZE_HTML)
+    {
+        $preg = '/[\\/<>\?\*\\\\|;:,+"\]\[]/';
+        /**
+         * These are illegal characters and can break ldap searching.
+         * when we create new user on Windows AD, these illegal characters will be replaced by '_'.
+         * Give a try by replacement of '_'
+         */
+        $newS = preg_replace($preg, '_', $s);
+        return $newS;
     }
 }

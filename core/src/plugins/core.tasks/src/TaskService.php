@@ -32,6 +32,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Log\Core\Logger;
@@ -91,7 +92,7 @@ class TaskService implements ITasksProvider
 
         $minisite = $request !== null && $request->getAttribute("minisite");
 
-        if(ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !$minisite) {
+        if(ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() && !$minisite) {
 
             CliRunner::applyTaskInBackground($task);
             return $response;

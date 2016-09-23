@@ -33,6 +33,75 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class ApplicationState
 {
     /**
+     * @var null|string
+     */
+    private static $restBase = null;
+
+    /**
+     * @var string
+     */
+    private static $sapiType = "session";
+
+    /**
+     * @var string
+     */
+    private static $minisiteHash = null;
+
+    /**
+     * @param string $restBase
+     */
+    public static function setSapiRestBase($restBase){
+        self::$sapiType = "rest";
+        self::$restBase = $restBase;
+    }
+
+    public static function setSapiTypeCLI(){
+        self::$sapiType = "cli";
+    }
+
+    /**
+     * @return bool
+     */
+    public static function sapiIsCli(){
+        return php_sapi_name() === "cli" || self::$sapiType === "cli";
+    }
+
+    /**
+     * @return null|string
+     */
+    public static function getSapiRestBase(){
+        return self::$restBase;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function sapiUsesSession(){
+        return !self::sapiIsCli() && self::$restBase === null;
+    }
+
+    /**
+     * @param $hash
+     */
+    public static function setStateMinisite($hash){
+        self::$minisiteHash = $hash;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function hasMinisiteHash(){
+        return self::$minisiteHash !== null;
+    }
+
+    /**
+     * @return string
+     */
+    public static function getMinisiteHash(){
+        return self::$minisiteHash;
+    }
+
+    /**
      * Check if data/cache/first_run_passed file exists or not
      * @return bool
      */
@@ -114,8 +183,9 @@ class ApplicationState
         if (!empty($setUrl) && !$forceInternal) {
             return (string)$setUrl;
         }
-        if (php_sapi_name() == "cli") {
-            Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD THE MAIL ADRESS WHEN WORKING IN CLI");
+        if (self::sapiIsCli()) {
+            Logger::debug("WARNING, THE SERVER_URL IS NOT SET, WE CANNOT BUILD IT WHEN WORKING IN CLI");
+            return "";
         }
         $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http');
         $port = (($protocol === 'http' && $_SERVER['SERVER_PORT'] == 80 || $protocol === 'https' && $_SERVER['SERVER_PORT'] == 443)
@@ -125,13 +195,14 @@ class ApplicationState
             return "$protocol://$name$port";
         } else {
             $uri = dirname($_SERVER["REQUEST_URI"]);
-            $api = ConfService::currentContextIsRestAPI();
+            $api = self::getSapiRestBase();
             if (!empty($api)) {
-                if(strpos($uri, '/api/') === 0){
+                $api .= '/';
+                if(strpos($uri, $api) === 0){
                     $uri = '/';
                 }else{
                     // Keep only before api base
-                    $uri = array_shift(explode("/api/", $uri));
+                    $uri = array_shift(explode($api, $uri));
                 }
             }
             return "$protocol://$name$port" . $uri;

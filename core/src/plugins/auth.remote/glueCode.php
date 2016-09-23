@@ -155,7 +155,6 @@ switch ($plugInAction) {
                 } else {
                     $userObject = AuthService::logUser($login["name"], $login["password"], true);
                 }
-                $userObject = AuthService::getLoggedUser();
                 auth_remote_debug("User logged to pydio succesfully");
                 if ($userObject->isAdmin()) {
                     auth_remote_debug("User is admin, updating admin rights");
@@ -166,6 +165,7 @@ switch ($plugInAction) {
                 }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
                 $userObject->save("superuser");
+                AuthService::updateSessionUser($userObject);
             }catch (\Pydio\Core\Exception\LoginException $l){
 
             }

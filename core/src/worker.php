@@ -21,6 +21,7 @@
 
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -31,14 +32,12 @@ use Pydio\Tasks\Task;
 include_once("base.conf.php");
 
 $pServ = PluginsService::getInstance();
-ConfService::$useSession = false;
-AuthService::$useSession = false;
 
 ConfService::init();
 ConfService::start();
 
 $authDriver = ConfService::getAuthDriverImpl();
-ConfService::currentContextIsRestAPI("/api");
+ApplicationState::setSapiRestBase("/api");
 PluginsService::getInstance()->initActivePlugins();
 
 /**

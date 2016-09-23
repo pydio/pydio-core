@@ -29,6 +29,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
@@ -49,7 +50,7 @@ class CoreIndexer extends Plugin {
      */
     public function debug($message = ""){
         $this->logDebug("core.indexer", $message);
-        if($this->verboseIndexation && ConfService::currentContextIsCommandLine()){
+        if($this->verboseIndexation && ApplicationState::sapiIsCli()){
             print($message."\n");
         }
     }
@@ -143,7 +144,7 @@ class CoreIndexer extends Plugin {
             }
         }
 
-        if(!ConfService::currentContextIsCommandLine()) @set_time_limit(120);
+        if(!ApplicationState::sapiIsCli()) @set_time_limit(120);
         $url = $node->getUrl();
         $this->debug("Indexing Node parent node ".$url);
         $this->setIndexStatus("RUNNING", str_replace("%s", $node->getPath(), $messages["core.index.8"]), $repository, $user);

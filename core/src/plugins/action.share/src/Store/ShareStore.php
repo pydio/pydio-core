@@ -26,7 +26,6 @@ use Pydio\Access\Core\Model\Repository;
 
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 
@@ -34,6 +33,7 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Log\Core\Logger;
 use Pydio\OCS\Model\TargettedLink;
 use Pydio\Share\Model\ShareLink;
@@ -183,23 +183,21 @@ class ShareStore {
         }
         class_alias("Pydio\\Share\\ShareCenter", "ShareCenter");
         $lines = file($file);
-        $inputData = '';
-        // Necessary for the eval
-        $id = $hash;
-        // UPDATE LINK FOR PHP5.6
-        if(trim($lines[4]) == '$inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $id, $cypheredData, MCRYPT_MODE_ECB), "\0");' && is_writable($file)){
-            // Upgrade line
-            $lines[4] = '   $inputData = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, str_pad($id, 16, "\0"), $cypheredData, MCRYPT_MODE_ECB), "\0");'."\n";
-            $res = file_put_contents($file, implode('', $lines));
+
+        // Eval the existing line 3, should be like
+        //    $cypheredData = base64_decode("cMYIUkAcvOqGFLbT5j/jyP/VzYJqV03X2.....71gJsTtxw==");
+        $cypheredData = '';
+        eval($lines[3]);
+        if(!empty($cypheredData)) {
+            $key = str_pad($hash, 16, "\0");
+            $inputData = Crypto::decrypt($cypheredData, $key, false);
+            if(!empty($inputData)){
+                $publicletData = @unserialize($inputData);
+                $publicletData["PUBLICLET_PATH"] = $file;
+                return $publicletData;
+            }
         }
-        $code = $lines[3] . $lines[4] . $lines[5];
-        eval($code);
-        if(empty($inputData)) return false;
-        $publicletData = @unserialize($inputData);
-        $publicletData["PUBLICLET_PATH"] = $file;
-
-        return $publicletData;
-
+        return [];
     }
 
     /**
@@ -701,13 +699,10 @@ class ShareStore {
         if($currentUser){
             $loggedUser = $this->context->getUser();
             $userId = $loggedUser->getId();
-            $originalUser = null;
         }else{
-            $originalUser = $this->context->getUser()->getId();
             $userId = null;
         }
         $deleted = [];
-        $switchBackToOriginal = false;
 
         $publicLets = $this->listShares($currentUser? $userId: '');
         foreach ($publicLets as $hash => $publicletData) {
@@ -716,14 +711,10 @@ class ShareStore {
                 continue;
             }
             if (ShareLink::isShareExpired($publicletData)){
-                if(!$currentUser) $switchBackToOriginal = true;
                 $this->deleteExpiredPubliclet($hash, $publicletData);
                 $deleted[] = $publicletData["FILE_PATH"];
 
             }
-        }
-        if($switchBackToOriginal){
-            AuthService::logUser($originalUser, "", true);
         }
         return $deleted;
     }

@@ -30,6 +30,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -162,7 +163,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             } catch (\Exception $ex) {
                 if ($this->seemsCurrentlyIndexing($ctx, 3)){
                     $x->addChunk(new UserMessage($messages["index.lucene.11"]));
-                }else if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine() && !isSet($httpVars["skip_unindexed"])) {
+                }else if (ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() && !isSet($httpVars["skip_unindexed"])) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
@@ -287,7 +288,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             try {
                 $index =  $this->loadIndex($ctx, false);
             } catch (\Exception $ex) {
-                if (ConfService::backgroundActionsSupported() && !ConfService::currentContextIsCommandLine()) {
+                if (ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli()) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
@@ -404,16 +405,16 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
     {
         //print("Indexing $url \n");
         $this->logDebug("Indexing content of folder ".$url);
-        if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+        if (ApplicationState::sapiIsCli() && $this->verboseIndexation) {
             print("Indexing content of ".$url."\n");
         }
-        if(!ConfService::currentContextIsCommandLine()) @set_time_limit(60);
+        if(!ApplicationState::sapiIsCli()) @set_time_limit(60);
         $handle = opendir($url);
         if ($handle !== false) {
             while ( ($child = readdir($handle)) != false) {
                 if($child[0] == ".") continue;
                 $newUrl = $url."/".$child;
-                if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+                if (ApplicationState::sapiIsCli() && $this->verboseIndexation) {
                     print("Indexing node ".$newUrl."\n");
                 }
                 $this->logDebug("Indexing Node ".$newUrl);
@@ -422,7 +423,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                     $this->updateNodeIndex(null, $newNode, false, true);
                     Controller::applyHook("node.index.add", [$newNode]);
                 } catch (\Exception $e) {
-                    if (ConfService::currentContextIsCommandLine() && $this->verboseIndexation) {
+                    if (ApplicationState::sapiIsCli() && $this->verboseIndexation) {
                         print("Error indexing node ".$newUrl." (".$e->getMessage().") \n");
                     }
                     $this->logDebug("Error Indexing Node ".$newUrl." (".$e->getMessage().")");
@@ -605,13 +606,13 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         if ($parseContent && in_array($ext, explode(",", $this->getContextualOption($ajxpNode->getContext(), "PARSE_CONTENT_HTML")))) {
             $doc = @\Zend_Search_Lucene_Document_Html::loadHTMLFile($ajxpNode->getUrl());
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Docx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Docx::loadDocxFile($realFile);
         } elseif ($parseContent && $ext == "docx" && class_exists("\Zend_Search_Lucene_Document_Pptx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Pptx::loadPptxFile($realFile);
         } elseif ($parseContent && $ext == "xlsx" && class_exists("\Zend_Search_Lucene_Document_Xlsx")) {
-            $realFile = call_user_func([$ajxpNode->wrapperClassName, "getRealFSReference"], $ajxpNode->getUrl());
+            $realFile = $ajxpNode->getRealFile();
             $doc = @\Zend_Search_Lucene_Document_Xlsx::loadXlsxFile($realFile);
         } else {
             $doc = new \Zend_Search_Lucene_Document();

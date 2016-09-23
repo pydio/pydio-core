@@ -227,11 +227,11 @@
                                     if(staticClass.getRESTPreviewLinks){
                                         var links = staticClass.getRESTPreviewLinks(node);
                                         $H(links).each(function(pair){
-                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href.split('?').shift() + "?dl=true&ct=true"+pair.value}));
+                                            modal.getForm().down("#additional_links").insert(tpl.evaluate({title:pair.key,link:document.location.href.split('?').shift() + "/dl"+node.getPath()+"?ct=true"+pair.value}));
                                         });
                                     }
                                 }
-                                var dlLink = document.location.href.split('?').shift() + "?dl=true&file=" + encodeURIComponent(node.getPath());
+                                var dlLink = document.location.href.split('?').shift() + "/dl" + node.getPath();
                                 modal.getForm().down("#additional_links").insert(tpl.evaluate({title:MessageHash['share_center.60'],link:dlLink}));
                             }
                         ]]></dialogOnOpen>
@@ -253,7 +253,7 @@
             </action>
             <action name="download">
                 <pre_processing>
-                    <serverCallback methodName="preProcessDownload" applyCondition="$apply=isSet($_SESSION['CURRENT_MINISITE']);"/>
+                    <serverCallback methodName="preProcessDownload" applyCondition="$apply=\Pydio\Core\Services\SessionService::has(\Pydio\Core\Services\SessionService::CTX_MINISITE_HASH);"/>
                 </pre_processing>
             </action>
         </actions>

@@ -24,6 +24,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Crypto;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -43,11 +44,7 @@ class OptionsHelper
      */
     public static function decypherStandardFormPassword($userId, $password)
     {
-        if (function_exists('mcrypt_decrypt')) {
-            // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-            $password = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($userId . "\1CDAFx¨op#"), base64_decode($password), MCRYPT_MODE_ECB), "\0");
-        }
-        return $password;
+        return Crypto::decrypt($password, md5($userId . "\1CDAFx¨op#"));
     }
 
     /**
@@ -119,9 +116,8 @@ class OptionsHelper
                     } else if ($type == "array") {
                         $value = explode(",", $value);
                     } else if ($type == "password" && $ctx->hasUser() && !empty($cypheredPassPrefix)) {
-                        if (trim($value) != "" && $value != "__AJXP_VALUE_SET__" && function_exists('mcrypt_encrypt')) {
-                            // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-                            $value = $cypheredPassPrefix . base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($ctx->getUser()->getId() . "\1CDAFx¨op#"), $value, MCRYPT_MODE_ECB));
+                        if (trim($value) != "" && $value != "__AJXP_VALUE_SET__") {
+                            $value = $cypheredPassPrefix . Crypto::encrypt($value, md5($ctx->getUser()->getId() . "\1CDAFx¨op#"));
                         }
                     } else if ($type == "binary" && $binariesContext !== null) {
                         if (!empty($value)) {

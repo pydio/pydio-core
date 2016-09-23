@@ -131,7 +131,7 @@ class AudioPreviewer extends Plugin
                 $ar = explode(".", $label);
                 $ext = strtolower(end($ar));
                 if(!$isFile || $ext != "mp3") continue;
-                $xmlBuff.="<track><location>".AJXP_SERVER_ACCESS."?secure_token=".SecureTokenMiddleware::getSecureToken()."&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>";
+                $xmlBuff.="<track><location>".AJXP_SERVER_ACCESS."?&get_action=audio_proxy&file=".base64_encode($child->getAttribute("filename"))."</location><title>".$label."</title></track>";
             }
             $xmlBuff.="</trackList>";
             $xmlBuff.= "</playlist>";

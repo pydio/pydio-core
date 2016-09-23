@@ -26,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
+use Pydio\Core\Services\SessionService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -201,6 +202,7 @@ class CypheredAuthFrontend extends AbstractAuthFrontend
             }
             $ctx->setUserObject($loggedUser);
             $request = $request->withAttribute("ctx", $ctx);
+            AuthService::updateSessionUser($loggedUser);
             return true;
 
         } catch (\Pydio\Core\Exception\LoginException $l) {

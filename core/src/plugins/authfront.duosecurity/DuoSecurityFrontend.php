@@ -115,7 +115,7 @@ class DuoSecurityFrontend extends SessionLoginFrontend
             $u->removeLock("duo_show_iframe");
             $u->save("superuser");
             $u->recomputeMergedRole();
-            AuthService::updateUser($u);
+            AuthService::updateSessionUser($u);
         } else {
             AuthService::disconnect();
             throw new \Pydio\Core\Exception\AuthRequiredException();

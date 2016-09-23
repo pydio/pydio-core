@@ -333,7 +333,7 @@ class UsersManager extends AbstractManager
                 $user->save();
                 $loggedUser = $ctx->getUser();
                 if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
+                    AuthService::updateSessionUser($user);
                 }
 
                 $userMessage    = new UserMessage($mess["ajxp_conf.46"].$httpVars["user_id"]);
@@ -436,7 +436,7 @@ class UsersManager extends AbstractManager
                 $user->save("superuser");
                 $loggedUser = $ctx->getUser();
                 if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
+                    AuthService::updateSessionUser($user);
                 }
 
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Roles reordered for user ".$httpVars["user_id"])));
@@ -472,7 +472,7 @@ class UsersManager extends AbstractManager
                     $userObject->save("superuser");
                     $loggedUser = $ctx->getUser();
                     if ($loggedUser->getId() == $userObject->getId()) {
-                        AuthService::updateUser($userObject);
+                        AuthService::updateSessionUser($userObject);
                     }
                 }
 
@@ -560,7 +560,7 @@ class UsersManager extends AbstractManager
                 $user->save();
 
                 if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
+                    AuthService::updateSessionUser($user);
                 }
 
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$httpVars["user_id"])));
@@ -594,7 +594,7 @@ class UsersManager extends AbstractManager
                 $user->save();
 
                 if ($loggedUser->getId() == $user->getId()) {
-                    AuthService::updateUser($user);
+                    AuthService::updateSessionUser($user);
                 }
 
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$httpVars["user_id"])));
@@ -1046,7 +1046,7 @@ class UsersManager extends AbstractManager
         }
         $user->save("superuser");
         if ($ctxUser->getId() == $user->getId()) {
-            AuthService::updateUser($user);
+            AuthService::updateSessionUser($user);
         }
         return $user;
 

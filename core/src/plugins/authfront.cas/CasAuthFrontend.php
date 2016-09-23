@@ -30,7 +30,9 @@ use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Log\Core\Logger;
 
@@ -81,7 +83,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
     {
         $httpVars = $request->getParsedBody();
 
-        if (isset($_SESSION["CURRENT_MINISITE"])) {
+        if (ApplicationState::hasMinisiteHash()) {
             return false;
         }
 
@@ -239,6 +241,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
         if (UsersService::userExists($cas_user)) {
             try {
                 $userObj = AuthService::logUser($cas_user, "", true);
+                AuthService::updateSessionUser($userObj);
                 MemorySafe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
 

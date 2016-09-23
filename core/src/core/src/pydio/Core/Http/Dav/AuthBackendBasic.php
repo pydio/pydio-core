@@ -178,7 +178,7 @@ class AuthBackendBasic extends Sabre\DAV\Auth\Backend\AbstractBasic
             $webdavData["TMP_PASS"] = $encryptedPass;
             $userObject->setPref("AJXP_WEBDAV_DATA", $webdavData);
             $userObject->save("user");
-            AuthService::updateUser($userObject);
+            AuthService::updateSessionUser($userObject);
         }
 
         return true;

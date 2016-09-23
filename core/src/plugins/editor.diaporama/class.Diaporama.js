@@ -719,8 +719,8 @@ Class.create("Diaporama", AbstractEditor, {
 
     getRESTPreviewLinks:function(node){
         return {
-            "Original image": "&file=" + encodeURIComponent(node.getPath()),
-            "Thumbnail (200px)": "&get_thumb=true&dimension=200&file=" + encodeURIComponent(node.getPath())
+            "Original image": "",
+            "Thumbnail (200px)": "&get_thumb=true&dimension=200"
         };
     },
 

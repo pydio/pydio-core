@@ -30,6 +30,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Controller\XMLWriter;
@@ -177,6 +178,9 @@ class MinisiteRenderer
             $confs = $shareCenter->getConfigs();
         }
         $repoObject = $context->getRepository();
+        if($repoObject === null && isSet($data['PRESET_LOGIN']) && isSet($data["REPOSITORY"])){
+            $repoObject = RepositoryService::getRepositoryById($data["REPOSITORY"]);
+        }
 
         $minisiteLogo = "plugins/gui.ajax/PydioLogo250.png";
         if(!empty($confs["CUSTOM_MINISITE_LOGO"])){
@@ -202,7 +206,7 @@ class MinisiteRenderer
                 $templateName = "ajxp_shared_folder";
             }
         }
-        if(!isSet($templateName) && isSet($error)){
+        if(!isSet($templateName) || isSet($error)){
             $templateName = "ajxp_unique_strip";
         }
         // UPDATE TEMPLATE

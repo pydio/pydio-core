@@ -28,6 +28,7 @@ use Pydio\Core\Exception\WorkspaceNotFoundException;
 
 
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\TextEncoder;
 use \Sabre;
 use Pydio\Auth\Core\MemorySafe;
@@ -58,11 +59,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
     public function __construct($context)
     {
         $this->context = $context;
-        if (defined('AJXP_SAFE_SECRET_KEY')) {
-            $this->secretKey = AJXP_SAFE_SECRET_KEY;
-        } else {
-            $this->secretKey = "\1CDAFx¨op#";
-        }
+        $this->secretKey = Crypto::getApplicationSecret();
     }
 
     /**
@@ -185,11 +182,7 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
      */
     private function _decodePassword($encoded, $user)
     {
-        if (function_exists('mcrypt_decrypt')) {
-            $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND);
-            $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB, $iv), "\0");
-        }
-        return $encoded;
+        return Crypto::decrypt($encoded, md5($user . $this->secretKey));
     }
 
 

@@ -21,6 +21,7 @@
 namespace Pydio\Core\Utils\Vars;
 
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Utils\Crypto;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -162,7 +163,7 @@ class PasswordEncoder
     public static function pbkdf2_create_hash($password)
     {
         // format: algorithm:iterations:salt:hash
-        $salt = base64_encode(mcrypt_create_iv(PBKDF2_SALT_BYTE_SIZE, MCRYPT_DEV_URANDOM));
+        $salt = Crypto::getRandomSalt();
         return PBKDF2_HASH_ALGORITHM . ":" . PBKDF2_ITERATIONS . ":" . $salt . ":" .
         base64_encode(self::pbkdf2_apply(
             PBKDF2_HASH_ALGORITHM,

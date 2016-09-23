@@ -584,6 +584,10 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 11px !important;
   opacity: 0.73;
 }
+.webfx-tree-item div.overlay_icon_div span.overlay-class-span.mdi-radar {
+  padding: 0 !important;
+  margin: 0 5px !important;
+}
 .webfx-tree-item.selected-webfx-tree-item div.overlay_icon_div span.overlay-class-span {
   color: white !important;
 }
@@ -2029,6 +2033,32 @@ div#multiple_download_container {
   height: 350px;
   text-align: left;
   border-radius: 1px;
+}
+div#multi_download_form a#dl_form_submit {
+  border-radius: 2px;
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  color: #009688;
+  text-transform: uppercase;
+}
+div#multi_download_form a#dl_form_submit:hover {
+  background-color: #bffff9;
+}
+div#multiple_download_container {
+  width: 100%;
+}
+div#multiple_download_container a {
+  font-size: 16px;
+}
+div#multiple_download_container a span.mdi-download {
+  font-size: 14px;
+  display: inline-block;
+  margin-right: 5px;
 }
 .droparea {
   background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;

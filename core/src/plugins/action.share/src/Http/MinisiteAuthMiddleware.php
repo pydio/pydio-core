@@ -26,7 +26,9 @@ use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -44,13 +46,11 @@ class MinisiteAuthMiddleware
      */
     public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
-        $rest = $requestInterface->getAttribute("rest");
+        $sessions = ApplicationState::sapiUsesSession();
         $hash = $requestInterface->getAttribute("hash");
         $shareData = $requestInterface->getAttribute("data");
 
-        if($rest){
-            AuthService::$useSession = false;
-        }else{
+        if($sessions){
             session_name("AjaXplorer_Shared".str_replace(".","_",$hash));
             session_start();
             AuthService::disconnect();
@@ -60,17 +60,22 @@ class MinisiteAuthMiddleware
 
             $loggedUser = AuthService::logUser($shareData["PRELOG_USER"], "", true);
             $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
+            if($sessions){
+                AuthService::updateSessionUser($loggedUser);
+            }
 
         } else if(isSet($shareData["PRESET_LOGIN"])) {
 
-            if($rest){
+            if($sessions) {
+
+                SessionService::save(SessionService::PENDING_REPOSITORY_ID, $shareData["REPOSITORY"]);
+                SessionService::save(SessionService::PENDING_FOLDER, "/");
+
+            } else {
                 $responseInterface = self::basicHttp($shareData["PRESET_LOGIN"], $requestInterface, $responseInterface);
-                if($responseInterface->getStatusCode() === 401){
+                if ($responseInterface->getStatusCode() === 401) {
                     return $responseInterface;
                 }
-            }else{
-                $_SESSION["PENDING_REPOSITORY_ID"] = $shareData["REPOSITORY"];
-                $_SESSION["PENDING_FOLDER"] = "/";
             }
 
         }
@@ -86,8 +91,9 @@ class MinisiteAuthMiddleware
             }
         }
 
-        if(!$rest){
-            $_SESSION["CURRENT_MINISITE"] = $hash;
+        if($sessions){
+            SessionService::save(SessionService::CTX_MINISITE_HASH, $hash);
+            ApplicationState::setStateMinisite($hash);
         }
         if(!empty($ctx) && $ctx->hasUser() && isSet($shareData["REPOSITORY"])){
             $repoObject = UsersService::getRepositoryWithPermission($ctx->getUser(), $shareData["REPOSITORY"]);

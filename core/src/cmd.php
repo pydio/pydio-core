@@ -29,12 +29,8 @@ use Pydio\Core\Services\AuthService;
 use Symfony\Component\Console\Application;
 use Pydio\Core\Http\Cli\Command;
 
-ConfService::$useSession = false;
-AuthService::$useSession = false;
-
 ConfService::init();
 ConfService::start();
-
 
 $input = new \Pydio\Core\Http\Cli\FreeArgvOptions();
 $application = new Application();

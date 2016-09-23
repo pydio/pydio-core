@@ -21,6 +21,8 @@
 namespace Pydio\Auth\Core;
 
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\SessionService;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 
@@ -34,6 +36,9 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class MemorySafe
 {
+
+    const SAFE_CREDENTIALS_KEY = "PYDIO_SAFE_CREDENTIALS";
+
     private static $instance;
 
     private $user;
@@ -46,11 +51,7 @@ class MemorySafe
      */
     public function __construct()
     {
-        if (defined('AJXP_SAFE_SECRET_KEY')) {
-            $this->secretKey = AJXP_SAFE_SECRET_KEY;
-        } else {
-            $this->secretKey = "\1CDAFx¨op#";
-        }
+        $this->secretKey = Crypto::getApplicationSecret();
     }
     /**
      * Store the user/password pair. Password will be encoded
@@ -89,11 +90,7 @@ class MemorySafe
      */
     private function _encodePassword($password, $user)
     {
-        if (function_exists('mcrypt_encrypt')) {
-            // We encode as base64 so if we need to store the result in a database, it can be stored in text column
-            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$this->secretKey), $password, MCRYPT_MODE_ECB));
-        }
-        return $password;
+        return Crypto::encrypt($password, md5($user . $this->secretKey));
     }
     /**
      * Use mcrypt functions to decode the password
@@ -103,19 +100,50 @@ class MemorySafe
      */
     private function _decodePassword($encoded, $user)
     {
-        if (function_exists('mcrypt_decrypt')) {
-             // We have encoded as base64 so if we need to store the result in a database, it can be stored in text column
-             $encoded = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, md5($user.$this->secretKey), base64_decode($encoded), MCRYPT_MODE_ECB), "\0");
-        }
-        return $encoded;
+        return Crypto::decrypt($encoded, md5($user . $this->secretKey));
     }
     /**
      * Store the password credentials in the session
      * @return void
      */
-    public function store()
-    {
-        $_SESSION["AJXP_SAFE_CREDENTIALS"] = base64_encode($this->user.$this->separator.$this->encodedPassword);
+    public function store() {
+        SessionService::save(self::SAFE_CREDENTIALS_KEY, base64_encode($this->user.$this->separator.$this->encodedPassword));
+    }
+
+    /**
+     * Set the encrypted string in the environment for running a CLI.
+     * @return bool
+     */
+    public static function setEnv(){
+        $encodedCreds = self::getEncodedCredentialString();
+        if (!empty($encodedCreds)) {
+            putenv(self::SAFE_CREDENTIALS_KEY. "=" . $encodedCreds);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Clear the environment variable
+     */
+    public static function clearEnv(){
+        putenv(self::SAFE_CREDENTIALS_KEY);
+    }
+
+    /**
+     * Try to load encrypted string, decode, and get password if the user is corresponding.
+     * @param string $userId
+     * @return bool|mixed
+     */
+    public static function loadPasswordStringFromEnvironment($userId){
+        $env = getenv(self::SAFE_CREDENTIALS_KEY);
+        if(!empty($env)){
+            $array = self::getCredentialsFromEncodedString($env);
+            if(isSet($array["user"]) && $array["user"] == $userId){
+                return $array["password"];
+            }
+        }
+        return false;
     }
 
     /**
@@ -125,8 +153,8 @@ class MemorySafe
      */
     public function load($encodedString = "")
     {
-        if ($encodedString == "" && !empty($_SESSION["AJXP_SAFE_CREDENTIALS"])) {
-            $encodedString = $_SESSION["AJXP_SAFE_CREDENTIALS"];
+        if ($encodedString == "" && SessionService::has(self::SAFE_CREDENTIALS_KEY)) {
+            $encodedString = SessionService::fetch(self::SAFE_CREDENTIALS_KEY);
         }
         if(empty($encodedString)) return;
         $sessData = base64_decode($encodedString);
@@ -140,7 +168,7 @@ class MemorySafe
      */
     public function clear()
     {
-        unset($_SESSION["AJXP_SAFE_CREDENTIALS"]);
+        SessionService::delete(self::SAFE_CREDENTIALS_KEY);
         $this->user = null;
         $this->encodedPassword = null;
     }
@@ -204,9 +232,8 @@ class MemorySafe
     /**
      * @return mixed
      */
-    public static function getEncodedCredentialString()
-    {
-        return $_SESSION["AJXP_SAFE_CREDENTIALS"];
+    public static function getEncodedCredentialString() {
+        return SessionService::fetch(self::SAFE_CREDENTIALS_KEY);
     }
 
     /**

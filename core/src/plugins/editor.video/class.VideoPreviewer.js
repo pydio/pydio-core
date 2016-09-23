@@ -92,7 +92,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
     },
 
     getRESTPreviewLinks:function(node){
-        return {"Video Stream": "&file=" + encodeURIComponent(node.getPath())};
+        return {"Video Stream": ""};
     },
 
 

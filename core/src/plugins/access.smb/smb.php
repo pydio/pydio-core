@@ -313,7 +313,6 @@ class smb
         switch ($pu['type']) {
             case 'host':
                 if ($o = smb::look ($pu))
-                //self::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
                    $stat = stat (SMB4PHP_SMBTMP);
                 else
                   trigger_error ("url_stat(): list failed for host", E_USER_WARNING);

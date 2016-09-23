@@ -129,8 +129,8 @@ class LocaleService
     public static function listAvailableLanguages()
     {
         // Cache in session!
-        if (isSet($_SESSION["AJXP_LANGUAGES"]) && !isSet($_GET["refresh_langs"])) {
-            return $_SESSION["AJXP_LANGUAGES"];
+        if (SessionService::has(SessionService::LANGUAGES_KEY) && !isSet($_GET["refresh_langs"])) {
+            return SessionService::fetch(SessionService::LANGUAGES_KEY);
         }
         $langDir = AJXP_COREI18N_FOLDER;
         $languages = array();
@@ -147,7 +147,7 @@ class LocaleService
             closedir($dh);
         }
         if (count($languages)) {
-            $_SESSION["AJXP_LANGUAGES"] = $languages;
+            SessionService::save(SessionService::LANGUAGES_KEY, $languages);
         }
         return $languages;
     }

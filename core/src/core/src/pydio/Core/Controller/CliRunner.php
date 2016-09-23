@@ -24,6 +24,7 @@ use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
@@ -75,11 +76,7 @@ class CliRunner
         $logFile = $logDir . "/" . $token . ".out";
 
         if (UsersService::usersEnabled()) {
-            $cKey = ConfService::getGlobalConf("AJXP_CLI_SECRET_KEY", "conf");
-            if (empty($cKey)) {
-                $cKey = "\1CDAFx¨op#";
-            }
-            $user = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, md5($token . $cKey), $user, MCRYPT_MODE_ECB));
+            $user = Crypto::encrypt($user, md5($token . Crypto::getCliSecret()));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";
@@ -108,20 +105,17 @@ class CliRunner
                 $cmd .= " --$key=" . escapeshellarg($value);
             }
         }
-
-        $repoObject = $ctx->getRepository();
-        $clearEnv = false;
-        if ($repoObject->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $encodedCreds = MemorySafe::getEncodedCredentialString();
-            if (!empty($encodedCreds)) {
-                putenv("AJXP_SAFE_CREDENTIALS=" . $encodedCreds);
-                $clearEnv = "AJXP_SAFE_CREDENTIALS";
-            }
+        error_log($cmd);
+        $envSet = false;
+        if ($ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
+            $envSet = MemorySafe::setEnv();
         }
 
+        // NOW RUN COMMAND
         $res = self::runCommandInBackground($cmd, $logFile);
-        if (!empty($clearEnv)) {
-            putenv($clearEnv);
+
+        if($envSet){
+            MemorySafe::clearEnv();
         }
         return $res;
     }

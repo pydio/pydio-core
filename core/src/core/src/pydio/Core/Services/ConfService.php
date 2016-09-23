@@ -44,7 +44,6 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class ConfService
 {
     private static $instance;
-    public static $useSession = true;
 
     private $errors = array();
     private $configs = array();
@@ -173,37 +172,7 @@ class ConfService
         return $plugin;
 
     }
-
-    /**
-     * Check if the STDIN constant is defined
-     * @static
-     * @return bool
-     */
-    public static function currentContextIsCommandLine()
-    {
-        return php_sapi_name() === "cli";
-    }
-
-    protected static $restAPIContext;
-
-    /**
-     * Set or get if we are currently running REST
-     * @static
-     * @param string $restBase
-     * @return bool
-     */
-    public static function currentContextIsRestAPI($restBase = '')
-    {
-        if(!empty($restBase)){
-            self::$restAPIContext = $restBase;
-            self::$useSession = false;
-            AuthService::$useSession = false;
-            return $restBase;
-        }else{
-            return self::$restAPIContext;
-        }
-    }
-
+    
     /**
      * Check the presence of mcrypt and option CMDLINE_ACTIVE
      * @static
@@ -211,7 +180,7 @@ class ConfService
      */
     public static function backgroundActionsSupported()
     {
-        return function_exists("mcrypt_create_iv") && ConfService::getGlobalConf("CMDLINE_ACTIVE");
+        return ConfService::getGlobalConf("CMDLINE_ACTIVE");
     }
 
     /**

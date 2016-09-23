@@ -148,7 +148,7 @@ class ApiKeysService
      * @param $userId
      * @return bool
      */
-    public static function requestHasValidHeadersForAdminTask($serverData, $adminTaskId, $userId){
+    public static function requestHasValidHeadersForAdminTask($serverData, $adminTaskId, $userId = ""){
         if(!isSet($serverData['HTTP_X_PYDIO_ADMIN_AUTH'])){
             Logger::error(__CLASS__, __FUNCTION__,"Invalid tokens for admin task $adminTaskId");
             return false;

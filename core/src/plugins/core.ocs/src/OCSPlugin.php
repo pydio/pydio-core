@@ -30,6 +30,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\ApplicationState;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -166,12 +167,7 @@ class OCSPlugin extends Plugin {
         $share = $store->remoteShareById($remoteShareId);
         if($share != null){
             $repoObject = $share->buildVirtualRepository();
-            $loggedUser = AuthService::getLoggedUser();
-            if($loggedUser != null){
-                $loggedUser->personalRole->setAcl($repoObject->getId(), "rw");
-                $loggedUser->recomputeMergedRole();
-                AuthService::updateUser($loggedUser);
-            }
+            AuthService::updateSessionUserAcl($repositoryId, "rw");
         }
         
     }
@@ -184,8 +180,7 @@ class OCSPlugin extends Plugin {
     public static function startServer($base, $route) {
         
         $pServ = PluginsService::getInstance(Context::emptyContext());
-        ConfService::$useSession = false;
-        AuthService::$useSession = false;
+        ApplicationState::setSapiRestBase($base);
 
         ConfService::init();
         ConfService::start();

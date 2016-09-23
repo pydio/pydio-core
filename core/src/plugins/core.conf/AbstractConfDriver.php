@@ -45,6 +45,7 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
@@ -728,7 +729,7 @@ abstract class AbstractConfDriver extends Plugin
 
                     if (UsersService::usersEnabled() && $loggedUser != null) {
                         $bmUser->save("user");
-                        AuthService::updateUser($bmUser);
+                        AuthService::updateSessionUser($bmUser);
                     } else if (!UsersService::usersEnabled()) {
                         $bmUser->save("user");
                     }
@@ -755,7 +756,7 @@ abstract class AbstractConfDriver extends Plugin
                     }
                     $loggedUser->setPref($prefName, $prefValue);
                     $loggedUser->save("user");
-                    AuthService::updateUser($loggedUser);
+                    AuthService::updateSessionUser($loggedUser);
                     $i++;
                 }
 
@@ -840,7 +841,7 @@ abstract class AbstractConfDriver extends Plugin
                     RolesService::updateRole($userObject->getPersonalRole(), $userObject);
                     $userObject->recomputeMergedRole();
                     if ($action == "custom_data_edit") {
-                        AuthService::updateUser($userObject);
+                        AuthService::updateSessionUser($userObject);
                         $crtLang = LocaleService::getLanguage();
                         $newLang = $userObject->getPersonalRole()->filterParameterValue("core.conf", "lang", AJXP_REPO_SCOPE_ALL, $crtLang);
                         if($newLang !== $crtLang){
@@ -926,13 +927,7 @@ abstract class AbstractConfDriver extends Plugin
                         $davData["ACTIVE"] = $activate;
                     }
                     if (!empty($httpVars["webdav_pass"])) {
-                        $password = $httpVars["webdav_pass"];
-                        if (function_exists('mcrypt_encrypt')) {
-                            $user = $loggedUser->getId();
-                            $secret = (defined("AJXP_SAFE_SECRET_KEY")? AJXP_SAFE_SECRET_KEY:"\1CDAFx¨op#");
-                            $password = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  md5($user.$secret), $password, MCRYPT_MODE_ECB));
-                        }
-                        $davData["PASS"] = $password;
+                        $davData["PASS"] = Crypto::encrypt($httpVars["webdav_pass"], md5($loggedUser->getId().Crypto::getApplicationSecret()));
                     }
                     $loggedUser->setPref("AJXP_WEBDAV_DATA", $davData);
                     $loggedUser->save("user");
@@ -1068,7 +1063,7 @@ abstract class AbstractConfDriver extends Plugin
                 $loggedUser->getPersonalRole()->setAcl($newRep->getUniqueId(), "rw");
                 $loggedUser->save("superuser");
                 $loggedUser->recomputeMergedRole();
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
 
                 $x = new SerializableResponseStream();
                 $responseInterface = $responseInterface->withBody($x);
@@ -1095,7 +1090,7 @@ abstract class AbstractConfDriver extends Plugin
                 $loggedUser->load();
                 $loggedUser->getPersonalRole()->setAcl($repoId, "");
                 $loggedUser->save("superuser");
-                AuthService::updateUser($loggedUser);
+                AuthService::updateSessionUser($loggedUser);
 
                 $x = new SerializableResponseStream();
                 $responseInterface = $responseInterface->withBody($x);

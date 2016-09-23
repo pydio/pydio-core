@@ -32,6 +32,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Reflection\DiagnosticRunner;
 use Pydio\Core\Utils\Reflection\DocsParser;
@@ -100,7 +101,7 @@ class RichClient extends Plugin
                     $output["EXT_REP"] = urldecode($parameters["folder"]);
                     $loggedUser->setArrayPref("history", "last_repository", $parameters["repository_id"]);
                     $loggedUser->setPref("pending_folder", InputFilter::decodeSecureMagic($parameters["folder"]));
-                    AuthService::updateUser($loggedUser);
+                    AuthService::updateSessionUser($loggedUser);
                 } else {
                     $session["PENDING_REPOSITORY_ID"] = $parameters["repository_id"];
                     $session["PENDING_FOLDER"] = InputFilter::decodeSecureMagic($parameters["folder"]);
@@ -445,8 +446,8 @@ class RichClient extends Plugin
             define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
         }
         $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
-        if (isSet($_SESSION["AJXP_SERVER_PREFIX_URI"])) {
-            $value = str_replace("AJXP_THEME_FOLDER", $_SESSION["AJXP_SERVER_PREFIX_URI"]."plugins/gui.ajax/res/themes/".$theme, $value);
+        if (SessionService::has('PYDIO-SERVER-URI-PREFIX')) {
+            $value = str_replace("AJXP_THEME_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX')."plugins/gui.ajax/res/themes/".$theme, $value);
         } else {
             $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
         }
@@ -463,7 +464,7 @@ class RichClient extends Plugin
     private function computeBootConf(ContextInterface $ctx)
     {
         if (isSet($_GET["server_prefix_uri"])) {
-            $_SESSION["AJXP_SERVER_PREFIX_URI"] = str_replace("_UP_", "..", $_GET["server_prefix_uri"]);
+            SessionService::save('PYDIO-SERVER-URI-PREFIX', str_replace("_UP_", "..", $_GET["server_prefix_uri"]));
         }
         $currentIsMinisite = (strpos(session_name(), "AjaXplorer_Shared") === 0);
         $config = array();

@@ -65,7 +65,7 @@ class DisclaimerProvider extends Plugin
 
             $u->removeLock("validate_disclaimer");
             $u->save("superuser");
-            AuthService::updateUser($u);
+            AuthService::updateSessionUser($u);
             $repo = SessionRepositoryMiddleware::switchUserToRepository($u, $request);
             if (!$repo) {
                 AuthService::disconnect();

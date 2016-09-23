@@ -172,7 +172,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 
     getRESTPreviewLinks:function(node){
         return {
-            "First Page Thumbnail": "&file=" + encodeURIComponent(node.getPath())
+            "First Page Thumbnail": ""
         };
     },
 

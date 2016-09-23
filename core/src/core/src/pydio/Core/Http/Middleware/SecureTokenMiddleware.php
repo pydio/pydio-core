@@ -25,6 +25,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Server;
 use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -37,6 +38,8 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class SecureTokenMiddleware
 {
+
+    const SECURE_TOKENS_KEY = "PYDIO_SECURE_TOKENS";
 
     /**
      *
@@ -58,7 +61,7 @@ class SecureTokenMiddleware
         });
 
         $pluginsUnSecureActions[] = "get_secure_token";
-        if (!in_array($requestInterface->getAttribute("action"), $pluginsUnSecureActions) && self::getSecureToken()) {
+        if (!in_array($requestInterface->getAttribute("action"), $pluginsUnSecureActions) && self::hasSecureToken()) {
             $params = $requestInterface->getParsedBody();
             if(array_key_exists("secure_token", $params)){
                 $token = $params["secure_token"];
@@ -78,15 +81,10 @@ class SecureTokenMiddleware
      */
     public static function generateSecureToken()
     {
-        if(!isSet($_SESSION["SECURE_TOKENS"])){
-            $_SESSION["SECURE_TOKENS"] = array();
-        }
-        if(isSet($_SESSION["FORCE_SECURE_TOKEN"])){
-            $_SESSION["SECURE_TOKENS"][] = $_SESSION["FORCE_SECURE_TOKEN"];
-            return $_SESSION["FORCE_SECURE_TOKEN"];
-        }
+        $arr = SessionService::fetch(self::SECURE_TOKENS_KEY) OR [];
         $newToken = StringHelper::generateRandomString(32);
-        $_SESSION["SECURE_TOKENS"][] = $newToken;
+        $arr[] = $newToken;
+        SessionService::save(self::SECURE_TOKENS_KEY, $arr);
         return $newToken;
     }
     /**
@@ -94,12 +92,10 @@ class SecureTokenMiddleware
      * @static
      * @return string|bool
      */
-    public static function getSecureToken()
+    protected static function hasSecureToken()
     {
-        if(isSet($_SESSION["SECURE_TOKENS"]) && count($_SESSION["SECURE_TOKENS"])){
-            return true;
-        }
-        return false;
+        $arr = SessionService::fetch(self::SECURE_TOKENS_KEY);
+        return ($arr !== null && is_array($arr) && count($arr));
     }
     /**
      * Verify a secure token value from the session
@@ -109,10 +105,8 @@ class SecureTokenMiddleware
      */
     public static function checkSecureToken($token)
     {
-        if (isSet($_SESSION["SECURE_TOKENS"]) && in_array($token, $_SESSION["SECURE_TOKENS"])) {
-            return true;
-        }
-        return false;
+        $arr = SessionService::fetch(self::SECURE_TOKENS_KEY);
+        return ($arr !== null && is_array($arr) && in_array($token, $arr));
     }
 
 }
