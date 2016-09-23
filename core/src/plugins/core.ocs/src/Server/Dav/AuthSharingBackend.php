@@ -68,17 +68,17 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
      *
      * @param string $username
      * @param string $password
-     * @return bool
+     * @return mixed AJXP_User|bool
      */
     protected function validateUserPass($username, $password)
     {
         try{
             if(isSet($this->shareData["PRESET_LOGIN"])){
-                AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false);
+                $user = AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false);
             }else{
-                AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
+                $user = AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
             }
-            return true;
+            return $user;
         }catch (LoginException $l){
             return false;
         }
@@ -119,7 +119,9 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
             $auth->requireLogin();
             throw new DAV\Exception\NotAuthenticated('Username or password does not match');
         }
-        if (!$this->validateUserPass($userpass[0],$userpass[1])) {
+
+        $user = $this->validateUserPass($userpass[0],$userpass[1]);
+        if (!$user) {
             $auth->requireLogin();
             throw new DAV\Exception\NotAuthenticated('Username or password does not match');
         }
@@ -136,7 +138,7 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
         }
 
         $this->currentUser = $userpass[0];
-        $this->context->setUserId($this->currentUser);
+        $this->context->setUserObject($user);
 
         Logger::updateContext($this->context);
         TextEncoder::updateContext($this->context);
