@@ -11,8 +11,8 @@
 }
 
 .animated.long {
-    -webkit-animation-duration: 2s;
-    animation-duration: 2s;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
 }
 
 @-webkit-keyframes fadeIn {
@@ -97,7 +97,7 @@
 @-webkit-keyframes fadeInUpBig {
 	0% {
 		opacity: 0;
-		-webkit-transform: translateY(2000px);
+		-webkit-transform: translateY(400px);
 	}
 	
 	100% {
@@ -109,7 +109,7 @@
 @-moz-keyframes fadeInUpBig {
 	0% {
 		opacity: 0;
-		-moz-transform: translateY(2000px);
+		-moz-transform: translateY(400px);
 	}
 	
 	100% {
@@ -121,7 +121,7 @@
 @-o-keyframes fadeInUpBig {
 	0% {
 		opacity: 0;
-		-o-transform: translateY(2000px);
+		-o-transform: translateY(400px);
 	}
 	
 	100% {
@@ -133,7 +133,7 @@
 @keyframes fadeInUpBig {
 	0% {
 		opacity: 0;
-		transform: translateY(2000px);
+		transform: translateY(400px);
 	}
 	
 	100% {
@@ -156,7 +156,7 @@
 	
 	100% {
 		opacity: 0;
-		-webkit-transform: translateY(2000px);
+		-webkit-transform: translateY(400px);
 	}
 }
 
@@ -168,7 +168,7 @@
 	
 	100% {
 		opacity: 0;
-		-moz-transform: translateY(2000px);
+		-moz-transform: translateY(400px);
 	}
 }
 
@@ -180,7 +180,7 @@
 	
 	100% {
 		opacity: 0;
-		-o-transform: translateY(2000px);
+		-o-transform: translateY(400px);
 	}
 }
 
@@ -192,7 +192,7 @@
 	
 	100% {
 		opacity: 0;
-		transform: translateY(2000px);
+		transform: translateY(400px);
 	}
 }
 

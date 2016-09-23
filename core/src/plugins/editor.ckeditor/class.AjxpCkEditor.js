@@ -124,7 +124,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		if(window.ajxpMobile){
 			this.setFullScreen();
 		}
-
+        this.element.down('.action_bar').removeClassName('full_width_action_bar');
 	},
 	
 	bindCkEditorEvents : function(){
@@ -181,11 +181,15 @@ Class.create("AjxpCkEditor", TextEditor, {
 	},
 			
 	saveFile : function(){
-		var connexion = this.prepareSaveConnexion();
-		var value = CKEDITOR.instances[this.editorInstanceId].getData();
-		this.textarea.value = value;		
-		connexion.addParameter('content', value);
-		connexion.sendAsync();
+
+        var value = CKEDITOR.instances[this.editorInstanceId].getData();
+        this.textarea.value = value;
+        PydioApi.getClient().postPlainTextContent(this.inputNode.getPath(), this.textarea.value, function(success){
+            if(success){
+                this.setModified(false);
+            }
+        }.bind(this));
+
 	},
 		
 	parseTxt : function(transport){	

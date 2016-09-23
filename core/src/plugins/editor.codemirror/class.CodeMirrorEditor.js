@@ -302,46 +302,25 @@ Class.create("CodeMirrorEditor", AbstractEditor, {
 	loadFileContent : function(fileName){
 		
 		this.currentFile = fileName;
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'get_content');
-		connexion.addParameter('file', fileName);	
-		connexion.onComplete = function(transp){
-			this.parseTxt(transp);
+        PydioApi.getClient().request({
+            get_action: 'get_content',
+            file: fileName
+        }, function(transport){
+			this.parseTxt(transport);
 			this.updateTitle(getBaseName(fileName));
-		}.bind(this);
-		this.setModified(false);
-		this.setOnLoad(this.contentMainContainer);
-		connexion.sendAsync();
-	},
-	
-	prepareSaveConnexion : function(){
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'put_content');
-        connexion.addParameter('file', this.inputNode.getPath());
-        connexion.onComplete = function(transp){
-			this.parseXml(transp);
-            ajaxplorer.fireNodeRefresh(this.inputNode);
-		}.bind(this);
-		this.setOnLoad(this.contentMainContainer);
-		connexion.setMethod('put');		
-		return connexion;
+        }.bind(this));
 	},
 	
 	saveFile : function(){
-		var connexion = this.prepareSaveConnexion();
-		connexion.addParameter('content', this.codeMirror.getCode());		
-		connexion.sendAsync();
+        this.setOnLoad(this.contentMainContainer);
+        PydioApi.getClient().postPlainTextContent(this.inputNode.getPath(), this.codeMirror.getCode(), function(success){
+            if(success){
+                this.setModified(false);
+            }
+            this.removeOnLoad(this.contentMainContainer)
+        }.bind(this));
 	},
-	
-	parseXml : function(transport){
-		if(parseInt(transport.responseText).toString() == transport.responseText){
-			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
-		}else{
-			this.setModified(false);
-		}
-		this.removeOnLoad(this.contentMainContainer);
-	},
-	
+
 	parseTxt : function(transport){	
 		this.codeMirror.setCode(transport.responseText);
 		this.setModified(false);

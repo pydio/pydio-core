@@ -179,6 +179,22 @@ class PydioApi{
 
     }
 
+    postPlainTextContent(filePath, content, finishedCallback){
+
+        this.request({
+            get_action:'put_content',
+            file: filePath,
+            content: content
+        }, function(transport){
+            var success = this.parseXmlMessage(transport.responseXML);
+            finishedCallback(success);
+        }.bind(this), function(){
+            finishedCallback(false);
+        });
+
+
+    }
+
     /**
      * Detect a minisite_session parameter in the URL
      * @param serverAccess

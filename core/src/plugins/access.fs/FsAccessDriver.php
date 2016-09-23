@@ -29,6 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Exception\FileNotWriteableException;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
@@ -867,23 +868,17 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 } else {
                     $code=str_replace("&lt;","<", InputFilter::magicDequote($code));
                 }
-                $response = $response->withHeader("Content-Type", "text/plain");
-                try {
-                    Controller::applyHook("node.before_change", [&$currentNode, strlen($code)]);
-                } catch (\Exception $e) {
-                    $response->getBody()->write($e->getMessage());
-                    break;
-                }
+                Controller::applyHook("node.before_change", [&$currentNode, strlen($code)]);
                 if (!is_file($fileName) || !$this->isWriteable($currentNode)) {
-                    $response->getBody()->write((!$this->isWriteable($currentNode)?"1001":"1002"));
-                    break;
+                    throw new FileNotWriteableException($currentNode);
                 }
                 $fp=fopen($fileName,"w");
                 fputs ($fp,$code);
                 fclose($fp);
                 clearstatcache(true, $fileName);
                 Controller::applyHook("node.change", [$currentNode, $currentNode, false]);
-                $response->getBody()->write($mess[115]);
+                $logMessage = new UserMessage($mess[115]);
+                $nodesDiffs->update([$currentNode]);
 
             break;
 

@@ -732,14 +732,11 @@ Class.create("Modal", {
         }else {
 			container = $(ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
 		}
-		var containerOffset = Position.cumulativeOffset(container);
-		var containerDimensions = container.getDimensions();
-		var boxWidth = parseInt(containerDimensions.width * 90/100);
-		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
+        var boxPosition = this.computeMessageBoxPosition(container);
 		this.messageBox.setStyle({
 			bottom:'20px',
-			left:leftPosition+'px',
-			width:boxWidth+'px'
+			left:boxPosition.left+'px',
+			width:boxPosition.width+'px'
 		});
 		new Effect.MessageAppear(this.messageBox);
         if(window.console){
@@ -748,6 +745,25 @@ Class.create("Modal", {
         }
 		this.tempoMessageDivClosing();
 	},
+
+    computeMessageBoxPosition(container){
+        var dim = container.getDimensions();
+        if(!container.visible()) dim = {width:0, height: 0};
+        while((!dim.width || !dim.height) && container.parentNode){
+            container = container.parentNode;
+            if(!container.visible()) continue;
+            if(container === window.document) {
+                dim = document.viewport.getDimensions();
+            } else {
+                dim = container.getDimensions();
+            }
+        }
+        var offset = Position.cumulativeOffset(container);
+        var boxWidth = parseInt(dim.width * 90/100);
+        var leftPosition = offset[0] + parseInt(dim.width*5/100);
+        return {left: leftPosition, width: boxWidth};
+    },
+
 	/**
 	 * Bootloader helper. Sets total steps
 	 * @param count Integer

@@ -39,15 +39,16 @@ Class.create("TextEditor", AbstractEditor, {
 		$super(nodeOrNodes);
 		var fileName = nodeOrNodes.getPath();
 		var textarea;
-		this.textareaContainer = document.createElement('div');
-		this.textarea = $(document.createElement('textarea'));
-		this.textarea.name =  this.textarea.id = 'content';
-		this.textarea.addClassName('dialogFocus');
-		this.textarea.addClassName('editor');
+		this.textareaContainer = new Element('div');
+		this.textarea = new Element('textarea', {
+            id:'content',
+            name:'content',
+            style:'margin:0; border:0; width: 100%;',
+            className:'dialogFocus editor',
+            wrap: 'off'
+        });
 		this.currentUseCp = false;
 		this.contentMainContainer = this.textarea;
-		this.textarea.setStyle({width:'100%'});	
-		this.textarea.setAttribute('wrap', 'off');	
 		if(!this.canWrite){
 			this.textarea.readOnly = true;
 		}
@@ -69,6 +70,7 @@ Class.create("TextEditor", AbstractEditor, {
         this.textarea.observe("blur", function(){
             pydio.UI.enableAllKeyBindings()
         });
+        this.element.down('.action_bar').addClassName('full_width_action_bar');
 	},
 	
 	loadFileContent : function(fileName){
@@ -85,33 +87,18 @@ Class.create("TextEditor", AbstractEditor, {
 		connexion.sendAsync();
 	},
 	
-	prepareSaveConnexion : function(){
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'put_content');
-		connexion.addParameter('file', this.inputNode.getPath());
-		connexion.onComplete = function(transp){
-			this.parseXml(transp);			
-		}.bind(this);
-		this.setOnLoad(this.textareaContainer);
-		connexion.setMethod('put');		
-		return connexion;
-	},
-	
 	saveFile : function(){
-		var connexion = this.prepareSaveConnexion();
-		connexion.addParameter('content', this.textarea.value);		
-		connexion.sendAsync();
+        
+        this.setOnLoad(this.textareaContainer);
+        PydioApi.getClient().postPlainTextContent(this.inputNode.getPath(), this.textarea.value, function(success){
+            if(success){
+                this.setModified(false);
+            }
+            this.removeOnLoad(this.textareaContainer)
+        }.bind(this));
+        
 	},
-	
-	parseXml : function(transport){
-		if(parseInt(transport.responseText).toString() == transport.responseText){
-			alert("Cannot write the file to disk (Error code : "+transport.responseText+")");
-		}else{
-			this.setModified(false);
-		}
-		this.removeOnLoad(this.textareaContainer);
-	},
-	
+
 	parseTxt : function(transport){	
 		this.textarea.value = transport.responseText;
 		if(this.canWrite){
