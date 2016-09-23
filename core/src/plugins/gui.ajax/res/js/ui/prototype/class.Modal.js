@@ -746,7 +746,8 @@ Class.create("Modal", {
 		this.tempoMessageDivClosing();
 	},
 
-    computeMessageBoxPosition(container){
+    computeMessageBoxPosition: function(container){
+
         var dim = container.getDimensions();
         if(!container.visible()) dim = {width:0, height: 0};
         while((!dim.width || !dim.height) && container.parentNode){
@@ -762,6 +763,7 @@ Class.create("Modal", {
         var boxWidth = parseInt(dim.width * 90/100);
         var leftPosition = offset[0] + parseInt(dim.width*5/100);
         return {left: leftPosition, width: boxWidth};
+        
     },
 
 	/**
