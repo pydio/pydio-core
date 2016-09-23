@@ -584,6 +584,10 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 11px !important;
   opacity: 0.73;
 }
+.webfx-tree-item div.overlay_icon_div span.overlay-class-span.mdi-radar {
+  padding: 0 !important;
+  margin: 0 5px !important;
+}
 .webfx-tree-item.selected-webfx-tree-item div.overlay_icon_div span.overlay-class-span {
   color: white !important;
 }
