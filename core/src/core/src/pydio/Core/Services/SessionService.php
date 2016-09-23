@@ -43,6 +43,12 @@ class SessionService implements RepositoriesCache
     const CTX_CHARSET_KEY = "PYDIO_CTX_CHARSET";
     const CTX_MINISITE_HASH = "PYDIO_CTX_MINISITE";
 
+    const LOADED_REPOSITORIES = "PYDIO_REPOSITORIES";
+    const PREVIOUS_REPOSITORY = "PYDIO_PREVIOUS_REPO_ID";
+    const CTX_REPOSITORY_ID = "PYDIO_REPO_ID";
+    const PENDING_REPOSITORY_ID = "PYDIO_PENDING_REPO_ID";
+    const PENDING_FOLDER = "PYDIO_PENDING_FOLDER";
+
     private static $sessionName = PYDIO_SESSION_NAME;
 
     /**
@@ -148,11 +154,11 @@ class SessionService implements RepositoriesCache
      * @param UserInterface $ctxUser
      */
     public static function checkPendingRepository($ctxUser){
-        if (isSet($_SESSION["PENDING_REPOSITORY_ID"]) && isSet($_SESSION["PENDING_FOLDER"])) {
-            $ctxUser->setArrayPref("history", "last_repository", $_SESSION["PENDING_REPOSITORY_ID"]);
-            $ctxUser->setPref("pending_folder", $_SESSION["PENDING_FOLDER"]);
-            unset($_SESSION["PENDING_REPOSITORY_ID"]);
-            unset($_SESSION["PENDING_FOLDER"]);
+        if (self::has(self::PENDING_REPOSITORY_ID) && self::has(self::PENDING_FOLDER)) {
+            $ctxUser->setArrayPref("history", "last_repository", self::fetch(self::PENDING_REPOSITORY_ID));
+            $ctxUser->setPref("pending_folder", self::fetch(self::PENDING_FOLDER));
+            self::delete(self::PENDING_REPOSITORY_ID);
+            self::delete(self::PENDING_FOLDER);
         }
     }
 
@@ -160,32 +166,31 @@ class SessionService implements RepositoriesCache
      * @return null
      */
     public static function getSessionRepositoryId(){
-
-        return isSet($_SESSION["REPO_ID"]) ? $_SESSION["REPO_ID"] : null;
+        return self::fetch(self::CTX_REPOSITORY_ID);
     }
 
     /**
      * @param $repoId
      */
     public static function saveRepositoryId($repoId){
-        $_SESSION["REPO_ID"] = $repoId;
+        self::save(self::CTX_REPOSITORY_ID, $repoId);
     }
 
     /**
      * @param $repoId
      */
     public static function switchSessionRepositoriId($repoId){
-        if(isSet($_SESSION["REPO_ID"])){
-            $_SESSION["PREVIOUS_REPO_ID"] = $_SESSION["REPO_ID"];
+        if(self::has(self::CTX_REPOSITORY_ID)) {
+            self::save(self::PREVIOUS_REPOSITORY, self::fetch(self::CTX_REPOSITORY_ID));
         }
-        $_SESSION["REPO_ID"] = $repoId;
+        self::save(self::CTX_REPOSITORY_ID, $repoId);
     }
 
     /**
      * @return null
      */
     public static function getPreviousRepositoryId(){
-        return isSet($_SESSION["PREVIOUS_REPO_ID"]) ? $_SESSION["PREVIOUS_REPO_ID"] : null;
+        return self::fetch(self::PREVIOUS_REPOSITORY);
     }
 
     /**
@@ -193,12 +198,13 @@ class SessionService implements RepositoriesCache
      */
     public static function getLoadedRepositories()
     {
-        if (isSet($_SESSION["REPOSITORIES"]) && is_array($_SESSION["REPOSITORIES"])) {
-            $sessionNotCorrupted = array_reduce($_SESSION["REPOSITORIES"], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
+        $arr = self::fetch(self::LOADED_REPOSITORIES);
+        if (is_array($arr)) {
+            $sessionNotCorrupted = array_reduce($arr, function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
             if($sessionNotCorrupted){
-                return $_SESSION["REPOSITORIES"];
+                return $arr;
             } else {
-                unset($_SESSION["REPOSITORIES"]);
+                self::delete(self::LOADED_REPOSITORIES);
             }
         }
         return null;
@@ -210,7 +216,7 @@ class SessionService implements RepositoriesCache
      */
     public static function updateLoadedRepositories($repositories)
     {
-        $_SESSION["REPOSITORIES"] = $repositories;
+        self::save(self::LOADED_REPOSITORIES, $repositories);
     }
 
     /**
@@ -218,9 +224,7 @@ class SessionService implements RepositoriesCache
      */
     public static function invalidateLoadedRepositories()
     {
-        if(isSet($_SESSION["REPOSITORIES"])){
-            unset($_SESSION["REPOSITORIES"]);
-        }
+        self::delete(self::LOADED_REPOSITORIES);
     }
 
     /**
@@ -233,6 +237,7 @@ class SessionService implements RepositoriesCache
         if(!empty($arr) && isSet($arr[$repositoryId])){
             return $arr[$repositoryId];
         }
+        return null;
     }
 
     /**

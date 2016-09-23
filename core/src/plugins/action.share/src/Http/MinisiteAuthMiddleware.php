@@ -68,8 +68,8 @@ class MinisiteAuthMiddleware
 
             if($sessions) {
 
-                $_SESSION["PENDING_REPOSITORY_ID"] = $shareData["REPOSITORY"];
-                $_SESSION["PENDING_FOLDER"] = "/";
+                SessionService::save(SessionService::PENDING_REPOSITORY_ID, $shareData["REPOSITORY"]);
+                SessionService::save(SessionService::PENDING_FOLDER, "/");
 
             } else {
                 $responseInterface = self::basicHttp($shareData["PRESET_LOGIN"], $requestInterface, $responseInterface);
