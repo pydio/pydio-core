@@ -27,6 +27,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ApiKeysService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Conf\Sql\SqlConfDriver;
+use Pydio\Log\Core\Logger;
 use Zend\Diactoros\UploadedFile;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -85,9 +86,11 @@ class AuthFrontend extends AbstractAuthFrontend
         if ($action == "upload") {
             $stream = $request->getBody();
 
+            $size = (int)$request->getHeader("Content-Length")[0];
+
             $uploadedFile = new UploadedFile(
                 $stream,
-                (int)$request->getHeader("content-length"),
+                $size,
                 0,
                 basename($path)
             );
