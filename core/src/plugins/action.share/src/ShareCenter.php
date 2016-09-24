@@ -1166,12 +1166,26 @@ class ShareCenter extends Plugin
     /**
      * Hook user.after_delete
      * make sure to clear orphan shares
+     * @param ContextInterface $ctx
      * @param String $userId
      */
-    public function cleanUserShares($userId){
+    public function cleanUserShares($ctx, $userId){
         $shares = $this->getShareStore()->listShares($userId);
         foreach($shares as $hash => $data){
             $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash, false, true);
+        }
+    }
+
+    /**
+     * Hook workspace.delete
+     * make sure to clear shares
+     * @param ContextInterface $ctx
+     * @param String $workspaceId
+     */
+    public function cleanWorkspaceShares($ctx, $workspaceId){
+        $shares = $this->getShareStore($ctx)->listShares('', $workspaceId);
+        foreach($shares as $hash => $data){
+            $this->getShareStore($ctx)->deleteShare($data['SHARE_TYPE'], $hash, false, true);
         }
     }
 

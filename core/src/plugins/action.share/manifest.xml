@@ -443,6 +443,7 @@
             <serverCallback hookName="node.info.nocache" methodName="nodeSharedMetadata"/>
             <serverCallback hookName="node.change" methodName="updateNodeSharedData"/>
             <serverCallback hookName="user.after_delete" methodName="cleanUserShares" defer="true"/>
+            <serverCallback hookName="workspace.after_delete" methodName="cleanWorkspaceShares" defer="true"/>
             <serverCallback methodName="forwardEventToShares" hookName="node.change" defer="true"/>
         </hooks>
     </registry_contributions>

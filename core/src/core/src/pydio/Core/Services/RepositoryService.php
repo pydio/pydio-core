@@ -432,13 +432,13 @@ class RepositoryService
      */
     private function addRepositoryInst($oRepository)
     {
-        Controller::applyHook("workspace.before_create", array(Context::fromGlobalServices(), $oRepository));
+        Controller::applyHook("workspace.before_create", array(Context::emptyContext(), $oRepository));
         $confStorage = ConfService::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepository);
         if ($res == -1) {
             return $res;
         }
-        Controller::applyHook("workspace.after_create", array(Context::fromGlobalServices(), $oRepository));
+        Controller::applyHook("workspace.after_create", array(Context::emptyContext(), $oRepository));
         Logger::info(__CLASS__,"Create Repository", array("repo_name"=>$oRepository->getDisplay()));
         CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:".$oRepository->getId(), $oRepository);
         return null;
@@ -469,13 +469,13 @@ class RepositoryService
      */
     private function replaceRepositoryInst($oldId, $oRepositoryObject)
     {
-        Controller::applyHook("workspace.before_update", array(Context::fromGlobalServices(), $oRepositoryObject));
+        Controller::applyHook("workspace.before_update", array(Context::emptyContext(), $oRepositoryObject));
         $confStorage = ConfService::getConfStorageImpl();
         $res = $confStorage->saveRepository($oRepositoryObject, true);
         if ($res == -1) {
             return -1;
         }
-        Controller::applyHook("workspace.after_update", array(Context::fromGlobalServices(), $oRepositoryObject));
+        Controller::applyHook("workspace.after_update", array(Context::emptyContext(), $oRepositoryObject));
         Logger::info(__CLASS__,"Edit Repository", array("repo_name"=>$oRepositoryObject->getDisplay()));
         CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:" . $oRepositoryObject->getId(), $oRepositoryObject);
         return 0;
@@ -488,7 +488,7 @@ class RepositoryService
      */
     private function deleteRepositoryInst($repoId)
     {
-        Controller::applyHook("workspace.before_delete", array(Context::fromGlobalServices(), $repoId));
+        Controller::applyHook("workspace.before_delete", array(Context::emptyContext(), $repoId));
         $confStorage = ConfService::getConfStorageImpl();
         $shares = $confStorage->listRepositoriesWithCriteria(array("parent_uuid" => $repoId));
         $toDelete = array();
@@ -502,7 +502,7 @@ class RepositoryService
         foreach($toDelete as $deleteId){
             $this->deleteRepositoryInst($deleteId);
         }
-        Controller::applyHook("workspace.after_delete", array(Context::fromGlobalServices(), $repoId));
+        Controller::applyHook("workspace.after_delete", array(Context::emptyContext(), $repoId));
         Logger::info(__CLASS__,"Delete Repository", array("repo_id"=>$repoId));
         CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:repository:".$repoId);
         return 0;

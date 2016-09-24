@@ -82,16 +82,6 @@ class Context implements ContextInterface
     }
 
     /**
-     * @return ContextInterface
-     */
-    public static function fromGlobalServices(){
-        $ctx = new Context();
-        //$ctx->setUserObject(AuthService::getLoggedUser());
-        //$ctx->setRepositoryObject(ConfService::getRepository());
-        return $ctx;
-    }
-
-    /**
      * @return Context
      */
     public static function emptyContext(){
