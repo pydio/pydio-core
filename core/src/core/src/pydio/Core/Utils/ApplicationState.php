@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -195,15 +196,11 @@ class ApplicationState
             return "$protocol://$name$port";
         } else {
             $uri = dirname($_SERVER["REQUEST_URI"]);
-            $api = self::getSapiRestBase();
-            if (!empty($api)) {
-                $api .= '/';
-                if(strpos($uri, $api) === 0){
-                    $uri = '/';
-                }else{
-                    // Keep only before api base
-                    $uri = array_shift(explode($api, $uri));
-                }
+            $apiBase = self::getSapiRestBase();
+            if (!empty($apiBase)) {
+                // apiBase must be /path/to/pydio/endpoint => remove endpoint
+                $uri = PathUtils::forwardSlashDirname(rtrim($apiBase));
+                if(empty($uri)) $uri = "/";
             }
             return "$protocol://$name$port" . $uri;
         }
