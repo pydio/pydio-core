@@ -205,7 +205,9 @@
                 <serverCallback methodName="switchAction" restParams="/"/>
 				<clientCallback prepareModal="false"><![CDATA[
 					modal.showDialogForm('EmptyRecycle', 'empty_recycle_form', null, function(){
-						PydioApi.getClient().request({get_action:'empty_recycle'});
+						PydioApi.getClient().request({get_action:'empty_recycle'}, function(transport){
+						    PydioApi.getClient().parseXmlMessage(transport.responseXML);
+						});
 						hideLightBox(true);
 						return false;
 					});
