@@ -126,7 +126,7 @@ spl_autoload_register('pydioAutoloader');
 
 include_once(AJXP_INSTALL_PATH . "/core/compat.php");
 
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 ApplicationState::safeIniSet("session.cookie_httponly", 1);
 
