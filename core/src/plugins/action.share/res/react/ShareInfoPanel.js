@@ -33,6 +33,10 @@
                 Loader.INSTANCE.hookAfterDelete();
             }
             var mainCont = container.querySelectorAll("#ajxp_shared_info_panel .infoPanelTable")[0];
+            mainCont.destroy = function(){
+                React.unmountComponentAtNode(mainCont);
+            };
+            mainCont.className += (mainCont.className ? ' ' : '') + 'infopanel-destroyable-pane';
             React.render(
                 React.createElement(InfoPanel, {pydio:global.pydio, node:node}),
                 mainCont
@@ -294,6 +298,17 @@
                     </div>
                 );
             }
+            if(this.state.model.getStatus() !== 'loading' && !sharedUsersEntries.length
+                && !remoteUsersEntries.length && !this.state.model.hasPublicLink()){
+                let func = function(){
+                    this.state.model.stopSharing();
+                }.bind(this);
+                var noEntriesFoundBlock = (
+                    <div className="infoPanelRow">
+                        <div className="infoPanelValue">{this.getMessage(232)} <a style={{textDecoration:'underline',cursor:'pointer'}} onClick={func}>{this.getMessage(233)}</a></div>
+                    </div>
+                );
+            }
 
             return (
                 <div>
@@ -301,6 +316,7 @@
                     {downloadField}
                     {templateField}
                     {sharedUsersBlock}
+                    {noEntriesFoundBlock}
                 </div>
             );
         }

@@ -247,5 +247,7 @@ $mess = array(
 "231" => "Click to start downloading",
 "11" => "Expiration",
 "49" => "create user",
+    "232" => "No entries found for share, did you maybe delete some users?",
+    "233" => "Reset this share",
 // will be replaced by the filename to download
 );

@@ -141,6 +141,9 @@ Class.create("InfoPanel", AjxpPane, {
             this.htmlElement.select(".class-FetchedResultPane").each(function(el){
                 el.ajxpPaneObject.destroy();
             });
+            this.htmlElement.select(".infopanel-destroyable-pane").each(function(el){
+                el.destroy();
+            });
         }
 		this.setContent('');
 	},

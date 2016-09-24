@@ -144,7 +144,7 @@ class CompositeShare
         }
         $sharedEntries = $rightsManager->computeSharedRepositoryAccessRights($this->getRepositoryId(), true, $repoRootNode);
         if(empty($sharedEntries)){
-            return false;
+//            return false;
         }
         $cFilter = $this->getRepository()->getContentFilter();
         if(!empty($cFilter)){

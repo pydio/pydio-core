@@ -247,4 +247,6 @@ $mess = array(
     "229" => "Collez ce code dans une page HTML pour insérer une prévisualisation du fichier.",
     "230" => "Veuillez sauver ce partage avant de pouvoir envoyer une invitation.",
     "231" => "Cliquez pour télécharger",
+    "232" => "Pas d'entrées pour ce partage, peut-être avez-vous supprimé des utilisateurs?",
+    "233" => "Réinitialiser le partage",
 );

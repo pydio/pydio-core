@@ -247,5 +247,7 @@ $mess = array(
 "161" => "Deprecated Link",
 "162" => "You have one or more legacy link on this file. Links are still active, but you can replace them with a new share link by stopping this share and recreating a new one. Copy the share 'hash' (the last part of the link, e.g. http://yourpydio.com/data/public/<em style='color:red;'>206a51</em>.php) and apply it to the new link using the 'Change Parameters' form.",
 "163" => "Drop Files Here (for upload-enabled minisites)",
+"232" => "No entries found for share, did you maybe delete some users?",
+"233" => "Reset this share",
 // will be replaced by the filename to download
 );
