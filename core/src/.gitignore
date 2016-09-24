@@ -19,3 +19,4 @@ composer.lock
 /plugins/access.inbox/res/build
 /plugins/core.mailer/js/build
 /plugins/uploader.html/js/build
+/plugins/core.tasks/js/build
