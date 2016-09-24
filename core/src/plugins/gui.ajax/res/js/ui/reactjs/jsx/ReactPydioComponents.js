@@ -655,6 +655,7 @@
 
         propTypes: {
             label:React.PropTypes.string,
+            labelElement:React.PropTypes.object,
             tooltip:React.PropTypes.string,
             tooltipClassName:React.PropTypes.string,
             className:React.PropTypes.string,
@@ -670,19 +671,21 @@
 
         render:function(){
             if(this.props.tooltip){
-                var tooltipStyle={};
-                if(this.props.label){
+                let tooltipStyle={};
+                if(this.props.label || this.props.labelElement){
                     if(this.state.show){
                         tooltipStyle = {bottom: -10, top: 'inherit'};
                     }
                 }else{
                     tooltipStyle = {position:'relative'};
                 }
-                var label;
+                let label;
                 if(this.props.label){
                     label = <span className="ellipsis-label">{this.props.label}</span>;
+                }else if(this.props.labelElement){
+                    label = this.props.labelElement;
                 }
-                var style = this.props.style || {position:'relative'};
+                let style = this.props.style || {position:'relative'};
 
                 return (
                     <span onMouseEnter={this.show} onMouseLeave={this.hide} style={style} className={this.props.className}>
@@ -692,8 +695,13 @@
                     </span>
                 );
             }else{
-                if(this.props.label) return (<span>{this.props.label}</span>);
-                else return (<span>this.props.children</span>);
+                if(this.props.label) {
+                    return <span>{this.props.label}</span>;
+                } else if(this.props.labelElement) {
+                    return this.props.labelElement;
+                } else {
+                    return <span>{this.props.children}</span>;
+                }
             }
         }
 
