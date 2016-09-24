@@ -22,8 +22,10 @@ namespace Pydio\Access\Meta\Lock;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
@@ -58,14 +60,12 @@ class SimpleLockManager extends AbstractMetaSource
         if ($store === false) {
             throw new PydioException("The 'meta.simple_lock' plugin requires at least one active 'metastore' plugin");
         }
-        $this->metaStore = $store;
-        $this->metaStore->initMeta($ctx, $accessDriver);
     }
 
     /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
-     * @throws \Exception
+     * @throws PydioException
      */
     public function applyChangeLock(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
     {
@@ -74,29 +74,29 @@ class SimpleLockManager extends AbstractMetaSource
         $ctx = $requestInterface->getAttribute("ctx");
 
         if ($ctx->getRepository()->getDriverInstance($ctx) instanceof \Pydio\Access\Driver\StreamProvider\FS\DemoAccessDriver) {
-            throw new \Exception("Write actions are disabled in demo mode!");
+            throw new PydioException("Write actions are disabled in demo mode!");
         }
         $repo = $ctx->getRepository();
         $user = $ctx->getUser();
         if (!UsersService::usersEnabled() && $user!=null && !$user->canWrite($repo->getId())) {
-            throw new \Exception("You have no right on this action.");
+            throw new PydioException("You have no right on this action.");
         }
         $selection = UserSelection::fromContext($ctx, $httpVars);
 
         $unlock = (isSet($httpVars["unlock"])?true:false);
+        $node = $selection->getUniqueNode();
         if ($unlock) {
-            $this->metaStore->removeMetadata($selection->getUniqueNode(), self::METADATA_LOCK_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
+            $node->removeMetadata(self::METADATA_LOCK_NAMESPACE, false, AJXP_METADATA_SCOPE_GLOBAL);
         } else {
-            $this->metaStore->setMetadata(
-                $selection->getUniqueNode(),
+            $node->setMetadata(
                 SimpleLockManager::METADATA_LOCK_NAMESPACE,
                 array("lock_user" => $ctx->getUser()->getId()),
                 false,
                 AJXP_METADATA_SCOPE_GLOBAL
             );
         }
-        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        $diff = new \Pydio\Access\Core\Model\NodesDiff();
+        $x = new SerializableResponseStream();
+        $diff = new NodesDiff();
         $diff->update($selection->getUniqueNode());
         $x->addChunk($diff);
         $responseInterface = $responseInterface->withBody($x);
@@ -109,8 +109,7 @@ class SimpleLockManager extends AbstractMetaSource
     {
         // Transform meta into overlay_icon
         // $this->logDebug("SHOULD PROCESS METADATA FOR ", $node->getLabel());
-        $lock = $this->metaStore->retrieveMetadata(
-           $node,
+        $lock = $node->retrieveMetadata(
            SimpleLockManager::METADATA_LOCK_NAMESPACE,
            false,
            AJXP_METADATA_SCOPE_GLOBAL);
@@ -138,13 +137,12 @@ class SimpleLockManager extends AbstractMetaSource
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
-     * @throws \Exception
+     * @throws PydioException
      */
     public function checkFileLock($node)
     {
         $this->logDebug("SHOULD CHECK LOCK METADATA FOR ", $node->getLabel());
-        $lock = $this->metaStore->retrieveMetadata(
-           $node,
+        $lock = $node->retrieveMetadata(
            SimpleLockManager::METADATA_LOCK_NAMESPACE,
            false,
            AJXP_METADATA_SCOPE_GLOBAL);
@@ -152,7 +150,7 @@ class SimpleLockManager extends AbstractMetaSource
             && array_key_exists("lock_user", $lock)
             && $lock["lock_user"] != $node->getUserId()){
             $mess = LocaleService::getMessages();
-            throw new \Exception($mess["meta.simple_lock.5"]);
+            throw new PydioException($mess["meta.simple_lock.5"]);
         }
     }
 }
