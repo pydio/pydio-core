@@ -26,7 +26,7 @@ use Pydio\Core\Model\ContextProviderInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Log\Core\Logger;

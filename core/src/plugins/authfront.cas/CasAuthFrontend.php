@@ -30,9 +30,8 @@ use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Conf\Sql\SqlConfDriver;
 use Pydio\Core\Services\RolesService;
-use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Log\Core\Logger;
 

@@ -30,7 +30,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\OCS\Server\Dummy;
 
 defined('AJXP_EXEC') or die('Access not allowed');

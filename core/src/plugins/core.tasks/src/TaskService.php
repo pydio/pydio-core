@@ -32,7 +32,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Log\Core\Logger;

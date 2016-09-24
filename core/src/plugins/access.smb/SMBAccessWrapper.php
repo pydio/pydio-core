@@ -26,7 +26,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Auth\Core\MemorySafe;
 
 
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Log\Core\Logger;
 

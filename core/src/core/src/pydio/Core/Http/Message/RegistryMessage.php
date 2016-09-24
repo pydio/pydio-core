@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Message;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

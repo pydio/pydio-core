@@ -24,7 +24,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\Vars\StringHelper;

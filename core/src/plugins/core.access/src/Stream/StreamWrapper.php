@@ -24,7 +24,7 @@ use ArrayIterator;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 use Pydio\Core\Utils\FileHelper;
 use React\Promise\Deferred;

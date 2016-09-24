@@ -35,7 +35,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Cache\Doctrine\Ext\PatternClearableCache;
 use GuzzleHttp\Client;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Log\Core\Logger;
 
 /**

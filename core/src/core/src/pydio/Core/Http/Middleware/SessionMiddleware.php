@@ -23,7 +23,7 @@ namespace Pydio\Core\Http\Middleware;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

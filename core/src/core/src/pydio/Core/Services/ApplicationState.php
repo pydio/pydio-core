@@ -18,10 +18,9 @@
  *
  * The latest code can be found at <https://pydio.com/>.
  */
-namespace Pydio\Core\Utils;
+namespace Pydio\Core\Services;
 
 use Pydio\Core\Model\RepositoryInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Log\Core\Logger;
 

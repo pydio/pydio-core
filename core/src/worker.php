@@ -21,7 +21,7 @@
 
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\PluginFramework\PluginsService;

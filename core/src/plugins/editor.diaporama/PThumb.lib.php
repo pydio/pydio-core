@@ -26,7 +26,7 @@
  */
 namespace Pydio\Editor\Image;
 
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 
 /**

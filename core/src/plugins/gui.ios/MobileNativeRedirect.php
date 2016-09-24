@@ -22,7 +22,7 @@
 namespace Pydio\Gui;
 
 use Exception;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Http\UserAgent;
 
 use Pydio\Core\PluginFramework\Plugin;

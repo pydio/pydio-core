@@ -22,8 +22,7 @@
 namespace Pydio\Core\Http\Rest;
 
 use Pydio\Core\Http\Server;
-use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

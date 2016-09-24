@@ -27,7 +27,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;

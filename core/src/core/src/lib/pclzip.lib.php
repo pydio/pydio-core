@@ -26,7 +26,7 @@
 // --------------------------------------------------------------------------------
 
   // ----- Constants
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Utils;
 
 if (!defined('PCLZIP_READ_BLOCK_SIZE')) {

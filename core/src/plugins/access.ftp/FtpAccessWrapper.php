@@ -30,7 +30,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\SessionService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\PathUtils;

@@ -37,9 +37,8 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Services\CacheService;
 
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\Access\Meta\Core\AbstractMetaSource;

@@ -29,7 +29,7 @@ use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Share\Store\ShareRightsManager;
 use Pydio\Share\View\PublicAccessManager;
 

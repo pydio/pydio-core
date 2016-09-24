@@ -24,7 +24,6 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\LoginException;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
-use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
 use Pydio\Core\Utils\Http\CookiesHelper;
 use Pydio\Core\Utils\Vars\InputFilter;

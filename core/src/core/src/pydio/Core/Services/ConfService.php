@@ -29,7 +29,6 @@ use Pydio\Core\Model\Context;
 
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
-use Pydio\Core\Utils\ApplicationState;
 use Pydio\Core\Utils\Vars\VarsFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;

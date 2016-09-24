@@ -23,7 +23,7 @@ namespace Pydio\Share\Model;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Share\Store\ShareStore;
 use Pydio\Share\View\PublicAccessManager;

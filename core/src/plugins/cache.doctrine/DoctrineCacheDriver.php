@@ -35,7 +35,7 @@ use Pydio\Cache\Core\AbstractCacheDriver;
 use Pydio\Cache\Doctrine\Ext\PydioChainCache;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Log\Core\Logger;
 use Pydio\Cache\Doctrine\Ext;

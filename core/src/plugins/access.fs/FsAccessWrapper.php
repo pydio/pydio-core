@@ -29,7 +29,7 @@ use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\UrlUtils;

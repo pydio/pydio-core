@@ -23,7 +23,7 @@ namespace Pydio\OCS\Client;
 defined('AJXP_EXEC') or die('Access not allowed');
 defined('AJXP_BIN_FOLDER') or die('Bin folder not available');
 
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 use GuzzleHttp\Exception\RequestException;
 use Pydio\OCS\Model\RemoteShare;

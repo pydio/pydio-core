@@ -25,7 +25,7 @@ use DOMNode;
 use DOMXPath;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Core\Utils\Vars\VarsFilter;

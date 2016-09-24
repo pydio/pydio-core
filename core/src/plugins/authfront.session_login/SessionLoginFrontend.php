@@ -20,7 +20,6 @@
  */
 namespace Pydio\Auth\Frontend;
 
-use __PHP_Incomplete_Class;
 use Exception;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
@@ -29,10 +28,9 @@ use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
 use Pydio\Core\Utils\Http\CookiesHelper;
-use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Utils\Http\CaptchaProvider;
 

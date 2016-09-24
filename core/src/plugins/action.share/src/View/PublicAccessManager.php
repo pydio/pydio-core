@@ -22,7 +22,7 @@ namespace Pydio\Share\View;
 
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 

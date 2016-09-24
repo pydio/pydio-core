@@ -23,7 +23,7 @@ namespace Pydio\Core\Utils\Vars;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Utils\ApplicationState;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Crypto;
 
 defined('AJXP_EXEC') or die('Access not allowed');
