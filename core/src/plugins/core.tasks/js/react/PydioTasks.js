@@ -145,6 +145,11 @@
 
         constructor(){
             super();
+            this._crtPoll   = 10;
+
+            this._quickPoll = 2;
+            this._longPoll  = 15;
+            this._pollSteps = 1.4;
             // Start listening to server messages
             global.pydio.observe("server_message", function(xml){
                 var task = XMLUtils.XPathSelectSingleNode(xml, 'tree/task');
@@ -169,12 +174,7 @@
                             taskMap.set(task.getId(), task);
                         });
                         this._tasksList = taskMap;
-                        this.notify("tasks_updated");
-                        if(tasks.length){
-                            global.pydio.notify("poller.frequency", {value:2});
-                        }else{
-                            global.pydio.notify("poller.frequency", {});
-                        }
+                        this.notifyAndSetPollerSpeed(tasks);
                     }
                 }
             }.bind(this));
@@ -193,12 +193,7 @@
                     let taskMap = new Map();
                     tasks.map(function(t){taskMap.set(t.getId(), t)});
                     this._tasksList = taskMap;
-                    this.notify("tasks_updated");
-                    if(tasks.length){
-                        global.pydio.notify("poller.frequency", {value:2});
-                    }else{
-                        global.pydio.notify("poller.frequency", {});
-                    }
+                    this.notifyAndSetPollerSpeed(tasks);
                 }.bind(this));
             }
             // Add local tasks
@@ -208,6 +203,21 @@
                 }.bind(this));
             }
             return this._tasksList;
+        }
+
+        notifyAndSetPollerSpeed(tasks){
+            this.notify("tasks_updated");
+            if(tasks.length){
+                this._crtPoll = this._quickPoll;
+                global.pydio.notify("poller.frequency", {value:this._quickPoll});
+            }else{
+                this._crtPoll *= this._pollSteps;
+                if(this._crtPoll >= this._longPoll){
+                    global.pydio.notify("poller.frequency", {});
+                }else{
+                    global.pydio.notify("poller.frequency", {value:this._crtPoll});
+                }
+            }
         }
 
         enqueueLocalTask(task){
