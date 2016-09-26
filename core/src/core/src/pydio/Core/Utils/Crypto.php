@@ -20,7 +20,11 @@
  */
 namespace Pydio\Core\Utils;
 
+use phpseclib\Crypt\Rijndael;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Crypto\ZeroPaddingRijndael;
+use Pydio\Core\Utils\Vars\StringHelper;
+
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -59,7 +63,13 @@ class Crypto
      * @return string
      */
     public static function getRandomSalt($base64encode = true){
-        $salt = mcrypt_create_iv(PBKDF2_SALT_BYTE_SIZE, MCRYPT_DEV_URANDOM);
+        if(function_exists('openssl_random_pseudo_bytes')){
+            $salt = openssl_random_pseudo_bytes(32);
+        }else if (function_exists('mcrypt_create_iv')){
+            $salt = mcrypt_create_iv(PBKDF2_SALT_BYTE_SIZE, MCRYPT_DEV_URANDOM);
+        }else{
+            $salt = StringHelper::generateRandomString(32, true);
+        }
         return ($base64encode ? base64_encode($salt) : $salt);
     }
 
@@ -70,7 +80,10 @@ class Crypto
      * @return mixed
      */
     public static function encrypt($data, $key, $base64encode = true){
-        $encoded = mcrypt_encrypt(MCRYPT_RIJNDAEL_256,  $key, $data, MCRYPT_MODE_ECB);
+        $r = new ZeroPaddingRijndael(Rijndael::MODE_ECB);
+        $r->setKey($key);
+        $r->setBlockLength(256);
+        $encoded = $r->encrypt($data);
         if($base64encode) {
             return base64_encode($encoded);
         } else {
@@ -88,7 +101,10 @@ class Crypto
         if($base64encoded){
             $data = base64_decode($data);
         }
-        return trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $data, MCRYPT_MODE_ECB), "\0");
+        $r = new ZeroPaddingRijndael(Rijndael::MODE_ECB);
+        $r->setKey($key);
+        $r->setBlockLength(256);
+        return $r->decrypt($data);
     }
 
 }
