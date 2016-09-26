@@ -72,9 +72,12 @@ class PluginsManager extends AbstractManager
 
             case "get_plugin_manifest" :
 
-                $ajxpPlugin     = PluginsService::getInstance($ctx)->getPluginById($httpVars["plugin_id"]);
+                $pluginId       = InputFilter::sanitize($httpVars["plugin_id"], InputFilter::SANITIZE_ALPHANUM);
+                if($pluginId === "core") {
+                    $pluginId = "core.ajaxplorer";
+                }
+                $ajxpPlugin     = PluginsService::getInstance($ctx)->getPluginById($pluginId);
                 $buffer = "<admin_data>";
-                //XMLWriter::header("admin_data");
 
                 $fullManifest = $ajxpPlugin->getManifestRawContent("", "xml");
                 $xPath = new \DOMXPath($fullManifest->ownerDocument);
@@ -201,6 +204,9 @@ class PluginsManager extends AbstractManager
                 $this->parseParameters($ctx, $httpVars, $options, true);
                 $confStorage = ConfService::getConfStorageImpl();
                 $pluginId = InputFilter::sanitize($httpVars["plugin_id"], InputFilter::SANITIZE_ALPHANUM);
+                if($pluginId === "core") {
+                    $pluginId = "core.ajaxplorer";
+                }
                 list($pType, $pName) = explode(".", $pluginId);
                 $existing = $confStorage->loadPluginConfig($pType, $pName);
                 $this->mergeExistingParameters($options, $existing);
