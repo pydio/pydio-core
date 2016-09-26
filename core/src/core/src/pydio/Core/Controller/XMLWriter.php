@@ -392,43 +392,6 @@ class XMLWriter
     {
         return XMLWriter::write("<require_auth/>", $print);
     }
-    /**
-     * Triggers a background action client side
-     * @static
-     * @param $actionName
-     * @param $parameters
-     * @param $messageId
-     * @param bool $print
-     * @param int $delay
-     * @return string
-     */
-    public static function triggerBgAction($actionName, $parameters, $messageId, $print=true, $delay = 0)
-    {
-        $messageId = StringHelper::xmlEntities($messageId);
-        $data = XMLWriter::write("<trigger_bg_action name=\"$actionName\" messageId=\"$messageId\" delay=\"$delay\">", $print);
-        foreach ($parameters as $paramName=>$paramValue) {
-            $paramValue = StringHelper::xmlEntities($paramValue);
-            $data .= XMLWriter::write("<param name=\"$paramName\" value=\"$paramValue\"/>", $print);
-        }
-        $data .= XMLWriter::write("</trigger_bg_action>", $print);
-        return $data;
-    }
-
-    /**
-     * Send directly JavaScript code to the client
-     * @param $jsCode
-     * @param $messageId
-     * @param bool $print
-     * @param int $delay
-     * @return string
-     */
-    public static function triggerBgJSAction($jsCode, $messageId, $print=true, $delay = 0)
-    {
-           $data = XMLWriter::write("<trigger_bg_action name=\"javascript_instruction\" messageId=\"$messageId\" delay=\"$delay\">", $print);
-            $data .= XMLWriter::write("<clientCallback><![CDATA[".$jsCode."]]></clientCallback>", $print);
-           $data .= XMLWriter::write("</trigger_bg_action>", $print);
-           return $data;
-       }
 
     /**
      * List all bookmmarks as XML

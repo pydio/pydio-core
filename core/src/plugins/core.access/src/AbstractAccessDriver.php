@@ -144,17 +144,18 @@ abstract class AbstractAccessDriver extends Plugin
      */
     public function crossRepositoryCopy(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
-        $httpVars = $requestInterface->getParsedBody();
+        $httpVars   = $requestInterface->getParsedBody();
+        $mess       = LocaleService::getMessages();
 
-        $taskId = $requestInterface->getAttribute("pydio-task-id");
-        $ctx = $requestInterface->getAttribute("ctx");
+        $taskId     = $requestInterface->getAttribute("pydio-task-id");
+        $ctx        = $requestInterface->getAttribute("ctx");
         if(empty($taskId)){
             $task = TaskService::actionAsTask($ctx, "cross_copy", $httpVars);
+            $task->setActionLabel($mess, isSet($httpVars["moving_files"]) ? '70' : '66');
             $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             return;
         }
 
-        $mess = LocaleService::getMessages();
 
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $files = $selection->getFiles();

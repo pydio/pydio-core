@@ -387,7 +387,6 @@ class Controller
             $request = $request->withParsedBody($httpVars);
 
             if(!empty($result)){
-                error_log("Action has result " . $request->getAttribute("action").", wrapping in XML Doc");
                 $response->getBody()->write(XMLWriter::wrapDocument($result));
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
             }

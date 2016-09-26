@@ -537,10 +537,6 @@ class PydioApi{
                 }
                 if(name == "javascript_instruction" && callback){
                     callback();
-                }else{
-                    var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
-                    bgManager.queueAction(name, parameters, messageId);
-                    bgManager.next();
                 }
             }
 

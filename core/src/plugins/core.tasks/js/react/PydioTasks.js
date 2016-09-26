@@ -261,12 +261,12 @@
             let t = this.props.task;
 
             let actions;
-            if(t.getStatus() == Task.STATUS_RUNNING && t.isStoppable()){
+            if(t.getStatus() === Task.STATUS_RUNNING && t.isStoppable()){
                 actions = (<span className="icon-stop" onClick={t.pause.bind(t)}/>);
             }else{
                 actions = (<span className="mdi mdi-close-circle-outline" onClick={t.stop.bind(t)}/>);
             }
-            if(this.state.showProgress && t.hasProgress()){
+            if(this.state.showProgress && t.hasProgress() && t.getStatus() !== Task.STATUS_FAILED){
                 actions = (
                     <div className="radial-progress">
                         <div className={"pie-wrapper pie-wrapper--solid progress-" + t.getProgress()}></div>
@@ -297,7 +297,7 @@
                 clickStyle = {cursor:'pointer'};
             }
             return (
-                <div className="task">
+                <div className={"task " + "task-status-" + this.props.task.getStatus()}>
                     <div className="task_texts" onClick={click} style={clickStyle}>
                         <div className="task_label">{scopeInfo}{t.getLabel()}</div>
                         <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>

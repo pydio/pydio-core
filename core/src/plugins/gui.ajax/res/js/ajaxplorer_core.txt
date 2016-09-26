@@ -15,7 +15,6 @@ js/core/http/PydioUsersApi.js
 js/core/model/RemoteNodeProvider.js
 js/core/model/EmptyNodeProvider.js
 js/core/model/Repository.js
-js/core/model/BackgroundTasksManager.js
 js/core/http/PydioApi.js
 js/core/http/MetaCacheService.js
 js/core/model/Action.js

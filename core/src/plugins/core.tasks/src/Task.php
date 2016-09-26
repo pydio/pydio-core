@@ -222,6 +222,15 @@ class Task
     }
 
     /**
+     * Set label like 'Launching task $actionLabel in background'
+     * @param array $messages
+     * @param string $actionLabelId
+     */
+    public function setActionLabel($messages, $actionLabelId){
+        $this->setLabel(str_replace("%s", $messages[$actionLabelId], $messages[556]));
+    }
+
+    /**
      * @return ContextInterface
      */
     public function getContext(){

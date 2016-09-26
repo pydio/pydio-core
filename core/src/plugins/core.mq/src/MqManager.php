@@ -280,6 +280,10 @@ class MqManager extends Plugin
      */
     private function _sendMessage(ContextInterface $ctx, $topic, $content) {
 
+        $wsActive = $this->getContextualOption($ctx, "WS_ACTIVE");
+        if(!$wsActive){
+            return;
+        }
         $host = $this->getContextualOption($ctx, "NSQ_HOST");
         $port = $this->getContextualOption($ctx, "NSQ_PORT");
 

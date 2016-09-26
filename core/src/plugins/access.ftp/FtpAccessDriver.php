@@ -161,6 +161,7 @@ class FtpAccessDriver extends FsAccessDriver
                 if ($nextFile!='') {
                     //$x->addChunk(new BgActionTrigger("next_to_remote", array(), "Copying file ".TextEncoder::toUTF8($nextFile)." to remote server"));
                     $newTask = TaskService::actionAsTask($ctx, "next_to_remote", []);
+                    $newTask->setLabel("Copying file " . $nextFile . " to remote server");
                     $response = TaskService::getInstance()->enqueueTask($newTask, $request, $response);
                 } else {
                     //$x->addChunk(new BgActionTrigger("reload_node", array(), "Upload done, reloading client."));
@@ -223,6 +224,7 @@ class FtpAccessDriver extends FsAccessDriver
                         $this->writeUploadSuccess($request, ["PREVENT_NOTIF" => true]);
 
                         $task = TaskService::actionAsTask($ctx, "next_to_remote", []);
+                        $task->setLabel("Copying file to remote server");
                         TaskService::getInstance()->enqueueTask($task, $request, $response);
 
                     } catch (\Exception $e) {

@@ -36,8 +36,13 @@ div.pydio-tasks-panel{
       > span{
         display: inline-block;
         margin-top: 15px;
-        margin-right: 10px;
+        margin-left: 10px;
         color: @teal-500;
+      }
+    }
+    &.task-status-8{ /* error status */
+      .task_texts .status_message, .task_actions > span{
+        color: #d32f2f;
       }
     }
   }

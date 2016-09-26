@@ -52,7 +52,9 @@ class PhpMailLite extends Mailer
     {
         require_once("lib/class.phpmailer-lite.php");
         $realRecipients = $this->resolveAdresses($ctx, $recipients);
-
+        if(!count($realRecipients)){
+            return;
+        }
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
         $mail = new PHPMailerLite(true);
         $mail->Mailer = $this->getContextualOption(Context::emptyContext(), "MAILER");

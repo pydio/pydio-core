@@ -89,6 +89,7 @@ class HttpDownload extends Plugin
                 $taskId = $request->getAttribute("pydio-task-id");
                 if(empty($taskId)) {
                     $task = TaskService::actionAsTask($request->getAttribute("ctx"), "external_download", $httpVars, [], Task::FLAG_HAS_PROGRESS | Task::FLAG_STOPPABLE);
+                    $task->setActionLabel(LocaleService::getMessages(), 'httpdownloader.1');
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
                 }
@@ -119,8 +120,8 @@ class HttpDownload extends Plugin
                     Controller::applyHook("node.change", array(new AJXP_Node($dlFile), null, false));
                 }
                 $mess = LocaleService::getMessages();
-                Controller::applyHook("node.change", array(null, $node, false), true);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, $mess["httpdownloader.8"]);
+                Controller::applyHook("node.change", array(null, $node, false), true);
 
             break;
             case "update_dl_data":

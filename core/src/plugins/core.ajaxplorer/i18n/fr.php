@@ -646,11 +646,12 @@ $mess=array(
 "546" => "Ce partage provient de %%OWNER%% d'un système distant. Souhaîtez-vous continuer ?",
 "547" => "Accepter",
 "548" => "Refuser",
-    "549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
-    "550" => "Rejeter ce partage",
-    "551" => "Rejeter",
-    "552" => "Please provide a password.",
-    "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
-    "554" => "%s résultat(s) dans la Corbeille",
+"549" => "Vaous avez précedemment accepté ce partage depuis un système distant (par %%OWNER%%). Désirez-vous le rejeter désormais?",
+"550" => "Rejeter ce partage",
+"551" => "Rejeter",
+"552" => "Please provide a password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s résultat(s) dans la Corbeille",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

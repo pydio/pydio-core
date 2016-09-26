@@ -30,40 +30,19 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * An XML response triggering a background action in Pydio UI.
  * @package Pydio\Core\Http\Message
  */
-class BgActionTrigger implements XMLSerializableResponseChunk
+class JsActionTrigger implements XMLSerializableResponseChunk
 {
-    private $actionName;
-    private $parameters;
-    private $messageId;
     private $delay;
-
     private $javascriptCode;
 
     /**
-     * @param string $actionName
-     * @param array $parameters
-     * @param string $messageId
-     * @param int $delay
-     */
-    public function __construct($actionName, $parameters, $messageId, $delay = 0)
-    {
-        $this->actionName = $actionName;
-        $this->parameters = $parameters;
-        $this->messageId = $messageId;
-        $this->delay = $delay;
-    }
-
-    /**
-     * Factory for BgActionTrigger
      * @param string $jsCode
-     * @param string $messageId
      * @param int $delay
-     * @return BgActionTrigger
      */
-    public static function createForJsAction($jsCode, $messageId, $delay = 0){
-        $newOne = new BgActionTrigger("javascript_action", [], $messageId, $delay);
-        $newOne->javascriptCode = $jsCode;
-        return $newOne;
+    public function __construct($jsCode, $delay = 0)
+    {
+        $this->javascriptCode = $jsCode;
+        $this->delay = $delay;
     }
 
     /**
@@ -71,10 +50,9 @@ class BgActionTrigger implements XMLSerializableResponseChunk
      */
     public function toXML()
     {
-        if(isSet($this->javascriptCode)){
-            return XMLWriter::triggerBgJSAction($this->javascriptCode, false, $this->delay);
-        }else{
-            return XMLWriter::triggerBgAction($this->actionName, $this->parameters, $this->messageId, false, $this->delay);
-        }
+        $data = "<trigger_bg_action name=\"javascript_instruction\" delay=\"".$this->delay."\">";
+        $data .= "<clientCallback><![CDATA[".$this->javascriptCode."]]></clientCallback>";
+        $data .= "</trigger_bg_action>";
+        return $data;
     }
 }

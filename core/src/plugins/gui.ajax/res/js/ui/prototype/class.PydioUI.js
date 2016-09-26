@@ -255,8 +255,6 @@ Class.create("PydioUI", {
             this.initTabNavigation();
             this.blockShortcuts = false;
             this.blockNavigation = false;
-            // TODO : ADD TO XML TEMPLATES INSTEAD
-            this.bgManagerPane = new BackgroundManagerPane();
             modal.updateLoadingProgress('Navigation loaded');
         }.bind(this));
 

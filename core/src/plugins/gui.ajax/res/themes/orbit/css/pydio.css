@@ -5906,8 +5906,15 @@ div.pydio-tasks-panel div.task .task_actions {
 div.pydio-tasks-panel div.task .task_actions > span {
   display: inline-block;
   margin-top: 15px;
-  margin-right: 10px;
+  margin-left: 10px;
   color: #009688;
+}
+div.pydio-tasks-panel div.task.task-status-8 {
+  /* error status */
+}
+div.pydio-tasks-panel div.task.task-status-8 .task_texts .status_message,
+div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
+  color: #d32f2f;
 }
 /**********************/
 /* MASTER VARIABLES

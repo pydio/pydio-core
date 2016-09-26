@@ -69,6 +69,7 @@ class CoreIndexer extends Plugin {
         /** @var \Pydio\Core\Model\ContextInterface $ctx */
         $ctx        = $requestInterface->getAttribute("ctx");
         $this->currentTaskId = $requestInterface->getAttribute("pydio-task-id") OR null;
+        $mess       = LocaleService::getMessages();
 
         if ($actionName !== "index") return null;
 
@@ -84,6 +85,7 @@ class CoreIndexer extends Plugin {
         $taskId = $requestInterface->getAttribute("pydio-task-id");
         if (empty($taskId)) {
             $task = TaskService::actionAsTask($ctx, "index", $httpVars, [$nodes[0]->getUrl()], Task::FLAG_STOPPABLE | Task::FLAG_RESUMABLE);
+            $task->setLabel($mess['core.index.3']);
             $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
             TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
             $responseInterface = $responseInterface->withBody(new \Pydio\Core\Http\Response\SerializableResponseStream(new \Pydio\Core\Http\Message\UserMessage("Indexation launched")));

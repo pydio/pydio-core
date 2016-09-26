@@ -166,6 +166,7 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             } catch (\Exception $ex) {
                 if (ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() && !isSet($httpVars["skip_unindexed"])) {
                     $task = \Pydio\Tasks\TaskService::actionAsTask($ctx, "index", []);
+                    $task->setLabel($messages["index.lucene.7"]);
                     $responseInterface = \Pydio\Tasks\TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     $x->addChunk(new UserMessage($messages["index.lucene.7"]));
                 }else{

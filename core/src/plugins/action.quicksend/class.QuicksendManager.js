@@ -37,10 +37,8 @@ Class.create("QuicksendManager", AjxpPane, {
             var uploader = uploaders[0];
             if(pydio.getController().getActionByName("trigger_remote_copy")){
                 modal.setCloseAction(function(){
-                    ajaxplorer.fireContextRefresh();
-                    var bgManager = pydio.getController().getBackgroundTasksManager();
-                    bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
-                    bgManager.next();
+                    pydio.fireContextRefresh();
+                    PydioApi.getClient().request({get_action:'trigger_remote_copy'});
                 });
             }
             if(uploader.dialogOnOpen){

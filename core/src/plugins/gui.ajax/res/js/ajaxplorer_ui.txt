@@ -42,7 +42,6 @@ js/ui/prototype/class.AjxpUsersCompleter.js
 js/ui/prototype/class.TreeSelector.js
 js/ui/prototype/class.SliderInput.js
 js/ui/prototype/class.ActionsToolbar.js
-js/ui/prototype/class.BackgroundManagerPane.js
 js/ui/prototype/class.HeaderResizer.js
 js/ui/prototype/class.PreviewFactory.js
 js/ui/prototype/class.FilesList.js

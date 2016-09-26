@@ -535,18 +535,6 @@ Connexion.parseXmlMessage = function(xmlResponse){
                 }
             }
 
-        }else if(childs[i].tagName == "trigger_bg_action"){
-            var name = childs[i].getAttribute("name");
-            var messageId = childs[i].getAttribute("messageId");
-            var parameters = {};
-            for(var j=0;j<childs[i].childNodes.length;j++){
-                var paramChild = childs[i].childNodes[j];
-                if(paramChild.tagName == 'param'){
-                    parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
-                }
-            }
-            pydio.getController().getBackgroundTasksManager().queueAction(name, parameters, messageId);
-            pydio.getController().getBackgroundTasksManager().next();
         }
 
     }

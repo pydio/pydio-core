@@ -67,4 +67,16 @@ class PydioApcuCache extends ApcuCache implements PatternClearableCache
         parent::setNamespace($namespace);
         $this->internalNamespace = $namespace;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function doFetchMultiple(array $keys)
+    {
+        $test = apcu_fetch($keys);
+        if($test === false) return [];
+        else return $test;
+    }
+
+
 }

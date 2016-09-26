@@ -659,5 +659,6 @@ $mess=array(
 "552" => "Please provide password.",
 "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
 "554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

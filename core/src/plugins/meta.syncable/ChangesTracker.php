@@ -26,6 +26,7 @@ use Pydio\Core\Controller\CliRunner;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\DBHelper;
@@ -269,6 +270,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
         }
         if($this->options["REQUIRES_INDEXATION"]){
             $task = TaskService::actionAsTask($contextInterface, "index", []);
+            $task->setActionLabel(LocaleService::getMessages(), 'core.index.3');
             TaskService::getInstance()->enqueueTask($task);
             // Unset the REQUIRES_INDEXATION FLAG
             $meta =  $currentRepo->getContextOption($contextInterface, "META_SOURCES");
@@ -574,6 +576,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                     // Make sure to index the content of this folder
                     $this->logInfo("Core.index", "Should reindex folder ".$newNode->getPath());
                     $task = TaskService::actionAsTask($newNode->getContext(), "index", ["file" => $newNode->getPath()]);
+                    $task->setActionLabel(LocaleService::getMessages(), 'core.index.3');
                     $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     TaskService::getInstance()->enqueueTask($task);
                 }
@@ -627,6 +630,7 @@ class ChangesTracker extends AbstractMetaSource implements SqlTableProvider
                             if($rowCount === 0){
                                 $this->logError(__FUNCTION__, "There was an update event on a non-indexed folder (".$newNode->getPath()."), relaunching a recursive indexation!");
                                 $task = TaskService::actionAsTask($newNode->getContext(), "index", ["file" => $newNode->getPath()]);
+                                $task->setActionLabel(LocaleService::getMessages(), 'core.index.3');
                                 $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                                 TaskService::getInstance()->enqueueTask($task);
 

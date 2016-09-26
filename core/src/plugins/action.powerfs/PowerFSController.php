@@ -33,7 +33,7 @@ use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Http\Message\BgActionTrigger;
+use Pydio\Core\Http\Message\JsActionTrigger;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 use RecursiveDirectoryIterator;
@@ -106,6 +106,7 @@ class PowerFSController extends Plugin
 
                 if ($taskId === null) {
                     $task = TaskService::actionAsTask($ctx, $request->getAttribute("action"), $httpVars);
+                    $task->setLabel($mess['powerfs.1']);
                     $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     return;
@@ -190,7 +191,7 @@ class PowerFSController extends Plugin
                 } else {
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
                     $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'" . $opeId . "',archive_name:'" . $archiveName . "'}); ";
-                    $actionTrigger = BgActionTrigger::createForJsAction($jsCode, $mess["powerfs.3"]);
+                    $actionTrigger = new JsActionTrigger($jsCode, 0);
                     Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML()));
 
                 }

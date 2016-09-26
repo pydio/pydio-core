@@ -115,14 +115,7 @@ class Controller extends Observable{
             value.refreshFromI18NHash();
         });
     }
-
-    getBackgroundTasksManager(){
-        if(!Controller._bgManager){
-            Controller._bgManager = new BackgroundTasksManager(this);
-        }
-        return Controller._bgManager;
-    }
-
+    
     getDataModel(){
         return this._dataModel;
     }
