@@ -28,6 +28,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\TextEncoder;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -83,7 +84,8 @@ class PowerFSController extends Plugin
             case "postcompress_download":
 
                 $archive = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
-
+                // This is  a real filename on a local FS => toStorageEncoding
+                $archive = TextEncoder::toStorageEncoding($archive);
                 $archiveName = $httpVars["archive_name"];
                 if (is_file($archive)) {
                     $fileReader = new \Pydio\Core\Http\Response\FileReaderResponse($archive);
