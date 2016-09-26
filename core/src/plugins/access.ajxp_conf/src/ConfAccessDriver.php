@@ -417,6 +417,28 @@ class ConfAccessDriver extends AbstractAccessDriver
     }
 
 
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function displayEnterprise(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $touchFile = $this->getPluginWorkDir(true).DIRECTORY_SEPARATOR."enterprise-display";
+        if(file_exists($touchFile)){
+            $lastDisplay = intval(file_get_contents($touchFile));
+            if(time() - $lastDisplay > 60 * 60 * 24 * 15){
+                $responseInterface = new JsonResponse(["display" => true]);
+                file_put_contents($touchFile, time());
+            }else{
+                $responseInterface = new JsonResponse(["display" => false]);
+                echo json_encode(["display" => false]);
+            }
+        }else{
+            $responseInterface = new JsonResponse(["display" => true]);
+            file_put_contents($touchFile, time());
+        }
+    }
+
+
     /********************/
     /* PLUGIN LIFECYCLE
     /********************/
