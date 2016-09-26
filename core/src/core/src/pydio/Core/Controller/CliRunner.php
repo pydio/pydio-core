@@ -76,7 +76,7 @@ class CliRunner
         $logFile = $logDir . "/" . $token . ".out";
 
         if (UsersService::usersEnabled()) {
-            $user = Crypto::encrypt($user, md5($token . Crypto::getCliSecret()));
+            $user = Crypto::encrypt($user, Crypto::buildKey($token , Crypto::getCliSecret()));
         }
         $robustInstallPath = str_replace("/", DIRECTORY_SEPARATOR, AJXP_INSTALL_PATH);
         $cmd = ConfService::getGlobalConf("CLI_PHP") . " " . $robustInstallPath . DIRECTORY_SEPARATOR . "cmd.php -u=$user -t=$token -a=$actionName -r=$repositoryId";

@@ -927,7 +927,7 @@ abstract class AbstractConfDriver extends Plugin
                         $davData["ACTIVE"] = $activate;
                     }
                     if (!empty($httpVars["webdav_pass"])) {
-                        $davData["PASS"] = Crypto::encrypt($httpVars["webdav_pass"], md5($loggedUser->getId().Crypto::getApplicationSecret()));
+                        $davData["PASS"] = Crypto::encrypt($httpVars["webdav_pass"], Crypto::buildKey($loggedUser->getId(),Crypto::getApplicationSecret()));
                     }
                     $loggedUser->setPref("AJXP_WEBDAV_DATA", $davData);
                     $loggedUser->save("user");

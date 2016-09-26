@@ -90,7 +90,7 @@ class MemorySafe
      */
     private function _encodePassword($password, $user)
     {
-        return Crypto::encrypt($password, md5($user . $this->secretKey));
+        return Crypto::encrypt($password, Crypto::buildKey($user, $this->secretKey));
     }
     /**
      * Use mcrypt functions to decode the password
@@ -100,7 +100,7 @@ class MemorySafe
      */
     private function _decodePassword($encoded, $user)
     {
-        return Crypto::decrypt($encoded, md5($user . $this->secretKey));
+        return  Crypto::decrypt($encoded, Crypto::buildKey($user, $this->secretKey, $encoded));
     }
     /**
      * Store the password credentials in the session

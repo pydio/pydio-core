@@ -1,6 +1,6 @@
--- Creating table ajxp_tasks
+/* SEPARATOR */
 DROP TABLE IF EXISTS ajxp_tasks;
-
+/* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_tasks (
     uid VARCHAR(255) NOT NULL ,
     type INTEGER NOT NULL,
@@ -22,17 +22,19 @@ CREATE TABLE IF NOT EXISTS ajxp_tasks (
 
     PRIMARY KEY (uid)
 );
-
-
+/* SEPARATOR */
 CREATE INDEX ajxp_task_usr_idx ON ajxp_tasks (user_id);
+/* SEPARATOR */
 CREATE INDEX ajxp_task_status_idx ON ajxp_tasks (status);
+/* SEPARATOR */
 CREATE INDEX ajxp_task_type ON ajxp_tasks (type);
+/* SEPARATOR */
 CREATE INDEX ajxp_task_schedule ON ajxp_tasks (schedule);
+/* SEPARATOR */
 CREATE INDEX ajxp_task_nodes_idx ON ajxp_tasks (nodes);
-
--- Rebuilding ajxp_changes trigger
+/* SEPARATOR */
 DROP TRIGGER IF EXISTS `LOG_UPDATE`;
-
+/* SEPARATOR */
 CREATE TRIGGER `LOG_UPDATE` AFTER UPDATE ON `ajxp_index`
 FOR EACH ROW INSERT INTO ajxp_changes (repository_identifier, node_id,source,target,type)
   VALUES (new.repository_identifier, new.node_id, old.node_path, new.node_path, CASE old.node_path COLLATE utf8_bin = new.node_path COLLATE utf8_bin WHEN true THEN 'content' ELSE 'path' END);

@@ -50,7 +50,7 @@
         },
 
         bufferChanges:function(newValue, oldValue){
-            this.props.onChange(newValue, oldValue);
+            this.triggerPropsOnChange(newValue, oldValue);
         },
 
         onChange:function(event, value){
@@ -59,18 +59,30 @@
                 global.clearTimeout(this.changeTimeout);
             }
             var newValue = value, oldValue = this.state.value;
+            console.log('CHANGE ' + newValue + ' // ' + oldValue);
             if(this.props.skipBufferChanges){
-                this.props.onChange(newValue, oldValue);
+                this.triggerPropsOnChange(newValue, oldValue);
             }
             this.setState({
                 dirty:true,
                 value:newValue
             });
             if(!this.props.skipBufferChanges) {
+                let timerLength = 250;
+                if(this.props.attributes['type'] === 'password'){
+                    timerLength = 1200;
+                }
                 this.changeTimeout = global.setTimeout(function () {
                     this.bufferChanges(newValue, oldValue);
-                }.bind(this), 250);
+                }.bind(this), timerLength);
             }
+        },
+
+        triggerPropsOnChange:function(newValue, oldValue){
+            if(this.props.attributes['type'] === 'password'){
+                this.toggleEditMode();
+            }
+            this.props.onChange(newValue, oldValue, {type:this.props.attributes['type']});
         },
 
         componentWillReceiveProps:function(newProps){
@@ -194,23 +206,35 @@
 
         render:function(){
             if(this.isDisplayGrid() && !this.state.editMode){
-                var value = this.state.value;
+                let value = this.state.value;
+                if(this.props.attributes['type'] === 'password' && value){
+                    value = '***********';
+                }else{
+                    value = this.state.value;
+                }
                 return <div onClick={this.props.disabled?function(){}:this.toggleEditMode} className={value?'':'paramValue-empty'}>{!value?'Empty':value}</div>;
             }else{
-                return(
-                    <span>
-                        <ReactMUI.TextField
-                            floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
-                            value={this.state.value}
-                            onChange={this.onChange}
-                            onKeyDown={this.enterToToggle}
-                            type={this.props.attributes['type'] == 'password'?'password':null}
-                            multiLine={this.props.attributes['type'] == 'textarea'}
-                            disabled={this.props.disabled}
-                            errorText={this.props.errorText}
-                        />
-                    </span>
+                let field = (
+                    <ReactMUI.TextField
+                        floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                        value={this.state.value}
+                        onChange={this.onChange}
+                        onKeyDown={this.enterToToggle}
+                        type={this.props.attributes['type'] == 'password'?'password':null}
+                        multiLine={this.props.attributes['type'] == 'textarea'}
+                        disabled={this.props.disabled}
+                        errorText={this.props.errorText}
+                    />
                 );
+                if(this.props.attributes['type'] === 'password'){
+                    return (
+                        <form autoComplete="off" style={{display:'inline'}}>{field}</form>
+                    );
+                }else{
+                    return(
+                        <span>{field}</span>
+                    );
+                }
             }
         }
 

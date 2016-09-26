@@ -70,7 +70,8 @@ class AuthCliMiddleware
         } else {
             // Consider "u" is a crypted version of u:p
             $optToken = $options["t"];
-            $optUser = Crypto::decrypt($optUser, md5($optToken.Crypto::getCliSecret()));
+            $key = Crypto::buildKey($optToken, Crypto::getCliSecret());
+            $optUser = Crypto::decrypt($optUser, $key);
             $envPass = MemorySafe::loadPasswordStringFromEnvironment($optUser);
             if($envPass !== false){
                 unset($optToken);
@@ -111,49 +112,6 @@ class AuthCliMiddleware
         $optRepoId = $options["r"];
 
         $impersonateUsers = false;
-        // TODO 1/ REIMPLEMENT parameter queue: to pass a file with many user names?
-        /**
-         * if (strpos($optUser, "queue:") === 0) {
-        $optUserQueue = substr($optUser, strlen("queue:"));
-        $optUser = false;
-        //echo("QUEUE : ".$optUserQueue);
-        if (is_file($optUserQueue)) {
-        $lines = file($optUserQueue);
-        if (count($lines) && !empty($lines[0])) {
-        $allUsers = explode(",", $lines[0]);
-        $optUser = array_shift($allUsers);
-        file_put_contents($optUserQueue, implode(",", $allUsers));
-        }
-        }
-        if ($optUser === false) {
-        if (is_file($optUserQueue)) {
-        unlink($optUserQueue);
-        }
-        die("No more users inside queue");
-        }
-         */
-        // TODO 2/ REIMPLEMENT DETECT USER PARAMETER BASED ON REPOSITORY PATH OPTION ?
-        /*
-        if ($optDetectUser != false) {
-        $path = $repository->getOption("PATH", true);
-        if (strpos($path, "AJXP_USER") !== false) {
-        $path = str_replace(
-        array("AJXP_INSTALL_PATH", "AJXP_DATA_PATH", "/"),
-        array(AJXP_INSTALL_PATH, AJXP_DATA_PATH, DIRECTORY_SEPARATOR),
-        $path
-        );
-        $parts = explode("AJXP_USER", $path);
-        if(count($parts) == 1) $parts[1] = "";
-        $first = str_replace("\\", "\\\\", $parts[0]);
-        $last = str_replace("\\", "\\\\", $parts[1]);
-        */
-        //if (preg_match("/$first(.*)$last.*/", $optDetectUser, $matches)) {
-        // $detectedUser = $matches[1];
-        //    }
-        //}
-        //}
-
-
         $loggedUser = self::authenticateFromCliParameters($options);
 
         $requestInterface = $requestInterface->withAttribute("action", $options["a"]);

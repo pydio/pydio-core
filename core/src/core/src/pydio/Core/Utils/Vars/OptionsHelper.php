@@ -44,7 +44,12 @@ class OptionsHelper
      */
     public static function decypherStandardFormPassword($userId, $password)
     {
-        return Crypto::decrypt($password, md5($userId . "\1CDAFx¨op#"));
+        if(Crypto::hasCBCEnctypeHeader($password)){
+            return Crypto::decrypt($password, Crypto::buildKey($userId, Crypto::getApplicationSecret()));
+        }else{
+            // Legacy encryption
+            return Crypto::decrypt($password, md5($userId . "\1CDAFx¨op#"));
+        }
     }
 
     /**
@@ -54,7 +59,7 @@ class OptionsHelper
      * @param null $binariesContext
      * @param string $cypheredPassPrefix
      */
-    public static function filterFormElementsFromMeta($metadata, &$nestedData, $userId = null, $binariesContext = null, $cypheredPassPrefix = "")
+    public static function filterFormElementsFromMeta(ContextInterface $ctx, $metadata, &$nestedData, $userId = null, $binariesContext = null, $cypheredPassPrefix = "")
     {
         foreach ($metadata as $key => $level) {
             if (!array_key_exists($key, $nestedData)) continue;
@@ -78,9 +83,14 @@ class OptionsHelper
                         }
                     }
                     $nestedData[$key] = $value;
+                }else if($type === "password" && !empty($cypheredPassPrefix) && $ctx->hasUser()){
+                    $value = $nestedData[$key];
+                    if(trim($value) !== '' && $value !== '__AJXP_VALUE_SET__'){
+                        $nestedData[$key] = $cypheredPassPrefix . Crypto::encrypt($value, Crypto::buildKey($ctx->getUser()->getId(), Crypto::getApplicationSecret()));
+                    }
                 }
             } else {
-                self::filterFormElementsFromMeta($level, $nestedData[$key], $userId, $binariesContext, $cypheredPassPrefix);
+                self::filterFormElementsFromMeta($ctx, $level, $nestedData[$key], $userId, $binariesContext, $cypheredPassPrefix);
             }
         }
     }
@@ -117,7 +127,7 @@ class OptionsHelper
                         $value = explode(",", $value);
                     } else if ($type == "password" && $ctx->hasUser() && !empty($cypheredPassPrefix)) {
                         if (trim($value) != "" && $value != "__AJXP_VALUE_SET__") {
-                            $value = $cypheredPassPrefix . Crypto::encrypt($value, md5($ctx->getUser()->getId() . "\1CDAFx¨op#"));
+                            $value = $cypheredPassPrefix . Crypto::encrypt($value, Crypto::buildKey($ctx->getUser()->getId(), Crypto::getApplicationSecret()));
                         }
                     } else if ($type == "binary" && $binariesContext !== null) {
                         if (!empty($value)) {

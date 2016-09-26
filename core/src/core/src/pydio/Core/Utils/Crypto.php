@@ -22,6 +22,7 @@ namespace Pydio\Core\Utils;
 
 use phpseclib\Crypt\Rijndael;
 use Pydio\Core\Services\ConfService;
+use Pydio\Core\Utils\Crypto\Key;
 use Pydio\Core\Utils\Crypto\ZeroPaddingRijndael;
 use Pydio\Core\Utils\Vars\StringHelper;
 
@@ -35,6 +36,7 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class Crypto
 {
+    const HEADER_CBC_128 = 'cbc-128';
 
     /**
      * @return string
@@ -62,15 +64,65 @@ class Crypto
      * @param bool $base64encode
      * @return string
      */
-    public static function getRandomSalt($base64encode = true){
+    public static function getRandomSalt($base64encode = true, $size = 32){
         if(function_exists('openssl_random_pseudo_bytes')){
-            $salt = openssl_random_pseudo_bytes(32);
+            $salt = openssl_random_pseudo_bytes($size);
         }else if (function_exists('mcrypt_create_iv')){
             $salt = mcrypt_create_iv(PBKDF2_SALT_BYTE_SIZE, MCRYPT_DEV_URANDOM);
         }else{
-            $salt = StringHelper::generateRandomString(32, true);
+            $salt = StringHelper::generateRandomString($size, true);
         }
         return ($base64encode ? base64_encode($salt) : $salt);
+    }
+
+    /**
+     * @return string
+     */
+    protected static function getDataHeader(){
+        return substr(md5(self::HEADER_CBC_128), 0, 16);
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    public static function hasCBCEnctypeHeader($data){
+        $h = self::getDataHeader();
+        return (strpos($data, $h) === 0);
+    }
+
+    /**
+     * @param $data
+     * @return bool
+     */
+    private static function removeCBCEnctypeHeader(&$data){
+        $h = self::getDataHeader();
+        if(strpos($data, $h) === 0){
+            $data = substr($data, strlen($h));
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    /**
+     * Builds a key using various methods depending on legacy status or not
+     * @param string $userKey
+     * @param string $secret
+     * @param null $encodedData
+     * @return array|bool|string
+     */
+    public static function buildKey($userKey, $secret, $encodedData = null){
+        if($encodedData === null){
+            // new encryption, use new method
+            return Key::create($userKey.$secret);
+        }else if(self::hasCBCEnctypeHeader($encodedData)){
+            // New method detected
+            return Key::create($userKey . $secret, Key::STRENGTH_MEDIUM);
+        }else{
+            // Legacy
+            return Key::createLegacy($userKey . $secret);
+        }
     }
 
     /**
@@ -80,14 +132,15 @@ class Crypto
      * @return mixed
      */
     public static function encrypt($data, $key, $base64encode = true){
-        $r = new ZeroPaddingRijndael(Rijndael::MODE_ECB);
+        // Encrypt in new mode, prepending a fixed header to the encoded data.
+        $r = new ZeroPaddingRijndael(Rijndael::MODE_CBC);
         $r->setKey($key);
-        $r->setBlockLength(256);
+        $r->setBlockLength(128);
         $encoded = $r->encrypt($data);
         if($base64encode) {
-            return base64_encode($encoded);
+            return self::getDataHeader().base64_encode($encoded);
         } else {
-            return $encoded;
+            return self::getDataHeader().$encoded;
         }
     }
 
@@ -98,12 +151,19 @@ class Crypto
      * @return mixed
      */
     public static function decrypt($data, $key, $base64encoded = true){
+        $test = self::removeCBCEnctypeHeader($data);
         if($base64encoded){
             $data = base64_decode($data);
         }
-        $r = new ZeroPaddingRijndael(Rijndael::MODE_ECB);
+        if($test){
+            $r = new ZeroPaddingRijndael(Rijndael::MODE_CBC);
+            $r->setBlockLength(128);
+        }else{
+            // Legacy encoding
+            $r = new ZeroPaddingRijndael(Rijndael::MODE_ECB);
+            $r->setBlockLength(256);
+        }
         $r->setKey($key);
-        $r->setBlockLength(256);
         return $r->decrypt($data);
     }
 

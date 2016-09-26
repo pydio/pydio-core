@@ -397,6 +397,7 @@ class RolesManager extends AbstractManager
                     }
                 }else{
                     OptionsHelper::filterFormElementsFromMeta(
+                        $parseContext,
                         $data["METADATA"],
                         $roleData,
                         ($userObject != null ? $usrId : null),

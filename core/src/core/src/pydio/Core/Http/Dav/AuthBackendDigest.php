@@ -182,7 +182,8 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
      */
     private function _decodePassword($encoded, $user)
     {
-        return Crypto::decrypt($encoded, md5($user . $this->secretKey));
+        $key = Crypto::buildKey($user, Crypto::getApplicationSecret(), $encoded);
+        return Crypto::decrypt($encoded, $key);
     }
 
 
