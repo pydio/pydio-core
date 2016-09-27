@@ -93,9 +93,11 @@ function checkThemeUsed($themeName){
 }
 
 checkPhpVersion('5.5.9');
-checkPluginUsed("conf", "serial");
-checkPluginUsed("auth", "serial");
-checkPluginUsed("auth", "cmsms");
-checkPluginUsed("access", "remote_fs");
-checkThemeUsed("vision");
-checkThemeUsed("umbra");
+if(AJXP_VERSION === '6.4.2'){
+    checkPluginUsed("conf", "serial");
+    checkPluginUsed("auth", "serial");
+    checkPluginUsed("auth", "cmsms");
+    checkPluginUsed("access", "remote_fs");
+    checkThemeUsed("vision");
+    checkThemeUsed("umbra");
+}

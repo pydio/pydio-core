@@ -81,8 +81,10 @@
         triggerPropsOnChange:function(newValue, oldValue){
             if(this.props.attributes['type'] === 'password'){
                 this.toggleEditMode();
+                this.props.onChange(newValue, oldValue, {type:this.props.attributes['type']});
+            }else{
+                this.props.onChange(newValue, oldValue);
             }
-            this.props.onChange(newValue, oldValue, {type:this.props.attributes['type']});
         },
 
         componentWillReceiveProps:function(newProps){
