@@ -768,8 +768,8 @@ class RepositoriesManager extends AbstractManager
         }else{
             $criteria["parent_uuid"] = AJXP_FILTER_EMPTY;
         }
-        if(isSet($requestInterface) && is_array($requestInterface) && isSet($requestInterface["template_children_id"])){
-            $criteria["parent_uuid"] = InputFilter::sanitize($requestInterface["template_children_id"], InputFilter::SANITIZE_ALPHANUM);
+        if(isSet($requestInterface->getParsedBody()["template_children_id"])){
+            $criteria["parent_uuid"] = InputFilter::sanitize($requestInterface->getParsedBody()["template_children_id"], InputFilter::SANITIZE_ALPHANUM);
         }
 
         $repos = RepositoryService::listRepositoriesWithCriteria($criteria, $count);
