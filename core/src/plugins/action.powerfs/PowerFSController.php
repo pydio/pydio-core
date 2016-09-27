@@ -121,6 +121,7 @@ class PowerFSController extends Plugin
                 $replaceSearch = array($rootDir, "\\");
                 $replaceReplace = array("", "/");
                 foreach ($selection->getFiles() as $selectionFile) {
+                    $selectionFile = TextEncoder::toStorageEncoding($selectionFile);
                     $baseFile = $selectionFile;
                     $args[] = escapeshellarg(substr($selectionFile, strlen($dir) + ($dir == "/" ? 0 : 1)));
                     $selectionFile = FsAccessWrapper::getRealFSReference($urlBase . $selectionFile);
@@ -133,8 +134,8 @@ class PowerFSController extends Plugin
                     }
                     if (trim($baseFile, "/") == "") {
                         // ROOT IS SELECTED, FIX IT
-                        $args = array(escapeshellarg(basename($rootDir)));
-                        $rootDir = dirname($rootDir);
+                        $args = array(escapeshellarg(TextEncoder::toStorageEncoding(basename($rootDir))));
+                        $rootDir = TextEncoder::toStorageEncoding(dirname($rootDir));
                         break;
                     }
                 }
