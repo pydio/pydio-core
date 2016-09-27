@@ -182,12 +182,16 @@
                 this.setState({items: store.getItems()});
             }.bind(this);
             store.observe("update", this._storeObserver);
+            store.observe("auto_close", function(){
+                pydio.UI.modal.dismiss();
+            });
             this.setState({items: store.getItems()});
         },
 
         componentWillUnmount: function(){
             if(this._storeObserver){
                 UploaderModel.Store.getInstance().stopObserving("update", this._storeObserver);
+                UploaderModel.Store.getInstance().stopObserving("auto_close");
             }
         },
 

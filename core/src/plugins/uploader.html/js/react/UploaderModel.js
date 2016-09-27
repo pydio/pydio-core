@@ -396,8 +396,12 @@
                 }.bind(this));
             }else{
                 UploadTask.getInstance().setIdle();
-                if(this.getAutoClose() && pydio.Controller.react_selector){
-                    pydio.UI.modal.dismiss();
+                if(this.hasErrors()){
+                    if(!pydio.getController().react_selector){
+                        global.pydio.getController().fireAction("upload");
+                    }
+                }else if(this.getAutoClose()){
+                    this.notify("auto_close");
                 }
             }
         }
@@ -425,6 +429,15 @@
                 pending: this._folders.concat(this._uploads),
                 processed: this._processed
             };
+        }
+        hasErrors(){
+            let result = false;
+            this._processed.map(function(item){
+                if(item.getStatus() === 'error'){
+                    result = true;
+                }
+            });
+            return result;
         }
         static getInstance(){
             if(!UploaderStore.__INSTANCE){
