@@ -33,14 +33,12 @@ function updateSharePhpContent($installPath, $publicFolder){
     }, explode("/", trim($publicFolder, "/")));
     $baseConfPath = implode("/", $folders);
 
-    $content = '
-    <?php
+    $content = '<?php
         include_once("'.$baseConfPath.'/base.conf.php");
         define(\'AJXP_EXEC\', true);
         require_once AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/vendor/autoload.php";
         $base = rtrim(dirname($_SERVER["SCRIPT_NAME"]), "/");
-        \Pydio\Share\ShareCenter::publicRoute($base, "/proxy", ["hash" => $_GET["hash"]]);    
-    ';
+        \Pydio\Share\ShareCenter::publicRoute($base, "/proxy", ["hash" => $_GET["hash"]]);';
     file_put_contents($sharePhpPath, $content);
 
 }
