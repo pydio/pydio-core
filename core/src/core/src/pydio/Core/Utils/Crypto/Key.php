@@ -43,14 +43,14 @@ class Key
      * @param null $options
      * @return array|bool|string
      */
-    public static function create($password, $strength = Key::STRENGTH_LOW, $options = null){
+    public static function create($password, $strength = Key::STRENGTH_MEDIUM, $options = null){
 
         if(!$options){
             $options = array(
                 "strength" => self::STRENGTH_MEDIUM,
                 "size" => self::SIZE_256,
                 "iterations" => 20000,
-                "salt" => Crypto::getRandomSalt(self::SIZE_256),
+                "salt" => md5(Crypto::getApplicationSecret()),
                 "hash_function" => "SHA512"
             );
         }
@@ -84,7 +84,6 @@ class Key
 
         } else if($strength == self::STRENGTH_LOW){
             return substr(hash($options["hash_function"], $password), 0, $options["size"]);
-
         } else {
             return openssl_pbkdf2($password, $options["salt"], $options["size"], $options["iterations"], $options["hash_function"]);
         }
