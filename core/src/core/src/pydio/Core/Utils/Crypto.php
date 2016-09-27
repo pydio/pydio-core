@@ -136,7 +136,9 @@ class Crypto
         $r = new ZeroPaddingRijndael(Rijndael::MODE_CBC);
         $r->setKey($key);
         $r->setBlockLength(128);
-        $encoded = $r->encrypt($data);
+        $iv = self::getRandomSalt(false, 16);
+        $r->setIV($iv);
+        $encoded = $iv . $r->encrypt($data);
         if($base64encode) {
             return self::getDataHeader().base64_encode($encoded);
         } else {
@@ -156,7 +158,10 @@ class Crypto
             $data = base64_decode($data);
         }
         if($test){
+            $iv = substr($data, 0, 16);
+            $data = substr($data, 16);
             $r = new ZeroPaddingRijndael(Rijndael::MODE_CBC);
+            $r->setIV($iv);
             $r->setBlockLength(128);
         }else{
             // Legacy encoding
