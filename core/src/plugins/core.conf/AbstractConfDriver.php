@@ -849,6 +849,7 @@ abstract class AbstractConfDriver extends Plugin
                             $mess = LocaleService::getMessages(true);
                         }
                     }
+                    UsersService::updateUser($userObject);
                 }
 
                 if ($action == "user_create_user") {
