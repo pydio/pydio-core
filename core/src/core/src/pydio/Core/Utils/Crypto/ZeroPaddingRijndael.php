@@ -74,10 +74,6 @@ class ZeroPaddingRijndael extends Rijndael {
      * @return string
      */
     function _unpad($text)   {
-        $trimed = trim($text, "\0");
-        while($text === $trimed){
-            $trimed = trim($text, "\0");
-        }
-        return $trimed;
+        return trim($text, "\0");
     }
 }
