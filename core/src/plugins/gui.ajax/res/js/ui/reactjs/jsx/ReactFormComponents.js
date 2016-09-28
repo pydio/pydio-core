@@ -59,7 +59,6 @@
                 global.clearTimeout(this.changeTimeout);
             }
             var newValue = value, oldValue = this.state.value;
-            console.log('CHANGE ' + newValue + ' // ' + oldValue);
             if(this.props.skipBufferChanges){
                 this.triggerPropsOnChange(newValue, oldValue);
             }
