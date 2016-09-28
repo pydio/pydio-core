@@ -69,6 +69,7 @@ class PowerFSController extends Plugin
         $httpVars = $request->getParsedBody();
         $dir = $httpVars["dir"] OR "";
         $dir = InputFilter::decodeSecureMagic($dir);
+        $dir = TextEncoder::toStorageEncoding($dir);
         if ($dir == "/") $dir = "";
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $urlBase = $ctx->getUrlBase();
@@ -146,7 +147,7 @@ class PowerFSController extends Plugin
                     $archiveName = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
                 }
                 chdir($rootDir);
-                $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);
+                $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg(TextEncoder::toStorageEncoding($archiveName)) . " " . implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
@@ -187,7 +188,7 @@ class PowerFSController extends Plugin
                 pclose($proc);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
                 if ($request->getAttribute("action") === "compress") {
-                    $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase . $dir . "/" . $archiveName);
+                    $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase . TextEncoder::fromStorageEncoding($dir) . "/" . $archiveName);
                     $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
                     $nodesDiff->add($newNode);
                     Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
