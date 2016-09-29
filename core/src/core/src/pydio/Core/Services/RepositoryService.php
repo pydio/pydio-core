@@ -236,7 +236,7 @@ class RepositoryService
         $statics = self::filterRepositoryListWithCriteria($statics, $criteria);
         $dyna = ConfService::getConfStorageImpl()->listRepositoriesWithCriteria($criteria, $count);
         $count += count($statics);
-        return array_merge($statics, $dyna);
+        return $statics + $dyna;
 
     }
 
