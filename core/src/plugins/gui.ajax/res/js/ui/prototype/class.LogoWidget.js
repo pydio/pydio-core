@@ -203,7 +203,8 @@ Class.create("LogoWidget", AjxpPane, {
                 position:'absolute',
                 left : (imgW + 16) + 'px',
                 top : (htHeight - (has_by?42:39)) + 'px',
-                fontSize : '19px'
+                fontSize : (has_by?'19px':'25px'),
+                fontWeight: 300
             });
         }
 
