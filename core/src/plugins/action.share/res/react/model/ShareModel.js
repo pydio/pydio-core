@@ -891,7 +891,23 @@
                 s = MessageHash["share_center.42"];
                 if(s) s = s.replace("%s", ApplicationTitle);
                 link = this.getPublicLink(linkId);
-                message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
+                let additionalData = '';
+                let password = this.hasHiddenPassword(linkId);
+                if(password){
+                    additionalData += '\n - ' + MessageHash['share_center.170'] + '.';
+                }
+                let dlLimit = this.getExpirationFor(linkId, 'downloads');
+                if(dlLimit){
+                    additionalData += '\n - ' + MessageHash['share_center.22'] + ': ' + dlLimit;
+                }
+                let expirationDate = this.getExpirationFor(linkId, 'days');
+                if(expirationDate){
+                    let today = new Date();
+                    let expDate = new Date();
+                    expDate.setDate(today.getDate() + parseInt(expirationDate));
+                    additionalData += '\n - ' + MessageHash['share_center.21'] + ': ' + expDate.toLocaleDateString();
+                }
+                message = s + additionalData + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
             }else{
                 if(!this._data['repository_url']){
                     throw new Error(MessageHash['share_center.230']);
