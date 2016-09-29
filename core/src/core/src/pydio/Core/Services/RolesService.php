@@ -22,7 +22,10 @@ namespace Pydio\Core\Services;
 
 use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpRole;
+use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Message\ReloadRepoListMessage;
+use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
@@ -144,6 +147,11 @@ class RolesService
         ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
         CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleObject->getId(), $roleObject);
         ConfService::getInstance()->invalidateLoadedRepositories();
+        $roleId = $roleObject->getId();
+        if(strpos($roleId, "AJXP_GRP_/") === 0){
+            $groupPath = substr($roleId, strlen("AJXP_GRP_"));
+            Controller::applyHook("msg.instant", array(Context::contextWithObjects(null, null), ReloadRepoListMessage::XML(), null, $groupPath));
+        }
     }
 
     /**

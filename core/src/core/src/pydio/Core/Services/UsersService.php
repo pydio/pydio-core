@@ -25,6 +25,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
+use Pydio\Core\Http\Message\ReloadRepoListMessage;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\FilteredRepositoriesList;
@@ -123,6 +124,7 @@ class UsersService
             CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
         }else{
             CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
+            Controller::applyHook("msg.instant", array(Context::contextWithObjects($userObject, null), ReloadRepoListMessage::XML(), $userObject->getId()));
         }
     }
 
