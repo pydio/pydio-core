@@ -319,16 +319,18 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
             }
             $writeMode = "w";
             $nodeIsWinLocal = false;
-            if($scope === AJXP_METADATA_SCOPE_GLOBAL && $this->nodeIsLocalWindowsFS($ajxpNode) && file_exists($metaFile)){
+            if($scope === AJXP_METADATA_SCOPE_GLOBAL && $this->nodeIsLocalWindowsFS($ajxpNode)) { 
                 $nodeIsWinLocal = true;
-                $writeMode = "rw+";
+                if (file_exists($metaFile)) {
+                    $writeMode = "rw+";
+                }
             }
             $fp = @fopen($metaFile, $writeMode);
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
                 if($nodeIsWinLocal){
-                    $real_path_metafile = TextEncoder::toStorageEncoding(realpath(MetaStreamWrapper::getRealFSReference($metaFile)));
+                    $real_path_metafile = realpath(MetaStreamWrapper::getRealFSReference($metaFile));
                     if (is_dir(dirname($real_path_metafile))) {
                         StatHelper::winSetHidden($real_path_metafile);
                     }
