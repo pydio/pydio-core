@@ -891,7 +891,7 @@
                 s = MessageHash["share_center.42"];
                 if(s) s = s.replace("%s", ApplicationTitle);
                 link = this.getPublicLink(linkId);
-                message = s + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
+                message = s + "\n\n " + link;
             }else{
                 if(!this._data['repository_url']){
                     throw new Error(MessageHash['share_center.230']);
