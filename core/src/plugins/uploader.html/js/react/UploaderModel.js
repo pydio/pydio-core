@@ -553,9 +553,17 @@
 
         constructor(){
             super();
-            this._global = global.pydio.getPluginConfigs("uploader");
-            this._mq = global.pydio.getPluginConfigs("mq");
-            this._user = global.pydio.user.preferences;
+            pydio.observe("registry_loaded", function(){
+                this._global = null;
+                this._mq = null;
+            }.bind(this));
+        }
+
+        _loadOptions(){
+            if(!this._global){
+                this._global = global.pydio.getPluginConfigs("uploader");
+                this._mq = global.pydio.getPluginConfigs("mq");
+            }
         }
 
         getOptionAsBool(name, userPref = '', defaultValue = undefined){
@@ -564,6 +572,7 @@
         }
 
         getOption(name, userPref = '', defaultValue = undefined){
+            this._loadOptions();
             if(userPref){
                 let test = this.getUserPreference('originalUploadForm_XHRUploader', userPref);
                 if(test !== undefined && test !== null) return test;
