@@ -467,7 +467,7 @@ class MqManager extends Plugin
             $this->getAdminKeyString();
             return "SUCCESS: Nothing to do, a pair already exists";
         }catch(PydioException $e){
-            $adminPair = $this->getAdminKeyString($u->getId());
+            $adminPair = $this->getAdminKeyString(true);
             $pairFile = $this->getPluginWorkDir(true)."/apikey";
             $r = file_put_contents($pairFile, $adminPair);
             if($r === false){
@@ -489,7 +489,7 @@ class MqManager extends Plugin
         if(!$u->isAdmin()){
             return "ERROR: You are not administrator";
         }
-        $c = ApiKeysService::revokePairForAdminTask("go-upload", $u->getId());
+        $c = ApiKeysService::revokePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER, $u->getId());
         if($c > 0){
             return "SUCCESS: Successfully revoked $c pair of keys. You may have to generate new ones and reload PydioBooster.";
         }else{
@@ -499,21 +499,21 @@ class MqManager extends Plugin
 
 
     /**
-     * @param string $writeForUserId
+     * @param bool $createIfNotExists
      * @param string $restrictToIp
      * @throws PydioException
      * @return string
      */
-    protected function getAdminKeyString($writeForUserId = "", $restrictToIp = ""){
+    protected function getAdminKeyString($createIfNotExists = false, $restrictToIp = ""){
 
-        if($writeForUserId){
-            $adminKey = ApiKeysService::findPairForAdminTask("go-upload", $writeForUserId);
+        if($createIfNotExists){
+            $adminKey = ApiKeysService::findPairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER);
             if($adminKey === null){
-                $adminKey = ApiKeysService::generatePairForAdminTask("go-upload", $writeForUserId, $restrictToIp);
+                $adminKey = ApiKeysService::generatePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER, "", $restrictToIp);
             }
             $adminKeyString = $adminKey["t"].":".$adminKey["p"];
         }else{
-            $adminKey = ApiKeysService::findPairForAdminTask("go-upload");
+            $adminKey = ApiKeysService::findPairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER);
             if($adminKey === null){
                 throw new PydioException("Cannot find any key pair for admin access, something went wrong!");
             }

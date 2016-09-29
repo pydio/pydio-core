@@ -131,7 +131,7 @@ class SimpleUpload extends Plugin
 
             if($externalUploadStatus === ExternalUploadedFile::STATUS_REQUEST_OPTIONS){
 
-                if(!ApiKeysService::requestHasValidHeadersForAdminTask($request->getServerParams(), "go-upload")){
+                if(!ApiKeysService::requestHasValidHeadersForAdminTask($request->getServerParams(), PYDIO_BOOSTER_TASK_IDENTIFIER)){
                     throw new AuthRequiredException();
                 }
 

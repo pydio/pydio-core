@@ -86,16 +86,18 @@ class ApiKeysService
      * @throws PydioException
      * @throws \Exception
      */
-    public static function generatePairForAdminTask($adminTaskId, $userId, $restrictToIP = ""){
+    public static function generatePairForAdminTask($adminTaskId, $userId = "", $restrictToIP = ""){
 
         $store = self::getStore();
         $token = StringHelper::generateRandomString();
         $private = StringHelper::generateRandomString();
         $data = [
-            "USER_ID"       => $userId,
             "PRIVATE"       => $private,
             "ADMIN_TASK_ID" => $adminTaskId
         ];
+        if(!empty($userId)){
+            $data["USER_ID"] = $userId;
+        }
         if(!empty($restrictToIP)){
             $data["RESTRICT_TO_IP"] = $restrictToIP;
         }
@@ -154,7 +156,7 @@ class ApiKeysService
             return false;
         }
         list($t, $p) = explode(":", trim($serverData['HTTP_X_PYDIO_ADMIN_AUTH']));
-        $existingKey = self::findPairForAdminTask("go-upload", $userId);
+        $existingKey = self::findPairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER);
         if($existingKey === null || $existingKey['p'] !== $p || $existingKey['t'] !== $t){
             Logger::error(__CLASS__, __FUNCTION__, "Invalid tokens for admin task $adminTaskId");
             return false;

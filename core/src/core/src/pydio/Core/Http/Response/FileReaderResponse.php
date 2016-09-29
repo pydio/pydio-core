@@ -442,7 +442,7 @@ class FileReaderResponse extends AsyncResponseStream
 
         // Pydio Agent acceleration - We make sure that request was really proxied by Agent, by checking a specific header.
         if($accelConfiguration === "pydio" && array_key_exists("HTTP_X_PYDIO_DOWNLOAD_SUPPORTED", $serverParams)
-            && ApiKeysService::requestHasValidHeadersForAdminTask($serverParams, "go-upload")) {
+            && ApiKeysService::requestHasValidHeadersForAdminTask($serverParams, PYDIO_BOOSTER_TASK_IDENTIFIER)) {
             
             if ($localPathOrNode instanceof AJXP_Node) {
                 $options = MetaStreamWrapper::getResolvedOptionsForNode($localPathOrNode);
