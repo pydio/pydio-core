@@ -1708,7 +1708,8 @@ div.shadow_class {
   width: 20%;
 }
 #activity_monitor_warning div.dialogContent {
-  border-radius: 10px;
+  border-radius: 2px;
+  padding: 30px;
   box-shadow: 1px 1px 46px rgba(0, 0, 0, 0.67);
 }
 #activity_monitor_warning span.click_anywhere {
