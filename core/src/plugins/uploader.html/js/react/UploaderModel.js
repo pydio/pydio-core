@@ -184,13 +184,17 @@
 
         tryAlternativeUpload(completeCallback, progressCallback, errorCallback){
             let configs = this.getMqConfigs();
+            var secure = configs.get("BOOSTER_MAIN_SECURE");
+            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE']){
+                secure = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
+            }
             var host = configs.get("BOOSTER_MAIN_HOST");
-            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST']){
-                host = configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST'];
+            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST']){
+                host = configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST'];
             }
             var port = configs.get("BOOSTER_MAIN_PORT");
-            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT']){
-                port = configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT'];
+            if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_PORT']){
+                port = configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_PORT'];
             }
             let fullPath = this._targetNode.getPath();
             if(this._relativePath) {
@@ -198,7 +202,7 @@
             }
             fullPath += '/' + PathUtils.getBasename(this._file.name);
 
-            let url = "http"+(configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
+            let url = "http"+(secure?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
             let queryString = '';
             let overwriteStatus = UploaderConfigs.getInstance().getOption("DEFAULT_EXISTING", "upload_existing");
             if(overwriteStatus === 'rename') {

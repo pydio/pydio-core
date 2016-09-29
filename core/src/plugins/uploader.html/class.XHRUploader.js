@@ -683,19 +683,23 @@ Class.create("XHRUploader", {
                 uri += '&' + queryStringParam;
             }
         } else {
-
+            
+            var secure = this.configs.get("BOOSTER_MAIN_SECURE");
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE']){
+                secure = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
+            }
             var host = this.configs.get("BOOSTER_MAIN_HOST");
-            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_ws_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST']){
-                host = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_HOST'];
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST']){
+                host = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST'];
             }
             var port = this.configs.get("BOOSTER_MAIN_PORT");
-            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT']){
-                port = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['WS_PORT'];
+            if(this.configs.get("BOOSTER_UPLOAD_ADVANCED") && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_PORT']){
+                port = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_PORT'];
             }
 
             xhr.withCredentials = true;
 
-            uri = "http"+(this.configs.get("UPLOAD_SECURE")?"s":"")+"://"+host+":"+port+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir + item.file.name;
+            uri = "http"+(secure?"s":"")+"://"+host+":"+port+"/"+this.configs.get("UPLOAD_PATH")+"/"+pydio.user.activeRepository + currentDir + item.file.name;
         }
 
 

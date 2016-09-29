@@ -57,7 +57,7 @@ class S3AccessWrapper extends FsAccessWrapper
         $options = [
             "TYPE" => "s3"
         ];
-        $optKeys = ["API_KEY", "SECRET_KEY", "SIGNATURE_VERSION", "STORAGE_URL", "REGION", "PROXY", "API_VERSION", "VHOST_NOT_SUPPORTED"];
+        $optKeys = ["API_KEY", "SECRET_KEY", "CONTAINER", "SIGNATURE_VERSION", "STORAGE_URL", "REGION", "PROXY", "API_VERSION", "VHOST_NOT_SUPPORTED"];
         foreach($optKeys as $key){
             $options[$key] = $repository->getContextOption($context, $key);
         }
