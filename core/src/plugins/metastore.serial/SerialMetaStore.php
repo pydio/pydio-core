@@ -20,10 +20,14 @@
  */
 namespace Pydio\Access\Metastore\Implementation;
 
+use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Controller\Controller;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 /**
@@ -103,6 +107,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
      * @param String $nameSpace
      * @param bool $private
      * @param int $scope
+     * @return array|void
      */
     public function removeMetadata($ajxpNode, $nameSpace, $private = false, $scope=AJXP_METADATA_SCOPE_REPOSITORY)
     {
@@ -312,10 +317,22 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
                     unset(self::$fullMetaCache[$metaFile][$fileKey]);
                 }
             }
-            $fp = @fopen($metaFile, "w");
+            $writeMode = "w";
+            $nodeIsWinLocal = false;
+            if($scope === AJXP_METADATA_SCOPE_GLOBAL && $this->nodeIsLocalWindowsFS($ajxpNode) && file_exists($metaFile)){
+                $nodeIsWinLocal = true;
+                $writeMode = "rw+";
+            }
+            $fp = @fopen($metaFile, $writeMode);
             if ($fp !== false) {
                 @fwrite($fp, serialize(self::$fullMetaCache[$metaFile]), strlen(serialize(self::$fullMetaCache[$metaFile])));
                 @fclose($fp);
+                if($nodeIsWinLocal){
+                    $real_path_metafile = TextEncoder::toStorageEncoding(realpath(MetaStreamWrapper::getRealFSReference($metaFile)));
+                    if (is_dir(dirname($real_path_metafile))) {
+                        StatHelper::winSetHidden($real_path_metafile);
+                    }
+                }
             }else{
                 $this->logError(__FUNCTION__, "Error while trying to open the meta file, maybe a permission problem?");
             }
@@ -360,44 +377,11 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
     }
 
     /**
-     * @param \Pydio\Access\Core\Model\AJXP_Node|null $srcNode
-     * @param \Pydio\Access\Core\Model\AJXP_Node|null $destNode
-     * @param bool|false $copy
+     * @param AJXP_Node $ajxpNode
+     * @return bool
      */
-    public function nodeChangeHook($srcNode = null, $destNode = null, $copy = false){
-        // This is not called, it's the responsibility of the meta provider/setter to
-        // handle the node.change event.
-        // For example, it would break the ShareCenter "shares" management.
-        /*
-        if($srcNode == null || $copy) return;
-        $operation = $destNode == null ? "delete" : "move";
-        $repositoryId = $srcNode->getRepositoryId();
-        $metaFile = $this->globalMetaFile."_".$repositoryId;
-        $metaFile = $this->updateSecurityScope($metaFile, $srcNode->getRepositoryId(), $srcNode->getUser());
-        if(!is_file($metaFile)) return;
-        $raw_data = file_get_contents($metaFile);
-        if($raw_data === false) return;
-        $metadata = unserialize($raw_data);
-        if($metadata === false || !is_array($metadata)) return;
-        $changes = false;
-        $srcPath = $srcNode->getPath();
-        foreach($metadata as $path => $data){
-            preg_match("#^".preg_quote($srcPath, "#")."/#", $path, $matches);
-            if($path == $srcPath || count($matches)){
-                if($operation == "move"){
-                    if($path == $srcPath) $newPath = $destNode->getPath();
-                    else $newPath = preg_replace("#^".preg_quote($srcPath, "#")."#", $destNode->getPath(), $path);
-                    $metadata[$newPath] = $data;
-                }
-                unset($metadata[$path]);
-                $changes = true;
-            }
-        }
-        if($changes){
-            // Should update $metadata now.
-            @file_put_contents($metaFile, serialize($metadata));
-        }
-        */
+    private function nodeIsLocalWindowsFS($ajxpNode){
+        return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' && !MetaStreamWrapper::wrapperIsRemote($ajxpNode->getUrl()));
     }
 
     /**
