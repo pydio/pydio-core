@@ -202,8 +202,8 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.setStyle({
                 position:'absolute',
                 left : (imgW + 16) + 'px',
-                top : (htHeight - (has_by?42:39)) + 'px',
-                fontSize : (has_by?'19px':'25px'),
+                top : (htHeight - (has_by?42:36)) + 'px',
+                fontSize : (has_by?'19px':'22px'),
                 fontWeight: 300
             });
         }
