@@ -24,6 +24,7 @@ namespace Pydio\Access\Core;
 use Normalizer;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\PluginFramework\PluginsService;
@@ -55,7 +56,13 @@ class MetaStreamWrapper implements IAjxpWrapper
     protected static $metaWrappers = [
         'core' => [
             'pydio' => 'Pydio\Access\Core\MetaStreamWrapper'
-        ]
+        ],
+    ];
+
+    protected static $metaWrappersOrders = [
+        'core' => [
+            'pydio' => 0
+        ],
     ];
 
     protected static $cachedRepositoriesWrappers = array();
@@ -110,9 +117,23 @@ class MetaStreamWrapper implements IAjxpWrapper
      * Register an addition protocol/wrapper in the stack
      * @param $name string
      * @param $className string
+     * @param int $order
+     * @param string $parent
+     * @throws PydioException
      */
-    public static function appendMetaWrapper($name, $className, $parent = "core"){
+    public static function appendMetaWrapper($name, $className, $order = 50, $parent = "core"){
+        if($order === 0){
+            throw new PydioException("Invalid argument: cannot use order 0 for registering a meta-wrapper.");
+        }
         self::$metaWrappers[$parent][$name] = $className;
+        self::$metaWrappersOrders[$parent][$name] = $order;
+        $orders = self::$metaWrappersOrders[$parent];
+        uksort(self::$metaWrappers[$parent], function($a, $b) use ($orders){
+            $oA = $orders[$a];
+            $oB = $orders[$b];
+            if($oA === $oB) return 0;
+            return $oA > $oB ? 1 : -1;
+        });
         self::register();
     }
 

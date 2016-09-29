@@ -216,6 +216,7 @@ class MqManager extends Plugin
 
         if (!$ctx->hasRepository()) {
             $userId = $targetUserId;
+            $gPath  = $targetGroupPath;
         } else {
             $scope = RepositoryService::getRepositoryById($repositoryId)->securityScope();
             if ($scope == "USER") {
@@ -243,6 +244,9 @@ class MqManager extends Plugin
             $message->nodePaths = $nodePaths;
         }
 
+        if($repositoryId === null && (isset($userId) || isSet($gPath))){
+            $repositoryId = "*";
+        }
         if ($this->msgExchanger) {
             $this->msgExchanger->publishInstantMessage($ctx, "nodes:$repositoryId", $message);
         }
@@ -489,7 +493,7 @@ class MqManager extends Plugin
         if(!$u->isAdmin()){
             return "ERROR: You are not administrator";
         }
-        $c = ApiKeysService::revokePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER, $u->getId());
+        $c = ApiKeysService::revokePairForAdminTask(PYDIO_BOOSTER_TASK_IDENTIFIER);
         if($c > 0){
             return "SUCCESS: Successfully revoked $c pair of keys. You may have to generate new ones and reload PydioBooster.";
         }else{

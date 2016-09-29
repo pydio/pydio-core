@@ -113,7 +113,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $chmod = $repository->getContextOption($contextInterface, "CHMOD_VALUE");
         $this->urlBase = $contextInterface->getUrlBase();
 
-        MetaStreamWrapper::appendMetaWrapper("pydio.encoding", "Pydio\\Access\\Core\\EncodingWrapper");
+        MetaStreamWrapper::appendMetaWrapper("pydio.encoding", "Pydio\\Access\\Core\\EncodingWrapper", 100);
 
         if ($create == true) {
             if(!is_dir($storagePath)) @mkdir($storagePath, 0755, true);
