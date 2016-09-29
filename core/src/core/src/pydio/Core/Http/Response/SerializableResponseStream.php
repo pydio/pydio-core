@@ -172,14 +172,20 @@ class SerializableResponseStream implements StreamInterface
             $wrap = true;
             $buffer = "";
             $charset = null;
-            foreach ($data as $serializableItem){
-                if(!$serializableItem instanceof XMLSerializableResponseChunk){
-                    continue;
-                }
-                $buffer .= $serializableItem->toXML();
-                if($serializableItem instanceof XMLDocSerializableResponseChunk){
-                    $wrap = false;
-                    $charset = $serializableItem->getCharset();
+            /** @var XMLDocSerializableResponseChunk[] $xmlDocs */
+            $xmlDocs = array_filter($data, function($serial){
+                return $serial instanceof XMLDocSerializableResponseChunk;
+            });
+            if(count($xmlDocs)){
+                $buffer = $xmlDocs[0]->toXML();
+                $charset = $xmlDocs[0]->getCharset();
+                $wrap = false;
+            }else{
+                foreach ($data as $serializableItem){
+                    if(!$serializableItem instanceof XMLSerializableResponseChunk){
+                        continue;
+                    }
+                    $buffer .= $serializableItem->toXML();
                 }
             }
 
