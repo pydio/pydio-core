@@ -894,7 +894,7 @@
                 let additionalData = '';
                 let password = this.hasHiddenPassword(linkId);
                 if(password){
-                    additionalData += '\n - ' + MessageHash['share_center.170'] + '.';
+                    additionalData += '\n - ' + MessageHash['share_center.170'];
                 }
                 let dlLimit = this.getExpirationFor(linkId, 'downloads');
                 if(dlLimit){
