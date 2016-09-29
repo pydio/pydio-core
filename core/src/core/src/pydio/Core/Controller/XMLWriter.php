@@ -322,16 +322,6 @@ class XMLWriter
     }
 
     /**
-     * Send a <reload> XML instruction for refreshing the repositories list
-     * @static
-     * @param bool $print
-     * @return string
-     */
-    public static function reloadRepositoryList($print = true)
-    {
-        return XMLWriter::write("<reload_instruction object=\"repository_list\"/>", $print);
-    }
-    /**
      * Outputs a <require_auth/> tag
      * @static
      * @param bool $print

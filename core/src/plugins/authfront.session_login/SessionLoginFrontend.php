@@ -21,6 +21,7 @@
 namespace Pydio\Auth\Frontend;
 
 use Exception;
+use Pydio\Core\Http\Message\ReloadRepoListMessage;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
@@ -72,7 +73,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
             if ($u->reloadRolesIfRequired()) {
                 ConfService::getInstance()->invalidateLoadedRepositories();
-                AuthService::$bufferedMessage = XMLWriter::reloadRepositoryList(false);
+                AuthService::$bufferedMessage = ReloadRepoListMessage::XML();
             }
             $request = $request->withAttribute("ctx", Context::contextWithObjects($u, null));
             return true;

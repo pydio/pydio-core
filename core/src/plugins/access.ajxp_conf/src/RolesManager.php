@@ -297,9 +297,12 @@ class RolesManager extends AbstractManager
                 $scope = "role";
                 if($roleGroup) {
                     $scope = "group";
-                    if($roleId == "AJXP_GRP_/") $scope = "role";
+                    if($roleId == "AJXP_GRP_/") {
+                        $scope = "role";
+                    }
+                }else if(isSet($userObject)) {
+                    $scope = "user";
                 }
-                else if(isSet($userObject)) $scope = "user";
                 $data["SCOPE_PARAMS"] = array();
                 $nodes = PluginsService::getInstance($ctx)->searchAllManifests("//param[contains(@scope,'".$scope."')]|//global_param[contains(@scope,'".$scope."')]", "node", false, true, true);
                 foreach ($nodes as $node) {
