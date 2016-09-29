@@ -261,7 +261,7 @@ class RemoteNodeProvider{
         }
     }
 
-    parseAjxpNodesDiffs(xmlElement, targetDataModel, setContextChildrenSelected=false){
+    parseAjxpNodesDiffs(xmlElement, targetDataModel, targetRepositoryId, setContextChildrenSelected=false){
         let removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
         let adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
         let updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
@@ -269,6 +269,9 @@ class RemoteNodeProvider{
         if(removes && removes.length){
             removes.forEach(function(r){
                 var p = r.getAttribute("filename");
+                if(r.getAttribute("node_repository_id") && r.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
                 var imTime = parseInt(r.getAttribute("ajxp_im_time"));
                 targetDataModel.removeNodeByPath(p, imTime);
                 notifyServerChange.push(p);
@@ -276,6 +279,9 @@ class RemoteNodeProvider{
         }
         if(adds && adds.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             adds.forEach(function(tree){
+                if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 targetDataModel.addNode(newNode, setContextChildrenSelected);
                 notifyServerChange.push(newNode.getPath());
@@ -283,6 +289,9 @@ class RemoteNodeProvider{
         }
         if(updates && updates.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             updates.forEach(function(tree){
+                if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 let original = newNode.getMetadata().get("original_path");
                 targetDataModel.updateNode(newNode, setContextChildrenSelected);

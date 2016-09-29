@@ -21,6 +21,7 @@
 namespace Pydio\Uploader\Processor;
 
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
@@ -197,6 +198,13 @@ class SimpleUpload extends Plugin
             // Ignore
             return;
         }
+        $nodesDiff = new NodesDiff();
+        if(isSet($result["CREATED_NODE"])){
+            $nodesDiff->add($result["CREATED_NODE"]);
+        }
+        if(isSet($result["UPDATED_NODE"])){
+            $nodesDiff->update($result["UPDATED_NODE"]);
+        }
 
         if (isSet($httpVars["simple_uploader"])) {
             $response = $response->withHeader("Content-type", "text/html; charset=UTF-8");
@@ -207,9 +215,7 @@ class SimpleUpload extends Plugin
             } else {
                 print("\n if(parent.pydio.getController().multi_selector) parent.pydio.getController().multi_selector.submitNext();");
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
-                    $s = '<tree>';
-                    $s .= XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD")=> array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
-                    $s.= '</tree>';
+                    $s = '<tree>' . $nodesDiff->toXML() . '</tree>';
                     $response->getBody()->write("\n var resultString = '".str_replace("'", "\'", $s)."'; var resultXML = parent.parseXml(resultString);");
                     $response->getBody()->write("\n parent.PydioApi.getClient().parseXmlMessage(resultXML);");
                 }
@@ -222,12 +228,12 @@ class SimpleUpload extends Plugin
                 $response->getBody()->write($message);
             } else {
 
-                $nodesDiff = "";
+                $nodesDiffXML = "";
                 if (isSet($result["CREATED_NODE"]) || isSet($result["UPDATED_NODE"])) {
-                    $nodesDiff = XMLWriter::writeNodesDiff(array((isSet($result["UPDATED_NODE"])?"UPDATE":"ADD") => array($result[(isSet($result["UPDATED_NODE"])?"UPDATED":"CREATED")."_NODE"])), false);
+                    $nodesDiffXML = $nodesDiff->toXML();
                 }
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
-                $response->getBody()->write(XMLWriter::wrapDocument($nodesDiff));
+                $response->getBody()->write(XMLWriter::wrapDocument($nodesDiffXML));
 
                 /* for further implementation */
                 if (!isSet($result["PREVENT_NOTIF"])) {

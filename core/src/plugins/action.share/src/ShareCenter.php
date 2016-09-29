@@ -28,6 +28,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Access\Core\Model\UserSelection;
@@ -751,7 +752,9 @@ class ShareCenter extends Plugin
                  */
                 if($shareScope == "public"){
                     $ajxpNode->loadNodeInfo();
-                    $content = XMLWriter::writeNodesDiff(["UPDATE" => array($ajxpNode->getPath() => $ajxpNode)]);
+                    $diff = new NodesDiff();
+                    $diff->update($ajxpNode);
+                    $content = $diff->toXML();
                     Controller::applyHook("msg.instant", array($ajxpNode->getContext(), $content, null, null, [$ajxpNode->getPath()]));
                 }
 
@@ -930,7 +933,9 @@ class ShareCenter extends Plugin
 
                             if(isSet($httpVars["share_scope"]) &&  $httpVars["share_scope"] == "public"){
                                 $ajxpNode->loadNodeInfo();
-                                $content = XMLWriter::writeNodesDiff(["UPDATE" => [$ajxpNode->getPath() => $ajxpNode]]);
+                                $diff = new NodesDiff();
+                                $diff->update($ajxpNode);
+                                $content = $diff->toXML();
                                 Controller::applyHook("msg.instant", array($ajxpNode->getContext(), $content, null, null, [$ajxpNode->getPath()]));
                             }
 

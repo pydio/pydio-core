@@ -113,6 +113,8 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
         if (!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)) {
             $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
         }
+        // Add Repository to the metadata
+        $ajxpNode->mergeMetadata(array("node_repository_id" => $ajxpNode->getRepositoryId()));
     }
 
     /**

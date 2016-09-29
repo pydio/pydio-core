@@ -239,7 +239,7 @@ class XMLWriter
             $ajxpNode->getPath(),
             $ajxpNode->getLabel(),
             $ajxpNode->isLeaf(),
-            $ajxpNode->metadata,
+            $ajxpNode->getNodeInfoMeta(),
             $close,
             $print);
     }
@@ -320,57 +320,6 @@ class XMLWriter
         $pendingSelection = StringHelper::xmlEntities($pendingSelection, true);
         return XMLWriter::write("<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>", $print);
     }
-
-
-    /**
-     * Send a <reload> XML instruction for refreshing the list
-     * @static
-     * @param $diffNodes
-     * @param bool $print
-     * @return string
-     */
-    public static function writeNodesDiff($diffNodes, $print = false)
-    {
-        /**
-         * @var $ajxpNode \Pydio\Access\Core\Model\AJXP_Node
-         */
-        $mess = LocaleService::getMessages();
-        $buffer = "<nodes_diff>";
-        if (isSet($diffNodes["REMOVE"]) && count($diffNodes["REMOVE"])) {
-            $buffer .= "<remove>";
-            foreach ($diffNodes["REMOVE"] as $nodePath) {
-                $nodePath = StringHelper::xmlEntities($nodePath, true);
-                $buffer .= "<tree filename=\"$nodePath\" ajxp_im_time=\"".time()."\"/>";
-            }
-            $buffer .= "</remove>";
-        }
-        if (isSet($diffNodes["ADD"]) && count($diffNodes["ADD"])) {
-            $buffer .= "<add>";
-            foreach ($diffNodes["ADD"] as $ajxpNode) {
-                $ajxpNode->loadNodeInfo(false, false, "all");
-                if (!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)) {
-                    $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
-                }
-                $buffer .=  self::renderAjxpNode($ajxpNode, true, false);
-            }
-            $buffer .= "</add>";
-        }
-        if (isSet($diffNodes["UPDATE"]) && count($diffNodes["UPDATE"])) {
-            $buffer .= "<update>";
-            foreach ($diffNodes["UPDATE"] as $originalPath => $ajxpNode) {
-                $ajxpNode->loadNodeInfo(false, false, "all");
-                if (!empty($ajxpNode->metaData["mimestring_id"]) && array_key_exists($ajxpNode->metaData["mimestring_id"], $mess)) {
-                    $ajxpNode->mergeMetadata(array("mimestring" =>  $mess[$ajxpNode->metaData["mimestring_id"]]));
-                }
-                $ajxpNode->original_path = $originalPath;
-                $buffer .= self::renderAjxpNode($ajxpNode, true, false);
-            }
-            $buffer .= "</update>";
-        }
-        $buffer .= "</nodes_diff>";
-        return XMLWriter::write($buffer, $print);
-    }
-
 
     /**
      * Send a <reload> XML instruction for refreshing the repositories list

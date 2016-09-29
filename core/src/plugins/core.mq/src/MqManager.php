@@ -26,6 +26,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\AJXP_Permission;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
@@ -168,20 +169,20 @@ class MqManager extends Plugin
         $content = "";$targetUserId=null; $nodePaths = array();
         $update = false;
         $ctx = null;
+        $diff = new NodesDiff();
         if ($newNode != null) {
             $ctx = $newNode->getContext();
             //$targetUserId = $newNode->getUserId();
             $targetUserId = null;
             $nodePaths[] = $newNode->getPath();
             $update = false;
-            $data = array();
             if ($origNode != null && !$copy) {
                 $update = true;
-                $data[$origNode->getPath()] = $newNode;
+                $diff->update($newNode, $origNode->getPath());
             } else {
-                $data[] = $newNode;
+                $diff->add($newNode);
             }
-            $content = XMLWriter::writeNodesDiff(array(($update?"UPDATE":"ADD") => $data));
+            $content = $diff->toXML();
         }
         if ($origNode != null && ! $update && !$copy) {
 
@@ -189,7 +190,8 @@ class MqManager extends Plugin
             //$targetUserId = $origNode->getUserId();
             $targetUserId = null;
             $nodePaths[] = $origNode->getPath();
-            $content = XMLWriter::writeNodesDiff(array("REMOVE" => array($origNode->getPath())));
+            $diff->remove([$origNode->getPath()]);
+            $content = $diff->toXML();
 
         }
         if (!empty($content) && !empty($ctx)) {

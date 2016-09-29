@@ -456,7 +456,7 @@ class PydioApi{
             } else if(childs[i].nodeName == 'nodes_diff') {
                 var dm = this._pydioObject.getContextHolder();
                 if(dm.getAjxpNodeProvider().parseAjxpNodesDiffs){
-                    dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, !window.currentLightBox);
+                    dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, this._pydioObject.user.activeRepository, !window.currentLightBox);
                 }
             }
             else if(childs[i].tagName == "logging_result")
