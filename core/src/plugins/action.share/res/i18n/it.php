@@ -247,7 +247,8 @@ $mess = array(
 "231" => "Click to start downloading",
 "11" => "Expiration",
 "49" => "create user",
-    "232" => "No entries found for share, did you maybe delete some users?",
-    "233" => "Reset this share",
+"232" => "No entries found for share, did you maybe delete some users?",
+"233" => "Reset this share",
+"234" => "It has been added to your %s workspace.",
 // will be replaced by the filename to download
 );

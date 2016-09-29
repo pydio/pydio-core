@@ -898,10 +898,18 @@
                 }
                 s = MessageHash["share_center." + (this.getNode().isLeaf() ? "42" : "43")];
                 if(s) s = s.replace("%s", ApplicationTitle);
+                let linkMessage = '';
                 if(this._data['repository_url']){
-                    link = this._data['repository_url'];
+                    if(this.getNode().isLeaf()){
+                        link = this._data['repository_url'].split('/ws-').shift() + '/ws-inbox';
+                        let sharedFilesString = MessageHash["share_center.100"];
+                        linkMessage = MessageHash["share_center.234"].replace('%s', '<a href="'+link+'">'+ sharedFilesString +'</a>');
+                    }else{
+                        link = this._data['repository_url'];
+                        linkMessage = "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ApplicationTitle) + "</a>";
+                    }
                 }
-                message = s + "\n\n " + "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                message = s + "\n\n " + linkMessage;
             }
             var usersList = null;
             if(this.shareFolderMode == 'workspace' && oForm) {
