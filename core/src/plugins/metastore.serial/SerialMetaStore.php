@@ -323,6 +323,7 @@ class SerialMetaStore extends AbstractMetaSource implements IMetaStoreProvider
                 $nodeIsWinLocal = true;
                 if (file_exists($metaFile)) {
                     $writeMode = "rw+";
+                    $nodeIsWinLocal = false;
                 }
             }
             $fp = @fopen($metaFile, $writeMode);
