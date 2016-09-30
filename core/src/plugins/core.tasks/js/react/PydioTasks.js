@@ -46,6 +46,10 @@
             return this._internal['statusMessage'];
         }
 
+        getClassName(){
+            return this._internal['className'];
+        }
+
         getData(){
             return this._internal;
         }
@@ -293,11 +297,12 @@
             }
             let click, clickStyle;
             if(this.props.task.hasOpenablePane()){
-                click = this.props.task.openDetailPane.bind(this);
+                click = this.props.task.openDetailPane;
                 clickStyle = {cursor:'pointer'};
             }
+            let customClassName = this.props.task.getClassName() || '';
             return (
-                <div className={"task " + "task-status-" + this.props.task.getStatus()}>
+                <div className={"task " + "task-status-" + this.props.task.getStatus() + " " + customClassName}>
                     <div className="task_texts" onClick={click} style={clickStyle}>
                         <div className="task_label">{scopeInfo}{t.getLabel()}</div>
                         <div className="status_message" title={t.getStatusMessage()}>{t.getStatusMessage()}</div>
