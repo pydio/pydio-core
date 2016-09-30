@@ -21,6 +21,7 @@
 namespace Pydio\Notification\Core;
 
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\UserInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -69,17 +70,19 @@ interface IFeedStore
     /**
      * @abstract
      * @param Notification $notif
+     * @param bool $repoScopeAll
+     * @param bool|string $groupScope
      * @return mixed
      */
-    public function persistAlert(Notification $notif);
+    public function persistAlert(Notification $notif, $repoScopeAll = false, $groupScope = false);
 
     /**
      * @abstract
-     * @param $userId
+     * @param UserInterface $userObject
      * @param null $repositoryIdFilter
      * @return Notification[]
      */
-    public function loadAlerts($userId, $repositoryIdFilter = null);
+    public function loadAlerts($userObject, $repositoryIdFilter = null);
 
 
     /**

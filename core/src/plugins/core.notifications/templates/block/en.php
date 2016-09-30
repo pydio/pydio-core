@@ -43,5 +43,7 @@ $mess=array(
     "folder.move" => "moved from AJXP_SOURCE_FOLDER",
     "folder.move_to" => "moved to AJXP_TARGET_FOLDER",
     "folder.move_from" => "moved from AJXP_SOURCE_FOLDER",
+    "file.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
+    "folder.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
     "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
 );

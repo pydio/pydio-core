@@ -38,5 +38,6 @@ $mess=array(
     "folder.move_from" => "Folder AJXP_NODE_LABEL moved from AJXP_SOURCE_FOLDER",
     "file.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
     "folder.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
-
+    "share.file" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
+    "share.folder" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
 );

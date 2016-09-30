@@ -45,4 +45,6 @@ $mess=array(
 "ajxp_URL" => "Clique aqui para ir directamente para <a href='AJXP_URL'>AJXP_NODE_LABEL</a>",
 "user_link" => "by",
 "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+"file.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
+"folder.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
 );

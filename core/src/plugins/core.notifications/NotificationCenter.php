@@ -25,6 +25,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\RepositoryInterface;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -397,7 +399,7 @@ class NotificationCenter extends Plugin
         if ($repositoryFilter == null) {
             $repositoryFilter = $ctx->getRepositoryId();
         }
-        $res = $this->eventStore->loadAlerts($userId, $repositoryFilter);
+        $res = $this->eventStore->loadAlerts($u, $repositoryFilter);
         if(!count($res)) return;
 
         // Recompute children notifs
@@ -436,7 +438,7 @@ class NotificationCenter extends Plugin
                 $path = $node->getPath();
                 $nodeRepo = $node->getRepository();
 
-                if($nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
+                if($notification->getAction() !== "share" && $nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
                     $newCtx = $node->getContext();
                     $currentRoot = $nodeRepo->getContextOption($newCtx, "PATH");
                     $contentFilter = $nodeRepo->getContentFilter();
@@ -575,6 +577,62 @@ class NotificationCenter extends Plugin
         return $notif;
     }
 
+    /**
+     * @param ContextInterface $context
+     * @param UserInterface|string $userOrRole
+     * @param RepositoryInterface $sharedRepository
+     * @param AJXP_Node $originalNode
+     */
+    public function shareAssignRight($context, $userOrRole, $sharedRepository, $originalNode){
+
+        $notification = new Notification();
+        $notification->setAction("share");
+        $notification->setAuthor($context->getUser()->getId());
+
+        if($userOrRole instanceof UserInterface && !$userOrRole->isHidden()){
+
+            $targetIdentifier = $userOrRole->getId();
+            $notification->setTarget($targetIdentifier);
+            if($originalNode->isLeaf()){
+                $node = new AJXP_Node("pydio://".$targetIdentifier."@inbox/".$originalNode->getLabel());
+                $node->setLeaf(true);
+            }else{
+                $node = new AJXP_Node("pydio://".$targetIdentifier."@".$sharedRepository->getId()."/");
+                $node->setLeaf(false);
+            }
+            $notification->setNode($node);
+            $this->eventStore->persistAlert($notification, true);
+            Controller::applyHook("msg.instant",array(
+                $context->withRepositoryId(null),
+                "<reload_user_feed/>",
+                $targetIdentifier
+            ));
+
+        }else if(is_string($userOrRole) && strpos($userOrRole, "AJXP_GRP_/") === 0){
+
+            $groupPath = substr($userOrRole, strlen("AJXP_GRP_"));
+            $notification->setTarget("*");
+            if($originalNode->isLeaf()){
+                $node = new AJXP_Node("pydio://*@inbox/".$originalNode->getLabel());
+                $node->setLeaf(true);
+            }else{
+                $node = new AJXP_Node("pydio://*@".$sharedRepository->getId()."/");
+                $node->setLeaf(false);
+            }
+            $notification->setNode($node);
+            $this->eventStore->persistAlert($notification, true, $groupPath);
+            Controller::applyHook("msg.instant",array(
+                $context->withRepositoryId(null),
+                "<reload_user_feed/>",
+                null,
+                $groupPath
+            ));
+
+
+        }
+
+    }
+    
 
     /**
      * @param Notification $notif

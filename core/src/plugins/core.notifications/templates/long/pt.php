@@ -43,4 +43,6 @@ $mess=array(
 "folder.move_from" => "A pasta AJXP_NODE_LABEL foi movida de AJXP_SOURCE_FOLDER AJXP_DATE, por AJXP_USER.",
 "ajxp_URL" => "Clique aqui para ir directamente para <a href='AJXP_URL'>AJXP_NODE_LABEL</a>",
 "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+"file.share" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
+"folder.share" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
 );

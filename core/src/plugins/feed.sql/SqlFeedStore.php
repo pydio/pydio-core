@@ -26,6 +26,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
@@ -205,19 +206,25 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
     /**
      * @abstract
      * @param Notification $notif
+     * @param bool $repoScopeAll
+     * @param bool|string $groupScope
      * @return mixed
      */
-    public function persistAlert(Notification $notif)
+    public function persistAlert(Notification $notif, $repoScopeAll = false, $groupScope = false)
     {
         if(!$notif->getNode()) return;
-        $repositoryId = $notif->getNode()->getRepositoryId();
+        if($repoScopeAll){
+            $repositoryId = "*";
+        }else{
+            $repositoryId = $notif->getNode()->getRepositoryId();
+        }
         $userId = $notif->getTarget();
         if($this->sqlDriver["password"] == "XXXX") return;
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
         try {
-            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[content], [index_path]) VALUES (%i,%s,%s,%s,%s,%bin,%s)",
+            dibi::query("INSERT INTO [ajxp_feed] ([edate],[etype],[htype],[user_id],[repository_id],[user_group],[content],[index_path]) VALUES (%i,%s,%s,%s,%s,".($groupScope?"'$groupScope'":"NULL").",%bin,%s)",
                 time(),
                 "alert",
                 "notification",
@@ -233,23 +240,24 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
 
     /**
      * @abstract
-     * @param $userId
+     * @param UserInterface $userObject
      * @param null $repositoryIdFilter
      * @return mixed
      */
-    public function loadAlerts($userId, $repositoryIdFilter = null)
+    public function loadAlerts($userObject, $repositoryIdFilter = null)
     {
+        $userId = $userObject->getId();
+        $userGroup = $userObject->getGroupPath();
         if($this->sqlDriver["password"] == "XXXX") return array();
         if(!dibi::isConnected()) {
             dibi::connect($this->sqlDriver);
         }
         if ($repositoryIdFilter !== null) {
             $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s
-            AND ([repository_id] = %s OR [repository_id] IN  (SELECT [uuid] FROM [ajxp_repo] WHERE [parent_uuid]=%s))
-            AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $repositoryIdFilter, $userId, 100);
-            //$res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [repository_id] = %s AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $userId, 100);
+            AND ([repository_id] = %s OR [repository_id] IN  (SELECT [uuid] FROM [ajxp_repo] WHERE [parent_uuid]=%s) OR [repository_id] = %s)
+            AND ([user_id] = %s OR [user_group] = %s ) ORDER BY [edate] DESC %lmt", "alert", $repositoryIdFilter, $repositoryIdFilter, '*', $userId, $userGroup, 100);
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, 100);
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [etype] = %s AND ([user_id] = %s OR [user_group] = %s) ORDER BY [edate] DESC %lmt", "alert", $userId, $userGroup, 100);
         }
         $data = array();
         foreach ($res as $n => $row) {
@@ -271,13 +279,15 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             dibi::connect($this->sqlDriver);
         }
         $userId = $contextInterface->getUser()->getId();
+        $userGroup = $contextInterface->getUser()->getGroupPath();
         if ($occurrences == 1) {
-            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+            dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND ([user_id] = %s OR [user_group] = %s) AND [etype] = %s", $alertId, $userId, $userGroup, "alert");
         } else {
-            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [id] = %i AND [user_id] = %s", $alertId, $userId);
+            $res = dibi::query("SELECT * FROM [ajxp_feed] WHERE [id] = %i AND ([user_id] = %s OR [user_group] = %s) AND [etype] = %s", $alertId, $userId, $userGroup, "alert");
             if(!count($res)){
                 return;
             }
+            $startEventRow = null;
             foreach ($res as $n => $row) {
                 $startEventRow = $row;
                 break;
@@ -286,13 +296,12 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
              * @var $startEventNotif Notification
              */
             $startEventNotif = unserialize($startEventRow->content);
-            if(empty($startEventNotif)) {
-                // Ignore, empty notif;
+            if(empty($startEventNotif) || ! $startEventNotif instanceof Notification) {
                 return;
             }
             $url = $startEventNotif->getNode()->getUrl();
             $date = $startEventRow->edate;
-            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND [user_id] = %s AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $date, $url, $occurrences);
+            $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND ([user_id] = %s OR [user_group] = %s) AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $userGroup, $date, $url, $occurrences);
             $a = $newRes->fetchPairs();
             if (!count($a)) {
                 // Weird, probably not upgraded!
