@@ -135,9 +135,14 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
                 $this->paginationData["dirs"],
                 $this->paginationData["remoteSort"]);
         }
+        $messages = LocaleService::getMessages();
         if(isSet($this->columnsDescription)){
             $xmlChildren = [];
             foreach($this->columnsDescription['columns'] as $column){
+                if(!isSet($messages[$column["messageId"]])){
+                    $column["messageString"] = $column["messageId"];
+                    unset($column["messageId"]);
+                }
                 $xmlChildren[] = XMLHelper::toXmlElement("column", $column);
             }
             $xmlConfig = XMLHelper::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
@@ -174,15 +179,20 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      * @param string $attributeName
      * @param string $sortType
      * @param string $width
+     * @param array $additionalMeta
      * @return $this
      */
-    public function appendColumn($messageId, $attributeName, $sortType='String', $width=''){
-        $this->columnsDescription['columns'][] = [
+    public function appendColumn($messageId, $attributeName, $sortType='String', $width='', $additionalMeta = []){
+        $col = [
             'messageId'     => $messageId,
             'attributeName' => $attributeName,
             'sortType'      => $sortType,
             'width'         => $width
         ];
+        foreach($additionalMeta as $k => $v){
+            $col[$k] = $v;
+        }
+        $this->columnsDescription['columns'][] = $col;
         return $this;
     }
 
@@ -252,7 +262,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         if(isSet($this->columnsDescription["columns"])){
             $messages = LocaleService::getMessages();
             foreach($this->columnsDescription["columns"] as $column){
-                $colTitle = $messages[$column["messageId"]];
+                $colTitle = isSet($messages[$column["messageId"]]) ? $messages[$column["messageId"]] : $column["messageId"];
                 $collAttr = $column["attributeName"];
                 $headers[$collAttr] = $colTitle;
             }
