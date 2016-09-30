@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Controller;
 
+use Pydio\Core\Utils\XMLHelper;
 use Zend\Diactoros\Response;
 use Zend\Diactoros\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
@@ -217,7 +218,7 @@ class Controller
                         && $loggedUser->canWrite($ctx->getRepositoryId()."")){
                         // Special case of "write only" right : return empty listing, no auth error.
                         $response = new Response();
-                        $response->getBody()->write(XMLWriter::wrapDocument(""));
+                        $response->getBody()->write(XMLHelper::wrapDocument(""));
                         return $response;
                     }else{
                         throw new AuthRequiredException("208");
@@ -387,7 +388,7 @@ class Controller
             $request = $request->withParsedBody($httpVars);
 
             if(!empty($result)){
-                $response->getBody()->write(XMLWriter::wrapDocument($result));
+                $response->getBody()->write(XMLHelper::wrapDocument($result));
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
             }
         }

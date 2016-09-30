@@ -22,11 +22,13 @@ namespace Pydio\Access\Core\Model;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Http\Response\CLISerializableResponseChunk;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
+use Pydio\Core\Serializer\NodeXML;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\XMLHelper;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -124,33 +126,32 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     public function toXML()
     {
         $buffer  = "";
-        $buffer .= XMLWriter::renderAjxpNode($this->parentNode, false, false);
+        $buffer .= NodeXML::toXML($this->parentNode, false);
         if(isSet($this->paginationData)){
-            $buffer .= XMLWriter::renderPaginationData(
+            $buffer .= $this->renderPaginationData(
                 $this->paginationData["count"],
                 $this->paginationData["current"],
                 $this->paginationData["total"],
                 $this->paginationData["dirs"],
-                $this->paginationData["remoteSort"],
-                false);
+                $this->paginationData["remoteSort"]);
         }
         if(isSet($this->columnsDescription)){
             $xmlChildren = [];
             foreach($this->columnsDescription['columns'] as $column){
-                $xmlChildren[] = XMLWriter::toXmlElement("column", $column);
+                $xmlChildren[] = XMLHelper::toXmlElement("column", $column);
             }
-            $xmlConfig = XMLWriter::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
-            $xmlConfig = XMLWriter::toXmlElement("component_config", ["className" => "FilesList"], $xmlConfig);
-            $buffer .= XMLWriter::toXmlElement("client_configs", [], $xmlConfig);
+            $xmlConfig = XMLHelper::toXmlElement("columns", $this->columnsDescription['description'], implode("", $xmlChildren));
+            $xmlConfig = XMLHelper::toXmlElement("component_config", ["className" => "FilesList"], $xmlConfig);
+            $buffer .= XMLHelper::toXmlElement("client_configs", [], $xmlConfig);
         }
         foreach ($this->children as $child){
             if($child instanceof NodesList){
                 $buffer .= $child->toXML();
             }else{
-                $buffer .= XMLWriter::renderAjxpNode($child, true, false);
+                $buffer .= NodeXML::toXML($child, true);
             }
         }
-        $buffer .= XMLWriter::close("tree", false);
+        $buffer .= "</tree>";
         return $buffer;
     }
 
@@ -288,4 +289,25 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         // Render
         $table->render();
     }
+
+    /**
+     * Ouput the <pagination> tag
+     * @static
+     * @param integer $count
+     * @param integer $currentPage
+     * @param integer $totalPages
+     * @param integer $dirsCount
+     * @param null $remoteSortAttributes
+     * @return void|string
+     */
+    private function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
+    {
+        $remoteSortString = "";
+        if (is_array($remoteSortAttributes)) {
+            foreach($remoteSortAttributes as $k => $v) $remoteSortString .= " $k='$v'";
+        }
+        return '<pagination count="'.$count.'" total="'.$totalPages.'" current="'.$currentPage.'" overflowMessage="'.$currentPage."/".$totalPages.'" icon="folder.png" openicon="folder_open.png" dirsCount="'.$dirsCount.'"'.$remoteSortString.'/>';
+    }
+
+
 }

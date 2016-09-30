@@ -35,7 +35,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Tasks\Task;
 use Pydio\Tasks\TaskService;
 
@@ -201,7 +201,7 @@ class FtpAccessDriver extends FsAccessDriver
                             "destination" => base64_encode($destinationFolder)
                         ];
 
-                        $destCopy = XMLWriter::replaceAjxpXmlKeywords($ctx->getRepository()->getContextOption($ctx, "TMP_UPLOAD"));
+                        $destCopy = XMLFilter::resolveKeywords($ctx->getRepository()->getContextOption($ctx, "TMP_UPLOAD"));
                         $this->logDebug("Upload : tmp upload folder", array($destCopy));
                         if (!is_dir($destCopy)) {
                             if (!@mkdir($destCopy)) {

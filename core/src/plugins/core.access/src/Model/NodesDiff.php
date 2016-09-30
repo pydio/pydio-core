@@ -20,10 +20,11 @@
  */
 namespace Pydio\Access\Core\Model;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
+use Pydio\Core\Serializer\NodeXML;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\StringHelper;
 
@@ -135,7 +136,7 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
             $buffer .= "<add>";
             foreach ($this->added as $ajxpNode) {
                 $this->forceLoadNodeInfo($ajxpNode);
-                $buffer .=  XMLWriter::renderAjxpNode($ajxpNode, true, false);
+                $buffer .= NodeXML::toXML($ajxpNode, true);
             }
             $buffer .= "</add>";
         }
@@ -144,7 +145,7 @@ class NodesDiff implements XMLSerializableResponseChunk, JSONSerializableRespons
             foreach ($this->updated as $originalPath => $ajxpNode) {
                 $this->forceLoadNodeInfo($ajxpNode);
                 $ajxpNode->original_path = $originalPath;
-                $buffer .= XMLWriter::renderAjxpNode($ajxpNode, true, false);
+                $buffer .= NodeXML::toXML($ajxpNode, true);
             }
             $buffer .= "</update>";
         }

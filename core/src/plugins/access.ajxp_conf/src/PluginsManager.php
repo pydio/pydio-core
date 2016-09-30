@@ -24,7 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Message\XMLDocMessage;
@@ -100,11 +100,11 @@ class PluginsManager extends AbstractManager
                         } catch (\Exception $e) {
                             $checkErrorMessage = " (Warning : " . $e->getMessage() . ")";
                         }
-                        $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[not(@group_switch_name)]"));
+                        $tParams = XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/param[not(@group_switch_name)]"));
                         $addParams .= '<global_param group_switch_name="' . $fieldName . '" name="instance_name" group_switch_label="' . $typePlug->getManifestLabel() . $checkErrorMessage . '" group_switch_value="' . $typePlug->getId() . '" default="' . $typePlug->getId() . '" type="hidden"/>';
                         $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"" . $typePlug->getManifestLabel() . $checkErrorMessage . "\" group_switch_value=\"" . $typePlug->getId() . "\" ", $tParams);
-                        $addParams .= str_replace("<param", "<global_param", XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param[@group_switch_name]")));
-                        $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
+                        $addParams .= str_replace("<param", "<global_param", XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/param[@group_switch_name]")));
+                        $addParams .= XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
                         $instancesDefs = $typePlug->getConfigsDefinitions();
                         if (!empty($instancesDefs) && is_array($instancesDefs)) {
                             foreach ($instancesDefs as $defKey => $defData) {
@@ -113,7 +113,7 @@ class PluginsManager extends AbstractManager
                         }
                     }
                 }
-                $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
+                $allParams = XMLFilter::resolveKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
                 $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
                 $allParams = str_replace("</server_settings>", $addParams . "</server_settings>", $allParams);
 
@@ -212,10 +212,7 @@ class PluginsManager extends AbstractManager
                 $this->mergeExistingParameters($options, $existing);
                 $confStorage->savePluginConfig($pluginId, $options);
                 ConfService::clearAllCaches();
-                XMLWriter::header();
-                XMLWriter::sendMessage($mess["ajxp_conf.97"], null);
-                XMLWriter::close();
-
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($mess["ajxp_conf.97"])]));
 
                 break;
 
@@ -324,7 +321,7 @@ class PluginsManager extends AbstractManager
                                 $n->appendChild($n->ownerDocument->createAttribute("default"));
                                 $n->attributes->getNamedItem("default")->nodeValue = $paramValue;
                             }
-                            $buffer .= XMLWriter::replaceAjxpXmlKeywords($n->ownerDocument->saveXML($n));
+                            $buffer .= XMLFilter::resolveKeywords($n->ownerDocument->saveXML($n));
                         }
                     }
                     $buffer .= "</repoScope>";

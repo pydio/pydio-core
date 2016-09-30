@@ -27,7 +27,7 @@ use Pydio\Access\Core\Filter\AJXP_PermissionMask;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\Repository;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
@@ -46,6 +46,7 @@ use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
+use Pydio\Core\Utils\XMLHelper;
 use Pydio\Tests\AbstractTest;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -84,7 +85,7 @@ class RepositoriesManager extends AbstractManager
             case "get_drivers_definition":
 
                 $buffer = "<drivers allowed='".($this->currentUserIsGroupAdmin() ? "false" : "true")."'>";
-                $buffer .= XMLWriter::replaceAjxpXmlKeywords(self::availableDriversToXML("param", "", true));
+                $buffer .= XMLFilter::resolveKeywords(self::availableDriversToXML("param", "", true));
                 $buffer .= "</drivers>";
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new XMLDocMessage($buffer)));
 
@@ -1082,7 +1083,7 @@ class RepositoriesManager extends AbstractManager
      */
     protected function serializeRepositoryDriverInfos(PluginsService $pServ, $format, $plug, $repository){
         $manifest = $plug->getManifestRawContent("server_settings/param");
-        $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
+        $manifest = XMLFilter::resolveKeywords($manifest);
         $clientSettings = $plug->getManifestRawContent("client_settings", "xml");
         $iconClass = "";$descriptionTemplate = "";
         if($clientSettings->length){
@@ -1103,7 +1104,7 @@ class RepositoriesManager extends AbstractManager
             foreach ($metas as $metaPlug) {
                 $buffer .= "<meta id=\"".$metaPlug->getId()."\" label=\"". StringHelper::xmlEntities($metaPlug->getManifestLabel()) ."\" description=\"". StringHelper::xmlEntities($metaPlug->getManifestDescription()) ."\">";
                 $manifest = $metaPlug->getManifestRawContent("server_settings/param");
-                $manifest = XMLWriter::replaceAjxpXmlKeywords($manifest);
+                $manifest = XMLFilter::resolveKeywords($manifest);
                 $buffer .= $manifest;
                 $buffer .= "</meta>";
             }
@@ -1125,7 +1126,7 @@ class RepositoriesManager extends AbstractManager
                     "id" => $metaPlug->getId(),
                     "label" => $metaPlug->getManifestLabel(),
                     "description" => $metaPlug->getManifestDescription(),
-                    "parameters" => $this->xmlServerParamsToArray(XMLWriter::replaceAjxpXmlKeywords($metaPlug->getManifestRawContent("server_settings/param")))
+                    "parameters" => $this->xmlServerParamsToArray(XMLFilter::resolveKeywords($metaPlug->getManifestRawContent("server_settings/param")))
                 ];
             }
             $data = ["driver" => $dData, "metasources" => $metaSources];
@@ -1140,7 +1141,7 @@ class RepositoriesManager extends AbstractManager
     protected function xmlServerParamsToArray($xmlParamsString){
         $doc = new \DOMDocument();
         $doc->loadXML("<parameters>$xmlParamsString</parameters>");
-        $result = XMLWriter::xmlToArray($doc, ["attributePrefix" => ""]);
+        $result = XMLHelper::xmlToArray($doc, ["attributePrefix" => ""]);
         if(isSet($result["parameters"]["param"])){
             return $result["parameters"]["param"];
         }else{

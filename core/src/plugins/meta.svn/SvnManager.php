@@ -20,18 +20,24 @@
  */
 namespace Pydio\Access\Meta\Version;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\RecycleBinManager;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Http\Message\ReloadMessage;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Message\XMLMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\AuthService;
 
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Utils\TextEncoder;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 
@@ -176,14 +182,16 @@ class SvnManager extends AbstractMetaSource
     }
 
     /**
-     * @param $actionName
-     * @param $httpVars
-     * @param $filesVars
-     * @param ContextInterface $ctx
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @throws \Exception
      */
-    public function switchAction($actionName, $httpVars, $filesVars, ContextInterface $ctx)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $actionName     = $requestInterface->getAttribute("action");
+        $httpVars       = $requestInterface->getParsedBody();
+        $ctx            = $requestInterface->getAttribute("ctx");
+
         $init = $this->initDirAndSelection($ctx, $httpVars);
         if ($actionName == "svnlog") {
             $res1 = ExecSvnCmd("svnversion", $init["DIR"]);
@@ -197,16 +205,17 @@ class SvnManager extends AbstractMetaSource
             $switches = '--xml -rHEAD:0';
             $arg = $init["SELECTION"][0];
             $res = ExecSvnCmd($command, $arg, $switches);
-            XMLWriter::header();
+            $serialStream = new SerializableResponseStream();
             $lines = explode(PHP_EOL, $res[IDX_STDOUT]);
             array_shift($lines);
             if (isSet($currentRev)) {
-                print("<current_revision>$currentRev</current_revision>");
+                $serialStream->addChunk(new XMLMessage("<current_revision>$currentRev</current_revision>"));
             } else if (isSet($revRange)) {
-                print("<revision_range start='$revRange[0]' end='$revRange[1]'/>");
+                $serialStream->addChunk(new XMLMessage("<revision_range start='$revRange[0]' end='$revRange[1]'/>"));
             }
-            print(TextEncoder::toUTF8(implode("", $lines), false));
-            XMLWriter::close();
+            $serialStream->addChunk(new XMLMessage(implode("", $lines)));
+            $responseInterface = $responseInterface->withBody($serialStream);
+
         } else if ($actionName == "svndownload") {
             $revision = $httpVars["revision"];
             $realFile = $init["SELECTION"][0];
@@ -296,14 +305,16 @@ class SvnManager extends AbstractMetaSource
     }
 
     /**
-     * @param $actionName
-     * @param $httpVars
-     * @param $filesVars
-     * @param ContextInterface $ctx
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @throws \Exception
      */
-    public function copyOrMoveSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
+    public function copyOrMoveSelection(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $actionName     = $requestInterface->getAttribute("action");
+        $httpVars       = $requestInterface->getParsedBody();
+        $ctx            = $requestInterface->getAttribute("ctx");
+
         if ($actionName != "rename") {
             $init = $this->initDirAndSelection($ctx, $httpVars, array("DEST_DIR" => InputFilter::decodeSecureMagic($httpVars["dest"])));
             $this->commitMessageParams = "To:".$httpVars["dest"].";items:";
@@ -328,17 +339,16 @@ class SvnManager extends AbstractMetaSource
         if ($actionName != "rename") {
             $this->commitMessageParams .= "[".implode(",",$init["SELECTION"])."]";
         }
-        $this->commitChanges($actionName, $httpVars, $filesVars, $ctx);
+        $this->commitChanges($actionName, $httpVars, [], $ctx);
         if ($actionName != "rename") {
-            $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), $filesVars, $ctx);
+            $this->commitChanges($actionName, array("dir" => $httpVars["dest"]), [], $ctx);
         }
         $this->logInfo("CopyMove/Rename (svn delegate)", array("files"=>$init["SELECTION"]));
 
         $mess = LocaleService::getMessages();
-        XMLWriter::header();
-        XMLWriter::sendMessage($mess["meta.svn.5"], null);
-        XMLWriter::reloadDataNode();
-        XMLWriter::close();
+
+        $serialStream = new SerializableResponseStream([new UserMessage($mess["meta.svn.5"]), new ReloadMessage()]);
+        $responseInterface = $responseInterface->withBody($serialStream);
     }
 
     /**
@@ -348,12 +358,18 @@ class SvnManager extends AbstractMetaSource
      * @param ContextInterface $ctx
      * @throws \Exception
      */
-    public function deleteSelection($actionName, &$httpVars, $filesVars, ContextInterface $ctx)
+    public function deleteSelection(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $actionName     = $requestInterface->getAttribute("action");
+        $httpVars       = $requestInterface->getParsedBody();
+        $ctx            = $requestInterface->getAttribute("ctx");
+
         $init = $this->initDirAndSelection($ctx, $httpVars, array(), true);
         if (isSet($init["RECYCLE"]) && isSet($init["RECYCLE"]["action"]) && $init["RECYCLE"]["action"] != "delete") {
             $httpVars["dest"] = TextEncoder::fromUTF8($init["RECYCLE"]["dest"]);
-            $this->copyOrMoveSelection("move", $httpVars, $filesVars, $ctx);
+            $updatedRequest = $requestInterface->withAttribute("action", "move")->withParsedBody($httpVars);
+            $this->copyOrMoveSelection($updatedRequest, $responseInterface);
+
             $userSelection = $init["ORIGINAL_SELECTION"];
             $files = $userSelection->getFiles();
             if ($actionName == "delete") {
@@ -365,21 +381,19 @@ class SvnManager extends AbstractMetaSource
                     RecycleBinManager::deleteFromRecycle($file);
                 }
             }
-            $this->commitChanges($actionName, array("dir" => RecycleBinManager::getRelativeRecycle()), $filesVars, $ctx);
+            $this->commitChanges($actionName, array("dir" => RecycleBinManager::getRelativeRecycle()), [], $ctx);
             return ;
         }
         foreach ($init["SELECTION"] as $selectedFile) {
             $res = ExecSvnCmd('svn delete', $selectedFile, '--force');
         }
         $this->commitMessageParams = "[".implode(",",$init["SELECTION"])."]";
-        $this->commitChanges($actionName, $httpVars, $filesVars, $ctx);
+        $this->commitChanges($actionName, $httpVars, [], $ctx);
         $this->logInfo("Delete (svn delegate)", array("files"=>$init["SELECTION"]));
 
         $mess = LocaleService::getMessages();
-        XMLWriter::header();
-        XMLWriter::sendMessage($mess["meta.svn.51"], null);
-        XMLWriter::reloadDataNode();
-        XMLWriter::close();
+        $serialStream = new SerializableResponseStream([new UserMessage($mess["meta.svn.51"]), new ReloadMessage()]);
+        $responseInterface = $responseInterface->withBody($serialStream);
     }
 
     /**

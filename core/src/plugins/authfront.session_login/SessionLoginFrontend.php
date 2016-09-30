@@ -32,7 +32,7 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Http\BruteForceHelper;
 use Pydio\Core\Utils\Http\CookiesHelper;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Utils\Http\CaptchaProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');

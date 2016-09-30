@@ -20,9 +20,9 @@
  */
 namespace Pydio\Core\Http\Message;
 
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -53,7 +53,13 @@ class UserMessage implements XMLSerializableResponseChunk, JSONSerializableRespo
      */
     public function toXML()
     {
-        return XMLWriter::sendMessage($this->level == LOG_LEVEL_INFO?$this->message:null, $this->level == LOG_LEVEL_ERROR?$this->message:null, false);
+        if ($this->level === LOG_LEVEL_INFO) {
+            $messageType = "SUCCESS";
+        } else {
+            $messageType = strtoupper($this->level);
+        }
+        $message = StringHelper::xmlContentEntities($this->message);
+        return "<message type=\"$messageType\">".$message."</message>";
     }
 
     /**

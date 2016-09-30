@@ -37,6 +37,7 @@ use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Serializer\UserXML;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
@@ -50,7 +51,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -734,7 +735,7 @@ abstract class AbstractConfDriver extends Plugin
                         $bmUser->save("user");
                     }
                 }
-                $doc = new XMLMessage(XMLWriter::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx, false, isset($httpVars["format"])?$httpVars["format"]:"legacy"));
+                $doc = new XMLMessage(UserXML::writeBookmarks($bmUser->getBookmarks($repositoryId), $ctx, false, isset($httpVars["format"]) ? $httpVars["format"] : "legacy"));
                 $x = new SerializableResponseStream([$doc]);
                 $responseInterface = $responseInterface->withBody($x);
 
@@ -1024,7 +1025,7 @@ abstract class AbstractConfDriver extends Plugin
                         }
                         if( in_array($paramNode->getAttribute("name"), $tplDefined) ) continue;
                         if($paramNode->getAttribute('no_templates') == 'true') continue;
-                        $xml.= XMLWriter::replaceAjxpXmlKeywords($paramNode->ownerDocument->saveXML($paramNode));
+                        $xml.= XMLFilter::resolveKeywords($paramNode->ownerDocument->saveXML($paramNode));
                     }
                     // ADD LABEL
                     $xml .= '<param name="DISPLAY" type="string" label="'.$mess[359].'" description="'.$mess[429].'" mandatory="true" default="'.$defaultLabel.'"/>';

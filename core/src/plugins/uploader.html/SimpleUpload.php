@@ -32,8 +32,9 @@ use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Http\Message\ExternalUploadedFile;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\PluginFramework\Plugin;
+use Pydio\Core\Utils\XMLHelper;
 use Zend\Diactoros\Response\TextResponse;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -233,7 +234,7 @@ class SimpleUpload extends Plugin
                     $nodesDiffXML = $nodesDiff->toXML();
                 }
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
-                $response->getBody()->write(XMLWriter::wrapDocument($nodesDiffXML));
+                $response->getBody()->write(XMLHelper::wrapDocument($nodesDiffXML));
 
                 /* for further implementation */
                 if (!isSet($result["PREVENT_NOTIF"])) {

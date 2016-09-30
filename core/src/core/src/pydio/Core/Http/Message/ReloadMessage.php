@@ -20,9 +20,9 @@
  */
 namespace Pydio\Core\Http\Message;
 
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -68,6 +68,8 @@ class ReloadMessage implements XMLSerializableResponseChunk, JSONSerializableRes
      */
     public function toXML()
     {
-        return XMLWriter::reloadDataNode($this->dataNode, $this->pendingSelection, false);
+        $nodePath = StringHelper::xmlEntities($this->dataNode, true);
+        $pendingSelection = StringHelper::xmlEntities($this->pendingSelection, true);
+        return "<reload_instruction object=\"data\" node=\"$nodePath\" file=\"$pendingSelection\"/>";
     }
 }

@@ -44,7 +44,7 @@ use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\StringHelper;
 use Pydio\Core\Utils\Vars\VarsFilter;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\PluginFramework\SqlTableProvider;
@@ -140,10 +140,10 @@ class BootConfLoader extends AbstractConfDriver
                 } catch (Exception $e) {
                     $checkErrorMessage = " (Warning : " . $e->getMessage() . ")";
                 }
-                $tParams = XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/param"));
+                $tParams = XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/param"));
                 $addParams .= '<global_param group_switch_name="' . $fieldName . '" name="instance_name" group_switch_label="' . $typePlug->getManifestLabel() . $checkErrorMessage . '" group_switch_value="' . $typePlug->getId() . '" default="' . $typePlug->getId() . '" type="hidden"/>';
                 $addParams .= str_replace("<param", "<global_param group_switch_name=\"${fieldName}\" group_switch_label=\"" . $typePlug->getManifestLabel() . $checkErrorMessage . "\" group_switch_value=\"" . $typePlug->getId() . "\" ", $tParams);
-                $addParams .= XMLWriter::replaceAjxpXmlKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
+                $addParams .= XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
         $uri = $_SERVER["REQUEST_URI"];
@@ -164,7 +164,7 @@ class BootConfLoader extends AbstractConfDriver
             if (!$vNodes->length) continue;
             $vNodes->item(0)->setAttribute("default", $pValue);
         }
-        $allParams = XMLWriter::replaceAjxpXmlKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
+        $allParams = XMLFilter::resolveKeywords($fullManifest->ownerDocument->saveXML($fullManifest));
         $allParams = str_replace('type="plugin_instance:', 'type="group_switch:', $allParams);
         $allParams = str_replace("</server_settings>", $addParams . "</server_settings>", $allParams);
 

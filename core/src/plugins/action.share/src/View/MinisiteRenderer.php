@@ -33,7 +33,7 @@ use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Http\UserAgent;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Share\ShareCenter;
@@ -212,7 +212,7 @@ class MinisiteRenderer
         // UPDATE TEMPLATE
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         Controller::applyHook("tpl.filter_html", [$context, &$html]);
-        $html = XMLWriter::replaceAjxpXmlKeywords($html);
+        $html = XMLFilter::resolveKeywords($html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);

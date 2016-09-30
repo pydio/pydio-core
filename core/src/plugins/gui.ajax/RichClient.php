@@ -40,7 +40,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Reflection\JSPacker;
 use Pydio\Core\Utils\Reflection\LocaleExtractor;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -278,7 +278,7 @@ class RichClient extends Plugin
                     $callback->parentNode->removeChild($callback);
                 }
             }
-            $START_PARAMETERS["PRELOADED_REGISTRY"] = XMLWriter::replaceAjxpXmlKeywords($clone->saveXML());
+            $START_PARAMETERS["PRELOADED_REGISTRY"] = XMLFilter::resolveKeywords($clone->saveXML());
         }
 
         $JSON_START_PARAMETERS = json_encode($START_PARAMETERS);
@@ -311,7 +311,7 @@ class RichClient extends Plugin
                 $ADDITIONAL_FRAMEWORKS = "";
             }
             $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
-            $content = XMLWriter::replaceAjxpXmlKeywords($content, false);
+            $content = XMLFilter::resolveKeywords($content, false);
             $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
             if ($JSON_START_PARAMETERS) {
                 $content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);

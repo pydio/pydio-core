@@ -26,7 +26,7 @@ use Pydio\Core\Model\ContextInterface;
 
 
 use Pydio\Core\Services\ConfService;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -460,7 +460,7 @@ class Plugin implements \Serializable
     {
         if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@label", $this->manifestDoc->documentElement);
-        if($l->length) return XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
+        if($l->length) return XMLFilter::resolveKeywords($l->item(0)->nodeValue);
         else return $this->id;
     }
     /**
@@ -471,7 +471,7 @@ class Plugin implements \Serializable
     {
         if($this->manifestXML != null) $this->unserializeManifest();
         $l = $this->xPath->query("@description", $this->manifestDoc->documentElement);
-        if($l->length) return XMLWriter::replaceAjxpXmlKeywords($l->item(0)->nodeValue);
+        if($l->length) return XMLFilter::resolveKeywords($l->item(0)->nodeValue);
         else return "";
     }
 

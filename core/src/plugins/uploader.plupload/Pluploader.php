@@ -44,7 +44,7 @@ use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\PluginFramework\Plugin;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -121,7 +121,7 @@ class Pluploader extends Plugin
         $remote = false;
         if (method_exists($driver, "storeFileToCopy")) {
             $remote = true;
-            $destCopy = XMLWriter::replaceAjxpXmlKeywords($repository->getContextOption($ctx, "TMP_UPLOAD"));
+            $destCopy = XMLFilter::resolveKeywords($repository->getContextOption($ctx, "TMP_UPLOAD"));
             // Make tmp folder a bit more unique using secure_token
             $tmpFolder = $destCopy."/".$httpVars["secure_token"];
             if(!is_dir($tmpFolder)){

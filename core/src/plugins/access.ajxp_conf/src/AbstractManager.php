@@ -22,7 +22,7 @@ namespace Pydio\Access\Driver\DataProvider\Provisioning;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\NodesList;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -162,7 +162,7 @@ abstract class AbstractManager
                 $att = $node->attributes->item($i);
                 $value = $att->nodeValue;
                 if(in_array($att->nodeName, array("choices", "description", "group", "label"))) {
-                    $value = XMLWriter::replaceAjxpXmlKeywords($value);
+                    $value = XMLFilter::resolveKeywords($value);
                 }
                 $attributes[$att->nodeName] = $value;
             }

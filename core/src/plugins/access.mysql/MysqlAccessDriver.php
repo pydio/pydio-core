@@ -22,13 +22,16 @@ namespace Pydio\Access\Driver\DataProvider;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Http\Message\ReloadMessage;
+use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -335,9 +338,9 @@ class MysqlAccessDriver extends AbstractAccessDriver
                 $link = $this->createDbLink($ctx);
                 //AJXP_Exception::errorToXml($link);
                 if ($dir == "") {
-                    XMLWriter::header();
+                    XMLFilter::header();
                     $tables = $this->listTables($ctx);
-                    XMLWriter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
+                    XMLFilter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
                         if(InputFilter::detectXSS($tableName)) {
@@ -351,7 +354,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
                     }
                     print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
-                    XMLWriter::close();
+                    XMLFilter::close();
                 } else {
                     $tableName = basename($dir);
                     if(isSet($page))$currentPage = $page;
@@ -392,7 +395,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         unset($_SESSION["LAST_SQL_QUERY"]);
                         throw $ex;
                     }
-                    XMLWriter::header();
+                    XMLFilter::header();
                     $blobCols = array();
                     $columnsString = '<columns switchDisplayMode="list" switchGridMode="grid">';
                     foreach ($result["COLUMNS"] as $col) {
@@ -403,10 +406,10 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     }
 
                     $columnsString .= '</columns>';
-                    XMLWriter::sendFilesListComponentConfig($columnsString);
+                    XMLFilter::sendFilesListComponentConfig($columnsString);
                     //print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
                     if ($result["TOTAL_PAGES"] > 1) {
-                        XMLWriter::renderPaginationData($count, $currentPage, $result["TOTAL_PAGES"]);
+                        XMLFilter::renderPaginationData($count, $currentPage, $result["TOTAL_PAGES"]);
                     }
                     foreach ($result["ROWS"] as $arbitIndex => $row) {
                         print '<tree ';
@@ -437,7 +440,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         }
 
                     }
-                    XMLWriter::close();
+                    XMLFilter::close();
                 }
                 $this->closeDbLink($link);
                 return null;
@@ -447,17 +450,19 @@ class MysqlAccessDriver extends AbstractAccessDriver
 
         if (isset($logMessage) || isset($errorMessage)) {
             if(InputFilter::detectXSS($logMessage) || InputFilter::detectXSS($errorMessage)){
-                $xmlBuffer = XMLWriter::sendMessage(null, "XSS Detected!", false);
+                $errorMessage = "XSS detected!";
             }
-            $xmlBuffer .= XMLWriter::sendMessage((isSet($logMessage)?$logMessage:null), (isSet($errorMessage)?$errorMessage:null), false);
         }
+        $uMessage = new UserMessage(isSet($logMessage)?$logMessage:$errorMessage, isset($logMessage) ? LOG_LEVEL_ERROR: LOG_LEVEL_INFO);
+        $xmlBuffer = $uMessage->toXML();
 
         if (isset($requireAuth)) {
-            $xmlBuffer .= XMLWriter::requireAuth(false);
+            throw new AuthRequiredException();
         }
 
         if (( isset($reload_current_node) && $reload_current_node == "true") || (isset($reload_file_list)) ) {
-            $xmlBuffer .= XMLWriter::reloadDataNode("", "", false);
+            $relo = new ReloadMessage();
+            $xmlBuffer .= $relo->toXML();
         }
 
         return $xmlBuffer;

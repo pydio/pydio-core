@@ -20,10 +20,11 @@
  */
 namespace Pydio\Core\Http\Message;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLDocSerializableResponseChunk;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\XMLHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -94,14 +95,14 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
             }
             $nodes = $this->xPathObject->query($this->xPath);
             if ($nodes->length) {
-                $xml .= XMLWriter::replaceAjxpXmlKeywords($this->registry->saveXML($nodes->item(0)));
+                $xml .= XMLFilter::resolveKeywords($this->registry->saveXML($nodes->item(0)));
             }
             $xml .= "</ajxp_registry_part>";
 
         } else {
 
             ApplicationState::safeIniSet("zlib.output_compression", "4096");
-            $xml = XMLWriter::replaceAjxpXmlKeywords($this->registry->saveXML());
+            $xml = XMLFilter::resolveKeywords($this->registry->saveXML());
 
         }
         $this->renderedXML = $xml;
@@ -120,11 +121,11 @@ class RegistryMessage implements XMLDocSerializableResponseChunk, JSONSerializab
             $nodes = $this->xPathObject->query($this->xPath);
             $data = [];
             if($nodes->length){
-                $data = XMLWriter::xmlToArray($nodes->item(0));
+                $data = XMLHelper::xmlToArray($nodes->item(0));
             }
             return $data;
         }else{
-            return XMLWriter::xmlToArray($this->registry);
+            return XMLHelper::xmlToArray($this->registry);
         }
     }
 

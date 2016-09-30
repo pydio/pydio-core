@@ -27,7 +27,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Conf\Core\AJXP_Role;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
@@ -312,7 +312,7 @@ class RolesManager extends AbstractManager
                     $node->attributes->getNamedItem("name")->nodeValue = "AJXP_REPO_SCOPE_ALL/".$pId."/".$origName;
                     $nArr = array();
                     foreach ($node->attributes as $attrib) {
-                        $nArr[$attrib->nodeName] = XMLWriter::replaceAjxpXmlKeywords($attrib->nodeValue);
+                        $nArr[$attrib->nodeName] = XMLFilter::resolveKeywords($attrib->nodeValue);
                     }
                     $data["SCOPE_PARAMS"][] = $nArr;
                 }

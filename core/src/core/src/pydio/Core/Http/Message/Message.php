@@ -20,9 +20,9 @@
  */
 namespace Pydio\Core\Http\Message;
 
-use Pydio\Core\Controller\XMLWriter;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -52,7 +52,12 @@ class Message implements XMLSerializableResponseChunk, JSONSerializableResponseC
      */
     public function toXML()
     {
-        return XMLWriter::sendMessage($this->message, $this->message);
+        if(is_string($this->message)){
+            $m = $this->message;
+        }else{
+            $m = json_encode($this->message);
+        }
+        return "<message>".StringHelper::xmlContentEntities($m)."</message>";
     }
 
     /**

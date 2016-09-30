@@ -69,9 +69,11 @@
             var dragSupported = 'draggable' in new Element('span');
             var fileUploadSupported = typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined" && (window.FileReader || window.FormData);
             if(fileUploadSupported && dragSupported && pydioUserWriteable){
-                ResourcesManager.loadClassesAndApply(["UploaderGlobalListener","UploaderModel"], function(){
-                    UploaderGlobalListener.initUploaderExtension();
-                });
+                try{
+                    ResourcesManager.loadClassesAndApply(["UploaderGlobalListener","UploaderModel"], function(){
+                        UploaderGlobalListener.initUploaderExtension();
+                    });
+                }catch(e){}
             }
 		]]></extensionOnInit>
 	</processing>

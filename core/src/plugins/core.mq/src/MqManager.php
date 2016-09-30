@@ -43,7 +43,7 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Mq\Core\Message\ConsumeChannelMessage;
 use Pydio\Notification\Core\IMessageExchanger;

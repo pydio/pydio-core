@@ -20,11 +20,15 @@
  */
 namespace Pydio\Core\Serializer;
 
+use Pydio\Access\Core\IAjxpWrapperProvider;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -34,6 +38,55 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class UserXML
 {
+    /**
+     * List all bookmmarks as XML
+     * @static
+     * @param $allBookmarks
+     * @param ContextInterface $context
+     * @param bool $print
+     * @param string $format legacy|node_list
+     * @return string
+     */
+    public static function writeBookmarks($allBookmarks, $context, $print = true, $format = "legacy")
+    {
+        $driver = false;
+        $repository = $context->getRepository();
+        if ($format == "node_list") {
+            $driver = $repository->getDriverInstance($context);
+            if (!($driver instanceof IAjxpWrapperProvider)) {
+                $driver = false;
+            }
+        }
+        $buffer = "";
+        foreach ($allBookmarks as $bookmark) {
+            $path = "";
+            $title = "";
+            if (is_array($bookmark)) {
+                $path = $bookmark["PATH"];
+                $title = $bookmark["TITLE"];
+            } else if (is_string($bookmark)) {
+                $path = $bookmark;
+                $title = basename($bookmark);
+            }
+            if ($format == "node_list") {
+                if ($driver) {
+                    $node = new AJXP_Node($context->getUrlBase() . $path);
+                    $buffer .= NodeXML::toXML($node, true);
+                } else {
+                    $buffer .= NodeXML::toNode($path, $title, false, array('icon' => "mime_empty.png"), true);
+                }
+            } else {
+                $buffer .= "<bookmark path=\"" . StringHelper::xmlEntities($path, true) . "\" title=\"" . StringHelper::xmlEntities($title, true) . "\"/>";
+            }
+        }
+        if ($print) {
+            print $buffer;
+            return null;
+        } else {
+            return $buffer;
+        }
+    }
+
     /**
      * Extract all the user data and put it in XML
      * @param ContextInterface $ctx

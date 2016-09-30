@@ -48,7 +48,7 @@ use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\OCS\Model\TargettedLink;
@@ -589,10 +589,11 @@ class ShareCenter extends Plugin
 
         if (strpos($action, "sharelist") === false && $this->accessDriver->getId() == "access.demo") {
             $errorMessage = "This is a demo, all 'write' actions are disabled!";
-            if ($httpVars["sub_action"] == "delegate_repo") {
-                return XMLWriter::sendMessage(null, $errorMessage, false);
+            if ($httpVars["sub_action"] === "delegate_repo") {
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($errorMessage, LOG_LEVEL_ERROR)]));
+                return;
             } else {
-                print($errorMessage);
+                $responseInterface->getBody()->write($errorMessage);
             }
             return null;
         }

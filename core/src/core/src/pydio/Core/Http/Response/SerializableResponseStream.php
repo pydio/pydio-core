@@ -22,8 +22,9 @@ namespace Pydio\Core\Http\Response;
 
 
 use Psr\Http\Message\StreamInterface;
-use Pydio\Core\Controller\XMLWriter;
+use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Utils\XMLHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -190,7 +191,7 @@ class SerializableResponseStream implements StreamInterface
             }
 
             if($wrap){
-                $output = XMLWriter::wrapDocument($buffer);
+                $output = XMLHelper::wrapDocument($buffer);
             }else{
                 if(substr($buffer, 0, 5) !== "<?xml"){
                     $buffer = "<?xml version=\"1.0\" encoding=\"".$charset."\"?>".$buffer;
