@@ -409,9 +409,10 @@ class ShareRightsManager
      * @param array $users
      * @param array $groups
      * @param \Pydio\Access\Core\Model\UserSelection $selection
+     * @param AJXP_Node $originalNode
      * @throws \Exception
      */
-    public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection){
+    public function assignSharedRepositoryPermissions($parentRepository, $childRepository, $isUpdate, $users, $groups, $selection, $originalNode = null){
 
         $childRepoId = $childRepository->getId();
         if($isUpdate){
@@ -458,6 +459,9 @@ class ShareRightsManager
             }
 
             $userObject->save("superuser");
+            if(!empty($originalNode)){
+                Controller::applyHook("node.share.assign_right", array($this->context, $userObject, $childRepository, $originalNode));
+            }
         }
 
         foreach ($groups as $group => $groupEntry) {
@@ -465,6 +469,9 @@ class ShareRightsManager
             $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
             $grRole->setAcl($childRepoId, $r);
             RolesService::updateRole($grRole);
+            if(!empty($originalNode)) {
+                Controller::applyHook("node.share.assign_right", array($this->context, $group, $childRepository, $originalNode));
+            }
         }
 
     }
@@ -491,6 +498,7 @@ class ShareRightsManager
                     $userObject = UsersService::getUserById($user, false);
                     $userObject->getPersonalRole()->setAcl($repoId, "");
                     $userObject->save("superuser");
+                    Controller::applyHook("node.share.remove_right", array($this->context, $userObject, $repoId));
                 }
                 if($this->watcher !== false && $watcherNode !== null){
                     $this->watcher->removeWatchFromFolder(
@@ -509,6 +517,7 @@ class ShareRightsManager
                 if ($role !== false) {
                     $role->setAcl($repoId, "");
                     RolesService::updateRole($role);
+                    Controller::applyHook("node.share.remove_right", array($this->context, $groupId, $repoId));
                 }
             }
         }

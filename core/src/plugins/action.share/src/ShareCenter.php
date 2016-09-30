@@ -648,7 +648,7 @@ class ShareCenter extends Plugin
                     $users = array(); $groups = array();
                     $this->getRightsManager()->createUsersFromParameters($httpVars, $users, $groups);
 
-                    $result = $this->createSharedRepository($httpVars, $isUpdate, $users, $groups);
+                    $result = $this->createSharedRepository($httpVars, $isUpdate, $users, $groups, $ajxpNode);
 
                     if (is_object($result) && $result instanceof Repository) {
 
@@ -1573,7 +1573,7 @@ class ShareCenter extends Plugin
         $users = array(); $groups = array();
         $users[$hiddenUserEntry["ID"]] = $hiddenUserEntry;
 
-        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups);
+        $newRepo = $this->createSharedRepository($httpVars, $repoUpdate, $users, $groups, $userSelection->getUniqueNode());
 
         $shareObject->setParentRepositoryId($this->repository->getId());
         $shareObject->attachToRepository($newRepo->getId());
@@ -1619,10 +1619,11 @@ class ShareCenter extends Plugin
      * @param bool $update
      * @param array $users
      * @param array $groups
+     * @param AJXP_Node $originalNode
      * @return Repository
      * @throws \Exception
      */
-    public function createSharedRepository($httpVars, &$update, $users=array(), $groups=array())
+    public function createSharedRepository($httpVars, &$update, $users=array(), $groups=array(), $originalNode = null)
     {
         // ERRORS
         // 100 : missing args
@@ -1642,7 +1643,7 @@ class ShareCenter extends Plugin
         $newRepo = $this->createOrLoadSharedRepository($httpVars, $update);
 
         $selection = UserSelection::fromContext($this->currentContext, $httpVars);
-        $this->getRightsManager()->assignSharedRepositoryPermissions($currentRepo, $newRepo, $update, $users, $groups, $selection);
+        $this->getRightsManager()->assignSharedRepositoryPermissions($currentRepo, $newRepo, $update, $users, $groups, $selection, $originalNode);
 
         // HANDLE WATCHES ON CHILDREN AND PARENT
         foreach($users as $userName => $userEntry){
@@ -1773,7 +1774,7 @@ class ShareCenter extends Plugin
             return null;
         }
 
-        $newRepo = $this->createSharedRepository($httpVars, $update, $users, $groups);
+        $newRepo = $this->createSharedRepository($httpVars, $update, $users, $groups, $ajxpNode);
 
         foreach($shareObjects as $shareObject){
 
