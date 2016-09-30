@@ -20,18 +20,21 @@
  */
 namespace Pydio\Access\Driver\DataProvider;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesList;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
-use Pydio\Core\Utils\Vars\StringHelper;
-use Pydio\Core\Utils\Vars\XMLFilter;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -46,6 +49,9 @@ class MysqlAccessDriver extends AbstractAccessDriver
     /** The user password */
     public $password;
 
+    /** @var  resource */
+    private $link;
+
     /**
      * @param ContextInterface $contextInterface
      * @throws PydioException
@@ -59,55 +65,68 @@ class MysqlAccessDriver extends AbstractAccessDriver
         $this->closeDbLink($link);
     }
 
-
+    /**
+     * @param ContextInterface $ctx
+     * @return bool|\mysqli
+     * @throws PydioException
+     */
     public function createDbLink(ContextInterface $ctx)
     {
-        $link = FALSE;
         //Connects to the MySQL Database.
         $host   = $ctx->getRepository()->getContextOption($ctx, "DB_HOST");
         $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
-        $link = @mysql_connect($host, $this->user, $this->password);
+        $link = @mysqli_connect($host, $this->user, $this->password);
         if (!$link) {
             throw new PydioException("Cannot connect to server!");
         }
-        if (!@mysql_select_db($dbname, $link)) {
+        if (!@mysqli_select_db($link, $dbname)) {
             throw new PydioException("Cannot find database!");
         }
         return $link;
     }
 
+    /**
+     * @param $link
+     * @throws PydioException
+     */
     public function closeDbLink($link)
     {
-        if (!mysql_close($link)) {
+        if (!mysqli_close($link)) {
             throw new PydioException("Cannot close connection!");
         }
     }
 
     /**
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
-     * @param ContextInterface $ctx
-     * @return null|string
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     * @return string
+     * @throws AuthRequiredException
      * @throws PydioException
+     * @throws \Pydio\Core\Exception\ForbiddenCharacterException
      */
-    public function switchAction($action, $httpVars, $fileVars, ContextInterface $ctx)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        $xmlBuffer = "";
-        foreach ($httpVars as $getName=>$getValue) {
-            $$getName = InputFilter::securePath($getValue);
-        }
+        $httpVars       = $requestInterface->getParsedBody();
+        $action         = $requestInterface->getAttribute("action");
+        /** @var ContextInterface $ctx */
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $dir            = $httpVars["dir"];
+
         $selection = UserSelection::fromContext($ctx, $httpVars);
         // FILTER DIR PAGINATION ANCHOR
         if (isSet($dir) && strstr($dir, "%23")!==false) {
             $parts = explode("%23", $dir);
             $dir = $parts[0];
             $page = $parts[1];
+        }else if(isSet($httpVars["page"])){
+            $page = InputFilter::sanitize($httpVars["page"], InputFilter::SANITIZE_ALPHANUM);
         }
 
         // Sanitize all httpVars entries
         foreach($httpVars as $k=>&$value){
-            $value = InputFilter::sanitize($value, InputFilter::SANITIZE_FILENAME);
+            if(is_string($value)){
+                $value = InputFilter::sanitize($value, InputFilter::SANITIZE_FILENAME);
+            }
         }
 
         switch ($action) {
@@ -116,13 +135,13 @@ class MysqlAccessDriver extends AbstractAccessDriver
             //	ONLINE EDIT
             //------------------------------------
             case "edit_record";
+
                 $isNew = false;
                 if(isSet($record_is_new) && $record_is_new == "true") $isNew = true;
-                $tableName = $_POST["table_name"];
-                $pkName = $_POST["pk_name"];
-                $query = "";
+                $tableName = $httpVars["table_name"];
+                $pkName = $httpVars["pk_name"];
                 $arrValues = array();
-                foreach ($_POST as $key=>$value) {
+                foreach ($httpVars as $key=>$value) {
                     if (substr($key, 0, strlen("ajxp_mysql_")) == "ajxp_mysql_") {
                         $newKey = substr($key, strlen("ajxp_mysql_"));
                         $arrValues[$newKey] = $value;
@@ -150,36 +169,25 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         }
                         $index++;
                     }
+                    if(!isSet($pkValue)) throw new PydioException("Cannot find PK Value");
                     $query = "UPDATE $tableName SET $string WHERE $pkName='$pkValue'";
                 }
-                $link = $this->createDbLink($ctx);
-                $res = $this->execQuery($query);
-                $this->closeDbLink($link);
+                $this->execQuery($ctx, $query);
+                $logMessage = $query;
+                $reload_file_list = true;
 
-                if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                    $errorMessage = $res->messageId;
-                } else {
-                    $logMessage = $query;
-                    $reload_file_list = true;
-                }
             break;
 
             //------------------------------------
             //	CHANGE COLUMNS OR CREATE TABLE
             //------------------------------------
             case "edit_table":
-                $link = $this->createDbLink($ctx);
                 if (isSet($httpVars["current_table"])) {
                     if (isSet($httpVars["delete_column"])) {
                         $query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
-                        $res = $this->execQuery($query);
-                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                            $errorMessage = $res->messageId;
-                        } else {
-                            $logMessage = $query;
-                            $reload_file_list = true;
-                        }
-                        $this->closeDbLink($link);
+                        $this->execQuery($ctx, $query);
+                        $logMessage = $query;
+                        $reload_file_list = true;
                         break;
                     }
                     if (isSet($httpVars["add_column"])) {
@@ -194,14 +202,9 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         if (isSet($httpVars["add_field_uniq"]) && $httpVars["add_field_uniq"]=="1") {
                             $query.= ", ADD UNIQUE (".$httpVars["add_field_name"].")";
                         }
-                        $res = $this->execQuery($query);
-                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                            $errorMessage = $res->messageId;
-                        } else {
-                            $logMessage = $query;
-                            $reload_file_list = true;
-                        }
-                        $this->closeDbLink($link);
+                        $this->execQuery($ctx, $query);
+                        $logMessage = $query;
+                        $reload_file_list = true;
                         break;
                     }
                 }
@@ -224,15 +227,9 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $sizeString = ($row["size"]!=""?"(".$row["size"].")":"");
                         $defString = ($row["default"]!=""?" DEFAULT ".$row["default"]."":"");
                         $query = "ALTER TABLE $current_table CHANGE ".$row["origname"]." ".$row["name"]." ".$row["type"].$sizeString.$defString." ".$row["null"];
-                        $res = $this->execQuery(trim($query));
-                        if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                            $errorMessage = $res->messageId;
-                            $this->closeDbLink($link);
-                            break;
-                        } else {
-                            $qMessage .= $query;
-                            $reload_file_list = true;
-                        }
+                        $this->execQuery($ctx, trim($query));
+                        $qMessage .= $query;
+                        $reload_file_list = true;
                     }
                     $logMessage = $qMessage;
                 } else if (isSet($new_table)) {
@@ -259,16 +256,11 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $fieldsDef.=",UNIQUE (".implode(",", $uniqs).")";
                     }
                     $query = "CREATE TABLE $new_table ($fieldsDef)";
-                    $res = $this->execQuery((trim($query)));
-                    if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                        $errorMessage = $res->messageId;
-                    } else {
-                        $logMessage = $query;
-                        $reload_file_list = true;
-                        $reload_current_node = true;
-                    }
+                    $this->execQuery($ctx, (trim($query)));
+                    $logMessage = $query;
+                    $reload_file_list = true;
+                    $reload_current_node = true;
                 }
-                $this->closeDbLink($link);
             break;
 
             //------------------------------------
@@ -277,7 +269,6 @@ class MysqlAccessDriver extends AbstractAccessDriver
             case "delete_table":
             case "delete_record":
                 $dir = basename($dir);
-                $link = $this->createDbLink($ctx);
                 if (trim($dir) == "") {
                     // ROOT NODE => DROP TABLES
                     $tables = $selection->getFiles();
@@ -286,7 +277,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $tables[$index] = basename($tableName);
                     }
                     $query.= " ".implode(",", $tables);
-                    $res = $this->execQuery($query);
+                    $this->execQuery($ctx, $query);
                     $reload_current_node = true;
                 } else {
                     // TABLE NODE => DELETE RECORDS
@@ -302,16 +293,11 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $pks[$key] = "(".implode(" AND ", $parts).")";
                     }
                     $query = "DELETE FROM $tableName WHERE ". implode(" OR ", $pks);
-                    $res = $this->execQuery($query);
+                    $this->execQuery($ctx, $query);
                 }
-                //AJXP_Exception::errorToXml($res);
-                if (is_a($res, "Pydio\Core\Exception\PydioException")) {
-                    $errorMessage = $res->messageId;
-                } else {
-                    $logMessage = $query;
-                    $reload_file_list = true;
-                }
-                $this->closeDbLink($link);
+                $logMessage = $query;
+                $reload_file_list = true;
+
             break;
 
             //------------------------------------
@@ -330,17 +316,23 @@ class MysqlAccessDriver extends AbstractAccessDriver
 
                 if(!isSet($dir) || $dir == "/") $dir = "";
                 $searchMode = $fileListMode = $completeMode = false;
-                if (isSet($mode)) {
+                if (isSet($httpVars["mode"])) {
+                    $mode = $httpVars["mode"];
                     if($mode == "search") $searchMode = true;
                     else if($mode == "file_list") $fileListMode = true;
                     else if($mode == "complete") $completeMode = true;
+                }else{
+                    $mode = "file_list";
                 }
-                $link = $this->createDbLink($ctx);
-                //AJXP_Exception::errorToXml($link);
                 if ($dir == "") {
-                    XMLFilter::header();
+                    $nodesList = new NodesList("/");
+
                     $tables = $this->listTables($ctx);
-                    XMLFilter::sendFilesListComponentConfig('<columns switchDisplayMode="list" switchGridMode="filelist"><column messageString="Table Name" attributeName="ajxp_label" sortType="String"/><column messageString="Byte Size" attributeName="bytesize" sortType="NumberKo"/><column messageString="Count" attributeName="count" sortType="Number"/></columns>');
+                    $nodesList->initColumnsData("filelist", "list");
+                    $nodesList->appendColumn("Table Name", "ajxp_label");
+                    $nodesList->appendColumn("Byte Size", "bytesize", "Number");
+                    $nodesList->appendColumn("Count", "count", "Number");
+
                     $icon = ($mode == "file_list"?"sql_images/mimes/ICON_SIZE/table_empty.png":"sql_images/mimes/ICON_SIZE/table_empty_tree.png");
                     foreach ($tables as $tableName) {
                         if(InputFilter::detectXSS($tableName)) {
@@ -349,25 +341,31 @@ class MysqlAccessDriver extends AbstractAccessDriver
                             $count = 'N/A';
                         }else{
                             $size = $this->getSize($ctx, $tableName);
-                            $count = $this->getCount($tableName);
+                            $count = $this->getCount($ctx, $tableName);
                         }
-                        print "<tree is_file=\"0\" text=\"$tableName\" filename=\"/$tableName\" bytesize=\"$size\" count=\"$count\" icon=\"$icon\" ajxp_mime=\"table\" />";
+                        $node = new AJXP_Node("/$tableName", ["bytesize" => $size, "count" => $count, "icon" => $icon, "ajxp_mime" => "table"]);
+                        $node->setLabel($tableName);
+                        $node->setLeaf(false);
+                        $nodesList->addBranch($node);
                     }
-                    print "<tree is_file=\"0\" text=\"Search Results\" ajxp_node=\"true\" filename=\"/ajxpmysqldriver_searchresults\" bytesize=\"-\" count=\"-\" icon=\"search.png\"/>";
-                    XMLFilter::close();
+                    $node = new AJXP_Node("/ajxpmysqldriver_searchresults", ["bytesize" => "-", "count" => "-", "icon" => "search.phng", "ajxp_node" => "true"]);
+                    $node->setLabel("Search Results");
+                    $node->setLeaf(false);
+                    $nodesList->addBranch($node);
+
                 } else {
                     $tableName = basename($dir);
+                    $nodesList = new NodesList("/$tableName");
+
                     if(isSet($page))$currentPage = $page;
                     else $currentPage = 1;
-                    $query = "SELECT * FROM $tableName";
-                    $searchQuery = false;
+                    $query = "SELECT * FROM `$tableName`";
                     if ($tableName == "ajxpmysqldriver_searchresults") {
                         if (isSet($_SESSION["LAST_SQL_QUERY"])) {
                             $query = $_SESSION["LAST_SQL_QUERY"];
                             $matches = array();
                             if (preg_match("/SELECT [\S, ]* FROM (\S*).*/i", $query, $matches)!==false) {
                                 $tableName = $matches[1];
-                                $searchQuery = true;
                             } else {
                                 break;
                             }
@@ -395,35 +393,39 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         unset($_SESSION["LAST_SQL_QUERY"]);
                         throw $ex;
                     }
-                    XMLFilter::header();
+
                     $blobCols = array();
-                    $columnsString = '<columns switchDisplayMode="list" switchGridMode="grid">';
+                    $nodesList->initColumnsData("grid", "list");
                     foreach ($result["COLUMNS"] as $col) {
-                        $columnsString .= "<column messageString=\"".$col["NAME"]."\" attributeName=\"".$col["NAME"]."\" field_name=\"".$col["NAME"]."\" field_type=\"".$col["TYPE"]."\" field_size=\"".$col["LENGTH"]."\" field_flags=\"".$this->cleanFlagString($col["FLAGS"])."\" field_pk=\"".(preg_match("/primary/", $col["FLAGS"])?"1":"0")."\" field_null=\"".(preg_match("/not_null/", $col["FLAGS"])?"NOT_NULL":"NULL")."\" sortType=\"".$this->sqlTypeToSortType($col["TYPE"])."\" field_default=\"".$col["DEFAULT"]."\"/>";
+                        $columMeta = [
+                            "field_name" => $col["NAME"],
+                            "field_type" => $col["TYPE"],
+                            "field_size" => $col["LENGTH"],
+                            "field_flags" => $this->cleanFlagString($col["FLAGS"]),
+                            "field_pk"  => preg_match("/primary/", $col["FLAGS"])?"1":"0",
+                            "field_null" => preg_match("/not_null/", $col["FLAGS"])?"NOT_NULL":"NULL",
+                            "field_default" => $col["DEFAULT"]
+                        ];
+                        $nodesList->appendColumn($col["NAME"], $col["NAME"], $this->sqlTypeToSortType($col["TYPE"]), '', $columMeta);
                         if (stristr($col["TYPE"],"blob")!==false && ($col["FLAGS"]!="" && stristr($col["FLAGS"], "binary"))) {
                             $blobCols[]=$col["NAME"];
                         }
                     }
-
-                    $columnsString .= '</columns>';
-                    XMLFilter::sendFilesListComponentConfig($columnsString);
-                    //print '<pagination total="'.$result["TOTAL_PAGES"].'" current="'.$currentPage.'" remote_order="true" currentOrderCol="'.$order_column.'" currentOrderDir="'.$order_direction.'"/>';
                     if ($result["TOTAL_PAGES"] > 1) {
-                        XMLFilter::renderPaginationData($count, $currentPage, $result["TOTAL_PAGES"]);
+                        $nodesList->setPaginationData($count, $currentPage, $result["TOTAL_PAGES"]);
                     }
                     foreach ($result["ROWS"] as $arbitIndex => $row) {
-                        print '<tree ';
+                        $nodeMeta = [];
                         $pkString = "";
                         foreach ($row as $key=>$value) {
                             if (in_array($key, $blobCols)) {
                                 $sizeStr = " - NULL";
                                 if(strlen($value)) $sizeStr = " - ". StatHelper::roundSize(strlen($value));
-                                print "$key=\"BLOB$sizeStr\" ";
+                                $nodeMeta[$key] = "BLOB$sizeStr";
                             } else {
                                 $value = str_replace("\"", "", $value);
                                 if(InputFilter::detectXSS($value)) $value = "Possible XSS Detected - Cannot display value!";
-                                $value = StringHelper::xmlEntities($value);
-                                print $key.'="'.$value.'" ';
+                                $nodeMeta[$key] = $value;
                                 if ($result["HAS_PK"]>0) {
                                     if (in_array($key, $result["PK_FIELDS"])) {
                                         $pkString .= $key."__".$value.".";
@@ -432,56 +434,64 @@ class MysqlAccessDriver extends AbstractAccessDriver
                             }
                         }
                         if ($result["HAS_PK"] > 0) {
-                            print 'filename="record.'.$pkString.'pk" ';
-                            print 'is_file="1" ajxp_mime="pk"/>';
+                            $nodeMeta["ajxp_mime"] = "pk";
+                            $node = new AJXP_Node("/$tableName/record.".$pkString."pk", $nodeMeta);
+                            $node->setLeaf(true);
                         } else {
-                            print 'filename="record_'.$arbitIndex.'.no_pk" ';
-                            print 'is_file="1" ajxp_mime="row"/>';
+                            $nodeMeta["ajxp_mime"] = "no_pk";
+                            $node = new AJXP_Node("/$tableName/record.".$arbitIndex.".no_pk", $nodeMeta);
+                            $node->setLeaf(true);
                         }
-
+                        $nodesList->addBranch($node);
                     }
-                    XMLFilter::close();
                 }
-                $this->closeDbLink($link);
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream($nodesList));
                 return null;
 
             break;
         }
 
-        if (isset($logMessage) || isset($errorMessage)) {
-            if(InputFilter::detectXSS($logMessage) || InputFilter::detectXSS($errorMessage)){
-                $errorMessage = "XSS detected!";
-            }
-        }
-        $uMessage = new UserMessage(isSet($logMessage)?$logMessage:$errorMessage, isset($logMessage) ? LOG_LEVEL_ERROR: LOG_LEVEL_INFO);
-        $xmlBuffer = $uMessage->toXML();
-
         if (isset($requireAuth)) {
             throw new AuthRequiredException();
         }
 
-        if (( isset($reload_current_node) && $reload_current_node == "true") || (isset($reload_file_list)) ) {
-            $relo = new ReloadMessage();
-            $xmlBuffer .= $relo->toXML();
+        $serialStream = new SerializableResponseStream();
+
+        if(isSet($errorMessage)){
+            $uMessage = new UserMessage($errorMessage, LOG_LEVEL_ERROR);
+        }else if(isSet($logMessage)){
+            $uMessage = new UserMessage($logMessage, LOG_LEVEL_INFO);
+        }
+        if(isSet($uMessage)){
+            $serialStream->addChunk($uMessage);
         }
 
-        return $xmlBuffer;
+        if (( isset($reload_current_node) && $reload_current_node == "true") || (isset($reload_file_list)) ) {
+            $serialStream->addChunk(new ReloadMessage());
+        }
+
+        $responseInterface = $responseInterface->withBody($serialStream);
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $tablename
+     * @return string
+     * @throws PydioException
+     */
     public function getSize(ContextInterface $ctx, $tablename)
     {
         $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
         $like="";
-        $total="";
         $t=0;
         if ($tablename !="") {
             $like=" like '$tablename'";
         }
         $sql= "SHOW TABLE STATUS FROM `$dbname` $like";
-        $result=$this->execQuery($sql);
+        $result=$this->execQuery($ctx, $sql);
         if ($result) {
 
-            while ($rec = mysql_fetch_array($result)) {
+            while ($rec = mysqli_fetch_array($result)) {
                 $t+=($rec['Data_length'] + $rec['Index_length']);
             }
             $total = StatHelper::roundSize($t);
@@ -491,30 +501,35 @@ class MysqlAccessDriver extends AbstractAccessDriver
         return($total);
     }
 
-    public function getCount($tableName)
+    /**
+     * Get total rows count for a table
+     * @param $ctx
+     * @param $tableName
+     * @return int|string
+     */
+    public function getCount($ctx, $tableName)
     {
-        $sql = "SELECT count(*) FROM $tableName";
-        $result = $this->execQuery($sql);
-        $t = 0;
-        if ($result) {
-            while ($res = mysql_fetch_array($result)) {
-                $t+=$res[0];
+        try{
+            $sql = "SELECT count(*) FROM $tableName";
+            $result = $this->execQuery($ctx, $sql);
+            $t = 0;
+            if ($result) {
+                while ($res = mysqli_fetch_array($result)) {
+                    $t+=$res[0];
+                }
             }
+        }catch (\Exception $e){
+            $t = "-";
         }
         return $t;
     }
 
-    public function getColumnData($tableName, $columnName)
-    {
-        $sql = "SHOW COLUMNS FROM $tableName LIKE '$columnName'";
-        $res = $this->execQuery($sql);
-        if ($res) {
-            return mysql_fetch_array($res);
-            // ["Field", "Type", "Null", "Key", "Default", "Extra"] => Type is like "enum('a', 'b', 'c')"
-        }
-        return [];
-    }
-
+    /**
+     * @param $row
+     * @param string $prefix
+     * @param string $suffix
+     * @return string
+     */
     public function makeColumnDef($row, $prefix="", $suffix="")
     {
         $defString = "";
@@ -526,6 +541,10 @@ class MysqlAccessDriver extends AbstractAccessDriver
         return trim($fieldsDef);
     }
 
+    /**
+     * @param $flagString
+     * @return string
+     */
     public function cleanFlagString($flagString)
     {
         $arr = explode(" ", $flagString);
@@ -539,6 +558,10 @@ class MysqlAccessDriver extends AbstractAccessDriver
         return implode(" ", $newFlags);
     }
 
+    /**
+     * @param $fieldType
+     * @return string
+     */
     public function sqlTypeToSortType($fieldType)
     {
         switch ($fieldType) {
@@ -554,40 +577,40 @@ class MysqlAccessDriver extends AbstractAccessDriver
                 return "String";
         }
     }
-    /*	<--- add a slash at the beggining of this line to switch between the 2 functions
-    public function listTables()
-    {
-        $repo = ConfService::getRepository();
-        $result = mysql_list_tables($repo->getOption("DB_NAME"));
-        $numtab = mysql_num_rows ($result);
-        $allTables = array();
-        for ($i =0; $i < $numtab; $i++) {
-            $table = trim(mysql_tablename($result, $i));
-            $allTables[] = $table;
-        }
-        return $allTables;
-    }
-    /*/
+
+    /**
+     * @param ContextInterface $ctx
+     * @return array
+     * @throws PydioException
+     */
     public function listTables(ContextInterface $ctx)
     {
-        $result = mysql_query("SHOW TABLES FROM `".$ctx->getRepository()->getContextOption($ctx, "DB_NAME")."` LIKE '".$ctx->getRepository()->getContextOption($ctx, "DB_PTRN")."%'");
+        $result = $this->execQuery($ctx, "SHOW TABLES FROM `".$ctx->getRepository()->getContextOption($ctx, "DB_NAME")."` LIKE '".$ctx->getRepository()->getContextOption($ctx, "DB_PTRN")."%'");
         $allTables = array();
-        while ($row = mysql_fetch_row($result)) {
+        while ($row = mysqli_fetch_row($result)) {
            $allTables[] = $row[0];
         }
         return $allTables;
     }
-    //*/
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $query
+     * @param $tablename
+     * @param int $currentPage
+     * @param int $rpp
+     * @param string $searchval
+     * @return array
+     * @throws PydioException
+     */
     public function showRecords(ContextInterface $ctx, $query, $tablename, $currentPage=1, $rpp=50, $searchval='' )
     {
-        $dbname = $ctx->getRepository()->getContextOption($ctx, "DB_NAME");
-        $result = $this->execQuery($query);
+        $totalCount = $this->getCount($ctx, $tablename);
+
 
         $columns = array();
         $rows = array();
 
-        $num_rows = mysql_num_rows($result);
         $pg=$currentPage-1;
         if (isset($_POST['first'])) {
             $pg=0;
@@ -596,51 +619,52 @@ class MysqlAccessDriver extends AbstractAccessDriver
         } else if (isset($_POST['next'])) {
             $pg++;
         } else if (isset($_POST['last'])) {
-            $pgs = $num_rows/$rpp;
+            $pgs = $totalCount/$rpp;
             $pg=ceil($pgs)-1;
         }
         if ($pg < 0) {
             $pg=0;
         }
-        if ($pg > $num_rows/$rpp) {
-            $pg=ceil($num_rows/$rpp)-1;
+        if ($pg > $totalCount/$rpp) {
+            $pg=ceil($totalCount/$rpp)-1;
         }
-        $totalPages = ceil($num_rows/$rpp);
+        $totalPages = ceil($totalCount/$rpp);
         $beg = $pg * $rpp;
 
-        $flds = mysql_num_fields($result);
-        $fields = @mysql_list_fields( $dbname, $tablename);
+        $query .= " LIMIT $beg,$rpp";
+        $result = $this->execQuery($ctx, $query);
+
+
+        $flds = mysqli_num_fields($result);
+        $fields =  mysqli_fetch_fields($result);
         if (!$fields) {
             throw new PydioException("Non matching fields for table '$tablename'");
         }
         $z=0;
-        $x=0;
-        $pkfield=array();
+        $pk = [];
+        $pkfield= [];
 
         // MAKE COLUMNS HEADER
         for ($i = 0; $i < $flds; $i++) {
-            $c=$i+1;
-            $title=mysql_field_name($fields, $i);
-            $type=mysql_field_type($fields, $i);
-            $size=mysql_field_len($fields, $i);
-            $flagstring = mysql_field_flags ($fields, $i);
-            $colData = $this->getColumnData($tablename, $title);
-            $colDataType = $colData["Type"];
-            if (preg_match("/(.*)\((.*)\)/", $colDataType, $matches)) {
-                $type = $matches[1];
-                $size = $matches[2];
+            $fieldMeta = $fields[$i];
+            $title = $fieldMeta->name;
+            $type  = $this->h_type2txt($fieldMeta->type);
+            $flagstring = $this->h_flags2txt($fieldMeta->flags);
+            $size = $fieldMeta->length;
+            $default = "";
+            if(property_exists($fieldMeta, "default")){
+                $default = $fieldMeta->default;
             }
-            $columns[] = array("NAME" => $title, "TYPE"=>$type, "LENGTH"=>$size, "FLAGS"=>$flagstring, "DEFAULT"=>$colData["Default"]);
+
+            $columns[] = array("NAME" => $title, "TYPE"=>$type, "LENGTH"=>$size, "FLAGS"=>$flagstring, "DEFAULT"=> $default);
 
             //Find the primary key
-            $flagstring = mysql_field_flags ($result, $i);
-            if (preg_match("/primary/",$flagstring )) {
+            if ($fieldMeta->flags & MYSQLI_PRI_KEY_FLAG) {
                 $pk[$z] = $i;
-                $pkfield[$z]= mysql_field_name($fields, $i);
+                $pkfield[$z]= $title;
                 $z++;
             }
         }
-        $v=$flds+1;
 
         if ($z > 0) {
             $cpk=count($pk);
@@ -649,44 +673,104 @@ class MysqlAccessDriver extends AbstractAccessDriver
         }
 
         // MAKE ROWS RESULT
-        for ($s=$beg; $s < $beg + $rpp; $s++) {
-            if ($s < $num_rows) {
-                if (!mysql_data_seek ($result, $s)) {
-                    continue;
-                }
-                $row=mysql_fetch_array($result);
-                if (!isset($pk)) {
-                    $pk=' ';
-                    $pkfield= array();
-                }
-                $values = array();
-                for ($col = 0; $col < $flds; $col ++) {
-                    $values[mysql_field_name($fields, $col)] = stripslashes($row[$col]);
-                }
-                $rows[] = $values;
+        for ($s=0; $s < $rpp; $s++) {
+            $row=mysqli_fetch_array($result);
+            if (!isset($pk)) {
+                $pk=' ';
+                $pkfield= array();
             }
+            $values = array();
+            for ($col = 0; $col < $flds; $col ++) {
+                $colMeta = $fields[$col];
+                $values[$colMeta->name] = stripslashes($row[$col]);
+            }
+            $rows[] = $values;
         }
 
         return array("COLUMNS" => $columns, "ROWS" => $rows, "HAS_PK"=>$cpk, "TOTAL_PAGES"=>$totalPages, "PK_FIELDS"=>$pkfield);
     }
 
-
-    public function execQuery($sql ='')
+    /**
+     * Execute a query by creating a db link
+     * @param ContextInterface $ctx
+     * @param $sql
+     * @return bool|\mysqli_result
+     * @throws PydioException
+     */
+    public function execQuery(ContextInterface $ctx, $sql)
     {
-        $output='';
-        if ($sql !='') {
-            //$sql=mysql_real_escape_string($sql);
-            $result= @mysql_query(stripslashes($sql));
-            if ($result) {
-                $this->logInfo("exec", array($sql));
-                return $result;
-            } else {
-                throw new PydioException($sql.":".mysql_error());
-            }
-        } else {
+        if(empty($sql)){
             throw new PydioException('Empty Query');
+        }
+        if(!isSet($this->link) || !is_resource($this->link)){
+            $link = $this->createDbLink($ctx);
+            $this->link = $link;
+            register_shutdown_function(function () use ($link){
+                mysqli_close($link);
+            });
+        }
+        $result= @mysqli_query($this->link, stripslashes($sql));
+        if ($result) {
+            $this->logInfo("exec", array($sql));
+            return $result;
+        } else {
+            throw new PydioException($sql.": ".mysqli_error($this->link));
         }
     }
 
+    /**
+     * Convert mysqli numeric types to text
+     * @param $type_id
+     * @return mixed|null
+     */
+    private function h_type2txt($type_id)
+    {
+        static $types;
+
+        if (!isset($types))
+        {
+            $types = array();
+            $constants = get_defined_constants(true);
+            foreach ($constants['mysqli'] as $c => $n) if (preg_match('/^MYSQLI_TYPE_(.*)/', $c, $m)) $types[$n] = $m[1];
+        }
+
+        $type = array_key_exists($type_id, $types)? strtolower($types[$type_id]) : NULL;
+        if($type === null) return null;
+        $convert = [
+            "string"     => "varchar",
+            "var_string" => "varchar"
+        ];
+        return array_key_exists($type, $convert) ? $convert[$type] : $type;
+    }
+
+    /**
+     * Convert mysqli numeric flags to text
+     * @param $flags_num
+     * @return string
+     */
+    private function h_flags2txt($flags_num)
+    {
+        static $flags;
+
+        if (!isset($flags))
+        {
+            $flags = array();
+            $constants = get_defined_constants(true);
+            foreach ($constants['mysqli'] as $c => $n) if (preg_match('/MYSQLI_(.*)_FLAG$/', $c, $m)) if (!array_key_exists($n, $flags)) $flags[$n] = $m[1];
+        }
+
+        $convert = [
+            "pri_key" => "primary_key"
+        ];
+        $result = array();
+        foreach ($flags as $n => $t) {
+            if ($flags_num & $n) {
+                $t = strtolower($t);
+                if(isSet($convert[$t])) $t = $convert[$t];
+                $result[] = $t;
+            }
+        }
+        return implode(' ', $result);
+    }
 
 }
