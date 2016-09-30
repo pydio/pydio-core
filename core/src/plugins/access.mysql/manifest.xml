@@ -45,7 +45,7 @@
 					<html><![CDATA[
 						<div style="padding:10px;">
 							<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{text}</big>
-							<div><b>#{files_string}</b> : #{count}</div>
+							<div>#{files_string} : #{count}</div>
 						</div>
 					]]></html>
 				</infoPanel>

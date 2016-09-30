@@ -137,7 +137,9 @@ class MysqlAccessDriver extends AbstractAccessDriver
             case "edit_record";
 
                 $isNew = false;
-                if(isSet($record_is_new) && $record_is_new == "true") $isNew = true;
+                if(isSet($httpVars['record_is_new']) && $httpVars['record_is_new'] == "true") {
+                    $isNew = true;
+                }
                 $tableName = $httpVars["table_name"];
                 $pkName = $httpVars["pk_name"];
                 $arrValues = array();
@@ -147,16 +149,19 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $arrValues[$newKey] = $value;
                     }
                 }
+                $autoKey = $this->findTableAutoIncrementKey($ctx, $tableName);
                 if ($isNew) {
-                    $string = "";
+                    $values = [];
                     $index = 0;
                     foreach ($arrValues as $k=>$v) {
-                        // CHECK IF AUTO KEY!!!
-                        $string .= "'".addslashes($v)."'";
-                        if($index < count($arrValues)-1) $string.=",";
+                        if($autoKey !== false && $k === $autoKey){
+                            $values[] = 'NULL';
+                        }else{
+                            $values []= "'".addslashes($v)."'";
+                        }
                         $index++;
                     }
-                    $query = "INSERT INTO $tableName VALUES ($string)";
+                    $query = "INSERT INTO `$tableName` VALUES (".implode(",", $values).")";
                 } else {
                     $string = "";
                     $index = 0;
@@ -170,7 +175,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $index++;
                     }
                     if(!isSet($pkValue)) throw new PydioException("Cannot find PK Value");
-                    $query = "UPDATE $tableName SET $string WHERE $pkName='$pkValue'";
+                    $query = "UPDATE `$tableName` SET $string WHERE $pkName='$pkValue'";
                 }
                 $this->execQuery($ctx, $query);
                 $logMessage = $query;
@@ -183,6 +188,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
             //------------------------------------
             case "edit_table":
                 if (isSet($httpVars["current_table"])) {
+                    $current_table = InputFilter::sanitize($httpVars["current_table"], InputFilter::SANITIZE_ALPHANUM);
                     if (isSet($httpVars["delete_column"])) {
                         $query = "ALTER TABLE ".$httpVars["current_table"]." DROP COLUMN ".$httpVars["delete_column"];
                         $this->execQuery($ctx, $query);
@@ -192,7 +198,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     }
                     if (isSet($httpVars["add_column"])) {
                         $defString = $this->makeColumnDef($httpVars, "add_field_");
-                        $query = "ALTER TABLE ".$httpVars["current_table"]." ADD COLUMN ($defString)";
+                        $query = "ALTER TABLE `".$current_table."` ADD COLUMN ($defString)";
                         if (isSet($httpVars["add_field_pk"]) && $httpVars["add_field_pk"]=="1") {
                             $query.= ", ADD PRIMARY KEY (".$httpVars["add_field_name"].")";
                         }
@@ -232,7 +238,8 @@ class MysqlAccessDriver extends AbstractAccessDriver
                         $reload_file_list = true;
                     }
                     $logMessage = $qMessage;
-                } else if (isSet($new_table)) {
+                } else if (isSet($httpVars["new_table"])) {
+                    $new_table = InputFilter::sanitize($httpVars["new_table"], InputFilter::SANITIZE_ALPHANUM);
                     $fieldsDef = array();
                     $pks = array();
                     $indexes = array();
@@ -261,6 +268,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
                     $reload_file_list = true;
                     $reload_current_node = true;
                 }
+
             break;
 
             //------------------------------------
@@ -594,6 +602,25 @@ class MysqlAccessDriver extends AbstractAccessDriver
     }
 
     /**
+     * Find autoincrement key
+     * @param ContextInterface $ctx
+     * @param $tablename
+     * @return bool
+     * @throws PydioException
+     */
+    public function findTableAutoIncrementKey(ContextInterface $ctx, $tablename){
+
+        $result = $this->execQuery($ctx, "SELECT * from `$tablename` LIMIT 0,1");
+        $fields =  mysqli_fetch_fields($result);
+        foreach($fields as $field){
+            if($field->flags & MYSQLI_AUTO_INCREMENT_FLAG){
+                return $field->name;
+            }
+        }
+        return false;
+    }
+
+    /**
      * @param ContextInterface $ctx
      * @param $query
      * @param $tablename
@@ -673,7 +700,7 @@ class MysqlAccessDriver extends AbstractAccessDriver
         }
 
         // MAKE ROWS RESULT
-        for ($s=0; $s < $rpp; $s++) {
+        for ($s=0; $s < min($rpp, mysqli_num_rows($result)); $s++) {
             $row=mysqli_fetch_array($result);
             if (!isset($pk)) {
                 $pk=' ';
