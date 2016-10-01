@@ -131,7 +131,7 @@ class Pluploader extends Plugin
             $fileVars["file"]["destination"] = base64_encode($dir);
         }else if(MetaStreamWrapper::wrapperIsRemote($destStreamURL)){
             $remote = true;
-            $tmpFolder = ApplicationState::getAjxpTmpDir() ."/".$httpVars["secure_token"];
+            $tmpFolder = ApplicationState::getTemporaryFolder() ."/".$httpVars["secure_token"];
             if(!is_dir($tmpFolder)){
                 @mkdir($tmpFolder, 0700, true);
             }

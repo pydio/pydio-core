@@ -141,7 +141,7 @@ class PluginCompression extends Plugin
                     throw new PydioException($messages["compression.17"]);
                 }
                 try {
-                    $tmpArchiveName = tempnam(ApplicationState::getAjxpTmpDir(), "tar-compression") . ".tar";
+                    $tmpArchiveName = tempnam(ApplicationState::getTemporaryFolder(), "tar-compression") . ".tar";
                     $archive = new PharData($tmpArchiveName);
                 } catch (Exception $e) {
                     $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);

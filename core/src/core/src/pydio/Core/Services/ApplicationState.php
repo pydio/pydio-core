@@ -230,7 +230,7 @@ class ApplicationState
      * @static
      * @return mixed|null|string
      */
-    public static function getAjxpTmpDir()
+    public static function getTemporaryFolder()
     {
         $conf = ConfService::getGlobalConf("AJXP_TMP_DIR");
         if (!empty($conf)) {

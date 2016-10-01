@@ -227,7 +227,7 @@ class FileHasher extends AbstractMetaSource implements IFileHasher
                 $fileUrl = $selection->getUniqueNode()->getUrl();
                 $file = MetaStreamWrapper::getRealFSReference($fileUrl, true);
                 if ($actionName == "filehasher_delta") {
-                    $deltaFile = tempnam(ApplicationState::getAjxpTmpDir(), $actionName."-delta");
+                    $deltaFile = tempnam(ApplicationState::getTemporaryFolder(), $actionName."-delta");
                     $this->logDebug("Received signature file, should compute delta now");
                     \rsync_generate_delta($signature_delta_file, $file, $deltaFile);
                     $this->logDebug("Computed delta file, size is ".filesize($deltaFile));

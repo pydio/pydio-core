@@ -113,7 +113,7 @@ class FsAccessWrapper implements IAjxpWrapper
             //print($streamType.$path);
                if ($streamType == "file") {
                    if (self::$crtZip == null ||  !is_array(self::$currentListingKeys)) {
-                       $tmpDir = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . md5(time()-rand());
+                       $tmpDir = ApplicationState::getTemporaryFolder() . DIRECTORY_SEPARATOR . md5(time()-rand());
                        mkdir($tmpDir);
                        $tmpFileName = $tmpDir.DIRECTORY_SEPARATOR.basename($localPath);
                        Logger::debug(__CLASS__,__FUNCTION__,"Tmp file $tmpFileName");

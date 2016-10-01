@@ -41,7 +41,7 @@ class BruteForceHelper
      */
     public static function getBruteForceLoginArray()
     {
-        $failedLog = ApplicationState::getAjxpTmpDir() . "/failedAJXP.log";
+        $failedLog = ApplicationState::getTemporaryFolder() . "/failedAJXP.log";
         $loginAttempt = @file_get_contents($failedLog);
         $loginArray = unserialize($loginAttempt);
         $ret = array();
@@ -66,7 +66,7 @@ class BruteForceHelper
         if($validCurrent && isSet($loginArray[$_SERVER["REMOTE_ADDR"]])){
             unset($loginArray[$_SERVER["REMOTE_ADDR"]]);
         }
-        $failedLog = ApplicationState::getAjxpTmpDir() . "/failedAJXP.log";
+        $failedLog = ApplicationState::getTemporaryFolder() . "/failedAJXP.log";
         @file_put_contents($failedLog, serialize($loginArray));
     }
 

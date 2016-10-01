@@ -1293,7 +1293,7 @@ abstract class AbstractConfDriver extends Plugin
             case "get_binary_param" :
 
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getAjxpTmpDir() ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         session_write_close();
                         header("Content-Type:image/png");
@@ -1317,7 +1317,7 @@ abstract class AbstractConfDriver extends Plugin
 
                 session_write_close();
                 if (isSet($httpVars["tmp_file"])) {
-                    $file = ApplicationState::getAjxpTmpDir() ."/". InputFilter::securePath($httpVars["tmp_file"]);
+                    $file = ApplicationState::getTemporaryFolder() ."/". InputFilter::securePath($httpVars["tmp_file"]);
                     if (isSet($file)) {
                         header("Content-Type:image/png");
                         readfile($file);
@@ -1341,10 +1341,10 @@ abstract class AbstractConfDriver extends Plugin
                     } else {
                         $rand = substr(md5(time()), 0, 6);
                         $tmp = $rand."-". $boxData->getClientFilename();
-                        $boxData->moveTo(ApplicationState::getAjxpTmpDir() . "/" . $tmp);
+                        $boxData->moveTo(ApplicationState::getTemporaryFolder() . "/" . $tmp);
                     }
                 }
-                if (isSet($tmp) && file_exists(ApplicationState::getAjxpTmpDir() ."/".$tmp)) {
+                if (isSet($tmp) && file_exists(ApplicationState::getTemporaryFolder() ."/".$tmp)) {
                     print('<script type="text/javascript">');
                     print('parent.formManagerHiddenIFrameSubmission("'.$tmp.'");');
                     print('</script>');

@@ -255,7 +255,7 @@ class SwiftAccessWrapper extends FsAccessWrapper
      */
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpFile = ApplicationState::getTemporaryFolder() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
            $tmpHandle = fopen($tmpFile, "wb", null, self::$cloudContext);
            self::copyFileInStream($path, $tmpHandle);
            fclose($tmpHandle);

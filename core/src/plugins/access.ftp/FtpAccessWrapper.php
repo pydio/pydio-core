@@ -79,7 +79,7 @@ class FtpAccessWrapper implements IAjxpWrapper
      */
     public static function getRealFSReference($path, $persistent = false)
     {
-        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
+        $tmpFile = ApplicationState::getTemporaryFolder() ."/".md5(time());
         $tmpHandle = fopen($tmpFile, "wb");
         self::copyFileInStream($path, $tmpHandle);
         fclose($tmpHandle);

@@ -249,7 +249,7 @@ class StreamWrapper implements IAjxpWrapper
         $nodeStream = self::createStream($path);
         $nodeStream->getContents();
 
-        $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
+        $tmpFile = ApplicationState::getTemporaryFolder() ."/".md5(time()).".".pathinfo($path, PATHINFO_EXTENSION);
         $tmpHandle = fopen($tmpFile, "wb");
 
         self::copyStreamInStream(PydioStreamWrapper::getResource($nodeStream), $tmpHandle);

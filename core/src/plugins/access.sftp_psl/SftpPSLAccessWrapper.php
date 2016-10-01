@@ -114,7 +114,7 @@ class SftpPSLAccessWrapper extends FsAccessWrapper
     public static function getRealFSReference($path, $persistent = false)
     {
         if ($persistent) {
-            $tmpFile = ApplicationState::getAjxpTmpDir() ."/".md5(time());
+            $tmpFile = ApplicationState::getTemporaryFolder() ."/".md5(time());
             $tmpHandle = fopen($tmpFile, "wb");
             self::copyFileInStream($path, $tmpHandle);
             fclose($tmpHandle);

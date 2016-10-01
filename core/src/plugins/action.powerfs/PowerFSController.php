@@ -83,7 +83,7 @@ class PowerFSController extends Plugin
 
             case "postcompress_download":
 
-                $archive = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
+                $archive = ApplicationState::getTemporaryFolder() . DIRECTORY_SEPARATOR . $httpVars["ope_id"] . "_" . InputFilter::decodeSecureMagic($httpVars["archive_name"], InputFilter::SANITIZE_FILENAME);
                 // This is  a real filename on a local FS => toStorageEncoding
                 $archive = TextEncoder::toStorageEncoding($archive);
                 $archiveName = $httpVars["archive_name"];
@@ -143,7 +143,7 @@ class PowerFSController extends Plugin
                 $opeId = substr(md5(time()), 0, 10);
                 $originalArchiveParam = $archiveName;
                 if ($request->getAttribute("action") == "precompress") {
-                    $archiveName = ApplicationState::getAjxpTmpDir() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
+                    $archiveName = ApplicationState::getTemporaryFolder() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
                 }
                 chdir($rootDir);
                 $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);

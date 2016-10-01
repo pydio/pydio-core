@@ -436,8 +436,8 @@ class Jumploader extends Plugin
 
                 if ($httpVars["partitionCount"] > 1) {
                     if (self::$remote) {
-                        $test = ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"];
-                        $newDest = fopen(ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"], "w");
+                        $test = ApplicationState::getTemporaryFolder() ."/".$httpVars["partitionRealName"];
+                        $newDest = fopen(ApplicationState::getTemporaryFolder() ."/".$httpVars["partitionRealName"], "w");
                         $newFile = array();
                         $length = 0;
                         for ($i = 0, $count = count($partitions); $i < $count; $i++) {
@@ -456,7 +456,7 @@ class Jumploader extends Plugin
                         $newFile["name"] = $httpVars["partitionRealName"];
                         $newFile["error"] = 0;
                         $newFile["size"] = $length;
-                        $newFile["tmp_name"] = ApplicationState::getAjxpTmpDir() ."/".$httpVars["partitionRealName"];
+                        $newFile["tmp_name"] = ApplicationState::getTemporaryFolder() ."/".$httpVars["partitionRealName"];
                         $newFile["destination"] = $partitions[0]["destination"];
                         $newPartitions[] = $newFile;
                     } else {

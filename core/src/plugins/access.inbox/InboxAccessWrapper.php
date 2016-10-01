@@ -136,7 +136,7 @@ class InboxAccessWrapper implements IAjxpWrapper
         $node = $nodes[ltrim($nodePath, '/')];
 
         if (empty($node) || ! isset($node['url'])) {
-            return ApplicationState::getAjxpTmpDir();
+            return ApplicationState::getTemporaryFolder();
         }
 
         $url = $node['url'];
@@ -149,7 +149,7 @@ class InboxAccessWrapper implements IAjxpWrapper
         }
 
         if(empty($nodePath)){
-            return ApplicationState::getAjxpTmpDir();
+            return ApplicationState::getTemporaryFolder();
         }
 
         if($pydioScheme){
@@ -181,14 +181,14 @@ class InboxAccessWrapper implements IAjxpWrapper
             $realFilePointer = MetaStreamWrapper::getRealFSReference($url, true);
             if(!$isRemote){
                 $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-                $tmpname = tempnam(ApplicationState::getAjxpTmpDir(), "real-file-inbox-pointer").".".$ext;
+                $tmpname = tempnam(ApplicationState::getTemporaryFolder(), "real-file-inbox-pointer").".".$ext;
                 copy($realFilePointer, $tmpname);
                 $realFilePointer = $tmpname;
             }
             self::$linkNode->getDriver();
             return $realFilePointer;
         }else{
-            $tmpname = tempnam(ApplicationState::getAjxpTmpDir(), "real-file-inbox-pointer");
+            $tmpname = tempnam(ApplicationState::getTemporaryFolder(), "real-file-inbox-pointer");
             $source = fopen($url, "r");
             $dest = fopen($tmpname, "w");
             stream_copy_to_stream($source, $dest);

@@ -74,7 +74,7 @@ abstract class AbstractSearchEngineIndexer extends AbstractMetaSource
                 $pipe = true;
             }
             $realFile = call_user_func(array($ajxpNode->wrapperClassName, "getRealFSReference"), $ajxpNode->getUrl());
-            $unoconv = "HOME=" . ApplicationState::getAjxpTmpDir() . " " . $unoconv . " --stdout -f $targetExt " . escapeshellarg($realFile);
+            $unoconv = "HOME=" . ApplicationState::getTemporaryFolder() . " " . $unoconv . " --stdout -f $targetExt " . escapeshellarg($realFile);
             if ($pipe) {
                 $newTarget = str_replace(".$ext", ".pdf", $realFile);
                 $unoconv .= " > $newTarget";

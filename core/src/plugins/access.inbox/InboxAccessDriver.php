@@ -103,13 +103,13 @@ class InboxAccessDriver extends FsAccessDriver
         $nodeObject = new AJXP_Node($nodePath);
         $basename = $nodeObject->getLabel();
         if($nodeObject->isRoot()){
-            return ['stat' => stat(ApplicationState::getAjxpTmpDir())];
+            return ['stat' => stat(ApplicationState::getTemporaryFolder())];
         }
         $allNodes = self::getNodes($nodeObject->getContext(), false);
         $nodeData = $allNodes[$basename];
         if(!isSet($nodeData["stat"])){
             if(in_array(pathinfo($basename, PATHINFO_EXTENSION), ["error", "invitation"])){
-                $stat = stat(ApplicationState::getAjxpTmpDir());
+                $stat = stat(ApplicationState::getTemporaryFolder());
             }else{
                 $url = $nodeData["url"];
                 $node = new AJXP_Node($url);
@@ -121,7 +121,7 @@ class InboxAccessDriver extends FsAccessDriver
                     Controller::applyHook("node.read", [&$node]);
                     $stat = stat($url);
                 }catch (\Exception $e){
-                    $stat = stat(ApplicationState::getAjxpTmpDir());
+                    $stat = stat(ApplicationState::getTemporaryFolder());
                 }
                 if(is_array($stat) && $nodeObject->getContext()->hasUser()){
                     $acl = $nodeObject->getContext()->getUser()->getMergedRole()->getAcl($nodeData["meta"]["shared_repository_id"]);
@@ -217,7 +217,7 @@ class InboxAccessDriver extends FsAccessDriver
                     $remoteShare = $ocsStore->remoteShareById($linkId);
                     $status = $remoteShare->getStatus();
                     if($status == OCS_INVITATION_STATUS_PENDING){
-                        $stat = stat(ApplicationState::getAjxpTmpDir());
+                        $stat = stat(ApplicationState::getTemporaryFolder());
                         $ext = "invitation";
                         $meta["ajxp_mime"] = "invitation";
                         $meta["share_meta_type"] = 0;

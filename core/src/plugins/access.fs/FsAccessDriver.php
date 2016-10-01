@@ -656,7 +656,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($zip) {
                     // Make a temp zip and send it as download
                     $loggedUser = $ctx->getUser();
-                    $file = ApplicationState::getAjxpTmpDir() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                    $file = ApplicationState::getTemporaryFolder() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
                     $zipFile = $this->makeZip($selection, $file, empty($dir)?"/":$dir);
                     if(!$zipFile) throw new PydioException("Error while compressing");
                     $localName = (empty($base)?"Files":$base).".zip";
@@ -804,7 +804,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 } else {
                     $localName = (basename($dir)==""?"Files":basename($dir)).".zip";
                 }
-                $file = ApplicationState::getAjxpTmpDir() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
+                $file = ApplicationState::getTemporaryFolder() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpCompression.zip";
                 if(isSet($httpVars["compress_flat"])) $baseDir = "__AJXP_ZIP_FLAT__/";
                 else $baseDir = $dir;
                 $zipFile = $this->makeZip($selection, $file, $baseDir, $taskId);
