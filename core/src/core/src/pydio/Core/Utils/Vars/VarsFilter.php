@@ -51,6 +51,21 @@ class VarsFilter
      */
     public static function filter($value, ContextInterface $ctx)
     {
+        // If AJXP_PARENT_OPTION, resolve and return directly, do not filter the real value.
+        if(is_string($value) && preg_match("/AJXP_PARENT_OPTION:([\w_-]*):/", $value, $matches)){
+            $repoObject = $ctx->getRepository();
+            $parentRepository = $repoObject->getParentRepository();
+            if(empty($parentRepository)){
+                throw new PydioException("Cannot resolve ".$matches[0]." without parent workspace");
+            }
+            $parentOwner = $ctx->getRepository()->getOwner();
+            $parentContext = Context::contextWithObjects(null, $parentRepository);
+            $parentContext->setUserId($parentOwner);
+            $parentPath = rtrim($parentRepository->getContextOption($parentContext, $matches[1]), "/");
+            $value = str_replace($matches[0], $parentPath, $value);
+            return $value;
+        }
+
         if (is_string($value) && strpos($value, "AJXP_USER")!==false) {
             if (UsersService::usersEnabled()) {
                 if(!$ctx->hasUser()){
@@ -84,18 +99,6 @@ class VarsFilter
         }
         if (is_string($value) && strstr($value, "AJXP_WORKSPACE_SLUG") !== false) {
             $value = rtrim(str_replace("AJXP_WORKSPACE_SLUG", $ctx->getRepository()->getSlug(), $value), "/");
-        }
-        if(is_string($value) && preg_match("/AJXP_PARENT_OPTION:([\w_-]*):/", $value, $matches)){
-            $repoObject = $ctx->getRepository();
-            $parentRepository = $repoObject->getParentRepository();
-            if(empty($parentRepository)){
-                throw new PydioException("Cannot resolve ".$matches[0]." without parent workspace");
-            }
-            $parentOwner = $ctx->getRepository()->getOwner();
-            $parentContext = Context::contextWithObjects(null, $parentRepository);
-            $parentContext->setUserId($parentOwner);
-            $parentPath = rtrim($parentRepository->getContextOption($parentContext, $matches[1]), "/");
-            $value = str_replace($matches[0], $parentPath, $value);
         }
 
         $tab = array(&$value, $ctx);

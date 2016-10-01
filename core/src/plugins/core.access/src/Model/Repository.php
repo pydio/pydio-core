@@ -425,7 +425,7 @@ class Repository implements RepositoryInterface
                 return $mess[$this->displayStringId];
             }
         }
-        return VarsFilter::filter($this->display, Context::emptyContext());
+        return $this->display;
     }
 
     /**
