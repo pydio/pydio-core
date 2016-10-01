@@ -98,6 +98,13 @@ class SqlLogDriver extends AbstractLogDriver implements SqlTableProvider
     }
 
     /**
+     * @return array
+     */
+    public function getDriverConfig(){
+        return $this->sqlDriver;
+    }
+
+    /**
      * @param $actionName
      * @param $httpVars
      * @param $fileVars
