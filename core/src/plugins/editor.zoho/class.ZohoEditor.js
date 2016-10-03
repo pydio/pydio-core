@@ -41,7 +41,8 @@ Class.create("ZohoEditor", AbstractEditor, {
             conn.addParameter("get_action", "retrieve_from_zohoagent");
             conn.onComplete = function(transport){
                 if(transport.responseText == "MODIFIED"){
-                    ajaxplorer.fireNodeRefresh(this.currentNode);// fireContextRefresh();
+                    this.currentNode.getParent().getMetadata().set('preview_seed', Math.round(date.getTime()*Math.random()));
+                    pydio.fireNodeRefresh(this.currentNode);
                 }
             }.bind(this);
             conn.sendAsync();
