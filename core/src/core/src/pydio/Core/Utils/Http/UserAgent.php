@@ -189,7 +189,8 @@ class UserAgent
             'PydioPro iOS Native Application' => 'Pydio-Native-iOS',
             'Pydio Android Native Application' => 'Apache-HttpClient',
             'PydioPro Android Native Application' => 'Pydio-Native-Android',
-            'Pydio Sync Client' => 'python-requests'
+            'Pydio Sync Client' => 'python-requests',
+            'Pydio Booster' => "Go-http-client"
         );
 
         if ($useragent == null) {

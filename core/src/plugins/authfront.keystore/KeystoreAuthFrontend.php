@@ -30,6 +30,7 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Utils\Http\UserAgent;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Controller\HTMLWriter;
 use Zend\Diactoros\Response\JsonResponse;
@@ -141,7 +142,7 @@ class KeystoreAuthFrontend extends AbstractAuthFrontend
 
             case "keystore_generate_auth_token":
 
-                if (ConfService::getContextConf($ctx, "SESSION_SET_CREDENTIALS", "auth")) {
+                if (ConfService::getContextConf($ctx, "SESSION_SET_CREDENTIALS", "auth") && UserAgent::osFromUserAgent($requestInterface->getServerParams()['HTTP_USER_AGENT']) !== 'Pydio Booster') {
                     $this->logDebug("Keystore Generate Tokens", "Session Credentials set: returning empty tokens to force basic authentication");
                     HTMLWriter::charsetHeader("text/plain");
                     echo "";
