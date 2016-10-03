@@ -43,6 +43,19 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     private $clientsGCTime = 10;
 
     /**
+     * Windows-ify channel name to avoid forbidden characters
+     * @param $channelName
+     * @return mixed
+     */
+    protected function channelNameToFileName($channelName){
+        if(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN'){
+            return str_replace(array(":", "*"), array("---", "__ALL__"), $channelName);
+        }else{
+            return $channelName;
+        }
+    }
+
+    /**
      * @param $channelName
      * @param bool $create
      * @throws \Exception
@@ -54,7 +67,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
         }
         if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
             if(!isset($this->channels)) $this->channels = array();
-            $data = FileHelper::loadSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName");
+            $data = FileHelper::loadSerialFile($this->getPluginWorkDir() . "/queues/channel-".$this->channelNameToFileName($channelName));
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -74,7 +87,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
         if (isSet($this->channels) && is_array($this->channels)) {
             foreach ($this->channels as $channelName => $data) {
                 if (is_array($data)) {
-                    FileHelper::saveSerialFile($this->getPluginWorkDir() . "/queues/channel-$channelName", $data);
+                    FileHelper::saveSerialFile($this->getPluginWorkDir() . "/queues/channel-".$this->channelNameToFileName($channelName), $data);
                 }
             }
         }
