@@ -61,7 +61,8 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         }
     }
 
-
+    
+    
     /**
      * @var array
      */
@@ -78,6 +79,12 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
     {
         if (isSet(self::$channels) && is_array(self::$channels[$channelName])) {
             return;
+        }
+        if(empty($this->sqlDriver)) {
+            return;
+        }
+        if(!dibi::isConnected()){
+            dibi::connect($this->sqlDriver);
         }
         $res = dibi::query('SELECT [content] FROM [ajxp_mq_queues] WHERE [channel_name] = %s', $channelName);
         if($res->count()){
@@ -100,10 +107,13 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
 
     public function __destruct()
     {
-        if (isSet(self::$channels) && is_array(self::$channels)) {
+        if (isSet(self::$channels) && is_array(self::$channels) && !empty($this->sqlDriver)) {
             $inserts = [];
             $deletes = [];
             $driver = $this->sqlDriver["driver"];
+            if(!dibi::isConnected()){
+                dibi::connect($this->sqlDriver);
+            }
             foreach (self::$channels as $channelName => $data) {
                 if (is_array($data)) {
                     if(isSet($data["CLIENTS"]) && count($data["CLIENTS"])) {
