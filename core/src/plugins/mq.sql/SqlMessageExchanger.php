@@ -192,7 +192,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger
     {
         $this->loadChannel($channelName);
         if(!isSet(self::$channels) || !isSet(self::$channels[$channelName])) {
-            return null;
+            return [];
         }
         // Check dead clients
         if (is_array(self::$channels[$channelName]["CLIENTS"])) {
