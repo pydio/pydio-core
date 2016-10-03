@@ -236,6 +236,13 @@ class OptionsHelper
                 $params["formatDate"] = "'Y-m-d'";
                 break;
         }
+        if(strpos($params['host'], ':') !== false){
+            list($h, $portOrSocket) = explode(":", $params['host']);
+            if(!is_numeric($portOrSocket) && file_exists($portOrSocket)){
+                $params['host'] = $h;
+                $params['socket'] = $portOrSocket;
+            }
+        }
         if (isSet($value)) {
             self::$_dibiParamClean[$value] = $params;
         }
