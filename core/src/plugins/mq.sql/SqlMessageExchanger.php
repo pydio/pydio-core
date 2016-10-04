@@ -90,7 +90,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         if($res->count()){
             if(!isset(self::$channels)) self::$channels = array();
             $single = $res->fetchSingle();
-            $data = unserialize(base64_decode($single));
+            $data = unserialize($single);
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -109,6 +109,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
     {
         if (isSet(self::$channels) && is_array(self::$channels) && !empty($this->sqlDriver)) {
             $inserts = [];
+            $insertValues = [];
             $deletes = [];
             $driver = $this->sqlDriver["driver"];
             if(!dibi::isConnected()){
@@ -117,12 +118,14 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
             foreach (self::$channels as $channelName => $data) {
                 if (is_array($data)) {
                     if(isSet($data["CLIENTS"]) && count($data["CLIENTS"])) {
-                        $serialized = base64_encode(serialize($data));
+                        $serialized = serialize($data);
                         if($driver === "postgre"){
                             dibi::query("DELETE FROM [ajxp_mq_queues] WHERE [channel_name] = %s", $channelName);
                             dibi::query('INSERT INTO [ajxp_mq_queues]', ["channel_name" => $channelName, "content" => $serialized]);
                         }else{
-                            $inserts[] = "('$channelName', '".$serialized."')";
+                            $inserts[] = "(%s, %bin)";
+                            $insertValues[] = $channelName;
+                            $insertValues[] = $serialized;
                         }
                     }else{
                         $deletes[] = $channelName;
@@ -131,7 +134,9 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
             }
             if(count($inserts)){
                 try{
-                    dibi::query('REPLACE INTO [ajxp_mq_queues] ([channel_name],[content]) VALUES '.implode(",", $inserts));
+                    $args = ['REPLACE INTO [ajxp_mq_queues] ([channel_name],[content]) VALUES '.implode(",", $inserts)];
+                    $args = array_merge($args, $insertValues);
+                    call_user_func_array(array("dibi", "query"), $args);
                 }catch(\DibiException $dE){
                     $this->logError(__CLASS__, $dE->getMessage());
                 }
