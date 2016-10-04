@@ -126,10 +126,10 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
         if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
             return;
         }
-        if($from != null){
+        if($from !== null){
             $this->clearCacheForNode($from);
         }
-        if($to != null){
+        if($to !== null && ($from === null || $from->getUrl() !== $to->getUrl())){
             $this->clearCacheForNode($to);
         }
     }
@@ -188,6 +188,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
         }else {
             // Delete node data and all its children
             $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "stat")["id"]);
+            $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node, "node.info")["id"]);
             if($node->getParent() !== null){
                 $cacheDriver->deleteKeyStartingWith(AJXP_CACHE_SERVICE_NS_NODES, AbstractCacheDriver::getOptionsForNode($node->getParent(), "list")["id"]);
             }else{
