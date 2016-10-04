@@ -48,6 +48,7 @@ use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Core\Utils\Vars\PathUtils;
 use Pydio\Core\Utils\Vars\XMLFilter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
@@ -1225,10 +1226,17 @@ class ShareCenter extends Plugin
                             continue;
                         }
                         $sharedNode = $metadata["SOURCE_NODE"];
-                        $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
+                        if($sharedNode === $node){
+                            // This is a minisite on one file, using a content filter, send a node.change on root to force clear cache
+                            $sharedPath = "/";
+                        }else{
+                            $sharedPath = substr($node->getPath(), strlen($sharedNode->getPath()));
+                        }
                         $newContext = $crtContext->withRepositoryId($wsId);
                         $sharedNodeUrl = $newContext->getUrlBase().$sharedPath;
-                        $result[$wsId] = array(new AJXP_Node($sharedNodeUrl), "DOWN");
+                        $newNode = new AJXP_Node($sharedNodeUrl);
+                        if($sharedPath === '/') $newNode->setLeaf(false);
+                        $result[$wsId] = array($newNode, "DOWN");
                         $this->logDebug('MIRROR NODES', 'Found shared in parent - register node '.$sharedNodeUrl);
                     }
                 }

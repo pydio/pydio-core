@@ -129,6 +129,13 @@ class ShareMetaManager
      */
     public function collectSharesInParent($node, &$metas){
         $node->collectMetadataInParents(AJXP_SHARED_META_NAMESPACE, AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_REPOSITORY, false, $metas);
+        if($node->isLeaf()){
+            $metadata = $node->retrieveMetadata(AJXP_SHARED_META_NAMESPACE, AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_REPOSITORY,false);
+            if($metadata != false){
+                $metadata["SOURCE_NODE"] = $node;
+                $metas[] = $metadata;
+            }
+        }
     }
 
     /**
