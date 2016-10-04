@@ -491,7 +491,7 @@ class PluginsService
         if(!empty($this->detectedPlugins)){
             return true;
         }
-        if(!empty($cacheStorage) && $this->_loadDetectedPluginsFromCache($cacheStorage)){
+        if($this->_loadDetectedPluginsFromCache($cacheStorage)){
             return true;
         }
 
