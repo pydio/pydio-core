@@ -138,14 +138,14 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
                     $args = array_merge($args, $insertValues);
                     call_user_func_array(array("dibi", "query"), $args);
                 }catch(\DibiException $dE){
-                    $this->logError(__CLASS__, $dE->getMessage());
+                    $this->logError(__CLASS__, $dE->getMessage().". SQL query was: ".$dE->getMessage());
                 }
             }
             if(count($deletes)){
                 try{
-                    dibi::query('DELETE FROM [ajxp_mq_queues] WHERE [channel_name] IN %s', $deletes);
+                    dibi::query('DELETE FROM [ajxp_mq_queues] WHERE [channel_name] IN (%s)', $deletes);
                 }catch(\DibiException $dE){
-                    $this->logError(__CLASS__, $dE->getMessage());
+                    $this->logError(__CLASS__, $dE->getMessage().". SQL query was: ".$dE->getMessage());
                 }
             }
         }
