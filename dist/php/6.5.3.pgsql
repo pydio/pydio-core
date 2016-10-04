@@ -34,6 +34,6 @@ CREATE INDEX ajxp_task_nodes_idx ON ajxp_tasks (nodes);
 /* SEPARATOR */
 CREATE TABLE IF NOT EXISTS ajxp_mq_queues (
   channel_name varchar(255) NOT NULL,
-  content text NOT NULL,
+  content BLOB NOT NULL,
   PRIMARY KEY (channel_name)
 );
