@@ -79,7 +79,7 @@ class CoreIndexer extends Plugin {
         }
         $nodes = $userSelection->buildNodes();
 
-        if (isSet($httpVars["verbose"]) && $httpVars["verbose"] == "true") {
+        if (isSet($httpVars["verboz"]) && $httpVars["verboz"] == "true") {
             $this->verboseIndexation = true;
         }
         $taskId = $requestInterface->getAttribute("pydio-task-id");
