@@ -262,12 +262,10 @@ class UsersManager extends AbstractManager
                 if (!isSet($httpVars["user_id"]) || !isSet($httpVars["profile"]) || !UsersService::userExists($httpVars["user_id"]) || trim($httpVars["profile"]) == "") {
                     throw new PydioException($mess["ajxp_conf.61"]);
                 }
-                $profile = InputFilter::sanitize($httpVars["profile"], InputFilter::SANITIZE_ALPHANUM);
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new PydioException("Cannot update user data for ".$userId);
-                }
+                $profile    = InputFilter::sanitize($httpVars["profile"], InputFilter::SANITIZE_ALPHANUM);
+                $userId     = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $user       = $this->getUserIfAuthorized($ctx, $userId);
+
                 $user->setProfile($profile);
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Updated profile for user ".$userId)));
 
@@ -275,36 +273,27 @@ class UsersManager extends AbstractManager
 
             case "user_set_lock" :
 
-                $userId = InputFilter::decodeSecureMagic($httpVars["user_id"]);
-                $lock = ($httpVars["lock"] == "true" ? true : false);
-                $lockType = $httpVars["lock_type"];
-                $ctxUser = $ctx->getUser();
-                if (UsersService::userExists($userId)) {
-                    $userObject = UsersService::getUserById($userId, false);
-                    if( !empty($ctxUser) && !$ctxUser->canAdministrate($userObject)){
-                        throw new \Exception("Cannot update user data for ".$userId);
-                    }
-                    if ($lock) {
-                        $userObject->setLock($lockType);
-                        $userMessage    = new UserMessage("Successfully set lock on user ($lockType)");
-                        $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage]));
-                    } else {
-                        $userObject->removeLock($lockType);
-                        $userMessage    = new UserMessage("Successfully unlocked user");
-                        $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage]));
-                    }
-                    $userObject->save("superuser");
+                $userId     = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $lock       = ($httpVars["lock"] == "true" ? true : false);
+                $lockType   = $httpVars["lock_type"];
+                $userObject = $this->getUserIfAuthorized($ctx, $userId);
+                if ($lock) {
+                    $userObject->setLock($lockType);
+                    $message = str_replace(array("%1", "%2"), array($lockType, $userId), $mess["ajxp_conf.166"]);
+                } else {
+                    $userObject->removeLock($lockType);
+                    $message = str_replace("%s", $userId, $mess["ajxp_conf.167"]);
                 }
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream([new UserMessage($message)]));
+                $userObject->save("superuser");
 
                 break;
 
             case "change_admin_right" :
 
-                $userId = $httpVars["user_id"];
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
+                $userId     = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $user       = $this->getUserIfAuthorized($ctx, $userId);
+
                 $user->setAdmin(($httpVars["right_value"]=="1"?true:false));
                 $user->save("superuser");
 
@@ -316,28 +305,26 @@ class UsersManager extends AbstractManager
 
             case "user_update_right" :
 
-                if(!isSet($httpVars["user_id"]) || !isSet($httpVars["repository_id"]) || !isSet($httpVars["right"]) || !UsersService::userExists($httpVars["user_id"])) {
+                $userId         = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;
+                $repositoryId   = isSet($httpVars["repository_id"]) ? InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM) : null;
+                $rightString    = isSet($httpVars["right"]) ? InputFilter::sanitize($httpVars["right"], InputFilter::SANITIZE_ALPHANUM) : null;
+
+                if(empty($userId) || empty($repositoryId) || empty($rightString) || !UsersService::userExists($userId)) {
 
                     $userMessage    = new UserMessage($mess["ajxp_conf.61"], LOG_LEVEL_ERROR);
-                    $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"old\" write=\"old\"/>");
+                    $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$userId."\" repository_id=\"".$repositoryId."\" read=\"old\" write=\"old\"/>");
                     $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage, $xmlMessage]));
-
                     break;
+
                 }
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
-                }
-                $user->getPersonalRole()->setAcl(InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM), InputFilter::sanitize($httpVars["right"], InputFilter::SANITIZE_ALPHANUM));
+                $user = $this->getUserIfAuthorized($ctx, $userId, false);
+                $user->getPersonalRole()->setAcl($repositoryId, $rightString);
                 $user->save();
-                $loggedUser = $ctx->getUser();
-                if ($loggedUser->getId() == $user->getId()) {
+                if ($ctx->getUser()->getId() == $user->getId()) {
                     AuthService::updateSessionUser($user);
                 }
-
-                $userMessage    = new UserMessage($mess["ajxp_conf.46"].$httpVars["user_id"]);
-                $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$httpVars["user_id"]."\" repository_id=\"".$httpVars["repository_id"]."\" read=\"".$user->canRead($httpVars["repository_id"])."\" write=\"".$user->canWrite($httpVars["repository_id"])."\"/>");
+                $userMessage    = new UserMessage($mess["ajxp_conf.46"].$userId);
+                $xmlMessage     = new XMLMessage("<update_checkboxes user_id=\"".$userId."\" repository_id=\"".$repositoryId."\" read=\"".$user->canRead($repositoryId)."\" write=\"".$repositoryId."\"/>");
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream([$userMessage, $xmlMessage]));
 
                 break;
@@ -367,11 +354,12 @@ class UsersManager extends AbstractManager
                 }
 
                 foreach ($userSelection->getFiles() as $selectedUser) {
-                    $userId = basename($selectedUser);
+                    $userId = InputFilter::sanitize(basename($selectedUser), InputFilter::SANITIZE_EMAILCHARS);
                     try{
-                        $user = UsersService::getUserById($userId);
-                        if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                            continue;
+                        $user = $this->getUserIfAuthorized($ctx, $userId);
+                        $currentPath = $user->getGroupPath();
+                        if($ctx->getUser()->getId() === $userId && (empty($currentPath) || $currentPath === "/") && $targetPath !== '/'){
+                            throw new PydioException($mess["ajxp_conf.161"]);
                         }
                         $user->setGroupPath($targetPath, true);
                         $user->save("superuser");
@@ -382,11 +370,11 @@ class UsersManager extends AbstractManager
                 }
                 $chunks = [];
                 if(count($usersMoved)){
-                    $chunks[] = new UserMessage(count($usersMoved)." user(s) successfully moved to ".$targetPath);
+                    $chunks[] = new UserMessage(str_replace(array("%1", "%2"), array(count($usersMoved), $targetPath), $mess["ajxp_conf.168"]));
                     $chunks[] = new ReloadMessage($dest, $userId);
                     $chunks[] = new ReloadMessage();
                 }else{
-                    $chunks[] = new UserMessage("No users moved, there must have been something wrong.", LOG_LEVEL_ERROR);
+                    $chunks[] = new UserMessage($mess["ajxp_conf.169"], LOG_LEVEL_ERROR);
                 }
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream($chunks));
 
@@ -395,9 +383,13 @@ class UsersManager extends AbstractManager
             case "user_add_role" :
             case "user_delete_role":
 
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["role_id"]) || !UsersService::userExists($httpVars["user_id"]) || !RolesService::getRole($httpVars["role_id"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
+                $userId         = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;
+                $roleId         = isSet($httpVars["role_id"]) ? InputFilter::sanitize($httpVars["role_id"]) : null;
+
+                if (empty($userId) || empty($roleId) || !UsersService::userExists($userId) || !RolesService::getRole($roleId)) {
+                    throw new PydioException($mess["ajxp_conf.61"]);
                 }
+                $this->getUserIfAuthorized($ctx, $userId, false);
                 if ($action == "user_add_role") {
                     $act = "add";
                     $messId = "73";
@@ -405,28 +397,28 @@ class UsersManager extends AbstractManager
                     $act = "remove";
                     $messId = "74";
                 }
-                $this->updateUserRole($ctx->getUser(), InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS), $httpVars["role_id"], $act);
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.".$messId].$httpVars["user_id"])));
+                $this->updateUserRole($ctx->getUser(), $userId, $roleId, $act);
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.".$messId].$userId)));
 
                 break;
 
             case "user_reorder_roles":
 
-                if (!isSet($httpVars["user_id"]) || !UsersService::userExists($httpVars["user_id"]) || !isSet($httpVars["roles"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
-                }
-                $roles = json_decode($httpVars["roles"], true);
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user data for ".$userId);
-                }
+                $userId         = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;
+                $roles          = isSet($httpVars["roles"]) ? $httpVars["roles"] : null;
 
+                if (empty($userId) || !UsersService::userExists($userId) || empty($roles)) {
+                    throw new PydioException($mess["ajxp_conf.61"]);
+                }
+                $roles = json_decode($roles, true);
+                $user = $this->getUserIfAuthorized($ctx, $userId, false);
 
                 // UPDATE ROLES
                 $currentRoles = array_filter(array_keys($user->getRoles()), function($rId){return strpos($rId, "AJXP_GRP_/")!==0 && strpos($rId, "AJXP_USR_/")!==0;});
                 $newRoles = array_diff($roles, $currentRoles);
-                foreach($newRoles as $r) $user->addRole(RolesService::getRole($r));
+                foreach($newRoles as $r) {
+                    $user->addRole(RolesService::getRole($r));
+                }
                 $removeRoles = array_diff($currentRoles, $roles);
                 foreach($removeRoles as $r) {
                     $user->removeRole($r);
@@ -434,24 +426,21 @@ class UsersManager extends AbstractManager
                 // REORDER ROLES
                 $user->updateRolesOrder($roles);
                 $user->save("superuser");
-                $loggedUser = $ctx->getUser();
-                if ($loggedUser->getId() == $user->getId()) {
+                if ($ctx->getUser()->getId() === $user->getId()) {
                     AuthService::updateSessionUser($user);
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Roles reordered for user ".$httpVars["user_id"])));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage(str_replace("%s", $userId, $mess["ajxp_conf.163"]))));
                 break;
 
             case "users_bulk_update_roles":
 
-                $data = json_decode($httpVars["json_data"], true);
-                $userIds = $data["users"];
-                $rolesOperations = $data["roles"];
+                $data               = json_decode($httpVars["json_data"], true);
+                $userIds            = $data["users"];
+                $rolesOperations    = $data["roles"];
                 foreach($userIds as $userId){
                     $userId = InputFilter::sanitize($userId, InputFilter::SANITIZE_EMAILCHARS);
-                    if(!UsersService::userExists($userId)) continue;
-                    $userObject = UsersService::getUserById($userId, false);
-                    if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)) continue;
+                    $userObject = $this->getUserIfAuthorized($ctx, $userId);
                     foreach($rolesOperations as $addOrRemove => $roles){
                         if(!in_array($addOrRemove, array("add", "remove"))) {
                             continue;
@@ -470,32 +459,31 @@ class UsersManager extends AbstractManager
                         }
                     }
                     $userObject->save("superuser");
-                    $loggedUser = $ctx->getUser();
-                    if ($loggedUser->getId() == $userObject->getId()) {
+                    if ($ctx->getUser()->getId() === $userObject->getId()) {
                         AuthService::updateSessionUser($userObject);
                     }
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Successfully updated roles")));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.164"])));
 
                 break;
 
             case "user_update_role" :
 
-                $selection = UserSelection::fromContext($ctx, $httpVars);
-                $files = $selection->getFiles();
-                $detectedRoles = array();
-                $roleId = null;
+                $selection      = UserSelection::fromContext($ctx, $httpVars);
+                $files          = $selection->getFiles();
+                $detectedRoles  = array();
+                $roleId         = null;
 
                 if (isSet($httpVars["role_id"]) && isset($httpVars["update_role_action"])) {
-                    $update = $httpVars["update_role_action"];
-                    $roleId = $httpVars["role_id"];
+                    $update = InputFilter::sanitize($httpVars["update_role_action"], InputFilter::SANITIZE_ALPHANUM);
+                    $roleId = InputFilter::sanitize($httpVars["role_id"]);
                     if (RolesService::getRole($roleId) === false) {
                         throw new \Exception("Invalid role id");
                     }
                 }
                 foreach ($files as $index => $file) {
-                    $userId = basename($file);
+                    $userId = InputFilter::sanitize(basename($file), InputFilter::SANITIZE_EMAILCHARS);
                     if (isSet($update)) {
                         $userObject = $this->updateUserRole($ctx->getUser(), $userId, $roleId, $update);
                     } else {
@@ -540,18 +528,16 @@ class UsersManager extends AbstractManager
             case "save_custom_user_params" :
 
                 $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $user = $loggedUser;
+                $currentIsLogged = false;
+                if ($userId === $ctx->getUser()->getId()) {
+                    $currentIsLogged = true;
+                    $user = $ctx->getUser();
                 } else {
-                    $user = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
+                    $user = $this->getUserIfAuthorized($ctx, $userId);
                 }
 
                 $custom = $user->getPref("CUSTOM_PARAMS");
                 if(!is_array($custom)) $custom = array();
-
                 $options = $custom;
                 $newCtx = new Context($userId, $ctx->getRepositoryId());
                 $this->parseParameters($newCtx, $httpVars, $options, false, $custom);
@@ -559,29 +545,28 @@ class UsersManager extends AbstractManager
                 $user->setPref("CUSTOM_PARAMS", $custom);
                 $user->save();
 
-                if ($loggedUser->getId() == $user->getId()) {
+                if ($currentIsLogged) {
                     AuthService::updateSessionUser($user);
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$httpVars["user_id"])));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$userId)));
 
                 break;
 
             case "save_repository_user_params" :
 
                 $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $user = $loggedUser;
+                $currentIsLogged = false;
+                if ($userId === $ctx->getUser()->getId()) {
+                    $currentIsLogged = true;
+                    $user = $ctx->getUser();
                 } else {
-                    $user = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new \Exception("Cannot update user with id ".$userId);
+                    $user = $this->getUserIfAuthorized($ctx, $userId);
                 }
 
                 $wallet = $user->getPref("AJXP_WALLET");
                 if(!is_array($wallet)) $wallet = array();
-                $repoID = $httpVars["repository_id"];
+                $repoID = InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM);
                 if (!array_key_exists($repoID, $wallet)) {
                     $wallet[$repoID] = array();
                 }
@@ -593,26 +578,21 @@ class UsersManager extends AbstractManager
                 $user->setPref("AJXP_WALLET", $wallet);
                 $user->save();
 
-                if ($loggedUser->getId() == $user->getId()) {
+                if ($currentIsLogged) {
                     AuthService::updateSessionUser($user);
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$httpVars["user_id"])));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$userId)));
 
                 break;
 
             case "update_user_pwd" :
                 
-                if (!isSet($httpVars["user_id"]) || !isSet($httpVars["user_pwd"]) || !UsersService::userExists($httpVars["user_id"]) || trim($httpVars["user_pwd"]) == "") {
-
+                $userId = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;
+                if (empty($userId) || !isSet($httpVars["user_pwd"]) || trim($httpVars["user_pwd"]) == "") {
                     throw new PydioException($mess["ajxp_conf.61"]);
-
                 }
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $user = UsersService::getUserById($userId);
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
-                    throw new PydioException("Cannot update user data for ".$userId);
-                }
+                $this->getUserIfAuthorized($ctx, $userId);
                 $res = UsersService::updatePassword($userId, $httpVars["user_pwd"]);
                 if($res !== true){
                     throw new PydioException($mess["ajxp_conf.49"].": $res");
@@ -623,17 +603,14 @@ class UsersManager extends AbstractManager
 
             case "save_user_preference":
 
-                if (!isSet($httpVars["user_id"]) || !UsersService::userExists($httpVars["user_id"])) {
-                    throw new \Exception($mess["ajxp_conf.61"]);
+                if (!isSet($httpVars["user_id"])) {
+                    throw new PydioException($mess["ajxp_conf.61"]);
                 }
                 $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                if ($userId == $loggedUser->getId()) {
-                    $userObject = $loggedUser;
+                if ($userId == $ctx->getUser()->getId()) {
+                    $userObject = $ctx->getUser();
                 } else {
-                    $userObject = UsersService::getUserById($userId);
-                }
-                if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($userObject)){
-                    throw new \Exception("Cannot update user data for ".$userId);
+                    $userObject = $this->getUserIfAuthorized($ctx, $userId);
                 }
 
                 $i = 0;
@@ -650,7 +627,7 @@ class UsersManager extends AbstractManager
                     $i++;
                 }
 
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage("Succesfully saved user preference")));
+                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.165"])));
 
                 break;
 
@@ -941,6 +918,21 @@ class UsersManager extends AbstractManager
             "text"      => $groupLabel,
             "is_file"   => false
         ];
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @param string $userId
+     * @param bool $checkExists
+     * @return UserInterface
+     * @throws PydioException
+     */
+    protected function getUserIfAuthorized($ctx, $userId, $checkExists = true){
+        $user = UsersService::getUserById($userId, $checkExists);
+        if($ctx->hasUser() && !$ctx->getUser()->canAdministrate($user)){
+            throw new PydioException("Cannot update user data for ".$userId);
+        }
+        return $user;
     }
 
     /**

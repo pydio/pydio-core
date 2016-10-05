@@ -183,4 +183,13 @@ $mess=array(
 "158" => "Shared", // user type shared
 "159" => "Guest",
 "160" => "Group was successfully created",
+"161" => "You are attempting to move yourself inside a group, and you will loose super-admininistrative rights. Please login as another user if you really want to do that. Aborting.",
+"162" => "You are not authorized to update user %s",
+"163" => "Roles reordered for user %s",
+"164" => "Successfully updated roles",
+"165" => "Successfully saved user preferences",
+"166" => "Successfully set lock (%1) on user (%2)",
+"167" => "Successfully unlocked user (%s)",
+"168" => "%1 users were moved to group %2",
+"169" => "No users were moved, there must have been something wrong!",
 );

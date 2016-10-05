@@ -182,4 +182,13 @@ $mess=array(
 "158" => "Shared", // user type shared
 "159" => "Guest",
 "160" => "Le groupe a été créé avec succès.",
+"161" => "Vous essayez de bouger votre propre utilisateur dans un groupe, et vous allez perdre les droits de super-utilisateur. Veuillez vous logger sous un autre utilisateur admin pour faire cette opération. Arrêt.",
+"162" => "Vous n'êtes pas autorisé à éditer l'utilisateur %s",
+"163" => "Les rôles ont été ré-ordonnés pour l'utilisateur %s",
+"164" => "Les rôles ont bien été mis à jour.",
+"165" => "Les préférences de l'utilisateur ont bien été mises à jour.",
+"166" => "Un blocage de type %1 a été ajouté à %2",
+"167" => "Le blocage a bien été enlevé pour l'utilisateur %s",
+"168" => "%1 utilisateurs ont été bougés dans le groupe %2",
+"169" => "Aucun utilisateurs n'ont été modifié, il y a une erreur!",
 );
