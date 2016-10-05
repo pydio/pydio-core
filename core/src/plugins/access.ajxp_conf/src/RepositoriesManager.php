@@ -718,15 +718,26 @@ class RepositoriesManager extends AbstractManager
         $mess = LocaleService::getMessages();
         $httpVars = $requestInterface->getParsedBody();
 
-        $repId        = InputFilter::sanitize(isSet($httpVars["workspaceId"]) ? $httpVars["workspaceId"] : $httpVars["repository_id"]);
-        $repo         = RepositoryService::findRepositoryByIdOrAlias($repId);
-        if(!is_object($repo)){
-            $res = -1;
-        }else{
-            $res = RepositoryService::deleteRepository($repId);
+        $repositories = "";
+        if(isSet($httpVars["repository_id"])) $repositories = $httpVars["repository_id"];
+        else if(isSet($httpVars["workspaceId"])) $repositories = $httpVars["workspaceId"];
+        if(!is_array($repositories)){
+            $repositories = [$repositories];
         }
-        if ($res == -1) {
-            throw new PydioException($mess[427]);
+        $repositories = array_map(function($r){
+            return InputFilter::sanitize($r, InputFilter::SANITIZE_ALPHANUM);
+        }, $repositories);
+
+        foreach($repositories as $repId){
+            $repo         = RepositoryService::findRepositoryByIdOrAlias($repId);
+            if(!is_object($repo)){
+                $res = -1;
+            }else{
+                $res = RepositoryService::deleteRepository($repId);
+            }
+            if ($res == -1) {
+                throw new PydioException($mess[427]);
+            }
         }
 
         $message = new UserMessage($mess["ajxp_conf.59"]);

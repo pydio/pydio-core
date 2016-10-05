@@ -662,29 +662,47 @@ class UsersManager extends AbstractManager
      */
     public function delete(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface){
 
-        $mess = LocaleService::getMessages();
-        $httpVars = $requestInterface->getParsedBody();
         /** @var ContextInterface $ctx */
-        $ctx = $requestInterface->getAttribute("ctx");
-
-        if (isSet($httpVars["group"])) {
-
-            $groupPath = $httpVars["group"];
-            $groupPath = preg_replace('/^\/data\/users/', '', $groupPath);
-            $basePath = PathUtils::forwardSlashDirname($groupPath);
-            $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
-            $gName = basename($groupPath);
-            UsersService::deleteGroup($basePath, $gName);
-
-            $resultMessage = $mess["ajxp_conf.128"];
-
-        } else {
-            if(empty($httpVars["user_id"]) || UsersService::isReservedUserId($httpVars["user_id"])
-                || $ctx->getUser()->getId() === $httpVars["user_id"]) {
-                throw new PydioException($mess["ajxp_conf.61"]);
+        $ctx        = $requestInterface->getAttribute("ctx");
+        $mess       = LocaleService::getMessages();
+        $httpVars   = $requestInterface->getParsedBody();
+        $groups     = [];
+        $users      = [];
+        if(isSet($httpVars['group'])) {
+            if(is_array($httpVars['group'])) $groups = $httpVars['group'];
+            else $groups[] = $httpVars['group'];
+            $groups = array_map(function ($g) {
+                return InputFilter::sanitize($g, InputFilter::SANITIZE_DIRNAME);
+            }, $groups);
+        }else if(isSet($httpVars['user_id'])) {
+            if(is_array($httpVars['user_id']))$users = $httpVars['user_id'];
+            else $users[] = $httpVars['user_id'];
+            $users = array_map(function ($u) {
+                return InputFilter::sanitize($u, InputFilter::SANITIZE_EMAILCHARS);
+            }, $users);
+        }
+        $resultMessage ='';
+        if (count($groups)) {
+            foreach($groups as $groupPath){
+                $groupPath = preg_replace('/^\/data\/users/', '', $groupPath);
+                if(empty($groupPath)){
+                    throw new PydioException("Oups trying to delete top-level role, there must be something wrong!");
+                }
+                $basePath = PathUtils::forwardSlashDirname($groupPath);
+                $basePath = ($ctx->hasUser() ? $ctx->getUser()->getRealGroupPath($basePath) : $basePath);
+                $gName = basename($groupPath);
+                UsersService::deleteGroup($basePath, $gName);
             }
-            UsersService::deleteUser($httpVars["user_id"]);
-            $resultMessage = $mess["ajxp_conf.60"];
+            $resultMessage = $mess["ajxp_conf.128"] . " (".count($groups).")";
+        } else if(count($users)) {
+
+            foreach($users as $userId){
+                if(UsersService::isReservedUserId($userId) || $ctx->getUser()->getId() === $userId) {
+                    throw new PydioException($mess["ajxp_conf.61"]);
+                }
+                UsersService::deleteUser($userId);
+            }
+            $resultMessage = $mess["ajxp_conf.60"] . " (".count($users).")";
         }
 
         $message = new UserMessage($resultMessage);

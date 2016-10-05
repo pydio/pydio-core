@@ -506,12 +506,20 @@ class RolesManager extends AbstractManager
 
         $mess = LocaleService::getMessages();
         $httpVars = $requestInterface->getParsedBody();
-
-        $roleId = InputFilter::sanitize(isSet($httpVars["roleId"]) ? $httpVars["roleId"] : $httpVars["role_id"], InputFilter::SANITIZE_DIRNAME);
-        if (RolesService::getRole($roleId) === false) {
-            throw new PydioException($mess["ajxp_conf.67"]);
+        $roles = "";
+        if(isSet($httpVars["role_id"])) $roles = $httpVars["role_id"];
+        else if(isSet($httpVars["roleId"])) $roles = $httpVars["roleId"];
+        if(!is_array($roles)){
+            $roles = [$roles];
         }
-        RolesService::deleteRole($roleId);
+        
+        foreach($roles as $roleId){
+            $roleId = InputFilter::sanitize($roleId);
+            if (RolesService::getRole($roleId) === false) {
+                throw new PydioException($mess["ajxp_conf.67"]);
+            }
+            RolesService::deleteRole($roleId);
+        }
 
         $message = new UserMessage($mess["ajxp_conf.68"]);
         $reload = new ReloadMessage();
