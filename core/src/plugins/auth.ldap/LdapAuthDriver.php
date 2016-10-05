@@ -686,6 +686,10 @@ class LdapAuthDriver extends AbstractAuthDriver
 
     }
 
+    /**
+     * User user object with mapping rules with attributes from LDAP
+     * @param \Pydio\Core\Model\UserInterface $userObject
+     */
     public function updateUserObject(&$userObject)
     {
 
@@ -785,7 +789,7 @@ class LdapAuthDriver extends AbstractAuthDriver
 
                                     if (is_array($userroles)) {
                                         foreach ($userroles as $rkey => $role) {
-                                            if ((AuthService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 if (isSet($matchFilter) && !preg_match($matchFilter, $rkey)) continue;
                                                 if (isSet($valueFilters) && !in_array($rkey, $valueFilters)) continue;
                                                 //$userObject->removeRole($key);
@@ -800,11 +804,11 @@ class LdapAuthDriver extends AbstractAuthDriver
                                         $uniqValueWithPrefix = $rolePrefix . $uniqValue;
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValueWithPrefix)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValueWithPrefix, $valueFilters)) continue;
-                                        $roleToAdd = AuthService::getRole($uniqValueWithPrefix);
+                                        $roleToAdd = RolesService::getRole($uniqValueWithPrefix);
                                         if($roleToAdd === false){
-                                            $roleToAdd = AuthService::getRole($uniqValueWithPrefix, true);
+                                            $roleToAdd = RolesService::getOrCreateRole($uniqValueWithPrefix);
                                             $roleToAdd->setLabel($uniqValue);
-                                            AuthService::updateRole($roleToAdd);
+                                            RolesService::updateRole($roleToAdd);
                                         }
                                         $newRoles[$roleToAdd->getId()] = $roleToAdd;
                                         //$userObject->addRole($roleToAdd);
@@ -815,14 +819,14 @@ class LdapAuthDriver extends AbstractAuthDriver
                                     {
                                         // remove old roles
                                         foreach ($oldRoles as $rkey => $role) {
-                                            if ((AuthService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->removeRole($rkey);
                                             }
                                         }
 
                                         //Add new roles;
                                         foreach($newRoles as $rkey => $role){
-                                            if ((AuthService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && !(strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->addRole($role);
                                             }
                                         }
@@ -838,10 +842,9 @@ class LdapAuthDriver extends AbstractAuthDriver
                                     // Get old roles
                                     if (is_array($userroles)) {
                                         foreach ($userroles as $rkey => $role) {
-                                            if ((AuthService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 if (isSet($matchFilter) && !preg_match($matchFilter, $rkey)) continue;
                                                 if (isSet($valueFilters) && !in_array($rkey, $valueFilters)) continue;
-                                                //$userObject->removeRole($key);
                                                 $oldRoles[$rkey] = $rkey;
                                             }
                                         }
@@ -852,14 +855,12 @@ class LdapAuthDriver extends AbstractAuthDriver
                                         if (isSet($matchFilter) && !preg_match($matchFilter, $uniqValue)) continue;
                                         if (isSet($valueFilters) && !in_array($uniqValue, $valueFilters)) continue;
                                         if (!empty($uniqValue)) {
-                                            $roleToAdd = AuthService::getRole($uniqValue);
+                                            $roleToAdd = RolesService::getRole($uniqValue);
                                             if($roleToAdd === false){
-                                                $roleToAdd = AuthService::getRole($uniqValue, true);
+                                                $roleToAdd = RolesService::getOrCreateRole($uniqValue);
                                                 $roleToAdd->setLabel($uniqValue);
-                                                AuthService::updateRole($roleToAdd);
+                                                RolesService::updateRole($roleToAdd);
                                             }
-                                            //$userObject->addRole(AuthService::getRole($uniqValue, true));
-                                            //$changes = true;
                                             $newRoles[$uniqValue]  = $roleToAdd;
                                         }
                                     }
@@ -869,13 +870,13 @@ class LdapAuthDriver extends AbstractAuthDriver
                                         (count(array_diff(array_keys($newRoles), array_keys($oldRoles))) > 0)){
                                         // remove old roles
                                         foreach ($oldRoles as $rkey => $role) {
-                                            if ((AuthService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->removeRole($rkey);
                                             }
                                         }
                                         //Add new roles;
                                         foreach($newRoles as $rkey => $role){
-                                            if ((AuthService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
+                                            if ((RolesService::getRole($rkey)) && (strpos($rkey, $this->mappedRolePrefix) === false)) {
                                                 $userObject->addRole($role);
                                             }
                                         }
@@ -906,7 +907,10 @@ class LdapAuthDriver extends AbstractAuthDriver
                                             $parent = "/" . implode("/", array_reverse($branch));
                                         }
                                         if (!ConfService::getConfStorageImpl()->groupExists(rtrim($userObject->getRealGroupPath($parent), "/") . "/" . $fullDN)) {
-                                            UsersService::createGroup($parent, $fullDN, $humanName);
+                                            try{
+                                                UsersService::createGroup($parent, $fullDN, $humanName);
+                                            }
+                                            catch(\Exception $e){}
                                         }
                                         $userObject->setGroupPath(rtrim($parent, "/") . "/" . $fullDN, true);
                                         // Update Roles from groupPath

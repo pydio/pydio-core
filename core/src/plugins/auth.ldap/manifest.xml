@@ -31,7 +31,7 @@
         <param name="LDAP_GDN" group="CONF_MESSAGE[Groups Schema]" type="string" replicationGroup="LDAPGDN" label="CONF_MESSAGE[Groups DN]" description="CONF_MESSAGE[DN where the groups are stored. Must be used in cunjonction with a group parameter mapping, generally using the memberOf feature.]" mandatory="false"/>
         <param name="LDAP_GROUP_FILTER" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[LDAP Groups Filter]" description="CONF_MESSAGE[Filter which groups to fetch.]" mandatory="false" default="objectClass=group"/>
         <param name="LDAP_GROUPATTR" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[Group attribute]" description="CONF_MESSAGE[Group main attribute to be used as a label]" mandatory="false"/>
-        <param name="LDAP_GROUP_PREFIX" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[Role Prefix (for memberof)]" description="CONF_MESSAGE[Role prefix when you mapping memberof => roleID]" default="" mandatory="false" />
+        <param name="LDAP_GROUP_PREFIX" group="CONF_MESSAGE[Groups Schema]" type="string" label="CONF_MESSAGE[Role Prefix (for memberof)]" description="CONF_MESSAGE[Role prefix when you mapping memberof => roleID]" default="ldap_" mandatory="false" />
 
         <!-- Attributes Mapping -->
         <param name="LDAP_MAPPING_LEGEND" group="CONF_MESSAGE[Attributes Mapping]" type="legend" label="" description="CONF_MESSAGE[Use this section to automatically map some LDAP attributes to Pydio plugins parameters values.]"/>
