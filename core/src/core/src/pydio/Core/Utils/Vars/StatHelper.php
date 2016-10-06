@@ -85,7 +85,7 @@ class StatHelper
         if (!is_array(self::$extensionsCache) || !array_key_exists($ctx->getStringIdentifier(), self::$extensionsCache)) {
             $EXTENSIONS = array();
             $RESERVED_EXTENSIONS = array();
-            include_once(AJXP_CONF_PATH."/extensions.conf.php");
+            include(AJXP_CONF_PATH."/extensions.conf.php");
             $EXTENSIONS = array_merge($RESERVED_EXTENSIONS, $EXTENSIONS);
             foreach ($EXTENSIONS as $key => $value) {
                 unset($EXTENSIONS[$key]);
