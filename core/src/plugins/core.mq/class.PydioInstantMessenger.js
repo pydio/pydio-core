@@ -33,7 +33,7 @@ Class.create("PydioInstantMessenger", {
     initialize : function(){
         "use strict";
 
-        if(window.ajxpMinisite) return;
+        //if(window.ajxpMinisite) return;
 
         this.clientId = window.ajxpBootstrap.parameters.get("SECURE_TOKEN");
         this.configs = pydio.getPluginConfigs("mq");
@@ -63,7 +63,7 @@ Class.create("PydioInstantMessenger", {
 
     initForRepoId:function(repoId){
 
-        if(window.WebSocket && this.configs.get("WS_ACTIVE")){
+        if(window.WebSocket && !window.ajxpMinisite && this.configs.get("WS_ACTIVE")){
 
             if(this.ws) {
                 if(!repoId){

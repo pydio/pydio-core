@@ -22,6 +22,8 @@
 namespace Pydio\Action\Compression;
 
 use Exception;
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 
@@ -96,7 +98,7 @@ class PowerFSController extends Plugin
                     $response = $response->withBody($fileReader);
                 } else {
                     $response = $response->withHeader("Content-type", "text/html");
-                    $response->getBody()->write("<script>alert('Cannot find archive! Is ZIP correctly installed?');</script>");
+                    $response->getBody()->write("<script>alert('".str_replace("'", "\'", $mess["powerfs.5"])."');</script>");
                 }
                 break;
 
@@ -109,7 +111,7 @@ class PowerFSController extends Plugin
                 if ($taskId === null) {
                     $task = TaskService::actionAsTask($ctx, $request->getAttribute("action"), $httpVars);
                     $task->setLabel($mess['powerfs.1']);
-                    $task->setFlags(Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
+                    $task->setFlags(Task::FLAG_HAS_PROGRESS);
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     return;
                 }
@@ -177,9 +179,12 @@ class PowerFSController extends Plugin
                             }
                             $tok = strtok("\n");
                         }
-                        if ($finishedEchoed) $percent = 100;
-                        else $percent = min(round(count($handled) / count($todo) * 100), 100);
-                        TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Creating archive " . $percent . " %", null, $percent);
+                        if ($finishedEchoed) $newPercent = 100;
+                        else $newPercent = min(round(count($handled) / count($todo) * 100), 100);
+                        if($newPercent !== $percent){
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, str_replace("%s", $percent, $mess["powerfs.4"]), null, $percent);
+                        }
+                        $percent = $newPercent;
                     }
                     // avoid a busy wait
                     if ($percent < 100) usleep(1);
@@ -187,15 +192,15 @@ class PowerFSController extends Plugin
                 pclose($proc);
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "");
                 if ($request->getAttribute("action") === "compress") {
-                    $newNode = new \Pydio\Access\Core\Model\AJXP_Node($urlBase . $dir . "/" . $archiveName);
-                    $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
+                    $newNode = new AJXP_Node($urlBase . $dir . "/" . $archiveName);
+                    $nodesDiff = new NodesDiff();
                     $nodesDiff->add($newNode);
                     Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
                 } else {
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
                     $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'" . $opeId . "',archive_name:'" . $archiveName . "'}); ";
                     $actionTrigger = new JsActionTrigger($jsCode, 0);
-                    Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML()));
+                    Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML(), $ctx->getUser()->getId()));
 
                 }
 

@@ -22,5 +22,7 @@ $mess = array(
     // will be replaced by the application title
     "1" => "A criar o ficheiro, por favor aguarde",
     "2" => "Actualize a pasta actual",
-    "3" => "A Transferência do ficheiro deverá começar automaticamente"
+    "3" => "A Transferência do ficheiro deverá começar automaticamente",
+    "4" => "A criar o ficheiro - %s%",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

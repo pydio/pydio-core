@@ -22,5 +22,7 @@ $mess = array(
     // will be replaced by the application title
     "1" => "Création de l'archive, veuillez patienter",
     "2" => "Rechargement du répertoire",
-    "3" => "Le téléchargement de l'archive devrait démarrer automatiquement"
+    "3" => "Le téléchargement de l'archive devrait démarrer automatiquement",
+    "4" => "Création de l'archive - %s%",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

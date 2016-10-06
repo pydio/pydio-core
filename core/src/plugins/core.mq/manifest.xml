@@ -73,7 +73,7 @@
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientListener name="init"><![CDATA[
-                        if(!pydio.mqObserver && !pydio.mqObserverLoading && !window.ajxpMinisite){
+                        if(!pydio.mqObserver && !pydio.mqObserverLoading){
                             pydio.mqObserverLoading = true;
                             ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.PydioInstantMessenger.js', 'PydioInstantMessenger', function(){
                                 pydio.mqObserver = new PydioInstantMessenger();

@@ -20,7 +20,9 @@
  */
 $mess = array(
     // will be replaced by the application title
-    "1" => "Creating archive, please wait",
+    "1" => "Launching archive creation in background, please wait.",
     "2" => "Reload current folder",
     "3" => "Archive download should start automatically",
+    "4" => "Creating archive - %s% done",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

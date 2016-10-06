@@ -90,9 +90,9 @@ class TaskService implements ITasksProvider
             return $response;
         }
 
-        $minisite = $request !== null && $request->getAttribute("minisite");
+        //$minisite = $request !== null && $request->getAttribute("minisite");
 
-        if(ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() && !$minisite) {
+        if(ConfService::backgroundActionsSupported() && !ApplicationState::sapiIsCli() /*&& !$minisite*/) {
 
             CliRunner::applyTaskInBackground($task);
             return $response;

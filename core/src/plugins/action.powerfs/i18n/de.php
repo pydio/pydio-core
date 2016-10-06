@@ -22,5 +22,7 @@ $mess = array(
     // will be replaced by the application title
     "1" => "Archiv wird erstellt. Bitte warten...",
     "2" => "Aktuellen Ordner neu laden",
-    "3" => "Der Download des Archivs sollte automatisch starten"
+    "3" => "Der Download des Archivs sollte automatisch starten",
+    "4" => "Archiv wird erstellt - %s%",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

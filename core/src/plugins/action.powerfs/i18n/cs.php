@@ -23,4 +23,6 @@ $mess = array(
     "1" => "Vytváří se archiv, chvíli strpení",
     "2" => "Znovu načíst aktuální adresář",
     "3" => "Stahování archivu by mělo začít automaticky",
+    "4" => "Vytváří se archiv - %s%",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );
