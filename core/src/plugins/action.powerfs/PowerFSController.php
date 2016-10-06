@@ -116,7 +116,7 @@ class PowerFSController extends Plugin
                     return;
                 }
 
-                $rootDir = FsAccessWrapper::getRealFSReference($urlBase) . $dir;
+                $rootDir = FsAccessWrapper::getRealFSReference($urlBase) . TextEncoder::toStorageEncoding($dir);
                 // List all files
                 $todo = array();
                 $args = array();
@@ -125,7 +125,7 @@ class PowerFSController extends Plugin
                 foreach ($selection->getFiles() as $selectionFile) {
                     $selectionFile = TextEncoder::toStorageEncoding($selectionFile);
                     $baseFile = $selectionFile;
-                    $args[] = escapeshellarg(substr($selectionFile, strlen($dir) + ($dir == "/" ? 0 : 1)));
+                    $args[] = escapeshellarg(substr($selectionFile, strlen(TextEncoder::toStorageEncoding($dir)) + ($dir == "/" ? 0 : 1)));
                     $selectionFile = FsAccessWrapper::getRealFSReference($urlBase . $selectionFile);
                     $todo[] = ltrim(str_replace($replaceSearch, $replaceReplace, $selectionFile), "/");
                     if (is_dir($selectionFile)) {
@@ -137,7 +137,7 @@ class PowerFSController extends Plugin
                     if (trim($baseFile, "/") == "") {
                         // ROOT IS SELECTED, FIX IT
                         $args = array(escapeshellarg(TextEncoder::toStorageEncoding(basename($rootDir))));
-                        $rootDir = TextEncoder::toStorageEncoding(dirname($rootDir));
+                        $rootDir = dirname($rootDir);
                         break;
                     }
                 }
@@ -148,7 +148,7 @@ class PowerFSController extends Plugin
                     $archiveName = ApplicationState::getTemporaryFolder() . DIRECTORY_SEPARATOR . $opeId . "_" . $archiveName;
                 }
                 chdir($rootDir);
-                $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg($archiveName) . " " . implode(" ", $args);
+                $cmd = $this->getContextualOption($ctx, "ZIP_PATH") . " -r " . escapeshellarg(TextEncoder::toStorageEncoding($archiveName)) . " " . implode(" ", $args);
                 /** @var \Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver $fsDriver */
                 $fsDriver = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("access");
                 $c = $fsDriver->getConfigs();
