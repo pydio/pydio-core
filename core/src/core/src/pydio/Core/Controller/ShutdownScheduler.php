@@ -122,7 +122,6 @@ class ShutdownScheduler
             $arguments = array_shift($this->callbacks);
             $callback = array_shift($arguments);
             try {
-                error_log("<comment>--> Applying Shutdown Hook: ". get_class($callback[0]) ."::".$callback[1]."</comment>");
                 if($cliOutput !== null){
                     $cliOutput->writeln("<comment>--> Applying Shutdown Hook: ". get_class($callback[0]) ."::".$callback[1]."</comment>");
                 }
