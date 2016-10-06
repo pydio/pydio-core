@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<editor
+        id="editor.libreoffice" enabled="false" openable="true" order="900" text="libreoffice.1" title="libreoffice.1"
+        canWrite="true" iconClass="icon-edit" icon="edit.png" className="LibreOfficeOpener" mimes="docx,pptx,xlsx,dotx,xltx,ppsx,doc,ppt,xls,dot,xlt,pps,odt,odp,ods,ots,ott,otp,rtf,csv"
+        formId="libreoffice_box" label="CONF_MESSAGE[Collabora Online]" description="CONF_MESSAGE[Collabora Online Editor for office documents]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+
+    <server_settings>
+        <global_param name="LIBREOFFICE_IFRAME_URL" type="string" label="CONF_MESSAGE[URL to the Libre Office Editor Iframe]" description="CONF_MESSAGE[URL to the Libre Office Editor Iframe...]" mandatory="true" expose="true"/>
+        <global_param name="LIBREOFFICE_WEBSOCKET_SECURE" type="boolean" label="CONF_MESSAGE[Websocket Uses TLS]" description="CONF_MESSAGE[Web Socket Uses TLS...]" default="false" mandatory="true"  expose="true"/>
+        <global_param name="LIBREOFFICE_WEBSOCKET_HOST" type="string" label="CONF_MESSAGE[Web Socket Connector Host]" description="CONF_MESSAGE[Host of the Web Socket Connector...]" default="localhost" mandatory="true"  expose="true"/>
+        <global_param name="LIBREOFFICE_WEBSOCKET_PORT" type="string" label="CONF_MESSAGE[Web Socket Connector Port]" description="CONF_MESSAGE[Host of the Web Socket Connector...]" default="9980" mandatory="true"  expose="true"/>
+    </server_settings>
+    <client_settings>
+        <resources>
+            <js file="plugins/editor.libreoffice/class.LibreOfficeOpener.js" className="LibreOfficeOpener"/>
+            <i18n namespace="libreoffice" path="plugins/editor.libreoffice/resources/i18n" />
+        </resources>
+    </client_settings>
+
+    <dependencies>
+        <activePlugin pluginName="authfront.keystore" />
+        <!-- Stream Wrapper Access
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>-->
+    </dependencies>
+
+    <clientForm id="libreoffice_box"><![CDATA[
+		<div id="libreoffice_box"  box_width="90%" box_height="90%" box_resize="true" box_padding="5" class="editor_container pdf_viewer"><div id="libreOfficeContainer"></div></div>
+	]]></clientForm>
+
+    <class_definition filename="plugins/editor.libreoffice/Driver.php" classname="Pydio\Editor\LibreOffice\Driver" />
+
+    <registry_contributions>
+        <actions>
+            <action name="libreoffice_get_file_url">
+                <processing>
+                    <serverCallback methodName="switchAction"/>
+                </processing>
+            </action>
+            <action name="libreoffice_list_formats">
+                <processing>
+                    <serverCallback methodName="listEmptyFormatsAction"/>
+                </processing>
+            </action>
+            <action name="libreoffice_mkempty_file">
+                <gui text="libreoffice.10" title="libreoffice.10" src="filenew.png" iconClass="icon-file-alt" hasAccessKey="false">
+                    <context selection="false" dir="true" recycle="hidden" actionBar="false"
+                             contextMenu="false" infoPanel="false" actionBarGroup="create" inZip="false"/>
+                </gui>
+                <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <processing>
+                    <clientCallback prepareModal="true"><![CDATA[
+                    modal.showDialogForm('Create', 'libreoffice_create_form', function(){
+                        var oForm = modal.getForm();
+                        var selector = oForm.down("#formats_selector");
+                        PydioApi.getClient().request({get_action:'libreoffice_list_formats'}, function(t){
+                            var response = t.responseJSON;
+                            for(var ext in response){
+                                if(!response.hasOwnProperty(ext)) continue;
+                                selector.insert('<option value="'+ ext +'">'+ response[ext] +' (.'+ext+')</option>');
+                            }
+                            selector.down('option[value="odt"]').selected = true;
+                        });
+                    }, function(){
+                        var oForm = modal.getForm();
+                        PydioApi.getClient().submitForm(oForm);
+                        hideLightBox(true);
+                        return false;
+                    });
+                ]]></clientCallback>
+                    <clientForm id="libreoffice_create_form"><![CDATA[
+                    <div id="libreoffice_create_form" action="libreoffice_mkempty_file">
+                        <div class="dialogLegend" ajxp_message_id="libreoffice.11">AJXP_MESSAGE[libreoffice.11]</div>
+                        <select name=format id="formats_selector"></select>
+                    </div>
+                ]]></clientForm>
+                    <clientListener name="init"><![CDATA[
+                    document.observe("ajaxplorer:afterApply-mkdir", function(){
+                        if(modal.getForm().down("#libreoffice_mkfile")) return;
+                        var link = '<div class="dialogLegend" style="padding-top:20px;" id="libreoffice_mkfile"><span class="icon-chevron-right"></span> '+MessageHash["libreoffice.12"]+'</div>';
+                        modal.getForm().down("div.dialogButtons").insert({before:link});
+                        modal.getForm().down("#libreoffice_mkfile").down("a").addClassName("create_file_alt_link").observe("click", function(){
+                            pydio.getController().fireAction("libreoffice_mkempty_file");
+                        });
+                    });
+                ]]></clientListener>
+                    <serverCallback methodName="createEmptyAction" restParams="/format/dir+"/>
+                </processing>
+            </action>
+        </actions>
+    </registry_contributions>
+</editor>
