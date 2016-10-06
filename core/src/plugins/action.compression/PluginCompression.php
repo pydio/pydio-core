@@ -213,7 +213,7 @@ class PluginCompression extends Plugin
                  } else {
                     // If tar command is not found, compress with PHP Phar instead
                     try {
-                        $tmpArchiveName = tempnam(ApplicationState::getAjxpTmpDir(), "tar-compression") . ".tar";
+                        $tmpArchiveName = tempnam(ApplicationState::getTemporaryFolder(), "tar-compression") . ".tar";
                         $archive = new PharData($tmpArchiveName);
                     } catch (Exception $e) {
                         $postMessageStatus($e->getMessage(), Task::STATUS_FAILED);
