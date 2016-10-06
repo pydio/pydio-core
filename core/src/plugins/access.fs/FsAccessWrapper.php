@@ -189,7 +189,7 @@ class FsAccessWrapper implements IAjxpWrapper
                         }
                     }
                 }
-                self::$currentListing = array_merge($folders, $builtFolders, $files);
+                self::$currentListing = $folders + $builtFolders + $files;
                 self::$currentListingKeys = array_keys(self::$currentListing);
                 self::$currentListingIndex = 0;
                 return -1;

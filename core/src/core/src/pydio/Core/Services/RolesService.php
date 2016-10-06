@@ -275,7 +275,7 @@ class RolesService
         }
         if(isSet($found) && count($found)){
             // Add the ones loaded from cache
-            $roles = array_merge($roles, $found);
+            $roles = $roles + $found;
         }
         if (self::$useCache && !count($roleIds) && $excludeReserved == true) {
             self::$rolesCache = $roles;
