@@ -381,16 +381,21 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
 
     /**
      * @param AJXP_Node $parentNode
+     * @param bool $success
      */
-    public function indexationEnds($parentNode){
-        $this->logDebug('INDEX.END', 'Optimizing Index');
-        $this->currentIndex->optimize();
-        $this->logDebug('INDEX.END', 'Commiting Index');
-        $this->currentIndex->commit();
-        unset($this->currentIndex);
-        $this->logDebug('INDEX.END', 'Merging Temporary in main');
-        $this->mergeTemporaryIndexToMain($parentNode->getContext());
-        $this->logDebug('INDEX.END', 'Done');
+    public function indexationEnds($parentNode, $success){
+        if($success){
+            $this->logDebug('INDEX.END', 'Optimizing Index');
+            $this->currentIndex->optimize();
+            $this->logDebug('INDEX.END', 'Commiting Index');
+            $this->currentIndex->commit();
+            unset($this->currentIndex);
+            $this->logDebug('INDEX.END', 'Merging Temporary in main');
+            $this->mergeTemporaryIndexToMain($parentNode->getContext());
+            $this->logDebug('INDEX.END', 'Done');
+        }else{
+            $this->deleteTemporaryIndex($parentNode->getContext());
+        }
     }
 
     /**
@@ -750,6 +755,15 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         $tmpIndexPath = $indexPath."-PYDIO_TMP";
         $this->clearIndexIfExists($indexPath);
         $this->moveIndex($tmpIndexPath, $indexPath);
+        $this->clearIndexIfExists($tmpIndexPath);
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     */
+    protected function deleteTemporaryIndex(ContextInterface $ctx){
+        $indexPath = $this->getIndexPath($ctx);
+        $tmpIndexPath = $indexPath."-PYDIO_TMP";
         $this->clearIndexIfExists($tmpIndexPath);
     }
 

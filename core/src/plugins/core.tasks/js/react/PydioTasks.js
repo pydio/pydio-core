@@ -55,7 +55,7 @@
         }
 
         pause(){
-            TaskAPI.updateTaskStatus(this, Task.STATUS_PAUSED);
+            TaskAPI.updateTaskStatus(this, Task.STATUS_INTERRUPT);
         }
 
         stop(){
@@ -74,6 +74,7 @@
     Task.STATUS_COMPLETE = 4;
     Task.STATUS_FAILED = 8;
     Task.STATUS_PAUSED = 16;
+    Task.STATUS_INTERRUPT = 64;
 
     Task.FLAG_STOPPABLE = 1;
     Task.FLAG_RESUMABLE = 2;
@@ -286,7 +287,8 @@
 
         propTypes: {
             task: React.PropTypes.instanceOf(Task),
-            adminDisplayScope: React.PropTypes.bool
+            adminDisplayScope: React.PropTypes.bool,
+            showFull: React.PropTypes.bool
         },
 
         render: function(){
@@ -301,6 +303,9 @@
                 clickStyle = {cursor:'pointer'};
             }
             let customClassName = this.props.task.getClassName() || '';
+            if(this.props.showFull){
+                customClassName += ' show-full';
+            }
             return (
                 <div className={"task " + "task-status-" + this.props.task.getStatus() + " " + customClassName}>
                     <div className="task_texts" onClick={click} style={clickStyle}>
@@ -326,7 +331,8 @@
 
         getInitialState(){
             return {
-                tasks: TaskStore.getInstance().getTasks()
+                tasks: TaskStore.getInstance().getTasks(),
+                mouseOver: false
             };
         },
 
@@ -338,21 +344,29 @@
             TaskStore.getInstance().stopObserving("tasks_updated");
         },
 
+        onMouseOver: function(){
+            this.setState({mouseOver: true});
+        },
+
+        onMouseOut: function(){
+            this.setState({mouseOver: false});
+        },
+
         render: function(){
             let tasks = [];
             this.state.tasks.forEach(function(t){
-                if(t.getStatus() == Task.STATUS_COMPLETE) return;
-                tasks.push(<TaskEntry task={t}/>);
-            });
+                if(t.getStatus() === Task.STATUS_COMPLETE) return;
+                tasks.push(<TaskEntry task={t} showFull={this.state.mouseOver}/>);
+            }.bind(this));
             let className = "pydio-tasks-panel";
             let heightStyle;
             if(!tasks.length){
                 className += " invisible";
             }else{
-                heightStyle = {height: Math.min(tasks.length * 60, 180)};
+                heightStyle = {height: this.state.mouseOver ? 'auto' : Math.min(tasks.length * 60, 180)};
             }
             return (
-                <div className={className} style={heightStyle}>
+                <div onMouseOver={this.onMouseOver} onMouseOut={this.onMouseOut} className={className} style={heightStyle}>
                     {tasks}
                 </div>
             );

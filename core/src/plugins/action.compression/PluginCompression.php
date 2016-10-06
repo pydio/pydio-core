@@ -98,7 +98,7 @@ class PluginCompression extends Plugin
                 $taskId = $requestInterface->getAttribute("pydio-task-id");
                 // LAUNCH IN BACKGROUND AND EXIT
                 if (empty($taskId)) {
-                    $task = TaskService::actionAsTask($ctx, "compression", $httpVars, [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
+                    $task = TaskService::actionAsTask($ctx, "compression", $httpVars, [], Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.5"]);
                     $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     break;
@@ -226,7 +226,7 @@ class PluginCompression extends Plugin
                 $taskId = $requestInterface->getAttribute("pydio-task-id");
                 // LAUNCH IN BACKGROUND AND EXIT
                 if (empty($taskId)) {
-                    $task = TaskService::actionAsTask($ctx, "extraction", $httpVars, [], Task::FLAG_STOPPABLE | Task::FLAG_HAS_PROGRESS);
+                    $task = TaskService::actionAsTask($ctx, "extraction", $httpVars, [], Task::FLAG_HAS_PROGRESS);
                     $task->setLabel($messages["compression.12"]);
                     $responseInterface = TaskService::getInstance()->enqueueTask($task, $requestInterface, $responseInterface);
                     break;

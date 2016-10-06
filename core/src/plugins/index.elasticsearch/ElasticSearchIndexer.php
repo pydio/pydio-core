@@ -124,9 +124,10 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
 
     /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $parentNode
+     * @param bool $success
      */
-    public function indexationEnds($parentNode){
-        if($this->currentIndex) {
+    public function indexationEnds($parentNode, $success){
+        if($success && $this->currentIndex) {
             $this->currentIndex->optimize();
         }
     }

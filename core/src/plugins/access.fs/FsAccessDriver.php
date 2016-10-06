@@ -786,7 +786,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($request->getAttribute("pydio-task-id") === null){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setActionLabel($mess, '313');
-                    $task->setFlags(Task::FLAG_STOPPABLE);
+                    //$task->setFlags(Task::FLAG_STOPPABLE);
                     $response = TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;
                 }
@@ -995,7 +995,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($taskId === null && ($size === -1 || $size > $bgSizeThreshold)){
                     $task = TaskService::actionAsTask($ctx, $action, $httpVars);
                     $task->setActionLabel($mess, $action === 'copy' ? '66' : '70');
-                    $task->setFlags(Task::FLAG_STOPPABLE);
+                    //$task->setFlags(Task::FLAG_STOPPABLE);
                     if($size === -1 || $size > $bgWorkerThreshold){
                         $task->setSchedule(new Schedule(Schedule::TYPE_ONCE_DEFER));
                     }

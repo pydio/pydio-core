@@ -88,7 +88,7 @@ class HttpDownload extends Plugin
                 // Preparing the task
                 $taskId = $request->getAttribute("pydio-task-id");
                 if(empty($taskId)) {
-                    $task = TaskService::actionAsTask($request->getAttribute("ctx"), "external_download", $httpVars, [], Task::FLAG_HAS_PROGRESS | Task::FLAG_STOPPABLE);
+                    $task = TaskService::actionAsTask($request->getAttribute("ctx"), "external_download", $httpVars, [], Task::FLAG_HAS_PROGRESS);
                     $task->setActionLabel(LocaleService::getMessages(), 'httpdownloader.1');
                     TaskService::getInstance()->enqueueTask($task, $request, $response);
                     break;

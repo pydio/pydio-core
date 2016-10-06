@@ -126,7 +126,9 @@ class Middleware extends SapiMiddleware
 
         if($response !== false && ($response->getBody()->getSize() || $response instanceof EmptyResponse) || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
+            $response = $response->withHeader("Connection", "close");
             $emitter->emit($response);
+            ShutdownScheduler::getInstance()->callRegisteredShutdown();
         }
     }
 

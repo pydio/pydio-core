@@ -55,7 +55,7 @@ class DAVServer
         self::$context = Context::emptyContext();
 
         if (!ConfService::getGlobalConf("WEBDAV_ENABLE")) {
-            throw new Forbidden('You are not allowed to access this service');
+            die('You are not allowed to access this service');
         }
 
         PluginsService::getInstance(self::$context)->initActivePlugins();
@@ -82,7 +82,7 @@ class DAVServer
                 }
             }
             if ($repository == null) {
-                throw new Forbidden('You are not allowed to access this service');
+                die('You are not allowed to access this service '.$repositoryId);
             }
 
             self::$context->setRepositoryId($repositoryId);

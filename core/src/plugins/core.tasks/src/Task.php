@@ -41,6 +41,7 @@ class Task
     const STATUS_FAILED = 8;
     const STATUS_PAUSED = 16;
     const STATUS_TEMPLATE = 32;
+    const STATUS_INTERRUPT = 64;
 
     const FLAG_STOPPABLE    = 1;
     const FLAG_RESUMABLE    = 2;

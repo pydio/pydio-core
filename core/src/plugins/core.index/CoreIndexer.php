@@ -23,6 +23,8 @@ namespace Pydio\Access\Indexer\Core;
 
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\UserInterruptException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Controller\Controller;
@@ -109,10 +111,16 @@ class CoreIndexer extends Plugin {
                     $this->debug("Error Indexing Node ".$node->getUrl()." (".$e->getMessage().")");
                 }
             }else{
-                try{
+                try {
                     $this->recursiveIndexation($ctx, $node);
+                }catch(UserInterruptException $uIE){
+                    $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
+                    $this->releaseStatus($node->getRepository(), $ctx->getUser(), "Interrupted by user", true);
+                    Controller::applyHook("node.index.recursive.end", array($node, false));
                 }catch (\Exception $e){
                     $this->debug("Indexation of ".$node->getUrl()." interrupted by error: (".$e->getMessage().")");
+                    $this->releaseStatus($node->getRepository(), $ctx->getUser(), "Error", true);
+                    Controller::applyHook("node.index.recursive.end", array($node, false));
                 }
             }
 
@@ -138,10 +146,7 @@ class CoreIndexer extends Plugin {
             Controller::applyHook("node.index.recursive.start", array($node));
         }else{
             if($this->isInterruptRequired($repository, $user)){
-                $this->debug("Interrupting indexation! - node.index.recursive.end - ". $node->getUrl());
-                Controller::applyHook("node.index.recursive.end", array($node));
-                $this->releaseStatus($repository, $user);
-                throw new \Exception("User interrupted");
+                throw new UserInterruptException("User interrupted");
             }
         }
 
@@ -163,6 +168,11 @@ class CoreIndexer extends Plugin {
                 if($child[0] == ".") continue;
                 $childNode = new AJXP_Node(rtrim($url, "/")."/".$child);
                 $childUrl = $childNode->getUrl();
+
+                if($this->isInterruptRequired($repository, $user)){
+                    throw new UserInterruptException("User interrupted");
+                }
+
                 if(is_dir($childUrl)){
                     $this->debug("Entering recursive indexation for ".$childUrl);
                     $this->recursiveIndexation($ctx, $childNode, $depth + 1);
@@ -182,8 +192,8 @@ class CoreIndexer extends Plugin {
         if($depth == 0){
             $this->debug("End indexation - node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
             $this->setIndexStatus("RUNNING", "Indexation finished, cleaning...", $repository, $user, false);
-            Controller::applyHook("node.index.recursive.end", array($node));
-            $this->releaseStatus($repository, $user);
+            Controller::applyHook("node.index.recursive.end", array($node, true));
+            $this->releaseStatus($repository, $user, "Indexation finished");
             $this->debug("End indexation - After node.index.recursive.end - ". memory_get_usage(true) ."  -  ". $node->getUrl());
         }
     }
@@ -216,7 +226,9 @@ class CoreIndexer extends Plugin {
     protected function setIndexStatus($status, $message, $repository, $user, $stoppable = true)
     {
         if(isSet($this->currentTaskId)){
-            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_RUNNING, $message, $stoppable);
+            if(!$this->isInterruptRequired($repository, $user)){
+                TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_RUNNING, $message, $stoppable);
+            }
         }
         $iPath = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes";
         if(!is_dir($iPath)) mkdir($iPath,0755, true);
@@ -243,11 +255,13 @@ class CoreIndexer extends Plugin {
     /**
      * @param \Pydio\Core\Model\RepositoryInterface $repository
      * @param UserInterface $user
+     * @param string $label
+     * @param bool $errorStatus
      */
-    protected function releaseStatus($repository, $user)
+    protected function releaseStatus($repository, $user, $label, $errorStatus = false)
     {
         if(isSet($this->currentTaskId)){
-            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, Task::STATUS_COMPLETE, "Done");
+            TaskService::getInstance()->updateTaskStatus($this->currentTaskId, $errorStatus ? Task::STATUS_FAILED : Task::STATUS_COMPLETE, $label);
         }
         $f = (defined('AJXP_SHARED_CACHE_DIR')?AJXP_SHARED_CACHE_DIR:AJXP_CACHE_DIR)."/indexes/.indexation_status-".$this->buildIndexLockKey($repository, $user);
         $this->debug("Removing file ".$f);
@@ -273,7 +287,7 @@ class CoreIndexer extends Plugin {
     {
         if(isSet($this->currentTaskId)){
             $task = TaskService::getInstance()->getTaskById($this->currentTaskId);
-            return ($task->getStatus() == Task::STATUS_PAUSED);
+            return ($task->getStatus() === Task::STATUS_INTERRUPT);
         }
         list($status, $message) = $this->getIndexStatus($repository, $user);
         return ($status == "INTERRUPT");

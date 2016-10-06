@@ -5905,6 +5905,14 @@ div.pydio-tasks-panel div.task .task_texts div {
   overflow: hidden;
   white-space: nowrap;
 }
+div.pydio-tasks-panel div.task .task_texts div.task_label {
+  font-weight: 500;
+}
+div.pydio-tasks-panel div.task.show-full .task_texts div {
+  text-overflow: inherit;
+  overflow: visible;
+  white-space: normal;
+}
 div.pydio-tasks-panel div.task .task_actions {
   cursor: pointer;
 }
