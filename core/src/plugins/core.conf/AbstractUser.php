@@ -207,13 +207,13 @@ abstract class AbstractUser implements UserInterface
     }
 
     /**
-     * @return array
+     * @return AJXP_Role[]
      */
     public function getRoles()
     {
-        if (isSet($this->rights["ajxp.roles"])) {
-            uksort($this->rights["ajxp.roles"], array($this, "orderRoles"));
-            return $this->rights["ajxp.roles"];
+        if (isSet($this->roles)) {
+            uksort($this->roles, array($this, "orderRoles"));
+            return $this->roles;
         } else {
             return array();
         }
