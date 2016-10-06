@@ -22,6 +22,7 @@ namespace Pydio\Core\Http\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
+use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\Exception\PydioException;
 
 use Pydio\Core\Http\Response\SerializableResponseStream;
@@ -125,7 +126,9 @@ class SapiMiddleware implements ITopLevelMiddleware
 
         if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse) || $response->getStatusCode() != 200) {
             $emitter = new \Zend\Diactoros\Response\SapiEmitter();
+            $response = $response->withHeader("Connection", "close");
             $emitter->emit($response);
+            ShutdownScheduler::getInstance()->callRegisteredShutdown();
         }
     }
 

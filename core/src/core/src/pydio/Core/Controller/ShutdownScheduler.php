@@ -20,7 +20,10 @@
  */
 namespace Pydio\Core\Controller;
 
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Log\Core\Logger;
+use Symfony\Component\Console\Output\OutputInterface;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 /**
@@ -53,23 +56,23 @@ class ShutdownScheduler
     public function __construct()
     {
         $this->callbacks = array();
-        register_shutdown_function(array($this, 'callRegisteredShutdown'));
-        ob_start();
+//        register_shutdown_function(array($this, 'callRegisteredShutdown'));
+//        ob_start();
     }
 
     /**
      * @return bool
-     * @throws \Exception
+     * @throws PydioException
      */
     public function registerShutdownEventArray()
     {
         $callback = func_get_args();
 
         if (empty($callback)) {
-            throw new \Exception('No callback passed to '.__FUNCTION__.' method');
+            throw new PydioException('No callback passed to '.__FUNCTION__.' method');
         }
         if (!is_callable($callback[0])) {
-            throw new \Exception('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
+            throw new PydioException('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
         }
         $flattenArray = array();
         $flattenArray[0] = $callback[0];
@@ -82,17 +85,17 @@ class ShutdownScheduler
 
     /**
      * @return bool
-     * @throws \Exception
+     * @throws PydioException
      */
     public function registerShutdownEvent()
     {
         $callback = func_get_args();
 
         if (empty($callback)) {
-            throw new \Exception('No callback passed to '.__FUNCTION__.' method');
+            throw new PydioException('No callback passed to '.__FUNCTION__.' method');
         }
         if (!is_callable($callback[0])) {
-            throw new \Exception('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
+            throw new PydioException('Invalid callback ('.$callback[0].') passed to the '.__FUNCTION__.' method');
         }
         $this->callbacks[] = $callback;
         return true;
@@ -100,16 +103,11 @@ class ShutdownScheduler
 
     /**
      * Trigger the schedulers
+     * @param OutputInterface $cliOutput
      */
-    public function callRegisteredShutdown()
+    public function callRegisteredShutdown($cliOutput = null)
     {
         session_write_close();
-        if (!headers_sent()) {
-            $size = ob_get_length();
-            header("Connection: close\r\n");
-            //header("Content-Encoding: none\r\n");
-            header("Content-Length: $size");
-        }
         ob_end_flush();
         flush();
         $index = 0;
@@ -117,8 +115,11 @@ class ShutdownScheduler
             $arguments = array_shift($this->callbacks);
             $callback = array_shift($arguments);
             try {
+                if($cliOutput !== null){
+                    $cliOutput->writeln("<comment>--> Applying Shutdown Hook: ". get_class($callback[0]) ."::".$callback[1]."</comment>");
+                }
                 call_user_func_array($callback, $arguments);
-            } catch (\Exception $e) {
+            } catch (PydioException $e) {
                 Logger::error(__CLASS__, __FUNCTION__, array("context" => "Applying hook " . get_class($callback[0]) . "::" . $callback[1], "message" => $e->getMessage()));
             }
             $index++;

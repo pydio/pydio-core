@@ -22,6 +22,7 @@ namespace Pydio\Core\Http\Cli;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\Exception\AuthRequiredException;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
@@ -63,6 +64,9 @@ class CliMiddleware implements ITopLevelMiddleware
             $responseInterface = Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
 
             $this->emitResponse($requestInterface, $responseInterface);
+
+            $logHooks = isSet($requestInterface->getParsedBody()["cli-show-hooks"]) ? $output: null;
+            ShutdownScheduler::getInstance()->callRegisteredShutdown($logHooks);
 
         } catch (AuthRequiredException $e){
 
