@@ -52,7 +52,14 @@ class PydioApcuCache extends ApcuCache implements PatternClearableCache
     public function deleteKeysStartingWith($pattern) {
         $pattern = '/^'.$this->namespacedIdAsPattern($pattern).'/';
         //SAMPLE /^pydio-unique-id_nodes_\[list\:\/\/1/
-        $iterator = new \APCIterator('user', $pattern);
+        if(class_exists("\\APCIterator")){
+            $iterator = new \APCIterator('user', $pattern);
+        }else if(class_exists("\\APCUIterator")){
+            $iterator = new \APCUIterator('user', $pattern);
+        }else{
+            error_log("Trying to delete cache entry using pattern, but could not find either APCIterator or APCUIterator");
+            return;
+        }
         foreach ($iterator as $data) {
             $this->doDelete($data['key']);
         }
