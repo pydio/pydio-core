@@ -127,7 +127,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
                         $serialized = gzdeflate(serialize($data), 9);
                         if($driver === "postgre"){
                             dibi::query("DELETE FROM [ajxp_mq_queues] WHERE [channel_name] = %s", $channelName);
-                            dibi::query('INSERT INTO [ajxp_mq_queues]', ["channel_name" => $channelName, "content" => $serialized]);
+                            dibi::query('INSERT INTO [ajxp_mq_queues] ([channel_name], [content]) VALUES (%s, %bin)', $channelName, $serialized);
                         }else{
                             $inserts[] = "(%s, %bin)";
                             $insertValues[] = $channelName;

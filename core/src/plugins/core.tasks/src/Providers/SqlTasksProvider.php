@@ -44,6 +44,21 @@ class SqlTasksProvider implements ITasksProvider
      * @return array
      */
     protected function taskToDBValues(Task $task, $removeId = false){
+        $modifiers = [
+            "[type]"              => "%i",
+            "[parent_uid]"        => "%s",
+            "[flags]"             => "%i",
+            "[label]"             => "%s",
+            "[user_id]"            => "%s",
+            "[ws_id]"              => "%s",
+            "[status]"            => "%i",
+            "[status_msg]"        => "%s",
+            "[progress]"          => "%i",
+            "[schedule]"          => "%i",
+            "[schedule_value]"    => "%s",
+            "[action]"            => "%s",
+            "[parameters]"        => "%bin",
+        ];
         $values = [
             "type"              => $task->getType(),
             "parent_uid"        => $task->getParentId(),
@@ -62,11 +77,14 @@ class SqlTasksProvider implements ITasksProvider
         if(!$removeId){
             // This is a creation
             $values["creation_date"] = time();
+            $modifiers["[creation_date]"] = "%i";
             $values = array_merge(["uid" => $task->getId()], $values);
+            $modifiers = array_merge(["[uid]" => "%s"], $modifiers);
         }else{
             $values["status_update"] = time();
+            $modifiers["[status_update]"] = "%i";
         }
-        return $values;
+        return [$modifiers, $values];
     }
 
     /**
@@ -134,7 +152,12 @@ class SqlTasksProvider implements ITasksProvider
      */
     public function createTask(Task $task, Schedule $when)
     {
-        dibi::query("INSERT INTO [ajxp_tasks] ", $this->taskToDBValues($task));
+        list($modifiers, $values) = $this->taskToDBValues($task);
+        $fields = implode(",", array_keys($modifiers));
+        $mods   = implode(",", array_values($modifiers));
+        $values = array_values($values);
+        array_unshift($values, "INSERT INTO [ajxp_tasks] (".$fields.") VALUES (".$mods.")");
+        call_user_func_array(["dibi", "query"], $values);
         $this->insertOrUpdateNodes($task);
     }
 
@@ -158,7 +181,15 @@ class SqlTasksProvider implements ITasksProvider
     public function updateTask(Task $task)
     {
         try{
-            dibi::query("UPDATE [ajxp_tasks] SET ", $this->taskToDBValues($task, true), " WHERE [uid] =%s", $task->getId());
+            list($modifiers, $values) = $this->taskToDBValues($task, true);
+            $mods = [];
+            foreach($modifiers as $field => $mod){
+                $mods[] = "$field=$mod";
+            }
+            $values = array_values($values);
+            $values[] = $task->getId();
+            array_unshift($values, "UPDATE [ajxp_tasks] SET ".implode(",", $mods)." WHERE [uid] =%s");
+            call_user_func_array(["dibi", "query"], $values);
             $this->insertOrUpdateNodes($task, true);
         }catch (\DibiException $ex){
             Logger::error(__CLASS__, __FUNCTION__, "Error while updating task: ".$ex->getSql());
