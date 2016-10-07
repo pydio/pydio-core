@@ -385,7 +385,8 @@ abstract class AbstractCacheDriver extends Plugin
         if(!isSet($this->httpClient)){
             $baseUrl = ApplicationState::detectServerURL(true);
             if(empty($baseUrl)){
-                throw new PydioException("Server URL does not seem to be configured, CLI cannot trigger cache deletion commands");
+                $this->logError("Http Deletion", "Server URL does not seem to be configured, CLI cannot trigger cache deletion commands!");
+                return null;
             }
             $this->httpClient = new Client([
                 'base_url' => $baseUrl
@@ -397,7 +398,9 @@ abstract class AbstractCacheDriver extends Plugin
     public function __destruct()
     {
         if(count($this->httpDeletion)){
-            $this->getHttpClient()->post('/?get_action=clear_cache_key', [
+            $client = $this->getHttpClient();
+            if(empty($client)) return;
+            $client->post('/?get_action=clear_cache_key', [
                 'body' => [
                     'data' => json_encode($this->httpDeletion)
                 ]
