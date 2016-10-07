@@ -23,9 +23,11 @@ namespace Pydio\Tasks\Providers;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Log\Core\Logger;
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
 use Pydio\Tasks\Task;
+use \dibi as dibi;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -55,12 +57,8 @@ class SqlTasksProvider implements ITasksProvider
             "schedule"          => $task->getSchedule()->getType(),
             "schedule_value"    => $task->getSchedule()->getValue(),
             "action"            => $task->getAction(),
-            "parameters"        => json_encode($task->getParameters()),
-            "nodes"             => ""
+            "parameters"        => gzdeflate(json_encode($task->getParameters()), 9),
         ];
-        if(count($task->nodes)){
-            $values["nodes"] = "|||".implode("|||", $task->nodes)."|||";
-        }
         if(!$removeId){
             // This is a creation
             $values["creation_date"] = time();
@@ -93,12 +91,40 @@ class SqlTasksProvider implements ITasksProvider
         $task->setAction($values["action"]);
         $task->setCreationDate($values["creation_date"]);
         $task->setStatusChangeDate($values["status_update"]);
-        $task->setParameters(json_decode($values["parameters"], true));
-        $nodes = explode("|||", trim($values["nodes"], "|||"));
-        foreach ($nodes as $node) {
-            if(!empty($node)) $task->attachToNode($node);
-        }
+        $task->setParameters(json_decode(gzinflate($values["parameters"]), true));
+        $this->loadTaskNodes($task);
         return $task;
+    }
+
+    /**
+     * @param Task $task
+     * @param bool $update
+     */
+    protected function insertOrUpdateNodes($task, $update = false){
+        if($update){
+            dibi::query("DELETE FROM [ajxp_tasks] WHERE [task_uid]=%s", $task->getId());
+        }
+        foreach($task->nodes as $nodeUrl){
+            $nodePath = parse_url($nodeUrl, PHP_URL_PATH);
+            if(empty($nodePath)) $nodePath = "/";
+            $nodeBaseUrl = preg_replace('/'. preg_quote($nodePath, '/') . '$/', "", $nodeUrl);
+            $values = [
+                "task_uid"      => $task->getId(),
+                "node_base_url" => $nodeBaseUrl,
+                "node_path"     => $nodePath
+            ];
+            dibi::query("INSERT INTO [ajxp_tasks_nodes] ", $values);
+        }
+    }
+
+    /**
+     * @param Task $task
+     */
+    protected function loadTaskNodes(&$task){
+        $rows = dibi::query("SELECT [node_base_url],[node_path] FROM [ajxp_tasks_nodes] WHERE [task_uid] = %s", $task->getId())->fetchAll();
+        foreach($rows as $dibiRow){
+            $task->attachToNode($dibiRow['node_base_url'].$dibiRow['node_path']);
+        }
     }
 
     /**
@@ -108,7 +134,8 @@ class SqlTasksProvider implements ITasksProvider
      */
     public function createTask(Task $task, Schedule $when)
     {
-        \dibi::query("INSERT INTO [ajxp_tasks] ", $this->taskToDBValues($task));
+        dibi::query("INSERT INTO [ajxp_tasks] ", $this->taskToDBValues($task));
+        $this->insertOrUpdateNodes($task);
     }
 
     /**
@@ -117,7 +144,7 @@ class SqlTasksProvider implements ITasksProvider
      */
     public function getTaskById($taskId)
     {
-        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE [uid]=%s', $taskId);
+        $res = dibi::query('SELECT * FROM [ajxp_tasks] WHERE [uid]=%s', $taskId);
         foreach ($res->fetchAll() as $row) {
             return $this->taskFromDBValues($row);
         }
@@ -131,9 +158,10 @@ class SqlTasksProvider implements ITasksProvider
     public function updateTask(Task $task)
     {
         try{
-            \dibi::query("UPDATE [ajxp_tasks] SET ", $this->taskToDBValues($task, true), " WHERE [uid] =%s", $task->getId());
+            dibi::query("UPDATE [ajxp_tasks] SET ", $this->taskToDBValues($task, true), " WHERE [uid] =%s", $task->getId());
+            $this->insertOrUpdateNodes($task, true);
         }catch (\DibiException $ex){
-            $sql = $ex->getSql();
+            Logger::error(__CLASS__, __FUNCTION__, "Error while updating task: ".$ex->getSql());
         }
     }
     
@@ -143,7 +171,8 @@ class SqlTasksProvider implements ITasksProvider
      */
     public function deleteTask($taskId)
     {
-        \dibi::query("DELETE FROM [ajxp_tasks] WHERE uid=%s", $taskId);
+        dibi::query("DELETE FROM [ajxp_tasks] WHERE [uid]=%s", $taskId);
+        dibi::query("DELETE FROM [ajxp_tasks_nodes] WHERE [task_uid]=%s", $taskId);
     }
 
     /**
@@ -169,7 +198,7 @@ class SqlTasksProvider implements ITasksProvider
         $tasks = [];
         $where = [];
         $where[] = array("[parent_uid] = %s", $taskId);
-        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
+        $res = dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
         foreach ($res->fetchAll() as $row) {
             $tasks[] = $this->taskFromDBValues($row);
         }
@@ -193,7 +222,7 @@ class SqlTasksProvider implements ITasksProvider
             $where[] = array("[ws_id] = %s", $repository->getId());
         }
         $where[] = array("[status] IN (1,2,8,16)");
-        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
+        $res = dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
         foreach ($res->fetchAll() as $row) {
             $tasks[] = $this->taskFromDBValues($row);
         }
@@ -208,12 +237,15 @@ class SqlTasksProvider implements ITasksProvider
     {
         $tasks = [];
         try{
-            $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE [nodes] LIKE %s AND [status] NOT IN (1,4,8)', "%|||".$node->getUrl()."|||%");
+            $res = dibi::query("SELECT * FROM [ajxp_tasks],[ajxp_tasks_nodes] WHERE 
+                [ajxp_tasks_nodes].[node_base_url] = %s 
+                AND [ajxp_tasks_nodes].[node_path] = %s
+                AND [status] NOT IN (1,4,8)", rtrim($node->getContext()->getUrlBase(), '/'), $node->getPath());
             foreach ($res->fetchAll() as $row) {
                 $tasks[] = $this->taskFromDBValues($row);
             }
         }catch(\DibiException $e){
-            $sql = $e->getSql();
+            Logger::error(__CLASS__, __FUNCTION__, "Error while retrieving task for node: ".$e->getSql());
         }
         return $tasks;
     }
@@ -253,7 +285,7 @@ class SqlTasksProvider implements ITasksProvider
                 $where[] = array("[parent_uid] = %s", $parentUid);
             }
         }
-        $res = \dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
+        $res = dibi::query('SELECT * FROM [ajxp_tasks] WHERE %and', $where);
         foreach ($res->fetchAll() as $row) {
             $tasks[] = $this->taskFromDBValues($row);
         }

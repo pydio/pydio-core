@@ -83,14 +83,16 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         if(empty($this->sqlDriver)) {
             return;
         }
-        if(!dibi::isConnected()){
+        try {
+            dibi::getConnection();
+        }catch(\DibiException $db){
             dibi::connect($this->sqlDriver);
         }
         $res = dibi::query('SELECT [content] FROM [ajxp_mq_queues] WHERE [channel_name] = %s', $channelName);
         if($res->count()){
             if(!isset(self::$channels)) self::$channels = array();
             $single = $res->fetchSingle();
-            $data = unserialize($single);
+            $data = unserialize(gzinflate($single));
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
@@ -108,17 +110,21 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
     public function __destruct()
     {
         if (isSet(self::$channels) && is_array(self::$channels) && !empty($this->sqlDriver)) {
+            $channels = self::$channels;
+            self::$channels = null;
             $inserts = [];
             $insertValues = [];
             $deletes = [];
             $driver = $this->sqlDriver["driver"];
-            if(!dibi::isConnected()){
+            try {
+                dibi::getConnection();
+            }catch(\DibiException $db){
                 dibi::connect($this->sqlDriver);
             }
-            foreach (self::$channels as $channelName => $data) {
+            foreach ($channels as $channelName => $data) {
                 if (is_array($data)) {
                     if(isSet($data["CLIENTS"]) && count($data["CLIENTS"])) {
-                        $serialized = serialize($data);
+                        $serialized = gzdeflate(serialize($data), 9);
                         if($driver === "postgre"){
                             dibi::query("DELETE FROM [ajxp_mq_queues] WHERE [channel_name] = %s", $channelName);
                             dibi::query('INSERT INTO [ajxp_mq_queues]', ["channel_name" => $channelName, "content" => $serialized]);
