@@ -160,14 +160,29 @@
             </div>
 
             <script type="text/javascript">
-                var testRewrite = new Ajax.Request('data/cache/index.html', {
+                var testAllowOverride = new Ajax.Request('data/cache/index.html', {
                     method : 'get',
                     onComplete : function(response){
-                        if(200 == response.status){
+                        if(200 === response.status){
                             var html = '<div class="testLine error">\
                                 <div class="testName"><span>-</span>Security Breach</div>\
                                 <div class="testStatus">error</div>\
                                 <div class="testDescription  visible">It seems that your <b>data/</b> folder is not correctly protected, and that subfolders (like the data/cache/ folder) are web-accessible. If you are using <b>Apache</b>, make sure the AllowOverride All option is active for your current directory. If you are running <b>Windows IIS</b>, you must manually add a RequestFiltering/HiddenSegments configuration to prevent web access to these folders. If you have defined a different AJXP_DATA_PATH pointing outside the webfolder, you can ignore this warning.</div>\
+                                <div class="testClear"></div>\
+                            </div>';
+                            $$('div.testList')[0].insert({top:html});
+                        }
+                    }
+                });
+
+                var testRewrite = new Ajax.Request('public/', {
+                    method : 'get',
+                    onComplete : function(response){
+                        if(404 === response.status){
+                            var html = '<div class="testLine error">\
+                                <div class="testName"><span>-</span>RewriteRule does not seem to work</div>\
+                                <div class="testStatus">error</div>\
+                                <div class="testDescription  visible">Testing access to <b>public/</b> should give an empty link page but gives a 404, which seems to indicate that your server is not configure to support RewriteRules. If you are using <b>Apache</b>, make sure the ModRewrite is active. For other servers, check pydio install folder where you may find proper configuration files (web.config.sample, nginx.sample)</div>\
                                 <div class="testClear"></div>\
                             </div>';
                             $$('div.testList')[0].insert({top:html});
