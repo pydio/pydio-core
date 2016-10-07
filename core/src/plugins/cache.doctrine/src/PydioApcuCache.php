@@ -55,7 +55,7 @@ class PydioApcuCache extends ApcuCache implements PatternClearableCache
         if(class_exists("\\APCIterator")){
             $iterator = new \APCIterator('user', $pattern);
         }else if(class_exists("\\APCUIterator")){
-            $iterator = new \APCUIterator('user', $pattern);
+            $iterator = new \APCUIterator($pattern);
         }else{
             error_log("Trying to delete cache entry using pattern, but could not find either APCIterator or APCUIterator");
             return;
