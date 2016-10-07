@@ -290,7 +290,7 @@ class BootConfLoader extends AbstractConfDriver
                 $diagResults = [];
                 include($diagFile);
                 if(isSet($diagResults['Command Line Available']) && $diagResults['Command Line Available'] === 'Yes'){
-                    $direct["ENABLE_CLI"] = "core.ajaxplorer/CLI_PHP";
+                    $direct["ENABLE_CLI"] = "core.ajaxplorer/CMDLINE_ACTIVE";
                     $data["ENABLE_CLI"]   = true;
                 }
             }
