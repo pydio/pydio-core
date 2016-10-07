@@ -907,7 +907,11 @@
                     expDate.setDate(today.getDate() + parseInt(expirationDate));
                     additionalData += '\n - ' + MessageHash['share_center.21'] + ': ' + expDate.toLocaleDateString();
                 }
-                message = s + additionalData + "\n\n " + "<a href='"+link+"'>"+link+"</a>";
+                if(ShareModel.forceMailerOldSchool()){
+                    message = s + additionalData + "\n\n: " + link;
+                }else{
+                    message = s + additionalData + "\n\n" + "<a href='"+link+"'>"+link+"</a>";
+                }
             }else{
                 if(!this._data['repository_url']){
                     throw new Error(MessageHash['share_center.230']);
@@ -919,10 +923,18 @@
                     if(this.getNode().isLeaf()){
                         link = this._data['repository_url'].split('/ws-').shift() + '/ws-inbox';
                         let sharedFilesString = MessageHash["share_center.100"];
-                        linkMessage = MessageHash["share_center.234"].replace('%s', '<a href="'+link+'">'+ sharedFilesString +'</a>');
+                        if(ShareModel.forceMailerOldSchool()){
+                            linkMessage = MessageHash["share_center.234"].replace('%s', sharedFilesString) + " ("+ link +")";
+                        }else{
+                            linkMessage = MessageHash["share_center.234"].replace('%s', '<a href="'+link+'">'+ sharedFilesString +'</a>');
+                        }
                     }else{
                         link = this._data['repository_url'];
-                        linkMessage = "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ApplicationTitle) + "</a>";
+                        if(ShareModel.forceMailerOldSchool()){
+                            linkMessage = ": " + link;
+                        }else{
+                            linkMessage = "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ApplicationTitle) + "</a>";
+                        }
                     }
                 }
                 message = s + "\n\n " + linkMessage;
