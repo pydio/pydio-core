@@ -120,7 +120,7 @@ class SqlTasksProvider implements ITasksProvider
      */
     protected function insertOrUpdateNodes($task, $update = false){
         if($update){
-            dibi::query("DELETE FROM [ajxp_tasks] WHERE [task_uid]=%s", $task->getId());
+            dibi::query("DELETE FROM [ajxp_tasks_nodes] WHERE [task_uid]=%s", $task->getId());
         }
         foreach($task->nodes as $nodeUrl){
             $nodePath = parse_url($nodeUrl, PHP_URL_PATH);
