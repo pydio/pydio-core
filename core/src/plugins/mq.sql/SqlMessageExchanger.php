@@ -88,10 +88,9 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         }catch(\DibiException $db){
             dibi::connect($this->sqlDriver);
         }
-        $res = dibi::query('SELECT [content] FROM [ajxp_mq_queues] WHERE [channel_name] = %s', $channelName);
-        if($res->count()){
+        $single = dibi::query('SELECT [content] FROM [ajxp_mq_queues] WHERE [channel_name] = %s', $channelName)->fetchSingle();
+        if(!empty($single)){
             if(!isset(self::$channels)) self::$channels = array();
-            $single = $res->fetchSingle();
             $data = unserialize(gzinflate($single));
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
