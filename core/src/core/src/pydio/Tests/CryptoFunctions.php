@@ -26,13 +26,13 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  * Check whether mcrypt is enabled
  * @package Pydio\Tests
  */
-class PHPMCrypt extends AbstractTest
+class CryptoFunctions extends AbstractTest
 {
 
     /**
      * @inheritdoc
      */
-    public function __construct() { parent::__construct("MCrypt enabled", "MCrypt is required by all security functions."); }
+    public function __construct() { parent::__construct("Crypto Extensions", "Either OpenSSL or MCrypt are required by internal security functions."); }
 
     /**
      * @inheritdoc
@@ -40,11 +40,11 @@ class PHPMCrypt extends AbstractTest
     public function doTest()
     {
         $this->failedLevel = "error";
-        if (!function_exists("mcrypt_create_iv")) {
-            $this->testedParams["MCrypt Enabled"] = "No";
+        if (!function_exists("openssl_encrypt")  && !function_exists("mcrypt_create_iv")) {
+            $this->testedParams["OpenSSL or MCrypt Detected"] = "No";
             return FALSE;
         }
-        $this->testedParams["MCrypt Enabled"] = "Yes";
+        $this->testedParams["Crypto Extension Detected"] = function_exists("openssl_encrypt") ? "OpenSSL" : "MCrypt";
         return TRUE;
     }
 }
