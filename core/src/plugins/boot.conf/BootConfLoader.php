@@ -146,9 +146,10 @@ class BootConfLoader extends AbstractConfDriver
                 $addParams .= XMLFilter::resolveKeywords($typePlug->getManifestRawContent("server_settings/global_param"));
             }
         }
-        $uri = $_SERVER["REQUEST_URI"];
-        if (strpos($uri, '.php') !== false) $uri = PathUtils::forwardSlashDirname($uri);
-        if (empty($uri)) $uri = "/";
+        //$uri = $_SERVER["REQUEST_URI"];
+        //if (strpos($uri, '.php') !== false) $uri = PathUtils::forwardSlashDirname($uri);
+        //if (empty($uri)) $uri = "/";
+        $url = ApplicationState::detectServerURL(true);
         $tryFullLocale = setlocale(LC_CTYPE, 0);
         $locale = TextEncoder::getEncoding();
         if(strpos($tryFullLocale, ".") !== false)$locale = $tryFullLocale;
@@ -156,7 +157,7 @@ class BootConfLoader extends AbstractConfDriver
         $apcCache = function_exists('apc_fetch') || function_exists('apcu_fetch');
         $loadedValues = array(
             "ENCODING" => $locale,
-            "SERVER_URI" => $uri,
+            "SERVER_URL" => $url,
             "APC_CACHE_ENABLE" => $apcCache ? "true" : "false"
         );
         foreach ($loadedValues as $pName => $pValue) {
@@ -267,20 +268,31 @@ class BootConfLoader extends AbstractConfDriver
             $data["ENABLE_NOTIF"] = true;
             // Prepare plugins configs
             $direct = array(
-                "APPLICATION_TITLE" => "core.ajaxplorer/APPLICATION_TITLE",
-                "APPLICATION_LANGUAGE" => "core.ajaxplorer/DEFAULT_LANGUAGE",
-                "ENABLE_NOTIF" => "core.notifications/USER_EVENTS",
-                "APPLICATION_WELCOME" => "gui.ajax/CUSTOM_WELCOME_MESSAGE"
+                "APPLICATION_TITLE"     => "core.ajaxplorer/APPLICATION_TITLE",
+                "APPLICATION_LANGUAGE"  => "core.ajaxplorer/DEFAULT_LANGUAGE",
+                "SERVER_URL"            => "core.ajaxplorer/SERVER_URL",
+                "ENABLE_NOTIF"          => "core.notifications/USER_EVENTS",
+                "APPLICATION_WELCOME"   => "gui.ajax/CUSTOM_WELCOME_MESSAGE",
             );
             $mailerEnabled = $data["MAILER_ENABLE"]["status"];
             if ($mailerEnabled == "yes") {
                 // Enable core.mailer
-                $data["MAILER_SYSTEM"] = $data["MAILER_ENABLE"]["MAILER_SYSTEM"];
-                $data["MAILER_ADMIN"] = $data["MAILER_ENABLE"]["MAILER_ADMIN"];
+                $data["MAILER_SYSTEM"]  = $data["MAILER_ENABLE"]["MAILER_SYSTEM"];
+                $data["MAILER_ADMIN"]   = $data["MAILER_ENABLE"]["MAILER_ADMIN"];
                 $direct = array_merge($direct, array(
-                    "MAILER_SYSTEM" => "mailer.phpmailer-lite/MAILER",
-                    "MAILER_ADMIN" => "core.mailer/FROM",
+                    "MAILER_SYSTEM"     => "mailer.phpmailer-lite/MAILER",
+                    "MAILER_ADMIN"      => "core.mailer/FROM",
                 ));
+            }
+            // If command line test passed, enable it directly
+            $diagFile = $this->getPluginWorkDir()."/diag_result.php";
+            if(file_exists($diagFile)){
+                $diagResults = [];
+                include($diagFile);
+                if(isSet($diagResults['Command Line Available']) && $diagResults['Command Line Available'] === 'Yes'){
+                    $direct["ENABLE_CLI"] = "core.ajaxplorer/CLI_PHP";
+                    $data["ENABLE_CLI"]   = true;
+                }
             }
         }
 
@@ -335,10 +347,12 @@ class BootConfLoader extends AbstractConfDriver
             "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
         ));
         if($data["APC_CACHE_ENABLE"]){
+            $rand = StringHelper::slugify(trim(parse_url($data["SERVER_URL"], PHP_URL_PATH), "/"));
+            if(empty($rand)) $rand = substr(md5(time()), 0, 8);
             $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array(
                 "instance_name" => "cache.doctrine",
                 "group_switch_value" => "cache.doctrine",
-                "CACHE_PREFIX" => StringHelper::slugify("pydio-".$data["SERVER_URI"]),
+                "CACHE_PREFIX" => "pydio-".$rand,
                 "DRIVER" => [
                     "group_switch_value" => "apc",
                     "driver" => "apc",
@@ -414,8 +428,9 @@ class BootConfLoader extends AbstractConfDriver
 
         $htAccessToUpdate = null;
         $tpl = file_get_contents($this->getBaseDir() . "/htaccess.tpl");
-        if (!empty($data["SERVER_URI"]) && $data["SERVER_URI"] != "/") {
-            $htContent = str_replace('${APPLICATION_ROOT}', $data["SERVER_URI"], $tpl);
+        $uri = rtrim(parse_url($data["SERVER_URL"], PHP_URL_PATH), "/");
+        if (!empty($uri)) {
+            $htContent = str_replace('${APPLICATION_ROOT}', $uri, $tpl);
         } else {
             $htContent = str_replace('${APPLICATION_ROOT}/', "/", $tpl);
             $htContent = str_replace('${APPLICATION_ROOT}', "/", $htContent);
@@ -491,13 +506,13 @@ class BootConfLoader extends AbstractConfDriver
         if ($action == "boot_test_sql_connexion") {
 
             $p = OptionsHelper::cleanDibiDriverParameters($data["db_type"]);
-            if ($p["driver"] == "sqlite3") {
+            if ($p["driver"] === "sqlite3") {
                 $dbFile = VarsFilter::filter($p["database"], $ctx);
                 if (!file_exists(dirname($dbFile))) {
                     mkdir(dirname($dbFile), 0755, true);
                 }
             }
-            if(empty($p["password"])){
+            if($p["driver"] !== "sqlite3" && empty($p["password"])){
                 throw new PydioException("Although it's technically possible, for security reasons please do not use blank password for your DB connection.");
             }
             // Should throw an exception if there was a problem.

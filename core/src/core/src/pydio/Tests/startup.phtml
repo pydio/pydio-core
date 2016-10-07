@@ -4,17 +4,16 @@
 		<title>Pydio</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-		<link rel="icon" type="image/x-png" href="AJXP_THEME_FOLDER/images/html-folder.png">
+		<link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/orbit/images/html-folder.png">
 		<script src="plugins/gui.ajax/res/js/vendor/prototype/prototype.js" type="text/javascript"></script>
         <style>
             * {
                 font-family: Roboto, sans-serif;
             }
             body {
-                background-color: #F5F5F5;
+                background-color: #ECEFF1;
                 margin: 0;
                 padding: 20px;
-                overflow: hidden;
             }
             h1 {
                 font-size: 30px;
@@ -27,13 +26,10 @@
 
             div.mainContainer{
                 position: relative;
-                display: block;
-                border-radius: 4px;
                 margin: 36px auto;
                 width: 660px;
                 height: 80%;
                 padding: 7px 11px;
-                color: #535353;
             }
 
             p.status{
@@ -46,13 +42,15 @@
             }
             p.status a{
                 display: inline-block;
-                background-color: #555555;
+                float: right;
+                background-color: #009688;
                 color: white;
                 text-transform: uppercase;
-                padding: 5px 10px;
+                padding: 6px 13px;
                 text-decoration: none;
-                border-radius: 3px;
-                margin: 9px 1px;
+                border-radius: 1px;
+                margin: 10px 0;
+                box-shadow: 0 2px 3px rgba(0,0,0,.16),0 2px 3px rgba(0,0,0,.43);
             }
             p.status strong{
                 font-weight: normal;
@@ -60,18 +58,16 @@
             }
 
             div.testList{
-                font-size: 15px;
                 margin: 0 auto;
-                overflow-y: scroll;
-                background-color: #ffffff;
-                border-radius: 3px;
-                box-shadow: 0 0 8px rgba(0,0,0,0.25);
             }
 
             div.testLine {
                 text-align: left;
                 padding: 15px 15px 9px;
-                border-bottom: 1px solid #E7E7E7;
+                margin: 4px 3px;
+                background-color: #ffffff;
+                box-shadow: 0 1px 2px rgba(0,0,0,.10),0 1px 1px rgba(0,0,0,.33);
+                border-radius: 1px;
             }
             div.testClear{
                 clear:both;
@@ -81,8 +77,8 @@
                 float: left;
                 width: 80%;
                 cursor: pointer;
-                font-size: 20px;
-                color: #555;
+                font-size: 16px;
+                color: #000;
             }
             div.testName span{
                 display: none;
@@ -102,18 +98,17 @@
                 color: #f90;
             }
             div.testDescription{
-                display:none;
-                font-size: 0.8em;
-                color: #999;
+                font-size: 12px;
+                color: rgba(0, 0, 0, 0.43);
                 clear: both;
-                padding: 20px 0 5px;
+                padding: 9px 0 5px;
+                font-weight: 500;
             }
             div.testDescription.visible
             {
                 display: block;
             }
             p.suggestion{
-                font-size:0.9em;
                 margin:5px 0 0;
             }
 
@@ -128,11 +123,11 @@
             <?php
                 if ($showSkipLink) {
                     if (count($ALL_ROWS["warning"]) && !count($ALL_ROWS["error"])) {
-                        echo "<p class='status statusWarning'><strong>Status</strong> : You have some warnings, but no fatal error detected, Pydio should run ok. <br/>Please review the warnings, and <a href='?ignore_tests=true'>click here to continue to Pydio</a>.</p>";
+                        echo "<p class='status statusWarning'><strong>Status</strong> : You have some warnings, but no fatal error detected, Pydio should run ok. <br/>Please review the warnings. <a href='?ignore_tests=true'>Continue to Pydio Installation</a></p>";
                     } else if(count($ALL_ROWS["error"])) {
-                        echo "<p class='status statusError'><strong>Status</strong> : <b>You have some errors</b> that may prevent Pydio from running. Please review the error lines to check what action you should do. If you want to skip this step, simply <a href='?ignore_tests=true'>click here to continue to Pydio</a>.</p>";
+                        echo "<p class='status statusError'><strong>Status</strong> : <b>You have some errors</b> that may prevent Pydio from running. Please review the error lines to check what action you should do. <a href='?ignore_tests=true'>Ignore and continue to Pydio</a>.</p>";
                     }else{
-                        echo "<p class='status'><strong>Status</strong> : <b>No specific errors</b> were detected, your Pydio installation should run smoothly! <br/><a href='?ignore_tests=true'>Click there to continue to Pydio</a></p>";
+                        echo "<p class='status'><strong>Status</strong> : <b>No specific errors</b> were detected, your Pydio installation should run smoothly! <br/><a href='?ignore_tests=true'>Continue to Pydio Installation!</a></p>";
                     }
                 }
             ?>
