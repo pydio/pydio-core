@@ -589,7 +589,6 @@
                             </fileset>
                         </copy>
 
-                        <property name="grunt-target" value=""/>
                         <if>
                             <and>
                                 <isset property="js-required"/>
@@ -598,22 +597,25 @@
                             </and>
                             <then>
                                 <echo message=" --> Target type:js only"/>
-                                <property name="grunt-target" value="type:js"/>
+                                <property name="grunttarget" value="type:js"/>
                             </then>
                             <elseif>
-                                <isset property="css-required"/>
-                                <isset property="has-js-path"/>
-                                <not><isset property="js-required"/></not>
+				<and>
+	                                <isset property="css-required"/>
+        	                        <isset property="has-js-path"/>
+                	                <not><isset property="js-required"/></not>
+				</and>
                                 <then>
                                     <echo message=" --> Target type:css only"/>
-                                    <property name="grunt-target" value="type:css"/>
+                                    <property name="grunttarget" value="type:css"/>
                                 </then>
                             </elseif>
                         </if>
 
+                        <echo message=" --> Grunt Target Value is ${grunttarget}"/>
                         <phingcall target="grunt">
                             <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
-                            <property name="grunt_target" value="${grunt-target}"/>
+                            <property name="grunt_target" override="true" value="${grunttarget}"/>
                         </phingcall>
                     </then>
                 </if>
@@ -647,20 +649,11 @@
 
     <target name="grunt">
         <if>
-            <isset property="grunt_target"/>
-            <then>
-                <property name="command" value="grunt ${grunt_target}"/>
-            </then>
-            <else>
-                <property name="command" value="grunt"/>
-            </else>
-        </if>
-        <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
-                <exec command="${command}" dir="${plugin_abs_dir}" passthru="true"/>
+                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
             </then>
         </if>
