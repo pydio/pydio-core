@@ -237,17 +237,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('assemble-less');
-    grunt.registerTask('default', [
+    grunt.registerTask('type:js', [
         'babel:dist',
         'uglify:js',
         'babel:materialui',
-//    'run:materialui',
         'env:build',
         'browserify',
         'env:dev',
         'uglify:nodejs',
-        'babel:pydio',
+        'babel:pydio'
+    ]);
+    grunt.registerTask('type:css', [
         'cssmin'
+    ]);
+    grunt.registerTask('default', [
+        'type:js',
+        'type:css'
     ]);
     grunt.registerTask('build-core', [
         'babel:dist',

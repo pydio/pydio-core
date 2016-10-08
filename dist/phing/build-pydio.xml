@@ -544,9 +544,11 @@
                 <if>
                     <not><equals arg1="${js_source_path}" arg2="__NOT_FOUND__"/></not>
                     <then>
+                        <property name="has-js-path" value="true"/>
                         <if>
                             <available type="dir" file="${upgrade_export}/plugins/${plugin}/${js_source_path}"/>
                             <then>
+                                <property name="js-required" value="true"/>
                                 <copy todir="${upgrade_export}/plugins/${plugin}/${js_source_path}">
                                     <fileset dir="${local_repository_root}/plugins/${plugin}/${js_source_path}" defaultexcludes="false">
                                         <include name="*/**"/>
@@ -559,9 +561,11 @@
                 <if>
                     <not><equals arg1="${css_source_path}" arg2="__NOT_FOUND__"/></not>
                     <then>
+                        <property name="has-css-path" value="true"/>
                         <if>
                             <available type="dir" file="${upgrade_export}/plugins/${plugin}/${css_source_path}"/>
                             <then>
+                                <property name="css-required" value="true"/>
                                 <copy todir="${upgrade_export}/plugins/${plugin}/${css_source_path}">
                                     <fileset dir="${local_repository_root}/plugins/${plugin}/${css_source_path}" defaultexcludes="false">
                                         <include name="*/**"/>
@@ -571,16 +575,46 @@
                         </if>
                     </then>
                 </if>
-                <echo message="REBUILD JS FOR PLUGIN ${plugin}"/>
-                <copy todir="${upgrade_export}/plugins/${plugin}">
-                    <fileset dir="${local_repository_root}/plugins/${plugin}">
-                        <include name="Gruntfile.js"/>
-                        <include name="package.json"/>
-                    </fileset>
-                </copy>
-                <phingcall target="grunt">
-                    <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
-                </phingcall>
+                <if>
+                    <or>
+                        <available property="js-required"/>
+                        <available property="css-required"/>
+                    </or>
+                    <then>
+                        <echo message="REBUILDING JS FOR PLUGIN ${plugin}"/>
+                        <copy todir="${upgrade_export}/plugins/${plugin}">
+                            <fileset dir="${local_repository_root}/plugins/${plugin}">
+                                <include name="Gruntfile.js"/>
+                                <include name="package.json"/>
+                            </fileset>
+                        </copy>
+
+                        <property name="grunt-target" value=""/>
+                        <if>
+                            <and>
+                                <available property="js-required"/>
+                                <available property="has-css-path"/>
+                                <not><available property="css-required"/></not>
+                            </and>
+                            <then>
+                                <property name="grunt-target" value="type:js"/>
+                            </then>
+                            <elseif>
+                                <available property="css-required"/>
+                                <available property="has-js-path"/>
+                                <not><available property="js-required"/></not>
+                                <then>
+                                    <property name="grunt-target" value="type:css"/>
+                                </then>
+                            </elseif>
+                        </if>
+
+                        <phingcall target="grunt">
+                            <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
+                            <property name="grunt_target" value="${grunt-target}"/>
+                        </phingcall>
+                    </then>
+                </if>
             </then>
         </if>
         <!-- Looking for Composer.json File -->
@@ -611,11 +645,20 @@
 
     <target name="grunt">
         <if>
+            <available property="grunt_target"/>
+            <then>
+                <property name="command" value="grunt ${grunt_target}"/>
+            </then>
+            <else>
+                <property name="command" value="grunt"/>
+            </else>
+        </if>
+        <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
-                <exec command="grunt" dir="${plugin_abs_dir}" passthru="true"/>
+                <exec command="${command}" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
             </then>
         </if>
