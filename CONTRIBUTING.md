@@ -23,7 +23,7 @@ PLEASE READ THE FOLLOWING BEFORE POSTING A BUG.
 
 #### Setting up your dev environment
 
-Pydio 7 requires **PHP5.6** and upper. 
+Pydio 7 requires **PHP5.5.9** and upper. 
 
 The web root of the application is located in ***core/src/***. Create a virtual host to point to this folder, set up your webserver to use index.php as default page. This is generally done by default. 
 
