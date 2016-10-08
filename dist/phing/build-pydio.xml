@@ -577,8 +577,8 @@
                 </if>
                 <if>
                     <or>
-                        <available property="js-required"/>
-                        <available property="css-required"/>
+                        <isset property="js-required"/>
+                        <isset property="css-required"/>
                     </or>
                     <then>
                         <echo message="REBUILDING JS FOR PLUGIN ${plugin}"/>
@@ -592,18 +592,20 @@
                         <property name="grunt-target" value=""/>
                         <if>
                             <and>
-                                <available property="js-required"/>
-                                <available property="has-css-path"/>
-                                <not><available property="css-required"/></not>
+                                <isset property="js-required"/>
+                                <isset property="has-css-path"/>
+                                <not><isset property="css-required"/></not>
                             </and>
                             <then>
+                                <echo message=" --> Target type:js only"/>
                                 <property name="grunt-target" value="type:js"/>
                             </then>
                             <elseif>
-                                <available property="css-required"/>
-                                <available property="has-js-path"/>
-                                <not><available property="js-required"/></not>
+                                <isset property="css-required"/>
+                                <isset property="has-js-path"/>
+                                <not><isset property="js-required"/></not>
                                 <then>
+                                    <echo message=" --> Target type:css only"/>
                                     <property name="grunt-target" value="type:css"/>
                                 </then>
                             </elseif>
@@ -645,7 +647,7 @@
 
     <target name="grunt">
         <if>
-            <available property="grunt_target"/>
+            <isset property="grunt_target"/>
             <then>
                 <property name="command" value="grunt ${grunt_target}"/>
             </then>
