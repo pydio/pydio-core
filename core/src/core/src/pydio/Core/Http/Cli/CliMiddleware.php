@@ -65,9 +65,6 @@ class CliMiddleware implements ITopLevelMiddleware
 
             $this->emitResponse($requestInterface, $responseInterface);
 
-            $logHooks = isSet($requestInterface->getParsedBody()["cli-show-hooks"]) ? $output: null;
-            ShutdownScheduler::getInstance()->callRegisteredShutdown($logHooks);
-
         } catch (AuthRequiredException $e){
 
             $output->writeln("<error>Authentication Failed</error>");
@@ -122,6 +119,8 @@ class CliMiddleware implements ITopLevelMiddleware
         }else{
             echo "".$responseInterface->getBody();
         }
+        $logHooks = isSet($requestInterface->getParsedBody()["cli-show-hooks"]) ? $output: null;
+        ShutdownScheduler::getInstance()->callRegisteredShutdown($logHooks);
 
     }
 }

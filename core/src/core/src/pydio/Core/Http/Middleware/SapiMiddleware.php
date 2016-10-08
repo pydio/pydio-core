@@ -28,6 +28,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Utils\Vars\InputFilter;
+use Zend\Diactoros\Response\SapiEmitter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -125,8 +126,8 @@ class SapiMiddleware implements ITopLevelMiddleware
         }
 
         if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse) || $response->getStatusCode() != 200) {
-            $emitter = new \Zend\Diactoros\Response\SapiEmitter();
-            $response = $response->withHeader("Connection", "close");
+            $emitter = new SapiEmitter();
+            ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);
             ShutdownScheduler::getInstance()->callRegisteredShutdown();
         }

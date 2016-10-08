@@ -26,6 +26,7 @@ require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vend
 
 use Pydio\Core\Http\Dav\BrowserPlugin;
 use Pydio\Core\Http\Dav\Collection;
+use Pydio\Core\Http\Dav\DAVResponse;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\ConfService;
@@ -51,6 +52,8 @@ class Server extends Sabre\DAV\Server
         $rootCollection = new Collection("/", $this->context);
 
         parent::__construct($rootCollection);
+
+        $this->httpResponse = new DAVResponse();
     }
 
     /**

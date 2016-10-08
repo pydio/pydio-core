@@ -20,8 +20,9 @@
  */
 namespace Pydio\Core\Controller;
 
+use Psr\Http\Message\ResponseInterface;
 use Pydio\Core\Exception\PydioException;
-use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Http\Dav\DAVResponse;
 use Pydio\Log\Core\Logger;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -51,13 +52,25 @@ class ShutdownScheduler
     }
 
     /**
+     * @param null|DAVResponse|ResponseInterface $responseObject
+     */
+    public static function setCloseHeaders(&$responseObject = null){
+        if($responseObject instanceof DAVResponse){
+            $responseObject->setHeader("Connection", "close");
+        }else if($responseObject instanceof ResponseInterface){
+            $responseObject = $responseObject->withHeader("Connection", "close");
+        }else if(!headers_sent()){
+            header("Connection: close\r\n");
+        }
+    }
+
+    /**
      * ShutdownScheduler constructor.
      */
     public function __construct()
     {
         $this->callbacks = array();
         register_shutdown_function(array($this, 'callRegisteredShutdown'));
-//        ob_start();
     }
 
     /**
@@ -101,12 +114,6 @@ class ShutdownScheduler
         return true;
     }
 
-    public function closeAndCallRegisteredShutdown(){
-        if(!headers_sent()){
-            header("Connection: close\r\n");
-        }
-        $this->callRegisteredShutdown();
-    }
 
     /**
      * Trigger the schedulers

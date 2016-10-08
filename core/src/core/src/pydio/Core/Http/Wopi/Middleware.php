@@ -24,11 +24,13 @@ use \Psr\Http\Message\ServerRequestInterface;
 use \Psr\Http\Message\ResponseInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
+use Pydio\Core\Controller\ShutdownScheduler;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\RouteNotFoundException;
 use Pydio\Core\Http\Message\Message;
 use Pydio\Core\Http\Middleware\SapiMiddleware;
 use Pydio\Core\Http\Response\SerializableResponseStream;
+use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Diactoros\Response\SapiEmitter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -126,7 +128,7 @@ class Middleware extends SapiMiddleware
 
         if($response !== false && ($response->getBody()->getSize() || $response instanceof EmptyResponse) || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
-            $response = $response->withHeader("Connection", "close");
+            ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);
             ShutdownScheduler::getInstance()->callRegisteredShutdown();
         }
