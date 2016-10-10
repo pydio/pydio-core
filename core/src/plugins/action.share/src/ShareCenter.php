@@ -1588,15 +1588,7 @@ class ShareCenter extends Plugin
         // STORE DATA & HASH IN SHARE STORE
         $hash = $shareObject->save();
         $url = $this->getPublicAccessManager()->buildPublicLink($hash);
-        $existingShortForm = $shareObject->getShortFormUrl();
-        if(empty($existingShortForm)){
-            $shortForm = "";
-            Controller::applyHook("url.shorten", array($this->currentContext, $url, &$shortForm));
-            if(!empty($shortForm)){
-                $shareObject->setShortFormUrl($shortForm);
-                $shareObject->save();
-            }
-        }
+        Controller::applyHook("url.shorten", array($this->currentContext, &$shareObject, $this->getPublicAccessManager()));
 
         // LOG AND PUBLISH EVENT
         $update = isSet($httpVars["repository_id"]);
@@ -1807,16 +1799,7 @@ class ShareCenter extends Plugin
                     $ocsStore->storeInvitation($invitation);
                 }
             }else{
-                $url = $this->getPublicAccessManager()->buildPublicLink($shareObject->getHash());
-                $existingShortForm = $shareObject->getShortFormUrl();
-                if(empty($existingShortForm)){
-                    $shortForm = "";
-                    Controller::applyHook("url.shorten", array($ctx, $url, &$shortForm));
-                    if(!empty($shortForm)){
-                        $shareObject->setShortFormUrl($shortForm);
-                        $shareObject->save();
-                    }
-                }
+                Controller::applyHook("url.shorten", array($this->currentContext, &$shareObject, $this->getPublicAccessManager()));
             }
 
         }
