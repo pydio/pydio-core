@@ -588,7 +588,12 @@ class FtpAccessWrapper implements IAjxpWrapper
         $this->user = $credentials["user"];
         $this->password = $credentials["password"];
         if ($this->user=="") {
-            throw new PydioException("Cannot find user/pass for FTP access!");
+            if (isSet($urlParts["user"]) && isset($urlParts["pass"])) {
+                $this->user       = rawurldecode($urlParts["user"]);
+                $this->password   = rawurldecode($urlParts["pass"]);
+            }else{
+                throw new PydioException("Cannot find user/pass for FTP access!");
+            }
         }
         if ($repository->getContextOption($node->getContext(), "DYNAMIC_FTP") == "TRUE" && isSet($_SESSION["AJXP_DYNAMIC_FTP_DATA"])) {
             $data               = $_SESSION["AJXP_DYNAMIC_FTP_DATA"];
