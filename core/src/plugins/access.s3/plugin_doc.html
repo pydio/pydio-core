@@ -1,9 +1,9 @@
-<p><b>Disclaimer:</b> If you installed Pydio by the linux repository ( apt / yum ), you must install the "pydio-plugin-access.s3" adn the "pydio-plugin-metastore.s3" package before.</p>
-<p>Use Amazon Simple Storage S3 as a file container. This extension requires the following to be installed :
-<ul>
-    <li>PHP cURL extension</li>
-    <li>PHP OpenSSL extension</li>
-    <li>Amazon PHP Sdk V2 or V3 : just drop the aws.phar inside the plugin folder</li>
-</ul>
-        Once all this is installed, you should be able to access an S3 storage, using the API keys provided on your Amazon console.
+<p>
+    <b>Disclaimer:</b> If you installed Pydio by the linux repository ( apt / yum ), you must install the "pydio-plugin-access.s3" adn the "pydio-plugin-metastore.s3" package before.
+</p>
+<p>Use Amazon Simple Storage S3 as a file container. This extension should work out-of-the-box in Pydio 7, as we package
+    the AWS SDK for PHP v3 directly.
+</p>
+<p>
+    To be able to access an S3 storage, you will have to use the API keys provided on your Amazon console.
 </p>
