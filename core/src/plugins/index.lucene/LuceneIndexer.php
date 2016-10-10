@@ -626,9 +626,9 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         }
         if($doc == null) throw new \Exception("Could not load document");
 
-        $doc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "utf8"));
-        $doc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "utf8"));
-        $doc->addField(\Zend_Search_Lucene_Field::text("basename", basename($ajxpNode->getPath()), "utf8"));
+        $doc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "UTF-8"));
+        $doc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "UTF-8"));
+        $doc->addField(\Zend_Search_Lucene_Field::text("basename", basename($ajxpNode->getPath()), "UTF-8"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_node", "yes"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_scope", "shared"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
@@ -651,13 +651,13 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
         }
         foreach ($this->metaFields as $field) {
             if ($ajxpNode->$field != null) {
-                $doc->addField(\Zend_Search_Lucene_Field::text("ajxp_meta_$field", $ajxpNode->$field, "utf8"));
+                $doc->addField(\Zend_Search_Lucene_Field::text("ajxp_meta_$field", $ajxpNode->$field, "UTF-8"));
             }
         }
         if (isSet($ajxpNode->indexableMetaKeys["user"]) && count($ajxpNode->indexableMetaKeys["user"]) && UsersService::usersEnabled() && $ajxpNode->getContext()->hasUser() ) {
             $privateDoc = new \Zend_Search_Lucene_Document();
-            $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "utf8"));
-            $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "utf8"));
+            $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "UTF-8"));
+            $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "UTF-8"));
 
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_scope", "user"));
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_user", $ajxpNode->getContext()->getUser()->getId()));
