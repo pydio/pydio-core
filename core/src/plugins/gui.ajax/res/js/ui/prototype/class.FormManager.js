@@ -448,19 +448,17 @@ Class.create("FormManager", {
                 };
                 conn.sendAsync();
             }else if(json_file){
-                var req = new Connexion(json_file);
-                req.onComplete = function(transport){
+                PydioApi.getClient().loadFile(json_file, function(transport){
                     element = div.down("select");
                     if(defaultValue) element.defaultValue = defaultValue;
                     element.down('option[value="loading"]').remove();
-                    $A(transport.responseJSON).each(function(entry){
+                    transport.responseJSON.each(function(entry){
                         var option = new Element('OPTION', {value:entry.key}).update(entry.label);
                         if(entry.key == defaultValue) option.setAttribute("selected", "true");
                         element.insert(option);
                     });
                     element.fire("chosen:updated");
-                };
-                req.sendAsync();
+                });
             }
 
             if(param.get('replicationGroup')){
