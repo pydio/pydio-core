@@ -684,7 +684,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
 
                 $node = $selection->getUniqueNode();
                 $dlFile = $node->getUrl();
-                if(!is_readable($dlFile)){
+                if(!$this->isReadable($node)){
                     throw new \Exception("Cannot access file!");
                 }
                 $this->logInfo("Get_content", ["files"=>$this->addSlugToPath($selection)]);
@@ -834,14 +834,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $jsonData = new \stdClass;
                 if($selection->isUnique()){
                     $stat = @stat($selection->getUniqueNode()->getUrl());
-                    if ($stat !== false && is_readable($selection->getUniqueNode()->getUrl())) {
+                    if ($stat !== false && !$this->isReadable($selection->getUniqueNode())) {
                         $jsonData = $stat;
                     }
                 }else{
                     $nodes = $selection->buildNodes();
                     foreach($nodes as $node){
                         $stat = @stat($node->getUrl());
-                        if(!$stat || !is_readable($node->getUrl())) {
+                        if(!$stat || !$this->isReadable($node)) {
                             $stat = new \stdClass();
                         }
                         $path = $node->getPath();
@@ -1275,7 +1275,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $lsOptions = $this->parseLsOptions((isSet($httpVars["options"])?$httpVars["options"]:"a"));
 
                 $startTime = microtime();
-                $path = $selection->nodeForPath(($dir!= ""?($dir[0]=="/"?"":"/").$dir:""))->getUrl();
+                $dirNode = $selection->nodeForPath(($dir!= ""?($dir[0]=="/"?"":"/").$dir:""));
+                $path = $dirNode->getUrl();
                 $nonPatchedPath = $path;
                 if ($patch) {
                     $nonPatchedPath = PathUtils::unPatchPathForBaseDir($path);
@@ -1284,7 +1285,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($testPath === null || $testPath === false){
                     throw new \Exception("There was a problem trying to open folder ". $path. ", please check your Administrator");
                 }
-                if(!is_readable($path) && !is_writeable($path)){
+                if(!$this->isReadable($dirNode) && !$this->isWriteable($dirNode)){
                     throw new \Exception("You are not allowed to access folder " . $path);
                 }
                 // Backward compat
@@ -1317,7 +1318,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     Controller::applyHook("node.read", [&$parentAjxpNode]);
                     $nodesList->setParentNode($parentAjxpNode);
                     foreach($uniqueNodes as $node){
-                        if(!file_exists($node->getUrl()) || (!is_readable($node->getUrl()) && !is_writable($node->getUrl()))) continue;
+                        if(!file_exists($node->getUrl()) || (!$this->isReadable($node) && !$this->isWriteable($node))) continue;
                         $nodeName = $node->getLabel();
                         if (!$this->filterNodeName($ctx, $node->getPath(), $nodeName, $isLeaf, $lsOptions)) {
                             continue;
@@ -2266,8 +2267,20 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $real = $node->getRealFile();
             return posix_access($real, POSIX_W_OK);
         }
-        //clearstatcache();
         return is_writable($node->getUrl());
+    }
+
+    /**
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    public function isReadable(AJXP_Node $node)
+    {
+        if ( $this->getContextualOption($node->getContext(), "USE_POSIX") == true && extension_loaded('posix')) {
+            $real = $node->getRealFile();
+            return posix_access($real, POSIX_R_OK);
+        }
+        return is_readable($node->getUrl());
     }
 
     /**
