@@ -105,7 +105,7 @@ class MqManager extends Plugin
     public function exposeConfigInManifest($configName, $configValue)
     {
         // Do not expose those
-        if(in_array($configName, ["WS_HOST", "WS_PORT", "UPLOAD_HOST", "UPLOAD_PORT"])){
+        if(in_array($configName, ["NSQ_HOST", "NSQ_PORT"])){
             return;
         }
         if(is_array($configValue)){
@@ -290,8 +290,10 @@ class MqManager extends Plugin
         if(!$wsActive){
             return;
         }
-        $host = $this->getContextualOption($ctx, "NSQ_HOST");
-        $port = $this->getContextualOption($ctx, "NSQ_PORT");
+
+        $configs = $this->getConfigs();
+        $host = OptionsHelper::getNetworkOption($configs, OptionsHelper::OPTION_HOST, OptionsHelper::FEATURE_MESSAGING, OptionsHelper::SCOPE_EXTERNAL);
+        $port = intval(OptionsHelper::getNetworkOption($configs, OptionsHelper::OPTION_PORT, OptionsHelper::FEATURE_MESSAGING, OptionsHelper::SCOPE_EXTERNAL));
 
         if(!empty($host) && !empty($port)){
 
