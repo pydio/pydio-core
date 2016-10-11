@@ -2079,7 +2079,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             throw new PydioException($mess[100]." ".$originalNode->getPath());
         }
         Controller::applyHook("node.before_path_change", [&$originalNode]);
-        $test = @rename($originalNode->getUrl(),$newNode->getUrl());
+        $test = rename($originalNode->getUrl(),$newNode->getUrl());
         if($test === false){
             throw new \Exception("Error while renaming ".$originalNode->getPath()." to ".$newNode->getPath());
         }
