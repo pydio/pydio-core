@@ -20,8 +20,11 @@
  */
 namespace Pydio\Editor\Etherpad;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\Controller\Controller;
@@ -43,28 +46,31 @@ class EtherpadClient extends Plugin
     public $baseURL = "http://localhost:9001";
     public $apiKey = "";
 
+    //public function switchAction($actionName, $httpVars, $fileVars, ContextInterface $ctx)
     /**
-     * @param $actionName
-     * @param $httpVars
-     * @param $fileVars
-     * @param ContextInterface $ctx
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @return null
      * @throws \Exception
-     * @throws \Exception
      */
-    public function switchAction($actionName, $httpVars, $fileVars, ContextInterface $ctx)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        /** @var ContextInterface $ctx */
+        $ctx            = $requestInterface->getAttribute("ctx");
+        $actionName     = $requestInterface->getAttribute("action");
+        $httpVars       = $requestInterface->getParsedBody();
+
         $this->baseURL = rtrim($this->getContextualOption($ctx, "ETHERPAD_SERVER"), "/");
         $this->apiKey =  $this->getContextualOption($ctx, "ETHERPAD_APIKEY");
 
         $userSelection = UserSelection::fromContext($ctx, $httpVars);
         if ($userSelection->isEmpty()){
-            throw new \Exception("Empty selection");
+            throw new PydioException("Empty selection");
         }
         $selectedNode = $userSelection->getUniqueNode();
         $selectedNode->loadNodeInfo();
         if(!$selectedNode->isLeaf()){
-            throw new \Exception("Cannot handle folders, please select a file!");
+            throw new PydioException("Cannot handle folders, please select a file!");
         }
         $nodeExtension = strtolower(pathinfo($selectedNode->getPath(), PATHINFO_EXTENSION));
 
@@ -210,11 +216,15 @@ class EtherpadClient extends Plugin
      * @param bool $copy
      */
     public function handleNodeChange($fromNode=null, $toNode=null, $copy = false){
-        if($fromNode == null) return;
-        if($toNode == null){
+        if($fromNode === null) return;
+        if($toNode === null){
             $fromNode->removeMetadata("etherpad", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
         }else if(!$copy){
             $toNode->copyOrMoveMetadataFromNode($fromNode, "etherpad", "move", AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+        }else if($copy && $toNode->getExtension() === 'pad'){
+            $padID = StringHelper::generateRandomString();
+            $toNode->setMetadata("etherpad", array("pad_id" => $padID), AJXP_METADATA_ALLUSERS, AJXP_METADATA_SCOPE_GLOBAL, false);
+            file_put_contents($toNode->getUrl(), $padID);
         }
     }
 
