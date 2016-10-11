@@ -186,7 +186,7 @@ class FileReaderResponse extends AsyncResponseStream
             $filePathOrData = $filePath;
         }
 
-        if(!$data === null && !file_exists($filePathOrData)){
+        if($data === null && !file_exists($filePathOrData)){
             throw new \Exception("File $filePathOrData not found!");
         }
         $confGzip               = ConfService::getGlobalConf("GZIP_COMPRESSION");
@@ -217,7 +217,7 @@ class FileReaderResponse extends AsyncResponseStream
             ApplicationState::safeIniSet('zlib.output_compression', 'Off');
         }
 
-        $isFile = ($data !== null) && !$confGzip;
+        $isFile = ($data === null) && !$confGzip;
         if ($byteLength == -1) {
             if ($data !== null) {
                 $size = strlen($data);
