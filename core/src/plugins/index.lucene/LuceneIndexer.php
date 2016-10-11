@@ -628,7 +628,11 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
 
         $doc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "UTF-8"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "UTF-8"));
-        $doc->addField(\Zend_Search_Lucene_Field::text("basename", basename($ajxpNode->getPath()), "UTF-8"));
+        $basename = basename($ajxpNode->getPath());
+        if(class_exists("Normalizer") && !\Normalizer::isNormalized($basename, \Normalizer::FORM_C)){
+            $basename = \Normalizer::normalize($basename, \Normalizer::FORM_C);
+        }
+        $doc->addField(\Zend_Search_Lucene_Field::text("basename", $basename, "UTF-8"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_node", "yes"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_scope", "shared"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_modiftime", date("Ymd", $ajxpNode->ajxp_modiftime)));
