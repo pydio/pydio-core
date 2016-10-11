@@ -1,4 +1,7 @@
-#userdashboard_main_tab {
+#userdashboard_main_tab,
+#userdashboard_myparams_title {
+  opacity: 1 !important;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -231,25 +234,25 @@
 }
 div#userdashboard_myparams_title {
   position: absolute;
-  color: #ffffff;
-  padding: 25px 16px;
-  height: 63px;
-  font-size: 12px;
   width: 240px;
   box-sizing: border-box;
   bottom: 0;
   z-index: 2;
-  letter-spacing: 1px;
-  font-weight: 500;
   white-space: nowrap;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 div#userdashboard_myparams_title span#dash_title {
   display: none;
 }
 div#userdashboard_myparams_title a#dash_back_workspace {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
   display: block;
   cursor: pointer;
+  padding: 25px;
+}
+div#userdashboard_myparams_title a#dash_back_workspace:hover {
+  color: #ffffff;
 }
 @media only screen and (max-width: 800px) {
   div#userdashboard_myparams_title {

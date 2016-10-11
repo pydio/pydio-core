@@ -3,9 +3,14 @@
 @break2: 200px;
 @break3: 240px;
 
-#userdashboard_main_tab{
+#userdashboard_main_tab, #userdashboard_myparams_title{
+  opacity: 1 !important;
+  transition: @bezier_transition;
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+#userdashboard_main_tab{
 
   &.horizontal_tabulator {
     display: block;
@@ -236,27 +241,26 @@
 div#userdashboard_myparams_title{
 
   position: absolute;
-  color: #ffffff;
-  padding: 25px 16px;
-  height: 63px;
-  font-size: 12px;
   width: @break3;
   box-sizing: border-box;
   bottom: 0;
   z-index: 2;
-  letter-spacing: 1px;
-  font-weight: 500;
-
   white-space: nowrap;
-  overflow-x: hidden;
+  overflow: hidden;
 
   span#dash_title{
       display: none;
   }
 
   a#dash_back_workspace{
-      display: block;
-      cursor: pointer;
+    color: rgba(255,255,255,0.8);
+    font-size: 14px;
+    display: block;
+    cursor: pointer;
+    padding: 25px;
+    &:hover{
+      color: #ffffff;
+    }
   }
 
   @media only screen

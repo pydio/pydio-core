@@ -17,11 +17,11 @@
 	<registry_contributions>
 		<client_configs>
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="orbit"><![CDATA[
-                <div id="userdashboard_myparams_title" ajxp_message_id="user_dash.title">
+                <div id="userdashboard_myparams_title" style="opacity:0;" ajxp_message_id="user_dash.title">
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
                 </div>
-                <div id="userdashboard_main_tab" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false, "route":{"base":"/dashboard"}, "events":{}, "tabsTips":"middle right", "defaultTabId": "profile","tabInfos" : [{"id":"profile","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
+                <div id="userdashboard_main_tab" style="opacity:0;" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false, "route":{"base":"/dashboard"}, "events":{}, "tabsTips":"middle right", "defaultTabId": "profile","tabInfos" : [{"id":"profile","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
                     <div id="account_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"ProfilePane"}'></div>
                 </div>
 			]]></template_part>
