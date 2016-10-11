@@ -45,9 +45,11 @@
                 </post_processing>
             </action>
         </actions>
+        <!--
         <hooks>
             <serverCallback methodName="attachTasksToNode" hookName="node.info"/>
         </hooks>
+        -->
         <client_configs>
             <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom"><![CDATA[
                 <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
