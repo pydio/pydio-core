@@ -20,31 +20,36 @@
  */
 namespace Pydio\Core\Http\Middleware;
 
-use \Psr\Http\Message\ServerRequestInterface;
-use \Psr\Http\Message\ResponseInterface;
-use Pydio\Core\Controller\ShutdownScheduler;
-use Pydio\Core\Exception\PydioException;
-
-use Pydio\Core\Http\Response\SerializableResponseStream;
-use Pydio\Core\Http\Server;
-use Pydio\Core\Utils\Vars\InputFilter;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use Zend\Diactoros\Response\SapiEmitter;
+
+use Pydio\Core\Http\Server;
+use Pydio\Core\Http\Response\SerializableResponseStream;
+use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Controller\ShutdownScheduler;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
 /**
- * Class SapiMiddleware
- * Main Middleware for Http requests
+ * Class SapiMiddleware: main middleware for http requests
+ * Pydio core is organized following the PSR-7 pattern,
+ * that defines HTTP message interfaces and concentric middlewares
+ * that carry around these interfaces.
+ *
  * @package Pydio\Core\Http\Middleware
  */
 class SapiMiddleware implements ITopLevelMiddleware
 {
 
     /**
-     * @param ServerRequestInterface $request
-     * @param ResponseInterface $response
-     * @param callable|null $next
-     * @return ResponseInterface
+     * Standard interface for PSR-7 Middleware
+     *
+     * @param ServerRequestInterface $request Interface that encapsulate http request parameters
+     * @param ResponseInterface $response Interface encapsulating the response
+     * @param callable|null $next Next middleware to call
+     * @return ResponseInterface Returns the modified response interface.
      * @throws PydioException
      */
     public function handleRequest(ServerRequestInterface $request, ResponseInterface $response, callable $next = null){
@@ -54,6 +59,7 @@ class SapiMiddleware implements ITopLevelMiddleware
         if(is_array($postParams)){
             $params = array_merge($params, $postParams);
         }
+        /** @var ServerRequestInterface $request */
         $request = $request->withParsedBody($params);
 
         if(in_array("application/json", $request->getHeader("Content-Type"))){
