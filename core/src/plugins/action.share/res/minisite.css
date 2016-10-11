@@ -10,11 +10,7 @@ body.ajxp_preloged_user a#logout_button {
 div#overlay.form-login_form_dynamic {
   opacity: 1;
 }
-.dialogBox .dialogTitle {
-  padding-top: 10px;
-  padding-left: 10px;
-}
-.dialogBox .dialogTitle #modalCloseBtn {
+.dialogBox.form-share_current_url .dialogTitle #modalCloseBtn {
   display: inline !important;
   padding-right: 0 !important;
 }
