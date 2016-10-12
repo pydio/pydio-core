@@ -28,7 +28,7 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|action.quicksend"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_home"/>
 	</dependencies>
 	<processing>
 		<clientForm id="flash_upload_form"><![CDATA[

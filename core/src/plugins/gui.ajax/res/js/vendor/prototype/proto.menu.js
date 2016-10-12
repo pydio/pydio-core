@@ -30,6 +30,7 @@ Proto.Menu = Class.create({
 			anchorSrc:'',
 			anchorTitle:'',
 			anchorPosition:'last',
+            forceCheckHeight:false,
 			beforeShow: e,
 			beforeHide: e,
 			beforeSelect: e,
@@ -383,7 +384,7 @@ Proto.Menu = Class.create({
 
 	checkHeight : function(offsetTop){
         offsetTop = parseInt(offsetTop);
-		if(this.options.anchor == 'mouse') return;
+		if(this.options.anchor == 'mouse' && !this.options.forceCheckHeight) return;
 		var vpHeight = getViewPortHeight()-10;
         if(this.options.menuMaxHeight){
             vpHeight = Math.min(this.options.menuMaxHeight, vpHeight);

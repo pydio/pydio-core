@@ -47,7 +47,13 @@
 
             let options;
             if(this.state && this.state.options){
-                options = <UploadOptionsPane onDismiss={this.toggleOptions}/>
+                let dismiss = function(e){
+                    this.toggleOptions(e);
+                    if(UploaderModel.Configs.getInstance().getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
+                        UploaderModel.Store.getInstance().processNext();
+                    }
+                }.bind(this);
+                options = <UploadOptionsPane onDismiss={dismiss}/>
             }
             let folderButton, startButton;
             let e = global.document.createElement('input');

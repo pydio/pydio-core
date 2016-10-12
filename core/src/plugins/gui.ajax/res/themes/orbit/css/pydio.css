@@ -2066,8 +2066,12 @@ div#multiple_download_container a span.mdi-download {
 .uploadFilesList.droparea {
   background-position: center;
 }
-.dropareaHover {
-  background-color: #FAF3ED !important;
+.dropareaHover,
+.dropareaHover #content_pane {
+  background-color: #FFF8E1 !important;
+}
+.webfx-tree-item.dropareaHover {
+  background-color: rgba(255, 253, 231, 0.43) !important;
 }
 #content_pane.dropareaHover div.thumbnail_selectable_cell {
   background-color: transparent !important;
@@ -2132,7 +2136,6 @@ div#total_files_list {
 .dotted_container_item_mixin {
   overflow: hidden;
   padding: 16px 14px;
-  height: 20px;
   position: relative;
   background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
@@ -2151,7 +2154,6 @@ div#upload_files_list {
 div#upload_files_list > div {
   overflow: hidden;
   padding: 16px 14px;
-  height: 20px;
   position: relative;
   background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
@@ -2265,7 +2267,6 @@ div#upload_files_list span.mdi-close:hover {
 div#multiple_download_container div {
   overflow: hidden;
   padding: 16px 14px;
-  height: 20px;
   position: relative;
   background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
@@ -5073,6 +5074,24 @@ div.menu.desktop.panelHeaderMenu li.menuTitle {
   padding: 11px 7px;
   text-align: left;
   background-color: #f2f2f2;
+}
+div.menu.desktop.home_upload {
+  background-color: rgba(255, 255, 255, 0.93);
+  width: 300px;
+}
+div.menu.desktop.home_upload li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+div.menu.desktop.home_upload li a {
+  font-size: 15px;
+}
+div.menu.desktop.home_upload li.menuTitle {
+  display: block;
+  padding: 16px;
+  text-align: left;
+  background-color: #607D8B;
+  color: white;
+  font-weight: 500;
 }
 div.menu.menuDetails a {
   line-height: 17px;
