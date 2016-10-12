@@ -195,9 +195,7 @@
             */
             return (
                 <div className="headerPanel">
-                    <div
-                        style={{fontSize: 24, color:'white', padding:'20px 16px 14px', wordBreak:'break-all'}}
-                    >{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
+                    <div>{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
                 </div>
             );
         }

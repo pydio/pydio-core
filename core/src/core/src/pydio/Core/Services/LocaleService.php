@@ -165,7 +165,19 @@ class LocaleService
         }
     }
 
-
+    /**
+     * @param $array
+     */
+    public static function contributeMessages($array){
+        $inst = self::getInstance();
+        if(!isSet($inst->cache["ADDITIONAL_MESSAGES"])){
+            $inst->cache["ADDITIONAL_MESSAGES"] = [];
+        }
+        $inst->cache["ADDITIONAL_MESSAGES"] = $inst->cache["ADDITIONAL_MESSAGES"] + $array;
+        if(isset($inst->cache["MESSAGES"])){
+            unset($inst->cache["MESSAGES"]);
+        }
+    }
 
     /**
      * PRIVATE INSTANCE METHODS
@@ -237,6 +249,9 @@ class LocaleService
             VarsFilter::filterI18nStrings($this->cache["MESSAGES"]);
             VarsFilter::filterI18nStrings($this->cache["CONF_MESSAGES"]);
             @file_put_contents($messageFile, "<?php \$MESSAGES = ".var_export($this->cache["MESSAGES"], true) ." ; \$CONF_MESSAGES = ".var_export($this->cache["CONF_MESSAGES"], true) ." ; ");
+        }
+        if(isSet($this->cache["ADDITIONAL_MESSAGES"])){
+            $this->cache["MESSAGES"] = $this->cache["MESSAGES"] + $this->cache["ADDITIONAL_MESSAGES"];
         }
 
         return $this->cache["MESSAGES"];
