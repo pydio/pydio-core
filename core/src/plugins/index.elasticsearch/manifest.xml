@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <indexer id="index.elasticsearch" enabled="false" label="CONF_MESSAGE[ElasticSearch Search Engine]" description="CONF_MESSAGE[ElasticSearch implementation to index all files and search a whole repository quickly.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
-        <core_relation packaged="false" tested_version="1.0"/>
+        <core_relation packaged="true" tested_version="7.0"/>
     </plugin_info>
 
-    <class_definition filename="plugins/index.elasticsearch/ElasticSearchIndexer.php" classname="Pydio\Access\Indexer\Implementation\ElasticSearchIndexer"/>
+    <class_definition filename="plugins/index.elasticsearch/vendor/autoload.php" classname="Pydio\Access\Indexer\Implementation\ElasticSearchIndexer"/>
     <client_settings>
         <resources>
             <img_library alias="elastic_search_images" path="plugins/index.elasticsearch/resources/images"/>

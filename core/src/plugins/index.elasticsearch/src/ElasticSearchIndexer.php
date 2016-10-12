@@ -35,8 +35,6 @@ use \Elastica;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-require_once (dirname(__FILE__)."/vendor/autoload.php");
-
 /**
  * Encapsultion of the Elastica component as a plugin
  * @package AjaXplorer_Plugins

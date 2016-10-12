@@ -6,10 +6,10 @@
 
 	<!-- plugin information -->
 	<plugin_info>
-		<plugin_author>Sylvain Letreguilly</plugin_author>
+		<plugin_author>Sylvain Letreguilly, Pydio Team</plugin_author>
 		<plugin_uri>no</plugin_uri>
 		<plugin_version>1</plugin_version>
-	        <core_relation packaged="false" tested_version="4.3.3"/>
+        <core_relation packaged="true" tested_version="7.0"/>
 	</plugin_info>
 
 	<client_settings>
