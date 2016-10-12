@@ -100,7 +100,7 @@ class AsyncResponseStream implements StreamInterface
     public function getSize()
     {
         // Return a non-null size if there's a pending callback.
-        return (isSet($this->callback) && !$this->callbackExecuted ? 1 : null);
+        return null;//(isSet($this->callback) && !$this->callbackExecuted ? 1 : null);
     }
 
     /**
