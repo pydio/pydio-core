@@ -42,14 +42,6 @@ class GitManager extends AbstractMetaSource
 
     private $repoBase;
 
-    public function performChecks()
-    {
-        $ex = ApplicationState::searchIncludePath("VersionControl/Git.php");
-        if (!$ex) {
-            throw new \Exception("Cannot find PEAR library VersionControl/Git");
-        }
-    }
-
     /**
      * @param ContextInterface $ctx
      * @param AbstractAccessDriver $accessDriver
@@ -58,7 +50,6 @@ class GitManager extends AbstractMetaSource
     public function initMeta(ContextInterface $ctx, AbstractAccessDriver $accessDriver)
     {
         parent::initMeta($ctx, $accessDriver);
-        require_once("VersionControl/Git.php");
         $repo = $ctx->getRepository();
         $this->repoBase = $repo->getContextOption($ctx, "PATH");
         if(empty($this->repoBase)){
