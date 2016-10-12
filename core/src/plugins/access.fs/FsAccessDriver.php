@@ -834,7 +834,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $jsonData = new \stdClass;
                 if($selection->isUnique()){
                     $stat = @stat($selection->getUniqueNode()->getUrl());
-                    if ($stat !== false && !$this->isReadable($selection->getUniqueNode())) {
+                    if ($stat !== false && $this->isReadable($selection->getUniqueNode())) {
                         $jsonData = $stat;
                     }
                 }else{
