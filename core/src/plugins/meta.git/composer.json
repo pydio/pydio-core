@@ -1,0 +1,13 @@
+{
+  "name" : "meta.git",
+  "autoload": {
+    "psr-4": {
+      "Pydio\\Access\\Meta\\Version\\" : "./src"
+    }
+  },
+  "require": {
+    "pear/versioncontrol_git": "dev-master"
+
+  }
+
+}
