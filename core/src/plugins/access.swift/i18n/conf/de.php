@@ -24,7 +24,7 @@ $mess=array(
 "Username" => "Benutzername",
 "User email as you enter it to log to the console" => "E-Mail-Adresse für den Login auf der Konsole",
 "Console Password" => "Passwort",
-"Tenant ID" => "Tenant ID",
+"Tenant ID" => "Tenant-ID",
 "Tenant ID (see API Keys page)" => "Tenant ID (siehe API-Dokumentation)",
 "Endpoint" => "Endpoint",
 "Endpoint (see API Keys page, Identity endpoint)" => "Endpoint (siehe API-Dokumentation)",
@@ -32,5 +32,5 @@ $mess=array(
 "Your region identifier" => "Identifikatur für die Region",
 "Container" => "Container",
 "Base Container" => "Der Basis-Container",
-"Console password" => "Console password",
+"Console password" => "Consolen-Passwort",
 );

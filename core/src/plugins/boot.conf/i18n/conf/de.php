@@ -25,14 +25,14 @@ $mess = array(
 "Configuration storage" => "<span class='icon-save'></span> Konfigurationsspeicher",
 "Add some users" => "<span class='icon-group'></span> Benutzer hinzufügen",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Bitte geben Sie Benutzername und Passwort für den Administrator ein. Dieser Schritt ist notwendig um sich anfangs Anzumelden. Sie könenn später über die Einstellungen mehr Benutzer mit Administratorrechten erstellen.",
-"Admin Login" => "Anmeldung als Aministrator",
+"Admin Login" => "Benutzername",
 "Alphanumeric login" => "Benutzernamen bestehen aus alphanumerischen Zeichen",
 "Admin Display Name" => "Angezeigter Name",
 "Name that users will see" => "Namen den die Benutzer sehen",
 "Admin Password" => "Passwort wählen",
-"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Wörterbuch-Wörter etc.).",
+"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Begriffe aus dem Wörterbuch, etc.).",
 "Confirm" => "Passwort bestätigen",
-"Confirm password" => "Passwort zur Kontrolle wiederholt eingeben",
+"Confirm password" => "Passwort zur Kontrolle erneut eingeben",
 "Test Mailer" => "E-Mail-Versand testen",
 "Try sending an email with the configured data" => "E-Mail-Versand mit dieser Konfiguration testen",
 "Test SQL Connection" => "SQL-Serververbindung testen",
@@ -75,6 +75,6 @@ $mess = array(
 "Detected Server Path" => "Server-Pfad",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => " Stellen Sie sicher, dass dieser Pfad korrekt ist. Er wird zum generieren der htaccess-Datei verwendet.",
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
-"Enable cache (recommended)" => "Enable cache (recommended)",
-"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
+"Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln."
 );

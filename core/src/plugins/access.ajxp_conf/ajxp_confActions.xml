@@ -182,8 +182,8 @@
 						</div>
 						<div id="driver_form" style="margin-top:32px;"></div>
 						<div class="dialogButtons" style="direction:rtl;">
-							<input type="submit" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
-							<input type="button" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
+							<input type="submit" class="dialogButton" id="submit_create_repo" value="AJXP_MESSAGE[179]" class="button" onclick="return false;">
+							<input type="button" class="dialogButton" value="AJXP_MESSAGE[49]" class="button" onclick="hideLightBox();return false;">
 						</div>
 					</div>
 				]]></clientForm>

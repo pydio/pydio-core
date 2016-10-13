@@ -33,8 +33,8 @@ $mess=array(
 "URL of the windows sync application" => "URL zum Windows-Sync-Client (leave empty if you want to hide the block)",
 "Mac PydioSync URL" => "URL zum Mac-Sync-Client",
 "URL of the mac sync application" => "URL zum Mac-Sync-Client (leave empty if you want to hide the block)",
-"Enable Global Search" => "Enable Global Search",
-"Enable cross-workspaces search form on home page" => "Enable cross-workspaces search form on home page",
-"Display Server QRCode"=>"Display Server QRCode",
-"Let users connect easily to the latest mobile applications by displaying a QRCode"=>"Let users connect easily to the latest mobile applications by displaying a QRCode",
+"Enable Global Search" => "Globale Suche aktivieren",
+"Enable cross-workspaces search form on home page" => "Arbeitsumgebungs übergreifende Suche auf der Willkommen-Seite",
+"Display Server QRCode"=>"Server-QRCode anzeigen",
+"Let users connect easily to the latest mobile applications by displaying a QRCode"=>"Benutzer können, mit den Apps, diesen QRCode scannen um eine Verbindung zum Server zu konfigurieren",
 );

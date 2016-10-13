@@ -45,8 +45,8 @@ $mess=array(
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "Für eine hohe Geschwindigkeit sollten Wildcards erst ab dem dritten Zeichen möglich sein.",
 "Auto-Wildcard" => "Auto-Wildcard",
 "Automatically append a * after the user query to make the search broader" => "Den Suchbegriff des Benutzers immer mit einem * beenden.",
-"ElasticSearch Host" => "ElasticSearch Host",
-"ElasticSearch Server host (without http)" => "ElasticSearch Server host (without http)",
-"ElasticSearch Port" => "ElasticSearch Port",
-"ElasticSearch Server port (default 9200)" => "ElasticSearch Server port (default 9200)",
+"ElasticSearch Host" => "ElasticSearch-Host",
+"ElasticSearch Server host (without http)" => "ElasticSearch-Server (ohne http)",
+"ElasticSearch Port" => "ElasticSearch-Port",
+"ElasticSearch Server port (default 9200)" => "Port des ElasticSearch-Servers (Standardmäßig 9200)",
 );
