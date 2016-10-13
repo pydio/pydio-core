@@ -146,6 +146,10 @@ class RolesService
     {
         ConfService::getConfStorageImpl()->updateRole($roleObject, $userObject);
         CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleObject->getId(), $roleObject);
+        $profiles = $roleObject->listAutoApplies();
+        foreach($profiles as $profile){
+            CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:profile:".$profile, time());
+        }
         ConfService::getInstance()->invalidateLoadedRepositories();
         $roleId = $roleObject->getId();
         if(strpos($roleId, "AJXP_GRP_/") === 0){
