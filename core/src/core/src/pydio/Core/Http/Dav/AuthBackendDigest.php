@@ -118,14 +118,14 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
             try{
                 $loggedUser = AuthService::logUser($this->currentUser, null, true);
             }catch (LoginException $l){
-                throw new Sabre\DAV\Exception\NotAuthenticated();
+                $this->breakNotAuthenticatedAndRequireLogin($server, $realm, $errmsg);
             }
             $this->updateCurrentUserRights($loggedUser);
         } else {
-          if ($success === false) {
-            Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
-          }
-          throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
+            if ($success === false) {
+                Logger::warning(__CLASS__, "Login failed", array("user" => $this->currentUser, "error" => "Invalid WebDAV user or password"));
+            }
+            $this->breakNotAuthenticatedAndRequireLogin($server, $realm, $errmsg);
         }
 
         if($this->context->hasRepository()){
@@ -157,6 +157,24 @@ class AuthBackendDigest extends Sabre\DAV\Auth\Backend\AbstractDigest
         TextEncoder::updateContext($this->context);
 
         return true;
+    }
+
+    /**
+     * @param Sabre\DAV\Server $server
+     * @param $errmsg
+     */
+    function breakNotAuthenticatedAndRequireLogin(Sabre\DAV\Server $server, $realm, $errmsg){
+        $digest = new Sabre\HTTP\DigestAuth();
+
+        // Hooking up request and response objects
+        $digest->setHTTPRequest($server->httpRequest);
+        $digest->setHTTPResponse($server->httpResponse);
+
+        $digest->setRealm($realm);
+        $digest->init();
+        $digest->requireLogin();
+        throw new Sabre\DAV\Exception\NotAuthenticated($errmsg);
+
     }
 
     /**

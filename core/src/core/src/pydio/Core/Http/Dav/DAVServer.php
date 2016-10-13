@@ -101,7 +101,7 @@ class DAVServer
         }
         $server->httpResponse = new DAVResponse();
 
-        if((AuthBackendBasic::detectBasicHeader() || ConfService::getGlobalConf("WEBDAV_FORCE_BASIC"))){
+        if(AuthBackendBasic::detectBasicHeader() || ConfService::getGlobalConf("WEBDAV_FORCE_BASIC")){
             $authBackend = new AuthBackendBasic(self::$context);
         } else {
             $authBackend = new AuthBackendDigest(self::$context);
