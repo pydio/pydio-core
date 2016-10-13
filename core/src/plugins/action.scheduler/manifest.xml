@@ -230,7 +230,7 @@
                 </processing>
             </action>
             <action name="scheduler_editTask">
-                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="icon-edit" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>

@@ -42,7 +42,7 @@
             </processing>
         </action>
         <action name="edit" fileDefault="true">
-            <gui text="ajxp_conf.93" title="301" iconClass="icon-edit" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+            <gui text="ajxp_conf.93" title="301" iconClass="mdi mdi-pencil" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"
                          actionBar="true" contextMenu="true" infoPanel="true"
                          actionBarGroup="get" inZip="false">

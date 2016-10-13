@@ -864,6 +864,7 @@ class UsersManager extends AbstractManager
             $topMeta = $this->serializeGroupMetadata("/", $messages["ajxp_conf.151"]);
             $topMeta["icon_class"] = "icon-home";
             $rootGroupNode = new AJXP_Node($fullBasePath ."/", $topMeta);
+            $rootGroupNode->setLeaf(true);
             $nodesList->addBranch($rootGroupNode);
 
         }
