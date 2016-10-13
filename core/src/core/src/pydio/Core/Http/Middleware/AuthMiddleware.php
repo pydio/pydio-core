@@ -32,6 +32,7 @@ use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 
+use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Zend\Diactoros\Response\EmptyResponse;
 
@@ -68,7 +69,8 @@ class AuthMiddleware
 
         } catch (NoActiveWorkspaceException $ex){
 
-            throw new AuthRequiredException();
+            AuthService::disconnect();
+            throw new AuthRequiredException("", $ex->getMessage());
 
         } catch(ActionNotFoundException $a){
 
