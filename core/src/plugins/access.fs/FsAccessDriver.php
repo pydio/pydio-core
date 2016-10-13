@@ -654,19 +654,34 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $zip = true;
                 }
                 if ($zip) {
-                    // Make a temp zip and send it as download
-                    $loggedUser = $ctx->getUser();
-                    $file = ApplicationState::getTemporaryFolder() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
-                    $zipFile = $this->makeZip($selection, $file, empty($dir)?"/":$dir);
-                    if(!$zipFile) throw new PydioException("Error while compressing");
                     $localName = (empty($base)?"Files":$base).".zip";
                     if(isSet($httpVars["archive_name"])){
                         $localName = InputFilter::decodeSecureMagic($httpVars["archive_name"]);
                     }
-                    $fileReader = new FileReaderResponse($file);
-                    $fileReader->setUnlinkAfterRead();
-                    $fileReader->setLocalName($localName);
-                    $response = $response->withBody($fileReader);
+                    if ($this->getContextualOption($ctx, "ZIP_ON_THE_FLY")) {
+                        // Make a zip on the fly and send stream as download
+                    	$response = HTMLWriter::responseWithAttachmentsHeaders($response, $localName, null, false, false);
+                        $asyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selection, $dir) {
+                            session_write_close();
+                            restore_error_handler();
+                            restore_exception_handler();
+                            set_exception_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
+                            set_error_handler('Pydio\Access\Driver\StreamProvider\FS\download_exception_handler');
+                            $zipFile = $this->makeZip($selection, "php://output", empty($dir)?"/":$dir);
+                            if(!$zipFile) throw new PydioException("Error while compressing");
+                        });
+                        $response = $response->withBody($asyncReader);
+                    } else {
+                        // Make a temp zip and send it as download
+                        $loggedUser = $ctx->getUser();
+                        $file = ApplicationState::getTemporaryFolder() ."/".($loggedUser?$loggedUser->getId():"shared")."_".time()."tmpDownload.zip";
+                        $zipFile = $this->makeZip($selection, $file, empty($dir)?"/":$dir);
+                        if(!$zipFile) throw new PydioException("Error while compressing");
+                        $fileReader = new FileReaderResponse($file);
+                        $fileReader->setUnlinkAfterRead();
+                        $fileReader->setLocalName($localName);
+                        $response = $response->withBody($fileReader);
+                    }
                 } else {
                     $localName = "";
                     Controller::applyHook("dl.localname", [$selection->getUniqueNode(), &$localName]);
