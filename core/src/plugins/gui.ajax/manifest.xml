@@ -227,7 +227,7 @@
 				</div>
 			]]></template>
 			<component_config className="FilesList">
-				<property name="thumbSize" value="64"/>
+				<property name="thumbSize" value="128"/>
 			</component_config>
 		</client_configs>
 	</registry_contributions>
