@@ -343,7 +343,7 @@ class SqlUser extends AbstractUser
         $this->groupPath = $res->fetchSingle();
         if (empty($this->groupPath)) {
             // Auto migrate from old version
-            $this->setGroupPath("/");
+            $this->groupPath = "/";
         }
 
         $result_rights = dibi::query('SELECT [repo_uuid], [rights] FROM [ajxp_user_rights] WHERE [login] = %s', $this->getId());
@@ -413,6 +413,9 @@ class SqlUser extends AbstractUser
         if (count($rolesToLoad)) {
             $allRoles = RolesService::getRolesList($rolesToLoad);
             foreach ($rolesToLoad as $roleId) {
+                if (!isSet($allRoles[$roleId]) && strpos($roleId, "AJXP_GRP_/") === 0){
+                    $allRoles[$roleId] = RolesService::getOrCreateRole($roleId);
+                }
                 if (isSet($allRoles[$roleId])) {
                     $this->roles[$roleId] = $allRoles[$roleId];
                     $this->rights["ajxp.roles"][$roleId] = true;
@@ -581,6 +584,8 @@ class SqlUser extends AbstractUser
         }
         parent::setGroupPath($groupPath);
         dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
+        $this->load();
+        $this->recomputeMergedRole();
         $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);
     }
 

@@ -376,7 +376,7 @@ class UsersService
     public static function createUser($userId, $userPass, $isAdmin = false, $isHidden = false)
     {
         $userId = self::filterUserSensitivity($userId);
-        $localContext = new Context($userId, null);
+        $localContext = Context::emptyContext();
         Controller::applyHook("user.before_create", array($localContext, $userId, $userPass, $isAdmin, $isHidden));
         if (!ConfService::getGlobalConf("ALLOW_GUEST_BROWSING", "auth") && $userId == "guest") {
             throw new \Exception("Reserved user id");

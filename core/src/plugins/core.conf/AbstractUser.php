@@ -239,6 +239,7 @@ abstract class AbstractUser implements UserInterface
     public function setProfile($profile)
     {
         $this->rights["ajxp.profile"] = $profile;
+        RolesService::updateAutoApplyRole($this);
     }
 
     /**
