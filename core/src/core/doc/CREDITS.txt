@@ -1,6 +1,6 @@
 <img src="plugins/gui.ajax/PydioLogo250.png"/>
 <div style="padding-left:10px;"><div style="font-size:0.8em;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
-Copyright 2007-2014 Abstrium SAS
+Copyright 2007-2016 Abstrium SAS
 The latest code can be found at https://pydio.com/.
 </div>
 ++ Getting Help ++

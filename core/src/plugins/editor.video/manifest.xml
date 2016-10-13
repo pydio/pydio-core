@@ -4,7 +4,7 @@
         text="video_editor.1" title="video_editor.1" icon="frame_image.png" iconClass="icon-film"
         className="VideoPreviewer" label="CONF_MESSAGE[Video Player]"
         description="CONF_MESSAGE[Inserts a video player in the info panel, either HTML5 or Flash depending on the format.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/editor.video/class.VideoReader.php" classname="VideoReader"/>
+	<class_definition filename="plugins/editor.video/VideoReader.php" classname="Pydio\Editor\Video\VideoReader"/>
     <client_settings>
         <resources>
             <js file="plugins/editor.video/class.VideoPreviewer.js" className="VideoPreviewer"/>

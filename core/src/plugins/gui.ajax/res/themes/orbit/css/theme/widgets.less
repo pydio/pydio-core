@@ -14,14 +14,23 @@
   height: 20px;
   width: 15px;
   transition: @bezier_transition;
-  &:hover{
-    background-color: @leftpanel_background_color;
-    color: white;
+  position: relative;
+  span.badge-icon{
+    display: inline;
+    position: absolute;
+    font-size: 7px;
+    top: 32px;
+    left: 24px;
+    background-color: #222;
+    padding: 2px 2px;
+    border-radius: 7px;
+    color: #fff;
+    transition: @bezier_transition;
   }
   &.disabled{
     display:none;
   }
-  &.open{
+  &:hover, &:hover span.badge-icon, &.open, &.open span.badge-icon{
     background-color: @leftpanel_background_color;
   }
   span.icon-sitemap {

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 (function(global) {
 
@@ -188,14 +188,14 @@
         render: function(){
 
             let nodePath = this.props.shareModel.getNode().getPath();
+            /*
             if(this.props.shareModel.getNode().getMetadata().get("original_path")){
                 nodePath = this.props.shareModel.getNode().getMetadata().get("original_path");
             }
+            */
             return (
                 <div className="headerPanel">
-                    <div
-                        style={{fontSize: 24, color:'white', padding:'20px 16px 14px', wordBreak:'break-all'}}
-                    >{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
+                    <div>{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
                 </div>
             );
         }
@@ -207,6 +207,23 @@
 
         propTypes: {
             onClick: React.PropTypes.func.isRequired
+        },
+        getInitialState: function(){
+            return {disabled: false};
+        },
+        disableSave: function(){
+            this.setState({disabled: true});
+        },
+        enableSave: function(){
+            this.setState({disabled:false});
+        },
+        componentDidMount: function(){
+            this.props.shareModel.observe('saving', this.disableSave);
+            this.props.shareModel.observe('saved', this.enableSave);
+        },
+        componendWillUnmount: function(){
+            this.props.shareModel.stopObserving('saving', this.disableSave);
+            this.props.shareModel.stopObserving('saved', this.enableSave);
         },
         triggerModelSave: function(){
             this.props.shareModel.save();
@@ -222,14 +239,14 @@
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
                         <a className="revert-button" onClick={this.triggerModelRevert}>{this.context.getMessage('179')}</a>
-                        <ReactMUI.FlatButton secondary={true} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
+                        <ReactMUI.FlatButton secondary={true} disabled={this.state.disabled} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
                         <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
                     </div>
                 );
             }else{
                 var unshareButton;
-                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error'){
-                    unshareButton = (<ReactMUI.FlatButton secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
+                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error' || global.pydio.user.activeRepository === "ajxp_conf"){
+                    unshareButton = (<ReactMUI.FlatButton  disabled={this.state.disabled} secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
                 }
                 return (
                     <div style={{padding:16,textAlign:'right'}}>
@@ -691,8 +708,9 @@
 
         buildLabel: function(){
             var link = this.props.linkData;
-            var host = link.HOST || link.invitation.HOST;
-            var user = link.USER || link.invitation.USER;
+            var host = link.HOST || (link.invitation ? link.invitation.HOST : null);
+            var user = link.USER || (link.invitation ? link.invitation.USER : null);
+            if(!host || !user) return "Error";
             return user + " @ " + host ;
         },
 
@@ -757,6 +775,21 @@
             showMailer:React.PropTypes.func
         },
 
+        disableSave: function(){
+            this.setState({disabled: true});
+        },
+        enableSave: function(){
+            this.setState({disabled:false});
+        },
+        componentDidMount: function(){
+            this.props.shareModel.observe('saving', this.disableSave);
+            this.props.shareModel.observe('saved', this.enableSave);
+        },
+        componendWillUnmount: function(){
+            this.props.shareModel.stopObserving('saving', this.disableSave);
+            this.props.shareModel.stopObserving('saved', this.enableSave);
+        },
+
         toggleLink: function(){
             var publicLinks = this.props.shareModel.getPublicLinks();
             if(this.state.showTemporaryPassword){
@@ -769,7 +802,7 @@
         },
 
         getInitialState: function(){
-            return {showTemporaryPassword: false, temporaryPassword: null};
+            return {showTemporaryPassword: false, temporaryPassword: null, disabled: false};
         },
 
         updateTemporaryPassword: function(value, event){
@@ -837,7 +870,7 @@
             return (
                 <div style={{padding:16}} className="reset-pydio-forms ie_material_checkbox_fix">
                     <ReactMUI.Checkbox
-                        disabled={this.context.isReadonly() || disableForNotOwner}
+                        disabled={this.context.isReadonly() || disableForNotOwner || this.state.disabled}
                         onCheck={this.toggleLink}
                         checked={!!this.props.linkData || this.state.showTemporaryPassword}
                         label={this.context.getMessage('189')}

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Auth Features" => "Funzionalità Generiche",
@@ -28,7 +28,7 @@ $mess=array(
 "Options applied to all auth drivers" => "Opzioni applicate su tutti i driver di autenticazione",
 "Activate the users management system to protect your Pydio installation." => "Attiva il sistema di gestone utenti per proteggere l'installazione di Pydio.",
 "Case Sensitive" => "Case Sensitive",
-"Whether the users identifiers should be case sensitive or not" => "Se attivo, l'identificatore dell'utente è case sensitive",
+"Whether the users identifiers should be case sensitive or not" => "Se attivo, l'identificatore dell'utente è case sensitive. WARNING, sql-based drivers will disable this by default, even if you check this.",
 "Enable the 'guest' user, who does not need to log in." => "Abilita l'utente 'guest' (ospite), che non necessita di login.",
 "Minimum number of characters required for passwords in the application" => "Numero minimo di caratteri richiesti per la password",
 "Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Imposta le credenziali dell'utente nella session, dopo il buon esito del login. Può essere necessario quando si collegano specifici plugin di autenticazione o accesso.",

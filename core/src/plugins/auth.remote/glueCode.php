@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Description : Interface between Pydio and external software. Handle with care!
  * Take care when using this file. It can't be included anywhere, as it's doing global scope pollution.
@@ -33,6 +33,13 @@
  * @package AjaXplorer_Plugins
  * @subpackage Auth
  */
+use Pydio\Conf\Core\AbstractUser;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
+
 global $AJXP_GLUE_GLOBALS;
 if (!isSet($AJXP_GLUE_GLOBALS)) {
     $AJXP_GLUE_GLOBALS = array();
@@ -47,7 +54,17 @@ include_once($FRAMEWORK_PATH."/base.conf.php");
 if (!class_exists("SessionSwitcher")) {
     require_once("$CURRENTPATH/sessionSwitcher.php");
 }
-$pServ = AJXP_PluginsService::getInstance();
+if (!function_exists("auth_remote_debug")){
+    /**
+     * @param $str
+     */
+    function auth_remote_debug($str){
+        if(AJXP_SERVER_DEBUG){
+            error_log('[Pydio Auth Remote] '.$str);
+        }
+    }
+}
+$pServ = PluginsService::getInstance();
 ConfService::init($FRAMEWORK_PATH);
 ConfService::start();
 $confStorageDriver = ConfService::getConfStorageImpl();
@@ -66,20 +83,27 @@ if ($authPlug->getOption("SECRET") == "") {
        die("This file must be included and cannot be called directly");
     }
     if ($_SERVER['PHP_SELF'] != $authPlug->getOption("LOGIN_URL")) {
-       $plugInAction = "WRONG_URL";
+        auth_remote_debug("No secret provided, comparing current URL and login URL parameter is wrong. Please set up a secret key.");
+        $plugInAction = "WRONG_URL";
     }
 } else if ($secret != $authPlug->getOption("SECRET")) {
+    auth_remote_debug("Secret keys are not corresponding. Make sure to setup secret in both CMS plugin and Pydio plugin.");
     $plugInAction = "WRONG_SECRET";
 }
 
 /**
  * @param array $loginData
- * @param AbstractAjxpUser $userObject
+ * @param AbstractUser $userObject
  */
 if(!function_exists("ajxp_gluecode_updateRole")){
 
+    /**
+     * @param $loginData
+     * @param $userObject
+     */
     function ajxp_gluecode_updateRole($loginData, &$userObject)
     {
+        auth_remote_debug("Updating user roles based on mappings");
         $authPlug = ConfService::getAuthDriverImpl();
         if(property_exists($authPlug, "drivers") && is_array($authPlug->drivers) && $authPlug->drivers["remote"]){
             $authPlug = $authPlug->drivers["remote"];
@@ -92,7 +116,7 @@ if(!function_exists("ajxp_gluecode_updateRole")){
         foreach ($rolesMap as $value) {
             $parts = explode(":", trim($value));
             $roleId = trim($parts[1]);
-            $roleObject = AuthService::getRole($roleId);
+            $roleObject = RolesService::getRole($roleId);
             if ($roleObject != null) {
                 $newMap[trim($parts[0])] = $roleObject;
                 $userObject->removeRole($roleId);
@@ -113,47 +137,54 @@ if(!function_exists("ajxp_gluecode_updateRole")){
 
 switch ($plugInAction) {
     case 'login':
+        auth_remote_debug("Entering 'login' case in glueCode");
         $login = $AJXP_GLUE_GLOBALS["login"]; $autoCreate = $AJXP_GLUE_GLOBALS["autoCreate"];
         if (is_array($login)) {
             $newSession = new SessionSwitcher("AjaXplorer");
+            auth_remote_debug("Entering 'login' case in glueCode");
             $creation = false;
-            if ($autoCreate && !AuthService::userExists($login["name"], "w")) {
+            if ($autoCreate && !UsersService::userExists($login["name"], "w")) {
+                auth_remote_debug("Automatically creating user in Pydio");
                 $creation = true;
                 $isAdmin = (isSet($login["right"]) && $login["right"] == "admin");
-                AuthService::createUser($login["name"], $login["password"], $isAdmin);
+                UsersService::createUser($login["name"], $login["password"], $isAdmin);
             }
-            if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
-                $result = AuthService::logUser($login["name"], $login["password"], false, false, -1);
-            } else {
-                $result = AuthService::logUser($login["name"], $login["password"], true);
-            }
-               // Update default rights (this could go in the trunk...)
-               if ($result == 1) {
-                   $userObject = AuthService::getLoggedUser();
-                   if ($userObject->isAdmin()) {
-                       AuthService::updateAdminRights($userObject);
-                   } else {
-                    AuthService::updateDefaultRights($userObject);
-                   }
+            try{
+                if (isSet($AJXP_GLUE_GLOBALS["checkPassword"]) && $AJXP_GLUE_GLOBALS["checkPassword"] === TRUE) {
+                    $userObject = AuthService::logUser($login["name"], $login["password"], false, false);
+                } else {
+                    $userObject = AuthService::logUser($login["name"], $login["password"], true);
+                }
+                auth_remote_debug("User logged to pydio succesfully");
+                if ($userObject->isAdmin()) {
+                    auth_remote_debug("User is admin, updating admin rights");
+                    RolesService::updateAdminRights($userObject);
+                } else {
+                    auth_remote_debug("User is standard, updating default rights");
+                    RolesService::updateDefaultRights($userObject);
+                }
                 if($creation) ajxp_gluecode_updateRole($login, $userObject);
                 $userObject->save("superuser");
-               }
+                AuthService::updateSessionUser($userObject);
+            }catch (\Pydio\Core\Exception\LoginException $l){
+
+            }
         }
         break;
     case 'logout':
+        auth_remote_debug("Entering 'logout' case in glueCode. Should kill pydio session");
         $newSession = new SessionSwitcher("AjaXplorer");
         global $_SESSION;
         $_SESSION = array();
         $result = TRUE;
         break;
     case 'addUser':
+        auth_remote_debug("Entering 'addUser' case in glueCode. Create user in pydio");
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
             $isAdmin = (isSet($user["right"]) && $user["right"] == "admin");
-            AuthService::createUser($user["name"], $user["password"], $isAdmin);
+            $userObject = UsersService::createUser($user["name"], $user["password"], $isAdmin);
             if (isSet($user["roles"])) {
-                $confDriver = ConfService::getConfStorageImpl();
-                $userObject = $confDriver->createUserObject($user["name"]);
                 ajxp_gluecode_updateRole($user, $userObject);
                 $userObject->save("superuser");
             }
@@ -161,19 +192,21 @@ switch ($plugInAction) {
         }
         break;
     case 'delUser':
+        auth_remote_debug("Entering 'delUser' case in glueCode. Delete user from pydio");
         $userName = $AJXP_GLUE_GLOBALS["userName"];
         if (strlen($userName)) {
-            AuthService::deleteUser($userName);
+            UsersService::deleteUser($userName);
             $result = TRUE;
         }
         break;
     case 'updateUser':
+        auth_remote_debug("Entering 'updateUser' case in glueCode. Update user in pydio");
         $user = $AJXP_GLUE_GLOBALS["user"];
         if (is_array($user)) {
-            if (AuthService::userExists($user["name"]) && AuthService::updatePassword($user["name"], $user["password"])) {
+            if (UsersService::userExists($user["name"]) && UsersService::updatePassword($user["name"], $user["password"])) {
                 $isAdmin =  (isSet($user["right"]) && $user["right"] == "admin");
                 $confDriver = ConfService::getConfStorageImpl();
-                $userObject = $confDriver->createUserObject($user["name"]);
+                $userObject = UsersService::getUserById($user["name"], false);
                 $userObject->setAdmin($isAdmin);
                 ajxp_gluecode_updateRole($user, $userObject);
                 $userObject->save("superuser");

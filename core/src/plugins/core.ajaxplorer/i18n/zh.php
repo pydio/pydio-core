@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //---------------------------------------------------------------------------------------------------
 //
@@ -60,7 +60,7 @@ $mess=array(
 "22" => "PHP脚本",
 "23" => "文件",
 "24" => "上一级目录",
-"25" => "上传一个或多个文件 (最多 ".ConfService::getConf('UPLOAD_MAX_NUMBER')." 个) 到目录: ",
+"25" => "上传一个或多个文件 (最多 ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER')." 个) 到目录: ",
 "26" => "创建新目录于 : ",
 "27" => "上传(U)",
 "28" => "创建新文件于 : ",
@@ -656,8 +656,12 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

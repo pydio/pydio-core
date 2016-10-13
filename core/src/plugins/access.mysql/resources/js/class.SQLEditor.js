@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("SQLEditor", {
 
@@ -198,7 +198,7 @@ Class.create("SQLEditor", {
 			addTable.select('td[new="false"]')[0].setStyle({width:'40px'});
 			var addRow = addTable.select('tbody tr')[0];
 			var addButton = new Element('input', {type:'button', value:'Add', className:'dialogButton'});
-			var submitDiv = new Element('div', {className:'dialogButtons'}).insert(addButton);
+			var submitDiv = new Element('div', {className:''}).insert(addButton);
 			var submitRow = new Element('tr').insert(new Element('td', {colspan:"9"}).insert(submitDiv));
 			addRow.insert({after:submitRow});
 			addButton.observe('click', function(e){

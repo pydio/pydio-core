@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 /**
  * API Client
@@ -81,22 +81,47 @@ class PydioApi{
         }
     }
 
-    uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}){
+    /**
+     * 
+     * @param file
+     * @param fileParameterName
+     * @param queryStringParams
+     * @param onComplete
+     * @param onError
+     * @param onProgress
+     * @returns XHR Handle to abort transfer
+     */
+    uploadFile(file, fileParameterName, queryStringParams='', onComplete=function(){}, onError=function(){}, onProgress=function(){}, uploadUrl='', xhrSettings={}){
+
+        if(!uploadUrl){
+            uploadUrl = pydio.Parameters.get('ajxpServerAccess');
+        }
+        if(queryStringParams){
+            uploadUrl += (uploadUrl.indexOf('?') === -1 ? '?' : '&') + queryStringParams;
+        }
 
         if(window.Connexion){
+            // Warning, avoid double error
+            let errorSent = false;
+            let localError = function(xhr){
+                if(!errorSent) onError('Request failed with status :' + xhr.status);
+                errorSent = true;
+            };
             var c = new Connexion();
-            c.uploadFile(file, fileParameterName, queryStringParams, onComplete, onError, onProgress);
+            return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, localError, onProgress, xhrSettings);
+
         }else if(window.jQuery){
+
             var formData = new FormData();
             formData.append(fileParameterName, file);
-            queryStringParams += '&secure_token' + this._secureToken;
-            jQuery.ajax(this._baseUrl + '&' + queryStringParams, {
+            return jQuery.ajax(uploadUrl, {
                 method:'POST',
                 data:formData,
                 complete:onComplete,
                 error:onError,
                 progress:onProgress
             });
+
         }
 
     }
@@ -151,6 +176,22 @@ class PydioApi{
                 if(window.console) window.console.error("Error while submitting hidden form for download", e);
             }
         }
+
+    }
+
+    postPlainTextContent(filePath, content, finishedCallback){
+
+        this.request({
+            get_action:'put_content',
+            file: filePath,
+            content: content
+        }, function(transport){
+            var success = this.parseXmlMessage(transport.responseXML);
+            finishedCallback(success);
+        }.bind(this), function(){
+            finishedCallback(false);
+        });
+
 
     }
 
@@ -313,13 +354,16 @@ class PydioApi{
 
     }
 
-    applyCheckHook(node, hookName, hookArg, completeCallback){
+    applyCheckHook(node, hookName, hookArg, completeCallback, additionalParams){
         var params = {
             get_action : "apply_check_hook",
             file       : node.getPath(),
             hook_name  : hookName,
             hook_arg   : hookArg
         };
+        if(additionalParams){
+            params = LangUtils.objectMerge(params, additionalParams);
+        }
         this.request(params, completeCallback, null, {async:false});
     }
 
@@ -412,7 +456,7 @@ class PydioApi{
             } else if(childs[i].nodeName == 'nodes_diff') {
                 var dm = this._pydioObject.getContextHolder();
                 if(dm.getAjxpNodeProvider().parseAjxpNodesDiffs){
-                    dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, !window.currentLightBox);
+                    dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, this._pydioObject.user.activeRepository, !window.currentLightBox);
                 }
             }
             else if(childs[i].tagName == "logging_result")
@@ -486,16 +530,18 @@ class PydioApi{
                     var paramChild = childs[i].childNodes[j];
                     if(paramChild.tagName == 'param'){
                         parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
+                    }else if(paramChild.tagName == 'clientCallback' && paramChild.firstChild && paramChild.firstChild.nodeValue){
+                        var callbackCode = paramChild.firstChild.nodeValue;
+                        var callback = new Function(callbackCode);
                     }
                 }
-                var bgManager = this._pydioObject.getController().getBackgroundTasksManager();
-                if(bgManager){
-                    bgManager.queueAction(name, parameters, messageId);
-                    bgManager.next();
+                if(name == "javascript_instruction" && callback){
+                    callback();
                 }
             }
 
         }
+        this._pydioObject.notify("response.xml", xmlResponse);
         if(reloadNodes.length){
             this._pydioObject.getContextHolder().multipleNodesReload(reloadNodes);
         }

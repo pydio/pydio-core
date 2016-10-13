@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /*
@@ -53,7 +53,7 @@ Class.create("PDFJSViewer", AbstractEditor, {
 
 		// Get the direct PDF file link valid for this session.
 		var fileName = nodeOrNodes.getPath();
-		var pdfurl = encodeURIComponent(url+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file=base64encoded:' + base64_encode(fileName) + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(fileName)));
+		var pdfurl = encodeURIComponent(LangUtils.trimRight(url, '\/')+'/'+ajxpBootstrap.parameters.get('ajxpServerAccess')+'&action=get_content&file=base64encoded:' + base64_encode(fileName) + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(fileName)));
 
 		// Hide the Pydio action bar.
 		this.element.down('.editor_action_bar').setStyle({display:'none'});

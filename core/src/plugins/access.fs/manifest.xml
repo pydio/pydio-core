@@ -6,7 +6,7 @@
         </resources>
     </client_settings>
 	<server_settings>
-		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Real path to the root folder on the server]" mandatory="true"/>
+		<param name="PATH" type="string" label="CONF_MESSAGE[Path]" description="CONF_MESSAGE[Absolute path to the folder on the server. You can use AJXP_DATA_PATH and AJXP_INSTALL_PATH to point to Pydio default data path and root install path.]" mandatory="true"/>
 		<param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="true" mandatory="true"/>
         <param name="CHMOD_VALUE" type="string" label="CONF_MESSAGE[File Creation Mask]" description="CONF_MESSAGE[Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.]" default="0666"/>
         <param name="PURGE_AFTER" type="integer" label="CONF_MESSAGE[Purge Days (Hard limit)]" description="CONF_MESSAGE[Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature.]" default="0"/>
@@ -14,12 +14,10 @@
         <param name="DATA_TEMPLATE" type="string" label="CONF_MESSAGE[Data template]" description="CONF_MESSAGE[Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded.]" default=""/>
         <global_param name="PROBE_REAL_SIZE" type="boolean" label="CONF_MESSAGE[Real Size Probing]" description="CONF_MESSAGE[Use system command line to get the filesize instead of php built-in function (fixes the 2Go limitation)]" default="false"/>
         <global_param name="USE_POSIX" type="boolean" label="CONF_MESSAGE[Use POSIX]" description="CONF_MESSAGE[Use php POSIX extension to read files permissions. Only works on *nix systems.]" default="false"/>
-        <global_param name="USE_XSENDFILE" type="boolean" label="CONF_MESSAGE[X-SendFile Active]" description="CONF_MESSAGE[Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)]" default="false"/>
-        <global_param name="USE_XACCELREDIRECT" type="boolean" label="CONF_MESSAGE[X-Accel-Redirect Active]" description="CONF_MESSAGE[Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping]" default="false"/>
         <global_param name="ZIP_ON_THE_FLY" type="boolean" label="CONF_MESSAGE[Zip downloading files on the fly]" description="CONF_MESSAGE[Directly write the zip file to an output stream which is connected to the user's browser.]" default="false"/>
         <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,meta.watch,meta.syncable,meta.filehasher,index.lucene"/>
 	</server_settings>
-	<class_definition filename="plugins/access.fs/class.fsAccessDriver.php" classname="fsAccessDriver"/>
+	<class_definition filename="plugins/access.fs/FsAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/access.fs/fsActions.xml" include="actions/*" exclude=""/>
 		<external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
@@ -39,7 +37,8 @@
 		<external_file filename="plugins/access.fs/fsActions.xml" include="client_configs/*" exclude=""/>
         <hooks>
             <serverCallback hookName="node.info" methodName="loadNodeInfo"/>
+            <serverCallback hookName="node.info.nocache" methodName="localizeNodeInfo"/>
         </hooks>
 	</registry_contributions>
-    <class_stream_wrapper filename="plugins/access.fs/class.fsAccessWrapper.php" classname="fsAccessWrapper" protocol="ajxp.fs"/>
+    <class_stream_wrapper filename="plugins/access.fs/FsAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper" protocol="ajxp.fs"/>
 </ajxpdriver>

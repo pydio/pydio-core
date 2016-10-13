@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Lucene Search Engine" => "Lucene",
@@ -43,6 +43,6 @@ $mess=array(
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "Für eine hohe Geschwindigkeit sollten Wildcards erst ab dem dritten Zeichen möglich sein.",
 "Auto-Wildcard" => "Auto-Wildcard",
 "Automatically append a * after the user query to make the search broader" => "Den Suchbegriff des Benutzers immer mit einem * beenden.",
-"Hide 'My Shares'" => "Hide 'My Shares'",
-"Hide My Shares section in the Orbit theme GUI." => "Hide My Shares section in the Orbit theme GUI.",
+"Hide 'My Shares'" => "Arbeitsumgebung 'Freigegebene Dateien' verstecken",
+"Hide My Shares section in the Orbit theme GUI." => "Versteckt die Arbeitsumgebung 'Freigegebene Dateien' im Orbit-Design.",
 );

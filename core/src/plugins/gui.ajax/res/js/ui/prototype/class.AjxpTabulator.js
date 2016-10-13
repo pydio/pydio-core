@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 Class.create("AjxpTabulator", AjxpPane, {
@@ -102,6 +102,14 @@ Class.create("AjxpTabulator", AjxpPane, {
             document.observe("ajaxplorer:user_logged", this.loadState.bind(this));
             this.loadState();
         }
+        if(this.options.route){
+            var routeOptions = this.options.route;
+            if(pydio.Router) {
+                this._bindToRouter(routeOptions);
+            } else pydio.observeOnce("loaded", function(){
+                if(pydio.Router) this._bindToRouter(routeOptions);
+            }.bind(this));
+        }
 
 	},
 
@@ -125,6 +133,8 @@ Class.create("AjxpTabulator", AjxpPane, {
                 label = MessageHash[tabInfo.label] || tabInfo.label;
             }
             var title = MessageHash[tabInfo.title] || label.stripTags();
+            title = he.escape(title);
+            label = he.escape(label);
             var options = {className:'toggleHeader toggleInactive'};
             if(!this.options.tabsTips){ options.title = title; }
             td = new Element('span', options);
@@ -165,6 +175,7 @@ Class.create("AjxpTabulator", AjxpPane, {
         if(label && label.innerHTML !== undefined){
             if(label.down('.filenameSpan')){
                 var cont = label.down('.filenameSpan').innerHTML;
+                cont = he.escape(cont);
                 if(cont.length > 25){
                     cont = cont.substr(0,7)+"[...]"+cont.substr(-13);
                     label.down('.filenameSpan').update(cont);
@@ -172,7 +183,7 @@ Class.create("AjxpTabulator", AjxpPane, {
             }
             return label;
         }
-        if(label.stripTags() != label) return label;
+        label = label.stripTags();
         if(!label || !label.length) return '';
         if(label.length > 25){
             return label.substr(0,7)+"[...]"+label.substr(-13);
@@ -481,7 +492,29 @@ Class.create("AjxpTabulator", AjxpPane, {
         this._eventPath = cNode.getPath();
     },
 
-	/**
+    _bindToRouter: function(routeOptions){
+        this.observe("switch", function(tabId){
+            if(tabId){
+                pydio.Router.router.navigate(routeOptions.base + "/" + tabId);
+            }
+        });
+        this._routerObserver = function(object){
+            if('/' + object.workspace === routeOptions.base){
+                var tabId = PathUtils.getBasename(object.path);
+                if(tabId) {
+                    this.switchTabulator(tabId);
+                }else{
+                    this.switchTabulator(this.tabulatorData.first().id);
+                }
+            }
+        }.bind(this);
+        pydio.observe("routechange", this._routerObserver);
+        window.setTimeout(function(){
+            this.notify("switch", this.tabulatorData.first().id);
+        }.bind(this), 500);
+    },
+
+    /**
 	 * Resizes the widget
 	 */
 	resize : function(size, loop){
@@ -601,6 +634,9 @@ Class.create("AjxpTabulator", AjxpPane, {
 		this.htmlElement.update("");
         try{pydio.UI.removeInstanceFromCache(this.htmlElement.id);}catch(e){}
 		this.htmlElement = null;
+        if(this._routerObserver){
+            pydio.stopObserving("routechange", this._routerObserver);
+        }
 	},
 	
 	

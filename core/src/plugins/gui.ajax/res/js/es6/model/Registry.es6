@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 class Registry{
 
@@ -178,6 +178,7 @@ class Registry{
                 }catch(e){
                     Logger.error("Ignoring Error in extensionOnInit code:");
                     Logger.error(extensionOnInit.firstChild.nodeValue);
+                    Logger.error(e.message);
                 }
             }
             var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');

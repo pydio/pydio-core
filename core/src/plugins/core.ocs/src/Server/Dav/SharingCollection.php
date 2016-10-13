@@ -16,21 +16,24 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\OCS\Server\Dav;
+use Pydio\Core\Http\Dav\Collection;
+use Sabre\DAV\SimpleCollection;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
-class SharingCollection extends \AJXP_Sabre_Collection
+class SharingCollection extends Collection
 {
     public function getChildren()
     {
-        if($this->path == "/" && !$this->repository->hasContentFilter()){
-            $basePath = $this->repository->getOption("PATH");
+        if($this->path == "/" && !$this->context->getRepository()->hasContentFilter()){
+            $basePath = $this->context->getRepository()->getContextOption($this->context, "PATH");
             $dirName = basename($basePath);
-            $this->children[$dirName] = new \Sabre\DAV\SimpleCollection($dirName);
+            $this->children[$dirName] = new SimpleCollection($dirName);
             return $this->children;
         }else{
             return parent::getChildren();

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  Estonian translation by Ardi Jürgens <ardi (at) zone.ee>
 //  + updates/fixes by Kain Väljaots <kain (at) zone.ee>
@@ -60,7 +60,7 @@ $mess=array(
 "22" => "PHP skript",
 "23" => "Fail",
 "24" => "Ülemine kataloog",
-"25" => "Lae üles fail või mitu faili (maks. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") kataloogi : ",
+"25" => "Lae üles fail või mitu faili (maks. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") kataloogi : ",
 "26" => "Loo uus kataloog asukohta : ",
 "27" => "Saada",
 "28" => "Loo uus fail asukohta : ",
@@ -647,8 +647,12 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

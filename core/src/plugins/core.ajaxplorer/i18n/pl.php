@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "languageLabel" => "Polski",
@@ -48,7 +48,7 @@ $mess=array(
 "22" => "Skrypt PHP",
 "23" => "Plik",
 "24" => "Katalog wyżej",
-"25" => "Wgraj na serwer jeden lub więcej plików (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") w katalogu: ",
+"25" => "Wgraj na serwer jeden lub więcej plików (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") w katalogu: ",
 "26" => "Utwórz nowy katalog w: ",
 "27" => "Wgraj",
 "28" => "Utwórz nowy plik w: ",
@@ -644,8 +644,12 @@ $mess=array(
 "546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
 "547" => "Accept",
 "548" => "Decline",
-    "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
-    "550" => "Reject this share",
-    "551" => "Reject",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

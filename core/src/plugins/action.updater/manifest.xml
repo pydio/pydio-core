@@ -160,7 +160,7 @@
             </action>
         </actions>
 	</registry_contributions>
-	<class_definition filename="plugins/action.updater/class.UpdateController.php" classname="UpdateController"/>
+	<class_definition filename="plugins/action.updater/UpdateController.php" classname="Pydio\Action\Update\UpdateController"/>
     <dependencies>
         <!-- Image proxy must be implemented -->
         <activePlugin pluginName="access.ajxp_conf|access.ajxp_admin"/>

@@ -25,7 +25,7 @@
                                 tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"action.cart.10","title":"action.cart.15","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                     <div id="ajxp-cart-manager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "saveState":true, "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                        <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "saveState":true, "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"submenuOffsetTop":2}}'>
                             <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"nodeProviderProperties":{}}'></div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                 <additional_content id="action_cart"><![CDATA[
                         <div ajxp_position="9" id="action_cart">
                             <h3 style="color:#E2DECB;" ajxp_message_id="action.cart.10">AJXP_MESSAGE[action.cart.10]</h3>
-                            <div id="cart-manager-header" class="innerTabulator" style="height: 200px;" ajxpClass="AjxpTabulator" ajxpOptions='{"saveState":true, "defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
+                            <div id="cart-manager-header" class="innerTabulator" style="height: 200px;" ajxpClass="AjxpTabulator" ajxpOptions='{"saveState":true, "defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"submenuOffsetTop":2}}'>
                                 <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"fit":"content", "nodeProviderProperties":{}}'></div>
                             </div>
                         </div>
@@ -290,5 +290,5 @@
         </actions>
     </registry_contributions>
 
-    <class_definition classname="CartManager" filename="plugins/action.cart/class.CartManager.php"/>
+    <class_definition classname="Pydio\Action\Cart\CartManager" filename="plugins/action.cart/CartManager.php"/>
 </ajxp_plugin>

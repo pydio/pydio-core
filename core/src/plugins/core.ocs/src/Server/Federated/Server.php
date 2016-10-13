@@ -16,9 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Server\Federated;
+
+use Pydio\Core\Services\RolesService;
+use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Vars\InputFilter;
 
 use Pydio\OCS\Model\RemoteShare;
 use Pydio\OCS\Model\SQLStore;
@@ -29,8 +33,18 @@ use Pydio\OCS\Server\UserNotFoundException;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Class Server
+ * @package Pydio\OCS\Server\Federated
+ */
 class Server extends Dummy
 {
+    /**
+     * @param $uriParts
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     * @throws UserNotFoundException
+     */
     public function run($uriParts, $parameters){
 
         if(!count($uriParts)){
@@ -56,16 +70,21 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     * @throws UserNotFoundException
+     */
     protected function actionReceive($parameters){
 
-        $targetUser = \AJXP_Utils::sanitize($parameters["shareWith"], AJXP_SANITIZE_EMAILCHARS);
-        if(!\AuthService::userExists($targetUser)){
+        $targetUser = InputFilter::sanitize($parameters["shareWith"], InputFilter::SANITIZE_EMAILCHARS);
+        if(!UsersService::userExists($targetUser)){
             throw new UserNotFoundException();
         }
-        $token          = \AJXP_Utils::sanitize($parameters["token"], AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = \AJXP_Utils::sanitize($parameters["remoteId"], AJXP_SANITIZE_ALPHANUM);
-        $documentName   = \AJXP_Utils::sanitize($parameters["name"], AJXP_SANITIZE_FILENAME);
-        $sender         = \AJXP_Utils::sanitize($parameters["owner"], AJXP_SANITIZE_EMAILCHARS);
+        $token          = InputFilter::sanitize($parameters["token"], InputFilter::SANITIZE_ALPHANUM);
+        $remoteId       = InputFilter::sanitize($parameters["remoteId"], InputFilter::SANITIZE_ALPHANUM);
+        $documentName   = InputFilter::sanitize($parameters["name"], InputFilter::SANITIZE_FILENAME);
+        $sender         = InputFilter::sanitize($parameters["owner"], InputFilter::SANITIZE_EMAILCHARS);
         $remote         = $parameters["remote"];
         $testParts = parse_url($remote);
         if(!is_array($testParts) || empty($testParts["scheme"]) || empty($testParts["host"])){
@@ -94,15 +113,21 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully received share, waiting for user response.", array("id" => $newShare->getId()));
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = RolesService::getRole("AJXP_USR_/" . $targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            \AuthService::updateRole($userRole);
+            RolesService::updateRole($userRole);
         }
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionAccept($remoteId, $token, $parameters){
 
         $store = new SQLStore();
@@ -121,6 +146,12 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionDecline($remoteId, $token, $parameters){
 
         $store = new SQLStore();
@@ -138,10 +169,16 @@ class Server extends Dummy
 
     }
 
+    /**
+     * @param $remoteId
+     * @param $token
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function actionUnshare($remoteId, $token, $parameters){
 
-        $token          = \AJXP_Utils::sanitize($token, AJXP_SANITIZE_ALPHANUM);
-        $remoteId       = \AJXP_Utils::sanitize($remoteId, AJXP_SANITIZE_ALPHANUM);
+        $token          = InputFilter::sanitize($token, InputFilter::SANITIZE_ALPHANUM);
+        $remoteId       = InputFilter::sanitize($remoteId, InputFilter::SANITIZE_ALPHANUM);
         $store = new SQLStore();
         $remoteShare = $store->remoteShareForOcsRemoteId($remoteId);
         if(empty($remoteShare)){
@@ -155,15 +192,19 @@ class Server extends Dummy
         $response = $this->buildResponse("ok", 200, "Successfully removed share.");
         $this->sendResponse($response, $this->getFormat($parameters));
 
-        $userRole = \AuthService::getRole("AJXP_USR_/".$targetUser);
+        $userRole = RolesService::getRole("AJXP_USR_/" . $targetUser);
         if($userRole !== false){
             // Artificially "touch" user role
             // to force repositories reload if he is logged in
-            \AuthService::updateRole($userRole);
+            RolesService::updateRole($userRole);
         }
 
     }
 
+    /**
+     * @param $parameters
+     * @throws InvalidArgumentsException
+     */
     protected function validateReceiveShareParameters($parameters){
 
         $keys = array("shareWith", "token", "name", "remoteId", "owner", "remote");

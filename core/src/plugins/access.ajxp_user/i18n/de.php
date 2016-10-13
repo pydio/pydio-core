@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "title"=> "Mein Dashboard",
@@ -65,7 +65,7 @@ $mess=array(
 "42"=> "Öffnen",
 "43"=> "Mein Profil",
 "43t"=> "Alle persönlichn Daten",
-"44"=> "Mein Konto",
+"44"=> "Mein Benutzerkonto",
 "45"=> "Persönliche Daten",
 "46"=> "Adressbuch",
 "47"=> "Benutzer und Teams, die Sie erstellt haben",

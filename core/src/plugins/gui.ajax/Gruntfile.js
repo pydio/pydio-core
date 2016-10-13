@@ -33,18 +33,17 @@ var gui_ajax_core = [
     'res/js/vendor/scriptaculous/src/slider.js',
     'res/js/vendor/prototype/cssfx.js',
     'res/js/vendor/prototype/proto.scroller.js',
-    'res/js/vendor/prototype/carousel.js',
     'res/js/vendor/prototype/accordion.js',
     'res/js/vendor/webfx/xtree.js',
     'res/js/vendor/webfx/ajxptree.js',
     'res/js/vendor/chosen/event.simulate.js',
     'res/js/vendor/chosen/chosen.proto.js',
+    'node_modules/he/he.js',
     'res/js/core/model/User.js',
     'res/js/core/http/ResourcesManager.js',
     'res/js/core/model/RemoteNodeProvider.js',
     'res/js/core/model/EmptyNodeProvider.js',
     'res/js/core/model/Repository.js',
-    'res/js/core/model/BackgroundTasksManager.js',
     'res/js/core/http/PydioApi.js',
     'res/js/core/http/PydioUsersApi.js',
     'res/js/core/http/MetaCacheService.js',
@@ -68,7 +67,6 @@ var gui_ajax_core = [
     'res/js/ui/prototype/class.TreeSelector.js',
     'res/js/ui/prototype/class.SliderInput.js',
     'res/js/ui/prototype/class.ActionsToolbar.js',
-    'res/js/ui/prototype/class.BackgroundManagerPane.js',
     'res/js/ui/prototype/class.HeaderResizer.js',
     'res/js/ui/prototype/class.PreviewFactory.js',
     'res/js/ui/prototype/class.FilesList.js',
@@ -239,17 +237,22 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('assemble-less');
-    grunt.registerTask('default', [
+    grunt.registerTask('type:js', [
         'babel:dist',
         'uglify:js',
         'babel:materialui',
-//    'run:materialui',
         'env:build',
         'browserify',
         'env:dev',
         'uglify:nodejs',
-        'babel:pydio',
+        'babel:pydio'
+    ]);
+    grunt.registerTask('type:css', [
         'cssmin'
+    ]);
+    grunt.registerTask('default', [
+        'type:js',
+        'type:css'
     ]);
     grunt.registerTask('build-core', [
         'babel:dist',

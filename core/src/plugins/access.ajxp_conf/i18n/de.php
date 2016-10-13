@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess=array(
@@ -145,7 +145,7 @@ $mess=array(
 "120" => "Go Pro",
 "121" => "Holen Sie sich professionelle Unterstützung für Ihr System",
 "122" => "Alle Einstellungen",
-"123" => "Kernfunktionalitäten",
+"123" => "Kernfunktionalität",
 "124" => "Quelle",
 "125" => "Alias",
 "126" => "Sind Sie sicher, dass Sie die ausgewählten Elemente löschen möchten?",
@@ -157,7 +157,7 @@ $mess=array(
 "132" => "Zwischenspeicher wurde geleert, aber Pydio läuft im SKIP_CACHE Modus (siehe bootstrap_context.php).",
 "133" => "Grundeinstellungen der Anwendung",
 "134" => "Zusätzliche Funktionen aktivieren und prüfen, ob diese korrekt funktionieren.",
-"135" => "Erweiterungen für Kernfunktionalitäten aktivieren und prüfen, ob diese korrekt funktionieren. Die Erweiterungen werden in den Grundeinstellungen konfiguriert.",
+"135" => "Erweiterungen für Kernfunktionalität aktivieren. Die Erweiterungen werden in den Grundeinstellungen konfiguriert.",
 "136" => "Einstellungen der Anwendung, sowie aller Erweiterungen ändern",
 "137" => "Zugriffsrechte und Benutzer verwalten",
 "138" => "Arbeitsumgebungen erstellen und Funktionen und Metadaten festlegen.",
@@ -183,4 +183,13 @@ $mess=array(
 "158" => "Freigabebenutzer", // user type shared
 "159" => "Gast",
 "160" => "Die Gruppe wurde erfolgreich erstellt",
+"161" => "You are attempting to move yourself inside a group, and you will loose super-admininistrative rights. Please login as another user if you really want to do that. Aborting.",
+"162" => "You are not authorized to update user %s",
+"163" => "Roles reordered for user %s",
+"164" => "Successfully updated roles",
+"165" => "Successfully saved user preferences",
+"166" => "Successfully set lock (%1) on user (%2)",
+"167" => "Successfully unlocked user (%s)",
+"168" => "%1 users were moved to group %2",
+"169" => "No users were moved, there must have been something wrong!",
 );

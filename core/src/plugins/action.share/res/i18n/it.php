@@ -242,8 +242,13 @@ $mess = array(
 "226" => "Non sei autorizzato per la creazione di link pubblici alle cartelle",
 "227" => "Non sei autorizzato per la condivisione interna di file",
 "228" => "Non sei autorizzato per la condivisione interna delle cartelle",
-    "229" => "Please save before sending an invitation",
+"229" => "Insert a preview of the file by pasting this code inside an HTML page.",
+"230" => "Please save before sending an invitation",
+"231" => "Click to start downloading",
 "11" => "Expiration",
 "49" => "create user",
+"232" => "No entries found for share, did you maybe delete some users?",
+"233" => "Reset this share",
+"234" => "It has been added to your %s workspace.",
 // will be replaced by the filename to download
 );

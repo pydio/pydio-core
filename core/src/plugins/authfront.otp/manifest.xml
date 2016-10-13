@@ -10,32 +10,94 @@
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
             <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
+            <css file="plugins/authfront.otp/configurator.css" autoload="true"/>
         </resources>
     </client_settings>
     <server_settings>
-        <global_param name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="13"/>
-        <global_param name="PROTOCOL_TYPE" type="select"
+        <global_param group="CONF_MESSAGE[Options]" name="ORDER" type="integer" label="CONF_MESSAGE[Order]" description="CONF_MESSAGE[Order this plugin with other auth frontends]" default="13"/>
+        <global_param group="CONF_MESSAGE[Options]" name="PROTOCOL_TYPE" type="select"
                       choices="session_only|CONF_MESSAGE[Sessions Only]"
                       label="CONF_MESSAGE[Protocol Type]" description="CONF_MESSAGE[Enable/disable automatically based on the protocol used]" default="session_only" editable="false"/>
-        <global_param  expose="true" name="MODIFY_LOGIN_SCREEN" group="CONF_MESSAGE[General]" type="boolean" label="CONF_MESSAGE[Modify login page]"
+        <global_param  group="CONF_MESSAGE[Options]" expose="true" name="MODIFY_LOGIN_SCREEN" type="boolean" label="CONF_MESSAGE[Modify login page]"
                        description="CONF_MESSAGE[Login page will be modified to give user a OTP textbox.]" default="true"/>
-        <global_param name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
-        <global_param name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
-        <param name="yubikey1" type="string" label="CONF_MESSAGE[YubiKey 1]"  description="CONF_MESSAGE[YubiKey 1]" mandatory="false"/>
-        <param name="yubikey2" type="string" label="CONF_MESSAGE[YubiKey 2]"  description="CONF_MESSAGE[YubiKey 2]" mandatory="false"/>
-        <param name="google" type="string" label="CONF_MESSAGE[Google Authenticator]"  description="CONF_MESSAGE[Google Authenticator Secret]" mandatory="false"/>
-        <param name="google_last" type="integer" label="CONF_MESSAGE[Google Authenticator Last]"  description="CONF_MESSAGE[Google Authenticator replay protection, do not edit]" mandatory="false" editable="false"/>
+        <global_param group="CONF_MESSAGE[Options]" name="YUBICO_SECRET_KEY" type="string" label="CONF_MESSAGE[Yubico Secret Key]" description="CONF_MESSAGE[Yubico secret key attached to your account]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Options]" name="YUBICO_CLIENT_ID" type="string" label="CONF_MESSAGE[Yubico Client ID]" description="CONF_MESSAGE[Yubico client id attached to your account]" mandatory="false"/>
+        <param name="yubikey_enabled" group="CONF_MESSAGE[Yubikey]" type="boolean" label="CONF_MESSAGE[Use Yubikey]"  description="CONF_MESSAGE[Require a Yubikey usage by the user.]" mandatory="false" default="false" expose="true" scope="user,group"/>
+        <param name="yubikey1" group="CONF_MESSAGE[Yubikey]" type="string" label="CONF_MESSAGE[Your YubiKey ID]"  description="CONF_MESSAGE[YubiKey ID. To add a yubikey, simply use your key button to fill this field.]" mandatory="false" expose="true" scope="user"/>
+        <param name="yubikey2" group="CONF_MESSAGE[Yubikey]" type="string" label="CONF_MESSAGE[Second YubiKey ID]"  description="CONF_MESSAGE[YubiKey ID. To add a second yubikey, simply use your key button to fill this field.]" mandatory="false" expose="true" scope="user"/>
+        <param name="google_enabled_admin" group="CONF_MESSAGE[Google Authenticator]" type="boolean" label="CONF_MESSAGE[Force Google Authenticator]"  description="CONF_MESSAGE[Force Google Auth usage without letting the choice to the user.]" mandatory="false" default="false" scope="user,group"/>
+        <param name="google_enabled" group="CONF_MESSAGE[Google Authenticator]" type="boolean" label="CONF_MESSAGE[Enable Google Authenticator]"  description="CONF_MESSAGE[If you enable it for the first time, you will be able to configure Google Authenticator application next time you log in.]" mandatory="false" default="false" scope="user,group" expose="true"/>
+        <param name="google" group="CONF_MESSAGE[Google Authenticator]" type="string" label="CONF_MESSAGE[Google Authenticator Secret]"  description="CONF_MESSAGE[Google Authenticator Secret Key.]" mandatory="false" scope="user"/>
+        <param name="google_last" group="CONF_MESSAGE[Google Authenticator]" type="integer" label="CONF_MESSAGE[Google Authenticator Last]"  description="CONF_MESSAGE[Google Authenticator replay protection, do not edit]" mandatory="false" editable="false"/>
     </server_settings>
-    <class_definition filename="plugins/authfront.otp/class.OtpAuthFrontend.php" classname="OtpAuthFrontend"/>
+    <class_definition filename="plugins/authfront.otp/OtpAuthFrontend.php" classname="Pydio\Auth\Frontend\OtpAuthFrontend"/>
     <registry_contributions>
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
+        <actions>
+            <action name="otp_show_setup_screen">
+                <gui src="icon-key" iconClass="icon-key" text="authfront.otp.1" title="authfront.otp.1">
+                    <context dir="true" recycle="false" selection="false"/>
+                </gui>
+                <processing>
+                    <clientCallback prepareModal="true" dialogOpenForm="otp_setup_screen" dialogOkButtonOnly="true" dialogSkipButtons="false">
+                        <dialogOnOpen><![CDATA[
+                            PydioApi.getClient().request({get_action:"otp_show_setup_screen"}, function(t){
+                                if(t.responseJSON){
+                                    modal.getForm().down("#google_otp").setValue(t.responseJSON.key);
+                                    React.render(
+                                        React.createElement(ReactQRCode, {
+                                            size:200,
+                                            value:t.responseJSON.qrcode,
+                                            level:'L'
+                                        }),
+                                        modal.getForm().down("#qrcode")
+                                    );
+                                }
+                            });
+                            modal.refreshDialogPosition();
+                        ]]></dialogOnOpen>
+                        <dialogOnComplete><![CDATA[
+                            if(!modal.getForm().down("#google_otp_verification").getValue()){
+                                pydio.displayMessage('ERROR', 'Please set up verification code');
+                                return false;
+                            }
+                            PydioApi.getClient().request({
+                                get_action:"otp_show_setup_screen",
+                                step:"verify",
+                                otp:modal.getForm().down("#google_otp_verification").getValue()
+                            }, function(t){
+                                if(t.responseJSON && t.responseJSON.RESULT === "OK"){
+                                    location.reload();
+                                }
+                            });
+                        ]]></dialogOnComplete>
+                    </clientCallback>
+                    <clientForm id="otp_setup_screen"><![CDATA[
+                         <div id="otp_setup_screen" box_width="500">
+                            <div data:ajxp_message_id="authfront.otp.2">AJXP_MESSAGE[authfront.otp.2]</div>
+                            <div data:ajxp_message_id="authfront.otp.3">AJXP_MESSAGE[authfront.otp.3]</div>
+                            <div data:ajxp_message_id="authfront.otp.4">AJXP_MESSAGE[authfront.otp.4]</div>
+                            <div class="codes">
+                                <div id="qrcode"></div>
+                                <input id="google_otp" type="text"/>
+                            </div>
+                            <div class="verif">
+                                <div data:ajxp_message_id="authfront.otp.5">AJXP_MESSAGE[authfront.otp.5]</div>
+                                <input id="google_otp_verification" type="text"/>
+                            </div>
+                         </div>
+					]]></clientForm>
+                    <serverCallback methodName="getConfigurationCode"/>
+                </processing>
+            </action>
+        </actions>
         <client_configs>
             <template element="ajxp_desktop" name="otp_script" position="bottom"><![CDATA[
             <script>
                   document.observe("ajaxplorer:afterApply-login", function(){
                     var f= modal.getForm();
 
-                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp")._object.MODIFY_LOGIN_SCREEN;
+                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp").get('MODIFY_LOGIN_SCREEN');
 
                     if(!enableModifyGUI) return;
 

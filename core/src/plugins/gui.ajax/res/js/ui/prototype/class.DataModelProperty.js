@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 Class.create("DataModelProperty", {
@@ -42,7 +42,7 @@ Class.create("DataModelProperty", {
                     element.update(l?l:'');
                     break;
                 case "root_label":
-                    element.update(dm.getRootNode().getLabel());
+                    element.update(he.escape(dm.getRootNode().getLabel()));
                     break;
                 case "metadata":
                     if(options.metadata_sum){

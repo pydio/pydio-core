@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("LogoWidget", AjxpPane, {
 
@@ -202,8 +202,9 @@ Class.create("LogoWidget", AjxpPane, {
             this.titleDiv.setStyle({
                 position:'absolute',
                 left : (imgW + 16) + 'px',
-                top : (htHeight - (has_by?42:39)) + 'px',
-                fontSize : '19px'
+                top : (htHeight - (has_by?42:36)) + 'px',
+                fontSize : (has_by?'19px':'22px'),
+                fontWeight: 300
             });
         }
 

@@ -1,8 +1,8 @@
-@tooltip_background_color:rgba(69, 77, 85, 0.86);
+@tooltip_background_color:rgba(69, 77, 85, 0.72);
 @tooltip_border_color:rgba(0,0,0,0);
 @tooltip_font_color:@white;
-@tooltip_font_size:13px;
-@tooltip_title_font_size:1.1em;
+@tooltip_font_size:12px;
+@tooltip_title_font_size:14px;
 
 .tooltipped
 {
@@ -11,18 +11,20 @@
 .simple_tooltip
 {
   position: absolute;
-  width: 150px;
+  width: 210px;
   z-index: 10000;
+  font-weight: 300;
+  line-height: 19px;
   font-size: @tooltip_font_size;
-  padding: 5px 10px;
+  padding: 8px 11px;
   &_observer {
     cursor: help;
   }
   &_title{
-    padding-top: 2px;
-    padding-bottom: 1px;
-    text-transform: uppercase;
-    font-weight: bold;
+    padding-top: 1px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+    margin-bottom: 6px;
     font-size: @tooltip_title_font_size;
   }
 }

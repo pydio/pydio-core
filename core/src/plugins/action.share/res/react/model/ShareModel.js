@@ -171,6 +171,10 @@
             }
             var updatedData = [];
             if(operation == 'add'){
+                let pluginsConfig = pydio.getPluginConfigs("action.share");
+                if(pluginsConfig.get('WATCHER_SHARES_AUTO_USERS')){
+                    userData['WATCH'] = true;
+                }
                 this._pendingData['entries'].push(userData);
             }else if(operation == 'remove'){
                 this._pendingData['entries'].map(function(entry){
@@ -244,7 +248,12 @@
                 return this._pendingData[name];
             }
             if(name == 'watch') {
-                return this._data["element_watch"] == 'META_WATCH_BOTH';
+                if(this._data["element_watch"] !== undefined){
+                    return this._data["element_watch"] == 'META_WATCH_BOTH';
+                }else{
+                    let pluginConfigs = pydio.getPluginConfigs("action.share");
+                    return pluginConfigs.get('WATCHER_SHARES_AUTO_OWNER');
+                }
             }else{
                 return this._data[name];
             }
@@ -603,11 +612,14 @@
             });
         }
 
-        load(){
+        load(replaceCache = false){
             if(this._status == 'loading') return;
             this._setStatus('loading');
             let cacheService = MetaCacheService.getInstance();
             cacheService.registerMetaStream('action.share', MetaCacheService.EXPIRATION_LOCAL_NODE);
+            if(replaceCache){
+                cacheService.invalidateMetaForKeys('action.share', this._node.getPath());
+            }
 
             let remoteLoader = function(transport){
                 if(transport.responseJSON){
@@ -693,7 +705,7 @@
             if(!params['repo_label']){
                 params['repo_label'] = this._node.getLabel();
             }
-
+            this.notify('saving');
             var publicLinks = this.getPublicLinks();
             if(publicLinks.length){
                 var pLinkId = publicLinks[0]['hash'];
@@ -734,7 +746,10 @@
                     // There must have been an error, revert
                     this.load();
                 }
-            }.bind(this), null);
+                this.notify('saved');
+            }.bind(this), function(){
+                this.notify('saved');
+            }.bind(this));
         }
 
 
@@ -745,7 +760,7 @@
             };
             ShareModel.prepareShareActionParameters(this.getNode(), params);
             PydioApi.getClient().request(params, function(){
-                this.load();
+                this.load(true);
                 callback();
             }.bind(this));
         }
@@ -856,6 +871,12 @@
         static federatedSharingEnabled(){
             return global.pydio.getPluginConfigs("core.ocs").get("ENABLE_FEDERATED_SHARING");
         }
+        
+        static buildDirectDownloadUrl(node, publicLink, contentProvider = false){
+            let ctString = contentProvider ? '?ct=true' : '';
+            let link = publicLink.split('--').shift();
+            return link + (link.endsWith('/')? '' : '/') + 'dl/'+encodeURIComponent(node.getLabel()) + ctString;
+        }
 
         static qrcodeEnabled(){
             return global.pydio.getPluginConfigs("action.share").get("CREATE_QRCODE");
@@ -870,17 +891,53 @@
                 s = MessageHash["share_center.42"];
                 if(s) s = s.replace("%s", ApplicationTitle);
                 link = this.getPublicLink(linkId);
-                message = s + "\n\n " + "<a href=\""+link+"\">"+link+"</a>";
+                let additionalData = '';
+                let password = this.hasHiddenPassword(linkId);
+                if(password){
+                    additionalData += '\n - ' + MessageHash['share_center.170'];
+                }
+                let dlLimit = this.getExpirationFor(linkId, 'downloads');
+                if(dlLimit){
+                    additionalData += '\n - ' + MessageHash['share_center.22'] + ': ' + dlLimit;
+                }
+                let expirationDate = this.getExpirationFor(linkId, 'days');
+                if(expirationDate){
+                    let today = new Date();
+                    let expDate = new Date();
+                    expDate.setDate(today.getDate() + parseInt(expirationDate));
+                    additionalData += '\n - ' + MessageHash['share_center.21'] + ': ' + expDate.toLocaleDateString();
+                }
+                if(ShareModel.forceMailerOldSchool()){
+                    message = s + additionalData + "\n\n: " + link;
+                }else{
+                    message = s + additionalData + "\n\n" + "<a href='"+link+"'>"+link+"</a>";
+                }
             }else{
                 if(!this._data['repository_url']){
-                    throw new Error(MessageHash['share_center.229']);
+                    throw new Error(MessageHash['share_center.230']);
                 }
                 s = MessageHash["share_center." + (this.getNode().isLeaf() ? "42" : "43")];
                 if(s) s = s.replace("%s", ApplicationTitle);
+                let linkMessage = '';
                 if(this._data['repository_url']){
-                    link = this._data['repository_url'];
+                    if(this.getNode().isLeaf()){
+                        link = this._data['repository_url'].split('/ws-').shift() + '/ws-inbox';
+                        let sharedFilesString = MessageHash["share_center.100"];
+                        if(ShareModel.forceMailerOldSchool()){
+                            linkMessage = MessageHash["share_center.234"].replace('%s', sharedFilesString) + " ("+ link +")";
+                        }else{
+                            linkMessage = MessageHash["share_center.234"].replace('%s', '<a href="'+link+'">'+ sharedFilesString +'</a>');
+                        }
+                    }else{
+                        link = this._data['repository_url'];
+                        if(ShareModel.forceMailerOldSchool()){
+                            linkMessage = ": " + link;
+                        }else{
+                            linkMessage = "<a href='" + link +"'>" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ApplicationTitle) + "</a>";
+                        }
+                    }
                 }
-                message = s + "\n\n " + "<a href=\"" + link +"\">" + MessageHash["share_center.46"].replace("%s1", this.getGlobal("label")).replace("%s2", ajaxplorer.appTitle) + "</a>";
+                message = s + "\n\n " + linkMessage;
             }
             var usersList = null;
             if(this.shareFolderMode == 'workspace' && oForm) {

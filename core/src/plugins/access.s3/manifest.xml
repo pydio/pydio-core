@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpdriver name="s3" label="CONF_MESSAGE[S3 (Amazon Web Service)]" description="CONF_MESSAGE[Access an AWS server. Requires AWS-SDK v2 for PHP]" mixins="filesystem_commons,slug_provider,template_provider" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/access.s3/class.s3AccessDriver.php" classname="s3AccessDriver"/>
+    <class_definition filename="plugins/access.s3/S3AccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\S3\S3AccessDriver"/>
     <client_settings icon="plugins/access.fs/icon.png" description_template="{REGION}{STORAGE_URL}/{CONTAINER}" iconClass="icon-sitemap">
         <resources>
             <i18n namespace="s3_access" path="plugins/access.s3/i18n"/>
@@ -16,9 +16,7 @@
 		<param name="API_VERSION" group="CONF_MESSAGE[API]" type="string" label="CONF_MESSAGE[API Version]" description="CONF_MESSAGE[The API Version of AS3 is a date (like 2006-03-01). If not sure, put latest ]" mandatory="true" default="latest"/>
         <param name="PROXY" group="CONF_MESSAGE[Custom Storage]" type="string" label="CONF_MESSAGE[Proxy]" description="CONF_MESSAGE[If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080]" mandatory="false"/>
         <param name="STORAGE_URL" group="CONF_MESSAGE[Custom Storage]" type="string" label="CONF_MESSAGE[Storage URL]" description="CONF_MESSAGE[Replace default AWS access points (built from region). Set a full URL, including protocol]" mandatory="false"/>
-        <param name="VHOST_NOT_SUPPORTED" group="CONF_MESSAGE[Custom Storage]" type="boolean" label="CONF_MESSAGE[Disable Virtual Host Syntax]" description="CONF_MESSAGE[S3 backends can be queried using protocol://bucket.host/. Some backend do not support this, use this option to force using protocol://host/bucket instead]" mandatory="false"/>
         <param name="IS_VIPR" group="CONF_MESSAGE[Custom Storage]" type="boolean" label="CONF_MESSAGE[Is ViPR]" description="CONF_MESSAGE[If the backend storage is an EMC ViPR storage]" mandatory="false"/>
-        <global_param name="SDK_VERSION" type="select" choices="v2|SDK Version 2,v3|SDK Version 3" label="CONF_MESSAGE[SDK Version]" description="CONF_MESSAGE[The AWS SDK version]" mandatory="true" default="v2" />
 	</server_settings>
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
@@ -30,5 +28,5 @@
     <dependencies>
         <pluginClass pluginName="access.fs"/>
     </dependencies>
-    <class_stream_wrapper filename="plugins/access.s3/class.s3AccessWrapper.php" classname="s3AccessWrapper" protocol="ajxp.s3"/>
+    <class_stream_wrapper filename="plugins/access.s3/S3AccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\S3\S3AccessWrapper" protocol="ajxp.s3"/>
 </ajxpdriver>

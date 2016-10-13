@@ -1,0 +1,16 @@
+#otp_setup_screen {
+  font-size: 12px;
+}
+#otp_setup_screen span.step {
+  font-size: 14px;
+  font-weight: 500;
+}
+#otp_setup_screen .codes {
+  width: 200px;
+  text-align: center;
+  margin: 10px auto;
+}
+#otp_setup_screen .codes input {
+  text-align: center;
+  width: 200px;
+}

@@ -12,6 +12,7 @@ defined('_JEXEC') or die( 'Restricted access' );
 define('AJXP_EXEC', true);
 jimport('joomla.event.plugin');
 jimport( 'joomla.registry.registry' );
+jimport( 'joomla.user.helper' );
 
 
 /**
@@ -133,13 +134,16 @@ class plgUserPydio extends JPlugin
         $success = false;
         if(!$this->glueCodeFound) return false;
 
+        $juser = JFactory::getUser();
+        $groups = JUserHelper::getUserGroups($juser->id);        
+
         global $AJXP_GLUE_GLOBALS;
         $AJXP_GLUE_GLOBALS = array();
         //$plugInAction, $login, $result, $secret, $autoCreate;
         $AJXP_GLUE_GLOBALS["secret"] = $this->secret;
         $AJXP_GLUE_GLOBALS["autoCreate"] = $this->autoCreate;
         $AJXP_GLUE_GLOBALS["plugInAction"] = "login";
-        $AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"]);
+        $AJXP_GLUE_GLOBALS["login"] = array("name"=>$user["username"], "password"=>$user["password"], "roles" => $groups);
         include($this->glueCode);
         new SessionSwitcher("previous", false, true);
         return true;

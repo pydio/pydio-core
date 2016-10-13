@@ -1,6 +1,6 @@
 {
   "name": "action.share",
-  "version": "6.2.3",
+  "version": "6.5.1",
   "description": "",
   "source_path":"res/react",
   "main": "index.js",

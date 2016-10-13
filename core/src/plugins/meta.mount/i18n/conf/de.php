@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "FS Mount" => "Dateisystem einbinden",
@@ -34,9 +34,9 @@ $mess=array(
 "Pass Password via environment instead of command line" => "Passwort über Umgebungsvariable statt Kommandozeile",
 "Instead of setting password through the AJXP_PASS variable in mount options, pass it through the environment variables. Sudo file must be changed accordingly." => "Statt das Passwort durch die AJXP_PASS-Variable an die Mount-Optionen anzuhängen wird es über eine Umgebungsvariable gesetzt. Sudo-Datei muss entsprechend angepasst werden.",
 "Devil" => "Devil",
-"Call the mount/umount commands through devil, must be configured on the server" => "Call the mount/umount commands through devil, must be configured on the server",
-"Additional result codes to accept as success" => "Additional result codes to accept as success",
-"On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes." => "On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes.",
-"Remove mount point on unmount" => "Remove mount point on unmount",
-"Delete mount folder on unmount. Can be required for security reasons." => "Delete mount folder on unmount. Can be required for security reasons.",
+"Call the mount/umount commands through devil, must be configured on the server" => "Den mount/umount-Befehl durch Devil ausführen. (Muss auf dem Server konfiguriert sein)",
+"Additional result codes to accept as success" => "Zusätzliche Rückgabewerte als Erfolgsmeldung interpretieren",
+"On some setup result code 32 is often an already mounted code and we want to consider this as a success. Add comma-separated list of codes." => "In manchen Umgebungen wird der Wert 32 zurückgegeben, wenn die Freigabe bereits eingebunden ist. Dieser Fall soll als Erfolg interpretiert werden. Durch Komma getrennte Liste von Rückgabewerten.",
+"Remove mount point on unmount" => "Einhängpunkt bei unmount entfernen",
+"Delete mount folder on unmount. Can be required for security reasons." => "Den Einhängpunkt (Ordner) beim Ausführen von unmount löschen. Kann aus Sicherheitsgründen notwendig sein.",
 );

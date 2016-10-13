@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.syncable" label="CONF_MESSAGE[Syncable Workspace]" description="CONF_MESSAGE[Track changes on this workspace to enable the synchronization with an external client]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/meta.syncable/class.ChangesTracker.php" classname="ChangesTracker"/>
+    <class_definition filename="plugins/meta.syncable/ChangesTracker.php" classname="Pydio\Access\Meta\Sync\ChangesTracker"/>
     <client_settings>
         <resources>
             <i18n namespace="meta.syncable" path="plugins/meta.syncable/i18n"/>
@@ -35,6 +35,7 @@
    			<serverCallback hookName="node.change" methodName="updateNodesIndex" defer="true"/>
    			<serverCallback hookName="node.index" methodName="indexNode"/>
    			<serverCallback hookName="node.index.recursive.start" methodName="clearIndexForNode"/>
+   			<serverCallback hookName="node.size.recursive" methodName="computeSizeRecursive"/>
             <serverCallback hookName="workspace.after_delete" methodName="clearIndexForWorkspaceId"/>
             <serverCallback hookName="workspace.share_metasources" methodName="setIndexationRequiredFlag"/>
         </hooks>

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("PixlrEditor", AbstractEditor, {
 
@@ -58,7 +58,7 @@ Class.create("PixlrEditor", AbstractEditor, {
             }else if(this.editorOptions.context.__className == "AjxpTabulator"){
                 this.editorOptions.context.closeTab("editor.pixlr:/" + this.currentNode.getPath());
             }
-			pydio.getController().fireAction('refresh');
+            pydio.fireNodeRefresh(this.currentNode);
 		}.bind(this);
 		conn.sendAsync();
 	},

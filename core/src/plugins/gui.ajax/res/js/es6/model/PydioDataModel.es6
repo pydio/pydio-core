@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -685,13 +685,13 @@ class PydioDataModel extends Observable{
 
 	}
 
-    applyCheckHook (node){
-        "use strict";
+    applyCheckHook (node, additionalParams = null){
+        
         var client = PydioApi.getClient();
         var result;
         client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function(transport){
             result = client.parseXmlMessage(transport.responseXML);
-        });
+        }, additionalParams);
         if(result === false){
             throw new Error("Check failed");
         }

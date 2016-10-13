@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -46,7 +46,7 @@ Class.create("AbstractEditor" , {
 	 */
 	editorOptions:null,
     /**
-     * @var An AjxpNode or an array of nodes
+     * @var Node or an array of nodes
      */
     inputNode : null,
 	
@@ -282,7 +282,7 @@ Class.create("AbstractEditor" , {
 	 */
 	updateTitle : function(title){
 		if(this.filenameSpan) {
-            this.filenameSpan.update(title);
+            this.filenameSpan.update(he.escape(title));
         }
 		if(this.fullScreenMode){
 			this.refreshFullScreenTitle();

@@ -1,9 +1,13 @@
-@userwidget_font_color: @white;
-@userwidget_font_size:12px;
-@userwidget_font_weight:300;
+@userwidget_font_color: @topbar_buttons_color;
+@userwidget_font_color_hover: @topbar_buttons_color_hover;
+@userwidget_font_size:@topbar_buttons_font_size;
+@userwidget_font_weight:@topbar_buttons_font_weight;
 
 #logging_string {
   color:@userwidget_font_color;
+  &:hover{
+    color: @userwidget_font_color_hover;
+  }
   float: right;
   margin-top: 12px;
   div.inlineBarButtonLeft {
@@ -50,10 +54,10 @@
       display: inline-block;
       font-size: @userwidget_font_size;
       font-weight: @userwidget_font_weight;
-      padding: 6px 0 0 8px;
-      color: rgba(255,255,255,0.9);
+      padding: 4px 0 0 8px;
+      color: @userwidget_font_color;
       &:hover{
-        color: white;
+        color: @userwidget_font_color_hover;
       }
       img {
       }
@@ -63,7 +67,7 @@
     float: right;
     width: 39px;
     height: 39px;
-    margin-top: -14px;
+    margin-top: -12px;
     margin-left: 14px;
     border-radius: 100%;
     background-position: center center;

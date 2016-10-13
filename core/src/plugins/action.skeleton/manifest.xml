@@ -64,5 +64,5 @@
             </action>
         </actions>
 	</registry_contributions>
-	<class_definition filename="plugins/action.skeleton/class.PluginSkeleton.php" classname="PluginSkeleton"/>
+	<class_definition filename="plugins/action.skeleton/PluginSkeleton.php" classname="Pydio\Action\Skeleton\PluginSkeleton"/>
 </ajxp_plugin>

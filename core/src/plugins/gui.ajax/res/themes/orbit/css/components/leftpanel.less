@@ -141,12 +141,15 @@
         font-size: 1.2em;
       }
       .material-list-text{
-        .nav-list-entry-label();
+        flex: 1;
+        overflow: hidden;
+        .material-list-line-1 > div{
+          .nav-list-entry-label();
+        }
       }
       .material-list-actions{
-        position:absolute;
-        right: 16px;
-        opacity: 0.5;
+        padding: 0 12px 0 6px;
+        opacity: 0.1;
         &:hover{
           opacity: 1;
         }

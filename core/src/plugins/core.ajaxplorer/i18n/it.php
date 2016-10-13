@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //
 //      Maintained by DepaMarco
@@ -68,7 +68,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "File",
 "24" => "Cartella superiore",
-"25" => "Invia uno o più file (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") nella cartella : ",
+"25" => "Invia uno o più file (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") nella cartella : ",
 "26" => "Crea una nuova cartella in: ",
 "27" => "Carica",
 "28" => "Crea un nuovo file in in: ",
@@ -604,13 +604,13 @@ $mess=array(
 "527"=> "Condiviso con",
 "528"=> "Utenti Interni",
 "530"=> "Utenti Esterni",
-"531"=> "Utenti",
-"532"=> "Gruppi",
-"533" => "Identificativo usato per il login. Utilizzare caratteri alfanumerici o indirizzo e-mail con caratteri minuscoli.",
-"534" => "Password usata per il login",
-"535" => "Invia password per e-mail",
-"536" => "Invia al nuovo utente una e-mail di benvenuto includendo la password",
-"plugtype.title.access" => "Driver Workspace",
+"531"=> "Users",
+"532"=> "Groups",
+"533" => "Identifier used to login, please use alphanumeric or email lowercase characters.",
+"534" => "Password used to login",
+"535" => "Send password by email",
+"536" => "Send a welcome email including the password to the new user",
+"plugtype.title.access" => "Workspace Driver",
 "plugtype.desc.access" => "'Plugin' definisce come un workspace può accedere al backend (un sistema di memorizzazione file o altro) e le principali azioni.",
 "plugtype.title.action" => "Plugin Azioni",
 "plugtype.desc.action" => "Plugin orientato alle funzionalità per gestire diversi aspetti",
@@ -660,12 +660,16 @@ $mess=array(
 "542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento",
 "543" => "Risultati limitati a %s.",
 "544" => "Visualizza tutti",
-"545" => "Finestra Condivisione Remota",
-"546" => "Questo elemento è stato condiviso da un percorso remoto con te da %%OWNER%%. Vuoi continuare?",
-"547" => "Accetta",
-"548" => "Declina",
-"549" => "Hai precedentemente accettato questo elemento che era stato condiviso da un percorso remoto con te da %%OWNER%%. Desideri rifiutare ora?",
-"550" => "Rifiuta questa condivisione",
-"551" => "Rifiuta",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -257,7 +257,13 @@ Class.create("FilesList", SelectableElements, {
 	getDomNode : function(){
 		return this.htmlElement;
 	},
-	
+
+    reSort: function(){
+        if(this._sortableTable){
+            this._sortableTable.sort(0, !!this.descending);
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
@@ -343,12 +349,12 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	contextObserver : function(e){
 		if(!this.crtContext || !this.htmlElement) return;
-		//console.log('FILES LIST : FILL');
-        var base = getBaseName(this.crtContext.getLabel());
-        if(!base){
-            try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
-        }
         if(!this.options.muteUpdateTitleEvent){
+            //console.log('FILES LIST : FILL');
+            var base = getBaseName(this.crtContext.getLabel());
+            if(!base){
+                try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
+            }
             this.htmlElement.fire("editor:updateTitle", base);
         }
         this.empty();
@@ -1403,9 +1409,7 @@ Class.create("FilesList", SelectableElements, {
     flushBulkUpdatingMode:function(){
         this.bulkUpdating = false;
         this.initRows();
-        if(this._sortableTable){
-            this._sortableTable.sort(0);
-        }
+        this.reSort();
     },
 
     getRenderer : function(){
@@ -1788,7 +1792,7 @@ Class.create("FilesList", SelectableElements, {
                 var textLabel = new Element("span", {
                     id          :'ajxp_label',
                     className   :'text_label'+fullview
-                }).update(metaData.get('text'));
+                }).update(he.escape(metaData.get('text')));
 
                 if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
                     textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
@@ -1935,7 +1939,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 		
 		innerSpan.insert({"bottom":img});
 		innerSpan.insert({"bottom":label});
@@ -2031,7 +2035,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 
 		innerSpan.insert({"bottom":img});
 		//newRow.insert({"bottom":label});
@@ -2199,16 +2203,7 @@ Class.create("FilesList", SelectableElements, {
 		var percent = parseInt( parseInt(ajxpNode.getMetadata().get("bytesize")) / parseInt(ajxpNode.getMetadata().get("target_bytesize")) * 100  );
 		var uuid = "ajxp_"+(new Date()).getTime();
 		var div = new Element('div', {style:'padding-left:3px;', className:'text_label'}).update('<span class="percent_text" style="line-height:19px;padding-left:5px;">'+percent+'%</span>');
-		var span = new Element('span', {id:uuid}).update('0%');		
-		var options = {
-			animate		: true,										// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 80,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: window.ajxpResourcesFolder+'/images/progress_box_80.gif',			// boxImage : image around the progress bar
-			barImage	: window.ajxpResourcesFolder+'/images/progress_bar_80.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
-            visualStyle : 'position:relative;'
-		};
+		var span = new Element('span', {id:uuid, className:'partSizeRender'}).update('0%');
         if(type == "detail" && element.down(".thumbnail_cell_metadata")){
             element.down(".thumbnail_cell_metadata").update(div);
         }else{
@@ -2239,7 +2234,6 @@ Class.create("FilesList", SelectableElements, {
 		}
 		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
 		window.setTimeout(function(){
-			span.pgBar = new JS_BRAMUS.jsProgressBar(span, percent, options);
 			var pe = new PeriodicalExecuter(function(){
 				if(!$(uuid)){ 
 					pe.stop();
@@ -2257,7 +2251,7 @@ Class.create("FilesList", SelectableElements, {
 						pydio.getController().fireAction("refresh");
 					}else{
 						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('data-target_size'))*100 );
-						$(uuid).pgBar.setPercentage(newPercentage);
+						$(uuid).setStyle({backgroundSize:newPercentage + '% 100%'});
 						$(uuid).next('span.percent_text').update(newPercentage+"%");
 					}
 				};
@@ -2284,7 +2278,7 @@ Class.create("FilesList", SelectableElements, {
 		elList.each(function(element){
 
             try{
-                var image_element = element.IMAGE_ELEMENT || element.down('img');
+                var image_element = element.IMAGE_ELEMENT /*|| element.down('img')*/;
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
             }catch(e){
                 return;
@@ -2399,6 +2393,9 @@ Class.create("FilesList", SelectableElements, {
 				rows[i].remove();
 			}
 		}
+        this.htmlElement.select("div[data-groupByValue] > h3").map(function(head){
+            head.remove();
+        });
 		if(!skipFireChange) this.fireChange();
         this.notify("rows:didClear");
 	},

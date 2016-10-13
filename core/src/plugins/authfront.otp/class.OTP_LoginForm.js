@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  */
 Class.create("OTP_LoginForm", {
@@ -24,15 +24,33 @@ Class.create("OTP_LoginForm", {
     },
     observer: function(){
         // string
-        var otpEnabled = '<span id="add_otp_notion" style=" font-size: 16px;"> * OTP enabled</span>';
+        var enableModifyGUI = pydio.getPluginConfigs("authfront.otp").get("MODIFY_LOGIN_SCREEN");
+        if(enableModifyGUI){
+            var f= modal.getForm();
 
-        var obj_loginform = $("login_form");
-        if(!obj_loginform.down(("#add_otp_notion"))){
-            obj_loginform.insert({bottom:otpEnabled});
+            if(!f.down('input[name="otp_code"]')){
+                try{
+                    var el = f.down('input[name="password"]').up("div.SF_element");
+                    var clone = el.cloneNode(true);
+                    el.insert({after:clone});
+                    var newField = clone.down('input[name="password"]');
+                    newField.writeAttribute('name', 'otp_code');
+                    newField.writeAttribute('data-ajxpLoginAdditionalParameter', 'true');
+                    clone.down('div.SF_label').update('Unique Code (6 digits)');
+                }catch(e){
+                    if(console) console.log('Error while replacing OTP field', e);
+                }}
+        }
+        else{
+            var f= modal.getForm();
+            if(f.down('input[name="otp_code"]')){
+                f.remove(f.down('input[name="otp_code"]'));
+            }
+            var otpEnabled = '<span id="add_otp_notion" style=" font-size: 16px;"> * OTP enabled</span>';
+            if(!f.down(("#add_otp_notion"))){
+                f.insert({bottom:otpEnabled});
+            }
         }
     }
 });
-var enableModifyGUI = pydio.getPluginConfigs("authfront.otp").get("MODIFY_LOGIN_SCREEN");
-if(!enableModifyGUI){
-    window.OTPFORM = new OTP_LoginForm();
-}
+window.OTPFORM = new OTP_LoginForm();

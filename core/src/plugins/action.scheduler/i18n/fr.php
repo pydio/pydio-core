@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     "1" => "Action",
@@ -49,6 +49,7 @@ $mess = array(
     "17d" => "Entrer une liste d'utilisateurs séparés par des virgules, ou un joker (*) pour lancer la tâche sur chaque utilisateur.",
     "18"  => "Planificateur",
     "18d" => "Actions du planificateur (type cron)",
+    "18e" => "Planificateur (inactif)",
     "19" => "Supprimer la tâche",
     "19d" => "Déplanifier et supprimer la tâche sélectionnée",
     "20" => "Expression Cron",
@@ -57,4 +58,6 @@ $mess = array(
     "22" => "Planificateur permettant l'exécution récurrente de tâches. Nécessite l'activation de la ligne de commande et un système type CRONTAB.",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

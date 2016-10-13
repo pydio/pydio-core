@@ -16,11 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
-defined('AJXP_EXEC') or die( 'Access not allowed');
+namespace Pydio\Tests;
 
-require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
+defined('AJXP_EXEC') or die( 'Access not allowed');
 
 /**
  * @package AjaXplorer_Plugins
@@ -28,17 +28,24 @@ require_once(AJXP_BIN_FOLDER . '/class.AbstractTest.php');
  */
 class ftpAccessTest extends AbstractTest
 {
+    /**
+     * ftpAccessTest constructor.
+     */
     public function __construct() { parent::__construct("Remote FTP Filesystem Plugin", ""); }
 
+    /**
+     * @param \Pydio\Access\Core\Model\Repository $repo
+     * @return bool|int
+     */
     public function doRepositoryTest($repo)
     {
         if($repo->accessType != "ftp") return -1;
 
         $basePath = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/access.ftp/" ;
         // Check file exists
-        if (!file_exists($basePath."class.ftpAccessDriver.php")
+        if (!file_exists($basePath."FtpAccessDriver.php")
          || !file_exists($basePath."manifest.xml"))
-        { $this->failedInfo .= "Missing at least one of the plugin files (class.ftpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
+        { $this->failedInfo .= "Missing at least one of the plugin files (FtpAccessDriver.php, manifest.xml, ftpActions.xml).\nPlease reinstall from lastest release."; return FALSE; }
 
         return TRUE;
     }

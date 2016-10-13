@@ -51,6 +51,7 @@
         getInitialState:function(){
             return {
                 statusOpen:true,
+                blinkingBell: false,
                 additionalContents:this.parseComponentConfigs(),
                 workspaces: this.props.pydio.user.getRepositoriesList()
             };
@@ -107,6 +108,40 @@
             this._timer = global.setTimeout(this.closeNavigation, 300);
         },
 
+        onAlertPanelBadgeChange: function(paneData, newValue, oldValue, memoData){
+            if(paneData.id !== 'navigation_alerts'){
+                return;
+            }
+            if(newValue){
+                this.setState({blinkingBell: newValue, blinkingBellClass:paneData.options['titleClassName']});
+            }else{
+                this.setState({blinkingBell: false});
+            }
+
+            if(newValue && newValue !== oldValue){
+                if(Object.isNumber(newValue)){
+                    if(oldValue !== '' && newValue > oldValue){
+                        let notifText = 'Something happened!';
+                        if(memoData instanceof PydioDataModel){
+                            let node = memoData.getRootNode().getFirstChildIfExists();
+                            if(node){
+                                if(paneData.options['tipAttribute']){
+                                    notifText = node.getMetadata().get(paneData.options['tipAttribute']);
+                                }else{
+                                    notifText = node.getLabel();
+                                }
+                            }
+                        }
+                        AlertTask.setCloser(this.openNavigation.bind(this));
+                        let title = global.pydio.MessageHash[paneData.options.title] || paneData.options.title;
+                        let alert = new AlertTask(title, notifText);
+                        alert.show();
+                    }
+                }
+            }
+
+        },
+
         render:function(){
             const additional = this.state.additionalContents.map(function(paneData){
                 if(paneData.type == 'ListProvider'){
@@ -115,6 +150,7 @@
                             pydio={this.props.pydio}
                             paneData={paneData}
                             nodeClicked={this.listNodeClicked}
+                            onBadgeChange={this.onAlertPanelBadgeChange}
                         />
                     );
                 }else{
@@ -122,10 +158,15 @@
                 }
             }.bind(this));
 
+            let badge;
+            if(this.state.blinkingBell){
+                badge = <span className={"badge-icon icon-bell-alt"}/>;
+            }
+
             return (
                 <span>
                     <div  id="repo_chooser" onClick={this.openNavigation} onMouseOver={this.openNavigation} className={this.state.statusOpen?"open":""}>
-                        <span className="icon-reorder"/>
+                        <span className="icon-reorder"/>{badge}
                     </div>
                     <div className={"left-panel" + (this.state.statusOpen?'':' hidden')} onMouseOver={this.closeMouseover} onMouseOut={this.closeMouseout}>
                         {additional}
@@ -139,11 +180,63 @@
         }
     });
 
+    class AlertTask extends PydioTasks.Task{
+
+        constructor(label, statusMessage){
+            super({
+                id              : 'local-alert-task-' + Math.random(),
+                userId          : global.pydio.user.id,
+                wsId            : global.pydio.user.activeRepository,
+                label           : label,
+                status          : PydioTasks.Task.STATUS_PENDING,
+                statusMessage   : statusMessage,
+                className       : 'alert-task'
+            });
+        }
+
+        show(){
+            this._timer = global.setTimeout(function(){
+                this.updateStatus(PydioTasks.Task.STATUS_COMPLETE);
+            }.bind(this), 7000);
+            PydioTasks.Store.getInstance().enqueueLocalTask(this);
+        }
+
+        updateStatus(status, statusMessage = ''){
+            this._internal['status'] = status;
+            this._internal['statusMessage'] = statusMessage;
+            this.notifyMainStore();
+        }
+
+        notifyMainStore(){
+            PydioTasks.Store.getInstance().notify("tasks_updated");
+        }
+
+        hasOpenablePane(){
+            return true;
+        }
+        openDetailPane(){
+            AlertTask.close();
+        }
+
+        static setCloser(click){
+            AlertTask.__CLOSER = click;
+        }
+
+        static close(){
+            AlertTask.__CLOSER();
+        }
+
+    }
+
+
+
     var DataModelBadge = React.createClass({
 
         propTypes:{
             dataModel:React.PropTypes.instanceOf(PydioDataModel),
-            options:React.PropTypes.object
+            options:React.PropTypes.object,
+            onBadgeIncrease: React.PropTypes.func,
+            onBadgeChange: React.PropTypes.func
         },
 
         getInitialState:function(){
@@ -151,33 +244,43 @@
         },
 
         componentDidMount:function(){
-            var options = this.props.options;
-            var dm = this.props.dataModel;
+            let options = this.props.options;
+            let dm = this.props.dataModel;
+            let newValue = '';
             this._observer = function(){
                 switch (options.property){
                     case "root_children":
                         var l = dm.getRootNode().getChildren().size;
-                        this.setState({value:l?l:''});
+                        newValue = l ? l : 0;
                         break;
                     case "root_label":
-                        this.setState({value:dm.getRootNode().getLabel()});
+                        newValue = dm.getRootNode().getLabel();
                         break;
                     case "root_children_empty":
                         var cLength = dm.getRootNode().getChildren().size;
-                        this.setState({value:!cLength?options['emptyMessage']:''});
+                        newValue = !cLength?options['emptyMessage']:'';
                         break;
                     case "metadata":
                         if(options['metadata_sum']){
-                            var sum = 0;
+                            newValue = 0;
                             dm.getRootNode().getChildren().forEach(function(c){
-                                if(c.getMetadata().get(options['metadata_sum'])) sum += parseInt(c.getMetadata().get(options['metadata_sum']));
+                                if(c.getMetadata().get(options['metadata_sum'])) newValue += parseInt(c.getMetadata().get(options['metadata_sum']));
                             });
-                            this.setState({value:sum?sum:''});
                         }
                         break;
                     default:
                         break;
                 }
+                let prevValue = this.state.value;
+                if(newValue && newValue !== prevValue){
+                    if(Object.isNumber(newValue) && this.props.onBadgeIncrease){
+                        if(prevValue !== '' && newValue > prevValue) this.props.onBadgeIncrease(newValue, prevValue ? prevValue : 0, this.props.dataModel);
+                    }
+                }
+                if(this.props.onBadgeChange){
+                    this.props.onBadgeChange(newValue, prevValue, this.props.dataModel);
+                }
+                this.setState({value: newValue});
             }.bind(this);
             dm.getRootNode().observe("loaded", this._observer);
         },
@@ -202,7 +305,9 @@
             paneData:React.PropTypes.object,
             pydio:React.PropTypes.instanceOf(Pydio),
             nodeClicked:React.PropTypes.func,
-            startOpen:React.PropTypes.bool
+            startOpen:React.PropTypes.bool,
+            onBadgeIncrease: React.PropTypes.func,
+            onBadgeChange: React.PropTypes.func
         },
 
         getInitialState:function(){
@@ -225,6 +330,20 @@
             this.setState({open:!this.state.open, componentLaunched:true});
         },
 
+        onBadgeIncrease: function(newValue, prevValue, memoData){
+            if(this.props.onBadgeIncrease){
+                this.props.onBadgeIncrease(this.props.paneData, newValue, prevValue, memoData);
+                if(!this.state.open) this.toggleOpen();
+            }
+        },
+
+        onBadgeChange(newValue, prevValue, memoData){
+            if(this.props.onBadgeChange){
+                this.props.onBadgeChange(this.props.paneData, newValue, prevValue, memoData);
+                if(!this.state.open) this.toggleOpen();
+            }
+        },
+
         render:function(){
 
             var messages = this.props.pydio.MessageHash;
@@ -236,7 +355,12 @@
 
             var badge;
             if(paneData.options.dataModelBadge){
-                badge = <DataModelBadge dataModel={this.state.dataModel} options={paneData.options.dataModelBadge} />;
+                badge = <DataModelBadge
+                    dataModel={this.state.dataModel}
+                    options={paneData.options.dataModelBadge}
+                    onBadgeIncrease={this.onBadgeIncrease}
+                    onBadgeChange={this.onBadgeChange}
+                />;
             }
             var emptyMessage;
             if(paneData.options.emptyChildrenMessage){

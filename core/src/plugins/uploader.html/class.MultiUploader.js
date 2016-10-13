@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Credit:
  *   Original class by Stickman -- http://www.the-stickman.com
  *      with thanks to:
@@ -295,9 +295,9 @@ Class.create("MultiUploader", {
 			return;
 		}
 		var stateImg = $(row).select("img")[0];
-		if(state == 'loading') stateImg.src = ajxpResourcesFolder+'/images/yellowled.png';
-		else if(state == 'done') stateImg.src = ajxpResourcesFolder+'/images/greenled.png';
-		else if(state == 'error') stateImg.src = ajxpResourcesFolder+'/images/redled.png';
+		if(state == 'loading') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/yellowled.png';
+		else if(state == 'done') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/greenled.png';
+		else if(state == 'error') stateImg.src = pydio.Parameters.get('APPLICATION_ROOT')+'plugins/uploader.html/img/redled.png';
 	},
 	
 	

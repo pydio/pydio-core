@@ -1,0 +1,13 @@
+{
+  "name": "ElasticSearchIndexer",
+  "description": "Search engine using ElasticSearch as a backend",
+  "homepage": "https://pydio.com/",
+  "autoload": {
+    "psr-4": {
+      "Pydio\\Access\\Indexer\\Implementation\\": "./src"
+    }
+  },
+  "require":{
+    "ruflin/elastica" : "3.2"
+  }
+}

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Sharing Features" => "Freigaben",
@@ -70,14 +70,14 @@ $mess=array(
 "Disable Folder Sharing" => "Freigabe von Ordnern deaktivieren",
 "Set password mandatory" => "Passwort als Pflichtfeld",
 "Do not allow users to create public links, only private links (password-protected)" => "Es ist nicht mögich, öffentliche Links zu erstellen, sondern nur welche mit Passwortschutz.",
-"Authorizations" => "Authorizations",
-"Allow users to generate public links on files" => "Allow users to generate public links on files",
-"Files: enable public links" => "Files: enable public links",
-"Enable internal file sharing (sharing with users existing or temporary users)" => "Enable internal file sharing (sharing with users existing or temporary users)",
-"Files: enable internal sharing" => "Files: enable internal sharing",
-"Allow users to generate public links on folders" => "Allow users to generate public links on folders",
-"Folders: enable public links" => "Folders: enable public links",
-"Enable internal folder sharing (sharing with users existing or temporary users)" => "Enable internal folder sharing (sharing with users existing or temporary users)",
-"Folders: enable internal sharing" => "Folders: enable internal sharing",
-"Internal Sharing" => "Internal Sharing",
+"Authorizations" => "Autorisierung",
+"Allow users to generate public links on files" => "Benutzer dürfen öffentliche Links zu Dateien erstellen",
+"Files: enable public links" => "Dateien: Öffentliche Links aktivieren",
+"Enable internal file sharing (sharing with users existing or temporary users)" => "Interne Freigaben aktivieren (Freigaben für existierende oder temporäre Benutzer)",
+"Files: enable internal sharing" => "Dateien: Interne Freigaben aktivieren",
+"Allow users to generate public links on folders" => "Benutzer dürfen öffentliche Links zu Ordnern erstellen",
+"Folders: enable public links" => "Ordner: Öffentliche Links aktivieren",
+"Enable internal folder sharing (sharing with users existing or temporary users)" => "Interne Freigaben aktivieren (Freigaben für existierende oder temporäre Benutzer)",
+"Folders: enable internal sharing" => "Ordner: Interne Freigaben aktivieren",
+"Internal Sharing" => "Interne Freigaben",
 );

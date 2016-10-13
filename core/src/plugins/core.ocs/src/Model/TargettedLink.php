@@ -16,20 +16,33 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\OCS\Model;
+use Pydio\Share\Model\ShareLink;
+use Pydio\Share\View\PublicAccessManager;
+
 defined('AJXP_EXEC') or die('Access not allowed');
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareLink.php");
-class TargettedLink extends \ShareLink
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
+
+/**
+ * Class TargettedLink
+ * @package Pydio\OCS\Model
+ */
+class TargettedLink extends ShareLink
 {
     /**
      * @var array
      */
     protected $pendingInvitation;
 
+    /**
+     * TargettedLink constructor.
+     * @param $store
+     * @param array $storeData
+     */
     public function __construct($store, $storeData = array()){
         parent::__construct($store, $storeData);
         $this->store = $store;
@@ -77,7 +90,7 @@ class TargettedLink extends \ShareLink
     }
 
     /**
-     * @param \PublicAccessManager $publicAccessManager
+     * @param PublicAccessManager $publicAccessManager
      * @param array $messages
      * @return mixed
      */

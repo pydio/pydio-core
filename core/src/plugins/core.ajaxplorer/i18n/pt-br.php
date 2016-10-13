@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "languageLabel" => "Português (Brasil)",
@@ -57,7 +57,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "Arquivo",
 "24" => "Diretório pai",
-"25" => "Enviar um ou vários arquivo (máx. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") no diretório : ",
+"25" => "Enviar um ou vários arquivo (máx. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") no diretório : ",
 "26" => "Criar um novo diretório em : ",
 "27" => "Enviar",
 "28" => "Criar um novo arquivo em : ",
@@ -634,19 +634,24 @@ $mess=array(
 "plugtype.desc.sec" => "Advanced Security Features",
 "plugtype.title.helper" => "Helper",
 "plugtype.desc.helper" => "Helpers tools for administrative tasks",
-"537" => "Arquivo é muito grande! O máximo permitido é %i",
-"538" => "Erro ao enviar: nenhum arquivo encontrado no servidor!",
-"539" => "Erro ao enviar: arquivo incompleto",
-"540" => "Erro ao enviar: diretório temporário não encontrado",
-"541" => "Erro ao enviar: não foi possível gravar no diretório temporário",
-"542" => "Erro ao enviar: uma extensão PHP interrompeu o processo de envio.",
-"543" => "Resultados limitados em %s.",
-"544" => "Exibir Todos",
-"545" => "Compartilhamento Remoto",
-"546" => "Este item foi compartilhado com você por %%OWNER%% de uma localização remota. Deseja continuar?",
-"547" => "Aceitar",
-"548" => "Recusar",
-"549" => "Anteriormente você aceitou este item compartilhado com você por %%OWNER%% de uma localização remota. Deseja rejeitar agora?",
-"550" => "Rejeitar este compartilhamento",
-"551" => "Rejeitar",
+"537" => "File is too large! Maximum authorized size is %i",
+"538" => "Upload error: no file found on server!",
+"539" => "Upload error: file is partial",
+"540" => "Upload error: cannot find the temporary directory",
+"541" => "Upload error: cannot write into the temporary directory",
+"542" => "Upload error: a PHP extension stopped the upload process.",
+"543" => "Results limited to %s.",
+"544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
+/* END SENTENCE */
 );

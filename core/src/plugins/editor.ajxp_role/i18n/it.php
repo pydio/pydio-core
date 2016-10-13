@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Modifica Ruoli",
@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Blocca Utente",
 "27" => "Riattiva Utente",
 "28" => "Forza cambio",
+"28b"=> "Cancel password change",
 "29" => "Inserisci la nuova password per questo utente",
 "30" => "Conferma",
 "31" => "ID Ruolo",

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -135,11 +135,11 @@ Class.create("RepositorySelect", {
                     return;
                 }
 
-                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + repoObject.getLabel() + '</span>';
-                var alt = repoObject.getLabel();
+                var label =  repoObject.getHtmlBadge() + '<span class="menu_label">' + he.escape(repoObject.getLabel()) + '</span>';
+                var alt = he.escape(repoObject.getLabel());
                 if(repoObject.getDescription()){
-                    label += '<span class="menu_description">' + repoObject.getDescription() + '</span>';
-                    alt += '-' + repoObject.getDescription();
+                    label += '<span class="menu_description">' + he.escape(repoObject.getDescription()) + '</span>';
+                    alt += '-' + he.escape(repoObject.getDescription());
                 }else{
                     alt += (repoObject.getOwner() ? " ("+MessageHash[413]+" " + repoObject.getOwner()+ ")":"");
                 }
@@ -166,7 +166,7 @@ Class.create("RepositorySelect", {
 					actions.push(actionData);
 				}				
 				if(key == repositoryId){
-					if(this.label) this.label.setValue(repoObject.getLabel());
+					if(this.label) this.label.setValue(he.escape(repoObject.getLabel()));
                     if(this.icon) this.icon.src = repoObject.getIcon();
 				}
 			}.bind(this));

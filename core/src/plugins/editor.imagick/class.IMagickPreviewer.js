@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("IMagickPreviewer", Diaporama, {
 
@@ -98,7 +98,7 @@ Class.create("IMagickPreviewer", Diaporama, {
             className:'thumbnail_iconlike_shadow',
             align:'absmiddle',
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
-		});		
+		});
         var div = new Element('div');
         div.insert(img);
 		div.resizePreviewElement = function(dimensionObject){
@@ -117,7 +117,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 				height:20/ratio
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
-			img.setStyle(styleObj);
+            img.setStyle(styleObj);
             div.setStyle({
                 height:styleObj.height,
                 width:styleObj.width,
@@ -172,7 +172,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 
     getRESTPreviewLinks:function(node){
         return {
-            "First Page Thumbnail": "&file=" + encodeURIComponent(node.getPath())
+            "First Page Thumbnail": ""
         };
     },
 

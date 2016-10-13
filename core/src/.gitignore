@@ -1,7 +1,3 @@
-/plugins/access.ajxp_home/res/build
-/plugins/access.inbox/res/build
-/plugins/core.mailer/js/build
-/plugins/gui.ajax/res/js/ui/reactjs/build/
 .idea/
 data/cache/*
 data/files/*
@@ -10,9 +6,17 @@ data/personal/*
 data/plugins/*
 data/public/*
 data/tmp
-node_modules/
+node_modules
 .DS_Store
 .jshintignore
 .jshintrc
-/plugins/gui.ajax/res/mui/mui-sources
 .validate.json
+composer.lock
+/core/vendor/
+/plugins/*/vendor/
+/plugins/access.ajxp_user/build
+/plugins/access.ajxp_home/res/build
+/plugins/access.inbox/res/build
+/plugins/core.mailer/js/build
+/plugins/uploader.html/js/build
+/plugins/core.tasks/js/build

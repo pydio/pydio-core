@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "title"=> "Home",
@@ -27,7 +27,7 @@ $mess=array(
 "42"=> "Öffnen",
 "43"=> "Mein Profil",
 "43t"=> "Alle meine persönlichen Dateien",
-"44"=> "Mein Konto",
+"44"=> "Mein Benutzerkonto",
 "45"=> "Persönliche Daten",
 "46"=> "Adressbuch",
 "47"=> "Benutzer und Teams, die Sie erstellt haben",
@@ -84,7 +84,11 @@ $mess=array(
     "69"=> "Sync-Client für Mac OSX herunterladen",
     "70"=> "App für iOS-Geräte",
     "71"=> "App für Android-Geräte",
-    "72" => "Server QRCode",
-    "73" => "Easily connect your mobile applications",
-    "74" => "Scan this QRCode with your mobile application to easily configure the connection",
+    "72" => "Server-QRCode",
+    "73" => "App schnell verbinden",
+    "74" => "Scannen Sie diesen QRCode um die Verbindung zum Server zu konfigurieren",
+    "75"=> "Alle Dateien durchsuchen...",
+    "76" => "Über das Menü oben rechts können Sie auf die %1 zugreifen",
+    "77" => "Einstellungen",
+    "78" => "Wählen Sie eine Ziel-Arbeitsumgebung",
 );

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS ajxp_mq_queues (
+  channel_name TEXT NOT NULL PRIMARY KEY,
+  content BLOB NOT NULL
+);

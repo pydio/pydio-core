@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     // will be replaced by the application title
     "1" => "A criar o ficheiro, por favor aguarde",
     "2" => "Actualize a pasta actual",
-    "3" => "A Transferência do ficheiro deverá começar automaticamente"
+    "3" => "A Transferência do ficheiro deverá começar automaticamente",
+    "4" => "A criar o ficheiro - %s%",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

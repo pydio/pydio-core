@@ -2,7 +2,7 @@
 <ajxpcore id="authfront.session_login" enabled="always" label="CONF_MESSAGE[Standard login screen]"
           description="CONF_MESSAGE[Display a standard user/password login screen]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.session_login/class.SessionLoginFrontend.php" classname="SessionLoginFrontend"/>
+	<class_definition filename="plugins/authfront.session_login/SessionLoginFrontend.php" classname="Pydio\Auth\Frontend\SessionLoginFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.session_login" path="plugins/authfront.session_login/i18n"/>
@@ -56,6 +56,9 @@
 						        oForm.addClassName('ajxp_password_auth');
 						        authConfs.set('SECURE_LOGIN_FORM', true);
 						        authConfs.set('ENABLE_FORGOT_PASSWORD', false);
+						        oForm.down('.dialogLegend').update(pydio.MessageHash[552]);
+                            }else{
+                                oForm.down('.dialogLegend').update(pydio.MessageHash[180]);
                             }
 						    $("generic_dialog_box").down(".titleString").hide();
 						    $("generic_dialog_box").down("#modalCloseBtn").hide();
@@ -91,7 +94,8 @@
                             }
                             if(authConfs && authConfs.get("ENABLE_FORGOT_PASSWORD") && !oForm.down('a.forgot-password-link')){
                                 try{
-                                    oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link" ajxp_message_id="479">AJXP_MESSAGE[479]</a></div>'});
+                                    var after = oForm.down('input[name="remember_me"]') ? oForm.down('input[name="remember_me"]').up("div.SF_element") : oForm.down('input[name="password"]').up("div.SF_element");
+                                    after.insert({after:'<div class="SF_element" id="forgot_element"><span class="icon-question-sign"></span><a href="#" class="forgot-password-link" ajxp_message_id="479">AJXP_MESSAGE[479]</a></div>'});
                                     oForm.down('a.forgot-password-link').observe("click", function(e){
                                         Event.stop(e);
                                         pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
@@ -133,6 +137,9 @@
                                     hideLightBox(true);
         						}else{
         						    var errorId = PydioApi.getClient().LAST_ERROR_ID;
+        						    if(errorId == '285' && window.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
+        						        errorId = '553';
+        						    }
                                     if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
                                         ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
                                     }
@@ -166,13 +173,13 @@
                                     <div class="SF_label"><ajxp:message ajxp_message_id="182">AJXP_MESSAGE[182]</ajxp:message></div>
                                     <div class="SF_input"><input type="password" name="password"  style="width: 100px; padding:0px;" placeholder="AJXP_MESSAGE[182]"></div>
                                 </div>
-                                <div class="SF_element">
+                                <div class="SF_element" id="remember_element">
                                     <input type="checkbox" class="radio" name="remember_me" style="border: none; width:20px !important;"/><ajxp:message ajxp_message_id="261">AJXP_MESSAGE[261]</ajxp:message>
                                 </div>
                             </div>
                         </form>
 					]]></clientForm>
-                    <serverCallback methodName="switchAction"></serverCallback>
+                    <serverCallback methodName="switchAction"/>
                 </processing>
             </action>
             <action name="logout" expireDefault="true">

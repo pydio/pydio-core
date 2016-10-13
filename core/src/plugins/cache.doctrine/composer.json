@@ -1,0 +1,10 @@
+{
+  "require": {
+      "doctrine/cache": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Pydio\\Cache\\Doctrine\\Ext\\": "./src"
+    }
+  }
+}

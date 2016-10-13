@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -115,14 +115,7 @@ class Controller extends Observable{
             value.refreshFromI18NHash();
         });
     }
-
-    getBackgroundTasksManager(){
-        if(!Controller._bgManager){
-            Controller._bgManager = new BackgroundTasksManager(this);
-        }
-        return Controller._bgManager;
-    }
-
+    
     getDataModel(){
         return this._dataModel;
     }
