@@ -24,7 +24,7 @@ $mess=array(
 "3" => "Bitte warten, die Datei wird in einem externen Fenster geöffnet. Dieses Fenster schließt sich automatisch.",
 "4" => "Neues URL-Lesezeichen",
 "5" => "Alternativ kann ein <a>neues URL-Lesezeichen erstellt werden</a>",
-"6" => "URL beginnend mit http/https eingeben",
-"7" => "URL Lesezeichen",
-"8" => "Titel für das Lesezeichen eingeben"
+"6" => "URL (beginnend mit http/https)",
+"7" => "URL-Lesezeichen",
+"8" => "Titel"
 );

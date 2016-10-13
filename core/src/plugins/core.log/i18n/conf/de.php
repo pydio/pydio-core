@@ -25,6 +25,6 @@ $mess = array(
 "Always send all Error-level messages to the system error log" => "Schreibt Fehler in das Protokoll des Betriebssystems",
 "Plugin instance to handle log implementation" => "Erweiterung für die Protokollierung von Ereignissen",
 "Logger plugin" => "Erweiterung",
-"Custom Header for IP" => "Custom Header for IP",
-"Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP." => "Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP.",
+"Custom Header for IP" => "Benutzerdefinierten Header für IP",
+"Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP." => "Kann bei Proxies verwendet werden um die X-Forwarded-For Kopfzeile zu setzen.",
 );

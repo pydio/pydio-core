@@ -26,7 +26,7 @@ $mess=array(
 "Consumer Secret" => "Benutzerpasswort",
 "Secret" => "Passwort",
 "User Mail" => "Benutzer E-Mail-Adresse",
-"User account" => "Benutzeraccount",
+"User account" => "Benutzerkonto",
 "Password" => "Passwort",
 "User Password" => "Passwort des Benutzers",
 );

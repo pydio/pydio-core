@@ -28,5 +28,5 @@ $mess=array(
 "Path" => "Pfad",
 "Real path to the root folder on the server" => "Absoluter Pfad zum Hauptordner auf dem Server",
 "Fix Permissions" => "Berechtigungen korrigieren",
-"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung."
+"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung.",
 );
