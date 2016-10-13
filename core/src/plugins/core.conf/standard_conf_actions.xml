@@ -321,32 +321,23 @@
                                 var values = $H(transport.responseJSON);
                                 values.set("existing_user_id", user_id);
 
-                                var params = $A(pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
-                                for(var i=0;i<params.length;i++){
-                                    params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-                                }
                                 var f = new FormManager();
-                                var def1 = $A();
-                                def1.push($H({
-                                    description: MessageHash[522],
-                                    editable: "true",
-                                    expose: "true",
-                                    label: MessageHash[522],
-                                    name: "existing_user_id",
-                                    scope: "user",
-                                    type: "hidden"
-                                }),$H({
-                                    description: MessageHash[524],
-                                    editable: "true",
-                                    expose: "true",
-                                    label: MessageHash[524],
-                                    name: "new_password",
-                                    scope: "user",
-                                    type: "password-create"
-                                }));
-                                var definitions = f.parseParameters(pydio.getXmlRegistry(), params.join('|'));
-                                definitions.each(function(el){ def1.push(el); });
-                                f.createParametersInputs(oForm.down('#user_create_user'), def1, true, values, false, true);
+                                var parameters = [];
+                                PydioUsers.Client.getCreateUserParameters().map(function(obj){
+                                    if(obj.type === 'valid-password') {
+                                        obj.type = 'password-create';
+                                    }
+                                    if(obj.name === 'new_user_id'){
+                                        obj.name = 'existing_user_id';
+                                        obj.type = 'hidden';
+                                    }
+                                    if(obj.name === 'send_email'){
+                                        return;
+                                    }
+                                    parameters.push($H(obj));
+                                });
+
+                                f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, values, false, true);
                                 modal.refreshDialogPosition();
 
                             };
@@ -384,48 +375,28 @@
             <processing>
                 <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
-                        var params = $A(pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
-                        for(var i=0;i<params.length;i++){
-                            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-                        }
+                        var parameters = PydioUsers.Client.getCreateUserParameters().map(function(obj){
+                            if(obj.type === 'valid-password') obj.type = 'password-create';
+                            return $H(obj)
+                        });
                         var f = new FormManager();
-                        var def1 = $A();
-                        def1.push($H({
-                            description: MessageHash[522],
-                            editable: "true",
-                            expose: "true",
-                            label: MessageHash[522],
-                            name: "new_user_id",
-                            scope: "user",
-                            type: "string"
-                        }),$H({
-                            description: MessageHash[523],
-                            editable: "true",
-                            expose: "true",
-                            label: MessageHash[523],
-                            name: "new_password",
-                            scope: "user",
-                            type: "password-create"
-                        }));
-                        var definitions = f.parseParameters(pydio.getXmlRegistry(), params.join('|'));
-                        definitions.each(function(el){ def1.push(el); });
-                        f.createParametersInputs(oForm.down('#user_create_user'), def1, true, $H(), false, true);
+                        f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, $H(), false, true);
                         modal.refreshDialogPosition();
                     ]]></dialogOnOpen>
                     <dialogOnComplete hideDialog="true"><![CDATA[
                         var params = $H();
                         var f = new FormManager();
-                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-                          var conn = new Connexion();
-                          params.set("get_action", "user_create_user");
-                          conn.setParameters(params);
-                          conn.setMethod("POST");
-                          conn.onComplete = function(transport){
-                               if($("address_book")){
-                                    $("address_book").ajxpPaneObject.reloadDataModel();
-                              }
-                          };
-                          conn.sendAsync();
+                        f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
+                        var conn = new Connexion();
+                        params.set("get_action", "user_create_user");
+                        conn.setParameters(params);
+                        conn.setMethod("POST");
+                        conn.onComplete = function(transport){
+                           if($("address_book")){
+                                $("address_book").ajxpPaneObject.reloadDataModel();
+                          }
+                        };
+                        conn.sendAsync();
                     ]]></dialogOnComplete>
                     <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                 </clientCallback>

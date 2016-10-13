@@ -211,7 +211,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             conn.setMethod("POST");
                             var success = false;
                             conn.onComplete = function(transport){
-                                if(transport.responseText == 'SUCCESS'){
+                                if(transport.responseJSON['result'] === 'SUCCESS'){
                                     var id = createActionPanel.down('[name="new_user_id"]').getValue();
                                     var label = id;
                                     if(createActionPanel.down('[name="USER_DISPLAY_NAME"]')){

@@ -777,13 +777,21 @@ abstract class AbstractConfDriver extends Plugin
                 if ($action == "user_create_user" && isSet($httpVars["NEW_new_user_id"])) {
                     $updating = false;
                     OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
-                    $original_id = InputFilter::decodeSecureMagic($data["new_user_id"]);
-                    $data["new_user_id"] = InputFilter::decodeSecureMagic($data["new_user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                    if($original_id != $data["new_user_id"]){
-                        throw new \Exception(str_replace("%s", $data["new_user_id"], $mess["ajxp_conf.127"]));
+                    $originalId = InputFilter::decodeSecureMagic($data["new_user_id"]);
+                    $newUserId = InputFilter::decodeSecureMagic($data["new_user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                    if($originalId != $newUserId){
+                        throw new PydioException(str_replace("%s", $newUserId, $mess["ajxp_conf.127"]));
                     }
-                    if (UsersService::userExists($data["new_user_id"], "w")) {
-                        throw new \Exception($mess["ajxp_conf.43"]);
+                    $prefix = '';
+                    $sharePlugin = PluginsService::getInstance($ctx)->getPluginById("action.share");
+                    if($sharePlugin !== null){
+                        $prefix = $sharePlugin->getContextualOption($ctx, "SHARED_USERS_TMP_PREFIX");
+                    }
+                    if(!empty($prefix) && strpos($newUserId, $prefix) !== 0){
+                        $newUserId = $prefix . $newUserId;
+                    }
+                    if (UsersService::userExists($newUserId, "w")) {
+                        throw new PydioException($mess["ajxp_conf.43"]);
                     }
                     $limit = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "USER_SHARED_USERS_LIMIT", AJXP_REPO_SCOPE_ALL, "");
                     if (!empty($limit) && intval($limit) > 0) {
@@ -792,8 +800,7 @@ abstract class AbstractConfDriver extends Plugin
                             throw new \Exception($mess['483']);
                         }
                     }
-
-                    $userObject = UsersService::createUser($data["new_user_id"], $data["new_password"]);
+                    $userObject = UsersService::createUser($newUserId, $data["new_password"]);
                     $userObject->setParent($loggedUser->getId());
                     $userObject->save('superuser');
                     $userObject->getPersonalRole()->clearAcls();
@@ -853,7 +860,7 @@ abstract class AbstractConfDriver extends Plugin
                     UsersService::updateUser($userObject);
                 }
 
-                if ($action == "user_create_user") {
+                if ($action == "user_create_user" && isSet($newUserId)) {
 
                     Controller::applyHook($updating?"user.after_update":"user.after_create", [$ctx, $userObject]);
                     if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
@@ -863,13 +870,11 @@ abstract class AbstractConfDriver extends Plugin
                             $link = ApplicationState::detectServerURL();
                             $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
                             $subject = str_replace("%s", $apptitle, $mess["507"]);
-                            $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $data["new_user_id"], $data["new_password"]], $mess["508"]);
+                            $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $newUserId, $data["new_password"]], $mess["508"]);
                             $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
                         }
                     }
-
-                    $responseInterface = $responseInterface->withHeader("Content-type", "text/plain");
-                    $responseInterface->getBody()->write("SUCCESS");
+                    $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $newUserId]);
 
                 } else {
 
