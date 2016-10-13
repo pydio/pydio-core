@@ -262,3 +262,15 @@
 .mdi-account-switch:before {
     content: "\f118";
 }
+
+.mdi-pencil:before {
+    content: "\f4da";
+}
+
+.mdi-pencil-box:before {
+    content: "\f4db";
+}
+
+.mdi-pencil-box-outline:before {
+    content: "\f4dc";
+}

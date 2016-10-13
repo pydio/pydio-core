@@ -85,8 +85,10 @@ class UsersService
         // Try to get from cache
         $test = CacheService::fetch(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId);
         if($test !== false && $test instanceof UserInterface){
-            // Second check : if roles were updated in cache
+            // Second check : if roles were updated in cache, or maybe profile with auto-apply feature
             $roleCacheIds = array_map(function($k){ return "pydio:role:".$k; }, $test->getRolesKeys());
+            $profile = $test->getProfile();
+            if(!empty($profile)) $roleCacheIds[] = "pydio:profile:".$profile;
             $test = CacheService::fetchWithTimestamps(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:".$userId, $roleCacheIds);
             if($test !== false){
                 if($test->getPersonalRole() === null){
@@ -181,6 +183,17 @@ class UsersService
     }
 
     /**
+     * @param string $userId
+     * @param RepositoryInterface[] $repoList
+     */
+    private function setInCache($userId, $repoList){
+
+        $this->repositoriesCache[$userId] = $repoList;
+        SessionService::updateLoadedRepositories($repoList);
+
+    }
+
+    /**
      * @param $userId
      * @return mixed|null|\Pydio\Core\Model\RepositoryInterface[]
      */
@@ -200,17 +213,6 @@ class UsersService
             }
         }
         return null;
-
-    }
-
-    /**
-     * @param string $userId
-     * @param RepositoryInterface[] $repoList
-     */
-    private function setInCache($userId, $repoList){
-
-        $this->repositoriesCache[$userId] = $repoList;
-        SessionService::updateLoadedRepositories($repoList);
 
     }
 

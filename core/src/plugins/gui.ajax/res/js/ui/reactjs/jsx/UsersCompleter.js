@@ -105,8 +105,13 @@
 
             var prefix = PydioUsers.Client.getCreateUserPostPrefix();
             var values = this.refs['creationForm'].getValuesForPost(prefix);
-            PydioUsers.Client.createUserFromPost(values, function(values){
-                var id = values[prefix + 'new_user_id'];
+            PydioUsers.Client.createUserFromPost(values, function(values, jsonReponse){
+                let id;
+                if(jsonReponse['createdUserId']){
+                    id = jsonReponse['createdUserId'];
+                }else{
+                    id = values[prefix + 'new_user_id'];
+                }
                 var display = values[prefix + 'USER_DISPLAY_NAME'] || id;
                 var fakeUser = new PydioUsers.User(id, display, 'user');
                 this.props.onValueSelected(id, display, 'user', fakeUser);
@@ -186,9 +191,11 @@
         },
 
         getInitialState: function(){
+            let userPrefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
+            if(!userPrefix || this.props.newUserName.startsWith(userPrefix)) userPrefix = '';
             return {
                 values:{
-                    new_user_id:this.props.newUserName,
+                    new_user_id:userPrefix + this.props.newUserName,
                     lang:global.pydio.currentLanguage,
                     new_password:'',
                     send_email:true

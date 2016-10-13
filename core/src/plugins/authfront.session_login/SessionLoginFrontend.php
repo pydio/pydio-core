@@ -218,7 +218,7 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
                 AuthService::disconnect();
                 $loggingResult = 2;
-                session_destroy();
+                @session_destroy();
                 $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
                 $x->addChunk(new \Pydio\Core\Http\Message\LoggingResult($loggingResult));
                 $responseInterface = $responseInterface->withBody($x);
