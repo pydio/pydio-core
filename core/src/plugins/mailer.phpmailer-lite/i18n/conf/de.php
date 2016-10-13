@@ -25,6 +25,6 @@ $mess=array(
 "Php mailer to use (see phpmail-lite documentation)." => "Programm, das zum Versenden von E-Mails verwendet wird (siehe phpmail-lite Dokumentation).",
 "Sendmail Path" => "Pfad zu Sendmail",
 "Path to sendmail if not the default one" => "Pfad zur ausführbaren Datei 'sendmail'",
-"Mails Encoding" => "Mails Encoding",
-"Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit." => "Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit.",
+"Mails Encoding" => "E-Mail-Encoding",
+"Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit." => "Encoding des E-Mail-Inhalts. Der Standardwert sollte für die meisten Konfigurationen passen. Für spezielle Windows Exchange + Outlook Kombinationen ist ein Wechsel zu 7bit notwendig.",
 );

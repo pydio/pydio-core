@@ -42,5 +42,5 @@ $mess=array(
 "Set default visibility." => "Setzt die standardmäßige Sichtbarkeit eines Feldes.",
 "Additional info" => "Zusätzliche Info",
 "Depending on the field type. Currently used for selection only" => "Abhängig vom Typ des Feldes. Aktuell nur für Wertelisten verwendet.",
-"Tags (extensible sets of values)" => "Tags (extensible sets of values)",
+"Tags (extensible sets of values)" => "Tags (erweiterbare Werteliste)",
 );

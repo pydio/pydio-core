@@ -50,7 +50,7 @@ $mess = array(
     "17d" => "Kommagetrennte Liste mit Benutzern oder Wildcard * damit die Aufgabe für alle Benutzer ausgeführt wird.",
     "18"  => "Aufgabenplanung",
     "18d" => "Cron-ähnliche Aufgabenplanung",
-    "18e" => "Aufgabenplanung (disabled)",
+    "18e" => "Aufgabenplanung (Deaktiviert)",
     "19" => "Aufgabe löschen",
     "19d" => "Aufgabe nicht mehr ausführen und löschen",
     "20" => "Crontab-Eintrag generieren",
@@ -59,6 +59,6 @@ $mess = array(
     "22" => "Aufgabenplanung, um bestimmte Aufgaben regelmäßig zu starten. Benötigt die PHP-Kommandozeile und Crontab oder ein ähnliches System.",
     "23" => "Grundeinstellungen",
     "24" => "Parameter",
-    "25" => "Stop Job",
-    "26" => "Stop running job",
+    "25" => "Aufgabe beenden",
+    "26" => "Laufende Aufgabe beenden",
 );

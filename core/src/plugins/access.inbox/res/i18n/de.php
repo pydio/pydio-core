@@ -18,6 +18,6 @@ $mess = array(
 "13" => "Für Sie freigegebene Dateien",
 "14" => "In eine Arbeitsumgebung kopieren",
 "15" => "Die Datei in eine der eigenen Arbeitsumgebungen kopieren",
-"16" => "Total",
-"17" => "New",
+"16" => "Summe",
+"17" => "Neu",
 );

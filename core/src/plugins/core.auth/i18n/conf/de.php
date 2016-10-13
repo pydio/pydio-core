@@ -59,8 +59,8 @@ $mess=array(
 "Master Only" => "Master-Benutzer",
 "Slave Only" => "Slave-Benutzer",
 "Both" => "Beide",
-"Disable Brute Force Check (Captcha)" => "Disable Brute Force Check (Captcha)",
-"Disable the check of failed login attempts, will disable the Captcha display" => "Disable the check of failed login attempts, will disable the Captcha display",
-"Multiple Instances Mode" => "Multiple Instances Mode",
-"Secondary Instance Driver" => "Secondary Instance Driver",
+"Disable Brute Force Check (Captcha)" => "Brute-Force-Prüfung deaktivieren (Captcha)",
+"Disable the check of failed login attempts, will disable the Captcha display" => "Deaktiviert die Captcha-Prüfung nach fehlgeschlagenen Anmeldeversuchen",
+"Multiple Instances Mode" => "Modus für mehrere Instanzen",
+"Secondary Instance Driver" => "Treiber der zweiten Instanz",
 );

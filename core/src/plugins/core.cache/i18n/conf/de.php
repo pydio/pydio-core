@@ -1,6 +1,6 @@
 <?php
 /*
-* Copyright 2007-2012 Charles du Jeu <charles (at) cdujeu.me>
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
 * This file is part of Pydio.
 *
 * Pydio is free software: you can redistribute it and/or modify
@@ -18,14 +18,10 @@
 *
 * The latest code can be found at <https://pydio.com>.
 */
-$mess = array(
-    "1" => "E-Mail erfolgreich an %s Benutzer versendet",
-    "2" => "Keine E-Mail Adresse vorhanden!",
-    "3" => "E-Mail-Programm nicht konfiguriert. Bitte kontaktieren Sie ihren Administrator.",
-    "4" => "Von",
-    "5" => "An",
-    "6" => "Betreff",
-    "7" => "Nachricht",
-    "8" => "Benutzer oder E-Mail",
-    "9" => "Benachrichtigungs-Digest",
+$mess=array(
+"Caching Driver" => "Caching",
+"Setup the caching system" => "Das verwendete Caching-System konfigurieren",
+"Cache Store Instance" => "Verwendetes Caching-System",
+"Instance" => "Erweiterung",
+"Choose the configuration plugin" => "Erweiterung auswählen",
 );
