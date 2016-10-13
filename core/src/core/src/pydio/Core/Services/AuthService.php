@@ -164,6 +164,7 @@ class AuthService
         CookiesHelper::clearRememberCookie($user);
         Logger::info(__CLASS__, "Log Out", "");
         SessionService::delete(SessionService::USER_KEY);
+        SessionService::invalidateLoadedRepositories();
         if (ConfService::getContextConf(Context::contextWithObjects($user, null), "SESSION_SET_CREDENTIALS", "auth")) {
             MemorySafe::clearCredentials();
         }
