@@ -87,4 +87,8 @@ $mess=array(
 "72" => "Server QRCode",
 "73" => "Conecte suas aplicações móveis facilmente",
 "74" => "Scaneie este QRCode como seu aplicativo móvel para configurar a conexão de forma fácil",
+"75"=> "Search all files...",
+"76" => "Access the %1 through the top-right menu",
+"77" => "admin dashboard",
+"78" => "Pick a target workspace",
 );
