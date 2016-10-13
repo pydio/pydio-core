@@ -93,4 +93,5 @@ $mess=array(
     "75"=> "Search all files...",
     "76" => "Access the %1 through the top-right menu",
     "77" => "admin dashboard",
+    "78" => "Pick a target workspace",
 );

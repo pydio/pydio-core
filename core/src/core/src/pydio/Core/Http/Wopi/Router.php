@@ -64,7 +64,7 @@ class Router
      */
     public function configureRoutes(RouteCollector &$r){
         
-        $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_DOCS_FOLDER . "/wopi.json"), true);
+        $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/core.ajaxplorer/routes/wopi.json"), true);
 
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){

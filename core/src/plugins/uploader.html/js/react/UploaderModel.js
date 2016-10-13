@@ -24,6 +24,9 @@
             this._status = status;
             this.notify('status');
         }
+        updateRepositoryId(repositoryId){
+            this._repositoryId = repositoryId;
+        }
         getErrorMessage(){
             return this._errorMessage || '';
         }
@@ -36,7 +39,6 @@
         }
         abort(completeCallback){
             if(this._status !== 'loading') return;
-            console.log('Should Stop XHR');
             this._doAbort(completeCallback);
         }
     }
@@ -236,6 +238,9 @@
                 dirname:PathUtils.getBasename(fullPath),
                 ignore_exists:true,
             };
+            if(this._repositoryId && global.pydio.user.activeRepository !== this._repositoryId) {
+                params['tmp_repository_id'] = this._repositoryId;
+            }
             PydioApi.getClient().request(params, function(t){
                 this.setStatus('loaded');
 
@@ -361,10 +366,6 @@
             this.notify('update');
         }
         log(){
-            if(global.console){
-                global.console.log("Uploads", this._uploads);
-                global.console.log("Folders", this._folders);
-            }
         }
         processQueue(){
             let next = this.getNext();
@@ -466,7 +467,7 @@
             }
         }
 
-        handleDropEventResults(items, files, targetNode){
+        handleDropEventResults(items, files, targetNode, accumulator = null){
 
             let oThis = this;
 
@@ -484,24 +485,41 @@
                     if (entry.isFile) {
                         entry.file(function(File) {
                             if(File.size == 0) return;
-                            oThis.pushFile(new UploadItem(File, targetNode));
+                            let uploadItem = new UploadItem(File, targetNode);
+                            if(!accumulator) oThis.pushFile(uploadItem);
+                            else accumulator.push(uploadItem);
                         }, error );
                     } else if (entry.isDirectory) {
-                        oThis.pushFolder(new FolderItem(entry.fullPath, targetNode));
+                        let folderItem = new FolderItem(entry.fullPath, targetNode);
+                        if(!accumulator) oThis.pushFolder(folderItem);
+                        else accumulator.push(folderItem);
+
                         this.recurseDirectory(entry, function(fileEntry){
                             var relativePath = fileEntry.fullPath;
                             fileEntry.file(function(File) {
                                 if(File.size == 0) return;
-                                oThis.pushFile(new UploadItem(File, targetNode, relativePath));
+                                let uploadItem = new UploadItem(File, targetNode, relativePath);
+                                if(!accumulator) oThis.pushFile(uploadItem);
+                                else accumulator.push(uploadItem);
+
                             }, error );
                         }, function(folderEntry){
-                            oThis.pushFolder(new FolderItem(folderEntry.fullPath, targetNode));
+                            let folderItem = new FolderItem(folderEntry.fullPath, targetNode);
+                            if(!accumulator) oThis.pushFolder(folderItem);
+                            else accumulator.push(folderItem);
                         }, error );
                     }
                 }
             }else{
                 for(var j=0;j<files.length;j++){
-                    oThis.pushFile(new UploadItem(files[j], targetNode));
+                    console.log(files[j]);
+                    if(files[j].size === 0){
+                        alert('It seems that your browser does not support dropping folders.');
+                        return;
+                    }
+                    let uploadItem = new UploadItem(files[j], targetNode);
+                    if(!accumulator) oThis.pushFile(uploadItem);
+                    else accumulator.push(uploadItem);
                 }
             }
             UploaderStore.getInstance().log();

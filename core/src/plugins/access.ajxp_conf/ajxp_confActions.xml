@@ -629,6 +629,7 @@
                         <div id="enterprise_advertise_block" box_width="70%" box_padding="0" box_height="80%" box_resize="true" style="height:100%;" class="vertical_layout">
                             <iframe style="width: 100%; height: 90%; border: 0px solid #ddd;" class="vertical_fit"></iframe>
                             <div style="padding:20px;">&nbsp;</div>
+                            <style>.form-enterprise_advertise_block .dialogTitle {display:none;}</style>
                         </div>
                     ]]></clientForm>
                 <clientListener name="init"><![CDATA[

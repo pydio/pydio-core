@@ -430,7 +430,6 @@ class ConfAccessDriver extends AbstractAccessDriver
                 file_put_contents($touchFile, time());
             }else{
                 $responseInterface = new JsonResponse(["display" => false]);
-                echo json_encode(["display" => false]);
             }
         }else{
             $responseInterface = new JsonResponse(["display" => true]);

@@ -90,4 +90,5 @@ $mess=array(
     "75"=> "Alle Dateien durchsuchen...",
     "76" => "Über das Menü oben rechts können Sie auf die %1 zugreifen",
     "77" => "Einstellungen",
+    "78" => "Wählen Sie eine Ziel-Arbeitsumgebung",
 );

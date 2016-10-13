@@ -72,7 +72,7 @@ class SimpleUpload extends Plugin
         $httpVars = $request->getParsedBody();
         $serverData = $request->getServerParams();
 
-        if (!isSet($httpVars["input_stream"]) || isSet($httpVars["force_post"])) {
+        if ((!isSet($httpVars["input_stream"]) || isSet($httpVars["force_post"])) && $request->getMethod() !== 'PUT') {
             // Nothing to do
             return;
         }
@@ -145,12 +145,17 @@ class SimpleUpload extends Plugin
             // The file is the post data stream
 
             // Mandatory headers
-            if (!isset($serverData['CONTENT_LENGTH'], $serverData['HTTP_X_FILE_NAME'])) {
-                throw new PydioException("Warning, missing headers!");
+            if (!isset($serverData['CONTENT_LENGTH'])) {
+                throw new PydioException("Warning, missing Content-Length header.");
             }
-
-            $fileNameH = $serverData['HTTP_X_FILE_NAME'];
-            $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
+            if(isSet($serverData['HTTP_X_FILE_NAME'])){
+                $fileNameH = $serverData['HTTP_X_FILE_NAME'];
+            }else if(isSet($httpVars['path'])){
+                $fileNameH = basename($httpVars['path']);
+            }
+            if(empty($fileNameH)){
+                throw new PydioException("Warning, missing either 'path' parameter or X-File-Name header.");
+            }
 
             // Clean up dir name (backward compat)
             if (dirname($httpVars["dir"]) == "/" && basename($httpVars["dir"]) == $fileNameH) {
@@ -162,18 +167,43 @@ class SimpleUpload extends Plugin
 
             // Checking headers
             if (isSet($serverData['HTTP_X_FILE_SIZE'])) {
+                $fileSizeH = (int)$serverData['HTTP_X_FILE_SIZE'];
                 if ($serverData['CONTENT_LENGTH'] != $serverData['HTTP_X_FILE_SIZE']) {
-                    $response = new TextResponse("Warning, wrong headers");
+                    $response = new TextResponse("Warning, X-File-Size and Content-Length header differ.");
                 }
+            }else{
+                $fileSizeH = (int)$serverData['CONTENT_LENGTH'];
             }
 
-            // Setting the stream to point to the post data
-            $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
+            if($request->getMethod() === 'PUT'){
+                $streamOrFile = $request->getBody();
+                $err = UPLOAD_ERR_OK;
+                $updateParsedBody = false;
+                if(isSet($serverData['HTTP_X_RENAME_IF_EXISTS'])){
+                    $httpVars['auto_rename'] = 'true';
+                    $updateParsedBody = true;
+                }
+                if(isSet($serverData['HTTP_X_PARTIAL_UPLOAD']) && isSet($serverData['HTTP_X_PARTIAL_TARGET_BYTESIZE'])){
+                    $httpVars['partial_upload'] = 'true';
+                    $httpVars['partial_target_bytesize'] = (int) $serverData['HTTP_X_PARTIAL_TARGET_BYTESIZE'];
+                    $updateParsedBody = true;
+                }
+                if(isSet($serverData['HTTP_X_APPEND_TO'])){
+                    $httpVars['appendto_url_encoded'] = urlencode($serverData['HTTP_X_APPEND_TO']);
+                }
+                if($updateParsedBody){
+                    $request = $request->withParsedBody($httpVars);
+                }
+            }else{
+                // Setting the stream to point to the post data
+                $streamOrFile = array_shift($request->getUploadedFiles())->getStream();
+                $err = $streamOrFile->getError();
+            }
             // Update UploadedFile object built on input stream with file name and size
             $uploadedFile = new \Zend\Diactoros\UploadedFile(
                 $streamOrFile,
                 $fileSizeH,
-                $streamOrFile->getError(),
+                $err,
                 $clientFileName
             );
 

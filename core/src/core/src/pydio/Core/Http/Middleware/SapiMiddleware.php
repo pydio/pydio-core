@@ -130,8 +130,14 @@ class SapiMiddleware implements ITopLevelMiddleware
                 $response = $response->withHeader("Content-type", "text/xml; charset=UTF-8");
             }
         }
+        if($response === false){
+            return;
+        }
 
-        if($response !== false && ($response->getBody()->getSize() || $response instanceof \Zend\Diactoros\Response\EmptyResponse) || $response->getStatusCode() != 200) {
+        if( $response->getBody()->getSize() === null
+            || $response->getBody()->getSize() > 0
+            || $response instanceof \Zend\Diactoros\Response\EmptyResponse
+            || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
             ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);

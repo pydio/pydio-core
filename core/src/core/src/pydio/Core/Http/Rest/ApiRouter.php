@@ -66,7 +66,7 @@ class ApiRouter
      */
     public function configureRoutes(\FastRoute\RouteCollector &$r){
         
-        $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_DOCS_FOLDER . "/api2.json"), true);
+        $configObject = json_decode(file_get_contents(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/core.ajaxplorer/routes/api2.json"), true);
         foreach ($configObject["paths"] as $path => $methods){
             foreach($methods as $method => $apiData){
                 if(preg_match('/\{path\}/', $path)){

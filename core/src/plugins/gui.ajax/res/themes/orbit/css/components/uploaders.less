@@ -62,8 +62,12 @@ div#multiple_download_container{
   background-position: center;
 }
 
-.dropareaHover{
-  background-color: #FAF3ED !important;
+.dropareaHover, .dropareaHover #content_pane{
+  background-color: #FFF8E1 !important;
+}
+
+.webfx-tree-item.dropareaHover{
+  background-color: rgba(255, 253, 231, 0.43) !important;
 }
 
 #content_pane.dropareaHover div.thumbnail_selectable_cell{
@@ -136,7 +140,6 @@ div#total_files_list{
 .dotted_container_item_mixin{
   overflow: hidden;
   padding: 16px 14px;
-  height: 20px;
   position: relative;
   background-image: url('@{imagePath}dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
