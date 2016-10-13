@@ -69,7 +69,7 @@ class TopLevelRouter
     public function configureRoutes($base, RouteCollector &$r){
         
         $allMethods = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'TRACE', 'OPTIONS', 'CONNECT', 'PATCH', 'PROPFIND', 'PROPPATCH', 'MKCOL', 'COPY', 'MOVE', 'LOCK', 'UNLOCK'];
-        $file = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/routes.json";
+        $file = AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.ajaxplorer/routes/main.json";
         $textContent = file_get_contents($file);
         $textContent = str_replace("%PUBLIC_BASEURI%", ConfService::getGlobalConf("PUBLIC_BASEURI"), $textContent);
         $textContent = str_replace("%WEBDAV_BASEURI%", ConfService::getGlobalConf("WEBDAV_BASEURI"), $textContent);
