@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("RepositoryEditor", AbstractEditor, {
 
@@ -155,8 +155,6 @@ Class.create("RepositoryEditor", AbstractEditor, {
 
             this.sharesToolbar = new ActionsToolbar(actionPane, {
                 toolbarsList:["share_list_toolbar-selection", "share_list_toolbar"],
-                skipBubbling:true,
-                skipCarousel:true,
                 submenuOffsetTop:2,
                 dataModelElementId:listPaneId
             });

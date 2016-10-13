@@ -16,9 +16,13 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "File Hasher" => "Hasher File",
 "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Calcola al momento l'hash del contenuto di un file e lo memorizza in un metadata, se il metastore è specificato",
+"Rsync Support" => "Rsync Support",
+"Cache full tree" => "Cache full tree",
+"Cache XML tree and invalidate on node change" => "Cache XML tree and invalidate on node change",
+"Dont edit, it will be detected by the server" => "Don't edit, it will be detected by the server",
 );

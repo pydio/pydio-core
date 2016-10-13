@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : Various functions used statically very often.
  */
 function getBaseName(fileName){
@@ -301,7 +301,7 @@ function fitHeightToBottom(element, parentElement, addMarginBottom, listen, minO
 {
 	element = $(element);
 	if(!element) return;
-    if(Modernizr.flexbox && element.parentNode && !element.hasClassName('forceComputeFit')
+    if(Modernizr.flexbox && element.parentNode && !element.hasClassName('forceComputeFit') && !element.up('.forceComputeFitChildren')
         && !element.parentNode.hasClassName('horizontal_layout')
         && !element.hasClassName('dialogContent') && !element.up(".dialogContent")
 ){

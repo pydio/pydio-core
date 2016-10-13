@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -41,7 +41,7 @@ Class.create("AjxpBootstrap", {
 			this.insertBasicSkeleton(this.parameters.get('MAIN_ELEMENT'));
             var startedFromOpener = false;
             try{
-                if(window.opener && window.opener.ajxpBootstrap){
+                if(window.opener && window.opener.ajxpBootstrap && this.parameters.get('serverAccessPath') === window.opener.ajxpBootstrap.parameters.get('serverAccessPath')){
                     this.parameters = window.opener.ajxpBootstrap.parameters;
                     // Handle queryString case, as it's not passed via get_boot_conf
                     var qParams = document.location.href.toQueryParams();
@@ -321,29 +321,8 @@ Class.create("AjxpBootstrap", {
                     if($('progressBox')) $('progressBox').hide();
                 }});
         };
-        if(!window.ajxpThemeSkipLoaderProgress){
-            var options = {
-                animate		: false,										// Animate the progress? - default: true
-                showText	: false,									// show text with percentage in next to the progressbar? - default : true
-                width		: 154,										// Width of the progressbar - don't forget to adjust your image too!!!
-                boxImage	: window.ajxpResourcesFolder+'/images/progress_box.gif',			// boxImage : image around the progress bar
-                barImage	: window.ajxpResourcesFolder+'/images/progress_bar.gif',	// Image to use in the progressbar. Can be an array of images too.
-                height		: 11,										// Height of the progressbar - don't forget to adjust your image too!!!
-                onTick		: function(pbObj) {
-                    if(pbObj.getPercentage() >= 80){
-                        loaderEndCallback();
-                        return false;
-                    }
-                    return true ;
-                }
-            };
-            this.loaderProgress = new JS_BRAMUS.jsProgressBar($('loaderProgress'), 0, options);
-        }
         document.observe('ajaxplorer:loader_state_update', function(e){
-            var p = e.memo.percent;
-            if(this.loaderProgress){
-                this.loaderProgress.setPercentage(p*100);
-            }else if(p >= 0.8){
+            if(e.memo.percent >= 0.8){
                 loaderEndCallback();
             }
         }.bind(this));
@@ -389,7 +368,7 @@ Class.create("AjxpBootstrap", {
         if(document.viewport.getWidth() < 500){
             elem.update('Pydio Community &copy; C. du Jeu 2008-2013');
         }else{
-            elem.update('Pydio, open source file sharing - Free / Non supported edition - <a target="_blank" style="color: #7a7a7a;" href="https://pyd.io/">https://pyd.io/</a>');
+            elem.update('Pydio, open source file sharing - Free / Non supported edition - <a target="_blank" style="color: #7a7a7a;" href="https://pydio.com/">https://pydio.com/</a>');
         }
         $(desktopNode).insert({after:elem});
         //disableTextSelection(elem);

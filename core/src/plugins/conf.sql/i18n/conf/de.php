@@ -16,15 +16,15 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"DB Storage" => "DB Speicher",
+"DB Storage" => "DB-Speicher",
 "Stores the conf data in an SQL database." => "Speichert Konfigurationsdaten in einer SQL-Datenbank.",
 "Connexion" => "Verbindung",
 "The Database Connexion" => "Die Datenbankverbindung",
 "Users Tmp Folder" => "Benutzerordner für temporäre Dateien",
 "The folder in which all temporary files will be stored" => "Ordner in dem alle temporären Dateien gespeichert werden",
-"SQL Tables" => "SQL Tabellen",
-"Install SQL Tables" => "SQL Tabellen installieren",
+"SQL Tables" => "SQL-Tabellen",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 );

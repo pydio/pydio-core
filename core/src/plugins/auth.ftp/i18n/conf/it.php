@@ -16,10 +16,10 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"FTP Authentification" => "Autenticazione FTP",
+"FTP Authentication" => "Autenticazione FTP",
 "Authenticate user directly to an FTP server, and connect him to this server." => "Autenticazione diretta degli utenti sul server FTP, e connessione ad esso.",
 "FTP Login Screen" => "Schermata Login FTP Login",
 "Whether to display a generic 'FTP connexion' dialog at startup (allowing the user to enter his own host/port data) or the standard login dialog." => "Mostrare una generica finestra 'Connessione FTP' all'avvio (consentendo all'utente di inserire il proprio host o la propria porta) o la finestra standard di login.",
@@ -29,4 +29,11 @@ $mess=array(
 "The ID of an existing admin for Pydio (using conf.serial)" => "L'ID di un utente amministratore esistente per Pydio (conf.serial)",
 "Test Connexion" => "Prova Connessione",
 "Test connexion to the FTP server" => "Prova della connessione al server FTP",
+"FTP authentication" => "FTP authentication",
+"Authenticate users by validating their credentials against an FTP server." => "Authenticate users by validating their credentials against an FTP server.",
+"Replace the default connection screen (username and password) by a screen allowing users to enter their own FTP connection data (server, port, etc.)" => "Whether to display a generic 'FTP connection' dialog at startup (allowing users to enter their own host/port data) or the standard login dialog.",
+"Workspace" => "Workspace",
+"ID of the workspace used to validate credentials" => "ID of the workspace used to validate credentials",
+"Test connection" => "Test connection",
+"Test connection to the FTP server" => "Test connection to the FTP server",
 );

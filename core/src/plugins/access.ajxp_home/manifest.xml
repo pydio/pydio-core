@@ -2,10 +2,9 @@
 <ajxpdriver id="access.ajxp_home" enabled="always" label="CONF_MESSAGE[Welcome Page]" description="CONF_MESSAGE[Welcome Page displaying a list of workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
-			<i18n namespace="user_home" path="plugins/access.ajxp_home/i18n" />
-            <!--<js className="WelcomeComponents" file="plugins/access.ajxp_home/build/WelcomeComponents.js" depends="React"/>-->
-            <js className="UserDashboardHome" file="plugins/access.ajxp_home/class.UserDashboardHome.js"/>
-            <css file="plugins/access.ajxp_home/home.css" autoload="true"/>
+			<i18n namespace="user_home" path="plugins/access.ajxp_home/res/i18n" />
+            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,ReactPydio,LeftNavigation"/>
+            <css file="plugins/access.ajxp_home/res/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
@@ -14,205 +13,41 @@
                       description="CONF_MESSAGE[Open workspace by simple click instead of double click.]" default="true" expose="true"/>
         <global_param name="ENABLE_GETTING_STARTED" type="boolean"
                       label="CONF_MESSAGE[Enable Getting Started]" description="CONF_MESSAGE[Enable addition tabulation to access getting started videos]" default="true" expose="true"/>
+        <global_param name="ENABLE_GLOBAL_SEARCH" type="boolean"
+                      label="CONF_MESSAGE[Enable Global Search]" description="CONF_MESSAGE[Enable cross-workspaces search form on home page]" default="true" expose="true"/>
         <global_param name="URL_APP_IOSAPPSTORE" type="string" expose="true"
                       label="CONF_MESSAGE[iOS App URL]" description="CONF_MESSAGE[URL of the iOS application]" default="https://itunes.apple.com/us/app/pydio/id709275884?mt=8"/>
         <global_param name="URL_APP_ANDROID" type="string" expose="true"
                       label="CONF_MESSAGE[Android App URL]" description="CONF_MESSAGE[URL of the Android application]" default="https://play.google.com/store/apps/details?id=com.pydio.android.Client"/>
         <global_param name="URL_APP_SYNC_WIN" type="string" expose="true"
-                      label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="http://pyd.io/apps/pydio-sync/"/>
+                      label="CONF_MESSAGE[Windows PydioSync URL]" description="CONF_MESSAGE[URL of the windows sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
         <global_param name="URL_APP_SYNC_MAC" type="string" expose="true"
-                      label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="http://pyd.io/apps/pydio-sync/"/>
-
+                      label="CONF_MESSAGE[Mac PydioSync URL]" description="CONF_MESSAGE[URL of the mac sync application]" default="https://pydio.com/en/features/downloads/pydiosync-desktop-app/"/>
+        <global_param name="DISPLAY_SERVER_QRCODE_ACTION" type="boolean" label="CONF_MESSAGE[Display Server QRCode]"
+                      description="CONF_MESSAGE[Let users connect easily to the latest mobile applications by displaying a QRCode]" default="false"/>
     </server_settings>
 	<registry_contributions>
-		<client_configs>
-            <template_part theme="umbra" ajxpId="sidebar_splitter" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fake":"option"}'><![CDATA[
-                <div id="folderPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="363" ajxpPaneIcon="view_tree.png" style="margin:20px;"></div>
-                <style>#sidebar_splitter{padding-bottom:20px;background-color:#A0C0A4;}</style>
-            ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="workspace_toolbar" ajxpOptions='{"fit":"none"}' theme="vision"><![CDATA[
-                <div id="search_container_settings" class="settings_search_container" style="display:none;" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
-                <style>
-                #workspace_toolbar{
-                    display:none;
-                }
-                #browser{
-                    padding:0;
-                    background-color: #ACB2B9;
-                }
-                div.flat_tabulator span.toggleHeader{
-                    background-color: #e35d52;
-                }
-                .largeButton, .SF_input.SF_inlineButton{
-                    background-color: #e35d52;
-                }
-                .action_bar{
-                    background-color: #ebedf0;
-                    padding: 4px;
-                    border-left:1px solid #5C5C5C;
-                }
-                #user_profile_form, div.class-FetchedResultPane{
-                    border-left:1px solid #5C5C5C;
-                }
-                #account_pane .action_bar{
-                    text-align: right;
-                }
-                .action_bar a{
-                    background-color: #e35d52;
-                    margin-top:3px;
-                    cursor: pointer;
-                }
-                div.class-FetchedResultPane{
-                    background-color: #f8f8f8;
-                }
-                #buttons_bar{
-                    padding-bottom: 2px;
-                    text-align: right;
-                }
-                #buttons_bar a {
-                    padding-bottom: 0;
-                    height: 26px;
-                }
-                .action_bar span.actionbar_button_label{
-                    font-size: 11px;
-                }
-                .flat_tabulator div.panelHeader.tabulatorContainer{
-                    background-color: #30383A;
-                    padding-top: 10px;
-                }
-                .flat_tabulator span.toggleHeader:first-of-type {
-                    background-color: #e35d52 !important;
-                }
-                .flat_tabulator span.toggleHeader.toggleInactive {
-                    background-color: rgba(119, 119, 119, 0.35) !important;
-                }
-                </style>
-            ]]></template_part>
-            <template_part ajxpClass="AjxpPane" ajxpId="browser" ajxpOptions='{"fit":"height"}' theme="vision"><![CDATA[
-                <div id="home_account_pane" ajxpClass="UserDashboardHome" class="vertical_fit horizontal_layout">
-                    <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="welcome"></div>
-                        <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height"}'>
-                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitMarginBottom":100}'>
-                                <ul id="workspaces_list"></ul>
-                            </div>
-                            <div id="workspaces_button">
-                                <input type="checkbox" name="save_ws_choice" id="save_ws_choice" class="disabled" disabled><label for="save_ws_choice">AJXP_MESSAGE[user_home.41]</label>
-                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_home.42]" class="disabled">
-                            </div>
-                        </div>
-                    </div>
-                    <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","flexTo":"browser"}'>
-                        <div id="logo_div"><img src=""></div>
-                        <div id="ws_legend"></div>
-                    </div>
-                </div>
-            ]]></template_part>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
-                <style>
-                    #global_toolbar{
-                        position: absolute;
-                        display: block;
-                        width:99%;
-                        background: none !important;
-                    }
-                    #clickable_home, div.custom_top_title, img.custom_logo_image.linked {
-                        display:none;
-                    }
-                </style>
-                <div id="home_account_pane" ajxpClass="UserDashboardHome" class="horizontal_layout">
-                    <div id="home_left_bar" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content"}' style="width:420px;">
-                        <div id="welcome" style="min-height:94px;"></div>
-                        <div id="workspaces_center" ajxpClass="AjxpPane"  ajxpOptions='{"fit":"height", "fitParent":"home_left_bar"}'>
-                            <div id="list_cont" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"workspaces_center"}'>
-                                <ul id="workspaces_list"></ul>
-                            </div>
-                            <div id="workspaces_button" style="display:none;">
-                                <input type="button" name="go_to_ws" id="go_to_ws" value="AJXP_MESSAGE[user_home.42]" class="disabled">
-                            </div>
-                        </div>
-                    </div>
-                    <div id="home_center_panel" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"orbit_content","flexTo":"orbit_content"}'>
-                        <div id="logo_div"><img src=""></div>
-                        <div id="ws_legend"></div>
-                    </div>
-                </div>
-			]]></template_part>
-        </client_configs>
         <actions>
-            <action name="open_tutorial_pane">
-                <gui src="tuto.png" text="1" title="2">
-                    <context dir="true" recycle="true" selection="false"/>
+            <action name="display-server-qrcode">
+                <gui src="folder.png" iconClass="mdi mdi-qrcode-scan" text="user_home.72" title="user_home.74">
+                    <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        $('videos_pane').setStyle({display:'block'});
-                        if(!$('videos_pane')._OBSERVER_SET){
-                            $('videos_pane').select('div.tutorial_load_button').invoke("observe", "click", function(e){
-                                var t = Event.findElement(e, 'div.tutorial_load_button');
-                                try{
-                                    var main = t.up('div.tutorial_legend');
-                                    main.next('iframe').src = main.readAttribute('data-videoSrc');
-                                }catch(e){}
-                            });
-                            var configs = ajaxplorer.getPluginConfigs('access.ajxp_home');
-                            $A(['URL_APP_IOSAPPSTORE', 'URL_APP_ANDROID', 'URL_APP_SYNC_WIN', 'URL_APP_SYNC_MAC']).each(function(p){
-                                $('videos_pane').select('a[href="'+p+'"]').invoke('writeAttribute', 'href', configs.get(p));
-                            });
-                            $('videos_pane')._OBSERVER_SET = true;
-                        }
+                    <clientCallback prepareModal="false"><![CDATA[
+                        var dialog = new AjxpReactDialogLoader('WelcomeComponents', 'QRCodeDialogLoader', {});
+                        dialog.openDialog('qrcode_dialog_form', true);
                     ]]></clientCallback>
-                    <clientForm id="videos_pane"><![CDATA[
-                        <div id="videos_pane" style="display:none;" class="skipSibling" ajxpClass="AjxpPane" ajxpOptions='{}' style="overflow-y: scroll;">
-                            <div style="float: left;font-size: 1.5em;margin-left: 16px;margin-top: 16px;cursor: pointer;" onclick="$('videos_pane').hide();" class="icon-remove-sign"></div>
-                            <div style="clear:left; font-size: 25px; text-align:center; margin: 40px 0 30px;">AJXP_MESSAGE[user_home.56]</div>
-                            <div id="tutorial_dl_apps_pane">
-                                <div style="width: 750px; margin: 0 auto;" id="dl_pydio_cont">
-                                    <div style="float: left;margin: 44px 18px;font-size: 21px;" id="dl_pydio_for">AJXP_MESSAGE[user_home.57]</div>
-                                    <div style="width: 81px; float:left;">
-                                        <a href="URL_APP_ANDROID" target="_blank" class="icon-mobile-phone" style="font-size: 96px;"></a><a href="URL_APP_ANDROID" target="_blank"  class="icon-android" style="font-size: 30px;position: relative;top: -26px;left: -32px;color: rgb(86, 190, 86);"></a><div style="font-size: 11px;top: -15px;position: relative;left: -13px;">AJXP_MESSAGE[user_home.58]</div>
-                                    </div>
-                                    <div style="width: 91px; float:left;">
-                                        <a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-tablet" style="font-size: 96px;"></a><a href="URL_APP_IOSAPPSTORE" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -33px;left: -40px;color: white;text-shadow: 0px 0px 20px rgba(0,0,0,0.4);"></a><div style="font-size: 11px;top: -15px;position: relative;left: 2px;">AJXP_MESSAGE[user_home.59]</div>
-                                    </div>                                <div style="width: 110px; float:left;padding-top: 14px;">
-                                        <a href="URL_APP_SYNC_MAC" target="_blank" class="icon-desktop" style="font-size: 74px;"></a><a href="URL_APP_SYNC_MAC" target="_blank" class="icon-apple" style="font-size: 26px;position: relative;top: -30px;left: -51px;color: rgb(148, 148, 148);"></a><div style="font-size: 11px;top: -6px;position: relative;left: 6px;">AJXP_MESSAGE[user_home.60]</div>
-                                    </div>
-                                    <div style="width: 100px; float:left;padding-top: 8px;">
-                                        <a href="URL_APP_SYNC_WIN" target="_blank" class="icon-laptop" style="font-size: 87px;"></a><a href="URL_APP_SYNC_WIN" target="_blank" class="icon-windows" style="font-size: 26px;position: relative;top: -66px;left: 34px;color: rgb(56, 122, 173);"></a><div style="font-size: 11px;top: -40px;position: relative;left: 12px;">AJXP_MESSAGE[user_home.61]</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/80kq-T6bQO4?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                                AJXP_MESSAGE[user_home.62]
-                                <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
-                            </div>
-                            <img class="tutorial_video" src="https://img.youtube.com/vi/80kq-T6bQO4/0.jpg">
-
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/ZuVKsIa4XdU?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                                AJXP_MESSAGE[user_home.63]
-                                <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
-                            </div>
-                            <img class="tutorial_video" src="https://img.youtube.com/vi/ZuVKsIa4XdU/0.jpg">
-
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/MEHCN64RoTY?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                                AJXP_MESSAGE[user_home.64]
-                                <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
-                            </div>
-                            <img class="tutorial_video" src="https://img.youtube.com/vi/MEHCN64RoTY/0.jpg">
-
-                            <div class="tutorial_legend" data-videoSrc="//www.youtube.com/embed/ot2Nq-RAnYE?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5">
-                                AJXP_MESSAGE[user_home.66]
-                                <div class="tutorial_load_button"><i class="icon-youtube-play"></i> Play Video</div>
-                            </div>
-                            <img class="tutorial_video" src="https://img.youtube.com/vi/ot2Nq-RAnYE/0.jpg">
-
-                            <div style="clear:left; text-align:center;">
-                                <a href="http://pyd.io/end-user-tutorials/" target="_blank" style="text-align: center;font-size: 25px;background-color: #e35d52;padding: 10px;border-radius: 5px;color: white;display: inline-block;margin: 40px 0;"><i class="icon-youtube-play"></i> AJXP_MESSAGE[user_home.65]</a></div>
-                        </div>
-                ]]></clientForm>
+                    <clientForm id="qrcode_dialog_form"><![CDATA[
+                        <div id="qrcode_dialog_form" box_width="296" box_padding="0" class="react-mui-context SF_material"></div>
+                    ]]></clientForm>
                 </processing>
             </action>
         </actions>
+		<client_configs>
+            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
+                <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
+			]]></template_part>
+        </client_configs>
 	</registry_contributions>
-    <class_definition filename="plugins/access.ajxp_home/class.HomePagePlugin.php" classname="HomePagePlugin"/>
+    <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>
 </ajxpdriver>

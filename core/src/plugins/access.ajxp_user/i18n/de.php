@@ -16,11 +16,11 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "title"=> "Mein Dashboard",
-"desc" => "Verwalte meine Kontoeinstellungen, mein Adressbuch, geteilte Elemente, etc.",
+"desc" => "Mein Benutzerkonto, Adressbuch, Freigaben, etc. verwalten",
 "1" => "Freigegebene Benutzer",
 "2" => "Freigegebene Ordner",
 "3" => "Freigegebene Dateien",
@@ -61,25 +61,25 @@ $mess=array(
 "38"=> "Benachrichtigungen",
 "39"=> "Unten ist eine Liste der Arbeitsumgebungen auf die Sie zugreifen können. Diese können persönliche oder mit/von anderen Benutzern genutzt werden.",
 "40"=> "Willkommen, %s",
-"41"=> "Diese Arbeitsumgebung standardmäßig verwenden",
-"42"=> "Betreten",
+"41"=> "Standardmässig öffnen",
+"42"=> "Öffnen",
 "43"=> "Mein Profil",
 "43t"=> "Alle persönlichn Daten",
-"44"=> "Mein Konto",
+"44"=> "Mein Benutzerkonto",
 "45"=> "Persönliche Daten",
 "46"=> "Adressbuch",
 "47"=> "Benutzer und Teams, die Sie erstellt haben",
 "48"=> "Meine Benutzer",
 "49"=> "Externe Benutzer, die Sie erstellt haben",
 "50"=> "Meine Teams",
-"51"=> "Teams von Benutzern, die während des Teilens als Favoriten verfügbar sind.",
+"51"=> "Um Inhalte schnell an einen bestimmten Personenkreis freizugeben.",
 "52"=> "Sind Sie sicher, dass Sie dieses Team löschen möchten? Es werden dabei keine Benutzer entfernt.",
 "53"=> "Zu den Arbeitsumgebungen",
 "54"=> "Mitglieder aktualisieren",
 "55"=> "Benutzer des Teams hinzufügen/entfernen",
 "56"=> "Einen Benutzer pro Zeile hinzufügen. Beim Tippen im Textfeld erscheint die Autovervollständigung.",
-"57" => "Create a Team",
-"58" => "Teams are used as a shortcut to quickly share a folder with a predefined set of users",
-"59" => "Team Label",
-"60" => "Team Users",
+"57" => "Team erstellen",
+"58" => "Teams werden verwendet, um Inhalte schnell an einen bestimmten Personenkreis freizugeben.",
+"59" => "Name des Teams",
+"60" => "Benutzer des Teams",
 );

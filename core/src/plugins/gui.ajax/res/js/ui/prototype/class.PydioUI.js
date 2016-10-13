@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("PydioUI", {
 
@@ -72,7 +72,7 @@ Class.create("PydioUI", {
         if(!editorData){
             var selectedMime = getAjxpMimeType(selectedNode);
             var editors = this._pydio.Registry.findEditorsForMime(selectedMime, false);
-            if(editors.length && editors[0].openable){
+            if(editors.length && editors[0].openable && !(editors[0].write && selectedNode.getMetadata().get("ajxp_readonly") === "true")){
                 editorData = editors[0];
             }
         }
@@ -89,6 +89,13 @@ Class.create("PydioUI", {
                 this._pydio.Controller.getActionByName("download").apply();
             }
         }
+    },
+
+    getSharedPreviewTemplateForEditor: function(editorData, node){
+        if(Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate) {
+            return Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate(node);
+        }
+        return null;
     },
 
     registerAsMessageBoxReference: function(element){
@@ -248,8 +255,6 @@ Class.create("PydioUI", {
             this.initTabNavigation();
             this.blockShortcuts = false;
             this.blockNavigation = false;
-            // TODO : ADD TO XML TEMPLATES INSTEAD
-            this.bgManagerPane = new BackgroundManagerPane();
             modal.updateLoadingProgress('Navigation loaded');
         }.bind(this));
 
@@ -262,7 +267,13 @@ Class.create("PydioUI", {
             for(var i=compRegistry.length;i>0;i--){
                 var el = compRegistry[i-1];
                 var ajxpId = el.ajxpId;
-                compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+                try{
+                    compRegistry[i-1] = new el['ajxpClass'](el.ajxpNode, el.ajxpOptions);
+                }catch(e){
+                    if(console){
+                        console.error('Error while initializing component', el, e);
+                    }
+                }
                 this._instancesCache.set(ajxpId, compRegistry[i-1]);
                 lastInst = compRegistry[i-1];
             }

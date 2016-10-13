@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="core.uploader" label="CONF_MESSAGE[Uploaders Options]" description="CONF_MESSAGE[Options shared by all uploaders plugins]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/core.uploader/class.CoreUploaderLoader.php" classname="CoreUploaderLoader"/>
+    <class_definition filename="plugins/core.uploader/CoreUploaderLoader.php" classname="Pydio\Uploader\Core\CoreUploaderLoader"/>
     <client_settings>
         <resources>
             <i18n namespace="core_uploader" path="plugins/core.uploader/i18n"/>

@@ -1,20 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
-		<action name="ls" dirDefault="true">
-			<gui text="32" title="32" src="fileopen.png"
-				accessKey="folder_access_key" iconClass="icon-folder-open-alt">
-				<context selection="true" dir="" recycle="false"
-					actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false"/>
-				<selectionContext dir="true" file="false" recycle="false"
-					unique="true" allowedMimes="*">
-				</selectionContext>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true"
-				write="false" adminOnly="false">
-			</rightsContext>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
+
+        <!-- SHARED ACTIONS -->
+        <action name="ls" dirDefault="true">
+            <gui text="32" title="32" src="fileopen.png"
+                 accessKey="folder_access_key" iconClass="icon-folder-open-alt">
+                <context selection="true" dir="" recycle="false"
+                         actionBar="false" actionBarGroup="get" contextMenu="true" infoPanel="false"/>
+                <selectionContext dir="true" file="false" recycle="false"
+                                  unique="true" allowedMimes="*">
+                </selectionContext>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true"
+                           write="false" adminOnly="false">
+            </rightsContext>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
 					var path;
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
@@ -29,426 +31,43 @@
 						ajaxplorer.updateContextData(path);
 					}
 					]]></clientCallback>
-				<serverCallback methodName="switchAction" restParams="/dir+" developerComment="List the content of the config. Depending on the path, will return users, workspaces, roles, etc..">
+                <serverCallback methodName="listAction" restParams="/dir+" developerComment="List the content of the config. Depending on the path, will return users, workspaces, roles, etc..">
                     <input_param name="dir" type="path" description="Path to config data to list. See URIs in webapp to guess the correct path."/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="admin_search">
-			<processing>
-				<serverCallback methodName="searchAction" restParams="/query/dir+" developerComment="Remote search implementation, currently only supporting users search."/>
-			</processing>
-		</action>
-		<action name="stat">
-			<processing>
-				<serverCallback methodName="switchAction" developerComment="To comply with GUI client, always returns true."/>
-			</processing>
-		</action>
-        <action name="list_all_plugins_actions">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available actions"/>
-            </processing>
-        </action>
-        <action name="list_all_plugins_parameters">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available parameter"/>
-            </processing>
-        </action>
-        <action name="parameters_to_form_definitions">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
-            </processing>
-        </action>
-        <action name="list_all_repositories">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all repository (output format is XML)"/>
-            </processing>
-        </action>
-        <action name="list_all_repositories_json">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
-            </processing>
-        </action>
-        <action name="list_all_users">
-            <processing>
-                <serverCallback methodName="listAllActions" restParams="/" developerComment="Returns all users"/>
-            </processing>
-        </action>
-        <action name="generate_api_docs">
-            <processing>
-                <serverCallback methodName="switchAction" restParams="/version" developerComment="Generate API docs">
-                    <input_param name="version" type="string" description="A two-digits version string, like 5.4, 6.2"/>
                 </serverCallback>
             </processing>
         </action>
-		<action name="get_plugin_manifest">
-			<processing>
-				<serverCallback methodName="switchAction" restParams="/plugin_id" developerComment="Send a plugin Manifest file.">
-                    <input_param description="Plugin identifier (like type.name)" name="plugin_id" type="string"/>
-                    <output type="XML" description="Manifest content"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="run_plugin_action">
-			<processing>
-				<serverCallback methodName="switchAction" restParams="/action_plugin_id/action_plugin_method" developerComment="Execute a class method on a plugin. Used for example for testing a DB connexion.">
-                    <input_param name="action_plugin_id" type="string" description="A plugin id, in the form type.name"/>
-                    <input_param name="action_plugin_method" type="string" description="A plugin method"/>
-                    <input_param name="form_data" type="FORM_DATA"
-                                 description="A set of parameters complying to the standard form parser"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="create_user">
-			<gui text="297" title="298" src="yast_user_add.png" iconClass="icon-user" accessKey="create_user_accesskey" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="hidden" allowedMimes="users_zone,group" behaviour="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var completeFunc = function(){
-						var oForm = modal.getForm();
-						if(!pydio.getController().configEditor){
-							pydio.getController().configEditor = new ConfigEditor(oForm);
-						}
-						pydio.getController().configEditor.setForm(oForm);
-						result = pydio.getController().configEditor.submitCreateUser();
-						if(result) hideLightBox();
-						return false;
-					};
-					var loadFunc = function(oForm){
-						if(!pydio.getController().configEditor){
-							pydio.getController().configEditor = new ConfigEditor(oForm);
-						}
-						pydio.getController().configEditor.setForm(oForm);
-						pydio.getController().configEditor.loadCreateUserForm();
-
-						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
-							barContainer:$('pwd_strength_container'),
-							barPosition:'bottom'
-						});
-					};
-					modal.showDialogForm('Create User', 'create_user_box', loadFunc, completeFunc, null, null, null, true);
-					]]></clientCallback>
-				<clientForm id="create_user_box"><![CDATA[
-					<div id="create_user_box" action="create_user" box_width="210">
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="94">AJXP_MESSAGE[94] : </div><input name="new_user_login" type="text" class="dialogFocus SF_input"/>
-						</div>
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] : </div><input name="new_user_pwd" type="password" class="SF_input"/>
-						</div>
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
-						</div>
-						<div class="SF_element" id="pwd_strength_container"></div>
-						<div style="clear:both; display:none;" class="dialogLegend" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
-						<div id="custom_pane" class="config_subblock" style="display:none;">
-
-						</div>
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction"
-                                developerComment="Create a user with login and password in the AUTH directory."
-                                restParams="/new_user_login/new_user_pwd"
-                        >
-                    <input_param description="User login, must be alphanumerical, no special chars" name="new_user_login" type="string"/>
-                    <input_param description="User password, must be alphanumerical, no special chars" name="new_user_pwd" type="string"/>
-				</serverCallback>
-				</processing>
-		</action>
-		<action name="create_role">
-			<gui text="ajxp_conf.75" title="ajxp_conf.75" iconClass="icon-th" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="hidden" allowedMimes="roles_zone"  behaviour="hidden"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Create Role', 'create_role_box');
-					]]></clientCallback>
-				<clientForm id="create_role_box"><![CDATA[
-					<div id="create_role_box" action="create_role" box_width="210">
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
-						</div>
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction" developerComment="Create an empty role" restParams="/role_id">
-                    <input_param description="Role identifier" name="role_id" type="string"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="create_group">
-			<gui text="ajxp_conf.118" title="ajxp_conf.118" iconClass="icon-group" src="user_group_new.png" accessKey="ajxp_conf.group_access" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="hidden" allowedMimes="users_zone,group"  behaviour="hidden"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					modal.showDialogForm('Create Role', 'create_group_box');
-					]]></clientCallback>
-				<clientForm id="create_group_box"><![CDATA[
-					<div id="create_group_box" action="create_group" box_width="210">
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group ID : </div><input name="group_name" type="text" class="dialogFocus SF_input"/>
-						</div>
-						<div class="SF_element">
-							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group Label : </div><input name="group_label" type="text" class="dialogFocus SF_input"/>
-						</div>
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction" developerComment="Create a new group of users" restParams="/group_label/group_path+">
-                    <input_param description="Full group path, must be in the form /group/path/name" name="group_path" type="String"/>
-                    <input_param description="Group Label" name="group_label" type="String"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="user_update_group" dragndropDefault="true">
-			<gui text="ajxp_conf.119" title="ajxp_conf.119" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
-				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
-					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+        <action name="stat">
             <processing>
-                <serverCallback methodName="switchAction" developerComment="Move an existing user to an existing group" restParams="/file/group_path+">
-                    <input_param description="User identifier" name="file" type="String"/>
-                    <input_param description="Target group path, must be /group/path" name="group_path" type="String"/>
-                </serverCallback>
+                <serverCallback methodName="listAction" developerComment="To comply with GUI client, always returns true."/>
             </processing>
-		</action>
-		<action name="create_repository">
-			<gui text="ajxp_conf.90" title="300" iconClass="icon-sitemap" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
-				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var loadFunc = function(oForm){
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!pydio.getController().configEditor){
-							pydio.getController().configEditor = new ConfigEditor(oForm);
-						}
-						pydio.getController().configEditor.setForm(oForm);
-						pydio.getController().configEditor.initCreateRepoWizard('repository');
-					};
-					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
-					]]></clientCallback>
-				<clientForm id="create_repository_box"><![CDATA[
-					<div id="create_repository_box" action="create_repository" box_width="380">
-					    <div id="creation_form" style="padding:5px;padding-top:0px;">
-                            <div class="dialogLegend repoCreationString">AJXP_MESSAGE[ajxp_conf.95]</div>
-                            <div class="dialogLegend tplCreationString">AJXP_MESSAGE[ajxp_conf.96]</div>
-                            <div class="SF_element">
-                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.8">AJXP_MESSAGE[ajxp_conf.8]* : </div>
-                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.116">AJXP_MESSAGE[ajxp_conf.116]* : </div>
-                                <input name="new_user_login" type="text" class="SF_input dialogFocus"/>
-                            </div>
-                            <div class="SF_element">
-                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.32">AJXP_MESSAGE[ajxp_conf.32]* : </div>
-                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.117">AJXP_MESSAGE[ajxp_conf.117]* : </div>
-                                <select class="SF_input"><option>AJXP_MESSAGE[ajxp_conf.33]</option></select>
-                            </div>
-						</div>
-						<div id="driver_form" style="margin-top:32px;"></div>
-						<div class="dialogButtons" style="direction:rtl;">
-							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/forward.png" height="22" width="22" class="dialogButton" id="submit_create_repo" value="Next" class="button" onclick="return false;">
-							<input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" class="dialogButton" value="Cancel" class="button" onclick="hideLightBox();return false;">
-						</div>
-					</div>
-				]]></clientForm>
-				<serverCallback methodName="switchAction" restParams="/json_data" developerComment="Create a workspace ( = repository, it's the same ) by passing a structured JSON object.">
-                    <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
-				</serverCallback>
-				</processing>
-		</action>
-		<action name="create_repository_template">
-			<gui text="ajxp_conf.91" title="ajxp_conf.92" iconClass="icon-th" src="hdd_external_unmount.png" hasAccessKey="false">
-				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
-					actionBar="true" contextMenu="false" infoPanel="false"
-					actionBarGroup="put" inZip="false">
-				</context>
-			</gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var loadFunc = function(oForm){
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!pydio.getController().configEditor){
-							pydio.getController().configEditor = new ConfigEditor(oForm);
-						}
-						pydio.getController().configEditor.setForm(oForm);
-						pydio.getController().configEditor.initCreateRepoWizard('template');
-					};
-					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
-                ]]></clientCallback>
-            </processing>
-		</action>
-		<action name="user_update_role" fileDefault="false">
-			<gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"  behaviour="hidden"
-					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"/></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection =  ajaxplorer.getUserSelection();
-					var loadFunc = function(oForm){
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
-						if(!pydio.getController().configEditor){
-							pydio.getController().configEditor = new ConfigEditor(oForm);
-						}
-						pydio.getController().configEditor.setForm(oForm);
-						pydio.getController().configEditor.loadUsers(userSelection);
-					};
-					modal.showDialogForm('Batch Edition', 'batch_roles_edit_box', loadFunc, function(){hideLightBox();}, null, true);
-				]]></clientCallback>
-                <clientForm id="batch_roles_edit_box"><![CDATA[
-                    <div id="batch_roles_edit_box" action="edit_user" box_width="420">
-                        <div id="user_acl">
-                            <div id="roles_pane">
-                                <div class="dialogLegend" ajxp_message_id="ajxp_conf.83">AJXP_MESSAGE[ajxp_conf.83]</div>
-                                <div>
-                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.71">AJXP_MESSAGE[ajxp_conf.71]</span> : <br><div id="available_roles"></div></div>
-                                    <div style="width:10%;float:left;text-align:center;vertical-align:middle; margin-top: 20px;"><span class="icon-chevron-left"></span> <span  class="icon-chevron-right"></span></div>
-                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ]]></clientForm>
-				<clientListener name="selectionChange"><![CDATA[
-				if(ajaxplorer){
-					var userSelection = ajaxplorer.getUserSelection();
-					var action = pydio.getController().getActionByName("user_update_role");
-					if(action){
-						if(userSelection.isUnique()){
-							action.selectionContext.dir = true;
-							action.selectionContext.file = false;
-						}else{
-							action.selectionContext.dir = false;
-							action.selectionContext.file = true;
-						}
-					}
-				}
-				]]></clientListener>
-				<serverCallback methodName="switchAction" developerComment="Add or remove a given role to a set of users. The rest access can only handle one user at a time, using the file parameter." restParams="/file/update_role_action/role_id">
-                    <input_param description="Users selection" name="file_0...N" type="string"/>
-                    <input_param description="Role identifier" name="role_id" type="string"/>
-                    <input_param description="Action : add or remove role?" name="update_role_action" type="string"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="edit" fileDefault="true">
-			<gui text="ajxp_conf.93" title="301" iconClass="icon-edit" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="true"
-					actionBarGroup="get" inZip="false">
-				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,group,ajxp_plugin,ajxp_role,ajxp_graphs,datagrid" behaviour="hidden"/>
+        </action>
+        <action name="edit" fileDefault="true">
+            <gui text="ajxp_conf.93" title="301" iconClass="mdi mdi-pencil" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden"
+                         actionBar="true" contextMenu="true" infoPanel="true"
+                         actionBarGroup="get" inZip="false">
+                </context>
+                <selectionContext dir="true" file="true" recycle="false" unique="true" allowedMimes="user,user_editable,repository,repository_editable,role,group,ajxp_plugin,ajxp_role,ajxp_graphs,datagrid" behaviour="hidden"/>
             </gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="false"><![CDATA[
                     var editorData = window.actionArguments[0];
                     pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
-                <serverCallback methodName="switchAction" restParams="/sub_action" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
+                <serverCallback methodName="editAction" restParams="/sub_action" developerComment="Shortcut for various actions, calling edit with subaction parameter."/>
             </processing>
         </action>
-        <action name="edit_repository_label">
-            <gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
-                <context selection="true" dir="" recycle="hidden" allowedMimes="workspaces_zone"
+        <action name="delete">
+            <gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+                <context selection="true" dir="" recycle="false"
                          actionBar="true" contextMenu="true" infoPanel="false"
                          actionBarGroup="get" inZip="false">
                 </context>
-                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"/>
-            </gui>
+                <selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="false"><![CDATA[
-					var callback = function(node, newValue){
-						var conn = new Connexion();
-						conn.addParameter('get_action', 'edit');
-						conn.addParameter('sub_action', 'edit_repository_label');
-						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
-						conn.addParameter('newLabel', newValue);
-						conn.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-						};
-						conn.sendSync();
-					};
-
-					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
-					]]></clientCallback>
-                <serverCallback methodName="switchAction" restParams="/repository_id/newLabel" developerComment="Update a workspace label">
-                    <input_param description="Repository Identifier" name="repository_id" type="string"/>
-                    <input_param description="New Label" name="newLabel" type="string"/>
-                </serverCallback>
-            </processing>
-        </action>
-		<action name="save_user_preference">
-			<processing>
-				<serverCallback methodName="switchAction" developerComment="Sets a user preference value. Rest can only take one value, but CLI or http GET can pass many preferences, using _1, _2, _3, etc." restParams="/user_id/pref_name_0/pref_value_0">
-                    <input_param description="User login" name="user_id" type="string"/>
-                    <input_param description="Preference name" name="pref_name_0" type="string"/>
-                    <input_param description="Preference value" name="pref_value_0" type="string"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="meta_source_edit">
-			<processing>
-				<serverCallback methodName="switchAction" developerComment="Edit an existing meta source parameters." restParams="/repository_id/plugId/json_data">
-                    <input_param description="Id of the repository" name="repository_id" type="string"/>
-                    <input_param description="Id of the plugin" name="plugId" type="string"/>
-                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
-                                 type="JSON"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="meta_source_add">
-			<processing>
-				<serverCallback methodName="switchAction" developerComment="Add a meta source to a repository, setting its parameters." restParams="/repository_id/plugId/json_data">
-                    <input_param description="Id of the repository" name="repository_id" type="string"/>
-                    <input_param description="Id of the plugin" name="plugId" type="string"/>
-                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
-                                 type="JSON"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="meta_source_delete">
-			<processing>
-				<serverCallback methodName="switchAction" developerComment="Remove a given meta source from a repository." restParams="/repository_id/plugId">
-                    <input_param description="Id of the repository" name="repository_id" type="string"/>
-                    <input_param description="Id of the plugin" name="plugId" type="string"/>
-				</serverCallback>
-			</processing>
-		</action>
-		<action name="delete">
-			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
-				<context selection="true" dir="" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="get" inZip="false">
-				</context>
-				<selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false" behaviour="hidden"/></gui>
-			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
-			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
+                <clientCallback prepareModal="true"><![CDATA[
 				    var userSelection;
 				    if(window.actionArguments && window.actionArguments.length){
 				        userSelection = window.actionArguments[0];
@@ -510,37 +129,470 @@
 						return false;
 					});
 					]]></clientCallback>
-				<clientForm id="delete_config_form"><![CDATA[
+                <clientForm id="delete_config_form"><![CDATA[
 				<div id="delete_config_form" action="delete" box_width="280">
 					<span id="delete_message"></span>
 					<input type="hidden" name="" value=""/>
 				</div>
 				]]></clientForm>
-				<serverCallback methodName="switchAction" restParams="/data_type/data_id+" developerComment="Generic delete action for config driver, used to delete users, workspaces, roles, etc.">
+                <serverCallback methodName="deleteAction" restParams="/data_type/data_id+" developerComment="Generic delete action for config driver, used to delete users, workspaces, roles, etc.">
                     <input_param description="Type of the data to delete. Can be : user, group, role, repository" name="data_type" type="String"/>
                     <input_param description="Id of the data to delete. For groups, full group path." name="data_id"
                                  type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
+
+        <!-- REPOSITORIES ACTIONS -->
+		<action name="create_repository">
+			<gui text="ajxp_conf.90" title="300" iconClass="icon-sitemap" src="hdd_external_unmount.png" accessKey="ajxp_conf.repository_access_key" hasAccessKey="false">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
+						}
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.initCreateRepoWizard('repository');
+					};
+					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
+					]]></clientCallback>
+				<clientForm id="create_repository_box"><![CDATA[
+					<div id="create_repository_box" action="create_repository" box_width="380">
+					    <div id="creation_form" style="padding:5px;padding-top:0px;">
+                            <div class="dialogLegend repoCreationString">AJXP_MESSAGE[ajxp_conf.95]</div>
+                            <div class="dialogLegend tplCreationString">AJXP_MESSAGE[ajxp_conf.96]</div>
+                            <div class="SF_element">
+                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.8">AJXP_MESSAGE[ajxp_conf.8]* : </div>
+                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.116">AJXP_MESSAGE[ajxp_conf.116]* : </div>
+                                <input name="new_user_login" type="text" class="SF_input dialogFocus"/>
+                            </div>
+                            <div class="SF_element">
+                                <div class="SF_label repoCreationString" ajxp_message_id="ajxp_conf.32">AJXP_MESSAGE[ajxp_conf.32]* : </div>
+                                <div class="SF_label tplCreationString" ajxp_message_id="ajxp_conf.117">AJXP_MESSAGE[ajxp_conf.117]* : </div>
+                                <select class="SF_input"><option>AJXP_MESSAGE[ajxp_conf.33]</option></select>
+                            </div>
+						</div>
+						<div id="driver_form" style="margin-top:32px;"></div>
+						<div class="dialogButtons" style="direction:rtl;">
+							<input type="submit" class="dialogButton" id="submit_create_repo" value="AJXP_MESSAGE[179]" class="button" onclick="return false;">
+							<input type="button" class="dialogButton" value="AJXP_MESSAGE[49]" class="button" onclick="hideLightBox();return false;">
+						</div>
+					</div>
+				]]></clientForm>
+				<serverCallback methodName="repositoriesAction" restParams="/json_data" developerComment="Create a workspace ( = repository, it's the same ) by passing a structured JSON object.">
+                    <input_param description="A JSON object containing the following mandatory keys : DISPLAY (string), DRIVER (string), DRIVER_OPTIONS (array of options) and optional keys : DISPLAY_ID (string), DESCRIPTION_ID (string), AJXP_SLUG (string), IS_TEMPLATE (boolean). &lt;br&gt;&lt;br&gt; The expected DRIVER value can be either an access type plugin name (fs, ftp, etc), or a template id by using the ajxp_template_ prefix (ajxp_template_TEMPLATE_ID). The DRIVER_OPTIONS array may depend on the used access type." name="json_data" type="JSON"/>
 				</serverCallback>
 				</processing>
 		</action>
+		<action name="create_repository_template">
+			<gui text="ajxp_conf.91" title="ajxp_conf.92" iconClass="icon-th" src="hdd_external_unmount.png" hasAccessKey="false">
+				<context selection="false" dir="false" recycle="hidden"  behaviour="hidden" allowedMimes="workspaces_zone"
+					actionBar="true" contextMenu="false" infoPanel="false"
+					actionBarGroup="put" inZip="false">
+				</context>
+			</gui>
+			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+			<processing>
+				<clientCallback prepareModal="true"><![CDATA[
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
+						}
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.initCreateRepoWizard('template');
+					};
+					modal.showDialogForm('Create Repository', 'create_repository_box', loadFunc, null, null, false, true);
+                ]]></clientCallback>
+            </processing>
+		</action>
+        <action name="edit_repository_label">
+            <gui text="6" title="158" src="applix.png" iconClass="icon-pencil" accessKey="rename_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden" allowedMimes="workspaces_zone"
+                         actionBar="true" contextMenu="true" infoPanel="false"
+                         actionBarGroup="get" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="repository_editable" behaviour="hidden"/>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+            <processing>
+                <clientCallback prepareModal="false"><![CDATA[
+					var callback = function(node, newValue){
+						var conn = new Connexion();
+						conn.addParameter('get_action', 'edit');
+						conn.addParameter('sub_action', 'edit_repository_label');
+						conn.addParameter('repository_id', node.getMetadata().get('repository_id'));
+						conn.addParameter('newLabel', newValue);
+						conn.onComplete = function(transport){
+							PydioApi.getClient().parseXmlMessage(transport.responseXML);
+						};
+						conn.sendSync();
+					};
+
+					if(ajaxplorer.getUserSelection() && ajaxplorer.getUserSelection().getSelectionSource() && ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {ajaxplorer.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);}
+					]]></clientCallback>
+                <serverCallback methodName="repositoriesAction" restParams="/repository_id/newLabel" developerComment="Update a workspace label">
+                    <input_param description="Repository Identifier" name="repository_id" type="string"/>
+                    <input_param description="New Label" name="newLabel" type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
+		<action name="edit_repository">
+			<processing>
+				<serverCallback methodName="repositoriesAction" developerComment="Load Repository." restParams="/repository_id"/>
+			</processing>
+		</action>
+		<action name="meta_source_edit">
+			<processing>
+				<serverCallback methodName="repositoriesAction" developerComment="Edit an existing meta source parameters." restParams="/repository_id/plugId/json_data">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
+                                 type="JSON"/>
+				</serverCallback>
+			</processing>
+		</action>
+		<action name="meta_source_add">
+			<processing>
+				<serverCallback methodName="repositoriesAction" developerComment="Add a meta source to a repository, setting its parameters." restParams="/repository_id/plugId/json_data">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+                    <input_param description="JSON Representation of the plugin necessary options" name="json_data"
+                                 type="JSON"/>
+				</serverCallback>
+			</processing>
+		</action>
+		<action name="meta_source_delete">
+			<processing>
+				<serverCallback methodName="repositoriesAction" developerComment="Remove a given meta source from a repository." restParams="/repository_id/plugId">
+                    <input_param description="Id of the repository" name="repository_id" type="string"/>
+                    <input_param description="Id of the plugin" name="plugId" type="string"/>
+				</serverCallback>
+			</processing>
+		</action>
+        <action name="patch_repository">
+            <processing><serverCallback methodName="repositoriesAction"/></processing>
+        </action>
+        <action name="post_repository">
+            <processing><serverCallback methodName="repositoriesAction"/></processing>
+        </action>
+        <action name="list_all_repositories_json">
+            <processing>
+                <serverCallback methodName="repositoriesAction" restParams="/" developerComment="Returns all repository (output format is JSON)"/>
+            </processing>
+        </action>
+
+        <!-- USERS ACTIONS -->
+        <action name="create_user">
+            <gui text="297" title="298" src="yast_user_add.png" iconClass="icon-user" accessKey="create_user_accesskey" hasAccessKey="true">
+                <context selection="false" dir="false" recycle="hidden" allowedMimes="users_zone,group" behaviour="hidden"
+                         actionBar="true" contextMenu="true" infoPanel="false"
+                         actionBarGroup="put" inZip="false">
+                </context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+					var completeFunc = function(){
+						var oForm = modal.getForm();
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
+						}
+						pydio.getController().configEditor.setForm(oForm);
+						result = pydio.getController().configEditor.submitCreateUser();
+						if(result) hideLightBox();
+						return false;
+					};
+					var loadFunc = function(oForm){
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
+						}
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.loadCreateUserForm();
+
+						new Protopass(oForm.down('input[name="new_user_pwd"]'), {
+							barContainer:$('pwd_strength_container'),
+							barPosition:'bottom'
+						});
+					};
+					modal.showDialogForm('Create User', 'create_user_box', loadFunc, completeFunc, null, null, null, true);
+					]]></clientCallback>
+                <clientForm id="create_user_box"><![CDATA[
+					<div id="create_user_box" action="create_user" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="94">AJXP_MESSAGE[94] : </div><input name="new_user_login" type="text" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="182">AJXP_MESSAGE[182] : </div><input name="new_user_pwd" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="199">AJXP_MESSAGE[199] : </div><input name="new_user_pwd_conf" type="password" class="SF_input"/>
+						</div>
+						<div class="SF_element" id="pwd_strength_container"></div>
+						<div style="clear:both; display:none;" class="dialogLegend" ajxp_message_id="89">AJXP_MESSAGE[ajxp_conf.89]</div>
+						<div id="custom_pane" class="config_subblock" style="display:none;">
+
+						</div>
+					</div>
+				]]></clientForm>
+                <serverCallback methodName="usersAction"
+                                developerComment="Create a user with login and password in the AUTH directory."
+                                restParams="/new_user_login/new_user_pwd"
+                >
+                    <input_param description="User login, must be alphanumerical, no special chars" name="new_user_login" type="string"/>
+                    <input_param description="User password, must be alphanumerical, no special chars" name="new_user_pwd" type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="create_group">
+            <gui text="ajxp_conf.118" title="ajxp_conf.118" iconClass="icon-group" src="user_group_new.png" accessKey="ajxp_conf.group_access" hasAccessKey="true">
+                <context selection="false" dir="false" recycle="hidden" allowedMimes="users_zone,group"  behaviour="hidden"
+                         actionBar="true" contextMenu="false" infoPanel="false"
+                         actionBarGroup="put" inZip="false">
+                </context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_group_box');
+					]]></clientCallback>
+                <clientForm id="create_group_box"><![CDATA[
+					<div id="create_group_box" action="create_group" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group ID : </div><input name="group_name" type="text" class="dialogFocus SF_input"/>
+						</div>
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">Group Label : </div><input name="group_label" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>
+				]]></clientForm>
+                <serverCallback methodName="usersAction" developerComment="Create a new group of users" restParams="/group_label/group_path+">
+                    <input_param description="Full group path, must be in the form /group/path/name" name="group_path" type="String"/>
+                    <input_param description="Group Label" name="group_label" type="String"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="user_update_group" dragndropDefault="true">
+            <gui text="ajxp_conf.119" title="ajxp_conf.119" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+                <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                         actionBar="false" contextMenu="false" infoPanel="false"
+                         actionBarGroup="put" inZip="false">
+                </context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+            <processing>
+                <serverCallback methodName="usersAction" developerComment="Move an existing user to an existing group" restParams="/file/group_path+">
+                    <input_param description="User identifier" name="file" type="String"/>
+                    <input_param description="Target group path, must be /group/path" name="group_path" type="String"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="user_update_role" fileDefault="false">
+            <gui text="ajxp_conf.94" title="ajxp_conf.82" src="edit.png" accessKey="edit_access_key" hasAccessKey="true">
+                <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
+                         actionBar="true" contextMenu="true" infoPanel="true"
+                         actionBarGroup="get" inZip="false">
+                </context>
+                <selectionContext dir="false" file="true" recycle="false" unique="false" multipleOnly="true" allowedMimes="user,user_editable" behaviour="hidden"/></gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+					var userSelection =  ajaxplorer.getUserSelection();
+					var loadFunc = function(oForm){
+						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						if(!pydio.getController().configEditor){
+							pydio.getController().configEditor = new ConfigEditor(oForm);
+						}
+						pydio.getController().configEditor.setForm(oForm);
+						pydio.getController().configEditor.loadUsers(userSelection);
+					};
+					modal.showDialogForm('Batch Edition', 'batch_roles_edit_box', loadFunc, function(){hideLightBox();}, null, true);
+				]]></clientCallback>
+                <clientForm id="batch_roles_edit_box"><![CDATA[
+                    <div id="batch_roles_edit_box" action="edit_user" box_width="420">
+                        <div id="user_acl">
+                            <div id="roles_pane">
+                                <div class="dialogLegend" ajxp_message_id="ajxp_conf.83">AJXP_MESSAGE[ajxp_conf.83]</div>
+                                <div>
+                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.71">AJXP_MESSAGE[ajxp_conf.71]</span> : <br><div id="available_roles"></div></div>
+                                    <div style="width:10%;float:left;text-align:center;vertical-align:middle; margin-top: 20px;"><span class="icon-chevron-left"></span> <span  class="icon-chevron-right"></span></div>
+                                    <div style="width:44%;float:left;"><span ajxp_message_id="ajxp_conf.70">AJXP_MESSAGE[ajxp_conf.70]</span> : <br><div id="user_roles"></div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ]]></clientForm>
+                <clientListener name="selectionChange"><![CDATA[
+				if(ajaxplorer){
+					var userSelection = ajaxplorer.getUserSelection();
+					var action = pydio.getController().getActionByName("user_update_role");
+					if(action){
+						if(userSelection.isUnique()){
+							action.selectionContext.dir = true;
+							action.selectionContext.file = false;
+						}else{
+							action.selectionContext.dir = false;
+							action.selectionContext.file = true;
+						}
+					}
+				}
+				]]></clientListener>
+                <serverCallback methodName="usersAction" developerComment="Add or remove a given role to a set of users. The rest access can only handle one user at a time, using the file parameter." restParams="/file/update_role_action/role_id">
+                    <input_param description="Users selection" name="file_0...N" type="string"/>
+                    <input_param description="Role identifier" name="role_id" type="string"/>
+                    <input_param description="Action : add or remove role?" name="update_role_action" type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="save_user_preference">
+            <processing>
+                <serverCallback methodName="usersAction" developerComment="Sets a user preference value. Rest can only take one value, but CLI or http GET can pass many preferences, using _1, _2, _3, etc." restParams="/user_id/pref_name_0/pref_value_0">
+                    <input_param description="User login" name="user_id" type="string"/>
+                    <input_param description="Preference name" name="pref_name_0" type="string"/>
+                    <input_param description="Preference value" name="pref_value_0" type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
 	    <action name="user_update_right">
             <processing>
-                <serverCallback methodName="switchAction" restParams="/repository_id/user_id/right" checkParams="true" developerComment="Update a user access right on a given workspace.">
+                <serverCallback methodName="usersAction" restParams="/repository_id/user_id/right" checkParams="true" developerComment="Update a user access right on a given workspace.">
                     <input_param name="user_id" type="AJXP_USER" mandatory="true" description="ID of the user"/>
                     <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
                     <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
                 </serverCallback>
             </processing>
         </action>
+        <action name="cli_update_user_list">
+            <processing>
+                <serverCallback methodName="usersAction"/>
+            </processing>
+        </action>
+        <action name="admin_search_users">
+            <processing>
+                <serverCallback methodName="searchUsersAction" restParams="/query/dir+" developerComment="Remote search implementation, currently only supporting users search."/>
+            </processing>
+        </action>
+        <action name="people-create-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
+        <action name="people-delete-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
+        <action name="people-patch-resource">
+            <processing><serverCallback methodName="usersAction"/></processing>
+        </action>
+
+        <!-- ROLES ACTIONS -->
+        <action name="create_role">
+            <gui text="ajxp_conf.75" title="ajxp_conf.75" iconClass="icon-th" src="user_group_new.png" accessKey="ajxp_conf.role_access" hasAccessKey="true">
+                <context selection="false" dir="false" recycle="hidden" allowedMimes="roles_zone"  behaviour="hidden"
+                         actionBar="true" contextMenu="false" infoPanel="false"
+                         actionBarGroup="put" inZip="false">
+                </context>
+            </gui>
+            <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly="true"/>
+            <processing>
+                <clientCallback prepareModal="true"><![CDATA[
+					modal.showDialogForm('Create Role', 'create_role_box');
+					]]></clientCallback>
+                <clientForm id="create_role_box"><![CDATA[
+					<div id="create_role_box" action="create_role" box_width="210">
+						<div class="SF_element">
+							<div class="SF_label" ajxp_message_id="ajxp_conf.76">AJXP_MESSAGE[ajxp_conf.76] : </div><input name="role_id" type="text" class="dialogFocus SF_input"/>
+						</div>
+					</div>
+				]]></clientForm>
+                <serverCallback methodName="rolesAction" developerComment="Create an empty role" restParams="/role_id">
+                    <input_param description="Role identifier" name="role_id" type="string"/>
+                </serverCallback>
+            </processing>
+        </action>
 	    <action name="role_update_right">
             <processing>
-                <serverCallback methodName="switchAction" restParams="/repository_id/role_id/right" checkParams="true" developerComment="Update a role access right on a given workspace.">
+                <serverCallback methodName="rolesAction" restParams="/repository_id/role_id/right" checkParams="true" developerComment="Update a role access right on a given workspace.">
                     <input_param name="role_id" type="AJXP_ROLE" mandatory="true" description="ID of the role"/>
                     <input_param name="repository_id" type="AJXP_REPOSITORY" mandatory="true" description="Repository ID"/>
                     <input_param name="right" type="string" mandatory="true" description="Must be r (read), w (write) or n (none)"/>
                 </serverCallback>
             </processing>
         </action>
+        <action name="edit_role">
+            <processing>
+                <serverCallback methodName="rolesAction"/>
+            </processing>
+        </action>
+        <action name="post_json_role">
+            <processing>
+                <serverCallback methodName="rolesAction"/>
+            </processing>
+        </action>
+
+        <!-- PLUGINS ACTIONS -->
+        <action name="clear_plugins_cache">
+            <gui src="edit.png" text="ajxp_conf.129" title="ajxp_conf.130">
+                <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
+            </gui>
+            <processing>
+                <clientCallback><![CDATA[
+                    var conn = new Connexion();
+                    conn.setParameters($H({get_action:'clear_plugins_cache'}));
+                    conn.sendAsync();
+                ]]></clientCallback>
+                <serverCallback methodName="pluginsAction"/>
+            </processing>
+        </action>
+        <action name="get_plugin_manifest">
+            <processing>
+                <serverCallback methodName="pluginsAction" restParams="/plugin_id" developerComment="Send a plugin Manifest file.">
+                    <input_param description="Plugin identifier (like type.name)" name="plugin_id" type="string"/>
+                    <output type="XML" description="Manifest content"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="run_plugin_action">
+            <processing>
+                <serverCallback methodName="pluginsAction" restParams="/action_plugin_id/action_plugin_method" developerComment="Execute a class method on a plugin. Used for example for testing a DB connexion.">
+                    <input_param name="action_plugin_id" type="string" description="A plugin id, in the form type.name"/>
+                    <input_param name="action_plugin_method" type="string" description="A plugin method"/>
+                    <input_param name="form_data" type="FORM_DATA"
+                                 description="A set of parameters complying to the standard form parser"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="list_all_plugins_actions">
+            <processing>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available actions"/>
+            </processing>
+        </action>
+        <action name="list_all_plugins_parameters">
+            <processing>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Returns a structured JSON object of all plugins and all their available parameter"/>
+            </processing>
+        </action>
+        <action name="parameters_to_form_definitions">
+            <processing>
+                <serverCallback methodName="pluginsAction" restParams="/" developerComment="Takes in input a list of plugin parameters and builds the corresponding XML to create a standard form."/>
+            </processing>
+        </action>
+
+        <!-- DOCUMENTATION ACTIONS -->
+        <action name="generate_api_docs">
+            <processing>
+                <serverCallback methodName="documentationAction" restParams="/version" developerComment="Generate API docs">
+                    <input_param name="version" type="string" description="A two-digits version string, like 5.4, 6.2"/>
+                </serverCallback>
+            </processing>
+        </action>
+
+        <!-- OTHER ACTIONS -->
         <action name="get_bookmarks">
             <pre_processing>
                 <serverCallback methodName="preProcessBookmarkAction"/>
@@ -552,28 +604,56 @@
             </gui>
             <processing>
                 <clientCallback><![CDATA[
-                    var win = window.open('https://pydio.com/?referrer=settings');
+                    var win = window.open('https://pydio.com/en/go-pro?referrer=settings');
                 ]]></clientCallback>
             </processing>
         </action>
-        <action name="cli_update_user_list">
-            <processing>
-                <serverCallback methodName="switchAction"/>
-            </processing>
-        </action>
-        <action name="clear_plugins_cache">
-            <gui src="edit.png" text="ajxp_conf.129" title="ajxp_conf.130">
-                <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
+        <action name="display_enterprise">
+            <gui text="ajxp_conf.120" title="ajxp_conf.121" iconClass="icon-lightbulb" src="download_manager.png" hasAccessKey="false">
+                <context selection="false" dir="false" recycle="hidden"  behaviour="hidden"
+                         actionBar="false" contextMenu="false" infoPanel="false" inZip="false">
+                </context>
             </gui>
             <processing>
-                <clientCallback><![CDATA[
+                <clientCallback prepareModal="false" dialogOpenForm="enterprise_advertise_block" dialogOkButtonOnly="true" dialogSkipButtons="false">
+                    <dialogOnOpen><![CDATA[
+                        var lang = "en";
+                        if(pydio && pydio.currentLanguage === "fr") lang = "fr";
+                        else if(pydio && pydio.currentLanguage === "de") lang = "de";
+                        $(oForm).down("iframe").src = "https://pydio.com/"+lang+"/switch-pydio-enterprise";
+                        pydio.Controller.DISPLAY_ENTERPRISE_PING = true;
+                    ]]></dialogOnOpen>
+                    <dialogOnComplete hideDialog="true"><![CDATA[]]></dialogOnComplete>
+                </clientCallback>
+                <clientForm id="enterprise_advertise_block"><![CDATA[
+                        <div id="enterprise_advertise_block" box_width="70%" box_padding="0" box_height="80%" box_resize="true" style="height:100%;" class="vertical_layout">
+                            <iframe style="width: 100%; height: 90%; border: 0px solid #ddd;" class="vertical_fit"></iframe>
+                            <div style="padding:20px;">&nbsp;</div>
+                            <style>.form-enterprise_advertise_block .dialogTitle {display:none;}</style>
+                        </div>
+                    ]]></clientForm>
+                <clientListener name="init"><![CDATA[
                     var conn = new Connexion();
-                    conn.setParameters($H({get_action:'clear_plugins_cache'}));
-                    conn.sendAsync();
-                ]]></clientCallback>
-                <serverCallback methodName="switchAction"/>
+                    conn.addParameter("get_action", "display_enterprise");
+                    conn.onComplete = function(transport){
+                        var response = transport.responseJSON;
+                        if(response && response.display){
+                            pydio.Controller.fireAction("display_enterprise");
+                        }else if(response && !response.display){
+                            pydio.Controller.DISPLAY_ENTERPRISE_PING = true;
+                        }
+                    };
+                    window.setTimeout(function(){
+                        if(!pydio.Controller.DISPLAY_ENTERPRISE_PING){
+                            conn.sendAsync();
+                        }
+                    }, 5000);
+                    ]]></clientListener>
+                <serverCallback methodName="displayEnterprise"/>
             </processing>
         </action>
+        <action name="share_react" forbidOverride="true"></action>
+
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">

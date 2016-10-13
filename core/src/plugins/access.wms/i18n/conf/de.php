@@ -16,11 +16,11 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"WMS Server" => "WMS Server",
-"Browse the layers served by a WMS server." => "Layers eines WMS Servers durchsuchen.",
-"Wms Server" => "Wms Server",
-"Wms server url" => "Wms server url",
+"WMS Server" => "WMS-Server",
+"Browse the layers served by a WMS server." => "Layers eines WMS-Servers durchsuchen.",
+"Wms Server" => "WMS-Server",
+"Wms server url" => "WMS-Server-URL",
 );

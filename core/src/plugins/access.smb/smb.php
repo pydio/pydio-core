@@ -20,6 +20,9 @@
 # GNU General Public License for more details.
 #
 ###################################################################
+namespace Pydio\Access\Driver\StreamProvider\SMB;
+
+use Pydio\Log\Core\Logger;
 
 define ('SMB4PHP_VERSION', '0.8');
 
@@ -63,6 +66,7 @@ class smb
         list ($pu['share'], $pu['path']) = (preg_match ('/^([^\/]+)\/(.*)/', $path, $regs))
           ? array ($regs[1], preg_replace ('/\//', '\\', $regs[2]))
           : array ($path, '');
+        if (empty($pu["path"]) && preg_match('/\/$/', $url)) $pu["path"] = "/";
         $pu['type'] = $pu['path'] ? 'path' : ($pu['share'] ? 'share' : ($pu['host'] ? 'host' : '**error**'));
         if (! ($pu['port'] = intval(@$pu['port']))) $pu['port'] = 139;
        /* $i = 0; $atcount = 0;
@@ -105,7 +109,7 @@ class smb
                 }
             }
         }
-        AJXP_Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
+        Logger::debug(__CLASS__,__FUNCTION__,$str, $array);
     }
 
 
@@ -194,97 +198,103 @@ class smb
             $env = array("LC_ALL" => AJXP_LOCALE);
         }
         $process = proc_open($cmd, $descriptorspec, $pipes, null, $env);
-        if (is_resource($process)) {
-            fclose($pipes[0]);
-            $error = stream_get_contents($pipes[2]);
-            fclose($pipes[2]);
-            if ($error != "") {
-                $error = strtolower($error);
-                // common error
-                if (strstr($error, "command not found")!==false) {
-                    fclose($pipes[1]);
-                    throw new Exception($error);
-                } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
-                    self::debug("Smbclient alternate stream : ".$error);
-                } else {
-                    AJXP_Logger::error(__CLASS__,"Smbclient error",$error);
+        try {
+            if (is_resource($process)) {
+                fclose($pipes[0]);
+                $error = stream_get_contents($pipes[2]);
+                fclose($pipes[2]);
+                if ($error != "") {
+                    $error = strtolower($error);
+                    // common error
+                    if (strstr($error, "command not found")!==false) {
+                        fclose($pipes[1]);
+                        throw new \Exception($error);
+                    } else if (strstr($error, "domain")!==false && strstr($error, "os")!==false ) {
+                        self::debug("Smbclient alternate stream : ".$error);
+                    } else {
+                        Logger::error(__CLASS__,"Smbclient error",$error);
+                    }
                 }
+                $output = $pipes[1];
             }
-            $output = $pipes[1];
-        }
 
-        if (isset($output) && is_resource($output)) {
+            if (isset($output) && is_resource($output)) {
 
-            while ($line = fgets ($output, 4096)) {
-			
-                if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
-                    $line = SystemTextEncoding::fromUTF8($line);
+                while ($line = fgets ($output, 4096)) {
+
+                    if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
+                        //$line = \Pydio\Core\Utils\TextEncoder::fromUTF8($line);
                     }
 
-                list ($tag, $regs, $i) = array ('skip', array (), array ());
-                reset ($regexp);
-                foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
-                    $tag = $t;
-                    break;
-                }
-                switch ($tag) {
-                    case 'skip':    continue;
-                    case 'shares':  $mode = 'shares';     break;
-                    case 'servers': $mode = 'servers';    break;
-                    case 'workg':   $mode = 'workgroups'; break;
-                    case 'share':
-                        list($name, $type) = array (
-                            trim(substr($line, 1, 15)),
-                            trim(strtolower(substr($line, 17, 10)))
-                        );
-                        $i = ($type <> 'disk' && preg_match('/^(.*) Disk/', $line, $regs))
-                            ? array(trim($regs[1]), 'disk')
-                            : array($name, 'disk');
+                    list ($tag, $regs, $i) = array ('skip', array (), array ());
+                    reset ($regexp);
+                    foreach ($regexp as $r => $t) if (preg_match ('/'.$r.'/', $line, $regs)) {
+                        $tag = $t;
                         break;
-                    case 'srvorwg':
-                        list ($name, $master) = array (
-                            strtolower(trim(substr($line,1,21))),
-                            strtolower(trim(substr($line, 22)))
-                        );
-                        $i = ($mode == 'servers') ? array ($name, "server") : array ($name, "workgroup", $master);
-                        break;
-                    case 'files':
-                        list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R|N]+)$/", trim ($regs[1]), $regs2)
-                            ? array (trim ($regs2[2]), trim ($regs2[1]))
-                            : array ('', trim ($regs[1]));
-                        list ($his, $im) = array (
-                        explode(':', $regs[6]), 1 + strpos("JanFebMarAprMayJunJulAugSepOctNovDec", $regs[4]) / 3);
-                        $i = ($name <> '.' && $name <> '..')
-                            ? array (
-                                $name,
-                                (strpos($attr,'D') === FALSE) ? 'file' : 'folder',
-                                'attr' => $attr,
-                                'size' => intval($regs[2]),
-                                'time' => mktime ($his[0], $his[1], $his[2], $im, $regs[5], $regs[7])
-                              )
-                            : array();
-                        break;
-                    case 'error':
-                        if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
-                            return "NOT_FOUND";
-                        }
-                        trigger_error($regs[1], E_USER_ERROR);
+                    }
+                    $mode = '';
+                    switch ($tag) {
+                        case 'skip':    continue;
+                        case 'shares':  $mode = 'shares';     break;
+                        case 'servers': $mode = 'servers';    break;
+                        case 'workg':   $mode = 'workgroups'; break;
+                        case 'share':
+                            list($name, $type) = array (
+                                trim(substr($line, 1, 15)),
+                                trim(strtolower(substr($line, 17, 10)))
+                            );
+                            $i = ($type <> 'disk' && preg_match('/^(.*) Disk/', $line, $regs))
+                                ? array(trim($regs[1]), 'disk')
+                                : array($name, 'disk');
+                            break;
+                        case 'srvorwg':
+                            list ($name, $master) = array (
+                                strtolower(trim(substr($line,1,21))),
+                                strtolower(trim(substr($line, 22)))
+                            );
+                            $i = ($mode == 'servers') ? array ($name, "server") : array ($name, "workgroup", $master);
+                            break;
+                        case 'files':
+                            list ($attr, $name) = preg_match ("/^(.*)[ ]+([D|A|H|S|R|N]+)$/", trim ($regs[1]), $regs2)
+                                ? array (trim ($regs2[2]), trim ($regs2[1]))
+                                : array ('', trim ($regs[1]));
+                            list ($his, $im) = array (
+                                explode(':', $regs[6]), 1 + strpos("JanFebMarAprMayJunJulAugSepOctNovDec", $regs[4]) / 3);
+                            $i = ($name <> '.' && $name <> '..')
+                                ? array (
+                                    $name,
+                                    (strpos($attr,'D') === FALSE) ? 'file' : 'folder',
+                                    'attr' => $attr,
+                                    'size' => intval($regs[2]),
+                                    'time' => mktime ($his[0], $his[1], $his[2], $im, $regs[5], $regs[7])
+                                )
+                                : array();
+                            break;
+                        case 'error':
+                            if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
+                                return "NOT_FOUND";
+                            }
+                            trigger_error($regs[1], E_USER_ERROR);
+                    }
+                    if ($i) switch ($i[1]) {
+                        case 'file':
+                        case 'folder':    $info['info'][$i[0]] = $i;
+                        case 'disk':
+                        case 'server':
+                        case 'workgroup': $info[$i[1]][] = $i[0];
+                    }
                 }
-                if ($i) switch ($i[1]) {
-                    case 'file':
-                    case 'folder':    $info['info'][$i[0]] = $i;
-                    case 'disk':
-                    case 'server':
-                    case 'workgroup': $info[$i[1]][] = $i[0];
-                }
-            }
-            //pclose($output);
-            fclose($output);
+                //pclose($output);
+                fclose($output);
 
+            }
+        } finally {
+            if (is_resource($process)){
+                proc_close($process);
+            }
         }
         //self::debug(print_r($info, true));
         return $info;
-        //return;
     }
 
 
@@ -303,54 +313,55 @@ class smb
         switch ($pu['type']) {
             case 'host':
                 if ($o = smb::look ($pu))
-                //self::debug($_SESSION["AJXP_SESSION_REMOTE_USER"]);
                    $stat = stat (SMB4PHP_SMBTMP);
                 else
-                  trigger_error ("url_stat(): list failed for host '{$host}'", E_USER_WARNING);
+                  trigger_error ("url_stat(): list failed for host", E_USER_WARNING);
                 break;
             case 'share':
-                if ($_SESSION["COUNT"] == 0) {
-                    $_SESSION["COUNT"] = 1;
+                $id = "smb_".md5($pu["host"].$pu["user"]);
+                if ($_SESSION[$id] == 0 || true) {
+                    $_SESSION[$id] = 1;
                     //self::debug("OH HEY");
                     //$__count++;
                     //self::debug($__count);
-                if ($o = smb::look ($pu)) {
-                    $_SESSION["disk"] = $o['disk'];
-                    self::debug(print_r($_SESSION["disk"], true));
-                 //self::debug(print_r($_ENV, true));
-                   $found = FALSE;
-                   $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if (is_array($o) && isSet($o['disk']) && is_array($o['disk'])) {
-                       foreach ($o['disk'] as $s) if ($lshare == strtolower($s)) {
-                           $found = TRUE;
-                           //self::debug("DISK: " . $s);
-                           $stat = stat (SMB4PHP_SMBTMP);
-                           break;
-                       }
-                   }
-                   if (! $found)
-                      //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
-                      return null;
-                 }
-                break;
-            } else {
-                //self::debug($__count);
-                //self::debug("WORKING");
-                $found = FALSE;
-                   $lshare = strtolower ($pu['share']);  # fix by Eric Leung
-                   if (is_array($_SESSION["disk"]) && isSet($_SESSION["disk"]) && is_array($_SESSION["disk"])) {
-                       foreach ($_SESSION["disk"] as $s) if ($lshare == strtolower($s)) {
-                           $found = TRUE;
-                           //self::debug("oh boy");
-                           $stat = stat (SMB4PHP_SMBTMP);
-                           break;
-                       }
-                   }
-                   if (! $found)
-                      //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
-                      return null;
-                break;
-             }
+                    if ($o = smb::look($pu)) {
+                        $_SESSION[$id."disk"] = $o['disk'];
+                        self::debug(print_r($_SESSION[$id."disk"], true));
+                        //self::debug(print_r($_ENV, true));
+                        $found = FALSE;
+                        $lshare = strtolower($pu['share']);  # fix by Eric Leung
+                        if (is_array($o) && isSet($o['disk']) && is_array($o['disk'])) {
+                            foreach ($o['disk'] as $s){
+                                if ($lshare == strtolower($s)) {
+                                    $found = TRUE;
+                                    //self::debug("DISK: " . $s);
+                                    $stat = stat(SMB4PHP_SMBTMP);
+                                    break;
+                                }}
+                        }
+                        if (!$found)
+                            //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
+                            return null;
+                    }
+                    break;
+                } else {
+                    //self::debug($__count);
+                    //self::debug("WORKING");
+                    $found = FALSE;
+                    $lshare = strtolower($pu['share']);  # fix by Eric Leung
+                    if (is_array($_SESSION[$id."disk"]) && isSet($_SESSION[$id."disk"]) && is_array($_SESSION[$id."disk"])) {
+                        foreach ($_SESSION[$id."disk"] as $s) if ($lshare == strtolower($s)) {
+                            $found = TRUE;
+                            //self::debug("oh boy");
+                            $stat = stat(SMB4PHP_SMBTMP);
+                            break;
+                        }
+                    }
+                    if (!$found)
+                        //trigger_error ("url_stat(): disk resource '{$share}' not found in '{$host}'", E_USER_WARNING);
+                        return null;
+                    break;
+                }
             case 'path':
                 //self::debug('before exe'.print_r($pu, true));
                 $o = smb::execute ('dir "'.$pu['path'].'"', $pu);
@@ -452,7 +463,7 @@ class smb
         smb::clearstatcache ($url_from);
         $res = smb::execute ('rename "'.$from['path'].'" "'.$to['path'].'"', $to);
         if(empty($res)) return true;
-        AJXP_Logger::info(__CLASS__, "SmbClient rename error: ".$res);
+        Logger::info(__CLASS__, "Smb Client", "SmbClient rename error: ".$res);
         return false;
     }
 
@@ -772,5 +783,5 @@ function ConvSmbParameterToWinOs($params)
 # Register 'smb' protocol !
 ###################################################################
 
-stream_wrapper_register('smbclient', 'smb_stream_wrapper')
+stream_wrapper_register('smbclient', 'Pydio\Access\Driver\StreamProvider\SMB\smb_stream_wrapper')
     or die ('Failed to register protocol');

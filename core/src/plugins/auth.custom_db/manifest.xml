@@ -19,7 +19,7 @@
         <param name="SQL_CUSTOM_TABLE_TEST_USER" type="string" label="CONF_MESSAGE[Test User]" description="CONF_MESSAGE[Use an existing user ID and click on Test Connexion to verify it is correctly found]" mandatory="false" />
         <param type="button" name="TEST_SQL" choices="run_plugin_action:auth.custom_db:testSQLConnexion" label="CONF_MESSAGE[Test Connexion]" description="CONF_MESSAGE[Test the SQL connexion]" mandatory="false"/>
     </server_settings>
-	<class_definition filename="plugins/auth.custom_db/class.customDbAuthDriver.php" classname="customDbAuthDriver"/>
+	<class_definition filename="plugins/auth.custom_db/CustomDbAuthDriver.php" classname="Pydio\Auth\Backend\CustomDbAuthDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
 	</registry_contributions>

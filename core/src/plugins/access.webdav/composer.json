@@ -1,0 +1,11 @@
+{
+    "name": "AccessWebdav",
+    "description": "Pydio WebDAV access through Guzzle Client",
+    "homepage": "http://pydio.com/",
+    "autoload": {
+        "psr-4": {
+            "Pydio\\Access\\Core\\": "../core.access/src",
+            "Pydio\\Access\\WebDAV\\": "./src/"
+        }
+    }
+}

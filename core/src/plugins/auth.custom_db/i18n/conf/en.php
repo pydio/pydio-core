@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Custom DB Auth Backend" => "Custom DB Auth Backend",
@@ -31,6 +31,8 @@ $mess=array(
 "How the password is minimaly hashed in the table" => "How the password is minimaly hashed in the table",
 "Test User" => "Test User",
 "Use an existing user ID and click on Test Connexion to verify it is correctly found" => "Use an existing user ID and click on Test Connexion to verify it is correctly found",
-"Test Connexion" => "Test Connexion",
-"Test the SQL connexion" => "Test the SQL connexion",
+"Test Connexion" => "Test Connection",
+"Test the SQL connexion" => "Test the SQL connection",
+"Connexion" => "Connexion",
+"The Database Connexion" => "The Database Connexion",
 );

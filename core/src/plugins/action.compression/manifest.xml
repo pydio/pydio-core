@@ -11,8 +11,8 @@
 
 	<registry_contributions>
         <extensions>
-            <extension mime="tar" icon="archive.png" messageId="61"/>
-            <extension mime="bz2" icon="archive.png" messageId="61"/>
+            <extension mime="tar" font="archive" icon="archive.png" messageId="61"/>
+            <extension mime="bz2" font="archive" icon="archive.png" messageId="61"/>
         </extensions>
         <actions>
             <action name="compression">
@@ -42,6 +42,9 @@
                                     while(userSelection.fileNameExists(name + extension)){
                                         name = tmpFileName + "-" + compteurFileName;
                                         compteurFileName ++;
+                                        if(compteurFileName > 20){
+                                            break;
+                                        }
                                     }
                                     archive_nameInput.setValue(name + extension);
                                     return name;
@@ -107,11 +110,6 @@
 				]]></clientForm>
                 </processing>
             </action>
-            <action name="check_compression_status">
-                <processing>
-                    <serverCallback methodName="receiveAction"/>
-                </processing>
-            </action>
             <action name="extraction">
                 <gui text="compression.9" title="compression.10" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
                     <context selection="true" dir="true" recycle="hidden"
@@ -138,14 +136,9 @@
                     <serverCallback methodName="receiveAction" pluginId="action.compression" />
                 </processing>
             </action>
-            <action name="check_extraction_status">
-                <processing>
-                    <serverCallback methodName="receiveAction"/>
-                </processing>
-            </action>
         </actions>
 	</registry_contributions>
-	<class_definition filename="plugins/action.compression/class.PluginCompression.php" classname="PluginCompression"/>
+	<class_definition filename="plugins/action.compression/PluginCompression.php" classname="Pydio\Action\Compression\PluginCompression"/>
     <dependencies>
         <activePlugin pluginName="access.fs"/>
     </dependencies>

@@ -1,13 +1,13 @@
 <img src="plugins/gui.ajax/PydioLogo250.png"/>
 <div style="padding-left:10px;"><div style="font-size:0.8em;">Version __AJXP_VERSION__ - __AJXP_VERSION_DATE__
-Copyright 2007-2014 Abstrium SAS
-The latest code can be found at http://pyd.io/.
+Copyright 2007-2016 Abstrium SAS
+The latest code can be found at https://pydio.com/.
 </div>
 ++ Getting Help ++
 Pydio is an open source software distributed without warranties and 'as is'. If you are encountering a bug or unexpected behavior, a great community is ready to help, given you respect some basic guidelines.
 
 [Configuration and Installation problems]
-The most complete Administrator Guide can be found on http://pyd.io/administrator/. It covers most configuration topics, and is handfully completed with a detailed set of How-To's describing more specific problems : http://pyd.io/knowledge-base-2/knowledge-base/.
+The most complete Administrator Guide can be found on https://pydio.com/en/docs. It covers most configuration topics, and is handfully completed with a detailed set of How-To's describing more specific problems : https://pydio.com/en/docs/kb.
 
 [Forum Help]
 If you can't find your answers in the standards docs, you can post to the forum. PLEASE read the rules below to make sure we keep the forum readable and organized, and to ensure you a proper response time.

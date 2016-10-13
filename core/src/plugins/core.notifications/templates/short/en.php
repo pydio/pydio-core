@@ -16,8 +16,9 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
+
 $mess=array(
     "file.add" => "File AJXP_NODE_LABEL created in AJXP_PARENT_PATH",
     "file.delete" => "File AJXP_NODE_LABEL deleted from AJXP_PARENT_PATH",
@@ -37,5 +38,6 @@ $mess=array(
     "folder.move_from" => "Folder AJXP_NODE_LABEL moved from AJXP_SOURCE_FOLDER",
     "file.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
     "folder.rename" => "AJXP_SOURCE_LABEL was renamed to AJXP_NODE_LABEL",
-
+    "share.file" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
+    "share.folder" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
 );

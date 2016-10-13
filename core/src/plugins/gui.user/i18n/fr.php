@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
     "1" => "Réinitialisation du mot de passe",
@@ -26,4 +26,5 @@ $mess=array(
     "5" => "Un courriel contenant une demande de réinitialisation du mot de passe a été envoyé à l'adresse courriel enregistrée dans votre compte. Cliquez sur le lien du courriel pour créer un nouveau mot de passe.",
     "6" => "Merci, vous pouvez à présent vous connecter avec ce nouveau mot de passe!",
     "7" => "Une demande de réinitialisation de mot de passe a été demandée pour le compte associé à ce courriel. Si vous n'en êtes pas l'auteur, vous pouvez ignorer ce courriel. Sinon cliquez sur le lien suivant :",
+    "8" => "Utilisez le formulaire pour remettre à zéro votre mot de passe. Entrez votre identifiant et votre nouveau mot de passe deux fois.",
 );

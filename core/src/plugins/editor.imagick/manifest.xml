@@ -4,7 +4,7 @@
         mimes="pdf,svg,tif,tiff,psd,xcf,eps,xls,xlsx,ods,doc,docx,odt,ppt,pptx,odp,rtf,cr2,ai" label="CONF_MESSAGE[Image Magick]"
         description="CONF_MESSAGE[Image Magick viewer supports PDF and various images formats preview. Requires external library to be installed on the server.]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/editor.imagick/class.IMagickPreviewer.php" classname="IMagickPreviewer"/>
+    <class_definition filename="plugins/editor.imagick/IMagickPreviewer.php" classname="Pydio\Editor\Image\IMagickPreviewer"/>
     <client_settings>
         <resources>
             <js file="plugins/editor.imagick/class.IMagickPreviewer.js" className="IMagickPreviewer"/>
@@ -22,7 +22,7 @@
 	</server_settings>
 	<registry_contributions>
 		<hooks>
-			<serverCallback hookName="node.change" methodName="deleteImagickCache"/>
+			<serverCallback hookName="node.change" methodName="deleteImagickCache" defer="true"/>
 		</hooks>
 		<actions>
 			<action name="imagick_data_proxy" contentTypedProvider="true">

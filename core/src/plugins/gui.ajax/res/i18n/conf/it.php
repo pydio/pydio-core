@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Client Plugin" => "Plugin Client",
@@ -79,4 +79,32 @@ $mess=array(
 "Fetch Window (repeat vertically)" => "Adatta alla pagina (ripetizione verticale)",
 "Fetch Window (no repeat)" => "Adatta alla pagina (senza ripetizione)",
 "Tile (repeat both directions)" => "Estendi (ripetizione in ogni direzione)",
+"Custom Background (1)" => "Custom background (1)",
+"Background Attributes (1)" => "Background attributes (1)",
+"Custom Background (2)" => "Custom background (2)",
+"Background Attributes (2)" => "Background attributes (2)",
+"Custom Background (3)" => "Custom background (3)",
+"Background Attributes (3)" => "Background attributes (3)",
+"Image used as a background" => "Image used as a background",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured.",
+"Detected Encoding" => "Detected Encoding",
+"Detected Server Path" => "Detected Server Path",
+"Application Title" => "Application Title",
+"Page Background Images" => "Page Background Images",
+"Minisite" => "Minisite",
+"Minisite Logo" => "Minisite Logo",
+"Top-right logo displayed on minisite page" => "Top-right logo displayed on minisite page",
+"User Home Logo" => "User Home Logo",
+"Web Session" => "Web Session",
+"Google Analytics Analytics ID" => "Google Analytics Analytics ID",
+"Google Analytics Analytics Domain" => "Google Analytics Analytics Domain",
+"Set the domain for your analytics reports (not mandatory!)" => "Set the domain for your analytics reports (not mandatory!)",
+"Google Analytics Analytics Events" => "Google Analytics Analytics Events",
+"Low-Resolution Background" => "Low-Resolution Background",
+"Make sure to use a smaller resolution image, otherwise mobile loading is very slow." => "Make sure to use a smaller resolution image, otherwise mobile loading is very slow.",
+"Background Attributes (Low Resolution)" => "Background Attributes (Low Resolution)",
+"Display Branding Tool" => "Display Branding Tool",
+"Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option.",
+"Use configured branding" => "Use configured branding",
+"Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option.",
 );

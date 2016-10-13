@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.html" order="0" text="51" title="162" className="MultiUploader" label="CONF_MESSAGE[HTML Uploader]" description="CONF_MESSAGE[Auto-switching HTML5 or IFrame uploader.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/uploader.html/class.SimpleUploadProcessor.php" classname="SimpleUploadProcessor"/>
+	<class_definition filename="plugins/uploader.html/SimpleUpload.php" classname="Pydio\Uploader\Processor\SimpleUpload"/>
     <server_settings>
         <global_param expose="true" name="DEFAULT_EXISTING" group="CONF_MESSAGE[Default Behaviour]" type="select" choices="overwrite|CONF_MESSAGE[Always Override],rename|CONF_MESSAGE[Auto Rename File],alert|CONF_MESSAGE[Prompt user]" label="CONF_MESSAGE[Existing Files]" description="CONF_MESSAGE[Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)]" mandatory="false" default="rename"/>
         <global_param expose="true" name="DEFAULT_AUTO_START" group="CONF_MESSAGE[Default Behaviour]" type="boolean" label="CONF_MESSAGE[Auto Start]" description="CONF_MESSAGE[Default value for automatically starting upload or not]" mandatory="false" default="true"/>
@@ -9,7 +9,9 @@
     <client_settings>
         <resources>
             <js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
-            <js file="plugins/uploader.html/class.XHRUploader.js" className="XHRUploader"/>
+            <js file="plugins/uploader.html/js/build/UploaderView.js" className="UploaderView" depends="React,PydioForm,UploaderModel"/>
+            <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel" depends="PydioTasks"/>
+            <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener"/>
             <i18n path="plugins/uploader.html/i18n" namespace="html_uploader"/>
         </resources>
     </client_settings>
@@ -37,170 +39,42 @@
 	</registry_contributions>
     <dependencies>
         <!-- Stream Wrapper Access, and dependancy to uploader.flex forces the order -->
-        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|action.quicksend"/>
+        <activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_home"/>
         <pluginClass pluginName="uploader.flex"/>
         <pluginClass pluginName="gui.ajax"/>
     </dependencies>
 	<processing>
-		<clientForm id="originalUploadForm"><![CDATA[
-			<!-- UPLOAD FORM -->
-			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="420">
-			<table>
-				<tr>
-				        <td id="fileInputContainer" valign="top"><div id="fileInputContainerDiv">
-				                <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
-				                <div id="uploadBrowseButton" class="fakeUploadButton"><img src="AJXP_THEME_FOLDER/images/actions/22/view_list_details.png"><br/>AJXP_MESSAGE[171]</div>
-				                <div id="uploadSendButton" class="fakeUploadButton"><img src="AJXP_THEME_FOLDER/images/actions/22/yast_backup.png"><br/>AJXP_MESSAGE[77]</div>
-				        </div></td>
-				        <td rowspan="2" id="uploadFilesListContainer">
-				                <div id="upload_files_list" class="uploadFilesList"></div>
-				        </td>
-				</tr>
-				<tr>
-				        <td id="optClosButtonsContainer">
-				                <div class="fakeUploadButton fakeOptionButton" id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></div>
-				                <div class="fakeUploadButton fakeOptionButton" id="uploadCloseButton">AJXP_MESSAGE[86]</div>
-				        </td>
-				</tr>
-			</table>
-			<input type="hidden" name="get_action" value="upload">
-			<input type="hidden" name="simple_uploader" value="true">
-			</form>
-			<script language="javascript">$('originalUploadForm').hide();</script>
-		]]></clientForm>
-        <clientForm id="originalUploadForm" theme="vision"><![CDATA[
-			<!-- UPLOAD FORM -->
-			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="500" box_padding="0">
-			<div style="padding:10px;">
-                <div id="fileInputContainer">
-                    <div id="uploaderTextActions">
-                        <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
-                        <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
-                        <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
-                    </div>
-                    <div id="fileInputContainerDiv">
-                            <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
-                            <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
-                    </div>
-                </div>
-                <div id="uploader_options_pane"></div>
-                <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
-                <div id="total_files_list"></div>
-                <input type="hidden" name="get_action" value="upload">
-                <input type="hidden" name="simple_uploader" value="true">
-			</div>
-			</form>
-			<script language="javascript">$('originalUploadForm').hide();</script>
-		]]></clientForm>
-        <clientForm id="originalUploadForm" theme="orbit"><![CDATA[
-			<!-- UPLOAD FORM -->
-			<form action="AJXP_SERVER_ACCESS" target="hidden_iframe" enctype="multipart/form-data" method="POST" id="originalUploadForm" style="text-align:left; display:none;" box_width="60%" box_padding="0">
-			<div style="padding:10px;">
-                <div id="fileInputContainer">
-                    <div id="uploaderTextActions">
-                        <span id="uploadSendButton">AJXP_MESSAGE[77] |</span>
-                        <span id="clear_list_button">AJXP_MESSAGE[216] |</span>
-                        <span id="uploadOptionsButton">AJXP_MESSAGE[310] <span style="display:none;">[x]</span></span>
-                    </div>
-                    <div id="fileInputContainerDiv">
-                            <div id="fileInputPos"><input type="file" name="userfile_1" class="dialogFocus"></div>
-                            <div id="uploadBrowseButton" class="fakeUploadButton"><span class="icon-desktop"></span>AJXP_MESSAGE[454]</div>
-                    </div>
-                </div>
-                <div id="uploader_options_pane"></div>
-                <div id="upload_files_list" class="uploadFilesList rowAsProgressBar"></div>
-                <div id="total_files_list"></div>
-                <input type="hidden" name="get_action" value="upload">
-                <input type="hidden" name="simple_uploader" value="true">
-			<div>
-			</form>
-			<script language="javascript">$('originalUploadForm').hide();</script>
+        <clientForm id="upload_main_container" theme="orbit"><![CDATA[
+			<div id="upload_main_container" box_width="60%" box_padding="0" style="padding:10px;"><div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
-			    if(pydio.getController().multi_selector && pydio.getController().multi_selector.__className == 'XHRUploader'){
-			        pydio.getController().multi_selector.initialize(oForm);
-			    }else{
-    				pydio.getController().multi_selector = new XHRUploader(oForm);
-                }
+                pydio.getController().react_selector = new AjxpReactComponent(oForm.down("#upload_main_container"), {
+                    componentNamespace:"UploaderView",
+                    componentName:"DropUploader",
+                    dependencies:["UploaderModel","PydioForm"]
+                });
 			}else{
 				pydio.getController().multi_selector = new MultiUploader(oForm);
 			}
 		]]></dialogOnOpen>
+        <dialogOnComplete><![CDATA[
+            if(pydio.getController().react_selector){
+                pydio.getController().react_selector.destroy();
+                pydio.getController().react_selector = null;
+            }
+        ]]></dialogOnComplete>
 		<extensionOnInit><![CDATA[
-		if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"
-		       && 'draggable' in new Element('span') && (window.FileReader || window.FormData)
-		       && ajaxplorer && ajaxplorer.user && ajaxplorer.user.write
-	    	){
-			var dropzones = $$('[ajxpClass="FilesList"]');
-			if(dropzones.length){
-			    var dropzone = dropzones[0];
-                dropzone.addClassName('droparea');
-                var selector = '#content_pane,div.webfx-tree-item,.ajxpNodeProvider';
-                var dragOverFunc = function(event) {
-                    var el = Event.findElement(event, selector);
-                    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
-                        el = Event.findElement(event, '#content_pane');
-                    }
-                    el.addClassName("dropareaHover");
-                    event.preventDefault();
-                };
-                var dropFunc = function(event) {
-                    event.preventDefault();
-                    var el = Event.findElement(event, selector);
-                    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
-                        el = Event.findElement(event, '#content_pane');
-                    }
-                    el.removeClassName("dropareaHover");
-                    if(!window.UploaderInstanceRunning){
-                        var items = event.dataTransfer.items || [];
-                        if (event.dataTransfer.files.length && items[0] && (items[0].getAsEntry || items[0].webkitGetAsEntry)) {
-                            window.UploaderDroppedItems = items;
-                            window.UploaderDroppedFiles = event.dataTransfer.files;
-                            window.UploaderDroppedTarget = el;
-                            pydio.getController().fireAction('upload');
-                        }else if(event.dataTransfer.files.length){
-                            window.UploaderDroppedFiles = event.dataTransfer.files;
-                            window.UploaderDroppedTarget = el;
-                            pydio.getController().fireAction('upload');
-                        }
-                    }
-                };
-                var enterFunc = function(){
-                    var el = Event.findElement(event, selector);
-                    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
-                        el = Event.findElement(event, '#content_pane');
-                    }
-                    el.addClassName("dropareaHover");
-                };
-                var leaveFunc = function(){
-                    var el = Event.findElement(event, selector);
-                    if(el.hasClassName('ajxpNodeProvider') && el.ajxpNode.isLeaf()){
-                        el = Event.findElement(event, '#content_pane');
-                    }
-                    el.removeClassName("dropareaHover");
-                };
-                AjxpDroppables.dragOverHook = dragOverFunc;
-                AjxpDroppables.dropHook = dropFunc;
-                AjxpDroppables.dragEnterHook = enterFunc;
-                AjxpDroppables.dragLeaveHook = leaveFunc;
-                dropzone.addEventListener("dragover", dragOverFunc, true);
-                dropzone.addEventListener("drop", dropFunc, true);
-                dropzone.addEventListener("dragenter", enterFunc, true);
-                dropzone.addEventListener("dragleave", leaveFunc, true);
-                document.observeOnce("ajaxplorer:trigger_repository_switch", function(){
-                    dropzone.removeClassName('droparea');
-                    dropzone.removeEventListener("dragover", dragOverFunc, true);
-                    dropzone.removeEventListener("drop", dropFunc, true);
-                    dropzone.removeEventListener("dragenter", enterFunc, true);
-                    dropzone.removeEventListener("dragleave", leaveFunc, true);
-                    AjxpDroppables.dragOverHook = null;
-                    AjxpDroppables.dropHook = null;
-                    AjxpDroppables.dragEnterHook = null;
-                    AjxpDroppables.dragLeaveHook = null;
-                });
-			}
-		}
+            var pydioUserWriteable = pydio && pydio.user && pydio.user.write;
+            var dragSupported = 'draggable' in new Element('span');
+            var fileUploadSupported = typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined" && (window.FileReader || window.FormData);
+            if(fileUploadSupported && dragSupported && pydioUserWriteable){
+                try{
+                    ResourcesManager.loadClassesAndApply(["UploaderGlobalListener","UploaderModel"], function(){
+                        UploaderGlobalListener.initUploaderExtension();
+                    });
+                }catch(e){}
+            }
 		]]></extensionOnInit>
 	</processing>
 </uploader>

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -76,7 +76,7 @@ Class.create("AjxpPane", {
         }
 
         this.configObserver = function(event){
-            if(event.memo.className == "AjxpPane::"+htmlElement.id){
+            if(event.memo.className == this.__className +"::"+ htmlElement.id){
                 this.parseComponentConfig(event.memo.classConfig.get("all"));
             }
         }.bind(this);
@@ -104,6 +104,19 @@ Class.create("AjxpPane", {
             this.scrollbar = new Control.ScrollBar(this.htmlElement,this.scroller, {fixed_scroll_distance:50});
         }
 
+        if(this.options.classNamesOn){
+            this._classNamesOnListeners = {};
+            for(var className in this.options.classNamesOn){
+                if(!this.options.classNamesOn.hasOwnProperty(className)) continue;
+                var data = this.options.classNamesOn[className];
+                var eventName = data["event"];
+                var memoKey = data["memoKey"];
+                var listener = this.classNameOnListener.bind(this, className, memoKey);
+                document.observe("ajaxplorer:" + eventName, listener);
+                this._classNamesOnListeners[eventName] = listener;
+            }
+        }
+
         var cPref = this.getUserPreference('rootElementClassPreference');
         if(cPref){
             if(Object.isString(cPref))cPref= {className:cPref};
@@ -123,11 +136,24 @@ Class.create("AjxpPane", {
 
     },
 
+    classNameOnListener:function(className, memoKey, event){
+        var add = false;
+        try{
+            add = event.memo[memoKey];
+        }catch(e){}
+        if(add) {
+            this.htmlElement.addClassName(className);
+        } else {
+            this.htmlElement.removeClassName(className);
+        }
+    },
+
     parseComponentConfig: function(domNode){
         var contentNodes = XMLUtils.XPathSelectNodes(domNode, "additional_content");
         // Check additional classes
         var detectedClasses = $H();
         contentNodes.each(function(n){
+            if(!n.firstChild) return;
             var cdataContent = n.firstChild.nodeValue;
             if(cdataContent){
                 detectedClasses = detectedClasses.merge(pydio.UI.findAjxpClassesInText(cdataContent));
@@ -136,6 +162,9 @@ Class.create("AjxpPane", {
         ResourcesManager.loadClassesAndApply(detectedClasses.keys(), function(){
             var change = false;
             contentNodes.each(function(addNode){
+                if(!addNode.firstChild){
+                    return;
+                }
                 var cdataContent = addNode.firstChild.nodeValue;
                 var anchor = this.htmlElement;
                 if(cdataContent && anchor){
@@ -311,6 +340,12 @@ Class.create("AjxpPane", {
         }
         if(this.configObserver){
             document.stopObserving("ajaxplorer:component_config_changed", this.configObserver);
+        }
+        if(this._classNamesOnListeners){
+            for (var k in this._classNamesOnListeners){
+                if(!this._classNamesOnListeners.hasOwnProperty(k)) continue;
+                document.stopObserving("ajaxplorer:" + k, this._classNamesOnListeners[k]);
+            }
         }
 	},
 

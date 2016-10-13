@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Custom DB Auth Backend" => "Benutzerdefinierte Datenbank",
@@ -33,4 +33,6 @@ $mess=array(
 "Use an existing user ID and click on Test Connexion to verify it is correctly found" => "Ein im bestehenden System existierender Benutzer, der für den Test der Verbindung verwendet wird",
 "Test Connexion" => "Verbindung testen",
 "Test the SQL connexion" => "SQL-Verbindung testen",
+"Connexion" => "Verbindung",
+"The Database Connexion" => "Die Datenbankverbindung",
 );

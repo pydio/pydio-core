@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
@@ -28,5 +28,17 @@ $mess=array(
 "Region" => "Area",
 "S3 storage region" => "Area di memoria S3",
 "Container" => "Contenitore",
-"Root container in the S3 storage" => "Contenitore nello spazio di storage S3"
+"Root container in the S3 storage" => "Contenitore nello spazio di storage S3",
+"Open Stack (Swift)" => "Open Stack (Swift)",
+"Access Open Stack Object Storage via Swift API" => "Access Open Stack Object Storage via Swift API",
+"Username" => "Username",
+"User email as you enter it to log to the console" => "User email as you enter it to log to the console",
+"Console Password" => "Console Password",
+"Tenant ID" => "Tenant ID",
+"Tenant ID (see API Keys page)" => "Tenant ID (see API Keys page)",
+"Endpoint" => "Endpoint",
+"Endpoint (see API Keys page, Identity endpoint)" => "Endpoint (see API Keys page, Identity endpoint)",
+"Your region identifier" => "Your region identifier",
+"Base Container" => "Base Container",
+"Console password" => "Console password",
 );

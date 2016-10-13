@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Conf Features" => "Generic Conf Features",
@@ -86,4 +86,8 @@ $mess=array(
 "Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex." => "Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex.",
 "Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex." => "Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex.",
 "External Users Creation" => "External Users Creation",
+"Always override other roles, included group roles." => "Always override other roles, included group roles.",
+"Always Override" => "Always Override",
+"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP.",
+"Make regexp mandatory" => "Make regexp mandatory",
 );

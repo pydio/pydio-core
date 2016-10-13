@@ -133,6 +133,11 @@ class AjxpNode extends Observable{
         return null;
     }
 
+    isMoreRecentThan(otherNode){
+        return otherNode.getMetadata().get("ajxp_im_time") && this.getMetadata().get("ajxp_im_time")
+            && parseInt(this.getMetadata().get("ajxp_im_time")) >= parseInt(otherNode.getMetadata().get("ajxp_im_time"));
+    }
+
     /**
      * Adds a child to children
      * @param ajxpNode AjxpNode The child
@@ -142,11 +147,17 @@ class AjxpNode extends Observable{
         if(this._iNodeProvider) ajxpNode._iNodeProvider = this._iNodeProvider;
         var existingNode = this.findChildByPath(ajxpNode.getPath());
         if(existingNode && !(existingNode instanceof String)){
-            existingNode.replaceBy(ajxpNode, "override");
+            if(!existingNode.isMoreRecentThan(ajxpNode)){
+                existingNode.replaceBy(ajxpNode, "override");
+                return existingNode;
+            }else{
+                return false;
+            }
         }else{
             this._children.set(ajxpNode.getPath(), ajxpNode);
             this.notify("child_added", ajxpNode.getPath());
         }
+        return ajxpNode;
     }
     /**
      * Removes the child from the children
@@ -158,6 +169,11 @@ class AjxpNode extends Observable{
         ajxpNode._parentNode = null;
         this._children.delete(ajxpNode.getPath());
         this.notify("child_removed", removePath);
+    }
+
+    replaceMetadata(newMeta){
+        this._metadata = newMeta;
+        this.notify("meta_replaced", this);
     }
 
     /**

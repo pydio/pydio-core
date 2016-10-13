@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 
@@ -156,7 +156,7 @@ Class.create("AjxpDraggable", Draggable, {
 			var max = Math.min(nodes.length,5);
 			var maxWidth = 0;
 			for(var i=0;i<max;i++){
-				var text = nodes[i].getLabel() + (i<max-1?",<br>":"");
+				var text = he.escape(nodes[i].getLabel()) + (i<max-1?",<br>":"");
 				maxWidth = Math.max(maxWidth, testStringWidth(text));
 				this._clone.insert(text);
 			}

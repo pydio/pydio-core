@@ -16,15 +16,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
+  //	Spanish translation: Salva Gómez <salva.gomez at gmail.com> 2016
 $mess=array(
 "1" => "Nueva ventana",
 "2" => "Navegador en nueva ventana",
 "3" => "Abriendo el fichero en una ventana externa, espere por favor, esta ventana se cerrará automáticamente.",
-    "4" => "New URL Bookmark",
-    "5" => "Alternatively, you can <a>create a new bookmark to an URL</a>",
-    "6" => "Enter an URL starting with http/https",
-    "7" => "URL Bookmark",
-    "8" => "Enter a label for this bookmark"
+    "4" => "Nuevo marcador URL",
+    "5" => "De manera alternativa, puede <a>crear un nuevo marcador a una URL</a>",
+    "6" => "Introduzca una URL empezando por http/https",
+    "7" => "Marcador URL",
+    "8" => "Introduzca una etiqueta para este marcador"
 );

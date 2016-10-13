@@ -142,7 +142,8 @@ Class.create("Splitter", AjxpPane, {
 		this.resizeGroup(null, startB || this.paneA._init || Math.round((this.group[this.options.offsetAdjust]-this.group._borderAdjust-this.splitbar._adjust)/2));
 
         this.userLoggedObs = function(){
-            var sizePref = this.getUserPreference("size");
+            //var sizePref = this.getUserPreference("size");
+            var sizePref = null;
             var folded = this.getUserPreference("folded");
 			if(sizePref){
                 if(folded) this.moveSplitter(parseInt(sizePref));
@@ -236,7 +237,7 @@ Class.create("Splitter", AjxpPane, {
         var options = {
             name: oThis.htmlElement.id + '_folding_action',
             src:'view_left_close.png',
-            icon_class:'icon-remove-sign',
+            icon_class:'mdi mdi-close',
             text_id:(oThis.options.foldingButtonText?oThis.options.foldingButtonText:416),
             title_id:(oThis.options.foldingButtonText?oThis.options.foldingButtonText:415),
             text:MessageHash[(oThis.options.foldingButtonText?oThis.options.foldingButtonText:416)],
@@ -269,7 +270,7 @@ Class.create("Splitter", AjxpPane, {
             var options2 = {
                 name:'folding_close_action',
                 src:'view_left_close.png',
-                icon_class:'icon-remove-sign',
+                icon_class:'mdi mdi-close',
                 text_id:416,
                 title_id:415,
                 text:MessageHash[416],
@@ -380,13 +381,14 @@ Class.create("Splitter", AjxpPane, {
         if(!pane) pane = this.foldedPane;
         if(!this.paneA) return;
         var state = this.splitbar.hasClassName("folded");
+        document.fire("ajaxplorer:"+this.htmlElement.id+"-fold-status", {"folded":state});
         if(!this.getFoldingAction()) return;
         if(this.options.foldingAlternateClose){
             this.getFoldingAction()[(state?"enable":"disable")]();
         }else{
             this.getFoldingAction().setIconSrc(
                 'view_left_'+ (state?'right':'close') + '.png',
-                (state?(pane == this.paneA?'icon-caret-right':'icon-caret-left'):'icon-remove-sign'));
+                (state?(pane == this.paneA?'icon-caret-right':'icon-caret-left'):'mdi mdi-close'));
         }
         if(pane == this.paneA && $(this.paneA).ajxpPaneObject){
             $(this.paneA).ajxpPaneObject.resize();
@@ -564,7 +566,7 @@ Class.create("Splitter", AjxpPane, {
 		if($(this.paneB).ajxpPaneObject){
 			$(this.paneB).ajxpPaneObject.resize();
 		}
-        this.setUserPreference("size", this.getCurrentSize());
+        //this.setUserPreference("size", this.getCurrentSize());
 	},
 	/**
 	 * Move the splitter object

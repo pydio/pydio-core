@@ -8,4 +8,5 @@ $mess=array(
 "Gravatar type" => "Type Gravatar",
 "Provider" => "Fournisseur",
 "Choose an avatar web service" => "Choisissez un service web d'avatar",
+"Avatars" => "Avatars",
 );

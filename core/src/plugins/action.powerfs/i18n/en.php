@@ -16,11 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     // will be replaced by the application title
-    "1" => "Creating archive, please wait",
+    "1" => "Launching archive creation in background, please wait.",
     "2" => "Reload current folder",
     "3" => "Archive download should start automatically",
+    "4" => "Creating archive - %s% done",
+    "5" => "Cannot find corresponding archive for download! Did you make sure to install the Zip binary on your server?",
 );

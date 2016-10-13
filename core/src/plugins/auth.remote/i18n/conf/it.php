@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Remote authentication" => "Autenticazione Remota",
@@ -59,4 +59,7 @@ $mess=array(
 "Main page of your Drupal installation that contains a login form. When not logged, accessing Pydio will redirect to this page. It's also used for the API calls for logging in a user from within Pydio. Make sure it does contain a login form." => "Pagina principale dell'installazione Drupal che contiene la form di login. Quando non loggato, accedendo a Pydio si verrà reindirizzati a questa pagina. E' anche utilizzato per le chiamate delle API durante il login in Pydio. Assicurati che contenga la form di login!.",
 "Custom Auth Function" => "Funzione Autenticazione Personalizzata",
 "User-defined function for performing real password check, necessary for REST API (including iOS client). Add this function inside the plugin cms_auth_functions.php file" => "Funzione definita lato utente, per consentire il controllo della password, necessario per l'uso delle REST API (iOS incluso). Aggiungi questa funzione nel file 'cms_auth_functions.php'",
+"Custom" => "Custom",
+"Back to main page" => "Back to main page",
+"Logout" => "Logout",
 );

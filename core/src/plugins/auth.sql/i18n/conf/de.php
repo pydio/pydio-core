@@ -16,14 +16,14 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"DB Storage" => "DB Speicher",
+"DB Storage" => "DB-Speicher",
 "Stores the Authentication data in an SQL database." => "Speichert Authentifizierungsdaten in einer SQL-Datenbank.",
 "Connexion" => "Verbindung",
 "The Database Connexion" => "Die Datenbankverbindung",
 "DB Auth Storage" => "Datenbank-Speicher",
 "SQL Tables" => "SQL Tabellen",
-"Install SQL Tables" => "SQL Tabellen installieren",
+"Install SQL Tables" => "SQL-Tabellen installieren",
 );

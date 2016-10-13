@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : Simple display of SVN logs.
  */
 Class.create("HistoryBrowser", {
@@ -66,7 +66,6 @@ Class.create("HistoryBrowser", {
 
         this.toolbarObject = new ActionsToolbar(this.toolbar, {
             buttonRenderer : 'this',
-            skipBubbling: true,
             toolbarsList : $A(['history']),
             dataModelElementId: this.element.id
         });

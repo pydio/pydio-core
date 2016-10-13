@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 $mess = array(
@@ -26,14 +26,14 @@ $mess = array(
     "3" => "Leer",
     "4" => "Ausgewählten Korb leeren",
     "5" => "Neu",
-    "6" => "Neuen Korb anlegen",
-    "7" => "Download",
+    "6" => "Neuen Korb erstellen",
+    "7" => "Herunterladen",
     "8" => "Inhalt des ausgewählten Korbs herunterladen",
     "9" => "Standard-Korb",
     "10"=> "Körbe",
-    "11"=> "Inhalt des ausgewählten Korbs komprimieren und teilen",
-    "12"=> "Archiv aus Auswahl erstellen und dieses teilen",
+    "11"=> "Inhalt des ausgewählten Korbs komprimieren und freigeben",
+    "12"=> "Archiv aus Auswahl erstellen und freigeben",
     "13"=> "Name des Korbs",
-    "14"=> "Archiv aus allen Dateien des Korbs erstellen und teilen. Bitte einen Namen für das Archiv angeben:",
-    "15"=> "Elemente in den Korb legen, um sie später herunter zu laden oder zu teilen.",
+    "14"=> "Archiv aus allen Dateien des Korbs erstellen und freigeben. Bitte einen Namen für das Archiv angeben:",
+    "15"=> "Elemente in den Korb legen, um sie später herunterzuladen oder freizugeben.",
 );

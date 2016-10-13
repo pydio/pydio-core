@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
- */
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <https://pydio.com>.
+*/
 $mess=array(
 "1" => "Configuratie Gegevens",
 "2" => "Gebruikers & Groepen",
@@ -154,27 +154,41 @@ $mess=array(
 "130" => "Clear plugins cache, can be necessary to see new plugins appear in the list.",
 "131" => "Plugins cache files were deleted succesfully!",
 "132" => "Cache cleared, but you are currently running in SKIP_CACHE mode (see bootstrap_context.php).",
-    "133" => "Core application parameters",
-    "134" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
-    "135" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
-    "136" => "Global configurations of the application core and of each plugin. Enable/disable plugins",
-    "137" => "Day-to-day administration of the application : who accesses to what, create roles, etc.",
-    "138" => "Create and delete workspaces, add features to them using meta sources.",
-    "139" => "Manage users and groups",
-    "140" => "Define profiles that can be applied at once to whole bunch of users.",
-    "141" => "Administrator tasks to monitor the application state.",
-    "142" => "Monitor all activities happening on the server",
-    "143" => "Read the start-up diagnostic",
-    "144" => "Developer Resources",
-    "145" => "Generated documentations for developers",
-    "146" => "Actions API",
-    "147" => "List all actions contributed by all plugins and visualize their input parameters",
-    "148" => "Hooks Definitions",
-    "149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
-    "150" => "Select a repository",
-    "151" => "Root Group",
-    "152" => "Root Group Role",
-    "153" => "Applies to the whole hierarchy of users",
-
+"133" => "Core application parameters",
+"134" => "Enable/disable additional feature-oriented plugins, check if they are correctly working, set up global parameters of the plugins.",
+"135" => "Enable/disable core plugins (auth, conf, mail, etc), check if they are correctly working. Configuration of these plugins are generally done through the Main Options",
+"136" => "Global configurations of the application core and of each plugin. Enable/disable plugins",
+"137" => "Day-to-day administration of the application : who accesses to what, create roles, etc.",
+"138" => "Create and delete workspaces, add features to them using meta sources.",
+"139" => "Manage users and groups",
+"140" => "Define profiles that can be applied at once to whole bunch of users.",
+"141" => "Administrator tasks to monitor the application state.",
+"142" => "Monitor all activities happening on the server",
+"143" => "Read the start-up diagnostic",
+"144" => "Developer Resources",
+"145" => "Generated documentations for developers",
+"146" => "Actions API",
+"147" => "List all actions contributed by all plugins and visualize their input parameters",
+"148" => "Hooks Definitions",
+"149" => "List all hooks triggered in the application, their documentation, where there are triggered and which plugin listen to them.",
+"150" => "Select a repository",
+"151" => "Root Group",
+"152" => "Root Group Role",
+"153" => "Applies to the whole hierarchy of users",
+"154" => "Repository Templates",
+"155" => "Access Drivers",
+"156" => "Standard", // user type standard
+"157" => "Administrator",
+"158" => "Shared", // user type shared
+"159" => "Guest",
+"160" => "Group was successfully created",
+"161" => "You are attempting to move yourself inside a group, and you will loose super-admininistrative rights. Please login as another user if you really want to do that. Aborting.",
+"162" => "You are not authorized to update user %s",
+"163" => "Roles reordered for user %s",
+"164" => "Successfully updated roles",
+"165" => "Successfully saved user preferences",
+"166" => "Successfully set lock (%1) on user (%2)",
+"167" => "Successfully unlocked user (%s)",
+"168" => "%1 users were moved to group %2",
+"169" => "No users were moved, there must have been something wrong!",
 );
-

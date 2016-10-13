@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //
 //      Maintained by DepaMarco
@@ -68,7 +68,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "File",
 "24" => "Cartella superiore",
-"25" => "Invia uno o più file (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") nella cartella : ",
+"25" => "Invia uno o più file (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") nella cartella : ",
 "26" => "Crea una nuova cartella in: ",
 "27" => "Carica",
 "28" => "Crea un nuovo file in in: ",
@@ -528,7 +528,7 @@ $mess=array(
 "detail_access_key" => "D",
 "date_relative_date" => "il DATE",
 "date_relative_time" => "TIME",
-"date_relative_date_format" => "Y/m/d",
+"date_relative_date_format" => "d F Y",
 "date_relative_time_format" => "H:i",
 "date_relative_today" => "oggi alle TIME",
 "date_relative_yesterday" => "ieri alle TIME",
@@ -544,7 +544,7 @@ $mess=array(
 "467" => "Tutti gli elementi condivisi",
 "468" => "My Workspaces",
 "469" => "Condivisi con me",
-"470" => "Creato il %date",
+"470" => "Creato %date",
 "471" => "Creato da %user %date",
 "472" => "Condiviso da %user",
 "473" => "Condiviso da %user %date",
@@ -604,8 +604,8 @@ $mess=array(
 "527"=> "Condiviso con",
 "528"=> "Utenti Interni",
 "530"=> "Utenti Esterni",
-"531"=> "Int.",
-"532"=> "Est.",
+"531"=> "Users",
+"532"=> "Groups",
 "533" => "Identifier used to login, please use alphanumeric or email lowercase characters.",
 "534" => "Password used to login",
 "535" => "Send password by email",
@@ -638,6 +638,8 @@ $mess=array(
 "plugtype.desc.boot" => "Plugin unico, per il caricamento del framework.",
 "plugtype.title.conf" => "Memorizzazione Configurazioni",
 "plugtype.desc.conf" => "Come i dati di configurazione sono memorizzati nel beckend",
+"plugtype.title.cache" => "Cache server",
+"plugtype.desc.cache" => "Unique plugin to set up the cache server used by the application",
 "plugtype.title.feed" => "Memorizzazione Eventi",
 "plugtype.desc.feed" => "Implementazioni per la memorizzazione degli eventi (al momento, solo SQL)",
 "plugtype.title.log" => "Loggers",
@@ -646,13 +648,28 @@ $mess=array(
 "plugtype.desc.mailer" => "Strumenti per consentire all'applicazione di inviare email",
 "plugtype.title.mq" => "Messaggistica Istantanea",
 "plugtype.desc.mq" => "Implementazione di un semplice server PUB/SUB",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
 "537" => "Il file è troppo grande! La dimensione massima autorizzata è %i",
 "538" => "Errore caricamento: nessun file trovato sul server!",
 "539" => "Errore caricamento: il file è parziale",
 "540" => "Errore caricamento: impossibile trovare la cartella temporanea",
 "541" => "Errore caricamento: non è possibile scrivere nella cartella temporanea",
 "542" => "Errore caricamento: un'estensione PHP ha bloccato il processo di caricamento",
-"543" => "Risultati limitati a 100 su %s.",
+"543" => "Risultati limitati a %s.",
 "544" => "Visualizza tutti",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

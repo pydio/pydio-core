@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "file.add" => "Dentro da Área de Trabalho AJXP_REPOSITORY_LABEL, o ficheiro AJXP_NODE_LABEL foi criado dentro de AJXP_PARENT_PATH AJXP_DATE por AJXP_USER.",
@@ -43,4 +43,6 @@ $mess=array(
 "folder.move_from" => "A pasta AJXP_NODE_LABEL foi movida de AJXP_SOURCE_FOLDER AJXP_DATE, por AJXP_USER.",
 "ajxp_URL" => "Clique aqui para ir directamente para <a href='AJXP_URL'>AJXP_NODE_LABEL</a>",
 "ajxp_link" => "Click here to get go directly to <a href='AJXP_LINK'>AJXP_NODE_LABEL</a>",
+"file.share" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
+"folder.share" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
 );

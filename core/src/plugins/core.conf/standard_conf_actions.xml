@@ -15,6 +15,12 @@
                 </serverCallback>
             </processing>
         </action>
+        <action name="user_state">
+            <!-- Alias to "state" for API V2 -->
+            <processing>
+                <serverCallback methodName="switchAction"/>
+            </processing>
+        </action>
 		<action name="switch_repository">
 			<processing>
 				<serverCallback methodName="switchAction"/>
@@ -88,7 +94,7 @@
                        conn.onComplete = function(transport){
                             conn.TPL_XML = transport.responseXML;
                             var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*39+25);
+                            conn.ORIGINAL_HEIGHT = (templates.length*47 + 21);
                             $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                             $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
                             for(var i=0;i<templates.length;i++){
@@ -184,7 +190,7 @@
                 <clientListener name="init"><![CDATA[
                 window.setTimeout(function(){
                     if(!$('get_bookmarks_button')) {
-                        if(!ajaxplorer.bookmarkBar) ajaxplorer.bookmarkBar = new BookmarksBar(null, {});
+                        if(!pydio.bookmarkBar) pydio.bookmarkBar = new BookmarksBar(null, {});
                         return;
                     }
                     if(!window.BookmarksBar) return;
@@ -202,7 +208,7 @@
                         image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
                         icon_class:'icon-plus-sign',
                         callback:function(e){
-                            var node = ajaxplorer.getContextNode();
+                            var node = pydio.getContextNode();
                             node.getMetadata().set('ajxp_bookmarked', 'true');
                             node.getMetadata().set('overlay_icon', 'bookmark.png');
                             node.getMetadata().set('overlay_class', 'icon-bookmark');
@@ -262,8 +268,8 @@
                 <clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
                         var f = new FormManager();
-                          var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
-                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, ajaxplorer.user.preferences, false, true);
+                          var definitions = f.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
+                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, pydio.user.preferences, false, true);
                           modal.refreshDialogPosition();
                     ]]></dialogOnOpen>
                     <dialogOnComplete hideDialog="true"><![CDATA[
@@ -280,7 +286,7 @@
                                   if(event.memo != "user/preferences") return;
                                   pydio.Registry.logXmlUser();
                               });
-                              ajaxplorer.loadXmlRegistry(false, "user/preferences");
+                              pydio.loadXmlRegistry(false, "user/preferences");
                           };
                           conn.sendAsync();
                     ]]></dialogOnComplete>
@@ -315,32 +321,23 @@
                                 var values = $H(transport.responseJSON);
                                 values.set("existing_user_id", user_id);
 
-                                var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
-                                for(var i=0;i<params.length;i++){
-                                    params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-                                }
                                 var f = new FormManager();
-                                var def1 = $A();
-                                def1.push($H({
-                                    description: MessageHash[522],
-                                    editable: "true",
-                                    expose: "true",
-                                    label: MessageHash[522],
-                                    name: "existing_user_id",
-                                    scope: "user",
-                                    type: "hidden"
-                                }),$H({
-                                    description: MessageHash[524],
-                                    editable: "true",
-                                    expose: "true",
-                                    label: MessageHash[524],
-                                    name: "new_password",
-                                    scope: "user",
-                                    type: "password-create"
-                                }));
-                                var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
-                                definitions.each(function(el){ def1.push(el); });
-                                f.createParametersInputs(oForm.down('#user_create_user'), def1, true, values, false, true);
+                                var parameters = [];
+                                PydioUsers.Client.getCreateUserParameters().map(function(obj){
+                                    if(obj.type === 'valid-password') {
+                                        obj.type = 'password-create';
+                                    }
+                                    if(obj.name === 'new_user_id'){
+                                        obj.name = 'existing_user_id';
+                                        obj.type = 'hidden';
+                                    }
+                                    if(obj.name === 'send_email'){
+                                        return;
+                                    }
+                                    parameters.push($H(obj));
+                                });
+
+                                f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, values, false, true);
                                 modal.refreshDialogPosition();
 
                             };
@@ -360,7 +357,7 @@
                                    if($("address_book")){
                                         $("address_book").ajxpPaneObject.reloadDataModel();
                                   }
-                                  ajaxplorer.displayMessage("SUCCESS", MessageHash[521]);
+                                  pydio.displayMessage("SUCCESS", MessageHash[521]);
                                 }
                           };
                           conn.sendAsync();
@@ -378,48 +375,28 @@
             <processing>
                 <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
-                        var params = $A(ajaxplorer.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(','));
-                        for(var i=0;i<params.length;i++){
-                            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-                        }
+                        var parameters = PydioUsers.Client.getCreateUserParameters().map(function(obj){
+                            if(obj.type === 'valid-password') obj.type = 'password-create';
+                            return $H(obj)
+                        });
                         var f = new FormManager();
-                        var def1 = $A();
-                        def1.push($H({
-                            description: MessageHash[522],
-                            editable: "true",
-                            expose: "true",
-                            label: MessageHash[522],
-                            name: "new_user_id",
-                            scope: "user",
-                            type: "string"
-                        }),$H({
-                            description: MessageHash[523],
-                            editable: "true",
-                            expose: "true",
-                            label: MessageHash[523],
-                            name: "new_password",
-                            scope: "user",
-                            type: "password-create"
-                        }));
-                        var definitions = f.parseParameters(ajaxplorer.getXmlRegistry(), params.join('|'));
-                        definitions.each(function(el){ def1.push(el); });
-                        f.createParametersInputs(oForm.down('#user_create_user'), def1, true, $H(), false, true);
+                        f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, $H(), false, true);
                         modal.refreshDialogPosition();
                     ]]></dialogOnOpen>
                     <dialogOnComplete hideDialog="true"><![CDATA[
                         var params = $H();
                         var f = new FormManager();
-                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-                          var conn = new Connexion();
-                          params.set("get_action", "user_create_user");
-                          conn.setParameters(params);
-                          conn.setMethod("POST");
-                          conn.onComplete = function(transport){
-                               if($("address_book")){
-                                    $("address_book").ajxpPaneObject.reloadDataModel();
-                              }
-                          };
-                          conn.sendAsync();
+                        f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
+                        var conn = new Connexion();
+                        params.set("get_action", "user_create_user");
+                        conn.setParameters(params);
+                        conn.setMethod("POST");
+                        conn.onComplete = function(transport){
+                           if($("address_book")){
+                                $("address_book").ajxpPaneObject.reloadDataModel();
+                          }
+                        };
+                        conn.sendAsync();
                     ]]></dialogOnComplete>
                     <dialogOnCancel><![CDATA[]]></dialogOnCancel>
                 </clientCallback>
@@ -437,42 +414,44 @@
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
-					    if(ajaxplorer.user) var userLang = ajaxplorer.user.getPreference("lang");
+					    if(pydio.user) var userLang = pydio.user.getPreference("lang");
 						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
 						var selector = $(oForm).select('select[id="language_selector"]')[0];
-						var languages = $H(window.ajxpBootstrap.parameters.get("availableLanguages"));
-						languages.each(function(pair){
-							var option = new Element('option', {value:pair.key,id:'lang_'+pair.key});
-							option.update(pair.value);
+						pydio.listLanguagesWithCallback(function(key, label){
+							var option = new Element('option', {value:key,id:'lang_'+key});
+							option.update(label);
 							selector.insert(option);
 						});
 						selector.setValue(userLang);
 						selector.observe("change", function(){
 							var value = selector.getValue();
-							if(ajaxplorer.user){
-    							ajaxplorer.user.setPreference("lang", selector.getValue());
-	    						ajaxplorer.user.savePreference("lang");
+							if(pydio.user){
+    							pydio.user.setPreference("lang", selector.getValue());
+	    						pydio.user.savePreference("lang");
 	    					}
 						});
 						$(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
 					]]></dialogOnOpen>
 					<dialogOnComplete hideDialog="true"><![CDATA[
-                        if(ajaxplorer.user){
-                            var oUser = ajaxplorer.user;
+                        if(pydio.user){
+                            var oUser = pydio.user;
                             if(oUser.getPreference('lang') != null
                                 && oUser.getPreference('lang') != ""
-                                && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
+                                && oUser.getPreference('lang') != pydio.currentLanguage)
                             {
-                                ajaxplorer.loadI18NMessages(oUser.getPreference('lang'));
-                                ajaxplorer.displayMessage('SUCCESS', MessageHash[241]);
+                                pydio.loadI18NMessages(oUser.getPreference('lang'));
+                                pydio.displayMessage('SUCCESS', MessageHash[241]);
                             }
                         }else{
                             var selector = $(oForm).select('select[id="language_selector"]')[0];
                             var value = selector.getValue();
-                            ajaxplorer.loadI18NMessages(value);
+                            pydio.loadI18NMessages(value);
                             window.ajxpBootstrap.parameters.set("currentLanguage", value);
                         }
 					]]></dialogOnComplete>
+                    <dialogOnCancel><![CDATA[
+                        pydio.Controller.fireAction("login");
+                    ]]></dialogOnCancel>
 					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
 				</clientCallback>
 				<clientForm id="switch_language_form"><![CDATA[
@@ -492,28 +471,28 @@
 			<processing>
 				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
 					<dialogOnOpen><![CDATA[
-					if(!ajaxplorer.user) return;
+					if(!pydio.user) return;
 					var cont = $('webdav_repo_list');
 					cont.update('');
 					var even = false;
 					var conn = new Connexion();
 					conn.setParameters(new Hash({get_action:'webdav_preferences'}));
 					conn.onComplete = function(transport){
-						ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-						$('webdav_activator').checked = ajaxplorer.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked && !ajaxplorer.webdavCurrentPreferences.digest_set
-						    && !ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+						pydio.webdavCurrentPreferences = transport.responseJSON;
+						$('webdav_activator').checked = pydio.webdavCurrentPreferences.webdav_active;
+						if($('webdav_activator').checked && !pydio.webdavCurrentPreferences.digest_set
+						    && !pydio.webdavCurrentPreferences.webdav_force_basic) {
 						    $('webdav_password_form').show();
 						}
-                        ProtoCompat.map2hash(ajaxplorer.user.getRepositoriesList()).each(function(pair){
-                            if(ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key]){
+                        ProtoCompat.map2hash(pydio.user.getRepositoriesList()).each(function(pair){
+                            if(pydio.webdavCurrentPreferences.webdav_repositories[pair.key]){
                                 var div = new Element('div', {className:(even?'even':'')});
-                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ ajaxplorer.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
+                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ pydio.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
                                 cont.insert(div);
                                 even = !even;
                             }
                         });
-                        modal.getForm().down('#webdav_main_access').setValue(ajaxplorer.webdavCurrentPreferences.webdav_base_url);
+                        modal.getForm().down('#webdav_main_access').setValue(pydio.webdavCurrentPreferences.webdav_base_url);
                         modal.getForm().down('#webdav_main_access').observe("click", function(){
                             modal.getForm().down('#webdav_main_access').select();
                         });
@@ -536,21 +515,21 @@
                                     activate:(checked?'true':'false')
                                 }));
                                 conn.onComplete = function(transport){
-                                    ajaxplorer.webdavCurrentPreferences = transport.responseJSON;
-                                    if(ajaxplorer.webdavCurrentPreferences.webdav_active){
-                                        if(!ajaxplorer.webdavCurrentPreferences.digest_set
-                                        || ajaxplorer.webdavCurrentPreferences.webdav_force_basic) {
+                                    pydio.webdavCurrentPreferences = transport.responseJSON;
+                                    if(pydio.webdavCurrentPreferences.webdav_active){
+                                        if(!pydio.webdavCurrentPreferences.digest_set
+                                        || pydio.webdavCurrentPreferences.webdav_force_basic) {
                                             $('webdav_password_form').show();
                                         }
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[408]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[408]);
                                     }else {
                                         $('webdav_password_form').hide();
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[409]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[409]);
                                     }
                                 };
                                 conn.sendAsync();
                             });
-                            if(!ajaxplorer.webdavCurrentPreferences.digest_set){
+                            if(!pydio.webdavCurrentPreferences.digest_set){
                                 $('webdav_pass_saver').observe("click", function(){
                                     var conn = new Connexion();
                                     conn.setMethod('POST');
@@ -559,7 +538,7 @@
                                         webdav_pass: $('webdav_password').value
                                     }));
                                     conn.onComplete = function(transport){
-                                        ajaxplorer.displayMessage("SUCCESS", MessageHash[410]);
+                                        pydio.displayMessage("SUCCESS", MessageHash[410]);
                                     };
                                     conn.sendAsync();
                                 });
@@ -579,7 +558,7 @@
 					    <div class="dialogContentMainTitle">WebDAV Access</div>
 						<div class="dialogLegend" style="margin-bottom: 2px;padding: 0 5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
 						<div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
-						<div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
+						<div id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
 							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
 						</div>
 						<div class="dialogLegend" style="margin: 5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
@@ -600,8 +579,8 @@
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
-                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_user"){
-                        ajaxplorer.triggerRepositoryChange('ajxp_user');
+                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_user"){
+                        pydio.triggerRepositoryChange('ajxp_user');
                     }
                 ]]></clientCallback>
             </processing>
@@ -613,8 +592,8 @@
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
                 <clientCallback><![CDATA[
-                    if(!ajaxplorer.repositoryId || ajaxplorer.repositoryId != "ajxp_conf"){
-                        ajaxplorer.triggerRepositoryChange('ajxp_conf');
+                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_conf"){
+                        pydio.triggerRepositoryChange('ajxp_conf');
                     }
                 ]]></clientCallback>
             </processing>
@@ -623,59 +602,53 @@
     <client_configs>
         <component_config className="AjxpTabulator::userdashboard_main_tab">
             <additional_tab id="webdav_pane"
-                            tabInfo='{"id":"my-webdav-data","iconClass":"icon-cog","element":"webdav_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":3}'
+                            tabInfo='{"id":"webdav","iconClass":"icon-cog","element":"webdav_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":3}'
                             paneInfo='{"type":"widget"}'><![CDATA[
-                <div id="webdav_pane" ajxpClass="WebDAVprefsEditor" class="tabbed_editor">
-                    <div class="action_bar" style="height: 33px;">&nbsp;</div>
-                    <h3 class="dashboard_panel_title">AJXP_MESSAGE[403]</h3>
-                    <div style="padding:10px;overflow: auto;" class="fit_me_to_bottom">
-                        <div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
-                        <div class="dialogLegend" style="margin-bottom: 2px;padding: 10px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
-                        <div class="dialogButtons" id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
-                            <div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px !important;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
-                        </div>
-                        <div class="dialogLegend" style="margin: 10px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
-                        <input type="text" style="width: 95% !important;" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
-                        <div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
-                        <span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
-                        <div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto; margin: 10px;"></div>
-                        <input type="hidden" name="get_action" value="webdav_preferences">
-                    </div>
-                </div>
+                <div id="webdav_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"WebDAVPane"}'></div>
                 ]]></additional_tab>
         </component_config>
         <component_config className="InfoPanel">
             <infoPanelExtension mime="ajxp_root_node" attributes="">
                 <messages>
                     <message key="shared_string" id="527"/>
-                    <message key="internal_string" id="528"/>
-                    <message key="external_string" id="530"/>
+                    <message key="internal_string" id="531"/>
+                    <message key="external_string" id="532"/>
                 </messages>
                 <html><![CDATA[
                     <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
                         <div class="panelHeader">#{shared_string}</div>
                         <div id="ajxp_workspace_info_panel_content"></div>
                         <script>
-                            bufferCallback("ajxp_load_repo_info_timer", 300,function(){
-                                if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
-                                    return;
-                                }
-                                if(!ajaxplorer.user) return;
-                                $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
-                                var conn = new Connexion();
-                                conn.setParameters({get_action:'load_repository_info'});
-                                conn.onComplete = function(transport){
-                                    $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
-                                    if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
-                                        var data = transport.responseJSON;
-                                        if(!data['core.users']['external']){
-                                            data['core.users']['external'] = 0;
-                                        }
-                                        $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['internal'] + ' <br/> #{external_string}: ' + data['core.users']['external']);
-                                    }
+                            if(pydio.user) {
+                                var cacheService = MetaCacheService.getInstance();
+                                cacheService.registerMetaStream('workspace.info', 'MANUAL_TRIGGER');
+                                var render = function(data){
+                                    $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['users'] + ' <br/> #{external_string}: ' + data['core.users']['groups']);
                                 };
-                                conn.sendAsync();
-                            });
+                                var repoKey = pydio.user.getActiveRepository();
+                                if(cacheService.hasKey('workspace.info', repoKey)){
+                                    render(cacheService.getByKey('workspace.info', repoKey));
+                                }else{
+                                    bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+                                        if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
+                                            return;
+                                        }
+                                        $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
+                                        PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport){
+                                            $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
+                                            if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
+                                                var data = transport.responseJSON;
+                                                if(!data['core.users']['groups']){
+                                                    data['core.users']['groups'] = 0;
+                                                }
+                                            }
+                                            cacheService.setKey('workspace.info', repoKey, data);
+                                            render(data);
+                                        }, null, {discrete:true});
+                                    });
+                                }
+                            }
+
                         </script>
                     </div>
                 ]]></html>

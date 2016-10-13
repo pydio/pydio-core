@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Samba" => "Samba",
@@ -35,4 +35,8 @@ $mess=array(
 "Path to smbclient executable, considered to be in the path by default." => "Chemin du programme smbclient, considéré comme étant dans le chemin par défaut.",
 "Enable Zip" => "Activer Zip",
 "Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very slow!" => "Activer la création de zip pour les dépôts utilisant un accès Samba.Assurez-vous d'utiliser un réseau performant, sinon cela sera très lent !",
+"Default domain to use with session credentials. The domain name ends with '/' or '\' depend on your system. Example: MyDomain\ or YourDomain/. Default is /" => "Domaine par défaut pour les identifiants. Le domaine termine par '/' ou '\' en fonction de votre système. Exemple: MyDomain\ ou MyDomain/. Par défaut /",
+"Enable zip creation for repositories using Samba access. Make sure that you are using a very fast network, otherwise it will be very long!" => "Activer la création de Zip pour les workspace utilisant Samba. Ceci peut être assez long si le réseau est lent.",
+"Path Tmp" => "Chemin temporaire",
+"OS Path Temporary if not the default one" => "Chemin vers le répertoire temporaire si ce n'est pas le défaut.",
 );

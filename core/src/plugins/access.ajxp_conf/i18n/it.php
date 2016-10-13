@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Configurazioni",
@@ -175,4 +175,20 @@ $mess=array(
 "151" => "Gruppo Principale",
 "152" => "Ruolo Gruppo Principale",
 "153" => "Applica a tutta la gerarchia degli utenti",
+"154" => "Repository Templates",
+"155" => "Driver Accesso",
+"156" => "Standard", // user type standard
+"157" => "Amministratore",
+"158" => "Condiviso", // user type shared
+"159" => "Ospite",
+"160" => "Gruppo creato con successo",
+"161" => "You are attempting to move yourself inside a group, and you will loose super-admininistrative rights. Please login as another user if you really want to do that. Aborting.",
+"162" => "You are not authorized to update user %s",
+"163" => "Roles reordered for user %s",
+"164" => "Successfully updated roles",
+"165" => "Successfully saved user preferences",
+"166" => "Successfully set lock (%1) on user (%2)",
+"167" => "Successfully unlocked user (%s)",
+"168" => "%1 users were moved to group %2",
+"169" => "No users were moved, there must have been something wrong!",
 );

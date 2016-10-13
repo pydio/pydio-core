@@ -16,7 +16,7 @@
 		</resources>
 		<node_provider ajxpClass="LocalAPINodeProvider" ajxpOptions="{}"/>
 	</client_settings>
-	<class_definition filename="plugins/access.jsapi/class.jsapiAccessDriver.php" classname="jsapiAccessDriver"/>
+	<class_definition filename="plugins/access.jsapi/JsapiAccessDriver.php" classname="Pydio\Access\Driver\DataProvider\JsapiAccessDriver"/>
 	<registry_contributions>
 		<actions>
 			<action name="ls" dirDefault="true">
@@ -58,7 +58,7 @@
 			</action>
 		</actions>
 		<client_configs>
-			<template theme="umbra" name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
+			<template theme="orbit" name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
 				<div id="toolbars">
 					<div id="action_bar">
 						<div id="locationbar_cont">

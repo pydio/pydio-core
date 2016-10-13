@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Zoho API Key, you must have registered to api.zoho.com" => "Chiave API Zoho; devi essere registrato ad 'api.zoho.com'",
@@ -30,4 +30,8 @@ $mess=array(
 "Uniquely generated public key, that you must copy and paste inside the save_zoho.php file (see doc)." => "Chiave pubblica univoca che devi copiare ed incollare nel file 'save_zoho.php' (vedi doc).",
 "Z-Agent Key" => "Chiave Z-Agent",
 "External Z-Agent" => "Z-Agent Esterno",
+"Office Docs" => "Office Docs",
+"Zoho editor" => "Zoho editor",
+"You can change ZOHO menu language (de, en, fr, it, pt, ru, ...)" => "You can change ZOHO menu language (de, en, fr, it, pt, ru, ...)",
+"Language" => "Language",
 );

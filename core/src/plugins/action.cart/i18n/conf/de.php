@@ -16,10 +16,10 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 $mess = array(
     "Selection Cart" => "Korb",
-    "Select files to a cart and download/share all at once" => "Dateien in einem Korb sammeln und später auf einmal herunterladen oder teilen.",
+    "Select files to a cart and download/share all at once" => "Dateien in einem Korb sammeln und später herunterladen oder freigeben.",
 );

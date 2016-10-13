@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.flex" text="51" order="1" title="162" label="CONF_MESSAGE[Flash uploader]" description="CONF_MESSAGE[Legacy flash uploader, used when the browser does not support HTML5. If you want to force the usage of this uploader, deactivate the uploader.html, and remove the activeCondition tag from the uploader.flex manifest file.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/uploader.flex/class.FlexUploadProcessor.php" classname="FlexUploadProcessor"/>
+	<class_definition filename="plugins/uploader.flex/FlexUpload.php" classname="Pydio\Uploader\Processor\FlexUpload"/>
     <client_settings>
         <resources>
             <i18n namespace="flex_uploader" path="plugins/uploader.flex/i18n" />
@@ -11,6 +11,11 @@
 	</server_settings>
 	<registry_contributions>
 		<actions>
+            <action name="flex_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
+                </processing>
+            </action>
 			<action name="upload">
 				<pre_processing>
 					<serverCallback methodName="preProcess"/>
@@ -23,7 +28,7 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|action.quicksend"/>
+		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER|access.ajxp_home"/>
 	</dependencies>
 	<processing>
 		<clientForm id="flash_upload_form"><![CDATA[
@@ -35,7 +40,7 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=flash_tpl.html&pluginName=uploader.flex&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=flex_tpl&encode=false';
         modal.getForm().down('#flashframe').src = src;
 		]]></dialogOnOpen>
 		<activeCondition><![CDATA[

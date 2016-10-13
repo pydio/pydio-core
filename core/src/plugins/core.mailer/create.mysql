@@ -1,0 +1,23 @@
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS `ajxp_mail_queue` (
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `recipient` varchar(255) NOT NULL,
+  `url` text NOT NULL,
+  `date_event` int(11) NOT NULL,
+  `notification_object` longblob NOT NULL,
+  `html` int(1) NOT NULL
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+/* SEPARATOR */
+CREATE TABLE IF NOT EXISTS `ajxp_mail_sent` (
+  `id` int(11) PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  `recipient` varchar(255) NOT NULL,
+  `url` text NOT NULL,
+  `date_event` int(11) NOT NULL,
+  `notification_object` longblob NOT NULL,
+  `html` int(1) NOT NULL
+) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+/* SEPARATOR */
+DROP TRIGGER IF EXISTS `mail_queue_go_to_sent`;
+
+CREATE TRIGGER `mail_queue_go_to_sent` BEFORE DELETE ON `ajxp_mail_queue`
+FOR EACH ROW INSERT INTO ajxp_mail_sent (recipient,url,date_event,notification_object,html) VALUES (old.recipient,old.url,old.date_event,old.notification_object,old.html);

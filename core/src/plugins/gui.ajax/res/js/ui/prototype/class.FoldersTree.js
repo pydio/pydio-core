@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -70,7 +70,7 @@ Class.create("FoldersTree", AjxpPane, {
 		var filter = this.createFilter();
 		var fakeRootNode = new AjxpNode("/", true, MessageHash[391], "folder.png");
 		fakeRootNode._isLoaded = true;
-		this.tree = new AJXPTree(fakeRootNode,  action, filter);		
+		this.tree = new AJXPTree(fakeRootNode,  action, filter, false);
 				
 		this.treeContainer.update(this.tree.toString());
 		$(this.tree.id).ajxpNode = this.tree.ajxpNode;	
@@ -286,7 +286,7 @@ Class.create("FoldersTree", AjxpPane, {
 	 * @param newIcon String
 	 */
 	changeNodeLabel: function(nodeId, newLabel, newIcon){	
-		$(nodeId+'-label').update(newLabel);
+		$(nodeId+'-label').update(he.escape(newLabel));
 		if(newIcon){
 			var realNode = webFXTreeHandler.all[nodeId];
 			realNode.icon = newIcon;
@@ -316,10 +316,11 @@ Class.create("FoldersTree", AjxpPane, {
    		var edit = new Element('input', {value:item.ajxpNode.getLabel('text'), id:'editbox'}).setStyle({
    			zIndex:5000,
    			position:'absolute',
-   			marginLeft:'0px',
-   			marginTop:'0px',
+   			marginLeft:'13px',
+   			marginTop:'5px',
    			height:'24px',
-               padding: 0
+            padding: '2px',
+            border: 0
    		});
    		$(document.getElementsByTagName('body')[0]).insert({bottom:edit});
    		modal.showContent('editbox', (item.getWidth()-offset.left)+'', '20', true, false, {opacity:0.25, backgroundColor:'#fff'});
@@ -362,7 +363,7 @@ Class.create("FoldersTree", AjxpPane, {
         buttons.addClassName("inlineEdition");
    		var ok = buttons.select('input[name="ok"]')[0];
    		ok.observe("click", onOkAction);
-   		var origWidth = edit.getWidth()-44;
+   		var origWidth = edit.getWidth()-74;
    		var newWidth = origWidth;
    		if(origWidth < 70){
    			// Offset edit box to be sure it's always big enough.
@@ -381,7 +382,7 @@ Class.create("FoldersTree", AjxpPane, {
    			position:'absolute',
    			width:'46px',
    			zIndex:2500,
-   			left:(pos.left+offset.left+origWidth)+'px',
+   			left:(pos.left+offset.left+origWidth + 15)+'px',
    			top:((pos.top+offset.top-scrollTop)-1)+'px'
    		});
    		var closeFunc = function(){

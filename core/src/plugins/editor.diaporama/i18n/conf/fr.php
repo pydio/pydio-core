@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Image viewer" => "Aperçu d'images",
@@ -30,5 +30,7 @@ $mess=array(
 "Quality" => "Qualité",
 "Thumbs quality" => "Qualité des miniatures.",
 "Exif Rotation" => "Rotation Exif",
-"Rotate image using exif rotation" => "Faire pivoter l'image en utilisation la rotation exif"
+"Rotate image using exif rotation" => "Faire pivoter l'image en utilisation la rotation exif",
+"Low-res Sizes" => "Tailles low-res",
+"Threshold for low-res versions of images" => "Seuil pour la version low-res des images",
 );

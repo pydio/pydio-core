@@ -2,14 +2,14 @@
 <ajxp_plugin enabled="false" id="antivirus" label="CONF_MESSAGE[Antivirus]" description="CONF_MESSAGE[antivirus plugin adaptor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 
 	<!-- class file -->
-	<class_definition filename="plugins/action.antivirus/class.AntivirusScanner.php" classname="AntivirusScanner"/>
+	<class_definition filename="plugins/action.antivirus/AntivirusScanner.php" classname="Pydio\Action\Antivirus\AntivirusScanner"/>
 
 	<!-- plugin information -->
 	<plugin_info>
-		<plugin_author>Sylvain Letreguilly</plugin_author>
+		<plugin_author>Sylvain Letreguilly, Pydio Team</plugin_author>
 		<plugin_uri>no</plugin_uri>
 		<plugin_version>1</plugin_version>
-	        <core_relation packaged="false" tested_version="4.3.3"/>
+        <core_relation packaged="true" tested_version="7.0"/>
 	</plugin_info>
 
 	<client_settings>

@@ -1,0 +1,75 @@
+.ajxpNodeProvider.share_meta_type_0{
+    font-weight: 500;
+    /*border-bottom: 1px solid white !important;*/
+    background-color: rgba(0, 150, 136, 0.03);
+}
+
+.share_meta_type_2 .thumbLabel{
+    color: rgba(236, 16, 16, 0.75);
+}
+
+div.inbox-left-panel{
+    font-size: 13px;
+    padding: 16px;
+    color: white;
+    font-family: Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+div.inbox-left-panel input{
+    margin-left:0;
+    box-sizing: border-box;
+    border-radius: 2px;
+    width: 100%;
+    border: 0;
+    font-size: 14px;
+    padding: 4px 8px;
+
+}
+
+#browser #topPane div.inbox-left-panel h3{
+    padding: 0 0 20px 0;
+    font-size: 14px;
+}
+
+#browser #topPane div.inbox-left-panel h4{
+    margin: 30px 0 5px;
+}
+
+#browser #topPane div.inbox-left-panel h5{
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#browser #topPane div.inbox-left-panel h5 span.clear {
+    background-color: transparent;
+    color: white;
+    float: right;
+    cursor: pointer;
+    color:rgba(255,255,255,0.5);
+}
+
+#browser #topPane div.inbox-left-panel span.share_meta_filter{
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 4px 8px 4px 0;
+    color: rgba(255,255,255,0.6);
+    background-color: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.75);
+}
+
+#browser #topPane div.inbox-left-panel span.share_meta_filter:hover{
+    color:#ff796b;
+}
+#browser #topPane div.inbox-left-panel span.share_meta_filter.active{
+    color: white;
+    box-shadow: 0 0 1px rgba(0,0,0,0.75);
+    margin-top:6px;
+    margin-bottom:3px;
+}

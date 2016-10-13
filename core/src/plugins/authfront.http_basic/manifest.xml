@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="authfront.http_basic" enabled="true" label="CONF_MESSAGE[Basic Http FrontEnd]" description="CONF_MESSAGE[Send a basic http request to the user]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.http_basic/class.BasicHttpAuthFrontend.php" classname="BasicHttpAuthFrontend"/>
+	<class_definition filename="plugins/authfront.http_basic/BasicHttpAuthFrontend.php" classname="Pydio\Auth\Frontend\BasicHttpAuthFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.http_basic" path="plugins/authfront.http_basic/i18n"/>

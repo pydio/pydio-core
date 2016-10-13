@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -58,5 +58,24 @@ $mess = array(
 "Mail address of the user" => "Adresse courriel de l'utilsateur",
 "Display name" => "Nom à afficher",
 "Password" => "Mot de passe",
+"Main options" => "Options Principales",
+"Set up application title and create a connexion identifier for the super-administrator user. Make sure to use a strong password, as this user will have full access to the server." => "Choisir le nom de l'application et créer des identifiants de connexion pour le super-administrateur. Veillez à utiliser un mot de passe fort, car cet utilisateur a accès au serveur.",
+"Application Title" => "Titre de l'application",
+"Your system title" => "Le titre de la plateform tel qu'il apparait aux utilisateurs.",
+"Welcome Message" => "Message de bienvenue",
+"An additional message displayed at startup, on the splash screen and the login screen." => "Message supplémentaire affiché sur la page d'accueil et dans l'écran de chargement.",
+"User-friendly name of the user" => "Nom de l'utilisateur",
+"Welcome to Pydio" => "Bienvenue sur Pydio",
+"Database Connexion" => "Base de données",
+"Driver type (do not touch)" => "Type de driver (ne pas changer)",
+"Advanced Options" => "Options Avancées",
+"Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Veuillez valider ces paramètres complémentaires. L'encodage et l'URI doivent être détectés automatiquement, mais assurez vous qu'ils correspondent à votre serveur.",
+"Detected Encoding" => "Encodage détecté",
+"Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8" => "Utilisez la valeur de l'encodage de votre système de fichier sur le serveur, au format ln_LN.CHARSET, par exemple fr_FR.UTF-8",
+"Detected Server Path" => "Chemin d'accès détecté",
+"Make sure this is correct, as it's used to rewrite the htaccess file" => "Chemin depuis le DocumentRoot de votre serveur web, utilisé dans la réécriture des redirections.",
+"Select a language activated by default( users will still be able to switch)" => "Selectionnez un langage par défaut (les utilisateurs pourront le changer)",
+"Enable cache (recommended)" => "Activer le cache (recommandé)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Utiliser un cache de type clé/valeur pour stocker des données serveurs en mémoire. Is APC/APCu est détecté, ça sera activé par défaut, vous pouvez le changer pour utiliser un serveur à part avec Redis ou Memcache."
 
 );

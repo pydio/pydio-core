@@ -1,23 +1,23 @@
 <?php
 /*
- * Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
- * This file is part of Pydio.
- *
- * Pydio is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Pydio is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
- *
- * The latest code can be found at <http://pyd.io/>.
- */
+* Copyright 2007-2013 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+* This file is part of Pydio.
+*
+* Pydio is free software: you can redistribute it and/or modify
+* it under the terms of the GNU Affero General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Pydio is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU Affero General Public License for more details.
+*
+* You should have received a copy of the GNU Affero General Public License
+* along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+*
+* The latest code can be found at <https://pydio.com>.
+*/
 $mess=array(
 "languageLabel" => "Russian",
 "date_intl_locale" => "ru_RU",
@@ -57,7 +57,7 @@ $mess=array(
 "22" => "Скрипт PHP",
 "23" => "Файл",
 "24" => "На уровень выше",
-"25" => "Загрузить один или несколько файлов (максимум ".ConfService::getConf('UPLOAD_MAX_NUMBER').") в папку: ",
+"25" => "Загрузить один или несколько файлов (максимум ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") в папку: ",
 "26" => "Создать новую папку в: ",
 "27" => "Закачать",
 "28" => "Создать новый файл в: ",
@@ -257,7 +257,6 @@ $mess=array(
 "204" => "Файл \"",
 "205" => "\" превышает допустимый размер (",
 "206" => "Mb).\\nОн не будет загружен.",
-/* END SENTENCE */
 "207" => "У вас нет прав для записи в эту папку",
 "208" => "У вас нет прав для чтения этой папки",
 "209" => "Внутренняя ошибка сервера, пожалуйста обратитесь к администратору!",
@@ -433,7 +432,6 @@ $mess=array(
 "375" => "Предупреждение: Вы неактивны с более чем __IDLE__, сессия прервётся в __LOGOUT__",
 "376" => "Щелкните в любом месте, чтобы активировать",
 "378" => "Предупреждение: пароль пустой или слишком короткий!",
-/* password strength tester */
 "379" => "Небезопасное слово!",
 "380" => "Очень коротко",
 "381" => "Очень слабый",
@@ -586,8 +584,8 @@ $mess=array(
 "527"=> "Общее с",
 "528"=> "Внутренних",
 "530"=> "Внешних",
-"531"=> "Внутр.",
-"532"=> "Внеш.",
+"531"=> "Users",
+"532"=> "Groups",
 "533" => "Идентификатор для входа, латинские буквы и цифры или email в нижнем регистре.",
 "534" => "Пароль для входа",
 "535" => "Послать пароль по e-mail",
@@ -620,6 +618,8 @@ $mess=array(
 "plugtype.desc.boot" => "Unique plugin for loading the framework.",
 "plugtype.title.conf" => "Хранилище конфигурации",
 "plugtype.desc.conf" => "How configuration data are stored in the backend",
+"plugtype.title.cache" => "Cache server",
+"plugtype.desc.cache" => "Unique plugin to set up the cache server used by the application",
 "plugtype.title.feed" => "Хранилище событий",
 "plugtype.desc.feed" => "Implementations for storing data events (only SQL yet)",
 "plugtype.title.log" => "Протоколирование",
@@ -628,12 +628,29 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "IM - сообщения",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
-    "537" => "File is too large! Maximum authorized size is %i",
-    "538" => "Upload error: no file found on server!",
-    "539" => "Upload error: file is partial",
-    "540" => "Upload error: cannot find the temporary directory",
-    "541" => "Upload error: cannot write into the temporary directory",
-    "542" => "Upload error: a PHP extension stopped the upload process.",
-    "543" => "Results limited to 100 out of %s.",
-    "544" => "Show All",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
+"537" => "File is too large! Maximum authorized size is %i",
+"538" => "Upload error: no file found on server!",
+"539" => "Upload error: file is partial",
+"540" => "Upload error: cannot find the temporary directory",
+"541" => "Upload error: cannot write into the temporary directory",
+"542" => "Upload error: a PHP extension stopped the upload process.",
+"543" => "Results limited to %s.",
+"544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
+/* END SENTENCE */
+/* password strength tester */
 );

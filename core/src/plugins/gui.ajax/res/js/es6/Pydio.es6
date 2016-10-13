@@ -178,8 +178,9 @@ class Pydio extends Observable{
             if(!repositoryObject){
                 if(this.user.lock){
                     this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
+                    let lock = this.user.lock.split(",").shift();
                     window.setTimeout(function(){
-                        this.Controller.fireAction(this.user.lock);
+                        this.Controller.fireAction(lock);
                     }.bind(this), 50);
                     return;
                 }
@@ -210,7 +211,7 @@ class Pydio extends Observable{
         this.observeOnce("registry_part_loaded", function(data){
             if(data != "user/repositories") return;
             this.Registry.logXmlUser(true);
-            document.fire("ajaxplorer:repository_list_refreshed", {
+            this.fire("repository_list_refreshed", {
                 list:this.user.getRepositoriesList(),
                 active:this.user.getActiveRepository()});
         }.bind(this));
@@ -289,6 +290,7 @@ class Pydio extends Observable{
                 && nodeOrPath.getAjxpMime() != "repository" && nodeOrPath.getAjxpMime() != "repository_editable"){
                 if(this.user){
                     this.user.setPreference("pending_folder", nodeOrPath.getPath());
+                    this._initLoadRep = nodeOrPath.getPath();
                 }
                 this.triggerRepositoryChange(nodeOrPath.getMetadata().get("repository_id"));
                 return;
@@ -339,6 +341,14 @@ class Pydio extends Observable{
 
     getPluginConfigs (pluginQuery){
         return this.Registry.getPluginConfigs(pluginQuery);
+    }
+
+    listLanguagesWithCallback(callback){
+        let langs = this.Parameters.get("availableLanguages") || {"en":"Default"};
+        let current = this.currentLanguage;
+        Object.keys(langs).sort().map(function(key){
+            callback(key, langs[key], (current === key));
+        });
     }
 
     /**

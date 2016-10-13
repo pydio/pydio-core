@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -34,7 +34,6 @@ class PydioDataModel extends Observable{
 		this._bEmpty = true;
         this._globalEvents = !localEvents;
 
-        this._bUnique= false;
         this._bFile= false;
         this._bDir= false;
         this._isRecycle= false;
@@ -114,7 +113,7 @@ class PydioDataModel extends Observable{
                         var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
-                        });
+                        }, {page_position:'true'});
                         if(newPage && newPage != currentPage){
                             ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
                             this.requireContextChange(ajxpNode, true, true);
@@ -169,8 +168,8 @@ class PydioDataModel extends Observable{
         this._iAjxpNodeProvider.refreshNodeAndReplace(nodeOrPath, onComplete);
     }
 
-    loadPathInfoSync (path, callback){
-        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false);
+    loadPathInfoSync (path, callback, additionalParameters = {}){
+        this._iAjxpNodeProvider.loadLeafNodeSync(new AjxpNode(path), callback, false, additionalParameters);
     }
 
     loadPathInfoAsync (path, callback){
@@ -341,9 +340,9 @@ class PydioDataModel extends Observable{
         var parent = parentFake.findInArbo(this.getRootNode(), undefined);
         if(!parent && PathUtils.getDirname(node.getPath()) == "") parent = this.getRootNode();
         if(parent){
-            parent.addChild(node);
-            if(setSelectedAfterAdd && this.getContextNode() == parent){
-                this.setSelectedNodes([node], {});
+            let addedNode = parent.addChild(node);
+            if(addedNode && setSelectedAfterAdd && this.getContextNode() == parent){
+                this.setSelectedNodes([addedNode], {});
             }
         }
 
@@ -352,11 +351,15 @@ class PydioDataModel extends Observable{
     /**
      * Remove a node by path somewhere
      * @param path string
+     * @param imTime integer|null
      */
-    removeNodeByPath(path){
+    removeNodeByPath(path, imTime = null){
         var fake = new AjxpNode(path);
         var n = fake.findInArbo(this.getRootNode(), undefined);
         if(n){
+            if(imTime && n.getMetadata() && n.getMetadata().get("ajxp_im_time") && parseInt(n.getMetadata().get("ajxp_im_time")) >= imTime){
+                return false;
+            }
             n.getParent().removeChild(n);
             return true;
         }
@@ -387,9 +390,17 @@ class PydioDataModel extends Observable{
                 parent.addChild(node);
             }
         }else{
+            if(node.getMetadata().get("original_path") === "/" && node.getPath() === "/"){
+                n = this.getRootNode();
+                n.replaceMetadata(node.getMetadata());
+                if(setSelectedAfterUpdate && this.getContextNode() == n) {
+                    this.setSelectedNodes([n], {});
+                }
+                return;
+            }
             fake = new AjxpNode(original);
             n = fake.findInArbo(this.getRootNode(), undefined);
-            if(n){
+            if(n && !n.isMoreRecentThan(node)){
                 node._isLoaded = n._isLoaded;
                 n.replaceBy(node, "override");
                 if(setSelectedAfterUpdate && this.getContextNode() == n.getParent()) {
@@ -428,6 +439,18 @@ class PydioDataModel extends Observable{
 	 * @param source String The source of this selection action
 	 */
 	setSelectedNodes (ajxpDataNodes, source){
+        if(this._selectedNodes.length == ajxpDataNodes.length){
+            if(ajxpDataNodes.length === 0) {
+                return;
+            }
+            var equal = true;
+            for(var k=0;k<ajxpDataNodes.length;k++){
+                equal = equal && ajxpDataNodes[k] == this._selectedNodes[k];
+            }
+            if(equal){
+                return;
+            }
+        }
 		if(!source){
 			this._selectionSource = {};
 		}else{
@@ -436,10 +459,8 @@ class PydioDataModel extends Observable{
 		this._selectedNodes = ajxpDataNodes;
 		this._bEmpty = ((ajxpDataNodes && ajxpDataNodes.length)?false:true);
 		this._bFile = this._bDir = this._isRecycle = false;
-        this._bUnique = false;
 		if(!this._bEmpty)
 		{
-			this._bUnique = (ajxpDataNodes.length == 1);
 			for(var i=0; i<ajxpDataNodes.length; i++)
 			{
 				var selectedNode = ajxpDataNodes[i];
@@ -523,7 +544,7 @@ class PydioDataModel extends Observable{
                 }
             });
         }catch(e){}
-
+        return found;
     }
 
 	/**
@@ -531,7 +552,7 @@ class PydioDataModel extends Observable{
 	 * @returns Boolean
 	 */
 	isUnique  (){
-		return this._bUnique;
+		return this._selectedNodes && this._selectedNodes.length === 1;
 	}
 	
 	/**
@@ -664,13 +685,13 @@ class PydioDataModel extends Observable{
 
 	}
 
-    applyCheckHook (node){
-        "use strict";
+    applyCheckHook (node, additionalParams = null){
+        
         var client = PydioApi.getClient();
         var result;
         client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function(transport){
             result = client.parseXmlMessage(transport.responseXML);
-        });
+        }, additionalParams);
         if(result === false){
             throw new Error("Check failed");
         }

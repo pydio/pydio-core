@@ -2,6 +2,10 @@
 
 }
 
+#apikeys_pane h2{
+    font-weight: 500;
+}
+
 #apikeys_pane #token_results{
     position: absolute;
     bottom: 5%;
@@ -14,7 +18,7 @@
     margin: 0 auto;
 }
 
-#apikeys_pane #token_results span.icon-remove-sign{
+#apikeys_pane #token_results span.mdi-close{
     position: absolute;
     right: -4px;
     font-size: 21px;

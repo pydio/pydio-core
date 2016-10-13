@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -321,7 +321,7 @@ Class.create("SearchEngine", AjxpPane, {
 		
 		if(!this.htmlElement) return;
 		
-		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><span class="search_advanced_direct_access">'+MessageHash[486].toLocaleLowerCase()+' <span class="icon-caret-down"></span></span><a class="icon-remove" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
+		this.htmlElement.insert('<div id="search_panel"><div id="search_form"><input style="float:left;" type="text" id="search_txt" placeholder="'+ MessageHash[87] +'" name="search_txt" onfocus="blockEvents=true;" onblur="blockEvents=false;"><a href="" id="search_button" class="icon-search" ajxp_message_title_id="184" title="'+MessageHash[184]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/search.png" border="0"/></a><span class="search_advanced_direct_access">'+MessageHash[486].toLocaleLowerCase()+' <span class="icon-caret-down"></span></span><a class="mdi mdi-close" href="" id="stop_search_button" ajxp_message_title_id="185" title="'+MessageHash[185]+'"><img width="16" height="16" align="absmiddle" src="'+ajxpResourcesFolder+'/images/actions/16/fileclose.png" border="0" /></a></div><div id="search_results"></div></div>');
         if(this._ajxpOptions.toggleResultsVisibility){
             this.htmlElement.down("#search_results").insert({before:"<div style='display: none;' id='"+this._ajxpOptions.toggleResultsVisibility+"'></div>"});
             this.htmlElement.down("#" + this._ajxpOptions.toggleResultsVisibility).insert(this.htmlElement.down("#search_results"));
@@ -524,10 +524,8 @@ Class.create("SearchEngine", AjxpPane, {
         }else{
             $(this._ajxpOptions.toggleResultsVisibility).setStyle({display:'none'});
         }
-        if(this._fileList) {
-            this._fileList.showElement(show);
-            this._dataModel.setSelectedNodes([]);
-        }
+        this._fileList.showElement(show);
+        this._dataModel.setSelectedNodes([]);
     },
 
 	/**
@@ -569,9 +567,7 @@ Class.create("SearchEngine", AjxpPane, {
             }
         }
 
-        if(this._fileList){
-            this._fileList.resize();
-        }
+        this._fileList.resize();
 
 		if(this.htmlElement && this.htmlElement.visible()){
 			//this._inputBox.setStyle({width:Math.max((this.htmlElement.getWidth() - this.htmlElement.getStyle("paddingLeft")- this.htmlElement.getStyle("paddingRight") -70),70) + "px"});
@@ -579,11 +575,9 @@ Class.create("SearchEngine", AjxpPane, {
 	},
 	
 	destroy : function(){
-        if(this._fileList){
-            pydio.UI.unregisterFocusable(this._fileList);
-            this._fileList.destroy();
-            this._fileList = null;
-        }
+        pydio.UI.unregisterFocusable(this._fileList);
+        this._fileList.destroy();
+        this._fileList = null;
         if(this.htmlElement) {
             var ajxpId = this.htmlElement.id;
             this.htmlElement.update('');
@@ -703,12 +697,16 @@ Class.create("SearchEngine", AjxpPane, {
 	 * Perform search
 	 */
 	search : function(limit, skipClear){
+        if(this._state === 'searching' || this._state === 'interrupt'){
+            return;
+        }
         if(!limit){
             this.currentLimitDefault = true;
             limit = 100;
         }else{
             this.currentLimitDefault = false;
         }
+        this.showRecycleResults = false;
 		var text = this._inputBox.value.toLowerCase();
         var searchQuery;
         var metadata = this.parseMetadataForm();
@@ -751,8 +749,8 @@ Class.create("SearchEngine", AjxpPane, {
 		$('stop_'+this._searchButtonName).removeClassName("disabled");
         if(this._ajxpOptions.toggleResultsVisibility){
             if(!$(this._ajxpOptions.toggleResultsVisibility).down("div.panelHeader.toggleResults")){
-                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results icon-remove-sign'></span><div id='display_toolbar'></div></div>"});
-                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],skipBubbling:true, skipCarousel:true,submenuOffsetTop:2});
+                $(this._ajxpOptions.toggleResultsVisibility).insert({top:"<div class='panelHeader toggleResults'><span class='results_string'>Results</span><span class='close_results mdi mdi-close'></span><div id='display_toolbar'></div></div>"});
+                this.tb = new ActionsToolbar($(this._ajxpOptions.toggleResultsVisibility).down("#display_toolbar"), {submenuClassName:"panelHeaderMenu",submenuPosition:"bottom right",toolbarsList:["ajxp-search-result-bar"],submenuOffsetTop:2});
                 this.tb.actionsLoaded({memo:pydio.getController().actions});
                 this.tb.element.select('a').invoke('show');
                 this.resultsDraggable = new Draggable(this._ajxpOptions.toggleResultsVisibility, {
@@ -814,9 +812,7 @@ Class.create("SearchEngine", AjxpPane, {
 		// Clear the results
         this.hasResults = false;
         this._rootNode.clear();
-        if(this._fileList) {
-            this._fileList.empty(true);
-        }
+        this._fileList.empty(true);
         this._even = false;
 	},
 	/**
@@ -829,60 +825,12 @@ Class.create("SearchEngine", AjxpPane, {
 
         var noRes =  $(this._resultsBoxId).down('#no-results-found');
         if(noRes) noRes.remove();
-
-        if(this._rootNode){
-            try{
-                // Some derived hooks can trigger errors, ignore them.
-                this._rootNode.addChild(ajxpNode);
-            }catch(e){}
-            return;
-        }
-
-		var fileName = ajxpNode.getLabel();
-		var icon = ajxpNode.getIcon();
-		// Display the result in the results box.
-		if(folderName == "") folderName = "/";
-        if(this._searchMode == "remote"){
-            folderName = getRepName(ajxpNode.getPath());
-        }
-		var isFolder = false;
-		if(icon == null) // FOLDER CASE
-		{
-			isFolder = true;
-			icon = 'folder.png';
-			if(folderName != "/") folderName += "/";
-			folderName += fileName;
-		}
-        var imgPath = resolveImageSource(icon, '/images/mimes/16', 16);
-		var imageString = '<img align="absmiddle" width="16" height="16" src="'+imgPath+'"> ';
-		var stringToDisplay;
-		if(metaFound){
-			stringToDisplay = fileName + ' (' + this.highlight(metaFound, this.crtText, 20)+ ') ';
-		}else{
-			stringToDisplay = this.highlight(fileName, this.crtText);
-		}
-		
-		var divElement = new Element('div', {title:MessageHash[224]+' '+ folderName, className:(this._even?'even':'')}).update(imageString+stringToDisplay);
-        this._even = !this._even;
-		$(this._resultsBoxId).insert(divElement);
-        if(this._searchMode == 'remote' && ajxpNode.getMetadata().get("search_score")){
-            /*divElement.insert(new Element('a', {className:"searchUnindex"}).update("X"));*/
-            divElement.insert(new Element('span', {className:"searchScore"}).update("SCORE "+ajxpNode.getMetadata().get("search_score")));
-        }
-		if(isFolder)
-		{
-			divElement.observe("click", function(e){
-				ajaxplorer.goTo(folderName);
-			});
-		}
-		else
-		{
-			divElement.observe("click", function(e){
-				ajaxplorer.goTo(folderName+"/"+fileName);
-			});
-		}
-        this.hasResults = true;
-	},
+        try{
+            // Some derived hooks can trigger errors, ignore them.
+            this._rootNode.addChild(ajxpNode);
+        }catch(e){}
+    },
+    
     addNoResultString : function(){
         if(!$(this._resultsBoxId).down('#no-results-found') && !(this._rootNode && ProtoCompat.map2values(this._rootNode.getChildren()).length)){
             $(this._resultsBoxId).insert({top: new Element('div', {id:'no-results-found'}).update(MessageHash[478])});
@@ -962,7 +910,7 @@ Class.create("SearchEngine", AjxpPane, {
             connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
-            if(limit){
+            if(limit && limit !== -1){
                 connexion.addParameter('limit', limit);
             }
             if(this.hasMetaSearch()){
@@ -1024,17 +972,14 @@ Class.create("SearchEngine", AjxpPane, {
 			var nodes = XPathSelectNodes(oXmlDoc.documentElement, "tree");
 			for (var i = 0; i < nodes.length; i++) 
 			{
-				if (nodes[i].tagName == "tree") 
-				{
-					var node = this.parseAjxpNode(nodes[i]);					
-					this._searchNode(node, currentFolder);
-					if(!node.isLeaf())
-					{
-						var newPath = node.getPath();
-						this.appendFolderToQueue(newPath, node.getMetadata().get("remote_indexation"));
-					}
-				}
-			}		
+                var node = this.parseAjxpNode(nodes[i]);
+                this._searchNode(node, currentFolder);
+                if(!node.isLeaf())
+                {
+                    var newPath = node.getPath();
+                    this.appendFolderToQueue(newPath, node.getMetadata().get("remote_indexation"));
+                }
+			}
 		}
 	},
 	
@@ -1043,19 +988,11 @@ Class.create("SearchEngine", AjxpPane, {
 			this.updateStateFinished();
 			return;
 		}
-        var paginationNode = XMLUtils.XPathSelectSingleNode(oXmlDoc.documentElement, "pagination");
         var showAllDiv = this.htmlElement.down('#search_show_all');
         if(showAllDiv) showAllDiv.remove();
-        if(paginationNode && this.currentLimitDefault){
-            var totalCount = parseInt(paginationNode.getAttribute("count"));
-            showAllDiv = new Element('div', {id:'search_show_all'}).update(pydio.MessageHash['543'].replace('%s', totalCount) + ' ');
-            var showAllLink = new Element('a').update(pydio.MessageHash['544']);
-            showAllLink.observe("click", function(){
-                this.search(totalCount, true);
-            }.bind(this));
-            showAllDiv.insert(showAllLink);
-            this.htmlElement.down("#basic_search").insert(showAllDiv);
-        }
+        var recycleDiv = this.htmlElement.down('#search_recycle_hidden');
+        if(recycleDiv) recycleDiv.remove();
+
 		var nodes = XMLUtils.XPathSelectNodes(oXmlDoc.documentElement, "tree");
         if(!nodes.length){
             this.addNoResultString();
@@ -1063,39 +1000,65 @@ Class.create("SearchEngine", AjxpPane, {
             var noRes =  $(this._resultsBoxId).down('#no-results-found');
             if(noRes) noRes.remove();
         }
-        if(this._fileList){
-            this._fileList.setBulkUpdatingMode();
-        }
+        this._fileList.setBulkUpdatingMode();
         var resultsCount = 0;
-		for (var i = 0; i < nodes.length; i++) 
+        var recycleCount = 0;
+        var recycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
+		for (var i = 0; i < nodes.length; i++)
 		{
-			if (nodes[i].tagName == "tree")
-			{
-				var ajxpNode = this.parseAjxpNode(nodes[i]);
-                if(this.hasMetaSearch()){
-                    var searchCols = this.getSearchColumns();
-                    var added = false;
-                    for(var k=0;k<searchCols.length;k++){
-                        var meta = ajxpNode.getMetadata().get(searchCols[k]);
-                        if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
-                            this.addResult(currentFolder, ajxpNode, meta);
-                            added = true;
-                        }
+            var ajxpNode = this.parseAjxpNode(nodes[i]);
+            if(recycle && ajxpNode.getPath().startsWith(recycle)){
+                recycleCount ++;
+                if(!this.showRecycleResults) continue;
+            }
+            if(this.hasMetaSearch()){
+                var searchCols = this.getSearchColumns();
+                var added = false;
+                for(var k=0;k<searchCols.length;k++){
+                    var meta = ajxpNode.getMetadata().get(searchCols[k]);
+                    if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
+                        this.addResult(currentFolder, ajxpNode, meta);
+                        resultsCount ++;
+                        added = true;
                     }
-                    if(!added){
-                        this.addResult(currentFolder, ajxpNode);
-                    }
-                }else{
-				    this.addResult(currentFolder, ajxpNode);
                 }
-			}
+                if(!added){
+                    this.addResult(currentFolder, ajxpNode);
+                    resultsCount ++;
+                }
+            }else{
+                this.addResult(currentFolder, ajxpNode);
+                resultsCount ++;
+            }
 		}
-		if(this._fileList){
-            //this._fileList.reload();
-            this._fileList.flushBulkUpdatingMode();
-            this._fileList._sortableTable.sort(0);
+        this._fileList.flushBulkUpdatingMode();
+
+        if(recycleCount /*&& !this.showRecycleResults*/){
+            recycleDiv = new Element('div', {id:'search_recycle_hidden',className:'results-parser-filter'}).update(pydio.MessageHash['554'].replace('%s', recycleCount) + ' - ');
+            var recycleLink = new Element('a').update(pydio.MessageHash[this.showRecycleResults ? '514': '513']);
+            recycleLink.observe("click", function(){
+                this.showRecycleResults = !this.showRecycleResults;
+                if(!this.showRecycleResults) this.clearResults();
+                this._parseResults(oXmlDoc, currentFolder);
+
+            }.bind(this));
+            recycleDiv.insert(recycleLink);
+            this.htmlElement.down("#basic_search").insert(recycleDiv);
         }
-	},
+
+        var paginationNode = XMLUtils.XPathSelectSingleNode(oXmlDoc.documentElement, "pagination");
+        if(paginationNode && this.currentLimitDefault){
+            showAllDiv = new Element('div', {id:'search_show_all',className:'results-parser-filter'}).update(pydio.MessageHash['543'].replace('%s', resultsCount-1) + ' ');
+            var showAllLink = new Element('a').update(pydio.MessageHash['544']);
+            showAllLink.observe("click", function(){
+                this.search(-1, true);
+            }.bind(this));
+            showAllDiv.insert(showAllLink);
+            this.htmlElement.down("#basic_search").insert(showAllDiv);
+        }
+
+
+    },
 	
 	_searchNode : function(ajxpNode, currentFolder){
 		var searchFileName = true;
@@ -1108,10 +1071,7 @@ Class.create("SearchEngine", AjxpPane, {
 		}
 		if(searchFileName && ajxpNode.getLabel().toLowerCase().indexOf(this.crtText) != -1){
 			this.addResult(currentFolder, ajxpNode);
-            if(this._fileList){
-                //this._fileList.reload();
-                this._fileList._sortableTable.sort(0);
-            }
+            this._fileList.reSort();
             return;
 		}
 		if(!searchCols) return;
@@ -1119,10 +1079,7 @@ Class.create("SearchEngine", AjxpPane, {
 			var meta = ajxpNode.getMetadata().get(searchCols[i]);
 			if(meta && meta.toLowerCase().indexOf(this.crtText) != -1){
 				this.addResult(currentFolder, ajxpNode, meta);
-                if(this._fileList){
-                    //this._fileList.reload();
-                    this._fileList._sortableTable.sort(0);
-                }
+                this._fileList.reSort();
                 return;
 			}
 		}

@@ -52,7 +52,7 @@
       "order":"Date_sortable"
     },
       "DIAGRAM":"bar",
-    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT ajxp_log.user ) AS Connections FROM ajxp_log WHERE ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN ( SELECT DISTINCT login  FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) )  AND AJXP_CURSOR_DATE GROUP BY DATE( logdate )  ORDER BY logdate DESC "
+    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT ajxp_log.user ) AS Connections FROM ajxp_log WHERE ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN ( SELECT DISTINCT login  FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) )  AND AJXP_CURSOR_DATE GROUP BY DATE( logdate )  ORDER BY DATE(logdate) DESC "
   },
   {
     "NAME":"connections_per_day",
@@ -63,7 +63,7 @@
       "order":"Date_sortable"
     },
       "DIAGRAM":"bar",
-    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS Connections FROM ajxp_log WHERE ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN (SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND AJXP_CURSOR_DATE AND (params LIKE  \"Log In%\" OR message LIKE  \"Log In%\" ) AND ( params LIKE \"%WebUI%\" ) GROUP BY DATE( logdate )  ORDER BY logdate DESC"
+    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS Connections FROM ajxp_log WHERE ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE severity =  \"INFO\" AND login NOT IN (SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND AJXP_CURSOR_DATE AND (params LIKE  \"Log In%\" OR message LIKE  \"Log In%\" ) AND ( params LIKE \"%WebUI%\" ) GROUP BY DATE( logdate )  ORDER BY DATE(logdate) DESC"
   },
     {
         "SEPARATOR":true,
@@ -78,7 +78,7 @@
        "order":"Date_sortable"
     },
       "DIAGRAM":"bar",
-    "SQL":"SELECT DATE(logdate) AS Date, COUNT(distinct id) AS Downloads FROM ajxp_log WHERE severity = \"INFO\" AND (params like \"Download%\" OR message like \"Download%\" ) AND AJXP_CURSOR_DATE GROUP BY DATE(logdate)  ORDER BY logdate DESC"
+    "SQL":"SELECT DATE(logdate) AS Date, COUNT(distinct id) AS Downloads FROM ajxp_log WHERE severity = \"INFO\" AND (params like \"Download%\" OR message like \"Download%\" ) AND AJXP_CURSOR_DATE GROUP BY DATE(logdate)  ORDER BY DATE(logdate) DESC"
   },
   {
     "NAME":"uploads_per_day",
@@ -89,7 +89,7 @@
       "order":"Date_sortable"
     },
       "DIAGRAM":"bar",
-    "SQL":"SELECT DATE(logdate) AS Date, COUNT(distinct id) AS Uploads FROM ajxp_log WHERE severity = \"INFO\" AND (message like \"Upload%\" OR message like \"Upload%\") AND AJXP_CURSOR_DATE GROUP BY DATE(logdate)  ORDER BY logdate DESC"
+    "SQL":"SELECT DATE(logdate) AS Date, COUNT(distinct id) AS Uploads FROM ajxp_log WHERE severity = \"INFO\" AND (message like \"Upload%\" OR message like \"Upload%\") AND AJXP_CURSOR_DATE GROUP BY DATE(logdate)  ORDER BY DATE(logdate) DESC"
   },
   {
     "NAME":"sharedfiles_per_day",
@@ -100,7 +100,7 @@
       "order":"Date_sortable"
     },
       "DIAGRAM":"bar",
-    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS Shares FROM ajxp_log WHERE severity = \"INFO\" AND AJXP_CURSOR_DATE AND ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights  WHERE login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND (params LIKE \"New Share%\" OR message LIKE \"New Share%\" ) GROUP BY DATE( logdate )  ORDER BY logdate DESC"
+    "SQL":"SELECT DATE( logdate )AS Date, COUNT( DISTINCT id ) AS Shares FROM ajxp_log WHERE severity = \"INFO\" AND AJXP_CURSOR_DATE AND ajxp_log.user IN ( SELECT DISTINCT login FROM ajxp_user_rights  WHERE login NOT IN ( SELECT DISTINCT login FROM ajxp_user_rights WHERE repo_uuid = \"ajxp.parent_user\" ) ) AND (params LIKE \"New Share%\" OR message LIKE \"New Share%\" ) GROUP BY DATE( logdate )  ORDER BY DATE(logdate) DESC"
   },
     {
         "NAME":"most_downloaded",

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uploader id="uploader.jumploader" order="2" enabled="false" text="51" title="162" label="CONF_MESSAGE[Jumploader]" description="CONF_MESSAGE[Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/uploader.jumploader/class.JumploaderProcessor.php" classname="JumploaderProcessor"/>
+	<class_definition filename="plugins/uploader.jumploader/Jumploader.php" classname="Pydio\Uploader\Processor\Jumploader"/>
     <client_settings>
         <resources>
             <i18n namespace="jumploader" path="plugins/uploader.jumploader/i18n"/>
@@ -11,6 +11,11 @@
     </server_settings>
 	<registry_contributions>
 		<actions>
+            <action name="jumploader_tpl">
+                <processing>
+                    <serverCallback methodName="getTemplate"/>
+                </processing>
+            </action>
 			<action name="upload">
 				<pre_processing>
 					<serverCallback methodName="preProcess"/>
@@ -35,8 +40,11 @@
 			</div>
 		]]></clientForm>
 		<dialogOnOpen><![CDATA[
-        var src = window.ajxpServerAccessPath + '&get_action=get_template&template_name=jumploader_tpl.html&pluginName=uploader.jumploader&encode=false';
+        var src = window.ajxpServerAccessPath + '&get_action=jumploader_tpl&encode=false';
         modal.getForm().down('#jumpframe').src = src;
 		]]></dialogOnOpen>
+        <activeCondition><![CDATA[
+            return navigator.javaEnabled();
+        ]]></activeCondition>
 	</processing>
 </uploader>

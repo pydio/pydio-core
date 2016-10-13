@@ -28,8 +28,8 @@
 		<!-- Stream Wrapper Access -->
 		<activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
 	</dependencies>
-    <class_definition filename="plugins/editor.browser/class.FileMimeSender.php"
-        classname="FileMimeSender" />
+    <class_definition filename="plugins/editor.browser/FileMimeSender.php"
+        classname="Pydio\Editor\Mime\FileMimeSender" />
     <registry_contributions>
     	<actions>
     		<action name="open_file" skipSecureToken="true">
@@ -77,8 +77,8 @@
             </action>
     	</actions>
         <extensions>
-            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="url"/>
-            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" messageId="openbrowser.7" mime="website"/>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" font="link" messageId="openbrowser.7" mime="url"/>
+            <extension icon="openbrowser_images/mimes/ICON_SIZE/earth.png" font="web" messageId="openbrowser.7" mime="website"/>
         </extensions>
     </registry_contributions>
 </editor>

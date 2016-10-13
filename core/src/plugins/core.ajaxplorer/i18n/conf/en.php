@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Main"      => "Main Options",
@@ -158,4 +158,23 @@ $mess=array(
 "Driver type (do not touch)" => "Driver type (do not touch)",
 "Use PHP MySQLi extension" => "Use PHP MySQLi extension",
 "Use MySQLi" => "Use MySQLi",
+"Ascending" => "Ascending",
+"Descending" => "Descending",
+"Name" => "Name",
+"Modification date" => "Modification date",
+"File size" => "File size",
+"File Type" => "File Type",
+"Read Only" => "Read Only",
+"Read and Write" => "Read and Write",
+"Write Only (upload)" => "Write Only (upload)",
+"OAuth Commons" => "OAuth Commons",
+"Client ID" => "Client ID",
+"Client SECRET" => "Client SECRET",
+"Scope" => "Scope",
+"Auth URL" => "Auth URL",
+"Token URL" => "Token URL",
+"Redirect URL" => "Redirect URL",
+"API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app",
+"API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Used to refresh or validate the token retrieved in the authentication part",
+"API setting - Redirect URL for the OAuth Application" => "API setting - Redirect URL for the OAuth Application"
 );

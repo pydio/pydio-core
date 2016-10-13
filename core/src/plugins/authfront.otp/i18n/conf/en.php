@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Authentication One-time-password" => "Authentication One-time-password",
@@ -32,4 +32,11 @@ $mess=array(
 "Yubico secret key attached to your account" => "Yubico secret key attached to your account",
 "Yubico Client ID" => "Yubico Client ID",
 "Yubico client id attached to your account" => "Yubico client id attached to your account",
+"General" => "General",
+"YubiKey 1" => "YubiKey 1",
+"YubiKey 2" => "YubiKey 2",
+"Google Authenticator" => "Google Authenticator",
+"Google Authenticator Secret" => "Google Authenticator Secret",
+"Google Authenticator Last" => "Google Authenticator Last",
+"Google Authenticator replay protection, do not edit" => "Google Authenticator replay protection, do not edit",
 );

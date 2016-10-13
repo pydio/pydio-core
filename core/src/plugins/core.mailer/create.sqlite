@@ -1,0 +1,25 @@
+/* SEPARATOR */
+CREATE TABLE ajxp_mail_queue (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  recipient TEXT,
+  url TEXT,
+  date_event INT,
+  notification_object blob,
+  html INT
+);
+/* SEPARATOR */
+CREATE TABLE ajxp_mail_sent (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  recipient TEXT,
+  url TEXT,
+  date_event INT,
+  notification_object blob,
+  html INT
+);
+/* SEPARATOR */
+CREATE TRIGGER mail_queue_go_to_sent BEFORE DELETE ON ajxp_mail_queue
+FOR EACH ROW
+    BEGIN
+        INSERT INTO ajxp_mail_sent (recipient,url,date_event,notification_object,html)
+        VALUES (old.recipient,old.url,old.date_event,old.notification_object,old.html);
+    END;

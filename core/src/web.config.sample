@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <system.webServer>
+        <rewrite>
+            <rules>
+                <rule name="redirect all requests" stopProcessing="true">
+                    <match url="^(.*)$" ignoreCase="false" />
+                    <conditions logicalGrouping="MatchAll">
+                            <add input="{REQUEST_FILENAME}" matchType="IsFile" negate="true" />
+                            <add input="{REQUEST_FILENAME}" matchType="IsDirectory" negate="true" />
+                    </conditions>
+                    <action type="Rewrite" url="index.php" appendQueryString="true" />
+                </rule>
+            </rules>
+        </rewrite>
+        <defaultDocument>
+            <files>
+                <clear />
+                <add value="index.php" />
+                <add value="index.html" />
+            </files>
+        </defaultDocument>
+        <staticContent>
+	    <remove fileExtension=".woff2" />
+            <mimeMap fileExtension=".woff2" mimeType="application/x-woff" />           
+	        <remove fileExtension=".woff" />
+	        <mimeMap fileExtension=".woff" mimeType="application/x-woff" />
+	        <remove fileExtension=".json" />
+            <mimeMap fileExtension=".json" mimeType="application/json" />
+        </staticContent>
+   </system.webServer>
+</configuration>

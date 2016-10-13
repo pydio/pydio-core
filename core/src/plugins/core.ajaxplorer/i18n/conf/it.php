@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Main"      => "Opzioni Principali",
@@ -91,7 +91,6 @@ $mess=array(
 "When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Quando una cartella contiene più elementi rispetto a quanto indicato quì, la visualizzazione passerà alla modalità paginazione, per migliorare le performance.",
 "#Items per page" => "#Elementi per pagina",
 "Once in pagination mode, number of items to display per page." => "Una volta in modalità paginazione, indica il numero di elementi da mostrare per ciascuna pagina.",
-"Default Metasources" => "Sorgenti META Principale",
 "Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista, separata da virgola, di plugin metastore e meta, che verrà automaticamente applicata a tutti i workspace creati con questo driver",
 "Auth Driver Commons" => "Driver Comuni Autenticazione",
 "Transmit Clear Pass" => "Trasmetti Password in chiaro",
@@ -138,4 +137,45 @@ $mess=array(
 "Explicitly disable WebDAV access for this repository." => "Disabilita esplicitamente l'accesso WebDAV a questo repository.",
 "Allow to group admins" => "Abilita per il gruppo admins",
 "Allow group administrators to create a repository from this template." => "Consenti al gruppo degli amministratori di creare repository da questo template.",
+"Skip auto-update admin rights" => "Salta auto-aggiornamento diritti admin",
+"If you have tons of workspaces (which is not recommanded), admin users login can take a long time while updating admin access to all repositories. Use this option to disable this step, admin will always have access to the Settings." => "Se si hanno molti workspace (raccomandato), il login degli amministratori può richiedere molto tempo per l'aggiornamento dell'accesso amministrativo a tutti i repository. Utilizzare questa opzione per disabilitare questo passaggio. L'amministratore avrà comunque sempre l'accesso alle Impostazioni.",
+"Auto apply role" => "Applicazione automatica ruolo",
+"For multiple authentication, apply this role to users authenticated via this driver" => "Per autenticazioni multiple, applica questo ruolo agli utenti autenticati con questo driver",
+"DSN" => "DSN",
+"Data Source Name" => "Data Source Name",
+"Host" => "Host",
+"Database server" => "Server Database",
+"Database" => "Database",
+"Database name" => "Nome Database",
+"File" => "File",
+"Database file" => "File Database",
+"Remote Sorting" => "Ordinamento remoto",
+"Force remote sorting when in paginated mode. Warning, this can impact the performances." => "Forza l'ordinamento remoto quando in modalità paginazione. ATTENZIONE: incide sulle prestazioni del sistema.",
+"Remote Sorting Default Field" => "Campo default ordinamento remoto",
+"Default field to sort on" => "Campo di default con cui effettuare l'ordinamento",
+"Remote Sorting Default Direction" => "Direzione default ordinamento remoto",
+"Default sorting direction" => "Direzione di default per l'ordinamento remoto",
+"Driver" => "Driver",
+"Driver type (do not touch)" => "Tipo Driver (non toccare)",
+"Use PHP MySQLi extension" => "Usa l'estensione PHP 'MySQLi'",
+"Use MySQLi" => "Usa MySQLi",
+"Ascending" => "Ascendente",
+"Descending" => "Discendente",
+"Name" => "Nome",
+"Modification date" => "Data modifica",
+"File size" => "Dimensione file",
+"File Type" => "Tipo file",
+"Read Only" => "Sola Lettura",
+"Read and Write" => "Lettura e Scrittura",
+"Write Only (upload)" => "Sola Scrittura (upload)",
+"OAuth Commons" => "OAuth Commons",
+"Client ID" => "ID Client",
+"Client SECRET" => "Client SECRET",
+"Scope" => "Contesto (Scope)",
+"Auth URL" => "URL Auth",
+"Token URL" => "URL Token",
+"Redirect URL" => "URL Redirezione",
+"API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Usato per aprire la finestra di autenticazione utente e l'accettazione dei termini d'uso dell'app",
+"API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Usato per aggiornare o verificare il token ricevuto nella parte di autenticazione",
+"API setting - Redirect URL for the OAuth Application" => "impostazioni API - URL di redirezione per l'applicazione OAuth"
 );

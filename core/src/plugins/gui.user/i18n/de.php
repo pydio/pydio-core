@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 /*******************************************************************************
 * German translation:
@@ -30,5 +30,6 @@ $mess=array(
     "4" => "Ihr Benutzername",
     "5" => "E-Mail erfolgreich versendet. Klicken Sie auf den Link in der Nachricht, um ein neues Passwort zu vergeben.",
     "6" => "Vielen Dank. Sie k&ouml;nnen sich jetzt anmelden.",
-    "7" => "Für das Konto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes angefordert. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie die E-Mail ignorieren. Ansonsten klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:", /* No HTML entities, might be the body of the mail */
+    "7" => "Für das Benutzerkonto mit dieser E-Mail-Adresse wurde eine Anfrage zum Zurücksetzen des Passwortes angefordert. Wenn Sie dieses Anfrage nicht gemacht haben, können Sie die E-Mail ignorieren. Ansonsten klicken Sie auf folgenden Link, um Ihr Passwort zurückzusetzen:", /* No HTML entities, might be the body of the mail */
+    "8" => "Bitte geben Sie nun Ihren Benutzernamen ein und bestätigen Sie das neues Passwort zweimal.",
 );

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "WebDAV (PEAR)" => "WebDAV (PEAR)",
@@ -27,4 +27,6 @@ $mess=array(
 "Path to the root folder on the server" => "Chemin du répertoire de base sur le serveur",
 "File Creation Mask" => "Masque de création des fichiers",
 "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionellement, appliquer un chmod operation. La valeur doit-être numérique, tel 0777, 0644, ...",
+"WebDAV" => "WebDAV",
+"Access WebDAV through Guzzle and SabreDAV" => "Accéder à WebDAV via Guzzle et SabreDAV",
 );

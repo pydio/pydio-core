@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -46,7 +46,7 @@ Class.create("AbstractEditor" , {
 	 */
 	editorOptions:null,
     /**
-     * @var An AjxpNode or an array of nodes
+     * @var Node or an array of nodes
      */
     inputNode : null,
 	
@@ -67,13 +67,13 @@ Class.create("AbstractEditor" , {
             this.defaultActions = new Hash({
                 'fs' : '<a id="fsButton" class="icon-resize-full"><span message_id="235"></span></a>',
                 'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><span message_id="236"></span></a>',
-                'close':'<a id="closeButton" class="icon-remove-sign"><span message_id="86"></span></a>'
+                'close':'<a id="closeButton" class="mdi mdi-close-circle"><span message_id="86"></span></a>'
             });
         }else{
             this.defaultActions = new Hash({
                 'fs' : '<a id="fsButton" class="icon-resize-full"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_fullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="235"></span></a>',
                 'nofs' : '<a id="nofsButton" class="icon-resize-small" style="display:none;"><img src="'+ajxpResourcesFolder+'/images/actions/22/window_nofullscreen.png"  width="22" height="22" alt="" border="0"><br><span message_id="236"></span></a>',
-                'close':'<a id="closeButton" class="icon-remove-sign"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
+                'close':'<a id="closeButton" class="mdi mdi-close-circle"><img src="'+ajxpResourcesFolder+'/images/actions/22/fileclose.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
             });
         }
         if(!this.editorOptions.closable){
@@ -282,7 +282,7 @@ Class.create("AbstractEditor" , {
 	 */
 	updateTitle : function(title){
 		if(this.filenameSpan) {
-            this.filenameSpan.update(title);
+            this.filenameSpan.update(he.escape(title));
         }
 		if(this.fullScreenMode){
 			this.refreshFullScreenTitle();
@@ -488,7 +488,13 @@ Class.create("AbstractEditor" , {
             if(!ajxpNode.isLeaf()) src = resolveImageSource('folder.png', "/images/mimes/ICON_SIZE", 64);
             else src = resolveImageSource('mime_empty.png', "/images/mimes/ICON_SIZE", 64);
         }
-		var imgObject = new Element("img", {src:src, width:64, height:64, align:'absmiddle', border:0});
+        var svg = AbstractEditor.prototype.getSvgSource(ajxpNode);
+        var imgObject;
+        if(svg){
+            imgObject = new Element("div", {className:"mimefont mdi mdi-"+svg, style:"font-size:28px;", "data-is_loaded": "true"});
+        }else{
+    		imgObject = new Element("img", {src:src, width:28, height:28, align:'absmiddle', border:0});
+        }
 		imgObject.resizePreviewElement = function(dimensionObject){
 			dimensionObject.maxWidth = dimensionObject.maxHeight = 64;
 			var styleObject = fitRectangleToDimension({width:64,height:64},dimensionObject);
@@ -497,8 +503,15 @@ Class.create("AbstractEditor" , {
 				var mT = parseInt((dimensionObject.width - 64)/2) + dimensionObject.margin;
 				var mB = dimensionObject.width+(dimensionObject.margin*2)-newHeight-mT-1;
 				styleObject.marginTop = mT + "px"; 
-				styleObject.marginBottom = mB + "px"; 
-			}
+				styleObject.marginBottom = mB + "px";
+                if(svg){
+                    styleObject.fontSize = styleObject.height;
+                    styleObject.lineHeight = "50px";
+                }
+			}else if(svg){
+                styleObject.fontSize = styleObject.height;
+                styleObject.lineHeight = styleObject.height;
+            }
 			this.setStyle(styleObject);
 		}.bind(imgObject);
 		return imgObject;
@@ -511,6 +524,15 @@ Class.create("AbstractEditor" , {
 	 */
 	getThumbnailSource : function(ajxpNode){
 		return resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 64);
-	}
+	},
+
+    /**
+     * Return SVG Icon if it exists
+     * @param ajxpNode
+     * @returns {V}
+     */
+    getSvgSource: function(ajxpNode){
+        return svg = ajxpNode.getMetadata().get("fonticon");
+    }
 	
 });

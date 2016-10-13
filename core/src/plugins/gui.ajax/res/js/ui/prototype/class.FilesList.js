@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -54,6 +54,8 @@ Class.create("FilesList", SelectableElements, {
         this.__allObservers = $A();
         this._parsingCache = new $H();
         this._filters = $H();
+
+        this.htmlElement.addClassName('class-FilesList');
 
 		if(typeof initDefaultDispOrOptions == "string"){
 			this.options = {};
@@ -148,6 +150,9 @@ Class.create("FilesList", SelectableElements, {
 			this._fireChange = false;
             this.setSelectedNodes(dm.getSelectedNodes());
             this._fireChange = origFC;
+//            if(!this.hasFocus){
+//                window.setTimeout(function(){pydio.UI.focusOn(this);}.bind(this),10);
+//            }
 		}.bind(this);
 
         if(this._dataModel){
@@ -163,7 +168,7 @@ Class.create("FilesList", SelectableElements, {
         }
         var userDisplay = this.getUserPreference("display");
         if(userDisplay) this._displayMode = userDisplay;
-		this._thumbSize = 64;
+		this._thumbSize = 128;
 		this._crtImageIndex = 0;
         if(this.options.fixedThumbSize){
             this._fixedThumbSize = this.options.fixedThumbSize;
@@ -252,7 +257,13 @@ Class.create("FilesList", SelectableElements, {
 	getDomNode : function(){
 		return this.htmlElement;
 	},
-	
+
+    reSort: function(){
+        if(this._sortableTable){
+            this._sortableTable.sort(0, !!this.descending);
+        }
+    },
+
 	/**
 	 * Implementation of the IAjxpWidget methods
 	 */
@@ -338,12 +349,12 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	contextObserver : function(e){
 		if(!this.crtContext || !this.htmlElement) return;
-		//console.log('FILES LIST : FILL');
-        var base = getBaseName(this.crtContext.getLabel());
-        if(!base){
-            try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
-        }
         if(!this.options.muteUpdateTitleEvent){
+            //console.log('FILES LIST : FILL');
+            var base = getBaseName(this.crtContext.getLabel());
+            if(!base){
+                try{base = ajaxplorer.user.repositories.get(ajaxplorer.repositoryId).getLabel();}catch(e){}
+            }
             this.htmlElement.fire("editor:updateTitle", base);
         }
         this.empty();
@@ -474,7 +485,7 @@ Class.create("FilesList", SelectableElements, {
 		var options1 = {
 			name:oThisId+'-multi_display',
 			src:'view_icon.png',
-            icon_class:'icon-th-large',
+            icon_class:'icon-columns',
 			text_id:150,
 			title_id:151,
 			text:MessageHash[150],
@@ -491,12 +502,6 @@ Class.create("FilesList", SelectableElements, {
                         command = window.actionArguments[0].command;
 					}
                     oThis.switchDisplayMode(command);
-                    /*
-                    window.setTimeout(function(){
-                        var item = this.subMenuItems.staticItems.detect(function(item){return item.command == command;});
-                        this.notify("submenu_active", item);
-                    }.bind(window.listenerContext), 500);
-                    */
                 }
 			},
 			listeners : {
@@ -571,7 +576,7 @@ Class.create("FilesList", SelectableElements, {
         var options3 = {
 			name:oThisId+'-thumbs_sortby',
 			src:'view_icon.png',
-            icon_class:'icon-sort',
+            icon_class:'icon-sort-by-alphabet',
 			text_id:450,
 			title_id:451,
 			text:MessageHash[450],
@@ -1404,9 +1409,7 @@ Class.create("FilesList", SelectableElements, {
     flushBulkUpdatingMode:function(){
         this.bulkUpdating = false;
         this.initRows();
-        if(this._sortableTable){
-            this._sortableTable.sort(0);
-        }
+        this.reSort();
     },
 
     getRenderer : function(){
@@ -1479,7 +1482,7 @@ Class.create("FilesList", SelectableElements, {
 			this._sortableTable.sortColumn = -1;
 			this._sortableTable.updateHeaderArrows();
 		}
-        if(this.options.fixedSortColumn && this.options.fixedSortDirection && !contextNode.getMetadata().get("filesList.sortColumn") && !this.paginationData){
+        if(this.options.fixedSortColumn && this.options.fixedSortDirection && !contextNode.getMetadata().get("filesList.sortColumn") && (!this.paginationData || this.paginationData.get("total") == "1")){
             var col = this.columnsDef.detect(function(c){
                 return c.attributeName == this.options.fixedSortColumn;
             }.bind(this));
@@ -1581,6 +1584,7 @@ Class.create("FilesList", SelectableElements, {
 		var scrollTop = 0;
         var addStyle = {fontSize: '12px'};
         var span, posSpan;
+        var smallThumb = false;
         if(this._displayMode == "list"){
             span = item.select('span.text_label')[0];
             posSpan = item.select('span.list_selectable_span')[0];
@@ -1589,10 +1593,20 @@ Class.create("FilesList", SelectableElements, {
             scrollTop = this.htmlElement.down('div.table_rows_container').scrollTop;
         }else if(this._displayMode == "thumb"){
             span = item.select('div.thumbLabel')[0];
-            posSpan = span;
+            if(item.hasClassName('fl-displayMode-thumbsize-small')){
+                posSpan = item;
+                smallThumb = true;
+            }else{
+                posSpan = span;
+            }
             offset.top=-2;
             offset.left=3;
             scrollTop = this.htmlElement.down('.selectable_div').scrollTop;
+            addStyle = {
+                marginTop: item.hasClassName('fl-displayMode-thumbsize-large') ? '10px' : '6px',
+                padding: item.hasClassName('fl-displayMode-thumbsize-large') ? '2px': 0,
+                border: 0
+            };
         }else if(this._displayMode == "detail"){
             span = item.select('div.thumbLabel')[0];
             posSpan = span;
@@ -1683,7 +1697,7 @@ Class.create("FilesList", SelectableElements, {
 			width:'46px',
 			zIndex:2500,
 			left:(pos.left+offset.left+origWidth)+'px',
-			top:((pos.top+offset.top-scrollTop)+1)+'px'
+			top:smallThumb ? '182px' : ((pos.top+offset.top-scrollTop)+1)+'px'
 		});
 		var closeFunc = function(){
 			span.setStyle({color:''});
@@ -1778,42 +1792,47 @@ Class.create("FilesList", SelectableElements, {
                 var textLabel = new Element("span", {
                     id          :'ajxp_label',
                     className   :'text_label'+fullview
-                }).update(metaData.get('text'));
+                }).update(he.escape(metaData.get('text')));
 
-                var backgroundPosition = this.options.iconBgPosition || '4px 2px';
-                var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                if(metaData.get('overlay_class') && ajaxplorer.currentThemeUsesIconFonts){
-                    metaData.get('overlay_class').split(',').each(function(c){
-                        textLabel.insert(new Element('span', {className:c+' overlay-class-span'}));
-                    });
-                }else if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
-                    var ovIcs = metaData.get('overlay_icon').split(',');
-                    switch(ovIcs.length){
-                        case 1:
-                            backgroundPosition = '14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 2:
-                            backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 3:
-                            backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
-                        case 4:
-                        default:
-                            backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                            backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
-                        break;
+                if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
+                    textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
+                    if(metaData.get('overlay_class')){
+                        metaData.get('overlay_class').split(',').each(function(c){
+                            textLabel.insert(new Element('span', {className:c+' overlay-class-span'}));
+                        });
                     }
+                }else{
+                    var backgroundPosition = this.options.iconBgPosition || '4px 2px';
+                    var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                    if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
+                        var ovIcs = metaData.get('overlay_icon').split(',');
+                        switch(ovIcs.length){
+                            case 1:
+                                backgroundPosition = '14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 2:
+                                backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 3:
+                                backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                            case 4:
+                            default:
+                                backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
+                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                break;
+                        }
+                    }
+                    textLabel.setStyle({
+                        paddingLeft:'27px',
+                        backgroundRepeat:'no-repeat',
+                        backgroundPosition:backgroundPosition,
+                        backgroundImage:backgroundImage
+                    });
                 }
-                textLabel.setStyle({
-                    paddingLeft:'24px',
-                    backgroundRepeat:'no-repeat',
-                    backgroundPosition:backgroundPosition,
-                    backgroundImage:backgroundImage
-                });
 
 				var innerSpan = new Element("span", {
 					className:"list_selectable_span", 
@@ -1876,7 +1895,7 @@ Class.create("FilesList", SelectableElements, {
 			}
 			newRow.appendChild(tableCell);
 			if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(tableCell, ajxpNode, 'row', attributeList.get(s));
+                attributeList.get(s).modifierFunc(tableCell, ajxpNode, 'row', attributeList.get(s), newRow);
 			}
 		}
 
@@ -1909,7 +1928,7 @@ Class.create("FilesList", SelectableElements, {
 	 */
 	ajxpNodeToDiv: function(ajxpNode){
 		var newRow = new Element('div', {
-            className:"thumbnail_selectable_cell",
+            className:"thumbnail_selectable_cell background-cover",
             id:"item-"+slugString(ajxpNode.getPath())});
 
 		var innerSpan = new Element('span', {style:"cursor:default;"});
@@ -1920,7 +1939,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 		
 		innerSpan.insert({"bottom":img});
 		innerSpan.insert({"bottom":label});
@@ -1958,14 +1977,14 @@ Class.create("FilesList", SelectableElements, {
                 });
                 ovDiv.addClassName('overlay_icon_div');
             }
-            innerSpan.insert({after:ovDiv});
+            label.insert({bottom:ovDiv});
         }
 
 		this._htmlElement.insert(newRow);
 
         this.getFromCache("columns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(newRow, ajxpNode, 'thumb', pair.value);
+                pair.value.modifierFunc(newRow, ajxpNode, 'thumb', pair.value, newRow);
             }
         });
 
@@ -2016,7 +2035,7 @@ Class.create("FilesList", SelectableElements, {
 		var label = new Element('div', {
 			className:"thumbLabel",
 			title:textNode.stripTags()
-		}).update(textNode);
+		}).update(he.escape(textNode));
 
 		innerSpan.insert({"bottom":img});
 		//newRow.insert({"bottom":label});
@@ -2100,7 +2119,7 @@ Class.create("FilesList", SelectableElements, {
             addedCell++;
             first = false;
             if(attributeList.get(s).modifierFunc){
-                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s));
+                attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s), largeRow);
             }
         }
 
@@ -2112,7 +2131,7 @@ Class.create("FilesList", SelectableElements, {
 
         this.getFromCache("hiddenColumns").each(function(pair){
             if(pair.value.modifierFunc){
-                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value);
+                pair.value.modifierFunc(largeRow, ajxpNode, 'detail', pair.value, largeRow);
             }
         });
 
@@ -2184,16 +2203,7 @@ Class.create("FilesList", SelectableElements, {
 		var percent = parseInt( parseInt(ajxpNode.getMetadata().get("bytesize")) / parseInt(ajxpNode.getMetadata().get("target_bytesize")) * 100  );
 		var uuid = "ajxp_"+(new Date()).getTime();
 		var div = new Element('div', {style:'padding-left:3px;', className:'text_label'}).update('<span class="percent_text" style="line-height:19px;padding-left:5px;">'+percent+'%</span>');
-		var span = new Element('span', {id:uuid}).update('0%');		
-		var options = {
-			animate		: true,										// Animate the progress? - default: true
-			showText	: false,									// show text with percentage in next to the progressbar? - default : true
-			width		: 80,										// Width of the progressbar - don't forget to adjust your image too!!!
-			boxImage	: window.ajxpResourcesFolder+'/images/progress_box_80.gif',			// boxImage : image around the progress bar
-			barImage	: window.ajxpResourcesFolder+'/images/progress_bar_80.gif',	// Image to use in the progressbar. Can be an array of images too.
-			height		: 8,										// Height of the progressbar - don't forget to adjust your image too!!!
-            visualStyle : 'position:relative;'
-		};
+		var span = new Element('span', {id:uuid, className:'partSizeRender'}).update('0%');
         if(type == "detail" && element.down(".thumbnail_cell_metadata")){
             element.down(".thumbnail_cell_metadata").update(div);
         }else{
@@ -2224,7 +2234,6 @@ Class.create("FilesList", SelectableElements, {
 		}
 		span.setAttribute('data-target_size', ajxpNode.getMetadata().get("target_bytesize"));
 		window.setTimeout(function(){
-			span.pgBar = new JS_BRAMUS.jsProgressBar(span, percent, options);
 			var pe = new PeriodicalExecuter(function(){
 				if(!$(uuid)){ 
 					pe.stop();
@@ -2242,7 +2251,7 @@ Class.create("FilesList", SelectableElements, {
 						pydio.getController().fireAction("refresh");
 					}else{
 						var newPercentage = parseInt( parseInt(transport.responseText)/parseInt($(uuid).getAttribute('data-target_size'))*100 );
-						$(uuid).pgBar.setPercentage(newPercentage);
+						$(uuid).setStyle({backgroundSize:newPercentage + '% 100%'});
 						$(uuid).next('span.percent_text').update(newPercentage+"%");
 					}
 				};
@@ -2269,7 +2278,7 @@ Class.create("FilesList", SelectableElements, {
 		elList.each(function(element){
 
             try{
-                var image_element = element.IMAGE_ELEMENT || element.down('img');
+                var image_element = element.IMAGE_ELEMENT /*|| element.down('img')*/;
                 var label_element = element.LABEL_ELEMENT || element.down('.thumbLabel');
             }catch(e){
                 return;
@@ -2384,6 +2393,9 @@ Class.create("FilesList", SelectableElements, {
 				rows[i].remove();
 			}
 		}
+        this.htmlElement.select("div[data-groupByValue] > h3").map(function(head){
+            head.remove();
+        });
 		if(!skipFireChange) this.fireChange();
         this.notify("rows:didClear");
 	},

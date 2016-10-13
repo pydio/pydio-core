@@ -12,12 +12,12 @@
 		<param name="SQL_DRIVER" type="group_switch:dibi" label="CONF_MESSAGE[Connexion]" description="CONF_MESSAGE[The Database Connexion]" mandatory="true" default="core"/>
         <param type="button" name="INSTALL_SQL" choices="run_plugin_action:conf.sql:installSQLTables" label="CONF_MESSAGE[SQL Tables]" description="CONF_MESSAGE[Install SQL Tables]" mandatory="false"/>
 	</server_settings>
-	<class_definition filename="plugins/conf.sql/class.sqlConfDriver.php" classname="sqlConfDriver"/>
+	<class_definition filename="plugins/conf.sql/SqlConfDriver.php" classname="Pydio\Conf\Sql\SqlConfDriver"/>
 	<registry_contributions>
 		<external_file filename="plugins/core.conf/standard_conf_actions.xml" include="actions/*,client_configs/*" exclude=""/>
         <actions>
             <action name="user_team_create">
-                <gui src="delete.png" iconClass="icon-create" text="user_dash.57" title="user_dash.57">
+                <gui src="delete.png" iconClass="icon-plus" text="user_dash.57" title="user_dash.57">
                     <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
                 </gui>
                 <processing>
@@ -67,13 +67,13 @@
                     <clientForm id="team_edit_form"><![CDATA[
                          <div id="team_edit_form" box_width="420">
                             <div class="dialogContentMainTitle" ajxp_message_id="user_dash.59">AJXP_MESSAGE[user_dash.59]</div>
-                            <input type="text" style="width:394px;margin-bottom:30px;" id="team_edit_label"/>
+                            <input type="text" style="width:367px;margin-bottom:30px;" id="team_edit_label"/>
 
                             <div class="dialogContentMainTitle" ajxp_message_id="user_dash.60">AJXP_MESSAGE[user_dash.60]</div>
                             <div class="dialogLegend" ajxp_message_id="user_dash.56">AJXP_MESSAGE[user_dash.56]</div>
                             <div style="position: relative;">
                                 <div id="team_loader" style="position: absolute;top: 2px;right: 3px;font-size: 17px;display: none;"><span class="icon-spinner"></span></div>
-                                <input type="text" style="width:394px;" id="team_edit_input"/>
+                                <input type="text" style="width:367px;" id="team_edit_input"/>
                                 <div type="text" class="editable_users_list" id="team_edit_entries"></div>
                                 <div id="team_edit_container"></div>
                             </div>
@@ -110,15 +110,23 @@
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
+            <action name="ajxp_table_exists">
+                <rightsContext adminOnly="true" noUser="false" read="true" userLogged="only" write="true"/>
+                <processing>
+                    <serverCallback methodName="ajxpTableExists" restParams="/table_name"/>
+                </processing>
+            </action>
         </actions>
         <client_configs>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="team_pane"
-                                tabInfo='{"id":"team_pane","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
+                                tabInfo='{"id":"teams","position":2,"iconClass":"icon-group","element":"team_pane","closeable":false,"label":"user_dash.50","title":"user_dash.51","dontFocus":true}'
                                 paneInfo='{"type":"widget"}'><![CDATA[
                 <div id="team_pane" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"team_panel","toolbarsList":["team_address_book"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]</h3>
+                    <div class="title-flex">
+                        <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.50]<div class="legend">AJXP_MESSAGE[user_dash.51]</div></h3>
+                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"team_panel","toolbarsList":["team_address_book"],"submenuOffsetTop":2}'></div>
+                    </div>
                     <div id="team_panel" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"teams"}}' class="tabbed_editor display_metadata"></div>
                 </div>
                 ]]></additional_tab>

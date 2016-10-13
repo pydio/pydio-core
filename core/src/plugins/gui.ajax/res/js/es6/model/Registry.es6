@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 class Registry{
 
@@ -146,7 +146,8 @@ class Registry{
                 icon_class : xmlNode.getAttribute("iconClass"),
                 editorClass : xmlNode.getAttribute("className"),
                 mimes : xmlNode.getAttribute("mimes").split(","),
-                write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false)
+                write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false),
+                canWrite: (xmlNode.getAttribute("canWrite") && xmlNode.getAttribute("canWrite")=="true"?true:false)
             };
             for(var k in properties){
                 if(properties.hasOwnProperty(k)){
@@ -177,6 +178,7 @@ class Registry{
                 }catch(e){
                     Logger.error("Ignoring Error in extensionOnInit code:");
                     Logger.error(extensionOnInit.firstChild.nodeValue);
+                    Logger.error(e.message);
                 }
             }
             var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
@@ -245,7 +247,7 @@ class Registry{
     findEditorsForMime (mime, restrictToPreviewProviders){
         var editors = [];
         var checkWrite = false;
-        if(this.user != null && !this.user.canWrite()){
+        if(this._pydioObject.user != null && !this._pydioObject.user.canWrite()){
             checkWrite = true;
         }
         this._extensionsRegistry.editor.forEach(function(el){

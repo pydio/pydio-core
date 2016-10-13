@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -66,7 +66,7 @@ Class.create("Modal", {
             if(sIconClass){
                 hString = "<span class=\"titleString\"><span class='"+sIconClass+" ajxp_icon_span'></span>";
             }
-            closeBtn = '<span id="modalCloseBtn" class="icon-remove" style="cursor:pointer;float:right;"></span>';
+            closeBtn = '<span id="modalCloseBtn" class="mdi mdi-close" style="cursor:pointer;float:right;"></span>';
         }else{
             closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';
         }
@@ -136,8 +136,12 @@ Class.create("Modal", {
 		}
 		this.dialogContent.appendChild(newForm);
 		var boxPadding = $(sFormId).getAttribute("box_padding");
-		if(!boxPadding) boxPadding = 10;
-		this.dialogContent.setStyle({padding:boxPadding+'px'});
+		if(!boxPadding) {
+            boxPadding = '';
+        }else{
+            boxPadding += 'px';
+        }
+		this.dialogContent.setStyle({padding:boxPadding});
 
 		if(this.dialogTitle.select('#modalCloseBtn')[0]){
             if(fOnCancel){
@@ -417,15 +421,6 @@ Class.create("Modal", {
     },
 
 
-    createTopCaret:function(element){
-        "use strict";
-        element.insert({top:'<span class="icon-caret-up ajxp-caret-up"></span>'});
-        var caret = element.down('span.ajxp-caret-up');
-        caret.setStyle({
-            left: (element.getWidth() -  caret.getWidth()) / 2 + 'px'
-        });
-    },
-
 	/**
 	 * Returns the current form, the real one.
 	 * @returns HTMLForm
@@ -562,24 +557,24 @@ Class.create("Modal", {
             contDiv.setStyle({direction:'rtl'});
         }
 		var okButton = new Element('input', {
-			type:'image',
+			type:'submit',
 			name:(bOkButtonOnly ? (bOkButtonOnly =='close' ? 'close' :'ok') :'ok'),
-			src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
+			//src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
-			title:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
+			value:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
 		okButton.addClassName('dialogButton');
 		okButton.addClassName('dialogFocus');
         contDiv.insert(okButton);
 		if(!bOkButtonOnly)
 		{
 			var caButton = new Element('input', {
-				type:"image",
+				type:"button",
 				name:"can",
 				height:22,
 				width:22,
-				src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
-				title:MessageHash[49],
+				//src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
+				value:MessageHash[49],
 				className:"dialogButton"
 			});
 			if(fOnCancel){
@@ -618,6 +613,12 @@ Class.create("Modal", {
 	simpleTooltip : function(element, title, position, className, hookTo, updateOnShow){
         if(!position) position = 'bottom right';
         if(!hookTo) hookTo = 'pointer';
+        if(!this.REMOVE_TOOLTIP_OBSERVER){
+            this.REMOVE_TOOLTIP_OBSERVER = function(){
+                if(this.tooltip) this.tooltip.hide();
+            }.bind(this);
+            document.observe("ajaxplorer:registry_loaded", this.REMOVE_TOOLTIP_OBSERVER);
+        }
 		element.observe("mouseover", function(event){
 			if(!this.tooltip){
 				this.tooltip = new Element("div", {className:"simple_tooltip"});
@@ -709,7 +710,7 @@ Class.create("Modal", {
 			this.messageBox.update(this.messageContent);
 			this.messageBox.observe("click", this.closeMessageDiv.bind(this));
 		}
-		message = message.stripScripts();
+		message = he.escape(message);
 		message = message.replace(new RegExp("(\\n)", "g"), "<br>");
 		if(messageType == "ERROR"){ this.messageBox.removeClassName('logMessage');  this.messageBox.addClassName('errorMessage');}
 		else { this.messageBox.removeClassName('errorMessage');  this.messageBox.addClassName('logMessage');}
@@ -731,14 +732,11 @@ Class.create("Modal", {
         }else {
 			container = $(ajxpBootstrap.parameters.get("MAIN_ELEMENT"));
 		}
-		var containerOffset = Position.cumulativeOffset(container);
-		var containerDimensions = container.getDimensions();
-		var boxWidth = parseInt(containerDimensions.width * 90/100);
-		var leftPosition = containerOffset[0] + parseInt(containerDimensions.width*5/100);
+        var boxPosition = this.computeMessageBoxPosition(container);
 		this.messageBox.setStyle({
 			bottom:'20px',
-			left:leftPosition+'px',
-			width:boxWidth+'px'
+			left:boxPosition.left+'px',
+			width:boxPosition.width+'px'
 		});
 		new Effect.MessageAppear(this.messageBox);
         if(window.console){
@@ -747,6 +745,27 @@ Class.create("Modal", {
         }
 		this.tempoMessageDivClosing();
 	},
+
+    computeMessageBoxPosition: function(container){
+
+        var dim = container.getDimensions();
+        if(!container.visible()) dim = {width:0, height: 0};
+        while((!dim.width || !dim.height) && container.parentNode){
+            container = container.parentNode;
+            if(!container.visible()) continue;
+            if(container === window.document) {
+                dim = document.viewport.getDimensions();
+            } else {
+                dim = container.getDimensions();
+            }
+        }
+        var offset = Position.cumulativeOffset(container);
+        var boxWidth = parseInt(dim.width * 90/100);
+        var leftPosition = offset[0] + parseInt(dim.width*5/100);
+        return {left: leftPosition, width: boxWidth};
+        
+    },
+
 	/**
 	 * Bootloader helper. Sets total steps
 	 * @param count Integer
@@ -807,7 +826,13 @@ Class.create("Modal", {
 			Event.stopObserving(window, "resize", this.currentResizeListener);
             this.currentResizeListener = null;
 		}
-	}
+	},
+    /**
+     * Encapsulate HideLightBox call
+     */
+    dismiss: function(){
+        hideLightBox();
+    }
 });
 	
 var modal = new Modal();

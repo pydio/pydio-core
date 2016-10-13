@@ -16,18 +16,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 $mess = array(
-    "1" => "Index Inhalt",
-    "2" => "Index Verzeichnisinhalt",
-    "3" => "Indexieren im Hintergrund ausführen",
-    "4" => "Der Index scheint gesperrt zu sein, ein Indexierungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
+    "1" => "Inhalt in­de­xie­ren",
+    "2" => "Verzeichnisinhalt in­de­xie­ren",
+    "3" => "In­de­xie­rung wird im Hintergrund ausführt",
+    "4" => "Der Index scheint gesperrt zu sein, ein In­de­xie­rungsprozess könnte bereits laufen. Falls nicht, bitte die .ajxp_lock-Datei im Verzeichnis cache/indexes löschen.",
     "5" => "Indexierung abgeschlossen",
-    "6" => "Warning, the repository is currently being indexed, please retry later.",
-    "7" => "First indexing of this repository, please wait and retry your search",
-    "8" => "Indexing %s in background",
-    "9" => "Cannot find index for current repository! You should trigger the indexation of the data first!",
-    "10" => "Indexing subfolders in background",
+    "6" => "Warnung, die Indexierung der Arbeitsumgebung wird gerade ausgeführt. Bitte versuchen Sie es später noch einmal.",
+    "7" => "Die Arbeitsumgebung wird zum ersten Mal indexiert. Bitte versuchen Sie es später noch einmal.",
+    "8" => "In­de­xie­rung von '%s' wird im Hintergrund ausführt",
+    "9" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung.",
+    "10" => "In­de­xie­rung des Unterordners wird im Hintergrund ausführt",
 );

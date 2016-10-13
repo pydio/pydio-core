@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Client Plugin" => "Client Plugin",
@@ -94,4 +94,17 @@ $mess=array(
 "Minisite" => "Minisite",
 "Minisite Logo" => "Minisite Logo",
 "Top-right logo displayed on minisite page" => "Top-right logo displayed on minisite page",
+"User Home Logo" => "User Home Logo",
+"Web Session" => "Web Session",
+"Google Analytics Analytics ID" => "Google Analytics Analytics ID",
+"Google Analytics Analytics Domain" => "Google Analytics Analytics Domain",
+"Set the domain for your analytics reports (not mandatory!)" => "Set the domain for your analytics reports (not mandatory!)",
+"Google Analytics Analytics Events" => "Google Analytics Analytics Events",
+"Low-Resolution Background" => "Low-Resolution Background",
+"Make sure to use a smaller resolution image, otherwise mobile loading is very slow." => "Make sure to use a smaller resolution image, otherwise mobile loading is very slow.",
+"Background Attributes (Low Resolution)" => "Background Attributes (Low Resolution)",
+"Display Branding Tool" => "Display Branding Tool",
+"Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option.",
+"Use configured branding" => "Use configured branding",
+"Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option.",
 );

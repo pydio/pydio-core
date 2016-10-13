@@ -16,13 +16,12 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Syncable Workspace" => "Workspace Sincronizzabile",
 "Track changes on this workspace to enable the synchronization with an external client" => "Traccia le modifiche in questo workspace per consentire la sincronizzazione con un client esterno.",
 "SQL Tables" => "Tabelle SQL",
 "Install SQL Tables" => "Installa Tabelle SQL",
-"Syncable Workspace" => "Workspace Sincronizzabile",
 "Workspace is syncable" => "Il Workspace è sincronizzabile",
 );

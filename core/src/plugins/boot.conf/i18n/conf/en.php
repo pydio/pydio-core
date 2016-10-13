@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -64,7 +64,6 @@ $mess = array(
 "Your system title" => "Your system title",
 "Welcome Message" => "Welcome Message",
 "An additional message displayed at startup, on the splash screen and the login screen." => "An additional message displayed at startup, on the splash screen and the login screen.",
-"Admin Display Name" => "Admin Display Name",
 "User-friendly name of the user" => "User-friendly name of the user",
 "Welcome to Pydio" => "Welcome to Pydio",
 "Database Connexion" => "Database Connexion",
@@ -76,4 +75,6 @@ $mess = array(
 "Detected Server Path" => "Detected Server Path",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Make sure this is correct, as it's used to rewrite the htaccess file",
 "Select a language activated by default( users will still be able to switch)" => "Select a language activated by default( users will still be able to switch)",
+"Enable cache (recommended)" => "Enable cache (recommended)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
 );

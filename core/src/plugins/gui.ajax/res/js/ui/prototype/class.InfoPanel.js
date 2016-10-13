@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -89,12 +89,15 @@ Class.create("InfoPanel", AjxpPane, {
         document.stopObserving("ajaxplorer:user_logged", this.userLogHandler );
         this.htmlElement.up('div.dialogBox').setStyle({width:Math.min(450, document.viewport.getWidth())+'px'});
         this.htmlElement.up('div.dialogContent').setStyle({padding:0});
-        this.htmlElement.down('#ip_content_info_panel').setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});
+        this.contentContainer = this.htmlElement.down('#ip_content_info_panel');
+        this.contentContainer.setStyle({position:"relative", top:0, left:0, width:'100%', height: Math.min(450, document.viewport.getHeight()-28)+'px', overflow:'auto'});
         try{
             this.htmlElement.down('#ip_content_modal_action_form').remove();
             this.htmlElement.down('#ip_scroller_modal_action_form').remove();
         }catch (e){}
         modal.refreshDialogPosition();
+        this.options.skipActions = true;
+        this.addActions("unique");
     },
 
 	/**
@@ -138,6 +141,9 @@ Class.create("InfoPanel", AjxpPane, {
             this.htmlElement.select(".class-FetchedResultPane").each(function(el){
                 el.ajxpPaneObject.destroy();
             });
+            this.htmlElement.select(".infopanel-destroyable-pane").each(function(el){
+                el.destroy();
+            });
         }
 		this.setContent('');
 	},
@@ -148,7 +154,7 @@ Class.create("InfoPanel", AjxpPane, {
 	update : function(objectOrEvent){
 		if(!this.htmlElement) return;
         var passedNode;
-        if(objectOrEvent.__className && objectOrEvent.__className == "AjxpNode"){
+        if(objectOrEvent instanceof AjxpNode){
             passedNode = objectOrEvent;
         }
         this.insertedTemplates = $A();
@@ -242,8 +248,13 @@ Class.create("InfoPanel", AjxpPane, {
         }else{
             uniqNode = passedNode;
         }
+        if(this._currentObservedNode){
+            this._currentObservedNode.stopObserving("node_replaced", this.updateHandler);
+        }
+        this._currentObservedNode = uniqNode;
+        this._currentObservedNode.observeOnce("node_replaced", this.updateHandler);
 
-        this.updateTitle(uniqNode.getLabel());
+        this.updateTitle(he.escape(uniqNode.getLabel()));
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
         if(!isFile && uniqNode && uniqNode.isRoot()){
@@ -430,9 +441,9 @@ Class.create("InfoPanel", AjxpPane, {
                 }
 				tAttributes.each(function(attName){
 					if(attName == 'basename' && metadata.get('filename')){
-						this[attName] = getBaseName(metadata.get('filename'));
+						this[attName] = he.escape(getBaseName(metadata.get('filename')));
                         if(metadata.get('text')){
-                            this[attName] = metadata.get('text');
+                            this[attName] = he.escape(metadata.get('text'));
                         }
 					} else if(attName == 'compute_image_dimensions'){
 						if(metadata.get('image_width') && metadata.get('image_height')){
@@ -452,10 +463,10 @@ Class.create("InfoPanel", AjxpPane, {
 					} else if(attName == 'preview_simple'){
                         if(multipleNodes){
                             var s ='';
-                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview">#{preview}</div><div class="tile_label">#{label}</div></div>');
+                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview_container"><div class="tile_preview">#{preview}</div></div><div class="tile_label">#{label}</div></div>');
                             multipleNodes.each(function(n){
                                 var p = oThis.getPreviewElement(n, false, false);
-                                var args = {label:getBaseName(n.getMetadata().get('filename'))};
+                                var args = {label:he.escape(PathUtils.getBasename(n.getMetadata().get('filename')))};
                                 if(Object.isString(p)) args['preview']=p;
                                 else if(Object.isElement(p) && p.outerHTML) args['preview']= p.outerHTML;
                                 s += simpleTpl.evaluate(args);
@@ -486,7 +497,7 @@ Class.create("InfoPanel", AjxpPane, {
 						}
 						this[attName] = url;
 					} else if(metadata.get(attName)){
-						this[attName] = metadata.get(attName);
+						this[attName] = he.escape(metadata.get(attName));
 					} else{
 						this[attName] = '';
 					}
@@ -504,7 +515,8 @@ Class.create("InfoPanel", AjxpPane, {
             this.insertedTemplates.push(registeredTemplates[i]);
 			if(tModifier){
                 var cContainer = this.contentContainer;
-                ResourcesManager.detectModuleToLoadAndApply(tModifier, function(){
+                var className = tModifier.split('.',1).shift();
+                ResourcesManager.loadClassesAndApply([className], function(){
                     if(!cContainer) return;
                     try{
                         var modifierFunc = eval(tModifier);
@@ -515,7 +527,15 @@ Class.create("InfoPanel", AjxpPane, {
                 });
 			}
 		}
-        if(this.contentContainer.down('#info_panel_primary') && this.contentContainer.down('div.infoPanelAllMetadata')){
+        var primaryPanel = this.contentContainer.down('#info_panel_primary');
+        if(primaryPanel){
+            if(!primaryPanel.innerHTML.strip()){
+                primaryPanel.addClassName("empty");
+            }else{
+                primaryPanel.removeClassName("empty");
+            }
+        }
+        if(primaryPanel && this.contentContainer.down('div.infoPanelAllMetadata')){
             this.contentContainer.select('[data-infoPanelPosition]').each(function(ip){
                 if(ip.readAttribute('data-infoPanelPosition') == 'first'){
                     this.contentContainer.down('#info_panel_primary').insert({after:ip});
@@ -596,7 +616,7 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}
 		}
-		return '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
+		return AbstractEditor.prototype.getPreview(ajxpNode).outerHTML; // '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
 	},
 	/**
 	 * Parses config node

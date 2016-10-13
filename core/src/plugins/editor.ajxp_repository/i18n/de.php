@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Arbeitsumgebungs-Editor",
@@ -27,7 +27,7 @@ $mess=array(
 "6" => "Parameter bearbeiten",
 "7" => "Aktivieren Sie Erweiterungen mit Zusatzfunktionen für die Arbeitsumgebung. Die Änderungen werden erst durch einen Klick auf 'Quelle hinzufügen' aktiv.",
 "8" => "Auf eine Erweiterung klicken, um die Parameter zu bearbeiten oder die Funktion zu entfernen",
-"9" => "%s Plugins",
+"9" => "%s Erweiterungen",
 "10" => "Quelle für Metadaten",
 "11" => "Quelle hinzufügen",
 "12" => "Erweiterung",

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "File System (Standard)" => "File System (Standard)",
@@ -39,10 +39,10 @@ $mess=array(
 "Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Opzione per eliminare automaticamente i documenti dopo il numero di giorni specificato (anche se condivisi). Richiede la configurazione manuale di un CRON job. Lascia 0 se non itendi usare questa funzione.",
 "Purge Days (Soft limit)" => "Giorni validità (Limite Soft)",
 "Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Opzione per eliminare automaticamente i documenti dopo il numero di giorni specificato (se NON condivisi). Richiede la configurazione manuale di un CRON job. Lascia 0 se non itendi usare questa funzione.",
-"Remote Sorting" => "Ordinamento Remoto",
-"Force remote sorting when in paginated mode. Warning, this can impact the performances." => "Forza l'ordinamento remoto in modalità paginata. Attenzione: può influenzare le performance.",
 "Use POSIX" => "Usa POSIX",
 "Use php POSIX extension to read files permissions. Only works on *nix systems." => "Usa l'estensione POSIX per PHP per leggere i permessi sui file. Funziona solo sui sistemi *nix.",
 "X-Accel-Redirect Active" => "X-Accel-Redirect Attivo",
 "Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping" => "Delega tutte le operazioni di download a nginx, usando l'header X-Accel-Redirect. Attenzione: devi aggiungere manualmente qualche configurazione a nginx, come l'X-Accel Mapping.",
+"Zip downloading files on the fly" => "Zip downloading files on the fly",
+"Directly write the zip file to an output stream which is connected to the user's browser." => "Directly write the zip file to an output stream which is connected to the user's browser.",
 );

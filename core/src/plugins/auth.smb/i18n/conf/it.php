@@ -16,13 +16,17 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"SMB Authentification" => "Autenticazione SMB",
+"SMB Authentication" => "Autenticazione SMB",
 "Authenticate user by directly connecting to an SMB share" => "Autentica gli utenti collegandoli direttamente ad una condivisione SMB",
 "Repository" => "Repository",
 "Id of the repository to use for testing connexion" => "ID del repository da usare per provare la connessione",
 "Admin user" => "Utente Admin",
 "The ID of an existing admin for Pydio (using conf.serial)" => "ID di un utente amministratore esistente per Pydio (usando conf.serial)",
+"Workspace" => "Workspace",
+"ID of the workspace used to validate credentials" => "ID of the workspace used to validate credentials",
+"Smbclient" => "Smbclient",
+"Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
 );

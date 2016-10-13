@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /** 
@@ -38,6 +38,11 @@ class Repository {
         this.slug = '';
         this.owner = '';
         this.description = '';
+        this._hasContentFilter = false;
+        this._hasUserScope = false;
+        this._repositoryType = 'local';
+        this._accessStatus = null;
+        this._lastConnection = null;
         if(window.ajxpResourcesFolder){
     		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
         }
@@ -50,6 +55,14 @@ class Repository {
 	 */
 	getId(){
 		return this.id;
+	}
+
+	/**
+	 * @returns String
+	 */
+	getShareId(){
+		return this.id.replace(/ocs_remote_share_/, '');
+
 	}
 	
 	/**
@@ -65,11 +78,12 @@ class Repository {
 		this.label = label;
 	}
 
-    getHtmlBadge(){
+    getHtmlBadge(noClass=false){
         if(!this.label) return '';
         if(!this.badge){
+            var className = noClass ? '' : 'letter_badge';
             var letters = this.label.split(" ").map(function(word){return word.substr(0,1)}).slice(0,3).join("");
-            this.badge = "<span class='letter_badge'>"+ letters +"</span>";
+            this.badge = "<span class='"+className+"'>"+ letters +"</span>";
         }
         return this.badge;
     }
@@ -145,7 +159,43 @@ class Repository {
     getOverlay(){
         return (this.getOwner() ? resolveImageSource("shared.png", "/images/overlays/ICON_SIZE", 8):"");
     }
-	
+
+    /**
+     * @returns {boolean}
+     */
+    hasContentFilter(){
+        return this._hasContentFilter;
+    }
+
+    /**
+     * @returns {boolean}
+     */
+    hasUserScope(){
+        return this._hasUserScope;
+    }
+
+    /**
+     * @returns {string}
+     */
+    getRepositoryType(){
+        return this._repositoryType;
+    }
+
+    /**
+     * @returns {string}
+     */
+    getAccessStatus(){
+        return this._accessStatus;
+    }
+
+    setAccessStatus(status) {
+    	this._accessStatus = status;
+    }
+
+    getLastConnection(){
+        return this._lastConnection;
+    }
+
 	/**
 	 * Parses XML Node
 	 * @param repoNode XMLNode
@@ -154,6 +204,22 @@ class Repository {
 		if(repoNode.getAttribute('allowCrossRepositoryCopy') && repoNode.getAttribute('allowCrossRepositoryCopy') == "true"){
 			this.allowCrossRepositoryCopy = true;
 		}
+		if(repoNode.getAttribute('hasContentFilter') && repoNode.getAttribute('hasContentFilter') == "true"){
+			this._hasContentFilter = true;
+		}
+		if(repoNode.getAttribute('userScope') && repoNode.getAttribute('userScope') == "true"){
+			this._hasUserScope = true;
+		}
+		if(repoNode.getAttribute('repository_type')){
+			this._repositoryType = repoNode.getAttribute('repository_type');
+		}
+		if(repoNode.getAttribute('access_status')){
+			this._accessStatus = repoNode.getAttribute('access_status');
+		}
+        if(repoNode.getAttribute('last_connection')){
+            this._lastConnection = repoNode.getAttribute('last_connection');
+        }
+
 		if(repoNode.getAttribute('user_editable_repository') && repoNode.getAttribute('user_editable_repository') == "true"){
 			this.userEditable = true;
 		}

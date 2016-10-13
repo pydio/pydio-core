@@ -16,13 +16,15 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess = array(
-    "Application Logger" => "Protokollierung",
-    "Setup the logging system" => "Die Protokollierung konfigurieren",
-    "Send errors to system log" => "Fehler in das System-Protokoll schreiben",
-    "Always send all Error-level messages to the system error log" => "Schreibt Fehler in das Protokoll des Betriebssystems",
-    "Plugin instance to handle log implementation" => "Erweiterung für die Protokollierung von Ereignissen",
-    "Logger plugin" => "Erweiterung",
+"Application Logger" => "Protokollierung",
+"Setup the logging system" => "Die Protokollierung konfigurieren",
+"Send errors to system log" => "Fehler in das System-Protokoll schreiben",
+"Always send all Error-level messages to the system error log" => "Schreibt Fehler in das Protokoll des Betriebssystems",
+"Plugin instance to handle log implementation" => "Erweiterung für die Protokollierung von Ereignissen",
+"Logger plugin" => "Erweiterung",
+"Custom Header for IP" => "Benutzerdefinierten Header für IP",
+"Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP." => "Kann bei Proxies verwendet werden um die X-Forwarded-For Kopfzeile zu setzen.",
 );

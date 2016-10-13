@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -42,6 +42,14 @@ class RemoteNodeProvider{
         if(this.properties && this.properties.has('connexion_discrete')){
             this.discrete = true;
             this.properties.delete('connexion_discrete');
+        }
+        if(this.properties && this.properties.has('cache_service')){
+            this.cacheService = this.properties.get('cache_service');
+            this.properties.delete('cache_service');
+            MetaCacheService.getInstance().registerMetaStream(
+                this.cacheService['metaStreamName'],
+                this.cacheService['expirationPolicy']
+            );
         }
     }
 
@@ -85,10 +93,22 @@ class RemoteNodeProvider{
         if(optionalParameters){
             params = LangUtils.objectMerge(params, optionalParameters);
         }
-        var complete = function (transport){
+        let parser = function (transport){
             this.parseNodes(node, transport, nodeCallback, childCallback);
+            return node;
         }.bind(this);
-        PydioApi.getClient().request(params,  complete, null, {discrete:this.discrete});
+        if(this.cacheService){
+            let loader = function(ajxpNode, cacheCallback){
+                PydioApi.getClient().request(params, cacheCallback, null, {discrete:this.discrete});
+            }.bind(this);
+            let cacheLoader = function(newNode){
+                node.replaceBy(newNode);
+                nodeCallback(node);
+            }.bind(this);
+            MetaCacheService.getInstance().metaForNode(this.cacheService['metaStreamName'], node, loader, parser, cacheLoader);
+        }else{
+            PydioApi.getClient().request(params, parser, null, {discrete:this.discrete});
+        }
     }
 
     /**
@@ -96,14 +116,19 @@ class RemoteNodeProvider{
      * @param node AjxpNode
      * @param nodeCallback Function On node loaded
      * @param aSync bool
+     * @param additionalParameters object
      */
-    loadLeafNodeSync (node, nodeCallback, aSync=false){
+    loadLeafNodeSync (node, nodeCallback, aSync=false, additionalParameters={}){
         var params = {
             get_action:'ls',
             options:'al',
             dir: PathUtils.getDirname(node.getPath()),
             file: PathUtils.getBasename(node.getPath())
         };
+        for(var k in additionalParameters){
+            if(!additionalParameters.hasOwnProperty(k)) continue;
+            params[k] = additionalParameters[k];
+        }
         if(this.properties){
             this.properties.forEach(function(value, key){
                 params[key] = value;
@@ -236,27 +261,46 @@ class RemoteNodeProvider{
         }
     }
 
-    parseAjxpNodesDiffs(xmlElement, targetDataModel, setContextChildrenSelected=false){
-        var removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
-        var adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
-        var updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
+    parseAjxpNodesDiffs(xmlElement, targetDataModel, targetRepositoryId, setContextChildrenSelected=false){
+        let removes = XMLUtils.XPathSelectNodes(xmlElement, "remove/tree");
+        let adds = XMLUtils.XPathSelectNodes(xmlElement, "add/tree");
+        let updates = XMLUtils.XPathSelectNodes(xmlElement, "update/tree");
+        let notifyServerChange = [];
         if(removes && removes.length){
             removes.forEach(function(r){
                 var p = r.getAttribute("filename");
-                targetDataModel.removeNodeByPath(p);
+                if(r.getAttribute("node_repository_id") && r.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
+                var imTime = parseInt(r.getAttribute("ajxp_im_time"));
+                targetDataModel.removeNodeByPath(p, imTime);
+                notifyServerChange.push(p);
             });
         }
         if(adds && adds.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             adds.forEach(function(tree){
+                if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 targetDataModel.addNode(newNode, setContextChildrenSelected);
+                notifyServerChange.push(newNode.getPath());
             });
         }
         if(updates && updates.length && targetDataModel.getAjxpNodeProvider().parseAjxpNode){
             updates.forEach(function(tree){
+                if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
+                    return;
+                }
                 var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
+                let original = newNode.getMetadata().get("original_path");
                 targetDataModel.updateNode(newNode, setContextChildrenSelected);
+                notifyServerChange.push(newNode.getPath());
+                if(original) notifyServerChange.push(original);
             });
+        }
+        if(notifyServerChange.length){
+            targetDataModel.notify("server_update", notifyServerChange);
         }
     }
 

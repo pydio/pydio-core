@@ -16,9 +16,11 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Comments Feed" => "Kanál komentářů",
 "Display a chat-like feed on all nodes" => "Zobrazit kanál podobný chatu na všech uzlech",
+"Comment limit" => "Comment limit",
+"Maximum number of characters for each comment" => "Maximum number of characters for each comment",
 );

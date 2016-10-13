@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -115,14 +115,7 @@ class Controller extends Observable{
             value.refreshFromI18NHash();
         });
     }
-
-    getBackgroundTasksManager(){
-        if(!Controller._bgManager){
-            Controller._bgManager = new BackgroundTasksManager(this);
-        }
-        return Controller._bgManager;
-    }
-
+    
     getDataModel(){
         return this._dataModel;
     }
@@ -441,12 +434,9 @@ class Controller extends Observable{
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireSelectionChange(){
-		var userSelection = null;
-        userSelection = this._dataModel;
-        if(userSelection.isEmpty()) userSelection = null;
 		this.actions.forEach(function(action){
-			action.fireSelectionChange(userSelection);
-		});
+			action.fireSelectionChange(this._dataModel);
+		}.bind(this));
         if(this.localDataModel){
             this.notify("actions_refreshed");
         }else{
@@ -459,11 +449,10 @@ class Controller extends Observable{
 	 * by triggering ajaxplorer:actions_refreshed event.
 	 */
 	fireContextChange(){
-        var crtNode = this._dataModel.getContextNode();
 		this.actions.forEach(function(action){
-			action.fireContextChange(this.usersEnabled,
-									 this.oUser, 									 
-									 crtNode);
+			action.fireContextChange(this._dataModel,
+                                     this.usersEnabled,
+									 this.oUser);
 		}.bind(this));
         if(this.localDataModel){
             this.notify("actions_refreshed");

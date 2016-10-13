@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 webFXTreeConfig.loadingText = "Loading...";
@@ -34,10 +34,11 @@ function splitOverlayClasses(ajxpNode){
     return ajxpNode.getMetadata().get("overlay_class").split(",");
 }
 
-function AJXPTree(rootNode, sAction, filter) {
+function AJXPTree(rootNode, sAction, filter, showPagination) {
 	this.WebFXTree = WebFXTree;
 	this.loaded = true;
 	this.ajxpNode = rootNode;
+    this.showPagination = showPagination;
 	var icon = rootNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
 		icon = resolveImageSource(icon, "/images/mimes/ICON_SIZE", 16);
@@ -96,6 +97,11 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 	};
 	this.ajxpNode.observe("force_clear",  clear.bind(this));
 	this.ajxpNode.observe("node_replaced",  clear.bind(this));
+    this.ajxpNode.observe("meta_replaced", function(newNode){
+        var overlayIcon = splitOverlayIcons(newNode);
+        var overlayClasses = splitOverlayClasses(newNode);
+        this.updateIcon(this.icon, this.openIcon, overlayIcon, overlayClasses);
+    }.bind(this));
 	this.attachListeners(this, rootNode);
 	if(oldNode){
 		oldNode.notify("node_replaced");
@@ -104,20 +110,44 @@ AJXPTree.prototype.setAjxpRootNode = function(rootNode){
 };
 
 AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
+    var showPagination = this.showPagination;
 	ajxpNode.observe("child_added", function(childPath){
 		if(ajxpNode.getMetadata().get('paginationData') && parseInt(ajxpNode.getMetadata().get('paginationData').get('total')) > 1){
 			var pData = ajxpNode.getMetadata().get('paginationData');
-			if(!this.paginated){
-				this.paginated = true;
-				if(pData.get('dirsCount')!="0"){
-                    var message = pData.get('overflowMessage');
-                    if(MessageHash[message]) message = MessageHash[message];
-					this.updateLabel(this.text + " (" + message+ ")");
-				}
-			}
-			//return;
+            this.paginated = true;
+            if(pData.get('dirsCount')!="0"){
+                var message = pData.get('overflowMessage');
+                if(!this.overflowMessage || this.overflowMessage !== message){
+                    this.overflowMessage = message;
+                    var label;
+                    if(showPagination){
+                        label = new Element('span', {className:'treeLabelPaginationWrapper'}).update(this.text + '<span class="treeLabelPaginationPadding"></span>');
+                        var total = parseInt(pData.get("total"));
+                        var current = parseInt(pData.get("current"));
+                        if(current > 1){
+                            var prev = new Element('a', {className:'treeLabelPagination prev icon-chevron-sign-left'}).observe('click', function(){
+                                ajxpNode.getMetadata().get("paginationData").set("current", current-1);
+                                ajxpNode.reload();
+                            });
+                            label.insert(prev);
+                        }
+                        label.insert(message);
+                        if(current < total){
+                            var prev = new Element('a', {className:'treeLabelPagination next icon-chevron-sign-right'}).observe('click', function(){
+                                ajxpNode.getMetadata().get("paginationData").set("current", current+1);
+                                ajxpNode.reload();
+                            });
+                            label.insert(prev);
+                        }
+                    }else{
+                        label = this.text + " (" + message+ ")";
+                    }
+                    this.updateLabel(label);
+                }
+            }
 		}else if(this.paginated){
 			this.paginated = false;
+            this.overflowMessage = false;
 			this.updateLabel(this.text);
 		}
 		var child = ajxpNode.findChildByPath(childPath);
@@ -136,11 +166,11 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 			if(ajxpNode.getMetadata().get("openicon")){
 				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
 			}
-            if(jsNode.icon != ic || jsNode.openIcon != oic){
-    			jsNode.updateIcon(ic, oic);
+            var overlayIcon = splitOverlayIcons(ajxpNode);
+            var overlayClasses = splitOverlayClasses(ajxpNode);
+            if(jsNode.icon != ic || jsNode.openIcon != oic || jsNode.overlayIcon != overlayIcon || jsNode.overlayClasses != overlayClasses){
+    			jsNode.updateIcon(ic, oic, overlayIcon, overlayClasses);
             }
-            jsNode.overlayIcon = splitOverlayIcons(ajxpNode);
-            jsNode.overlayClasses = splitOverlayClasses(ajxpNode);
 		}
 		if(jsNode.updateLabel && jsNode.text != ajxpNode.getLabel()) {
             jsNode.updateLabel(ajxpNode.getLabel());
@@ -181,6 +211,7 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	}
 	
 	this.folder = true;
+    this.showPagination = eParent.showPagination;
 	this.WebFXTreeItem(
         ajxpNode.getLabel(),
         sAction,

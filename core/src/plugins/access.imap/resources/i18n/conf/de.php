@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Mailbox (Imap or POP)" => "Mailbox (Imap oder POP)",
@@ -32,16 +32,16 @@ $mess=array(
 "Imap or Pop Server?" => "Imap- oder POP-Server?",
 "Mailbox Definition" => "Mailbox",
 "User" => "Benutzer",
-"User account" => "Zugang des Benutzers",
+"User account" => "Benutzerkonto",
 "Password" => "Passwort",
 "User Password" => "Passwort des Benutzers",
 "Default Mailbox" => "Standard Mailbox",
 "Mailbox to connect by default" => "Mailbox-Verbindung die standardmäßig verbunden wird",
-"Repository Options" => "Repository Options",
-"Default Rights" => "Default Rights",
-"This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "This right pattern (empty, r, or rw) will be applied at user creation for this repository.",
-"Pagination Threshold" => "Pagination Threshold",
-"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "When a folder will contain more items than this number, display will switch to pagination mode, for better performances.",
-"#Items per page" => "#Items per page",
-"Once in pagination mode, number of items to display per page." => "Once in pagination mode, number of items to display per page.",
+"Repository Options" => "Arbeitsumgebungs-Einstellungen",
+"Default Rights" => "Standard-Rechte",
+"This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "Rechte-Pattern, welches beim Erstellen von Benutzern für diese Arbeitsumgebung angewendet wird. (leer, r oder rw)",
+"Pagination Threshold" => "Schwellwert für Seitenwechsel",
+"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Wenn es mehr als die konfigurierte Anzahl an Seiten gibt, wird der Seitenwechsel aktiviert.",
+"#Items per page" => "Einträge pro Seite",
+"Once in pagination mode, number of items to display per page." => "Anzahl der Einträge pro Seite, wenn Seitenwechsel aktiv ist.",
 );

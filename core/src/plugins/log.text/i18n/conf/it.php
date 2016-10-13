@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Text logger" => "Logger Testuale",
@@ -29,4 +29,17 @@ $mess=array(
 "" => "",
 "Log Folder" => "Cartella Log",
 "Files Name Pattern" => "Maschera Nome File",
+"Doctrine Cache driver" => "Doctrine Cache driver",
+"Use doctrine as main caching driver." => "Use doctrine as main caching driver.",
+"Cache Driver" => "Cache Driver",
+"Cache driver" => "Cache driver",
+"Hostname" => "Hostname",
+"The hostname to access Memcache server" => "The hostname to access Memcache server",
+"Port" => "Port",
+"The port to access Memcache server" => "The port to access Memcache server",
+"The hostname to access Memcached server" => "The hostname to access Memcached server",
+"The port to access Memcached server" => "The port to access Memcached server",
+"The hostname to access Redis server" => "The hostname to access Redis server",
+"The port to access Redis server" => "The port to access Redis server",
+"Cache Prefix" => "Cache Prefix",
 );

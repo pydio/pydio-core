@@ -20,7 +20,7 @@
 			<div id="editor_selector"></div>
 			<div class="dialogButtons">
 			    <div id="clear_assoc_link">AJXP_MESSAGE[openother.5]</div>
-				<input type="image" name="close" src="AJXP_THEME_FOLDER/images/actions/22/dialog_close.png" height="22" width="22" title="OK" class="dialogButton"/>
+				<input type="submit" name="close" value="OK" class="dialogButton"/>
 			</div>
 		</div>
 	]]></clientForm>

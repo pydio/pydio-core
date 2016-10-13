@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Sharing Features" => "Opzioni Condivisione",
@@ -55,9 +55,9 @@ $mess=array(
 "Page Title" => "Titolo Pagina",
 "Share page title. Use AJXP_FILENAME keyword to display the file name." => "Ttolo pagina condivisione. Utilizza AJXP_FILENAME per visualizzare il nome del file.",
 "Download text" => "Testo Download",
-"Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and AJXP_APPLICATION_TITLE for the application title." => "Testo visualizzato sotto il pulsante di download. Usa AJXP_FILENAME per il nome del file e AJXP_APPLICATION_TITLE per il nome dell'applicazione.",
+"Text displayed below the download button. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title." => "Testo visualizzato sotto il pulsante di download. Usa AJXP_FILENAME per il nome del file e PYDIO_APP_TITLE per il nome dell'applicazione.",
 "Download text w/ Pass" => "Testo Download w/ Pass",
-"Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and AJXP_APPLICATION_TITLE for the application title." => "Testo visualizzato sotto il pulsante di download quando una password è obbligatoria. Usa AJXP_FILENAME per il nome del file e AJXP_APPLICATION_TITLE per il nome dell'applicazione.",
+"Text displayed below the download button when a password is mandatory. Use AJXP_FILENAME keyword to display the file name, and PYDIO_APP_TITLE for the application title." => "Testo visualizzato sotto il pulsante di download quando una password è obbligatoria. Usa AJXP_FILENAME per il nome del file e PYDIO_APP_TITLE per il nome dell'applicazione.",
 "Download Button" => "Pulsante Download",
 "Image used as a button for downloading the file" => "Immagine usata come pulsante per il download dei file",
 "Background Color" => "Colore Sfondo",
@@ -79,4 +79,24 @@ $mess=array(
 "Top-right logo displayed on minisite page" => "Logo visualizzato in alto a destra nella pagina del minisito",
 "Set password mandatory" => "Impostazione password obbligatoria",
 "Do not allow users to create public links, only private links (password-protected)" => "Non permette agli utenti di creare link pubblici, ma solo link privati (protetti da password)",
+"Fork Events Forwarding" => "Fork Events Forwarding",
+"If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server." => "If you detect performances issues while modifiyng files under deep trees, try activating that one. Please be sure of what you do, this may trigger a whole lot of php processes on the server.",
+"Enable public links for files" => "Enable public links for files",
+"Enable public link generation for files" => "Enable public link generation for files",
+"Hash user-editable" => "Hash user-editable",
+"Allow users to manually choose a hash for the generated links" => "Allow users to manually choose a hash for the generated links",
+"Minisites and Workspaces" => "Minisites and Workspaces",
+"Minisites only" => "Minisites only",
+"Workspaces only" => "Workspaces only",
+"Disable Folder Sharing" => "Disable Folder Sharing",
+"Authorizations" => "Authorizations",
+"Allow users to generate public links on files" => "Allow users to generate public links on files",
+"Files: enable public links" => "Files: enable public links",
+"Enable internal file sharing (sharing with users existing or temporary users)" => "Enable internal file sharing (sharing with users existing or temporary users)",
+"Files: enable internal sharing" => "Files: enable internal sharing",
+"Allow users to generate public links on folders" => "Allow users to generate public links on folders",
+"Folders: enable public links" => "Folders: enable public links",
+"Enable internal folder sharing (sharing with users existing or temporary users)" => "Enable internal folder sharing (sharing with users existing or temporary users)",
+"Folders: enable internal sharing" => "Folders: enable internal sharing",
+"Internal Sharing" => "Internal Sharing",
 );

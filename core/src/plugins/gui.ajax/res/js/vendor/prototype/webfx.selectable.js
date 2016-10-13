@@ -93,6 +93,9 @@ Class.create('SelectableElements', {
 		Event.observe(this.dragSelectionElement, "mousedown", this.eventMouseDown);
 	},
 	dragStart : function(e){
+        if(!this.hasFocus){
+            pydio.UI.focusOn(this);
+        }
 		this.originalX = e.clientX;
 		this.originalY = e.clientY;
 		
@@ -255,6 +258,11 @@ Class.create('SelectableElements', {
 
 				var scrollOffset = oEl[direction];
 				var parentHeight = parent[dimMethod]();
+                if(parent.parentNode && dimMethod == 'getHeight' && parent.parentNode.getHeight() < parentHeight){
+                    parentHeight = parent.parentNode.getHeight();
+                    parent.setStyle({height:parentHeight + 'px'});
+                    if(parent.scrollerInstance) parent.scrollerInstance.recalculateLayout(parentHeight);
+                }
 				var parentScrollTop = parent[scrollDir];
 				var elHeight = $(oEl)[dimMethod]();
 

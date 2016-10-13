@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /** 
@@ -209,12 +209,12 @@ class Action extends Observable{
 		
 	/**
 	 * Updates the action status on context change
+     * @param PydioDataModel dataModel
+     * @param boolean usersEnabled
+     * @param string crtUser
 	 * @returns void
 	 */
-	fireContextChange(){
-		if(arguments.length < 3) return;
-		var usersEnabled = arguments[0];
-		var crtUser = arguments[1];
+	fireContextChange(dataModel, usersEnabled, crtUser){
 
         var crtIsRecycle = false;
         var crtInZip = false;
@@ -222,7 +222,7 @@ class Action extends Observable{
         var crtAjxpMime = '';
         var crtIsReadOnly = false;
 
-        var crtNode = arguments[2];
+        var crtNode = dataModel.getContextNode();
         if(crtNode){
             crtIsRecycle = (crtNode.getAjxpMime() == "ajxp_recycle");
             crtInZip = crtNode.hasAjxpMimeInBranch("ajxp_browsable_archive");
@@ -284,7 +284,8 @@ class Action extends Observable{
 		if(!this.context.root && crtIsRoot){
 			return this.hideForContext();
 		}
-		this.showForContext();				
+
+		this.showForContext(dataModel);
 		
 	}
 		
@@ -302,7 +303,7 @@ class Action extends Observable{
 		}
         if(this.options.activeCondition){
             try{
-                var result = this.options.activeCondition();
+                let result = this.options.activeCondition();
                 if(result === false) this.disable();
                 else if(result === true) this.enable();
             }catch(e){
@@ -329,7 +330,7 @@ class Action extends Observable{
 			else this.disable();
 		}
         if(selectionContext.evalMetadata && userSelection && userSelection.isUnique()){
-            var result = this._evalScripts(selectionContext.evalMetadata, userSelection.getUniqueNode().getMetadata());
+            let result = this._evalScripts(selectionContext.evalMetadata, userSelection.getUniqueNode().getMetadata());
             if(!result){
                 if(selectionContext.behaviour == 'hidden') this.hide();
              	else this.disable();
@@ -663,11 +664,11 @@ class Action extends Observable{
 	/**
 	 * Changes show/hide state
 	 */
-	showForContext(){
+	showForContext(dataModel){
         this.contextHidden = false;
         this.show();
         if(this.selectionContext){
-            this.fireSelectionChange();
+            this.fireSelectionChange(dataModel);
         }
 	}
 	

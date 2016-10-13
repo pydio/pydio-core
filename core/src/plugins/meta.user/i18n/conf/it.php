@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Text Metadata" => "Testo Metadata",
@@ -42,4 +42,5 @@ $mess=array(
 "Set default visibility." => "Imposta visibilità principale.",
 "Additional info" => "Info Addizionali",
 "Depending on the field type. Currently used for selection only" => "In base al tipo di campo. Attualmente utilizzato solo per la selezione.",
+"Tags (extensible sets of values)" => "Tags (extensible sets of values)",
 );

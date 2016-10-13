@@ -14,7 +14,7 @@
             <processing>
                 <clientCallback prepareModal="true" dialogOpenForm="pass_change_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
                     <dialogOnOpen><![CDATA[
-					    if(ajaxplorer.user.lock){
+					    if(pydio.user.lock){
 					        modal.getForm().insert({top:new Element("div", {className:"dialogLegend"}).update(MessageHash[444])});
 					    }
 						$('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
@@ -36,7 +36,7 @@
 						var passSeed = null;
 						if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
 						{
-							if($('user_change_ownpass1').value.length < parseInt(window.ajaxplorer.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
+							if($('user_change_ownpass1').value.length < parseInt(window.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
 								alert(MessageHash[378]);
 								return false;
 							}
@@ -59,19 +59,19 @@
 							var onComplete = function(transport){
 								var addition = '';
 								var logout = false;
-								if(ajaxplorer.user.lock){
+								if(pydio.user.lock){
 								    addition = '\n ' + MessageHash[445];
 								}
 								if(userPass != null){
 									if(transport.responseText == 'PASS_ERROR'){
 										alert(MessageHash[240]);
 									}else if(transport.responseText == 'SUCCESS'){
-										ajaxplorer.displayMessage('SUCCESS', MessageHash[197] + addition);
+										pydio.displayMessage('SUCCESS', MessageHash[197] + addition);
 										if(addition) logout = true;
 										hideLightBox(true);
 									}
 								}else{
-									ajaxplorer.displayMessage('SUCCESS', MessageHash[241] + addition);
+									pydio.displayMessage('SUCCESS', MessageHash[241] + addition);
 									if(addition) logout = true;
 									hideLightBox(true);
 								}
@@ -89,7 +89,11 @@
 							conn.sendAsync();
 						}
 					]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                    <dialogOnCancel><![CDATA[
+                        if(pydio.user.lock){
+                            throw new Error();
+                        }
+                    ]]></dialogOnCancel>
                 </clientCallback>
                 <clientForm id="pass_change_form"><![CDATA[
 					<div id="pass_change_form" action="pass_change_form" box_width="260">

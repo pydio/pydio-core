@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * Description : configuration file
  * BASIC REPOSITORY CONFIGURATION.
@@ -52,7 +52,7 @@ $REPOSITORIES[0] = array(
             ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
-            "meta.syncable"     => array(),
+            "meta.syncable"     => array("REPO_SYNCABLE" => true),
             "meta.exif"   => array(
                 "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
                 "meta_labels" => "Latitude,Longitude"
@@ -91,7 +91,7 @@ $REPOSITORIES[1] = array(
             ),
             "meta.filehasher"   => array(),
             "meta.watch"        => array(),
-            "meta.syncable"     => array(),
+            "meta.syncable"     => array("REPO_SYNCABLE" => true),
             "meta.exif"   => array(
                 "meta_fields" => "COMPUTED_GPS.GPS_Latitude,COMPUTED_GPS.GPS_Longitude",
                 "meta_labels" => "Latitude,Longitude"
@@ -126,6 +126,24 @@ $REPOSITORIES["ajxp_home"] = array(
     "DRIVER"		    =>	"ajxp_home",
     "DRIVER_OPTIONS"    => array(
         "DEFAULT_RIGHTS" => "rw"
+    )
+);
+
+$REPOSITORIES["inbox"] = array(
+    "DISPLAY"		    =>	"Inbox",
+    "DISPLAY_ID"        =>  "inbox_driver.12",
+    "DESCRIPTION_ID"	=>	"inbox_driver.13",
+    "AJXP_SLUG"		    =>  "inbox",
+    "DRIVER"		    =>	"inbox",
+    "DRIVER_OPTIONS"    => array(
+        "DEFAULT_RIGHTS" => "rw",
+        "META_SOURCES"   => array(
+            "metastore.serial"=> array(
+                "METADATA_FILE"	=> ".ajxp_meta",
+                "METADATA_FILE_LOCATION" => "infolders"
+            ),
+            "meta.watch"    => array()
+        )
     )
 );
 

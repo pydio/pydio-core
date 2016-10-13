@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Text Metadata" => "Textová metadata",
@@ -39,4 +39,14 @@ $mess=array(
 "Set default visibility." => "Nastavit výchozí viditelnost.",
 "Additional info" => "Další informace",
 "Depending on the field type. Currently used for selection only" => "V závislosti na typu pole. Momentálně použité pouze pro výběr",
+"Short text" => "Short text",
+"Long text" => "Long text",
+"Created by..." => "Created by...",
+"Last updated by..." => "Last updated by...",
+"Stars Rating" => "Stars Rating",
+"Color labels" => "Color labels",
+"Selection (set choices in Additional Info)" => "Selection (set choices in Additional Info)",
+"Visible" => "Visible",
+"Hidden" => "Hidden",
+"Tags (extensible sets of values)" => "Tags (extensible sets of values)",
 );

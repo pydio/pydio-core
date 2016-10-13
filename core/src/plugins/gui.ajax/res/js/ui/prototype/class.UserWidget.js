@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -88,7 +88,8 @@ Class.create("UserWidget", {
                 }
 
                 if (imgSrc != '') {
-                    img = '<img src="'+imgSrc+'" alt="avatar" class="user_widget_mini">';
+                    var style = 'background-image: url(\''+imgSrc+'\')';
+                    img = '<div class="user_widget_mini" style="'+style+'"></div>';
                     label = '<i>' + img + displayName + '</i>';
                 }
 				var icon = this.options.iconClass || "icon-reorder";

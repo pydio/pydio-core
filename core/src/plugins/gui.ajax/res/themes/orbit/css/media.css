@@ -40,17 +40,31 @@ and (max-width : 720px) {
     span.actionbar_button_label,
     .action_bar span.actionbar_button_label,
     #get_my_feed_button_label,
-    #logging_string i,
     #logging_string *[ajxp_message_id],
     #global_toolbar span.icon-caret-down,
     #search_form a
     {
         display: none !important;
     }
+    #logging_string{
+        margin-top: 7px;
+        height: 33px;
+        overflow: hidden;
+    }
+    #logging_string div.user_widget_mini {
+        margin-top: -5px;
+        height: 32px;
+        width: 32px;
+    }
+    #logging_string div.user_widget_label:not(withImage){
+        padding-top: 10px;
+    }
+    #logging_string div.user_widget_label:not(withImage) i{
+        display: none;
+    }
     div.toolbarGroup span.ajxp_icon_span
     {
         display: inline-block !important;
-        padding: 5px 1px 4px;
     }
 
     div.toolbarGroup a{
@@ -146,41 +160,8 @@ and (max-width : 420px){
         padding-top:0;
     }
 
-    #buttons_bar, #buttons_bar_top{
-
-    }
-
-    #buttons_bar a, #buttons_bar_top a{
-        padding: 1px 8px;
-        border-radius: 19px;
-    }
-
     .tabulatorContainer.panelHeader.icons_only {
         width: 37px;
-    }
-
-    #userdashboard_myparams_title{
-        display: none;
-    }
-
-    #userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
-        width: 40px !important;
-    }
-
-    div#userdashboard_main_tab.horizontal_tabulator div.tabulatorContainer {
-        padding-top: 0;
-    }
-
-    div#userdashboard_main_tab.horizontal_tabulator span.toggleHeader {
-        text-align: left;
-        padding: 8px 12px;
-        color: #ffffff !important;
-        border: 0;
-        display: block;
-        font-size: 20px;
-        font-weight: lighter;
-        text-transform: uppercase;
-        margin: 0 0;
     }
 
     div.dialogBox{
@@ -192,12 +173,16 @@ and (max-width : 420px){
         padding-top: 20%!important;*/
     }
 
+    div.dialogContent div.SF_element {
+        margin: 0 10px;
+    }
+
     #login_form, #login_form_dynamic {
         margin: 0;
     }
 
-    div.dialogContent div.SF_element {
-        margin: 0 10px;
+    #login_form div.SF_element, #login_form_dynamic div.SF_element{
+        padding-left: 0 !important;
     }
 
     #global_toolbar{

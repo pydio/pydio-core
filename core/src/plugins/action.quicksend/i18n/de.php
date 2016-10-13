@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 $mess = array(
     "1" => "Schnelles Senden",
-    "2" => "Sende eine Datei, teile sie und sende eine Email mit den Link an jemand anderes.",
+    "2" => "Eine Datei freigeben und den Link per E-Mail versenden.",
     "3" => "Eine Datei auswählen",
     "4" => "Wählen Sie eine Datei zum Senden oder zieh sie in die Zone darunter",
 );

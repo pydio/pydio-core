@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : Static class for renderers
  */
 Class.create("MetaCellRenderer", {
@@ -353,9 +353,9 @@ Class.create("MetaCellRenderer", {
         var values = $A(value.split(",")).invoke("strip");
         element.update('');
         values.each(function(v){
-            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='icon-remove' style='cursor: pointer;'></span>");
+            var tag = new Element('span', {className:"meta_user_tag_block"}).update(v + " <span class='mdi mdi-close' style='cursor: pointer;'></span>");
             element.insert(tag);
-            var remove = tag.down(".icon-remove");
+            var remove = tag.down(".mdi-close");
             remove.observe("click", function(){
                 var conn = new Connexion();
                 conn.setParameters($H({
@@ -389,13 +389,14 @@ Class.create("MetaCellRenderer", {
         htmlElement.select('[data-metatype]').each(function(td){
             var metaType = td.readAttribute("data-metatype");
             var metaName = td.id.replace(/^ip_/, '');
+            var value;
             switch(metaType){
                 case "stars_rate":
-                    var value = parseInt(td.innerHTML);
+                    value = parseInt(td.innerHTML);
                     td.update(this.createStars(value, null, metaName));
                 break;
                 case "css_label":
-                    var value = td.innerHTML.strip();
+                    value = td.innerHTML.strip();
                     var rule = this.findCssRule(value);
                     if(rule){
                         td.addClassName(rule.cssClass);
@@ -406,14 +407,14 @@ Class.create("MetaCellRenderer", {
                     if(MetaCellRenderer.staticMetadataCache && MetaCellRenderer.staticMetadataCache.get(metaName)){
                         var selectorValues  = MetaCellRenderer.staticMetadataCache.get(metaName);
                         if(!selectorValues) break;
-                        var value = td.innerHTML.strip();
+                        value = td.innerHTML.strip();
                         if(selectorValues[value]){
                             td.update(selectorValues[value]);
                         }
                     }
                 break;
                 case "tags":
-                    var value = td.innerHTML.strip();
+                    value = td.innerHTML.strip();
                     this.displayTagsAsBlocks(metaName, td, value, ajxpNode);
                 break;
                 case "text":
@@ -438,7 +439,7 @@ Class.create("MetaCellRenderer", {
 	},
 
     linkEditableDiv : function(div){
-        div.saver = new Element("img", {src:"plugins/gui.ajax/res/themes/umbra/images/actions/22/dialog_ok_apply.png"}).setStyle({
+        div.saver = new Element("img", {src:"plugins/gui.ajax/res/themes/orbit/images/actions/22/dialog_ok_apply.png"}).setStyle({
             float:"left",
             width: "22px",
             height:"22px",

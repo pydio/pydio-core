@@ -16,12 +16,13 @@
     * You should have received a copy of the GNU Affero General Public License
     * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
     *
-    * The latest code can be found at <http://pyd.io/>.
+    * The latest code can be found at <https://pydio.com>.
     */
 $mess=array(
     "workspace.normal" => "Workspace AJXP_REPOSITORY_LABEL",
-    "workspace.shared" => "Shared Folder AJXP_REPOSITORY_LABEL",
+    "workspace.shared.folder" => "Shared Folder AJXP_REPOSITORY_LABEL",
+    "workspace.shared.file" => "Shared File AJXP_REPOSITORY_LABEL",
     "minisite.file" => "Public File AJXP_REPOSITORY_LABEL",
     "minisite.folder" => "Public Folder AJXP_REPOSITORY_LABEL",
-    "public_user" => "a public user (connection from '%s')"
+    "public_user" => "a public user (connection from '%s')",
 );

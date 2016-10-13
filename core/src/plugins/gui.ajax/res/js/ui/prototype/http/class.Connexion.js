@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 var PydioLog = $A();
 /**
@@ -217,13 +217,14 @@ Class.create("Connexion", {
 		document.fire("ajaxplorer:server_answer", this);
 	},
 
-    uploadFile: function(file, fileParameterName, queryStringParams, onComplete, onError, onProgress){
+    uploadFile: function(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings){
+
+        if(xhrSettings === undefined) xhrSettings = {};
 
         if(!onComplete) onComplete = function(){};
         if(!onError) onError = function(){};
         if(!onProgress) onProgress = function(){};
-        var url = pydio.Parameters.get('ajxpServerAccess') + '&' +  queryStringParams;
-        var xhr = this.initializeXHRForUpload(url, onComplete, onError, onProgress);
+        var xhr = this.initializeXHRForUpload(uploadUrl, onComplete, onError, onProgress, xhrSettings);
         if(window.FormData){
             this.sendFileUsingFormData(xhr, file, fileParameterName);
         }else if(window.FileReader){
@@ -235,12 +236,19 @@ Class.create("Connexion", {
         }else if(file.getAsBinary){
             this.xhrSendAsBinary(xhr, file.name, file.getAsBinary(), fileParameterName)
         }
+        return xhr;
 
     },
 
-    initializeXHRForUpload : function(url, onComplete, onError, onProgress){
+    initializeXHRForUpload : function(url, onComplete, onError, onProgress, xhrSettings){
+
+        if(xhrSettings === undefined) xhrSettings = {};
+
         var xhr = new XMLHttpRequest();
         var upload = xhr.upload;
+        if(xhrSettings.withCredentials){
+            xhr.withCredentials = true;
+        }
         upload.addEventListener("progress", function(e){
             if (!e.lengthComputable) return;
             onProgress(e);
@@ -527,18 +535,6 @@ Connexion.parseXmlMessage = function(xmlResponse){
                 }
             }
 
-        }else if(childs[i].tagName == "trigger_bg_action"){
-            var name = childs[i].getAttribute("name");
-            var messageId = childs[i].getAttribute("messageId");
-            var parameters = {};
-            for(var j=0;j<childs[i].childNodes.length;j++){
-                var paramChild = childs[i].childNodes[j];
-                if(paramChild.tagName == 'param'){
-                    parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
-                }
-            }
-            pydio.getController().getBackgroundTasksManager().queueAction(name, parameters, messageId);
-            pydio.getController().getBackgroundTasksManager().next();
         }
 
     }

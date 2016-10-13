@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -36,10 +36,12 @@ $mess = array(
     "12"=> "Die alte meta.serial-Erweiterung wurde aufgeteilt in metastore.serial und meta.user",
     "13"=> "Migration simulieren",
     "14"=> "Migration nun starten",
-    "15" => "Are you sure that you want to perform the upgrade?",
-    "16" => "The following packages will be downloaded and installed.",
-    "17" => "Checking for available upgrades...",
-    "18" => "No necessary upgrade detected: click to perform a new check.",
-    "19" => "Click to check for new upgrade",
-    "20" => "Check now",
+    "15" => "Sind sie sicher, dass die Aktualisierung durchgeführt werden soll?",
+    "16" => "Folgende Pakete werden heruntergeladen und installiert.",
+    "17" => "Prüfe auf Aktualisierungen...",
+    "18" => "Keine Aktualisierungen gefunden. Klicken, um erneut zu prüfen.",
+    "19" => "Klicken um auf Aktualisierungen zu prüfen",
+    "20" => "Nun prüfen",
+    "21" => "Aktuell im Entwickler-Modus.",
+    "22" => "Die aktuelle Version ist %1 (%2).",
 );

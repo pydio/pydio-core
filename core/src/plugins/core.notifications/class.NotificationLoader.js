@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 Class.create("NotificationLoader", {
@@ -92,7 +92,7 @@ Class.create("NotificationLoader", {
             }
             var elLabel = el.getLabel();
             if(!elLabel) elLabel = "/";
-            var block = '<div class="notif_event_label">'+elLabel+'</div>';
+            var block = '<div class="notif_event_label">'+he.escape(elLabel)+'</div>';
             var detail = '';
             if(el.getMetadata().get('event_repository_label')){
                 detail += '<div class="notif_event_repository">'+ el.getMetadata().get('event_repository_label') + '</div>';
@@ -112,7 +112,7 @@ Class.create("NotificationLoader", {
                 var alertID = parseInt(el.getMetadata().get("alert_id"));
                 moreActions.push({
                     name:MessageHash["notification_center.7"],
-                    icon_class:"icon-remove-sign",
+                    icon_class:"mdi mdi-close-circle",
                     callback:function(e){
                         Event.stop(e);
                         Effect.Fade(e.target.up('li'));
@@ -201,7 +201,7 @@ Class.create("NotificationLoader", {
                     obje.title,
                     {
                         body: obje.body,
-                        icon: 'plugins/gui.ajax/res/themes/vision/images/mimes/64/mime_empty.png',
+                        icon: 'plugins/gui.ajax/res/themes/orbit/images/mimes/64/mime_empty.png',
                         tag: 'ajaxplorer',
                         dir: 'auto',
                         lang: ajaxplorer.currentLanguage
@@ -295,7 +295,32 @@ Class.create("NotificationLoader", {
         protoMenu.correctWindowClipping(protoMenu.container, offset, dim);
     },
 
+    clearMetaCacheForPath: function(path){
+        var parts = path.split("/");
+        while(parts.length){
+            var newPath = parts.join("/");
+            if(!newPath) newPath = '/';
+            MetaCacheService.getInstance().clearMetaStreamKeys("files.activity" + newPath);
+            parts.pop();
+        }
+    },
+
     loadInfoPanel : function(container, node){
+        if(!NotificationLoader.LOADED){
+
+            pydio.getContextHolder().observe("server_update", function(pathes){
+                // Clear all caches for all pathes.
+                for(var i = 0; i < pathes.length ; i++){
+                    NotificationLoader.prototype.clearMetaCacheForPath(pathes[i]);
+                    if(NotificationLoader.IPANEL_FETCHPANE && NotificationLoader.IPANEL_FETCHPANE_PATH && pathes[i].indexOf(NotificationLoader.IPANEL_FETCHPANE_PATH) === 0){
+                        NotificationLoader.IPANEL_FETCHPANE.reloadDataModel();
+                    }
+                }
+            });
+
+            NotificationLoader.LOADED = true;
+        }
+
         var label= MessageHash['notification_center.'+(node.isLeaf()?'11': (node.isRoot()?'9': '10'))];
         var mainContainer = container.down("#ajxp_activity_panel");
         mainContainer.addClassName("infopanel_loading");
@@ -306,13 +331,15 @@ Class.create("NotificationLoader", {
         var timer = NotificationLoader.prototype.loaderTimer;
         if(timer) window.clearTimeout(timer);
 
-        var fRp = new FetchedResultPane(resultPane, {
+        NotificationLoader.IPANEL_FETCHPANE_PATH = node.getPath();
+        NotificationLoader.IPANEL_FETCHPANE = new FetchedResultPane(resultPane, {
             "fit":"content",
             "replaceScroller": false,
             "columnsDef":[
                 {"attributeName":"ajxp_label", "messageId":1, "sortType":"String"},
                 {"attributeName":"event_time", "messageString":"Time", "sortType":"Number"},
-                {"attributeName":"event_type", "messageString":"Type", "sortType":"String"}],
+                {"attributeName":"event_description", "messageString":"Description", "sortType":"String"}
+            ],
             "silentLoading":true,
             "fixedSortColumn":"event_time",
             "fixedSortDirection":"desc",
@@ -325,10 +352,14 @@ Class.create("NotificationLoader", {
                 "limit":(node.isLeaf() || node.isRoot() ? 18 : 4),
                 "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
                 "merge_description":"true",
-                "description_as_label":node.isLeaf()?"true":"false"
+                "description_as_label":node.isLeaf()?"true":"false",
+                "cache_service":{
+                    "metaStreamName":"files.activity" + node.getPath(),
+                    "expirationPolicy":MetaCacheService.EXPIRATION_MANUAL_TRIGGER
+                }
             }});
         var pane = container.up('[ajxpClass="InfoPanel"]');
-        fRp._rootNode.observe("loaded", function(){
+        NotificationLoader.IPANEL_FETCHPANE._rootNode.observe("loaded", function(){
             if(!mainContainer.hasClassName("infopanel_loading_finished")){
                 mainContainer.addClassName("infopanel_loading_finished");
             }
@@ -338,7 +369,7 @@ Class.create("NotificationLoader", {
                 },0.2);
             }
             if(container.down('#ajxp_activity_panel > div.panelHeader')){
-                if(!fRp._rootNode.getChildren().size){
+                if(!NotificationLoader.IPANEL_FETCHPANE._rootNode.getChildren().size){
                     container.down('#ajxp_activity_panel > div.panelHeader').hide();
                 }else{
                     container.down('#ajxp_activity_panel > div.panelHeader').show();
@@ -347,7 +378,7 @@ Class.create("NotificationLoader", {
         });
         // fRp.showElement(true);
         NotificationLoader.prototype.loaderTimer = window.setTimeout(function(){
-            fRp.showElement(true);
+            NotificationLoader.IPANEL_FETCHPANE.showElement(true);
         }, 0.5);
 
     },

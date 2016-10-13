@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
     // will be replaced by the application title
@@ -49,6 +49,7 @@ $mess = array(
     "17" => "Utente(i)",
     "17d" => "Inserisci un elenco di utenti, separati dalla virgola, o il  wildcard * per eseguire l'azione per ogni utente.",
     "18"  => "Schedulatore",
+    "18e"  => "Schedulatore (disabled)",
     "18d" => "Azioni in stile 'Cron'",
     "19" => "Cancella Azione",
     "19d" => "De-Schedula e rimuovi l'azione selezionata",
@@ -58,4 +59,6 @@ $mess = array(
     "22" => "Schedulatore generico per eseguire azioni su basi regolari. Richiede l'attivazione della CLI e del CRONTAB (o equivalente).",
     "23" => "Execution Context",
     "24" => "Parameters",
+    "25" => "Stop Job",
+    "26" => "Stop running job",
 );

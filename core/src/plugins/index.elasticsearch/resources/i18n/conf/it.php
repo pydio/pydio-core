@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Lucene Search Engine" => "Motore Rierca Lucene",
@@ -45,4 +45,10 @@ $mess=array(
 "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension." => "Analizzatore usato da Zend per scansionare le query. ATTENZIONE: l'analizzatore UTF8 richiede l'estensione 'mbstring' di PHP.",
 "Wildcard limitation" => "Limitazione Wildcard",
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "Per amor delle performance, non è raccomandato l'uso di wildcard come primo e solo carattere di una query. Lucene raccomanda di chiedere all'utente un minimo di 3 caratteri prima del wildcard. Ad ogni modo, si può impostare a 0 se necessario.",
+"Auto-Wildcard" => "Auto-Wildcard",
+"Automatically append a * after the user query to make the search broader" => "Automatically append a * after the user query to make the search broader",
+"ElasticSearch Host" => "ElasticSearch Host",
+"ElasticSearch Server host (without http)" => "ElasticSearch Server host (without http)",
+"ElasticSearch Port" => "ElasticSearch Port",
+"ElasticSearch Server port (default 9200)" => "ElasticSearch Server port (default 9200)",
 );

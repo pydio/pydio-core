@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "S3 (Amazon Web Service)" => "S3 (Serviço Amazon Web)",
@@ -28,5 +28,24 @@ $mess=array(
 "Region" => "Região",
 "S3 storage region" => "Região de Armazenamento S3",
 "Container" => "Contentor",
-"Root container in the S3 storage" => "Contentor S3"
+"Root container in the S3 storage" => "Contentor S3",
+"Access an AWS server. Requires AWS-SDK v2 for PHP" => "Access an AWS server. Requires AWS-SDK (Version 2) for PHP ",
+"Storage URL" => "Storage URL",
+"Replace default AWS access points (built from region). Set a full URL, including protocol" => "Replace default AWS access points (built from region). Set a full URL, including protocol",
+"Signature Version" => "Signature Version",
+"API Signature Version. Leave empty if you are not sure, EU Frankfurt and AP Seoul should use v4 only." => "API Signature Version. Leave empty if you are not sure, EU Frankfurt and AP Seoul should use v4 only.",
+"API Version" => "API Version",
+"The API Version of AS3 is a date (like 2006-03-01). If not sure, put latest " => "The API Version of AS3 is a date (like 2006-03-01). If not sure, put latest ",
+"Proxy" => "Proxy",
+"If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080" => "If you are using a proxy, for example:  127.0.0.1:80 or username:password@127.0.0.1:8080",
+"Disable Virtual Host Syntax" => "Disable Virtual Host Syntax",
+"S3 backends can be queried using protocol://bucket.host/. Some backend do not support this, use this option to force using protocol://host/bucket instead" => "S3 backends can be queried using protocol://bucket.host/. Some backend do not support this, use this option to force using protocol://host/bucket instead",
+"Is ViPR" => "Is ViPR",
+"If the backend storage is an EMC ViPR storage" => "If the backend storage is an EMC ViPR storage",
+"SDK Version" => "SDK Version",
+"The AWS SDK version" => "The AWS SDK version",
+"Authentication" => "Authentication",
+"Location" => "Location",
+"API" => "API",
+"Custom Storage" => "Custom Storage",
 );

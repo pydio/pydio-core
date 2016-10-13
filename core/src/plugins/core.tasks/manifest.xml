@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin label="CONF_MESSAGE[Tasks Service]" description="CONF_MESSAGE[Centralize background tasks and scheduling]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition classname="Pydio\Tasks\TaskController" filename="plugins/core.tasks/src/TaskController.php"/>
+    <client_settings>
+        <resources>
+            <js className="PydioTasks" file="plugins/core.tasks/js/build/PydioTasks.js" depends="React,ReactPydio"/>
+        </resources>
+    </client_settings>
+    <registry_contributions>
+        <actions>
+            <action name="tasks_list">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_info">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_create">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_update">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_toggle_status">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="task_delete">
+                <processing>
+                    <serverCallback methodName="route"/>
+                </processing>
+            </action>
+            <action name="client_consume_channel">
+                <post_processing>
+                    <serverCallback methodName="enrichConsumeChannel"/>
+                </post_processing>
+            </action>
+        </actions>
+        <!--
+        <hooks>
+            <serverCallback methodName="attachTasksToNode" hookName="node.info"/>
+        </hooks>
+        -->
+        <client_configs>
+            <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom"><![CDATA[
+                <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
+            ]]></template>
+        </client_configs>
+    </registry_contributions>
+</ajxp_plugin>

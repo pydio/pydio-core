@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("BrowserOpener", AbstractEditor, {
 
@@ -40,7 +40,7 @@ Class.create("BrowserOpener", AbstractEditor, {
             if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
         }
         //var nonSecureAccessPath = window.ajxpServerAccessPath.substring(0, window.ajxpServerAccessPath.lastIndexOf('?'));
-        var open_file_url = url + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
+        var open_file_url = LangUtils.trimRight(url, "\/") + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
 
         if(this.editorOptions.context.__className == 'Modal'){
             window.open(open_file_url);

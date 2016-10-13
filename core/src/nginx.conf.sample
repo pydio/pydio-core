@@ -1,0 +1,26 @@
+# Debian 8 with default /etc/nginx/nginx.conf
+# File name: /etc/nginx/sites-available/pydio.conf
+server {
+        listen 80 default_server;
+        keepalive_requests    10;
+        keepalive_timeout     60 60;
+
+        client_max_body_size 800M;
+        client_body_buffer_size 128k;
+
+	    # Document Root
+        root /usr/share/pydio;
+
+        if (!-e $request_filename){
+                rewrite ^(.*)$ /index.php break;
+        }
+
+        # nginx configuration
+        location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/var/lib/php5-fpm/www.sock;
+        }
+}
+types {
+        application/font-woff2                 woff2;
+}

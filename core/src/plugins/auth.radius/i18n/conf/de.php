@@ -16,10 +16,10 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"RADIUS Authentification" => "RADIUS-Authentifizierung",
+"RADIUS Authentication" => "RADIUS-Authentifizierung",
 "Authenticate user by directly connecting to an RADIUS server" => "Benutzer über einen RADIUS-Server authentifizieren",
 "Server" => "Server",
 "IP or DNS name of the RADIUS server" => "IP oder DNS-Name des RADIUS-Servers",

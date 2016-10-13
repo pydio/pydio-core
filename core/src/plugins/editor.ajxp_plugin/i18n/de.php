@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Erweiterungs-Editor",
@@ -25,12 +25,12 @@ $mess=array(
 "4" => "Dokumentation",
 "5" => "Funktion auswählen",
 "6" => "Parameter bearbeiten",
-"7" => "Aktivieren Sie Plugins um neue Funktionen zur Arbeitsumgebung hinzuzufügen.",
-"8" => "Auf ein Plugin klicken, um die Parameter zu bearbeiten oder die Funktion zu entfernen",
-"9" => "%s Plugins",
+"7" => "Aktivieren Sie Erweiterungen um neue Funktionen zur Arbeitsumgebung hinzuzufügen.",
+"8" => "Auf eine Erweiterung klicken, um die Parameter zu bearbeiten oder die Funktion zu entfernen",
+"9" => "%s Erweiterungen",
 "10" => "Quelle für Metadaten",
 "11" => "Quelle hinzufügen",
-"12" => "Metadaten Plugin",
+"12" => "Metadaten-Erweiterung",
 "13" => "Soll diese Quelle wirklich gelöscht werden?",
 "14" => "Wählen Sie bitte einen Treiber!",
 "15" => "Diese Arbeitsumgebung wurde in der Konfigurationsdatei erstellt (siehe conf/bootstrap_repositories.php) und kann deshalb nicht in der GUI bearbeitet werden.",

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Auth Features" => "Configuration génériques pour les authentifications",
@@ -24,11 +24,11 @@ $mess=array(
 "Guest Browsing" => "Autoriser l'utilisateur 'Invité'",
 "Password length" => "Longueur du mot de passe",
 "Store Credentials in Session" => "Stocker les identifiants dans la session",
-"Authentification" => "Authentification",
+"Authentication" => "Authentification",
 "Options applied to all auth drivers" => "Options appliquées à tous les drivers d'autentification",
 "Activate the users management system to protect your Pydio installation." => "Activer le système de gestion d'utilisateurs pour protéger votre installation Pydio.",
 "Case Sensitive" => "Sensible à la casse",
-"Whether the users identifiers should be case sensitive or not" => "Définit si les identifiants des utilisateurs doivent-être sensibles à la casse",
+"Whether the users identifiers should be case sensitive or not" => "Définit si les identifiants des utilisateurs doivent-être sensibles à la casse. Attention les drivers basés sur SQL vont toujours désactiver cette valeur.",
 "Enable the 'guest' user, who does not need to log in." => "Activer l'utilisateur 'Invité', qui n'a pas besoin de se connecter.",
 "Minimum number of characters required for passwords in the application" => "Longueur minimale (en caractères) des mots de passe pour l'application",
 "Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Stocker les identifiants de l'utilisateur dans la session après la connexion, peut-être requis lors de l'utilisation de plugins d'authentification et d'accès spécifiques.",
@@ -44,7 +44,7 @@ $mess=array(
 "Choose the configuration plugin" => "Choisissez le plugin de configuration",
 "Secondary Instance (optional)" => "Instance secondaire (optionnel)",
 "Mode" => "Mode",
-"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup." => "Maître / Esclave supposera que le Maître est en lecture seule, et que l'Esclave est une alternative locale pour les fonctionnalités de partage. 'Choix de l'utilisateur' permettra à l'utilisateur de choisir manuellement sa méthode de connexion au démarrage.",
+"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentication method at startup." => "Maître / Esclave supposera que le Maître est en lecture seule, et que l'Esclave est une alternative locale pour les fonctionnalités de partage. 'Choix de l'utilisateur' permettra à l'utilisateur de choisir manuellement sa méthode de connexion au démarrage.",
 "Separator" => "Séparateur",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Requis pour différencier les données des utilisateurs en provenance de différentes sources. Attention, utilisez des caractères compatibles avec le nom de répertoire (:: ne marche pas !).",
 "Master Authentifiaction Label" => "Libellé d'authentification Maître",
@@ -52,4 +52,15 @@ $mess=array(
 "Slave Authentifiaction Label" => "Libellé d'authentification Esclave",
 "Users Listing" => "Liste d'utilisateurs",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "En mode Maître / Esclave, utilisez cette option pour limiter la liste des utilisateurs à un seul driver (laissez vide si vous voulez voir tous les utilisateurs)",
+"Master/Slave" => "Maître/Esclave",
+"User Choice" => "Choix de l'utilisateur",
+"Cache master users" => "Cacher les utilisateurs (non recommandé)",
+"Create a local copy (at login time) of master users inside slave base" => "Cacher une copie locale au login.",
+"Master Only" => "Maître seulement",
+"Slave Only" => "Esclave seulement",
+"Both" => "Les deux",
+"Disable Brute Force Check (Captcha)" => "Désactiver la détection d'attaque 'brute force' (captcha)",
+"Disable the check of failed login attempts, will disable the Captcha display" => "Désactive le compte des identifications échouées depuis une IP donnée.",
+"Multiple Instances Mode" => "Mode Instances multiples",
+"Secondary Instance Driver" => "Driver d'authentification secondaire",
 );

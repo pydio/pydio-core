@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //  Korean translation : minuki@gmail.com
 //  오타, 오역, 어색한 부분은 누구든지 수정하여 재 공유 부탁드립니다.
@@ -57,7 +57,7 @@ $mess=array(
 "22" => "PHP 스크립트",
 "23" => "파일",
 "24" => "상위 디렉토리",
-"25" => "하나 또는 다수의 파일을 업로드 (최대 ".ConfService::getConf('UPLOAD_MAX_NUMBER')." 개), 해당 디렉토리: ",
+"25" => "하나 또는 다수의 파일을 업로드 (최대 ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER')." 개), 해당 디렉토리: ",
 "26" => "새 디렉토리 생성 : ",
 "27" => "업로드(U)",
 "28" => "다음 디렉토리에 새 파일 생성 : ",
@@ -593,8 +593,8 @@ $mess=array(
 "527"=> "Shared with",
 "528"=> "Internal users",
 "530"=> "External users",
-"531"=> "Int.",
-"532"=> "Ext.",
+"531"=> "Users",
+"532"=> "Groups",
 "533" => "Identifier used to login, please use alphanumeric or email lowercase characters.",
 "534" => "Password used to login",
 "535" => "Send password by email",
@@ -627,6 +627,8 @@ $mess=array(
 "plugtype.desc.boot" => "Unique plugin for loading the framework.",
 "plugtype.title.conf" => "Configuration Storage",
 "plugtype.desc.conf" => "How configuration data are stored in the backend",
+"plugtype.title.cache" => "Cache server",
+"plugtype.desc.cache" => "Unique plugin to set up the cache server used by the application",
 "plugtype.title.feed" => "Events Feed Storage",
 "plugtype.desc.feed" => "Implementations for storing data events (only SQL yet)",
 "plugtype.title.log" => "Loggers",
@@ -635,13 +637,28 @@ $mess=array(
 "plugtype.desc.mailer" => "Tools for letting the application send emails",
 "plugtype.title.mq" => "Instant Messaging",
 "plugtype.desc.mq" => "Implementations of a simple PUB/SUB server",
-    "537" => "File is too large! Maximum authorized size is %i",
-    "538" => "Upload error: no file found on server!",
-    "539" => "Upload error: file is partial",
-    "540" => "Upload error: cannot find the temporary directory",
-    "541" => "Upload error: cannot write into the temporary directory",
-    "542" => "Upload error: a PHP extension stopped the upload process.",
-    "543" => "Results limited to 100 out of %s.",
-    "544" => "Show All",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
+"537" => "File is too large! Maximum authorized size is %i",
+"538" => "Upload error: no file found on server!",
+"539" => "Upload error: file is partial",
+"540" => "Upload error: cannot find the temporary directory",
+"541" => "Upload error: cannot write into the temporary directory",
+"542" => "Upload error: a PHP extension stopped the upload process.",
+"543" => "Results limited to %s.",
+"544" => "Show All",
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 /* END SENTENCE */
 );

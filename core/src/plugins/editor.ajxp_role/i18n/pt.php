@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "1" => "Editor de Papel",
@@ -52,6 +52,7 @@ $mess=array(
 "26" => "Bloquear Utilizador",
 "27" => "Reactivar utilizador",
 "28" => "Forçar Mudança de Palavra-Chave",
+"28b"=> "Cancel password change",
 "29" => "Introduza uma nova Palavra-Chave para este utilizador",
 "30" => "Confirmar",
 "31" => "ID de Papel",
@@ -67,4 +68,7 @@ $mess=array(
 "41" => "Remover",
 "42" => "Informação personalizada de papel",
 "43" => "Select one or more",
+"44" => "Plugins Parameters Fine-tuning",
+"45" => "Access Control List",
+"46" => "Disabled Actions",
 );

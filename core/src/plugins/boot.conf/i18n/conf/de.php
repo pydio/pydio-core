@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -25,16 +25,16 @@ $mess = array(
 "Configuration storage" => "<span class='icon-save'></span> Konfigurationsspeicher",
 "Add some users" => "<span class='icon-group'></span> Benutzer hinzufügen",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Bitte geben Sie Benutzername und Passwort für den Administrator ein. Dieser Schritt ist notwendig um sich anfangs Anzumelden. Sie könenn später über die Einstellungen mehr Benutzer mit Administratorrechten erstellen.",
-"Admin Login" => "Anmeldung als Aministrator",
+"Admin Login" => "Benutzername",
 "Alphanumeric login" => "Benutzernamen bestehen aus alphanumerischen Zeichen",
 "Admin Display Name" => "Angezeigter Name",
 "Name that users will see" => "Namen den die Benutzer sehen",
 "Admin Password" => "Passwort wählen",
-"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Wörterbuch-Wörter etc.).",
+"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Begriffe aus dem Wörterbuch, etc.).",
 "Confirm" => "Passwort bestätigen",
-"Confirm password" => "Passwort zur Kontrolle wiederholt eingeben",
-"Test Mailer" => "Mailversand testen",
-"Try sending an email with the configured data" => "Mailversand mit dieser Konfiguration testen",
+"Confirm password" => "Passwort zur Kontrolle erneut eingeben",
+"Test Mailer" => "E-Mail-Versand testen",
+"Try sending an email with the configured data" => "E-Mail-Versand mit dieser Konfiguration testen",
 "Test SQL Connection" => "SQL-Serververbindung testen",
 "Try connecting to the database" => "Verbindung testen",
 "Enable emails" => "E-Mails aktivieren",
@@ -43,8 +43,8 @@ $mess = array(
 "Yes (requires a correct PHP configuration)" => "Ja (Voraussetzung: Korrekte PHP-Konfiguration)",
 "Php Mailer" => "PHP Mailer",
 "Set up the correct value to send emails" => "Setzen Sie den korrekten Wert um Emails zu senden",
-"Administrator Email" => "Mailadresse Administrator",
-"Default 'From' email used to send emails." => "Standard 'Absender' mit den Emails verschickt werden.",
+"Administrator Email" => "Administrator E-Mail",
+"Default 'From' email used to send emails." => "Standard 'Absender' mit den E-Mails versendet werden.",
 "How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection." => "Legt fest, wo die Konfiguration der Anwengung gespeichert wird, <b>nicht</b> wo Dokumente abgelegt werden. (Benutzer, Erweiterungen, etc.). Sqlite kann für ein Testsystem verwendet werden und benötigt keinen zusätzlichen Dienst.",
 "Storage Type" => "Speichertyp",
 "Select how the configuration will be stored" => "Wählen Sie wie und wo die Konfigurationsdaten gespeichert werden sollen",
@@ -52,10 +52,10 @@ $mess = array(
 "Database system (production environments, requires a DBMS supported by APPLICATION_TITLE)" => "Datenbank (Produktive Umgebungen, von APPLICATION_TITLE unterstütztes DBMS vorausgesetzt)",
 "Enable Notifications" => "Protokollierung aktivieren",
 "Log all events and alerts" => "Alle Ereignisse und Warnungen protokollieren",
-"Create users for your organization right now. You can do this later by going to the Settings workspace." => "Benutzer für ihre Firma anlegen. Dies kann auch später über die Arbeitsumgebung 'Einstellungen' nachgeholt werden.",
+"Create users for your organization right now. You can do this later by going to the Settings workspace." => "Benutzer für ihre Firma erstellen. Dies kann auch später über die Arbeitsumgebung 'Einstellungen' nachgeholt werden.",
 "Login" => "Benutzername",
-"User Email" => "Mailadresse",
-"Mail address of the user" => "Mailadresse der Benutzern, des Benutzers",
+"User Email" => "E-Mail-Adresse",
+"Mail address of the user" => "E-Mail-Adresse des Benutzers",
 "Display name" => "Angezeigter Name",
 "Password" => "Passwort wählen",
 "Main options" => "Grundeinstellungen",
@@ -64,7 +64,6 @@ $mess = array(
 "Your system title" => "Titel dieser Installation von Pydio",
 "Welcome Message" => "Willkommens-Mitteilung",
 "An additional message displayed at startup, on the splash screen and the login screen." => "Eine zusätzliche Mitteilung für die Anmelde-Seite.",
-"Admin Display Name" => "Angezeigter Name",
 "User-friendly name of the user" => "Namen den die Benutzer sehen",
 "Welcome to Pydio" => "Willkommen bei Pydio",
 "Database Connexion" => "Datenbankverbindung",
@@ -76,4 +75,6 @@ $mess = array(
 "Detected Server Path" => "Server-Pfad",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => " Stellen Sie sicher, dass dieser Pfad korrekt ist. Er wird zum generieren der htaccess-Datei verwendet.",
 "Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
+"Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln."
 );

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("IMagickPreviewer", Diaporama, {
 
@@ -31,13 +31,13 @@ Class.create("IMagickPreviewer", Diaporama, {
             actions : {}
         }, editorOptions);
 		$super(oFormObject, options);
-		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page&file=";
+		this.baseUrl = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=get_extracted_page";
 		// Override onload for the text
 		this.jsImage.onload = function(){
 			this.jsImageLoading = false;
 			this.imgTag.src = this.jsImage.src;
             this.imgTag.setStyle({opacity:1});
-			this.resizeImage(true);
+			this.resizeImage();
 			var i;
 			for(i=0;i<this.items.length;i++){
 				if(this.items[i] == this.currentFile){
@@ -53,6 +53,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 	
 	open : function($super, node)
 	{
+        this.inputNode = node;
 		this.src_file = node.getPath();
 		this.currentIM = getBaseName(this.src_file);
 		// Extract the pages and load result!
@@ -97,17 +98,18 @@ Class.create("IMagickPreviewer", Diaporama, {
             className:'thumbnail_iconlike_shadow',
             align:'absmiddle',
             src:IMagickPreviewer.prototype.getThumbnailSource(ajxpNode)
-		});		
-		img.resizePreviewElement = function(dimensionObject){			
+		});
+        var div = new Element('div');
+        div.insert(img);
+		div.resizePreviewElement = function(dimensionObject){
 			var ratio = img.ratio;
 			if(!ratio) {
 				var fakeIm = new Image();
 				fakeIm.onload = function(){	
 					img.ratio = fakeIm.width/fakeIm.height;
-					img.resizePreviewElement(dimensionObject);
+					div.resizePreviewElement(dimensionObject);
 				};
 				fakeIm.src = img.src;
-				//img.onload = function(){img.resizePreviewElement(dimensionObject);};
 				ratio = 1.0;
 			}
 			var imgDim = {
@@ -115,7 +117,14 @@ Class.create("IMagickPreviewer", Diaporama, {
 				height:20/ratio
 			};
 			var styleObj = fitRectangleToDimension(imgDim, dimensionObject);
-			img.setStyle(styleObj);
+            img.setStyle(styleObj);
+            div.setStyle({
+                height:styleObj.height,
+                width:styleObj.width,
+                /*position:'relative',*/
+                display:'inline'
+            });
+            if($(div.parentNode)) $(div.parentNode).setStyle({position:"relative"});
         };
 		img.observe("mouseover", function(event){
 			var theImage = event.target;
@@ -158,23 +167,23 @@ Class.create("IMagickPreviewer", Diaporama, {
 			if(theImage.up('.thumbnail_selectable_cell')) return;
 			theImage.previewOpener.setStyle({display:'none'});
 		});		
-		return img;
+		return div;
 	},
 
     getRESTPreviewLinks:function(node){
         return {
-            "First Page Thumbnail": "&file=" + encodeURIComponent(node.getPath())
+            "First Page Thumbnail": ""
         };
     },
 
 
 	getThumbnailSource : function(ajxpNode){
         var repoString = "";
-        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+        if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){
             repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
         }
-        var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
-		return ajxpServerAccessPath+"&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
+        var mtimeString = this.buildRandomSeed(ajxpNode);
+		return pydioBootstrap.parameters.get('ajxpServerAccess') + "&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
 	},
 	
 	setOnLoad: function()	{
@@ -198,9 +207,10 @@ Class.create("IMagickPreviewer", Diaporama, {
 		if(this.crtWidth){
 			this.crtRatio = this.crtHeight / this.crtWidth;
 		}
+        var mstring = this.buildRandomSeed(this.inputNode);
 		new Effect.Opacity(this.imgTag, {afterFinish : function(){
 			this.jsImageLoading = true;
-			this.jsImage.src  = this.baseUrl + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
+			this.jsImage.src  = this.baseUrl + mstring + "&file=" + encodeURIComponent(this.currentFile) + "&src_file=" + this.src_file;
 			if(!this.crtWidth && !this.crtHeight){
 				this.crtWidth = this.imgTag.getWidth();
 				this.crtHeight = this.imgTag.getHeight();

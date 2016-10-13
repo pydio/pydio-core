@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Sharing Features" => "Sharing Features",
@@ -70,4 +70,14 @@ $mess=array(
 "Disable Folder Sharing" => "Disable Folder Sharing",
 "Set password mandatory" => "Set password mandatory",
 "Do not allow users to create public links, only private links (password-protected)" => "Do not allow users to create public links, only private links (password-protected)",
+"Authorizations" => "Authorizations",
+"Allow users to generate public links on files" => "Allow users to generate public links on files",
+"Files: enable public links" => "Files: enable public links",
+"Enable internal file sharing (sharing with users existing or temporary users)" => "Enable internal file sharing (sharing with users existing or temporary users)",
+"Files: enable internal sharing" => "Files: enable internal sharing",
+"Allow users to generate public links on folders" => "Allow users to generate public links on folders",
+"Folders: enable public links" => "Folders: enable public links",
+"Enable internal folder sharing (sharing with users existing or temporary users)" => "Enable internal folder sharing (sharing with users existing or temporary users)",
+"Folders: enable internal sharing" => "Folders: enable internal sharing",
+"Internal Sharing" => "Internal Sharing",
 );

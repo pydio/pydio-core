@@ -2,7 +2,7 @@
 <ajxp_plugin enabled="false" label="CONF_MESSAGE[Encfs Mount]" description="CONF_MESSAGE[Dynamically create/mount/umount an encfs filesystem]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
-        <core_relation packaged="false" tested_version="4.2.2"/>
+        <core_relation packaged="true" tested_version="7.0"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
     <client_settings>
@@ -22,7 +22,7 @@
                       label="CONF_MESSAGE[UID]" name="ENCFS_UID"
                       type="integer" mandatory="true" default="33"/>
     </server_settings>
-    <class_definition classname="EncfsMounter" filename="plugins/cypher.encfs/class.EncfsMounter.php"/>
+    <class_definition classname="Pydio\Action\Cypher\EncfsMounter" filename="plugins/cypher.encfs/EncfsMounter.php"/>
     <registry_contributions>
         <actions>
             <action name="encfs.cypher_folder_create">

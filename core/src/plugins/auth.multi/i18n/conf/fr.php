@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Multiple" => "Multiple",
@@ -31,4 +31,6 @@ $mess=array(
 "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features." => "Maître / Esclave supposera que le Maître est en lecture seule, et que l'Esclave est une alternative locale pour les fonctionnalités de partage.",
 "Listing" => "Liste",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "En mode Maître / Esclave, utilisez cette option pour limiter la liste des utilisateurs à un seul driver (laissez vide si vous voulez voir tous les utilisateurs)",
+"Cache master users" => "Cacher les utilisateurs 'master'",
+"Create a local copy (at login time) of master users inside slave base" => "Crée une copie locale (au login) des utilisateurs 'master' dans la base 'slave'. OPTION NON RECOMMANDE.",
 );

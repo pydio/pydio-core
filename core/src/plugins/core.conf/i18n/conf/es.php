@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 // spanish translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 
@@ -88,4 +88,8 @@ $mess=array(
 "Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex." => "Roles ocultos en la lista. Lista separada por ',' o empezar con 'preg: ' para expresiones regulares regex.",
 "Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex." => "Roles que deben mostrarse en la lista. Lista separada por ',' o empezar con 'preg: ' para expresiones regulares regex.",
 "External Users Creation" => "Creación de usuarios externos",
+"Always override other roles, included group roles." => "Always override other roles, included group roles.",
+"Always Override" => "Always Override",
+"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP.",
+"Make regexp mandatory" => "Make regexp mandatory",
 );

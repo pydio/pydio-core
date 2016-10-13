@@ -16,9 +16,11 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Open in..." => "Open in...",
 "Simple Picker to open any type of file in any available editor." => "Simple Picker to open any type of file in any available editor.",
+"Info Panel..." => "Info Panel...",
+"Info Panel" => "Info Panel",
 );

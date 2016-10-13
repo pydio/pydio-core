@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "FTP Server" => "FTP-Server",
@@ -42,8 +42,8 @@ $mess=array(
 "In conjunction with a correctly configured auth.ftp driver, this allow to transform ajaxplorer into a simple netFtp client." => "Mit einem korrekt konfigurierten Auth.ftp-Treiber, kann Pydio als einfacher netFTP Client genutzt werden.",
 "Test Connexion" => "Verbindung testen",
 "Test FTP connexion" => "FTP-Verbindung testen",
-"Create" => "Anlegen",
-"Create folder if it does not exists" => "Ordner anlegen, wenn dieser nicht existiert",
+"Create" => "Erstellen",
+"Create folder if it does not exists" => "Ordner erstellen, wenn dieser nicht existiert",
 "User Id" => "Benutzer Id",
 "To fetch the user id you have to run a listing command on your ftp client (ls or dir most of the time) and take the first of the two last numbers as the user id. It can be possible that there is more than one number. If you experience errors using one id try to use another one." => "Um die Benutzer Id zu ermitteln muss ein listing-Befehl im FTP-Client ausgeführt werden (üblicherweise ls oder dir). Bei der ersten der letzten zwei Zahlen handelt es sich um die Benutzer Id. Möglicherweise befinden sich dort mehrere Zahlen. Falls es mit der einen zu Fehlern kommt testen Sie bitte die andere.",
 );

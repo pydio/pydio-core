@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin name="memcache" enabled="no" label="CONF_MESSAGE[Doctrine Cache driver]" description="CONF_MESSAGE[Use doctrine as main caching driver.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <class_definition filename="plugins/cache.doctrine/DoctrineCacheDriver.php" classname="Pydio\Cache\Implementation\DoctrineCacheDriver"/>
+    <client_settings>
+        <resources>
+            <i18n namespace="doctrine_cachedriver" path="plugins/log.text/i18n"/>
+        </resources>
+    </client_settings>
+    <server_settings>
+        <param name="DRIVER" type="group_switch:driver" label="CONF_MESSAGE[Cache Driver]" description="CONF_MESSAGE[Cache driver]" default="apc" mandatory="false"/>
+
+        <param group_switch_name="driver" group_switch_label="apc" group_switch_value="apc" name="driver" type="hidden" label="" description="" mandatory="false" default="apc"/>
+
+        <param group_switch_name="driver" group_switch_label="memcache" group_switch_value="memcache" name="driver" type="hidden" label="" description="" mandatory="false" default="memcache"/>
+        <param group_switch_name="driver" group_switch_label="memcache" group_switch_value="memcache" name="MEMCACHE_HOSTNAME" type="string" label="CONF_MESSAGE[Hostname]" description="CONF_MESSAGE[The hostname to access Memcache server]" mandatory="true" default="localhost" />
+        <param group_switch_name="driver" group_switch_label="memcache" group_switch_value="memcache" name="MEMCACHE_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The port to access Memcache server]" mandatory="true" default="11211" />
+
+        <param group_switch_name="driver" group_switch_label="memcached" group_switch_value="memcached" name="driver" type="hidden" label="" description="" mandatory="false" default="memcached"/>
+        <param group_switch_name="driver" group_switch_label="memcached" group_switch_value="memcached" name="MEMCACHED_HOSTNAME" type="string" label="CONF_MESSAGE[Hostname]" description="CONF_MESSAGE[The hostname to access Memcached server]" mandatory="true" default="localhost" />
+        <param group_switch_name="driver" group_switch_label="memcached" group_switch_value="memcached" name="MEMCACHED_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The port to access Memcached server]" mandatory="true" default="11211" />
+
+        <param group_switch_name="driver" group_switch_label="redis" group_switch_value="redis" name="driver" type="hidden" label="" description="" mandatory="false" default="redis"/>
+        <param group_switch_name="driver" group_switch_label="redis" group_switch_value="redis" name="REDIS_HOSTNAME" type="string" label="CONF_MESSAGE[Hostname]" description="CONF_MESSAGE[The hostname to access Redis server]" mandatory="true" default="localhost" />
+        <param group_switch_name="driver" group_switch_label="redis" group_switch_value="redis" name="REDIS_PORT" type="string" label="CONF_MESSAGE[Port]" description="CONF_MESSAGE[The port to access Redis server]" mandatory="true" default="6379" />
+
+        <param group_switch_name="driver" group_switch_label="xcache" group_switch_value="xcache" name="driver" type="hidden" label="" description="" mandatory="false" default="xcache"/>
+
+        <param name="CACHE_PREFIX" type="string" label="CONF_MESSAGE[Cache Prefix]" description="CONF_MESSAGE[Cache Prefix]" mandatory="false" default="pydio-unique-id" />
+    </server_settings>
+</ajxp_plugin>

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -35,10 +35,8 @@ Class.create("ActionsToolbar", AjxpPane, {
 		this.element.ajxpPaneObject = this;
 		this.options = Object.extend({
 			buttonRenderer : 'this',
-            skipBubbling: true,
 			toolbarsList : $A(['default', 'put', 'get', 'change', 'user', 'remote']),
             groupOtherToolbars : $A([]),
-            skipCarousel : true,
             manager:null,
             dataModelElementId:null
 		}, options || {});
@@ -49,9 +47,6 @@ Class.create("ActionsToolbar", AjxpPane, {
 			this.options.buttonRenderer = new renderer();
 		}
 		this.toolbars = $H();
-        if(!this.options.skipCarousel){
-            this.initCarousel();
-        }
         if(this.options.styles){
             this.buildActionBarStylingMenu();
             this.style = this.options.defaultStyle;
@@ -238,9 +233,6 @@ Class.create("ActionsToolbar", AjxpPane, {
 			if(hasVisibleActions) sep.show();
 			else sep.hide();
 		}.bind(this) );
-        if(!this.options.skipCarousel){
-		    this.refreshSlides();
-        }
 	},
 	
 	/**
@@ -292,39 +284,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 		}.bind(this));
 		this.toolbars = new Hash();
 	},
-	
-	/**
-	 * Initialize a caroussel to scroll the buttons on small screens
-	 */
-	initCarousel : function(){
-		this.outer = this.element;
-		var origHeight = this.outer.getHeight()-1;
-		this.prev = new Element("a", {className:'carousel-control', rel:'prev', style:'height:'+origHeight+'px;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/arrow_left.png'}));
-		this.next = new Element("a", {className:'carousel-control', rel:'next', style:'float:right;height:'+origHeight+'px;'}).update(new Element('img', {src:ajxpResourcesFolder+'/images/arrow_right.png'}));
-		this.inner = new Element("div", {id:'buttons_inner', style:'width:1000px;'});
-		this.outer.insert({before:this.prev});
-		this.outer.insert({before:this.next});
-		this.outer.insert(this.inner);		
-		if(Prototype.Browser.IE) this.outer.setStyle({cssFloat:'left'});
-		this.element = this.inner;
-		
-		this.carousel = new Carousel(this.outer, [], $A([this.prev,this.next]), {
-			duration:0.1
-		});
-	},
-	
-	/**
-	 * Refreshes the caroussel slides 
-	 */
-	refreshSlides : function(){
-		var allSlides = $A();
-		this.inner.select('a').each(function(a){
-			if(a.visible()) allSlides.push(a);
-		});
-        this.carousel.refreshSlides(allSlides);
-		this.resize();
-	},
-	
+    
 	/**
 	 * Render an Action for the toolbar
 	 * @param action Action The action
@@ -383,17 +343,7 @@ Class.create("ActionsToolbar", AjxpPane, {
                 button.insert(arrowDiv);
             }
 
-		}else if(!this.options.skipBubbling) {
-			button.observe("mouseover", function(){
-				this.buttonStateHover(button, action);
-			}.bind(this) );
-			button.observe("mouseout", function(){
-				this.buttonStateOut(button, action);
-			}.bind(this) );
 		}
-        if(!this.options.skipBubbling){
-            img.setStyle("width:18px;height:18px;margin-top:8px;");
-        }
         button.hideButton = function(){
             this.hide();
             this.removeClassName("action_visible");
@@ -423,9 +373,10 @@ Class.create("ActionsToolbar", AjxpPane, {
 	attachListeners : function(button, action){
 
         if(this.options.attachToNode){
-            action.fireContextChange(ajaxplorer.usersEnabled, ajaxplorer.user, this.options.attachToNode.getParent());
             var fakeDm = new PydioDataModel();
+            fakeDm.setContextNode(this.options.attachToNode.getParent());
             fakeDm.setSelectedNodes([this.options.attachToNode]);
+            action.fireContextChange(fakeDm, pydio.usersEnabled, pydio.user);
             action.fireSelectionChange(fakeDm);
             if(action.deny) {
                 button.hideButton();
@@ -515,14 +466,12 @@ Class.create("ActionsToolbar", AjxpPane, {
 		});	
 		subMenu.options.beforeShow = function(){
 			button.addClassName("menuAnchorSelected");
-			if(!this.options.skipBubbling) this.buttonStateHover(button, action);
 		  	if(action.subMenuItems.dynamicBuilder){
 		  		action.subMenuItems.dynamicBuilder(subMenu);
 		  	}
 		}.bind(this);		
 		subMenu.options.beforeHide = function(){
 			button.removeClassName("menuAnchorSelected");
-			if(!this.options.skipBubbling) this.buttonStateOut(button, action);
 		}.bind(this);
 		if(!this.element.subMenus) this.element.subMenus = $A([]);
 		this.element.subMenus.push(subMenu);
@@ -613,39 +562,6 @@ Class.create("ActionsToolbar", AjxpPane, {
     },
 
 	/**
-	 * Listener for mouseover on the button
-	 * @param button HTMLElement The button
-	 * @param action Action its associated action
-	 */
-	buttonStateHover : function(button, action){		
-		if(button.hasClassName('disabled')) return;
-		if(button.hideTimeout) clearTimeout(button.hideTimeout);
-		new Effect.Morph(button.select('img[id="'+action.options.name +'_button_icon"]')[0], {
-			style:'width:22px; height:22px;margin-top:3px;',
-			duration:0.08,
-			transition:Effect.Transitions.sinoidal,
-			afterFinish: function(){this.updateTitleSpan(button.select('span')[0], 'big');}.bind(this)
-		});
-	},
-	
-	/**
-	 * Listener for mouseout on the button
-	 * @param button HTMLElement The button
-	 * @param action Action its associated action
-	 */
-	buttonStateOut : function(button, action){
-		if(button.hasClassName('disabled')) return;
-		button.hideTimeout = setTimeout(function(){				
-			new Effect.Morph(button.select('img[id="'+action.options.name +'_button_icon"]')[0], {
-				style:'width:18px; height:18px;margin-top:8px;',
-				duration:0.2,
-				transition:Effect.Transitions.sinoidal,
-				afterFinish: function(){this.updateTitleSpan(button.select('span')[0], 'small');}.bind(this)
-			});	
-		}.bind(this), 10);
-	},
-	
-	/**
 	 * Updates the button label
 	 * @param span HTMLElement <span>
 	 * @param state String "big", "small"
@@ -659,44 +575,6 @@ Class.create("ActionsToolbar", AjxpPane, {
 		span.setStyle({fontSize:(state=='big'?'11px':'9px')});
 	},	
 	
-	/**
-	 * Resize the widget. May trigger the apparition/disparition of the Carousel buttons.
-	 */
-	resize : function($super){
-        $super();
-        if(this.options.skipCarousel) {
-            return;
-        }
-		var innerSize = 0;
-		var parentWidth = $(this.outer).parentNode.getWidth();
-		if(Prototype.Browser.IE){
-			parentWidth = $(this.outer).getOffsetParent().getWidth()-4;//document.viewport.getWidth();
-		}
-		var visibles = [];
-		var buttons = this.inner.select('a');
-		buttons.each(function(a){
-			if(a.visible()) visibles.push(a);
-		});
-		if(visibles.length){
-			var last = visibles[visibles.length-1];
-			innerSize = last.cumulativeOffset()[0] + last.getWidth();
-		}
-		if(innerSize > parentWidth){
-            var h = parseInt(this.element.up("div.action_bar").getHeight()) - 1;
-            var m = parseInt( (h - 10) / 2);
-            h = h - m;
-            this.prev.setStyle({height:h+'px',paddingTop:m+'px'});
-            this.next.setStyle({height:h+'px',paddingTop:m+'px'});
-			this.prev.show();
-			this.next.show();
-			this.outer.setStyle({width:(parentWidth-this.prev.getWidth()-this.next.getWidth()) + 'px'});
-		}else{
-			this.prev.hide();
-			this.next.hide();
-			this.carousel.first();
-			this.outer.setStyle({width:parentWidth + 'px'});
-		}
-	},
 	/**
 	 * IAjxpWidget Implementation. Empty.
 	 * @param show Boolean

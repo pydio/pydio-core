@@ -1,3 +1,4 @@
+<?php die(); ?>
 <!DOCTYPE html>
 <html>
 <head>

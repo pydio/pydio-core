@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 div#emlHeaderContainer{
 	background-color: #EEE;
@@ -23,6 +23,7 @@ div#emlHeaderContainer{
 	border-right-width: 0px;
 	font-family: Trebuchet MS,sans-serif;
 	font-size: 12px;
+    position: relative;
 }
 
 div#emlHeaderContainer #attachments_container{
@@ -91,5 +92,6 @@ div#treeSelectorCpContainer{
 	padding: 5px;
 	background-color: white;
 	top: 156px;
-	box-shadow: 1px 1px 4px #BBB;	
+	box-shadow: 1px 1px 4px #BBB;
+    z-index: 200;
 }

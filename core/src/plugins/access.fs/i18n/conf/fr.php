@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "File System (Standard)" => "Fichiers locaux (Standard)",
@@ -39,10 +39,10 @@ $mess=array(
 "Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option pour purger les documents après un nombre de jours défini (même en cas de partage). Nécessite la mise en place manuelle d'une tâche 'CRON'. Laisser à 0 pour ne pas utiliser.",
 "Purge Days (Soft limit)" => "Purge après (limite douce)",
 "Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option pour purger les documents après un nombre de jours défini (s'ils ne sont pas partagés). Nécessite la mise en place manuelle d'une tâche 'CRON'. Laisser à 0 pour ne pas utiliser.",
-"Remote Sorting" => "Tri distant",
-"Force remote sorting when in paginated mode. Warning, this can impact the performances." => "Force le tri distant en mode paginé. Impacte les performances !",
 "Use POSIX" => "Utiliser POSIX",
 "Use php POSIX extension to read files permissions. Only works on *nix systems." => "Utiliser l'extension PHP POSIX pour lire les permissions de fichiers. Uniquement pour les systèmes *nix.",
 "X-Accel-Redirect Active" => "Activer X-Accel-Redirect",
 "Delegates all download operations to nginx using the X-Accel-Redirect header. Warning, you have to add some configuration in nginx, like X-Accel-Mapping" => "Déléguer l'ensemble des opérations de téléchargement à nginx en utilisant l'entête X-SendFile. Attention, il faut ajouter une configuration à nginx, par exemple X-Accel-Mapping",
+"Zip downloading files on the fly" => "Télécharger les zips à la construction",
+"Directly write the zip file to an output stream which is connected to the user's browser." => "Ecrire directement l'archive Zip dans le flux de sortie, sans passer par un fichier temporaire.",
 );

@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2008
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2009
@@ -55,7 +55,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "Archivo",
 "24" => "Carpeta superior",
-"25" => "Subir uno más archivos (max ".ConfService::getConf('UPLOAD_MAX_NUMBER').") a la carpeta: ",
+"25" => "Subir uno más archivos (max ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") a la carpeta: ",
 "26" => "Crear nueva carpeta en: ",
 "27" => "Subir",
 "28" => "Crear nuevo archivo en: ",
@@ -298,8 +298,8 @@ $mess=array(
 "246" => "Mensaje",
 "247" => "Extrae",
 "248" => "Extrae la selección desde el zip a...",
-"249" => "Gestión de usuarios",
-"250" => "Gestión de repositorios",
+"249" => "Usuarios",
+"250" => "Repositorios",
 "251" => "Logs",
 "252" => "Tamaño máximo de envío alcanzado.",
 "253" => "Error HTTP:",
@@ -591,8 +591,8 @@ $mess=array(
 "527"=> "Compartido con",
 "528"=> "Usuarios internos",
 "530"=> "Usuarios externos",
-"531"=> "Int.",
-"532"=> "Ext.",
+"531"=> "Users",
+"532"=> "Groups",
 "533" => "Identificador usado para acceder, por favor utilice caracteres alfanuméricos en minúsculas o correo electrónico.",
 "534" => "Contraseña usada para acceder",
 "535" => "Enviar contraseña por correo electrónico",
@@ -625,6 +625,8 @@ $mess=array(
 "plugtype.desc.boot" => "Plugin único para la carga del framework.",
 "plugtype.title.conf" => "Almacenamiento de la configuración",
 "plugtype.desc.conf" => "Cómo los datos de almacenamiento son guardados en el backend",
+"plugtype.title.cache" => "Cache server",
+"plugtype.desc.cache" => "Unique plugin to set up the cache server used by the application",
 "plugtype.title.feed" => "Almacenamiento del notificador de eventos",
 "plugtype.desc.feed" => "Implementaciones para almacenamiento de datos de eventos (de momento únicamente SQL)",
 "plugtype.title.log" => "Registradores",
@@ -633,13 +635,27 @@ $mess=array(
 "plugtype.desc.mailer" => "Herramientas que permiten a la aplicación enviar correos electrónicos",
 "plugtype.title.mq" => "Mensajería instantanea",
 "plugtype.desc.mq" => "Implementaciones de un simple servidor PUB/SUB",
+"plugtype.title.sec" => "Security",
+"plugtype.desc.sec" => "Advanced Security Features",
+"plugtype.title.helper" => "Helper",
+"plugtype.desc.helper" => "Helpers tools for administrative tasks",
 "537" => "¡El fichero es demasiado grande! El tamaño máximo autorizado es %i",
 "538" => "Error al subir: ningún archivo encontrado en el servidor!",
 "539" => "Error al subir: archivo parcialmente subido",
 "540" => "Error al subir: no puede encontrar el directorio temporal",
 "541" => "Error al subir: no se puede escribir en el directorio temporal",
 "542" => "Error al subir: una extensión de PHP se detuvo el proceso de carga.",
-"543" => "Resultados limitados a 100 de %s.",
+"543" => "Resultados limitados a %s.",
 "544" => "Mostrar todo",
-
+"545" => "Remote Share Dialog",
+"546" => "This item has been shared with you by %%OWNER%% from a remote location. Do you want to continue ?",
+"547" => "Accept",
+"548" => "Decline",
+"549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
+"550" => "Reject this share",
+"551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 );

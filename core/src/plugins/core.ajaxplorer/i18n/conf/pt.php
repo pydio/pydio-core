@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Main"      => "Opções Principais",
@@ -113,7 +113,6 @@ $mess=array(
 "Hide files" => "Ocultar Ficheiros",
 "Comma-separated list of specific files to hide" => "Lista de ficheiros a esconder, separada por virgulas",
 "Metadata and indexation" => "Indexação e Metadata",
-"Default Metasources" => "Fontes Meta pré-Definidas",
 "Comma-separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver" => "Lista de Fontes Meta e de Meta Plugins, separada por virgulas, que irá ser aplicada automaticamente a todas as Áreas de Trabalho criadas por este controlador",
 "Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature." => "Absolute path to the public folder where temporary download links will be created. Setting this empty will disable the sharing feature.",
 "Admin email" => "Admin email",
@@ -142,4 +141,45 @@ $mess=array(
 "Explicitly disable WebDAV access for this repository." => "Explicitly disable WebDAV access for this repository.",
 "Allow to group admins" => "Allow to group admins",
 "Allow group administrators to create a repository from this template." => "Allow group administrators to create a repository from this template.",
+"Skip auto-update admin rights" => "Skip auto-update admin rights",
+"If you have tons of workspaces (which is not recommanded), admin users login can take a long time while updating admin access to all repositories. Use this option to disable this step, admin will always have access to the Settings." => "If you have tons of workspaces (which is not recommanded), admin users login can take a long time while updating admin access to all repositories. Use this option to disable this step, admin will always have access to the Settings.",
+"Auto apply role" => "Auto apply role",
+"For multiple authentication, apply this role to users authenticated via this driver" => "For multiple authentication, apply this role to users authenticated via this driver",
+"DSN" => "DSN",
+"Data Source Name" => "Data Source Name",
+"Host" => "Host",
+"Database server" => "Database server",
+"Database" => "Database",
+"Database name" => "Database name",
+"File" => "File",
+"Database file" => "Database file",
+"Remote Sorting" => "Remote Sorting",
+"Force remote sorting when in paginated mode. Warning, this can impact the performances." => "Force remote sorting when in paginated mode. Warning, this can impact the performances.",
+"Remote Sorting Default Field" => "Remote Sorting Default Field",
+"Default field to sort on" => "Default field to sort on",
+"Remote Sorting Default Direction" => "Remote Sorting Default Direction",
+"Default sorting direction" => "Default sorting direction",
+"Driver" => "Driver",
+"Driver type (do not touch)" => "Driver type (do not touch)",
+"Use PHP MySQLi extension" => "Use PHP MySQLi extension",
+"Use MySQLi" => "Use MySQLi",
+"Ascending" => "Ascending",
+"Descending" => "Descending",
+"Name" => "Name",
+"Modification date" => "Modification date",
+"File size" => "File size",
+"File Type" => "File Type",
+"Read Only" => "Read Only",
+"Read and Write" => "Read and Write",
+"Write Only (upload)" => "Write Only (upload)",
+"OAuth Commons" => "OAuth Commons",
+"Client ID" => "Client ID",
+"Client SECRET" => "Client SECRET",
+"Scope" => "Scope",
+"Auth URL" => "Auth URL",
+"Token URL" => "Token URL",
+"Redirect URL" => "Redirect URL",
+"API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app" => "API endpoint - Used to launch the window allowing the user to authenticate and accept the terms of the app",
+"API endpoint - Used to refresh or validate the token retrieved in the authentication part" => "API endpoint - Used to refresh or validate the token retrieved in the authentication part",
+"API setting - Redirect URL for the OAuth Application" => "API setting - Redirect URL for the OAuth Application"
 );

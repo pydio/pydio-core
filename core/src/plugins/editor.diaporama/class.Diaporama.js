@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : The image gallery manager.
  */
 Class.create("Diaporama", AbstractEditor, {
@@ -275,7 +275,12 @@ Class.create("Diaporama", AbstractEditor, {
 			if(this.IEorigWidth) this.imgContainer.setStyle({width:this.IEorigWidth});
 		}else{
 			if(this.fullScreenMode){
-				fitHeightToBottom(this.imgContainer, this.element);
+                if(this.imgContainer.parentNode !== this.element){
+                    fitHeightToBottom(this.imgContainer.parentNode);
+                    fitHeightToBottom(this.imgContainer);
+                }else{
+    				fitHeightToBottom(this.imgContainer, this.element);
+                }
 				if(this.IEorigWidth) this.imgContainer.setStyle({width:this.element.getWidth()});
 			}else{
                 if(this.editorOptions.context.elementName){
@@ -536,10 +541,7 @@ Class.create("Diaporama", AbstractEditor, {
 	updateImage : function(){
 
         var node = this.nodes.get(this.currentFile);
-        var mstring = '';
-        if(node && node.getMetadata().get('ajxp_modiftime')){
-            mstring = '&time_seed=' + node.getMetadata().get('ajxp_modiftime');
-        }
+        var mstring = this.buildRandomSeed(node);
 
         if(node && node.getMetadata().get("image_dimensions_thumb")){
             var sizeLoader = new Image();
@@ -711,14 +713,14 @@ Class.create("Diaporama", AbstractEditor, {
 	
     getSharedPreviewTemplate : function(node){
 
-        return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
+        return new Template('<img src="#{DL_CT_LINK}">');
 
     },
 
     getRESTPreviewLinks:function(node){
         return {
-            "Original image": "&file=" + encodeURIComponent(node.getPath()),
-            "Thumbnail (200px)": "&get_thumb=true&dimension=200&file=" + encodeURIComponent(node.getPath())
+            "Original image": "",
+            "Thumbnail (200px)": "&get_thumb=true&dimension=200"
         };
     },
 
@@ -814,21 +816,29 @@ Class.create("Diaporama", AbstractEditor, {
 		});
 		return div;
 	},
-	
+
+    getCoveringBackgroundSource: function(ajxpNode){
+        return this.getThumbnailSource(ajxpNode);
+    },
+
 	getThumbnailSource : function(ajxpNode){
         var repoString = "";
-        if(ajaxplorer.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != ajaxplorer.repositoryId){
+        if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){
             repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
         }
+        var mtimeString = this.buildRandomSeed(ajxpNode);
+		return pydioBootstrap.parameters.get('ajxpServerAccess') + repoString + mtimeString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
+	},
+
+    buildRandomSeed : function(ajxpNode){
         var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
-		var source = ajxpServerAccessPath + repoString + mtimeString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
-		if(ajxpNode.getParent()){
+        if(ajxpNode.getParent()){
             var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
-    		if(preview_seed){
-    			source += "&rand="+preview_seed;
-    		}
+            if(preview_seed){
+                mtimeString += "&rand="+preview_seed;
+            }
         }
-		return source;
-	}
+        return mtimeString;
+    }
 	
 });

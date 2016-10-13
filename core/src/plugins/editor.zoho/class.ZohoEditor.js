@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("ZohoEditor", AbstractEditor, {
 
@@ -41,7 +41,8 @@ Class.create("ZohoEditor", AbstractEditor, {
             conn.addParameter("get_action", "retrieve_from_zohoagent");
             conn.onComplete = function(transport){
                 if(transport.responseText == "MODIFIED"){
-                    ajaxplorer.fireNodeRefresh(this.currentNode);// fireContextRefresh();
+                    this.currentNode.getParent().getMetadata().set('preview_seed', Math.round(date.getTime()*Math.random()));
+                    pydio.fireNodeRefresh(this.currentNode);
                 }
             }.bind(this);
             conn.sendAsync();

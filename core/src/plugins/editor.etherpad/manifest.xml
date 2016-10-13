@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor enabled="false" id="editor.etherpad" openable="true" iconClass="icon-comments-alt" order="10"
-        text="etherpad.2" title="etherpad.3" icon="edit.png" className="EtherpadLauncher"
+        text="etherpad.2" title="etherpad.3" icon="edit.png" className="EtherpadLauncher" canWrite="true"
         mimes="pad" formId="ether_box" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
@@ -120,12 +120,12 @@
             </action>
         </actions>
         <extensions>
-            <extension icon="etherpad/discussion.png" messageId="etherpad.1" mime="pad"/>
+            <extension icon="etherpad/discussion.png" messageId="etherpad.1" font="comment-multiple-outline" mime="pad"/>
         </extensions>
         <hooks>
             <!--<serverCallback methodName="hideExtension" hookName="node.info"/>-->
             <serverCallback methodName="handleNodeChange" hookName="node.change"/>
         </hooks>
     </registry_contributions>
-    <class_definition classname="EtherpadClient" filename="plugins/editor.etherpad/class.EtherpadClient.php"/>
+    <class_definition classname="Pydio\Editor\Etherpad\EtherpadClient" filename="plugins/editor.etherpad/EtherpadClient.php"/>
 </editor>

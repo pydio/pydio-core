@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.codemirror" openable="true" text="code_mirror.1" iconClass="icon-text-height" title="code_mirror.2" icon="codemirror_images/source_edit.png" className="CodeMirrorEditor" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl," formId="codemirror_box" label="CONF_MESSAGE[Source Viewer]" description="CONF_MESSAGE[Syntax Highlighter for all major code source files]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.codemirror" openable="true" canWrite="true" text="code_mirror.1" iconClass="icon-text-height" title="code_mirror.2" icon="codemirror_images/source_edit.png" className="CodeMirrorEditor" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl," formId="codemirror_box" label="CONF_MESSAGE[Source Viewer]" description="CONF_MESSAGE[Syntax Highlighter for all major code source files]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="code_mirror" path="plugins/editor.codemirror/i18n" autoload="true"/>
@@ -10,7 +10,7 @@
         </resources>
     </client_settings>
 	<clientForm id="codemirror_box"><![CDATA[
-		<div id="codemirror_box" action="editer" box_width="80%" box_height="90%" box_padding="0" box_resize="true" class="editor_container">
+		<div id="codemirror_box" action="editer" box_width="80%" box_height="90%" box_padding="0" box_resize="true" class="editor_container forceComputeFit forceComputeFitChildren">
 			<div class="action_bar full_width_action_bar" style="position:relative;">
 				<div align="right" style="height: 21px;position: absolute;right: 5px;bottom: 3px;">
 					<span style="font-size:10px; display:none;" message_id="AJXP_MESSAGE[code_mirror.6]">AJXP_MESSAGE[code_mirror.6]</span><input placeholder="AJXP_MESSAGE[code_mirror.6]" type="text" style="width: 24px; text-align:center;height: 16px; padding: 0px 1px 0px 0px; border: 1px solid rgb(204, 204, 204); margin-right:5px;" id="goto_line"><span style="font-size:10px;" message_id="AJXP_MESSAGE[code_mirror.9]">AJXP_MESSAGE[code_mirror.9]</span> <input type="text" style="text-align: left; width: 80px; height: 16px; padding: 0px 1px 0px 0px; border: 1px solid rgb(204, 204, 204);" placeholder="AJXP_MESSAGE[87]" value="" id="text_search">

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.watch" label="CONF_MESSAGE[Watch Metadata]" description="CONF_MESSAGE[Register watched on files or folders]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/meta.watch/class.MetaWatchRegister.php" classname="MetaWatchRegister"/>
+    <class_definition filename="plugins/meta.watch/WatchRegister.php" classname="Pydio\Access\Meta\Watch\WatchRegister"/>
     <client_settings>
         <resources>
             <img_library alias="meta.watch" path="plugins/meta.watch/icons"/>
@@ -12,7 +12,7 @@
             <action name="toggle_watch">
                 <gui src="meta.watch/ICON_SIZE/watch.png" text="meta.watch.1" title="meta.watch.2" iconClass="icon-rss">
                     <context dir="true" recycle="hidden" selection="true" actionBar="true" actionBarGroup="more" contextMenu="true"/>
-                    <selectionContext dir="true" file="true" recycle="false" unique="true"/>
+                    <selectionContext dir="true" file="true" recycle="false" unique="true" enableRoot="true"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
                 <subMenu>
@@ -104,7 +104,7 @@
         <hooks>
             <serverCallback hookName="node.read" methodName="processReadHook" defer="true"/>
             <serverCallback hookName="node.change" methodName="processChangeHook" defer="true"/>
-            <serverCallback hookName="node.info" methodName="enrichNode" />
+            <serverCallback hookName="node.info.nocache" methodName="enrichNode" />
         </hooks>
     </registry_contributions>
 </meta>

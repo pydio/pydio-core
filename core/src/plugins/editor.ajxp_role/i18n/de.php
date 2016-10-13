@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 /*******************************************************************************
@@ -49,7 +49,7 @@ $mess=array(
 "17" => "Parameter",
 "18" => "Parameter hinzuf&uuml;gen",
 "19" => "Sie haben ungespeicherte Änderungen. Möchten Sie das Fenster wirklich schliessen?",	 /* Html entity would break tooltip */
-"20" => "Rollen-Update erfolgreich",
+"20" => "Rolle erfolgreich aktualisiert",
 "21" => "Benutzername",
 "22" => "Profilart",
 "23" => "Standard-Arbeitsumgebung",
@@ -58,6 +58,7 @@ $mess=array(
 "26" => "Benutzer sperren",
 "27" => "Benutzer aktivieren",
 "28" => "Passwort&auml;nderung erzwingen",
+"28b"=> "Passwortänderung abbrechen",
 "29" => "Geben Sie ein neues Passwort f&uuml;r den Benutzer ein",
 "30" => "Wiederholen",
 "31" => "Rollen-ID",
@@ -72,8 +73,8 @@ $mess=array(
 "40" => "Einschalten",
 "41" => "Entfernen",
 "42" => "Rollen-Daten",
-"43" => "Select one or more",
-"44" => "Plugins Parameter Fein-Einstellungen",
+"43" => "Bitte auswählen",
+"44" => "Fein-Einstellungen für Erweiterungs-Parameter",
 "45" => "Zugriffssteuerungsliste",
 "46" => "Ausgeschaltete Aktionen",
 );

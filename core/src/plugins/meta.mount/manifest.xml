@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.mount" label="CONF_MESSAGE[FS Mount]" description="CONF_MESSAGE[Mount a remote location on the file system before accessing the repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="credentials_consumer">
-    <class_definition filename="plugins/meta.mount/class.FilesystemMounter.php" classname="FilesystemMounter"/>
+    <class_definition filename="plugins/meta.mount/FilesystemMounter.php" classname="Pydio\Access\Meta\Mount\FilesystemMounter"/>
     <server_settings>
         <param name="FILESYSTEM_TYPE" type="string" label="CONF_MESSAGE[FS Type]" description="CONF_MESSAGE[Filesystem Type, will be used for the -t option of the mount command]" mandatory="true" default="cifs"/>
         <param name="MOUNT_DEVIL" type="boolean" label="CONF_MESSAGE[Devil]" description="CONF_MESSAGE[Call the mount/umount commands through devil, must be configured on the server]" mandatory="true" default="false"/>

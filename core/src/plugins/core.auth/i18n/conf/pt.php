@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Auth Features" => "Funções Auth Genéricas",
@@ -24,11 +24,11 @@ $mess=array(
 "Guest Browsing" => "Navegação como visitante",
 "Password length" => "Tamanho da Palavra-Chave",
 "Store Credentials in Session" => "Guardar credenciais na Sessão",
-"Authentification" => "Authentification",
+"Authentication" => "Authentication",
 "Options applied to all auth drivers" => "Options applied to all auth drivers",
 "Activate the users management system to protect your Pydio installation." => "Activate the users management system to protect your Pydio installation.",
 "Case Sensitive" => "Case Sensitive",
-"Whether the users identifiers should be case sensitive or not" => "Whether the users identifiers should be case sensitive or not",
+"Whether the users identifiers should be case sensitive or not" => "Whether the users identifiers should be case sensitive or not. WARNING, sql-based drivers will disable this by default, even if you check this.",
 "Enable the 'guest' user, who does not need to log in." => "Enable the 'guest' user, who does not need to log in.",
 "Minimum number of characters required for passwords in the application" => "Minimum number of characters required for passwords in the application",
 "Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins.",
@@ -44,7 +44,7 @@ $mess=array(
 "Choose the configuration plugin" => "Choose the configuration plugin",
 "Secondary Instance (optional)" => "Secondary Instance (optional)",
 "Mode" => "Mode",
-"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup.",
+"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentication method at startup." => "Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentication method at startup.",
 "Separator" => "Separator",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!",
 "Master Authentifiaction Label" => "Master Authentifiaction Label",
@@ -52,4 +52,15 @@ $mess=array(
 "Slave Authentifiaction Label" => "Slave Authentifiaction Label",
 "Users Listing" => "Users Listing",
 "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)" => "In Master_Slave mode, use this option to limit the users listing in the administration to one driver only (leave empty if you want to see all users)",
+"Master/Slave" => "Master/Slave",
+"User Choice" => "User Choice",
+"Cache master users" => "Cache master users",
+"Create a local copy (at login time) of master users inside slave base" => "Create a local copy (at login time) of master users inside slave base",
+"Master Only" => "Master Only",
+"Slave Only" => "Slave Only",
+"Both" => "Both",
+"Disable Brute Force Check (Captcha)" => "Disable Brute Force Check (Captcha)",
+"Disable the check of failed login attempts, will disable the Captcha display" => "Disable the check of failed login attempts, will disable the Captcha display",
+"Multiple Instances Mode" => "Multiple Instances Mode",
+"Secondary Instance Driver" => "Secondary Instance Driver",
 );

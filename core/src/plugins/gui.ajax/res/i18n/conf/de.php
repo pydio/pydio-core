@@ -16,14 +16,14 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 /* *****************************************************************************
 * Initial translation:  Martin Schaible <martin@martinschaible.ch>
-***************************************************************************** */ 
+***************************************************************************** */
 
-/* Do not use HTML entities! It would mess up everything */ 
+/* Do not use HTML entities! It would mess up everything */
 $mess=array(
 "Client Plugin" => "Desktop-Client",
 "Browser-based rich interface. Contains configurations for theming, custom welcome message, etc." => "Browser-basierte Oberfläche. Beinhaltet die Konfiguraton der Themen, kundenspezifische Willkommens-Mitteilung, usw.",
@@ -46,7 +46,7 @@ $mess=array(
 "Number of MINUTES before the session expiration for issuing an alert to the user" => "Den Benutzer warnen bevor die Sitzung abläuft. (Anzahl an Minuten vor dem Ablauf der Sitzung)",
 "Google Analytics" => "Google Analytics",
 "Analytics ID" => "Analytics-ID",
-"Id of your GA account, something like UE-XXXX-YY" => "ID Ihres GA-Kontos (Beispiel: UE-XXXX-YY)",
+"Id of your GA account, something like UE-XXXX-YY" => "ID Ihres GA-Benutzerkontos (Beispiel: UE-XXXX-YY)",
 "Analytics Domain" => "Analytics-Domain",
 "Set the domain for your analytics reports (not mandatory!)" => "Setzen Sie die Domain für Ihre Analytics-Berichte (Nicht zwingend!)",
 "Analytics Events" => "Ereignisse protokollieren",
@@ -92,12 +92,25 @@ $mess=array(
 "Fetch Window (repeat vertically)" => "Ganzes Fenster (Vertikal wiederholend)",
 "Fetch Window (no repeat)" => "Ganzes Fenster (Nicht-wiederholend)",
 "Tile (repeat both directions)" => "Nebeneinander (In beide Richtungen wiederholend)",
-"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Grundeinstellungen der Anwendung festlegen. Bei aktivem E-Mail-Versand kann die PHP-Konfiguration mit einem Klick auf 'Mailversand mit dieser Konfiguration testen' überprüft werden.",
+"Set up some application parameters. If you enable Emails, please use the Test button to check if your php is correctly configured." => "Grundeinstellungen der Anwendung festlegen. Bei aktivem E-Mail-Versand kann die PHP-Konfiguration mit einem Klick auf 'E-Mail-Versand mit dieser Konfiguration testen' überprüft werden.",
 "Detected Encoding" => "Server-Encoding",
 "Detected Server Path" => "Server-Pfad",
 "Application Title" => "Titel der Anwendung",
 "Page Background Images" => "Hintergrundbilder",
-"Minisite" => "Minisite",
+"Minisite" => "Öffentlicher Link",
 "Minisite Logo" => "Logo",
-"Top-right logo displayed on minisite page" => "Logo, das auf Minisites angezeigt wird",
+"Top-right logo displayed on minisite page" => "Logo, das auf der Seite eines öffentlichen Links angezeigt wird",
+"Set the domain for yuor analytics reports (not mandatory!)" => "Set the domain for yuor analytics reports (not mandatory!)",
+"User Home Logo" => "Hauptseiten-Logo",
+"Web Session" => "Web-Sitzung",
+"Google Analytics Analytics ID" => "Google-Analytics ID",
+"Google Analytics Analytics Domain" => "Google-Analytics Domain",
+"Google Analytics Analytics Events" => "Google-Analytics Events",
+"Low-Resolution Background" => "Hintergrund für niedrige Auflösungen",
+"Make sure to use a smaller resolution image, otherwise mobile loading is very slow." => "Kleines Bild, um die Ladezeit auf mobilen Geräten zu verbessern.",
+"Background Attributes (Low Resolution)" => "Hintergrund-Attribute (niedrige Auflösung)",
+"Display Branding Tool" => "Branding-Tool anzeigen",
+"Show the palette on the interface to change the interface colors and logos. Make sure to reload the interface if you toggle this option." => "Palette anzeigen, um die Farben der Oberfläche und Logos zu ändern. Nach dem Ändern der Einstellung muss die Seite neu geladen werden.",
+"Use configured branding" => "Konfiguriertes Branding verwenden",
+"Override default styles and colors with the options defined in the branding tool. Make sure to reload the interface if you toggle this option." => "Die konfigurierten Farben verwenden. Nach dem Ändern der Einstellung muss die Seite neu geladen werden.",
 );

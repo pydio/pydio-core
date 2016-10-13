@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Auth Features" => "Standard-Authentifizierung",
@@ -24,14 +24,14 @@ $mess=array(
 "Guest Browsing" => "Gäste erlauben",
 "Password length" => "Minimale Passwortlänge",
 "Store Credentials in Session" => "Einstellungen in der Sitzung speichern",
-"Authentification" => "Authentifizierung",
+"Authentication" => "Authentifizierung",
 "Options applied to all auth drivers" => "Einstellungen für alle Authentifizierung-Treiber",
 "Activate the users management system to protect your Pydio installation." => "Benutzerverwaltung aktivieren um die Pydio-Installation zu schützen.",
 "Case Sensitive" => "Groß- / Kleinschreibung beachten",
-"Whether the users identifiers should be case sensitive or not" => "Bei der BenutzerId Groß- / Kleinschreibung beachten",
+"Whether the users identifiers should be case sensitive or not" => "Bei der BenutzerId Groß- / Kleinschreibung beachten. WARNING, sql-based drivers will disable this by default, even if you check this.",
 "Enable the 'guest' user, who does not need to log in." => "Aktiviert den 'Gast' Benutzer ohne Login.",
 "Minimum number of characters required for passwords in the application" => "Minimale Passwortlänge",
-"Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Anmeldedaten nach erfolgreichem Login in der Sitzung merken. (möglicherweise beim Bridging von Auth-Plugins nötig)",
+"Set the users credentials in the session after a successful login, this can be necessary when bridging specific auth and access plugins." => "Anmeldedaten nach erfolgreichem Login in der Sitzung merken. (möglicherweise beim Bridging von Auth-Erweiterungen nötig)",
 "Login Form" => "Formular-Authentifizierung",
 "Secure Login Form" => "Sicheres Anmelde-Formular",
 "Raise the security of the login form by disabling autocompletion and remember me feature" => "Erhöht die Sicherheit des Anmelde-Formulars indem AutoComplete und automatische Anmeldung deaktiviert werden.",
@@ -44,7 +44,7 @@ $mess=array(
 "Choose the configuration plugin" => "Erweiterung auswählen",
 "Secondary Instance (optional)" => "Zweite Instanz (optional)",
 "Mode" => "Modus",
-"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentification method at startup." => "Bei Master/slave wird auf den Master nur lesend zugegriffen, während der Slave alternativ für Freigaben verwendet wird. Benutzerdefiniert ermöglicht eine manuelle Auswahl der Authentifizierungsart beim Start.",
+"Master/slave will assume that the master is read-only, and the slave is a local alternative to allow sharing features. User Choice will allow the user to manually choose its authentication method at startup." => "Bei Master/slave wird auf den Master nur lesend zugegriffen, während der Slave alternativ für Freigaben verwendet wird. Benutzerdefiniert ermöglicht eine manuelle Auswahl der Authentifizierungsart beim Start.",
 "Separator" => "Trennzeichen",
 "This is necessary to discriminate users data loaded from various sources. Warning, use foldername compliant characters. For example :: does not work!" => "Nötig um die Benutzerdaten aus verschiedenen Quellen zu trennen. Achtung, bitte Zeichen verwenden, die auch in Ordnernamen erlaubt sind.",
 "Master Authentifiaction Label" => "Titel für Master-Authentifizierung",
@@ -59,4 +59,8 @@ $mess=array(
 "Master Only" => "Master-Benutzer",
 "Slave Only" => "Slave-Benutzer",
 "Both" => "Beide",
+"Disable Brute Force Check (Captcha)" => "Brute-Force-Prüfung deaktivieren (Captcha)",
+"Disable the check of failed login attempts, will disable the Captcha display" => "Deaktiviert die Captcha-Prüfung nach fehlgeschlagenen Anmeldeversuchen",
+"Multiple Instances Mode" => "Modus für mehrere Instanzen",
+"Secondary Instance Driver" => "Treiber der zweiten Instanz",
 );

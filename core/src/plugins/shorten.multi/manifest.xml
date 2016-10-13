@@ -2,7 +2,7 @@
 <ajxp_plugin id="shorten.multi" enabled="false" label="CONF_MESSAGE[multi URL Shortener]" description="CONF_MESSAGE[Shorten Download Links before sending them back to the user.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <plugin_author>Miguelon</plugin_author>
-        <core_relation packaged="true" tested_version="4.3"/>
+        <core_relation packaged="true" tested_version="6.4"/>
     </plugin_info>
     <client_settings>
         <resources>
@@ -29,16 +29,11 @@
 		<global_param group_switch_name="shorten_type" group_switch_label="yourls" group_switch_value="yourls" name="YOURLS_USEIDN" type="boolean" label="CONF_MESSAGE[Use IDN]" description="CONF_MESSAGE[Use IDN]" mandatory="false" default="false"/>
     </server_settings>
 	<registry_contributions>
-        <actions>
-        <!-- Override a simple action -->
-            <action name="share">
-                <post_processing>
-                    <serverCallback methodName="postProcess" capture="true" applyCondition="$apply=(!isSet($httpVars['sub_action']) || $httpVars['sub_action'] == 'create_minisite');"/>
-                </post_processing>
-            </action>
-        </actions>
+        <hooks>
+            <serverCallback methodName="processShortenHook" hookName="url.shorten"/>
+        </hooks>
 	</registry_contributions>
-	<class_definition filename="plugins/shorten.multi/class.multiShortener.php" classname="multiShortener"/>
+	<class_definition filename="plugins/shorten.multi/MultiShortener.php" classname="Pydio\LinkShortener\MultiShortener"/>
     <dependencies>
         <activePlugin pluginName="action.share"/>
     </dependencies>

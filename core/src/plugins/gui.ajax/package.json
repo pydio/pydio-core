@@ -1,9 +1,10 @@
 {
   "name": "gui.ajax",
-  "version": "6.2.1",
+  "version": "6.5.1",
   "description": "",
   "main": "index.js",
   "source_path":"res/js",
+  "css_path":"res/themes/orbit/css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,8 +20,14 @@
     "reactify": "^1.1.1",
     "react-select": "^0.6.5",
     "react-dnd": "^1.1.5",
+    "react-tap-event-plugin": "0.1.7",
     "lodash": "^3.10.1",
-    "classnames": "~2.1.3"
+    "classnames": "~2.1.3",
+    "react-autosuggest": "1.18.2",
+    "clipboard":"^1.5.8",
+    "qrcode.react":"0.6.1",
+    "cronstrue":"0.3.1",
+    "he":"1.1.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -29,6 +36,9 @@
     "grunt-contrib-watch": "~0.6.1",
     "grunt-browserify": "~4.0.1",
     "grunt-env": "~0.4.4",
-    "grunt-run":"~0.5.2"
+    "grunt-run":"~0.5.2",
+    "grunt-contrib-cssmin":"~0.14.0",
+    "assemble-less": "~0.7.0",
+    "less-plugin-autoprefix": "~1.5.1"
   }
 }

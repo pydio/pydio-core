@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin id="authfront.cas" enabled="false" label="CONF_MESSAGE[CAS FrontEnd]" description="CONF_MESSAGE[Authentication by CAS]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/authfront.cas/class.CasAuthFrontend.php" classname="CasAuthFrontend"/>
+    <class_definition filename="plugins/authfront.cas/CasAuthFrontend.php" classname="Pydio\Auth\Frontend\CasAuthFrontend"/>
     <client_settings>
         <resources>
             <js className="CAS_LoginForm" file="plugins/authfront.cas/class.CAS_LoginForm.js" autoload="true"/>

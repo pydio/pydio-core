@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
 "SSH File Transfer Protocol (SFTP)" => "SSH File Transfer Protocol (SFTP)",
@@ -28,5 +28,5 @@ $mess=array(
 "Path" => "Pfad",
 "Real path to the root folder on the server" => "Absoluter Pfad zum Hauptordner auf dem Server",
 "Fix Permissions" => "Berechtigungen korrigieren",
-"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung."
+"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Wie die Serverrechte durch PHP als lokale Rechte verwendet werden. Siehe Anleitung.",
 );

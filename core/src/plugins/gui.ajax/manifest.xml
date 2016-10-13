@@ -5,10 +5,15 @@
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
             <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"
                 fallbackCondition="!window.addEventListener" fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"/>
+            <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
+            <js className="ReactPydio" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactPydioComponents.js"/>
+            <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
+            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,ReactPydio"/>
+            <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>
 	<server_settings>
-        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="vision|Vision,orbit|Orbit,umbra|Umbra" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
+        <global_param name="GUI_THEME" group="CONF_MESSAGE[Main Options]" type="select" choices="orbit|Orbit" label="CONF_MESSAGE[Theme]" description="CONF_MESSAGE[Theme used for display]" mandatory="true" default="orbit"/>
         <global_param name="JS_RESOURCES_BEFORE" group="CONF_MESSAGE[Main Options]" type="string" label="CONF_MESSAGE[Additional JS frameworks]" description="CONF_MESSAGE[Additional JS frameworks description]" mandatory="false" default="plugins/gui.ajax/res/js/jquery_backbone-min.js"/>
         <global_param name="CUSTOM_WELCOME_MESSAGE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additionnal message displayed in the start up screen]" mandatory="false" default="Welcome to Pydio"/>
         <global_param name="CUSTOM_ICON_ONLY" group="CONF_MESSAGE[Login Screen]" type="boolean" label="CONF_MESSAGE[Icon Only]" description="CONF_MESSAGE[Skip the title, only display an image]" mandatory="false" default="true"/>
@@ -36,7 +41,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/vision/images/white_logo.png"
+                      defaultImage="AJXP_THEME_FOLDER/images/white_logo.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
@@ -53,7 +58,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/01.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/01.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -65,7 +70,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -77,7 +82,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -89,7 +94,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/04.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/04.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -101,7 +106,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -125,7 +130,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03-mobile.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03-mobile.jpg"
                       expose="true"
                 />
 
@@ -138,7 +143,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
@@ -149,7 +154,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
@@ -159,7 +164,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
@@ -176,134 +181,39 @@
                 />
 
 	</server_settings>
-	<class_definition filename="plugins/gui.ajax/class.AJXP_ClientDriver.php" classname="AJXP_ClientDriver"/>
+	<class_definition filename="plugins/gui.ajax/RichClient.php" classname="Pydio\Gui\RichClient"/>
 	<registry_contributions>
 		<actions>
 			<action name="get_boot_gui" skipSecureToken="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="getBootGui"/>
 				</processing>
 			</action>
 			<action name="get_boot_conf" skipSecureToken="true">
 				<processing>
-					<serverCallback methodName="switchAction"></serverCallback>
+					<serverCallback methodName="getBootConf"/>
 				</processing>
 			</action>
 		</actions>
         <hooks>
-            <serverCallback hookName="node.info" methodName="nodeBookmarkMetadata"/>
+            <serverCallback hookName="node.info.nocache" methodName="nodeBookmarkMetadata"/>
             <serverCallback hookName="node.change" methodName="nodeChangeBookmarkMetadata"/>
         </hooks>
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
-			<template name="main_oxygen" element="ajxp_desktop" position="top" theme="oxygen"><![CDATA[
-				<div id="toolbars">
-					<div id="action_bar">
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar"></div>
-						<div id="locationbar_cont">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
-								<div id="logging_string" ajxpClass="UserWidget"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 200, "maxA":600, "minA":50,"fit":"height","fitParent":"browser"}'>
-						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":200,"minB":24,"maxB":500}'>
-							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz"}' ajxpPaneHeader="130" style="border: 1px solid #676965;"></div>
-					    	<div id="bottomSplitPane" ajxpClass="AjxpTabulator" style="border: 1px solid #676965;" ajxpOptions='{"defaultTabId": "info","tabInfos" : [{"id":"info","label":"131","icon":"file_info.png","element":"info_panel"},{"id":"search","label":"87","icon":"search.png","element":"search_container"}]}'>
-						    	<div id="search_container" ajxpClass="SearchEngine"></div>
-						    	<div id="info_panel" ajxpClass="InfoPanel"></div>
-					    	</div>
-					    </div>
-						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='"list"' style="border: 1px solid #676965;"></div>
-					</div>
-				</div>
-			]]></template>
-            <template name="main_umbra" element="ajxp_desktop" position="top" theme="umbra"><![CDATA[
-				<div id="toolbars">
-					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
-						<div id="locationbar_cont" class="css_gradient">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="repo_chooser" ajxpClass="RepositorySelect"></div>
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont","searchButton":"searchbar_splitter","searchIcon":"xmag.png", "searchFocus":"search_txt"}'></div>
-								<div id="logging_string" ajxpClass="UserWidget"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 350, "maxA":600, "minA":0,"fit":"height","fitParent":"browser", "minSize":0, "foldingButton":true}'>
-						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initB":300,"minB":57}'>
-							<div id="topPane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ajxpPaneHeader="130" ajxpPaneIcon="view_tree.png" style="margin:20px;margin-bottom:10px;padding-right: 10px;"></div>
-							<div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true"}' style="margin:20px;margin-top:10px;padding-right: 10px;" ></div>
-					    </div>
-						<div id="searchbar_splitter" style="overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"horizontal","initA":0, "minSize":0, "startFolded": true, "foldingButton": "A"}'>
-							<div id="search_container" ajxpClass="SearchEngine" ajxpPaneHeader="87" ajxpPaneIcon="xmag.png" data-globalOptions='{"headerClose":{"icon":"panel_vertical_hide.png","splitter":"searchbar_splitter","title":86}}' style="height: 0px; overflow:hidden;"></div>
-    						<div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "messageBoxReference":true}' style="border: 1px solid #bbb;"></div>
-					    </div>
-					</div>
-				</div>
-			]]></template>
-            <template name="main_vision" element="ajxp_desktop" position="top" theme="vision"><![CDATA[
-				<div id="toolbars" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'>
-					<div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
-					    <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over"}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["user", "admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-						<div id="repo_chooser" ajxpClass="RepositorySelect" ajxpOptions='{"menuPosition": "bottom middle", "menuOffsetTop":11, "menuOffsetLeft":0, "menuMaxHeight":535, "menuEvent":"over", "simpleLabel":"<span class=\"icon-sitemap\"></span><span class=\"ws-label\" ajxp_message_id=\"455\">AJXP_MESSAGE[455]</span><span class=\"icon-caret-down\"></span>"}'></div>
-					</div>
-					<div id="workspace_toolbar" ajxpClass="AjxpPane">
-                        <div id="simple_repository_label" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"bindSizeTo":{"width":{"id":"topPane", "events":["resize-AjxpTabulator-cpane_tabs","actions_refreshed"], "min":150, "checkSiblings":true,"offset":-5}}}'></div>
-					    <div style="float:left;" ajxpClass="AjxpPane"  id="buttons_bar_cont">
-						    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-						</div>
-						<div style="float:right;" ajxpClass="AjxpPane" ajxpOptions='{"bindSizeTo":{"width":{"id":"info_panel", "events":["resize-InfoPanel-info_panel", "resize-FoldersTree-folder_pane","actions_refreshed"], "min":120, "offset":-20, "checkSiblings":true}}}' id="search_engine_cont">
-						    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}'></div>
-						</div>
-						<div style="clear:both;" class="skipSibling"/>
-					</div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-					<div id="vertical_splitter" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA":"70%", "minB":26,"fit":"height","fitParent":"browser", "minSize":26, "foldingButton":"B", "invisibleBar": true}'>
-    					<div id="vertical_splitter2" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "autoFoldOnEvent":"ajaxplorer:context_changed", "initA": "50%", "minA":26, "maxA":450, "fit":"height","fitParent":"browser", "minSize":0, "foldingButton":"A", "invisibleBar": true}'>
-    					    <div id="topPane" ajxpClass="AjxpTabulator" ajxpOptions='{"defaultTabId": "folders","tabInfos" : [{"id":"folders","label":"130","iconClass":"icon-folder-close","element":"folder_pane"},{"id":"flagged","label":"147","iconClass":"icon-bookmark-empty","element":"flagged_elements"}],"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter2-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'>
-                                <div id="folder_pane" ajxpClass="FoldersTree" ajxpOptions='{"display":"dz","replaceScroller":true}' ></div>
-                                <div id="flagged_elements" ajxpClass="FetchedResultPane" ajxpOptions='{"nodeProviderProperties":{"get_action":"get_bookmarks", "format":"node_list"},"reloadOnServerMessage":"tree/reload_bookmarks"}'></div>
-    					    </div>
-							<div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                                <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"browser","registerAsEditorOpener":true, "saveState":true,"events":{"ajaxplorer:context_changed":"this.switchToFirstIfPathDiffers(arguments[0]);"}, "defaultTabId": "files","tabInfos" : [{"id":"files","label":"","iconClass":"icon-folder-open", "element":"files_list_pane"}]}'>
-                                    <div id="files_list_pane" ajxpClass="AjxpPane">
-                                        <div id="files_list_header" ajxpClass="AjxpPane">
-                                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_tabs","flexToMargin":20}'></div>
-                                        </div>
-                                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"files_lit_pane", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border-left: 1px solid #bbb;"></div>
-                                    </div>
-                                </div>
-							</div>
-                        </div>
-                        <div id="info_panel" ajxpClass="InfoPanel" ajxpPaneHeader="131" ajxpPaneIcon="file_info.png" ajxpOptions='{"replaceScroller":"true", "skipActions":true,"headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["filter","vertical_splitter-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}}'></div>
-                    </div>
-				</div>
-			]]></template>
             <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
                 <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
                     <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
                         <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
+						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"submenuOffsetTop":2}'></div>
                     </div>
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>
 			]]></template>
-            <template name="widget_umbra" element="ajxp_widget" position="top" theme="umbra"><![CDATA[
+            <template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
 				<div id="toolbars">
 					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
+						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
 						<div id="locationbar_cont" class="css_gradient">
 							<div style="height: 100%;" class="separator"></div>
 							<div style="padding-top : 5px;">
@@ -315,549 +225,9 @@
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>
-			]]></template>
-<template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
-				<div id="toolbars">
-					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"skipBubbling":true,"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
-						<div id="locationbar_cont" class="css_gradient">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
-					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
-				</div>
-			]]></template>			
-            <template name="widget_vision" element="ajxp_widget" position="top" theme="vision"><![CDATA[
-				<div id="toolbars">
-    			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["put", "get"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-				</div>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="cpane_header" class="panelHeader">
-                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
-                        </div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"list","replaceScroller":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    </div>
-				</div>
-			]]></template>
-            <template name="minisite_vision" element="ajxp_shared_folder" position="top" label="Standard" theme="vision"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div class="widget_logo"></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-      			    <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="cpane_header" class="panelHeader">
-                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["default"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header","flexToMargin":30}'></div>
-                        </div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    </div>
-				</div>
-			]]></template>
-            <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153" theme="orbit"><![CDATA[
-                <style>
-                    div#overlay.form-login_form_dynamic {
-                        opacity: 1;
-                    }
-                    #browser{
-                        background-color: #345E79;
-                    }
-                    #widget_title{
-                        font-size: 30px;
-                        padding: 10px 0 0 5px;
-                        color: #fff;
-                        line-height: 25px;
-                        background-color: #345E79;
-                    }
-                    #cpane_container{
-                        float: none;
-                    }
-                    div#breadcrumb {
-                        font-size: 16px;
-                        padding: 12px 10px 8px;
-                        color: white;
-                    }
-                    span.icon-chevron-right,
-                    span.icon-refresh.ajxp-goto-refresh
-                    {
-                        padding: 0 5px;
-                        font-size: 13px;
-                    }
-                    .action_bar {
-                        background-color: transparent;
-                        height: auto !important
-                    }
-                    .action_bar > .toolbarGroup{
-                        height: auto;
-                    }
-                    #display_toolbar a{
-                        color: #555;
-                        font-size: 11px;
-                    }
-                    div.separator{
-                        border-left-width: 0;
-                    }
-                    #display_toolbar{
-                        margin-top: 0;
-                        margin-right: 0;
-                        padding: 9px 9px 8px;
-                    }
-                    @media only screen and (max-width : 720px) {
-                        #display_toolbar{
-                            padding: 8px 9px 6px;
-                        }
-                    }
-                    img.custom_logo_image{
-                        height:90px !important;
-                        width: auto;
-                        right: 0;
-                        top: 5px !important;
-                        left: inherit !important;
-                    }
-                </style>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="breadcrumb" ajxpClass="Breadcrumb" ajxpOptions='{}'></div>
-                    <div id="files_list_header">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation","minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    </div>
-                    <div id="cpane_container1" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container1", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    </div>
-				</div>
-                <link rel="stylesheet" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-                <script>
-                document.observe("ajaxplorer:afterApply-login", function(){
-                    AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                });
-                </script>
-			]]></template>
-            <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154" theme="orbit"><![CDATA[
-				<style type="text/css">
-                div#overlay.form-login_form_dynamic {
-                    opacity: 1;
-                }
-				#browser{
-				    -webkit-font-smoothing: antialiased;
-				}
-                #widget_title{
-                    font-size: 30px;
-                    padding: 10px 0 0 5px;
-                    color: #fff;
-                    line-height: 25px;
-                    margin-right: 0;
-                    background-color: #222;
-                }
-                .widget_logo{
-                    background-size:120px;
-                }
-				#cpane_container{
-				    left:0;
-				    width:100%;
-				    float: none;
-				}
-                div#breadcrumb {
-                    color: white;
-                    font-size: 16px;
-                    padding: 2px 10px;
-                }
-                span.ajxp-goto {
-                    cursor: pointer;
-                }
-                span.icon-chevron-right,
-                span.icon-refresh.ajxp-goto-refresh
-                {
-                    padding: 0 5px;
-                    font-size: 13px;
-                }
-				#cpane_header{
-				    padding-bottom: 7px;
-                    height: 19px;
-                    background-color: #222;
-                    border-bottom: 0;
-                    padding-top: 10px;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-                }
-                #cpane_tabs div#imageContainer {
-                    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.5);
-                    background-color: rgb(74, 74, 74) !important;
-                }
-                div#content_pane{
-                    position: fixed !important;
-                    bottom: 0;
-                    width: 100%;
-                    background-color: #222;
-                    box-shadow: 0 0 4px rgba(0,0,0,0.5);
-                    padding-top: 3px;
-                    padding-left: 3px;
-                    height: 80px !important;
-                }
-                .fl-displayMode-thumb div.thumbnail_selectable_cell div.thumbLabel {
-                    color: #555;
-                    background-color: transparent;
-                }
-                .fl-displayMode-thumb div.thumbnail_selectable_cell{
-                    margin: 2px 2px;
-                }
-                div.thumbnail_selectable_cell{
-                    background-color: transparent;
-                    color: white !important;
-                }
-                div.thumbnail_selectable_cell.ajxpNodeLeaf, div.thumbnail_selectable_cell.ajxpNodeLeaf > span{
-                    cursor: pointer !important;
-                }
-                #cpane_tabs>div.tabulatorContainer{
-                    height:0;
-                    border-bottom-width: 0;
-                }
-                #cpane_container{
-                    background-color: rgb(85, 85, 85);
-                }
-                #loading_overlay{
-                    display:none !important;
-                }
-                #diaporama_box{
-                    position:relative;
-                }
-                img.custom_logo_image{
-                    right: 0px !important;
-                    left: inherit !important;
-                    height: 65px !important;
-                    width: auto;
-                }
-                @media only screen and (max-width : 720px) {
-                    #display_toolbar{
-                        margin-top: -2px;
-                    }
-                }
-                .fl-displayMode-thumb div.thumbnail_selectable_cell{
-                    background-color: transparent;
-                }
-				</style>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "fitMarginBottom":80}'>
-                        <div id="cpane_header" class="panelHeader">
-                            <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                            <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":50, "resize_events":["actions_refreshed"]}'></div>
-                        </div>
-                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
-                        <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"thumb", "fixedDisplayMode":"thumb", "fixedThumbSize":60,"replaceScroller":false, "horizontalScroll":true, "messageBoxReference":true, "fit":"content", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'></div>
-                    </div>
-				</div>
-                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                    document.observe("ajaxplorer:selection_changed", function(e){
-                        try{
-                            var dm = ajaxplorer.getContextHolder();
-                            var nodes = dm.getSelectedNodes();
-                            if(nodes[0].isLeaf() && e.memo._selectionSource.__className == 'FilesList'){
-                                window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                            }
-                        }catch(e){}
-                    });
-                    var p;
-				    document.observe("ajaxplorer:user_logged", function(){
-                        if(p) return;
-                        try{
-                            p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var first = dm.getRootNode().getFirstChildIfExists();
-                                if(first){
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){}
-                    });
-				</script>
-			]]></template>
-            <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"><![CDATA[
-                <style type="text/css">
-                div#overlay.form-login_form_dynamic {
-                    opacity: 1;
-                }
-                #browser{
-                    background-color: #345E79;
-                    -webkit-font-smoothing: antialiased;
-                }
-                #widget_title {
-                    font-size: 30px;
-                    color: #fff;
-
-                    margin-right: 0;
-                    background-color: #333;
-                    height: 69px;
-                    padding: 7px 10px !important;
-                }
-                #widget_title div.repository_description {
-                    font-size: 12px;
-                }
-                .widget_logo{
-                    background-size:120px;
-                    height: 58px;
-                    top: 5px;
-                }
-                img.custom_logo_image{
-                    right: 0 !important;
-                    left: inherit !important;
-                    height: 72px !important;
-                    width: auto;
-                }
-                #cpane_container{
-                  float: none;
-                  left:0;
-                  width: 100%;
-                }
-                #cpane_header{
-                    padding-bottom: 7px;
-                    height: 48px;
-                    background-color: #222;
-                    border-bottom: 0;
-                    padding-top: 10px;
-                }
-                div#content_pane{
-                    background-color: #222;
-                    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-                    margin-bottom:5px;
-                }
-                div.thumbnail_selectable_cell{
-                    background-color: transparent;
-                    color: white !important;
-                }
-                #cpane_tabs>div.tabulatorContainer{
-                    height:0;
-                    border-bottom-width: 0;
-                }
-                #cpane_container{
-                    background-color: rgb(85, 85, 85);
-                }
-                #loading_overlay{
-                    display:none !important;
-                }
-                #diaporama_box{
-                    position:relative;
-                }
-                #display_toolbar {
-                    position: absolute;
-                    top: 55px;
-                    font-size: 12px;
-                }
-                #display_toolbar span.actionbar_button_label {
-                    display: inline-block !important;
-                    margin-left: 4px !important;
-                }
-                #display_toolbar a {
-                    padding: 0 7px;
-                }
-                #cpane_tabs div#imageContainer {
-                    box-shadow: inset 0px 2px 4px rgba(0, 0, 0, 0.5);
-                    background-color: rgb(74, 74, 74) !important;
-                }
-				</style>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                    <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["inline", "minisite-share-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                    <div id="widget_title" style="padding: 28px 0 22px 20px;" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="cpane_tabs" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "fitParent":"cpane_container","registerAsEditorOpener":true, "saveState":false, "defaultTabId": "","tabInfos" : [], "uniqueTab":true}'></div>
-                    </div>
-				</div>
-                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-				    document.observe("ajaxplorer:user_logged", function(){
-                        try{
-
-                            var p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var root = dm.getRootNode();
-                                var first = root.getFirstChildIfExists();
-                                if(first){
-                                    if((first.getAjxpMime() == 'mp3' || first.getAjxpMime() == 'wav') && !(window.soundManager && window.soundManager.enabled)){
-                                        return;
-                                    }
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    window.setTimeout(function(){pydio.getController().fireDefaultAction("file");}, 1);
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){
-                            if (console) console.log(e);
-                        }
-                    });
-				</script>
-			]]></template>
-            <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"><![CDATA[
-				<style type="text/css">
-                    div#overlay.form-login_form_dynamic {
-                        opacity: 1;
-                    }
-				#browser{
-				    background-color: #000;
-				    width:102%;
-                    -webkit-font-smoothing: antialiased;
-				}
-				#cpane_container{
-				    float:none;
-                    left:0;
-				    position: absolute;
-                    width: 100%;
-                    top:0;
-                }
-                body{ overflow: hidden; }
-                u{ text-decoration: none; }
-                #background_container{
-				    position: absolute;
-                    width: 102%;
-                    top:-5px;
-                    left:-5px;
-                    bottom:-5px;
-                    right:-5px;
-                }
-                div#dl_toolbar {
-                    margin: 27% auto;
-                    display: block;
-                    width: 400px;
-                    font-size: 52px;
-                    text-align: center;
-                }
-                div.widget_logo{
-                    height: 90px;
-                    background-position: 86px 76px;
-                }
-                div#widget_title{
-                    color: rgba(255,255,255,0.8);
-                    position: absolute;
-                    margin-top: 0px;
-                    padding: 23px 30px 20px;
-                    width: 100%;
-                    background-color: rgba(0,0,0,0.7);
-                    position: absolute;
-                }
-                div#inline_toolbar a{
-                    display:none;
-                }
-                a#download_button, a#share_current_page_button{
-                    display:block !important;
-                    text-align: center;
-                    color: rgba(255,255,255,0.8);
-                    background-color: rgba(0,0,0,0.5);
-                    padding: 20px 10px;
-                    border-radius: 5px;
-                }
-                a#download_button span.ajxp_icon{
-                    display: inline-block;
-                    margin-right: 10px;
-                }
-                div#share_toolbar{
-                    position: absolute;
-                    right: 48px;
-                    bottom: 37px;
-                    font-size: 21px;
-                }
-                img.custom_logo_image{
-                    right: 6px !important;
-                    left: inherit !important;
-                    height: 90px !important;
-                    width: auto;
-                }
-                </style>
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="background_container" ajxpClass="AjxpPane" ajxpOptions='{"imageBackgroundFromConfigs":"gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_"}'></div>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser"}'>
-                        <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-                        <div id="widget_title" ajxpClass="RepositorySimpleLabel" ajxpOptions='{"displayLabelLegend":false,"displayWorkspaceDescription":true}'>
-                        </div>
-                        <div id="dl_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["inline"], "skipCarousel":true}'></div>
-                        <div id="share_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["minisite-share-actions"], "skipCarousel":true}'></div>
-                    </div>
-				</div>
-                <link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<script>
-				    document.observe("ajaxplorer:user_logged", function(){
-                        try{
-
-                            var p = new PeriodicalExecuter(function(){
-                                var dm = ajaxplorer.getContextHolder();
-                                if(dm.getSelectedNodes().length){
-                                    p.stop();
-                                    return;
-                                }
-                                var first = dm.getRootNode().getFirstChildIfExists();
-                                if(first){
-                                    dm.setSelectedNodes([first], "dataModel");
-                                    p.stop();
-                                    return;
-                                }
-                            }, 1);
-                        }catch(e){
-                            if (console) console.log(e);
-                        }
-                    });
-				</script>
-			]]></template>
-            <template name="minisite_bare" element="ajxp_embed_template" position="top" label="share_center.155"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["navigation", "minisite", "inline", "content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
-                    </div>
-                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-				</div>
-				<link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ width: auto; height: 85px !important; top: inherit !important; bottom: 25px; } #cpane_container{left:0;} div#overlay.form-login_form_dynamic { opacity: 1; }</style>
-                <script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                </script>
-			]]></template>
-            <template name="minisite_dropbox" element="ajxp_dropbox_template" position="top" label="share_center.163"><![CDATA[
-				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                    <div id="cpane_header" class="panelHeader">
-                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["minisite", "inline","content_pane-actions"],"skipBubbling":true, "skipCarousel":true,"submenuOffsetTop":2}'></div>
-                        <div id="breadcrumb" ajxpClass="Breadcrumb" style="width:50%;" ajxpOptions='{"flexTo":"cpane_header", "flexToMargin":30}'></div>
-                    </div>
-                    <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
-                    <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
-				</div>
-				<link rel="stylesheet" data-hrefRebase="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css" href="plugins/gui.ajax/res/themes/orbit/css/fontfaces.css"/>
-				<style>img.custom_logo_image{ width: auto; right: 6px !important; left: inherit !important; height: 87px !important; bottom: 3px; top: inherit !important; }  div#overlay.form-login_form_dynamic { opacity: 1; }</style>
-				<script>
-                    document.observe("ajaxplorer:afterApply-login", function(){
-                        AjxpPane.prototype.staticApplyBackgroundFromConfigs($("overlay"), "gui.ajax/CUSTOM_SHAREPAGE_BACKGROUND_", "display:block;", true);
-                    });
-                </script>
 			]]></template>
 			<component_config className="FilesList">
-				<property name="thumbSize" value="64"/>
+				<property name="thumbSize" value="128"/>
 			</component_config>
 		</client_configs>
 	</registry_contributions>

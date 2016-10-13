@@ -19,7 +19,6 @@ $mess=array(
 "Bit.ly URL Shortener" => "Bit.ly URL Shortener",
 "User Name" => "User Name",
 "Bit.ly account user name" => "Bit.ly account user name",
-"API Key" => "API Key",
 "Bit.ly account API Key" => "Bit.ly account API Key",
 "Yourls domain" => "Yourls domain",
 "Use IDN" => "Use IDN",

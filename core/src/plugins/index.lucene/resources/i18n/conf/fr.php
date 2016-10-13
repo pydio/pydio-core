@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Lucene Search Engine" => "Moteur de recherche Lucene",
@@ -41,4 +41,8 @@ $mess=array(
 "Analyzer used by Zend to parse the queries. Warning, the UTF8 analyzers require the php mbstring extension." => "Analyzeur utilisé par zend pour analyser les requêtes. Attention, les analysuers UTF8 requierent l'extension php mbstring.",
 "Wildcard limitation" => "Limitation des jokers",
 "For the sake of performances, it is not recommanded to use wildcard as a very first character of a query string. Lucene recommends asking the user minimum 3 characters before wildcard. Still, you can set it to 0 if necessary for your usecases." => "Pour des raisons de performances, il n'est pas recommandé d'utiliser un joker en premier caractère d'une requête. Lucene recommande de demander, à l'utilisateur, au minimum, 3 caractères avant le joker. Toutefois, vous pouvez le définir à 0 si requis pour votre utilisation.",
+"Auto-Wildcard" => "Auto-Joker",
+"Automatically append a * after the user query to make the search broader" => "Ajoute * automatiquement à la fin de la recherche de le l'utilisateur pour élargir les résultats.",
+"Hide 'My Shares'" => "Cacher le panneau 'Mes Partages'",
+"Hide My Shares section in the Orbit theme GUI." => "Cacher le panneau 'Mes Partages' dans la colonne gauche du thème Orbit.",
 );

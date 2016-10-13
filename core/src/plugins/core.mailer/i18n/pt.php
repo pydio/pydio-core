@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess = array(
     "1" => "E-mail enviado com sucesso para %s ",
@@ -27,4 +27,5 @@ $mess = array(
     "6" => "Subject",
     "7" => "Message",
     "8" => "User or email",
+    "9" => "Notifications Digest",
 );
