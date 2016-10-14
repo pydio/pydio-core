@@ -102,15 +102,15 @@
                 }
                 dataModel.applyCheckHook(newNode, params);
             }catch(e){
-                throw new Error('Error while checking before uploads');
+                throw new Error(global.pydio.MessageHash['html_uploader.3']);
             }
             let overwriteStatus = UploaderConfigs.getInstance().getOption("DEFAULT_EXISTING", "upload_existing");
             if(overwriteStatus === 'rename'){
                 queryString += '&auto_rename=true';
             }else if(overwriteStatus === 'alert' && !this._relativePath && currentRepo === this._repositoryId){
                 if(dataModel.fileNameExists(nodeName, false, this._targetNode)){
-                    if(!global.confirm(MessageHash[124])){
-                        throw new Error('File already exists');
+                    if(!global.confirm(global.pydio.MessageHash[124])){
+                        throw new Error(global.pydio.MessageHash[71]);
                     }
                 }
             }
@@ -146,11 +146,6 @@
             this.setStatus('loading');
 
             let maxUpload = parseFloat(UploaderConfigs.getInstance().getOption('UPLOAD_MAX_SIZE'));
-            if(this.getSize() > maxUpload){
-                this.onError('File is too big: contact your admin to raise the upload value, or use the desktop client.');
-                completeCallback();
-                return;
-            }
 
             let queryString;
             try{
@@ -166,11 +161,21 @@
 
                 this.tryAlternativeUpload(complete, progress, function(){
                     // Failed, switch back to normal upload.
+                    if(this.getSize() > maxUpload){
+                        this.onError(global.pydio.MessageHash[211]);
+                        completeCallback();
+                        return;
+                    }
                     this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,complete,error,progress);
                 }.bind(this));
 
             }else{
-
+                
+                if(this.getSize() > maxUpload){
+                    this.onError(global.pydio.MessageHash[211]);
+                    completeCallback();
+                    return;
+                }
                 this.xhr = PydioApi.getClient().uploadFile(this._file,'userfile_0',queryString,complete,error,progress);
 
             }
@@ -251,7 +256,7 @@
             }.bind(this));
         }
         _doAbort(completeCallback){
-            if(global.console) global.console.log('Cannot abort folder creation');
+            if(global.console) global.console.log(global.pydio.MessageHash['html_uploader.6']);
         }
     }
 
@@ -263,7 +268,7 @@
                 userId  : global.pydio.user.id,
                 wsId    : global.pydio.user.activeRepository,
                 flags   : PydioTasks.Task.FLAG_HAS_PROGRESS|PydioTasks.Task.FLAG_STOPPABLE,
-                label   : "Uploading files to server...",
+                label   : global.pydio.MessageHash['html_uploader.7'],
                 status  : PydioTasks.Task.STATUS_COMPLETE,
                 statusMessage  : ''
             });
@@ -274,11 +279,11 @@
             this.updateStatus(PydioTasks.Task.STATUS_RUNNING);
         }
         setPending(queueSize){
-            this._internal['statusMessage'] = queueSize + ' files waiting for upload';
+            this._internal['statusMessage'] = global.pydio.MessageHash['html_uploader.1'].replace('%s', queueSize);
             this.updateStatus(PydioTasks.Task.STATUS_PENDING);
         }
         setRunning(queueSize){
-            this._internal['statusMessage'] = 'Uploading ' + queueSize + ' files';
+            this._internal['statusMessage'] = global.pydio.MessageHash['html_uploader.2'].replace('%s', queueSize);
             this.updateStatus(PydioTasks.Task.STATUS_RUNNING);
         }
         setIdle(){
@@ -514,7 +519,7 @@
                 for(var j=0;j<files.length;j++){
                     console.log(files[j]);
                     if(files[j].size === 0){
-                        alert('It seems that your browser does not support dropping folders.');
+                        alert(global.pydio.MessageHash['html_uploader.8']);
                         return;
                     }
                     let uploadItem = new UploadItem(files[j], targetNode);

@@ -46,6 +46,8 @@
         render: function(){
 
             let options;
+            let messages = global.pydio.MessageHash;
+
             if(this.state && this.state.options){
                 let dismiss = function(e){
                     this.toggleOptions(e);
@@ -59,21 +61,21 @@
             let e = global.document.createElement('input');
             e.setAttribute('type', 'file');
             if('webkitdirectory' in e){
-                folderButton = <ReactMUI.RaisedButton label="Pick Folder" onClick={this.openFolderPicker}/>;
+                folderButton = <ReactMUI.RaisedButton label={messages['html_uploader.5']} onClick={this.openFolderPicker}/>;
             }
             e = null;
             let configs = UploaderModel.Configs.getInstance();
             if(!configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
-                startButton = <ReactMUI.FlatButton label="Start" onClick={this.start} secondary={true}/>
+                startButton = <ReactMUI.FlatButton label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
             }
             return (
                 <div style={{position:'relative'}}>
                     <div className="react-mui-context uploader-action-bar">
                         <ReactMUI.FlatButton style={{float: 'right'}} label="Options"  onClick={this.toggleOptions}/>
-                        <ReactMUI.RaisedButton secondary={true} label="Pick File" onClick={this.openFilePicker}/>
+                        <ReactMUI.RaisedButton secondary={true} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
                         {folderButton}
                         {startButton}
-                        <ReactMUI.FlatButton label="Clear List" onClick={this.clear}/>
+                        <ReactMUI.FlatButton label={messages['html_uploader.12']} onClick={this.clear}/>
                     </div>
                     <PydioForm.FileDropZone
                         ref="dropzone"
@@ -169,7 +171,7 @@
         render: function(){
             let statusMessage;
             if(this.props.item.getStatus() === 'loaded'){
-                statusMessage = 'Created';
+                statusMessage = global.pydio.MessageHash['html_uploader.13'];
             }
             return (
                 <div className={"folder-row upload-" + this.props.item.getStatus() + " " + (this.props.className?this.props.className:"")}>
@@ -226,9 +228,9 @@
         render: function(){
             let items = [];
             if(this.state && this.state.items){
-                this.renderSection(items, this.state.items.processing, 'Processing', 'section-processing');
-                this.renderSection(items, this.state.items.pending, 'Pending', 'section-pending');
-                this.renderSection(items, this.state.items.processed, 'Processed', 'section-processed');
+                this.renderSection(items, this.state.items.processing, global.pydio.MessageHash['html_uploader.14'], 'section-processing');
+                this.renderSection(items, this.state.items.pending, global.pydio.MessageHash['html_uploader.15'], 'section-pending');
+                this.renderSection(items, this.state.items.processed, global.pydio.MessageHash['html_uploader.16'], 'section-processed');
             }
             return (
                 <div id="upload_files_list" className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
@@ -279,8 +281,12 @@
         
         render: function(){
 
-            let maxUpload = this.state.configs.getOption('UPLOAD_MAX_SIZE');
-            let maxUploadMessage = MessageHash[282] + ': ' + PathUtils.roundFileSize(maxUpload, '');
+            let maxUploadMessage
+            if(!global.pydio.getPluginConfigs('mq').get('UPLOAD_ACTIVE')){
+                let maxUpload = this.state.configs.getOption('UPLOAD_MAX_SIZE');
+                maxUploadMessage = global.pydio.MessageHash[282] + ': ' + PathUtils.roundFileSize(maxUpload, '');
+                maxUploadMessage = <div className="option-row">{maxUploadMessage}</div>;
+            }
             let toggleStart = this.state.configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send');
             let toggleClose = this.state.configs.getOptionAsBool('DEFAULT_AUTO_CLOSE', 'upload_auto_close');
             let toggleShowProcessed = this.state.configs.getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false);
@@ -289,16 +295,16 @@
             return (
                 <div className="upload-options-pane react-mui-context">
                     <span className="close-options mdi mdi-close" onClick={this.props.onDismiss}></span>
-                    <div className="option-row">{maxUploadMessage}</div>
-                    <div className="option-row"><ReactMUI.Toggle label="Start uploading automatically" labelPosition="right" toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label="Close panel after upload is finished" labelPosition="right"  toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label="Show/hide processed files" labelPosition="right"  toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')}/></div>
+                    {maxUploadMessage}
+                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[337]} labelPosition="right" toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')}/></div>
+                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[338]} labelPosition="right"  toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')}/></div>
+                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash['html_uploader.17']} labelPosition="right"  toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')}/></div>
                     <div className="option-row">
-                        <div style={{marginBottom: 10}}>If a file with the same name exists</div>
+                        <div style={{marginBottom: 10}}>{global.pydio.MessageHash['html_uploader.18']}</div>
                         <ReactMUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
-                            <ReactMUI.RadioButton value="alert" label="Stop upload and alert me"/>
-                            <ReactMUI.RadioButton value="rename" label="Rename new file automatically"/>
-                            <ReactMUI.RadioButton value="overwrite" label="Overwrite existing file"/>
+                            <ReactMUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']}/>
+                            <ReactMUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']}/>
+                            <ReactMUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
                         </ReactMUI.RadioButtonGroup>
                     </div>
                 </div>
