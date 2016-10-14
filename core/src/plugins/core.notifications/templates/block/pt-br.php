@@ -16,7 +16,7 @@
     * You should have received a copy of the GNU Affero General Public License
     * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
     *
-    * The latest code can be found at <http://pyd.io/>.
+    * The latest code can be found at <https://pydio.com>.
     */
 
 $mess=array(
@@ -25,7 +25,7 @@ $mess=array(
     "file.delete" => "apagado",
     "file.change" => "modificado",
     "file.rename" => "renomeado para AJXP_NODE_LABEL",
-    "file.view" => "consuldado",
+    "file.view" => "consultado",
     "file.copy" => "copiado para AJXP_PARENT_PATH",
     "file.copy_to" => "copiado para AJXP_TARGET_FOLDER",
     "file.copy_from" => "copiado para AJXP_SOURCE_FOLDER",

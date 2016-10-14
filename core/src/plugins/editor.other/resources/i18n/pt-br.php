@@ -16,12 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
 "1" => "Escolher outro...",
 "2" => "Escolher outro editor",
-"3" => "Seleccione outro editor para abrir este arquivo",
-"4" => "Aviso, estes editores não declaram suportar este tipo de arquivo, o comportamento dos mesmos pode ser imprevisível!",
+"3" => "Selecione outro editor para abrir este arquivo",
+"4" => "Aviso, estes editores não declararam suportar este tipo de arquivo, o comportamento dos mesmos pode ser imprevisível!",
 "5" => "Apagar associações existentes",
 );
