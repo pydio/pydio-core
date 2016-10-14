@@ -94,11 +94,9 @@ class Driver extends Plugin
 
         $selection = UserSelection::fromContext($ctx, $httpVars);
         $destStreamURL = $selection->currentBaseUrl();
-        $filePath = str_replace('%2F', '/', rawurlencode($httpVars['file']));
+        $node = $selection->getUniqueNode();
 
-        $nodeUrl = $destStreamURL . $filePath;
-
-        if (empty($userId) || empty($filePath) || empty($repository)) return false;
+        if (empty($userId) || empty($node) || empty($repository)) return false;
 
         if ($action == "libreoffice_get_file_url") {
 
@@ -114,23 +112,30 @@ class Driver extends Plugin
 
             // Generating the auth hash and token
             $nonce = sha1(rand());
-            $uri = '/wopi/files/' . $repositoryId . $filePath;
 
-            $msg = $uri . ':' . $nonce . ':' . $private;
+            $nodePath = $node->getPath();
+            $nodeUrl = $node->getUrl();
+
+            $escapedNodePath = str_replace('%2F', '/', rawurlencode($node->getPath()));
+
+            $uri = '/wopi/files/' . $repositoryId . $nodePath;
+            $escapedUri = '/wopi/files/' . $repositoryId . $escapedNodePath;
+
+            $msg = $escapedUri . ':' . $nonce . ':' . $private;
             $hmac = hash_hmac('sha256', $msg, $token);
             $auth_hash = $nonce . ':' . $hmac;
 
             // Generating the jwt token for the file
             $payload["token"] = $token;
             $payload["hash"] = $auth_hash;
-            $payload["file"] = $uri;
+            $payload["uri"] = $uri;
             $payload["task"] = $task;
 
             $jwt = JWT::encode($payload, $private);
 
             $resp = [
                 'host' => ApplicationState::detectServerURL(),
-                'uri' => $uri,
+                'uri' => $escapedUri,
                 'jwt' => $jwt,
                 'permission' => $user->canWrite($repositoryId) && is_writeable($nodeUrl) ? 'edit' : 'readonly'
             ];

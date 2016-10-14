@@ -96,7 +96,7 @@ class Middleware extends SapiMiddleware
                 $meta = $node->getNodeInfoMeta();
                 $userId = $node->getUser()->getId();
                 $data = [
-                    "BaseFileName" => $node->getLabel(),
+                    "BaseFileName" => urlencode($node->getLabel()),
                     "OwnerId" => $userId,
                     "Size" => $meta["bytesize"],
                     "UserId" => $userId,
@@ -126,7 +126,10 @@ class Middleware extends SapiMiddleware
             }
         }
 
-        if($response !== false && ($response->getBody()->getSize() || $response instanceof EmptyResponse) || $response->getStatusCode() != 200) {
+        if( $response->getBody()->getSize() === null
+            || $response->getBody()->getSize() > 0
+            || $response instanceof \Zend\Diactoros\Response\EmptyResponse
+            || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
             ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);
