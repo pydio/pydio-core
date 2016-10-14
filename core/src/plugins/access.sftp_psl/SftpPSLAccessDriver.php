@@ -24,6 +24,7 @@ namespace Pydio\Access\Driver\StreamProvider\SFTP_PSL;
 
 use DOMNode;
 use PclZip;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Model\ContextInterface;
@@ -173,8 +174,12 @@ class SftpPSLAccessDriver extends FsAccessDriver
         return false;
     }
 
-    public function isWriteable($dir, $type="dir")
+    /**
+     * @param AJXP_Node $node
+     * @return bool
+     */
+    public function isWriteable(AJXP_Node $node)
     {
-        return is_writable($dir);
+        return is_writable($node->getUrl());
     }
 }
