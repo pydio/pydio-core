@@ -8,7 +8,11 @@
             let d = new Date();
             let remainingMinutes = 30 - d.getMinutes() % 30;
             let remainingSeconds = 60 - d.getSeconds();
-            this.setState({timeLeft: remainingMinutes + '\'' + (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds) + 'mn' });
+            if(remainingMinutes === 30) {
+                this.setState({timeLeft: (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds) + 's' });
+            }else{
+                this.setState({timeLeft: remainingMinutes + '\'' + (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds) + 'mn' });
+            }
 
         },
 
