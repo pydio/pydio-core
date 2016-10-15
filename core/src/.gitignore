@@ -20,3 +20,4 @@ composer.lock
 /plugins/core.mailer/js/build
 /plugins/uploader.html/js/build
 /plugins/core.tasks/js/build
+/plugins/action.demo_counter/build

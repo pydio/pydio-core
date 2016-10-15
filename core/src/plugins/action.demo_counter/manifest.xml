@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin enabled="false" id="action.demo_counter" label="CONF_MESSAGE[Demo Death Counter]" description="CONF_MESSAGE[Display a panel advertising the demo will die in XX minutes]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+
+    <plugin_info>
+        <core_relation packaged="false" tested_version="follow_core"/>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+
+    <client_settings>
+        <resources>
+            <js className="DemoDeathCounter" file="plugins/action.demo_counter/build/DemoDeathCounter.js" depends="React"/>
+        </resources>
+    </client_settings>
+
+    <registry_contributions>
+        <client_configs>
+            <template name="pydio-demo-death-counter" element="ajxp_desktop" position="bottom"><![CDATA[
+                <div id="demo-death-counter" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"DemoDeathCounter","componentName":"Panel"}'></div>
+            ]]></template>
+        </client_configs>
+   </registry_contributions>
+
+</ajxp_plugin>
