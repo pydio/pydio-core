@@ -20,6 +20,7 @@
  */
 namespace Pydio\Access\Driver\StreamProvider\Inbox;
 
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
@@ -98,6 +99,7 @@ class InboxAccessDriver extends FsAccessDriver
     /**
      * @param string $nodePath Url of a node
      * @return array|mixed
+     * @throws FileNotFoundException
      */
     public static function getNodeData($nodePath){
         $nodeObject = new AJXP_Node($nodePath);
@@ -106,6 +108,9 @@ class InboxAccessDriver extends FsAccessDriver
             return ['stat' => stat(ApplicationState::getTemporaryFolder())];
         }
         $allNodes = self::getNodes($nodeObject->getContext(), false);
+        if(!isSet($allNodes[$basename])){
+            throw new FileNotFoundException($basename);
+        }
         $nodeData = $allNodes[$basename];
         if(!isSet($nodeData["stat"])){
             if(in_array(pathinfo($basename, PATHINFO_EXTENSION), ["error", "invitation"])){
