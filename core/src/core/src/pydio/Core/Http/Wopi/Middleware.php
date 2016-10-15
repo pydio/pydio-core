@@ -96,11 +96,12 @@ class Middleware extends SapiMiddleware
                 $meta = $node->getNodeInfoMeta();
                 $userId = $node->getUser()->getId();
                 $data = [
-                    "BaseFileName" => urlencode($node->getLabel()),
+                    "BaseFileName" => $node->getLabel(),
                     "OwnerId" => $userId,
                     "Size" => $meta["bytesize"],
                     "UserId" => $userId,
-                    "Version" => "" . $meta["ajxp_modiftime"]
+                    "Version" => "" . $meta["ajxp_modiftime"],
+                    "UserFriendlyName" => $userId
                 ];
 
                 $x->addChunk(new Message($data));
