@@ -6,9 +6,9 @@
 
             // Compute next occurence of 0 or 30
             let d = new Date();
-            let remainingMinutes = 30 - d.getMinutes() % 30;
-            let remainingSeconds = 60 - d.getSeconds();
-            if(remainingMinutes === 30) {
+            let remainingMinutes = 29 - d.getMinutes() % 30;
+            let remainingSeconds = 59 - d.getSeconds();
+            if(remainingMinutes === 0) {
                 this.setState({timeLeft: (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds) + 's' });
             }else{
                 this.setState({timeLeft: remainingMinutes + '\'' + (remainingSeconds < 10 ? '0' + remainingSeconds : remainingSeconds) + 'mn' });
