@@ -100,7 +100,8 @@ class Middleware extends SapiMiddleware
                     "OwnerId" => $userId,
                     "Size" => $meta["bytesize"],
                     "UserId" => $userId,
-                    "Version" => "" . $meta["ajxp_modiftime"]
+                    "Version" => "" . $meta["ajxp_modiftime"],
+                    "UserFriendlyName" => $userId
                 ];
 
                 $x->addChunk(new Message($data));
@@ -126,7 +127,10 @@ class Middleware extends SapiMiddleware
             }
         }
 
-        if($response !== false && ($response->getBody()->getSize() || $response instanceof EmptyResponse) || $response->getStatusCode() != 200) {
+        if( $response->getBody()->getSize() === null
+            || $response->getBody()->getSize() > 0
+            || $response instanceof \Zend\Diactoros\Response\EmptyResponse
+            || $response->getStatusCode() != 200) {
             $emitter = new SapiEmitter();
             ShutdownScheduler::setCloseHeaders($response);
             $emitter->emit($response);

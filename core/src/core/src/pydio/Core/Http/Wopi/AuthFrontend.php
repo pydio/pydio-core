@@ -75,12 +75,12 @@ class AuthFrontend extends AbstractAuthFrontend
         $httpVars["auth_token"] = $payload->token;
         $httpVars["auth_hash"] = $payload->hash;
 
-        // NOT GREAT - WE REMOVE /contents from the uri to ensure that the auth_hash works fine
         $uri = $request->getUri();
-        $path = str_replace("/contents", "", $uri->getPath());
-        $uri = $uri->withPath($path);
+        $query = $uri->getQuery();
+        $uri = $uri->withPath($payload->uri);
+        $path = $uri->getPath();
 
-        $_SERVER["REQUEST_URI"] = $uri->getPath() . '?' . $uri->getQuery();
+        $_SERVER["REQUEST_URI"] = $path . '?' . $query;
 
         // Handle upload case
         if ($action == "upload") {
@@ -92,7 +92,7 @@ class AuthFrontend extends AbstractAuthFrontend
                 $stream,
                 $size,
                 0,
-                basename($path)
+                basename($payload->uri)
             );
 
             $request = $request->withUploadedFiles(["userfile_0" => $uploadedFile]);
@@ -159,4 +159,4 @@ class AuthFrontend extends AbstractAuthFrontend
         // We're through
         return true;
     }
-} 
+}

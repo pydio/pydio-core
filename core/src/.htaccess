@@ -1,9 +1,9 @@
 <IfModule mod_rewrite.c>
-# You must set the correct values here if you want
-# to enable webDAV sharing. The values assume that your 
-# Pydio installation is at http://yourdomain/
-# and that you want the webDAV shares to be accessible via 
-# http://yourdomain/shares/repository_id/
+
+# Make sure to enable RewriteRule on your server, and the the RewriteBase is correctly set.
+# If your install is accessible on https://yourdomain.tld/pydio, RewriteBase should be /pydio.
+# If your install is accessible on https://yourdomain.tld/, RewriteBase should be /.
+
 RewriteEngine on
 RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-f
