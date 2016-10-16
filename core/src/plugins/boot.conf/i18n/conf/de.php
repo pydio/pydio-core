@@ -74,7 +74,7 @@ $mess = array(
 "Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8" => "Bitte stellen Sie sicher, dass das Encoding zur Serverkonfiguration passt. (Format: ln_LN.CHARSET - z.B. en_US.UTF-8)",
 "Detected Server URL" => "Server-URL",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Bitte stellen Sie sicher, dass die URL zu Ihrer Pydio-Installation korrekt ist.",
-"Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
+"Select a language activated by default( users will still be able to switch)" => "Wählen Sie die Standard-Sprache der Installation aus. Alle Benutzer können ihre Sprache im Benutzerprofil ändern.",
 "Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
 "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln."
 );
