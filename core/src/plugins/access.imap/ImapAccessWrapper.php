@@ -30,8 +30,6 @@ use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-function rejectEmpty($element){return !empty($element);}
-
 /**
  * Plugin to browse a mailbox content (IMAP OR POP)
  * @package AjaXplorer_Plugins
@@ -87,6 +85,12 @@ class ImapAccessWrapper implements IAjxpWrapper
         return self::$attachmentsMetadata;
     }
 
+    private function rejectEmpty($element){
+        return !empty($element);
+    }
+
+
+
     public function stream_open($path, $mode, $options, &$opened_path)
     {
         // parse URL
@@ -102,7 +106,7 @@ class ImapAccessWrapper implements IAjxpWrapper
         $this->path = substr($parts["path"], 1);
         //$this->mailbox = "INBOX";
         $pathParts = explode("/", $this->path);
-        $pathParts = array_filter($pathParts, "rejectEmpty");
+        $pathParts = array_filter($pathParts, [$this, "rejectEmpty"]);
         if (count($pathParts) > 1) {
             $this->path = array_pop($pathParts);
             $this->mailbox = implode("/", $pathParts);
