@@ -20,7 +20,7 @@
 */
 $mess=array(
 "File System (Standard)" => "Dateisystem (Standard)",
-"The most standard access to a filesystem located on the server." => "Der Standardzugriff zu dem Dateisystem auf den Server.",
+"The most standard access to a filesystem located on the server." => "Zugriff auf das Dateisystem des Servers",
 "Path" => "Pfad",
 "Real path to the root folder on the server" => "Absoluter Pfad zum Haupt-Verzeichnis auf dem Server",
 "Create" => "Erstellen",
@@ -34,11 +34,11 @@ $mess=array(
 "X-SendFile Active" => "X-SendFile Aktiv",
 "Delegates all download operations to the webserver using the X-SendFile header. Warning, this is an external module to install for Apache. Module is active by default in Lighttpd. Warning, you have to manually add the folders where files will be downloaded in the module configuration (XSendFilePath directive)" => "Alle Downloadoperationen zum Webserver verwenden den X-SendFile-Header. Achtung dies ist ein externes Modul zum Installieren für Apache. Das Modul ist bei Lighttpd standardmäßig aktiv. Achtung, in der Modul-Konfiguration müssen die Download-Verzeichnisse von Hand angegeben werden (XSendFilePath directive)",
 "Data template" => "Daten-Vorlage",
-"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Pfad zu einem Verzeichnis des Dateisystems, die enthaltenen Dateien werden beim ersten Laden in die Arbeitsumgebung kopiert.",
+"Path to a directory on the filesystem whose content will be copied to the repository the first time it is loaded." => "Die Dateien aus dem konfigurierten Ordner werden beim ersten Laden in die Arbeitsumgebung kopiert.",
 "Purge Days (Hard limit)" => "Tage bis Bereinigung (Hard limit)",
-"Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option um Dokumente nach einer bestimmten Anzahl von Tagen (auch wenn sie freigegeben wurden) zu löschen. Dies erfordert die manuelle Einrichtung eines Cron-Jobs. Lassen Sie 0, wenn Sie die Funktion nicht verwenden möchten.",
+"Option to purge documents after a given number of days (even if shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option um Dokumente nach einer bestimmten Anzahl von Tagen (auch wenn sie freigegeben wurden) zu löschen. Dies erfordert die manuelle Einrichtung eines Cron-Jobs. Mit dem Wert 0 ist diese Funktion deaktiviert.",
 "Purge Days (Soft limit)" => "Tage bis Bereinigung (Soft limit)",
-"Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option um Dokumente nach einer bestimmten Anzahl von Tagen (wenn sie nicht freigegeben wurden) zu löschen. Dies erfordert die manuelle Einrichtung eines Cron-Jobs. Lassen Sie 0, wenn Sie die Funktion nicht verwenden möchten.",
+"Option to purge documents after a given number of days (if not shared). This require a manual set up of a CRON task. Leave to 0 if you don't wan't to use this feature." => "Option um Dokumente nach einer bestimmten Anzahl von Tagen (wenn sie nicht freigegeben wurden) zu löschen. Dies erfordert die manuelle Einrichtung eines Cron-Jobs. Mit dem Wert 0 ist diese Funktion deaktiviert.",
 "Use POSIX" => "POSIX verwenden",
 "Use php POSIX extension to read files permissions. Only works on *nix systems." => "Verwenden Sie php-POSIX Erweiterungen um Dateiberechtigungen zu lesen. Funktioniert nur auf *nix-Systemen",
 "X-Accel-Redirect Active" => "X-Accel-Redirect aktiviert",
