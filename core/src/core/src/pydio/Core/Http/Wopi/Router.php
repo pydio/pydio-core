@@ -54,7 +54,7 @@ class Router
         $this->base = $base;
         $this->cacheOptions = array_merge([
             "cacheDisabled" => AJXP_SKIP_CACHE,
-            "cacheFile" => AJXP_DATA_PATH."/cache/plugins_wopiroutes.php"
+            "cacheFile" => AJXP_CACHE_DIR."/plugins_wopiroutes.php"
         ], $cacheOptions);
     }
 
