@@ -2380,10 +2380,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile];
             } else {
                 $shortName = $node->getLabel();
-                if(!empty($zipEncoding)){
-                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
-                    if($test !== false) $shortName = $test;
-                }
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile,
                                     PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName];
             }
@@ -2400,7 +2396,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             }
             $search = $header["filename"];
             if(!empty($zipEncoding)){
-                $test = iconv($fsEncoding, $zipEncoding, $header["stored_filename"]);
+                $test = iconv($fsEncoding, $zipEncoding.'//TRANSLIT', $header["stored_filename"]);
                 if($test !== false){
                     $header["stored_filename"] = $test;
                 }
