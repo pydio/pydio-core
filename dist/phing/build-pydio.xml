@@ -528,7 +528,7 @@
 
     <target name="iterate-plugins">
         <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
-            <fileset dir="${plugins_dir}">
+            <fileset dir="${plugins_dir}" defaultexcludes="false">
                 <include name="*"/>
             </fileset>
         </foreach>
