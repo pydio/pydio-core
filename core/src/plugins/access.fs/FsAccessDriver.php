@@ -1114,6 +1114,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $this->filterUserSelectionToHidden($ctx, [$destNode->getLabel()]);
                 }else if(isSet($httpVars["filename_new"])){
                     $filename_new = InputFilter::decodeSecureMagic($httpVars["filename_new"]);
+                    $filename_new = rtrim($filename_new);
                     $this->filterUserSelectionToHidden($ctx, [$filename_new]);
                 }
                 $renamedNode = $this->rename($originalNode, $destNode, $filename_new);
@@ -1148,6 +1149,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     $parentDir = PathUtils::forwardSlashDirname($newDirPath);
                     $basename = PathUtils::forwardSlashBasename($newDirPath);
                     $basename = substr($basename, 0, $max_length);
+                    $basename = rtrim($basename);
                     $this->filterUserSelectionToHidden($ctx, [$basename]);
                     $parentNode = $selection->nodeForPath($parentDir);
                     try{
