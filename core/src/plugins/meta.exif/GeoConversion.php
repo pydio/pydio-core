@@ -133,7 +133,7 @@ Class GeoConversion{
        $array_DMm['M'] = $array_DMS['M'];
        $array_DMm['D'] = $array_DMS['D'];
 
-       return $this->negative_path.$array_DMm['D'].'�'.($array_DMm['M'] + $array_DMm['m']);
+       return $this->negative_path.$array_DMm['D'].'o'.($array_DMm['M'] + $array_DMm['m']);
    }
 
     /**
@@ -182,7 +182,7 @@ Class GeoConversion{
        $array_DMS['M'] = $array_DMm['M'];
        $array_DMS['D'] = $array_DMm['D'];
 
-       return $array_DMS['D'].'�'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
+       return $array_DMS['D'].'o'.$array_DMS['M'].'\''.$array_DMS['S'].'"';
    }
 
     /**
@@ -204,7 +204,7 @@ Class GeoConversion{
        $array_DMm['M'] = $dados_Mm[0];
        $array_DMm['D'] = $array_Dd['D'];
 
-       return $this->negative_path.$array_DMm['D']."� ".$array_DMm['M'].".".$array_DMm['m'];
+       return $this->negative_path.$array_DMm['D']."o ".$array_DMm['M'].".".$array_DMm['m'];
    }
 
     /**
