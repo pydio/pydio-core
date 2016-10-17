@@ -11,7 +11,7 @@
     <server_settings>
         <global_param name="API_KEY" type="string" label="CONF_MESSAGE[Api Key]" description="CONF_MESSAGE[Api Key as provided in your Pydio.com account]"/>
         <global_param name="API_SECRET" type="password" label="CONF_MESSAGE[Api Secret]" description="CONF_MESSAGE[Api Secret, as provided in your Pydio.com account]"/>
-        <global_param name="GATEWAY_SERVER" type="select" choices="filesend|Filesend.cc (EU Region),yourshare|Yoursha.re (US Region)" label="CONF_MESSAGE[Gateway Server]" description="CONF_MESSAGE[Choose on which server you want the link to be proxied. You may choose depending on your region.]"/>
+        <global_param name="GATEWAY_SERVER" type="select" choices="eu.filesend|Filesend.cc - EU Region,us.filesend|Filesend.cc - US Region,eu.yourshare|Yoursha.re - EU Region,eu.yourshare|Yoursha.re - US Region" label="CONF_MESSAGE[Gateway Domain and Region]" description="CONF_MESSAGE[Choose on which server you want the link to be proxied. You may choose depending on your region.]"/>
     </server_settings>
 	<registry_contributions>
         <hooks>
