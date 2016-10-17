@@ -20,6 +20,8 @@
  */
 namespace Pydio\Access\Meta\Mount;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\ContextInterface;
@@ -205,12 +207,14 @@ class FilesystemMounter extends AbstractMetaSource
     }
 
     /**
-     * @param ContextInterface $contextInterface
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @return bool
      * @throws \Exception
      */
-    public function umountFS(ContextInterface $contextInterface)
+    public function umountFS(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
+        $contextInterface = $requestInterface->getAttribute("ctx");
         $this->logDebug("FSMounter::unmountFS");
         list($user, $password) = $this->getCredentials();
         $MOUNT_POINT = $this->getOption($contextInterface, "MOUNT_POINT", $user, $password);
