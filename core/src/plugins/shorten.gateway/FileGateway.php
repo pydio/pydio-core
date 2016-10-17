@@ -39,10 +39,10 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 class FileGateway extends Plugin
 {
     private $servers = [
-        "eu.filesend" => "https://eu.filesend.cc",
-        "us.filesend" => "https://us.filesend.cc",
-        "eu.yourshare" => "https://eu.yoursha.re",
-        "us.yourshare" => "https://us.yoursha.re",
+        "eu.filesend"   => "https://eu.filesend.cc/links/",
+        "us.filesend"   => "https://us.filesend.cc/links/",
+        "eu.yourshare"  => "https://eu.yoursha.re/links/",
+        "us.yourshare"  => "https://us.yoursha.re/links/",
     ];
 
     /**
