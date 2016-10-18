@@ -2401,6 +2401,11 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "Adding ".$header["stored_filename"]." to archive");
             }
             $search = $header["filename"];
+            $split = explode("/", $header["stored_filename"]);
+            foreach ($split as &$value) {
+                $value = rtrim($value);
+            }
+            $header["stored_filename"] = join("/", $split);
             if(!empty($zipEncoding)){
                 $test = iconv($fsEncoding, $zipEncoding, $header["stored_filename"]);
                 if($test !== false){
