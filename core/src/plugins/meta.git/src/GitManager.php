@@ -234,7 +234,7 @@ class GitManager extends AbstractMetaSource
     {
         $command = $git->getCommand("log");
         if(strpos($file, " ") === false){
-            // We currently cannot use follow if file/folder has a space
+            // We currently cannot use the follow option if file/folder has a space
             $command->setOption("follow", true);
         }
         $command->setOption("p", true);
