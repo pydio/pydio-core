@@ -24,6 +24,7 @@ namespace Pydio\Access\Core;
 use Normalizer;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 
@@ -251,7 +252,7 @@ class MetaStreamWrapper implements IAjxpWrapper
             return self::$cachedRepositoriesWrappers[$repositoryId];
         }
         $repository = RepositoryService::getRepositoryById($repositoryId);
-        if(!is_a($repository, "Repository")){
+        if(!$repository instanceof Repository){
             throw new \Exception("Cannot find repository with this id!");
         }
         if(self::detectWrapperForNode($node, false, $streams, $streamData)){

@@ -179,14 +179,14 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
                 continue;
             }
             $value1 = $t1[$key];
-            if(is_a($value1, "AJXP_Permission") && is_a($value2, "AJXP_Permission")){
+            if($value1 instanceof AJXP_Permission && $value2 instanceof AJXP_Permission){
                 /**
                  * @var AJXP_Permission $value2
                  */
                 $result[$key] = $value2->override($value1);
-            }else if(is_a($value1, "AJXP_Permission")){
+            }else if($value1 instanceof AJXP_Permission){
                 $result[$key] = $value2;
-            }else if(is_a($value2, "AJXP_Permission")){
+            }else if($value2 instanceof AJXP_Permission){
                 /**
                  * @var AJXP_Permission $value2
                  */
@@ -237,7 +237,7 @@ class AJXP_PermissionMask implements \JsonSerializable, \Serializable
         if($pathes == null) $pathes = array();
         if(!is_array($tree) || $tree == null) $tree = array();
         foreach($tree as $pathPart => $value){
-            if(is_a($value, "AJXP_Permission")){
+            if($value instanceof AJXP_Permission){
                 $pathes[$currentRoot."/".$pathPart] = $value;
             }else{
                 $this->flattenTree($value, $pathes, $currentRoot."/".$pathPart);
