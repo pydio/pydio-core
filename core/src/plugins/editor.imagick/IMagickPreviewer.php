@@ -348,14 +348,18 @@ class IMagickPreviewer extends Plugin
         if ($unoconv !== false && in_array(strtolower($extension), $officeExt)) {
             $unoDoc = preg_replace("/(-[0-9]+)?\\.jpg/", "_unoconv.pdf", $tmpFileThumb);
             if (!is_file($unoDoc)  || (is_file($unoDoc) && (filesize($unoDoc) == 0))) {
+                $timelimit = 'timeout 60 ';
                 if (stripos(PHP_OS, "win") === 0) {
                     $unoconv = $this->pluginConf["UNOCONV"]." -o ".escapeshellarg(basename($unoDoc))." -f pdf ".escapeshellarg($masterFile);
+                    $unoconv = $timelimit.$unoconv;
                 } else {
+                    $unoconv = $timelimit.$unoconv;
                     $unoconv =  "HOME=". ApplicationState::getTemporaryFolder() ." ".$unoconv." --stdout -f pdf ".escapeshellarg($masterFile)." > ".escapeshellarg(basename($unoDoc));
                 }
                 if(defined('AJXP_LOCALE')){
                     putenv('LC_CTYPE='.AJXP_LOCALE);
                 }
+                $this->logDebug("Unoconv Command : $unoconv");
                 exec($unoconv, $out, $return);
             }
             if (is_file($unoDoc)) {
@@ -389,6 +393,8 @@ class IMagickPreviewer extends Plugin
         }
         $params = $customOptions." ".( $this->extractAll? $viewerQuality : $thumbQuality );
         $cmd = $this->getContextualOption($ctx, "IMAGE_MAGICK_CONVERT")." ".$params." ".escapeshellarg(($masterFile).$pageLimit)." ".escapeshellarg($tmpFileThumb);
+        $timelimit = 'timeout 30 ';
+        $cmd = $timelimit.$cmd;
         $this->logDebug("IMagick Command : $cmd");
         session_write_close(); // Be sure to give the hand back
         exec($cmd, $out, $return);
