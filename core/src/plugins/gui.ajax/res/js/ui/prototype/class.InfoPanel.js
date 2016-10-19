@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -141,6 +141,9 @@ Class.create("InfoPanel", AjxpPane, {
             this.htmlElement.select(".class-FetchedResultPane").each(function(el){
                 el.ajxpPaneObject.destroy();
             });
+            this.htmlElement.select(".infopanel-destroyable-pane").each(function(el){
+                el.destroy();
+            });
         }
 		this.setContent('');
 	},
@@ -245,8 +248,13 @@ Class.create("InfoPanel", AjxpPane, {
         }else{
             uniqNode = passedNode;
         }
+        if(this._currentObservedNode){
+            this._currentObservedNode.stopObserving("node_replaced", this.updateHandler);
+        }
+        this._currentObservedNode = uniqNode;
+        this._currentObservedNode.observeOnce("node_replaced", this.updateHandler);
 
-        this.updateTitle(uniqNode.getLabel());
+        this.updateTitle(he.escape(uniqNode.getLabel()));
 		var isFile = false;
 		if(uniqNode) isFile = uniqNode.isLeaf();
         if(!isFile && uniqNode && uniqNode.isRoot()){
@@ -433,9 +441,9 @@ Class.create("InfoPanel", AjxpPane, {
                 }
 				tAttributes.each(function(attName){
 					if(attName == 'basename' && metadata.get('filename')){
-						this[attName] = getBaseName(metadata.get('filename'));
+						this[attName] = he.escape(getBaseName(metadata.get('filename')));
                         if(metadata.get('text')){
-                            this[attName] = metadata.get('text');
+                            this[attName] = he.escape(metadata.get('text'));
                         }
 					} else if(attName == 'compute_image_dimensions'){
 						if(metadata.get('image_width') && metadata.get('image_height')){
@@ -455,10 +463,10 @@ Class.create("InfoPanel", AjxpPane, {
 					} else if(attName == 'preview_simple'){
                         if(multipleNodes){
                             var s ='';
-                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview">#{preview}</div><div class="tile_label">#{label}</div></div>');
+                            var simpleTpl = new Template('<div class="info_panel_multiple_tile"><div class="tile_preview_container"><div class="tile_preview">#{preview}</div></div><div class="tile_label">#{label}</div></div>');
                             multipleNodes.each(function(n){
                                 var p = oThis.getPreviewElement(n, false, false);
-                                var args = {label:getBaseName(n.getMetadata().get('filename'))};
+                                var args = {label:he.escape(PathUtils.getBasename(n.getMetadata().get('filename')))};
                                 if(Object.isString(p)) args['preview']=p;
                                 else if(Object.isElement(p) && p.outerHTML) args['preview']= p.outerHTML;
                                 s += simpleTpl.evaluate(args);
@@ -489,7 +497,7 @@ Class.create("InfoPanel", AjxpPane, {
 						}
 						this[attName] = url;
 					} else if(metadata.get(attName)){
-						this[attName] = metadata.get(attName);
+						this[attName] = he.escape(metadata.get(attName));
 					} else{
 						this[attName] = '';
 					}

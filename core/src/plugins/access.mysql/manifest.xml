@@ -22,7 +22,6 @@
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SQLSearchEngine" ajxpOptions="{}"/>
-            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
             <component_config className="InfoPanel">
 				<infoPanel mime="no_selection" attributes="">
 					<messages>
@@ -46,12 +45,12 @@
 					<html><![CDATA[
 						<div style="padding:10px;">
 							<big style="font-weight: bold; font-size: 14px; color:#79f;display: block; text-align:center; padding-bottom:20px;">#{text}</big>
-							<div><b>#{files_string}</b> : #{count}</div>
+							<div>#{files_string} : #{count}</div>
 						</div>
 					]]></html>
 				</infoPanel>
 			</component_config>
 		</client_configs>
 	</registry_contributions>
-	<class_definition filename="plugins/access.mysql/class.mysqlAccessDriver.php" classname="mysqlAccessDriver"/>
+	<class_definition filename="plugins/access.mysql/MysqlAccessDriver.php" classname="Pydio\Access\Driver\DataProvider\MysqlAccessDriver"/>
 </ajxpdriver>

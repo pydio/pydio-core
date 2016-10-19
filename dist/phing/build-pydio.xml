@@ -141,16 +141,32 @@
         	<property name="passed_directory" value="${INNER_DIRECTORY}"/>
         </phingcall>
 
-    	<!-- BUILD JAVASCRIPT -->
-        <!--
-    	<exec command="npm install" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-        <exec command="grunt" dir="${INNER_DIRECTORY}/plugins/gui.ajax" passthru="true"/>
-	    <delete dir="${INNER_DIRECTORY}/plugins/gui.ajax/node_modules"/>
-	    -->
-        <phingcall target="iterate-plugins">
-            <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
-            <property name="target" value="grunt"/>
+        <!-- RUN COMPOSER IF NECESSARY INSIDE CORE -->
+        <phingcall target="composer">
+            <property name="plugin_abs_dir" value="${INNER_DIRECTORY}/core"/>
         </phingcall>
+
+        <!-- RUN COMPOSER IF NECESSARY INSIDE PLUGINS -->
+        <if>
+            <not><isset property="skip-plugins-composer"/></not>
+            <then>
+                <phingcall target="iterate-plugins">
+                    <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+                    <property name="target" value="composer"/>
+                </phingcall>
+            </then>
+        </if>
+
+    	<!-- BUILD JAVASCRIPT -->
+        <if>
+            <not><isset property="skip-plugins-grunt"/></not>
+            <then>
+                <phingcall target="iterate-plugins">
+                    <property name="plugins_dir" value="${INNER_DIRECTORY}/plugins"/>
+                    <property name="target" value="grunt"/>
+                </phingcall>
+            </then>
+        </if>
 
         <!-- DISCRIMINATE PLUGINS -->
         <mkdir dir="${build.working_folder}/ext_plugins" />
@@ -183,6 +199,23 @@
         </phingcall>
 
 
+        <!-- RE-RUN CORE COMPOSER IF NECESSARY (Any changes appeared in core/src) -->
+        <if>
+            <or>
+                <!-- There was a change in core/src, rerun to make sure autoloader is up-to-date -->
+                <available type="dir" file="${upgrade_export}/core/src"/>
+                <!-- There was a change in composer.json, rerun to make sure vendor/ is up-to-date -->
+                <available type="file" file="${upgrade_export}/core/composer.json"/>
+            </or>
+            <then>
+                <copy file="${git.local_repository}/core/src/core/composer.json" todir="${upgrade_export}/core" overwrite="true"/>
+                <phingcall target="composer">
+                    <property name="plugin_abs_dir" value="${upgrade_export}/core"/>
+                </phingcall>
+            </then>
+        </if>
+
+        <!-- RE-RUN COMPOSER & GRUNT IF NECESSARY ON PLUGINS -->
         <phingcall target="iterate-plugins">
             <property name="plugins_dir" value="${git.local_repository}/core/src/plugins"/>
             <property name="upgrade_export" value="${upgrade_export}"/>
@@ -214,45 +247,44 @@
 		</copy>
 
 		<!-- ADDITIONAL UPGRADE SCRIPT -->
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.php"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.php" toFile="${upgrade_export}/UPGRADE/PHP-SCRIPT"/>
-			</then>
-		</if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="php"/>
+            <property name="target_name" value="PHP-SCRIPT"/>
+        </phingcall>
 
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.html"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.html" toFile="${upgrade_export}/UPGRADE/NOTE-HTML"/>
-			</then>
-		</if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="html"/>
+            <property name="target_name" value="NOTE-HTML"/>
+        </phingcall>
 
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.sql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.sql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sql"/>
-			</then>
-		</if>
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.mysql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.mysql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.mysql"/>
-			</then>
-		</if>
-		<if>
-			<available type="file" file="${git.local_repository}/dist/php/${build.version}.pgsql"/>
-			<then>
-				<copy file="${git.local_repository}/dist/php/${build.version}.pgsql" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.pgsql"/>
-			</then>
-		</if>
-        <if>
-            <available type="file" file="${git.local_repository}/dist/php/${build.version}.sqlite"/>
-            <then>
-                <copy file="${git.local_repository}/dist/php/${build.version}.sqlite" toFile="${upgrade_export}/UPGRADE/DB-UPGRADE.sqlite"/>
-            </then>
-        </if>
+        <phingcall target="add_update_script">
+            <property name="extension" value="sql"/>
+            <property name="target_name" value="DB-UPGRADE.sql"/>
+        </phingcall>
 
+        <phingcall target="add_update_script">
+            <property name="extension" value="mysql"/>
+            <property name="target_name" value="DB-UPGRADE.mysql"/>
+        </phingcall>
+
+        <phingcall target="add_update_script">
+            <property name="extension" value="pgsql"/>
+            <property name="target_name" value="DB-UPGRADE.pgsql"/>
+        </phingcall>
+
+        <phingcall target="add_update_script">
+            <property name="extension" value="sqlite"/>
+            <property name="target_name" value="DB-UPGRADE.sqlite"/>
+        </phingcall>
+
+        <phingcall target="add_update_triggers">
+            <property name="input_folder" value="${git.local_repository}/dist/php"/>
+            <property name="output_folder" value="${upgrade_export}/UPGRADE"/>
+            <property name="version" value="${build.version}"/>
+        </phingcall>
+
+        <!-- FINALY, RECHECK CLEAN-FILES AS GIT MAY HAVE REGISTERED SOME DELETIONS THAT WE DO REQUIRE -->
+        <pydio-parse-git-summarize upgradeCleanFile="true" upgradeDir="${upgrade_export}" />
     </target>
 
     <target name="zip" description="Package as Zip archive">
@@ -317,6 +349,24 @@
                 destfile="${build.working_folder}/build/upgrade/${packaged_zip}"
                 includeemptydirs="true"
                 ><fileset dir="${build.working_folder}/upgrade/export/" defaultexcludes="false"><include name="*/**"/></fileset></zip>
+    </target>
+
+    <target name="add_update_script" description="Additional upgrade scripts, requires extension and target_name properties">
+        <if>
+            <available type="file" file="${git.local_repository}/dist/php/${build.version}.${extension}"/>
+            <then>
+                <copy file="${git.local_repository}/dist/php/${build.version}.${extension}" toFile="${upgrade_export}/UPGRADE/${target_name}"/>
+            </then>
+        </if>
+    </target>
+
+    <target name="add_update_triggers" description="Look for pre/post triggers and append them to the package">
+        <copy todir="${output_folder}" verbose="true">
+            <fileset dir="${input_folder}">
+                <include name="${version}-*-*.php"/>
+            </fileset>
+            <mapper type="regexp" from="^(.*)-(.*)-(.*).php" to="PHP--\3-\2.php"/>
+        </copy>
     </target>
 
     <target name="build_external_plugins">
@@ -478,7 +528,7 @@
 
     <target name="iterate-plugins">
         <foreach param="plugin" absparam="plugin_abs_dir" target="${target}">
-            <fileset dir="${plugins_dir}">
+            <fileset dir="${plugins_dir}" defaultexcludes="false">
                 <include name="*"/>
             </fileset>
         </foreach>
@@ -486,6 +536,7 @@
 
     <!-- We should have a ${local_repository_root} and ${upgrade_export} from upper scope -->
     <target name="force-update-if-package-json">
+        <!-- Looking for package.json File -->
         <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
@@ -493,9 +544,11 @@
                 <if>
                     <not><equals arg1="${js_source_path}" arg2="__NOT_FOUND__"/></not>
                     <then>
+                        <property name="has-js-path" value="true"/>
                         <if>
                             <available type="dir" file="${upgrade_export}/plugins/${plugin}/${js_source_path}"/>
                             <then>
+                                <property name="js-required" value="true"/>
                                 <copy todir="${upgrade_export}/plugins/${plugin}/${js_source_path}">
                                     <fileset dir="${local_repository_root}/plugins/${plugin}/${js_source_path}" defaultexcludes="false">
                                         <include name="*/**"/>
@@ -508,9 +561,11 @@
                 <if>
                     <not><equals arg1="${css_source_path}" arg2="__NOT_FOUND__"/></not>
                     <then>
+                        <property name="has-css-path" value="true"/>
                         <if>
                             <available type="dir" file="${upgrade_export}/plugins/${plugin}/${css_source_path}"/>
                             <then>
+                                <property name="css-required" value="true"/>
                                 <copy todir="${upgrade_export}/plugins/${plugin}/${css_source_path}">
                                     <fileset dir="${local_repository_root}/plugins/${plugin}/${css_source_path}" defaultexcludes="false">
                                         <include name="*/**"/>
@@ -520,14 +575,71 @@
                         </if>
                     </then>
                 </if>
-                <echo message="REBUILD JS FOR PLUGIN ${plugin}"/>
-                <copy todir="${upgrade_export}/plugins/${plugin}">
-                    <fileset dir="${local_repository_root}/plugins/${plugin}">
-                        <include name="Gruntfile.js"/>
-                        <include name="package.json"/>
+                <if>
+                    <or>
+                        <isset property="js-required"/>
+                        <isset property="css-required"/>
+                    </or>
+                    <then>
+                        <echo message="REBUILDING JS FOR PLUGIN ${plugin}"/>
+                        <copy todir="${upgrade_export}/plugins/${plugin}">
+                            <fileset dir="${local_repository_root}/plugins/${plugin}">
+                                <include name="Gruntfile.js"/>
+                                <include name="package.json"/>
+                            </fileset>
+                        </copy>
+
+                        <if>
+                            <and>
+                                <isset property="js-required"/>
+                                <isset property="has-css-path"/>
+                                <not><isset property="css-required"/></not>
+                            </and>
+                            <then>
+                                <echo message=" --> Target type:js only"/>
+                                <property name="grunttarget" value="type:js"/>
+                            </then>
+                            <elseif>
+				<and>
+	                                <isset property="css-required"/>
+        	                        <isset property="has-js-path"/>
+                	                <not><isset property="js-required"/></not>
+				</and>
+                                <then>
+                                    <echo message=" --> Target type:css only"/>
+                                    <property name="grunttarget" value="type:css"/>
+                                </then>
+                            </elseif>
+                        </if>
+
+                        <echo message=" --> Grunt Target Value is ${grunttarget}"/>
+                        <phingcall target="grunt">
+                            <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
+                            <property name="grunt_target" override="true" value="${grunttarget}"/>
+                        </phingcall>
+                    </then>
+                </if>
+            </then>
+        </if>
+        <!-- Looking for Composer.json File -->
+        <if>
+            <and>
+                <available file="${plugin_abs_dir}/composer.json"/>
+                <available type="dir" file="${upgrade_export}/plugins/${plugin}/src"/>
+            </and>
+            <then>
+                <copy todir="${upgrade_export}/plugins/${plugin}/src">
+                    <fileset dir="${local_repository_root}/plugins/${plugin}/src" defaultexcludes="false">
+                        <include name="*/**"/>
                     </fileset>
                 </copy>
-                <phingcall target="grunt">
+                <echo message="RERUN COMPOSER JS FOR PLUGIN ${plugin}"/>
+                <copy todir="${upgrade_export}/plugins/${plugin}">
+                    <fileset dir="${local_repository_root}/plugins/${plugin}">
+                        <include name="composer.json"/>
+                    </fileset>
+                </copy>
+                <phingcall target="composer">
                     <property name="plugin_abs_dir" override="true" value="${upgrade_export}/plugins/${plugin}"/>
                 </phingcall>
             </then>
@@ -541,8 +653,20 @@
             <then>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
-                <exec command="grunt" dir="${plugin_abs_dir}" passthru="true"/>
+                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
+            </then>
+        </if>
+    </target>
+
+    <target name="composer">
+        <if>
+            <available type="file" file="${plugin_abs_dir}/composer.json"/>
+            <then>
+                <exec command="composer install --optimize-autoloader"
+                      dir="${plugin_abs_dir}"
+                      passthru="true"
+                />
             </then>
         </if>
     </target>

@@ -99,6 +99,8 @@ class PydioParseGitSummarize extends Task
       private $extPluginsFolder;
       private $ignores = array("/.gitignore");
 
+      private $upgradeCleanFile = false;
+
       public function setSummarizeFile($summarizeFile)
       {
           $this->summarizeFile = $summarizeFile;
@@ -134,8 +136,39 @@ class PydioParseGitSummarize extends Task
           return $this->prefixPath;
       }
 
+      public function setUpgradeCleanFile($clean){
+           $this->upgradeCleanFile = true;
+      }
+
+      public function getUpgradeCleanFile(){
+        return $this->upgradeCleanFile;
+      }
+
+      protected function checkCleanFileFalsePositive(){
+           $cF = $this->upgradeDir."/UPGRADE/CLEAN-FILES";
+           if(!file_exists($cF)){
+                $this->log("No CLEAN-FILES found, nothing to do");
+           }
+           $lines = file($cF, FILE_IGNORE_NEW_LINES);
+           $newLines = [];
+           foreach($lines as $line){
+                if(file_exists($this->upgradeDir.$line)){
+                    $this->log("File $line was found in upgrade dir, we must ignore this git deletion.");
+                    continue;
+                } else {
+                    $newLines[] = $line;
+                }
+           }
+           file_put_contents($cF, implode("\n", $newLines));
+      }
+
       public function main()
       {
+           if($this->upgradeCleanFile || empty($this->summarizeFile)){
+                $this->checkCleanFileFalsePositive();
+                return;
+           }
+
           $summarizeLines = file($this->summarizeFile);
           $toDelete = array();
           if(isSet($this->prefixPath)) $this->sourceDir .= "/" . $this->prefixPath;
@@ -147,9 +180,11 @@ class PydioParseGitSummarize extends Task
                       $this->log("-- Skipping ".$path, Project::MSG_INFO);
                       continue;
                   }
-                  $end = str_replace($this->prefixPath, "", $path);
+                  $pref = str_replace("/", "\/", $this->prefixPath);
+                  $end = preg_replace("/^".$pref."/", "", $path);
               } else {
-                  $end = str_replace($this->sourceDir, '', $path);
+                  $pref = str_replace("/", "\/", $this->sourceDir);
+                  $end = preg_replace("/^".$pref."/", "", $path);
               }
               if (in_array($end, $this->ignores)) {
                   continue;

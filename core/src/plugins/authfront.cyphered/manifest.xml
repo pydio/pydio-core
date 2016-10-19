@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxpcore id="authfront.cyphered" label="CONF_MESSAGE[Cyphered Identifiers]" enabled="false" description="CONF_MESSAGE[Cyphered identifiers passed through GET, POST or HTTP Headers, using a private key shared by Pydio and Third-party application.]"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/authfront.cyphered/class.CypheredAuthFrontend.php" classname="CypheredAuthFrontend"/>
+	<class_definition filename="plugins/authfront.cyphered/CypheredAuthFrontend.php" classname="Pydio\Auth\Frontend\CypheredAuthFrontend"/>
     <client_settings>
         <resources>
             <i18n namespace="authfront.cyphered" path="plugins/authfront.cyphered/i18n"/>

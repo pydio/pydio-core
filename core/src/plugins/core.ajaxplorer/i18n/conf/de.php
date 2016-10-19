@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 /*******************************************************************************
@@ -28,10 +28,10 @@
 
 /* Do not use HTML entities! It would mess up everything */ 
 $mess=array(
-"Main"      => "Haupteinstellungen",
+"Main"      => "Allgemein",
 "App Title" => "Anwendungsname",
 "Your application title" => "Dieser Title wird auf dem Begrüssungsbildschirm als Fenstertitel angezeigt",
-"Main container for core Pydio settings (application title, sharing, webdav server config, etc...)" => "Haupteinstellungen für Pydio (Applikations-Titel, Freigaben, webDAV-Server Konfiguration, usw.)",
+"Main container for core Pydio settings (application title, sharing, webdav server config, etc...)" => "Allgemeine Einstellungen für Pydio (Applikations-Titel, Freigaben, webDAV-Server Konfiguration, usw.)",
 "Default Language" => "Standardsprache",
 "Default language when a user does not have set his/her own." => "Sprache die vorausgewählt ist, wenn der Benutzer keine abweichende konfiguriert.",
 "Sharing" => "Freigaben",
@@ -122,7 +122,7 @@ $mess=array(
 "Hide files" => "Dateien verstecken",
 "Comma-separated list of specific files to hide" => "Kommagetrennte Liste mit Dateien, die versteckt werden. Der Zugriff auf versteckte Dateien wird ebenfalls verboten.",
 "Metadata and indexation" => "Metadaten und Indexierung",
-"Pydio Main Options" => "Pydio-Haupteinstellungen",
+"Pydio Main Options" => "Allgemein",
 "Server URL" => "Server-URL",
 "Server URL used to build share links and notifications. It will be detected if empty." => "Wird für Freigabe-Links und Benachrichtigungen verwendet. Wert wird automatisch ermittelt, wenn leer.",
 "Force Basic Auth" => "Standard-Authentifizierung erzwingen",

@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -42,4 +42,6 @@ $mess = array(
     "18" => "Keine Aktualisierungen gefunden. Klicken, um erneut zu prüfen.",
     "19" => "Klicken um auf Aktualisierungen zu prüfen",
     "20" => "Nun prüfen",
+    "21" => "Aktuell im Entwickler-Modus.",
+    "22" => "Die aktuelle Version ist %1 (%2).",
 );

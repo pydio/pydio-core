@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 Class.create("PydioUI", {
 
@@ -89,6 +89,13 @@ Class.create("PydioUI", {
                 this._pydio.Controller.getActionByName("download").apply();
             }
         }
+    },
+
+    getSharedPreviewTemplateForEditor: function(editorData, node){
+        if(Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate) {
+            return Class.getByName(editorData.editorClass).prototype.getSharedPreviewTemplate(node);
+        }
+        return null;
     },
 
     registerAsMessageBoxReference: function(element){
@@ -248,8 +255,6 @@ Class.create("PydioUI", {
             this.initTabNavigation();
             this.blockShortcuts = false;
             this.blockNavigation = false;
-            // TODO : ADD TO XML TEMPLATES INSTEAD
-            this.bgManagerPane = new BackgroundManagerPane();
             modal.updateLoadingProgress('Navigation loaded');
         }.bind(this));
 

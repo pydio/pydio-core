@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 (function(global) {
 
@@ -124,7 +124,8 @@
         }
 
         static getCreateUserParameters(){
-            var basicParameters = [];
+            let basicParameters = [];
+            let prefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
             basicParameters.push({
                 description: MessageHash['533'],
                 editable: false,
@@ -133,7 +134,8 @@
                 name: "new_user_id",
                 scope: "user",
                 type: "string",
-                mandatory: "true"
+                mandatory: "true",
+                "default": prefix ? prefix : ''
             },{
                 description: MessageHash['534'],
                 editable: "true",
@@ -143,15 +145,6 @@
                 scope: "user",
                 type: "valid-password",
                 mandatory: "true"
-            },{
-                description: MessageHash['536'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['535'],
-                name: "send_email",
-                scope: "user",
-                type: "boolean",
-                mandatory: true
             });
 
             var params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
@@ -161,6 +154,16 @@
             var xPath = params.join('|');
             PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
                 basicParameters.push(el);
+            });
+            basicParameters.push({
+                description: MessageHash['536'],
+                editable: "true",
+                expose: "true",
+                label: MessageHash['535'],
+                name: "send_email",
+                scope: "user",
+                type: "boolean",
+                mandatory: true
             });
             return basicParameters;
         }
@@ -172,7 +175,7 @@
         static createUserFromPost(postValues, callback){
             postValues['get_action'] = 'user_create_user';
             PydioApi.getClient().request(postValues, function(transport){
-                callback(postValues);
+                callback(postValues, transport.responseJSON);
             }.bind(this));
         }
 

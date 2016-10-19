@@ -29,5 +29,5 @@
             </action>
         </actions>
     </registry_contributions>
-	<class_definition filename="plugins/log.sql/class.sqlLogDriver.php" classname="sqlLogDriver"/>
+	<class_definition filename="plugins/log.sql/SqlLogDriver.php" classname="Pydio\Log\Implementation\SqlLogDriver"/>
 </logdriver>

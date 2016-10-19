@@ -13,6 +13,8 @@
         <param name="DISCLAIMER_ACCEPTED" type="select" group="CONF_MESSAGE[Disclaimer]" choices="yes|CONF_MESSAGE[Accepted],no|CONF_MESSAGE[Not Accepted]" label="CONF_MESSAGE[Validation]"
               scope="user,group,role"
               description="CONF_MESSAGE[Whether the user has accepted the disclaimer or not]" default="no"/>
+            <global_param name="DISCLAIMER_ENABLE_SHARED" type="boolean" label="CONF_MESSAGE[Enable for public links]"
+                      description="CONF_MESSAGE[Enable disclaimer for public links. if enabled, it will require disclaimer validation on each public link load, even if a user already accessed the link.]" default="false"/>
         <global_param name="DISCLAIMER_CONTENT" type="textarea" label="CONF_MESSAGE[Disclaimer Content]"
                description="CONF_MESSAGE[You can use HTML]" default=""/>
     </server_settings>
@@ -75,6 +77,10 @@
                 </processing>
             </action>
         </actions>
+        <hooks>
+            <serverCallback methodName="updateSharedUser" hookName="user.after_create"/>
+            <serverCallback methodName="updateSharedUserLogin" hookName="user.after_login"/>
+        </hooks>
     </registry_contributions>
-    <class_definition filename="plugins/action.disclaimer/class.DisclaimerProvider.php" classname="DisclaimerProvider"/>
+    <class_definition filename="plugins/action.disclaimer/DisclaimerProvider.php" classname="Pydio\Action\Disclaimer\DisclaimerProvider"/>
 </ajxp_plugin>

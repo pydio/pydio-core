@@ -49,22 +49,22 @@
 | Created 2000-12-11 | All changes are in the log above. | Updated 2006-05-26 |
 \----------------------------------------------------------------------------*/
 var	webFXTreeConfig = {
-		rootIcon        : '/images/foldericon.png',
-		openRootIcon    : '/images/openfoldericon.png',
-		folderIcon      : '/images/foldericon.png',
-		openFolderIcon  : '/images/openfoldericon.png',
-		fileIcon        : '/images/foldericon.png',
-		iIcon           : '/images/I.png',
-		lIcon           : '/images/L.png',
-		lMinusIcon      : '/images/Lminus.png',
-		lPlusIcon       : '/images/Lplus.png',
-		lMinusIconActive: '/images/Lminus-active.png',
-		lPlusIconActive : '/images/Lplus-active.png',
-		tIcon           : '/images/T.png',
-		tMinusIcon      : '/images/Tminus.png',
-		tPlusIcon       : '/images/Tplus.png',
-		tMinusIconActive: '/images/Tminus-active.png',
-		tPlusIconActive : '/images/Tplus-active.png',
+		rootIcon        : '/images/xtree/foldericon.png',
+		openRootIcon    : '/images/xtree/openfoldericon.png',
+		folderIcon      : '/images/xtree/foldericon.png',
+		openFolderIcon  : '/images/xtree/openfoldericon.png',
+		fileIcon        : '/images/xtree/foldericon.png',
+		iIcon           : '/images/xtree/I.png',
+		lIcon           : '/images/xtree/L.png',
+		lMinusIcon      : '/images/xtree/Lminus.png',
+		lPlusIcon       : '/images/xtree/Lplus.png',
+		lMinusIconActive: '/images/xtree/Lminus-active.png',
+		lPlusIconActive : '/images/xtree/Lplus-active.png',
+		tIcon           : '/images/xtree/T.png',
+		tMinusIcon      : '/images/xtree/Tminus.png',
+		tPlusIcon       : '/images/xtree/Tplus.png',
+		tMinusIconActive: '/images/xtree/Tminus-active.png',
+		tPlusIconActive : '/images/xtree/Tplus-active.png',
 		blankIcon       : '/images/blank.png',
 		defaultText     : 'Tree Item',
 		defaultAction   : function(e){},
@@ -74,22 +74,22 @@ var	webFXTreeConfig = {
 };
 Event.observe(document, 'ajaxplorer:boot_loaded', function(){
 	var resourcesFolder = window.ajxpResourcesFolder;
-	webFXTreeConfig.rootIcon        = resourcesFolder+'/images/foldericon.png';
-	webFXTreeConfig.openRootIcon    = resourcesFolder+'/images/openfoldericon.png';
-	webFXTreeConfig.folderIcon      = resourcesFolder+'/images/foldericon.png';
-	webFXTreeConfig.openFolderIcon  = resourcesFolder+'/images/openfoldericon.png';
-	webFXTreeConfig.fileIcon        = resourcesFolder+'/images/foldericon.png';
-	webFXTreeConfig.iIcon           = resourcesFolder+'/images/I.png';
-	webFXTreeConfig.lIcon           = resourcesFolder+'/images/L.png';
-	webFXTreeConfig.lMinusIcon      = resourcesFolder+'/images/Lminus.png';
-	webFXTreeConfig.lPlusIcon       = resourcesFolder+'/images/Lplus.png';
-	webFXTreeConfig.lMinusIconActive= resourcesFolder+'/images/Lminus-active.png';
-	webFXTreeConfig.lPlusIconActive = resourcesFolder+'/images/Lplus-active.png';
-	webFXTreeConfig.tIcon           = resourcesFolder+'/images/T.png';
-	webFXTreeConfig.tMinusIcon      = resourcesFolder+'/images/Tminus.png';
-	webFXTreeConfig.tPlusIcon       = resourcesFolder+'/images/Tplus.png';
-	webFXTreeConfig.tMinusIconActive= resourcesFolder+'/images/Tminus-active.png';
-	webFXTreeConfig.tPlusIconActive = resourcesFolder+'/images/Tplus-active.png';
+	webFXTreeConfig.rootIcon        = resourcesFolder+'/images/xtree/foldericon.png';
+	webFXTreeConfig.openRootIcon    = resourcesFolder+'/images/xtree/openfoldericon.png';
+	webFXTreeConfig.folderIcon      = resourcesFolder+'/images/xtree/foldericon.png';
+	webFXTreeConfig.openFolderIcon  = resourcesFolder+'/images/xtree/openfoldericon.png';
+	webFXTreeConfig.fileIcon        = resourcesFolder+'/images/xtree/foldericon.png';
+	webFXTreeConfig.iIcon           = resourcesFolder+'/images/xtree/I.png';
+	webFXTreeConfig.lIcon           = resourcesFolder+'/images/xtree/L.png';
+	webFXTreeConfig.lMinusIcon      = resourcesFolder+'/images/xtree/Lminus.png';
+	webFXTreeConfig.lPlusIcon       = resourcesFolder+'/images/xtree/Lplus.png';
+	webFXTreeConfig.lMinusIconActive= resourcesFolder+'/images/xtree/Lminus-active.png';
+	webFXTreeConfig.lPlusIconActive = resourcesFolder+'/images/xtree/Lplus-active.png';
+	webFXTreeConfig.tIcon           = resourcesFolder+'/images/xtree/T.png';
+	webFXTreeConfig.tMinusIcon      = resourcesFolder+'/images/xtree/Tminus.png';
+	webFXTreeConfig.tPlusIcon       = resourcesFolder+'/images/xtree/Tplus.png';
+	webFXTreeConfig.tMinusIconActive= resourcesFolder+'/images/xtree/Tminus-active.png';
+	webFXTreeConfig.tPlusIconActive = resourcesFolder+'/images/xtree/Tplus-active.png';
 	webFXTreeConfig.blankIcon       = resourcesFolder+'/images/blank.png';
 });
 
@@ -156,12 +156,13 @@ WebFXCookie.prototype.getCookie = function (key) {
  */
 
 function WebFXTreeAbstractNode(sText, sAction) {
-	this.childNodes  = [];
-	this.id     = webFXTreeHandler.getId();
-	this.text   = sText || webFXTreeConfig.defaultText;
-	this.action = sAction || null;
-	this.url 	= "/";
-	this._last  = false;
+	this.childNodes         = [];
+    this.childrenPathes     = {};
+	this.id             = webFXTreeHandler.getId();
+	this.text           = sText || webFXTreeConfig.defaultText;
+	this.action         = sAction || null;
+	this.url 	        = "/";
+	this._last          = false;
 	webFXTreeHandler.all[this.id] = this;
 }
 
@@ -192,7 +193,10 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		node.action = node.parentNode.action;
 	}
 	
-	this.childNodes[this.childNodes.length] = node;
+	this.childNodes.push(node);
+    if(node.ajxpNode){
+        this.childrenPathes[node.ajxpNode.getPath()] = node.id;
+    }
 	var root = this;
 	if (this.childNodes.length >= 2) {
 		this.childNodes[this.childNodes.length - 2]._last = false;
@@ -216,7 +220,22 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 			foo = foo.parentNode;
 		}
 		$(this.id + '-cont').insert(node.toString());
-		$(node.id).ajxpNode = node.ajxpNode;
+        var addedBloc = $(this.id + '-cont').down('#' + node.id);
+        var addedCont = $(this.id + '-cont').down('#' + node.id + '-cont');
+        if(this.childNodes.length > 2 && node.ajxpNode && node.ajxpNode.getAjxpMime() !== 'ajxp_recycle'){
+            var sorted = Object.keys(this.childrenPathes).sort(function(a,b){
+                return a.toLowerCase().localeCompare(b.toLowerCase());
+            });
+            var sortedIndex = sorted.indexOf(node.ajxpNode.getPath());
+            if(sortedIndex < sorted.length-1){
+                var nextId = this.childrenPathes[sorted[sortedIndex + 1]];
+                if($(this.id + '-cont').down('#' + nextId)){
+                    $(this.id + '-cont').down('#' + nextId).insert({before: addedBloc});
+                    if(addedCont) addedBloc.insert({after: addedCont});
+                }
+            }
+        }
+		addedBloc.ajxpNode = node.ajxpNode;
 		if(!node.inZip){
             window.setTimeout(function(){
                 if(!$(node.id)) return;
@@ -225,19 +244,19 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 		}
 		//new Draggable(node.id, {revert:true,ghosting:true,constraint:'vertical'});
 		if(webFXTreeHandler.contextMenu){
-			Event.observe(node.id+'','contextmenu', function(event){
+			Event.observe(addedBloc,'contextmenu', function(event){
 				this.select();
 				this.action();
 				Event.stop(event);
 			}.bind(node));
 			 webFXTreeHandler.contextMenu.addElements('#'+node.id+'');
 		}
-		Event.observe(node.id,'click', function(event){
+		Event.observe(addedBloc,'click', function(event){
 			this.select();
 			this.action();
 			Event.stop(event);
 		}.bind(node));
-		Event.observe(node.id,'dblclick', function(event){
+		Event.observe(addedBloc,'dblclick', function(event){
 			this.toggle();
 			Event.stop(event);
 		}.bind(node));
@@ -271,7 +290,16 @@ WebFXTreeAbstractNode.prototype.add = function (node, bNoIdent) {
 
 
 WebFXTreeAbstractNode.prototype.updateLabel = function(label){
-	if($(this.id+'-label')) $(this.id+'-label').update(label);	
+	if($(this.id+'-label')) $(this.id+'-label').update(he.escape(label));
+};
+
+WebFXTreeAbstractNode.prototype.updateIcon = function(icon, openIcon, overlayIcon, overlayClasses){
+    if(openIcon) this.openIcon = openIcon;
+    else this.openIcon = icon;
+    this.icon = icon;
+    this.overlayIcon = overlayIcon ? overlayIcon : [];
+    this.overlayClasses = overlayClasses ? overlayClasses : [];
+    this.setLabelIcon((this.open && webFXTreeHandler.behavior != 'classic'?this.openIcon:icon));
 };
 
 WebFXTreeAbstractNode.prototype.updateIcon = function(icon, openIcon, overlayIcon, overlayClasses){
@@ -660,6 +688,9 @@ WebFXTreeItem.prototype._remove = function() {
 			break;
 	}	}
 	//webFXTreeHandler.all[this.id] = null;
+    if(this.ajxpNode && this.parentNode.childrenPathes[this.ajxpNode.getPath()]){
+       delete this.parentNode.childrenPathes[this.ajxpNode.getPath()];
+    }
 	delete(webFXTreeHandler.all[this.id]);
 	var tmp = $(this.id);
 	if (tmp) { tmp.parentNode.removeChild(tmp); }
@@ -801,7 +832,7 @@ WebFXTreeItem.prototype.toString = function (nItem, nItemCount) {
         }
     }
 	var label = this.text.replace(/</g, '&lt;').replace(/>/g, '&gt;') + d;
-	var str = "<div id=\"" + this.id + "\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" data-node-icon=\"" + getBaseName((this.open?this.openIcon:this.icon)) + "\">" +
+	var str = "<div id=\"" + this.id + "\" class=\"webfx-tree-item\" onkeydown=\"return webFXTreeHandler.keydown(this, event)\" data-node-path=\""+(this.ajxpNode?this.ajxpNode.getPath():"")+"\" data-node-icon=\"" + getBaseName((this.open?this.openIcon:this.icon)) + "\">" +
 		indent +
 		"<img  width=\"19\" height=\"25\" id=\"" + this.id + "-plus\" src=\"" + ((this.folder)?((this.open)?((this.parentNode._last)?webFXTreeConfig.lMinusIcon:webFXTreeConfig.tMinusIcon):((this.parentNode._last)?webFXTreeConfig.lPlusIcon:webFXTreeConfig.tPlusIcon)):((this.parentNode._last)?webFXTreeConfig.lIcon:webFXTreeConfig.tIcon)) + "\">" +
 		"<a href=\"" + this.url + "\" id=\"" + this.id + "-anchor\" onkeydown=\"return webFXTreeHandler.linkKeyPress(this, event);\" onfocus=\"webFXTreeHandler.focus(this);\" onblur=\"webFXTreeHandler.blur(this);\"" +

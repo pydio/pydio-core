@@ -14,13 +14,11 @@
         <param name="CREATE" type="boolean" label="CONF_MESSAGE[Create]" description="CONF_MESSAGE[Create folder if it does not exists]" default="false" mandatory="false"/>
         <global_param group="MIXIN_MESSAGE[Metadata and indexation]" name="DEFAULT_METASOURCES" type="string" label="MIXIN_MESSAGE[Default Metasources]" description="MIXIN_MESSAGE[Comma separated list of metastore and meta plugins, that will be automatically applied to all repositories created with this driver]" mandatory="false" default="metastore.serial,meta.filehasher,index.lucene"/>
     </server_settings>
-	<class_definition filename="plugins/access.sftp/class.sftpAccessDriver.php" classname="sftpAccessDriver"/>
+	<class_definition filename="plugins/access.sftp/SFTPAccessDriver.php" classname="Pydio\Access\Driver\StreamProvider\SFTP\SFTPAccessDriver"/>
 	<registry_contributions>
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
-			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"topPane", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}' theme="orbit"/>
-            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
             <component_config className="FilesList">
 				<columns switchGridMode="filelist">
 					<column messageId="1" attributeName="ajxp_label" sortType="StringDirFile"/>
@@ -40,5 +38,5 @@
 	<dependencies>
 		<pluginClass pluginName="access.fs"/>
 	</dependencies>
-    <class_stream_wrapper filename="plugins/access.sftp/class.sftpAccessWrapper.php" classname="sftpAccessWrapper" protocol="ajxp.sftp"/>
+    <class_stream_wrapper filename="plugins/access.sftp/SFTPAccessWrapper.php" classname="Pydio\Access\Driver\StreamProvider\SFTP\SFTPAccessWrapper" protocol="ajxp.sftp"/>
 </ajxpdriver>

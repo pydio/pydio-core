@@ -1,1 +1,13 @@
-<p>Get user avatar from Gravatar, based on email address.</p>
+<p>Disclaimer plugin allows you to force your users to validate any usage conditions of the platform before being able to access it.</p>
+
+<h4>Enabling Disclaimer</h4>
+<p>Once enable, you have to update the Root Group (or any sub group) by switching <b>"Disclaimer Validated"</b> to <em>"No"</em>, and
+    manually type in the following value in the <b>Users Lock</b> field : "validate_disclaimer" (without quotes). That setting will be propagated
+    to all users of the group, and then each user will have its lock/disclaimer parameter updated when they will sign it and accept it.
+</p>
+
+<h4>Shares Behaviour</h4>
+<ul>Regarding shared links, there are two options:
+    <li>. <b>Enable Shared Links</b>: disclaimer will be enabled and displayed <b>each time</b> a link is loaded, even if a user already accessed this link previously.</li>
+    <li>. <b>Disable Shared Links</b>: no disclaimer will be shown (shared users are automatically "validated" on creation).</li>
+</ul>

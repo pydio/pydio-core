@@ -68,6 +68,10 @@
     content: "\f250";
 }
 
+.mdi-radar:before {
+    content: "\f526";
+}
+
 .mdi-archive:before {
     content: "\f13a";
 }
@@ -165,4 +169,108 @@
 
 .mdi-qrcode-scan:before {
     content: "\f522";
+}
+
+.mdi-server-plus:before {
+    content: "\f57f";
+}
+
+.mdi-account:before {
+    content: "\f103";
+}
+
+.mdi-account-alert:before {
+    content: "\f104";
+}
+
+.mdi-account-box:before {
+    content: "\f105";
+}
+
+.mdi-account-box-outline:before {
+    content: "\f106";
+}
+
+.mdi-account-check:before {
+    content: "\f107";
+}
+
+.mdi-account-circle:before {
+    content: "\f108";
+}
+
+.mdi-account-convert:before {
+    content: "\f109";
+}
+
+.mdi-account-key:before {
+    content: "\f10a";
+}
+
+.mdi-account-location:before {
+    content: "\f10b";
+}
+
+.mdi-account-minus:before {
+    content: "\f10c";
+}
+
+.mdi-account-multiple:before {
+    content: "\f10d";
+}
+
+.mdi-account-multiple-outline:before {
+    content: "\f10e";
+}
+
+.mdi-account-multiple-plus:before {
+    content: "\f10f";
+}
+
+.mdi-account-network:before {
+    content: "\f110";
+}
+
+.mdi-account-off:before {
+    content: "\f111";
+}
+
+.mdi-account-outline:before {
+    content: "\f112";
+}
+
+.mdi-account-plus:before {
+    content: "\f113";
+}
+
+.mdi-account-remove:before {
+    content: "\f114";
+}
+
+.mdi-account-search:before {
+    content: "\f115";
+}
+
+.mdi-account-star:before {
+    content: "\f116";
+}
+
+.mdi-account-star-variant:before {
+    content: "\f117";
+}
+
+.mdi-account-switch:before {
+    content: "\f118";
+}
+
+.mdi-pencil:before {
+    content: "\f4da";
+}
+
+.mdi-pencil-box:before {
+    content: "\f4db";
+}
+
+.mdi-pencil-box-outline:before {
+    content: "\f4dc";
 }

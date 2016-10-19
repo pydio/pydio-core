@@ -1,0 +1,26 @@
+{
+  "name" : "pydio/core",
+  "autoload": {
+    "psr-4": {
+      "Pydio\\Core\\": "./src/pydio/Core",
+      "Pydio\\Tests\\": "./src/pydio/Tests"
+    }
+  },
+  "require": {
+    "zendframework/zend-diactoros": "~1.0",
+    "guzzlehttp/guzzle": "~5",
+    "guzzlehttp/command": "~0.7",
+    "guzzlehttp/guzzle-services": "~0.5",
+    "gimler/guzzle-description-loader" : "*",
+    "commerceguys/guzzle-oauth2-plugin": "~2.0",
+    "nikic/fast-route":"~1.0",
+    "symfony/console":"^3.0",
+    "davegardnerisme/nsqphp": "dev-master",
+    "sabre/dav":"1.8.10",
+    "aws/aws-sdk-php": "^3.19.4",
+    "meenie/javascript-packer":"1.1",
+    "dapphp/securimage":"3.6.4",
+    "phpseclib/phpseclib":"2.0.3"
+  }
+
+}

@@ -97,7 +97,7 @@
 }
 #home_account_pane #home_left_bar #workspaces_center .workspaces .workspace-entry .workspace-label {
   padding: 0;
-  font-weight: 500;
+  font-weight: 400;
   font-size: 18px;
   margin: 0;
   line-height: 26px;
@@ -200,7 +200,7 @@
 }
 #home_account_pane #home_center_panel div#logo_div {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-  margin-top: 20%;
+  margin-top: 17%;
   position: relative;
 }
 #home_account_pane #home_center_panel.legend_visible div#logo_div {
@@ -647,6 +647,96 @@ div#tutorial_dl_apps_pane div#dl_pydio_mac div {
 div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
   top: 30px;
 }
+div.home_search {
+  text-align: center;
+  position: relative;
+  top: 120px;
+  background-color: transparent;
+  width: 710px;
+  margin: 0 auto;
+  height: 40px;
+  overflow: visible;
+}
+div.home_search div.react-autosuggest {
+  position: absolute;
+}
+div.home_search div.react-autosuggest input.react-autosuggest__input {
+  width: 340px;
+  font-size: 16px;
+  padding: 8px 0;
+  position: relative;
+  border-width: 0 0 1px 0;
+  border-color: white;
+  border-radius: 0;
+  background-color: transparent;
+  color: white;
+}
+div.home_search div.react-autosuggest input.react-autosuggest__input::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.73);
+}
+div.home_search div.react-autosuggest input.react-autosuggest__input:-moz-placeholder {
+  /* Firefox 18- */
+  color: rgba(255, 255, 255, 0.73);
+}
+div.home_search div.react-autosuggest input.react-autosuggest__input::-moz-placeholder {
+  /* Firefox 19+ */
+  color: rgba(255, 255, 255, 0.73);
+}
+div.home_search div.react-autosuggest input.react-autosuggest__input:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.73);
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions {
+  width: 340px;
+  background-color: rgba(255, 255, 255, 0.98);
+  max-height: 235px;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion {
+  text-align: left;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.nodeSuggestion {
+  display: block;
+  padding: 16px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.93);
+  cursor: pointer;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.nodeSuggestion span.highlight {
+  display: inline-block;
+  background-color: rgba(255, 255, 0, 0.26);
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.nodeSuggestion span.icon {
+  font-size: 16px;
+  display: inline-block;
+  margin: 0 12px 0 5px;
+  color: rgba(0, 0, 0, 0.73);
+  text-align: center;
+  width: 25px;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.groupHeader {
+  display: block;
+  padding: 8px 8px;
+  border-bottom: 0px;
+  font-size: 13px;
+  color: white;
+  cursor: pointer;
+  background-color: #009688;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.groupHeader span.openicon {
+  display: none;
+  float: right;
+}
+div.home_search div.react-autosuggest .react-autosuggest__suggestions li.react-autosuggest__suggestion span.groupHeader:hover span.openicon {
+  margin-top: 3px;
+  display: inline-block;
+}
+div.home_search span.suggest-search {
+  font-size: 16px;
+  position: absolute;
+  color: white;
+  right: 380px;
+  top: 10px;
+}
 .form-qrcode_dialog_form {
   min-width: 296px;
 }
@@ -668,7 +758,10 @@ div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
     width: 100px;
   }
 }
-@media only screen and (max-width: 800px) {
+@media only screen and (max-width: 800px) and (min-width: 420px) {
+  #logo_div {
+    margin-top: 25% !important;
+  }
   #logo_div img {
     width: 210px;
   }
@@ -682,14 +775,26 @@ div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
     margin-right: 3%;
     margin-left: 3%;
   }
-  #dl_pydio_cont {
-    width: 400px !important;
+  div#dl_pydio_cont {
+    width: 650px !important;
+  }
+  div.home_search {
+    width: 650px !important;
+  }
+  div.home_search span.suggest-search {
+    right: 320px;
   }
   #dl_pydio_for {
     display: none;
   }
-  #home_left_bar {
-    width: 380px;
+  #home_account_pane #home_left_bar {
+    width: 300px;
+  }
+  #home_account_pane #home_left_bar .workspace-entry {
+    padding: 8px 10px 8px 23px !important;
+  }
+  #home_account_pane #home_left_bar .workspace-entry span.workspace-badge {
+    display: none !important;
   }
   #welcome {
     font-size: 1em;
@@ -703,9 +808,9 @@ div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
     padding: 0 30px;
   }
 }
-@media only screen and (max-width: 400px) {
+@media only screen and (max-width: 420px) {
   #home_left_bar {
-    width: 100%;
+    width: 100% !important;
     position: absolute;
     top: 0;
     height: 100%;

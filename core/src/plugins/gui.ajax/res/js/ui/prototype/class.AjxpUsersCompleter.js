@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
@@ -211,7 +211,7 @@ Class.create("AjxpUsersCompleter", Ajax.Autocompleter, {
                             conn.setMethod("POST");
                             var success = false;
                             conn.onComplete = function(transport){
-                                if(transport.responseText == 'SUCCESS'){
+                                if(transport.responseJSON['result'] === 'SUCCESS'){
                                     var id = createActionPanel.down('[name="new_user_id"]').getValue();
                                     var label = id;
                                     if(createActionPanel.down('[name="USER_DISPLAY_NAME"]')){

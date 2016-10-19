@@ -17,7 +17,6 @@
         <external_file filename="plugins/access.fs/fsTemplatePart.xml" include="client_configs/*" exclude=""/>
 		<client_configs>
 			<template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions="{}"/>
-            <template_part ajxpId="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "fitMarginBottom":20}' theme="vision"/>
             <component_config className="InfoPanel">
 				<infoPanel mime="generic_file" attributes="icon,text,preview_rich">
 					<messages>
@@ -158,5 +157,5 @@
 
 		</actions>
 	</registry_contributions>
-	<class_definition filename="plugins/access.wms/class.WmsBrowser.php" classname="WmsBrowser"/>
+	<class_definition filename="plugins/access.wms/WmsBrowser.php" classname="Pydio\Access\Driver\DataProvider\WmsBrowser"/>
 </ajxpdriver>

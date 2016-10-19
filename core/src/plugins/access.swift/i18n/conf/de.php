@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Open Stack (Swift)" => "OpenStack (Swift)",
@@ -24,7 +24,7 @@ $mess=array(
 "Username" => "Benutzername",
 "User email as you enter it to log to the console" => "E-Mail-Adresse für den Login auf der Konsole",
 "Console Password" => "Passwort",
-"Tenant ID" => "Tenant ID",
+"Tenant ID" => "Tenant-ID",
 "Tenant ID (see API Keys page)" => "Tenant ID (siehe API-Dokumentation)",
 "Endpoint" => "Endpoint",
 "Endpoint (see API Keys page, Identity endpoint)" => "Endpoint (siehe API-Dokumentation)",
@@ -32,5 +32,5 @@ $mess=array(
 "Your region identifier" => "Identifikatur für die Region",
 "Container" => "Container",
 "Base Container" => "Der Basis-Container",
-"Console password" => "Console password",
+"Console password" => "Consolen-Passwort",
 );

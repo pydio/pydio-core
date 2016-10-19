@@ -521,6 +521,7 @@
                 <xs:element minOccurs="0" ref="clientCallback"/>
                 <xs:element minOccurs="0" maxOccurs="100" ref="clientForm"/>
                 <xs:element minOccurs="0" ref="dialogOnOpen"/>
+                <xs:element minOccurs="0" ref="dialogOnComplete"/>
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
                 <xs:element minOccurs="0" ref="standardFormDefinition"/>

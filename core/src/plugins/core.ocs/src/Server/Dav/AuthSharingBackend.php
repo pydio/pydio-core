@@ -16,24 +16,37 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Server\Dav;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+use Pydio\Core\Exception\LoginException;
+use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\AuthService;
+use Pydio\Core\Services\ConfService;
+use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Utils\TextEncoder;
+use Pydio\Log\Core\Logger;
+use Pydio\Share\Store\ShareStore;
 use Sabre\DAV;
 use Sabre\HTTP;
 
-require_once(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/class.ShareStore.php");
+require_once(AJXP_INSTALL_PATH . "/" . AJXP_PLUGINS_FOLDER . "/action.share/vendor/autoload.php");
 
+/**
+ * Class AuthSharingBackend
+ * @package Pydio\OCS\Server\Dav
+ */
 class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 {
 
     /**
-     * @var \AJXP_Sabre_Collection
+     * @var ContextInterface
      */
-    var $rootCollection;
+    private $context;
+
     /**
      * @var array
      */
@@ -41,10 +54,10 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
     /**
      * OCS_DavAuthSharingBackend constructor.
-     * @param \AJXP_Sabre_Collection $rootCollection Repository object will be updated once authentication is passed
+     * @param ContextInterface $context Repository object will be updated once authentication is passed
      */
-    public function __construct($rootCollection){
-        $this->rootCollection = $rootCollection;
+    public function __construct(ContextInterface $context){
+        $this->context = $context;
     }
 
     /**
@@ -55,16 +68,20 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
      *
      * @param string $username
      * @param string $password
-     * @return bool
+     * @return mixed AJXP_User|bool
      */
     protected function validateUserPass($username, $password)
     {
-        if(isSet($this->shareData["PRESET_LOGIN"])){
-            $res = \AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false, -1);
-        }else{
-            $res = \AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
+        try{
+            if(isSet($this->shareData["PRESET_LOGIN"])){
+                $user = AuthService::logUser($this->shareData["PRESET_LOGIN"], $password, false, false);
+            }else{
+                $user = AuthService::logUser($this->shareData["PRELOG_USER"], "", true);
+            }
+            return $user;
+        }catch (LoginException $l){
+            return false;
         }
-        return $res === 1;
     }
 
 
@@ -93,7 +110,8 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
 
         // Authenticates the user
         $token = $userpass[0];
-        $shareStore = new \ShareStore(\ConfService::getCoreConf("PUBLIC_DOWNLOAD_FOLDER"));
+
+        $shareStore = new ShareStore($this->context, ConfService::getGlobalConf("PUBLIC_DOWNLOAD_FOLDER"));
         $shareData = $shareStore->loadShare($token);
         if(is_array($shareData)){
             $this->shareData = $shareData;
@@ -101,23 +119,30 @@ class AuthSharingBackend extends DAV\Auth\Backend\AbstractBasic
             $auth->requireLogin();
             throw new DAV\Exception\NotAuthenticated('Username or password does not match');
         }
-        if (!$this->validateUserPass($userpass[0],$userpass[1])) {
+
+        $user = $this->validateUserPass($userpass[0],$userpass[1]);
+        if (!$user) {
             $auth->requireLogin();
             throw new DAV\Exception\NotAuthenticated('Username or password does not match');
         }
 
         $repositoryId = $this->shareData["REPOSITORY"];
-        $repository = \ConfService::getRepositoryById($repositoryId);
+        $repository = RepositoryService::getRepositoryById($repositoryId);
         if ($repository == null) {
-            $repository = \ConfService::getRepositoryByAlias($repositoryId);
+            $repository = RepositoryService::getRepositoryByAlias($repositoryId);
         }
         if ($repository == null) {
             throw new DAV\Exception\NotAuthenticated('Username cannot access any repository');
         }else{
-            $this->rootCollection->updateRepository($repository);
+            $this->context->setRepositoryObject($repository);
         }
 
         $this->currentUser = $userpass[0];
+        $this->context->setUserObject($user);
+
+        Logger::updateContext($this->context);
+        TextEncoder::updateContext($this->context);
+
         return true;
     }
 

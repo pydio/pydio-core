@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  * Description : The image gallery manager.
  */
 Class.create("Diaporama", AbstractEditor, {
@@ -713,14 +713,14 @@ Class.create("Diaporama", AbstractEditor, {
 	
     getSharedPreviewTemplate : function(node){
 
-        return new Template('<img width="#{WIDTH}" height="#{HEIGHT}" src="#{DL_CT_LINK}">');
+        return new Template('<img src="#{DL_CT_LINK}">');
 
     },
 
     getRESTPreviewLinks:function(node){
         return {
-            "Original image": "&file=" + encodeURIComponent(node.getPath()),
-            "Thumbnail (200px)": "&get_thumb=true&dimension=200&file=" + encodeURIComponent(node.getPath())
+            "Original image": "",
+            "Thumbnail (200px)": "&get_thumb=true&dimension=200"
         };
     },
 

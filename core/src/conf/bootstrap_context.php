@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * This is the main configuration file for configuring the core of the application.
  * In a standard usage, you should not have to change any variables.
@@ -53,12 +53,15 @@ define("AJXP_PLUGINS_REPOSITORIES_CACHE", AJXP_CACHE_DIR."/plugins_repositories.
 define("AJXP_PLUGINS_MESSAGES_FILE", AJXP_CACHE_DIR."/plugins_messages.ser");
 define("AJXP_SERVER_ACCESS", "index.php");
 define("AJXP_PLUGINS_FOLDER", "plugins");
-define("AJXP_BIN_FOLDER_REL", "core/classes");
-define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/classes");
+define("AJXP_BIN_FOLDER_REL", "core/src");
+define("AJXP_VENDOR_FOLDER_REL", "core/vendor");
+define("AJXP_BIN_FOLDER", AJXP_INSTALL_PATH."/core/src");
+define("AJXP_VENDOR_FOLDER", AJXP_INSTALL_PATH."/core/vendor");
 define("AJXP_DOCS_FOLDER", "core/doc");
 define("AJXP_COREI18N_FOLDER", AJXP_INSTALL_PATH."/plugins/core.ajaxplorer/i18n");
-define("TESTS_RESULT_FILE", AJXP_CACHE_DIR."/diag_result.php");
-define("AJXP_TESTS_FOLDER", AJXP_INSTALL_PATH."/core/tests");
+define("TESTS_RESULT_FILE", AJXP_DATA_PATH."/plugins/boot.conf/diag_result.php");
+define("TESTS_RESULT_FILE_LEGACY", AJXP_CACHE_DIR."/diag_result.php");
+define("AJXP_TESTS_FOLDER", AJXP_BIN_FOLDER."/pydio/Tests");
 define("INITIAL_ADMIN_PASSWORD", "admin");
 // Startup admin password (used at first creation). Once
 // The admin password is created and his password is changed,
@@ -69,10 +72,6 @@ define("ADMIN_PASSWORD", "admin");
 // and used if defined. See bootstrap_plugins.php default configs for
 // example in log.serial. Do not forget the trailing slash
 // define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
-
-// KEY-VALUE-CACHE
-define("AJXP_KVCACHE_PREFIX", "pydio-unique-id");
-define("AJXP_KVCACHE_IGNORE", true);
 
 // DEBUG OPTIONS
 define("AJXP_CLIENT_DEBUG"  ,	false);
@@ -92,44 +91,52 @@ define("HASH_ITERATION_INDEX", 1);
 define("HASH_SALT_INDEX", 2);
 define("HASH_PBKDF2_INDEX", 3);
 
+// Used to identify the booster admin tasks
+define("PYDIO_BOOSTER_TASK_IDENTIFIER", "pydio-booster");
+
 // CAN BE SWITCHED TO TRUE TO MAKE THE SECURE TOKEN MORE SAFE
 // MAKE SURE YOU HAVE PHP.5.3, OPENSSL, AND THAT IT DOES NOT DEGRADE PERFORMANCES
 define("USE_OPENSSL_RANDOM", false);
 
-function AjaXplorer_autoload($className)
+require_once (AJXP_VENDOR_FOLDER . "/autoload.php");
+$corePlugAutoloads = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/vendor/autoload.php", GLOB_NOSORT);
+if ($corePlugAutoloads !== false && count($corePlugAutoloads)) {
+    foreach($corePlugAutoloads as $autoloader){
+        require_once ($autoloader);
+    }
+}
+
+/**
+ * Used as autoloader
+ * @param $className
+ */
+function pydioAutoloader($className)
 {
+    // Temp : super dummy autoloader, take only class name
+    $parts = explode("\\", $className);
+    $className = array_pop($parts);
+
     if($className == "dibi"){
-        require_once(AJXP_BIN_FOLDER."/dibi/dibi.php");
+        require_once(AJXP_BIN_FOLDER."/lib/dibi/dibi.php");
     }
-    $fileName = AJXP_BIN_FOLDER."/"."class.".$className.".php";
-    if (file_exists($fileName)) {
-        require_once($fileName);
-        return;
-    }
-    $fileName = AJXP_BIN_FOLDER."/"."interface.".$className.".php";
-    if (file_exists($fileName)) {
-        require_once($fileName);
-        return;
-    }
-    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/class.".$className.".php", GLOB_NOSORT);
+    $corePlugClass = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/".$className.".php", GLOB_NOSORT);
     if ($corePlugClass !== false && count($corePlugClass)) {
         require_once($corePlugClass[0]);
         return;
     }
-    $corePlugInterface = glob(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/core.*/interface.".$className.".php", GLOB_NOSORT);
-    if ($corePlugInterface !== false && count($corePlugInterface)) {
-        require_once($corePlugInterface[0]);
-        return;
-    }
 }
-spl_autoload_register('AjaXplorer_autoload');
+spl_autoload_register('pydioAutoloader');
 
-AJXP_Utils::safeIniSet("session.cookie_httponly", 1);
+include_once(AJXP_INSTALL_PATH . "/core/compat.php");
+
+use Pydio\Core\Services\ApplicationState;
+
+ApplicationState::safeIniSet("session.cookie_httponly", 1);
 
 if (is_file(AJXP_CONF_PATH."/bootstrap_conf.php")) {
     include(AJXP_CONF_PATH."/bootstrap_conf.php");
     if (isSet($AJXP_INISET)) {
-        foreach($AJXP_INISET as $key => $value) AJXP_Utils::safeIniSet($key, $value);
+        foreach($AJXP_INISET as $key => $value) ApplicationState::safeIniSet($key, $value);
     }
     if (defined('AJXP_LOCALE')) {
         setlocale(LC_CTYPE, AJXP_LOCALE);

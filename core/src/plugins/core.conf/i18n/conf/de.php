@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
 "Generic Conf Features" => "Standard Konfiguration",
@@ -25,7 +25,7 @@ $mess=array(
 "If the 'guest' user is enabled, remember her preferences accross sessions." => "Wenn der Benutzer 'Gast' aktiv ist kann festgelegt werden, ob geänderte Einstellungen über mehrere Sitzungen gelten.",
 "Configurations Management" => "Konfigurationsmanagement",
 "Sets how the application core data (users,roles,etc) is stored." => "Festlegen wie Core-Daten (Benutzer, Rollen, etc) gespeichert werden.",
-"Default start repository" => "Standard Start Arbeitsumgebung",
+"Default start repository" => "Diese Arbeitsumgebung nach der Anmeldung standardmäßig öffnen",
 "Default repository" => "Standard Arbeitsumgebung",
 "Maximum number of shared users per user" => "Maximale Anzahl an Freigabenbenutzer pro Benutzer",
 "Shared users limit" => "Begrenzung der Freigabenbenutzer",
@@ -52,14 +52,14 @@ $mess=array(
 "Instance" => "Erweiterung",
 "Choose the configuration plugin" => "Erweiterung für den Konfigurationsspeicher auswählen",
 "Name" => "Name",
-"Full name displayed to others" => "Für andere sichtbarer Name",
+"Full name displayed to others" => "Ihr Name wird anderen Benutzern angezeigt",
 "Avatar" => "Avatar",
-"Image displayed next to the user name" => "Bild, welches neben dem Benutzer angezeigt wird",
+"Image displayed next to the user name" => "Der Avatar wird neben Ihrem Benutzernamen angezeigt",
 "Email" => "E-Mail",
-"Address used for notifications" => "Adresse wird für Benachrichtigungen verwendet",
+"Address used for notifications" => "Für Benachrichtigungen verwendete E-Mail-Adresse",
 "Country" => "Land",
 "Language" => "Sprache",
-"User Language" => "Benutzer Sprache",
+"User Language" => "Ihre Sprache",
 "Role Label" => "Rollenname",
 "Users Lock Action" => "Anmelde-Aktion",
 "If set, this action will be triggered automatically at users login. Can be logout (to lock out the users), pass_change (to force password change), or anything else" => "Dieser Befehl wir automatisch bei der Benutzeranmeldung ausgeführt. (z.B. Benutzer sperren, Passwortänderung, etc.)",
@@ -86,8 +86,8 @@ $mess=array(
 "Some roles should be disappered in the list.  list separated by ',' or start with 'preg:' for regex." => "Rollen die nicht angezeigt werden sollen. Mit Komma getrennt oder beginnend mit 'preg:' für regex.",
 "Some roles should be shown in the list.  list separated by ',' or start with 'preg:' for regex." => "Rollen die angezeigt werden sollen. Mit Komma getrennt oder beginnend mit 'preg:' für regex.",
 "External Users Creation" => "Anlage von Benutzern während der Freigabe von Elementen",
-"Always override other roles, included group roles." => "Always override other roles, included group roles.",
-"Always Override" => "Always Override",
-"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP.",
-"Make regexp mandatory" => "Make regexp mandatory",
+"Always override other roles, included group roles." => "Andere Rollen überschreiben (einschließlich Rollen der Gruppe)",
+"Always Override" => "Immer überschreiben",
+"Do not load groups and users list if no regexp is entered. Avoid sending large search on LDAP." => "Lädt Benutzer und Gruppen nicht, solange kein regulärer Ausdruck angegeben ist. (verhindert umfangreiche LDAP-Suchen).",
+"Make regexp mandatory" => "Regulärer Ausdruck ist Pflicht",
 );

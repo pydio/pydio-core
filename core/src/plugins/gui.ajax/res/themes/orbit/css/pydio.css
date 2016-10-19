@@ -25,16 +25,6 @@
   font-style: normal;
 }
 @font-face {
-  font-family: 'Open Sans Regular';
-  src: url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.eot');
-  src: url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.eot?iefix') format('eot'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.woff') format('woff'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.ttf') format('truetype'), url('../fonts/open-sans-fontfacekit/opensans_regular/OpenSans-Regular-webfont.svg#webfont') format('svg');
-}
-@font-face {
-  font-family: 'Open Sans Light';
-  src: url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.eot');
-  src: url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.eot?iefix') format('eot'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.woff') format('woff'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.ttf') format('truetype'), url('../fonts/open-sans-fontfacekit/opensans_light/OpenSans-Light-webfont.svg#webfont') format('svg');
-}
-@font-face {
   font-family: 'Roboto';
   font-weight: 300;
   src: url('../fonts/roboto-font/roboto-light.woff2') format('woff2'), url('../fonts/roboto-font/roboto-light.woff') format('woff');
@@ -86,7 +76,8 @@ body,
 html {
   margin: 0;
   padding: 0;
-  background-color: #333;
+  background-color: #fcfcff;
+  overflow-x: hidden;
 }
 * {
   -moz-user-select: -moz-none;
@@ -98,12 +89,14 @@ html {
 input,
 textarea,
 .selectable {
-  font-family: "Open Sans Light", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   -moz-user-select: text;
   -khtml-user-select: auto;
   -webkit-user-select: auto;
   -ms-user-select: auto;
       user-select: auto;
+}
+input {
+  font-weight: 300;
 }
 *::-moz-focus-inner {
   border: none;
@@ -138,7 +131,7 @@ span.letter_badge {
   text-align: center;
   padding: 7px 0;
   font-size: 0.8em;
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 .kbd {
   padding: .1em .6em;
@@ -591,6 +584,10 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 11px !important;
   opacity: 0.73;
 }
+.webfx-tree-item div.overlay_icon_div span.overlay-class-span.mdi-radar {
+  padding: 0 !important;
+  margin: 0 5px !important;
+}
 .webfx-tree-item.selected-webfx-tree-item div.overlay_icon_div span.overlay-class-span {
   color: white !important;
 }
@@ -780,7 +777,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   background-color: #fdfce4;
 }
 .class-FilesList.fl-displayMode-list .table_rows_container span#ajxp_label {
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell {
   margin: 1px;
@@ -997,6 +994,17 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 }
 .class-FilesList.fl-showFilterPane div.sort-table-filter {
   display: block;
+}
+.class-FilesList .partSizeRender {
+  display: inline-block;
+  width: 80px;
+  height: 20px;
+  background-image: url('../images/dl_bg.png');
+  background-repeat: no-repeat;
+  background-size: 0 100%;
+  font-size: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  color: rgba(0, 0, 0, 0.87);
 }
 .class-FilesList .pg_cancel_button {
   background-color: #C33;
@@ -1289,23 +1297,32 @@ select.SF_input {
   max-width: 490px;
 }
 .SF_replication_Add {
-  background: url('../images/0.gif') no-repeat 5px 6px;
-  bottom: 0;
+  bottom: -2px;
   display: block;
   height: 20px;
-  left: 0;
+  left: 5px;
   position: absolute;
   width: 20px;
+  cursor: pointer;
+  color: #009688;
+  font-family: FontAwesome;
+}
+.SF_replication_Add:before {
+  content: "\f067";
 }
 .SF_replication_Remove {
-  background: url('../images/1.gif') no-repeat 5px 6px;
-  bottom: 0;
+  font-family: FontAwesome;
   display: block;
   height: 20px;
-  left: 0;
+  left: 5px;
   position: absolute;
-  top: 0;
+  top: 5px;
   width: 20px;
+  cursor: pointer;
+  color: #009688;
+}
+.SF_replication_Remove:before {
+  content: "\f068";
 }
 .SF_rgClear {
   clear: left;
@@ -1318,6 +1335,9 @@ select.SF_input {
 .SF_image.small {
   max-height: 80px;
   max-width: 80px;
+}
+.SF_image.small[src*="default_avatar"] {
+  background-color: #B0BEC5;
 }
 #user_profile_form img.SF_image.small {
   border-radius: 40px;
@@ -1412,7 +1432,6 @@ select.SF_input {
   border-radius: 0;
   border: 0;
   font-size: 14px;
-  margin: 1px 0 0 0;
   padding: 4px 1% 0 0 !important;
   border-bottom: 1px solid #dddddd;
 }
@@ -1638,6 +1657,10 @@ div.shadow_class {
   margin-right: 0;
   width: auto;
 }
+.dialogBox .dialogContent .react-mui-context .mui-enhanced-switch .mui-enhanced-switch-input {
+  width: 100%;
+  height: 100%;
+}
 .dialogBox .dialogContent select {
   border-radius: 0;
   background-color: #ffffff;
@@ -1685,7 +1708,8 @@ div.shadow_class {
   width: 20%;
 }
 #activity_monitor_warning div.dialogContent {
-  border-radius: 10px;
+  border-radius: 2px;
+  padding: 30px;
   box-shadow: 1px 1px 46px rgba(0, 0, 0, 0.67);
 }
 #activity_monitor_warning span.click_anywhere {
@@ -1749,24 +1773,26 @@ div.shadow_class {
 }
 .simple_tooltip {
   position: absolute;
-  width: 150px;
+  width: 210px;
   z-index: 10000;
-  font-size: 13px;
-  padding: 5px 10px;
+  font-weight: 300;
+  line-height: 19px;
+  font-size: 12px;
+  padding: 8px 11px;
 }
 .simple_tooltip_observer {
   cursor: help;
 }
 .simple_tooltip_title {
-  padding-top: 2px;
-  padding-bottom: 1px;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-size: 1.1em;
+  padding-top: 1px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+  font-size: 14px;
 }
 .down_arrow_tip,
 .top_arrow_tip {
-  background: rgba(69, 77, 85, 0.86);
+  background: rgba(69, 77, 85, 0.72);
   color: #ffffff;
   border: 0;
   border-radius: 2px;
@@ -1780,7 +1806,7 @@ div.shadow_class {
   position: absolute;
   pointer-events: none;
   border-color: rgba(0, 0, 0, 0);
-  border-top-color: rgba(69, 77, 85, 0.86);
+  border-top-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -1799,7 +1825,7 @@ div.shadow_class {
 }
 .top_arrow_tip:after {
   border-color: rgba(111, 123, 136, 0);
-  border-bottom-color: rgba(69, 77, 85, 0.86);
+  border-bottom-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   left: 50%;
   margin-left: -5px;
@@ -1810,7 +1836,7 @@ div.shadow_class {
 .right_arrow_tip {
   color: #ffffff;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: rgba(69, 77, 85, 0.72);
   border: 0;
 }
 .right_arrow_tip:after,
@@ -1825,14 +1851,14 @@ div.shadow_class {
 }
 .right_arrow_tip:after {
   border-color: rgba(0, 0, 0, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-left-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
 }
 .right_arrow_tip:before {
   border-color: rgba(0, 0, 0, 0);
-  border-left-color: rgba(69, 77, 85, 0.86);
+  border-left-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   margin-top: -5px;
@@ -1840,7 +1866,7 @@ div.shadow_class {
 .left_arrow_tip {
   color: #ffffff;
   border-radius: 4px;
-  background-color: rgba(69, 77, 85, 0.86);
+  background-color: rgba(69, 77, 85, 0.72);
   border: 0;
 }
 .left_arrow_tip:after,
@@ -1855,7 +1881,7 @@ div.shadow_class {
 }
 .left_arrow_tip:before {
   border-color: rgba(0, 0, 0, 0);
-  border-right-color: rgba(69, 77, 85, 0.86);
+  border-right-color: rgba(69, 77, 85, 0.72);
   border-width: 5px;
   top: 50%;
   left: -10px;
@@ -1923,6 +1949,56 @@ div.autocomplete ul li {
 div.autocomplete ul li.selected {
   background-color: aliceblue !important;
 }
+div.react-autosuggest {
+  padding-left: 1px;
+}
+div.react-autosuggest li.react-autosuggest__suggestion {
+  display: block;
+}
+div.react-autosuggest .react-autosuggest__suggestion--focused {
+  background-color: aliceblue;
+}
+div.react-autosuggest input.react-autosuggest__input {
+  width: 300px;
+}
+div.react-autosuggest .react-autosuggest__suggestions {
+  background-color: white;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.63);
+  display: block;
+  margin-top: 1px;
+  max-height: 300px;
+  overflow-y: auto;
+  position: absolute;
+  width: 300px;
+  z-index: 20;
+}
+.list-force-hide div.react-autosuggest .react-autosuggest__suggestions {
+  display: none !important;
+}
+div.react-autosuggest input#users-autosuggest {
+  font-size: 18px;
+  padding-bottom: 9px !important;
+  padding-left: 4px !important;
+}
+div.react-autosuggest input#pydioform-autosuggest {
+  font-size: 16px;
+  padding-bottom: 5px !important;
+  border-bottom: 1px solid #e0e0e0;
+}
+div.react-autosuggest input#pydioform-autosuggest:focus {
+  border-bottom: 2px solid #009688;
+}
+div.pydioform_autocomplete .suggest-search {
+  position: absolute;
+  right: 36px;
+  padding-top: 2px;
+  color: #e0e0e0;
+}
+div.pydioform_autocomplete .react-autosuggest__suggestions li {
+  padding: 8px 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
 a.carousel-control {
   border-left: 1px solid #c4c7c1;
   border-right: 1px solid #c4c7c1;
@@ -1956,8 +2032,33 @@ div#multiple_download_container {
   overflow: auto;
   height: 350px;
   text-align: left;
+  border-radius: 1px;
+}
+div#multi_download_form a#dl_form_submit {
   border-radius: 2px;
-  background-color: rgba(239, 239, 239, 0.52);
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 5px;
+  padding: 5px 12px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 15px;
+  color: #009688;
+  text-transform: uppercase;
+}
+div#multi_download_form a#dl_form_submit:hover {
+  background-color: #bffff9;
+}
+div#multiple_download_container {
+  width: 100%;
+}
+div#multiple_download_container a {
+  font-size: 16px;
+}
+div#multiple_download_container a span.mdi-download {
+  font-size: 14px;
+  display: inline-block;
+  margin-right: 5px;
 }
 .droparea {
   background: url("../../../../../../index.php?get_action=get_drop_bg") no-repeat scroll left bottom transparent;
@@ -1965,8 +2066,12 @@ div#multiple_download_container {
 .uploadFilesList.droparea {
   background-position: center;
 }
-.dropareaHover {
-  background-color: #FAF3ED !important;
+.dropareaHover,
+.dropareaHover #content_pane {
+  background-color: #FFF8E1 !important;
+}
+.webfx-tree-item.dropareaHover {
+  background-color: rgba(255, 253, 231, 0.43) !important;
 }
 #content_pane.dropareaHover div.thumbnail_selectable_cell {
   background-color: transparent !important;
@@ -2000,74 +2105,120 @@ div#multiple_download_container {
   cursor: default;
   border-bottom: 3px solid #ff5722;
 }
-div#uploader_options_pane {
+div.upload-options-pane {
   position: absolute;
-  right: 10px;
+  top: 0;
+  right: 0;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.16), 0 1px 6px rgba(0, 0, 0, 0.23);
-  background-color: white;
-  font-size: 11px;
-  height: 59px;
-  overflow: hidden;
-  padding: 12px 20px 20px;
-  text-align: right;
-  display: none;
-  margin-bottom: 11px;
-  margin-top: -2px;
-  margin-right: 2px;
-  z-index: 2;
+  padding: 16px;
+}
+div.upload-options-pane .option-row {
+  padding: 8px 0;
+}
+div.upload-options-pane .close-options {
+  float: right;
+  cursor: pointer;
+  display: inline-block;
+}
+div.upload-options-pane .mui-radio-button {
+  margin: 12px 0;
+}
+div.uploader-action-bar {
+  margin-bottom: 10px;
+}
+div.uploader-action-bar > button,
+div.uploader-action-bar > div {
+  margin-right: 5px;
 }
 div#total_files_list {
   display: none !important;
 }
-div#uploader_options_pane input {
-  width: 15px;
-  margin-right: 0;
-  margin-left: 0;
-  margin-top: 5px;
-}
 .dotted_container_item_mixin {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
-  height: 20px;
+  padding: 16px 14px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
 .dotted_container_item_mixin rect {
   fill: #ffffff;
 }
-div#upload_files_list div {
+div#upload_files_list {
+  border: 1px solid rgba(0, 0, 0, 0.13);
+}
+div#upload_files_list > div {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
-  height: 20px;
+  padding: 16px 14px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
-div#upload_files_list div rect {
+div#upload_files_list > div rect {
   fill: #ffffff;
+}
+div#upload_files_list > div.header {
+  padding: 8px 14px;
+  font-weight: 500;
+  font-size: 13px;
+  color: #636e75;
+  border-bottom: 0;
+}
+div#upload_files_list > div span.mdi.mdi-file,
+div#upload_files_list > div span.mdi.mdi-folder {
+  margin: 0 8px 0 0;
+}
+div#upload_files_list > div span.status,
+div#upload_files_list > div span.path {
+  font-size: 11px;
+  display: inline-block;
+  margin: 0 6px;
+  color: rgba(0, 0, 0, 0.53);
+}
+div#upload_files_list > div span.stop-button {
+  cursor: pointer;
+  color: #6b7781;
+  float: right;
+  display: inline-block;
+  margin: 4px 10px;
+}
+div#upload_files_list > div div.uploader-pgbar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background-color: #009688;
+  height: 2px;
+  width: 0;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+div#upload_files_list > div.section-processed,
+div#upload_files_list > div.header {
+  display: none;
+}
+div#upload_files_list > div.upload-error {
+  display: block;
+  color: #d32f2f;
+}
+div#upload_files_list > div.upload-error span.status {
+  color: #d32f2f;
+}
+div#upload_files_list.show-processed > div.section-processed,
+div#upload_files_list.show-processed > div.header {
+  display: block;
 }
 div#upload_files_list span.item_relative_path {
   color: #5f5f5f;
   margin-left: 15px;
   font-size: 0.8em;
-}
-div#upload_files_list img {
-  margin-right: 6px;
 }
 div#upload_files_list img.fakeUploadButton {
   display: none;
@@ -2115,17 +2266,14 @@ div#upload_files_list span.mdi-close:hover {
 }
 div#multiple_download_container div {
   overflow: hidden;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 14px;
-  height: 20px;
+  padding: 16px 14px;
   position: relative;
-  background-image: url('../images//dl_bg.png');
+  background-image: url('../images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.09);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   color: rgba(0, 0, 0, 0.87);
 }
 div#multiple_download_container div rect {
@@ -2193,7 +2341,7 @@ div#multiple_download_container div div a:hover {
   font-weight: 500;
   background-color: #c9fffa;
   color: #00776c;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
   position: absolute;
   text-transform: uppercase;
   white-space: nowrap;
@@ -2255,31 +2403,29 @@ div#multiple_download_container div div a:hover {
 /* SLIDER*/
 /*********************************/
 .slider-pane {
-  background-color: #ebedf0;
-  padding: 5px 2px;
+  background-color: #ffffff;
+  padding: 10px 2px;
   position: absolute;
-  width: 11px;
+  width: 22px;
   z-index: 10000;
   border-radius: 2px;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.75);
 }
-.slider-handle,
-.slider-pane div.selected {
-  background-image: url('../images/slider-handle-vert.png') !important;
-  background-position: top center;
-  background-repeat: no-repeat !important;
-  background-color: transparent !important;
-  height: 15px;
+.slider-pane .slider-tracker {
+  background-color: #009688;
+  width: 2px !important;
+  margin-left: 10px;
+}
+.slider-pane .slider-tracker .slider-handle {
+  background-color: #009688 !important;
+  height: 10px;
   width: 10px;
+  margin-left: -4px;
+  border-radius: 50%;
+  cursor: pointer;
 }
-.slider-tracker {
-  background-image: url("../images/slider-track-bottom.png");
-  background-position: bottom center;
-  background-repeat: no-repeat;
-}
-.slider-tracker-top {
-  background-position: top center;
-  background-repeat: no-repeat;
+.slider-pane .slider-tracker .slider-tracker-top {
+  display: none;
 }
 .action_bar {
   line-height: 15px;
@@ -2634,9 +2780,12 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   cursor: pointer;
 }
 #logging_string {
-  color: #ffffff;
+  color: rgba(255, 255, 255, 0.98);
   float: right;
   margin-top: 12px;
+}
+#logging_string:hover {
+  color: #ffffff;
 }
 #logging_string div.inlineBarButtonLeft {
   display: none;
@@ -2682,17 +2831,17 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   display: inline-block;
   font-size: 13px;
   font-weight: 300;
-  padding: 6px 0 0 8px;
-  color: rgba(255, 255, 255, 0.9);
+  padding: 4px 0 0 8px;
+  color: rgba(255, 255, 255, 0.98);
 }
 #logging_string .user_widget_label.withImage i:hover {
-  color: white;
+  color: #ffffff;
 }
 #logging_string div.user_widget_mini {
   float: right;
   width: 39px;
   height: 39px;
-  margin-top: -14px;
+  margin-top: -12px;
   margin-left: 14px;
   border-radius: 100%;
   background-position: center center;
@@ -2707,15 +2856,22 @@ div.multiple_selection_draggable {
   display: block;
   color: #000;
   background-color: #ffffff;
-  padding: 5px;
-  border: 1px solid #c3d9ff;
+  padding: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
+  border: 0;
   font-size: 12px;
   cursor: default;
   overflow: hidden;
   border-radius: 3px;
+  line-height: 20px;
 }
-div.selection_ctrl_key {
-  background: url('../images/0.gif') no-repeat bottom right;
+div.multiple_selection_draggable.selection_ctrl_key:before {
+  font-family: FontAwesome;
+  content: "\f067";
+  display: block;
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
 }
 #search_container {
   float: right;
@@ -2741,7 +2897,7 @@ div.selection_ctrl_key {
   text-align: left;
   padding-right: 0;
   font-size: 40px;
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
 }
 #search_container.search_active div#search_form a {
   font-size: 1.6em;
@@ -2807,7 +2963,7 @@ div.selection_ctrl_key {
 #search_container #search_results_cont span.results_string {
   display: none;
 }
-#search_container #search_results_cont div#search_show_all {
+#search_container #search_results_cont div.results-parser-filter {
   text-align: center;
   font-size: 12px;
   color: #747474;
@@ -2815,7 +2971,7 @@ div.selection_ctrl_key {
   display: inline-block;
   margin-left: 10px;
 }
-#search_container #search_results_cont div#search_show_all a {
+#search_container #search_results_cont div.results-parser-filter a {
   text-decoration: underline;
   color: #393939;
   cursor: pointer;
@@ -2933,7 +3089,7 @@ div.selection_ctrl_key {
   border-bottom: none;
   background-color: white;
   height: 102px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
 }
 #search_container #search_results_cont #search_results div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
   /*opacity: 1;*/
@@ -3167,9 +3323,6 @@ div.selection_ctrl_key {
 }
 .hsplitbar {
   height: 4px;
-  background-image: url('../images/hgrabber.gif');
-  background-repeat: no-repeat;
-  background-position: center;
   z-index: 1014;
 }
 .hsplitbar.active {
@@ -3559,7 +3712,8 @@ span.first-bread em {
   }
 }
 .rotating,
-.icon-spinner {
+.icon-spinner,
+.mdi.mdi-radar {
   -webkit-transform-origin: 50% 50%;
   -webkit-animation-name: rotate;
   -webkit-animation-duration: 1.0s;
@@ -3583,6 +3737,10 @@ span.first-bread em {
 }
 .icon-spinner {
   display: block !important;
+  text-align: center;
+}
+.mdi.mdi-radar {
+  display: inline-block;
   text-align: center;
 }
 .icon-spinner.spinner_large {
@@ -3723,6 +3881,981 @@ span.first-bread em {
 }
 .no-csstransitions #AjxpConnexion-loader img {
   height: 6px;
+}
+.radial-progress {
+  display: inline-block;
+}
+.radial-progress *,
+.radial-progress *:before,
+.radial-progress *:after {
+  box-sizing: border-box;
+}
+.radial-progress .charts-container:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+.radial-progress .pie-wrapper {
+  height: 16px;
+  width: 16px;
+  float: left;
+  margin: 13px 8px 0 0;
+  position: relative;
+}
+.radial-progress .pie-wrapper:nth-child(3n+1) {
+  clear: both;
+}
+.radial-progress .pie-wrapper .pie {
+  height: 100%;
+  width: 100%;
+  clip: rect(0, 16px, 16px, 8px);
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+.radial-progress .pie-wrapper .pie .half-circle {
+  height: 100%;
+  width: 100%;
+  border: 1.6px solid #3498db;
+  border-radius: 50%;
+  clip: rect(0, 8px, 16px, 0);
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+.radial-progress .pie-wrapper .label {
+  background: #ffffff;
+  border-radius: 50%;
+  bottom: 6.4px;
+  color: #ecf0f1;
+  cursor: default;
+  display: block;
+  font-size: 4px;
+  left: 6.4px;
+  line-height: 41.6px;
+  position: absolute;
+  right: 6.4px;
+  text-align: center;
+  top: 6.4px;
+}
+.radial-progress .pie-wrapper .label .smaller {
+  color: #bdc3c7;
+  font-size: .45em;
+  padding-bottom: 20px;
+  vertical-align: super;
+}
+.radial-progress .pie-wrapper .shadow {
+  height: 100%;
+  width: 100%;
+  border: 1.6px solid #bdc3c7;
+  border-radius: 50%;
+}
+.radial-progress .pie-wrapper.style-2 .label {
+  background: none;
+  color: #7f8c8d;
+}
+.radial-progress .pie-wrapper.style-2 .label .smaller {
+  color: #bdc3c7;
+}
+.radial-progress .pie-wrapper.progress-30 .pie .right-side {
+  display: none;
+}
+.radial-progress .pie-wrapper.progress-30 .pie .half-circle {
+  border-color: #3498db;
+}
+.radial-progress .pie-wrapper.progress-30 .pie .left-side {
+  -webkit-transform: rotate(108deg);
+          transform: rotate(108deg);
+}
+.radial-progress .pie-wrapper.progress-60 .pie {
+  clip: rect(auto, auto, auto, auto);
+}
+.radial-progress .pie-wrapper.progress-60 .pie .right-side {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.radial-progress .pie-wrapper.progress-60 .pie .half-circle {
+  border-color: #9b59b6;
+}
+.radial-progress .pie-wrapper.progress-60 .pie .left-side {
+  -webkit-transform: rotate(216deg);
+          transform: rotate(216deg);
+}
+.radial-progress .pie-wrapper.progress-90 .pie {
+  clip: rect(auto, auto, auto, auto);
+}
+.radial-progress .pie-wrapper.progress-90 .pie .right-side {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.radial-progress .pie-wrapper.progress-90 .pie .half-circle {
+  border-color: #e67e22;
+}
+.radial-progress .pie-wrapper.progress-90 .pie .left-side {
+  -webkit-transform: rotate(324deg);
+          transform: rotate(324deg);
+}
+.radial-progress .pie-wrapper.progress-45 .pie .right-side {
+  display: none;
+}
+.radial-progress .pie-wrapper.progress-45 .pie .half-circle {
+  border-color: #1abc9c;
+}
+.radial-progress .pie-wrapper.progress-45 .pie .left-side {
+  -webkit-transform: rotate(162deg);
+          transform: rotate(162deg);
+}
+.radial-progress .pie-wrapper.progress-75 .pie {
+  clip: rect(auto, auto, auto, auto);
+}
+.radial-progress .pie-wrapper.progress-75 .pie .right-side {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.radial-progress .pie-wrapper.progress-75 .pie .half-circle {
+  border-color: #8e44ad;
+}
+.radial-progress .pie-wrapper.progress-75 .pie .left-side {
+  -webkit-transform: rotate(270deg);
+          transform: rotate(270deg);
+}
+.radial-progress .pie-wrapper.progress-95 .pie {
+  clip: rect(auto, auto, auto, auto);
+}
+.radial-progress .pie-wrapper.progress-95 .pie .right-side {
+  -webkit-transform: rotate(180deg);
+          transform: rotate(180deg);
+}
+.radial-progress .pie-wrapper.progress-95 .pie .half-circle {
+  border-color: #e74c3c;
+}
+.radial-progress .pie-wrapper.progress-95 .pie .left-side {
+  -webkit-transform: rotate(342deg);
+          transform: rotate(342deg);
+}
+.radial-progress .pie-wrapper--solid {
+  border-radius: 50%;
+  overflow: hidden;
+}
+.radial-progress .pie-wrapper--solid:before {
+  border-radius: 0 100% 100% 0%;
+  content: '';
+  display: block;
+  height: 100%;
+  margin-left: 50%;
+  -webkit-transform-origin: left;
+          transform-origin: left;
+}
+.radial-progress .pie-wrapper--solid .label {
+  background: transparent;
+}
+.radial-progress .pie-wrapper--solid.progress-100 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-100:before {
+  background: #009688;
+  -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+}
+.radial-progress .pie-wrapper--solid.progress-99 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-99:before {
+  background: #009688;
+  -webkit-transform: rotate(3.6deg);
+          transform: rotate(3.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-98 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-98:before {
+  background: #009688;
+  -webkit-transform: rotate(7.2deg);
+          transform: rotate(7.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-97 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-97:before {
+  background: #009688;
+  -webkit-transform: rotate(10.8deg);
+          transform: rotate(10.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-96 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-96:before {
+  background: #009688;
+  -webkit-transform: rotate(14.4deg);
+          transform: rotate(14.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-95 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-95:before {
+  background: #009688;
+  -webkit-transform: rotate(18deg);
+          transform: rotate(18deg);
+}
+.radial-progress .pie-wrapper--solid.progress-94 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-94:before {
+  background: #009688;
+  -webkit-transform: rotate(21.6deg);
+          transform: rotate(21.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-93 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-93:before {
+  background: #009688;
+  -webkit-transform: rotate(25.2deg);
+          transform: rotate(25.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-92 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-92:before {
+  background: #009688;
+  -webkit-transform: rotate(28.8deg);
+          transform: rotate(28.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-91 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-91:before {
+  background: #009688;
+  -webkit-transform: rotate(32.4deg);
+          transform: rotate(32.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-90 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-90:before {
+  background: #009688;
+  -webkit-transform: rotate(36deg);
+          transform: rotate(36deg);
+}
+.radial-progress .pie-wrapper--solid.progress-89 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-89:before {
+  background: #009688;
+  -webkit-transform: rotate(39.6deg);
+          transform: rotate(39.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-88 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-88:before {
+  background: #009688;
+  -webkit-transform: rotate(43.2deg);
+          transform: rotate(43.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-87 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-87:before {
+  background: #009688;
+  -webkit-transform: rotate(46.8deg);
+          transform: rotate(46.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-86 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-86:before {
+  background: #009688;
+  -webkit-transform: rotate(50.4deg);
+          transform: rotate(50.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-85 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-85:before {
+  background: #009688;
+  -webkit-transform: rotate(54deg);
+          transform: rotate(54deg);
+}
+.radial-progress .pie-wrapper--solid.progress-84 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-84:before {
+  background: #009688;
+  -webkit-transform: rotate(57.6deg);
+          transform: rotate(57.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-83 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-83:before {
+  background: #009688;
+  -webkit-transform: rotate(61.2deg);
+          transform: rotate(61.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-82 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-82:before {
+  background: #009688;
+  -webkit-transform: rotate(64.8deg);
+          transform: rotate(64.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-81 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-81:before {
+  background: #009688;
+  -webkit-transform: rotate(68.4deg);
+          transform: rotate(68.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-80 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-80:before {
+  background: #009688;
+  -webkit-transform: rotate(72deg);
+          transform: rotate(72deg);
+}
+.radial-progress .pie-wrapper--solid.progress-79 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-79:before {
+  background: #009688;
+  -webkit-transform: rotate(75.6deg);
+          transform: rotate(75.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-78 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-78:before {
+  background: #009688;
+  -webkit-transform: rotate(79.2deg);
+          transform: rotate(79.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-77 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-77:before {
+  background: #009688;
+  -webkit-transform: rotate(82.8deg);
+          transform: rotate(82.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-76 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-76:before {
+  background: #009688;
+  -webkit-transform: rotate(86.4deg);
+          transform: rotate(86.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-75 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-75:before {
+  background: #009688;
+  -webkit-transform: rotate(90deg);
+          transform: rotate(90deg);
+}
+.radial-progress .pie-wrapper--solid.progress-74 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-74:before {
+  background: #009688;
+  -webkit-transform: rotate(93.6deg);
+          transform: rotate(93.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-73 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-73:before {
+  background: #009688;
+  -webkit-transform: rotate(97.2deg);
+          transform: rotate(97.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-72 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-72:before {
+  background: #009688;
+  -webkit-transform: rotate(100.8deg);
+          transform: rotate(100.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-71 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-71:before {
+  background: #009688;
+  -webkit-transform: rotate(104.4deg);
+          transform: rotate(104.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-70 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-70:before {
+  background: #009688;
+  -webkit-transform: rotate(108deg);
+          transform: rotate(108deg);
+}
+.radial-progress .pie-wrapper--solid.progress-69 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-69:before {
+  background: #009688;
+  -webkit-transform: rotate(111.6deg);
+          transform: rotate(111.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-68 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-68:before {
+  background: #009688;
+  -webkit-transform: rotate(115.2deg);
+          transform: rotate(115.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-67 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-67:before {
+  background: #009688;
+  -webkit-transform: rotate(118.8deg);
+          transform: rotate(118.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-66 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-66:before {
+  background: #009688;
+  -webkit-transform: rotate(122.4deg);
+          transform: rotate(122.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-65 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-65:before {
+  background: #009688;
+  -webkit-transform: rotate(126deg);
+          transform: rotate(126deg);
+}
+.radial-progress .pie-wrapper--solid.progress-64 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-64:before {
+  background: #009688;
+  -webkit-transform: rotate(129.6deg);
+          transform: rotate(129.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-63 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-63:before {
+  background: #009688;
+  -webkit-transform: rotate(133.2deg);
+          transform: rotate(133.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-62 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-62:before {
+  background: #009688;
+  -webkit-transform: rotate(136.8deg);
+          transform: rotate(136.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-61 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-61:before {
+  background: #009688;
+  -webkit-transform: rotate(140.4deg);
+          transform: rotate(140.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-60 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-60:before {
+  background: #009688;
+  -webkit-transform: rotate(144deg);
+          transform: rotate(144deg);
+}
+.radial-progress .pie-wrapper--solid.progress-59 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-59:before {
+  background: #009688;
+  -webkit-transform: rotate(147.6deg);
+          transform: rotate(147.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-58 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-58:before {
+  background: #009688;
+  -webkit-transform: rotate(151.2deg);
+          transform: rotate(151.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-57 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-57:before {
+  background: #009688;
+  -webkit-transform: rotate(154.8deg);
+          transform: rotate(154.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-56 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-56:before {
+  background: #009688;
+  -webkit-transform: rotate(158.4deg);
+          transform: rotate(158.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-55 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-55:before {
+  background: #009688;
+  -webkit-transform: rotate(162deg);
+          transform: rotate(162deg);
+}
+.radial-progress .pie-wrapper--solid.progress-54 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-54:before {
+  background: #009688;
+  -webkit-transform: rotate(165.6deg);
+          transform: rotate(165.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-53 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-53:before {
+  background: #009688;
+  -webkit-transform: rotate(169.2deg);
+          transform: rotate(169.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-52 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-52:before {
+  background: #009688;
+  -webkit-transform: rotate(172.8deg);
+          transform: rotate(172.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-51 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-51:before {
+  background: #009688;
+  -webkit-transform: rotate(176.4deg);
+          transform: rotate(176.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-50 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-50:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-360deg);
+          transform: rotate(-360deg);
+}
+.radial-progress .pie-wrapper--solid.progress-49 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-49:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-356.4deg);
+          transform: rotate(-356.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-48 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-48:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-352.8deg);
+          transform: rotate(-352.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-47 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-47:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-349.2deg);
+          transform: rotate(-349.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-46 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-46:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-345.6deg);
+          transform: rotate(-345.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-45 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-45:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-342deg);
+          transform: rotate(-342deg);
+}
+.radial-progress .pie-wrapper--solid.progress-44 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-44:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-338.4deg);
+          transform: rotate(-338.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-43 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-43:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-334.8deg);
+          transform: rotate(-334.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-42 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-42:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-331.2deg);
+          transform: rotate(-331.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-41 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-41:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-327.6deg);
+          transform: rotate(-327.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-40 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-40:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-324deg);
+          transform: rotate(-324deg);
+}
+.radial-progress .pie-wrapper--solid.progress-39 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-39:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-320.4deg);
+          transform: rotate(-320.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-38 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-38:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-316.8deg);
+          transform: rotate(-316.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-37 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-37:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-313.2deg);
+          transform: rotate(-313.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-36 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-36:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-309.6deg);
+          transform: rotate(-309.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-35 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-35:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-306deg);
+          transform: rotate(-306deg);
+}
+.radial-progress .pie-wrapper--solid.progress-34 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-34:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-302.4deg);
+          transform: rotate(-302.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-33 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-33:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-298.8deg);
+          transform: rotate(-298.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-32 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-32:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-295.2deg);
+          transform: rotate(-295.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-31 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-31:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-291.6deg);
+          transform: rotate(-291.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-30 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-30:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-288deg);
+          transform: rotate(-288deg);
+}
+.radial-progress .pie-wrapper--solid.progress-29 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-29:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-284.4deg);
+          transform: rotate(-284.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-28 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-28:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-280.8deg);
+          transform: rotate(-280.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-27 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-27:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-277.2deg);
+          transform: rotate(-277.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-26 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-26:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-273.6deg);
+          transform: rotate(-273.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-25 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-25:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-270deg);
+          transform: rotate(-270deg);
+}
+.radial-progress .pie-wrapper--solid.progress-24 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-24:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-266.4deg);
+          transform: rotate(-266.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-23 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-23:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-262.8deg);
+          transform: rotate(-262.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-22 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-22:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-259.2deg);
+          transform: rotate(-259.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-21 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-21:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-255.6deg);
+          transform: rotate(-255.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-20 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-20:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-252deg);
+          transform: rotate(-252deg);
+}
+.radial-progress .pie-wrapper--solid.progress-19 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-19:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-248.4deg);
+          transform: rotate(-248.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-18 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-18:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-244.8deg);
+          transform: rotate(-244.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-17 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-17:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-241.2deg);
+          transform: rotate(-241.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-16 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-16:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-237.6deg);
+          transform: rotate(-237.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-15 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-15:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-234deg);
+          transform: rotate(-234deg);
+}
+.radial-progress .pie-wrapper--solid.progress-14 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-14:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-230.4deg);
+          transform: rotate(-230.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-13 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-13:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-226.8deg);
+          transform: rotate(-226.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-12 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-12:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-223.2deg);
+          transform: rotate(-223.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-11 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-11:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-219.6deg);
+          transform: rotate(-219.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-10 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-10:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-216deg);
+          transform: rotate(-216deg);
+}
+.radial-progress .pie-wrapper--solid.progress-9 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-9:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-212.4deg);
+          transform: rotate(-212.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-8 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-8:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-208.8deg);
+          transform: rotate(-208.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-7 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-7:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-205.2deg);
+          transform: rotate(-205.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-6 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-6:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-201.6deg);
+          transform: rotate(-201.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-5 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-5:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-198deg);
+          transform: rotate(-198deg);
+}
+.radial-progress .pie-wrapper--solid.progress-4 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-4:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-194.4deg);
+          transform: rotate(-194.4deg);
+}
+.radial-progress .pie-wrapper--solid.progress-3 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-3:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-190.8deg);
+          transform: rotate(-190.8deg);
+}
+.radial-progress .pie-wrapper--solid.progress-2 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-2:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-187.2deg);
+          transform: rotate(-187.2deg);
+}
+.radial-progress .pie-wrapper--solid.progress-1 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-1:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-183.6deg);
+          transform: rotate(-183.6deg);
+}
+.radial-progress .pie-wrapper--solid.progress-0 {
+  background: linear-gradient(to right, #009688 50%, #ffffff 50%);
+}
+.radial-progress .pie-wrapper--solid.progress-0:before {
+  background: #ffffff;
+  -webkit-transform: rotate(-180deg);
+          transform: rotate(-180deg);
 }
 /************************/
 /* CONTEXT MENU STYLES  */
@@ -3941,6 +5074,24 @@ div.menu.desktop.panelHeaderMenu li.menuTitle {
   padding: 11px 7px;
   text-align: left;
   background-color: #f2f2f2;
+}
+div.menu.desktop.home_upload {
+  background-color: rgba(255, 255, 255, 0.93);
+  width: 300px;
+}
+div.menu.desktop.home_upload li {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+}
+div.menu.desktop.home_upload li a {
+  font-size: 15px;
+}
+div.menu.desktop.home_upload li.menuTitle {
+  display: block;
+  padding: 16px;
+  text-align: left;
+  background-color: #607D8B;
+  color: white;
+  font-weight: 500;
 }
 div.menu.menuDetails a {
   line-height: 17px;
@@ -4190,13 +5341,9 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.folded_icons {
   display: none;
 }
-#info_panel div.class-FetchedResultPane,
-.form-ip_content_info_panel div.class-FetchedResultPane {
-  font-size: 13px;
-}
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed {
-  padding: 0;
+  padding: 0 0 16px;
   cursor: default;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell,
@@ -4205,12 +5352,11 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  font-size: 1.1em;
-  color: #222222;
+  font-size: 15px;
+  color: #666666;
   white-space: normal;
-  line-height: 1.5em;
   padding-top: 0;
-  padding-bottom: 8px;
+  font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
@@ -4218,6 +5364,31 @@ div.menu.rootDirChooser span.rootDirTitle {
   display: block;
   font-size: 0.8em;
   line-height: 15px;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata {
+  display: block;
+  opacity: 0.9;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description {
+  font-size: 12px;
+  opacity: 1 !important;
+  color: #666666 !important;
+  white-space: normal;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard {
+  display: none;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbnail_cell_metadata {
+  opacity: 0.9;
+}
+#info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel,
+.form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel {
+  color: #666666;
+  font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
@@ -4252,7 +5423,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel .infopanel_loading,
 .form-ip_content_info_panel .infopanel_loading {
   opacity: 0;
-  transition: opacity ease 0.2s;
+  transition: opacity ease 0.1s;
 }
 #info_panel .infopanel_loading_finished,
 .form-ip_content_info_panel .infopanel_loading_finished {
@@ -4341,10 +5512,28 @@ div.menu.rootDirChooser span.rootDirTitle {
   position: relative;
   text-align: center;
   border-radius: 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.33);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
 }
-#info_panel .panelContent .info_panel_multiple_tile div.tile_preview img,
-.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview img {
+#info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  height: 60px;
+}
+#info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview {
+  margin: auto;
+}
+#info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview .mimefont,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview .mimefont {
+  color: #607d8b;
+}
+#info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview img,
+.form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview img {
   max-width: 90%;
   max-height: 60px;
 }
@@ -4632,14 +5821,19 @@ div.menu.rootDirChooser span.rootDirTitle {
   font-size: 1.2em;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow: hidden;
+}
+.left-panel .simple-provider .material-list-entry .material-list-text .material-list-line-1 > div {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 .left-panel .simple-provider .material-list-entry .material-list-actions {
-  position: absolute;
-  right: 16px;
-  opacity: 0.5;
+  padding: 0 12px 0 6px;
+  opacity: 0.1;
 }
 .left-panel .simple-provider .material-list-entry .material-list-actions:hover {
   opacity: 1;
@@ -4693,6 +5887,67 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel.hidden {
   left: -255px;
 }
+div.pydio-tasks-panel {
+  position: absolute;
+  width: 356px;
+  height: 60px;
+  bottom: 20px;
+  right: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: white;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  z-index: 20001;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+div.pydio-tasks-panel.invisible {
+  right: -361px;
+}
+div.pydio-tasks-panel div.task {
+  padding: 10px;
+  border-bottom: 1px solid #f2f2f2;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
+}
+div.pydio-tasks-panel div.task .task_texts {
+  -webkit-flex: 5;
+      -ms-flex: 5;
+          flex: 5;
+  max-width: 296px;
+}
+div.pydio-tasks-panel div.task .task_texts div {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+div.pydio-tasks-panel div.task .task_texts div.task_label {
+  font-weight: 500;
+}
+div.pydio-tasks-panel div.task.show-full .task_texts div {
+  text-overflow: inherit;
+  overflow: visible;
+  white-space: normal;
+}
+div.pydio-tasks-panel div.task .task_actions {
+  cursor: pointer;
+}
+div.pydio-tasks-panel div.task .task_actions > span {
+  display: inline-block;
+  margin-top: 15px;
+  margin-left: 10px;
+  color: #009688;
+}
+div.pydio-tasks-panel div.task.task-status-8 {
+  /* error status */
+}
+div.pydio-tasks-panel div.task.task-status-8 .task_texts .status_message,
+div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
+  color: #d32f2f;
+}
 /**********************/
 /* MASTER VARIABLES
 /**********************/
@@ -4718,7 +5973,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 /* tooltips */
 /* tree */
 /* uploaders */
-/* user widget */
+/* user widget && top toolbar actions */
 /* menus */
 /* InfoPanel */
 /* Left PAnel */
@@ -4789,8 +6044,11 @@ div.form-switch_language_form div.dialogContent div.dialogLegend,
 div.form-reset-password div.dialogContent div.dialogLegend,
 div.form-reset-password-ask div.dialogContent div.dialogLegend {
   text-align: center;
-  font-style: italic;
-  color: #ddd;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  padding: 0 40px;
+  line-height: 18px;
 }
 div.form-login_form div.dialogContent #switch_language_form div.dialogLegend,
 div.form-login_form_dynamic div.dialogContent #switch_language_form div.dialogLegend,
@@ -4802,19 +6060,40 @@ div.form-reset-password-ask div.dialogContent #switch_language_form div.dialogLe
   margin-top: 16px;
   margin-bottom: 5px;
 }
-div.form-login_form div.dialogContent a.forgot-password-link,
-div.form-login_form_dynamic div.dialogContent a.forgot-password-link,
-div.form-switch_language_form div.dialogContent a.forgot-password-link,
-div.form-reset-password div.dialogContent a.forgot-password-link,
-div.form-reset-password-ask div.dialogContent a.forgot-password-link {
-  color: white !important;
-  margin-right: 45px;
-  margin-top: 6px;
-  text-decoration: underline;
+div.form-login_form div.dialogContent div.SF_element,
+div.form-login_form_dynamic div.dialogContent div.SF_element,
+div.form-switch_language_form div.dialogContent div.SF_element,
+div.form-reset-password div.dialogContent div.SF_element,
+div.form-reset-password-ask div.dialogContent div.SF_element {
+  padding-left: 20px;
   font-size: 13px;
-  text-align: right;
-  display: block;
-  float: right;
+  color: rgba(255, 255, 255, 0.93);
+}
+div.form-login_form div.dialogContent div.SF_element div.SF_label,
+div.form-login_form_dynamic div.dialogContent div.SF_element div.SF_label,
+div.form-switch_language_form div.dialogContent div.SF_element div.SF_label,
+div.form-reset-password div.dialogContent div.SF_element div.SF_label,
+div.form-reset-password-ask div.dialogContent div.SF_element div.SF_label {
+  padding-left: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+div.form-login_form div.dialogContent div.SF_element span.icon-question-sign,
+div.form-login_form_dynamic div.dialogContent div.SF_element span.icon-question-sign,
+div.form-switch_language_form div.dialogContent div.SF_element span.icon-question-sign,
+div.form-reset-password div.dialogContent div.SF_element span.icon-question-sign,
+div.form-reset-password-ask div.dialogContent div.SF_element span.icon-question-sign {
+  display: inline-block;
+  margin: 0 6px 0 13px;
+}
+div.form-login_form div.dialogContent div.SF_element a.forgot-password-link,
+div.form-login_form_dynamic div.dialogContent div.SF_element a.forgot-password-link,
+div.form-switch_language_form div.dialogContent div.SF_element a.forgot-password-link,
+div.form-reset-password div.dialogContent div.SF_element a.forgot-password-link,
+div.form-reset-password-ask div.dialogContent div.SF_element a.forgot-password-link {
+  color: rgba(255, 255, 255, 0.93) !important;
 }
 div.form-login_form div.dialogContent .captcha_container,
 div.form-login_form_dynamic div.dialogContent .captcha_container,
@@ -4848,21 +6127,6 @@ div.form-switch_language_form div.dialogContent .ajxp_password_auth div.SF_eleme
 div.form-reset-password div.dialogContent .ajxp_password_auth div.SF_element:first-of-type,
 div.form-reset-password-ask div.dialogContent .ajxp_password_auth div.SF_element:first-of-type {
   display: none !important;
-}
-div.form-login_form div.dialogContent div.SF_element,
-div.form-login_form_dynamic div.dialogContent div.SF_element,
-div.form-switch_language_form div.dialogContent div.SF_element,
-div.form-reset-password div.dialogContent div.SF_element,
-div.form-reset-password-ask div.dialogContent div.SF_element {
-  padding-left: 20px;
-}
-div.form-login_form div.dialogContent div.SF_element div.SF_label,
-div.form-login_form_dynamic div.dialogContent div.SF_element div.SF_label,
-div.form-switch_language_form div.dialogContent div.SF_element div.SF_label,
-div.form-reset-password div.dialogContent div.SF_element div.SF_label,
-div.form-reset-password-ask div.dialogContent div.SF_element div.SF_label {
-  padding-left: 4px;
-  text-transform: uppercase;
 }
 div.form-login_form div.dialogContent div.dialogButtons,
 div.form-login_form_dynamic div.dialogContent div.dialogButtons,
@@ -4918,7 +6182,7 @@ div.dialogBox.form-login_form form,
 div.dialogBox.form-login_form_dynamic form {
   margin: 0 40px;
   font-size: 15px;
-  padding-top: 20px;
+  padding-top: 0;
   padding-bottom: 20px;
 }
 div.dialogBox.form-login_form form.no_placeholder div.SF_label,
@@ -4955,7 +6219,7 @@ textarea#myCode {
   border-left-color: #ccc;
 }
 .create_file_alt_link {
-  font-family: "Open Sans Regular", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-family: Roboto, sans-serif;
   font-style: italic;
   cursor: pointer;
 }
@@ -4990,9 +6254,18 @@ div#copymove_form div#treeCopy {
 }
 div#copymove_form > input {
   box-sizing: border-box;
-  width: 100% !important;
+  width: 338px !important;
   background-color: #fff;
   padding: 5px;
+  border: 0 !important;
+  border-bottom: 1px solid #cccccc !important;
+}
+div#copymove_form a#selector_create_folder {
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 6px 2px;
+  border: 0px solid #cccccc;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
 }
 div#external_download > div {
   padding: 10px 24px 52px !important;
@@ -5006,6 +6279,7 @@ div#external_download > div input {
   width: 380px !important;
 }
 div.dialogBox.form-originalUploadForm #modalCloseBtn,
+div.dialogBox.form-upload_main_container #modalCloseBtn,
 div.dialogBox.form-jumploader_form #modalCloseBtn,
 div.dialogBox.form-external_download #modalCloseBtn,
 div.dialogBox.form-smplayer_editor #modalCloseBtn,
@@ -5118,6 +6392,7 @@ div.dialogButtons.inlineEdition input {
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar {
+  position: relative;
   height: 47px;
   padding: 0 15px 0 5px;
   background: #009688 no-repeat 7px 7px;
@@ -5152,10 +6427,14 @@ div.dialogButtons.inlineEdition input {
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a {
   font-size: 13px;
-  padding: 7px 24px;
+  padding: 5px 20px;
   font-weight: 300;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.98);
   display: inline-block;
+}
+#ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a:hover,
+#ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a:hover {
+  color: #ffffff;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_span,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_span,
@@ -5163,7 +6442,7 @@ div.dialogButtons.inlineEdition input {
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a span.ajxp_icon_arrow {
   font-size: 1.0em;
   display: inline-block;
-  padding: 0 4px;
+  padding: 0 8px;
 }
 #ajxp_desktop[class^="ajxp_ws-"] #global_toolbar #top_toolbar a img,
 #ajxp_desktop[class*=" ajxp_ws-"] #global_toolbar #top_toolbar a img {
@@ -5473,15 +6752,27 @@ div.dialogButtons.inlineEdition input {
   height: 20px;
   width: 15px;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  position: relative;
 }
-#repo_chooser:hover {
-  background-color: #353535;
-  color: white;
+#repo_chooser span.badge-icon {
+  display: inline;
+  position: absolute;
+  font-size: 7px;
+  top: 32px;
+  left: 24px;
+  background-color: #222;
+  padding: 2px 2px;
+  border-radius: 7px;
+  color: #fff;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 #repo_chooser.disabled {
   display: none;
 }
-#repo_chooser.open {
+#repo_chooser:hover,
+#repo_chooser:hover span.badge-icon,
+#repo_chooser.open,
+#repo_chooser.open span.badge-icon {
   background-color: #353535;
 }
 #repo_chooser span.icon-sitemap {

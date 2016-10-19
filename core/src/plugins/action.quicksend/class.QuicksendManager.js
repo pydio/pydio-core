@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  */
 Class.create("QuicksendManager", AjxpPane, {
@@ -37,10 +37,8 @@ Class.create("QuicksendManager", AjxpPane, {
             var uploader = uploaders[0];
             if(pydio.getController().getActionByName("trigger_remote_copy")){
                 modal.setCloseAction(function(){
-                    ajaxplorer.fireContextRefresh();
-                    var bgManager = pydio.getController().getBackgroundTasksManager();
-                    bgManager.queueAction("trigger_remote_copy", {}, "Copying files to server");
-                    bgManager.next();
+                    pydio.fireContextRefresh();
+                    PydioApi.getClient().request({get_action:'trigger_remote_copy'});
                 });
             }
             if(uploader.dialogOnOpen){

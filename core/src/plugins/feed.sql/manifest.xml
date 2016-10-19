@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ajxp_plugin id="feed.sql" label="CONF_MESSAGE[Events SQL]" description="CONF_MESSAGE[Use an SQL based storage for persisting all user-space event logs]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd" mixins="dibidriver_consumer">
-    <class_definition classname="AJXP_SqlFeedStore" filename="plugins/feed.sql/class.AJXP_SqlFeedStore.php"/>
+    <class_definition classname="Pydio\Notification\Feed\SqlFeedStore" filename="plugins/feed.sql/SqlFeedStore.php"/>
     <server_settings>
         <param description="CONF_MESSAGE[SQL Connexion Parameters]" label="CONF_MESSAGE[SQL Driver]" name="SQL_DRIVER"
                       type="group_switch:dibi" mandatory="true" default="core"/>

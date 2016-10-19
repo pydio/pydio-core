@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
 "languageLabel" => "English",
@@ -57,7 +57,7 @@ $mess=array(
 "22" => "PHP script",
 "23" => "File",
 "24" => "Parent directory",
-"25" => "Upload one or more files (max. ".ConfService::getConf('UPLOAD_MAX_NUMBER').") in the directory : ",
+"25" => "Upload one or more files (max. ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") in the directory : ",
 "26" => "Create a new directory in : ",
 "27" => "Upload",
 "28" => "Create a new file in : ",
@@ -262,7 +262,7 @@ $mess=array(
 "208" => "You have no read permission on this folder",
 "209" => "Internal server error, please contact Administrator!",
 "210" => "Upload failed",
-"211" => "The file is too big!",
+"211" => "The file is too big! Please contact your administrator or use the desktop sync client.",
 "212" => "No file found on server!",
 "213" => "Error while copying file to current folder",
 "214" => "Browse",
@@ -392,8 +392,8 @@ $mess=array(
 "334" => "more",
 "335" => "Please enter a page number between 1 and ",
 "336" => "Sorry you cannot drop folders, drop only files!",
-"337" => "Auto start upload",
-"338" => "Auto close after upload",
+"337" => "Start uploading automatically",
+"338" => "Close panel after upload is finished",
 "339" => "Existing Files",
 "340" => "Alert",
 "341" => "File Info",
@@ -649,4 +649,8 @@ $mess=array(
 "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
 "550" => "Reject this share",
 "551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 ); 

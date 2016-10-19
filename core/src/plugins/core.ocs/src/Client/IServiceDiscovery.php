@@ -16,16 +16,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\OCS\Client;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 
+/**
+ * Interface IServiceDiscovery
+ * @package Pydio\OCS\Client
+ */
 interface IServiceDiscovery
 {
+    /**
+     * @param $url
+     * @return mixed
+     */
     public static function findEndpointsForURL($url);
 
+    /**
+     * @param $client
+     * @return mixed
+     */
     public static function findEndpointsForClient($client);
 }

@@ -16,10 +16,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Model;
 
+use Pydio\Access\Core\Filter\ContentFilter;
+
+use Pydio\Core\Services\RepositoryService;
 use Sabre\DAV;
 use Sabre\DAV\Exception;
 
@@ -30,6 +33,10 @@ if(!defined('OCS_INVITATION_STATUS_PENDING')){
     define('OCS_INVITATION_STATUS_REJECTED', 4);
 }
 
+/**
+ * Class RemoteShare
+ * @package Pydio\OCS\Model
+ */
 class RemoteShare
 {
     /**
@@ -112,12 +119,15 @@ class RemoteShare
         return $this->id;
     }
 
+    /**
+     * @param $id
+     */
     public function setId($id){
         $this->id = $id;
     }
 
     /**
-     * @return \Repository
+     * @return \Pydio\Access\Core\Model\Repository
      */
     public function buildVirtualRepository(){
         $repositoryId = "ocs_remote_share_".$this->getOcsToken();
@@ -140,19 +150,22 @@ class RemoteShare
 
         $remoteHost = $this->getHost();
         $remoteHost = !empty($remoteHost) ? '@' . $remoteHost : ' [remote]';
-        $repo = \ConfService::createRepositoryFromArray($repositoryId, $data);
+        $repo = RepositoryService::createRepositoryFromArray($repositoryId, $data);
         $repo->setRepositoryType("remote");
         $repo->setAccessStatus($this->getStatus() == OCS_INVITATION_STATUS_ACCEPTED ? "accepted":"");
         $repo->setWriteable(false);
         $repo->setOwnerData(null, $this->getSender().$remoteHost);
         if($this->isDocumentIsLeaf()){
-            $contentFilter = new \ContentFilter(array());
+            $contentFilter = new ContentFilter(array());
             $contentFilter->filters["/".$this->getDocumentName()] = "/"; // . $this->getDocumentName();
             $repo->setContentFilter($contentFilter);
         }
         return $repo;
     }
 
+    /**
+     * @return bool
+     */
     public function pingRemoteDAVPoint(){
 
         $fullPath = rtrim($this->getOcsDavUrl(), "/")."/".$this->getDocumentName();

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <guidriver name="ajxp_ios" label="CONF_MESSAGE[iOS]" description="CONF_MESSAGE[Template for redirecting to iPhone application]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-    <class_definition filename="plugins/gui.ios/class.IOSGuiPlugin.php" classname="IOSGuiPlugin"/>
+    <class_definition filename="plugins/gui.ios/MobileNativeRedirect.php" classname="Pydio\Gui\MobileNativeRedirect"/>
     <server_settings>
         <global_param description="CONF_MESSAGE[iOS Application URL]" label="CONF_MESSAGE[iOS Application]" name="IOS_URL" type="string" default="http://pyd.io/support/stores/ios.php" expose="true"/>
         <global_param description="CONF_MESSAGE[Android Application URL]" label="CONF_MESSAGE[Android App]" name="ANDROID_URL" type="string" default="http://pyd.io/support/stores/android.php" expose="true"/>

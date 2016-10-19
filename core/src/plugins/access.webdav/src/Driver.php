@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  */
 
@@ -24,66 +24,104 @@ namespace Pydio\Access\WebDAV;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
-use AJXP_MetaStreamWrapper;
-use Pydio\Access\Core\Stream\StreamWrapper as AccessStreamWrapper;
-use ConfService;
-use RecycleBinManager;
+require_once(__DIR__ . '/../vendor/autoload.php');
+
+use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Stream\Listener\PathSubscriber;
+use Pydio\Access\Core\Stream\Stream;
+use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
+use Pydio\Access\WebDAV\Listener\WebDAVSubscriber;
+use Pydio\Core\Model\ContextInterface;
 
 /**
- * AJXP_Plugin to access a webdav enabled server
+ * AJXP_Plugin to access a DropBox enabled server
  * @package AjaXplorer_Plugins
  * @subpackage Access
  */
-class Driver extends \fsAccessDriver
+class Driver extends FsAccessDriver
 {
+    const PROTOCOL = "access.webdav";
+    const RESOURCES_PATH = "Resources";
+    const RESOURCES_FILE = "dav.json";
+
+    public $driverType = "webdav";
+
     /**
-    * @var Repository
-    */
-    public $repository;
-    public $driverConf;
-    protected $client;
-    protected $wrapperClassName;
-    protected $urlBase;
-
-    /*
      * Driver Initialization
-     *
+     * @param $repository
+     * @param array $options
      */
-    public function init($repository, $options = array())
+    public function init(ContextInterface $ctx, $options = array())
     {
-        parent::init($repository, $options);
-
-        AJXP_MetaStreamWrapper::appendMetaWrapper("auth.dav", "Pydio\Access\Core\Stream\AuthWrapper", "pydio.dav");
-        AJXP_MetaStreamWrapper::appendMetaWrapper("path.dav", "Pydio\Access\Core\Stream\PathWrapper", "pydio.dav");
+        parent::init($ctx, $options);
     }
 
     /**
      * Repository Initialization
-     *
+     * @param ContextInterface $context
+     * @return bool|void
+     * @internal param ContextInterface $contextInterface
      */
-    public function initRepository()
+    protected function initRepository(ContextInterface $context)
     {
         $this->detectStreamWrapper(true);
 
-        if (is_array($this->pluginConf)) {
-            $this->driverConf = $this->pluginConf;
-        } else {
-            $this->driverConf = array();
-        }
+        $repository = $context->getRepository();
+        $resourcesFile = $repository->getContextOption($context, "API_RESOURCES_FILE", __DIR__ . "/" . self::RESOURCES_PATH . "/" . self::RESOURCES_FILE);
 
-        $client = new Client([
-            'base_url' => $this->repository->getOption("HOST")
+        Stream::addContextOption($context, [
+            "resources"   => $resourcesFile,
+            "subscribers" => [
+                new PathSubscriber(),
+                new WebDAVSubscriber()
+            ]
         ]);
 
-        // Params
-        $recycle = $this->repository->getOption("RECYCLE_BIN");
+        return true;
+    }
 
-        // Config
-        ConfService::setConf("PROBE_REAL_SIZE", false);
-        $this->urlBase = "pydio://".$this->repository->getId();
-        if ($recycle != "") {
-            RecycleBinManager::init($this->urlBase, "/".$recycle);
+    /********************************************************
+     * Static functions used in the JSON service description
+     ******************************************************
+     * @param AJXP_Node $node
+     * @return string
+     */
+    public static function convertPath($node) {
+
+        $ctx = $node->getContext();
+        $repository = $node->getRepository();
+
+        $basePath = ltrim($repository->getContextOption($ctx, "PATH"), "/");
+        $path = $node->getPath();
+
+        $contentFilters = $node->getRepository()->getContentFilter();
+
+        if (isset($contentFilters)) {
+            $contentFilters = $contentFilters->filters;
+
+            foreach ($contentFilters as $key => $value) {
+                if ($value == $path || empty($path)) {
+                    $path = $key;
+                    break;
+                }
+            }
         }
+
+        if (isset($path)) {
+            return "/" . $basePath . $path;
+        }
+
+        return $basePath;
+    }
+
+    /**
+     * @param $date
+     * @return int
+     */
+    public static function convertTime($date) {
+        $date = date_create($date);
+
+        return date_timestamp_get($date);
     }
 
 }

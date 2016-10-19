@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -72,10 +72,9 @@ $mess = array(
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration.",
 "Detected Encoding" => "Detected Encoding",
 "Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8" => "Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8",
-"Detected Server Path" => "Detected Server Path",
+"Detected Server URL" => "Detected Server URL",
 "Make sure this is correct, as it's used to rewrite the htaccess file" => "Make sure this is correct, as it's used to rewrite the htaccess file",
 "Select a language activated by default( users will still be able to switch)" => "Select a language activated by default( users will still be able to switch)",
-"Bootstrap Loader" => "Bootstrap Loader",
-"Core plugin for loading the framework. Do NOT disable this plugin!" => "Core plugin for loading the framework. Do NOT disable this plugin!",
-
+"Enable cache (recommended)" => "Enable cache (recommended)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache."
 );

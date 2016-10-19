@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 /**
@@ -56,8 +56,9 @@
 		var new_row = new Element( 'div' );
 
 		var new_row_button = new Element('a');
-		new_row_button.href= this.downloadUrl + fileName;		
-		new_row_button.insert('<img src="'+ajxpResourcesFolder+'/images/actions/16/download_manager.png" height="16" width="16" align="absmiddle" border="0"> '+(label?label:getBaseName(fileName)));
+		new_row_button.href= this.downloadUrl + fileName;
+        var display = he.escape(label?label:getBaseName(fileName));
+		new_row_button.insert('<span class="mdi mdi-download"></span> '+ display);
 
 		new_row_button.multidownloader = this;
 		

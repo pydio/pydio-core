@@ -1,6 +1,6 @@
 {
   "name": "core.mailer",
-  "version": "6.2.3",
+  "version": "6.5.1",
   "description": "",
   "source_path":"js",
   "main": "index.js",

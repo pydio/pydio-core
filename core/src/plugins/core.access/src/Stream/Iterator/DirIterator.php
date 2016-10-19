@@ -16,11 +16,15 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 
 namespace Pydio\Access\Core\Stream\Iterator;
 
+/**
+ * Class DirIterator
+ * @package Pydio\Access\Core\Stream\Iterator
+ */
 class DirIterator implements \Iterator {
 
     private $position = 0;

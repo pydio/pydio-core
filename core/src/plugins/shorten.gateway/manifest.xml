@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxp_plugin id="shorten.gateway" enabled="false" label="CONF_MESSAGE[File Gateway]" description="CONF_MESSAGE[Shorten links and serve them proxied by Pydio hosted service]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <plugin_author>Charles du Jeu</plugin_author>
+    </plugin_info>
+    <client_settings>
+        <resources>
+            <i18n namespace="gateway_shortener" path="plugins/shorten.gateway/i18n" />
+        </resources>
+    </client_settings>
+    <server_settings>
+        <global_param name="API_KEY" type="string" label="CONF_MESSAGE[Api Key]" description="CONF_MESSAGE[Api Key as provided in your Pydio.com account]"/>
+        <global_param name="API_SECRET" type="password" label="CONF_MESSAGE[Api Secret]" description="CONF_MESSAGE[Api Secret, as provided in your Pydio.com account]"/>
+        <global_param name="GATEWAY_SERVER" type="select" choices="eu.filesend|Filesend.cc - EU Region,us.filesend|Filesend.cc - US Region,eu.yourshare|Yoursha.re - EU Region,us.yourshare|Yoursha.re - US Region" label="CONF_MESSAGE[Gateway Domain and Region]" description="CONF_MESSAGE[Choose on which server you want the link to be proxied. You may choose depending on your region.]"/>
+    </server_settings>
+	<registry_contributions>
+        <hooks>
+            <serverCallback methodName="processShortenHook" hookName="url.shorten"/>
+        </hooks>
+	</registry_contributions>
+	<class_definition filename="plugins/shorten.gateway/FileGateway.php" classname="Pydio\LinkShortener\FileGateway"/>
+    <dependencies>
+        <activePlugin pluginName="action.share"/>
+    </dependencies>
+</ajxp_plugin>

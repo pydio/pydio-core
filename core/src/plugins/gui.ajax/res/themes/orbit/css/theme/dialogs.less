@@ -62,9 +62,18 @@ div#copymove_form{
   }
   > input{
     box-sizing: border-box;
-    width: 100% !important;
+    width: 338px !important;
     background-color: #fff;
     padding: 5px;
+    border:0 !important;
+    border-bottom: 1px solid #cccccc !important;
+  }
+  a#selector_create_folder{
+    cursor: pointer;
+    display: inline-block;
+    padding: 4px 6px 2px;
+    border: 0px solid #cccccc;
+    box-shadow: @reactBoxShadowDepthMini;
   }
 }
 
@@ -83,6 +92,7 @@ div#external_download{
 }
 
 div.dialogBox.form-originalUploadForm,
+div.dialogBox.form-upload_main_container,
 div.dialogBox.form-jumploader_form,
 div.dialogBox.form-external_download,
 div.dialogBox.form-smplayer_editor,

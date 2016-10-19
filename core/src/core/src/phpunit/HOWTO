@@ -1,0 +1,4 @@
+We pass the base.conf.php file as the PHPUnit "bootstrap" file. For example, running a given
+test suite, knowing Pydio is installed at /var/www/pydio :
+
+> phpunit --bootstrap /var/www/pydio/base.conf.php Pydio_Tests_Suite_Atomics

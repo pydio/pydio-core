@@ -16,11 +16,12 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  *
  * This functions are necessary to implement the bridge between Pydio
  * and other CMS's.
  */
+use Pydio\Log\Core\Logger;
 
 /**
  * @package AjaXplorer_Plugins
@@ -47,18 +48,32 @@ function extractResponseCookies($client)
     return $cookies;
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ * @throws \Pydio\Core\Exception\PydioException
+ */
 function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
     $client->setHeadersOnly(true);
     $client->setCookies(array("wordpress_test_cookie"=>"WP+Cookie+check"));
-    $res = $client->post($uri, array(
+    $client->post($uri, array(
         "log" => $login,
         "pwd" => $pass,
         "wp-submit" => "Log In",
         "testcookie" => 1)
     );
+    $err = $client->getError();
+    if(!empty($err)){
+        throw new \Pydio\Core\Exception\PydioException($err);
+    }
     $newCookies = extractResponseCookies($client);
     if (isSet($newCookies["AjaXplorer"])) {
         return $newCookies;
@@ -66,11 +81,20 @@ function wordpress_remote_auth($host, $uri, $login, $pass, $formId = "")
     return "";
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ */
 function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
-    $res = $client->get($uri);
+    $client->get($uri);
     $content = $client->getContent();
     $postData = array(
            "username" => $login,
@@ -78,12 +102,14 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
            "Submit"   => "Log in",
            "remember" => "yes"
        );
-    $xmlDoc = @DOMDocument::loadHTML($content);
+    $xmlDoc = new DOMDocument();
+    $xmlDoc->loadHTML($content);
     if ($xmlDoc === false) {
         $pos1 = strpos($content, "<form ");
         $pos2 = strpos($content, "</form>", $pos1);
-        $content = substr($content, $pos1, $pos2 + "7" - $pos1);
-        $xmlDoc = @DOMDocument::loadHTML($content);
+        $content = substr($content, $pos1, $pos2 + 7 - $pos1);
+        $xmlDoc = new DOMDocument();
+        $xmlDoc->loadHTML($content);
     }
     if ($xmlDoc !== false) {
            $xPath = new DOMXPath($xmlDoc);
@@ -119,13 +145,23 @@ function joomla_remote_auth($host, $uri, $login, $pass, $formId = "")
     return "";
 }
 
+/**
+ * @param $host
+ * @param $uri
+ * @param $login
+ * @param $pass
+ * @param string $formId
+ * @return array|string
+ */
 function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
 {
+    require_once(AJXP_BIN_FOLDER."/lib/HttpClient.php");
     $client = new HttpClient($host);
     $client->setHandleRedirects(false);
-    $res = $client->get($uri);
+    $client->get($uri);
     $content = $client->getContent();
-    $xmlDoc = DOMDocument::loadHTML($content);
+    $xmlDoc = new DOMDocument();
+    $xmlDoc->loadHTML($content);
     $xPath = new DOMXPath($xmlDoc);
     if($formId == "") $formId = "user-login-form";
     $nodes = $xPath->query('//form[@id="'.$formId.'"]');
@@ -135,7 +171,7 @@ function drupal_remote_auth($host, $uri, $login, $pass, $formId = "")
     $form = $nodes->item(0);
     $postUri = $form->getAttribute("action");
     $hiddens = $xPath->query('.//input[@type="hidden"]', $form);
-    AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Carry on Drupal hiddens ". $hiddens->length);
+    Logger::debug(__CLASS__,__FUNCTION__,"Carry on Drupal hiddens ". $hiddens->length);
     $postData = array(
         "name" => $login,
         "pass" => $pass,

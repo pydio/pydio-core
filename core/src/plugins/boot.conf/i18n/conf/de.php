@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 $mess = array(
@@ -25,14 +25,14 @@ $mess = array(
 "Configuration storage" => "<span class='icon-save'></span> Konfigurationsspeicher",
 "Add some users" => "<span class='icon-group'></span> Benutzer hinzufügen",
 "Please set up a login and password for the administrator user. This step is necessary to let you login the first time. You can create more administrators later by going to the 'Settings' workspace." => "Bitte geben Sie Benutzername und Passwort für den Administrator ein. Dieser Schritt ist notwendig um sich anfangs Anzumelden. Sie könenn später über die Einstellungen mehr Benutzer mit Administratorrechten erstellen.",
-"Admin Login" => "Anmeldung als Aministrator",
+"Admin Login" => "Benutzername",
 "Alphanumeric login" => "Benutzernamen bestehen aus alphanumerischen Zeichen",
 "Admin Display Name" => "Angezeigter Name",
 "Name that users will see" => "Namen den die Benutzer sehen",
 "Admin Password" => "Passwort wählen",
-"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Wörterbuch-Wörter etc.).",
+"Use a strong password (more than 8 characters, complicated ones." => "Verwenden Sie ein komplexes Passwort (mehr als 8 Zeichen, keine Begriffe aus dem Wörterbuch, etc.).",
 "Confirm" => "Passwort bestätigen",
-"Confirm password" => "Passwort zur Kontrolle wiederholt eingeben",
+"Confirm password" => "Passwort zur Kontrolle erneut eingeben",
 "Test Mailer" => "E-Mail-Versand testen",
 "Try sending an email with the configured data" => "E-Mail-Versand mit dieser Konfiguration testen",
 "Test SQL Connection" => "SQL-Serververbindung testen",
@@ -72,11 +72,9 @@ $mess = array(
 "Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration." => "Bitte überprüfen Sie diese technischen Parameter. Encoding und der Pfad sollten automatich erkannt werden. Bitte stellen Sie sicher, dass die Werte zur Konfiguration des Servers passen.",
 "Detected Encoding" => "Server-Encoding",
 "Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8" => "Bitte stellen Sie sicher, dass das Encoding zur Serverkonfiguration passt. (Format: ln_LN.CHARSET - z.B. en_US.UTF-8)",
-"Detected Server Path" => "Server-Pfad",
-"Make sure this is correct, as it's used to rewrite the htaccess file" => " Stellen Sie sicher, dass dieser Pfad korrekt ist. Er wird zum generieren der htaccess-Datei verwendet.",
-"Select a language activated by default( users will still be able to switch)" => "Wählen Sie die standardmäßig aktivierte Sprache aus. Die Benutzer können die Sprache trotzdem ändern.",
-"Configurations storage" => "Configurations storage",
-"Select how the configurations will be stored" => "Select how the configurations will be stored",
-"Bootstrap Loader" => "Bootstrap Loader",
-"Core plugin for loading the framework. Do NOT disable this plugin!" => "Core plugin for loading the framework. Do NOT disable this plugin!",
+"Detected Server URL" => "Server-URL",
+"Make sure this is correct, as it's used to rewrite the htaccess file" => "Bitte stellen Sie sicher, dass die URL zu Ihrer Pydio-Installation korrekt ist.",
+"Select a language activated by default( users will still be able to switch)" => "Wählen Sie die Standard-Sprache der Installation aus. Alle Benutzer können ihre Sprache im Benutzerprofil ändern.",
+"Enable cache (recommended)" => "Cache aktivieren (empfohlen)",
+"Use key/value store to cache server data in-memory. If APC/APCu is detected, it will be enabled by default, you can change this setting later to use a dedicated server like Redis or Memcache." => "Server-Daten werden im Arbeitsspeicher zwischengespeichert. Diese Einstellung wird mit APC/APCu standardmäßig aktiviert. Es ist später möglich auf einen externen Server, wie z.B. Redis oder Memcache zu wechseln."
 );

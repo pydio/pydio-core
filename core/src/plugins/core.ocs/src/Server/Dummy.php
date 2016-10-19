@@ -16,15 +16,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
  *
- * The latest code can be found at <http://pyd.io/>.
+ * The latest code can be found at <https://pydio.com>.
  */
 namespace Pydio\OCS\Server;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
+/**
+ * Dummy Server for not active Federated Sharing
+ * @package Pydio\OCS\Server
+ */
 class Dummy
 {
-
+    /**
+     * Dummy constructor.
+     */
     public function __construct()
     {
         set_exception_handler(array($this, "handleException"));

@@ -50,7 +50,7 @@
         },
 
         bufferChanges:function(newValue, oldValue){
-            this.props.onChange(newValue, oldValue);
+            this.triggerPropsOnChange(newValue, oldValue);
         },
 
         onChange:function(event, value){
@@ -60,16 +60,29 @@
             }
             var newValue = value, oldValue = this.state.value;
             if(this.props.skipBufferChanges){
-                this.props.onChange(newValue, oldValue);
+                this.triggerPropsOnChange(newValue, oldValue);
             }
             this.setState({
                 dirty:true,
                 value:newValue
             });
             if(!this.props.skipBufferChanges) {
+                let timerLength = 250;
+                if(this.props.attributes['type'] === 'password'){
+                    timerLength = 1200;
+                }
                 this.changeTimeout = global.setTimeout(function () {
                     this.bufferChanges(newValue, oldValue);
-                }.bind(this), 250);
+                }.bind(this), timerLength);
+            }
+        },
+
+        triggerPropsOnChange:function(newValue, oldValue){
+            if(this.props.attributes['type'] === 'password'){
+                this.toggleEditMode();
+                this.props.onChange(newValue, oldValue, {type:this.props.attributes['type']});
+            }else{
+                this.props.onChange(newValue, oldValue);
             }
         },
 
@@ -143,12 +156,9 @@
                     this.setState({choices:newOutput});
                 }.bind(this));
             }else if(choices == "AJXP_AVAILABLE_LANGUAGES"){
-                var object = global.pydio.Parameters.get("availableLanguages");
-                for(var key in object){
-                    if(object.hasOwnProperty(key)){
-                        output.set(key, object[key]);
-                    }
-                }
+                global.pydio.listLanguagesWithCallback(function(key, label){
+                    output.set(key, label);
+                });
             }else if(choices == "AJXP_AVAILABLE_REPOSITORIES"){
                 if(global.pydio.user){
                     global.pydio.user.repositories.forEach(function(repository){
@@ -197,23 +207,35 @@
 
         render:function(){
             if(this.isDisplayGrid() && !this.state.editMode){
-                var value = this.state.value;
+                let value = this.state.value;
+                if(this.props.attributes['type'] === 'password' && value){
+                    value = '***********';
+                }else{
+                    value = this.state.value;
+                }
                 return <div onClick={this.props.disabled?function(){}:this.toggleEditMode} className={value?'':'paramValue-empty'}>{!value?'Empty':value}</div>;
             }else{
-                return(
-                    <span>
-                        <ReactMUI.TextField
-                            floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
-                            value={this.state.value}
-                            onChange={this.onChange}
-                            onKeyDown={this.enterToToggle}
-                            type={this.props.attributes['type'] == 'password'?'password':null}
-                            multiLine={this.props.attributes['type'] == 'textarea'}
-                            disabled={this.props.disabled}
-                            errorText={this.props.errorText}
-                        />
-                    </span>
+                let field = (
+                    <ReactMUI.TextField
+                        floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                        value={this.state.value}
+                        onChange={this.onChange}
+                        onKeyDown={this.enterToToggle}
+                        type={this.props.attributes['type'] == 'password'?'password':null}
+                        multiLine={this.props.attributes['type'] == 'textarea'}
+                        disabled={this.props.disabled}
+                        errorText={this.props.errorText}
+                    />
                 );
+                if(this.props.attributes['type'] === 'password'){
+                    return (
+                        <form autoComplete="off" style={{display:'inline'}}>{field}</form>
+                    );
+                }else{
+                    return(
+                        <span>{field}</span>
+                    );
+                }
             }
         }
 
@@ -344,6 +366,79 @@
                         labelPosition={this.isDisplayForm()?'left':'right'}
                     />
                 </span>
+            );
+        }
+
+    });
+
+    var AutocompleteBox = React.createClass({
+
+        mixins:[FormMixin],
+
+        onSuggestionSelected: function(value, event){
+            this.onChange(event, value);
+        },
+
+        getInitialState:function(){
+            return {loading : 0};
+        },
+
+        suggestionLoader:function(input, callback) {
+
+            this.setState({loading:true});
+            let values = {};
+            if(this.state.choices){
+                this.state.choices.forEach(function(v){
+                    if(v.indexOf(input) === 0){
+                        values[v] = v;
+                    }
+                });
+            }
+            callback(null, LangUtils.objectValues(values));
+            this.setState({loading:false});
+
+        },
+
+        getSuggestions(input, callback){
+            bufferCallback('suggestion-loader-search', 350, function(){
+                this.suggestionLoader(input, callback);
+            }.bind(this));
+        },
+
+        suggestionValue: function(suggestion){
+            return '';
+        },
+
+        renderSuggestion(value){
+            return <span>{value}</span>;
+        },
+
+        render: function(){
+
+            const inputAttributes = {
+                id: 'pydioform-autosuggest',
+                name: 'pydioform-autosuggest',
+                className: 'react-autosuggest__input',
+                placeholder: this.props.attributes['label'],
+                /*onBlur: event => pydio.UI.enableAllKeyBindings(),*/
+                onFocus: event => pydio.UI.disableAllKeyBindings(),
+                value: this.state.value   // Initial value
+            };
+            return (
+                <div className="pydioform_autocomplete">
+                    <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
+                    <ReactAutoSuggest
+                        ref="autosuggest"
+                        cache={true}
+                        showWhen = {input => true }
+                        inputAttributes={inputAttributes}
+                        suggestions={this.getSuggestions}
+                        suggestionRenderer={this.renderSuggestion}
+                        suggestionValue={this.suggestionValue}
+                        onSuggestionSelected={this.onSuggestionSelected}
+                    />
+                </div>
+
             );
         }
 
@@ -829,6 +924,17 @@
             this.refs.fileInput.getDOMNode().click();
         },
 
+        onFolderPicked: function(e){
+            if(this.props.onFolderPicked){
+                this.props.onFolderPicked(e.target.files);
+            }
+        },
+
+        openFolderPicker: function(){
+            this.refs.folderInput.getDOMNode().setAttribute("webkitdirectory", "true");
+            this.refs.folderInput.getDOMNode().click();
+        },
+
         render: function() {
 
             var className = this.props.className || 'dropzone';
@@ -844,10 +950,13 @@
             if(this.props.style){
                 style = LangUtils.objectMerge(this.props.style, style);
             }
-
+            if(this.props.enableFolders){
+                var folderInput = <input style={{display:'none'}} name="userfolder" type="file" ref="folderInput" onChange={this.onFolderPicked}/>;
+            }
             return (
                 <div className={className} style={style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
                     <input style={{display:'none'}} name="userfile" type="file" multiple={this.props.multiple} ref="fileInput" onChange={this.onDrop} accept={this.props.accept}/>
+                    {folderInput}
                 {this.props.children}
                 </div>
             );
@@ -1212,6 +1321,7 @@
                 return (
                     <PydioFormPanel
                         {...this.props}
+                        tabs={null}
                         key={index}
                         values={subValues}
                         onChange={null}
@@ -1277,6 +1387,7 @@
                 bottom:React.PropTypes.array
             }),
             tabs:React.PropTypes.array,
+            onTabChange:React.PropTypes.func,
             accordionizeIfGroupsMoreThan:React.PropTypes.number,
             onScrollCallback:React.PropTypes.func,
 
@@ -1285,6 +1396,16 @@
             checkHasHelper:React.PropTypes.func,
             helperTestFor:React.PropTypes.string
 
+        },
+
+        externallySelectTab:function(index){
+            try{
+                let t = this.refs.tabs;
+                let c = this.refs.tabs.props.children[index];
+                t.handleTouchTap(index, c);
+            }catch(e){
+                if(global.console) global.console.log(e);
+            }
         },
 
         getDefaultProps:function(){
@@ -1470,13 +1591,16 @@
                         }
                         var mandatoryMissing = false;
                         var classLegend = "form-legend";
-                        if( attributes['mandatory'] && (attributes['mandatory'] === "true" || attributes['mandatory'] === true) ){
+                        if(attributes['errorText']) {
+                            classLegend = "form-legend mandatory-missing";
+                        }else if(attributes['warningText']){
+                            classLegend = "form-legend warning-message";
+                        }else if( attributes['mandatory'] && (attributes['mandatory'] === "true" || attributes['mandatory'] === true) ){
                             if(['string', 'textarea', 'image', 'integer'].indexOf(attributes['type']) !== -1 && !values[paramName]){
                                 mandatoryMissing = true;
                                 classLegend = "form-legend mandatory-missing";
                             }
                         }
-
 
                         var props = {
                             ref:"formElement",
@@ -1491,13 +1615,13 @@
                             binary_context:this.props.binary_context,
                             displayContext:'form',
                             applyButtonAction:this.applyButtonAction,
-                            errorText:mandatoryMissing?'Field cannot be empty':null
+                            errorText:mandatoryMissing?'Field cannot be empty':(attributes.errorText?attributes.errorText:null)
                         };
 
                         field = (
                             <div key={paramName} className={'form-entry-' + attributes['type']}>
                                 {PydioForm.createFormElement(props)}
-                                <div className={classLegend}>{attributes['description']} {helperMark}</div>
+                                <div className={classLegend}>{attributes['warningText'] ? attributes['warningText'] : attributes['description']} {helperMark}</div>
                             </div>
                         );
                     }else{
@@ -1596,9 +1720,14 @@
 
             if(this.props.tabs){
                 var className = this.props.className;
+                let initialSelectedIndex = 0;
+                let i = 0;
                 var tabs = this.props.tabs.map(function(tDef){
                     var label = tDef['label'];
                     var groups = tDef['groups'];
+                    if(tDef['selected']){
+                        initialSelectedIndex = i;
+                    }
                     var panes = groups.map(function(gId){
                         if(groupPanes[gId]){
                             return groupPanes[gId];
@@ -1606,6 +1735,7 @@
                             return null;
                         }
                     });
+                    i++;
                     return(
                         <ReactMUI.Tab label={label} key={label}>
                             <div className={(className?className+' ':' ') + 'pydio-form-panel' + (panes.length % 2 ? ' form-panel-odd':'')}>
@@ -1613,10 +1743,10 @@
                             </div>
                         </ReactMUI.Tab>
                     );
-                });
+                }.bind(this));
                 return (
                     <div className="layout-fill vertical-layout tab-vertical-layout">
-                        <ReactMUI.Tabs>
+                        <ReactMUI.Tabs ref="tabs" initialSelectedIndex={initialSelectedIndex} onChange={this.props.onTabChange}>
                             {tabs}
                         </ReactMUI.Tabs>
                     </div>
@@ -1728,6 +1858,9 @@
                     break;
                 case 'select':
                     value = <InputSelectBox {...props}/>;
+                    break;
+                case 'autocomplete':
+                    value = <AutocompleteBox {...props}/>;
                     break;
                 case 'legend':
                     value = null;
@@ -1892,10 +2025,12 @@
     PydioForm.InputButton = InputButton;
     PydioForm.MonitoringLabel = MonitoringLabel;
     PydioForm.InputSelectBox = InputSelectBox;
+    PydioForm.AutocompleteBox = AutocompleteBox;
     PydioForm.InputImage = InputImage;
     PydioForm.FormPanel = PydioFormPanel;
     PydioForm.PydioHelper = PydioFormHelper;
     PydioForm.HelperMixin = HelperMixin;
+    PydioForm.FileDropZone = FileDropzone;
 
     global.PydioForm = PydioForm;
 

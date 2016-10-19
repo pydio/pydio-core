@@ -18,6 +18,12 @@ div#react_share_form .mui-checkbox .mui-checkbox-icon {
 div#react_share_form div.headerPanel {
   background-color: #4aceb0 !important;
 }
+div#react_share_form div.headerPanel > div {
+  color: white;
+  font-size: 24px;
+  padding: 20px 16px 14px;
+  word-break: 'break-all';
+}
 div#react_share_form .mui-tabs-container .mui-tab-item-container {
   background-color: #4aceb0 !important;
 }
@@ -284,10 +290,8 @@ div#react_share_form div.user-badge .user-badge-label {
   -webkit-flex: 5;
       -ms-flex: 5;
           flex: 5;
-  padding: 13px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  padding: 9px 0;
+  line-height: 25px;
 }
 div#react_share_form div.user-badge:last-of-type {
   border-bottom: 0;
@@ -424,7 +428,8 @@ div#ajxp_shared_info_panel .copy-button {
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.87);
   padding: 7px;
-  font-size: 14px;
+  font-size: 13px;
+  height: 12px;
   border-radius: 0 2px 2px 0;
 }
 div#ajxp_shared_info_panel .copy-message {

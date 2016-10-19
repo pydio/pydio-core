@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2008
 //	spanish translation: Mikel Pascual Aldabaldetreku <mikel.paskual@gmail.com>, 2009
@@ -55,7 +55,7 @@ $mess=array(
 "22" => "Script PHP",
 "23" => "Archivo",
 "24" => "Carpeta superior",
-"25" => "Subir uno más archivos (max ".ConfService::getConf('UPLOAD_MAX_NUMBER').") a la carpeta: ",
+"25" => "Subir uno más archivos (max ". \Pydio\Core\Services\ConfService::getConf('UPLOAD_MAX_NUMBER').") a la carpeta: ",
 "26" => "Crear nueva carpeta en: ",
 "27" => "Subir",
 "28" => "Crear nuevo archivo en: ",
@@ -654,4 +654,8 @@ $mess=array(
 "549" => "You have previously accepted this item that was shared with you by %%OWNER%% from a remote location. Do you want to reject it now?",
 "550" => "Reject this share",
 "551" => "Reject",
+"552" => "Please provide password.",
+"553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
+"554" => "%s result(s) in Recycle Bin",
+"556" => "Launching task %s in background",
 );

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.comments" label="CONF_MESSAGE[Comments Feed]" description="CONF_MESSAGE[Display a chat-like feed on all nodes]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<class_definition filename="plugins/meta.comments/class.CommentsMetaManager.php" classname="CommentsMetaManager"/>
+	<class_definition filename="plugins/meta.comments/CommentsMetaManager.php" classname="Pydio\Access\Meta\UserGenerated\CommentsMetaManager"/>
 	<client_settings>
 		<resources>
 			<i18n namespace="meta.comments" path="plugins/meta.comments/i18n" />
@@ -66,6 +66,6 @@
 	</registry_contributions>
 	<dependencies>
 		<!-- Wrapper type plugins only -->
-		<pluginClass pluginName="access.fs|access.ftp|access.demo|access.remote_fs"/>
+		<pluginClass pluginName="access.fs|access.ftp|access.demo"/>
 	</dependencies>
 </meta>

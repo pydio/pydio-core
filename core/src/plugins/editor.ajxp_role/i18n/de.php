@@ -16,7 +16,7 @@
 * You should have received a copy of the GNU Affero General Public License
 * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
 *
-* The latest code can be found at <http://pyd.io/>.
+* The latest code can be found at <https://pydio.com>.
 */
 
 /*******************************************************************************
@@ -58,6 +58,7 @@ $mess=array(
 "26" => "Benutzer sperren",
 "27" => "Benutzer aktivieren",
 "28" => "Passwort&auml;nderung erzwingen",
+"28b"=> "Passwortänderung abbrechen",
 "29" => "Geben Sie ein neues Passwort f&uuml;r den Benutzer ein",
 "30" => "Wiederholen",
 "31" => "Rollen-ID",
