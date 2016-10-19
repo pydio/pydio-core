@@ -24,6 +24,9 @@ namespace Pydio\Conf\Boot;
 use dibi;
 use DOMXPath;
 use Exception;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Zend\Diactoros\Response\JsonResponse;
 use Pydio\Access\Core\Model\Repository;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\Context;
@@ -180,7 +183,7 @@ class BootConfLoader extends AbstractConfDriver
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      */
-    public function loadInstallerForm(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
+    public function loadInstallerForm(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $httpVars = $requestInterface->getParsedBody();
         if (isSet($httpVars["lang"])) {
@@ -195,14 +198,16 @@ class BootConfLoader extends AbstractConfDriver
 
     /**
      * Transmit to the ajxp_conf load_plugin_manifest action
-     * @param $action
-     * @param $httpVars
-     * @param $fileVars
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      */
-    public function applyInstallerForm($action, $httpVars, $fileVars, ContextInterface $ctx)
+    public function applyInstallerForm(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $data = array();
-        OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "");
+        OptionsHelper::parseStandardFormParameters(
+            $requestInterface->getAttribute("ctx"),
+            $requestInterface->getParsedBody(),
+            $data, "");
 
         list($newConfigPlugin, $newAuthPlugin, $newCachePlugin) = $this->createBootstrapConf($data);
 
@@ -214,7 +219,7 @@ class BootConfLoader extends AbstractConfDriver
         $this->setAdditionalData($data);
         $htContent = null;
         $htAccessToUpdate = $this->updateHtAccess($data, $htContent);
-        $this->sendInstallResult($htAccessToUpdate, $htContent);
+        $this->sendInstallResult($htAccessToUpdate, $htContent, $responseInterface);
 
     }
 
@@ -222,19 +227,18 @@ class BootConfLoader extends AbstractConfDriver
      * Send output to the user.
      * @param String $htAccessToUpdate file path
      * @param String $htContent file content
+     * @param ResponseInterface $responseInterface
      */
-    public function sendInstallResult($htAccessToUpdate, $htContent)
+    public function sendInstallResult($htAccessToUpdate, $htContent, ResponseInterface &$responseInterface)
     {
         ConfService::clearAllCaches();
         ApplicationState::setApplicationFirstRunPassed();
 
         if ($htAccessToUpdate != null) {
-            HTMLWriter::charsetHeader("application/json");
-            echo json_encode(array('file' => $htAccessToUpdate, 'content' => $htContent));
+            $responseInterface = new JsonResponse(['file' => $htAccessToUpdate, 'content' => $htContent]);
         } else {
             session_destroy();
-            HTMLWriter::charsetHeader("text/plain");
-            echo 'OK';
+            $responseInterface->getBody()->write("OK");
         }
 
     }
