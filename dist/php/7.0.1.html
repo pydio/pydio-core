@@ -6,7 +6,7 @@
     <div style="border:1px solid red; padding: 5px; color: red;border-radius: 3px;">Please Note: you are now disconnected and all requests in page are blocked. Review the release note before reloading the page entirely.</div>
     <p>
         Pydio 7 is a full overhaul of the PHP code, raising the standards, improving performances and making the platform more modular than ever. We also introduce a new separate tool called <b>Pydio Booster</b>, written in Go, removing php limits and easing the deployment of WebSockets.<br/>
-        <i>Pydio 7.0.1 fixes some small but critical issues that could break upgrade in 7.0.</i>
+        <i>Pydio 7.0.1 fixes some small but critical issues that could break upgrade in 7.0, see changelog below.</i>
     </p>
 
     <h2>New Features</h2>
@@ -52,6 +52,17 @@
 
 
     <h2 style="color: darkgrey;">Full Changelog</h2>
+    <h3  style="color: darkgrey;">7.0.1</h3>
+    <ul style="color: darkgrey;">
+        <li>Fix installer form if "output_buffering" is not disabled (<a href="http://github.com/pydio/pydio-core/commit/bdf5bdc1c89e142b18d3201997b7f1f0ae053173">details</a>)</li>
+        <li>Remove check for aws.phar file in the access.s3 directory. Fix #1257 (<a href="http://github.com/pydio/pydio-core/commit/98b350f98dfa3ce06ed9d4f60e959c26f0dcc5bc">details</a>)</li>
+        <li>Another "incompatible declaration" error was silently breaking s3 on PHP7. (<a href="http://github.com/pydio/pydio-core/commit/b1d4c369a921275b986cd8331c0e569f01421191">details</a>)</li>
+        <li>Unused resource (<a href="http://github.com/pydio/pydio-core/commit/a6cb1844c8babbff197c75a83e3c68ff795793b1">details</a>)</li>
+        <li>php 5.5.9 issue, count(false) returns true, making RolesList empty. (<a href="http://github.com/pydio/pydio-core/commit/0a7e49096d273edb273749b26a26b11e6ed8cf9e">details</a>)</li>
+        <li>Check php version: 5.6 is finally required for enterprise dist, because of ioncube loaders. (<a href="http://github.com/pydio/pydio-core/commit/a0274d8c4960a16383b3b51a1a82878ca5b7155b">details</a>)</li>
+        <li>Fix case sensitive rename (<a href="http://github.com/pydio/pydio-core/commit/a66a1bb58841d71eb3c34076311d5f7c5e3fe3ed">details</a>)</li>
+    </ul>
+    <h3  style="color: darkgrey;">7.0.0</h3>
     <ul style="color: darkgrey;">
         <li>Fix typo in index.elasticsearch/plugin_doc.html (<a href="http://github.com/pydio/pydio-core/commit/4801fd176cf47a4e3fa62ceab647832ee6df4884">details</a>)</li>
         <li>Update Release number (<a href="http://github.com/pydio/pydio-core/commit/5c0dd435c1064f2ea2f5d3c8f82f265eb247a0a4">details</a>)</li>
