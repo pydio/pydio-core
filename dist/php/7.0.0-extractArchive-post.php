@@ -53,7 +53,7 @@ function checkPluginUsed($type, $name){
             if ($p->getName() === "multi") {
                 $drivers = $p->drivers;
                 if (isSet($drivers[$name])) {
-                    throw new Exception("You are currently using $type.$name for authentication backend. This was deprecated in Pydio 6 and is nowremoved in Pydio7. Aborting upgrade");
+                    throw new Exception("You are currently using $type.$name for authentication backend. This was deprecated in Pydio 6 and is now removed in Pydio7. Aborting upgrade");
                 } else {
                     echo "<div class='upgrade_result success'>- Checking plugin $type (" . implode(", ", array_keys($drivers)) . ") : OK</div>";
                 }
@@ -106,7 +106,11 @@ function blockAllXHRInPage(){
 }
 
 blockAllXHRInPage();
-checkPhpVersion('5.5.9');
+if(defined('AJXP_PACKAGE_NAME') && AJXP_PACKAGE_NAME === 'pydio-enterprise'){
+    checkPhpVersion('5.6.0');
+}else{
+    checkPhpVersion('5.5.9');
+}
 if(AJXP_VERSION === '6.4.2'){
     checkPluginUsed("conf", "serial");
     checkPluginUsed("auth", "serial");
