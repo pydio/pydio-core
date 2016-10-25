@@ -106,11 +106,7 @@ function blockAllXHRInPage(){
 }
 
 blockAllXHRInPage();
-if(defined('AJXP_PACKAGE_NAME') && AJXP_PACKAGE_NAME === 'pydio-enterprise'){
-    checkPhpVersion('5.6.0');
-}else{
-    checkPhpVersion('5.5.9');
-}
+checkPhpVersion('5.5.9');
 if(AJXP_VERSION === '6.4.2'){
     checkPluginUsed("conf", "serial");
     checkPluginUsed("auth", "serial");
