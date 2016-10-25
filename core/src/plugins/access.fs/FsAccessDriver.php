@@ -29,6 +29,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\AbstractAccessDriver;
+use Pydio\Access\Core\Exception\FileNotFoundException;
 use Pydio\Access\Core\Exception\FileNotWriteableException;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
@@ -2079,6 +2080,10 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             throw new PydioException("$mess[37]");
         }
 
+        if( !file_exists($originalNode->getUrl())){
+            throw new FileNotFoundException($originalNode->getPath());
+        }
+
         if (!$this->isWriteable($originalNode)) {
             throw new PydioException($mess[34]." ".$originalNode->getLabel()." ".$mess[99]);
         }
@@ -2088,7 +2093,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         } else {
             $newNode = $dest;
         }
-        if (file_exists($newNode->getUrl())) {
+
+        $caseChange = ($newNode->getPath() !== $originalNode->getPath() && strtolower($newNode->getPath()) === strtolower($originalNode->getPath()));
+        if (!$caseChange && file_exists($newNode->getUrl())) {
             throw new PydioException($newNode->getPath()." $mess[43]");
         }
         if (!file_exists($originalNode->getUrl())) {
