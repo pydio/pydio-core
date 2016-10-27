@@ -20,7 +20,7 @@
 */
 $mess=array(
 "S3 (Amazon Web Service)" => "S3 (Amazon Web Service)",
-"Access an AWS server. Requires AWS-SDK v2 for PHP" => "Access an AWS server. Requires AWS-SDK (Version 2) for PHP ",
+"Access an AWS server. Requires AWS-SDK v2 for PHP" => "Store documents in Amazon S3 object storage.",
 "Key" => "Key",
 "S3 Api Key" => "S3 Api Key",
 "Secret Key" => "Secret Key",

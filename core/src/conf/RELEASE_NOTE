@@ -4,6 +4,15 @@ Welcome to Pydio 7.0!
 
 Pydio 7 is a full overhaul of the PHP code, raising the standards, improving performances and making the platform more modular than ever. We also introduce a new separate tool called Pydio Booster, written in Go, removing php limits and easing the deployment of WebSockets.
 
+Pydio 7.0.1 Fix main upgrade issues of 7.0
+--
+. Fix installer form if output_buffering is not disabled
+. Remove check for aws.phar file in the access.s3 directory. Fix #1257
+. Another "incompatible declaration" error was silently breaking s3 on PHP7.
+. php 5.5.9 issue, count(false) returns true, making RolesList empty.
+. Check php version: 5.6 is finally required for enterprise dist, because of ioncube loaders.
+. Fix case sensitive rename (details)
+
 **************
 New Features
 **************
