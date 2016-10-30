@@ -56,7 +56,7 @@ class ApiRouter
         $this->base = $base;
         $this->cacheOptions = array_merge([
             "cacheDisabled" => AJXP_SKIP_CACHE,
-            "cacheFile" => AJXP_DATA_PATH."/cache/plugins_api2routes.php"
+            "cacheFile" => AJXP_CACHE_DIR."/plugins_api2routes.php"
         ], $cacheOptions);
     }
 

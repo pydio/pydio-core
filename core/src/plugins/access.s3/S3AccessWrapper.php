@@ -106,8 +106,8 @@ class S3AccessWrapper extends FsAccessWrapper
                 $config["endpoint"] = $baseURL;
             }
             require_once("S3Client.php");
-            $s3Client = new S3Client($config);
-            $s3Client->registerStreamWrapper($repoObject->getId());
+            $s3Client = new S3Client($config, $repoObject->getId());
+            $s3Client->registerStreamWrapper();
             self::$clients[$repoObject->getId()] = $s3Client;
         }
         return self::$clients[$repoObject->getId()];

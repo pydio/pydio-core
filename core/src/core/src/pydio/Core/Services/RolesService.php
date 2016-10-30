@@ -245,7 +245,7 @@ class RolesService
         $searches = array_map(function($k){return "pydio:role:".$k;}, $roleIds);
         $fetches = CacheService::fetchMultiple(AJXP_CACHE_SERVICE_NS_SHARED, $searches);
         $missing = [];
-        if(count($fetches)){
+        if($fetches !== false && count($fetches)){
             $found = [];
             foreach($searches as $cacheKey){
                 $okKey = preg_replace('/^pydio:role:/', "", $cacheKey);

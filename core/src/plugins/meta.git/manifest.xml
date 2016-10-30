@@ -2,7 +2,7 @@
 <ajxp_plugin id="meta.git" label="CONF_MESSAGE[Git-based Versioning]" description="CONF_MESSAGE[Keep tracks of all files modifications using a local Git repository]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
-        <core_relation packaged="true" tested_version="4.2.0"/>
+        <core_relation packaged="true" tested_version="7.0"/>
         <plugin_author>Charles du Jeu</plugin_author>
     </plugin_info>
     <class_definition classname="Pydio\Access\Meta\Version\GitManager" filename="plugins/meta.git/vendor/autoload.php"/>

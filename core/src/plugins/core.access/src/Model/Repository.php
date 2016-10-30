@@ -24,7 +24,6 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Filter\ContentFilter;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Exception\RepositoryLoadException;
-use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 
@@ -357,7 +356,7 @@ class Repository implements RepositoryInterface
     public function getContextOption(ContextInterface $ctx, $oName, $default = null){
         if(isSet($this->inferOptionsFromParent) && isSet($this->parentId)){
             $parentTemplateObject = RepositoryService::getRepositoryById($this->parentId);
-            if(empty($parentTemplateObject) || !is_a($parentTemplateObject, "Repository")) {
+            if(empty($parentTemplateObject) || !$parentTemplateObject instanceof Repository) {
                 throw new PydioException("Option should be loaded from parent repository, but it was not found");
             }
         }

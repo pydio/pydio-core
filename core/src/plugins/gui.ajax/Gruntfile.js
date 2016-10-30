@@ -38,7 +38,7 @@ var gui_ajax_core = [
     'res/js/vendor/webfx/ajxptree.js',
     'res/js/vendor/chosen/event.simulate.js',
     'res/js/vendor/chosen/chosen.proto.js',
-    'node_modules/he/he.js',
+    'res/js/ui/prototype/util/he.js',
     'res/js/core/model/User.js',
     'res/js/core/http/ResourcesManager.js',
     'res/js/core/model/RemoteNodeProvider.js',
@@ -98,6 +98,14 @@ module.exports = function(grunt) {
                 NODE_ENV: 'development',
                 DEST: 'tmp'
             }
+        },
+        copy: {
+            debug: {
+                expand: true,
+                src: 'node_modules/he/he.js',
+                dest: 'res/js/ui/prototype/util',
+                flatten:true
+            },
         },
         uglify: {
             options: {
@@ -234,10 +242,12 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('assemble-less');
     grunt.registerTask('type:js', [
+        'copy:debug',
         'babel:dist',
         'uglify:js',
         'babel:materialui',

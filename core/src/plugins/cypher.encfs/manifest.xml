@@ -42,7 +42,7 @@
                              var conn = new Connexion();
                              conn.setParameters($H({
                                 get_action:'encfs.cypher_folder',
-                                dir:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
+                                file:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
                                 pass: passValue
                              }));
                              conn.onComplete = function(transport){
@@ -68,7 +68,7 @@
                 </processing>
             </action>
             <action name="encfs.cypher_folder">
-                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.1" title="encfs.2" hasAccessKey="false">
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.1" title="encfs.2" hasAccessKey="false">
                     <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
@@ -77,7 +77,7 @@
                          var conn = new Connexion();
                          conn.setParameters($H({
                             get_action:'encfs.cypher_folder',
-                            dir:ajaxplorer.getUserSelection().getUniqueNode().getPath()
+                            file:ajaxplorer.getUserSelection().getUniqueNode().getPath()
                          }));
                          conn.onComplete = function(transport){
                             PydioApi.getClient().parseXmlMessage(transport.responseXML);
@@ -92,7 +92,7 @@
                 </processing>
             </action>
             <action name="encfs.uncypher_folder">
-                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" text="encfs.3" title="encfs.4" hasAccessKey="false">
+                <gui src="cypher.encfs/ICON_SIZE/encrypted.png" iconClass="icon-credit-card" text="encfs.3" title="encfs.4" hasAccessKey="false">
                     <context dir="false" recycle="false" selection="true" actionBar="false" contextMenu="true"/>
                     <selectionContext dir="true" file="false" recycle="false" unique="true" evalMetadata="metadata.get('ENCFS_clear_folder') &amp;&amp; !metadata.get('ENCFS_clear_folder_mounted')"/>
                 </gui>
@@ -103,7 +103,7 @@
                              var conn = new Connexion();
                              conn.setParameters($H({
                                 get_action:'encfs.uncypher_folder',
-                                dir:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
+                                file:ajaxplorer.getUserSelection().getUniqueNode().getPath(),
                                 pass: passValue
                                 }));
                              conn.onComplete = function(transport){

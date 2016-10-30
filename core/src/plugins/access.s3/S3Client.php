@@ -32,13 +32,25 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
  */
 class S3Client extends AwsS3Client
 {
+    private $repositoryId;
+
+    /**
+     * S3Client constructor.
+     * @param array $args
+     * @param $repositoryId
+     */
+    public function __construct(array $args, $repositoryId)
+    {
+        $this->repositoryId = $repositoryId;
+        parent::__construct($args);
+    }
+
     /**
      * Register a new stream wrapper who overwrite the Amazon S3 stream wrapper with this client instance.
-     * @param string $repositoryId
-     * @return $this|void
+     * @return void
      */
-    public function registerStreamWrapper($repositoryId)
+    public function registerStreamWrapper()
     {
-        StreamWrapper::register($this, "s3.".$repositoryId, new S3CacheService());
+        StreamWrapper::register($this, "s3.".$this->repositoryId, new S3CacheService());
     }
 }
