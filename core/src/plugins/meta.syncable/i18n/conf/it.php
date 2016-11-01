@@ -24,4 +24,8 @@ $mess=array(
 "SQL Tables" => "Tabelle SQL",
 "Install SQL Tables" => "Installa Tabelle SQL",
 "Workspace is syncable" => "Il Workspace è sincronizzabile",
+"Observe storage changes" => "Observe storage changes [Experimental]",
+"Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio." => "Continuously monitor underlying storage changes. This is experimental. Can be used if the storage content is modified OUTSIDE of Pydio.",
+"Observe storage changes every..." => "Observe storage changes every...",
+"If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes." => "If previous option is set to Yes, this will trigger a storage indexation every X minutes. This can be heavy in memory, so it can be a good practice to use something between 5 and 60 minutes.",
 );

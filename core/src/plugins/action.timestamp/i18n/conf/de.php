@@ -25,7 +25,7 @@ $mess=array(
 "URL" => "URL zum Universign API Webservice",
 "Timestamp provider API URL" => "Universign-API URL",
 "User Mail" => "E-Mail-Adresse",
-"Password" => "Passwort wählen",
+"Password" => "Passwort",
 "User account" => "Die bei Universign registrierte E-Mail-Adresse",
 "User Password" => "Das Passwort zum Universign-Benutzer",
 );

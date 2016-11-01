@@ -32,4 +32,6 @@ $mess=array(
 "Instance Params" => "Parameter des Ereignisspeichers",
 "Feed Instance" => "Ereignisspeicher",
 "Choose the plugin" => "Eine Erweiterung auswählen",
+"Display Workspaces Activity" => "Arbeitsumgebungs-Aktivitäten anzeigen",
+"Display workspaces activity to the users in the right-hand information panel" => "Arbeitsumgebungs-Aktivitäten im Info-Bereich auf der rechten Seite anzeigen",
 );

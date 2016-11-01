@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Access not allowed');
 $mess = array(
     "1" => "Upgrade",
     "2" => "Automatische Versionsaktualisierung",
-    "3" => "Klicken Sie auf die Schaltfläche um die Aktualisierung zu starten. Bitte überprüfen vor dem Start der Aktualisierung ob der Anwendungsordner beschreibbar ist.",
+    "3" => "Klicken Sie auf die Schaltfläche um die Aktualisierung zu starten. Der Installations-Ordner darf nicht schreibgeschützt sein.",
     "4" => "Starte Aktualisierung",
     "5" => "Von 3.2.4",
     "6" => "Konfiguration von 3.2.4 importieren",

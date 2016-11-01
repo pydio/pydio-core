@@ -28,4 +28,6 @@ $mess=array(
 "Instance Params" => "Instance Params",
 "Feed Instance" => "Feed Instance",
 "Choose the plugin" => "Choose the plugin",
+"Display Workspaces Activity" => "Display Workspaces Activity",
+"Display workspaces activity to the users in the right-hand information panel" => "Display workspaces activity to the users in the right-hand information panel",
 );
