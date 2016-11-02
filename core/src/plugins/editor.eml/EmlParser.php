@@ -37,6 +37,7 @@ use Pydio\Core\Utils\Http\UserAgent;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Utils\TextEncoder;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -241,7 +242,7 @@ class EmlParser extends Plugin
         if ($wrapperClassName == "imapAccessWrapper" && !$metadata["is_file"]) {
             $metadata["mimestring"] = "Mailbox";
         }
-        $parsed = parse_url($currentNode);
+        $parsed = UrlUtils::mbParseUrl($currentNode);
         if ( $noMail || ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0 ) ) {
             EmlParser::$currentListingOnlyEmails = FALSE;
             return;

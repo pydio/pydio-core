@@ -26,6 +26,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
@@ -128,7 +129,7 @@ class SwiftAccessWrapper extends FsAccessWrapper
         // File and zip case
         // AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Stating $path");
 
-        $url = parse_url($path);
+        $url = UrlUtils::mbParseUrl($path);
         if(empty($url["path"])){
             // This is root, return fake stat;
             return $this->fakeStat(true);
@@ -141,8 +142,7 @@ class SwiftAccessWrapper extends FsAccessWrapper
         if ($stat["mode"] == 0666) {
             $stat[2] = $stat["mode"] |= 0100000; // S_ISREG
         }
-        $parsed = parse_url($path);
-        if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $parsed["path"] != "/") {
+        if ($stat["mtime"] == $stat["ctime"]  && $stat["ctime"] == $stat["atime"] && $stat["atime"] == 0 && $url["path"] != "/") {
             //AJXP_Logger::debug(__CLASS__,__FUNCTION__,"Nullifying stats");
             return null;
         }

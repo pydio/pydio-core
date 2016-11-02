@@ -31,6 +31,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\Vars\PathUtils;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -153,7 +154,7 @@ class MetaStreamWrapper implements IAjxpWrapper
      * @throws \Exception
      */
     protected static function getNextScheme($url, $context='core'){
-        $parts = parse_url($url);
+        $parts = UrlUtils::mbParseUrl($url);
         $metaWrapperKeys = array_keys(self::getMetaWrappers($context));
         $key = array_search($parts["scheme"], $metaWrapperKeys);
         if($key < count($metaWrapperKeys) - 1){
@@ -293,7 +294,7 @@ class MetaStreamWrapper implements IAjxpWrapper
      * @param string $path
      */
     public static function applyInitPathHook($path, $context = 'core') {
-        $currentScheme = parse_url($path, PHP_URL_SCHEME);
+        $currentScheme = UrlUtils::mbParseUrl($path, PHP_URL_SCHEME);
         $wrapper = self::findWrapperClassName(AJXP_Node::contextFromUrl($path), $currentScheme, $context);
 
         if (is_callable(array($wrapper, "applyInitPathHook"))) {
@@ -418,7 +419,7 @@ class MetaStreamWrapper implements IAjxpWrapper
 
         $this->handle = opendir($newPath);
         if($this->handle !== false){
-            $this->currentDirPath = parse_url($path, PHP_URL_PATH);
+            $this->currentDirPath = UrlUtils::mbParseUrl($path, PHP_URL_PATH);
             return true;
         }else{
             return false;
