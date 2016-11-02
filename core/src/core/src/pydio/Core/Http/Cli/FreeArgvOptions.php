@@ -59,6 +59,15 @@ class FreeArgvOptions extends ArgvInput
     }
 
     /**
+     * Decides wether we should split an option value by commas
+     * @param $key
+     * @return bool
+     */
+    protected function fieldSupportCommaSplit($key){
+        return in_array($key, ["cli_repository_id", "cli_impersonate"]);
+    }
+
+    /**
      * @return array
      */
     public function getOptions()
@@ -66,8 +75,12 @@ class FreeArgvOptions extends ArgvInput
         if(!isSet($this->freeParsed)){
             $options = parent::getOptions();
             foreach ($options as $key => $value) {
-                $options[$key] = self::removeEqualsSign($value);
-                $options[$key] = $this->splitByComma($value);
+                $value = self::removeEqualsSign($value);
+                if($this->fieldSupportCommaSplit($key)){
+                    $options[$key] = $this->splitByComma($value);
+                }else{
+                    $options[$key] = $value;
+                }
             }
             $this->freeParsed = $options;
         }
