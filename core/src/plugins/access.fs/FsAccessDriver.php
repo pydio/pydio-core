@@ -662,6 +662,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if ($this->getContextualOption($ctx, "ZIP_ON_THE_FLY")) {
                         // Make a zip on the fly and send stream as download
                     	$response = HTMLWriter::responseWithAttachmentsHeaders($response, $localName, null, false, false);
+                    	$response = $response->withoutHeader("Content-Length");
                         $asyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selection, $dir) {
                             session_write_close();
                             restore_error_handler();
