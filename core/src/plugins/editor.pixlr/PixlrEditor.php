@@ -35,6 +35,7 @@ use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\PluginFramework\Plugin;
 
 use GuzzleHttp\Client;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -145,7 +146,7 @@ class PixlrEditor extends Plugin
             $this->logInfo('Edit', 'Retrieving content of '.$file.' from Pixlr server.', array("files" => $file));
             Controller::applyHook("node.before_change", array(&$selectedNode));
             $url = $httpVars["new_url"];
-            $urlParts = parse_url($url);
+            $urlParts = UrlUtils::mbParseUrl($url);
             $query = $urlParts["query"];
             if ($this->getContextualOption($ctx, "CHECK_SECURITY_TOKEN")) {
                 $scriptName = basename($urlParts["path"]);

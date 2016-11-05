@@ -37,6 +37,7 @@ use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Utils\FileHelper;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 
 /**
@@ -766,12 +767,12 @@ class AJXP_Node implements \JsonSerializable, ContextProviderInterface
     {
         if (strstr($this->_url, "#") !== false) {
             $url = str_replace("#", "__HASH__", $this->_url);
-            $this->urlParts = parse_url($url);
+            $this->urlParts = UrlUtils::mbParseUrl($url);
             foreach ($this->urlParts as $partKey => $partValue) {
                 $this->urlParts[$partKey] = str_replace("__HASH__", "#", $partValue);
             }
         } else {
-            $this->urlParts = parse_url($this->_url);
+            $this->urlParts = UrlUtils::mbParseUrl($this->_url);
         }
         if(isSet($this->urlParts["user"])){
             $this->_user = $this->urlParts["user"];

@@ -452,6 +452,7 @@ class UsersService
         foreach ($subUsers as $deletedUser) {
             $authDriver->deleteUser($deletedUser);
         }
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:".$userId);
         Controller::applyHook("user.after_delete", array($ctx, $userId));
         Logger::info(__CLASS__, "Delete User", array("user_id" => $userId, "sub_user" => implode(",", $subUsers)));
         return true;

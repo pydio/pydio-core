@@ -28,6 +28,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -107,7 +108,7 @@ class ImapAccessDriver extends FsAccessDriver
         $currentNode = $ajxpNode->getUrl();
         $baseUrl = $ajxpNode->getContext()->getUrlBase();
         $metadata = $ajxpNode->metadata;
-        $parsed = parse_url($currentNode);
+        $parsed = UrlUtils::mbParseUrl($currentNode);
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
             list(, $attachmentId) = explode("/", $parsed["fragment"]);
             $meta = ImapAccessWrapper::getCurrentAttachmentsMetadata();
@@ -144,7 +145,7 @@ class ImapAccessDriver extends FsAccessDriver
      */
     public function attachmentDLName($currentNode, &$localName, $wrapperClassName)
     {
-        $parsed = parse_url($currentNode->getUrl());
+        $parsed = UrlUtils::mbParseUrl($currentNode->getUrl());
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
             list(, $attachmentId) = explode("/", $parsed["fragment"]);
             $meta = ImapAccessWrapper::getCurrentAttachmentsMetadata();

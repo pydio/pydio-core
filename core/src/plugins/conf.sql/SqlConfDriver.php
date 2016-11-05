@@ -35,6 +35,7 @@ use Pydio\Conf\Core\AJXP_Role;
 use Pydio\Conf\Core\AjxpRole;
 
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
@@ -919,16 +920,23 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function deleteGroup($groupPath)
     {
-        // Delete users of this group, as well as subgroups
-        $res = dibi::query("SELECT * FROM [ajxp_users] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s ORDER BY [login] ASC", $groupPath."/", $groupPath);
+        // Delete users of this group
+        $res = dibi::query("SELECT [login] FROM [ajxp_users] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s ORDER BY [login] ASC", $groupPath."/", $groupPath);
         $rows = $res->fetchAll();
-        $subUsers = array();
         foreach ($rows as $row) {
-            $this->deleteUser($row["login"], $subUsers);
-            dibi::query("DELETE FROM [ajxp_users] WHERE [login] = %s", $row["login"]);
+            UsersService::deleteUser($row["login"]);
         }
+
+        // Delete associated roles
+        $res = dibi::query("SELECT [groupPath] FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s", $groupPath."/", $groupPath);
+        $rows = $res->fetchAll();
+        foreach($rows as $row){
+            RolesService::deleteRole('AJXP_GRP_'.$row['groupPath']);
+        }
+
+        // Now delete groups and subgroups
         dibi::query("DELETE FROM [ajxp_groups] WHERE [groupPath] LIKE %like~ OR [groupPath] = %s", $groupPath."/", $groupPath);
-        dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_GRP_'.$groupPath);
+
     }
 
     /**
@@ -976,12 +984,12 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
             dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_bookmarks] WHERE [login] = %s', $userId);
             dibi::query('DELETE FROM [ajxp_user_teams] WHERE [owner_id] = %s', $userId);
-            dibi::query('DELETE FROM [ajxp_roles] WHERE [role_id] = %s', 'AJXP_USR_/'.$userId);
             dibi::commit();
             foreach ($children as $childId) {
                 $this->deleteUser($childId, $deletedSubUsers);
                 $deletedSubUsers[] = $childId;
             }
+            RolesService::deleteRole("AJXP_USR_/".$userId);
         } catch (DibiException $e) {
             throw new \Exception('Failed to delete user, Reason: '.$e->getMessage());
         }
