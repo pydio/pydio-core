@@ -41,4 +41,5 @@ $mess = [
     "19" => "Interrompre et me demander",
     "20" => "Renommer automatiquement",
     "21" => "Remplacer le fichier existant",
+    "22" => "Options",
 ];

@@ -71,7 +71,7 @@
             return (
                 <div style={{position:'relative'}}>
                     <div className="react-mui-context uploader-action-bar">
-                        <ReactMUI.FlatButton style={{float: 'right'}} label="Options"  onClick={this.toggleOptions}/>
+                        <ReactMUI.FlatButton style={{float: 'right'}} label={messages['html_uploader.22']}  onClick={this.toggleOptions}/>
                         <ReactMUI.RaisedButton secondary={true} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
                         {folderButton}
                         {startButton}
