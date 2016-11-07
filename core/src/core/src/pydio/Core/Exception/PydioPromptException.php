@@ -74,36 +74,42 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
         parent::__construct($messageString, $messageId);
     }
 
+
     /**
      * Prompt user for credentials
-     * @param $sessionVariable
-     * @param $switchToRepositoryId
+     * @param array $parameters
+     * @param string $passFieldName
+     * @param string $postSubmitCallback
      * @throws PydioPromptException
      */
-    public static function testOrPromptForCredentials($sessionVariable, $switchToRepositoryId){
-        if(isSet($_GET["prompt_passed_data"]) && isSet($_GET["variable_name"]) && $_GET["variable_name"] == $sessionVariable){
-            $_SESSION[$sessionVariable] = true;
+    public static function promptForWorkspaceCredentials($parameters, $passFieldName, $postSubmitCallback = ""){
+        $hiddens = [];
+        $getFields = [$passFieldName];
+        foreach($parameters as $key => $value){
+            $hiddens[] = "<input type='hidden' name='$key' value='$value'>";
+            $getFields[] = $key;
         }
-        if(!isSet($_SESSION[$sessionVariable])){
-            throw new PydioPromptException(
-                "confirm",
-                array(
-                    "DIALOG" => "Please enter your credentials for this workspace
-                                <input type='hidden' name='get_action' value='switch_repository'>
-                                <input type='hidden' name='repository_id' value='".$switchToRepositoryId."'>
-                                <input type='hidden' name='prompt_passed_data' value='true'>
-                                <input type='hidden' name='variable_name' value='".$sessionVariable."'>
-                                ",
-                    "OK"        => array(
-                        "GET_FIELDS" => array("get_action", "repository_id", "prompt_passed_data", "variable_name"),
-                        "EVAL" => "ajaxplorer.loadXmlRegistry();"
-                    ),
-                    "CANCEL"    => array(
-                        "EVAL" => "ajaxplorer.loadXmlRegistry();"
-                    )
+        throw new PydioPromptException(
+            "confirm",
+            array(
+                "DIALOG" => "<div>
+                                <h3>Credentials Required</h3>
+                                <div class='dialogLegend'>Please provide a password to enter this workspace. You may have to manually redo the action you were currently trying to achieve.</div>
+                                <form autocomplete='off'>
+                                    ".implode("\n", $hiddens)."
+                                    <input style='width: 200px;' type='password' autocomplete='off' name='$passFieldName' value='' placeholder='Password'>
+                                </form>
+                            </div>
+                            ",
+                "OK"        => array(
+                    "GET_FIELDS" => $getFields,
+                    "EVAL" => $postSubmitCallback
                 ),
-                "Credentials Needed");
-        }
+                "CANCEL"    => array(
+                    "EVAL" => ""
+                )
+            ),
+            "Credentials Needed");
 
     }
 

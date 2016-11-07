@@ -178,7 +178,7 @@ class SessionService implements RepositoriesCache
     /**
      * @param $repoId
      */
-    public static function switchSessionRepositoriId($repoId){
+    public static function switchSessionRepositoryId($repoId){
         if(self::has(self::CTX_REPOSITORY_ID)) {
             self::save(self::PREVIOUS_REPOSITORY, self::fetch(self::CTX_REPOSITORY_ID));
         }

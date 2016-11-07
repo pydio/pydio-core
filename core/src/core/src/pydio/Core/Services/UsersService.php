@@ -23,6 +23,7 @@ namespace Pydio\Core\Services;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\UserNotFoundException;
+use Pydio\Core\Exception\WorkspaceAuthRequired;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Http\Message\ReloadRepoListMessage;
@@ -145,6 +146,7 @@ class UsersService
         if(!RepositoryService::repositoryIsAccessible($repo, $user)){
             throw new WorkspaceForbiddenException($repositoryId);
         }
+        WorkspaceAuthRequired::testWorkspace($repo, $user);
         return $repo;
     }
 

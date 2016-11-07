@@ -31,8 +31,9 @@ class UrlUtils
 {
     /**
      * UTF8 support for parseUrl
-     * @param $url
-     * @return mixed
+     * @param string $url
+     * @param int $part one of PHP_URL_** variable
+     * @return array|string
      */
     public static function mbParseUrl($url, $part = -1){
         $enc_url = preg_replace_callback(
