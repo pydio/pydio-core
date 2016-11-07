@@ -771,6 +771,38 @@ Class.create("PydioUI", {
 
     enableAllKeyBindings : function(){
         this.blockNavigation = this.blockShortcuts = this.blockEditorShortcuts = false;
+    },
+
+    openPromptDialog: function(json){
+        var dialogContent = new Element('div').update(json["DIALOG"]);
+        modal.showSimpleModal(document.body, dialogContent, function(){
+            // ok callback;
+            if(json["OK"]["GET_FIELDS"]){
+                var params = $H();
+                $A(json["OK"]["GET_FIELDS"]).each(function(fName){
+                    params.set(fName, dialogContent.down('input[name="'+fName+'"]').getValue());
+                });
+                var conn = new Connexion();
+                conn.setParameters(params);
+                if(json["OK"]["EVAL"]){
+                    conn.onComplete = function(){
+                        eval(json["OK"]["EVAL"]);
+                    };
+                }
+                conn.sendAsync();
+            }else{
+                if(json["OK"]["EVAL"]){
+                    eval(json["OK"]["EVAL"]);
+                }
+            }
+            return true;
+        }, function(){
+            // cancel callback
+            if(json["CANCEL"]["EVAL"]){
+                eval(json["CANCEL"]["EVAL"]);
+            }
+            return true;
+        }, 'bottom', 'simple-modal-auth-prompt', true);
     }
 
 });

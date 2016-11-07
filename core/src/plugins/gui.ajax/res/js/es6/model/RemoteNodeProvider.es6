@@ -217,6 +217,14 @@ class RemoteNodeProvider{
             }
         }
 
+        // CHECK FOR AUTH PROMPT REQUIRED
+        var authNode = XMLUtils.XPathSelectSingleNode(rootNode, "prompt");
+        if(authNode && pydio && pydio.UI && pydio.UI.openPromptDialog){
+            let jsonData = XMLUtils.XPathSelectSingleNode(authNode, "data").firstChild.nodeValue;
+            pydio.UI.openPromptDialog(JSON.parse(jsonData));
+            throw new Error();
+        }
+
         // CHECK FOR PAGINATION DATA
         var paginationNode = XMLUtils.XPathSelectSingleNode(rootNode, "pagination");
         if(paginationNode){

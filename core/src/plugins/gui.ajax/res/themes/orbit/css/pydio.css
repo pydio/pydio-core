@@ -6316,6 +6316,22 @@ div.dialogButtons.inlineEdition input {
   font-weight: 500;
   font-family: Roboto, sans-serif;
 }
+.dialogBox.simple-modal-auth-prompt {
+  min-width: 260px;
+  width: 260px;
+  left: 40%;
+}
+.dialogBox.simple-modal-auth-prompt .dialogContent {
+  border-radius: 2px;
+  padding-bottom: 56px;
+}
+.dialogBox.simple-modal-auth-prompt .dialogContent h3 {
+  color: rgba(0, 0, 0, 0.73);
+}
+.dialogBox.simple-modal-auth-prompt .dialogContent input[type="password"] {
+  margin-top: 10px;
+  font-size: 13px !important;
+}
 .toolbars_buttons_mixin {
   box-sizing: border-box;
   height: 30px;
