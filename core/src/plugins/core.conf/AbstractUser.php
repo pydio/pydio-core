@@ -698,19 +698,7 @@ abstract class AbstractUser implements UserInterface
                 }
             }
         }
-
-        // Move old WALLET values to personal role parameter
-        $wallet = $this->getPref("AJXP_WALLET");
-        if (is_array($wallet) && count($wallet)) {
-            foreach ($wallet as $repositoryId => $walletData) {
-                $repoObject = RepositoryService::getRepositoryById($repositoryId);
-                if($repoObject == null) continue;
-                $accessType = "access.".$repoObject->getAccessType();
-                foreach ($walletData as $paramName => $paramValue) {
-                    $this->personalRole->setParameterValue($accessType, $paramName, $paramValue, $repositoryId);
-                }
-            }
-        }
+        
         return $changes;
     }
 

@@ -76,6 +76,7 @@ class AuthCliMiddleware
             if($envPass !== false){
                 unset($optToken);
                 $optPass = $envPass;
+                MemorySafe::storeCredentials($optUser, $optPass);
             }
         }
 

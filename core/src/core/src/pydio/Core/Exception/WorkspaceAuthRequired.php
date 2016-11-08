@@ -34,16 +34,19 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class WorkspaceAuthRequired extends PydioException {
 
-    private $repositoryId;
+    private $workspaceId;
+    private $requireLogin;
 
     /**
      * WorkspaceAuthRequired constructor.
-     * @param string $repositoryId
+     * @param string $workspaceId
+     * @param boolean $requireLogin
      * @param string $message
      */
-    public function __construct($repositoryId, $message = "Authentication required for this workspace")
+    public function __construct($workspaceId, $requireLogin = false, $message = "Authentication required for this workspace")
     {
-        $this->repositoryId = $repositoryId;
+        $this->workspaceId = $workspaceId;
+        $this->requireLogin = $requireLogin;
         parent::__construct($message, false, null);
     }
 
@@ -53,13 +56,31 @@ class WorkspaceAuthRequired extends PydioException {
      * @throws WorkspaceAuthRequired
      */
     public static function testWorkspace($workspaceObject, $userObject){
-        if($workspaceObject->getContextOption(Context::contextWithObjects($userObject, $workspaceObject), "USE_SESSION_CREDENTIALS") !== true){
+        $ctx = Context::contextWithObjects($userObject, $workspaceObject);
+        $instanceId = MemorySafe::contextUsesInstance($ctx);
+        if($instanceId === false){
             return;
         }
-        if(MemorySafe::loadCredentials() !== false){
+        if(MemorySafe::loadCredentials($instanceId) !== false){
             return;
         }
-        throw new WorkspaceAuthRequired($workspaceObject->getId());
+        $allowFreeLogin = ($workspaceObject->getContextOption($ctx, "SESSION_CREDENTIALS_FREE_LOGIN") === true);
+        throw new WorkspaceAuthRequired($workspaceObject->getId(), $allowFreeLogin);
     }
+
+    /**
+     * @return string
+     */
+    public function getWorkspaceId(){
+        return $this->workspaceId;
+    }
+
+    /**
+     * @return bool
+     */
+    public function requiresLogin(){
+        return $this->requireLogin;
+    }
+
 
 }

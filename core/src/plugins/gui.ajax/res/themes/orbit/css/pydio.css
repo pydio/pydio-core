@@ -6328,9 +6328,15 @@ div.dialogButtons.inlineEdition input {
 .dialogBox.simple-modal-auth-prompt .dialogContent h3 {
   color: rgba(0, 0, 0, 0.73);
 }
-.dialogBox.simple-modal-auth-prompt .dialogContent input[type="password"] {
+.dialogBox.simple-modal-auth-prompt .dialogContent input[type="password"],
+.dialogBox.simple-modal-auth-prompt .dialogContent input[type="text"] {
   margin-top: 10px;
   font-size: 13px !important;
+}
+@media only screen and (max-width: 420px) {
+  .dialogBox.simple-modal-auth-prompt {
+    left: 80px;
+  }
 }
 .toolbars_buttons_mixin {
   box-sizing: border-box;

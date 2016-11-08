@@ -2527,8 +2527,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             "DEFAULT_RIGHTS" => "",
             "DATA_TEMPLATE"  => ""
         ];
-        if ($repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") === true) {
-            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+        $sessionCredsInstance = MemorySafe::contextUsesInstance($ctx);
+        if($sessionCredsInstance !== false){
+            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getInstance($sessionCredsInstance)->getEncodedCredentials();
         }
         $customData = [];
         foreach ($httpVars as $key => $value) {
@@ -2543,7 +2544,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $newOptions["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
             foreach ($newOptions["META_SOURCES"] as $index => &$data) {
                 if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
-                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getInstance()->getEncodedCredentials();
                 }
             }
             Controller::applyHook("workspace.share_metasources", [$ctx, &$newOptions["META_SOURCES"]]);

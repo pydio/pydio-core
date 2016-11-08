@@ -309,7 +309,6 @@ class ConfAccessDriver extends AbstractAccessDriver
             case "user_reorder_roles":
             case "users_bulk_update_roles":
             case "save_custom_user_params":
-            case "save_repository_user_params":
             case "update_user_pwd":
                 $this->usersAction($requestInterface, $responseInterface);
                 break;

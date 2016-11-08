@@ -20,6 +20,7 @@
  */
 namespace Pydio\Core\Exception;
 
+use Pydio\Core\Http\Middleware\WorkspaceAuthMiddleware;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
 
@@ -78,31 +79,33 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
     /**
      * Prompt user for credentials
      * @param array $parameters
-     * @param string $passFieldName
      * @param string $postSubmitCallback
-     * @throws PydioPromptException
+     * @return  PydioPromptException
      */
-    public static function promptForWorkspaceCredentials($parameters, $passFieldName, $postSubmitCallback = ""){
-        $hiddens = [];
-        $getFields = [$passFieldName];
+    public static function promptForWorkspaceCredentials($parameters, $postSubmitCallback = ""){
+        $inputs = [];
         foreach($parameters as $key => $value){
-            $hiddens[] = "<input type='hidden' name='$key' value='$value'>";
-            $getFields[] = $key;
+            if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_LOGIN) {
+                $inputs[] = "<input type='text' name='$key' value='$value' placeholder='Login'>";
+            }else if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_PASS){
+                $inputs[] = "<input type='password' name='$key' value='' placeholder='Password' autocomplete='off'>";
+            }else{
+                $inputs[] = "<input type='hidden' name='$key' value='$value'>";
+            }
         }
-        throw new PydioPromptException(
+        return new PydioPromptException(
             "confirm",
             array(
                 "DIALOG" => "<div>
                                 <h3>Credentials Required</h3>
-                                <div class='dialogLegend'>Please provide a password to enter this workspace. You may have to manually redo the action you were currently trying to achieve.</div>
+                                <div class='dialogLegend'>Please provide a password to enter this workspace.</div>
                                 <form autocomplete='off'>
-                                    ".implode("\n", $hiddens)."
-                                    <input style='width: 200px;' type='password' autocomplete='off' name='$passFieldName' value='' placeholder='Password'>
+                                    ".implode("\n", $inputs)."
                                 </form>
                             </div>
                             ",
                 "OK"        => array(
-                    "GET_FIELDS" => $getFields,
+                    "GET_FIELDS" => array_keys($parameters),
                     "EVAL" => $postSubmitCallback
                 ),
                 "CANCEL"    => array(

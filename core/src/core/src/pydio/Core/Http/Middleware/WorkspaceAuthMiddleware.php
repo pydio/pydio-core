@@ -22,6 +22,7 @@ namespace Pydio\Core\Http\Middleware;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Exception\PydioException;
 
@@ -30,6 +31,7 @@ use Pydio\Core\Exception\WorkspaceAuthRequired;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -47,7 +49,9 @@ class WorkspaceAuthMiddleware
     const RESUBMIT_AUTH_COUNT   = "PYDIO_WORKSPACE_AUTH_RESUBMIT_COUNT";
 
     const FORM_RESUBMIT_KEY     = "workspace-auth-submission-id";
+    const FORM_RESUBMIT_LOGIN   = "workspace-auth-login";
     const FORM_RESUBMIT_PASS    = "workspace-auth-password";
+    const FORM_SESSION_CREDS    = "workspace-auth-test-session-credentials";
 
     /**
      * @param ServerRequestInterface $requestInterface
@@ -59,15 +63,33 @@ class WorkspaceAuthMiddleware
     public static function handleRequest(ServerRequestInterface $requestInterface, ResponseInterface $responseInterface, callable $next = null){
 
         $vars = $requestInterface->getParsedBody();
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute("ctx");
+
         if(isSet($vars[self::FORM_RESUBMIT_KEY]) && SessionService::has(self::RESUBMIT_AUTH_VARS."-".$vars[self::FORM_RESUBMIT_KEY]) && !empty($vars[self::FORM_RESUBMIT_PASS])){
             $submittedId = $vars[self::FORM_RESUBMIT_KEY];
-            // Count a max number of submission?
 
-            /** @var ContextInterface $ctx */
-            $ctx = $requestInterface->getAttribute("ctx");
             if($ctx->hasUser()){
+                $userId = $ctx->getUser()->getId();
+            }
+            if(isSet($vars[self::FORM_RESUBMIT_LOGIN]) && !empty($vars[self::FORM_RESUBMIT_LOGIN])){
+                $userId = InputFilter::sanitize($vars[self::FORM_RESUBMIT_LOGIN], InputFilter::SANITIZE_EMAILCHARS);
+            }
+
+            if(!empty($userId)){
                 $password = $vars[self::FORM_RESUBMIT_PASS];
-                MemorySafe::storeCredentials($ctx->getUser()->getId(), $password);
+                if(isSet($vars[self::FORM_SESSION_CREDS])){
+                    $node = new AJXP_Node("pydio://".$userId."@".$vars[self::FORM_SESSION_CREDS]."/");
+                    try{
+                        MemorySafe::storeCredentials($userId, $password);
+                        if(!is_writeable($node->getUrl())){
+                            MemorySafe::clearCredentials();
+                        }
+                    }catch (\Exception $e){
+                        MemorySafe::clearCredentials();
+                        throw new PydioException($e->getMessage());
+                    }
+                }
             }
 
             $newVars = SessionService::fetch(self::RESUBMIT_AUTH_VARS."-".$submittedId);
@@ -89,13 +111,21 @@ class WorkspaceAuthMiddleware
             // Generate a random ID.
             $submissionId = StringHelper::generateRandomString(24);
             SessionService::save(self::RESUBMIT_AUTH_VARS."-".$submissionId, $vars);
-            $parameters = [self::FORM_RESUBMIT_KEY => $submissionId];
+            $parameters = [];
+            if($ex->requiresLogin()){
+                $parameters[self::FORM_RESUBMIT_LOGIN] = $ctx->hasUser() ? $ctx->getUser()->getId() : "";
+            }
+            $parameters = array_merge($parameters, [
+                self::FORM_RESUBMIT_KEY => $submissionId,
+                self::FORM_RESUBMIT_PASS => "",
+                self::FORM_SESSION_CREDS => $ex->getWorkspaceId()
+            ]);
             $postSubmitCallback = "";
             if($requestInterface->getAttribute("action") === "switch_repository"){
                 $postSubmitCallback = "ajaxplorer.loadXmlRegistry();";
             }
             // Will throw a prompt exception with all current values
-            return PydioPromptException::promptForWorkspaceCredentials($parameters, self::FORM_RESUBMIT_PASS, $postSubmitCallback);
+            throw PydioPromptException::promptForWorkspaceCredentials($parameters, $postSubmitCallback);
 
         }
 
