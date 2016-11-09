@@ -36,6 +36,7 @@ use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\Vars\StringHelper;
 
 use Pydio\Log\Core\Logger;
+use Pydio\Tasks\Providers\SqlTasksProvider;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -68,6 +69,8 @@ class TaskService implements ITasksProvider
     public static function getInstance(){
         if(!isSet(self::$instance)){
             self::$instance = new TaskService();
+            // Sets a default provider!
+            self::$instance->setProvider(new SqlTasksProvider());
         }
         return self::$instance;
     }
@@ -183,7 +186,7 @@ class TaskService implements ITasksProvider
      * @throws PydioException
      */
     public function updateTaskStatus($taskId, $status, $message, $stoppable = null, $progress = null){
-        $t = self::getTaskById($taskId);
+        $t = $this->getTaskById($taskId);
         if(empty($t)){
             throw new PydioException("Cannot find task with this id");
         }
@@ -198,7 +201,7 @@ class TaskService implements ITasksProvider
         if($progress !== null){
             $t->setProgress($progress);
         }
-        return self::updateTask($t);
+        return $this->updateTask($t);
     }
 
     /**
