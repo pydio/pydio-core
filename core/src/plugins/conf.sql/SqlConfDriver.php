@@ -417,7 +417,7 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     protected function uniquifySlug($slug, $repositoryId = null){
 
         if(!empty($repositoryId)){
-            $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [uuid] != %s AND [slug] LIKE '".$slug."%'", $repositoryId);
+            $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [uuid] != %s AND [slug] = %s", $repositoryId, $slug);
         }else{
             $res = dibi::query("SELECT [slug],[uuid] FROM [ajxp_repo] WHERE [slug] LIKE '".$slug."%'");
         }
