@@ -1549,7 +1549,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getContextualOption($ctx, "HIDE_RECYCLE") !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     $recycleNode = $selection->nodeForPath("/".$recycleBinOption);
-                    if (file_exists($recycleNode->getUrl())) {
+                    if (file_exists($recycleNode->getUrl()) && $this->isReadable($recycleNode)) {
                         $recycleNode->loadNodeInfo();
                         $nodesList->addBranch($recycleNode);
                     }
@@ -1747,6 +1747,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         // Update Recycle Bin label
         if ($currentMeta["ajxp_mime"] === "ajxp_recycle"){
             $ajxpNode->setLabel($messages[122]);
+        }
+
+        $user = $ajxpNode->getContext()->getUser();
+        if(!empty($user) && $user->getMergedRole()->hasMask($ajxpNode->getRepositoryId())){
+            $localMeta["ajxp_readonly"] = "false";
+            if (!@$this->isWriteable($ajxpNode)) {
+                $localMeta["ajxp_readonly"] = "true";
+            }
         }
 
         // Now remerge in node
