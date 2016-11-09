@@ -1891,7 +1891,7 @@ div.accordion_toggle {
   color: #75808b;
   border-bottom: 1px solid #75808b;
   cursor: pointer;
-  background: url('../images/Tplus.png') no-repeat;
+  background: url('../images/xtree/Tplus.png') no-repeat;
   background-position-x: -6px;
   background-position-y: -3px;
   padding-left: 15px;
@@ -1902,7 +1902,7 @@ div.accordion_toggle {
   border-bottom: 0;
 }
 div.accordion_toggle_active {
-  background-image: url('../images/Tminus.png');
+  background-image: url('../images/xtree/Tminus.png');
 }
 div.accordion_content {
   overflow: hidden;
