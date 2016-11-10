@@ -204,6 +204,6 @@ class Collection extends Node implements Sabre\DAV\ICollection
     public function childExists($name) {
         $ajxpNode = new AJXP_Node($this->getUrl());
         $child = $ajxpNode->createChildNode($name);
-        return is_file($child->getUrl());
+        return file_exists($child->getUrl());
     }
 }
