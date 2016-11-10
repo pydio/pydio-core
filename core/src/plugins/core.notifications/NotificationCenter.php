@@ -146,7 +146,7 @@ class NotificationCenter extends Plugin
 
         $nodes = [];
         if($oldNode !== null && $newNode !== null && $oldNode->getRepositoryId() !== $newNode->getRepositoryId()){
-            $nodes[] = $oldNode;
+            if(!$copy) $nodes[] = $oldNode;
             $nodes[] = $newNode;
         }else{
             $nodes[] = ($oldNode === null ? $newNode : $oldNode);
@@ -559,6 +559,9 @@ class NotificationCenter extends Plugin
                 $primaryNode = $newNode;
                 $secondNode = $oldNode;
             } else if ($targetNotif == "old") {
+                if($oldNode->getRepositoryId() !== $newNode->getRepositoryId() && $copy){
+                    return false;
+                }
                 $type = $copy ? AJXP_NOTIF_NODE_COPY_TO : AJXP_NOTIF_NODE_MOVE_TO;
                 $primaryNode = $oldNode;
                 $secondNode = $newNode;
