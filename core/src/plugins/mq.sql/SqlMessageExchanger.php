@@ -20,11 +20,11 @@
  */
 namespace Pydio\Mq\Implementation;
 
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 
 use Pydio\Core\PluginFramework\SqlTableProvider;
 use Pydio\Core\Utils\DBHelper;
-use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
@@ -162,7 +162,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
      * @param $channelName
      * @param $clientId
      * @return mixed
-     * @throws \Exception
+     * @throws PydioException
      */
     public function suscribeToChannel(ContextInterface $ctx, $channelName, $clientId)
     {
@@ -170,7 +170,7 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         if ($ctx->hasUser()) {
             $user = $ctx->getUser();
             if ($user == null) {
-                throw new \Exception("You must be logged in");
+                throw new PydioException("You must be logged in");
             }
             $GROUP_PATH = $user->getGroupPath();
             $USER_ID = $user->getId();
@@ -179,6 +179,14 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
             $USER_ID = "shared";
         }
         if($GROUP_PATH == null) $GROUP_PATH = false;
+        if(strpos($channelName, "nodes:") === 0 && $channelName !== "nodes:*"){
+            $repositoryId = substr($channelName, strlen("nodes:*"));
+            // Make sure current user has Read access on this workspace
+            if(!empty($user) && !$user->canRead($repositoryId)){
+                $this->suscribeToChannel($ctx, "nodes:*", $clientId);
+                return;
+            }
+        }
         self::$channels[$channelName]["CLIENTS"][$clientId] = array(
             "ALIVE" => time(),
             "USER_ID" => $USER_ID,
@@ -187,11 +195,6 @@ class SqlMessageExchanger extends Plugin implements IMessageExchanger, SqlTableP
         if(strpos($channelName, "nodes:") === 0 && $channelName !== "nodes:*"){
             $this->suscribeToChannel($ctx, "nodes:*", $clientId);
         }
-        /*
-        foreach (self::$channels[$channelName]["MESSAGES"] as &$object) {
-            $object->messageRC[$clientId] = $clientId;
-        }
-        */
     }
 
     /**

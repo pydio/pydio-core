@@ -36,16 +36,16 @@ class RepositoryLoadException extends PydioException
     private $repository;
     /**
      * RepositoryLoadException constructor.
-     * @param RepositoryInterface|String $repository
+     * @param RepositoryInterface|String $workspace
      * @param array $errors
      */
-    public function __construct($repository, $errors)
+    public function __construct($workspace, $errors)
     {
-        if($repository instanceof RepositoryInterface){
-            $message = "Error while loading workspace ".$repository->getDisplay()." : ".implode("\n-", $errors);
-            $this->repository = $repository;
+        if($workspace instanceof RepositoryInterface){
+            $message = "Error while loading workspace ".$workspace->getDisplay()." : ".implode("\n-", $errors);
+            $this->repository = $workspace;
         }else{
-            $message = "Error while loading workspace ".$repository." : ".implode("\n-", $errors);
+            $message = "Error while loading workspace ".$workspace." : ".implode("\n-", $errors);
         }
         parent::__construct($message, false, 5000);
     }

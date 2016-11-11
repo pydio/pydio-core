@@ -141,3 +141,24 @@ div.dialogButtons.inlineEdition{
     font-family: @fontReact;
   }
 }
+
+.dialogBox.simple-modal-auth-prompt {
+  min-width: 260px;
+  width: 260px;
+  left:40%;
+  .dialogContent{
+    border-radius: 2px;
+    padding-bottom: 56px;
+    h3{
+      color: rgba(0,0,0,0.73);
+    }
+    input[type="password"], input[type="text"] {
+      margin-top: 10px;
+      font-size: 13px !important;
+    }
+  }
+  @media only screen
+  and (max-width : 420px) {
+    left:80px;
+  }
+}

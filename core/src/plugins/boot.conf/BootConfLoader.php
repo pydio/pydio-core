@@ -350,7 +350,7 @@ class BootConfLoader extends AbstractConfDriver
             "group_switch_value" => "auth.sql",
             "SQL_DRIVER" => array("core_driver" => "core", "group_switch_value" => "core")
         ));
-        if($data["APC_CACHE_ENABLE"]){
+        if($data["APC_CACHE_ENABLE"] && (function_exists('apc_fetch') || function_exists('apcu_fetch'))){
             $rand = StringHelper::slugify(trim(parse_url($data["SERVER_URL"], PHP_URL_PATH), "/"));
             if(empty($rand)) $rand = substr(md5(time()), 0, 8);
             $coreCache["UNIQUE_INSTANCE_CONFIG"] = array_merge($coreCache["UNIQUE_INSTANCE_CONFIG"], array(

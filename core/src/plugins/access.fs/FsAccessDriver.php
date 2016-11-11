@@ -662,6 +662,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if ($this->getContextualOption($ctx, "ZIP_ON_THE_FLY")) {
                         // Make a zip on the fly and send stream as download
                     	$response = HTMLWriter::responseWithAttachmentsHeaders($response, $localName, null, false, false);
+                    	$response = $response->withoutHeader("Content-Length");
                         $asyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selection, $dir) {
                             session_write_close();
                             restore_error_handler();
@@ -1548,7 +1549,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getContextualOption($ctx, "HIDE_RECYCLE") !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     $recycleNode = $selection->nodeForPath("/".$recycleBinOption);
-                    if (file_exists($recycleNode->getUrl())) {
+                    if (file_exists($recycleNode->getUrl()) && $this->isReadable($recycleNode)) {
                         $recycleNode->loadNodeInfo();
                         $nodesList->addBranch($recycleNode);
                     }
@@ -1746,6 +1747,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         // Update Recycle Bin label
         if ($currentMeta["ajxp_mime"] === "ajxp_recycle"){
             $ajxpNode->setLabel($messages[122]);
+        }
+
+        $user = $ajxpNode->getContext()->getUser();
+        if(!empty($user) && $user->getMergedRole()->hasMask($ajxpNode->getRepositoryId())){
+            $localMeta["ajxp_readonly"] = "false";
+            if (!@$this->isWriteable($ajxpNode)) {
+                $localMeta["ajxp_readonly"] = "true";
+            }
         }
 
         // Now remerge in node
@@ -2527,8 +2536,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             "DEFAULT_RIGHTS" => "",
             "DATA_TEMPLATE"  => ""
         ];
-        if ($repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") === true) {
-            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+        $sessionCredsInstance = MemorySafe::contextUsesInstance($ctx);
+        if($sessionCredsInstance !== false){
+            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getInstance($sessionCredsInstance)->getEncodedCredentials();
         }
         $customData = [];
         foreach ($httpVars as $key => $value) {
@@ -2543,7 +2553,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $newOptions["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
             foreach ($newOptions["META_SOURCES"] as $index => &$data) {
                 if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
-                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getInstance()->getEncodedCredentials();
                 }
             }
             Controller::applyHook("workspace.share_metasources", [$ctx, &$newOptions["META_SOURCES"]]);

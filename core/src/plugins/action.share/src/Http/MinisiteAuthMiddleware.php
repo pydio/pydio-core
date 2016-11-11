@@ -98,6 +98,9 @@ class MinisiteAuthMiddleware
         if(!empty($ctx) && $ctx->hasUser() && isSet($shareData["REPOSITORY"])){
             $repoObject = UsersService::getRepositoryWithPermission($ctx->getUser(), $shareData["REPOSITORY"]);
             $ctx->setRepositoryObject($repoObject);
+            if($sessions){
+                SessionService::saveRepositoryId($shareData["REPOSITORY"]);
+            }
             $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
         }
 

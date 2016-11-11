@@ -105,11 +105,7 @@ class CliRunner
                 $cmd .= " --$key=" . escapeshellarg($value);
             }
         }
-        $envSet = false;
-        if ($ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $envSet = MemorySafe::setEnv();
-        }
-
+        $envSet = MemorySafe::setEnvForContext($ctx);
         // NOW RUN COMMAND
         $res = self::runCommandInBackground($cmd, $logFile);
 

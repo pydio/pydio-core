@@ -312,7 +312,11 @@ abstract class AbstractCacheDriver extends Plugin
     public function supportsPatternDelete($namespace)
     {
         $cacheDriver = $this->getCacheDriver($namespace);
-        return $cacheDriver instanceof PatternClearableCache;
+        if($cacheDriver instanceof PydioChainCache){
+            return $cacheDriver->allProvidersSupportPatternDeletion();
+        }else{
+            return $cacheDriver instanceof PatternClearableCache;
+        }
     }
 
     /**
@@ -322,13 +326,13 @@ abstract class AbstractCacheDriver extends Plugin
      */
     public function deleteKeyStartingWith($namespace, $id){
 
+        /** @var PatternClearableCache $cacheDriver */
         $cacheDriver = $this->getCacheDriver($namespace);
         if($this->requiresHttpForwarding($cacheDriver)){
             $this->httpDeletion[$namespace.$id.'pattern'] = ["namespace"=>$namespace, "pattern" => $id];
             return true;
         }
-
-        if(!($cacheDriver instanceof PatternClearableCache)){
+        if(!$this->supportsPatternDelete($namespace)){
             return false;
         }
         Logger::debug("CacheDriver::Http", "Clear Pattern ".$id, ["namespace" => $namespace]);
