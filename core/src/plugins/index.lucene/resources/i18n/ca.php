@@ -31,5 +31,6 @@ $mess = array(
     "9" => "No es put trobat l'índex de la carpeta actual! En primer lloc hauría d'executar la indexació de les dades!",
     "10" => "Indexant subcarpetes en segon pla",
 	"11" => "El repositori sembla que està realitzant la indexació, per favor esperi 3 minuts i reintenti la seva cerca.",
-    "12" => "El repositori no està indexat, per favor llanci la indexació manualment!"
+    "12" => "El repositori no està indexat, per favor llanci la indexació manualment!",
+    "13" => "Content",
 );

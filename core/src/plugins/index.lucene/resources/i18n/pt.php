@@ -31,5 +31,6 @@ $mess = array(
     "9" => "Não foi possível encontrar um Índice para a Área de Trabalho Actual! Deverá ordenar uma Indexação dos ficheiros primeiro!",
     "10" => "A Indexar sub-pastas em segundo plano",
     "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
-    "12" => "Workspace is not indexed, try launching indexation manually!"
+    "12" => "Workspace is not indexed, try launching indexation manually!",
+    "13" => "Content",
 );

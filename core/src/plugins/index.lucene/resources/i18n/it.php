@@ -31,5 +31,6 @@ $mess = array(
     "9" => "Impossibile trovare l'indice per il workspace corrente! È necessario attivare l'indicizzazione dei dati prima!",
     "10" => "Indicizzazione sottocartelle in background",
     "11" => "Workspace seems to be currently indexing, please wait 3 minutes and retry your search.",
-    "12" => "Workspace is not indexed, try launching indexation manually!"
+    "12" => "Workspace is not indexed, try launching indexation manually!",
+    "13" => "Content",
 );

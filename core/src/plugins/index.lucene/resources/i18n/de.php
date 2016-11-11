@@ -31,5 +31,6 @@ $mess = array(
     "9" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung.",
     "10" => "In­de­xie­rung des Unterordners wird im Hintergrund ausführt",
     "11" => "Die Indexierung der Arbeitsumgebung wird gerade ausgeführt. Bitte versuchen Sie es in drei Minuten noch einmal.",
-    "12" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung."
+    "12" => "Für die Arbeitsumgebung existiert kein Index. Bitte starten Sie zuerst die Indexierung.",
+    "13" => "Inhalt",
 );
