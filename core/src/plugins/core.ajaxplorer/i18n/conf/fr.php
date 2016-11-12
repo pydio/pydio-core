@@ -28,6 +28,7 @@ $mess=array(
 "Sharing" => "Partage",
 "Download Folder (Legacy)" => "Download Folder (Legacy)",
 "Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead." => "Absolute path to the public folder where temporary download links will be created. This is used for legacy purpose, newly created links do not use it anymore, but use the Base URI instead.",
+"Download URL" => "URL de téléchargement",
 "If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here." => "If not inferred directly from the current pydio URL plus the public base URI, replace the public access URL here.",
 "Existing users" => "Utilisateurs existants",
 "Allow the users to pick an existing user when sharing a folder" => "Autoriser les utilisateurs à voir une liste d'utilisateurs existants lors du partage d'un répertoire",
