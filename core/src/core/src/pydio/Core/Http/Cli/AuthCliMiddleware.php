@@ -158,7 +158,11 @@ class AuthCliMiddleware
                 foreach( $repos as $repoId => $repositoryInterface ){
 
                     try{
-                        $output->writeln("<comment>Applying action '$actionName' on workspace ".$repositoryInterface->getDisplay()." (".$repoId.")</comment>");
+                        $message = "Applying action '$actionName' on workspace ".$repositoryInterface->getDisplay()." (".$repoId.")";
+                        $output->writeln("<comment>$message</comment>");
+                        if(!empty($taskId)){
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_RUNNING, "User '$userId' - ".$message);
+                        }
                         $subResponse = new Response();
                         $ctx = Context::contextWithObjects($user, $repositoryInterface);
                         $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
@@ -189,7 +193,7 @@ class AuthCliMiddleware
 
                         $output->writeln("<error>$taskId: ".$repoEx->getMessage()."</error>");
                         if(!empty($taskId)){
-                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $repoEx->getMessage());
+                            TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "User '$userId' / $repoId - ".$repoEx->getMessage());
                         }
 
                     }
@@ -200,7 +204,7 @@ class AuthCliMiddleware
 
                 $output->writeln("<error>USER: ".$userEx->getMessage()."</error>");
                 if(!empty($taskId)){
-                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, $userEx->getMessage());
+                    TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_FAILED, "User '$userId' - ".$userEx->getMessage());
                 }
 
             }

@@ -97,6 +97,13 @@ class CliMiddleware implements ITopLevelMiddleware
 
         }
 
+        if(!empty($taskId)){
+            $task = TaskService::getInstance()->getTaskById($taskId);
+            // Update status if required. 
+            if($task->getStatus() === Task::STATUS_RUNNING){
+                TaskService::getInstance()->updateTaskStatus($taskId, Task::STATUS_COMPLETE, "Finished");
+            }
+        }
     }
 
     /**
