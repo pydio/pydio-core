@@ -266,7 +266,11 @@ class MultiAuthDriver extends AbstractAuthDriver
     {
         if (empty($this->baseName)) {
             if ($this->masterSlaveMode) {
-                return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                if($filterProperty === 'parent' && $filterValue === AJXP_FILTER_NOT_EMPTY){
+                    return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                }else{
+                    return $this->drivers[$this->slaveName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$this->masterName]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
+                }
             } else {
                 $keys = array_keys($this->drivers);
                 return $this->drivers[$keys[0]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive) + $this->drivers[$keys[1]]->getUsersCount($baseGroup, $regexp, $filterProperty, $filterValue, $recursive);
