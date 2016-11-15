@@ -225,8 +225,6 @@ class HttpDownload extends Plugin
 
         // Copy-ing the body to the destination file
         while (!$body->eof()) {
-            $body->read(4096);
-
             $part = $body->read(4096);
             $readBytes = strlen($part);
 
