@@ -266,8 +266,16 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 if ($source["serialized_metadata"] != null) {
                     $meta = unserialize(base64_decode($source["serialized_metadata"]));
                     $tmpNode = new AJXP_Node($source["node_url"], $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($source['ajxp_scope'] === "user" && !empty($source['ajxp_user'])) $tmpNode->setUserId($source['ajxp_user']);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node($source["node_url"], []);
+                    if(!$tmpNode->hasUser()){
+                        if($source['ajxp_scope'] === "user" && !empty($source['ajxp_user'])) $tmpNode->setUserId($source['ajxp_user']);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
 
@@ -330,8 +338,16 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node($hit->node_url, []);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
