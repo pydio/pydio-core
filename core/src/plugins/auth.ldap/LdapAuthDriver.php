@@ -477,9 +477,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
 
         if (!empty($this->hasGroupsMapping)) {
-            if ($baseGroup == "/") {
-                $this->dynamicFilter = "!(" . $this->hasGroupsMapping . "=*)";
-            } else {
+            if ($baseGroup !== "/") 
                 $this->dynamicFilter = $this->hasGroupsMapping . "=" . basename($baseGroup);
             }
         }
