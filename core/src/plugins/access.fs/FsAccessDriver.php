@@ -650,6 +650,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 } else {
                     if(isset($httpVars["dir"])){
                         $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
+                    }else{
+                        $dir = $selection->commonDirFromSelection();
                     }
                     $base = basename(PathUtils::forwardSlashDirname($selection->getUniqueFile()));
                     $zip = true;
@@ -2391,7 +2393,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $filePaths = [];
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $node) {
-            $realFile = $node->getRealFile();
+            //$realFile = $node->getRealFile();
+            $realFile = MetaStreamWrapper::getRealFSReference($node->getUrl());
             if (basename($node->getPath()) == "") {
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile];
             } else {
@@ -2427,7 +2430,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if($basedir == "__AJXP_ZIP_FLAT__/"){
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }else{
-            $basedir = MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()).trim($basedir);
+            $basedir = rtrim(MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()), '/').trim($basedir);
             $this->logDebug("Basedir", [$basedir]);
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }
