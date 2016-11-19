@@ -23,6 +23,7 @@
 namespace Pydio\Access\Driver\StreamProvider\SMB;
 
 use Pydio\Log\Core\Logger;
+use Pydio\Core\Utils\TextEncoder;
 
 define ('SMB4PHP_VERSION', '0.8');
 
@@ -185,6 +186,7 @@ class smb
 
         if (PHP_OS == "WIN32" || PHP_OS == "WINNT" || PHP_OS == "Windows") {
             $params = ConvSmbParameterToWinOs($params);
+            $params = TextEncoder::toStorageEncoding($params);
             }
 	
         $cmd = SMB4PHP_SMBCLIENT." -N {$options} {$port} {$options} {$params} {$auth}";
