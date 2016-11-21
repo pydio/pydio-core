@@ -174,6 +174,9 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 return null;
             }
             $textQuery = $httpVars["query"];
+            if($this->getContextualOption($ctx, "APPLY_ASCII_TRANSLIT") === true){
+                $textQuery = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $textQuery);
+            }
             if($this->getContextualOption($ctx, "AUTO_WILDCARD") === true && strlen($textQuery) > 0 && ctype_alnum($textQuery)){
                 if($textQuery[0] == '"' && $textQuery[strlen($textQuery)-1] == '"'){
                     $textQuery = substr($textQuery, 1, -1);
