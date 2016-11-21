@@ -134,11 +134,17 @@ class MetadataCachingStream implements StreamInterface
 
                 CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $stat);
             }
-        } else if (isset($stats)) {
+        } else {
             CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"], $stats, $this->cacheOptions["timelimit"]);
         }
 
         return CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
+    }
+
+    public function write($string) {
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_NODES, $this->cacheOptions["id"]);
+
+        return $this->stream->write($string);
     }
 
     public function rename($newNode) {

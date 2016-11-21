@@ -311,8 +311,10 @@ class StreamWrapper implements IAjxpWrapper
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
         if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
 
+        if (strpos($mode, 'w') !== false) {
+            $nodeStream = new WriteBufferStream($nodeStream, $node);
+        }
         $nodeStream = new MetadataCachingStream($nodeStream, $node);
-        $nodeStream = new WriteBufferStream($nodeStream, $node);
 
         PydioStreamWrapper::getResource($nodeStream);
 
