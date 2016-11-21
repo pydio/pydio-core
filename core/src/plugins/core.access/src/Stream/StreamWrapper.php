@@ -137,7 +137,7 @@ class StreamWrapper implements IAjxpWrapper
 
         return true;
     }
-    
+
     /**
      * @return bool
      */
@@ -182,7 +182,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function mkdir($path, $mode, $options) {
         $stream = self::createStream($path);
-        
+
         return $stream->mkdir();
     }
 
@@ -348,6 +348,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function unlink($path)
     {
-        // TODO: Implement unlink() method.
+        $stream = self::createStream($path);
+        return $stream->delete();
     }
 }
