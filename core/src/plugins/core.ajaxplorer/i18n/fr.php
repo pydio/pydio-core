@@ -653,5 +653,8 @@ $mess=array(
 "553" => "Mot de passe invalide, veuillez réessayer. \\n Attention à ce que votre touche Majuscule ne soit pas activée.",
 "554" => "%s résultat(s) dans la Corbeille",
 "556" => "Lancement de %s en tâche de fond",
+"557" => "Identification requise",
+"558" => "Veuillez entrer votre mot de passe pour accéder à ce workspace.",
+"559" => "L'authentification pour accéder au workspace a échoué.",
 /* END SENTENCE */
 );

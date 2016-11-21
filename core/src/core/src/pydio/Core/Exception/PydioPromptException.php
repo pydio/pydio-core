@@ -23,6 +23,7 @@ namespace Pydio\Core\Exception;
 use Pydio\Core\Http\Middleware\WorkspaceAuthMiddleware;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -83,12 +84,15 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
      * @return  PydioPromptException
      */
     public static function promptForWorkspaceCredentials($parameters, $postSubmitCallback = ""){
+        $mess = LocaleService::getMessages();
         $inputs = [];
         foreach($parameters as $key => $value){
             if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_LOGIN) {
-                $inputs[] = "<input type='text' name='$key' value='$value' placeholder='Login'>";
+                $loginString = str_replace("'","\'", $mess['181']);
+                $inputs[] = "<input type='text' name='$key' value='$value' placeholder='$loginString'>";
             }else if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_PASS){
-                $inputs[] = "<input type='password' name='$key' value='' placeholder='Password' autocomplete='off'>";
+                $passString = str_replace("'","\'", $mess['182']);
+                $inputs[] = "<input type='password' name='$key' value='' placeholder='$passString' autocomplete='off'>";
             }else{
                 $inputs[] = "<input type='hidden' name='$key' value='$value'>";
             }
@@ -97,8 +101,8 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
             "confirm",
             array(
                 "DIALOG" => "<div>
-                                <h3>Credentials Required</h3>
-                                <div class='dialogLegend'>Please provide a password to enter this workspace.</div>
+                                <h3>".$mess['557']."</h3>
+                                <div class='dialogLegend'>".$mess['558']."</div>
                                 <form autocomplete='off'>
                                     ".implode("\n", $inputs)."
                                 </form>
@@ -112,7 +116,7 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
                     "EVAL" => ""
                 )
             ),
-            "Credentials Needed");
+            $mess['557']);
 
     }
 

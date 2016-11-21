@@ -651,5 +651,8 @@ $mess=array(
 "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
 "554" => "%s result(s) in Recycle Bin",
 "556" => "Launching task %s in background",
+"557" => "Credentials required",
+"558" => "Please provide a password to enter this workspace.",
+"559" => "Authentication failed for this workspace.",
 /* END SENTENCE */
 );

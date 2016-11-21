@@ -24,6 +24,7 @@ use Pydio\Access\Core\Model\Repository;
 use Pydio\Auth\Core\MemorySafe;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -43,10 +44,13 @@ class WorkspaceAuthRequired extends PydioException {
      * @param boolean $requireLogin
      * @param string $message
      */
-    public function __construct($workspaceId, $requireLogin = false, $message = "Authentication required for this workspace")
+    public function __construct($workspaceId, $requireLogin = false, $message = "")
     {
         $this->workspaceId = $workspaceId;
         $this->requireLogin = $requireLogin;
+        if(empty($message)){
+            $message = LocaleService::getMessages()['559'];
+        }
         parent::__construct($message, false, null);
     }
 
