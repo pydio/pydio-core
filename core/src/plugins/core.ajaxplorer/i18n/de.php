@@ -658,6 +658,9 @@ $mess=array(
 "553" => "Ungültiges Passwort. Bitte stellen Sie sicher, dass die Feststelltaste nicht gedrückt ist und geben Sie das Kennwort erneut ein.",
 "554" => "%s Ergebnis(se) im Papierkorb",
 "556" => "Starte Aufgabe %s im Hintergrund",
+"557" => "Credentials required",
+"558" => "Please provide a password to enter this workspace.",
+"559" => "Authentication failed for this workspace.",
 /* END SENTENCE */
 /* password strength tester */
 );

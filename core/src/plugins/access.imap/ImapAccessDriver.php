@@ -71,11 +71,21 @@ class ImapAccessDriver extends FsAccessDriver
         }
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function inverseSort($st1, $st2)
     {
         return strnatcasecmp($st2, $st1);
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function sortInboxFirst($st1, $st2)
     {
         if($st1 == "INBOX") return -1;
@@ -83,6 +93,13 @@ class ImapAccessDriver extends FsAccessDriver
         return strcmp($st1, $st2);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     * @throws \Pydio\Access\Core\Exception\FileNotWriteableException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         if ($request->getAttribute("action") ==  "ls") {

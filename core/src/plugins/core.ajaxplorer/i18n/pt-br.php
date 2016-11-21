@@ -257,7 +257,6 @@ $mess=array(
 "204" => "O arquivo \"",
 "205" => "\" excede o limite de tamanho (",
 "206" => "Mb).\\nNão será enviado.",
-/* END SENTENCE */
 "207" => "Você não tem permissão de escrita neste diretório",
 "208" => "Você não tem permissão de leitura neste diretório",
 "209" => "Erro interno no servidor, contate o administrador do sistema!",
@@ -433,7 +432,6 @@ $mess=array(
 "375" => "Aviso, você esteve inativo mais do que __IDLE__, você será desconectado em __LOGOUT__",
 "376" => "Clique em qualquer lugar para reativar",
 "378" => "Aviso, senha vazia ou muito curta!",
-/* testador de força de senha */
 "379" => "Palavra não-segura!",
 "380" => "Muito curto",
 "381" => "Muito fraco",
@@ -653,4 +651,9 @@ $mess=array(
 "553" => "Senha inválida, favor tentar novamente. \\n Verifique se a função Caps Lock não está ativada!",
 "554" => "%s resultado(s) na Lixeira",
 "556" => "Executando tarefa %s em segundo plano",
+"557" => "Credentials required",
+"558" => "Please provide a password to enter this workspace.",
+"559" => "Authentication failed for this workspace.",
+/* END SENTENCE */
+/* testador de força de senha */
 );

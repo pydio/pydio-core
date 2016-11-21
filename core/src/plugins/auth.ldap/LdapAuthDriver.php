@@ -214,8 +214,10 @@ class LdapAuthDriver extends AbstractAuthDriver
             if ($this->ldapconn == null) {
                 $this->logError(__FUNCTION__, 'LDAP Server connexion could NOT be established');
             }
+            if ($this->ldapconn !== null && isSet($this->options["LDAP_PROTOCOL"]) && $this->options["LDAP_PROTOCOL"] === 'starttls') {
+                ldap_start_tls($this->ldapconn);
+            }
         }
-        //return $this->ldapconn;
     }
 
     public function __deconstruct()

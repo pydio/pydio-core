@@ -326,8 +326,11 @@ class Scheduler extends Plugin
                 $task = TaskService::getInstance()->getTaskById(InputFilter::sanitize($httpVars["task_id"], InputFilter::SANITIZE_ALPHANUM));
                 if($task !== null){
                     $children = $task->getChildrenTasks();
-                    if(!empty($children)){
-                        throw new PydioException("This task has currently jobs running, please wait that they are finished");
+                    foreach ($children as $child){
+                        if($child->getStatus() === Task::STATUS_RUNNING){
+                            throw new PydioException("This task has currently jobs running, please wait that they are finished");
+                        }
+                        TaskService::getInstance()->deleteTask($child->getId());
                     }
                     TaskService::getInstance()->deleteTask($task->getId());
                 }
