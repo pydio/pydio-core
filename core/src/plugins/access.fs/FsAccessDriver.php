@@ -2385,7 +2385,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
-        $zipEncoding = ConfService::getContextConf($selection->getContext(), "ZIP_ENCODING");
+
 
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
@@ -2398,10 +2398,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile];
             } else {
                 $shortName = $node->getLabel();
-                if(!empty($zipEncoding)){
-                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
-                    if($test !== false) $shortName = $test;
-                }
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile,
                                     PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName];
             }
