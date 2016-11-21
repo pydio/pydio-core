@@ -137,7 +137,7 @@ class StreamWrapper implements IAjxpWrapper
 
         return true;
     }
-    
+
     /**
      * @return bool
      */
@@ -182,7 +182,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function mkdir($path, $mode, $options) {
         $stream = self::createStream($path);
-        
+
         return $stream->mkdir();
     }
 
@@ -311,8 +311,10 @@ class StreamWrapper implements IAjxpWrapper
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
         if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
 
+        if (strpos($mode, 'w') !== false) {
+            $nodeStream = new WriteBufferStream($nodeStream, $node);
+        }
         $nodeStream = new MetadataCachingStream($nodeStream, $node);
-        $nodeStream = new WriteBufferStream($nodeStream, $node);
 
         PydioStreamWrapper::getResource($nodeStream);
 
@@ -348,6 +350,7 @@ class StreamWrapper implements IAjxpWrapper
      */
     public function unlink($path)
     {
-        // TODO: Implement unlink() method.
+        $stream = self::createStream($path);
+        return $stream->delete();
     }
 }

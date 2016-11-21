@@ -86,7 +86,7 @@ class Driver extends FsAccessDriver
      * @param AJXP_Node $node
      * @return string
      */
-    public static function convertPath($node) {
+    public static function convertPath($node, $withHost = false) {
 
         $ctx = $node->getContext();
         $repository = $node->getRepository();
@@ -107,11 +107,16 @@ class Driver extends FsAccessDriver
             }
         }
 
-        if (isset($path)) {
-            return "/" . $basePath . $path;
+        $host = ""; // By default, we don't return the host
+        if ($withHost) {
+            $host = rtrim($repository->getContextOption($ctx, "HOST"), "/");
         }
 
-        return $basePath;
+        if (isset($path)) {
+            return rtrim($host . "/" . $basePath . $path, "/");
+        }
+
+        return ltrim($host . "/" . $basePath, "/");
     }
 
     /**

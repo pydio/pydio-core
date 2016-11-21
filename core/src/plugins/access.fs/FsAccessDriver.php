@@ -1311,7 +1311,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles([$dir . "/" . $selection->getUniqueFile()]);
                 }
-                
+
                 $orderField = $orderDirection = null;
                 $threshold          = 500;
                 $limitPerPage       = 200;
@@ -2253,7 +2253,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $mess = LocaleService::getMessages();
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $selectedNode) {
-
             $selectedNode->loadNodeInfo();
             $fileUrl = $selectedNode->getUrl();
             $filePath = $selectedNode->getPath();
@@ -2262,12 +2261,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $logMessages[]=$mess[100]." ".$filePath;
                 continue;
             }
-            $this->deldir($fileUrl, $repoData, $taskId);
-            if ($selectedNode->isLeaf()) {
+            if (!$selectedNode->isLeaf()) {
                 $logMessages[]="$mess[38] ".$filePath." $mess[44].";
             } else {
                 $logMessages[]="$mess[34] ".$filePath." $mess[44].";
             }
+            $this->deldir($fileUrl, $repoData, $taskId);
             Controller::applyHook("node.change", [$selectedNode]);
         }
         if($taskId != null){

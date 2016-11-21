@@ -15,12 +15,14 @@
                 },
                 "body": [
                     "<?xml version=\"1.0\"?>",
-                    "<a:propfind xmlns:a=\"DAV:\">",
-                        "<a:prop><a:getcontenttype/></a:prop>",
-                        "<a:prop><a:getcontentlength/></a:prop>",
-                        "<a:prop><a:resourcetype/></a:prop>",
-                        "<a:prop><a:getlastmodified/></a:prop>",
-                    "</a:propfind>"
+                    "<propfind xmlns=\"DAV:\">",
+                        "<prop>",
+                            "<getcontenttype/>",
+                            "<getcontentlength/>",
+                            "<resourcetype/>",
+                            "<getlastmodified/>",
+                        "</prop>",
+                    "</propfind>"
                 ]
             },
             "parameters" : {
@@ -40,7 +42,7 @@
         },
         "Ls": {
             "httpMethod" : "PROPFIND",
-            "uri" : "{path}",
+            "uri" : "{path}/",
             "summary" : "Returns the stat of a specific object",
             "responseClass" : "Directory",
             "exceptions" : false,
@@ -51,12 +53,14 @@
                 },
                 "body": [
                     "<?xml version=\"1.0\"?>",
-                    "<a:propfind xmlns:a=\"DAV:\">",
-                        "<a:prop><a:getcontenttype/></a:prop>",
-                        "<a:prop><a:getcontentlength/></a:prop>",
-                        "<a:prop><a:resourcetype/></a:prop>",
-                        "<a:prop><a:getlastmodified/></a:prop>",
-                    "</a:propfind>"
+                    "<propfind xmlns=\"DAV:\">",
+                        "<prop>",
+                            "<getcontenttype/>",
+                            "<getcontentlength/>",
+                            "<resourcetype/>",
+                            "<getlastmodified/>",
+                        "</prop>",
+                    "</propfind>"
                 ]
             },
             "parameters" : {
@@ -157,7 +161,8 @@
                     "filters": [{
                         "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
                         "args": [
-                            "@value"
+                            "@value",
+                            true
                         ]
                     }]
                 }
@@ -187,18 +192,19 @@
         },
         "Delete" : {
             "httpMethod": "DELETE",
-            "uri" : "{path/basepath}/{path/fullpath}",
-            "responseClass": "DeleteOutput",
-            "parameters": {
-                "path/fullpath":  {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
-                },
-                "path/basepath": {
-                    "required" : true,
-                    "type" : "string",
-                    "location" : "uri"
+            "uri" : "{path}",
+            "parameters" :  {
+                "path" : {
+                    "required": true,
+                    "type": "object",
+                    "location": "uri",
+                    "sentAs": "path",
+                    "filters": [{
+                        "method": "\\Pydio\\Access\\WebDAV\\Driver::convertPath",
+                        "args": [
+                            "@value"
+                        ]
+                    }]
                 }
             }
         }
