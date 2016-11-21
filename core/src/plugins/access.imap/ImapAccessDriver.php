@@ -218,11 +218,16 @@ class ImapAccessDriver extends FsAccessDriver
     {
         if($foldersOnly) return 0;
         $count = 0;
-        if($tmpHandle = opendir($dirNode->getUrl())){
+        if($dirHANDLE !== null){
+            $tmpHandle = $dirHANDLE;
+        }else{
+            $tmpHandle = opendir($dirNode->getUrl());
+        }
+        if($tmpHandle !== false){
             // WILL USE IMAP FUNCTIONS TO COUNT;
             $this->logDebug("COUNT : ".ImapAccessWrapper::getCurrentDirCount());
             $count = ImapAccessWrapper::getCurrentDirCount();
-            closedir($tmpHandle);
+            //closedir($tmpHandle);
         }
         return $count;
     }
