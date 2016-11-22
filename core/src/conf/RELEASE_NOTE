@@ -62,6 +62,21 @@ Pydio 7.0.2 Bugfix release for Pydio 7
 . Update trigger as mysql automatically pads varchars when comparing, creating a content instead of path in some case (trailing spaces). See #1253 (details)
 . i18n new prompt exception mechanism (details)
 . RolesManager loading role data : Make sure to remove invalid repos on error from shared repositories list. (details)
+. Initiate release note and dist resources for 7.0.2 (details)
+. 7.0.2 : rename extensions.conf file. (details)
+. Fixing webdav dir php7, caching and guzzle version compat issue (details)
+. Enabling empty file creation via Guzzle (details)
+. Optionally convert to ASCII//TRANSLIT the search term. Close #1243 (details)
+. Removing double encoding to fix 1252 (details)
+. Fix IMAP access driver that was failing if cache was enabled. (details)
+. resolveAddress: check userExists before validateEmail(), otherwise a user with email-like ID will not have his real address taken into account. Close #1286 (details)
+. Handle Minisite + Lock case - Fix #1278 (details)
+. Access.smb: throw WorkspaceAuthRequired if no credentials found and anonymous connection is not allowed. (details)
+. Previous commit seems not necessary (details)
+. Finally keep the WorkspaceAuthRequired throw from Smb. Test for empty credentials when testing workspace. Modal: fix overlay not present (prevents prompt opening). (details)
+. Document the //TRANSLIT support in Zip Encoding field. See #1252 (details)
+. Fix drag'n'drop on leaf nodes (cause of possible "Empty Response" error at upload). (details)
+. Make sure to never call getId() on null user. (details)
 
 **************
 New Features
