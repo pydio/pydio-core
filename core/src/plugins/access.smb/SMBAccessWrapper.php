@@ -86,6 +86,8 @@ class SMBAccessWrapper extends FsAccessWrapper
                     $credentials = $domain."/".$credentials;
                 }
             }
+        }else if($repoObject->getContextOption($node->getContext(), "ANONYMOUS_FORBIDDEN") === true){
+            throw new WorkspaceAuthRequired($repoObject->getId());
         }
         $basePath = $repoObject->getContextOption($node->getContext(), "PATH");
         $fullPath = "smbclient://".$credentials.$host."/";//.$basePath."/".$path;

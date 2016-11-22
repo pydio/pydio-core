@@ -65,7 +65,8 @@ class WorkspaceAuthRequired extends PydioException {
         if($instanceId === false){
             return;
         }
-        if(MemorySafe::loadCredentials($instanceId) !== false){
+        $credentials = MemorySafe::loadCredentials($instanceId);
+        if($credentials !== false && !empty($credentials['user']) && !empty($credentials['password'])){
             return;
         }
         $allowFreeLogin = ($workspaceObject->getContextOption($ctx, "SESSION_CREDENTIALS_FREE_LOGIN") === true);
