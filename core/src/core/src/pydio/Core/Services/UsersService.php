@@ -159,6 +159,9 @@ class UsersService
      */
     public static function getRepositoriesForUser($user, $includeShared = true, $details = false, $labelsOnly = false){
 
+        if(!$user instanceof UserInterface){
+            return [];
+        }
         $self = self::instance();
         $repos = $self->getFromCaches($user->getId());
         if($repos !== null) {
