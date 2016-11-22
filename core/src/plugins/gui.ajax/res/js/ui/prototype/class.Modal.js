@@ -347,7 +347,10 @@ Class.create("Modal", {
         content.addClassName("dialogContent");
         var overlay;
         if(element === document.body){
-            overlay = $(document.body).down('#overlay');
+            if(!$('overlay')){
+                addLightboxMarkup();
+            }
+            overlay = $('overlay');
             overlay.setStyle({display:'block'});
             pydio.UI.disableShortcuts();
         }else{

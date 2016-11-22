@@ -96,12 +96,15 @@ class MinisiteAuthMiddleware
             ApplicationState::setStateMinisite($hash);
         }
         if(!empty($ctx) && $ctx->hasUser() && isSet($shareData["REPOSITORY"])){
-            $repoObject = UsersService::getRepositoryWithPermission($ctx->getUser(), $shareData["REPOSITORY"]);
-            $ctx->setRepositoryObject($repoObject);
             if($sessions){
                 SessionService::saveRepositoryId($shareData["REPOSITORY"]);
             }
-            $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+            $uLock = $ctx->getUser()->getLock();
+            if(empty($uLock)){
+                $repoObject = UsersService::getRepositoryWithPermission($ctx->getUser(), $shareData["REPOSITORY"]);
+                $ctx->setRepositoryObject($repoObject);
+                $requestInterface = $requestInterface->withAttribute("ctx", $ctx);
+            }
         }
 
         return Server::callNextMiddleWare($requestInterface, $responseInterface, $next);
