@@ -408,7 +408,8 @@ class Stream implements StreamInterface
 
         $this->prepare('Put', [
             'headers' => [
-                "Content-Length" => $this->size
+                "Content-Length" => $this->size,
+                "Content-Type" => "application/octet-stream"
             ],
             'body' => $this->resource
         ]);
@@ -484,6 +485,7 @@ class Stream implements StreamInterface
         $result = $this->client->execute($this->command);
 
         $this->detach();
+
         $this->attach(GuzzleStreamWrapper::getResource($result["body"]));
 
         return $result;

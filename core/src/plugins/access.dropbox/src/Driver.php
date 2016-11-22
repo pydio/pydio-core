@@ -119,8 +119,46 @@ class Driver extends FsAccessDriver
      */
     public static function convertToJSON($key, $value) {
         $key = '' . $key->getName();
-        $value = '' . $value;
+
+        if ($value instanceof AJXP_Node) {
+            $value = self::convertPath($value);
+        } else {
+            $value = '' . $value;
+        }
+
         $arr = [$key => $value];
         return json_encode($arr);
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return string
+     */
+    public static function convertToJSONOverwrite($key, $value) {
+        $key = '' . $key->getName();
+
+        if ($value instanceof AJXP_Node) {
+            $value = self::convertPath($value);
+        } else {
+            $value = '' . $value;
+        }
+
+        $arr = [$key => $value,
+            "mode" => [
+                ".tag" => "overwrite"
+            ]
+        ];
+        return json_encode($arr);
+    }
+
+    /**
+     * @param $date
+     * @return int
+     */
+    public static function convertTime($date) {
+        $date = date_create($date);
+
+        return date_timestamp_get($date);
     }
 }

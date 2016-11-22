@@ -61,6 +61,7 @@ class DropBoxSubscriber implements SubscriberInterface
         $count = $event->getRetryCount();
         $path = $request->getPath();
         $found = strpos($path, "download");
+        $found |= strpos($path, "upload");
 
         if ( $host != $target && $found  && $count == 0) {
             $request->setHost("content.dropboxapi.com");
