@@ -170,7 +170,7 @@ class Context implements ContextInterface
      */
     public function hasRepository()
     {
-        return ($this->repositoryId !== null);
+        return ($this->repositoryId !== null && $this->repositoryId !== '*');
     }
 
     /**
@@ -178,7 +178,7 @@ class Context implements ContextInterface
      */
     public function getRepository()
     {
-        if(isSet($this->repositoryId)){
+        if(isSet($this->repositoryId) && $this->repositoryId !== '*'){
             if(!isSet($this->repositoryObject)){
                 $this->repositoryObject = RepositoryService::getRepositoryById($this->repositoryId);
             }
