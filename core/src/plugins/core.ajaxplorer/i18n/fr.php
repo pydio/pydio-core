@@ -656,5 +656,7 @@ $mess=array(
 "557" => "Identification requise",
 "558" => "Veuillez entrer votre mot de passe pour accéder à ce workspace.",
 "559" => "L'authentification pour accéder au workspace a échoué.",
+"560" => "Authentification requise",
+"561" => "Vous allez être redirigé vers la page d'authentification du fournisseur. Si vous n'êtes pas redirigé automaiquement, cliquez sur OK pour réessayer...",
 /* END SENTENCE */
 );

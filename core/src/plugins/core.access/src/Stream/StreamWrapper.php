@@ -25,6 +25,8 @@ use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Exception\PydioPromptException;
+use Pydio\Access\Core\Stream\Exception\OAuthException;
 
 use Pydio\Core\Utils\FileHelper;
 use React\Promise\Deferred;
@@ -309,7 +311,12 @@ class StreamWrapper implements IAjxpWrapper
 
         $nodeStream = Stream::factory($node, $mode);
         if ($useAuthStream) $nodeStream = new AuthStream($nodeStream, $node);
-        if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
+
+        try {
+            if ($useOAuthStream) $nodeStream = new OAuthStream($nodeStream, $node);
+        } catch (OAuthException $e) {
+            throw PydioPromptException::promptForAuthRedirection("test", $e->getURL());
+        }
 
         if (strpos($mode, 'w') !== false) {
             $nodeStream = new WriteBufferStream($nodeStream, $node);

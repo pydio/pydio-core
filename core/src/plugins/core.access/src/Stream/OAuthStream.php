@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Stream\StreamDecoratorTrait;
 use GuzzleHttp\Stream\StreamInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Access\Core\Stream\Exception\OAuthException;
 use Pydio\Access\Core\Stream\Utils\AuthorizationCode;
 use Pydio\Core\Exception\PydioUserAlertException;
 use Pydio\Core\Model\ContextInterface;
@@ -31,7 +32,6 @@ class OAuthStream implements StreamInterface
 
     /** @var ContextInterface Context */
     private $context;
-
 
     /**
      * OAuthStream constructor.
@@ -115,7 +115,7 @@ class OAuthStream implements StreamInterface
         }
 
         if (empty($oauth2)) {
-            throw new PydioUserAlertException("Please go to <a style=\"text-decoration:underline;\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
+            throw new OAuthException("You will be redirected to your account for authentication", $authUrl);
         }
 
         // Retrieving access token and checking access
@@ -123,7 +123,7 @@ class OAuthStream implements StreamInterface
             $accessToken = $oauth2->getAccessToken();
             $refreshToken = $oauth2->getRefreshToken();
         } catch (\Exception $e) {
-            throw new PydioUserAlertException("Please go to <a style=\"text-decoration:underline;\" href=\"" . $authUrl . "\">" . $authUrl . "</a> to authorize the access to your onedrive. Then try again to switch to this workspace");
+            throw new OAuthException("You will be redirected to your account for authentication", $authUrl);
         }
 
         // Saving tokens for later use
@@ -138,10 +138,7 @@ class OAuthStream implements StreamInterface
             "subscribers" => [$oauth2]
         ]);
 
-        if (isset($node)) {
-            $resource = PydioStreamWrapper::getResource($stream);
-            $this->stream = new Stream($resource, $node);
-        }
+        $this->stream = $stream;
     }
 
     /**

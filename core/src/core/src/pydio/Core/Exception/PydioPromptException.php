@@ -121,6 +121,39 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
     }
 
     /**
+     * Prompt url for OAuth authentication
+     * @param array $parameters
+     * @param string $postSubmitCallback
+     * @return  PydioPromptException
+     */
+    public static function promptForAuthRedirection($message, $url) {
+
+        $mess = LocaleService::getMessages();
+
+        $redirect = "window.location.href = \"".$url."\";";
+        $cancel = "window.clearTimeout(window.OAuthTimeout); window.OAuthTimeout = null;";
+
+        return new PydioPromptException(
+            "confirm",
+            array(
+                "DIALOG" => "<div>
+                                <h3>".$mess['560']."</h3>
+                                <div class='dialogLegend'>".$mess['561']."</div>
+
+                                <script type=\"text/javascript\">
+                                    window.OAuthTimeout = window.setTimeout(function() {".$redirect."}, 2000);
+                                </script>
+                            </div>
+                            ",
+                "OK"        => array(
+                    "EVAL" => $redirect
+                )
+            ),
+            $mess['557']
+        );
+    }
+
+    /**
      * @return mixed
      */
     public function jsonSerializableData()

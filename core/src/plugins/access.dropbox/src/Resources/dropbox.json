@@ -93,17 +93,25 @@
       "httpMethod" : "POST",
       "uri" : "files/move",
       "parameters" : {
-        "frompath/fullpath" : {
+        "path" : {
           "required" : true,
           "type" : "string",
           "location" : "json",
-          "sentAs": "from_path"
+          "sentAs": "from_path",
+          "filters": [{
+            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+            "args": [ "@value" ]
+          }]
         },
-        "topath/fullpath" : {
+        "newPath" : {
           "required" : true,
           "type" : "string",
           "location" : "json",
-          "sentAs": "to_path"
+          "sentAs": "to_path",
+          "filters": [{
+            "method": "\\Pydio\\Access\\DropBox\\Driver::convertPath",
+            "args": [ "@value" ]
+          }]
         }
       }
     },

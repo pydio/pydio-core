@@ -48,7 +48,7 @@ class Driver extends FsAccessDriver
     const RESOURCES_FILE = "dropbox.json";
 
     public $driverType = "dropbox";
-    
+
     /**
      * Repository Initialization
      * @param ContextInterface $context
@@ -90,7 +90,7 @@ class Driver extends FsAccessDriver
 
             // Simulate the creation of a stream to ensure we store the oauth in the stream context
             $stream = new OAuthStream(Stream::factory('php://memory'), $context);
-            $stream->close();
+
         }
 
         return parent::switchAction($request, $response);
@@ -106,7 +106,7 @@ class Driver extends FsAccessDriver
     public static function convertPath(AJXP_Node $node) {
         $path = $node->getPath();
 
-        if (isset($path)) {
+        if (isset($path) && $path !== "/") {
             return $path;
         }
         return "";
