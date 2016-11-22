@@ -1179,7 +1179,7 @@ class ShareCenter extends Plugin
     public function cleanUserShares($ctx, $userId){
         $shares = $this->getShareStore($ctx)->listShares($userId);
         foreach($shares as $hash => $data){
-            $this->getShareStore()->deleteShare($data['SHARE_TYPE'], $hash, false, true);
+            $this->getShareStore($ctx)->deleteShare($data['SHARE_TYPE'], $hash, false, true);
         }
     }
 

@@ -94,6 +94,21 @@
         <li>Update trigger as mysql automatically pads varchars when comparing, creating a content instead of path in some case (trailing spaces). See #1253 (<a href="http://github.com/pydio/pydio-core/commit/c2f492623657852a09497c84147029394ea758b1">details</a>)</li>
         <li>i18n new prompt exception mechanism (<a href="http://github.com/pydio/pydio-core/commit/1646efe8f10e906efdc8f8a842f3cdd01f113149">details</a>)</li>
         <li>RolesManager loading role data : Make sure to remove invalid repos on error from shared repositories list. (<a href="http://github.com/pydio/pydio-core/commit/5d6b0ddb83164f18ce2ac24b3a6641e901bd5407">details</a>)</li>
+        <li>Initiate release note and dist resources for 7.0.2 (<a href="http://github.com/pydio/pydio-core/commit/d54df84f70226956d6ea0f90ce41d8266d5a4641">details</a>)</li>
+        <li>7.0.2 : rename extensions.conf file. (<a href="http://github.com/pydio/pydio-core/commit/bef0f957ceaa73453582178d55f5e5f307fb8181">details</a>)</li>
+        <li>Fixing webdav dir php7, caching and guzzle version compat issue (<a href="http://github.com/pydio/pydio-core/commit/edaa6b428bf2ad0eec7c11a7fe32e2f75f3473a6">details</a>)</li>
+        <li>Enabling empty file creation via Guzzle (<a href="http://github.com/pydio/pydio-core/commit/67c037a4fef603165cb8dc595dc5dd8b8360a8ee">details</a>)</li>
+        <li>Optionally convert to ASCII//TRANSLIT the search term. Close #1243 (<a href="http://github.com/pydio/pydio-core/commit/f7194ddeafca6a01b72fc0ad070f063a9a57a812">details</a>)</li>
+        <li>Removing double encoding to fix 1252 (<a href="http://github.com/pydio/pydio-core/commit/e2c684abe9f53d9301184dd84dbb503a70f01f30">details</a>)</li>
+        <li>Fix IMAP access driver that was failing if cache was enabled. (<a href="http://github.com/pydio/pydio-core/commit/442478dd09bbca366302f8d82486a5fe527c9e80">details</a>)</li>
+        <li>resolveAddress: check userExists before validateEmail(), otherwise a user with email-like ID will not have his real address taken into account. Close #1286 (<a href="http://github.com/pydio/pydio-core/commit/00d4dd7d5bc880e3dc4eb74ee42acfa5a2bd070f">details</a>)</li>
+        <li>Handle Minisite + Lock case - Fix #1278 (<a href="http://github.com/pydio/pydio-core/commit/1c2acd6658feb4854b676ced3a18e8e50a390d3c">details</a>)</li>
+        <li>Access.smb: throw WorkspaceAuthRequired if no credentials found and anonymous connection is not allowed. (<a href="http://github.com/pydio/pydio-core/commit/b03585c0e91e38cee60bb8e7cdd73b450cc33e60">details</a>)</li>
+        <li>Previous commit seems not necessary (<a href="http://github.com/pydio/pydio-core/commit/4da80e80ea5662a80c4f4c58aff88143655d1296">details</a>)</li>
+        <li>Finally keep the WorkspaceAuthRequired throw from Smb. Test for empty credentials when testing workspace. Modal: fix overlay not present (prevents prompt opening). (<a href="http://github.com/pydio/pydio-core/commit/8f4a585e09c58f40a897c85a615977502bfaaa33">details</a>)</li>
+        <li>Document the //TRANSLIT support in Zip Encoding field. See #1252 (<a href="http://github.com/pydio/pydio-core/commit/e4f2f43233cb058d1869fc4e5f31b6d497da917a">details</a>)</li>
+        <li>Fix drag'n'drop on leaf nodes (cause of possible "Empty Response" error at upload). (<a href="http://github.com/pydio/pydio-core/commit/30e982117c7c65fec89ec4f13bbaea5055390a87">details</a>)</li>
+        <li>Make sure to never call getId() on null user. (<a href="http://github.com/pydio/pydio-core/commit/adbc8398c35a89d7c0f2d3b9dbbeb70212d2e973">details</a>)</li>
     </ul>
 
 </div>
