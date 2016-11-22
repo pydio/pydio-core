@@ -87,7 +87,7 @@
                 if(Event.findElement(event, '.class-FetchedResultPane')){
                     return (listZone ? listZone : dropzone);
                 }
-                if(el.ajxpNode.isLeaf() && listZoneSelector){
+                if((el.hasClassName('ajxpNodeLeaf') || el.ajxpNode.isLeaf() || el.ajxpNode.getAjxpMime() === 'ajxp_recycle') && listZoneSelector){
                     el = Event.findElement(event, listZoneSelector);
                 }
             }
