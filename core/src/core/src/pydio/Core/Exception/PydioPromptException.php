@@ -20,8 +20,10 @@
  */
 namespace Pydio\Core\Exception;
 
+use Pydio\Core\Http\Middleware\WorkspaceAuthMiddleware;
 use Pydio\Core\Http\Response\JSONSerializableResponseChunk;
 use Pydio\Core\Http\Response\XMLSerializableResponseChunk;
+use Pydio\Core\Services\LocaleService;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -74,37 +76,81 @@ class PydioPromptException extends PydioException implements XMLSerializableResp
         parent::__construct($messageString, $messageId);
     }
 
+
     /**
      * Prompt user for credentials
-     * @param $sessionVariable
-     * @param $switchToRepositoryId
-     * @throws PydioPromptException
+     * @param array $parameters
+     * @param string $postSubmitCallback
+     * @return  PydioPromptException
      */
-    public static function testOrPromptForCredentials($sessionVariable, $switchToRepositoryId){
-        if(isSet($_GET["prompt_passed_data"]) && isSet($_GET["variable_name"]) && $_GET["variable_name"] == $sessionVariable){
-            $_SESSION[$sessionVariable] = true;
+    public static function promptForWorkspaceCredentials($parameters, $postSubmitCallback = ""){
+        $mess = LocaleService::getMessages();
+        $inputs = [];
+        foreach($parameters as $key => $value){
+            if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_LOGIN) {
+                $loginString = str_replace("'","\'", $mess['181']);
+                $inputs[] = "<input type='text' name='$key' value='$value' placeholder='$loginString'>";
+            }else if($key === WorkspaceAuthMiddleware::FORM_RESUBMIT_PASS){
+                $passString = str_replace("'","\'", $mess['182']);
+                $inputs[] = "<input type='password' name='$key' value='' placeholder='$passString' autocomplete='off'>";
+            }else{
+                $inputs[] = "<input type='hidden' name='$key' value='$value'>";
+            }
         }
-        if(!isSet($_SESSION[$sessionVariable])){
-            throw new PydioPromptException(
-                "confirm",
-                array(
-                    "DIALOG" => "Please enter your credentials for this workspace
-                                <input type='hidden' name='get_action' value='switch_repository'>
-                                <input type='hidden' name='repository_id' value='".$switchToRepositoryId."'>
-                                <input type='hidden' name='prompt_passed_data' value='true'>
-                                <input type='hidden' name='variable_name' value='".$sessionVariable."'>
-                                ",
-                    "OK"        => array(
-                        "GET_FIELDS" => array("get_action", "repository_id", "prompt_passed_data", "variable_name"),
-                        "EVAL" => "ajaxplorer.loadXmlRegistry();"
-                    ),
-                    "CANCEL"    => array(
-                        "EVAL" => "ajaxplorer.loadXmlRegistry();"
-                    )
+        return new PydioPromptException(
+            "confirm",
+            array(
+                "DIALOG" => "<div>
+                                <h3>".$mess['557']."</h3>
+                                <div class='dialogLegend'>".$mess['558']."</div>
+                                <form autocomplete='off'>
+                                    ".implode("\n", $inputs)."
+                                </form>
+                            </div>
+                            ",
+                "OK"        => array(
+                    "GET_FIELDS" => array_keys($parameters),
+                    "EVAL" => $postSubmitCallback
                 ),
-                "Credentials Needed");
-        }
+                "CANCEL"    => array(
+                    "EVAL" => ""
+                )
+            ),
+            $mess['557']);
 
+    }
+
+    /**
+     * Prompt url for OAuth authentication
+     * @param array $parameters
+     * @param string $postSubmitCallback
+     * @return  PydioPromptException
+     */
+    public static function promptForAuthRedirection($message, $url) {
+
+        $mess = LocaleService::getMessages();
+
+        $redirect = "window.location.href = \"".$url."\";";
+        $cancel = "window.clearTimeout(window.OAuthTimeout); window.OAuthTimeout = null;";
+
+        return new PydioPromptException(
+            "confirm",
+            array(
+                "DIALOG" => "<div>
+                                <h3>".$mess['560']."</h3>
+                                <div class='dialogLegend'>".$mess['561']."</div>
+
+                                <script type=\"text/javascript\">
+                                    window.OAuthTimeout = window.setTimeout(function() {".$redirect."}, 2000);
+                                </script>
+                            </div>
+                            ",
+                "OK"        => array(
+                    "EVAL" => $redirect
+                )
+            ),
+            $mess['557']
+        );
     }
 
     /**

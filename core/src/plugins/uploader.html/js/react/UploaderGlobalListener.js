@@ -83,12 +83,14 @@
 
         let findElement = function(event){
             var el = Event.findElement(event, selector);
+            console.log(el, event, selector);
             if(el.hasClassName('ajxpNodeProvider')){
                 if(Event.findElement(event, '.class-FetchedResultPane')){
                     return (listZone ? listZone : dropzone);
                 }
-                if(el.ajxpNode.isLeaf() && listZoneSelector){
-                    el = Event.findElement(event, listZoneSelector);
+                if(el.hasClassName('ajxpNodeLeaf') || el.ajxpNode.isLeaf() || el.ajxpNode.getAjxpMime() === 'ajxp_recycle'){
+                    if(listZoneSelector) el = Event.findElement(event, listZoneSelector);
+                    else el = Event.findElement(event, '[ajxpClass="FilesList"]');
                 }
             }
             if(!el) {

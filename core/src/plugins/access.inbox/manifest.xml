@@ -82,7 +82,7 @@
                         }
                         PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
                         ]]></clientCallback>
-                    <serverCallback methodName="switchAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
+                    <serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                         <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <output type="stream"/>
                     </serverCallback>

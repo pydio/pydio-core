@@ -552,40 +552,7 @@ class UsersManager extends AbstractManager
                 $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$userId)));
 
                 break;
-
-            case "save_repository_user_params" :
-
-                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
-                $currentIsLogged = false;
-                if ($userId === $ctx->getUser()->getId()) {
-                    $currentIsLogged = true;
-                    $user = $ctx->getUser();
-                } else {
-                    $user = $this->getUserIfAuthorized($ctx, $userId);
-                }
-
-                $wallet = $user->getPref("AJXP_WALLET");
-                if(!is_array($wallet)) $wallet = array();
-                $repoID = InputFilter::sanitize($httpVars["repository_id"], InputFilter::SANITIZE_ALPHANUM);
-                if (!array_key_exists($repoID, $wallet)) {
-                    $wallet[$repoID] = array();
-                }
-                $options = $wallet[$repoID];
-                $existing = $options;
-                $newCtx = new Context($userId, $ctx->getRepositoryId());
-                $this->parseParameters($newCtx, $httpVars, $options, false, $existing);
-                $wallet[$repoID] = $options;
-                $user->setPref("AJXP_WALLET", $wallet);
-                $user->save();
-
-                if ($currentIsLogged) {
-                    AuthService::updateSessionUser($user);
-                }
-
-                $responseInterface = $responseInterface->withBody(new SerializableResponseStream(new UserMessage($mess["ajxp_conf.47"].$userId)));
-
-                break;
-
+            
             case "update_user_pwd" :
                 
                 $userId = isSet($httpVars["user_id"]) ? InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS) : null;

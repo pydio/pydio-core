@@ -1,0 +1,114 @@
+<div style='font-family: "Roboto", "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 7.0.2 successfully installed</h2>
+
+    <p>
+        Pydio 7.0.2 is a bugfix release for Pydio 7. Main changes/fixes are
+        <ul>
+            <li>Encoding, zip operation, installation issues</li>
+            <li>Some plugins needed upgrade for v7 compatibility (imap, eml)</li>
+            <li>New uploader did not take into account the 'allowed extensions' parameter</li>
+            <li>See detailed changelog below</li>
+        </ul>
+        This version also introduce a new feature for dynamically providing a password for a workspace relying on session-based authentication.
+    </p>
+
+    <h2>Pydio 7 Important Features</h2>
+
+    <h3>Pydio Booster</h3>
+
+    <p>Pydio Go is a complement to Pydio that runs as a Server. It is based on GO, a performant language developed by Google. It will improve overall software performances, by delegating CPU-consuming task to this new tool. In this first version, it will handle uploads, scheduler triggers, and best of all, one-click install websocket server, which will especially improve scalability and performances by pushing events from server instead of polling all the time.<br/>
+    Pydio Go is available for Pydio Community and Pydio Enterprise.</p>
+
+    <h3>File Gateway improves your server security</h3>
+    Pydio offers a brand new SaaS-based service called FileGateway, a host proxy to send public links without disclosing your server URL.
+    Choose your domain name (filesend.cc / yoursha.re) and your region (US / EU).
+
+    <h3>Online Documents Edition</h3>
+
+    By hosting your own instance of Libreoffice Online from Collabora and using our new connector, you can now edit any office documents directly online, without the need to use third-party services like Zoho.
+
+    <h3>API, Performances</h3>
+        - Full rewrite of Pydio API, especially regarding provisioning, following Open API standards; there is now an extensive, accurate API REST documentation.
+        <br/>- Increased caching, especially files list, whick makes it mindblasting in terms of performances, especially for remote workspaces like S3 or FTP
+        <br/>- Search for files or information across several storages / workspaces at the same time, and get quicker search results with the upgrade of our Elastic Search plugin
+        <br/>- New Admin parameter to easily allow or prevent user to re-share files
+
+    <h3>Under the Hood</h3>
+        - Code refactoring, with PSR-7 pattern, Composer, Guzzle
+        <br/>- New Messaging Server based on NSQ, a language originally developed by Bitly
+        <br/>- Auto-complete command line makes it easier for Admins to look for specific actions with Pydio (thanks to @symfony)
+        <br/>- End of some unmaintained plugins (e.g. auth.serial, conf.serial)
+        <br/>- Internal router embeded solves deployment issues, simplifying RewriteRules at maximum
+        <br/>- New way of storing shares that will facilitate Pydio migrations
+        <br/> And many more... !!
+
+
+    <h2 style="color: darkgrey;">7.0.2 detailed changelog</h2>
+    <ul style="color: darkgrey;">
+        <li>Fix command line automatic comma-split, let it enabled only for -i and -r options, otherwise it can break some commands. (<a href="http://github.com/pydio/pydio-core/commit/d14c977e2aacdaeb545b72e8923b41a0c166a923">details</a>)</li>
+        <li>Update current stable version (<a href="http://github.com/pydio/pydio-core/commit/856bfdf8d0caa887cbc4e7b9ca5303985492447e">details</a>)</li>
+        <li>Use a dedicated mbParseUrl() function instead of parse_url that may fail with utf-8 on some specific installs (inc. macos) (<a href="http://github.com/pydio/pydio-core/commit/3f3513cefab1031a41c910eafbe6057998b7442a">details</a>)</li>
+        <li>Fix issue #1259: Zip on-the-fly option creates 0-sized empty files (apache compatibility) (<a href="http://github.com/pydio/pydio-core/commit/71e7d46e6705a79ad451b201d45841a5b80c6f65">details</a>)</li>
+        <li>Users and groups deletion: use UsersService and RolesService instead of deleting directly in db to fix caching issues. (<a href="http://github.com/pydio/pydio-core/commit/2e3cca879ea6d2b3a412c3caafdbb56a515a0ad1">details</a>)</li>
+        <li>Fix roles assignment when updating user groupPath (<a href="http://github.com/pydio/pydio-core/commit/2a90fa2996b0c4cd2f160587ac3bfc71bae007c8">details</a>)</li>
+        <li>JS UI: handle Prompt exception and dialog. (<a href="http://github.com/pydio/pydio-core/commit/05100454bae384491fcee6d7358591ce6425d95c">details</a>)</li>
+        <li>New Middleware WorkspaceAuthRequired catches specific exception, sends JS prompt message and re-initialize request when form is submitted. (<a href="http://github.com/pydio/pydio-core/commit/8ce39099bd683e87136c050eaeef106a018a92c0">details</a>)</li>
+        <li>changed invalid link to developer guide to v7 developer guide (<a href="http://github.com/pydio/pydio-core/commit/b6686d6a5e8718f5cf0f5c3d03f4b0452f4bb507">details</a>)</li>
+        <li>Reorganize MemorySafe. Add a context identifier to handle multiple credential sources. For storing when passed via ENV CLi. (<a href="http://github.com/pydio/pydio-core/commit/1f90363e3752f34aeed6ec6b5a333a9bc5bc460e">details</a>)</li>
+        <li>Tplus / Tminus were moved to subfolder. Fix #1255 (<a href="http://github.com/pydio/pydio-core/commit/182a504c1cc764ae96c2a56717287e5aa4978201">details</a>)</li>
+        <li>Change docs editors orders. Fix #1264 (<a href="http://github.com/pydio/pydio-core/commit/6d466d930c3bb13a7e9298191cc7b23c34b83518">details</a>)</li>
+        <li>Fix ChainCache declaring PatternClearable although subacaches may not have this feature. Fix #1265 (<a href="http://github.com/pydio/pydio-core/commit/37b6c13600b54bc2c6d766fce70d8c8ec8e8f2bc">details</a>)</li>
+        <li>Make sure to save repoId in session when loading minisite, can make some issues if shared user have other workspaces accesses. (<a href="http://github.com/pydio/pydio-core/commit/89612bddbc391d07ccf96bea04777bda81283a9c">details</a>)</li>
+        <li>Sets a default provider for TaskService otherwise top-level errors of command line are not visible to task status. (<a href="http://github.com/pydio/pydio-core/commit/1fd60a5ef2920369fb8e53bd276a4a442668cb0b">details</a>)</li>
+        <li>Fix slug issues - Fix #1273 (<a href="http://github.com/pydio/pydio-core/commit/4481a9460dd3dd349125a92555e846a74ffdb484">details</a>)</li>
+        <li>Prevent enabling cache at install if apc/apcu is not enabled. Should fix #1261 (<a href="http://github.com/pydio/pydio-core/commit/63d7e8a9022a4f3a54dbc0743778c11218920de1">details</a>)</li>
+        <li>Make sure to recompute readonly flag if current context has a permission mask, by using node.info.nocache hook. (<a href="http://github.com/pydio/pydio-core/commit/f274294cc9ad00079450fda3a8565381df4b361b">details</a>)</li>
+        <li>Change icon for dwg files, use cube. Fix #1230 (<a href="http://github.com/pydio/pydio-core/commit/31ac23335262290588f47cb8635cf88a37e0c102">details</a>)</li>
+        <li>Do not post "change" notifications or alerts when just copying a file to another workspace. Fix #1274 (<a href="http://github.com/pydio/pydio-core/commit/3ad15f5c302a8c602f845ccbb0390c9681860fcd">details</a>)</li>
+        <li>Silently ignore register channel on non-readable repository. Avoid sending events on write-only repositories, see #1256 (<a href="http://github.com/pydio/pydio-core/commit/9815d75bf88624f7b06543754b13b43b6c5c9b45">details</a>)</li>
+        <li>Dav impl childExists function is highly inefficient, replace by a simple call to is_file on childnode. (<a href="http://github.com/pydio/pydio-core/commit/aea7dd84f77331f242fd0d81704b786a143ccdd5">details</a>)</li>
+        <li>And WorkspaceAuthRequired instead of simple exception (<a href="http://github.com/pydio/pydio-core/commit/50454101c48328ce751e176467306935ba358270">details</a>)</li>
+        <li>Fix meta.git download/preview. Fix #1275 (<a href="http://github.com/pydio/pydio-core/commit/bcaea85666ec86a5ab44f5bf08a857efafb9bfc5">details</a>)</li>
+        <li>Fix Shared Files download, the associated method is no more switchAction but downloadAction. Fix #1276 (<a href="http://github.com/pydio/pydio-core/commit/6d58493c4970194b86d45d773be9888214cbea17">details</a>)</li>
+        <li>Use file_exists instead of is_file (<a href="http://github.com/pydio/pydio-core/commit/a7e00ceb2921a0ccb56cd99f275e515fe9fc25c1">details</a>)</li>
+        <li>CLI and task_id passed : make sure to update status by default, for actions that do not implement specific tasks management. Otherwise scheduler will show "Starting action.... " and nothing more. (<a href="http://github.com/pydio/pydio-core/commit/3ca1220d8b867566828c736266cbc419e1b59bdc">details</a>)</li>
+        <li>Missing context in cleanUserShares() could create an error on user deletion. Close #1279 (<a href="http://github.com/pydio/pydio-core/commit/9933d87c65f12a4064aaae755d5f06f028a63984">details</a>)</li>
+        <li>Fix mbParseUrl if preg_replace returns null. (<a href="http://github.com/pydio/pydio-core/commit/bfd03729637ceb3a8b3ce3683c22ebcbe21af830">details</a>)</li>
+        <li>Catch deleteById() exceptions in ElasticSearch (<a href="http://github.com/pydio/pydio-core/commit/d6dd8ca13cb70dac151b62ab5c6256cf30c2aaa1">details</a>)</li>
+        <li>Remote download was broken. Fix #1281 (<a href="http://github.com/pydio/pydio-core/commit/1ee2dbaddebd183082f0f2c3fe709ef29726c0a7">details</a>)</li>
+        <li>Auth.multi : when looking for shared users only, skip master driver. Auth.ldap : fix users count caching per baseGroup. (<a href="http://github.com/pydio/pydio-core/commit/d43cab3ea2e98d078a728d783d48b17c69ca86e5">details</a>)</li>
+        <li>Fix CSS on share dialog title. (<a href="http://github.com/pydio/pydio-core/commit/585516442109454ed86c17928bba0c70838b04ca">details</a>)</li>
+        <li>Add user if not in indexed URL. (<a href="http://github.com/pydio/pydio-core/commit/d472eb01e01519077a8a4c93d7f8476901b30343">details</a>)</li>
+        <li>Meta.git: make sure to apply node.change after revert operation. (<a href="http://github.com/pydio/pydio-core/commit/cec749a993d2672bdde2596734d973221bae198b">details</a>)</li>
+        <li>Fix counting user on ldap (<a href="http://github.com/pydio/pydio-core/commit/4cb8850cdc90a4a6fe1e6e04e19d5e4db4e08425">details</a>)</li>
+        <li>Missing curly brace (<a href="http://github.com/pydio/pydio-core/commit/8290d6969384cd18bacc2bf3e120cc8ca55a5d41">details</a>)</li>
+        <li>Fix Imap & EML plugins - Warning php7 requires Mail_mimeDecode 1.5.6 - Fix #1282 (<a href="http://github.com/pydio/pydio-core/commit/08ba5172e025cf2a2aa41e4f34571bfe30b19bfa">details</a>)</li>
+        <li>Fix #1288 (<a href="http://github.com/pydio/pydio-core/commit/b9ed5a7b84dba20cb0fe25b0481b2128dbca5e3b">details</a>)</li>
+        <li>Rewire ALLOWED_EXTENSIONS configs - Fix #1283 (<a href="http://github.com/pydio/pydio-core/commit/1a694236832a2524823e9cd57e19c9a6337b53f0">details</a>)</li>
+        <li>Fix SMB access driver and custom smbclient path. Close #1290 (<a href="http://github.com/pydio/pydio-core/commit/61e90bc5e2b2cfdf9c2e6ecb39deb63173e62b77">details</a>)</li>
+        <li>Fix zip operation when child drivers are remote (inc. smb) - Fix #1287 Fix base detection for archive (<a href="http://github.com/pydio/pydio-core/commit/5ea81c5e6eab04af0a07ee5b9d7186167ae5d32c">details</a>)</li>
+        <li>Auth.ldap: add starttsl support. See #1248, should fix it. (<a href="http://github.com/pydio/pydio-core/commit/f49aa9032adc0754e510f98ac761e5fef69a8495">details</a>)</li>
+        <li>Manual merge of #1292 (put encoding call directly inside win-dedicated function. (<a href="http://github.com/pydio/pydio-core/commit/72bf93932af927079f010b7d4f0c1b28e61e5c4e">details</a>)</li>
+        <li>Update trigger as mysql automatically pads varchars when comparing, creating a content instead of path in some case (trailing spaces). See #1253 (<a href="http://github.com/pydio/pydio-core/commit/c2f492623657852a09497c84147029394ea758b1">details</a>)</li>
+        <li>i18n new prompt exception mechanism (<a href="http://github.com/pydio/pydio-core/commit/1646efe8f10e906efdc8f8a842f3cdd01f113149">details</a>)</li>
+        <li>RolesManager loading role data : Make sure to remove invalid repos on error from shared repositories list. (<a href="http://github.com/pydio/pydio-core/commit/5d6b0ddb83164f18ce2ac24b3a6641e901bd5407">details</a>)</li>
+        <li>Initiate release note and dist resources for 7.0.2 (<a href="http://github.com/pydio/pydio-core/commit/d54df84f70226956d6ea0f90ce41d8266d5a4641">details</a>)</li>
+        <li>7.0.2 : rename extensions.conf file. (<a href="http://github.com/pydio/pydio-core/commit/bef0f957ceaa73453582178d55f5e5f307fb8181">details</a>)</li>
+        <li>Fixing webdav dir php7, caching and guzzle version compat issue (<a href="http://github.com/pydio/pydio-core/commit/edaa6b428bf2ad0eec7c11a7fe32e2f75f3473a6">details</a>)</li>
+        <li>Enabling empty file creation via Guzzle (<a href="http://github.com/pydio/pydio-core/commit/67c037a4fef603165cb8dc595dc5dd8b8360a8ee">details</a>)</li>
+        <li>Optionally convert to ASCII//TRANSLIT the search term. Close #1243 (<a href="http://github.com/pydio/pydio-core/commit/f7194ddeafca6a01b72fc0ad070f063a9a57a812">details</a>)</li>
+        <li>Removing double encoding to fix 1252 (<a href="http://github.com/pydio/pydio-core/commit/e2c684abe9f53d9301184dd84dbb503a70f01f30">details</a>)</li>
+        <li>Fix IMAP access driver that was failing if cache was enabled. (<a href="http://github.com/pydio/pydio-core/commit/442478dd09bbca366302f8d82486a5fe527c9e80">details</a>)</li>
+        <li>resolveAddress: check userExists before validateEmail(), otherwise a user with email-like ID will not have his real address taken into account. Close #1286 (<a href="http://github.com/pydio/pydio-core/commit/00d4dd7d5bc880e3dc4eb74ee42acfa5a2bd070f">details</a>)</li>
+        <li>Handle Minisite + Lock case - Fix #1278 (<a href="http://github.com/pydio/pydio-core/commit/1c2acd6658feb4854b676ced3a18e8e50a390d3c">details</a>)</li>
+        <li>Access.smb: throw WorkspaceAuthRequired if no credentials found and anonymous connection is not allowed. (<a href="http://github.com/pydio/pydio-core/commit/b03585c0e91e38cee60bb8e7cdd73b450cc33e60">details</a>)</li>
+        <li>Previous commit seems not necessary (<a href="http://github.com/pydio/pydio-core/commit/4da80e80ea5662a80c4f4c58aff88143655d1296">details</a>)</li>
+        <li>Finally keep the WorkspaceAuthRequired throw from Smb. Test for empty credentials when testing workspace. Modal: fix overlay not present (prevents prompt opening). (<a href="http://github.com/pydio/pydio-core/commit/8f4a585e09c58f40a897c85a615977502bfaaa33">details</a>)</li>
+        <li>Document the //TRANSLIT support in Zip Encoding field. See #1252 (<a href="http://github.com/pydio/pydio-core/commit/e4f2f43233cb058d1869fc4e5f31b6d497da917a">details</a>)</li>
+        <li>Fix drag'n'drop on leaf nodes (cause of possible "Empty Response" error at upload). (<a href="http://github.com/pydio/pydio-core/commit/30e982117c7c65fec89ec4f13bbaea5055390a87">details</a>)</li>
+        <li>Make sure to never call getId() on null user. (<a href="http://github.com/pydio/pydio-core/commit/adbc8398c35a89d7c0f2d3b9dbbeb70212d2e973">details</a>)</li>
+    </ul>
+
+</div>

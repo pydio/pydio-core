@@ -266,13 +266,23 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 if ($source["serialized_metadata"] != null) {
                     $meta = unserialize(base64_decode($source["serialized_metadata"]));
                     $tmpNode = new AJXP_Node($source["node_url"], $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($source['ajxp_scope'] === "user" && !empty($source['ajxp_user'])) $tmpNode->setUserId($source['ajxp_user']);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node($source["node_url"], []);
+                    if(!$tmpNode->hasUser()){
+                        if($source['ajxp_scope'] === "user" && !empty($source['ajxp_user'])) $tmpNode->setUserId($source['ajxp_user']);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
 
                 if (!file_exists($tmpNode->getUrl())) {
-                    $this->currentType->deleteById($hit->getId());
+                    try{
+                        $this->currentType->deleteById($hit->getId());
+                    }catch (Elastica\Exception\NotFoundException $nfe){}
                     continue;
                 }
 
@@ -328,12 +338,22 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 if ($hit->serialized_metadata!=null) {
                     $meta = unserialize(base64_decode($hit->serialized_metadata));
                     $tmpNode = new AJXP_Node($hit->node_url, $meta);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                 } else {
                     $tmpNode = new AJXP_Node($hit->node_url, []);
+                    if(!$tmpNode->hasUser()){
+                        if($hit->ajxp_user) $tmpNode->setUserId($hit->ajxp_user);
+                        else $tmpNode->setUserId($ctx->getUser()->getId());
+                    }
                     $tmpNode->loadNodeInfo();
                 }
                 if (!file_exists($tmpNode->getUrl())) {
-                    $this->currentType->deleteById($hit->getId());
+                    try{
+                        $this->currentType->deleteById($hit->getId());
+                    }catch (Elastica\Exception\NotFoundException $eEx){}
                     continue;
                 }
                 $tmpNode->search_score = sprintf("%0.2f", $hit->score);
@@ -392,12 +412,18 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
             foreach ($hits as $hit) {
                 $source = $hit->getSource();
                 if ($source['ajxp_scope'] == 'shared' || ($source['ajxp_scope'] == 'user' && $source['ajxp_user'] == $node->getContext()->getUser()->getId())) {
-                    $this->currentType->deleteById($hit->getId());
+                    try{
+                        $this->currentType->deleteById($hit->getId());
+                    }catch (Elastica\Exception\NotFoundException $eEx){}
                 }
             }
         } else {
             $id = $this->getIndexedDocumentId($node);
-            if($id != null) $this->currentType->deleteById($id);
+            if($id != null) {
+                try{
+                    $this->currentType->deleteById($id);
+                }catch (Elastica\Exception\NotFoundException $eEx){}
+            }
         }
         $this->createIndexedDocument($node);
 
@@ -433,7 +459,9 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                     $childrenHits = $childrenHits->getResults();
 
                     foreach ($childrenHits as $hit) {
-                        $this->currentType->deleteById($hit->getId());
+                        try{
+                            $this->currentType->deleteById($hit->getId());
+                        }catch (Elastica\Exception\NotFoundException $eEx){}
                     }
                 }
             }
@@ -479,7 +507,9 @@ class ElasticSearchIndexer extends AbstractSearchEngineIndexer
                 foreach ($childrenHits as $hit) {
                     $oldChildURL = $this->currentType->getDocument($hit->getId())->get("node_url");
                     if ($copy == false) {
-                        $this->currentType->deleteById($hit->getId());
+                        try{
+                            $this->currentType->deleteById($hit->getId());
+                        }catch (Elastica\Exception\NotFoundException $eEx){}
                     }
                     $newChildURL = str_replace($oldNode->getUrl(),
                         $newNode->getUrl(),

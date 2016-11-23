@@ -340,11 +340,24 @@ Class.create("Modal", {
 		this.showDialogForm('', editorData.formId, loadFunc, null, null, true, true);			
 	},
 
-    showSimpleModal : function(element, content, okCallback, cancelCallback, position){
-        var box = new Element("div", {className:"dialogBox css_boxshadow", style:'display:block;'});
+    showSimpleModal : function(element, content, okCallback, cancelCallback, position, additionalClass, skipEffect){
+        if(!additionalClass) additionalClass = '';
+        var box = new Element("div", {className:"dialogBox css_boxshadow" + ' ' + additionalClass, style:'display:block;'});
         box.insert(content);
         content.addClassName("dialogContent");
-        addLightboxMarkupToElement(element);
+        var overlay;
+        if(element === document.body){
+            if(!$('overlay')){
+                addLightboxMarkup();
+            }
+            overlay = $('overlay');
+            overlay.setStyle({display:'block'});
+            pydio.UI.disableShortcuts();
+        }else{
+            addLightboxMarkupToElement(element);
+            overlay = element.down("#element_overlay");
+            overlay.setStyle({opacity:0.9});
+        }
         if(Prototype.Browser.IE && !Prototype.Browser.IE10plus){
             $("all_forms").insert(box);
             var outBox = element.up(".dialogBox");
@@ -364,58 +377,60 @@ Class.create("Modal", {
                 });
             }
         }else{
-            $(element).down("#element_overlay").insert({after:box});
-            $(element).down("#element_overlay").setStyle({opacity:0.9});
-            if(element.up('div.dialogBox')){
-                //Effect.BlindDown(box, {
-                //    duration:0.6,
-                //    transition:Effect.Transitions.sinoidal
-                //});
-            }
+            overlay.insert({after:box});
         }
         this.currentLightBoxElement = $(element);
         this.currentLightBoxModal = box;
         this.addSubmitCancel(content, cancelCallback, (cancelCallback==null), position);
+
+        var finish = function(){
+            content.down('div.dialogButtons').remove();
+            box.remove();
+            if(element !== document.body){
+                overlay.setStyle({opacity:0});
+                removeLightboxFromElement(element);
+            }else{
+                overlay.setStyle({display:null});
+                pydio.UI.enableShortcuts();
+            }
+            this.currentLightBoxElement = null;
+            this.currentLightBoxModal = null;
+        }.bind(this);
+        var finishWrapped = function(){
+            if(skipEffect){
+                finish();
+            }else{
+                Effect.BlindUp(box, {
+                    duration:0.4,
+                    afterFinish:finish
+                });
+            }
+        };
+
         content.down(".dialogButtons").select("input").each(function(button){
             if(((cancelCallback==null) && button.getAttribute("name") == "close") || button.getAttribute("name") == "ok"){
                 button.observe("click", function(event){
                     Event.stop(event);
-                    var res = okCallback();
-                    if(res){
-                        Effect.BlindUp(box, {
-                            duration:0.4,
-                            afterFinish:function(){
-                                content.down('div.dialogButtons').remove();
-                                $(element).down("#element_overlay").setStyle({opacity:0});
-                                box.remove();
-                                removeLightboxFromElement(element);
-                                this.currentLightBoxElement = null;
-                                this.currentLightBoxModal = null;
-                            }.bind(this)
-                        });
+                    if(okCallback()){
+                        finishWrapped();
                     }
                 }.bind(this));
             }else{
                 button.stopObserving("click");
                 button.observe("click", function(event){
                     Event.stop(event);
-                    var res = cancelCallback();
-                    if(res){
-                        Effect.BlindUp(box, {
-                            duration:0.4,
-                            afterFinish:function(){
-                                content.down('div.dialogButtons').remove();
-                                if($(element).down("#element_overlay")) {
-                                    $(element).down("#element_overlay").setStyle({opacity:0});
-                                }
-                                box.remove();
-                                removeLightboxFromElement(element);
-                                this.currentLightBoxElement = null;
-                                this.currentLightBoxModal = null;
-                            }.bind(this)
-                        });
+                    if(cancelCallback()){
+                        finishWrapped();
                     }
                 }.bind(this));
+            }
+        });
+        content.select('input[type="password"],input[type="text"]').invoke("observe", "keydown", function(event){
+            if(event.keyCode === Event.KEY_RETURN){
+                Event.stop(event);
+                if(okCallback()){
+                    finishWrapped();
+                }
             }
         });
     },

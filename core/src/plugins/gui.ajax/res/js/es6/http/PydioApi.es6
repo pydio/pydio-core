@@ -382,7 +382,7 @@ class PydioApi{
 
         for(var i=0; i<childs.length;i++)
         {
-            if(childs[i].tagName == "message")
+            if(childs[i].tagName === "message")
             {
                 var messageTxt = "No message";
                 if(childs[i].firstChild) messageTxt = childs[i].firstChild.nodeValue;
@@ -393,43 +393,13 @@ class PydioApi{
                     Logger.log(messageTxt);
                 }
 
-            }else if(childs[i].tagName == "prompt"){
+            }else if(childs[i].tagName === "prompt"){
 
-                var message = XMLUtils.XPathSelectSingleNode(childs[i], "message").firstChild.nodeValue;
-                var jsonData = XMLUtils.XPathSelectSingleNode(childs[i], "data").firstChild.nodeValue;
-                var json = JSON.parse(jsonData);
-                // TODO: DELEGATE TO UI
-                /*
-                var dialogContent = new Element('div').update(json["DIALOG"]);
-                modal.showSimpleModal(modal.messageBox?modal.messageBox:document.body, dialogContent, function(){
-                    // ok callback;
-                    if(json["OK"]["GET_FIELDS"]){
-                        var params = $H();
-                        $A(json["OK"]["GET_FIELDS"]).each(function(fName){
-                            params.set(fName, dialogContent.down('input[name="'+fName+'"]').getValue());
-                        });
-                        var conn = new Connexion();
-                        conn.setParameters(params);
-                        if(json["OK"]["EVAL"]){
-                            conn.onComplete = function(){
-                                eval(json["OK"]["EVAL"]);
-                            };
-                        }
-                        conn.sendAsync();
-                    }else{
-                        if(json["OK"]["EVAL"]){
-                            eval(json["OK"]["EVAL"]);
-                        }
-                    }
-                    return true;
-                }, function(){
-                    // cancel callback
-                    if(json["CANCEL"]["EVAL"]){
-                        eval(json["CANCEL"]["EVAL"]);
-                    }
-                    return true;
-                });
-                */
+                if(pydio && pydio.UI && pydio.UI.openPromptDialog){
+                    let jsonData = XMLUtils.XPathSelectSingleNode(childs[i], "data").firstChild.nodeValue;
+                    pydio.UI.openPromptDialog(JSON.parse(jsonData));
+                }
+                // Interrupt further process
                 throw new Error();
 
             }

@@ -233,10 +233,12 @@ class RolesManager extends AbstractManager
                             || ($repositoryObject->getUniqueUser() != null && $repositoryObject->getUniqueUser() != $userObject->getId())
                         )
                     ){
+                        if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
                         continue;
                     }else if(empty($userObject) && (
                             (empty($currentMainUser) && !$currentMainUser->canAdministrate($repositoryObject)) || $repositoryObject->isTemplate()
                         )){
+                        if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
                         continue;
                     }
                     $meta = array();

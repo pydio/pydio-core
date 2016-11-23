@@ -651,6 +651,11 @@ $mess=array(
 "553" => "Invalid password, please try again. \\n Make sure your Caps Lock is not engaged!",
 "554" => "%s result(s) in Recycle Bin",
 "556" => "Launching task %s in background",
+"557" => "Credentials required",
+"558" => "Please provide a password to enter this workspace.",
+"559" => "Authentication failed for this workspace.",
+"560" => "Authentication required",
+"561" => "We will redirect you to the Authentication page of the provider. If you are not redirected automatically, press OK to retry...",
 /* END SENTENCE */
 /* password strength tester */
 );

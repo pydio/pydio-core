@@ -62,7 +62,7 @@
 			</action>
 		</actions>
 		<hooks>
-			<serverCallback hookName="node.info" methodName="extractMimeHeaders"/>
+			<serverCallback hookName="node.info.nocache" methodName="extractMimeHeaders"/>
 		</hooks>
 	</registry_contributions>
 	<dependencies>

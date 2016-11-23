@@ -143,12 +143,14 @@
                 let bytesLoaded = computableEvent.loaded;
                 this.setProgress(percentage, bytesLoaded);
             }.bind(this);
+
             this.setStatus('loading');
 
             let maxUpload = parseFloat(UploaderConfigs.getInstance().getOption('UPLOAD_MAX_SIZE'));
 
             let queryString;
             try{
+                UploaderConfigs.getInstance().extensionAllowed(this);
                 queryString = this.buildQueryString();
             }catch(e){
                 this.onError(e.message);
@@ -586,6 +588,17 @@
             if(!this._global){
                 this._global = global.pydio.getPluginConfigs("uploader");
                 this._mq = global.pydio.getPluginConfigs("mq");
+            }
+        }
+
+        extensionAllowed(uploadItem){
+            let extString = this.getOption("ALLOWED_EXTENSIONS", '', '');
+            if(!extString) return true;
+            let extDescription = this.getOption("ALLOWED_EXTENSIONS_READABLE", '', '');
+            if(extDescription) extDescription = ' (' + extDescription + ')';
+            let itemExt = PathUtils.getFileExtension(uploadItem.getLabel());
+            if(extString.split(',').indexOf(itemExt) === -1){
+                throw new Error(global.pydio.MessageHash[367] + extString + extDescription);
             }
         }
 

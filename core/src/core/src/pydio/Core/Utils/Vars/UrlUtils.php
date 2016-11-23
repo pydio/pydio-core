@@ -29,6 +29,42 @@ defined('AJXP_EXEC') or die('Access not allowed');
  */
 class UrlUtils
 {
+    /**
+     * UTF8 support for parseUrl
+     * @param string $url
+     * @param int $part one of PHP_URL_** variable
+     * @return array|string
+     */
+    public static function mbParseUrl($url, $part = -1){
+        $enc_url = preg_replace_callback(
+            '%[^:/@?&=#]+%usD',
+            function ($matches)
+            {
+                return urlencode($matches[0]);
+            },
+            $url
+        );
+        if($enc_url === null) {
+            return parse_url($url, $part);
+        }
+
+        $parts = parse_url($enc_url, $part);
+
+        if($parts === false)
+        {
+            throw new \InvalidArgumentException('Malformed URL: ' . $url);
+        }
+        if($part !== -1){
+            return urldecode($parts);
+        }
+
+        foreach($parts as $name => $value)
+        {
+            $parts[$name] = urldecode($value);
+        }
+
+        return $parts;
+    }
 
     /**
      * Parse URL ignoring # and ?
@@ -37,7 +73,7 @@ class UrlUtils
      */
     public static function safeParseUrl($path)
     {
-        $parts = parse_url(str_replace(array("#", "?"), array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), $path));
+        $parts = self::mbParseUrl(str_replace(array("#", "?"), array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), $path));
         $parts["path"] = str_replace(array("__AJXP_FRAGMENT__", "__AJXP_MARK__"), array("#", "?"), $parts["path"]);
         return $parts;
     }

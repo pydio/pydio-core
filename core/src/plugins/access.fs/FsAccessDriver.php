@@ -650,6 +650,8 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 } else {
                     if(isset($httpVars["dir"])){
                         $dir = InputFilter::decodeSecureMagic($httpVars["dir"], InputFilter::SANITIZE_DIRNAME);
+                    }else{
+                        $dir = $selection->commonDirFromSelection();
                     }
                     $base = basename(PathUtils::forwardSlashDirname($selection->getUniqueFile()));
                     $zip = true;
@@ -662,6 +664,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                     if ($this->getContextualOption($ctx, "ZIP_ON_THE_FLY")) {
                         // Make a zip on the fly and send stream as download
                     	$response = HTMLWriter::responseWithAttachmentsHeaders($response, $localName, null, false, false);
+                    	$response = $response->withoutHeader("Content-Length");
                         $asyncReader = new \Pydio\Core\Http\Response\AsyncResponseStream(function () use ($selection, $dir) {
                             session_write_close();
                             restore_error_handler();
@@ -1308,7 +1311,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && strpos($selection->getUniqueFile(), "/") !== 0){
                     $selection->setFiles([$dir . "/" . $selection->getUniqueFile()]);
                 }
-                
+
                 $orderField = $orderDirection = null;
                 $threshold          = 500;
                 $limitPerPage       = 200;
@@ -1548,7 +1551,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if ($dir == ""  && $lsOptions["d"] && RecycleBinManager::recycleEnabled() && $this->getContextualOption($ctx, "HIDE_RECYCLE") !== true) {
                     $recycleBinOption = RecycleBinManager::getRelativeRecycle();
                     $recycleNode = $selection->nodeForPath("/".$recycleBinOption);
-                    if (file_exists($recycleNode->getUrl())) {
+                    if (file_exists($recycleNode->getUrl()) && $this->isReadable($recycleNode)) {
                         $recycleNode->loadNodeInfo();
                         $nodesList->addBranch($recycleNode);
                     }
@@ -1746,6 +1749,14 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         // Update Recycle Bin label
         if ($currentMeta["ajxp_mime"] === "ajxp_recycle"){
             $ajxpNode->setLabel($messages[122]);
+        }
+
+        $user = $ajxpNode->getContext()->getUser();
+        if(!empty($user) && $user->getMergedRole()->hasMask($ajxpNode->getRepositoryId())){
+            $localMeta["ajxp_readonly"] = "false";
+            if (!@$this->isWriteable($ajxpNode)) {
+                $localMeta["ajxp_readonly"] = "true";
+            }
         }
 
         // Now remerge in node
@@ -2242,7 +2253,6 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         $mess = LocaleService::getMessages();
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $selectedNode) {
-
             $selectedNode->loadNodeInfo();
             $fileUrl = $selectedNode->getUrl();
             $filePath = $selectedNode->getPath();
@@ -2251,12 +2261,12 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 $logMessages[]=$mess[100]." ".$filePath;
                 continue;
             }
-            $this->deldir($fileUrl, $repoData, $taskId);
-            if ($selectedNode->isLeaf()) {
+            if (!$selectedNode->isLeaf()) {
                 $logMessages[]="$mess[38] ".$filePath." $mess[44].";
             } else {
                 $logMessages[]="$mess[34] ".$filePath." $mess[44].";
             }
+            $this->deldir($fileUrl, $repoData, $taskId);
             Controller::applyHook("node.change", [$selectedNode]);
         }
         if($taskId != null){
@@ -2375,22 +2385,19 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
      */
     public function makeZip (UserSelection $selection, $dest, $basedir, $taskId = null)
     {
-        $zipEncoding = ConfService::getContextConf($selection->getContext(), "ZIP_ENCODING");
+
 
         @set_time_limit(0);
         require_once(AJXP_BIN_FOLDER."/lib/pclzip.lib.php");
         $filePaths = [];
         $selectedNodes = $selection->buildNodes();
         foreach ($selectedNodes as $node) {
-            $realFile = $node->getRealFile();
+            //$realFile = $node->getRealFile();
+            $realFile = MetaStreamWrapper::getRealFSReference($node->getUrl());
             if (basename($node->getPath()) == "") {
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile];
             } else {
                 $shortName = $node->getLabel();
-                if(!empty($zipEncoding)){
-                    $test = iconv(TextEncoder::getEncoding(), $zipEncoding, $shortName);
-                    if($test !== false) $shortName = $test;
-                }
                 $filePaths[] = [PCLZIP_ATT_FILE_NAME => $realFile,
                                     PCLZIP_ATT_FILE_NEW_SHORT_NAME => $shortName];
             }
@@ -2418,7 +2425,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
         if($basedir == "__AJXP_ZIP_FLAT__/"){
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_ALL_PATH, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }else{
-            $basedir = MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()).trim($basedir);
+            $basedir = rtrim(MetaStreamWrapper::getRealFSReference($selection->currentBaseUrl()), '/').trim($basedir);
             $this->logDebug("Basedir", [$basedir]);
             $vList = $archive->create($filePaths, PCLZIP_OPT_REMOVE_PATH, $basedir, PCLZIP_OPT_NO_COMPRESSION, PCLZIP_OPT_ADD_TEMP_FILE_ON, PCLZIP_CB_PRE_ADD, $preAddCallback);
         }
@@ -2527,8 +2534,9 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             "DEFAULT_RIGHTS" => "",
             "DATA_TEMPLATE"  => ""
         ];
-        if ($repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") === true) {
-            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+        $sessionCredsInstance = MemorySafe::contextUsesInstance($ctx);
+        if($sessionCredsInstance !== false){
+            $newOptions["ENCODED_CREDENTIALS"] = MemorySafe::getInstance($sessionCredsInstance)->getEncodedCredentials();
         }
         $customData = [];
         foreach ($httpVars as $key => $value) {
@@ -2543,7 +2551,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
             $newOptions["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
             foreach ($newOptions["META_SOURCES"] as $index => &$data) {
                 if (isSet($data["USE_SESSION_CREDENTIALS"]) && $data["USE_SESSION_CREDENTIALS"] === true) {
-                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getEncodedCredentialString();
+                    $newOptions["META_SOURCES"][$index]["ENCODED_CREDENTIALS"] = MemorySafe::getInstance()->getEncodedCredentials();
                 }
             }
             Controller::applyHook("workspace.share_metasources", [$ctx, &$newOptions["META_SOURCES"]]);

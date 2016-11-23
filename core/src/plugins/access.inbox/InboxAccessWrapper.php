@@ -26,6 +26,7 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\IAjxpWrapper;
 
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -180,7 +181,7 @@ class InboxAccessWrapper implements IAjxpWrapper
             $isRemote = MetaStreamWrapper::wrapperIsRemote($url);
             $realFilePointer = MetaStreamWrapper::getRealFSReference($url, true);
             if(!$isRemote){
-                $ext = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+                $ext = pathinfo(UrlUtils::mbParseUrl($url, PHP_URL_PATH), PATHINFO_EXTENSION);
                 $tmpname = tempnam(ApplicationState::getTemporaryFolder(), "real-file-inbox-pointer").".".$ext;
                 copy($realFilePointer, $tmpname);
                 $realFilePointer = $tmpname;

@@ -22,6 +22,7 @@ namespace Pydio\Access\Meta\Version;
 
 use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\ApplicationState;
@@ -121,8 +122,10 @@ class GitManager extends AbstractMetaSource
                 $ctx = $requestInterface->getAttribute("ctx");
                 $this->commitChanges($ctx);
                 $diff = new \Pydio\Access\Core\Model\NodesDiff();
-                $diff->update(new AJXP_Node($ctx->getUrlBase().$file));
+                $node = new AJXP_Node($ctx->getUrlBase()."/".$file);
+                $diff->update($node);
                 $x->addChunk($diff);
+                Controller::applyHook("node.change", [$node, $node]);
 
 
             break;
@@ -136,7 +139,7 @@ class GitManager extends AbstractMetaSource
                 $command = $git->getCommand("cat-file");
                 $command->setOption("s", true);
                 $command->addArgument($commitId.":".$file);
-                $size = $command->execute();
+                $size = floatval(trim($command->execute()));
 
                 $command = $git->getCommand("show");
                 $command->addArgument($commitId.":".$file);

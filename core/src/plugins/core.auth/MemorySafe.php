@@ -39,27 +39,249 @@ class MemorySafe
 
     const SAFE_CREDENTIALS_KEY = "PYDIO_SAFE_CREDENTIALS";
 
-    private static $instance;
+    private static $instances;
 
+    private $instanceId = "";
     private $user;
     private $encodedPassword;
     private $secretKey;
     private $separator = "__SAFE_SEPARATOR__";
     private $forceSessionCredentials = false;
+
     /**
      * Instance constructor
+     * @param string $instanceId
      */
-    public function __construct()
+    public function __construct($instanceId = "")
     {
         $this->secretKey = Crypto::getApplicationSecret();
+        $this->instanceId = $instanceId;
     }
+
+    /**
+     * @return null|string
+     */
+    public function getEncodedCredentials(){
+        return SessionService::fetch(self::SAFE_CREDENTIALS_KEY.$this->instanceId);
+    }
+
+    /**********************/
+    /* STATIC ENV METHODS */
+    /**********************/
+    /**
+     * @param ContextInterface $ctx
+     * @return bool|string FALSE if no need, or String (warning, it can be an empty string) if instance needed.
+     */
+    public static function contextUsesInstance($ctx){
+        if ($ctx->hasRepository() && $ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
+            $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
+            if (empty($instanceId)) $instanceId = "";
+            return $instanceId;
+        }
+        return false;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @return bool
+     */
+    public static function setEnvForContext($ctx){
+        $instanceId = self::contextUsesInstance($ctx);
+        if($instanceId !== false){
+            return self::setEnv($instanceId);
+        }
+        return false;
+    }
+    /**
+     * Set the encrypted string in the environment for running a CLI.
+     * @param string
+     * @return bool
+     */
+    public static function setEnv($instanceId = ""){
+        // Pass Default Instance Credentials
+        $encodedCreds = self::getInstance($instanceId)->getEncodedCredentials();
+        if (!empty($encodedCreds)) {
+            putenv(self::SAFE_CREDENTIALS_KEY. "=" . $encodedCreds);
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Clear the environment variable
+     */
+    public static function clearEnv(){
+        putenv(self::SAFE_CREDENTIALS_KEY);
+    }
+    /**
+     * Try to load encrypted string, decode, and get password if the user is corresponding.
+     * @param string $userId
+     * @return bool|mixed
+     */
+    public static function loadPasswordStringFromEnvironment($userId){
+        $env = getenv(self::SAFE_CREDENTIALS_KEY);
+        if(!empty($env)){
+            $array = self::getCredentialsFromEncodedString($env);
+            if(isSet($array["user"]) && $array["user"] == $userId){
+                return $array["password"];
+            }
+        }
+        return false;
+    }
+
+    /**
+     * For the session credentials to override other credentials set via config
+     * @return void
+     */
+    public function forceSessionCredentialsUsage()
+    {
+        $this->forceSessionCredentials = true;
+    }
+
+    /****************************/
+    /* STATIC INSTANCE METHODS  */
+    /****************************/
+    /**
+     * Creates the singleton instance
+     * @param string $instanceId
+     * @return MemorySafe
+     */
+    public static function getInstance($instanceId = '')
+    {
+        $instanceKey = $instanceId;
+        if(empty($instanceKey)) {
+            $instanceKey = '__DEFAULT__';
+        }
+        if (empty(self::$instances)) {
+            self::$instances = [];
+        }
+        if(!isSet(self::$instances[$instanceKey])){
+            self::$instances[$instanceKey] = new MemorySafe($instanceId);
+        }
+        return self::$instances[$instanceKey];
+    }
+    /**
+     * Store the user/pass key pair
+     * @static
+     * @param string $user
+     * @param string $password
+     * @param string $instanceId
+     * @return void
+     */
+    public static function storeCredentials($user, $password, $instanceId = '')
+    {
+        $inst = MemorySafe::getInstance($instanceId);
+        $inst->setCredentials($user, $password);
+        $inst->store();
+    }
+    /**
+     * Remove the user/pass encoded from the session
+     * @param string $instanceId
+     * @static
+     * @return void
+     */
+    public static function clearCredentials($instanceId = '')
+    {
+        $inst = MemorySafe::getInstance($instanceId);
+        $inst->clear();
+    }
+    /**
+     * Retrieve the user/pass from the session
+     * @param string $instanceId
+     * @static
+     * @return array|bool
+     */
+    public static function loadCredentials($instanceId = '')
+    {
+        $inst = MemorySafe::getInstance($instanceId);
+        $inst->load();
+        return $inst->getCredentials();
+    }
+
+
+    /**
+     * @param $encoded
+     * @return array|bool
+     */
+    public static function getCredentialsFromEncodedString($encoded)
+    {
+        $tmpInstance = new MemorySafe();
+        $tmpInstance->load($encoded);
+        return $tmpInstance->getCredentials();
+    }
+    /**
+     * Will try to get the credentials for a given repository as follow :
+     * + Try to get the credentials from the url parsing
+     * + Try to get them from the user merged role
+     * + Try to get them from the repository configuration
+     * + Try to get them from the MemorySafe.
+     *
+     * @param ContextInterface $ctx
+     * @return array
+     */
+    public static function tryLoadingCredentialsFromSources($ctx)
+    {
+        $user = $password = "";
+        $optionsPrefix = "";
+        $repository = $ctx->getRepository();
+        if ($repository->getAccessType() == "ftp") {
+            $optionsPrefix = "FTP_";
+        }
+        // 1. Look in Role parameters
+        if ($user =="") {
+            $loggedUser = $ctx->getUser();
+            if ($loggedUser != null) {
+                $u = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."USER", $repository->getId(), "");
+                $p = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
+                if (!empty($u) && !empty($p)) {
+                    $user = $u;
+                    $password = OptionsHelper::decypherStandardFormPassword($loggedUser->getId(), $p);
+                }
+            }
+        }
+        // 2. Try from repository config
+        if ($user=="") {
+            $user       = $repository->getContextOption($ctx, $optionsPrefix."USER");
+            $password   = $repository->getContextOption($ctx, $optionsPrefix."PASS");
+        }
+        // 3. Test if there are encoded credentials available
+        if ($user == "" && $repository->getContextOption($ctx, "ENCODED_CREDENTIALS") != "") {
+            list($user, $password) = MemorySafe::getCredentialsFromEncodedString($repository->getContextOption($ctx, "ENCODED_CREDENTIALS"));
+        }
+        // 4. Try from session
+        $storeCreds = false;
+        if ($repository->getContextOption($ctx, "META_SOURCES")) {
+            $options["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
+            foreach ($options["META_SOURCES"] as $metaSource) {
+                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
+                    $storeCreds = true;
+                    break;
+                }
+            }
+        }
+        if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
+            $instanceId = $repository->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT");
+            $instanceId = empty($instanceId) ? "" : $instanceId;
+            $safeCred = MemorySafe::loadCredentials($instanceId);
+            if ($safeCred !== false) {
+                $user = $safeCred["user"];
+                $password = $safeCred["password"];
+            }
+        }
+        return array("user" => $user, "password" => $password);
+
+    }
+
+    /*******************/
+    /* PRIVATE METHODS */
+    /*******************/
+
     /**
      * Store the user/password pair. Password will be encoded
      * @param string $user
      * @param string $password
      * @return void
      */
-    public function setCredentials($user, $password)
+    private function setCredentials($user, $password)
     {
         $this->user = $user;
         $this->encodedPassword = $this->_encodePassword($password, $user);
@@ -68,7 +290,7 @@ class MemorySafe
      * Return the user/password pair, or false if cannot find it.
      * @return array|bool
      */
-    public function getCredentials()
+    private function getCredentials()
     {
         if (isSet($this->user) && isSet($this->encodedPassword)) {
             $decoded = $this->_decodePassword($this->encodedPassword, $this->user);
@@ -106,55 +328,18 @@ class MemorySafe
      * Store the password credentials in the session
      * @return void
      */
-    public function store() {
-        SessionService::save(self::SAFE_CREDENTIALS_KEY, base64_encode($this->user.$this->separator.$this->encodedPassword));
+    private function store() {
+        SessionService::save(self::SAFE_CREDENTIALS_KEY.$this->instanceId, base64_encode($this->user.$this->separator.$this->encodedPassword));
     }
-
-    /**
-     * Set the encrypted string in the environment for running a CLI.
-     * @return bool
-     */
-    public static function setEnv(){
-        $encodedCreds = self::getEncodedCredentialString();
-        if (!empty($encodedCreds)) {
-            putenv(self::SAFE_CREDENTIALS_KEY. "=" . $encodedCreds);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Clear the environment variable
-     */
-    public static function clearEnv(){
-        putenv(self::SAFE_CREDENTIALS_KEY);
-    }
-
-    /**
-     * Try to load encrypted string, decode, and get password if the user is corresponding.
-     * @param string $userId
-     * @return bool|mixed
-     */
-    public static function loadPasswordStringFromEnvironment($userId){
-        $env = getenv(self::SAFE_CREDENTIALS_KEY);
-        if(!empty($env)){
-            $array = self::getCredentialsFromEncodedString($env);
-            if(isSet($array["user"]) && $array["user"] == $userId){
-                return $array["password"];
-            }
-        }
-        return false;
-    }
-
     /**
      * Load the credentials from session
      * @param string $encodedString
      * @return void
      */
-    public function load($encodedString = "")
+    private function load($encodedString = "")
     {
-        if ($encodedString == "" && SessionService::has(self::SAFE_CREDENTIALS_KEY)) {
-            $encodedString = SessionService::fetch(self::SAFE_CREDENTIALS_KEY);
+        if ($encodedString == "" && SessionService::has(self::SAFE_CREDENTIALS_KEY.$this->instanceId)) {
+            $encodedString = SessionService::fetch(self::SAFE_CREDENTIALS_KEY.$this->instanceId);
         }
         if(empty($encodedString)) return;
         $sessData = base64_decode($encodedString);
@@ -166,165 +351,12 @@ class MemorySafe
      * Remove the credentials from session
      * @return void
      */
-    public function clear()
+    private function clear()
     {
-        SessionService::delete(self::SAFE_CREDENTIALS_KEY);
+        SessionService::delete(self::SAFE_CREDENTIALS_KEY.$this->instanceId);
         $this->user = null;
         $this->encodedPassword = null;
     }
-    /**
-     * For the session credentials to override other credentials set via config
-     * @return void
-     */
-    public function forceSessionCredentialsUsage()
-    {
-        $this->forceSessionCredentials = true;
-    }
 
-
-
-    /**
-     * Creates the singleton instance
-     * @return MemorySafe
-     */
-    public static function getInstance()
-    {
-        if (empty(self::$instance)) {
-            self::$instance = new MemorySafe();
-        }
-        return self::$instance;
-    }
-    /**
-     * Store the user/pass key pair
-     * @static
-     * @param string $user
-     * @param string $password
-     * @return void
-     */
-    public static function storeCredentials($user, $password)
-    {
-        $inst = MemorySafe::getInstance();
-        $inst->setCredentials($user, $password);
-        $inst->store();
-    }
-    /**
-     * Remove the user/pass encoded from the session
-     * @static
-     * @return void
-     */
-    public static function clearCredentials()
-    {
-        $inst = MemorySafe::getInstance();
-        $inst->clear();
-    }
-    /**
-     * Retrieve the user/pass from the session
-     * @static
-     * @return array|bool
-     */
-    public static function loadCredentials()
-    {
-        $inst = MemorySafe::getInstance();
-        $inst->load();
-        return $inst->getCredentials();
-    }
-
-    /**
-     * @return mixed
-     */
-    public static function getEncodedCredentialString() {
-        return SessionService::fetch(self::SAFE_CREDENTIALS_KEY);
-    }
-
-    /**
-     * @param $encoded
-     * @return array|bool
-     */
-    public static function getCredentialsFromEncodedString($encoded)
-    {
-        $tmpInstance = new MemorySafe();
-        $tmpInstance->load($encoded);
-        return $tmpInstance->getCredentials();
-    }
-
-    /**
-     * Will try to get the credentials for a given repository as follow :
-     * + Try to get the credentials from the url parsing
-     * + Try to get them from the user "Wallet" (personal data)
-     * + Try to get them from the repository configuration
-     * + Try to get them from the MemorySafe.
-     *
-     * @param ContextInterface $ctx
-     * @return array
-     */
-    public static function tryLoadingCredentialsFromSources($ctx)
-    {
-        $user = $password = "";
-        $optionsPrefix = "";
-        $repository = $ctx->getRepository();
-        if ($repository->getAccessType() == "ftp") {
-            $optionsPrefix = "FTP_";
-        }
-        // Get USER/PASS
-        // 1. Try from URL
-        /*
-        if (isSet($parsedUrl["user"]) && isset($parsedUrl["pass"])) {
-            $user       = rawurldecode($parsedUrl["user"]);
-            $password   = rawurldecode($parsedUrl["pass"]);
-        }
-        */
-        // 2. Try from user wallet
-        if ($user=="") {
-            $loggedUser = $ctx->getUser();
-            if ($loggedUser != null) {
-                $wallet = $loggedUser->getPref("AJXP_WALLET");
-                if (is_array($wallet) && isSet($wallet[$repository->getId()][$optionsPrefix."USER"])) {
-                    $user = $wallet[$repository->getId()][$optionsPrefix."USER"];
-                    $password = OptionsHelper::decypherStandardFormPassword($loggedUser->getId(), $wallet[$repository->getId()][$optionsPrefix . "PASS"]);
-                }
-            }
-        }
-        // 2bis. Wallet is now a custom parameter
-        if ($user =="") {
-            $loggedUser = $ctx->getUser();
-            if ($loggedUser != null) {
-                $u = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."USER", $repository->getId(), "");
-                $p = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), $optionsPrefix."PASS", $repository->getId(), "");
-                if (!empty($u) && !empty($p)) {
-                    $user = $u;
-                    $password = OptionsHelper::decypherStandardFormPassword($loggedUser->getId(), $p);
-                }
-            }
-        }
-        // 3. Try from repository config
-        if ($user=="") {
-            $user       = $repository->getContextOption($ctx, $optionsPrefix."USER");
-            $password   = $repository->getContextOption($ctx, $optionsPrefix."PASS");
-        }
-        // 4. Test if there are encoded credentials available
-        if ($user == "" && $repository->getContextOption($ctx, "ENCODED_CREDENTIALS") != "") {
-            list($user, $password) = MemorySafe::getCredentialsFromEncodedString($repository->getContextOption($ctx, "ENCODED_CREDENTIALS"));
-        }
-        // 5. Try from session
-        $storeCreds = false;
-        if ($repository->getContextOption($ctx, "META_SOURCES")) {
-            $options["META_SOURCES"] = $repository->getContextOption($ctx, "META_SOURCES");
-            foreach ($options["META_SOURCES"] as $metaSource) {
-                if (isSet($metaSource["USE_SESSION_CREDENTIALS"]) && $metaSource["USE_SESSION_CREDENTIALS"] === true) {
-                    $storeCreds = true;
-                    break;
-                }
-            }
-        }
-        if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
-            $safeCred = MemorySafe::loadCredentials();
-            if ($safeCred !== false) {
-                $user = $safeCred["user"];
-                $password = $safeCred["password"];
-            }
-        }
-        return array("user" => $user, "password" => $password);
-
-    }
 
 }

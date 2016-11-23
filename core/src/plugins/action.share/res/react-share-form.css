@@ -21,8 +21,9 @@ div#react_share_form div.headerPanel {
 div#react_share_form div.headerPanel > div {
   color: white;
   font-size: 24px;
+  line-height: 27px;
   padding: 20px 16px 14px;
-  word-break: 'break-all';
+  word-break: break-all;
 }
 div#react_share_form .mui-tabs-container .mui-tab-item-container {
   background-color: #4aceb0 !important;

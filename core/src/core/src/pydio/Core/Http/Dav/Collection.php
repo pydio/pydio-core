@@ -201,14 +201,9 @@ class Collection extends Node implements Sabre\DAV\ICollection
      * @param string $name
      * @return bool
      */
-    public function childExists($name)
-    {
-        foreach ($this->getChildren() as $child) {
-
-            if ($child->getName()==$name) return true;
-
-        }
-        return false;
-
+    public function childExists($name) {
+        $ajxpNode = new AJXP_Node($this->getUrl());
+        $child = $ajxpNode->createChildNode($name);
+        return file_exists($child->getUrl());
     }
 }

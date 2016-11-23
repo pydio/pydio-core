@@ -697,12 +697,12 @@ class Mailer extends Plugin implements SqlTableProvider
                     $parts = explode(":", $recipient, 2);
                     $realRecipients[] = array("name" => $parts[0], "adress" => $parts[2]);
                 } else {
-                    if ($this->validateEmail($recipient)) {
-                        $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
-                    } else if (UsersService::userExists($recipient)) {
+                    if (UsersService::userExists($recipient)) {
                         $user = UsersService::getUserById($recipient, false);
                         $res = $this->abstractUserToAdress($user);
                         if ($res !== false) $realRecipients[] = $res;
+                    } else if ($this->validateEmail($recipient)) {
+                        $realRecipients[] = array("name" => $recipient, "adress" => $recipient);
                     }
                 }
             }

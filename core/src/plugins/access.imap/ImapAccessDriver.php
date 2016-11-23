@@ -28,6 +28,7 @@ use Pydio\Access\Driver\StreamProvider\FS\FsAccessDriver;
 use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Utils\Vars\StatHelper;
+use Pydio\Core\Utils\Vars\UrlUtils;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -70,11 +71,21 @@ class ImapAccessDriver extends FsAccessDriver
         }
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function inverseSort($st1, $st2)
     {
         return strnatcasecmp($st2, $st1);
     }
 
+    /**
+     * @param $st1
+     * @param $st2
+     * @return int
+     */
     public static function sortInboxFirst($st1, $st2)
     {
         if($st1 == "INBOX") return -1;
@@ -82,6 +93,13 @@ class ImapAccessDriver extends FsAccessDriver
         return strcmp($st1, $st2);
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @throws PydioException
+     * @throws \Exception
+     * @throws \Pydio\Access\Core\Exception\FileNotWriteableException
+     */
     public function switchAction(ServerRequestInterface &$request, ResponseInterface &$response)
     {
         if ($request->getAttribute("action") ==  "ls") {
@@ -107,7 +125,7 @@ class ImapAccessDriver extends FsAccessDriver
         $currentNode = $ajxpNode->getUrl();
         $baseUrl = $ajxpNode->getContext()->getUrlBase();
         $metadata = $ajxpNode->metadata;
-        $parsed = parse_url($currentNode);
+        $parsed = UrlUtils::mbParseUrl($currentNode);
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
             list(, $attachmentId) = explode("/", $parsed["fragment"]);
             $meta = ImapAccessWrapper::getCurrentAttachmentsMetadata();
@@ -144,7 +162,7 @@ class ImapAccessDriver extends FsAccessDriver
      */
     public function attachmentDLName($currentNode, &$localName, $wrapperClassName)
     {
-        $parsed = parse_url($currentNode->getUrl());
+        $parsed = UrlUtils::mbParseUrl($currentNode->getUrl());
         if ( isSet($parsed["fragment"]) && strpos($parsed["fragment"], "attachments") === 0) {
             list(, $attachmentId) = explode("/", $parsed["fragment"]);
             $meta = ImapAccessWrapper::getCurrentAttachmentsMetadata();
@@ -200,11 +218,16 @@ class ImapAccessDriver extends FsAccessDriver
     {
         if($foldersOnly) return 0;
         $count = 0;
-        if($tmpHandle = opendir($dirNode->getUrl())){
+        if($dirHANDLE !== null){
+            $tmpHandle = $dirHANDLE;
+        }else{
+            $tmpHandle = opendir($dirNode->getUrl());
+        }
+        if($tmpHandle !== false){
             // WILL USE IMAP FUNCTIONS TO COUNT;
             $this->logDebug("COUNT : ".ImapAccessWrapper::getCurrentDirCount());
             $count = ImapAccessWrapper::getCurrentDirCount();
-            closedir($tmpHandle);
+            //closedir($tmpHandle);
         }
         return $count;
     }

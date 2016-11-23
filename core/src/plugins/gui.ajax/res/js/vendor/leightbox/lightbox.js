@@ -177,6 +177,10 @@ function hideLightBox(onFormSubmit)
 	if(currentLightBox)
 	{
 		currentLightBox.deactivate();
+        if($('overlay')) {
+            $('overlay').setAttribute('style', '');
+            $('overlay').className = 'overlay';
+        }
 		hideOverlay();
 		if(!onFormSubmit)
 		{
@@ -264,5 +268,9 @@ function addLightboxMarkupToElement(element, skipElement)
 
 function removeLightboxFromElement(element)
 {
-	$(element).select('#element_overlay').invoke('remove');
+    if(element == document.body){
+        element.down('#overlay').setStyle({display:null});
+    }else{
+	    $(element).select('#element_overlay').invoke('remove');
+    }
 }

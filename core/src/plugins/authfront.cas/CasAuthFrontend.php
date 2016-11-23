@@ -241,7 +241,7 @@ class CasAuthFrontend extends AbstractAuthFrontend
             try {
                 $userObj = AuthService::logUser($cas_user, "", true);
                 AuthService::updateSessionUser($userObj);
-                MemorySafe::storeCredentials($cas_user, $_SESSION['PROXYTICKET']);
+                MemorySafe::storeCredentials($cas_user, $_SESSION['PROXYTICKET'], 'authfront.cas');
                 $_SESSION['LOGGED_IN_BY_CAS'] = true;
 
                 if (!empty($this->cas_additional_role)) {

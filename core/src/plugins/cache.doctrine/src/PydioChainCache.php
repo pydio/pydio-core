@@ -78,6 +78,15 @@ class PydioChainCache extends ChainCache implements PatternClearableCache {
     }
 
     /**
+     * @return mixed
+     */
+    public function allProvidersSupportPatternDeletion(){
+        return array_reduce($this->cacheProviders, function($carry, $item){
+            return $carry && $item instanceof PatternClearableCache;
+        }, true);
+    }
+
+    /**
      * @return bool
      */
     public function oneProviderRequiresHttpDeletion(){

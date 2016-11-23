@@ -584,6 +584,11 @@ class SqlUser extends AbstractUser
         }
         parent::setGroupPath($groupPath);
         dibi::query('UPDATE [ajxp_users] SET ', Array('groupPath'=>$groupPath), 'WHERE [login] = %s', $this->getId());
+        $r = $this->getRoles();
+        // REMOVE OLD GROUP ROLES
+        foreach (array_keys($r) as $role) {
+            if(strpos($role, "AJXP_GRP_/") === 0) $this->removeRole($role);
+        }
         $this->load();
         $this->recomputeMergedRole();
         $this->log('UPDATE GROUP: [Login]: '.$this->getId().' [Group]:'.$groupPath);

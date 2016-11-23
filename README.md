@@ -3,14 +3,14 @@
 [Homepage](https://pydio.com/) |
 [GitHub-Repository](https://github.com/pydio/pydio-core) |
 [Issue-Tracker](https://github.com/pydio/pydio-core/issues) 
-| ![Latest Stable](https://img.shields.io/badge/stable-6.4.2-brightgreen.svg) 
+| ![Latest Stable](https://img.shields.io/badge/stable-7.0.1-brightgreen.svg) 
 | ![License Badge](https://img.shields.io/badge/License-AGPL%203%2B-blue.svg)
 | [![Codacy Badge](https://api.codacy.com/project/badge/3b5cafea44e949e789d1928687e04032)](https://www.codacy.com/app/charles_3085/pydio-core) 
 |  [![Build Status](https://travis-ci.org/pydio/pydio-core.svg)](https://travis-ci.org/pydio/pydio-core) 
 
 This is the main source code repository of Pydio (formerly AjaXplorer), containing all the PHP server and HTML5 Web GUI.
 
-* Latest Stable release : 6.4.2
+* Latest Stable release : 7.0.1
 * Latest Dev release : 6.5.5 (Final Release Candidate for Pydio 7)
 * License: [AGPLv3](https://www.gnu.org/licenses/agpl.html)
 * Lead developer  : Charles du Jeu (cdujeu): [Github](https://github.com/cdujeu) | [Twitter](https://twitter.com/Pydio)
@@ -60,7 +60,7 @@ If you think you have found a bug and a way to fix it neatly in the code, use a 
 
 #### Writing new plugins
 
-Please read the Developer doc located at https://pydio.com/en/docs/developer-guide, you will find here a bunch of useful information about the plugins architecture, how to create your own plugin, etc. The action.skeleton plugin is a perfect start for that. 
+Please read the Developer doc located at https://pydio.com/en/docs/developer-guide-v7, you will find here a bunch of useful information about the plugins architecture, how to create your own plugin, etc. The action.skeleton plugin is a perfect start for that. 
 
 New in latest build, in the Settings panel, you can find a new "Developer" node where all actions contributed by all plugins are listed. These can be called either by http, or via the CLI API. At the same location, you will find all "hooks" registered and triggered in the server, that are VERY useful when you want your plugin to be really sandboxed.  
 

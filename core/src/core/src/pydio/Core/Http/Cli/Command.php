@@ -104,7 +104,7 @@ class Command extends Symfony\Component\Console\Command\Command
             if(in_array($key, $definitionsKeys)){
                 if(strpos($key, "cli_") === 0) {
                     $shortcut = $this->getDefinition()->getOption($key)->getShortcut();
-                    $pydioCliOptions[$shortcut] = FreeArgvOptions::removeEqualsSign($option);
+                    $pydioCliOptions[$shortcut] = $option;
                 }
             }else{
                 $actionParameters[$key] = $option;

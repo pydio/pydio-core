@@ -23,6 +23,7 @@ namespace Pydio\Core\Services;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Exception\UserNotFoundException;
+use Pydio\Core\Exception\WorkspaceAuthRequired;
 use Pydio\Core\Exception\WorkspaceForbiddenException;
 use Pydio\Core\Exception\WorkspaceNotFoundException;
 use Pydio\Core\Http\Message\ReloadRepoListMessage;
@@ -145,6 +146,7 @@ class UsersService
         if(!RepositoryService::repositoryIsAccessible($repo, $user)){
             throw new WorkspaceForbiddenException($repositoryId);
         }
+        WorkspaceAuthRequired::testWorkspace($repo, $user);
         return $repo;
     }
 
@@ -157,6 +159,9 @@ class UsersService
      */
     public static function getRepositoriesForUser($user, $includeShared = true, $details = false, $labelsOnly = false){
 
+        if(!$user instanceof UserInterface){
+            return [];
+        }
         $self = self::instance();
         $repos = $self->getFromCaches($user->getId());
         if($repos !== null) {
@@ -452,6 +457,7 @@ class UsersService
         foreach ($subUsers as $deletedUser) {
             $authDriver->deleteUser($deletedUser);
         }
+        CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:".$userId);
         Controller::applyHook("user.after_delete", array($ctx, $userId));
         Logger::info(__CLASS__, "Delete User", array("user_id" => $userId, "sub_user" => implode(",", $subUsers)));
         return true;

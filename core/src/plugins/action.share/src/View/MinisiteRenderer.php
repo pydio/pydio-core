@@ -178,7 +178,7 @@ class MinisiteRenderer
             $confs = $shareCenter->getConfigs();
         }
         $repoObject = $context->getRepository();
-        if($repoObject === null && isSet($data['PRESET_LOGIN']) && isSet($data["REPOSITORY"])){
+        if($repoObject === null && (isSet($data['PRESET_LOGIN']) || ($context->hasUser() && $context->getUser()->getLock() !== false)) && isSet($data["REPOSITORY"])){
             $repoObject = RepositoryService::getRepositoryById($data["REPOSITORY"]);
         }
 

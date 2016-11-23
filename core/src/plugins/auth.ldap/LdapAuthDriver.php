@@ -26,6 +26,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\ProgressBarCLI;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\FileHelper;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StringHelper;
 
@@ -213,8 +214,10 @@ class LdapAuthDriver extends AbstractAuthDriver
             if ($this->ldapconn == null) {
                 $this->logError(__FUNCTION__, 'LDAP Server connexion could NOT be established');
             }
+            if ($this->ldapconn !== null && isSet($this->options["LDAP_PROTOCOL"]) && $this->options["LDAP_PROTOCOL"] === 'starttls') {
+                ldap_start_tls($this->ldapconn);
+            }
         }
-        //return $this->ldapconn;
     }
 
     public function __deconstruct()
@@ -343,7 +346,7 @@ class LdapAuthDriver extends AbstractAuthDriver
         //Update progress bar in CLI mode
         $isListAll = (($offset == -1) && ($limit == -1) && (is_null($login)) && $regexpOnSearchAttr && (php_sapi_name() == "cli"));
         if ($isListAll) {
-            $total = $this->getCountFromCache();
+            $total = $this->getCountFromCache("/");
             $progressBar = new ProgressBarCLI();
             $progressBar->init($index, $total["count"], "Get ldap users");
         }
@@ -460,24 +463,29 @@ class LdapAuthDriver extends AbstractAuthDriver
         return $persons;
     }
 
+    /**
+     * @param string $baseGroup
+     * @param string $regexp
+     * @param null $filterProperty
+     * @param null $filterValue
+     * @param bool $recursive
+     * @return mixed
+     */
     public function getUsersCount($baseGroup = "/", $regexp = "", $filterProperty = null, $filterValue = null, $recursive = true)
     {
-        $check_cache = $this->getCountFromCache();
-
+        $check_cache = $this->getCountFromCache($baseGroup);
         if ((is_array($check_cache) && $check_cache["count"] > 0)) {
             return $check_cache["count"];
         }
 
         if (!empty($this->hasGroupsMapping)) {
-            if ($baseGroup == "/") {
-                $this->dynamicFilter = "!(" . $this->hasGroupsMapping . "=*)";
-            } else {
+            if ($baseGroup !== "/") {
                 $this->dynamicFilter = $this->hasGroupsMapping . "=" . basename($baseGroup);
             }
         }
 
         $res = $this->getUserEntries(StringHelper::regexpToLdap($regexp), true, null);
-        $this->saveCountToCache($res);
+        $this->saveCountToCache($res, $baseGroup);
         $this->dynamicFilter = null;
         return $res["count"];
     }
@@ -988,30 +996,50 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
     }
 
-    public function getCountFromCache()
+    /**
+     * @return string
+     * @throws \Exception
+     */
+    private function getCacheCountFileName(){
+        return $this->getPluginCacheDir() . DIRECTORY_SEPARATOR . "ldap.ser";
+    }
+
+    /**
+     * @param $baseGroup
+     * @return int
+     */
+    public function getCountFromCache($baseGroup)
     {
         $ttl = $this->getOption("LDAP_COUNT_CACHE_TTL");
         if (empty($ttl)) $ttl = 1;
-        $fileName = "ldap.ser";
-        if (file_exists($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName)) {
-            $fileContent = unserialize(file_get_contents($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName));
-            if (($fileContent) && ($fileContent["count"]) && ($fileContent["timestamp"]) && ((time() - $fileContent["timestamp"]) < 60 * 60 * $ttl)) {
-                return $fileContent;
-            }
+        $fileContent = FileHelper::loadSerialFile($this->getCacheCountFileName());
+        if (!empty($fileContent) && $fileContent[$baseGroup]["count"] && $fileContent[$baseGroup]["timestamp"] && (time() - $fileContent[$baseGroup]["timestamp"]) < 60 * 60 * $ttl ) {
+            return $fileContent[$baseGroup];
         }
         return 0;
     }
 
-    public function saveCountToCache($fileContent)
+    /**
+     * @param $fileContent
+     * @param $baseGroup
+     * @throws \Exception
+     */
+    public function saveCountToCache($fileContent, $baseGroup)
     {
-        $fileName = "ldap.ser";
         if (!is_dir($this->getPluginCacheDir(false, true))) return;
-        if (is_array($fileContent) && ($fileContent > 0)) {
+        $fileName = $this->getCacheCountFileName();
+
+        $existing = FileHelper::loadSerialFile($fileName);
+        if(!empty($existing) && is_array($existing)) {
+            $data = $existing;
+        }else{
+            $data = [];
+        }
+
+        if (is_array($fileContent) && count($fileContent) > 0) {
             $fileContent["timestamp"] = time();
-            if (file_exists($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName)) {
-                unlink($this->getPluginCacheDir() . "/" . $fileName);
-            }
-            file_put_contents($this->getPluginCacheDir() . DIRECTORY_SEPARATOR . $fileName, serialize($fileContent));
+            $data[$baseGroup] = $fileContent;
+            FileHelper::saveSerialFile($fileName, $data, false);
         }
     }
 

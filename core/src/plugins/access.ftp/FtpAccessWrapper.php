@@ -25,6 +25,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\IAjxpWrapper;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Auth\Core\MemorySafe;
+use Pydio\Core\Exception\WorkspaceAuthRequired;
 use Pydio\Core\Model\ContextInterface;
 
 
@@ -745,7 +746,7 @@ class FtpAccessWrapper implements IAjxpWrapper
         //register_shutdown_function('ftp_close', $link);
         @ftp_set_option($link, FTP_TIMEOUT_SEC, 10);
         if (!@ftp_login($link,$this->user,$this->password)) {
-            throw new PydioException("Cannot login to FTP server with user $this->user");
+            throw new WorkspaceAuthRequired($this->repositoryId, "Cannot login to FTP server with user $this->user");
         }
         if (!$this->ftpActive) {
             @ftp_pasv($link, true);

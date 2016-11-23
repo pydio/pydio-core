@@ -25,9 +25,9 @@ use Pydio\Access\Core\Model\AJXP_Node;
 
 use Pydio\Access\Driver\StreamProvider\FS\FsAccessWrapper;
 use Pydio\Core\Model\ContextInterface;
-use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Utils\FileHelper;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Log\Core\Logger;
 
 defined('AJXP_EXEC') or die('Access not allowed');
@@ -126,7 +126,7 @@ class S3AccessWrapper extends FsAccessWrapper
      */
     protected static function initPath($path, $streamType, $storeOpenContext = false, $skipZip = false)
     {
-        $url        = parse_url($path);
+        $url        = UrlUtils::mbParseUrl($path);
         $node       = new AJXP_Node($path);
         $repoId     = $node->getRepositoryId();
         $repoObject = $node->getRepository();
@@ -349,8 +349,8 @@ class S3AccessWrapper extends FsAccessWrapper
             $s3Client = self::getClientForContext($node->getContext(), false);
             $bucket = $repoObject->getContextOption($ctx, "CONTAINER");
             $basePath = $repoObject->getContextOption($ctx, "PATH");
-            $fromKeyname = trim(str_replace("//", "/", $basePath . parse_url($from, PHP_URL_PATH)), '/');
-            $toKeyname = trim(str_replace("//", "/", $basePath . parse_url($to, PHP_URL_PATH)), '/');
+            $fromKeyname = trim(str_replace("//", "/", $basePath . UrlUtils::mbParseUrl($from, PHP_URL_PATH)), '/');
+            $toKeyname = trim(str_replace("//", "/", $basePath . UrlUtils::mbParseUrl($to, PHP_URL_PATH)), '/');
             if ($isViPR) {
                 $toKeyname .= '/';
                 $parts = explode('/', $bucket);

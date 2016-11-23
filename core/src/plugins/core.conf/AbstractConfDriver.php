@@ -611,13 +611,8 @@ abstract class AbstractConfDriver extends Plugin
                 if (!isSet($repository_id)) {
                     break;
                 }
-                $dirList = UsersService::getRepositoriesForUser($ctx->getUser());
-                /** @var $repository_id string */
-                if (!isSet($dirList[$repository_id])) {
-                    throw new PydioException("Trying to switch to an unkown repository!");
-                }
-                //ConfService::switchRootDir($repository_id);
-                SessionService::switchSessionRepositoriId($repository_id);
+                UsersService::getRepositoryWithPermission($ctx->getUser(), $repository_id);
+                SessionService::switchSessionRepositoryId($repository_id);
                 PluginsService::getInstance($ctx->withRepositoryId($repository_id));
                 if (UsersService::usersEnabled() && $loggedUser !== null) {
                     $loggedUser->setArrayPref("repository_last_connected", $repository_id, time());

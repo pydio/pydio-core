@@ -23,6 +23,7 @@ namespace Pydio\Tasks\Providers;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Utils\Vars\UrlUtils;
 use Pydio\Log\Core\Logger;
 use Pydio\Tasks\ITasksProvider;
 use Pydio\Tasks\Schedule;
@@ -123,7 +124,7 @@ class SqlTasksProvider implements ITasksProvider
             dibi::query("DELETE FROM [ajxp_tasks_nodes] WHERE [task_uid]=%s", $task->getId());
         }
         foreach($task->nodes as $nodeUrl){
-            $nodePath = parse_url($nodeUrl, PHP_URL_PATH);
+            $nodePath = UrlUtils::mbParseUrl($nodeUrl, PHP_URL_PATH);
             if(empty($nodePath)) $nodePath = "/";
             $nodeBaseUrl = preg_replace('/'. preg_quote($nodePath, '/') . '$/', "", $nodeUrl);
             $values = [

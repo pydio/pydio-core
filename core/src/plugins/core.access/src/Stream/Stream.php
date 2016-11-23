@@ -75,7 +75,6 @@ class Stream implements StreamInterface
         $ctx = $node->getContext();
         $repository = $ctx->getRepository();
 
-
         $this->customMetadata["uri"] = $node->getUrl();
 
         $this->attach($resource);
@@ -97,7 +96,15 @@ class Stream implements StreamInterface
 
         $options["base_url"] = $apiUrl;
         $this->httpClient = new Client([
-            "base_url" => $apiUrl
+            "base_url" => $apiUrl,
+            "defaults" => [
+                "allow_redirects" => [
+                    "max"       => 5,       // allow at most 10 redirects.
+                    "strict"    => true,     // use "strict" RFC compliant redirects.
+                    "referer"   => true,     // add a Referer header
+                    "protocols" => ['http', 'https'] // only allow https URLs
+                ]
+            ]
         ]);
 
         $options["defaults"] = self::getContextOption($ctx);
@@ -399,15 +406,15 @@ class Stream implements StreamInterface
 
         $this->size = $stream->getSize();
 
-        $command = $this->client->getCommand('Put', [
-            'path'    => $this->node,
+        $this->prepare('Put', [
             'headers' => [
-                "Content-Length" => $this->size
+                "Content-Length" => $this->size,
+                "Content-Type" => "application/octet-stream"
             ],
             'body' => $this->resource
         ]);
 
-        $this->client->execute($command);
+        $this->client->execute($this->command);
 
         return $stream->getSize();
     }
@@ -432,7 +439,7 @@ class Stream implements StreamInterface
      * @param null $cmdName
      * @throws Exception
      */
-    private function prepare($cmdName = null) {
+    private function prepare($cmdName = null, $params = []) {
 
         $options = self::getContextOption($this->node->getContext());
         $options = array_intersect_key($options, ["subscribers" => "", "auth" => ""]);
@@ -449,9 +456,11 @@ class Stream implements StreamInterface
             return;
         }
 
-        $this->command = $this->client->getCommand($cmdName, [
+        $params = array_merge([
             'path' => $this->node
-        ]);
+        ], $params);
+
+        $this->command = $this->client->getCommand($cmdName, $params);
     }
 
     /**
@@ -476,6 +485,7 @@ class Stream implements StreamInterface
         $result = $this->client->execute($this->command);
 
         $this->detach();
+
         $this->attach(GuzzleStreamWrapper::getResource($result["body"]));
 
         return $result;
@@ -522,11 +532,24 @@ class Stream implements StreamInterface
     }
 
     /**
+     * @return bool
+     */
+    public function delete() {
+
+        $this->prepare('Delete');
+
+        $this->client->execute($this->command);
+
+        return true;
+    }
+
+    /**
      * @param $newNode
      * @return bool
      */
     public function rename($newNode) {
-        $this->client->getCommand('Rename', [
+
+        $this->prepare('Rename', [
             'path'    => $this->node,
             'newPath' => $newNode
         ]);
