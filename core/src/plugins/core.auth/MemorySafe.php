@@ -73,7 +73,7 @@ class MemorySafe
      * @return bool|string FALSE if no need, or String (warning, it can be an empty string) if instance needed.
      */
     public static function contextUsesInstance($ctx){
-        if ($ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
+        if ($ctx->hasRepository() && $ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
             $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
             if (empty($instanceId)) $instanceId = "";
             return $instanceId;
