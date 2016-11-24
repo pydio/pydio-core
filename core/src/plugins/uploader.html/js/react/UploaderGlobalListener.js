@@ -83,7 +83,6 @@
 
         let findElement = function(event){
             var el = Event.findElement(event, selector);
-            console.log(el, event, selector);
             if(el.hasClassName('ajxpNodeProvider')){
                 if(Event.findElement(event, '.class-FetchedResultPane')){
                     return (listZone ? listZone : dropzone);
