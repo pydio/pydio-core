@@ -134,7 +134,7 @@ class Driver extends Plugin
             $jwt = JWT::encode($payload, $private);
 
             $resp = [
-                'host' => ApplicationState::detectServerURL(),
+                'host' => rtrim(ApplicationState::detectServerURL(), "/"),
                 'uri' => $escapedUri,
                 'jwt' => $jwt,
                 'permission' => $user->canWrite($repositoryId) && is_writeable($nodeUrl) ? 'edit' : 'readonly'
