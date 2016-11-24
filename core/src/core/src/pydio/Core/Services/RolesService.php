@@ -300,41 +300,42 @@ class RolesService
         $rootRole = RolesService::getRole("AJXP_GRP_/");
         if ($rootRole === false) {
             $rootRole = new AJXP_Role("AJXP_GRP_/");
-            $rootRole->setLabel("Root Group");
-            //$rootRole->setAutoApplies(array("standard", "admin"));
-            //$dashId = "";
-            $allRepos = RepositoryService::listAllRepositories();
-            foreach ($allRepos as $repositoryId => $repoObject) {
-                if ($repoObject->isTemplate) continue;
-                //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
-                $gp = $repoObject->getGroupPath();
-                if (empty($gp) || $gp == "/") {
-                    if ($repoObject->getDefaultRight() != "") {
-                        $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
-                    }
-                }
-            }
-            //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
-            $parameters = PluginsService::searchManifestsWithCache("//server_settings/param[@scope]", function ($paramNodes) {
-                $result = [];
-                /** @var \DOMElement $xmlNode */
-                foreach ($paramNodes as $xmlNode) {
-                    $default = $xmlNode->getAttribute("default");
-                    if (empty($default)) continue;
-                    $parentNode = $xmlNode->parentNode->parentNode;
-                    $pluginId = $parentNode->getAttribute("id");
-                    if (empty($pluginId)) {
-                        $pluginId = $parentNode->nodeName . "." . $parentNode->getAttribute("name");
-                    }
-                    $result[] = ["pluginId" => $pluginId, "name" => $xmlNode->getAttribute("name"), "default" => $default];
-                }
-                return $result;
-            });
-            foreach ($parameters as $parameter) {
-                $rootRole->setParameterValue($parameter["pluginId"], $parameter["name"], $parameter["default"]);
-            }
-            RolesService::updateRole($rootRole);
         }
+        $rootRole->setLabel("Root Group");
+        //$rootRole->setAutoApplies(array("standard", "admin"));
+        //$dashId = "";
+        $allRepos = RepositoryService::listAllRepositories();
+        foreach ($allRepos as $repositoryId => $repoObject) {
+            if ($repoObject->isTemplate) continue;
+            //if($repoObject->getAccessType() == "ajxp_user") $dashId = $repositoryId;
+            $gp = $repoObject->getGroupPath();
+            if (empty($gp) || $gp == "/") {
+                if ($repoObject->getDefaultRight() != "") {
+                    $rootRole->setAcl($repositoryId, $repoObject->getDefaultRight());
+                }
+            }
+        }
+        //if(!empty($dashId)) $rootRole->setParameterValue("core.conf", "DEFAULT_START_REPOSITORY", $dashId);
+        $parameters = PluginsService::searchManifestsWithCache("//server_settings/param[@scope]", function ($paramNodes) {
+            $result = [];
+            /** @var \DOMElement $xmlNode */
+            foreach ($paramNodes as $xmlNode) {
+                $default = $xmlNode->getAttribute("default");
+                if (empty($default)) continue;
+                $parentNode = $xmlNode->parentNode->parentNode;
+                $pluginId = $parentNode->getAttribute("id");
+                if (empty($pluginId)) {
+                    $pluginId = $parentNode->nodeName . "." . $parentNode->getAttribute("name");
+                }
+                $result[] = ["pluginId" => $pluginId, "name" => $xmlNode->getAttribute("name"), "default" => $default];
+            }
+            return $result;
+        });
+        foreach ($parameters as $parameter) {
+            $rootRole->setParameterValue($parameter["pluginId"], $parameter["name"], $parameter["default"]);
+        }
+        RolesService::updateRole($rootRole);
+
         $miniRole = RolesService::getRole("MINISITE");
         if ($miniRole === false) {
             $rootRole = new AJXP_Role("MINISITE");
