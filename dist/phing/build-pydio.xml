@@ -303,6 +303,7 @@
         </if>
         <property name="packaged_zip" value="${package_name}.zip"/>
         <property name="packaged_tar" value="${package_name}.tar.gz"/>
+        <property name="packaged_tar_noemptydirs" value="${package_name}-noemptydirs.tar.gz"/>
         <zip
                 destfile="${build.working_folder}/build/${packaged_zip}"
                 includeemptydirs="true"
@@ -310,6 +311,11 @@
         <tar
                 destfile="${build.working_folder}/build/${packaged_tar}"
                 includeemptydirs="true"
+                compression="gzip"
+            ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
+        <tar
+                destfile="${build.working_folder}/build/${packaged_tar_noemptydirs}"
+                includeemptydirs="false"
                 compression="gzip"
             ><fileset dir="${build.source_folder}" defaultexcludes="false"><include name="*/**"/></fileset></tar>
         <if>
