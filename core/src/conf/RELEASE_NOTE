@@ -1,5 +1,8 @@
 Pydio ##VERSION_NUMBER## Release Note
 
+7.1.0 - Test Release Note
+--
+
 Welcome to Pydio 7.0!
 
 Pydio 7 is a full overhaul of the PHP code, raising the standards, improving performances and making the platform more modular than ever. We also introduce a new separate tool called Pydio Booster, written in Go, removing php limits and easing the deployment of WebSockets.
