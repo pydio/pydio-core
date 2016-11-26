@@ -20,11 +20,11 @@
 */
 $mess=array(
 "PHPMailer-lite" => "PHPMailer-lite",
-"A simple mailer" => "A simple mailer",
-"Mailer" => "Mailer",
-"Php mailer to use (see phpmail-lite documentation)." => "Php mailer to use (see phpmail-lite documentation).",
-"Sendmail Path" => "Sendmail Path",
-"Path to sendmail if not the default one" => "Path to sendmail if not the default one",
-"Mails Encoding" => "Mails Encoding",
-"Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit." => "Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit.",
+"A simple mailer" => "Un gestor de correo simple",
+"Mailer" => "Gestor Correo",
+"Php mailer to use (see phpmail-lite documentation)." => "Un gestor de correo PHP para usarlo revise (phpmail-lite documentation).",
+"Sendmail Path" => "Ruta Sendmail",
+"Path to sendmail if not the default one" => "Ruta a sendmail si no se usa la ruta por defecto",
+"Mails Encoding" => "Codificación del Correo",
+"Content encoding of the email. Default value should be ok for most configurations. Some specific Windows Exchange + Outlook combination may require switching to 7bit." => "Codificación del contenido del correo. El valor por defecto debería de estar bien para la mayoría de configuraciones. Algunas configuraciones Windows Exchange + Outlook puede necesitar un cambio a 7bit.",
 );

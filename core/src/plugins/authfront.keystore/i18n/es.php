@@ -21,12 +21,12 @@
 
 $mess = array(
     "1" => "API Keys",
-    "2" => "Manage API keys created by client devices like phone, sync clients, etc...",
-    "3" => "Generate a key",
-    "4" => "Generate an API key pair",
-    "5" => "Revoke all accesses",
-    "6" => "Invalidate existing API keys",
-    "7" => "Are you sure you want to revoke this/these key(s)?",
-    "8" => "Key(s) removed successfully!",
-    "9" => "Devices connected to your account:",
+    "2" => "Mantiene las API keys creadas por los dispositivos del cliente como teléfonos, etc...",
+    "3" => "Generar una key",
+    "4" => "Generar una pareja de API keys",
+    "5" => "Elimina todo el acceso",
+    "6" => "Invalida las API keys existentes",
+    "7" => "¿Estas seguro que quiers eliminar esta(s) key(s)?",
+    "8" => "¡La(s) key(s) se eliminaron!",
+    "9" => "Dispositivos conectado a tu cuenta:",
 );

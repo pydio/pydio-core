@@ -19,9 +19,9 @@
 * The latest code can be found at <https://pydio.com>.
 */
 
-defined('AJXP_EXEC') or die('Access not allowed');
+defined('AJXP_EXEC') or die('Acceso no permitido');
 
 $mess = array(
-    "Git-based Versioning" => "Git-based Versioning",
-    "Keep tracks of all files modifications using a local Git repository" => "Keep tracks of all files modifications using a local Git workspace",
+    "Git-based Versioning" => "Versiones basadas en Git",
+    "Keep tracks of all files modifications using a local Git repository" => "Sigue todas las modificaciones de arivhos usando un repositorio Git local",
 );

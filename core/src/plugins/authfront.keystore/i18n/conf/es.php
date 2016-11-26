@@ -20,12 +20,12 @@
 */
 $mess=array(
 "API Keystore" => "API Keystore",
-"Store API keys/token to simplify REST connection" => "Store API keys/token to simplify REST connection",
-"Order" => "Order",
-"Order this plugin with other auth frontends" => "Order this plugin with other auth frontends",
-"Protocol Type" => "Protocol Type",
-"Enable/disable automatically based on the protocol used" => "Enable/disable automatically based on the protocol used",
-"Sessions Only" => "Sessions Only",
-"REST Only" => "REST Only",
-"Session-based or Rest" => "Session-based or Rest",
+"Store API keys/token to simplify REST connection" => "Almacenar API keys/token para simplificar la conexión REST",
+"Order" => "Orden",
+"Order this plugin with other auth frontends" => "Ordena este plugin con otro frontend de autenticación",
+"Protocol Type" => "Tipo de Protocolo",
+"Enable/disable automatically based on the protocol used" => "Activa/Desactiva automáticamente basado en el protocolo usado",
+"Sessions Only" => "Sólo Sesiones",
+"REST Only" => "Sólo REST",
+"Session-based or Rest" => "Basado en session o REST",
 );

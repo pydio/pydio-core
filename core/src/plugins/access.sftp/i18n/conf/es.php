@@ -19,16 +19,16 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"FTP over SSH" => "FTP over SSH",
-"Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." => "Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems.",
-"Server URL" => "Server URL",
-"Path to remote sftp server" => "Path to remote sftp server",
-"Port number" => "Port number",
-"Port to SSH server" => "Port to SSH server",
-"Path" => "Path",
-"Real path to the folder on the server" => "Real path to the folder on the server",
-"Fix Permissions" => "Fix Permissions",
-"How to handle remote permissions to be used by PHP as local permissions. See manual." => "How to handle remote permissions to be used by PHP as local permissions. See manual.",
-"Create" => "Create",
-"Create folder if it does not exists" => "Create folder if it does not exists",
+"FTP over SSH" => "FTP sobre SSH",
+"Access a remote server filesystem using FTP via SSH server. Handy for working around permissions problems." => "Accede al sistema de arhivos remoto usando FTP sobre el servidor SSH. Útil para solventar problemas de permisos.",
+"Server URL" => "URL del Servidor",
+"Path to remote sftp server" => "Ruta al servidor SFTP remoto",
+"Port number" => "Número de Puerto",
+"Port to SSH server" => "Puerto al servidor SSH",
+"Path" => "Ruta",
+"Real path to the folder on the server" => "Ruta real al directorio en el servidor",
+"Fix Permissions" => "Arreglar Permisos",
+"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Cómo arreglar permisos remotos para usar permisos locales en PHP. Ver manual.",
+"Create" => "Crear",
+"Create folder if it does not exists" => "Crea el directorio si no existe",
 );

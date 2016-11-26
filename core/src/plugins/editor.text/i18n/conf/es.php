@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Text Editor" => "Text Editor",
-"Very basic text editor" => "Very basic text editor",
+"Text Editor" => "Editor de Texto",
+"Very basic text editor" => "Editor de texto básico",
 );

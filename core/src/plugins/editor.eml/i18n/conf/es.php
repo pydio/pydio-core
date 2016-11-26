@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Email Viewer" => "Email Viewer",
-"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.",
+"Email Viewer" => "Visor de Email",
+"Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly." => "Lecto de Email, soporta el formato eml y los mimetypes eml. Detecta si un directorio contiene únicamente emails y lo muestra en columnas",
 );

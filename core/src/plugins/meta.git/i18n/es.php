@@ -19,25 +19,25 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-defined('AJXP_EXEC') or die('Access not allowed');
+defined('AJXP_EXEC') or die('Acceso no permitido');
 
 $mess = array(
-    "1" => "Versions",
-    "2" => "Document previous versions",
-    "3" => "Download",
-    "4" => "Download selected version to your computer",
-    "5" => "Preview (browser)",
-    "6" => "Open the selected version in a browser window",
-    "7" => "Revert to...",
-    "8" => "Revert the file to the selected revision on the server",
+    "1" => "Versiones",
+    "2" => "Versiones anteriores del documento",
+    "3" => "Descarga",
+    "4" => "Descarga la versión seleccionada del documento",
+    "5" => "Vista previa (navegador)",
+    "6" => "Abre la version seleccionada en una ventana del navegador",
+    "7" => "Revertir a...",
+    "8" => "Revierte el archivo a la versión seleccionada",
     "9" => "#",
-    "10" => "Date",
-    "11" => "Author",
-    "12" => "Modification",
-    "13" => "Are you sure you want to do this? Reverting to an old version will now create a new version of the document with the selected revision.",
-    "RENAME"        => "File renamed",
-    "MOVE"          => "File moved",
-    "MODIFICATION"  => "Content modified",
-    "DELETION"      => "File deleted",
-    "CREATION"      => "File created",
+    "10" => "Fecha",
+    "11" => "Autor",
+    "12" => "Modificación",
+    "13" => "¿Estás seguro de que quieres hacer esto? Se creará una versión nueva del documento con la versión seleccionada.",
+    "RENAME"        => "Archivo renombrado",
+    "MOVE"          => "Archivo movido",
+    "MODIFICATION"  => "Contenido modificado",
+    "DELETION"      => "Archivo eliminado",
+    "CREATION"      => "Archivo creado",
 );

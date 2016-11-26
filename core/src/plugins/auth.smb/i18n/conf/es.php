@@ -19,14 +19,14 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"SMB Authentication" => "SMB Authentication",
-"Authenticate user by directly connecting to an SMB share" => "Authenticate user by directly connecting to an SMB share",
-"Repository" => "Repository",
-"Id of the repository to use for testing connexion" => "Id of the repository to use for testing connection",
-"Admin user" => "Admin user",
-"The ID of an existing admin for Pydio (using conf.serial)" => "The ID of an existing admin for Pydio (using conf.serial)",
+"SMB Authentication" => "Autenticación SMB",
+"Authenticate user by directly connecting to an SMB share" => "Autenticación de usuario directamente conectando a una compartición SMB",
+"Repository" => "Repositorio",
+"Id of the repository to use for testing connexion" => "ID del repositorio para probar la conexión",
+"Admin user" => "Usuario administrador",
+"The ID of an existing admin for Pydio (using conf.serial)" => "ID del un Administrador existente en PYDIO (usando conf.serial)",
 "Workspace" => "Workspace",
-"ID of the workspace used to validate credentials" => "ID of the workspace used to validate credentials",
+"ID of the workspace used to validate credentials" => "ID del workspace usado para validar los credenciales",
 "Smbclient" => "Smbclient",
-"Path to smbclient executable, considered to be in the path by default." => "Path to smbclient executable, considered to be in the path by default.",
+"Path to smbclient executable, considered to be in the path by default." => "Ruta al ejecutable smbclient, se considera que esta en la ruta por defecto.",
 );
