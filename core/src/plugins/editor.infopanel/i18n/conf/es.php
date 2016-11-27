@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Open in..." => "Open in...",
-"Simple Picker to open any type of file in any available editor." => "Simple Picker to open any type of file in any available editor.",
-"Info Panel..." => "Info Panel...",
-"Info Panel" => "Info Panel",
+"Open in..." => "Abrir en...",
+"Simple Picker to open any type of file in any available editor." => "Selector para abrir cualquier archivo en el editor disponible.",
+"Info Panel..." => "Panel de Información...",
+"Info Panel" => "Panel de Información",
 );

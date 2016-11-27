@@ -1,5 +1,5 @@
 <?php
 $mess = array(
-    "1" => "Analytics",
-    "2" => "Analytics Graphs Viewer",
+    "1" => "Estadísticas",
+    "2" => "Visor de Estadísticas",
 );

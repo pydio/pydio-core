@@ -1,4 +1,4 @@
 <?php
 $mess = array(
-    "Graphs Viewer" => "Graphs Viewer",
+    "Graphs Viewer" => "Visor de Gráficos",
 );
