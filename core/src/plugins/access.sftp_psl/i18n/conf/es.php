@@ -20,13 +20,13 @@
  */
 $mess=array(
 "SSH File Transfer Protocol (SFTP)" => "SSH File Transfer Protocol (SFTP)",
-"The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2." => "The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2.",
+"The SSH File Transfer Protocol is a network protocol that provides file access, file transfer, and file management functionalities over SSH2." => "SSH File Transfer Protocol es un protocolo de red que proporciona acceso a archivos, transferencia de archivos y manteniemiento sobre SSH2",
 "Host" => "Host",
-"SFTP Host to connect to" => "SFTP Host to connect to",
-"Port" => "Port",
-"SFTP Host port" => "SFTP Host port",
-"Path" => "Path",
-"Real path to the root folder on the server" => "Real path to the root folder on the server",
-"Fix Permissions" => "Fix Permissions",
-"How to handle remote permissions to be used by PHP as local permissions. See manual." => "How to handle remote permissions to be used by PHP as local permissions. See manual.",
+"SFTP Host to connect to" => "Conectar a SFTP Host",
+"Port" => "Puerto",
+"SFTP Host port" => "Puerto SFTP Host",
+"Path" => "Ruta",
+"Real path to the root folder on the server" => "Ruta real al directorio raiz en el servidor",
+"Fix Permissions" => "Arreglar Permisos",
+"How to handle remote permissions to be used by PHP as local permissions. See manual." => "Cómo arreglar permisos remotos para usarlos como locales en PHP. Ver manual.",
 );

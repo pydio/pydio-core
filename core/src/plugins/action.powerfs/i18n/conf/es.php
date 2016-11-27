@@ -21,7 +21,7 @@
 $mess = array(
     // will be replaced by the application title
     "Power FS" => "Zip Delegation",
-    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "This extension assumes you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, and to use the command line version of ZIP.",
-    "Zip path" => "Zip path",
-    "Path of the zip utilitary on the command line" => "Path of the zip utilitary on the command line",
+    "This set of extensions assume that you have an administration access to your server: ability to tweak the webserver and the php configuration, ability to access the command line, etc." => "Esta extensión asume que tienes acceso de administrador al servidor: ajustes del servidor y configuración php, acceso a la linea de comandos, versión de linea de comandos de ZIP.",
+    "Zip path" => "Ruta Zip",
+    "Path of the zip utilitary on the command line" => "Ruta a la utilidad zip desde la linea de comandos",
 );

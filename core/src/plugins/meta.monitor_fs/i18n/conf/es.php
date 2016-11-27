@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"FileSystem Monitoring" => "FileSystem Monitoring",
-"If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes" => "If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes",
+"FileSystem Monitoring" => "Monitorización del Sistema de Archivos",
+"If the workspace is meant to be modified directly through the file system, use this plugin to monitor the changes" => "Si el workspace se modifica directamente desde el sistema de archivos, usa este plugin para monitorizar los cambios.",
 );

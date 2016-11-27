@@ -22,6 +22,6 @@
 /* PSD.JS viewer. Adjusted for Pydio by Kristian Garnét. */
 
 $mess=array(
-"PDF Viewer" => "PDF Viewer",
-"JavaScript PDF viewer" => "JavaScript PDF viewer",
+"PDF Viewer" => "Visor de PDF",
+"JavaScript PDF viewer" => "Visor de PDF en JavaScript",
 );
