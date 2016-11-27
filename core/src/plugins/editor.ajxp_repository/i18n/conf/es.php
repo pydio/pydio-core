@@ -19,5 +19,5 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Repository Editor" => "Repository Editor",
+"Repository Editor" => "Editor de Repositorio",
 );

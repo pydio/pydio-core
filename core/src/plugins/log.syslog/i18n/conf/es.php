@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Syslog logger" => "Syslog logger",
-"Send the logs to the system syslog" => "Send the logs to the system syslog",
-"Identifier" => "Identifier",
-"How the logs will be identified in the system logs" => "How the logs will be identified in the system logs",
+"Syslog logger" => "Registro Syslog",
+"Send the logs to the system syslog" => "Envia los registros al syslog del sistema",
+"Identifier" => "Identificador",
+"How the logs will be identified in the system logs" => "Cómo se identifican los registros en el sistema",
 );

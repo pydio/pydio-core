@@ -20,7 +20,7 @@
 */
 $mess=array(
 "MQ SQL" => "MQ SQL",
-"Store persistant and worker queues in database" => "Almacenar en la base de datos las colas persistentes y del worker",
+"Store persistant and worker queues in database" => "Almacenar en la base de datos las colas persistentes y en ejecución",
 "Install SQL Tables" => "Instalar Tablas SQL",
 "SQL Tables" => "Tablas SQL",
 "SQL Driver" => "Driver SQL",

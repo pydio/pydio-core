@@ -20,5 +20,5 @@
 */
 $mess=array(
 "MQ Serial" => "MQ Serial",
-"Store persistant and worker queues in serial files" => "Store persistant and worker queues in serial files",
+"Store persistant and worker queues in serial files" => "Almacena las colas persistentes y en ejecución en archvios en serie",
 );
