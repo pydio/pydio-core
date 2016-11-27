@@ -19,9 +19,9 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Syncable Workspace" => "Syncable Workspace",
-"Track changes on this workspace to enable the synchronization with an external client" => "Track changes on this workspace to enable the synchronization with an external client",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
-"Workspace is syncable" => "Workspace is syncable",
+"Syncable Workspace" => "Workspace Sincronizable",
+"Track changes on this workspace to enable the synchronization with an external client" => "Sigue los cambios en este workspace para activar la sincronización con un cliente externo",
+"SQL Tables" => "Tablas SQL",
+"Install SQL Tables" => "Instala Tablas SQL",
+"Workspace is syncable" => "El workspace es sincronizable",
 );

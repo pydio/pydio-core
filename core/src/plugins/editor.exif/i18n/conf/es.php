@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"EXIF Extractor" => "EXIF Extractor",
-"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.",
+"EXIF Extractor" => "Extractor EXIF",
+"Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data." => "Muestra los metadatos EXIF contenidos en los archivos JPEG. Puede localizar una imagen en un mapa si contiene datos de geolocalización.",
 );

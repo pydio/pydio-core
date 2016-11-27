@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Role Editor" => "Role Editor",
-"Administrator Role Editor" => "Administrator Role Editor",
+"Role Editor" => "Editor de Rol",
+"Administrator Role Editor" => "Editor de Rol de Administrador",
 );

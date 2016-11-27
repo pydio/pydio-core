@@ -20,9 +20,9 @@
 */
 $mess=array(
     "Collabora Online" => "Collabora Online",
-    "Collabora Online Editor for office documents" => "Collabora Online Editor for office documents",
-    "URL to the Libre Office Editor Iframe" => "URL to the Libre Office Editor Iframe",
-    "Websocket Uses TLS" => "Websocket Uses TLS",
+    "Collabora Online Editor for office documents" => "Editor Collabora Online para documentos de oficina",
+    "URL to the Libre Office Editor Iframe" => "URL a Libre Office Editor Iframe",
+    "Websocket Uses TLS" => "Websocket Usa TLS",
     "Web Socket Connector Host" => "Web Socket Connector Host",
     "Web Socket Connector Port" => "Web Socket Connector Port",
 );

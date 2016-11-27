@@ -19,13 +19,13 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess = array(
-    "1" => "Email successfully sent to %s user(s)",
-    "2" => "No address found to send the email!",
-    "3" => "No mailer configured to send emails, contact your administrator",
-    "4" => "From",
-    "5" => "To",
-    "6" => "Subject",
-    "7" => "Message",
-    "8" => "Pick a user or type an address",
-    "9" => "Notifications Digest",
+    "1" => "Correo enviado correctamente a %s",
+    "2" => "¡No se encontró la direccióin para enviar el correo!",
+    "3" => "No se configuró el gestor de correo, contacte con el administrador",
+    "4" => "De",
+    "5" => "A",
+    "6" => "Asunto",
+    "7" => "Mensaje",
+    "8" => "Elija un usuario o escriba una dirección",
+    "9" => "Resumen de Notificaciones",
 );

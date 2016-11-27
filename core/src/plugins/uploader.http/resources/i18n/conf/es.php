@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Remote Download" => "Remote Server",
-"Async downloader to load a file from another source" => "Async downloader to load a file from another source",
+"Remote Download" => "Servidor Remoto",
+"Async downloader to load a file from another source" => "Carga un archivo desde otra fuente de forma asíncrona",
 );
