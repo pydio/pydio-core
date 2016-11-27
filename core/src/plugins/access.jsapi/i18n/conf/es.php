@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Javascript Api Browser" => "Javascript Api Browser",
-"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!",
+"Javascript Api Browser" => "Navegador Javascript API",
+"Browse Pydio Javascript classes and interfaces. Helper for developpers, but also good demonstration of how Pydio data can be fed by something different than a remote server filesystem!" => "Navega por las clases e interfaces de Javascript. Para desarrolladores, aunque también sirve de demostración de cómo se pueden usar los datos de Pydio.",
 );

@@ -19,14 +19,14 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die( '¡Acceso no permitido!');
 
 $mess = array(
-    "1" => "External Link",
-    "2" => "Link added by the action.skeleton plugin",
-    "3" => "Are you sure that you want to open %s in a new window?",
-    "4" => "Modal Link",
-    "5" => "Open the link in a modal dialog",
-    "6" => "Dynamic content",
-    "7" => "Loading content, please wait...",
+    "1" => "Enlace Externo",
+    "2" => "Enlace añadido por el plugin action.skeleton",
+    "3" => "¿Quieres abrir %s en una ventana nueva?",
+    "4" => "Enlace Modal",
+    "5" => "Abre el enlace en un dialogo modal",
+    "6" => "Contenido dinámico",
+    "7" => "Cargando contenido, por favor espere...",
 );

@@ -20,12 +20,12 @@
 */
 $mess=array(
 "timestamp" => "timestamp",
-"Allow timestamp files with Universign." => "Allow timestamp files with Universign.",
-"msgBox1" => "Please confirm that you want to add a timestamp to this file",
+"Allow timestamp files with Universign." => "Permite archivos timestamp con Universign.",
+"msgBox1" => "Por favor confirma que quieres añadir un timestamp a este archivo",
 "URL" => "URL",
-"Timestamp provider API URL" => "Timestamp provider API URL",
-"User Mail" => "User Mail",
-"Password" => "Password",
-"User account" => "User account",
-"User Password" => "User Password",
+"Timestamp provider API URL" => "API URL de proveedor de timestamp",
+"User Mail" => "Correo de Usuario",
+"Password" => "Contraseña",
+"User account" => "Cuenta de Usuario",
+"User Password" => "Contraseña de Usuario",
 );

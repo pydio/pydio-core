@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Open Documents Viewer" => "Open Documents Viewer",
-"Open Document Formats viewer - based on WebODF.js library" => "Open Document Formats viewer - based on WebODF.js library",
+"Open Documents Viewer" => "Visor de Documentos",
+"Open Document Formats viewer - based on WebODF.js library" => "Visor de documentos de formato abierto, basado en la librería WebODF.js",
 );

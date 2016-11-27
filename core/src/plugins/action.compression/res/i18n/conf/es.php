@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Tar Archives Support" => "Tar Archives Support",
-"Create and extract tar, tar.gz and tar.bz2 archives." => "Create and extract tar, tar.gz and tar.bz2 archives.",
+"Tar Archives Support" => "Soporte de Archivos Tar",
+"Create and extract tar, tar.gz and tar.bz2 archives." => "Crea y extrae archivos tar, tar.gz y tar.bz2.",
 );

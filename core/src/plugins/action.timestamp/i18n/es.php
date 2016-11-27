@@ -1,7 +1,7 @@
 <?php
 $mess = array(
-"1" => "Warning, a timestamp token is already attached to this file. Delete the token manually to be able to add a new one",
-"2" => "Warning, you can't add a timestamp to a token",
-"3" => "Timestamp token has already been created for the file ",
-"4" => "WARNING : Configuration problem, please contact the system administrator as soon as possible.",
+"1" => "Atención, este archivo ya tiene una señal timestamp. ¿Borrarla manualmente y añadir una nueva?",
+"2" => "Atención, no puedes añadir un timestamp a una señal",
+"3" => "Ya se ha creado una señal timestamp para el archivo ",
+"4" => "ATENCIÓN : Problema en la configuración, contacte con el administrador lo antes posible.",
 );

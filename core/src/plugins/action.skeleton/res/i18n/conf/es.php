@@ -20,11 +20,11 @@
 */
 $mess=array(
 "Skeleton Plugin" => "Skeleton Plugin",
-"This is an empty container to demonstrate the basics of plugins coding." => "This is an empty container to demonstrate the basics of plugins coding.",
-"Custom Footer" => "Custom Footer",
-"Show a custom footer div" => "Show a custom footer div",
-"Footer Content" => "Footer Content",
-"Display this content in the footer" => "Display this content in the footer",
-"Button Target Url" => "Button Target Url",
-"The target URL of the button that will be added to the application" => "The target URL of the button that will be added to the application",
+"This is an empty container to demonstrate the basics of plugins coding." => "Esto es un plugin vacio para mostrar los principios básicos de la programación de plugins.",
+"Custom Footer" => "Footer Personalizado",
+"Show a custom footer div" => "Muestra un footer div personalizado",
+"Footer Content" => "Contenido de Footer",
+"Display this content in the footer" => "Muestra el contenido en el footer",
+"Button Target Url" => "URL del Botón",
+"The target URL of the button that will be added to the application" => "La dirección URL del botón que se añadirá a la aplicación",
 );

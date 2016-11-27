@@ -19,24 +19,24 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-defined('AJXP_EXEC') or die( 'Access not allowed');
+defined('AJXP_EXEC') or die( '¡Acceso no permitido!');
 
 $mess = array(
-    "1" => "Compress",
-    "2" => "Compress Selection",
-    "3" => "Select the format of the archive:",
-    "4" => "Archive's name :",
-    "5" => "Starting compression...",
-    "6" => "Adding files in the archive... %s ",
-    "7" => "During compression in %s ...",
-    "8" => "Your archive finished successfully !!",
-    "9" => "Extract",
-    "10" => "Extract selected archives",
-    "11" => "Path of the extracted files ",
-    "12" => "Starting extraction...",
-    "13" => "Extracting files ... %s ",
-    "14" => "Extraction finished successfullly in the folder '%s'.",
-    "15" => "The selected file is neither a TAR  or a TAR.GZ or a TAR.BZ2 archive.",
-    "16" => "You can only compress in TAR, TAR.GZ or TAR.BZ2.",
-    "17" => "You can't compress empty folders.",
+    "1" => "Comprimir",
+    "2" => "Comprimir Selección",
+    "3" => "Selecciona el formato del archivo:",
+    "4" => "Nombre del archivo:",
+    "5" => "Comprimiendo...",
+    "6" => "Añadiendo ficheros al archivo... %s ",
+    "7" => "Durante la compresión en %s ...",
+    "8" => "¡El archivo terminó correctamente!",
+    "9" => "Extraer",
+    "10" => "Extraer los archivos seleccionados",
+    "11" => "Ruta a los archivos extraidos ",
+    "12" => "Extrayendo...",
+    "13" => "Extrayendo archivos... %s ",
+    "14" => "La extracción terminó correctamente en el directorio '%s'.",
+    "15" => "El archivo seleccionado no es de tipo TAR, TAR.GZ o TAR.BZ2.",
+    "16" => "Sólo puedes comprimir en formato TAR, TAR.GZ o TAR.BZ2.",
+    "17" => "No puedes comprimir directorios vacíos",
 );
