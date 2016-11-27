@@ -20,7 +20,7 @@
 */
 $mess=array(
 "SMB Authentication" => "Autenticación SMB",
-"Authenticate user by directly connecting to an SMB share" => "Autenticación de usuario directamente conectando a una compartición SMB",
+"Authenticate user by directly connecting to an SMB share" => "Autenticación de usuario directamente conectando a SMB",
 "Repository" => "Repositorio",
 "Id of the repository to use for testing connexion" => "ID del repositorio para probar la conexión",
 "Admin user" => "Usuario administrador",
