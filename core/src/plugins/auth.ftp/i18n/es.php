@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Enter connection data",
+"1" => "Introducir datos de conexión",
 "2" => "Host",
-"3" => "Optional data",
-"4" => "Start",
-"5" => "Protocol",
+"3" => "Datos opcionales",
+"4" => "Comenzar",
+"5" => "Protocolo",
 "6" => "Charset",
-"7" => "Active",
-"8" => "Port",
+"7" => "Activo",
+"8" => "Puerto",
 );

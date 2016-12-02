@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"External Window" => "External Window",
-"Open file in a new browser window, thus using native browser capabilities." => "Open file in a new browser window, thus using native browser capabilities.",
-"Open documents in..." => "Open documents in...",
-"Choose where the documents are opened" => "Choose where the documents are opened",
-"Open link in..." => "Open link in...",
-"Choose where the http links are opened" => "Choose where the http links are opened",
-"Application Tab" => "Application Tab",
-"Browser Tab" => "Browser Tab",
+"External Window" => "Ventana Externa",
+"Open file in a new browser window, thus using native browser capabilities." => "Abrir archivo en una nueva ventana del navegador, se usa las capacidades nativa del navegador.",
+"Open documents in..." => "Abrir documentos en...",
+"Choose where the documents are opened" => "Elegir donde se abrirán los documentos",
+"Open link in..." => "Abrir enlace en...",
+"Choose where the http links are opened" => "Elegir donde se abrir los enlaces http",
+"Application Tab" => "Pestaña de Aplicación",
+"Browser Tab" => "Pestaña del Navegador",
 );

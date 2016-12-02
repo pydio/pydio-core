@@ -20,13 +20,13 @@
 */
 $mess=array(
 "WebDAV (PEAR)" => "WebDAV (PEAR)",
-"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied.",
+"Access a WebDAV server. Requires PEAR/HTTP_WebDAVClient installed with the patched found in the plugin folder applied." => "Acceder a un servidor WebDAV. Requiere tener instalado PEAR/HTTP_WebDAVClient con el parche que se encuentra en el directorio del plugin.",
 "Host" => "Host",
-"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too.",
-"Uri" => "Uri",
-"Path to the root folder on the server" => "Path to the root folder on the server",
-"File Creation Mask" => "File Creation Mask",
-"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc.",
+"Host of the WebDAV server, with http/https and without trailing slash. Can contain user:password too." => "Host del servidor WebDAV, con http/https sin la barra final. Puede incluir usuario:contraseña.",
+"Uri" => "URI",
+"Path to the root folder on the server" => "Ruta al directorio raiz del servidor",
+"File Creation Mask" => "Máscara de Archivo",
+"Optionnaly apply a chmod operation. Value must be numeric, like 0777, 0644, etc." => "Aplicar una operación chmod opcional. El valor tiene que ser numérico, por ejemplo: 0777, 0644, etc.",
 "WebDAV" => "WebDAV",
-"Access WebDAV through Guzzle and SabreDAV" => "Access WebDAV through Guzzle and SabreDAV",
+"Access WebDAV through Guzzle and SabreDAV" => "Acceder a WebDAV a través de Guzzle y SabreDAV",
 );

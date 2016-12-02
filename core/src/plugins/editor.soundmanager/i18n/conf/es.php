@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Sound Player" => "Sound Player",
-"Uses HTML5 or Flash to play a sound" => "Uses HTML5 or Flash to play a sound",
+"Sound Player" => "Reproductor de Sonido",
+"Uses HTML5 or Flash to play a sound" => "Usa HTML5 o Flash para reproducir un sonido",
 );

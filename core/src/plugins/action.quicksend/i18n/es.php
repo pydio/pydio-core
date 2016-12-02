@@ -20,8 +20,8 @@
  */
 
 $mess = array(
-    "1" => "Quick Send",
-    "2" => "Send a file, share it and email the link at once",
-    "3" => "Select a file",
-    "4" => "Click to select a file, or drop it in the zone below",
+    "1" => "Envío Rápido",
+    "2" => "Enviar un archivo, comparte y envía el enlace por correo",
+    "3" => "Seleccionar un archivo",
+    "4" => "Pulsar para seleccionar un archivo, o soltarlo en la zona inferior",
 );

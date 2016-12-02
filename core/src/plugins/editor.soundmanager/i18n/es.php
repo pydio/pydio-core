@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Sound Volume",
-"2" => "Sound Player",
+"1" => "Volumen de Sonido",
+"2" => "Reproductor de Sonido",
 );

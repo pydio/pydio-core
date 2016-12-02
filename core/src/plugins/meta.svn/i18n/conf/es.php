@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Subversion Repository" => "Subversion Repository",
-"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extract SVN informations (revision, change log, etc) if the workspace is a Working-Copy, and SVN is available as a commandline.",
+"Subversion Repository" => "Repositorio Subversion",
+"Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline." => "Extraer la información SVN (revisión, cambios, etc) si el workspace es una Working-Copy y si SVN está disponible desde la línea de comandos.",
 );

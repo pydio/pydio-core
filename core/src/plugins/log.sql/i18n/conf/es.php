@@ -19,10 +19,10 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the logs in an SQL database." => "Stores the logs in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"DB Storage" => "Almacenamiento DB",
+"Stores the logs in an SQL database." => "Almacena los registros en una base de datos SQL.",
+"Connexion" => "Conexión",
+"The Database Connexion" => "Conexión de la Base de Datos",
+"SQL Tables" => "Tablas SQL",
+"Install SQL Tables" => "Instalar Tablas SQL",
 );
