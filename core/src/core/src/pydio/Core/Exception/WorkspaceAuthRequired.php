@@ -69,6 +69,10 @@ class WorkspaceAuthRequired extends PydioException {
         if($credentials !== false && !empty($credentials['user']) && !empty($credentials['password'])){
             return;
         }
+        // 3. Test if there are encoded credentials available
+        if ($workspaceObject->getContextOption($ctx, "ENCODED_CREDENTIALS") != "") {
+            return;
+        }
         $allowFreeLogin = ($workspaceObject->getContextOption($ctx, "SESSION_CREDENTIALS_FREE_LOGIN") === true);
         throw new WorkspaceAuthRequired($workspaceObject->getId(), $allowFreeLogin);
     }
