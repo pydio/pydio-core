@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"WMS Server" => "WMS Server",
-"Browse the layers served by a WMS server." => "Browse the layers served by a WMS server.",
-"Wms Server" => "Wms Server",
-"Wms server url" => "Wms server url",
+"WMS Server" => "Servidor WMS",
+"Browse the layers served by a WMS server." => "Navegar por las capas proporcionadas por el servidor WMS.",
+"Wms Server" => "Servidor WMS",
+"Wms server url" => "URL del servidor WMS",
 );

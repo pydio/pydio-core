@@ -19,16 +19,16 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"HTML Uploader" => "Standard",
-"Auto-switching HTML5 or IFrame uploader." => "Auto-switching HTML5 or IFrame uploader.",
-"Default Behaviour" => "Default Behaviour",
-"Existing Files" => "Existing Files",
-"Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)" => "Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)",
-"Auto Start" => "Auto Start",
-"Default value for automatically starting upload or not" => "Default value for automatically starting upload or not",
-"Auto Close" => "Auto Close",
-"Default value for automatically closing the dialog after upload or not" => "Default value for automatically closing the dialog after upload or not",
-"Always Override" => "Always Override",
-"Auto Rename File" => "Auto Rename File",
-"Prompt user" => "Prompt user",
+"HTML Uploader" => "Estándar",
+"Auto-switching HTML5 or IFrame uploader." => "Uploader en HTML5 o IFrame.",
+"Default Behaviour" => "Comportamiento Predeterminado",
+"Existing Files" => "Ficheros Existentes",
+"Inform the user or not if the file already exists (default behaviour, the user will be able to change this preference)" => "Informar al usuario o no si el archivo ya existe (comportamiento predeterminado, el usuario puede cambiar esta opción)",
+"Auto Start" => "Auto Comenzar",
+"Default value for automatically starting upload or not" => "Valor predeterminado para empezar la subida automaticamente",
+"Auto Close" => "Auto Cerrar",
+"Default value for automatically closing the dialog after upload or not" => "Valor predeterminado para cerrar automaticamente el diálogo después de la subida",
+"Always Override" => "Siempre Sobreescribir",
+"Auto Rename File" => "Auto Renombrado",
+"Prompt user" => "Preguntar al usuario",
 );
