@@ -20,5 +20,5 @@
 */
 $mess=array(
 "CKEditor" => "CKEditor",
-"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Wysiwyg HTML Editor, requires separate library to be downloaded.",
+"Wysiwyg HTML Editor, requires separate library to be downloaded." => "Editor WYSIWYG de HTML Editor, necesita descargar librerias.",
 );

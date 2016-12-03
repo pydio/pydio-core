@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess = array(
-"Application Logger" => "Application Logger",
-"Setup the logging system" => "Setup the logging system",
-"Send errors to system log" => "Send errors to system log",
-"Always send all Error-level messages to the system error log" => "Always send all Error-level messages to the system error log",
-"Plugin instance to handle log implementation" => "Plugin instance to handle log implementation",
-"Logger plugin" => "Logger plugin",
-"Custom Header for IP" => "Custom Header for IP",
-"Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP." => "Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP.",
+"Application Logger" => "Registro de Aplicación",
+"Setup the logging system" => "Configura un sitema de registro",
+"Send errors to system log" => "Enviar errores al registro del sistema",
+"Always send all Error-level messages to the system error log" => "Enviar siempre los mensajes nivel Error al registro del sistema",
+"Plugin instance to handle log implementation" => "Instancia del Plugin que administra la implementación del registro",
+"Logger plugin" => "Plugin de Registro",
+"Custom Header for IP" => "Cabecera Personalizada para IP",
+"Can be used in a proxy situation to use e.g. X-Forwarded-For header value instead of proxy IP." => "Se puede usar con un proxy p.e. el valor de la cabecera X-Forwarded-For en vez de la IP del proxy.",
 );

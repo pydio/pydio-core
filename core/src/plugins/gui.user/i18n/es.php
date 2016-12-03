@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-    "1" => "Password Reset",
-    "2" => "Set your new password",
-    "3" => "Please enter your login, a reset password will be sent to you by email.",
-    "4" => "Your identifier",
-    "5" => "A reset password request has been sent to the email registered with your account. Click on the link in the email to recreate a password.",
-    "6" => "Thank you, you can now log in!",
-    "7" => "A password reset has been requested on the account associated to this email address. If you are not the author of this request, you can safely ignore this email. Otherwise click on the following link to reset your password:",
-    "8" => "Use the form below to reset your password. Please enter your login and the new password twice."
+    "1" => "Restaurar Contraseña",
+    "2" => "Configurar tu contraseña",
+    "3" => "Por favor introduce tu usuario, se enviará un enlace a tu correo.",
+    "4" => "Tu identificador",
+    "5" => "Se ha enviado un enlace al correo de tu cuenta. Pulsa en el enlace del correo para volver a crear la contraseña.",
+    "6" => "Gracias, ¡ahora puedes iniciar sesión!",
+    "7" => "Se ha enviado una solicitud de restauración de contraseña a tu correo asociado a la cuenta. Si no has sido tu quien la ha solicitado, ignora este correo. Si lo solicistaste pulsa en el siguiente enlace para cambiar la contraseña:",
+    "8" => "Usar el formulario para restaurar la contraseña. Introduce tu usuario y la nueva contraseña dos veces."
 );

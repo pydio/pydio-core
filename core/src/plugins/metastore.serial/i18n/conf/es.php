@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Files MetaStore" => "Files MetaStore",
-"Stores metadata inside local hidden files." => "Stores metadata inside local hidden files.",
-"File location" => "File location",
-"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder.",
-"Application Data Folder" => "Application Data Folder",
-"In Local Folders" => "In Local Folders",
-"Meta File" => "Meta File",
-"Hidden file used inside folders to save meta data" => "Hidden file used inside folders to save meta data",
+"Files MetaStore" => "MetaStore de Archivos",
+"Stores metadata inside local hidden files." => "Almacena los metadatos en archivos ocultos.",
+"File location" => "Localización del archivo",
+"Where to store the metadata file : LOCAL means a hidden file will be created in each folder, GLOBAL means that one file will be created in AJXP_DATA_PATH/plugins/action.share folder." => "Dónde almacenar el archivo de metadatos: LOCAL significa que se creará un archivo oculto en cada directorio, GLOBAL significa que se creará sólo un archivo en el directorio AJXP_DATA_PATH/plugins/action.share.",
+"Application Data Folder" => "Directorio de Datos de la Aplicación",
+"In Local Folders" => "En Directorios Locales",
+"Meta File" => "Meta Archivo",
+"Hidden file used inside folders to save meta data" => "Archivo oculto usado en los directorios para almacenar metadatos",
 );

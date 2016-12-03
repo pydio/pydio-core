@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"DB Storage" => "DB Storage",
-"Stores the conf data in an SQL database." => "Stores the conf data in an SQL database.",
-"Connexion" => "Connection",
-"The Database Connexion" => "The Database Connection",
-"Users Tmp Folder" => "Users Tmp Folder",
-"The folder in which all temporary files will be stored" => "The folder in which all temporary files will be stored",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
+"DB Storage" => "Almacenamiento en Base de Datos",
+"Stores the conf data in an SQL database." => "Almacena los datos de configuración en una base de datos SQL.",
+"Connexion" => "Conexión",
+"The Database Connexion" => "Conexión a la Base de Datos",
+"Users Tmp Folder" => "Directorio Temporal",
+"The folder in which all temporary files will be stored" => "Directorio donde se almacenarán los archivos temporales",
+"SQL Tables" => "Tablas SQL",
+"Install SQL Tables" => "Instalar Tablas SQL",
 );

@@ -19,5 +19,5 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"User access point" => "User access point",
+"User access point" => "Punto de acceso de usuario",
 );

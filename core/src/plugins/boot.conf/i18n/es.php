@@ -20,12 +20,12 @@
  */
 
 $mess = array(
-    "1" => "Pydio Setup Wizard",
-    "2" => "Welcome in the Pydio Setup Wizard",
-    "3" => "Thank you for installing Pydio. <br/> Please follow this installation wizard to start sharing and syncing files across all of your devices in no time.  Make sure to create a database and prepare your SQL credentials before starting.  You can hover over the field labels for more information. <br/> Press start when you are ready",
-    "4" => "Start Wizard",
-    "5" => "Please wait while Pydio is being configured! It will be up and running in a couple of seconds...",
-    "6" => "Install Pydio",
-    "7" => "Language",
-    "8" => "Click on each section to edit parameters",
+    "1" => "Asistente de Configuración",
+    "2" => "Bienvenido al asistente de configuración de Pydio",
+    "3" => "Gracias por instalar Pydio. <br/> Por favor siga las instrucciones para comenzar a compartir y sincronizar archivos en todos sus dispositivos. Asegurese de crear una base de datos y preparar los credenciales SQL antes de comenzar. Puedes pasar el cursor por encima de los campos para más información. <br/> Pulsa comenzar cuando estes listo.",
+    "4" => "Comenzar",
+    "5" => "¡Por favor espera mientras Pydio se configura! Estará listo en unos segundos...",
+    "6" => "Instalar Pydio",
+    "7" => "Lenguaje",
+    "8" => "Pulsa en cada sección para editar los parámetros",
 );
