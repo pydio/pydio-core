@@ -20,5 +20,5 @@
 */
 $mess=array(
     "S3 MetaStore" => "MetaStore S3",
-    "Stores metadata s3 metadata" => "Store metadata inside S3 object.",
+    "Stores metadata s3 metadata" => "Almacenar metadatos en objetos S3.",
 );

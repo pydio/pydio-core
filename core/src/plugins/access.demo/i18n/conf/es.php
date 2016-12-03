@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Demo (no write actions)" => "Demo (no write actions)",
-"This is a standard access to the filesystem but with all write actions disabled server-side." => "This is a standard access to the filesystem but with all write actions disabled server-side.",
-"Path" => "Path",
-"Real path to the root folder on the server" => "Real path to the root folder on the server",
-"Create" => "Create",
-"Create folder if it does not exists" => "Create folder if it does not exists",
-"Recycle Bin Folder" => "Recycle Bin Folder",
-"Leave empty if you do not want to use a recycle bin." => "Leave empty if you do not want to use a recycle bin.",
+"Demo (no write actions)" => "Demo (sin acciones de escritura)",
+"This is a standard access to the filesystem but with all write actions disabled server-side." => "Esto es un acceso estándar al sistema de archivos pero con todas las funciones de escrituras desactivadas por parte del servidor.",
+"Path" => "Ruta",
+"Real path to the root folder on the server" => "Ruta real al directorio raiz del servidor",
+"Create" => "Crear",
+"Create folder if it does not exists" => "Crear directorio si no existe",
+"Recycle Bin Folder" => "Directorio de la Papelera de Reciclaje",
+"Leave empty if you do not want to use a recycle bin." => "Dejar vacío si no quieres usar la papelera de reciclaje.",
 );

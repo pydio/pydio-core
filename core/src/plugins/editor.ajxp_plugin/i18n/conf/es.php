@@ -19,5 +19,5 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Plugin Editor" => "Plugin Editor",
+"Plugin Editor" => "Editor de Plugin",
 );

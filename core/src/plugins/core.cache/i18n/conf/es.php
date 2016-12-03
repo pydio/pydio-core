@@ -19,9 +19,9 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Caching Driver" => "Caching Driver",
-"Setup the caching system" => "Setup the caching system",
-"Cache Store Instance" => "Cache Store Instance",
-"Instance" => "Instance",
-"Choose the configuration plugin" => "Choose the configuration plugin",
+"Caching Driver" => "Controlador de Almacenamiento",
+"Setup the caching system" => "Configurar el sistema de almacenamiento",
+"Cache Store Instance" => "Instancia de Almacenamiento",
+"Instance" => "Instancia",
+"Choose the configuration plugin" => "Elegir el plugin de configuración",
 );

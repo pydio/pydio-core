@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Pixlr Editor" => "Pixlr Editor",
-"Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI." => "Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI.",
-"Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)",
-"Secure Token" => "Secure Token",
+"Pixlr Editor" => "Editor Pixlr",
+"Bridge to the Pixlr.com webservice that allow online image edition via a photoshop-like GUI." => "Conectar al servicio Pixlr.com que permite la edición de imágnes online al estilo de PhotoShop.",
+"Add a secure token to the target script to make sure that we are downloading an authorized image. The .htaccess file contained in the plugin must be correctly configured (apache)" => "Añade un token al script para asegurar que se descarga la imágen autorizada. El archivo .htaccess del plugin tiene que estar correctamente configurado (Apache)",
+"Secure Token" => "Token Seguro",
 );

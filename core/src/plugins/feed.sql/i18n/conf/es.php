@@ -19,10 +19,10 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Events SQL" => "Events SQL",
-"Use an SQL based storage for persisting all user-space event logs" => "Use an SQL based storage for persisting all user-space event logs",
-"SQL Tables" => "SQL Tables",
-"Install SQL Tables" => "Install SQL Tables",
-"SQL Driver" => "SQL Driver",
-"SQL Connexion Parameters" => "SQL Connexion Parameters",
+"Events SQL" => "Eventos SQL",
+"Use an SQL based storage for persisting all user-space event logs" => "Usar almacenamiento basado en SQL para el registro persistente de eventos de los usuarios",
+"SQL Tables" => "Tablas SQL",
+"Install SQL Tables" => "Instalar Tablas SQL",
+"SQL Driver" => "Controlador SQL",
+"SQL Connexion Parameters" => "Parámetros de Conexión SQL",
 );

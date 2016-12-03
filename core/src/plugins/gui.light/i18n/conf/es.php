@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Light" => "Light",
-"Simple Template for Bookmarklets" => "Simple Template for Bookmarklets",
+"Simple Template for Bookmarklets" => "Plantilla Simple para Marcadores",
 );

@@ -20,9 +20,9 @@
 */
 $mess=array(
 "File Hasher" => "File Hasher",
-"Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided",
-"Rsync Support" => "Rsync Support",
-"Cache full tree" => "Cache full tree",
-"Cache XML tree and invalidate on node change" => "Cache XML tree and invalidate on node change",
-"Dont edit, it will be detected by the server" => "Don't edit, it will be detected by the server",
+"Compute on-demand a hash of the file content and stores it in the metadata if a metastore is provided" => "Calcular un hash del contenido del archivo y almacenarlo en los metadatos si está configurado un metastore.",
+"Rsync Support" => "Soporte Rsync",
+"Cache full tree" => "Almacena árbol completo",
+"Cache XML tree and invalidate on node change" => "Almacenar el árbol XML e invalidar cuando cambie el nodo",
+"Dont edit, it will be detected by the server" => "No editar, será detectado por el servidor",
 );
