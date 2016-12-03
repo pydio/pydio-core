@@ -1,6 +1,6 @@
 <?php
 
 $mess = array(
-"Simple Lock" => "Simple Lock",
-"Manual Locking mechanism to avoid concurrent edition" => "Manual Locking mechanism to avoid concurrent edition",
+"Simple Lock" => "Bloqueo Simple",
+"Manual Locking mechanism to avoid concurrent edition" => "Mecanismo de bloqueo manual que evita la edición simultánea",
 );

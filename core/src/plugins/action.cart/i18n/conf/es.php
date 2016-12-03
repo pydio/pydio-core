@@ -20,6 +20,6 @@
  */
 
 $mess = array(
-    "Selection Cart" => "Selection Cart",
-    "Select files to a cart and download/share all at once" => "Select files to a cart and download/share all at once",
+    "Selection Cart" => "Cesta de Selección",
+    "Select files to a cart and download/share all at once" => "Seleccionar archivos para añadir a la cesta y descargarlos/compartirlos en un paso",
 );

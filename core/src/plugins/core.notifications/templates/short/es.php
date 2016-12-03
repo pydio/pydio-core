@@ -38,7 +38,6 @@ $mess=array(
 "folder.move_from" => "Carpeta AJXP_NODE_LABEL movida desde AJXP_SOURCE_FOLDER",
 "file.rename" => "AJXP_SOURCE_LABEL fue renombrado a AJXP_NODE_LABEL",
 "folder.rename" => "AJXP_SOURCE_LABEL fue renombrada a AJXP_NODE_LABEL",
-"share.file" => "User AJXP_USER has shared the file AJXP_NODE_LABEL with you",
-"share.folder" => "User AJXP_USER has shared the folder AJXP_NODE_LABEL with you",
-
+"share.file" => "El usuario AJXP_USER ha compartido el archivo AJXP_NODE_LABEL contigo",
+"share.folder" => "El usuario AJXP_USER ha compartido la carpeta AJXP_NODE_LABEL contigo",
 );

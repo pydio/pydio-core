@@ -36,6 +36,6 @@ $mess=array(
 "folder.copy_from" => "Carpeta AJXP_NODE_LABEL copiada desde AJXP_SOURCE_FOLDER",
 "folder.move_to" => "Carpeta AJXP_NODE_LABEL movida a AJXP_TARGET_FOLDER",
 "folder.move_from" => "Carpeta AJXP_NODE_LABEL movida desde AJXP_SOURCE_FOLDER",
-"file.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
-"folder.share" => "User AJXP_USER shared AJXP_NODE_LABEL with you",
+"file.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
+"folder.share" => "El usuario AJXP_USER compartió AJXP_NODE_LABEL contigo",
 );

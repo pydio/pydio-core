@@ -1,5 +1,5 @@
 <?php
 $mess = array(
-    "Watch Metadata" => "Watch Metadata",
-    "Register watched on files or folders" => "Register watched on files or folders",
+    "Watch Metadata" => "Vigilar Metadatos",
+    "Register watched on files or folders" => "Vigilar el registro de archivos o directorios",
 );

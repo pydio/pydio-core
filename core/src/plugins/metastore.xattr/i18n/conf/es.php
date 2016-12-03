@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Extended Attributes" => "Extended Attributes",
-"Stores metadata inside filesystem Extended Attributes." => "Stores metadata inside filesystem Extended Attributes.",
-"Size limit" => "Size limit",
-"Some filesystem have size limitations" => "Some filesystem have size limitations",
+"Extended Attributes" => "Atributos Extendidos",
+"Stores metadata inside filesystem Extended Attributes." => "Almacena los metadatos en los Atributos Extendidos del sistema de archivos.",
+"Size limit" => "Límite de Tamaño",
+"Some filesystem have size limitations" => "Algunos sistemas de archivo tienen límite de tamaño",
 );

@@ -19,13 +19,13 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Standard login screen" => "Standard login screen",
-"Display a standard user/password login screen" => "Display a standard user/password login screen",
-"Order" => "Order",
-"Order this plugin with other auth frontends" => "Order this plugin with other auth frontends",
-"Protocol Type" => "Protocol Type",
-"Enable/disable automatically based on the protocol used" => "Enable/disable automatically based on the protocol used",
-"Sessions Only" => "Sessions Only",
-"REST Only" => "REST Only",
-"Session-based or Rest" => "Session-based or Rest",
+"Standard login screen" => "Pantalla de Inicio de Sesión",
+"Display a standard user/password login screen" => "Muestra la pantalla estándar de inicio de sesión usuario/contraseña",
+"Order" => "Ordenar",
+"Order this plugin with other auth frontends" => "Ordenar este plugin con otros frontends de autenticación",
+"Protocol Type" => "Tipo de Protocolo",
+"Enable/disable automatically based on the protocol used" => "Activa/desactiva automáticamente basado en el protocolo usado",
+"Sessions Only" => "Sólo Sesiónes",
+"REST Only" => "Sólo REST",
+"Session-based or Rest" => "Sesión o REST",
 );

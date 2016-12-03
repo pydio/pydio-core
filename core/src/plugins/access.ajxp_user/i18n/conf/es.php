@@ -19,8 +19,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
-"User Dashboard"=> "User Dashboard",
-"User home dashboard, can be displayed before accessing to workspaces" => "User home dashboard, can be displayed before accessing to workspaces",
-"Disable Address Book" => "Disable Address Book",
-"Do not display address book in user account panel." => "Do not display address book in user account panel.",
+"User Dashboard"=> "Panel de Usuario",
+"User home dashboard, can be displayed before accessing to workspaces" => "Panel de Usuario, se puede mostrar antes de acceder a los workspaces",
+"Disable Address Book" => "Desactivar Agenda",
+"Do not display address book in user account panel." => "No mostrar agenda en el panel de usuario.",
 );

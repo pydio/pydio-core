@@ -20,12 +20,12 @@
  */
 
 $mess=array(
-    "File Gateway" => "File Gateway",
-    "Shorten links and serve them proxied by Pydio hosted service" => "Shorten links and serve them proxied by Pydio hosted service",
-    "Api Key" => "Api Key",
-    "Api Key as provided in your Pydio.com account" => "Api Key as provided in your Pydio.com account",
-    "Api Secret" => "Api Secret",
-    "Api Secret, as provided in your Pydio.com account" => "Api Secret, as provided in your Pydio.com account",
-    "Gateway Server" => "Gateway Server",
-    "Choose on which server you want the link to be proxied. You may choose depending on your region." => "Choose on which server you want the link to be proxied. You may choose depending on your region.",
+    "File Gateway" => "Portal de Archivos",
+    "Shorten links and serve them proxied by Pydio hosted service" => "Acortar enlaces y servirlos por medio de proxy usando el servicio Pydio",
+    "Api Key" => "Clave de API",
+    "Api Key as provided in your Pydio.com account" => "Clage de API proporcionada en tu cuenta Pydio.com",
+    "Api Secret" => "Secreto de API",
+    "Api Secret, as provided in your Pydio.com account" => "Secreto de API, proporcionado en tu cuenta Pydio.com",
+    "Gateway Server" => "Portal del Servidor",
+    "Choose on which server you want the link to be proxied. You may choose depending on your region." => "Elegir en que servidor quieres que el enlace pase por proxy. Debes elegirlo dependiendo de tu región.",
 );
