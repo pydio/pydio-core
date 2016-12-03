@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Source Viewer" => "Source Viewer",
-"Syntax Highlighter for all major code source files" => "Syntax Highlighter for all supported code source files",
+"Source Viewer" => "Visor de Código",
+"Syntax Highlighter for all major code source files" => "Resalta la sintaxis para todos los formatos soportados",
 );

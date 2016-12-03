@@ -19,13 +19,13 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Basic Http FrontEnd" => "Basic Http FrontEnd",
-"Send a basic http request to the user" => "Send a basic http request to the user",
-"Order" => "Order",
-"Order this plugin with other auth frontends" => "Order this plugin with other auth frontends",
-"Protocol Type" => "Protocol Type",
-"Enable/disable automatically based on the protocol used" => "Enable/disable automatically based on the protocol used",
-"Sessions Only" => "Sessions Only",
-"REST Only" => "REST Only",
-"Session-based or Rest" => "Session-based or Rest",
+"Basic Http FrontEnd" => "FrontEnd Básico HTTP",
+"Send a basic http request to the user" => "Enviar una petición básica HTTP al usuario",
+"Order" => "Ordenar",
+"Order this plugin with other auth frontends" => "Ordenar este plugin con otros frontends de autentificación",
+"Protocol Type" => "Tipo de Protocolo",
+"Enable/disable automatically based on the protocol used" => "Activa/Desactiva automáticamente basado en el protocolo usado",
+"Sessions Only" => "Sólo Sesiones",
+"REST Only" => "Sólo REST",
+"Session-based or Rest" => "Sesión o REST",
 );

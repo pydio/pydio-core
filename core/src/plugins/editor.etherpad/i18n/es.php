@@ -20,15 +20,15 @@
  */
 
 $mess = array(
-    "1" => "Collaboration board",
-    "1b"=> "Create or join an empty collaboration pad",
-    "2" => "Collaborative Editor",
-    "3" => "Real-time collaborative edition",
-    "4" => "Join an existing board or create a new one: ",
-    "5" => "Free boards",
-    "6" => "Files",
-    "7" => "Join",
-    "8" => "Board name",
-    "9" => "You can also create <a>new discussion board</a>",
-    "10" => "Export",
+    "1" => "Panel de Colaboración",
+    "1b"=> "Crear o unirse a un panel de colaboración",
+    "2" => "Editor Colaborativo",
+    "3" => "Edición colaborativa en tiempo real",
+    "4" => "Unete a un panel existente o crea uno: ",
+    "5" => "Paneles libres",
+    "6" => "Archivos",
+    "7" => "Unirse",
+    "8" => "Nombre",
+    "9" => "Puedes crear un <a>nuevo panel de discusión</a>You can also create <a>new discussion board</a>",
+    "10" => "Exportar",
 );

@@ -19,5 +19,5 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Media Player",
+"1" => "Reproductor",
 );

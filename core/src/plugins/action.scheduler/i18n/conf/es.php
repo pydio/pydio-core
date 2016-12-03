@@ -19,6 +19,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess = array(
-"Tasks Scheduler" => "Tasks Scheduler",
-"Register tasks to be run on a regular basis instead of writing them one by one in cron tab." => "Register tasks to be run on a regular basis instead of writing them one by one in cron tab.",
+"Tasks Scheduler" => "Planificador de Tareas",
+"Register tasks to be run on a regular basis instead of writing them one by one in cron tab." => "Regitrar tareas para ejecutarlas organizadamente usando CRON.",
 );

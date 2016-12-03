@@ -20,5 +20,5 @@
 */
 $mess=array(
 "Etherpad" => "Etherpad",
-"Collaborative edition of text files" => "Collaborative edition of text files",
+"Collaborative edition of text files" => "Edición colaborativa de archivos de texto",
 );

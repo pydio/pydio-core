@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Video Player" => "Video Player",
-"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Inserts a video player in the info panel, either HTML5 or Flash depending on the format.",
+"Video Player" => "Reproductor de Vídeo",
+"Inserts a video player in the info panel, either HTML5 or Flash depending on the format." => "Añade un reproductor de video en el panel de información, en HTML5 o Flash dependiendo del formato.",
 );

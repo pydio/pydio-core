@@ -19,6 +19,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
-"Admin Driver" => "Admin Driver",
-"Access Pydio configuration data." => "Access Pydio configuration data.",
+"Admin Driver" => "Controlador de Administración",
+"Access Pydio configuration data." => "Acceder a los datos de configuración de Pydio.",
 );

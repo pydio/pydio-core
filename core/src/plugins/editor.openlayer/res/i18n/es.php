@@ -2,7 +2,7 @@
 
 $mess=array(
 "1" => "Mapa OpenLayers",
-"2" => "Filro",
+"2" => "Filtro",
 "3" => "Posición",
 "4" => "Capas",
 "5" => "Antialias",

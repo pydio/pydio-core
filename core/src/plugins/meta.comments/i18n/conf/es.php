@@ -19,8 +19,8 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Comments Feed" => "Comments Feed",
-"Display a chat-like feed on all nodes" => "Display a chat-like feed on all nodes",
-"Comment limit" => "Comment limit",
-"Maximum number of characters for each comment" => "Maximum number of characters for each comment",
+"Comments Feed" => "Comentarios",
+"Display a chat-like feed on all nodes" => "Muestra una ventana de comentarios en todos los nodos",
+"Comment limit" => "Límite de comentarios",
+"Maximum number of characters for each comment" => "Número máximo de caracteres para cada comentario",
 );

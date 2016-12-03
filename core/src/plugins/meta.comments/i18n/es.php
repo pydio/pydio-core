@@ -1,8 +1,8 @@
 <?php
 
 $mess = array(
-"1" => "Users Comments",
-"2" => "Enter your comment here",
-"3" => "Post",
-"4" => "Go to %s",
+"1" => "Comentarios de Usuarios",
+"2" => "Escribe tu comentario",
+"3" => "Enviar",
+"4" => "Ir a %s",
 );

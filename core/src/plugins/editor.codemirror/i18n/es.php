@@ -19,15 +19,15 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
-"1"	=> "Source Editor",
-"2"	=> "CodeMirror Syntax Highlighter",
-"3" => "Wrapping",
-"3b"=> "Toggle lines wrapping",
-"4" => "Numbers",
-"5" => "Toggle lines numbers",
-"6"	=> "Jump to line",
-"7" => "Undo",
-"8"	=> "Redo",
-"9"	=> "Text Search",
-"10" => "Indent size",
+"1"	=> "Editor de Código",
+"2"	=> "Resaltar Sintáxis con CodeMirror",
+"3" => "Ajuste Línea",
+"3b"=> "Activa ajuste de línea",
+"4" => "Número",
+"5" => "Activa el número de línea",
+"6"	=> "Salta a Línea",
+"7" => "Deshacer",
+"8"	=> "Rehacer",
+"9"	=> "Búsqueda",
+"10" => "Sangría",
 );
