@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Mobile" => "Mobile",
-"Template extending gui.ajax for small screen terminals." => "Template extending gui.ajax for small screen terminals.",
+"Mobile" => "Móvil",
+"Template extending gui.ajax for small screen terminals." => "Plantilla para extender gui.ajax para terminales con pantalla pequeña.",
 );

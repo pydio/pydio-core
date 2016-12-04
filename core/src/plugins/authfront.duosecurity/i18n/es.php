@@ -1,6 +1,6 @@
 <?php
 
 $mess = array(
-    "1" => "Dual-Form Authentication",
-    "2" => "Dual-Form Authentication",
+    "1" => "Autenticación Dual",
+    "2" => "Autenticación Dual",
 );

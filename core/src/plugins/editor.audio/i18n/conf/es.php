@@ -19,6 +19,6 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Audio Player" => "Audio Player",
-"Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window." => "Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window.",
+"Audio Player" => "Reproductor de Audio",
+"Inserts a flash player for reading mp3 files online, and playing a whole folder in a separate window." => "Inserta un reproductor Flash para leer los archivo mp3 online y reproducir directorios enteros en una ventana diferente.",
 );

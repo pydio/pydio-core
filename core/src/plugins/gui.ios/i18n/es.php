@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1.ios" => "There is a native application available for accessing %s through iPhone/iPad!",
-"2.ios" => "I have it already, open it and add this server to my remote servers",
-"3.ios" => "I don't have it, send me to the App Store now!",
-"4.ios" => "I don't care, let me use the web version of %s.",
-"1.android" => "There is a native APPLICATION_TITLE client available for accessing %s on Android OS.",
-"2.android" => "I have it already, open it and add this server to my preconfigured remote servers",
-"3.android" => "I don't have it, send me to the Play Store now!",
-"4.android" => "I don't care, let me use the web version of %s.",
+"1.ios" => "!Existe una aplicación nativa para acceder a %s desde iPhone/iPad!",
+"2.ios" => "Ya la tengo, abrirla y añadir este servidor a mis servidores remotos",
+"3.ios" => "No la tengo, ¡llévame a la App Store!",
+"4.ios" => "No me importa, déjame usar la versión web de %s.",
+"1.android" => "!Existe una aplicación nativa APPLICATION_TITLE para acceder a %s desde Android!",
+"2.android" => "Ya la tengo, abrirla y añadir este servidor a mis servidores remotos",
+"3.android" => "No la tengo, ¡llévame a Play Store!",
+"4.android" => "No me importa, déjame usar la versión web de %s.",
 );

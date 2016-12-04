@@ -19,10 +19,10 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Exif Metadata" => "Exif Metadata",
-"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif",
-"Info Panel Fields" => "Info Panel Fields",
-"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'.",
-"Info Panel Labels" => "Info Panel Labels",
-"Associated list of labels, be sure to define as many as fields!" => "Associated list of labels, be sure to define as many as fields!",
+"Exif Metadata" => "Metadatos Exif",
+"Extracts the EXIF metadata of a JPG image. Used in conjunction with editor.exif" => "Extrae los metadatos EXIF de una imágen JPG. Usado junto al editor.exif",
+"Info Panel Fields" => "Campos de Información",
+"Comma separated list of fields, use syntax 'EXIF_SECTION.ExifName'." => "Lista de campos separados por comas, usar sintáxis 'EXIF_SECTION.ExifName'.",
+"Info Panel Labels" => "Etiquetas de Información",
+"Associated list of labels, be sure to define as many as fields!" => "Lista asociada de etiquetas, ¡asegurate de definir tantas como campos hay!",
 );

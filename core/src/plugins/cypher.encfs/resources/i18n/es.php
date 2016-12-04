@@ -19,10 +19,10 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1" => "Cypher Folder",
-"2" => "Encrypt folder data",
-"3" => "Uncypher folder",
-"4" => "Decrypt folder data",
-"5" => "Cypher folder",
-"6" => "Encrypt folder data",
+"1" => "Cifrar Directorio",
+"2" => "Cifrar los datos del directorio",
+"3" => "Descifrar Directorio",
+"4" => "Descifrar los datos del directorio",
+"5" => "Cifrar Directorio",
+"6" => "Cifrar los datos del directorio",
 );

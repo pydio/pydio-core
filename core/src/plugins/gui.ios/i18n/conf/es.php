@@ -20,9 +20,9 @@
 */
 $mess=array(
 "iOS" => "iOS",
-"Template for redirecting to iPhone application" => "Template for redirecting to iPhone application",
-"iOS Application URL" => "iOS Application URL",
-"iOS Application" => "iOS Application",
-"Android Application URL" => "Android Application URL",
-"Android App" => "Android App",
+"Template for redirecting to iPhone application" => "Pantilla para redirigir a la aplicación de iOS",
+"iOS Application URL" => "URL de la Aplicación de iOS",
+"iOS Application" => "Aplicación de iOS",
+"Android Application URL" => "URL de la Aplicación de Android",
+"Android App" => "Aplicación de Android",
 );

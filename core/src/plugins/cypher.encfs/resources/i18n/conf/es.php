@@ -19,12 +19,12 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Encfs Mount" => "Encfs Mount",
-"Dynamically create/mount/umount an encfs filesystem" => "Dynamically create/mount/umount an encfs filesystem",
-"Full path on the server to a pre-generated .encfs6.xml file" => "Full path on the server to a pre-generated .encfs6.xml file",
-"Encfs XML File" => "Encfs XML File",
-"Password used when generating the encfs6.xml file" => "Password used when generating the encfs6.xml file",
-"Encfs Password" => "Encfs Password",
-"User ID for the web accessing user (apache, www-data,...)." => "User ID for the web accessing user (apache, www-data,...).",
+"Encfs Mount" => "Montaje Encfs",
+"Dynamically create/mount/umount an encfs filesystem" => "Crear/montar dinámicamente un sistema de archivos encfs",
+"Full path on the server to a pre-generated .encfs6.xml file" => "Ruta completa en el servidor al archivo .encfs6.xml pregenerado",
+"Encfs XML File" => "Archivo Encfs XML",
+"Password used when generating the encfs6.xml file" => "Contraseña usada en la generación del archivo encfs6.xml",
+"Encfs Password" => "Contraseña Encfs",
+"User ID for the web accessing user (apache, www-data,...)." => "ID de usuario con acceso a la web (apache, www-data, ...)",
 "UID" => "UID",
 );

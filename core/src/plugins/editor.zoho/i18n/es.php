@@ -19,9 +19,9 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
-    "1" => "Office Documents",
-    "2" => "Preview and edit office documents online",
-    "3" => "Word Document",
-    "4" => "Presentation Document",
-    "5" => "Spreadsheet Document",
+    "1" => "Documentos de Oficina",
+    "2" => "Visualizar y editar documentos de oficina en línea",
+    "3" => "Documento Word",
+    "4" => "Presentación",
+    "5" => "Hoja de Cálculo",
 );

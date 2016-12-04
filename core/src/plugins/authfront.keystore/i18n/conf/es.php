@@ -24,8 +24,8 @@ $mess=array(
 "Order" => "Orden",
 "Order this plugin with other auth frontends" => "Ordena este plugin con otro frontend de autenticación",
 "Protocol Type" => "Tipo de Protocolo",
-"Enable/disable automatically based on the protocol used" => "Activa/Desactiva automáticamente basado en el protocolo usado",
+"Enable/disable automatically based on the protocol used" => "Activa/Desactiva automáticamente en base al protocolo usado",
 "Sessions Only" => "Sólo Sesiones",
 "REST Only" => "Sólo REST",
-"Session-based or Rest" => "Basado en session o REST",
+"Session-based or Rest" => "Sesión o REST",
 );

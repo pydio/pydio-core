@@ -1,7 +1,7 @@
 <?php
 
 $mess = array(
-"1" => "GeoUbicación",
+"1" => "GeoLocalización",
 "2" => "Ubicar",
-    "3" => "Meta Data (EXIF)",
+"3" => "Metadatos (EXIF)",
 );
