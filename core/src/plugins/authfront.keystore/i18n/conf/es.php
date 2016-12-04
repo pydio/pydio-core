@@ -20,7 +20,7 @@
 */
 $mess=array(
 "API Keystore" => "API Keystore",
-"Store API keys/token to simplify REST connection" => "Almacenar API keys/token para simplificar la conexión REST",
+"Store API keys/token to simplify REST connection" => "Almacenar clave API/token para simplificar la conexión REST",
 "Order" => "Orden",
 "Order this plugin with other auth frontends" => "Ordena este plugin con otro frontend de autenticación",
 "Protocol Type" => "Tipo de Protocolo",

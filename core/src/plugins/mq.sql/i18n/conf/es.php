@@ -23,6 +23,6 @@ $mess=array(
 "Store persistant and worker queues in database" => "Almacenar en la base de datos las colas persistentes y en ejecución",
 "Install SQL Tables" => "Instalar Tablas SQL",
 "SQL Tables" => "Tablas SQL",
-"SQL Driver" => "Driver SQL",
+"SQL Driver" => "Controlador SQL",
 "SQL Connexion Parameters" => "Parametros de conexión SQL",
 );

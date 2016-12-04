@@ -25,6 +25,6 @@ $mess=array(
 "Real path to the root folder on the server" => "Ruta real al directorio raiz del servidor",
 "Create" => "Crear",
 "Create folder if it does not exists" => "Crear directorio si no existe",
-"Recycle Bin Folder" => "Directorio de la Papelera de Reciclaje",
+"Recycle Bin Folder" => "Carpeta Papelera de Reciclaje",
 "Leave empty if you do not want to use a recycle bin." => "Dejar vacío si no quieres usar la papelera de reciclaje.",
 );

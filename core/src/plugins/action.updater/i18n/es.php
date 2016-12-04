@@ -24,7 +24,7 @@ defined('AJXP_EXEC') or die( 'Acceso no permitido');
 $mess = array(
     "1" => "Actualizar",
     "2" => "Actualización Automática",
-    "3" => "Pulse en el botón para comenzar la actualización. Por favor asegurate que el directorio del software esta instalado antes de comenzar. Si tienes un aviso 'Linux Package', significa que no puedes realizar la actualización desde la aplicación, tienes que usar el gestor de paquetes de tu servidor.",
+    "3" => "Pulse en el botón para comenzar la actualización. Por favor asegurate que el directorio de software esta instalado antes de comenzar. Si tienes un aviso 'Linux Package', significa que no puedes realizar la actualización desde la aplicación, tienes que usar el gestor de paquetes de tu servidor.",
     "4" => "Comenzar actualización",
     "5" => "Desde 3.2.4",
     "6" => "Importa los datos de configuración desde 3.2.4",

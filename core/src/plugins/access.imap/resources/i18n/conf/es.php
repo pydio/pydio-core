@@ -41,7 +41,7 @@ $mess=array(
 "Default Rights" => "Permisos Predeterminados",
 "This right pattern (empty, r, or rw) will be applied at user creation for this repository." => "Estos permisos (vacío, r, o rw) se aplicarán cuando se cree un usuario en este repositorio.",
 "Pagination Threshold" => "Límite de Paginación",
-"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Cuando un directorio contiene más elementos del límite, se mostrará el modo paginación para mejorar el rendimiento.",
+"When a folder will contain more items than this number, display will switch to pagination mode, for better performances." => "Cuando una carpeta contiene más elementos del límite, se mostrará el modo paginación para mejorar el rendimiento.",
 "#Items per page" => "Elementos por página",
 "Once in pagination mode, number of items to display per page." => "Número de elementos para mostrar en el modo paginación.",
 );

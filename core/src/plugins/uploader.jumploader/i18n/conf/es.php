@@ -20,6 +20,6 @@
 */
 $mess=array(
 "Jumploader" => "Java (archivos grandes)",
-"Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "Applet Java JumpLoader que permite subir directorios, archivos en trozos grandes, etc.",
+"Third-party JumpLoader JAVA applet allowing to upload folders, chunk big files, etc." => "Applet Java JumpLoader que permite subir carpetas, archivos en trozos grandes, etc.",
 "Install Applet" => "Instalar Applet",
 );

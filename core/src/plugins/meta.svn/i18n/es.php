@@ -13,7 +13,7 @@ $mess = array(
 "41" => "Última Revisión",
 "42" => "Fecha de la Revisión",
 "43" => "Autor de la Revisión",
-"5" => "Los archivos/directorios elegidos han sido copidados/movidos (por SVN)",
-"51" => "Los archivos/directorios elegidos han sido eliminados (by SVN)",
+"5" => "Los archivos/carpetas elegidos han sido copidados/movidos (por SVN)",
+"51" => "Los archivos/carpetas elegidos han sido eliminados (by SVN)",
 "61" => "Acciones",
 );

@@ -35,8 +35,8 @@ $mess = array(
     "11" => "Ruta a los archivos extraidos ",
     "12" => "Extrayendo...",
     "13" => "Extrayendo archivos... %s ",
-    "14" => "La extracción terminó correctamente en el directorio '%s'.",
+    "14" => "La extracción terminó correctamente en la carpeta '%s'.",
     "15" => "El archivo seleccionado no es de tipo TAR, TAR.GZ o TAR.BZ2.",
     "16" => "Sólo puedes comprimir en formato TAR, TAR.GZ o TAR.BZ2.",
-    "17" => "No puedes comprimir directorios vacíos",
+    "17" => "No puedes comprimir carpetas vacías",
 );

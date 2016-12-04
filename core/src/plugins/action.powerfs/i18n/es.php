@@ -21,7 +21,7 @@
 $mess = array(
     // will be replaced by the application title
     "1" => "Lanzando creación de archivos en segundo plano, espere por favor.",
-    "2" => "Recarga el directorio actual",
+    "2" => "Recarga la carpeta actual",
     "3" => "La descarga de archivo debería comenzar automáticamente",
     "4" => "Creando archivo - %s% completado",
     "5" => "¡No se encuentra el archivo para descargar! ¿Está el binario Zip instalado en el servidor?",
