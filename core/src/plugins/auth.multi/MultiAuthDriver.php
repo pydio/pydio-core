@@ -315,7 +315,7 @@ class MultiAuthDriver extends AbstractAuthDriver
         }
         $allUsers = array();
         foreach ($this->drivers as $driver) {
-            $allUsers = array_merge($allUsers, $driver->listUsers($baseGroup, $recursive));
+            $allUsers = $allUsers + $driver->listUsers($baseGroup, $recursive);
         }
         return $allUsers;
     }
@@ -360,7 +360,7 @@ class MultiAuthDriver extends AbstractAuthDriver
         }
         $groups = array();
         foreach ($this->drivers as $d) {
-            $groups = array_merge($groups, $d->listChildrenGroups($baseGroup));
+            $groups = $groups + $d->listChildrenGroups($baseGroup);
         }
         return $groups;
     }
