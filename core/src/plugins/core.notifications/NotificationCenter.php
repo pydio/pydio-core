@@ -456,6 +456,8 @@ class NotificationCenter extends Plugin
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
                     $path = $node->getPath();
+                }else if($notification->getAction() === 'share' && !$node->isLeaf()){
+                    $path = $node->getPath()."#".$node->getRepositoryId();
                 }
 
 
@@ -477,6 +479,7 @@ class NotificationCenter extends Plugin
                 $node->event_date = StatHelper::relativeDate($notification->getDate(), $mess);
                 $node->event_type = "alert";
                 $node->alert_id = $notification->alert_id;
+                $node->alert_action = $notification->getAction();
                 if ($node->getRepository() != null) {
                     $node->repository_id = ''.$node->getRepository()->getId();
                     if ($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null) {
@@ -516,8 +519,10 @@ class NotificationCenter extends Plugin
             }
             // Replace PATH
             $nodeToSend->real_path = $path;
-            //$url = parse_url($nodeToSend->getUrl());
-            //$nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
+            if($nodeToSend->alert_action === 'share' && !$nodeToSend->isLeaf()){
+                $url = parse_url($nodeToSend->getUrl());
+                $nodeToSend->setUrl($url["scheme"]."://".$url["host"]."/alert_".$index);
+            }
             $index ++;
             $nodesList->addBranch($nodeToSend);
 
