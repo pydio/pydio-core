@@ -878,6 +878,9 @@ class PluginsService
         }
         /** @var AbstractAccessDriver $access */
         $access = $this->getActivePluginsForType("access", true);
+        if($access === false){
+            return null;
+        }
         $data = $access->detectStreamWrapper($register);
         if($data !== null && $data["protocol"] == $protocol){
             return $data["classname"];
