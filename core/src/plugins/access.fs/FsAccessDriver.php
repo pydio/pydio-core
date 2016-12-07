@@ -1034,7 +1034,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 if($selection->isUnique() && isSet($httpVars["targetBaseName"])){
                     $targetBaseName = $httpVars["targetBaseName"];
                 }
-                if(!file_exists($destPath) && isSet($httpVars["recycle_restore"])){
+                if(isSet($httpVars["recycle_restore"]) && !file_exists($selection->nodeForPath($destPath)->getUrl())){
                     $this->mkDir($selection->nodeForPath(PathUtils::forwardSlashDirname($destPath)), basename($destPath), false, true);
                 }
                 $this->filterUserSelectionToHidden($ctx, [$httpVars["dest"]]);
