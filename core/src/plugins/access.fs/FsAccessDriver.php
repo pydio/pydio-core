@@ -2226,6 +2226,7 @@ class FsAccessDriver extends AbstractAccessDriver implements IAjxpWrapperProvide
                 fputs($fp, $content);
             }
             $this->changeMode($node->getUrl(), $repoData);
+            fflush($fp);
             fclose($fp);
             $node->loadNodeInfo();
             Controller::applyHook("node.change", [null, $node, false]);
