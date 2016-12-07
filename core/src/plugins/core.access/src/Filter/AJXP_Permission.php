@@ -171,10 +171,22 @@ class AJXP_Permission implements \JsonSerializable
         if($this->denies()){
             $newPerm->setDeny();
         }else{
-            if($this->canRead())
-                $newPerm->setRead();
-            if($this->canWrite())
-                $newPerm->setWrite();
+            $r = $this->canRead();
+            $w = $this->canWrite();
+            // Reset if necessary
+            if($newPerm->canWrite() && $newPerm->canRead() && ($r &! $w || $w && !$r) ){
+                $newPerm->setRead($r);
+                $newPerm->setWrite($w);
+            }else{
+                if($r){
+                    $newPerm->setRead();
+                }
+                if($w){
+                    $newPerm->setWrite();
+                }
+
+            }
+
         }
         return $newPerm;
     }

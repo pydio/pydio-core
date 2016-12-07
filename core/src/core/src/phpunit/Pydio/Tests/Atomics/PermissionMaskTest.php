@@ -91,11 +91,14 @@ class AJXP_PermissionMaskTest extends \PHPUnit_Framework_TestCase
         $empty = new AJXP_Permission();
 
         $this->isRW($writeonly->override($readonly));
+        $this->isWriteonly($writeonly->override($writeonly));
+        $this->isWriteonly($writeonly->override($deny));
+
         $this->isRW($readonly->override($writeonly));
         $this->isRW($readwrite->override($readonly));
         $this->isRW($readwrite->override($writeonly));
-        $this->isRW($readonly->override($readwrite));
-        $this->isRW($writeonly->override($readwrite));
+        $this->isReadonly($readonly->override($readwrite));
+        $this->isWriteonly($writeonly->override($readwrite));
 
         $this->isDenied($deny->override($readonly));
         $this->isDenied($deny->override($writeonly));
