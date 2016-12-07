@@ -78,8 +78,10 @@ class RemoteNodeProvider{
             paginationHash = "%23" + node.getMetadata().get("paginationData").get("current");
             path += paginationHash;
             params['remote_order'] = 'true';
-            if(node.getMetadata().get("remote_order")){
-                node.getMetadata().get("remote_order").forEach(function(value, key){
+            let remoteOrderData = node.getMetadata().get("remote_order");
+            if(remoteOrderData){
+                if(remoteOrderData._object) remoteOrderData = ProtoCompat.hash2map(remoteOrderData);
+                remoteOrderData.forEach(function(value, key){
                     params[key] = value;
                 });
             }
