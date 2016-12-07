@@ -79,9 +79,10 @@ class RemoteNodeProvider{
             path += paginationHash;
             params['remote_order'] = 'true';
             if(node.getMetadata().get("remote_order")){
-                node.getMetadata().get("remote_order").forEach(function(value, key){
-                    params[key] = value;
-                });
+                var remoteOrder = node.getMetadata().get("remote_order")._object;
+                for (let key of Object.keys(remoteOrder)) {
+                    params[key] = remoteOrder[key];
+                }
             }
         }
         params['dir'] = path;
