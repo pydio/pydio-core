@@ -99,8 +99,7 @@ class AbstractAuthDriver extends Plugin
                     print "PASS_ERROR";
                     break;
                 }
-                header("Content-Type:text/plain");
-                print "SUCCESS";
+                $responseInterface = new TextResponse("SUCCESS");
 
                 break;
 
