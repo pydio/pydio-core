@@ -1074,6 +1074,10 @@ class PThumb
         if (!$this->exif_rotation || !function_exists('exif_read_data'))
             return false;
 
+        if (isSet($this->currentRealFile) && is_file($this->currentRealFile)) {
+            $image = $this->currentRealFile;
+        }
+
         if ($fetch) {
             $image_data = $this->retrieve_remote_file($image, true, false, 1);
             $exif = @exif_read_data("data://image/jpeg;base64," . @base64_encode($image_data), 'IFD0');
