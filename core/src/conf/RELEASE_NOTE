@@ -1,6 +1,28 @@
 Pydio ##VERSION_NUMBER## Release Note
 
-7.1.0 - Test Release Note
+7.0.3 is a bugfixes for 7.0.2. Particularly, some issues were introduced with the Session Credentials mechanism.
+
+. Build a version tar.gz with noemptydirs
+. Simple modif to release note for testing builds with noemptydirs
+. Fix test workspace in public links (repository has encoded credentials option)
+. Typo in hasNumericKeys detection was still breaking the numeric logins case for meta watch.
+. Fix multi auth with numeric logins
+. getWrapperClassName: make sure to exit if current registry does not have any active access plugin.
+. Put -moz-user-select key after the others to make sure it's taken. Was breaking Ctrl+C on recent Firefox versions.
+. Fix share alerts overriding one another
+. Fix restore
+. Change how RO or WO permission overwrites existing RW permission.
+. Call fflush in createEmptyFile to make sure FTP wrapper is working.
+. Should fix #1300
+. Fixing admin key for the pydio booster so that a user id is always associated to it
+. Use TextResponse objects - Fix #1308 (plus other similar occurrences)
+. Fix specific urlencoding issues on webdav.
+. Fix specific cases in PThumb
+. Fix get instance ID base on plugin option and roles
+. Fix #1306 - moving file cross workspace
+. Fixing non initialized message
+
+
 --
 
 Welcome to Pydio 7.0!

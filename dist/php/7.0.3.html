@@ -1,0 +1,68 @@
+<div style='font-family: "Roboto", "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 7.0.3 successfully installed</h2>
+
+    <p>
+        7.0.3 is a bugfixes for 7.0.2. Particularly, some issues were introduced with the Session Credentials mechanism.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid black;"/>
+
+    <h2>Pydio 7 Important Features</h2>
+
+    <h3>Pydio Booster</h3>
+
+    <p>Pydio Go is a complement to Pydio that runs as a Server. It is based on GO, a performant language developed by Google. It will improve overall software performances, by delegating CPU-consuming task to this new tool. In this first version, it will handle uploads, scheduler triggers, and best of all, one-click install websocket server, which will especially improve scalability and performances by pushing events from server instead of polling all the time.<br/>
+        Pydio Go is available for Pydio Community and Pydio Enterprise.</p>
+
+    <h3>File Gateway improves your server security</h3>
+    Pydio offers a brand new SaaS-based service called FileGateway, a host proxy to send public links without disclosing your server URL.
+    Choose your domain name (filesend.cc / yoursha.re) and your region (US / EU).
+
+    <h3>Online Documents Edition</h3>
+
+    By hosting your own instance of Libreoffice Online from Collabora and using our new connector, you can now edit any office documents directly online, without the need to use third-party services like Zoho.
+
+    <h3>API, Performances</h3>
+    - Full rewrite of Pydio API, especially regarding provisioning, following Open API standards; there is now an extensive, accurate API REST documentation.
+    <br/>- Increased caching, especially files list, whick makes it mindblasting in terms of performances, especially for remote workspaces like S3 or FTP
+    <br/>- Search for files or information across several storages / workspaces at the same time, and get quicker search results with the upgrade of our Elastic Search plugin
+    <br/>- New Admin parameter to easily allow or prevent user to re-share files
+
+    <h3>Under the Hood</h3>
+    - Code refactoring, with PSR-7 pattern, Composer, Guzzle
+    <br/>- New Messaging Server based on NSQ, a language originally developed by Bitly
+    <br/>- Auto-complete command line makes it easier for Admins to look for specific actions with Pydio (thanks to @symfony)
+    <br/>- End of some unmaintained plugins (e.g. auth.serial, conf.serial)
+    <br/>- Internal router embeded solves deployment issues, simplifying RewriteRules at maximum
+    <br/>- New way of storing shares that will facilitate Pydio migrations
+    <br/> And many more... !!
+
+    <hr style="border: none; border-top: 1px solid black;"/>
+
+    <h2>7.0.3 detailed changelog</h2>
+    <ul>
+        <li>Update last build (<a href="http://github.com/pydio/pydio-core/commit/e4235f8b1c9f002316a41edd47ac4302e976ec64">details</a>)</li>
+        <li>Build a version tar.gz with noemptydirs (<a href="http://github.com/pydio/pydio-core/commit/a0c3a86744fb7b599e5e893a4b510cc8539270a3">details</a>)</li>
+        <li>Simple modif to release note for testing builds with noemptydirs (<a href="http://github.com/pydio/pydio-core/commit/bffcdfa0fddfcf79506f6301015970bd8c804ab7">details</a>)</li>
+        <li>Fix test workspace in public links (repository has encoded credentials option) (<a href="http://github.com/pydio/pydio-core/commit/1f624d938c156943475a3cfe9a84d9a5a33f87ec">details</a>)</li>
+        <li>Typo in hasNumericKeys detection was still breaking the numeric logins case for meta watch. (<a href="http://github.com/pydio/pydio-core/commit/aebe0fc6daa692f63b53ee4ea36fd98522964600">details</a>)</li>
+        <li>Fix multi auth with numeric logins (<a href="http://github.com/pydio/pydio-core/commit/1aa3dc083d19c90b891a0b443eb7773332e02d1d">details</a>)</li>
+        <li>getWrapperClassName: make sure to exit if current registry does not have any active access plugin. (<a href="http://github.com/pydio/pydio-core/commit/e72319172d43741ae229bd2613d7f8782fc503a9">details</a>)</li>
+        <li>Put -moz-user-select key after the others to make sure it's taken. Was breaking Ctrl+C on recent Firefox versions. (<a href="http://github.com/pydio/pydio-core/commit/97fd336b71f9cf419f2837388ab23ee469aef5b3">details</a>)</li>
+        <li>Fix share alerts overriding one another (<a href="http://github.com/pydio/pydio-core/commit/acff30ed37d96b194f3d7e85ba1d343037f29071">details</a>)</li>
+        <li>Fix restore (<a href="http://github.com/pydio/pydio-core/commit/eee6458be8d997177bdfb33ce66fefa3ac84052f">details</a>)</li>
+        <li>Change how RO or WO permission overwrites existing RW permission. (<a href="http://github.com/pydio/pydio-core/commit/b11ed505971bee72ee6f2bf3b0acc938fd690eed">details</a>)</li>
+        <li>Call fflush in createEmptyFile to make sure FTP wrapper is working. (<a href="http://github.com/pydio/pydio-core/commit/3a86ae3275fc9a9f5ddcc2f2a6fd56a6dfd4b705">details</a>)</li>
+        <li>Should fix #1300 (<a href="http://github.com/pydio/pydio-core/commit/c3e187bf93b4d6afb36afbc1deebb5df98aa451b">details</a>)</li>
+        <li>Fixing admin key for the pydio booster so that a user id is always associated to it (<a href="http://github.com/pydio/pydio-core/commit/8f6f5236efde97027d88489a6c44dfa0813edd4d">details</a>)</li>
+        <li>Use TextResponse objects - Fix #1308 (plus other similar occurrences) (<a href="http://github.com/pydio/pydio-core/commit/3c9987f83199b069ea29004c1a0ef799eea31aff">details</a>)</li>
+        <li>Fix specific urlencoding issues on webdav. (<a href="http://github.com/pydio/pydio-core/commit/ee5695e18ccab248f1beb41ea95cae9a579eea39">details</a>)</li>
+        <li>Fix specific cases in PThumb (<a href="http://github.com/pydio/pydio-core/commit/3aa47090787af421936256e7008915a85d80e3d1">details</a>)</li>
+        <li>Fix get instance ID base on plugin option and roles (<a href="http://github.com/pydio/pydio-core/commit/338cae2f95eabd94572fd50d48a8403265fc5af1">details</a>)</li>
+        <li>Fix #1306 - moving file cross workspace (<a href="http://github.com/pydio/pydio-core/commit/9de126d8107f65051a2983f47a1f0112561da17d">details</a>)</li>
+        <li>Fixing non initialized message (<a href="http://github.com/pydio/pydio-core/commit/a8445d0c6a6a703ee66634a2b075d3667f781eb2">details</a>)</li>
+    </ul>
+
+</div>
