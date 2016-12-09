@@ -138,7 +138,10 @@ class WebDAVSubscriber implements SubscriberInterface
                 }
             }
 
-            $propResult["name"] = urldecode(trim(str_replace($basePath, "", $href), "/"));
+            $baseDecoded = urldecode($basePath);
+            $hrefDecoded = urldecode($href);
+
+            $propResult["name"] = trim(str_replace($baseDecoded, "", $hrefDecoded), "/");
 
             $isFile = $propResult["getcontenttype"] != "httpd/unix-directory";
             $isFile &= $propResult["resourcetype"] != "collection";
