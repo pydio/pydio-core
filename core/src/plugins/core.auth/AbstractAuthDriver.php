@@ -77,15 +77,13 @@ class AbstractAuthDriver extends Plugin
 
                 $userObject = $ctx->getUser();
                 if ($userObject == null || $userObject->getId() == "guest") {
-                    header("Content-Type:text/plain");
-                    print "SUCCESS";
+                    $responseInterface = new TextResponse("SUCCESS");
                     break;
                 }
                 $oldPass = $httpVars["old_pass"];
                 $newPass = $httpVars["new_pass"];
                 if (strlen($newPass) < ConfService::getContextConf($ctx, "PASSWORD_MINLENGTH", "auth")) {
-                    header("Content-Type:text/plain");
-                    print "PASS_ERROR";
+                    $responseInterface = new TextResponse("PASS_ERROR");
                     break;
                 }
                 if (UsersService::checkPassword($userObject->getId(), $oldPass, false)) {
@@ -95,13 +93,10 @@ class AbstractAuthDriver extends Plugin
                         $userObject->save("superuser");
                     }
                 } else {
-                    header("Content-Type:text/plain");
-                    print "PASS_ERROR";
+                    $responseInterface = new TextResponse("PASS_ERROR");
                     break;
                 }
-                header("Content-Type:text/plain");
-                print "SUCCESS";
-
+                $responseInterface = new TextResponse("SUCCESS");
                 break;
 
 
