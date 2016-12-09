@@ -801,11 +801,8 @@
 							this.submitForm(oForm, false, function(transport){
 							    var res = this.parseXmlMessage(transport.responseXML);
 							    if(!res) return;
-								getAction.value = "delete";
-								subAction.name = "force_deletion";
-								this.submitForm(oForm, false, function(transport2){
-								    this.parseXmlMessage(transport2.responseXML);
-								}.bind(this));
+
+								pydio.fireContextRefresh();
 							}.bind(this));
 						}else{
 							this.submitForm(oForm);
