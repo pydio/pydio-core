@@ -74,11 +74,27 @@ class MemorySafe
      */
     public static function contextUsesInstance($ctx){
         if ($ctx->hasRepository() && $ctx->getRepository()->getContextOption($ctx, "USE_SESSION_CREDENTIALS")) {
-            $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
+            $instanceId = self::getInstanceId($ctx);
             if (empty($instanceId)) $instanceId = "";
             return $instanceId;
         }
         return false;
+    }
+
+    /**
+     * @param ContextInterface $ctx
+     * @return string return instanceId (e.g "authfront.cas")
+     */
+    public static function getInstanceId(ContextInterface $ctx){
+        $instanceId = $ctx->getRepository()->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT", null);
+        if(!empty($instanceId)) return $instanceId;
+        $loggedUser = $ctx->getUser();
+        if ($loggedUser != null) {
+            $repository = $ctx->getRepository();
+            $instanceId = $loggedUser->getMergedRole()->filterParameterValue("access.".$repository->getAccessType(), "SESSION_CREDENTIALS_AUTHFRONT", $repository->getId(), "");
+        }
+        if (empty($instanceId)) $instanceId = "";
+        return $instanceId;
     }
 
     /**
@@ -259,7 +275,7 @@ class MemorySafe
             }
         }
         if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
-            $instanceId = $repository->getContextOption($ctx, "SESSION_CREDENTIALS_AUTHFRONT");
+            $instanceId = $instanceId = self::getInstanceId($ctx);
             $instanceId = empty($instanceId) ? "" : $instanceId;
             $safeCred = MemorySafe::loadCredentials($instanceId);
             if ($safeCred !== false) {
