@@ -92,15 +92,20 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 dibi::connect($this->sqlDriver);
             }
             if(AJXP_SERVER_DEBUG && AJXP_VERSION_DB != "##DB_VERSION##"){
-                $res = dibi::query("select MAX(db_build) from [ajxp_version]");
-                if(!empty($res)){
-                    $dbVersion = intval($res->fetchSingle());
-                    $current = intval(AJXP_VERSION_DB);
-                    if($dbVersion > 0 && $dbVersion < $current){
-                        // We need to upgrade now!
-                        error_log("[Pydio] DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
-                        $this->logError("[DB]", "DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
+                try{
+                    $res = dibi::query("select MAX(db_build) from [ajxp_version]");
+                    if(!empty($res)){
+                        $dbVersion = intval($res->fetchSingle());
+                        $current = intval(AJXP_VERSION_DB);
+                        if($dbVersion > 0 && $dbVersion < $current){
+                            // We need to upgrade now!
+                            error_log("[Pydio] DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
+                            $this->logError("[DB]", "DB Upgrade Required! You may encounter strange issues. Make sure to manually apply the DB update.");
+                        }
                     }
+                }catch (DibiException $e1){
+                    error_log("[Pydio] Error while checking DB version: ".$e1->getMessage());
+                    $this->logError("[DB]", "Error while checking DB version: ".$e1->getMessage());
                 }
             }
         } catch (DibiException $e) {
