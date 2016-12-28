@@ -66,9 +66,10 @@ interface IAjxpWrapper
      * Describe whether the current wrapper operates on a remote server or not.
      * @static
      * @abstract
-     * @return boolean
+     * @param $url
+     * @return bool
      */
-    public static function isRemote();
+    public static function isRemote($url);
 
     /**
      * Describe whether the current wrapper can rewind a stream or not.
