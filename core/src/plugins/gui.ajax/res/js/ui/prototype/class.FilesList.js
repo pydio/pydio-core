@@ -677,6 +677,13 @@ Class.create("FilesList", SelectableElements, {
         if(this.slider){
             this.slider.destroy();
         }
+        // Move initial components outside
+        var initialElements = $A();
+        this.htmlElement.select('> [ajxpClass]').each(function(el){
+            initialElements.push(el);
+            this.htmlElement.insert({after:el});
+        }.bind(this));
+
         $A(['list', 'thumb', 'detail']).each(function(f){
             if(this._displayMode == f){
                 this.htmlElement.addClassName('fl-displayMode-' + f);
@@ -959,6 +966,10 @@ Class.create("FilesList", SelectableElements, {
             }.bind(this);
             this.observe("resize", this.scrollSizeObserver);
         }
+
+        initialElements.each(function(el){
+            this.htmlElement.insert(el);
+        }.bind(this));
 
 		this.notify("resize");
 	},

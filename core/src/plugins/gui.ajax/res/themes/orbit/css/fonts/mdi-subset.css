@@ -278,3 +278,31 @@
 .mdi-cube-outline:before {
     content: "\f29c";
 }
+
+.mdi-plus:before {
+    content: "\f504";
+}
+
+.mdi-plus-box:before {
+    content: "\f505";
+}
+
+.mdi-plus-circle:before {
+    content: "\f506";
+}
+
+.mdi-plus-circle-multiple-outline:before {
+    content: "\f507";
+}
+
+.mdi-plus-circle-outline:before {
+    content: "\f508";
+}
+
+.mdi-plus-network:before {
+    content: "\f509";
+}
+
+.mdi-plus-one:before {
+    content: "\f50a";
+}

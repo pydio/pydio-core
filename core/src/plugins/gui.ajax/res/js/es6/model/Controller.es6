@@ -205,13 +205,13 @@ class Controller extends Observable{
      * @param ignoreGroups Array a list of groups to ignore
 	 * @returns Array
 	 */
-	getContextActions(actionsSelectorAtt, ignoreGroups)
+	getContextActions(actionsSelectorAtt, ignoreGroups, onlyGroups)
 	{		
 		var contextActions = [];
 		var defaultGroup;
         var contextActionsGroup = new Map();
 		this.actions.forEach(function(action){
-			if(!action.context.contextMenu) return;
+			if(!action.context.contextMenu && !(onlyGroups && onlyGroups.length)) return;
 			if(actionsSelectorAtt == 'selectionContext' && !action.context.selection) return;
 			if(actionsSelectorAtt == 'directoryContext' && !action.context.dir) return;
 			if(actionsSelectorAtt == 'genericContext' && action.context.selection) return;
@@ -276,7 +276,10 @@ class Controller extends Observable{
             if(!first){
                 contextActions.push({separator:true});
             }
-            if(ignoreGroups && ignoreGroups.indexOf(key) != -1){
+            if(ignoreGroups && ignoreGroups.indexOf(key) !== -1){
+                return;
+            }
+            if(onlyGroups && onlyGroups.indexOf(key) === -1){
                 return;
             }
             first = false;
