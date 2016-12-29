@@ -176,10 +176,7 @@ class RichClient extends Plugin
     public function loadConfigs($configData)
     {
         parent::loadConfigs($configData);
-        if (!defined("AJXP_THEME_FOLDER")) {
-            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
-        }
+        $this->defineThemeConstants($this->pluginConf);
         if (!isSet($configData["CLIENT_TIMEOUT_TIME"])) {
             $this->pluginConf["CLIENT_TIMEOUT_TIME"] = intval(ini_get("session.gc_maxlifetime"));
         }
@@ -208,10 +205,7 @@ class RichClient extends Plugin
      */
     public function getBootGui(ServerRequestInterface &$request, ResponseInterface &$response){
 
-        if (!defined("AJXP_THEME_FOLDER")) {
-            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
-        }
+        $this->defineThemeConstants($this->pluginConf);
         $mess = LocaleService::getMessages();
         /** @var ContextInterface $ctx */
         $ctx = $request->getAttribute("ctx");
@@ -327,10 +321,7 @@ class RichClient extends Plugin
      */
     public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
-        if (!defined("AJXP_THEME_FOLDER")) {
-            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$this->pluginConf["GUI_THEME"]);
-        }
+        $this->defineThemeConstants($this->pluginConf);
 
         switch ($requestInterface->getAttribute("action")) {
 
@@ -437,19 +428,20 @@ class RichClient extends Plugin
      ************************/
     public static function filterXml(&$value)
     {
+        /**
+         * @var RichClient
+         */
         $instance = PluginsService::getInstance(Context::emptyContext())->getPluginByTypeName("gui", "ajax");
         if($instance === false) return null;
         $confs = $instance->getConfigs();
-        $theme = $confs["GUI_THEME"];
-        if (!defined("AJXP_THEME_FOLDER")) {
-            define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
-            define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
-        }
+        $instance->defineThemeConstants($confs);
         $value = str_replace(array("AJXP_CLIENT_RESOURCES_FOLDER", "AJXP_CURRENT_VERSION"), array(CLIENT_RESOURCES_FOLDER, AJXP_VERSION), $value);
         if (SessionService::has('PYDIO-SERVER-URI-PREFIX')) {
-            $value = str_replace("AJXP_THEME_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX')."plugins/gui.ajax/res/themes/".$theme, $value);
+            $value = str_replace("AJXP_THEME_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX').AJXP_THEME_FOLDER, $value);
+            $value = str_replace("AJXP_IMAGES_FOLDER", SessionService::fetch('PYDIO-SERVER-URI-PREFIX').AJXP_IMAGES_FOLDER, $value);
         } else {
-            $value = str_replace("AJXP_THEME_FOLDER", "plugins/gui.ajax/res/themes/".$theme, $value);
+            $value = str_replace("AJXP_THEME_FOLDER", AJXP_THEME_FOLDER, $value);
+            $value = str_replace("AJXP_IMAGES_FOLDER", AJXP_IMAGES_FOLDER, $value);
         }
         return $value;
     }
@@ -457,6 +449,22 @@ class RichClient extends Plugin
     /************************
      * PRIVATE FUNCTIONS
      ************************/
+    /**
+     * @param array $configs
+     */
+    private function defineThemeConstants($configs){
+        if (defined("AJXP_THEME_FOLDER")) return;
+        $theme = $configs["GUI_THEME"];
+        define("CLIENT_RESOURCES_FOLDER", AJXP_PLUGINS_FOLDER."/gui.ajax/res");
+        define("AJXP_THEME_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/".$theme);
+        $imagesFolder = AJXP_THEME_FOLDER."/images";
+        if(file_exists(AJXP_INSTALL_PATH . "." . $imagesFolder)){
+            define("AJXP_IMAGES_FOLDER", $imagesFolder);
+        }else{
+            define("AJXP_IMAGES_FOLDER", CLIENT_RESOURCES_FOLDER."/themes/common/images");
+        }
+    }
+
     /**
      * @param ContextInterface $ctx
      * @return array
@@ -520,6 +528,10 @@ class RichClient extends Plugin
         $config["SECURE_TOKEN"] = SecureTokenMiddleware::generateSecureToken();
         $config["streaming_supported"] = "true";
         $config["theme"] = $this->pluginConf["GUI_THEME"];
+        $themeImages = AJXP_INSTALL_PATH.'/plugins/gui.ajax/res/themes/'.$config["theme"].'/images';
+        if(!file_exists($themeImages)) {
+            $config["ajxpImagesCommon"] = true;
+        }
         return $config;
     }
 

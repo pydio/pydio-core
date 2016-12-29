@@ -219,7 +219,7 @@ Class.create("NotificationLoader", {
             name:MessageHash[466],
             alt:'',
             className:'loading_input',
-            image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
+            image:ResourcesManager.resolveImageSource('hdd_external_unmount.png', 'actions/ICON_SIZE',  22),
             icon_class:'icon-spinner event_loading',
             callback:function(e){ this.apply(); }.bind(action)
         } );
@@ -262,7 +262,7 @@ Class.create("NotificationLoader", {
                         id:'event_loading',
                         name:MessageHash[466],
                         alt:'',
-                        image:resolveImageSource('images/actions/22/hdd_external_unmount.png', '',  22),
+                        image:ResourcesManager.resolveImageSource('hdd_external_unmount.png', 'actions/ICON_SIZE',  22),
                         icon_class:'icon-spinner event_loading',
                         callback:function(e){ this.apply(); }.bind(action)
                     } );

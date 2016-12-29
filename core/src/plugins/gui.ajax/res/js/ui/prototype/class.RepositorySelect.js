@@ -79,7 +79,7 @@ Class.create("RepositorySelect", {
 
 		this.icon = new Element('img', {
 			id:'repo_icon',
-			src:resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16),
+			src:ResourcesManager.resolveImageSource(this._defaultIcon,'actions/ICON_SIZE', 16),
 			width:16,
 			height:16,
 			align:'absmiddle'
@@ -99,7 +99,7 @@ Class.create("RepositorySelect", {
 			'inlineBarButton', 
 			200, 
 			200, 
-			ajxpResourcesFolder + '/images/arrow_down.png', 
+			ResourcesManager.resolveImageSource('arrow_down.png'),
 			16,
 			'inline_hover', null, true);
 		this.button.setStyle({marginRight:'7px'});		
@@ -172,7 +172,7 @@ Class.create("RepositorySelect", {
 			}.bind(this));
 		}else{
             if(this.label) this.label.setValue(this._defaultString);
-            if(this.icon) this.icon.src = resolveImageSource(this._defaultIcon,'/images/actions/ICON_SIZE', 16);
+            if(this.icon) this.icon.src = ResourcesManager.resolveImageSource(this._defaultIcon,'actions/ICON_SIZE', 16);
 		}
 		
 		var fonc = function(a,b){
@@ -215,7 +215,7 @@ Class.create("RepositorySelect", {
                     action_id:otherAction.options.name,
                     icon_class:otherAction.options.icon_class,
                     className:"edit",
-                    image:resolveImageSource(otherAction.options.src, '/images/actions/ICON_SIZE', 16),
+                    image:ResourcesManager.resolveImageSource(otherAction.options.src, 'actions/ICON_SIZE', 16),
                     callback:function(e){this.apply();}.bind(otherAction)
                 });
             });
@@ -239,7 +239,7 @@ Class.create("RepositorySelect", {
                 position: (this.options.menuPosition? this.options.menuPosition : 'bottom'),
 				createAnchor:false,
 				anchorContainer:$('dir_chooser'),
-				anchorSrc:ajxpResourcesFolder+'/images/arrow_down.png',
+				anchorSrc:ResourcesManager.resolveImageSource('arrow_down.png'),
 				anchorTitle:MessageHash[200],
 				topOffset:(this.options.menuOffsetTop !== undefined ? this.options.menuOffsetTop: 2),
 				leftOffset:(this.options.menuOffsetLeft !== undefined ? this.options.menuOffsetLeft: -127),
@@ -284,7 +284,7 @@ Class.create("RepositorySelect", {
 		var removeAction = {
 				name:MessageHash[423],
 				alt:MessageHash[423],
-				image:ajxpResourcesFolder+'/images/actions/16/delete_bookmark.png',
+				image: ResourcesManager.resolveImageSource('actions/16/delete_bookmark.png'),
                 icon_class:'icon-remove',
 				disabled:false,
 				className:"edit",

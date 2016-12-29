@@ -97,7 +97,7 @@
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.list_target);
 		var img = new Element('img', {
-			src : ajxpResourcesFolder+'/images/loadingImage.gif'
+			src : ResourcesManager.resolveImageSource('loadingImage.gif')
 		});
 		var overlay = $(this.list_target).down("#element_overlay");
 		overlay.insert(img);

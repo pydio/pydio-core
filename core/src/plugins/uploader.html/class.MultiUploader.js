@@ -215,7 +215,7 @@ Class.create("MultiUploader", {
 		// Delete button
 		var new_row_button = document.createElement( 'img' );
 		//new_row_button.appendChild(document.createTextNode('remove'));
-		new_row_button.src = ajxpResourcesFolder+'/images/actions/22/editdelete.png';
+		new_row_button.src = ResourcesManager.resolveImageSource('actions/22/editdelete.png');
 		new_row_button.align = 'absmiddle';
 		new_row_button.setAttribute("style", "border:0px;cursor:pointer;");
 

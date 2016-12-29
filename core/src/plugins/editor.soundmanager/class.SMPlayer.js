@@ -149,10 +149,11 @@ function hookToFilesList(){
 }
 
 function addVolumeButton(){
+    return;
+    /*
     if($("sm_volume_button")) return;
     var locBars = pydio.UI.getRegisteredComponentsByClassName("LocationBar");
     if(!locBars.length){
-        return;
     }
     var locBar = locBars[0];
     var volumeButton = simpleButton(
@@ -186,6 +187,7 @@ function addVolumeButton(){
         }.bind(this)
     });
     locBar.resize();
+    */
 }
 
 Class.create("SMPlayer", AbstractEditor, {
@@ -249,7 +251,7 @@ soundManager.setup({\n\
 	getPreview : function(ajxpNode, rich){
         if(!window.soundManager || !window.soundManager.enabled){
             if(console) console.log("Returning simple image, window.soundManager is not loaded");
-            var simpleImage = new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
+            var simpleImage = new Element('img', {src:ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64),align:"absmiddle"});
             simpleImage.resizePreviewElement = function(element){
                 simpleImage.setStyle({
                     width:Math.min(64, element.width) + 'px',
@@ -325,7 +327,7 @@ soundManager.setup({\n\
     },
 
     getThumbnailSource : function(ajxpNode){
-        return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+        return ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64);
     },
 
     filterElement : function(element, ajxpNode){

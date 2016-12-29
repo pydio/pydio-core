@@ -431,7 +431,7 @@
                                 name:el.text,
                                 alt:el.title,
                                 isDefault : (index == 0),
-                                image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
+                                image:ResourcesManager.resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
                                 icon_class: el.icon_class,
                                 callback:function(e){this.apply([el]);}.bind(context)
                             } );
@@ -442,7 +442,7 @@
                         context.builderMenuItems.push({
                             name:MessageHash[324],
                             alt:MessageHash[324],
-                            image:resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
+                            image:ResourcesManager.resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
                             callback:function(e){}
                         } );
                     }
@@ -497,7 +497,7 @@
 				<fieldset>
 					<legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
 					<input type="text" style="width:195px;margin-right:5px;" id="ajxp_link_container" class="dialogFocus"/>
-                    <a id="email" title="AJXP_MESSAGE[323]"><span class="icon-envelope-alt"></span><img style="border:none;" align="absmiddle" src="AJXP_THEME_FOLDER/images/actions/22/mail_generic.png" height="22" width="22"/></a>
+                    <a id="email" title="AJXP_MESSAGE[323]"><span class="icon-envelope-alt"></span><img style="border:none;" align="absmiddle" src="AJXP_IMAGES_FOLDER/actions/22/mail_generic.png" height="22" width="22"/></a>
                   </fieldset>
 				</div>
 				]]></clientForm>

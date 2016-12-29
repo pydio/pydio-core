@@ -39,7 +39,7 @@
 					<html><![CDATA[
 						<div style="padding:10px;">
 							<div class="folderImage">
-								<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+								<img src="AJXP_IMAGES_FOLDER/mimes/64/#{icon}" height="64" width="64">
 							</div>
 							<b>#{name_string}</b> : #{text}
 						</div>
@@ -120,7 +120,7 @@
 									name:el.text,
 									alt:el.title,
 									isDefault : (index == 0),
-									image:resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
+									image:ResourcesManager.resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
 									callback:function(e){this.apply([el]);}.bind(context)
 								} );
 								index++;
@@ -130,7 +130,7 @@
 							context.builderMenuItems.push({
 								name:MessageHash[324],
 								alt:MessageHash[324],
-								image:resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
+								image:ResourcesManager.resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
 								callback:function(e){}
 							} );
 						}

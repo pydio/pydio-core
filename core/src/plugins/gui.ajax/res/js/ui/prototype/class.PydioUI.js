@@ -606,7 +606,7 @@ Class.create("PydioUI", {
             if(transport.responseJSON){
                 seedInputField.value = transport.responseJSON.seed;
                 var src = window.ajxpServerAccessPath + '&get_action=get_captcha&sid='+Math.random();
-                var refreshSrc = ajxpResourcesFolder + '/images/actions/16/reload.png';
+                var refreshSrc = ResourcesManager.resolveImageSource('actions/16/reload.png');
                 if(existingCaptcha){
                     existingCaptcha.src = src;
                 }else{

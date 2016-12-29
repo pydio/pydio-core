@@ -475,6 +475,10 @@ class ImapAccessWrapper implements IAjxpWrapper
         }
     }
 
+    /**
+     * @param $url
+     * @return bool
+     */
     public static function isRemote($url)
     {
         return true;

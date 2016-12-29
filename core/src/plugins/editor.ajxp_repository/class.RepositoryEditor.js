@@ -108,7 +108,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
         }else{
             this.repositoryId = getBaseName(node.getPath());
             this.updateTitle(node.getMetadata().get("text"));
-            var icon = resolveImageSource(node.getIcon(), "/images/mimes/64");
+            var icon = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/64");
             this.element.down("span.header_label").setStyle(
                 {
                     backgroundImage:"url('"+icon+"')",

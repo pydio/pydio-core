@@ -21,17 +21,12 @@
 webFXTreeConfig.loadingText = "Loading...";
 
 function splitOverlayIcons(ajxpNode){
-    if(window.ajaxplorer.currentThemeUsesIconFonts || !ajxpNode.getMetadata().get("overlay_icon")  || !Modernizr.multiplebgs) return false;
-    var ret = [];
-    $A(ajxpNode.getMetadata().get("overlay_icon").split(",")).each(function(el){
-        ret.push(resolveImageSource(el, "/images/overlays/ICON_SIZE", 8));
-    });
-    return ret;
+    return false;
 }
 
 function splitOverlayClasses(ajxpNode){
-    if(!ajxpNode.getMetadata().get("overlay_class")  || ! window.ajaxplorer.currentThemeUsesIconFonts) return false;
-    return ajxpNode.getMetadata().get("overlay_class").split(",");
+    var overlayClass = ajxpNode.getMetadata().get("overlay_class");
+    return (overlayClass ? overlayClass.split(", ") : false);
 }
 
 function AJXPTree(rootNode, sAction, filter, showPagination) {
@@ -41,12 +36,12 @@ function AJXPTree(rootNode, sAction, filter, showPagination) {
     this.showPagination = showPagination;
 	var icon = rootNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
-		icon = resolveImageSource(icon, "/images/mimes/ICON_SIZE", 16);
+		icon = ResourcesManager.resolveImageSource(icon, "mimes/ICON_SIZE", 16);
 	}
 	var openIcon = rootNode.getMetadata().get("openicon");
 	if(openIcon){
 		if(openIcon.indexOf(ajxpResourcesFolder+"/") != 0){
-			openIcon = resolveImageSource(openIcon, "/images/mimes/ICON_SIZE", 16);
+			openIcon = ResourcesManager.resolveImageSource(openIcon, "mimes/ICON_SIZE", 16);
 		}
 	}else{
 		openIcon = icon;
@@ -161,10 +156,10 @@ AJXPTree.prototype.attachListeners = function(jsNode, ajxpNode){
 	ajxpNode.observe("node_replaced", function(newNode){
 		// Should refresh label / icon
 		if(jsNode.updateIcon){
-			var ic = resolveImageSource(ajxpNode.getIcon(), "/images/mimes/ICON_SIZE", 16);
+			var ic = ResourcesManager.resolveImageSource(ajxpNode.getIcon(), "mimes/ICON_SIZE", 16);
 			var oic = ic;
 			if(ajxpNode.getMetadata().get("openicon")){
-				oic = resolveImageSource(ajxpNode.getMetadata().get("openicon"), "/images/mimes/ICON_SIZE", 16);
+				oic = ResourcesManager.resolveImageSource(ajxpNode.getMetadata().get("openicon"), "mimes/ICON_SIZE", 16);
 			}
             var overlayIcon = splitOverlayIcons(ajxpNode);
             var overlayClasses = splitOverlayClasses(ajxpNode);
@@ -199,12 +194,12 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
 	this.ajxpNode = ajxpNode;
 	var icon = ajxpNode.getIcon();
 	if(icon.indexOf(ajxpResourcesFolder+"/") != 0){
-		icon = resolveImageSource(icon, "/images/mimes/ICON_SIZE", 16);
+		icon = ResourcesManager.resolveImageSource(icon, "mimes/ICON_SIZE", 16);
 	}
 	var openIcon = ajxpNode.getMetadata().get("openicon");
 	if(openIcon){
 		if(openIcon.indexOf(ajxpResourcesFolder+"/") != 0){
-			openIcon = resolveImageSource(openIcon, "/images/mimes/ICON_SIZE", 16);
+			openIcon = ResourcesManager.resolveImageSource(openIcon, "mimes/ICON_SIZE", 16);
 		}
 	}else{
 		openIcon = icon;
@@ -217,7 +212,7 @@ function AJXPTreeItem(ajxpNode, sAction, eParent) {
         sAction,
         eParent,
         icon,
-        (openIcon?openIcon:resolveImageSource("folder_open.png", "/images/mimes/ICON_SIZE", 16)),
+        (openIcon?openIcon:ResourcesManager.resolveImageSource("folder_open.png", "mimes/ICON_SIZE", 16)),
         splitOverlayIcons(ajxpNode),
         splitOverlayClasses(ajxpNode)
     );

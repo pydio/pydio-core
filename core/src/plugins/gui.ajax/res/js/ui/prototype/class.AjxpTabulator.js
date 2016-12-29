@@ -149,7 +149,7 @@ Class.create("AjxpTabulator", AjxpPane, {
                     "element");
             }
             if(tabInfo.icon){
-                td.insert('<img width="16" height="16" align="absmiddle" src="'+resolveImageSource(tabInfo.icon, '/images/actions/ICON_SIZE', 16)+'">');
+                td.insert('<img width="16" height="16" align="absmiddle" src="'+ResourcesManager.resolveImageSource(tabInfo.icon, 'actions/ICON_SIZE', 16)+'">');
             }
             if(tabInfo.iconClass){
                 td.insert(new Element('span', {className:tabInfo.iconClass}));

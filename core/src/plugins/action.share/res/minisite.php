@@ -30,7 +30,6 @@
                 startParameters["PASSWORD_AUTH_ONLY"] = false;
             }
             document.observe("ajaxplorer:before_gui_load", function(e){
-               ajaxplorer.currentThemeUsesIconFonts = true;
                document.documentElement.className += " ajxp_theme_AJXP_THEME";
            });
             if(startParameters['HASH_LOAD_ERROR']){

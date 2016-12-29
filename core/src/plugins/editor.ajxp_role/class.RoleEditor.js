@@ -620,7 +620,7 @@ Class.create("RoleEditor", AbstractEditor, {
             rightsCell.insert(blockBox);
             rightsCell.insert('<label for="chck_'+repoId+'_block">' + MessageHash["ajxp_role_editor.37"] + '</label> ');
    			var tr = new Element('div', {className:"repositoryEntry"});
-   			var titleCell = new Element('div', {className:"repositoryLabel"}).update('<img src="'+ajxpResourcesFolder+'/images/mimes/16/folder_red.png" style="float:left;margin-right:5px;">');
+   			var titleCell = new Element('div', {className:"repositoryLabel"}).update('<img src="'+ResourcesManager.resolveImageSource('mimes/16/folder_red.png')+'" style="float:left;margin-right:5px;">');
             var theLabel = new Element("span",{style:'cursor:pointer;', 'data-repoId':repoId}).update(repoLabel);
             titleCell.insert(theLabel);
             if(this.isInherited(["ACL", repoId])) {

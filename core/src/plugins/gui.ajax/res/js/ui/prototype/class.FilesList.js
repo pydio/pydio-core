@@ -622,7 +622,7 @@ Class.create("FilesList", SelectableElements, {
                     items.push({
                         name:(column.messageId?MessageHash[column.messageId]:column.messageString),
                         alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                        image:resolveImageSource((isSorted?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                        image:ResourcesManager.resolveImageSource((isSorted?"column-visible":"transp")+".png", 'actions/ICON_SIZE', 16),
                         icon_class:(isSorted?'icon-caret-'+(this._sortableTable.descending?'down':'up'):''),
                         isDefault:false,
                         callback:function(e){
@@ -823,7 +823,7 @@ Class.create("FilesList", SelectableElements, {
                             items.push({
                                 name:(column.messageId?MessageHash[column.messageId]:column.messageString),
                                 alt:(column.messageId?MessageHash[column.messageId]:column.messageString),
-                                image:resolveImageSource((isVisible?"column-visible":"transp")+".png", '/images/actions/ICON_SIZE', 16),
+                                image:ResourcesManager.resolveImageSource((isVisible?"column-visible":"transp")+".png", 'actions/ICON_SIZE', 16),
                                 isDefault:false,
                                 callback:function(e){this.setColumnVisible(column.attributeName, !isVisible);}.bind(this)
                             });
@@ -840,8 +840,7 @@ Class.create("FilesList", SelectableElements, {
 				this.headerMenu.destroy();
 				delete this.headerMenu;
 			}
-			buffer = '<div class="panelHeader"><div style="float:right;padding-right:5px;font-size:1px;height:16px;"><input type="image" height="16" width="16" src="'+ajxpResourcesFolder+'/images/actions/16/zoom-in.png" id="slider-input-1" style="border:0px;width:16px;height:16px;margin-top:0px;padding:0px;" value="64"/></div>'+MessageHash[126]+'</div>';
-			buffer += '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow-y:'+ (this.options.replaceScroller?'hidden':'auto') +';overflow-x:hidden;">';
+			buffer = '<div id="selectable_div-'+this.__currentInstanceIndex+'" class="selectable_div'+(this._displayMode == "detail" ? ' detailed':'')+'" style="overflow-y:'+ (this.options.replaceScroller?'hidden':'auto') +';overflow-x:hidden;">';
 			this.htmlElement.update(buffer);
 			if(this.paginationData && parseInt(this.paginationData.get('total')) > 1 ){
                 this.htmlElement.addClassName("paginated");
@@ -1805,7 +1804,7 @@ Class.create("FilesList", SelectableElements, {
                     className   :'text_label'+fullview
                 }).update(he.escape(metaData.get('text')));
 
-                if(metaData.get('fonticon') && pydio.currentThemeUsesIconFonts){
+                if(metaData.get('fonticon')){
                     textLabel.insert({top: new Element('span', {className: 'mimefont mdi mdi-' + metaData.get('fonticon')})});
                     if(metaData.get('overlay_class')){
                         metaData.get('overlay_class').split(',').each(function(c){
@@ -1814,26 +1813,26 @@ Class.create("FilesList", SelectableElements, {
                     }
                 }else{
                     var backgroundPosition = this.options.iconBgPosition || '4px 2px';
-                    var backgroundImage = 'url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                    var backgroundImage = 'url("'+ResourcesManager.resolveImageSource(metaData.get('icon'), "mimes/ICON_SIZE", 16)+'")';
                     if(metaData.get('overlay_icon') && Modernizr.multiplebgs){
                         var ovIcs = metaData.get('overlay_icon').split(',');
                         switch(ovIcs.length){
                             case 1:
                                 backgroundPosition = '14px 11px, ' + backgroundPosition;
-                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                backgroundImage = 'url("'+ResourcesManager.resolveImageSource(ovIcs[0], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(metaData.get('icon'), "mimes/ICON_SIZE", 16)+'")';
                                 break;
                             case 2:
                                 backgroundPosition = '2px 11px, 14px 11px, ' + backgroundPosition;
-                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                backgroundImage = 'url("'+ResourcesManager.resolveImageSource(ovIcs[0], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[1], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(metaData.get('icon'), "mimes/ICON_SIZE", 16)+'")';
                                 break;
                             case 3:
                                 backgroundPosition = '14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                backgroundImage = 'url("'+ResourcesManager.resolveImageSource(ovIcs[0], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[1], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[2], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(metaData.get('icon'), "mimes/ICON_SIZE", 16)+'")';
                                 break;
                             case 4:
                             default:
                                 backgroundPosition = '2px 2px, 14px 2px, 2px 11px, 14px 11px, ' + backgroundPosition;
-                                backgroundImage = 'url("'+resolveImageSource(ovIcs[0], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[1], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[2], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(ovIcs[3], "/images/overlays/ICON_SIZE", 8)+'"), url("'+resolveImageSource(metaData.get('icon'), "/images/mimes/ICON_SIZE", 16)+'")';
+                                backgroundImage = 'url("'+ResourcesManager.resolveImageSource(ovIcs[0], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[1], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[2], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(ovIcs[3], "overlays/ICON_SIZE", 8)+'"), url("'+ResourcesManager.resolveImageSource(metaData.get('icon'), "mimes/ICON_SIZE", 16)+'")';
                                 break;
                         }
                     }
@@ -1966,7 +1965,7 @@ Class.create("FilesList", SelectableElements, {
             var index = 0;
             ovIcs.each(function(ic){
                 bgPos.push('0px '+((index*12)+(index>0?2:0))+'px');
-                bgImg.push("url('"+resolveImageSource(ovIcs[index], "/images/overlays/ICON_SIZE", 12)+"')");
+                bgImg.push("url('"+ResourcesManager.resolveImageSource(ovIcs[index], "overlays/ICON_SIZE", 12)+"')");
                 bgRep.push('no-repeat');
                 index++;
             });
@@ -1982,7 +1981,7 @@ Class.create("FilesList", SelectableElements, {
                 backgroundPosition:bgPos.join(', '),
                 backgroundRepeat:bgRep.join(', ')
             });
-            if(ajxpNode.getMetadata().get("overlay_class") && ajaxplorer.currentThemeUsesIconFonts){
+            if(ajxpNode.getMetadata().get("overlay_class")){
                 ajxpNode.getMetadata().get("overlay_class").split(",").each(function(ovC){
                     ovDiv.insert(new Element('span',{className:ovC+' overlay-class-span'}));
                 });
@@ -2062,7 +2061,7 @@ Class.create("FilesList", SelectableElements, {
             var index = 0;
             ovIcs.each(function(ic){
                 bgPos.push('0px '+((index*12)+(index>0?2:0))+'px');
-                bgImg.push("url('"+resolveImageSource(ovIcs[index], "/images/overlays/ICON_SIZE", 12)+"')");
+                bgImg.push("url('"+ResourcesManager.resolveImageSource(ovIcs[index], "overlays/ICON_SIZE", 12)+"')");
                 bgRep.push('no-repeat');
                 index++;
             });
@@ -2078,7 +2077,7 @@ Class.create("FilesList", SelectableElements, {
                 backgroundPosition:bgPos.join(', '),
                 backgroundRepeat:bgRep.join(', ')
             });
-            if(ajxpNode.getMetadata().get("overlay_class") && ajaxplorer.currentThemeUsesIconFonts){
+            if(ajxpNode.getMetadata().get("overlay_class")){
                 ajxpNode.getMetadata().get("overlay_class").split(",").each(function(ovC){
                     ovDiv.insert(new Element('span',{className:ovC+' overlay-class-span'}));
                 });
@@ -2423,7 +2422,7 @@ Class.create("FilesList", SelectableElements, {
         var element = this.htmlElement; // this.htmlElement.down('.selectable_div,.table_rows_container') || this.htmlElement;
 		addLightboxMarkupToElement(element);
 		var img = new Element('img', {
-			src : ajxpResourcesFolder+'/images/loadingImage.gif'
+			src : ResourcesManager.resolveImageSource('loadingImage.gif')
 		});
 		var overlay = this.htmlElement.down("#element_overlay");
 		overlay.insert(img);

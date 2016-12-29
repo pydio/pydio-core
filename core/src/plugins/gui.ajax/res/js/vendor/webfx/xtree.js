@@ -49,23 +49,23 @@
 | Created 2000-12-11 | All changes are in the log above. | Updated 2006-05-26 |
 \----------------------------------------------------------------------------*/
 var	webFXTreeConfig = {
-		rootIcon        : '/images/xtree/foldericon.png',
-		openRootIcon    : '/images/xtree/openfoldericon.png',
-		folderIcon      : '/images/xtree/foldericon.png',
-		openFolderIcon  : '/images/xtree/openfoldericon.png',
-		fileIcon        : '/images/xtree/foldericon.png',
-		iIcon           : '/images/xtree/I.png',
-		lIcon           : '/images/xtree/L.png',
-		lMinusIcon      : '/images/xtree/Lminus.png',
-		lPlusIcon       : '/images/xtree/Lplus.png',
-		lMinusIconActive: '/images/xtree/Lminus-active.png',
-		lPlusIconActive : '/images/xtree/Lplus-active.png',
-		tIcon           : '/images/xtree/T.png',
-		tMinusIcon      : '/images/xtree/Tminus.png',
-		tPlusIcon       : '/images/xtree/Tplus.png',
-		tMinusIconActive: '/images/xtree/Tminus-active.png',
-		tPlusIconActive : '/images/xtree/Tplus-active.png',
-		blankIcon       : '/images/blank.png',
+		rootIcon        : 'xtree/foldericon.png',
+		openRootIcon    : 'xtree/openfoldericon.png',
+		folderIcon      : 'xtree/foldericon.png',
+		openFolderIcon  : 'xtree/openfoldericon.png',
+		fileIcon        : 'xtree/foldericon.png',
+		iIcon           : 'xtree/I.png',
+		lIcon           : 'xtree/L.png',
+		lMinusIcon      : 'xtree/Lminus.png',
+		lPlusIcon       : 'xtree/Lplus.png',
+		lMinusIconActive: 'xtree/Lminus-active.png',
+		lPlusIconActive : 'xtree/Lplus-active.png',
+		tIcon           : 'xtree/T.png',
+		tMinusIcon      : 'xtree/Tminus.png',
+		tPlusIcon       : 'xtree/Tplus.png',
+		tMinusIconActive: 'xtree/Tminus-active.png',
+		tPlusIconActive : 'xtree/Tplus-active.png',
+		blankIcon       : 'blank.png',
 		defaultText     : 'Tree Item',
 		defaultAction   : function(e){},
 		defaultBehavior : 'classic',
@@ -73,24 +73,23 @@ var	webFXTreeConfig = {
 		usePersistence	: false
 };
 Event.observe(document, 'ajaxplorer:boot_loaded', function(){
-	var resourcesFolder = window.ajxpResourcesFolder;
-	webFXTreeConfig.rootIcon        = resourcesFolder+'/images/xtree/foldericon.png';
-	webFXTreeConfig.openRootIcon    = resourcesFolder+'/images/xtree/openfoldericon.png';
-	webFXTreeConfig.folderIcon      = resourcesFolder+'/images/xtree/foldericon.png';
-	webFXTreeConfig.openFolderIcon  = resourcesFolder+'/images/xtree/openfoldericon.png';
-	webFXTreeConfig.fileIcon        = resourcesFolder+'/images/xtree/foldericon.png';
-	webFXTreeConfig.iIcon           = resourcesFolder+'/images/xtree/I.png';
-	webFXTreeConfig.lIcon           = resourcesFolder+'/images/xtree/L.png';
-	webFXTreeConfig.lMinusIcon      = resourcesFolder+'/images/xtree/Lminus.png';
-	webFXTreeConfig.lPlusIcon       = resourcesFolder+'/images/xtree/Lplus.png';
-	webFXTreeConfig.lMinusIconActive= resourcesFolder+'/images/xtree/Lminus-active.png';
-	webFXTreeConfig.lPlusIconActive = resourcesFolder+'/images/xtree/Lplus-active.png';
-	webFXTreeConfig.tIcon           = resourcesFolder+'/images/xtree/T.png';
-	webFXTreeConfig.tMinusIcon      = resourcesFolder+'/images/xtree/Tminus.png';
-	webFXTreeConfig.tPlusIcon       = resourcesFolder+'/images/xtree/Tplus.png';
-	webFXTreeConfig.tMinusIconActive= resourcesFolder+'/images/xtree/Tminus-active.png';
-	webFXTreeConfig.tPlusIconActive = resourcesFolder+'/images/xtree/Tplus-active.png';
-	webFXTreeConfig.blankIcon       = resourcesFolder+'/images/blank.png';
+	webFXTreeConfig.rootIcon        = ResourcesManager.resolveImageSource('xtree/foldericon.png');
+	webFXTreeConfig.openRootIcon    = ResourcesManager.resolveImageSource('xtree/openfoldericon.png');
+	webFXTreeConfig.folderIcon      = ResourcesManager.resolveImageSource('xtree/foldericon.png');
+	webFXTreeConfig.openFolderIcon  = ResourcesManager.resolveImageSource('xtree/openfoldericon.png');
+	webFXTreeConfig.fileIcon        = ResourcesManager.resolveImageSource('xtree/foldericon.png');
+	webFXTreeConfig.iIcon           = ResourcesManager.resolveImageSource('xtree/I.png');
+	webFXTreeConfig.lIcon           = ResourcesManager.resolveImageSource('xtree/L.png');
+	webFXTreeConfig.lMinusIcon      = ResourcesManager.resolveImageSource('xtree/Lminus.png');
+	webFXTreeConfig.lPlusIcon       = ResourcesManager.resolveImageSource('xtree/Lplus.png');
+	webFXTreeConfig.lMinusIconActive= ResourcesManager.resolveImageSource('xtree/Lminus-active.png');
+	webFXTreeConfig.lPlusIconActive = ResourcesManager.resolveImageSource('xtree/Lplus-active.png');
+	webFXTreeConfig.tIcon           = ResourcesManager.resolveImageSource('xtree/T.png');
+	webFXTreeConfig.tMinusIcon      = ResourcesManager.resolveImageSource('xtree/Tminus.png');
+	webFXTreeConfig.tPlusIcon       = ResourcesManager.resolveImageSource('xtree/Tplus.png');
+	webFXTreeConfig.tMinusIconActive= ResourcesManager.resolveImageSource('xtree/Tminus-active.png');
+	webFXTreeConfig.tPlusIconActive = ResourcesManager.resolveImageSource('xtree/Tplus-active.png');
+	webFXTreeConfig.blankIcon       = ResourcesManager.resolveImageSource('blank.png');
 });
 
 var webFXTreeHandler = {

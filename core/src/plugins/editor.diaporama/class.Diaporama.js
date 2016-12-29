@@ -30,9 +30,7 @@ Class.create("Diaporama", AbstractEditor, {
             floatingToolbar:true,
             replaceScroller:false,
             toolbarStyle: "icons_only diaporama_toolbar",
-            actions : (window.ajxpMinisite || window.ajxpMobile) ? {} : {}/* : {
-                'toggleSideBar' : '<a id="toggleButton"><img src="'+ajxpResourcesFolder+'/images/actions/22/view_left_close.png"  width="22" height="22" alt="" border="0"><br><span message_id="86"></span></a>'
-            }*/
+            actions : (window.ajxpMinisite || window.ajxpMobile) ? {} : {}
         }, options);
 		$super(oFormObject, options);
 

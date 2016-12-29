@@ -586,7 +586,7 @@ Class.create("InfoPanel", AjxpPane, {
 			if(selectionType == 'unique' && (!action.context.selection || action.selectionContext.multipleOnly)) return;
             var id ="";
             if(action.options.name) id = 'id="action_instance_'+action.options.name+'"';
-			actionString += '<a href="" '+id+' onclick="pydio.getController().fireAction(\''+action.options.name+'\');return false;"><img src="'+resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
+			actionString += '<a href="" '+id+' onclick="pydio.getController().fireAction(\''+action.options.name+'\');return false;"><img src="'+ResourcesManager.resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16)+'" width="16" height="16" align="absmiddle" border="0"> '+action.options.title+'</a>';
 			count++;
 		}.bind(this));
 		actionString += '</div>';
@@ -616,7 +616,7 @@ Class.create("InfoPanel", AjxpPane, {
 				}
 			}
 		}
-		return AbstractEditor.prototype.getPreview(ajxpNode).outerHTML; // '<img src="' + resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
+		return AbstractEditor.prototype.getPreview(ajxpNode).outerHTML; // '<img src="' + ResourcesManager.resolveImageSource(ajxpNode.getIcon(), '/images/mimes/ICON_SIZE',64) + '" height="64" width="64">';
 	},
 	/**
 	 * Parses config node

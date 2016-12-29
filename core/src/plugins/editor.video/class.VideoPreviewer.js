@@ -149,7 +149,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 					webm:'video/webm; codecs="vp8, vorbis"',
 					ogv:'video/ogg; codecs="theora, vorbis"'
 				};
-				var poster = resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+				var poster = ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64);
 				div = new Element("div", {className:"video-js-box"});
 				content = '';
 				content +='	<video class="video-js" controls preload="auto" height="200">';
@@ -242,7 +242,7 @@ preload="auto" width="#{WIDTH}" height="#{HEIGHT}" data-setup="{}">\n\
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+		return ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64);
 	}
 	
 });

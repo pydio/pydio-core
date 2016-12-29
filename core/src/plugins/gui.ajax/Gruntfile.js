@@ -59,7 +59,6 @@ var gui_ajax_core = [
     'res/js/ui/prototype/class.RepositorySelect.js',
     'res/js/ui/prototype/class.RepositorySimpleLabel.js',
     'res/js/ui/prototype/class.Breadcrumb.js',
-    'res/js/ui/prototype/class.LocationBar.js',
     'res/js/ui/prototype/class.UserWidget.js',
     'res/js/ui/prototype/class.LogoWidget.js',
     'res/js/ui/prototype/class.AjxpAutoCompleter.js',
@@ -181,7 +180,8 @@ module.exports = function(grunt) {
                     ]
                 },
                 files: {
-                    "res/themes/orbit/css/pydio.css": "res/themes/orbit/css/pydio.less"
+                    "res/themes/orbit/css/pydio.css": "res/themes/orbit/css/pydio.less",
+                    "res/themes/material/css/pydio.css": "res/themes/material/css/pydio.less"
                 }
             }
         },
@@ -212,8 +212,15 @@ module.exports = function(grunt) {
                     spawn: false
                 }
             },
-            styles: {
+            styles_orbit: {
                 files: ['res/themes/orbit/css/**/*.less'],
+                tasks: ['less', 'cssmin'],
+                options: {
+                    nospawn: true
+                }
+            },
+            styles_material: {
+                files: ['res/themes/material/css/**/*.less'],
                 tasks: ['less', 'cssmin'],
                 options: {
                     nospawn: true
@@ -229,9 +236,15 @@ module.exports = function(grunt) {
                 files: {
                     'res/themes/orbit/css/allz.css': [
                         'res/themes/orbit/css/pydio.css',
-                        'res/themes/orbit/css/animate-custom.css',
-                        'res/themes/orbit/css/chosen.css',
-                        'res/themes/orbit/css/media.css'
+                        'res/themes/common/css/animate-custom.css',
+                        'res/themes/common/css/chosen.css',
+                        'res/themes/common/css/media.css'
+                    ],
+                    'res/themes/material/css/allz.css': [
+                        'res/themes/material/css/pydio.css',
+                        'res/themes/common/css/animate-custom.css',
+                        'res/themes/common/css/chosen.css',
+                        'res/themes/common/css/media.css'
                     ]
                 }
             }

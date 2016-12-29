@@ -190,7 +190,7 @@ Class.create("IMagickPreviewer", Diaporama, {
 		if(this.loading) return;
 		addLightboxMarkupToElement(this.imgContainer);
 		var img = document.createElement("img");
-		img.src = ajxpResourcesFolder+'/images/loadingImage.gif';
+		img.src = ResourcesManager.resolveImageSource('loadingImage.gif');
 		$(this.imgContainer).getElementsBySelector("#element_overlay")[0].appendChild(img);
 		this.loading = true;
 	},

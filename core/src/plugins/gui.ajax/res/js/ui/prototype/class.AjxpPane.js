@@ -407,12 +407,12 @@ Class.create("AjxpPane", {
         var header = new Element('div', {className:'panelHeader'}).update(label);
         var ic;
         if(headerIcon){
-            ic = resolveImageSource(headerIcon, '/images/actions/ICON_SIZE', 16);
+            ic = ResourcesManager.resolveImageSource(headerIcon, 'actions/ICON_SIZE', 16);
             header.insert({top: new Element("img", {src:ic, className:'panelHeaderIcon'})});
             header.addClassName('panelHeaderWithIcon');
         }
         if(this.options.headerClose){
-            ic = resolveImageSource(this.options.headerClose.icon, '/images/actions/ICON_SIZE', 16);
+            ic = ResourcesManager.resolveImageSource(this.options.headerClose.icon, 'actions/ICON_SIZE', 16);
             var img = new Element("img", {src:ic, className:'panelHeaderCloseIcon', title:MessageHash[this.options.headerClose.title]});
             header.insert({top: img});
             var sp = this.options.headerClose.splitter;

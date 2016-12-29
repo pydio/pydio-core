@@ -4,4 +4,4 @@ res/js/vendor/nodejs/bundle*
 res/js/pydio.min.js
 res/js/ui/reactjs/build/
 res/mui/mui-sources
-/res/themes/orbit/css/allz.css
+/res/themes/*/css/allz.css

@@ -45,7 +45,7 @@
                        var conn = new Connexion();
                        var okButton = oForm.down('.dialogButtons input');
                        var backButton = new Element('img', {
-                            src:ajxpResourcesFolder+'/images/actions/22/back_22.png',
+                            src:ResourcesManager.resolveImageSource('actions/22/back_22.png'),
                             style:'float: left;margin-top: 7px;margin-left: 4px;cursor: pointer;',
                             title:'Back'
                        }).observe('click', function(e){
@@ -205,7 +205,7 @@
                     bmBar.addBookmarkObject = {
                         name:bmAction.getKeyedText(),
                         alt:bmAction.options.title,
-                        image:ajxpResourcesFolder+'/images/actions/16/bookmark_add.png',
+                        image:ResourcesManager.resolveImageSource('actions/16/bookmark_add.png'),
                         icon_class:'icon-plus-sign',
                         callback:function(e){
                             var node = pydio.getContextNode();
@@ -559,7 +559,7 @@
 						<div class="dialogLegend" style="margin-bottom: 2px;padding: 0 5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
 						<div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
 						<div id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
-							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_THEME_FOLDER/images/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
+							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_IMAGES_FOLDER/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
 						</div>
 						<div class="dialogLegend" style="margin: 5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
 						<input type="text" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>

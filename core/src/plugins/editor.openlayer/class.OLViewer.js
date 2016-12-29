@@ -80,7 +80,7 @@ Class.create("OLViewer", AbstractEditor, {
 		var bar = this.element.down('div.filter');
 		var button = this.element.down('div#filterButton');
 		bar.select('select').invoke('setStyle', {width:'80px',height:'18px',fontSize:'11px',marginRight:'5px',border:'1px solid #AAAAAA'});
-		bar.select('input').invoke('setStyle', {height:'18px',fontSize:'11px',border:'1px solid #AAAAAA',backgroundImage:'url('+ajxpResourcesFolder+'"/images/locationBg.gif")', backgroundPosition:'left top', backgroundRepeat:'no-repeat'});
+		bar.select('input').invoke('setStyle', {height:'18px',fontSize:'11px',border:'1px solid #AAAAAA',backgroundPosition:'left top', backgroundRepeat:'no-repeat'});
 		bar.hide();
 		this.filterBar = bar;
 		button.observe("click", function(e){
@@ -346,12 +346,12 @@ Class.create("OLViewer", AbstractEditor, {
 			};
 			return div;
 		}else{
-			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64)});
+			return new Element('img', {src:ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64)});
 		}
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+		return ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64);
 	}
 	
 });

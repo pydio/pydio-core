@@ -193,7 +193,7 @@ Proto.Menu = Class.create({
                             }).observe('click', action.callback));
                     }else{
                         if(action.image_unresolved){
-                            action.image = resolveImageSource(action.image_unresolved, '/images/actions/ICON_SIZE', 22);
+                            action.image = ResourcesManager.resolveImageSource(action.image_unresolved, 'actions/ICON_SIZE', 22);
                         }
                         actionsContainer.insert(
                             new Element('a', {
@@ -237,7 +237,7 @@ Proto.Menu = Class.create({
             }else if(item.image){
                 if(!item.separator) {
                     if(item.image_unresolved){
-                        item.image = resolveImageSource(item.image_unresolved, '/images/actions/ICON_SIZE', 16);
+                        item.image = ResourcesManager.resolveImageSource(item.image_unresolved, 'actions/ICON_SIZE', 16);
                     }
                     img = new Element('img', {src:item.image,border:'0',height:16,width:16,align:'absmiddle'});
                 }

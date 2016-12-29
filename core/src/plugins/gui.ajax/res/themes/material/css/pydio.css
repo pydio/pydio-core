@@ -19,31 +19,31 @@
 }
 @font-face {
   font-family: 'FontAwesome';
-  src: url('../../common/fonts/awesome/fontawesome-webfont.eot?v=3.2.1');
-  src: url('../../common/fonts/awesome/fontawesome-webfont.eot?#iefix&v=3.2.1') format('embedded-opentype'), url('../../common/fonts/awesome/fontawesome-webfont.woff?v=3.2.1') format('woff'), url('../../common/fonts/awesome/fontawesome-webfont.ttf?v=3.2.1') format('truetype'), url('../../common/fonts/awesome/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1') format('svg');
+  src: url('../../../common/css/fonts/awesome/fontawesome-webfont.eot?v=3.2.1');
+  src: url('../../../common/css/fonts/awesome/fontawesome-webfont.eot?#iefix&v=3.2.1') format('embedded-opentype'), url('../../../common/css/fonts/awesome/fontawesome-webfont.woff?v=3.2.1') format('woff'), url('../../../common/css/fonts/awesome/fontawesome-webfont.ttf?v=3.2.1') format('truetype'), url('../../../common/css/fonts/awesome/fontawesome-webfont.svg#fontawesomeregular?v=3.2.1') format('svg');
   font-weight: normal;
   font-style: normal;
 }
 @font-face {
   font-family: 'Roboto';
   font-weight: 300;
-  src: url('../../common/fonts/roboto-font/roboto-light.woff2') format('woff2'), url('../../common/fonts/roboto-font/roboto-light.woff') format('woff');
+  src: url('../../../common/css/fonts/roboto-font/roboto-light.woff2') format('woff2'), url('../../../common/css/fonts/roboto-font/roboto-light.woff') format('woff');
 }
 @font-face {
   font-family: 'Roboto';
   font-weight: 400;
-  src: url('../../common/fonts/roboto-font/roboto.woff2') format('woff2'), url('../../common/fonts/roboto-font/roboto.woff') format('woff');
+  src: url('../../../common/css/fonts/roboto-font/roboto.woff2') format('woff2'), url('../../../common/css/fonts/roboto-font/roboto.woff') format('woff');
 }
 @font-face {
   font-family: 'Roboto';
   font-weight: 500;
-  src: url('../../common/fonts/roboto-font/roboto-medium.woff2') format('woff2'), url('../../common/fonts/roboto-font/roboto-medium.woff') format('woff');
+  src: url('../../../common/css/fonts/roboto-font/roboto-medium.woff2') format('woff2'), url('../../../common/css/fonts/roboto-font/roboto-medium.woff') format('woff');
 }
 /* MaterialDesignIcons.com */
 @font-face {
   font-family: "Material Design Icons";
-  src: url("../../common/fonts/mdi/materialdesignicons-webfont.eot?v=1.4.57");
-  src: url("../../common/fonts/mdi/materialdesignicons-webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), url("../../common/fonts/mdi/materialdesignicons-webfont.woff2?v=1.4.57") format("woff2"), url("../../common/fonts/mdi/materialdesignicons-webfont.woff?v=1.4.57") format("woff"), url("../../common/fonts/mdi/materialdesignicons-webfont.ttf?v=1.4.57") format("truetype"), url("../../common/fonts/mdi/materialdesignicons-webfont.svg?v=1.4.57#materialdesigniconsregular") format("svg");
+  src: url("../../../common/css/fonts/mdi/materialdesignicons-webfont.eot?v=1.4.57");
+  src: url("../../../common/css/fonts/mdi/materialdesignicons-webfont.eot?#iefix&v=1.4.57") format("embedded-opentype"), url("../../../common/css/fonts/mdi/materialdesignicons-webfont.woff2?v=1.4.57") format("woff2"), url("../../../common/css/fonts/mdi/materialdesignicons-webfont.woff?v=1.4.57") format("woff"), url("../../../common/css/fonts/mdi/materialdesignicons-webfont.ttf?v=1.4.57") format("truetype"), url("../../../common/css/fonts/mdi/materialdesignicons-webfont.svg?v=1.4.57#materialdesigniconsregular") format("svg");
   font-weight: normal;
   font-style: normal;
 }
@@ -999,7 +999,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: inline-block;
   width: 80px;
   height: 20px;
-  background-image: url('../../common/css/images/dl_bg.png');
+  background-image: url('../../../common/css/images/dl_bg.png');
   background-repeat: no-repeat;
   background-size: 0 100%;
   font-size: 14px;
@@ -1574,7 +1574,7 @@ div.shadow_class {
   font-family: Roboto, sans-serif;
   font-weight: 500;
   font-size: 15px;
-  color: #546e7a;
+  color: #009688;
   text-transform: uppercase;
   background-color: transparent;
   border: 0;
@@ -1586,10 +1586,10 @@ div.shadow_class {
   cursor: pointer;
 }
 .dialogBox .dialogContent .dialogButtons .dialogButton:focus {
-  background-color: #ffffff;
+  background-color: #d8fffb;
 }
 .dialogBox .dialogContent .dialogButtons .dialogButton:hover {
-  background-color: #fafbfc;
+  background-color: #bffff9;
 }
 .dialogBox .dialogContent .dialogButtons fieldSet input.dialogButton {
   background-color: transparent;
@@ -1640,7 +1640,7 @@ div.shadow_class {
 }
 .dialogBox .dialogContent input[type="text"]:focus,
 .dialogBox .dialogContent input[type="password"]:focus {
-  border-color: #546e7a;
+  border-color: #009688;
 }
 .dialogBox .dialogContent input[type="text"]:disabled,
 .dialogBox .dialogContent input[type="password"]:disabled {
@@ -1891,7 +1891,7 @@ div.accordion_toggle {
   color: #75808b;
   border-bottom: 1px solid #75808b;
   cursor: pointer;
-  background: url('../../common/css/images/xtree/Tplus.png') no-repeat;
+  background: url('../../../common/css/images/xtree/Tplus.png') no-repeat;
   background-position-x: -6px;
   background-position-y: -3px;
   padding-left: 15px;
@@ -1902,7 +1902,7 @@ div.accordion_toggle {
   border-bottom: 0;
 }
 div.accordion_toggle_active {
-  background-image: url('../../common/css/images/xtree/Tminus.png');
+  background-image: url('../../../common/css/images/xtree/Tminus.png');
 }
 div.accordion_content {
   overflow: hidden;
@@ -2137,7 +2137,7 @@ div#total_files_list {
   overflow: hidden;
   padding: 16px 14px;
   position: relative;
-  background-image: url('../../common/css/images/dl_bg.png');
+  background-image: url('../../../common/css/images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
@@ -2155,7 +2155,7 @@ div#upload_files_list > div {
   overflow: hidden;
   padding: 16px 14px;
   position: relative;
-  background-image: url('../../common/css/images/dl_bg.png');
+  background-image: url('../../../common/css/images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
@@ -2268,7 +2268,7 @@ div#multiple_download_container div {
   overflow: hidden;
   padding: 16px 14px;
   position: relative;
-  background-image: url('../../common/css/images/dl_bg.png');
+  background-image: url('../../../common/css/images/dl_bg.png');
   /*background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><rect x='0' y='0' width='100%' height='100%' stroke='transparent' fill='@{uploader_dialog_progress_color}' fill-opacity='1'/></svg>");*/
   background-repeat: no-repeat;
   background-size: 0 100%;
@@ -2339,8 +2339,8 @@ div#multiple_download_container div div a:hover {
   font-size: 14px;
   cursor: pointer;
   font-weight: 500;
-  background-color: #ffffff;
-  color: #485e68;
+  background-color: #c9fffa;
+  color: #00776c;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 1px rgba(0, 0, 0, 0.33);
   position: absolute;
   text-transform: uppercase;
@@ -7229,7 +7229,7 @@ div.dialogButtons.inlineEdition input {
   position: relative;
   height: 47px;
   padding: 0 15px 0 5px;
-  background: #546e7a no-repeat 7px 7px;
+  background: #009688 no-repeat 7px 7px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
   z-index: 1021;
   display: block;
@@ -7363,11 +7363,11 @@ div.dialogButtons.inlineEdition input {
 }
 #files_list_header #info_panel_toolbar a,
 #files_list_header #info_panel_share_toolbar a {
-  color: #546e7a;
+  color: #009688;
 }
 #files_list_header #info_panel_toolbar a:hover,
 #files_list_header #info_panel_share_toolbar a:hover {
-  background-color: #ffffff;
+  background-color: #c9fffa;
 }
 #files_list_header #info_panel_toolbar a.disabled,
 #files_list_header #info_panel_share_toolbar a.disabled,

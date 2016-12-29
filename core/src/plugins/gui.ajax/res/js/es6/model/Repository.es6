@@ -44,7 +44,7 @@ class Repository {
         this._accessStatus = null;
         this._lastConnection = null;
         if(window.ajxpResourcesFolder){
-    		this.icon = window.ajxpResourcesFolder+'/images/actions/16/network-wired.png';
+    		this.icon = ResourcesManager.resolveImageSource('actions/16/network-wired.png');
         }
 		this.resourcesManager = new ResourcesManager();
 		if(xmlDef) this.loadFromXml(xmlDef);
@@ -157,7 +157,7 @@ class Repository {
 	}
 
     getOverlay(){
-        return (this.getOwner() ? resolveImageSource("shared.png", "/images/overlays/ICON_SIZE", 8):"");
+        return (this.getOwner() ? ResourcesManager.resolveImageSource("shared.png", "overlays/ICON_SIZE", 8):"");
     }
 
     /**

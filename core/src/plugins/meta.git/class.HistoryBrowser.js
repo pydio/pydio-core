@@ -202,7 +202,7 @@ Class.create("HistoryBrowser", {
 	setOnLoad:function(){
 		addLightboxMarkupToElement(this.container);
 		var img = new Element("img", {
-			src:ajxpResourcesFolder+'/images/loadingImage.gif',
+			src:ResourcesManager.resolveImageSource('loadingImage.gif'),
 			style:'margin-top:80px;'
 		});
 		this.container.down("#element_overlay").insert(img);		

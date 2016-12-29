@@ -61,7 +61,7 @@
                         ]]></dialogOnComplete>
                     </clientCallback>
                     <clientForm id="installer_form"><![CDATA[
-                        <div id="installer_form" box_padding="0" box_resize="true" box_width="460" overlayStyle='{"backgroundColor":"black","opacity":10,"backgroundImage":"url(\"AJXP_THEME_FOLDER/images/grid_t.png\")"}' style="padding: 20px 20px; overflow:auto; background-color: white;">
+                        <div id="installer_form" box_padding="0" box_resize="true" box_width="460" overlayStyle='{"backgroundColor":"black","opacity":10,"backgroundImage":"url(\"AJXP_IMAGES_FOLDER/grid_t.png\")"}' style="padding: 20px 20px; overflow:auto; background-color: white;">
                             <img class="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:20px auto;">
                             <div class="installerWelcome">
                                 <span ajxp_message_id="installer.3">AJXP_MESSAGE[installer.3]</span>

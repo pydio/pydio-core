@@ -62,7 +62,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
 		allEditors.each(function(el){
             var elDiv;
 			if(el.editorClass == "OtherEditorChooser") return;
-            if(ajaxplorer.currentThemeUsesIconFonts && el.icon_class){
+            if(el.icon_class){
                 elDiv = new Element('a', {
                     href:'#',
                     className:'iconic '+(even?'even':'')
@@ -71,7 +71,7 @@ Class.create("OtherEditorChooser", AbstractEditor, {
                 elDiv = new Element('a', {
                     href:'#',
                     className:(even?'even':''),
-                    style:"background-image:url('"+resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22)+"');background-size:22px;"
+                    style:"background-image:url('"+ResourcesManager.resolveImageSource(el.icon, 'actions/ICON_SIZE', 22)+"');background-size:22px;"
                 }).update(el.text + '<span class="chooser_editor_legend">'+el.title+'</span>');
             }
 			even = !even;

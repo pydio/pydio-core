@@ -244,7 +244,40 @@ class ResourcesManager{
         window.AjxpImageLibraries[aliasName] = aliasPath;
     }
 
-	/**
+    /**
+     * Find the default images path
+     * @param src Icon source
+     * @param defaultPath Default path, can contain ICON_SIZE
+     * @param size Integer size optional
+     * @returns string
+     */
+    static resolveImageSource(src, defaultPath, size){
+        if(!src) return "";
+        let imagesFolder = ajxpResourcesFolder + '/images';
+        if(pydioBootstrap.parameters.get('ajxpImagesCommon')){
+            imagesFolder = imagesFolder.replace('/'+pydioBootstrap.parameters.get('theme')+'/', '/common/');
+        }
+
+        if(defaultPath && defaultPath[0] !== '/') {
+            defaultPath = '/' + defaultPath;
+        }
+
+        if(!window.AjxpImageLibraries || src.indexOf("/")==-1){
+            return imagesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
+        }
+        var radic = src.substring(0,src.indexOf("/"));
+        if(window.AjxpImageLibraries[radic]){
+            src = src.replace(radic, window.AjxpImageLibraries[radic]);
+            if(pydioBootstrap.parameters.get("SERVER_PREFIX_URI")){
+                src = pydioBootstrap.parameters.get("SERVER_PREFIX_URI") + src;
+            }
+            return (size?src.replace("ICON_SIZE", size):src);
+        }else{
+            return imagesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
+        }
+    }
+
+    /**
 	 * Check if resources are tagged autoload and load them
 	 * @param registry DOMDocument XML Registry
 	 */

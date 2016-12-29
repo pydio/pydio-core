@@ -295,12 +295,12 @@ Class.create("EmlViewer", AbstractEditor, {
 								className:"emlAttachmentAction", 
 								title:MessageHash["editor.eml.10"]+attachments[key]});
 				dlBut.update(new Element("img", {
-								src:window.ajxpResourcesFolder+'/images/actions/16/download_manager.png',
+								src:ResourcesManager.resolveImageSource('actions/16/download_manager.png'),
 								height: 16,
 								width: 16}));
 				var cpBut = new Element("a", {className:"emlAttachmentAction", title:MessageHash["editor.eml.11"]});
 				cpBut.update(new Element("img", {
-					src:window.ajxpResourcesFolder+'/images/actions/16/editcopy.png',
+					src:ResourcesManager.resolveImageSource('actions/16/editcopy.png'),
 					height: 16,
 					width: 16}));				
 				att.insert({top: dlBut});

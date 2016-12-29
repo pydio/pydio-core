@@ -667,7 +667,7 @@
 				<html><![CDATA[
 				<div style="padding:10px;">
 					<div class="folderImage">
-						<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+						<img src="AJXP_IMAGES_FOLDER/mimes/64/#{icon}" height="64" width="64">
 					</div>
 					<b>#{name_string}</b> : #{text}
 				</div>
@@ -681,7 +681,7 @@
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div class="folderImage">
-							<img src="AJXP_THEME_FOLDER/images/mimes/64/#{icon}" height="64" width="64">
+							<img src="AJXP_IMAGES_FOLDER/mimes/64/#{icon}" height="64" width="64">
 						</div>
 						<b>#{name_string}</b> : #{text}
 					</div>
@@ -694,7 +694,7 @@
 				<html><![CDATA[
 					<div style="padding:10px;">
 						<div class="folderImage">
-							<img src="AJXP_THEME_FOLDER/images/mimes/64/admin.png" height="64" width="64">
+							<img src="AJXP_IMAGES_FOLDER/mimes/64/admin.png" height="64" width="64">
 						</div>
 					</div>
 				]]></html>

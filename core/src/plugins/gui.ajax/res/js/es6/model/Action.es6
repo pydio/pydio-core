@@ -29,7 +29,7 @@ class Action extends Observable{
 	 */
 	constructor(){
         super();
-        this.__DEFAULT_ICON_PATH = "/images/actions/ICON_SIZE";
+        this.__DEFAULT_ICON_PATH = "actions/ICON_SIZE";
 		this.options = LangUtils.objectMerge({
 			name:'',
 			src:'',

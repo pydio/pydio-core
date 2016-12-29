@@ -85,8 +85,6 @@ foreach ($lines as $line){
     <script type="text/javascript">
         if(window.React) React.initializeTouchEvents(true);
         document.observe("ajaxplorer:before_gui_load", function(e){
-            ajaxplorer.currentThemeUsesIconFonts = true;
-            pydio.Parameters.set('currentThemeUsesIconFonts', true);
             document.documentElement.className += " ajxp_theme_orbit";
         });
     </script>

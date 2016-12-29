@@ -13,7 +13,7 @@
                 <span class="header_label"></span>
 			</div>
 			<div id="roleTabulator">
-                <div class="action_bar"><a href="#" onclick="return false;" class="disabled icon-save" id="saveButton" onclick="return false;"><img src="AJXP_THEME_FOLDER/images/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a></div>
+                <div class="action_bar"><a href="#" onclick="return false;" class="disabled icon-save" id="saveButton" onclick="return false;"><img src="AJXP_IMAGES_FOLDER/actions/22/filesave.png" width="22" height="22" alt="AJXP_MESSAGE[53]" border="0"><br><span message_id="53">AJXP_MESSAGE[53]</span></a></div>
 			    <ul class="tabrow">
                     <li class="selected" data-PaneID="pane-infos"><i class="icon-info-sign"></i> <span>AJXP_MESSAGE[ajxp_role_editor.3]</span></li>
                     <li class="" data-PaneID="pane-acls"><i class="icon-lock"></i> <span>AJXP_MESSAGE[ajxp_role_editor.4]</span></li>

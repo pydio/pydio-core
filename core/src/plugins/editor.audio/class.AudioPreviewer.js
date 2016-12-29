@@ -64,12 +64,12 @@ Class.create("AudioPreviewer", AbstractEditor, {
 			}			
 			return div;
 		}else{
-			return new Element('img', {src:resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64),align:"absmiddle"});
+			return new Element('img', {src:ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64),align:"absmiddle"});
 		}
 	},
 	
 	getThumbnailSource : function(ajxpNode){
-		return resolveImageSource(ajxpNode.getIcon(),'/images/mimes/ICON_SIZE',64);
+		return ResourcesManager.resolveImageSource(ajxpNode.getIcon(),'mimes/ICON_SIZE',64);
 	},
 	
 	createFolderPlayer : function(ajxpNode){

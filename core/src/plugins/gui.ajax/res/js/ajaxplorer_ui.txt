@@ -34,7 +34,6 @@ js/ui/prototype/class.AjxpSimpleTabs.js
 js/ui/prototype/class.RepositorySelect.js
 js/ui/prototype/class.RepositorySimpleLabel.js
 js/ui/prototype/class.Breadcrumb.js
-js/ui/prototype/class.LocationBar.js
 js/ui/prototype/class.UserWidget.js
 js/ui/prototype/class.LogoWidget.js
 js/ui/prototype/class.AjxpAutoCompleter.js

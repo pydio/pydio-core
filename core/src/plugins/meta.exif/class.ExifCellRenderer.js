@@ -46,10 +46,8 @@ Class.create("ExifCellRenderer", {
 		split = longiCell.innerHTML.split('--');
 		longiCell.update(split[0]);
 		longiCell.setAttribute("longiDegree", split[1]);
-        var decorator = '<img src="plugins/meta.exif/world.png" style="margin-bottom: 0;">';
-        if(ajaxplorer.currentThemeUsesIconFonts){
-            decorator = '<span class="icon-map-marker" style="font-size: 2em;"></span>';
-        }
+        
+        var decorator = '<span class="icon-map-marker" style="font-size: 2em;"></span>';
 		var button = new Element('div', {
 			className:'fakeUploadButton',
 			style:'padding-top:6px;width:50px;margin-bottom:0px;padding-bottom:3px;text-align:center; font-size: 11px;'

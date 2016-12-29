@@ -62,14 +62,10 @@ Class.create("Modal", {
 		var hString = "<span class=\"titleString\">";
 		if(sIconSrc != "") hString = "<span class=\"titleString\"><img src=\""+sIconSrc.replace('22', '16')+"\" width=\"16\" height=\"16\" align=\"top\"/>&nbsp;";
         var closeBtn;
-        if(window.ajaxplorer.currentThemeUsesIconFonts){
-            if(sIconClass){
-                hString = "<span class=\"titleString\"><span class='"+sIconClass+" ajxp_icon_span'></span>";
-            }
-            closeBtn = '<span id="modalCloseBtn" class="mdi mdi-close" style="cursor:pointer;float:right;"></span>';
-        }else{
-            closeBtn = '<img id="modalCloseBtn" style="cursor:pointer;float:right;margin-top:2px;" src="'+ajxpResourcesFolder+'/images/actions/16/window_close.png" />';
+        if(sIconClass){
+            hString = "<span class=\"titleString\"><span class='"+sIconClass+" ajxp_icon_span'></span>";
         }
+        closeBtn = '<span id="modalCloseBtn" class="mdi mdi-close" style="cursor:pointer;float:right;"></span>';
 
         hString += '<span class="string-only-title">' + sTitle + '</span></span>';
 		this.dialogTitle.update(closeBtn + hString);
@@ -321,7 +317,7 @@ Class.create("Modal", {
 			return;
 		}
 		var editorKlass = editorData.editorClass;
-		this.prepareHeader(editorData.text, resolveImageSource(editorData.icon, '/images/actions/ICON_SIZE', 16), editorData.icon_class);
+		this.prepareHeader(editorData.text, ResourcesManager.resolveImageSource(editorData.icon, 'actions/ICON_SIZE', 16), editorData.icon_class);
 		var loadFunc = function(oForm){			
 			if(typeof(editorKlass) == "string"){
 				pydio.getController().editor = eval('new '+editorKlass+'(oForm, {editorData:editorData, context:modal})');
@@ -574,7 +570,6 @@ Class.create("Modal", {
 		var okButton = new Element('input', {
 			type:'submit',
 			name:(bOkButtonOnly ? (bOkButtonOnly =='close' ? 'close' :'ok') :'ok'),
-			//src:ajxpResourcesFolder+'/images/actions/22/'+(bOkButtonOnly?(bOkButtonOnly =='close' ? 'dialog_close' :'dialog_ok_apply'):(useNextButton?'forward':'dialog_ok_apply'))+'.png',
 			height:22,
 			width:22,
 			value:MessageHash[(bOkButtonOnly ? (bOkButtonOnly =='close' ? 49 : 48) : 48)]});
@@ -588,7 +583,6 @@ Class.create("Modal", {
 				name:"can",
 				height:22,
 				width:22,
-				//src:ajxpResourcesFolder+'/images/actions/22/dialog_close.png',
 				value:MessageHash[49],
 				className:"dialogButton"
 			});

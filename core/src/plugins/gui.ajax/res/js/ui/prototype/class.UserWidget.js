@@ -93,7 +93,7 @@ Class.create("UserWidget", {
                     label = '<i>' + img + displayName + '</i>';
                 }
 				var icon = this.options.iconClass || "icon-reorder";
-				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="'+icon+'"></span> '+label+' </div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0 5px 5px 0;border-radius: 0 5px 5px 0;border-left-style:none; border-width:1px;"><img width="16" height="16" style="height: 6px; width: 10px; margin-top: 9px; margin-left: 3px; margin-right: 3px;" ajxp_message_title="189" title="'+MessageHash[189]+'" src="'+ajxpResourcesFolder+'/images/arrow_down.png"></div>';
+				logging_string = '<div class="user_widget_label '+(img?'withImage':'')+'"><span class="'+icon+'"></span> '+label+' </div><div class="inlineBarButtonLeft" style="-moz-border-radius: 0 5px 5px 0;border-radius: 0 5px 5px 0;border-left-style:none; border-width:1px;"></div>';
 				this.element.removeClassName('disabled');
 				if(!oUser.lock && oUser.getPreference('lang') != null && oUser.getPreference('lang') != "" && oUser.getPreference('lang') != ajaxplorer.currentLanguage)
 				{
@@ -135,7 +135,7 @@ Class.create("UserWidget", {
 				name:action.getKeyedText(),
                 action_id:action.options.name,
 				alt:action.options.title,
-				image:resolveImageSource(action.options.src, '/images/actions/ICON_SIZE', 16),
+				image:ResourcesManager.resolveImageSource(action.options.src, 'actions/ICON_SIZE', 16),
                 icon_class:action.options.icon_class,
 				callback:function(e){this.apply();}.bind(action)
 			});

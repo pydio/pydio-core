@@ -52,7 +52,6 @@
             "SERVER_PREFIX_URI": "../../"
         };
         document.observe("ajaxplorer:before_gui_load", function (e) {
-            ajaxplorer.currentThemeUsesIconFonts = true;
             document.documentElement.className += " ajxp_theme_vision";
         });
         window.ajxpBootstrap = new AjxpBootstrap(startParameters);

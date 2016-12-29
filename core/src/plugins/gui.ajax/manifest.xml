@@ -22,11 +22,11 @@
                     editable="true"
                     uploadAction="store_binary_temp"
                     loadAction="get_global_binary_param"
-                    defaultImage="AJXP_THEME_FOLDER/images/LoginBoxLogo.png"
+                    defaultImage="AJXP_IMAGES_FOLDER/LoginBoxLogo.png"
                     mandatory="false"
                     expose="true"
                 />
-        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_THEME_FOLDER/images/LoginBoxLogo.png" mandatory="false" expose="true"/>
+        <global_param name="CUSTOM_ICON" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Path (Legacy)]" description="CONF_MESSAGE[URI to a custom image to be used as start up logo]" default="AJXP_IMAGES_FOLDER/LoginBoxLogo.png" mandatory="false" expose="true"/>
         <global_param name="CUSTOM_ICON_WIDTH" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Width]" description="CONF_MESSAGE[Width of the custom image (by default 35px)]" mandatory="false" default="250px"/>
         <global_param name="CUSTOM_ICON_HEIGHT" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Icon Height]" description="CONF_MESSAGE[Height of the custom icon (with the px mention)]" mandatory="false" default="120px"/>
         <global_param name="CUSTOM_FONT_SIZE" group="CONF_MESSAGE[Login Screen]" type="string" label="CONF_MESSAGE[Title Font Size]" description="CONF_MESSAGE[Font sized used for the title in the start up screen]" mandatory="false" default=""/>
@@ -34,7 +34,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/PydioLogo250.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/PydioLogo250.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_TITLE" group="CONF_MESSAGE[Top Toolbar]" type="string" label="CONF_MESSAGE[Title]" description="CONF_MESSAGE[Append a title to the image logo]" mandatory="false" default="" expose="true"/>
@@ -42,7 +42,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/white_logo.png"
+                      defaultImage="AJXP_IMAGES_FOLDER/white_logo.png"
                       expose="true"
                 />
         <global_param name="CUSTOM_TOP_LOGO_H" group="CONF_MESSAGE[Top Toolbar]" type="integer" label="CONF_MESSAGE[Logo Height]" description="CONF_MESSAGE[Manually set a logo height]" mandatory="false" default="39" expose="true"/>
@@ -59,7 +59,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/01.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/01.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -71,7 +71,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -83,7 +83,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -95,7 +95,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/04.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/04.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_4" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -107,7 +107,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_5" group="CONF_MESSAGE[Page Background Images]" type="select"
@@ -131,7 +131,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03-mobile.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03-mobile.jpg"
                       expose="true"
                 />
 
@@ -144,7 +144,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/02.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/02.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_1" group="CONF_MESSAGE[Minisite]" type="select"
@@ -155,7 +155,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/03.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/03.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_2" group="CONF_MESSAGE[Minisite]" type="select"
@@ -165,7 +165,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="AJXP_THEME_FOLDER/images/hires-photos/05.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/05.jpg"
                       expose="true"
                 />
         <global_param name="CUSTOM_SHAREPAGE_BACKGROUND_ATTRIBUTES_3" group="CONF_MESSAGE[Minisite]" type="select"
@@ -212,17 +212,6 @@
                 </div>
 			]]></template>
             <template name="widget_orbit" element="ajxp_widget" position="top" theme="orbit"><![CDATA[
-				<div id="toolbars">
-					<div>
-						<div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"defaultIconSize":16,"defaultStyle":"icon_text","styles":{"icons_only":"Icons Only","icon_text":"Icons and Text","text_only":"Text only"},"stylesImgSizes":{"icons_only":22,"icon_text":16,"text_only":16},"stylesBarSizes":{"icons_only":40,"icon_text":51,"text_only":30}}' class="soft_css_gradient"></div>
-						<div id="locationbar_cont" class="css_gradient">
-							<div style="height: 100%;" class="separator"></div>
-							<div style="padding-top : 5px;">
-								<div id="locationBar" ajxpClass="LocationBar" ajxpOptions='{"flexTo":"locationbar_cont"}'></div>
-							</div>
-						</div>
-					</div>
-				</div>
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>
 				</div>

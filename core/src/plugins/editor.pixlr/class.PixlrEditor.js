@@ -100,7 +100,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 		if(openMessage){
 			waiter.update('<br><br><br>Please wait while opening Pixlr editor...<br>');
 		}
-		waiter.insert(new Element("img", {src:ajxpResourcesFolder+'/images/loadingImage.gif'}));
+		waiter.insert(new Element("img", {src:ResourcesManager.resolveImageSource('loadingImage.gif')}));
 		$(this.container).select("#element_overlay")[0].insert(waiter);
 		this.loading = true;
 	},

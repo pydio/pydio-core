@@ -97,7 +97,7 @@ Class.create("Connexion", {
                 id:'AjxpConnexion-loader',
                 style:'position:absolute;top:2px;right:2px;z-index:40000;display:none;'});
             var img = new Element("img", {
-                src:ajxpResourcesFolder+"/images/loadingImage.gif"
+                src:ResourcesManager.resolveImageSource('loadingImage.gif')
             });
             span.insert(img);
             $$('body')[0].insert(span);

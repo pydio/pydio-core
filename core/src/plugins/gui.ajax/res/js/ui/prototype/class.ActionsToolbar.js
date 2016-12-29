@@ -307,13 +307,13 @@ Class.create("ActionsToolbar", AjxpPane, {
             icSize = this.options.stylesImgSizes[this.style];
         }
         var img;
-        if(action.options.icon_class && window.ajaxplorer.currentThemeUsesIconFonts){
+        if(action.options.icon_class){
             img = new Element('span', {
                 className:action.options.icon_class + ' ajxp_icon_span',
                 title:action.options.title
             });
         }else{
-            var imgPath = resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, icSize);
+            var imgPath = ResourcesManager.resolveImageSource(action.options.src,action.__DEFAULT_ICON_PATH, icSize);
             img = new Element('img', {
                 id:action.options.name +'_button_icon',
                 className:'actionbar_button_icon',
@@ -331,18 +331,7 @@ Class.create("ActionsToolbar", AjxpPane, {
 		//this.elements.push(this.button);
 		if(action.options.subMenu){
 			this.buildActionBarSubMenu(button, action);
-            if(window.ajaxplorer.currentThemeUsesIconFonts){
-
-                button.insert(new Element('span', {className:'icon-caret-down ajxp_icon_arrow'}));
-
-            }else{
-                button.setStyle({position:'relative'});
-                var arrowDiv = new Element('div', {className:'actionbar_arrow_div'});
-                arrowDiv.insert(new Element('img',{src:ajxpResourcesFolder+'/images/arrow_down.png',height:6,width:10,border:0}));
-                arrowDiv.imgRef = img;
-                button.insert(arrowDiv);
-            }
-
+            button.insert(new Element('span', {className:'icon-caret-down ajxp_icon_arrow'}));
 		}
         button.hideButton = function(){
             this.hide();
@@ -419,13 +408,9 @@ Class.create("ActionsToolbar", AjxpPane, {
             var previousIconClass = data['previous_class'];
             var iconClass = data['new_class'];
             var iconSrc = data['new_src'];
-            if(window.ajaxplorer.currentThemeUsesIconFonts){
-                if(iconClass && button.down('span.ajxp_icon_span')){
-                    button.down('span.ajxp_icon_span').removeClassName(previousIconClass);
-                    button.down('span.ajxp_icon_span').addClassName(iconClass);
-                }
-            }else if(button.down('img.actionbar_button_icon')){
-                button.down('img.actionbar_button_icon').src = resolveImageSource(iconSrc,action.__DEFAULT_ICON_PATH, 22);
+            if(iconClass && button.down('span.ajxp_icon_span')){
+                button.down('span.ajxp_icon_span').removeClassName(previousIconClass);
+                button.down('span.ajxp_icon_span').addClassName(iconClass);
             }
         }.bind(this));
 		action.observe("submenu_active", function(submenuItem){
@@ -436,7 +421,7 @@ Class.create("ActionsToolbar", AjxpPane, {
             if(this.options.stylesImgSizes && this.style && this.options.stylesImgSizes[this.style]){
                 icSize = this.options.stylesImgSizes[this.style];
             }
-			images[0].src = resolveImageSource(submenuItem.src, action.__DEFAULT_ICON_PATH,icSize);
+			images[0].src = ResourcesManager.resolveImageSource(submenuItem.src, action.__DEFAULT_ICON_PATH,icSize);
 			action.options.src = submenuItem.src;
 		}.bind(this));
         action.observe("remove", function(){
@@ -505,7 +490,7 @@ Class.create("ActionsToolbar", AjxpPane, {
             items.push({
                 name: this.options.styles[k],
                 alt: k,
-                image: resolveImageSource((k == this.style?'button_ok.png':'transp.png'),Action.prototype.__DEFAULT_ICON_PATH, 16),
+                image: ResourcesManager.resolveImageSource((k == this.style?'button_ok.png':'transp.png'),Action.prototype.__DEFAULT_ICON_PATH, 16),
                 isDefault: (k == this.style),
                 callback: function(){ oThis.switchStyle(this); }
             });
@@ -535,7 +520,7 @@ Class.create("ActionsToolbar", AjxpPane, {
             this.element.parentNode.addClassName(style);
             if(this.options.stylesImgSizes && this.options.stylesImgSizes[style]){
                 this.element.select("img.actionbar_button_icon").each(function(img){
-                    img.src = resolveImageSource(img.getAttribute("data-action-src"),Action.prototype.__DEFAULT_ICON_PATH, this.options.stylesImgSizes[style]);
+                    img.src = ResourcesManager.resolveImageSource(img.getAttribute("data-action-src"),Action.prototype.__DEFAULT_ICON_PATH, this.options.stylesImgSizes[style]);
                 }.bind(this));
             }
             if(parent.ajxpPaneObject) parent.ajxpPaneObject.resize();

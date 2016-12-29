@@ -101,7 +101,7 @@ Class.create("PluginEditor", AbstractEditor, {
         $super(node);
         this.pluginId = getBaseName(node.getMetadata().get("plugin_id"));
         this.updateTitle(node.getMetadata().get("text"));
-        var icon = resolveImageSource(node.getIcon(), "/images/mimes/64");
+        var icon = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/64");
         this.element.down("span.header_label").setStyle(
             {
                 backgroundImage:"url('"+icon+"')",

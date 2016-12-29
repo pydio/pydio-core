@@ -85,33 +85,10 @@ function getUrlFromBase(){
     return $$('base')[0].href;
 }
 
-
-function addImageLibrary(aliasName, aliasPath){		
-	if(!window.AjxpImageLibraries) window.AjxpImageLibraries = {};
-	window.AjxpImageLibraries[aliasName] = aliasPath;
-}
-
-function resolveImageSource(src, defaultPath, size){
-	if(!src) return "";
-	if(!window.AjxpImageLibraries || src.indexOf("/")==-1){
-		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
-	}
-	var radic = src.substring(0,src.indexOf("/"));
-	if(window.AjxpImageLibraries[radic]){
-		src = src.replace(radic, window.AjxpImageLibraries[radic]);
-        if(ajxpBootstrap.parameters.get("SERVER_PREFIX_URI")){
-            src = ajxpBootstrap.parameters.get("SERVER_PREFIX_URI") + src;
-        }
-		return (size?src.replace("ICON_SIZE", size):src);
-	}else{
-		return ajxpResourcesFolder + (defaultPath?(size?defaultPath.replace("ICON_SIZE", size):defaultPath):'')+ '/' +  src;
-	}
-}
-
 function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback, skipIconResolution, addArrow){
 	var button = new Element("div", {id:id, className:cssClass});
 	var img = new Element("img", {
-		src:(skipIconResolution?iconSrc:resolveImageSource(iconSrc, '/images/actions/ICON_SIZE', iconSize)), 
+		src:(skipIconResolution?iconSrc:ResourcesManager.resolveImageSource(iconSrc, 'actions/ICON_SIZE', iconSize)),
 		width:iconSize,
 		height:iconSize,
 		title:MessageHash[messageTitle],
@@ -129,7 +106,7 @@ function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, 
     if(addArrow){
         button.setStyle({position:'relative'});
         var arrowImg = new Element('img', {
-            src: resolveImageSource('arrow_down.png', '/images'),
+            src: ResourcesManager.resolveImageSource('arrow_down.png', ''),
             width:10,
             height:6,
             className:'simple_button_arrow'
