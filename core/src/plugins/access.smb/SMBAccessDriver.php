@@ -127,7 +127,7 @@ class SMBAccessDriver extends FsAccessDriver
      */
     public function isWriteable(AJXP_Node $node)
     {
-        $dir = $node->getPath();
+        $dir = $node->getUrl();
         if(substr_count($dir, '/') <= 3) $rc = true;
     	else $rc = is_writable($dir);
     	return $rc;

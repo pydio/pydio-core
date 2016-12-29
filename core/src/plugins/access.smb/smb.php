@@ -272,7 +272,7 @@ class smb
                                 : array();
                             break;
                         case 'error':
-                            if (strstr($regs[1], "NO_SUCH_FILE") == 0) {
+                            if (strstr($regs[1], "NO_SUCH_FILE") !== false) {
                                 return "NOT_FOUND";
                             }
                             trigger_error($regs[1], E_USER_ERROR);
