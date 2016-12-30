@@ -57,7 +57,7 @@
             if(hl) children.push(hl);
 
             return (
-                <ReactMFB.Menu effect="slidein" position="br" icon="mdi mdi-file" ref="menu">
+                <ReactMFB.Menu effect="slidein" position="tl" icon="mdi mdi-file" ref="menu">
                     <ReactMFB.MainButton iconResting="mdi mdi-plus" iconActive="mdi mdi-close"/>
                     {children}
                 </ReactMFB.Menu>

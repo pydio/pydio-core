@@ -58,7 +58,7 @@
 			</action>
 		</actions>
 		<client_configs>
-			<template theme="orbit" name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
+			<template name="api_viewer" element="ajxp_api_desktop" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
 					<div id="vertical_splitter" style="background-color: #fff;" ajxpClass="Splitter" ajxpOptions='{"direction": "vertical", "initA": 700, "minA":50,"fit":"height","fitParent":"browser"}'>
 						<div id="sidebar_splitter" style="float:left; overflow:hidden;" ajxpClass="Splitter" ajxpOptions='{"direction":"vertical","initA":150,"maxA":300}'>

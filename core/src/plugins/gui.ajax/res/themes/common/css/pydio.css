@@ -5600,7 +5600,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel div.infoPanelAllMetadata > div,
 .form-ip_content_info_panel div.infoPanelAllMetadata > div {
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #dddddd;
   padding: 6px 16px;
 }
 #info_panel div.infoPanelAllMetadata > div#info_panel_primary,
@@ -6700,6 +6700,11 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /**
  * Apply this class to the html tag when developing the slide-in button
  */
+.mfb-component--tl {
+  position: absolute !important;
+  top: -13px;
+  left: -20px;
+}
 .mfb-component--br {
   position: absolute !important;
 }

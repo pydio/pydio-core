@@ -1011,7 +1011,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" theme="orbit" primary="true">
+			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -1048,7 +1048,7 @@
 				</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon,fonticon,formated_date,ajxp_description" theme="orbit">
+			<infoPanel mime="generic_dir" attributes="basename,icon,fonticon,formated_date,ajxp_description">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
@@ -1075,14 +1075,14 @@
                     </div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="ajxp_root_node" attributes="" theme="orbit">
+			<infoPanel mime="ajxp_root_node" attributes="">
 				<html><![CDATA[
                     <div class="infoPanelAllMetadata">
                         <div id="info_panel_primary"></div>
                     </div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_multiple" attributes="preview_simple" theme="orbit">
+			<infoPanel mime="generic_multiple" attributes="preview_simple">
 				<html><![CDATA[
                     <div class="infoPanelAllMetadata">
                         <div id="info_panel_primary" class="info_panel_primary_multiple">

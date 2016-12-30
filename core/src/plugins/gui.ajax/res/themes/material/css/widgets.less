@@ -1,0 +1,52 @@
+#workspace_toolbar{
+  .primaryColorPane;
+  display: flex;
+  #breadcrumb{
+    flex: 1;
+  }
+}
+#files_list_header{
+  .primaryColorPane;
+  box-shadow: @reactBoxShadowDepthHalf;
+  a{
+    color: @applicationPrimaryFontColor;
+  }
+}
+#browser {
+  background-color: white;
+  #cpane_container #cpane_tabs #content_pane.class-FilesList{
+    background-color: transparent;
+    padding-top: 5px;
+  }
+  #right_split{
+    .primaryLightPane;
+    background-color: lighten(@applicationPrimaryLight, 2);
+    #ipanel_header{
+      border-left: 1px solid lighten(@applicationPrimaryColor, 10);
+      box-sizing: border-box;
+      padding: 10px;
+      .primaryColorPane;
+      height: 42px;
+      box-shadow: @reactBoxShadowDepthHalf;
+      z-index: 10;
+    }
+    #info_panel{
+      border-left: 1px solid @infopanel_section_separator_color;
+      .panelContent{
+        background-color: transparent;
+      }
+      div.infoPanelBasenameTitle{
+        display: none;
+      }
+      .infoPanelImagePreview{
+        margin: 0;
+        img.thumbnail_iconlike_shadow{
+          box-shadow: 0 0 0;
+        }
+      }
+    }
+    div.infoPanelLabel, td.infoPanelLabel{
+      padding-bottom: 5px;
+    }
+  }
+}

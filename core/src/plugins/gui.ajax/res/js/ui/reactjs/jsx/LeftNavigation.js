@@ -180,6 +180,99 @@
         }
     });
 
+    var FoldersTree = React.createClass({
+
+        propTypes: {
+            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+            dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
+            onNodeSelected: React.PropTypes.func
+        },
+
+        nodeObserver: function(){
+            let r = this.props.dataModel.getRootNode();
+            if(!r.isLoaded()) {
+                r.observeOnce("loaded", function(){
+                    this.forceUpdate();
+                }.bind(this));
+            }else{
+                this.forceUpdate();
+            }
+        },
+
+        componentDidMount: function(){
+            let dm = this.props.dataModel;
+            this._dmObs = this.nodeObserver.bind(this);
+            dm.observe("context_changed", this._dmObs);
+            dm.observe("root_node_changed", this._dmObs);
+            this.nodeObserver();
+        },
+
+        componentWillUnmount: function(){
+            if(this._dmObs){
+                let dm = this.props.dataModel;
+                dm.stopObserving("context_changed", this._dmObs);
+                dm.stopObserving("root_node_changed", this._dmObs);
+            }
+        },
+
+        treeNodeSelected: function(n){
+            if(this.props.onNodeSelected){
+                this.props.onNodeSelected(n);
+            }else{
+                this.props.pydio.goTo(n);
+            }
+        },
+
+        nodeIsSelected: function(n){
+            return n === this.props.dataModel.getContextNode();
+        },
+
+        render: function(){
+            return (
+                <ReactPydio.SimpleTree
+                    onNodeSelect={this.treeNodeSelected}
+                    nodeIsSelected={this.nodeIsSelected}
+                    dataModel={this.props.dataModel}
+                    node={this.props.dataModel.getRootNode()}
+                    showRoot={false}
+                    className="folders-tree"
+                />
+            );
+        }
+
+    });
+
+    var UserWidget = React.createClass({
+
+        render: function(){
+            return (
+                <div className="user-widget">
+                    John Doe
+                </div>
+            );
+        }
+    });
+
+    var PinnedLeftPanel = React.createClass({
+
+        propTypes: {
+            pydio: React.PropTypes.instanceOf(Pydio).isRequired
+        },
+
+        render: function(){
+            return (
+            <div className="left-panel">
+                <UserWidget pydio={this.props.pydio}/>
+                <UserWorkspacesList
+                    pydio={this.props.pydio}
+                    workspaces={this.props.pydio.user.getRepositoriesList()}
+                    showTreeForWorkspace={this.props.pydio.user.activeRepository}
+                />
+            </div>
+            );
+        }
+    });
+
     class AlertTask extends PydioTasks.Task{
 
         constructor(label, statusMessage){
@@ -423,6 +516,7 @@
         propTypes:{
             pydio:React.PropTypes.instanceOf(Pydio),
             workspaces:React.PropTypes.instanceOf(Map),
+            showTreeForWorkspace:React.PropTypes.string,
             onHoverLink:React.PropTypes.func,
             onOutLink:React.PropTypes.func
         },
@@ -446,6 +540,7 @@
                         {...this.props}
                         key={key}
                         workspace={object}
+                        showFoldersTree={this.props.showTreeForWorkspace && this.props.showTreeForWorkspace===key}
                     />
                 );
                 if (object.getAccessType() == "inbox") {
@@ -513,6 +608,7 @@
         propTypes:{
             pydio:React.PropTypes.instanceOf(Pydio).isRequired,
             workspace:React.PropTypes.instanceOf(Repository).isRequired,
+            showFoldersTree:React.PropTypes.bool,
             onHoverLink:React.PropTypes.func,
             onOutLink:React.PropTypes.func
         },
@@ -657,7 +753,7 @@
                 additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleRemoveTplBasedWorkspace} title={messages['423']}/>;
             }
 
-            return (
+            let wsBlock = (
                 <div
                     className={currentClass}
                     onClick={onClick}
@@ -671,6 +767,21 @@
                     {additionalAction}
                 </div>
             );
+
+            if(this.props.showFoldersTree){
+                return (
+                    <div>
+                        {wsBlock}
+                        <FoldersTree
+                            pydio={this.props.pydio}
+                            dataModel={this.props.pydio.getContextHolder()}
+                        />
+                    </div>
+                )
+            }else{
+                return wsBlock;
+            }
+
         }
 
     });
@@ -738,8 +849,10 @@
     var ns = global.LeftNavigation || {};
     if(global.ReactDND){
         ns.Panel = ReactDND.DragDropContext(FakeDndBackend)(LeftPanel);
+        ns.PinnedLeftPanel = ReactDND.DragDropContext(FakeDndBackend)(PinnedLeftPanel);
     }else{
         ns.Panel = LeftPanel;
+        ns.PinnedLeftPanel = PinnedLeftPanel;
     }
     ns.UserWorkspacesList = UserWorkspacesList;
     global.LeftNavigation=ns;

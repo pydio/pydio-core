@@ -92,7 +92,7 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" theme="orbit" primary="true">
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" primary="true">
                     <messages>
                         <message key="name_string" id="133"/>
                         <message key="size_string" id="127"/>

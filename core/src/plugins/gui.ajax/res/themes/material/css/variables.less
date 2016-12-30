@@ -1,2 +1,41 @@
 @applicationPrimaryColor:#546e7a;
-@applicationSecondaryColor:#ff5722;
+@applicationPrimaryFontColor: white;
+
+@applicationPrimaryLight:#f5f6f9;
+@applicationPrimaryLightFont:#546E7A;
+
+
+@applicationSecondaryColor:#ffeb3b;
+@applicationSecondaryFontColor:white;
+
+@selectionMainTint:#ffe0b2;
+
+.primaryColorPane{
+  background-color: @applicationPrimaryColor;
+  color: @applicationPrimaryFontColor;
+}
+
+.secondaryColorPane{
+  background-color: @applicationSecondaryColor;
+  color: @applicationSecondaryFontColor;
+}
+
+.primaryLightPane{
+  background-color: @applicationPrimaryLight;
+  color: @applicationPrimaryLightFont;
+}
+
+@workspacesToolbarHeight: 68px;
+
+@leftpanel_background_color:@applicationPrimaryLight;
+@leftpanel_text_color:@applicationPrimaryLightFont;
+
+@infopanel_main_text_color:@applicationPrimaryLightFont;
+@infopanel_section_title_color:darken(@applicationPrimaryLightFont, 5);
+@infopanel_labels_color:lighten(@applicationPrimaryLightFont, 30);
+@infopanel_values_color:darken(@applicationPrimaryLightFont, 15);
+@infopanel_quick_button_border:1px dotted @applicationPrimaryLightFont;
+@infopanel_fetchedpane_text_color: @applicationPrimaryLightFont;
+@infopanel_fetchedpane_legend_color: @applicationPrimaryLightFont;
+
+@infopanel_section_separator_color: darken(@applicationPrimaryLight, 5);

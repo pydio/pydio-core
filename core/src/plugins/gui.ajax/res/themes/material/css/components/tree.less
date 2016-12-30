@@ -1,0 +1,31 @@
+.folders-tree{
+  &, ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  div.tree-item{
+
+    div.tree-item-label{
+      padding: 10px 6px;
+      cursor: pointer;
+      .tree-icon{
+        padding: 0 8px;
+        &.icon-angle-right, &.icon-angle-down{
+          padding-right: 0;
+        }
+      }
+    }
+    &.mui-is-selected{
+      div.tree-item-label{
+        font-weight: 500;
+        color: darken(@applicationPrimaryLightFont, 15);
+      }
+    }
+    &:hover{
+      div.tree-item-label{
+        font-weight: 500;
+      }
+    }
+  }
+}

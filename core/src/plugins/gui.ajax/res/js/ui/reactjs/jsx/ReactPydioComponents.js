@@ -297,6 +297,8 @@
             node:React.PropTypes.instanceOf(AjxpNode),
             dataModel:React.PropTypes.instanceOf(PydioDataModel),
             forceLabel:React.PropTypes.string,
+            // Optional currently selected detection
+            nodeIsSelected: React.PropTypes.func,
             // Optional checkboxes
             checkboxes:React.PropTypes.array,
             checkboxesValues:React.PropTypes.object,
@@ -360,6 +362,10 @@
             ev.preventDefault();
             ev.stopPropagation();
         },
+        nodeIsSelected: function(n){
+            if(this.props.nodeIsSelected) return this.props.nodeIsSelected(n);
+            else return (this.props.dataModel.getSelectedNodes().indexOf(n) !== -1);
+        },
         render: function () {
             var hasFolderChildrens = this.state.children.length?true:false;
             var hasChildren = hasFolderChildrens ? (
@@ -370,7 +376,7 @@
                     }
                 </span>
             ):<span className="tree-icon icon-angle-right"></span>;
-            var isSelected = (this.props.dataModel.getSelectedNodes().indexOf(this.props.node) !== -1 ? 'mui-menu-item mui-is-selected' : 'mui-menu-item');
+            var isSelected = (this.nodeIsSelected(this.props.node) ? 'mui-menu-item mui-is-selected' : 'mui-menu-item');
             var selfLabel;
             if(!this.props.childrenOnly){
                 if(this.props.canDrop && this.props.isOverCurrent){
@@ -414,7 +420,7 @@
                     <div className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={{paddingLeft:this.props.depth*20}}>
                         <div className="tree-item-label" onClick={this.onNodeSelect} title={this.props.node.getLabel()}
                             data-id={this.props.node.getPath()}>
-                        {hasChildren} <span className="tree-icon icon-folder-close"></span> {this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
+                        {hasChildren}<span className="tree-icon icon-folder-close"></span>{this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
                         </div>
                         {boxes}
                     </div>
@@ -431,6 +437,7 @@
                             dataModel={this.props.dataModel}
                             node={child}
                             onNodeSelect={this.props.onNodeSelect}
+                            nodeIsSelected={this.props.nodeIsSelected}
                             collapse={this.props.collapse}
                             depth={this.props.depth+1}
                             checkboxes={this.props.checkboxes}
@@ -499,6 +506,8 @@
             initialSelectionModel:React.PropTypes.array,
             onSelectionChange:React.PropTypes.func,
             forceExpand:React.PropTypes.bool,
+            // Optional currently selected detection
+            nodeIsSelected: React.PropTypes.func,
             // Optional checkboxes
             checkboxes:React.PropTypes.array,
             checkboxesValues:React.PropTypes.object,
@@ -514,7 +523,11 @@
         },
 
         onNodeSelect: function(node){
-            this.props.dataModel.setSelectedNodes([node]);
+            if(this.props.onNodeSelect){
+                this.props.onNodeSelect(node);
+            }else{
+                this.props.dataModel.setSelectedNodes([node]);
+            }
         },
 
         render: function(){
@@ -526,6 +539,7 @@
                         node={this.props.node?this.props.node:this.props.dataModel.getRootNode()}
                         dataModel={this.props.dataModel}
                         onNodeSelect={this.onNodeSelect}
+                        nodeIsSelected={this.props.nodeIsSelected}
                         forceLabel={this.props.rootLabel}
                         checkboxes={this.props.checkboxes}
                         checkboxesValues={this.props.checkboxesValues}

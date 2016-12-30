@@ -44,7 +44,7 @@
 					window.ajxpMobile = true;
 				</script>
 			]]></template>
-            <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}' theme="orbit"><![CDATA[
+            <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'><![CDATA[
             <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
                 <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>
                     <div id="navigation_pane" style="position:relative;" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}' >
@@ -76,7 +76,7 @@
             </div>
         ]]></template_part>
 
-            <template_part ajxpClass="FilesList" ajxpId="content_pane" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' theme="orbit"><![CDATA[
+            <template_part ajxpClass="FilesList" ajxpId="content_pane" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}'><![CDATA[
                 <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"inlineToolbarOptions":{"toolbarsList":["inline"],"unique":true}, "displayMode":"detail", "detailThumbSize": 50 ,"replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"cpane_container", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px", "invisibleSelection":false}' style="border: 1px solid #bbb; border-width:0 1px;"></div>
             ]]></template_part>
             <template element="ajxp_shared_folder" name="minisite_complete" position="bottom"><![CDATA[

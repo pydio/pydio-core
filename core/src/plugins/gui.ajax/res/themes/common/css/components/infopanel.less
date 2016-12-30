@@ -11,6 +11,8 @@
 
 @infopanel_toolbar_buttons_radius:0;
 
+@infopanel_section_separator_color: #ddd;
+
 .form-ip_content_info_panel .panelContent{
   background-color: white !important;
 }
@@ -375,7 +377,7 @@
   }
 
   div.infoPanelAllMetadata > div {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid @infopanel_section_separator_color;
     padding: 6px 16px;
     &#info_panel_primary{
       padding-top: 12px;

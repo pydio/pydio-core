@@ -44,7 +44,7 @@
             </action>
         </actions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}' theme="orbit"><![CDATA[
+            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}'><![CDATA[
                 <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
 			]]></template_part>
         </client_configs>

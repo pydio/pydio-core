@@ -37,7 +37,7 @@
 				    }
 				</style>
 			]]></template>
-			<template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
+			<template name="main_orbit" element="ajxp_desktop" position="top"><![CDATA[
                 <div id="actions_log" style="overflow: hidden;font-size: 17px;height: 128px;border-radius: 5px;background-color: #BBB;padding: 3px;"></div>
 			]]></template>
 		</client_configs>

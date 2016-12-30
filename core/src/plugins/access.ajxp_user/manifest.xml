@@ -16,7 +16,7 @@
     </server_settings>
 	<registry_contributions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}' theme="orbit"><![CDATA[
+            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}'><![CDATA[
                 <div id="userdashboard_myparams_title" style="opacity:0;" ajxp_message_id="user_dash.title">
                     <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
                     <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>

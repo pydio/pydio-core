@@ -1,0 +1,21 @@
+.left-panel{
+  top:0;
+  .primaryLightPane;
+  .section-title:first-of-type{
+    border-top:none;
+  }
+  .workspaces {
+    .workspace-entry {
+      .workspace-badge{
+        background-color: lighten(@applicationPrimaryColor, 25);
+      }
+      &.workspace-current{
+        opacity: 1;
+        background-color: @selectionMainTint;
+        .workspace-badge{
+          background-color: @applicationPrimaryColor;
+        }
+      }
+    }
+  }
+}
