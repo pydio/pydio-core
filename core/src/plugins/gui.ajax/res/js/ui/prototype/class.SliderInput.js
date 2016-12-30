@@ -28,7 +28,6 @@ Class.create("SliderInput", {
 	 * @param options Object
 	 */
 	initialize : function(inputElement, options){
-		this.input = $(inputElement);
 		this.options = Object.extend({
 			format : '',
 			axis : 'vertical',
@@ -43,13 +42,13 @@ Class.create("SliderInput", {
 
 		var original = this.options.onSlide;
 		this.options.onSlide = function(value){
-			this.input.value = value;			
+			this.value = value;
 			original(value);
 			this.delay();
 		}.bind(this);
 			
 		if(this.options.sliderValue){
-			this.input.value = this.options.sliderValue;
+			this.value = this.options.sliderValue;
 		}
 		this.buildGui();
 	},
@@ -69,15 +68,9 @@ Class.create("SliderInput", {
 		$(document.body).insert(this.holder);
 		this.slider = new Control.Slider(this.cursor, this.tracker, this.options);
         this.showObserver = this.show.bind(this);
-		if(this.input.getAttribute("type") && this.input.getAttribute("type") == "image" || this.input.nodeName != 'input'){
-			this.input.observe("click", this.showObserver );
-		}else{
-			this.input.observe("focus", this.showObserver );
-		}
         this.docObserver = function(event){
 			var element = Event.findElement(event);
-			if(element.descendantOf && !element.descendantOf(this.holder) && !element.descendantOf(this.input)
-                && element != this.holder && element!=this.input) {
+			if(element.descendantOf && !element.descendantOf(this.holder) && element != this.holder) {
 				this.hide();
 			}
 		}.bind(this);
@@ -87,8 +80,6 @@ Class.create("SliderInput", {
     destroy : function(){
         try{
 
-            this.input.stopObserving("click", this.showObserver);
-            this.input.stopObserving("focus", this.showObserver);
             document.stopObserving("click", this.docObserver);
             this.holder.remove();
 
@@ -106,10 +97,7 @@ Class.create("SliderInput", {
 		if(this.slider){
 			this.slider.setValue(value);
 		}
-		if(this.input){
-			this.input.value = value;
-		}
-
+        this.value = value;
         this.slider.options.onChange = original;
 	},
 	
@@ -117,14 +105,10 @@ Class.create("SliderInput", {
 	 * Show the sub pane
 	 */
 	show : function(anchor){
-        var pos = this.computeAnchorPosition(this.input);
-        if(anchor && !anchor.target){
-            pos = this.computeAnchorPosition(anchor);
-        }
+        var pos = this.computeAnchorPosition(anchor);
 		this.holder.setStyle(pos);
-		this.slider.setValue(parseFloat(this.input.value));
+		this.slider.setValue(parseFloat(this.value));
 		this.holder.show();
-        this.input.addClassName(this.options.anchorActiveClass);
         if(anchor && !anchor.target){
             anchor.addClassName(this.options.anchorActiveClass);
         }
@@ -139,9 +123,6 @@ Class.create("SliderInput", {
 		if(this.timer) {
 			window.clearTimeout(this.timer);
 		}
-		try{this.input.blur();}
-		catch(e){}
-        this.input.removeClassName(this.options.anchorActiveClass);
 	},
 	/**
 	 * Wait until automatically hiding the pane
