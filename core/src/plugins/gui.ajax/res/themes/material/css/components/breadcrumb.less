@@ -8,8 +8,8 @@
     padding: 20px;
   }
 
-  font-size: 18px;
-  line-height: 22px;
+  font-size: 22px;
+  line-height: 24px;
   ul {
     list-style: none;
     margin: 0;
@@ -17,7 +17,7 @@
   }
   em {
     font-style: normal;
-    font-weight: 300;
+    font-weight: 400;
   }
   li {
     display: inline-block;
@@ -25,6 +25,9 @@
       content: "/";
       display: inline-block;
       padding: 0 4px;
+    }
+    &:last-of-type::after{
+      display: none;
     }
   }
   .current {
@@ -35,6 +38,11 @@
       em{
         font-weight: 400;
       }
+    }
+  }
+  i.ajxp-goto{
+    .icon-refresh{
+      font-size: 16px;
     }
   }
   /*

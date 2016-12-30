@@ -1,5 +1,27 @@
 .user-widget{
-  .primaryColorPane;
+  .primaryColorDarkerPane;
   height: 110px;
+  width: 250px;
+  position: fixed;
   box-shadow: @reactBoxShadowDepthHalf;
+  z-index: 1002;
+  .username{
+    padding: 20px 16px;
+    font-size: 22px;
+    line-height: 24px;
+  }
+  .action_bar{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px;
+    a{
+      cursor: pointer;
+      font-size: 16px;
+      background-color: transparent;
+      color: white;
+      padding: 5px 9px;
+    }
+  }
 }

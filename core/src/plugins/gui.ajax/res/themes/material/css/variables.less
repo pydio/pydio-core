@@ -4,14 +4,18 @@
 @applicationPrimaryLight:#f5f6f9;
 @applicationPrimaryLightFont:#546E7A;
 
-
-@applicationSecondaryColor:#ffeb3b;
+@applicationSecondaryColor:#ff9800;
 @applicationSecondaryFontColor:white;
 
-@selectionMainTint:#ffe0b2;
+@selectionMainTint: rgba(0, 150, 136, 0.24);
 
 .primaryColorPane{
   background-color: @applicationPrimaryColor;
+  color: @applicationPrimaryFontColor;
+}
+
+.primaryColorDarkerPane{
+  background-color: darken(@applicationPrimaryColor, 8);
   color: @applicationPrimaryFontColor;
 }
 

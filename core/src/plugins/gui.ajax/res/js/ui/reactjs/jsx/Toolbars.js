@@ -29,7 +29,6 @@
         },
 
         close: function(e){
-            console.log(this.refs.menu);
             this.refs.menu.toggleMenu(e);
         },
 
@@ -60,6 +59,7 @@
                 <ReactMFB.Menu effect="slidein" position="tl" icon="mdi mdi-file" ref="menu">
                     <ReactMFB.MainButton iconResting="mdi mdi-plus" iconActive="mdi mdi-close"/>
                     {children}
+                    <span className="hiddenOverlay"/>
                 </ReactMFB.Menu>
             );
         }

@@ -244,10 +244,34 @@
 
     var UserWidget = React.createClass({
 
+        applyAction: function(actionName){
+            switch (actionName){
+                case 'alerts':
+                    break;
+                case 'home':
+                    this.props.pydio.Controller.fireAction('switch_to_home');
+                    break;
+                case 'cog':
+                    this.props.pydio.Controller.fireAction('switch_to_user_dashboard');
+                    break;
+                case 'logout':
+                    this.props.pydio.Controller.fireAction('logout');
+                    break;
+                default:
+                    break;
+            }
+        },
+
         render: function(){
             return (
                 <div className="user-widget">
-                    John Doe
+                    <div className="username">John Doe</div>
+                    <div className="action_bar">
+                        <a><span className="icon-bell" onClick={this.applyAction.bind(this, 'alerts')}></span></a>
+                        <a><span className="icon-home" onClick={this.applyAction.bind(this, 'home')}></span></a>
+                        <a><span className="icon-cog" onClick={this.applyAction.bind(this, 'cog')}></span></a>
+                        <a><span className="icon-signout" onClick={this.applyAction.bind(this, 'signout')}></span></a>
+                    </div>
                 </div>
             );
         }

@@ -6550,10 +6550,64 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
  * Apply this class to the html tag when developing the slide-in button
  */
 /*# sourceMappingURL=mfb.css.map */
+.mfb-component__button--child {
+  height: 40px;
+  width: 40px;
+  right: 8px;
+}
+.mfb-component__button--child i {
+  font-size: 15px;
+  line-height: 40px;
+}
+[data-mfb-state=open] [data-mfb-label]:after,
+[data-mfb-toggle=hover] [data-mfb-label]:after {
+  background: rgba(0, 0, 0, 0.65);
+  font-weight: 400;
+  opacity: 1;
+}
+[data-mfb-state=open] [data-mfb-label]:hover:after,
+[data-mfb-toggle=hover] [data-mfb-label]:hover:after {
+  opacity: 1;
+}
 .mfb-component--tl {
   position: absolute !important;
-  top: -13px;
-  left: -20px;
+  top: -18px;
+  left: -12px;
+}
+.mfb-component--tl .mfb-component__button--child {
+  right: 4px;
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(1) {
+  -webkit-transform: translateY(70px);
+  transform: translateY(65px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(2) {
+  -webkit-transform: translateY(125px);
+  transform: translateY(125px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(3) {
+  -webkit-transform: translateY(185px);
+  transform: translateY(185px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(4) {
+  -webkit-transform: translateY(245px);
+  transform: translateY(245px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(5) {
+  -webkit-transform: translateY(305px);
+  transform: translateY(305px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(6) {
+  -webkit-transform: translateY(365px);
+  transform: translateY(365px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(7) {
+  -webkit-transform: translateY(425px);
+  transform: translateY(425px);
+}
+.mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(8) {
+  -webkit-transform: translateY(485px);
+  transform: translateY(485px);
 }
 .mfb-component--br {
   position: absolute !important;
@@ -6563,22 +6617,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   color: white;
 }
 .mfb-component--br [data-mfb-label]:after {
-  background: rgba(0, 0, 0, 0.5);
-  font-weight: 400;
-  opacity: 0;
   right: 60px !important;
-}
-.mfb-component--br [data-mfb-label]:hover:after {
-  opacity: 1;
-}
-.mfb-component--br .mfb-component__button--child {
-  height: 40px;
-  width: 40px;
-  right: 8px;
-}
-.mfb-component--br .mfb-component__button--child i {
-  font-size: 15px;
-  line-height: 40px;
 }
 .mfb-component--br.mfb-slidein[data-mfb-state="open"] .mfb-component__list li:nth-child(1) {
   -webkit-transform: translateY(-60px);
