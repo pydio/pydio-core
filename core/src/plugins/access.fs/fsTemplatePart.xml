@@ -48,7 +48,7 @@
             <div style="margin-left: 250px;"  ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"orbit_content"}' id="right-part">
                 <div id="workspace_toolbar" ajxpClass="AjxpPane" class="skipSibling">
                     <div id="breadcrumb" class="breadcrumbs-one" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true, "resize_events":["actions_refreshed"]}'></div>
-                    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'></div>
+                    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"cpane_container","searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'></div>
                 </div>
                 <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"orbit_content"}'>
                     <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "flexTo":"browser"}'>
@@ -66,7 +66,10 @@
                                         <div id="content_pane" ajxpClass="FilesList" ajxpOptions='{"displayMode":"detail","replaceScroller":true, "messageBoxReference":true, "fit":"height", "fitParent":"center_split", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
                                     </div>
                                     <div id="right_split" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"files_list_pane"}' class="vertical_layout">
-                                        <div id="ipanel_header">Header</div>
+                                        <div id="ipanel_header">
+                                            <div id="display_toolbar_right" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"submenuOffsetTop":5}'></div>
+                                            Header
+                                        </div>
                                         <div id="info_panel" ajxpClass="InfoPanel" class="vertical_fit" ajxpOptions='{"replaceScroller":"true", "skipActions":true}'></div>
                                     </div>
                                 </div>

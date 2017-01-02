@@ -9,6 +9,23 @@
     flex: 1;
   }
 }
+.icon_buttons_toolbar{
+  background-color: transparent;
+  color: darken(@applicationPrimaryColor, 15);
+  &:hover{
+    background-color: transparent;
+    span.ajxp_icon_span{
+      color: @applicationPrimaryFontColor;
+    }
+  }
+  span.ajxp_icon_span{
+    font-size: 16px;
+    color: inherit;
+  }
+  span.actionbar_button_label{
+    display: none;
+  }
+}
 #files_list_header{
   .primaryColorPane;
   box-shadow: @reactBoxShadowDepthHalf;
@@ -24,18 +41,7 @@
     }
   }
   #display_toolbar a{
-    background-color: transparent;
-    color: darken(@applicationPrimaryColor, 15);
-    &:hover{
-      background-color: transparent;
-      span.ajxp_icon_span{
-        color: @applicationPrimaryFontColor;
-      }
-    }
-    span.ajxp_icon_span{
-      font-size: 16px;
-      color: inherit;
-    }
+    .icon_buttons_toolbar;
   }
   .mfb-component--tl{
     .mfb-component__button, .mfb-component__button--child, .mfb-component__button--main{
@@ -53,7 +59,16 @@
       font-size: 24px;
     }
   }
+  #vertical_splitter-actions_toolbar{
+    display: none;
+  }
 }
+.infoPanelFolded{
+  #files_list_header #vertical_splitter-actions_toolbar{
+    display: inline-block;
+  }
+}
+
 #browser {
   background-color: white;
   #cpane_container #cpane_tabs #content_pane.class-FilesList{
@@ -71,6 +86,13 @@
       height: 42px;
       box-shadow: @reactBoxShadowDepthHalf;
       z-index: 10;
+      #display_toolbar_right{
+        float: right;
+        margin: 3px 10px 3px;
+        a{
+          .icon_buttons_toolbar;
+        }
+      }
     }
     #info_panel{
       border-left: 1px solid @infopanel_section_separator_color;
@@ -85,6 +107,9 @@
         img.thumbnail_iconlike_shadow{
           box-shadow: 0 0 0;
         }
+      }
+      #ip_scroller_info_panel{
+        margin-top:45px;
       }
     }
     div.infoPanelLabel, td.infoPanelLabel{

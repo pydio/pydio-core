@@ -1,13 +1,15 @@
+@applicationPrimaryColor: #2196F3;
 @applicationPrimaryColor:#546e7a;
 @applicationPrimaryFontColor: white;
 
 @applicationPrimaryLight:#f5f6f9;
-@applicationPrimaryLightFont:#546E7A;
+@applicationPrimaryLightFont: #637e8a;
 
-@applicationSecondaryColor:#ff9800;
+@applicationSecondaryColor:#FF5722;
 @applicationSecondaryFontColor:white;
 
-@selectionMainTint: rgba(0, 150, 136, 0.24);
+/*@selectionMainTint: rgba(0, 150, 136, 0.24);*/
+@selectionMainTint: lighten(@applicationSecondaryColor, 10);
 
 .primaryColorPane{
   background-color: @applicationPrimaryColor;
@@ -15,7 +17,7 @@
 }
 
 .primaryColorDarkerPane{
-  background-color: darken(@applicationPrimaryColor, 8);
+  background-color: darken(@applicationPrimaryColor, 10);
   color: @applicationPrimaryFontColor;
 }
 

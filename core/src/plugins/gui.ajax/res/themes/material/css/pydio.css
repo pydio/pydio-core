@@ -537,7 +537,7 @@ div.selected-webfx-tree-item-inactive {
 }
 div.selected-webfx-tree-item,
 .selected-focus {
-  background-color: rgba(0, 150, 136, 0.24) !important;
+  background-color: #ff7e55 !important;
 }
 .settings_main_pane div.selected-webfx-tree-item,
 .settings_main_pane div.selected-focus,
@@ -587,7 +587,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 }
 .folders-tree div.tree-item.mui-is-selected div.tree-item-label {
   font-weight: 500;
-  color: #35454d;
+  color: #43555d;
 }
 .folders-tree div.tree-item:hover div.tree-item-label {
   font-weight: 500;
@@ -828,14 +828,14 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: none;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus {
-  border: 2px solid rgba(0, 150, 136, 0.24);
+  border: 2px solid #ff7e55;
   /*background-color: @filelist_thumbnail_background !important;*/
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.overlay_icon_div {
   right: 15px !important;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus.fl-displayMode-thumbsize-small {
-  background-color: rgba(0, 150, 136, 0.24) !important;
+  background-color: #ff7e55 !important;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus div.thumbLabel {
   padding: 12px 14px 10px 14px;
@@ -848,7 +848,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   right: 8px !important;
 }
 .class-FilesList.fl-displayMode-thumb div.thumbnail_selectable_cell.selected-focus span.overlay-class-span {
-  color: rgba(0, 150, 136, 0.24);
+  color: #ff7e55;
 }
 .class-FilesList .list_selectable_span img {
   float: left;
@@ -2092,7 +2092,7 @@ div#multiple_download_container a span.mdi-download {
   list-style: none;
   display: block;
   position: relative;
-  border-bottom: 1px solid #ff9800;
+  border-bottom: 1px solid #ff5722;
   background-color: #ffffff;
 }
 #uploader_chooser ul li {
@@ -2110,7 +2110,7 @@ div#multiple_download_container a span.mdi-download {
 #uploader_chooser ul li.current {
   font-weight: 500;
   cursor: default;
-  border-bottom: 3px solid #ff9800;
+  border-bottom: 3px solid #ff5722;
 }
 div.upload-options-pane {
   position: absolute;
@@ -2789,7 +2789,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   cursor: pointer;
 }
 .user-widget {
-  background-color: #435862;
+  background-color: #3f535c;
   color: #ffffff;
   height: 110px;
   width: 250px;
@@ -3349,7 +3349,7 @@ span.toggleHeader {
   transition: border-color 0.3s ease;
   color: #555;
   font-size: 12px;
-  border-bottom: 3px solid #ff9800;
+  border-bottom: 3px solid #ff5722;
 }
 .flat_tabulator span.toggleHeader {
   border-bottom-color: #3d8180;
@@ -5009,7 +5009,7 @@ div.menu.rootDirChooser a.disabled img {
 }
 div.menu.rootDirChooser a:hover,
 div.menu.rootDirChooser a.hovered {
-  background-color: rgba(0, 150, 136, 0.24);
+  background-color: #ff7e55;
   color: #ffffff;
 }
 div.menu.rootDirChooser span.rootDirTitle {
@@ -5111,7 +5111,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel div.infoPanelLabel,
 .form-ip_content_info_panel div.infoPanelLabel {
   width: 50%;
-  color: #a6b9c1;
+  color: #b9c7cd;
   font-size: 0.9em;
   font-weight: 500;
 }
@@ -5121,7 +5121,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.infoPanelValue {
   padding: 0 0 10px;
   font-size: 1em;
-  color: #35454d;
+  color: #43555d;
   line-height: 1.3em;
   vertical-align: top;
 }
@@ -5149,14 +5149,14 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   font-size: 15px;
-  color: #546e7a;
+  color: #637e8a;
   white-space: normal;
   padding-top: 0;
   font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
-  color: #546e7a;
+  color: #637e8a;
   display: block;
   font-size: 0.8em;
   line-height: 15px;
@@ -5170,7 +5170,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description {
   font-size: 12px;
   opacity: 1 !important;
-  color: #546e7a !important;
+  color: #637e8a !important;
   white-space: normal;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard,
@@ -5183,12 +5183,12 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel {
-  color: #546e7a;
+  color: #637e8a;
   font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  color: #546e7a;
+  color: #637e8a;
   display: block;
   font-size: 13px;
   line-height: 17px;
@@ -5242,7 +5242,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel .panelContent div.panelHeader {
   font-size: 13px;
   padding: 8px 0 16px 0;
-  color: #4a606b;
+  color: #58707b;
   font-weight: 500;
 }
 #info_panel .panelContent div.panelHeader span.user_meta_change,
@@ -5466,7 +5466,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   font-family: Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   font-size: 13px;
-  color: #546e7a;
+  color: #637e8a;
   overflow-y: auto;
   box-sizing: border-box;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -5478,7 +5478,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel .section-title {
   padding: 16px 16px ;
   font-weight: 500;
-  border-top: 1px solid rgba(84, 110, 122, 0.3);
+  border-top: 1px solid rgba(99, 126, 138, 0.3);
   margin-top: 10px;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   white-space: nowrap;
@@ -5533,7 +5533,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   text-align: center;
   font-size: 0.9em;
   font-weight: 500;
-  background-color: #546e7a;
+  background-color: #637e8a;
   color: #f5f6f9;
   border-radius: 50%;
   position: relative;
@@ -5620,15 +5620,15 @@ div.menu.rootDirChooser span.rootDirTitle {
   position: absolute;
   top: 16px;
   right: 60px;
-  color: #161c1f;
+  color: #232d31;
 }
 .left-panel .simple-provider .toggle-button {
   cursor: pointer;
   float: right;
-  color: #161c1f;
+  color: #232d31;
 }
 .left-panel .simple-provider .toggle-button:hover {
-  color: #546e7a;
+  color: #637e8a;
 }
 .left-panel .simple-provider .section-title {
   border-top: 0;
@@ -5668,7 +5668,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel {
   top: 0;
   background-color: #f5f6f9;
-  color: #546e7a;
+  color: #637e8a;
 }
 .left-panel .section-title:first-of-type {
   border-top: none;
@@ -5679,7 +5679,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 1;
-  background-color: rgba(0, 150, 136, 0.24);
+  background-color: #ff7e55;
 }
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-badge {
   background-color: #546e7a;
@@ -6625,21 +6625,22 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /* menus */
 /* InfoPanel */
 /* Left PAnel */
+/*@selectionMainTint: rgba(0, 150, 136, 0.24);*/
 .primaryColorPane {
   background-color: #546e7a;
   color: #ffffff;
 }
 .primaryColorDarkerPane {
-  background-color: #435862;
+  background-color: #3f535c;
   color: #ffffff;
 }
 .secondaryColorPane {
-  background-color: #ff9800;
+  background-color: #ff5722;
   color: #ffffff;
 }
 .primaryLightPane {
   background-color: #f5f6f9;
-  color: #546e7a;
+  color: #637e8a;
 }
 div.form-login_form,
 div.form-login_form_dynamic,
@@ -7657,6 +7658,23 @@ span.overlay-class-span.icon-bookmark-empty {
 #workspace_toolbar #breadcrumb {
   flex: 1;
 }
+.icon_buttons_toolbar {
+  background-color: transparent;
+  color: #35454d;
+}
+.icon_buttons_toolbar:hover {
+  background-color: transparent;
+}
+.icon_buttons_toolbar:hover span.ajxp_icon_span {
+  color: #ffffff;
+}
+.icon_buttons_toolbar span.ajxp_icon_span {
+  font-size: 16px;
+  color: inherit;
+}
+.icon_buttons_toolbar span.actionbar_button_label {
+  display: none;
+}
 #files_list_header {
   background-color: #546e7a;
   color: #ffffff;
@@ -7685,10 +7703,13 @@ span.overlay-class-span.icon-bookmark-empty {
   font-size: 16px;
   color: inherit;
 }
+#files_list_header #display_toolbar a span.actionbar_button_label {
+  display: none;
+}
 #files_list_header .mfb-component--tl .mfb-component__button,
 #files_list_header .mfb-component--tl .mfb-component__button--child,
 #files_list_header .mfb-component--tl .mfb-component__button--main {
-  background-color: #ff9800;
+  background-color: #ff5722;
   color: #ffffff;
 }
 #files_list_header .mfb-component--tl .mfb-component__button--main {
@@ -7703,6 +7724,12 @@ span.overlay-class-span.icon-bookmark-empty {
 #files_list_header .mfb-component--tl .mfb-component__main-icon--resting {
   font-size: 24px;
 }
+#files_list_header #vertical_splitter-actions_toolbar {
+  display: none;
+}
+.infoPanelFolded #files_list_header #vertical_splitter-actions_toolbar {
+  display: inline-block;
+}
 #browser {
   background-color: white;
 }
@@ -7712,7 +7739,7 @@ span.overlay-class-span.icon-bookmark-empty {
 }
 #browser #right_split {
   background-color: #f5f6f9;
-  color: #546e7a;
+  color: #637e8a;
   background-color: #fbfcfd;
 }
 #browser #right_split #ipanel_header {
@@ -7724,6 +7751,27 @@ span.overlay-class-span.icon-bookmark-empty {
   height: 42px;
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
   z-index: 10;
+}
+#browser #right_split #ipanel_header #display_toolbar_right {
+  float: right;
+  margin: 3px 10px 3px;
+}
+#browser #right_split #ipanel_header #display_toolbar_right a {
+  background-color: transparent;
+  color: #35454d;
+}
+#browser #right_split #ipanel_header #display_toolbar_right a:hover {
+  background-color: transparent;
+}
+#browser #right_split #ipanel_header #display_toolbar_right a:hover span.ajxp_icon_span {
+  color: #ffffff;
+}
+#browser #right_split #ipanel_header #display_toolbar_right a span.ajxp_icon_span {
+  font-size: 16px;
+  color: inherit;
+}
+#browser #right_split #ipanel_header #display_toolbar_right a span.actionbar_button_label {
+  display: none;
 }
 #browser #right_split #info_panel {
   border-left: 1px solid #e5e8ef;
@@ -7739,6 +7787,9 @@ span.overlay-class-span.icon-bookmark-empty {
 }
 #browser #right_split #info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
   box-shadow: 0 0 0;
+}
+#browser #right_split #info_panel #ip_scroller_info_panel {
+  margin-top: 45px;
 }
 #browser #right_split div.infoPanelLabel,
 #browser #right_split td.infoPanelLabel {
