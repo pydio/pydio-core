@@ -584,6 +584,14 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 .folders-tree div.tree-item div.tree-item-label .tree-icon.icon-angle-right,
 .folders-tree div.tree-item div.tree-item-label .tree-icon.icon-angle-down {
   padding-right: 0;
+  font-size: 16px;
+  width: 20px;
+  display: inline-block;
+  text-align: center;
+}
+.folders-tree div.tree-item div.tree-item-label .tree-icon.icon-angle-right.no-folder-children,
+.folders-tree div.tree-item div.tree-item-label .tree-icon.icon-angle-down.no-folder-children {
+  visibility: hidden;
 }
 .folders-tree div.tree-item.mui-is-selected div.tree-item-label {
   font-weight: 500;
@@ -5677,12 +5685,50 @@ div.menu.rootDirChooser span.rootDirTitle {
 .left-panel .workspaces .workspace-entry .workspace-badge {
   background-color: #96adb7;
 }
+.left-panel .workspaces .workspace-entry:hover {
+  background-color: transparent;
+}
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 1;
-  background-color: #ff7e55;
+  /*background-color: @selectionMainTint;*/
+  font-weight: 500;
+  color: #546e7a;
 }
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-badge {
   background-color: #546e7a;
+}
+.left-panel .workspaces .workspace-entry.workspace-current.workspace-current-node {
+  color: #ff7e55;
+}
+.left-panel .workspaces .workspace-entry.workspace-current.workspace-current-node .workspace-badge {
+  background-color: #ff7e55;
+}
+.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down,
+.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up {
+  font-size: 16px;
+  position: absolute;
+  right: 8px;
+  margin-top: -2px;
+  padding: 5px 10px;
+  border-radius: 50%;
+}
+.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down:hover,
+.left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+.left-panel .folders-tree {
+  color: #4a606b;
+}
+.left-panel .folders-tree.closed {
+  display: none;
+}
+.left-panel .folders-tree div.tree-item.mui-is-selected div.tree-item-label {
+  color: #ff7e55;
+}
+.left-panel .folders-tree div.tree-item div.tree-item-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 div.pydio-tasks-panel {
   position: absolute;

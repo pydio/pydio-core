@@ -10,12 +10,52 @@
       .workspace-badge{
         background-color: lighten(@applicationPrimaryColor, 25);
       }
+      &:hover{
+        background-color: transparent;
+      }
       &.workspace-current{
         opacity: 1;
-        background-color: @selectionMainTint;
+        /*background-color: @selectionMainTint;*/
+        font-weight: 500;
+        color: @applicationPrimaryColor;
         .workspace-badge{
           background-color: @applicationPrimaryColor;
         }
+        &.workspace-current-node{
+          color: @selectionMainTint;
+          .workspace-badge{
+            background-color: @selectionMainTint;
+          }
+        }
+        .workspace-additional-action.icon-angle-down, .workspace-additional-action.icon-angle-up{
+          font-size: 16px;
+          position: absolute;
+          right: 8px;
+          margin-top: -2px;
+          padding: 5px 10px;
+          border-radius: 50%;
+          &:hover{
+            background-color: rgba(255,255,255,0.7);
+          }
+        }
+      }
+    }
+  }
+  .folders-tree{
+    color: darken(@applicationPrimaryColor, 5);
+    &.closed{
+      display: none;
+    }
+    div.tree-item{
+      &.mui-is-selected{
+        div.tree-item-label{
+          color: @selectionMainTint;
+        }
+      }
+      div.tree-item-label{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
   }

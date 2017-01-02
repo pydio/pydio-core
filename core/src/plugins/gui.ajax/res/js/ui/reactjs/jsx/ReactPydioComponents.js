@@ -343,7 +343,7 @@
         _nodeToChildren:function(){
             var children = [];
             this.props.node.getChildren().forEach(function(c){
-                if(!c.isLeaf()) children.push(c);
+                if(!c.isLeaf() || c.getAjxpMime() === 'ajxp_browsable_archive') children.push(c);
             });
             return children;
         },
@@ -368,14 +368,22 @@
         },
         render: function () {
             var hasFolderChildrens = this.state.children.length?true:false;
-            var hasChildren = hasFolderChildrens ? (
-                <span onClick={this.onChildDisplayToggle}>
+            var hasChildren;
+            if(hasFolderChildrens){
+                hasChildren = (
+                    <span onClick={this.onChildDisplayToggle}>
                 {this.state.showChildren || this.props.forceExpand?
                     <span className="tree-icon icon-angle-down"></span>:
                     <span className="tree-icon icon-angle-right"></span>
-                    }
-                </span>
-            ):<span className="tree-icon icon-angle-right"></span>;
+                }
+                </span>);
+            }else{
+                let cname = "tree-icon icon-angle-right";
+                if(this.props.node.isLoaded()){
+                    cname += " no-folder-children";
+                }
+                hasChildren = <span className={cname}></span>;
+            }
             var isSelected = (this.nodeIsSelected(this.props.node) ? 'mui-menu-item mui-is-selected' : 'mui-menu-item');
             var selfLabel;
             if(!this.props.childrenOnly){

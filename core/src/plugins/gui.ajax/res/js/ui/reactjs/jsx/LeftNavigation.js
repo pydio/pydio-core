@@ -185,6 +185,7 @@
         propTypes: {
             pydio: React.PropTypes.instanceOf(Pydio).isRequired,
             dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
+            className: React.PropTypes.string,
             onNodeSelected: React.PropTypes.func
         },
 
@@ -235,7 +236,7 @@
                     dataModel={this.props.dataModel}
                     node={this.props.dataModel.getRootNode()}
                     showRoot={false}
-                    className="folders-tree"
+                    className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
                 />
             );
         }
@@ -249,7 +250,7 @@
                 case 'alerts':
                     break;
                 case 'home':
-                    this.props.pydio.Controller.fireAction('switch_to_home');
+                    this.props.pydio.triggerRepositoryChange('ajxp_home');
                     break;
                 case 'cog':
                     this.props.pydio.Controller.fireAction('switch_to_user_dashboard');
@@ -638,11 +639,30 @@
         },
 
         getInitialState:function(){
-            return {openAlert:false};
+            return {
+                openAlert:false,
+                openFoldersTree: true,
+                currentContextNode: this.props.pydio.getContextHolder().getContextNode()
+            };
         },
 
         getLetterBadge:function(){
             return {__html:this.props.workspace.getHtmlBadge(true)};
+        },
+
+        componentDidMount: function(){
+            if(this.props.showFoldersTree){
+                this._monitorFolder = function(){
+                    this.setState({currentContextNode: this.props.pydio.getContextHolder().getContextNode()});
+                }.bind(this);
+                this.props.pydio.getContextHolder().observe("context_changed", this._monitorFolder);
+            }
+        },
+
+        componentWillUnmount: function(){
+            if(this._monitorFolder){
+                this.props.pydio.getContextHolder().stopObserving("context_changed", this._monitorFolder);
+            }
         },
 
         handleAccept: function () {
@@ -714,7 +734,16 @@
         },
 
         onClick:function() {
-            this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
+            if(this.props.workspace.getId() === this.props.pydio.user.activeRepository && this.props.showFoldersTree){
+                this.props.pydio.goTo('/');
+            }else{
+                this.props.pydio.triggerRepositoryChange(this.props.workspace.getId());
+            }
+        },
+
+        toggleFoldersPanelOpen: function(ev){
+            ev.stopPropagation();
+            this.setState({openFoldersTree: !this.state.openFoldersTree});
         },
 
         render:function(){
@@ -727,6 +756,9 @@
 
             if (current) {
                 currentClass +=" workspace-current";
+            }
+            if(this.props.showFoldersTree && this.state.currentContextNode && this.state.currentContextNode.getPath() === '/' ){
+                currentClass +=" workspace-current-node";
             }
 
             currentClass += " workspace-access-" + this.props.workspace.getAccessType();
@@ -777,6 +809,11 @@
                 additionalAction = <span className="workspace-additional-action mdi mdi-close" onClick={this.handleRemoveTplBasedWorkspace} title={messages['423']}/>;
             }
 
+            if(this.props.showFoldersTree){
+                let fTCName = this.state.openFoldersTree ? "workspace-additional-action icon-angle-down" : "workspace-additional-action icon-angle-up";
+                additionalAction = <span className={fTCName} onClick={this.toggleFoldersPanelOpen}></span>;
+            }
+
             let wsBlock = (
                 <div
                     className={currentClass}
@@ -799,6 +836,7 @@
                         <FoldersTree
                             pydio={this.props.pydio}
                             dataModel={this.props.pydio.getContextHolder()}
+                            className={this.state.openFoldersTree?"open":"closed"}
                         />
                     </div>
                 )
