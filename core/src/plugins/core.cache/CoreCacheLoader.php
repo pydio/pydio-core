@@ -70,7 +70,8 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
                 $pluginInstance = ConfService::instanciatePluginFromGlobalParams($this->pluginConf["UNIQUE_INSTANCE_CONFIG"], "Pydio\\Cache\\Core\\AbstractCacheDriver", $pluginsService);
             }
             self::$cacheInstance = $pluginInstance;
-            if(!ApplicationState::sapiIsCli() && $pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
+            if(!ApplicationState::sapiIsCli() && !$this->pluginConf["CORE_CACHE_DISABLE_NODES"]
+                && $pluginInstance !== null && $pluginInstance instanceof AbstractCacheDriver && $pluginInstance->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)){
                 MetaStreamWrapper::appendMetaWrapper("pydio.cache", "\\Pydio\\Cache\\Core\\CacheStreamLayer");
             }
         }
@@ -79,15 +80,24 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
     }
 
     /**
+     * Check if nodes caching is enabled
+     * @return bool
+     */
+    public function enableNodesCaching(){
+        if($this->getConfigs()["CORE_CACHE_DISABLE_NODES"]) {
+            return false;
+        }
+        $cDriver = ConfService::getCacheDriverImpl();
+        return !(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES)));
+    }
+
+    /**
      * @param \Pydio\Access\Core\Model\AJXP_Node $node
      * @param \Pydio\Access\Core\Model\AJXP_Node $contextNode
      * @param bool $details
      */
     public function cacheNodeInfo(&$node, $contextNode, $details){
-        $cDriver = ConfService::getCacheDriverImpl();
-        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
-            return;
-        }
+        if(!$this->enableNodesCaching()) return;
         $id = $this->computeId($node, $details);
         CacheService::save(AJXP_CACHE_SERVICE_NS_NODES, $id, $node->getNodeInfoMeta());
     }
@@ -103,10 +113,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
             Controller::applyHook("node.clear_cache_deferred", [&$node]);
             return;
         }
-        $cDriver = ConfService::getCacheDriverImpl();
-        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
-            return;
-        }
+        if(!$this->enableNodesCaching()) return;
         $id = $this->computeId($node, $details);
         if(CacheService::contains(AJXP_CACHE_SERVICE_NS_NODES, $id)){
             $metadata = CacheService::fetch(AJXP_CACHE_SERVICE_NS_NODES, $id);
@@ -123,10 +130,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      * @param bool $copy
      */
     public function clearNodeInfoCache($from=null, $to=null, $copy = false){
-        $cDriver = ConfService::getCacheDriverImpl();
-        if(empty($cDriver) || !($cDriver->supportsPatternDelete(AJXP_CACHE_SERVICE_NS_NODES))){
-            return;
-        }
+        if(!$this->enableNodesCaching()) return;
         if($from !== null){
             $this->clearCacheForNode($from);
         }
@@ -208,6 +212,17 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
     }
 
     /**
+     * @return array
+     */
+    public function listNamespaces(){
+        if($this->enableNodesCaching()){
+            return [AJXP_CACHE_SERVICE_NS_SHARED, AJXP_CACHE_SERVICE_NS_NODES];
+        }else{
+            return [AJXP_CACHE_SERVICE_NS_SHARED];
+        }
+    }
+
+    /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
      */
@@ -216,7 +231,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
         $cImpl = $this->getImplementation();
         $result = [];
         if($cImpl != null){
-            $nspaces = $cImpl->listNamespaces();
+            $nspaces = $this->listNamespaces();
             foreach ($nspaces as $nspace){
                 $data = $cImpl->getStats($nspace);
                 $data["namespace"] = $nspace;

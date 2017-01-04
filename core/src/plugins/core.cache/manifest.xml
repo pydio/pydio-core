@@ -8,7 +8,10 @@
         </resources>
     </client_settings>
     <server_settings>
-        <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]" default="cache.doctrine" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false"/>
+        <global_param type="plugin_instance:cache" name="UNIQUE_INSTANCE_CONFIG" group="CONF_MESSAGE[Cache Store Instance]"
+                      default="cache.doctrine" label="CONF_MESSAGE[Instance]" description="CONF_MESSAGE[Choose the configuration plugin]" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Cache Store Instance]" name="CORE_CACHE_DISABLE_NODES" type="boolean" label="CONF_MESSAGE[Disable Nodes Caching]"
+                      description="CONF_MESSAGE[Cache files and folders data in memory. Depending on the amount of data and on the caching method used (remote cache), this can be disabled.]" default="false"/>
     </server_settings>
     <registry_contributions>
         <actions>

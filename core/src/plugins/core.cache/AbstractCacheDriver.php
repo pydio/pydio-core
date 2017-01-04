@@ -338,15 +338,7 @@ abstract class AbstractCacheDriver extends Plugin
         Logger::debug("CacheDriver::Http", "Clear Pattern ".$id, ["namespace" => $namespace]);
         return $cacheDriver->deleteKeysStartingWith($id);
     }
-
-
-    /**
-     * @return array
-     */
-    public function listNamespaces(){
-        return [AJXP_CACHE_SERVICE_NS_SHARED, AJXP_CACHE_SERVICE_NS_NODES];
-    }
-
+    
     /**
      * @param $namespace
      * @return array|null
