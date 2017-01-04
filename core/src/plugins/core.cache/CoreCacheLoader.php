@@ -23,6 +23,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\MetaStreamWrapper;
 use Pydio\Access\Core\Model\Repository;
+use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\PluginFramework\CoreInstanceProvider;
@@ -99,7 +100,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      */
     public function loadNodeInfoFromCache(&$node, $contextNode, $details, $forceRefresh = false){
         if($forceRefresh) {
-            $this->clearNodeInfoCache($node);
+            Controller::applyHook("node.clear_cache_deferred", [&$node]);
             return;
         }
         $cDriver = ConfService::getCacheDriverImpl();
