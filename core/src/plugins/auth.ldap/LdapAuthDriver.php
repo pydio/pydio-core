@@ -54,6 +54,7 @@ class LdapAuthDriver extends AbstractAuthDriver
     public $fakeAttrMemberOf;
     public $mappedRolePrefix;
     public $pageSize;
+    public $userRecursiveMemberOf = false;
 
     public $ldapconn = null;
     public $separateGroup = "";
@@ -137,6 +138,9 @@ class LdapAuthDriver extends AbstractAuthDriver
             $this->ldapGroupAttr = strtolower($options["LDAP_GROUPATTR"]);
         } else {
             $this->ldapGroupAttr = 'cn';
+        }
+        if (!empty($options["LDAP_RECURSIVE_MEMBEROF"])) {
+            $this->userRecursiveMemberOf = $options["LDAP_RECURSIVE_MEMBEROF"];
         }
     }
 
@@ -736,6 +740,12 @@ class LdapAuthDriver extends AbstractAuthDriver
             $entries = $this->getUserEntries($userObject->getId());
             if ($entries["count"]) {
                 $entry = $entries[0];
+
+                // search memberof recursively.(if ldap is AD)
+                if($this->userRecursiveMemberOf){
+                    $this->recursiveMemberOf($entry);
+                }
+
                 foreach ($this->paramsMapping as $params) {
                     $key = strtolower($params['MAPPING_LDAP_PARAM']);
                     if (isSet($entry[$key])) {
@@ -996,6 +1006,56 @@ class LdapAuthDriver extends AbstractAuthDriver
         }
     }
 
+    /**
+     * Reconstruct memberOf values recursive.
+     * @param $entry ldap user object.
+     */
+    public function recursiveMemberOf(&$entry){
+        $filterPrefix = "member:1.2.840.113556.1.4.1941:=";
+        $userDN = $entry["dn"];
+        $filterString = $filterPrefix.$userDN;
+
+        // backup ldap configs
+        $bkUserDN = $this->ldapDN;
+        $this->ldapDN = $this->ldapGDN;
+        $bkFilter = $this->dynamicFilter;
+        $bkUserFilter = $this->ldapFilter;
+        $this->ldapFilter = $filterString;
+        $bkUserAttribute = $this->ldapUserAttr;
+        $this->ldapUserAttr = $this->ldapGroupAttr;
+        $bkDynamicExpected = $this->dynamicExpected;
+        $this->dynamicExpected = null;
+        $bkCustomParamsMapping = $this->customParamsMapping;
+        $this->customParamsMapping = null;
+        $bkParamsMapping = $this->paramsMapping;
+        $this->paramsMapping = null;
+
+        $searchForGroups = $this->getUserEntries();
+
+        // restore ldap configs
+        $this->ldapDN = $bkUserDN;
+        $this->dynamicFilter = $bkFilter;
+        $this->ldapFilter = $bkUserFilter;
+        $this->ldapUserAttr = $bkUserAttribute;
+        $this->dynamicExpected = $bkDynamicExpected;
+        $this->customParamsMapping = $bkCustomParamsMapping;
+        $this->paramsMapping = $bkParamsMapping;
+
+        if (empty($searchForGroups) || $searchForGroups["count"] < 1) return;
+
+        // construct recursive ldap
+        $memberOf = array();
+        $memberOf["count"] = $searchForGroups["count"];
+        unset($searchForGroups["count"]);
+
+        foreach ($searchForGroups as $i => $group) {
+            $memberOf[] = $group["dn"];
+        }
+
+        $entry[$entry["count"]] = "memberof";
+        $entry["count"]++;
+        $entry["memberof"] = $memberOf;
+    }
     /**
      * @return string
      * @throws \Exception
