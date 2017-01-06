@@ -51,6 +51,7 @@ class PhpMailLite extends Mailer
     protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
     {
         require_once("lib/class.phpmailer-lite.php");
+        require_once("lib/class.Html2Text.php");
         $realRecipients = $this->resolveAdresses($ctx, $recipients);
         if(!count($realRecipients)){
             return;
@@ -92,9 +93,9 @@ class PhpMailLite extends Mailer
             } else {
                 $mail->Body = "<html><body>" . nl2br($body) . "</body></html>";
             }
-            $mail->AltBody = Mailer::simpleHtml2Text($mail->Body);
+            $mail->AltBody = \Html2Text\Html2Text::convert($mail->Body);
         } else {
-            $mail->Body = Mailer::simpleHtml2Text($body);
+            $mail->Body = \Html2Text\Html2Text::convert($body);
         }
 
         if (!$mail->Send()) {
