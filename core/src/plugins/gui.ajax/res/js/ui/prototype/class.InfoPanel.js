@@ -386,7 +386,7 @@ Class.create("InfoPanel", AjxpPane, {
             this.scrollbar.recalculateLayout(parseInt(this.contentContainer.getHeight()));
         }
 		if(this.htmlElement && this.currentPreviewElement && this.currentPreviewElement.visible()){
-			var squareDim = Math.min(parseInt(this.htmlElement.getWidth()-40));
+			var squareDim = parseInt(this.htmlElement.getWidth()) - (this.options.previewWidthMargin?this.options.previewWidthMargin:0);
 			this.currentPreviewElement.resizePreviewElement({width:squareDim,height:squareDim, maxHeight:previewMaxHeight});
 		}
         if(this.htmlElement){
@@ -611,7 +611,20 @@ Class.create("InfoPanel", AjxpPane, {
                 this.contributePanelHeaderIcon('icon-eye-close', 'Preview', 'open_with');
 				if(getTemplateElement){
 					return '<div id="preview_rich_fake_element"></div>';
-				}else{
+				}else if(this.options.previewUseCoveringBg && editorClass.prototype.getCoveringBackgroundSource){
+                    var img = new Element('div', {className:'bgCoverImage'});
+                    img.setStyle({
+                        backgroundImage:'url('+editorClass.prototype.getCoveringBackgroundSource(ajxpNode)+')',
+                        backgroundSize:'cover',
+                        backgroundPosition: 'center center',
+                        width: '100%',
+                        height: '200px'
+                    });
+                    img.resizePreviewElement = function(dimensionObject){
+                        img.setStyle({width: dimensionObject.width, height: dimensionObject.maxHeight + 'px'});
+                    };
+                    return img;
+                }else{
 					return editorClass.prototype.getPreview(ajxpNode, rich);
 				}
 			}
