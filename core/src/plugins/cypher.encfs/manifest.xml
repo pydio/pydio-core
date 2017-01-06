@@ -155,7 +155,7 @@
             </action>
         </actions>
         <hooks>
-            <serverCallback methodName="filterENCFS" hookName="node.info"/>
+            <serverCallback methodName="filterENCFS" hookName="node.info.nocache"/>
         </hooks>
     </registry_contributions>
     <dependencies>
