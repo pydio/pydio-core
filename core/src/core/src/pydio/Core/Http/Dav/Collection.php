@@ -78,22 +78,23 @@ class Collection extends Node implements Sabre\DAV\ICollection
             ;
             Controller::run($request);
 
+            $parent = new AJXP_Node($this->getUrl());
             if ( $data != null && is_file($this->getUrl()."/".$name)) {
 
-                $p = $this->path."/".$name;
-                $newNode = new AJXP_Node($this->getUrl().$p);
+                $newNode = $parent->createChildNode($name);
                 Controller::applyHook("node.before_change", array($newNode, $_SERVER["CONTENT_LENGTH"]));
-                //AJXP_Logger::debug("Should now copy stream or string in ".$this->getUrl()."/".$name);
+
                 if (is_resource($data)) {
-                    $stream = fopen($this->getUrl()."/".$name, "w");
+                    $stream = fopen($newNode->getUrl(), "w");
                     stream_copy_to_stream($data, $stream);
                     fclose($stream);
                 } else if (is_string($data)) {
-                    file_put_contents($data, $this->getUrl()."/".$name);
+                    file_put_contents($data, $newNode->getUrl());
                 }
 
                 $toto = null;
-                Controller::applyHook("node.change", array(null, $newNode, false));
+                clearstatcache($newNode->getUrl());
+                Controller::applyHook("node.change", array($newNode, $newNode, false));
 
             }
             $node = new NodeLeaf($this->path."/".$name, $this->context);

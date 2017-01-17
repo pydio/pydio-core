@@ -62,7 +62,7 @@ class NodeLeaf extends Node implements Sabre\DAV\IFile
         if (!$this->context->getUser()->canWrite($this->context->getRepositoryId())) {
             throw new Sabre\DAV\Exception\Forbidden() ;
         }
-        $newNode = new AJXP_Node($this->getUrl().$p);
+        $newNode = new AJXP_Node($this->getUrl());
         Controller::applyHook("node.before_change", array($newNode, $_SERVER["CONTENT_LENGTH"]));
 
         $stream = fopen($this->getUrl(), "w");
@@ -70,7 +70,7 @@ class NodeLeaf extends Node implements Sabre\DAV\IFile
         fclose($stream);
 
         $toto = null;
-        Controller::applyHook("node.change", array(null, $newNode, false));
+        Controller::applyHook("node.change", array($newNode, $newNode, false));
 
         return $this->getETag();
     }
