@@ -222,6 +222,9 @@ class Mailer extends Plugin implements SqlTableProvider
             // Retrieving notification information
             /** @var Notification $notification */
             $notification = unserialize($value["notification_object"]);
+            if(!$notification instanceof Notification){
+                continue;
+            }
 
             $action = $notification->getAction();
             $author = $notification->getAuthor();
