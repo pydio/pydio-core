@@ -24,8 +24,7 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\OptionsHelper;
-
-
+use Doctrine\Common\Cache\ArrayCache;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -40,6 +39,7 @@ class MemorySafe
     const SAFE_CREDENTIALS_KEY = "PYDIO_SAFE_CREDENTIALS";
 
     private static $instances;
+    private static $cache;
 
     private $instanceId = "";
     private $user;
@@ -239,6 +239,14 @@ class MemorySafe
         $user = $password = "";
         $optionsPrefix = "";
         $repository = $ctx->getRepository();
+        $instanceId = self::getInstanceId($ctx);
+        $instanceId = empty($instanceId) ? "__DEFAULT__" : $instanceId;
+
+    	$cache = self::$cache;
+        if (isset($cache[$instanceId])) {
+            return $cache[$instanceId];
+        }
+
         if ($repository->getAccessType() == "ftp") {
             $optionsPrefix = "FTP_";
         }
@@ -275,16 +283,18 @@ class MemorySafe
             }
         }
         if ($user=="" && ( $repository->getContextOption($ctx, "USE_SESSION_CREDENTIALS") || $storeCreds || self::getInstance()->forceSessionCredentials )) {
-            $instanceId = $instanceId = self::getInstanceId($ctx);
-            $instanceId = empty($instanceId) ? "" : $instanceId;
             $safeCred = MemorySafe::loadCredentials($instanceId);
             if ($safeCred !== false) {
                 $user = $safeCred["user"];
                 $password = $safeCred["password"];
             }
         }
-        return array("user" => $user, "password" => $password);
 
+        $res = ["user" => $user, "password" => $password];
+
+        self::$cache[$instanceId] = $res;
+
+        return $res;
     }
 
     /*******************/

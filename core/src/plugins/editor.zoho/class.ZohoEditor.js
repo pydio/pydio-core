@@ -20,21 +20,21 @@
 Class.create("ZohoEditor", AbstractEditor, {
 
 	fullscreenMode: false,
-	
+
 	initialize: function($super, oFormObject, options)
 	{
 		this.element =  $(oFormObject);
         this.editorOptions = options;
-		this.defaultActions = new Hash();		
+		this.defaultActions = new Hash();
 		this.createTitleSpans();
         if(this.editorOptions.context.__className == "Modal"){
             modal.setCloseAction(function(){this.close();}.bind(this));
         }
 		this.container = $(oFormObject).select('div[id="zohoContainer"]')[0];
 		fitHeightToBottom($(this.container), $(this.editorOptions.context.elementName));
-		this.contentMainContainer = new Element("iframe", {			
+		this.contentMainContainer = new Element("iframe", {
 			style:"border:none;width:"+this.container.getWidth()+"px;"
-		});						
+		});
 		this.container.update(this.contentMainContainer);
         this.element.observe("editor:close", function(){
             var conn = new Connexion();
@@ -47,9 +47,15 @@ Class.create("ZohoEditor", AbstractEditor, {
             }.bind(this);
             conn.sendAsync();
         }.bind(this));
+
+		if (window.ajxpMinisite) {
+			this.interval = window.setInterval(function() {
+				this.element.fire("editor:close")
+			}.bind(this), 10000);
+		}
 	},
 
-	
+
 	open : function($super, node)
 	{
 		$super(node);
@@ -66,8 +72,8 @@ Class.create("ZohoEditor", AbstractEditor, {
 					this.resize();
 					// Force here for WebKit
 					this.contentMainContainer.setStyle({height:this.container.getHeight() + 'px'});
-					this.removeOnLoad();	
-					pe.stop();		
+					this.removeOnLoad();
+					pe.stop();
 				}
 			}
 		}.bind(this) , 0.5);
@@ -91,10 +97,10 @@ Class.create("ZohoEditor", AbstractEditor, {
 		$(this.container).select("#element_overlay")[0].insert(waiter);
 		this.loading = true;
 	},
-	
+
 	removeOnLoad: function(){
 		removeLightboxFromElement(this.container);
 		this.loading = false;
 	}
-	
+
 });
