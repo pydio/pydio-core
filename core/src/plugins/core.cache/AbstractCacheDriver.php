@@ -109,7 +109,7 @@ abstract class AbstractCacheDriver extends Plugin
 
         $options = [
             "id"        => $cacheType."://".$repo->getId().$subPath.$node->getPath().($details?"##$details":""),
-            "timelimit" => $repo->getContextOption($ctx, "CACHE_TIMELIMIT", 5)
+            "timelimit" => $repo->getContextOption($ctx, "CACHE_TIMELIMIT", 0)
         ];
         return $options;
     }
