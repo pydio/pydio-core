@@ -93,6 +93,12 @@ interface IFeedStore
     public function dismissAlertById(ContextInterface $ctx, $alertId, $occurrences = 1);
 
     /**
+     * @param ContextInterface $ctx
+     * @param $objectId
+     */
+    public function dismissMetaObjectById(ContextInterface $ctx, $objectId);
+
+    /**
      * @param string $indexPath
      * @param mixed $data
      * @param string $repositoryId

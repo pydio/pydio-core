@@ -402,10 +402,24 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
     }
 
     /**
+     * @inheritdoc
+     */
+    public function dismissMetaObjectById(ContextInterface $ctx, $objectId){
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
+        $userId = $ctx->getUser()->getId();
+        $userGroup = $ctx->getUser()->getGroupPath();
+        dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND ([user_id] = %s OR [user_group] = %s) AND [etype] = %s", $objectId, $userId, $userGroup, "meta");
+    }
+
+
+    /**
      * @param $repositoryId
      * @param $oldPath
      * @param null $newPath
      * @param bool $copy
+     * @return mixed|void
      */
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {
