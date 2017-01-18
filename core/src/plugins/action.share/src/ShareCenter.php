@@ -840,6 +840,7 @@ class ShareCenter extends Plugin
 
             case "load_shared_element_data":
 
+                SessionService::close();
                 $node = null;
                 if(isSet($httpVars["hash"]) && $httpVars["element_type"] == "file"){
 
