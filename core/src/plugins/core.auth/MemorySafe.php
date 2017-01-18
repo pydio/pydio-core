@@ -24,7 +24,6 @@ use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Crypto;
 use Pydio\Core\Utils\Vars\OptionsHelper;
-use Doctrine\Common\Cache\ArrayCache;
 
 defined('AJXP_EXEC') or die( 'Access not allowed');
 
@@ -239,12 +238,17 @@ class MemorySafe
         $user = $password = "";
         $optionsPrefix = "";
         $repository = $ctx->getRepository();
+        
         $instanceId = self::getInstanceId($ctx);
-        $instanceId = empty($instanceId) ? "__DEFAULT__" : $instanceId;
+        $instanceId = empty($instanceId) ? "" : $instanceId;
+        $instanceKey = $instanceId;
+        if(empty($instanceKey)) {
+            $instanceKey = '__DEFAULT__';
+        }
 
     	$cache = self::$cache;
-        if (isset($cache[$instanceId])) {
-            return $cache[$instanceId];
+        if (isset($cache[$instanceKey])) {
+            return $cache[$instanceKey];
         }
 
         if ($repository->getAccessType() == "ftp") {
@@ -292,7 +296,10 @@ class MemorySafe
 
         $res = ["user" => $user, "password" => $password];
 
-        self::$cache[$instanceId] = $res;
+        // Storing to local cache when we have a result
+        if ($user != "") {
+            self::$cache[$instanceKey] = $res;
+        }
 
         return $res;
     }
