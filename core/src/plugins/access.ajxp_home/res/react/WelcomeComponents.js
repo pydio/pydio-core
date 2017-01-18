@@ -180,7 +180,7 @@
         },
 
         launchVideo: function(){
-            this.props.launchVideo("//www.youtube.com/embed/"+this.props.youtubeId+"?list=PLxzQJCqzktEYnIChsR5h3idjAxgBssnt5&autoplay=1");
+            this.props.launchVideo("//www.youtube.com/embed/"+this.props.youtubeId+"?list=PLxzQJCqzktEbYm3U_O1EqFru0LsEFBca5&autoplay=1");
         },
 
         render: function(){
@@ -192,7 +192,7 @@
                     <div className="tutorial_legend">
                         <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+this.props.youtubeId+'/0.jpg")'}}></div>
                         <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
-                        <div className="tutorial_load_button" onClick={this.launchVideo}><i className="icon-youtube-play"/> Play Video</div>
+                        <div className="tutorial_load_button" onClick={this.launchVideo}><i className="icon-youtube-play"/> {MessageHash['user_home.86']}</div>
                     </div>
                 </div>
             );
@@ -255,18 +255,48 @@
                     <div className="videoCards">
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            youtubeId="C6L_9QT0lDE"
+                            youtubeId="nkfRn-MxezE"
                             contentMessageId="user_home.62"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            youtubeId="ZuVKsIa4XdU"
+                            youtubeId="qvsSeLXr-T4"
                             contentMessageId="user_home.63"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
-                            youtubeId="MEHCN64RoTY"
-                            contentMessageId="user_home.64"
+                            youtubeId="HViCWPpyZ6k"
+                            contentMessageId="user_home.79"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="jBRNqwannJM"
+                            contentMessageId="user_home.80"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="2jl1EsML5v8"
+                            contentMessageId="user_home.81"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="28-t4dvhE6c"
+                            contentMessageId="user_home.82"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="fP0MVejnVZE"
+                            contentMessageId="user_home.83"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="TXFz4w4trlQ"
+                            contentMessageId="user_home.84"
+                        />
+                        <VideoCard
+                            launchVideo={this.launchVideo}
+                            youtubeId="OjHtgnL_L7Y"
+                            contentMessageId="user_home.85"
                         />
                         <VideoCard
                             launchVideo={this.launchVideo}
@@ -298,12 +328,29 @@
         },
 
         showGettingStarted: function(){
-            //this.props.controller.fireAction("open_tutorial_pane");
+            if(!this.isMounted()) return;
             this.setState({showGettingStarted:true});
         },
 
+        closeGettingStarted: function(){
+            this.setState({showGettingStarted:false});
+            if(this.state.initiallyOpened){
+                let guiPrefs = this.props.user.getPreference("gui_preferences", true);
+                guiPrefs['WelcomeComponent.HomePanel.TutorialShown'] = true;
+                this.props.user.setPreference('gui_preferences', guiPrefs, true);
+                this.props.user.savePreference('gui_preferences');
+            }
+        },
+
         getInitialState:function(){
-            return {showGettingStarted:false};
+            let guiPrefs = this.props.user.getPreference('gui_preferences', true);
+            return {showGettingStarted:false, initiallyOpened:!guiPrefs['WelcomeComponent.HomePanel.TutorialShown']};
+        },
+
+        componentDidMount: function(){
+            if(this.state.initiallyOpened){
+                window.setTimeout(this.showGettingStarted, 1000);
+            }
         },
 
         render: function(){
@@ -336,10 +383,7 @@
                 gettingStartedBlock = (
                     <small> <span onClick={this.showGettingStarted} dangerouslySetInnerHTML={dgs()}/></small>
                 );
-                var close = function(){
-                    this.setState({showGettingStarted:false});
-                }.bind(this);
-                gettingStartedPanel = <TutorialPane closePane={close} open={this.state.showGettingStarted}/>;
+                gettingStartedPanel = <TutorialPane closePane={this.closeGettingStarted} open={this.state.showGettingStarted}/>;
             }
             let a = this.props.controller.getActionByName('switch_to_settings');
             if(!a.deny){
