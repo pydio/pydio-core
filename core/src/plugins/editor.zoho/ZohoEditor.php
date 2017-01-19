@@ -266,7 +266,7 @@ class ZohoEditor extends Plugin
             Controller::applyHook("node.before_change", array(&$node));
 
             $b64Sig = $this->signID($id);
-
+            $nodeChanged = false;
             if ($this->getContextualOption($ctx, "USE_ZOHO_AGENT") ) {
 
                 $url =  $this->getContextualOption($ctx, "ZOHO_AGENT_URL")."?ajxp_action=get_file&name=".$id."&ext=".$ext."&signature=".$b64Sig ;
@@ -274,22 +274,19 @@ class ZohoEditor extends Plugin
                 $data = FileHelper::getRemoteContent($url);
                 if (strlen($data)) {
                     file_put_contents($targetFile, $data);
-
-                    $stream->write("MODIFIED");
-
-                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
-                    Controller::applyHook("node.change", array(null, &$node));
+                    $nodeChanged = true;
                 }
             } else {
                 if (is_file(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext)) {
                     copy(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext, $targetFile);
                     unlink(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/editor.zoho/agent/files/".$id.".".$ext);
-
-                    $stream->write("MODIFIED");
-
-                    $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
-                    Controller::applyHook("node.change", array(null, &$node));
+                    $nodeChanged = true;
                 }
+            }
+            if($nodeChanged){
+                $stream->write("MODIFIED");
+                $this->logInfo('Edit', 'Retrieved content of '.$node->getUrl(), array("files" => $node->getUrl()));
+                Controller::applyHook("node.change", array(&$node, &$node));
             }
         }
     }
