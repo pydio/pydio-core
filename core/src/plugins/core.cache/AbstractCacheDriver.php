@@ -109,7 +109,7 @@ abstract class AbstractCacheDriver extends Plugin
 
         $options = [
             "id"        => $cacheType."://".$repo->getId().$subPath.$node->getPath().($details?"##$details":""),
-            "timelimit" => $repo->getContextOption($ctx, "CACHE_TIMELIMIT", 5)
+            "timelimit" => $repo->getContextOption($ctx, "CACHE_TIMELIMIT", 0)
         ];
         return $options;
     }
@@ -338,15 +338,7 @@ abstract class AbstractCacheDriver extends Plugin
         Logger::debug("CacheDriver::Http", "Clear Pattern ".$id, ["namespace" => $namespace]);
         return $cacheDriver->deleteKeysStartingWith($id);
     }
-
-
-    /**
-     * @return array
-     */
-    public function listNamespaces(){
-        return [AJXP_CACHE_SERVICE_NS_SHARED, AJXP_CACHE_SERVICE_NS_NODES];
-    }
-
+    
     /**
      * @param $namespace
      * @return array|null

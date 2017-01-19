@@ -32,6 +32,7 @@ use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 use Pydio\Core\PluginFramework\Plugin;
@@ -201,6 +202,7 @@ class NotificationCenter extends Plugin
      */
     public function loadUserFeed(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, &$returnData = [])
     {
+        SessionService::close();
         $httpVars = $requestInterface->getParsedBody();
         if(!$this->eventStore) {
             throw new \Pydio\Core\Exception\PydioException("Cannot find eventStore for notification plugin");

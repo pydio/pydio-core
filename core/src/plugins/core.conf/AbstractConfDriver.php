@@ -1276,6 +1276,7 @@ abstract class AbstractConfDriver extends Plugin
 
             case "load_repository_info":
 
+                SessionService::close();
                 $data = [];
                 $repo = $ctx->getRepository();
                 if($repo != null){

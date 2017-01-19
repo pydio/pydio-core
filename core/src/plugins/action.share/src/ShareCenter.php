@@ -840,6 +840,7 @@ class ShareCenter extends Plugin
 
             case "load_shared_element_data":
 
+                SessionService::close();
                 $node = null;
                 if(isSet($httpVars["hash"]) && $httpVars["element_type"] == "file"){
 
@@ -1247,15 +1248,21 @@ class ShareCenter extends Plugin
                 $parentRepoId = $node->getRepository()->getParentId();
                 $parentRepository = RepositoryService::getRepositoryById($parentRepoId);
                 if(!empty($parentRepository) && !$parentRepository->isTemplate()){
-                    $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
                     $newContext = $crtContext->withRepositoryId($parentRepoId);
                     $owner = $node->getRepository()->getOwner();
                     if($owner !== null){
                         $newContext = $newContext->withUserId($owner);
                     }
-                    $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
-                    $relative = substr($currentRoot, strlen($parentRoot));
-                    $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                    if($node->getRepository()->hasContentFilter()){
+                        $cFilter = $node->getRepository()->getContentFilter();
+                        $parentNodePath = array_keys($cFilter->filters)[0];
+                        $parentNodeURL = $newContext->getUrlBase().$parentNodePath;
+                    }else{
+                        $currentRoot = $node->getRepository()->getContextOption($crtContext, "PATH");
+                        $parentRoot = $parentRepository->getContextOption($newContext, "PATH");
+                        $relative = substr($currentRoot, strlen($parentRoot));
+                        $parentNodeURL = $newContext->getUrlBase().$relative.$node->getPath();
+                    }
                     $this->logDebug("action.share", "Should trigger on ".$parentNodeURL);
                     $parentNode = new AJXP_Node($parentNodeURL);
                     $result[$parentRepoId] = array($parentNode, "UP");

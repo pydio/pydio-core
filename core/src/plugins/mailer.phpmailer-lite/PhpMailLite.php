@@ -22,8 +22,8 @@
 namespace Pydio\Mailer\Implementation;
 
 use Exception;
+use PHPMailer;
 use phpmailerException;
-use PHPMailerLite;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Mailer\Core\Mailer;
@@ -50,13 +50,15 @@ class PhpMailLite extends Mailer
      */
     protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
     {
-        require_once("lib/class.phpmailer-lite.php");
+        require_once("vendor/autoload.php");
         $realRecipients = $this->resolveAdresses($ctx, $recipients);
         if(!count($realRecipients)){
             return;
         }
         // NOW IF THERE ARE RECIPIENTS FOR ANY REASON, GO
-        $mail = new PHPMailerLite(true);
+        $mail = new PHPMailer(true);
+
+        //All option are set in the PHPMailer class
         $mail->Mailer = $this->getContextualOption(Context::emptyContext(), "MAILER");
         $mail->Sendmail = $this->getContextualOption(Context::emptyContext(), "SENDMAIL_PATH");
         $from = $this->resolveFrom($ctx, $from);
@@ -65,24 +67,24 @@ class PhpMailLite extends Mailer
         }
         if (!empty($from)) {
             if ($from["adress"] != $from["name"]) {
-                $mail->SetFrom($from["adress"], $from["name"]);
+                $mail->setFrom($from["adress"], $from["name"]);
             } else {
-                $mail->SetFrom($from["adress"]);
+                $mail->setFrom($from["adress"]);
             }
         }
         foreach ($realRecipients as $address) {
             if ($address["adress"] == $address["name"]) {
-                $mail->AddAddress(trim($address["adress"]));
+                $mail->addAddress(trim($address["adress"]));
             } else {
-                $mail->AddAddress(trim($address["adress"]), trim($address["name"]));
+                $mail->addAddress(trim($address["adress"]), trim($address["name"]));
             }
         }
         $mail->WordWrap = 50;                                 // set word wrap to 50 characters
-        $mail->IsHTML($useHtml);                                  // set email format to HTML
+        $mail->isHTML($useHtml);                                  // set email format to HTML
         $mail->CharSet = "utf-8";
         $mail->Encoding = $this->getContextualOption(Context::emptyContext(), "MAIL_ENCODING");
         foreach ($images as $image) {
-            $mail->AddEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
+            $mail->addEmbeddedImage($image["path"], $image["cid"], '', 'base64', 'image/png');
         }
 
         $mail->Subject = $subject;
@@ -97,7 +99,7 @@ class PhpMailLite extends Mailer
             $mail->Body = Mailer::simpleHtml2Text($body);
         }
 
-        if (!$mail->Send()) {
+        if (!$mail->send()) {
             $message = "Message could not be sent\n";
             $message .= "Mailer Error: " . $mail->ErrorInfo;
             throw new Exception($message);

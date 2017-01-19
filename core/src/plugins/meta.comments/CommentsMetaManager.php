@@ -24,6 +24,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Access\Core\Model\UserSelection;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\SessionService;
 use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\StatHelper;
 
@@ -174,6 +175,7 @@ class CommentsMetaManager extends AbstractMetaSource
 
             case "load_comments_feed":
 
+                SessionService::close();
                 HTMLWriter::charsetHeader("application/json");
                 if ($feedStore !== false) {
                     $sortBy = isSet($httpVars["sort_by"])? InputFilter::decodeSecureMagic($httpVars["sort_by"]) :"date";
@@ -242,7 +244,7 @@ class CommentsMetaManager extends AbstractMetaSource
                     HTMLWriter::charsetHeader("application/json");
                     echo json_encode($reFeed);
                 } else {
-                    $feedStore->dismissAlertById($ctx, $data["uuid"], 1);
+                    $feedStore->dismissMetaObjectById($ctx, $data["uuid"]);
                 }
 
                 break;

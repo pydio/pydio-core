@@ -25,13 +25,14 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
 
-use Pydio\Core\Controller\Controller;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Utils\DBHelper;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\SqlTableProvider;
+use Pydio\Core\PluginFramework\PluginsService;
+use Pydio\Enterprise\Session\PydioSessionManager;
 use Pydio\Notification\Core\IFeedStore;
 use Pydio\Notification\Core\Notification;
 
@@ -131,11 +132,15 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
         }
 
         // Add some permission mask if necessary
+        /** @var PydioSessionManager $sessionManager */
+        $sessionManager = PluginsService::findPluginWithoutCtxt("sec", "session");
 
         $repoOrs = array();
         foreach($filterByRepositories as $repoId){
             $masks = array();
-            Controller::applyHook("role.masks", array(new Context($userId, $repoId), &$masks, AJXP_Permission::READ));
+            if($sessionManager !== false){
+                $sessionManager->listCurrentMasks(new Context($userId, $repoId), $masks, AJXP_Permission::READ);
+            }
             if(count($masks)){
                 $pathesOr = array();
                 foreach($masks as $mask){
@@ -397,10 +402,24 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
     }
 
     /**
+     * @inheritdoc
+     */
+    public function dismissMetaObjectById(ContextInterface $ctx, $objectId){
+        if(!dibi::isConnected()) {
+            dibi::connect($this->sqlDriver);
+        }
+        $userId = $ctx->getUser()->getId();
+        $userGroup = $ctx->getUser()->getGroupPath();
+        dibi::query("DELETE FROM [ajxp_feed] WHERE [id] = %i AND ([user_id] = %s OR [user_group] = %s) AND [etype] = %s", $objectId, $userId, $userGroup, "meta");
+    }
+
+
+    /**
      * @param $repositoryId
      * @param $oldPath
      * @param null $newPath
      * @param bool $copy
+     * @return mixed|void
      */
     public function updateMetaObject($repositoryId, $oldPath, $newPath = null, $copy = false)
     {

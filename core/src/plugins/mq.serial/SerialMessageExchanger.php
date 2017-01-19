@@ -39,7 +39,7 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     /**
      * @var array
      */
-    private $channels;
+    private static $channels;
     private $clientsGCTime = 10;
 
     /**
@@ -62,30 +62,30 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
      */
     public function loadChannel($channelName, $create = false)
     {
-        if (isSet($this->channels) && is_array($this->channels[$channelName])) {
+        if (isSet(self::$channels) && is_array(self::$channels[$channelName])) {
             return;
         }
         if (is_file($this->getPluginWorkDir()."/queues/channel-$channelName")) {
-            if(!isset($this->channels)) $this->channels = array();
+            if(!isset(self::$channels)) self::$channels = array();
             $data = FileHelper::loadSerialFile($this->getPluginWorkDir() . "/queues/channel-".$this->channelNameToFileName($channelName));
             if (is_array($data)) {
                 if(!is_array($data["MESSAGES"])) $data["MESSAGES"] = array();
                 if(!is_array($data["CLIENTS"])) $data["CLIENTS"] = array();
-                $this->channels[$channelName] = $data;
+                self::$channels[$channelName] = $data;
                 return;
             }
         }
         if ($create) {
-            if(!isSet($this->channels)) $this->channels = array();
-            $this->channels[$channelName] = array("CLIENTS" => array(),
+            if(!isSet(self::$channels)) self::$channels = array();
+            self::$channels[$channelName] = array("CLIENTS" => array(),
                 "MESSAGES" => array());
         }
     }
 
     public function __destruct()
     {
-        if (isSet($this->channels) && is_array($this->channels)) {
-            foreach ($this->channels as $channelName => $data) {
+        if (isSet(self::$channels) && is_array(self::$channels)) {
+            foreach (self::$channels as $channelName => $data) {
                 if (is_array($data)) {
                     FileHelper::saveSerialFile($this->getPluginWorkDir() . "/queues/channel-".$this->channelNameToFileName($channelName), $data);
                 }
@@ -116,12 +116,12 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
             $USER_ID = 'shared';
         }
         if($GROUP_PATH == null) $GROUP_PATH = false;
-        $this->channels[$channelName]["CLIENTS"][$clientId] = array(
+        self::$channels[$channelName]["CLIENTS"][$clientId] = array(
             "ALIVE" => time(),
             "USER_ID" => $USER_ID,
             "GROUP_PATH" => $GROUP_PATH
         );
-        foreach ($this->channels[$channelName]["MESSAGES"] as &$object) {
+        foreach (self::$channels[$channelName]["MESSAGES"] as &$object) {
             $object->messageRC[$clientId] = $clientId;
         }
     }
@@ -135,13 +135,13 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     public function unsuscribeFromChannel(ContextInterface $ctx, $channelName, $clientId)
     {
         $this->loadChannel($channelName);
-        if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
-        if(!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) return;
-        unset($this->channels[$channelName]["CLIENTS"][$clientId]);
-        foreach ($this->channels[$channelName]["MESSAGES"] as $index => &$object) {
+        if(!isSet(self::$channels) || !isSet(self::$channels[$channelName])) return;
+        if(!array_key_exists($clientId,  self::$channels[$channelName]["CLIENTS"])) return;
+        unset(self::$channels[$channelName]["CLIENTS"][$clientId]);
+        foreach (self::$channels[$channelName]["MESSAGES"] as $index => &$object) {
             unset($object->messageRC[$clientId]);
             if (count($object->messageRC)== 0) {
-                unset($this->channels[$channelName]["MESSAGES"][$index]);
+                unset(self::$channels[$channelName]["MESSAGES"][$index]);
             }
         }
     }
@@ -154,12 +154,12 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     public function publishToChannel(ContextInterface $ctx, $channelName, $messageObject)
     {
         $this->loadChannel($channelName);
-        if(!isSet($this->channels) || !isSet($this->channels[$channelName])) return;
-        if(!count($this->channels[$channelName]["CLIENTS"])) return;
-        $clientIds = array_keys($this->channels[$channelName]["CLIENTS"]);
+        if(!isSet(self::$channels) || !isSet(self::$channels[$channelName])) return;
+        if(!count(self::$channels[$channelName]["CLIENTS"])) return;
+        $clientIds = array_keys(self::$channels[$channelName]["CLIENTS"]);
         $messageObject->messageRC = array_combine($clientIds, $clientIds);
         $messageObject->messageTS = microtime();
-        $this->channels[$channelName]["MESSAGES"][] = $messageObject;
+        self::$channels[$channelName]["MESSAGES"][] = $messageObject;
     }
 
     /**
@@ -173,15 +173,15 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     public function consumeInstantChannel(ContextInterface $ctx, $channelName, $clientId, $userId, $userGroup)
     {
         // Force refresh
-        //$this->channels = null;
+        //self::$channels = null;
         $this->loadChannel($channelName);
-        if(!isSet($this->channels) || !isSet($this->channels[$channelName])) {
+        if(!isSet(self::$channels) || !isSet(self::$channels[$channelName])) {
             return null;
         }
         // Check dead clients
-        if (is_array($this->channels[$channelName]["CLIENTS"])) {
+        if (is_array(self::$channels[$channelName]["CLIENTS"])) {
             $toRemove = array();
-            foreach ($this->channels[$channelName]["CLIENTS"] as $cId => $cData) {
+            foreach (self::$channels[$channelName]["CLIENTS"] as $cId => $cData) {
                 $cAlive = $cData["ALIVE"];
                 if( $cId != $clientId &&  time() - $cAlive > $this->clientsGCTime * 60) $toRemove[] = $cId;
             }
@@ -191,14 +191,14 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
                 }
             }
         }
-        if (!array_key_exists($clientId,  $this->channels[$channelName]["CLIENTS"])) {
+        if (!array_key_exists($clientId,  self::$channels[$channelName]["CLIENTS"])) {
             // Auto Suscribe
             $this->suscribeToChannel($ctx, $channelName, $clientId);
         }
-        $this->channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
+        self::$channels[$channelName]["CLIENTS"][$clientId]["ALIVE"] = time();
         
         $result = array();
-        foreach ($this->channels[$channelName]["MESSAGES"] as $index => $object) {
+        foreach (self::$channels[$channelName]["MESSAGES"] as $index => $object) {
             if (!isSet($object->messageRC[$clientId])) {
                 continue;
             }
@@ -213,9 +213,9 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
             $result[] = $object;
             unset($object->messageRC[$clientId]);
             if (count($object->messageRC) <= 0) {
-                unset($this->channels[$channelName]["MESSAGES"][$index]);
+                unset(self::$channels[$channelName]["MESSAGES"][$index]);
             } else {
-                $this->channels[$channelName]["MESSAGES"][$index] = $object;
+                self::$channels[$channelName]["MESSAGES"][$index] = $object;
             }
         }
         return $result;
@@ -270,11 +270,11 @@ class SerialMessageExchanger extends Plugin implements IMessageExchanger
     public function publishInstantMessage(ContextInterface $ctx, $channel, $message)
     {
         $this->loadChannel($channel);
-        if(!isSet($this->channels) || !isSet($this->channels[$channel])) return;
-        if(!count($this->channels[$channel]["CLIENTS"])) return;
-        $clientIds = array_keys($this->channels[$channel]["CLIENTS"]);
+        if(!isSet(self::$channels) || !isSet(self::$channels[$channel])) return;
+        if(!count(self::$channels[$channel]["CLIENTS"])) return;
+        $clientIds = array_keys(self::$channels[$channel]["CLIENTS"]);
         $message->messageRC = array_combine($clientIds, $clientIds);
         $message->messageTS = microtime();
-        $this->channels[$channel]["MESSAGES"][] = $message;
+        self::$channels[$channel]["MESSAGES"][] = $message;
     }
 }

@@ -20,13 +20,13 @@
 						path = window.actionArguments[0];
 						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
 					}else{
-						var userSelection = ajaxplorer.getUserSelection();
+						var userSelection = pydio.getUserSelection();
 						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
 							path = userSelection.getUniqueNode();
 						}
 					}
 					if(path){
-						ajaxplorer.updateContextData(path);
+						pydio.updateContextData(path);
 					}
 					]]></clientCallback>
 				<serverCallback methodName="switchAction" restParams="/dir+" preferredHttp="GET" sdkMethodName="listNodes" checkParams="true" developerComment="Standard listing action
@@ -69,7 +69,7 @@
                     }, function(){
                         var oForm = $(modal.getForm());
                         var elementToCheck=(oForm['dirname']);
-                        if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
+                        if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
                         {
                             alert(MessageHash[125]);
                             return false;
@@ -103,7 +103,7 @@
                     modal.showDialogForm('Create', 'mkfile_form', null, function(){
                         var oForm = $(modal.getForm());
                         var elementToCheck=(oForm['filename']);
-                        if(ajaxplorer.getContextHolder().fileNameExists($(elementToCheck).getValue()))
+                        if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
                         {
                             alert(MessageHash[125]);
                             return false;
@@ -227,7 +227,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = ajaxplorer.getUserSelection();
+					var userSelection = pydio.getUserSelection();
 					if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled'))
 					{
 						if(window.gaTrackEvent){
@@ -269,8 +269,8 @@
 					</div>]]>
 					</clientForm>
 					<clientListener name="selectionChange"><![CDATA[
-					if(ajaxplorer){
-						var userSelection = ajaxplorer.getUserSelection();
+					if(pydio){
+						var userSelection = pydio.getUserSelection();
 						var action = pydio.getController().getActionByName("download");
 						if(window.zipEnabled && window.multipleFilesDownloadEnabled){
 							if(action){
@@ -337,7 +337,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = ajaxplorer.getUserSelection();
+					var userSelection = pydio.getUserSelection();
 					if((multipleFilesDownloadEnabled))
 					{
 						var loadFunc = function(oForm){
@@ -371,8 +371,8 @@
 				</div>
 				]]></clientForm>
 				<clientListener name="selectionChange"><![CDATA[
-				if(ajaxplorer){
-					var userSelection = ajaxplorer.getUserSelection();
+				if(pydio){
+					var userSelection = pydio.getUserSelection();
 					var action = pydio.getController().getActionByName("compress_ui");
 					if(!window.zipEnabled || !window.multipleFilesDownloadEnabled){
 						if(action){
@@ -474,12 +474,12 @@
 						if(url.indexOf('?') > 0){
 							url = url.substring(0, url.indexOf('?'));
 						}
-						var repoId = ajaxplorer.repositoryId || (ajaxplorer.user ? ajaxplorer.user.activeRepository : null);
-						if(ajaxplorer.user){
-							var slug = ajaxplorer.user.repositories.get(repoId).getSlug();
+						var repoId = pydio.repositoryId || (pydio.user ? pydio.user.activeRepository : null);
+						if(pydio.user){
+							var slug = pydio.user.repositories.get(repoId).getSlug();
 							if(slug) repoId = slug;
 						}
-						link = url + '?goto=' + repoId + encodeURIComponent(ajaxplorer.getUserSelection().getUniqueNode().getPath());
+						link = url + '?goto=' + repoId + encodeURIComponent(pydio.getUserSelection().getUniqueNode().getPath());
 						input.value = link;
                         var email = oForm.down('a[id="email"]');
                         if (email){
@@ -560,7 +560,7 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-				   var userSelection = ajaxplorer.getUserSelection();
+				   var userSelection = pydio.getUserSelection();
 				   var fileNames = $A(userSelection.getFileNames());
 				   var connexion = new Connexion();
 				   connexion.addParameter('get_action', 'restore');
@@ -637,8 +637,8 @@
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
-					if(ajaxplorer.user){
-						var user = ajaxplorer.user;
+					if(pydio.user){
+						var user = pydio.user;
 						var activeRepository = user.getActiveRepository();
 					}
 					var context = pydio.getController();
@@ -692,7 +692,7 @@
 						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
 							getAction.value = "cross_copy" ;
 						}
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						pydio.getUserSelection().updateFormOrUrl(oForm);
 						this.submitForm(oForm);
 						this.treeSelector.unload();
 						hideLightBox();
@@ -712,20 +712,22 @@
 					</div>
 				]]></clientForm>
 				<clientListener name="contextChange"><![CDATA[
-				if(ajaxplorer){
+				if(pydio){
 					var action = pydio.getController().getActionByName("copy");
 					if(action){
 						action.rightsContext.write = true;
-						var ajxpUser = ajaxplorer.user;
-						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
+						var ajxpUser = pydio.user;
+						if(ajxpUser && ajxpUser.canRead() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
 							action.rightsContext.write = false;
-							pydio.getController().defaultActions['delete']('ctrldragndrop');
-							pydio.getController().defaultActions['delete']('dragndrop');
+							if(!ajxpUser.canWrite()){
+							    pydio.getController().defaultActions['delete']('ctrldragndrop');
+							    pydio.getController().defaultActions['delete']('dragndrop');
+                            }
 						}
-						if(ajxpUser && ajxpUser.canWrite() && ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+						if(ajxpUser && ajxpUser.canWrite() && pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 						    action.rightsContext.write = false;
 						}
-						if(ajaxplorer.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+						if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
 							action.setLabel(247, 248);
 							action.setIconSrc('ark_extract.png');
 						}else{
@@ -752,8 +754,8 @@
 			<processing>
 				<clientCallback prepareModal="true"><![CDATA[
 					var context = pydio.getController();
-					if(ajaxplorer.user){
-						var user = ajaxplorer.user;
+					if(pydio.user){
+						var user = pydio.user;
 						var activeRepository = user.getActiveRepository();
 					}
 					var context = pydio.getController();
@@ -766,7 +768,7 @@
                             }
 						});
 						this.treeSelector.load();
-						if(!ajaxplorer.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+						if(!pydio.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
 							this.treeSelector.setFilterShow(true);
 							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
 								this.treeSelector.appendFilterValue(pair.key, pair.value.getLabel());
@@ -789,11 +791,11 @@
 						var oForm = modal.getForm();
 						var getAction = oForm.down('input[name="get_action"]');
 						var selectedNode = this.treeSelector.getSelectedNode();
-						if(!this.treeSelector.getFilterActive(activeRepository) && selectedNode == ajaxplorer.getContextNode().getPath()){
+						if(!this.treeSelector.getFilterActive(activeRepository) && selectedNode == pydio.getContextNode().getPath()){
 							alert(MessageHash[183]);
 							return false;
 						}
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						pydio.getUserSelection().updateFormOrUrl(oForm);
 						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
 							getAction.value = "cross_copy" ;
 							var subAction = new Element('input', {type:'hidden',name:'moving_files',value:'true'});
@@ -840,7 +842,7 @@
 					};
 					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
 						var oForm = modal.getForm();
-						ajaxplorer.getUserSelection().updateFormOrUrl(oForm);
+						pydio.getUserSelection().updateFormOrUrl(oForm);
 						PydioApi.getClient().submitForm(oForm, true, function(transport){
 						    var result = PydioApi.getClient().parseXmlMessage(transport.responseXML);
 						}.bind(pydio.getController()));
@@ -868,7 +870,7 @@
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="true"><![CDATA[
-                    var userSelection =  ajaxplorer.getUserSelection();
+                    var userSelection =  pydio.getUserSelection();
                     var loadFunc = function(oForm){
                         pydio.getController().propertyPane = new PropertyPanel(userSelection, oForm);
                     };
@@ -915,7 +917,7 @@
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
                 <clientCallback prepareModal="true"><![CDATA[
-					var userSelection = ajaxplorer.getUserSelection();
+					var userSelection = pydio.getUserSelection();
 
 					var loadFunc = function(oForm){
 						var dObject = oForm.down('div[id="multiple_download_container"]');

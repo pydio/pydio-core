@@ -73,7 +73,7 @@ class FilesystemMounter extends AbstractMetaSource
             list($user,$password) = MemorySafe::getCredentialsFromEncodedString($this->options["ENCODED_CREDENTIALS"]);
         }
         // 2. Try from session
-        if ($user=="" &&  isSet($this->options["USE_SESSION_CREDENTIALS"]) ) {
+        if ($user=="" &&  isSet($this->options["USE_SESSION_CREDENTIALS"]) && $this->options["USE_SESSION_CREDENTIALS"] === true ) {
             $safeCred = MemorySafe::loadCredentials();
             if ($safeCred !== false) {
                 $user = $safeCred["user"];
