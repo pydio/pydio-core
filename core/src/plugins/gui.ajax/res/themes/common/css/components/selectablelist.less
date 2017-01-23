@@ -521,3 +521,82 @@
 
 
 }
+
+.react-mui-context{
+
+  .main-file-list{
+
+    .mui-toolbar .mui-toolbar-group .icon-th-large{
+      margin: 0 18px;
+      font-size: 15px;
+      display: inline-block;
+    }
+
+    .material-list-entry{
+
+      .material-list-icon{
+        .covering-bg-preview{
+          border-radius: 50%;
+          height: 42px;
+          width: 42px;
+          margin-left: 14px;
+          margin-top: 5px;
+        }
+        > div{
+          width: 100%;
+          height: 100%;
+          &.mimefont-container{
+            display: flex;
+            align-items: center;
+            div.mimefont{
+              flex: 1;
+              font-size: 35px;
+              text-align: center;
+              color: @thumbnail_mimefont_color;
+            }
+          }
+        }
+      }
+
+      .material-list-line-2{
+        span.icon-angle-right{
+          display:inline-block;
+          margin: 0 5px;
+        }
+      }
+    }
+
+    &.material-list-grid{
+
+      .material-list-entry{
+        width: 230px;
+        float: left;
+        height: 200px;
+        position: relative;
+        display: block;
+        .material-list-icon{
+          width: 100%;
+          height: 100%;
+          div.covering-bg-preview{
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+          }
+          div.mimefont{
+            font-size: 70px !important;
+          }
+        }
+        .material-list-text{
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          padding: 10px;
+          background-color: rgba(0,0,0,0.53);
+          color: white;
+        }
+      }
+    }
+  }
+
+}

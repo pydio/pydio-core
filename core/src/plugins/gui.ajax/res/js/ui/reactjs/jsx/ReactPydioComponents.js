@@ -1122,7 +1122,8 @@
             thirdLine:React.PropTypes.node,
             actions:React.PropTypes.element,
             activeDroppable:React.PropTypes.bool,
-            className:React.PropTypes.string
+            className:React.PropTypes.string,
+            style: React.PropTypes.object
         },
 
         onClick: function(event){
@@ -1162,7 +1163,7 @@
                 }
             }
             return (
-                <div onClick={this.onClick} className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}>
+                <div onClick={this.onClick} className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")} style={this.props.style}>
                     {selector}
                     <div className={"material-list-icon" + ((this.props.mainIcon || iconCell)?"":" material-list-icon-none")}>
                         {iconCell}
@@ -1253,6 +1254,7 @@
                             className={"icon-refresh" + (this.props.loading?" rotating":"")}
                             onClick={this.props.reload}
                         />
+                        {this.props.additionalActions}
                     </ReactMUI.ToolbarGroup>
                 </ReactMUI.Toolbar>
             );
@@ -1313,7 +1315,8 @@
             renderFirstLine:React.PropTypes.func,
             renderSecondLine:React.PropTypes.func,
             renderThirdLine:React.PropTypes.func,
-            renderActions:React.PropTypes.func
+            renderActions:React.PropTypes.func,
+            style: React.PropTypes.object
         },
 
         render: function(){
@@ -1384,7 +1387,11 @@
             entryRenderFirstLine:React.PropTypes.func,
             entryRenderSecondLine:React.PropTypes.func,
             entryRenderThirdLine:React.PropTypes.func,
+            
+            openEditor:React.PropTypes.func,
+            openCollection:React.PropTypes.func,
 
+            elementStyle: React.PropTypes.object,
             elementHeight:React.PropTypes.oneOfType([
                 React.PropTypes.number,
                 React.PropTypes.object
@@ -1417,7 +1424,11 @@
                 uniqueSelection.set(node, true);
                 this.setState({selection:uniqueSelection}, this.rebuildLoadedElements);
             } else if(!node.isLeaf()) {
-                this.props.dataModel.setSelectedNodes([node]);
+                if(this.props.openCollection){
+                    this.props.openCollection(node);
+                }else{
+                    this.props.dataModel.setSelectedNodes([node]);
+                }
             }
         },
 
@@ -1438,6 +1449,7 @@
             if(this.props.elementHeight instanceof Object){
                 state.elementHeight = this.computeElementHeightResponsive();
             }
+            state.infiniteLoadBeginBottomOffset = 200;
             return state;
         },
 
@@ -1457,14 +1469,7 @@
             }else if(nextProps.autoRefresh && !this.refreshInterval){
                 this.refreshInterval = global.setInterval(this.reload, nextProps.autoRefresh);
             }
-            /*
-            if(this.props.node === nextProps.node && this.indexedElements && nextProps.node.isLoaded()){
-                nextProps.node.getChildren().forEach(function (child) {
-                    var nodeActions = this.getActionsForNode(this.dm, child);
-                    this.indexedElements.push({node: child, parent: false, actions: nodeActions});
-                }.bind(this));
-            }
-            */
+            this.patchInfiniteGrid(nextProps.elementsPerLine);
         },
 
         _loadNodeIfNotLoaded: function(){
@@ -1666,11 +1671,19 @@
             }
         },
 
+        patchInfiniteGrid: function(els){
+            if(this.refs.infinite && els > 1){
+                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexStart = function (windowTop){return els * Math.floor((windowTop/this.heightData) / els)};
+                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexEnd = function (windowBottom){return els * Math.ceil((windowBottom/this.heightData) / els)};
+            }
+        },
+
         componentDidMount: function(){
             this._loadNodeIfNotLoaded();
+            this.patchInfiniteGrid(this.props.elementsPerLine);
             if(this.refs.infiniteParent){
                 this.updateInfiniteContainerHeight();
-                if(!this.props.heightAutoWithMax) {
+                if(!this.props.heightAutoWithMax && !this.props.externalResize) {
                     if(global.addEventListener){
                         global.addEventListener('resize', this.updateInfiniteContainerHeight);
                     }else{
@@ -1776,6 +1789,9 @@
                         actions:<SimpleReactActionBar node={entry.node} actions={entry.actions} dataModel={this.dm}/>,
                         selectorDisabled:!(this.props.entryEnableSelector?this.props.entryEnableSelector(entry.node):entry.node.isLeaf())
                     };
+                    if(this.props.elementStyle){
+                        data['style'] = this.props.elementStyle;
+                    }
                     if(this.props.tableKeys){
                         if(this.state && this.state.groupBy){
                             data['tableKeys'] = LangUtils.deepCopy(this.props.tableKeys);
@@ -1845,6 +1861,10 @@
 
 
 
+            if(this.props.elementPerLine > 1){
+                end = end * this.props.elementPerLine;
+                start = start * this.props.elementPerLine;
+            }
             var nodes = this.indexedElements.slice(start, end);
             if(!nodes.length && theNode.getMetadata().get('paginationData')){
                 /*
@@ -1865,22 +1885,24 @@
         },
 
         rebuildLoadedElements: function(){
-            var elemLength = this.state.elements.length;
-            var newElements = this.buildElements(0, elemLength);
-            this.setState({elements:newElements});
+            let elemLength = this.state.elements.length;
+            let newElements = this.buildElements(0, elemLength);
+            let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;
+            this.setState({
+                elements:newElements,
+                infiniteLoadBeginBottomOffset:infiniteLoadBeginBottomOffset
+            });
             this.updateInfiniteContainerHeight();
         },
 
         handleInfiniteLoad: function() {
-            var that = this;
+            let elemLength = this.state.elements.length;
+            let newElements = this.buildElements(elemLength, elemLength + this.props.infiniteSliceCount);
+            let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;
             this.setState({
-                isInfiniteLoading: true
-            });
-            var elemLength = that.state.elements.length;
-            var newElements = that.buildElements(elemLength, elemLength + this.props.infiniteSliceCount);
-            that.setState({
                 isInfiniteLoading: false,
-                elements: that.state.elements.concat(newElements)
+                elements: this.state.elements.concat(newElements),
+                infiniteLoadBeginBottomOffset:infiniteLoadBeginBottomOffset
             });
         },
 
@@ -1893,6 +1915,9 @@
                         className={"icon-refresh" + (this.state.loading?" rotating":"")}
                         onClick={this.reload}
             />;
+            if(this.props.additionalActions){
+                rightButtons = [rightButtons, this.props.additionalActions];
+            }
             var leftToolbar;
             var paginator;
 
@@ -1989,6 +2014,7 @@
                     ref="loading_indicator"
                     dm={this.props.dataModel}
                     node={this.props.node}
+                    additionalActions={this.props.additionalActions}
                 />
             }else{
                 toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
@@ -2002,8 +2028,9 @@
                         <Infinite
                             elementHeight={this.state.elementHeight?this.state.elementHeight:this.props.elementHeight}
                             containerHeight={this.state.containerHeight}
-                            infiniteLoadBeginBottomOffset={200}
+                            infiniteLoadBeginBottomOffset={this.state.infiniteLoadBeginBottomOffset}
                             onInfiniteLoad={this.handleInfiniteLoad}
+                            ref="infinite"
                         >
                             {elements}
                         </Infinite>

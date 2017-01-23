@@ -47,6 +47,16 @@ Class.create('AjxpReactComponent', AjxpPane, {
         this.reactComponent = null;
         React.unmountComponentAtNode(this.htmlElement);
         $super();
+    },
+
+    resize: function(){
+        if(this.reactComponent){
+            if(this.reactComponent.pydioResize){
+                this.reactComponent.pydioResize();
+            }else if(this.reactComponent.refs && this.reactComponent.refs['child'] && this.reactComponent.refs['child'].pydioResize){
+                this.reactComponent.refs['child'].pydioResize();
+            }
+        }
     }
 
 });

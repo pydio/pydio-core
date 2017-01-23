@@ -7,6 +7,7 @@
                 fallbackCondition="!window.addEventListener" fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"/>
             <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
             <js className="ReactPydio" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactPydioComponents.js"/>
+            <js className="WSComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/WSComponents.js" depends="React,ReactPydio"/>
             <js className="Toolbars" file="plugins/gui.ajax/res/js/ui/reactjs/build/Toolbars.js" depends="React,ReactMFB"/>
             <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
             <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,ReactPydio"/>
