@@ -1285,7 +1285,12 @@
 
                 var data = this.props.tableKeys[key];
                 var style = data['width']?{width:data['width']}:null;
-                var value = this.props.node.getMetadata().get(key);
+                let value;
+                if(data.renderCell){
+                    value = data.renderCell(this.props.node);
+                }else{
+                    value = this.props.node.getMetadata().get(key);
+                }
                 cells.push(<span key={key} className={'cell cell-' + key} title={value} style={style} data-label={data['label']}>{value}</span>);
             }
 
@@ -1322,7 +1327,7 @@
         render: function(){
             var icon, firstLine, secondLine, thirdLine;
             if(this.props.renderIcon) {
-                icon = this.props.renderIcon(this.props.node);
+                icon = this.props.renderIcon(this.props.node, this.props);
             } else {
                 var node = this.props.node;
                 var iconClass = node.getMetadata().get("icon_class")? node.getMetadata().get("icon_class") : (node.isLeaf()?"icon-file-alt":"icon-folder-close");
@@ -1392,6 +1397,7 @@
             openCollection:React.PropTypes.func,
 
             elementStyle: React.PropTypes.object,
+            passScrollingStateToChildren:React.PropTypes.bool,
             elementHeight:React.PropTypes.oneOfType([
                 React.PropTypes.number,
                 React.PropTypes.object
@@ -1456,12 +1462,13 @@
         componentWillReceiveProps: function(nextProps) {
             this.indexedElements = null;
             if(nextProps.filterNodes) this.props.filterNodes = nextProps.filterNodes;
-            var currentLength = Math.max(this.state.elements.length, this.props.infiniteSliceCount);
+            var currentLength = Math.max(this.state.elements.length, nextProps.infiniteSliceCount);
             this.setState({
                 loaded: nextProps.node.isLoaded(),
                 loading:!nextProps.node.isLoaded(),
                 showSelector:false,
-                elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[]
+                elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
+                infiniteLoadBeginBottomOffset:200
             });
             if(!nextProps.autoRefresh&& this.refreshInterval){
                 global.clearInterval(this.refreshInterval);
@@ -1673,8 +1680,12 @@
 
         patchInfiniteGrid: function(els){
             if(this.refs.infinite && els > 1){
-                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexStart = function (windowTop){return els * Math.floor((windowTop/this.heightData) / els)};
-                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexEnd = function (windowBottom){return els * Math.ceil((windowBottom/this.heightData) / els)};
+                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexStart = function (windowTop){
+                    return els * Math.floor((windowTop/this.heightData) / els)
+                };
+                this.refs.infinite.state.infiniteComputer.__proto__.getDisplayIndexEnd = function (windowBottom){
+                    return els * Math.ceil((windowBottom/this.heightData) / els)
+                };
             }
         },
 
@@ -1734,11 +1745,31 @@
             this._loadNodeIfNotLoaded();
         },
 
-        onScroll:function(ev){
-            var scrollTop = ev.target.scrollTop;
-            bufferCallback('infiniteScroller', 50, function(){
-                this.setState({scrollerDelta:scrollTop});
-            }.bind(this));
+        onScroll:function(scrollTop){
+
+            if(!this.props.passScrollingStateToChildren){
+                return;
+            }
+            // Maintains a series of timeouts to set this.state.isScrolling
+            // to be true when the element is scrolling.
+
+            if (this.state.scrollTimeout) {
+                clearTimeout(this.state.scrollTimeout);
+            }
+
+            var that = this,
+                scrollTimeout = setTimeout(() => {
+                    that.setState({
+                        isScrolling: false,
+                        scrollTimeout: undefined
+                    })
+                }, 150);
+
+            this.setState({
+                isScrolling: true,
+                scrollTimeout: scrollTimeout
+            });
+
         },
 
         buildElementsFromNodeEntries: function(nodeEntries, showSelector){
@@ -1791,6 +1822,9 @@
                     };
                     if(this.props.elementStyle){
                         data['style'] = this.props.elementStyle;
+                    }
+                    if(this.props.passScrollingStateToChildren){
+                        data['parentIsScrolling'] = this.state.isScrolling;
                     }
                     if(this.props.tableKeys){
                         if(this.state && this.state.groupBy){
@@ -2030,6 +2064,7 @@
                             containerHeight={this.state.containerHeight}
                             infiniteLoadBeginBottomOffset={this.state.infiniteLoadBeginBottomOffset}
                             onInfiniteLoad={this.handleInfiniteLoad}
+                            handleScroll={this.onScroll}
                             ref="infinite"
                         >
                             {elements}

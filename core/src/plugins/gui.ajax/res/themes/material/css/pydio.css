@@ -1056,6 +1056,9 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 7px;
   margin-top: 2px;
 }
+.react-mui-context .main-file-list {
+  opacity: 1;
+}
 .react-mui-context .main-file-list .mui-toolbar .mui-toolbar-group .icon-th-large {
   margin: 0 18px;
   font-size: 15px;
@@ -1092,6 +1095,25 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: inline-block;
   margin: 0 5px;
 }
+.react-mui-context .main-file-list.table-mode span.cell {
+  color: rgba(0, 0, 0, 0.53);
+}
+.react-mui-context .main-file-list.table-mode span.cell.cell-text {
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 14px;
+  font-weight: 400;
+}
+.react-mui-context .main-file-list.table-mode span.cell.cell-text > span {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+.react-mui-context .main-file-list.table-mode span.cell.cell-text > span div.mimefont-container {
+  font-size: 17px;
+  margin-top: -2px;
+  margin-right: 10px;
+  color: #607d8b;
+}
 .react-mui-context .main-file-list.material-list-grid .material-list-entry {
   width: 230px;
   float: left;
@@ -1119,6 +1141,23 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   padding: 10px;
   background-color: rgba(0, 0, 0, 0.53);
   color: white;
+}
+.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry {
+  padding: 0.5px 1px;
+}
+.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text {
+  display: none;
+  padding: 5px;
+}
+.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text .material-list-line-1 {
+  font-size: 12px;
+  line-height: 12px;
+}
+.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover {
+  background-color: #ff7e55 !important;
+}
+.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
+  display: block;
 }
 .class-FilesList .thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
   padding-left: 6px;

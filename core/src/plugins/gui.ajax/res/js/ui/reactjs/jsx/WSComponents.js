@@ -26,7 +26,8 @@
     let FilePreview = React.createClass({
 
         propTypes: {
-            node: React.PropTypes.instanceOf(AjxpNode)
+            node: React.PropTypes.instanceOf(AjxpNode),
+            noRichPreview: React.PropTypes.bool
         },
 
         getInitialState: function(){
@@ -40,10 +41,17 @@
         componentWillReceiveProps: function(nextProps){
             if(nextProps.node.getPath() !== this.props.node.getPath()){
                 this.loadCoveringImage();
+                return;
+            }
+            if(nextProps.noRichPreview !== this.props.noRichPreview && !nextProps.noRichPreview){
+                this.loadCoveringImage(true);
             }
         },
 
-        loadCoveringImage: function(){
+        loadCoveringImage: function(force = false){
+            if(this.props.noRichPreview && !force){
+                return;
+            }
             let pydio = global.pydio, node = this.props.node;
             let editors = global.pydio.Registry.findEditorsForMime((node.isLeaf()?node.getAjxpMime():"mime_folder"), true);
             if(!editors || !editors.length) {
@@ -119,11 +127,12 @@
                 thumbSize   : 200,
                 elementsPerLine: 5,
                 columns     : {
-                    text:{label:'File Name', message:'1', width: '50%'},
+                    text:{label:'File Name', message:'1', width: '50%', renderCell:this.tableEntryRenderCell.bind(this)},
                     filesize:{label:'File Size', message:'2'},
                     mimestring:{label:'File Type', message:'3'},
                     ajxp_modiftime:{label:'Mofidied on', message:'4'}
-                }
+                },
+                parentIsScrolling: this.props.parentIsScrolling
             }
         },
 
@@ -134,16 +143,23 @@
             this.recomputeThumbnailsDimension();
         },
 
-        recomputeThumbnailsDimension: function(){
+        recomputeThumbnailsDimension: function(nearest){
+
+            if(!nearest){
+                nearest = this.state.thumbNearest;
+            }
 
             let containerWidth = this.refs['list'].getDOMNode().clientWidth;
-            let nearest = this.state.thumbNearest;
 
             // Find nearest dim
             let blockNumber = Math.floor(containerWidth / nearest);
             let width = Math.floor(containerWidth / blockNumber);
 
-            this.setState({elementsPerLine: blockNumber, thumbSize: width});
+            this.setState({
+                elementsPerLine: blockNumber,
+                thumbSize: width,
+                thumbNearest:nearest
+            });
         },
 
         componentDidMount: function(){
@@ -167,8 +183,12 @@
             }
         },
 
-        entryRenderIcon: function(node){
-            return <FilePreview node={node}/>;
+        entryRenderIcon: function(node, entryProps = {}){
+            return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
+        },
+
+        tableEntryRenderCell: function(node){
+            return <span><FilePreview noRichPreview={true} node={node}/> {node.getLabel()}</span>;
         },
 
         entryRenderSecondLine: function(node){
@@ -217,11 +237,16 @@
         },
 
         renderDisplaySwitcher: function(){
-            var modes = ['detail', 'list', 'grid']
+            var modes = ['list', 'grid-160', 'grid-320', 'detail', 'grid-80'];
             let nextMode = function(){
                 let current = this.state.displayMode;
                 let i = modes.indexOf(current);
-                this.setState({displayMode: modes[(i == 2 ? 0 : i+1)]});
+                let dMode = modes[(i == (modes.length - 1) ? 0 : i+1)];
+                if(dMode.indexOf('grid-') === 0){
+                    let near = parseInt(dMode.split('-')[1]);
+                    this.recomputeThumbnailsDimension(near);
+                }
+                this.setState({displayMode: dMode});
             }.bind(this);
             return (<ReactMUI.FontIcon
                 tooltip="Display Mode"
@@ -233,24 +258,34 @@
         render: function(){
 
             let tableKeys, elementStyle, className = 'main-file-list layout-fill';
-            let elementHeight, entryRenderSecondLine, elementsPerLine = 1;
+            let elementHeight, entryRenderSecondLine, elementsPerLine = 1, near;
+            let dMode = this.state.displayMode;
+            if(dMode.indexOf('grid-') === 0){
+                near = parseInt(dMode.split('-')[1]);
+                dMode = 'grid';
+            }
+            let infiniteSliceCount = 50;
 
-            if(this.state.displayMode === 'detail'){
+            if(dMode === 'detail'){
 
                 elementHeight = ReactPydio.SimpleList.HEIGHT_ONE_LINE;
                 tableKeys = this.state.columns;
 
-            } else if(this.state.displayMode === 'grid'){
+            } else if(dMode === 'grid'){
 
-                className += ' material-list-grid';
+                className += ' material-list-grid grid-size-' + near;
                 elementHeight =  Math.ceil(this.state.thumbSize / this.state.elementsPerLine);
                 elementsPerLine = this.state.elementsPerLine;
                 elementStyle={
                     width: this.state.thumbSize,
                     height: this.state.thumbSize
                 };
+                // Todo: compute a more real number of elements visible per page.
+                if(near === 320) infiniteSliceCount = 25;
+                else if(near === 160) infiniteSliceCount = 80;
+                else if(near === 80) infiniteSliceCount = 200;
 
-            } else if(this.state.displayMode === 'list'){
+            } else if(dMode === 'list'){
 
                 elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES;
                 entryRenderSecondLine = this.entryRenderSecondLine.bind(this);
@@ -268,10 +303,11 @@
                     externalResize={true}
                     className={className}
                     actionBarGroups={["get"]}
-                    infiniteSliceCount={30}
+                    infiniteSliceCount={infiniteSliceCount}
                     elementsPerLine={elementsPerLine}
                     elementHeight={elementHeight}
                     elementStyle={elementStyle}
+                    passScrollingStateToChildren={true}
                     entryRenderIcon={this.entryRenderIcon}
                     entryRenderSecondLine={entryRenderSecondLine}
                     additionalActions={[this.renderDisplaySwitcher()]}

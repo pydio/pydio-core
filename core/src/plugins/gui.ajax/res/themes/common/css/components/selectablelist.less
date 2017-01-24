@@ -526,6 +526,8 @@
 
   .main-file-list{
 
+    opacity: 1;
+
     .mui-toolbar .mui-toolbar-group .icon-th-large{
       margin: 0 18px;
       font-size: 15px;
@@ -566,6 +568,26 @@
       }
     }
 
+    &.table-mode{
+      span.cell{
+        color: rgba(0,0,0,0.53);
+      }
+      span.cell.cell-text{
+        color: rgba(0,0,0,0.87);
+        font-size: 14px;
+        font-weight: 400;
+        > span{
+          display: flex;
+          div.mimefont-container{
+            font-size: 17px;
+            margin-top: -2px;
+            margin-right: 10px;
+            color: @thumbnail_mimefont_color;
+          }
+        }
+      }
+    }
+
     &.material-list-grid{
 
       .material-list-entry{
@@ -596,6 +618,29 @@
           color: white;
         }
       }
+
+      &.grid-size-80{
+
+        .material-list-entry{
+          padding: 0.5px 1px;
+          .material-list-text{
+            display:none;
+            padding: 5px;
+            .material-list-line-1{
+              font-size: 12px;
+              line-height: 12px;
+            }
+          }
+          &:hover{
+            background-color: @selectionMainTint !important;
+            .material-list-text{
+              display: block;
+            }
+          }
+        }
+
+      }
+
     }
   }
 
