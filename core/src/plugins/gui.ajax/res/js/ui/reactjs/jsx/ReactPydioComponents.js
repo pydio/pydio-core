@@ -315,6 +315,34 @@
             }
         },
 
+        listenToNode: function(node){
+            this._childrenListener = function(){
+                if(!this.isMounted()) return;
+                this.setState({children:this._nodeToChildren(node)});
+            }.bind(this);
+            this._nodeListener = function(){
+                if(!this.isMounted()) return;
+                this.forceUpdate();
+            }.bind(this);
+            node.observe("child_added", this._childrenListener);
+            node.observe("child_removed", this._childrenListener);
+            node.observe("node_replaced", this._nodeListener);
+        },
+
+        stopListening: function(node){
+            node.stopObserving("child_added", this._childrenListener);
+            node.stopObserving("child_removed", this._childrenListener);
+            node.stopObserving("node_replaced", this._nodeListener);
+        },
+
+        componentDidMount: function(){
+            this.listenToNode(this.props.node);
+        },
+        
+        componentWillUnmount:function(){
+            this.stopListening(this.props.node);
+        },
+        
         componentWillReceiveProps: function(nextProps){
             var oldNode = this.props.node;
             var newNode = nextProps.node;
@@ -330,6 +358,10 @@
                 this.setState({children:remapedChildren});
             }else{
                 this.setState({children:this._nodeToChildren(newNode)});
+            }
+            if(newNode !== oldNode){
+                this.stopListening(oldNode);
+                this.listenToNode(newNode);
             }
         },
 
@@ -1390,6 +1422,20 @@
             style: React.PropTypes.object
         },
 
+        componentDidMount: function(){
+            this._nodeListener = function(){
+                if(!this.isMounted()) return;
+                this.forceUpdate();
+            }.bind(this);
+            this.props.node.observe("node_replaced", this._nodeListener);
+        },
+
+        componentWillUnmount: function(){
+            if(this._nodeListener){
+                this.props.node.stopObserving("node_replaced", this._nodeListener);
+            }
+        },
+
         render: function(){
             var icon, firstLine, secondLine, thirdLine;
             if(this.props.renderIcon) {
@@ -1577,6 +1623,27 @@
                 this.refreshInterval = global.setInterval(this.reload, nextProps.autoRefresh);
             }
             this.patchInfiniteGrid(nextProps.elementsPerLine);
+            if(this.props.node && nextProps.node !== this.props.node) {
+                this.observeNodeChildren(this.props.node, true);
+            }
+        },
+
+        observeNodeChildren: function(node, stop = false){
+            if(stop && !this._childrenObserver) return;
+
+            if(!this._childrenObserver){
+                this._childrenObserver = function(){
+                    this.indexedElements = null;
+                    this.rebuildLoadedElements();
+                }.bind(this);
+            }
+            if(stop){
+                node.stopObserving("child_added", this._childrenObserver);
+                node.stopObserving("child_removed", this._childrenObserver);
+            }else{
+                node.observe("child_added", this._childrenObserver);
+                node.observe("child_removed", this._childrenObserver);
+            }
         },
 
         _loadNodeIfNotLoaded: function(){
@@ -1585,6 +1652,7 @@
                 node.observeOnce("loaded", function(){
                     if(!this.isMounted()) return;
                     if(this.props.node === node){
+                        this.observeNodeChildren(node);
                         this.setState({
                             loaded:true,
                             loading: false,
@@ -1596,10 +1664,13 @@
                     }
                 }.bind(this));
                 node.load();
+            }else{
+                this.observeNodeChildren(node);
             }
         },
 
         _loadingListener: function(){
+            this.observeNodeChildren(this.props.node, true);
             this.setState({loaded:false, loading:true});
             this.indexedElements = null;
         },
@@ -1612,6 +1683,7 @@
             if(this.props.heightAutoWithMax){
                 this.updateInfiniteContainerHeight();
             }
+            this.observeNodeChildren(this.props.node);
         },
 
         reload: function(){
@@ -1839,9 +1911,15 @@
             if(this.props.observeNodeReload){
                 this.stopReloadListeners();
             }
+            if(this.props.node) {
+                this.observeNodeChildren(this.props.node, true);
+            }
         },
 
-        componentDidUpdate: function(){
+        componentDidUpdate: function(prevProps, prevState){
+            if(prevProps.node && this.props.node && prevProps.node.getPath() === this.props.node.getPath()){
+                return;
+            }
             this._loadNodeIfNotLoaded();
         },
 
@@ -2036,8 +2114,7 @@
         },
 
         rebuildLoadedElements: function(){
-            let elemLength = this.state.elements.length;
-            let newElements = this.buildElements(0, elemLength);
+            let newElements = this.buildElements(0, Math.max(this.state.elements.length, this.props.infiniteSliceCount));
             let infiniteLoadBeginBottomOffset = newElements.length? 200 : 0;
             this.setState({
                 elements:newElements,
