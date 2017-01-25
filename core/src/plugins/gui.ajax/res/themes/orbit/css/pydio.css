@@ -1027,17 +1027,12 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 .react-mui-context .main-file-list {
   opacity: 1;
 }
-.react-mui-context .main-file-list .mui-toolbar .mui-toolbar-group .icon-th-large {
-  margin: 0 18px;
-  font-size: 15px;
-  display: inline-block;
-}
 .react-mui-context .main-file-list .material-list-entry .material-list-icon .covering-bg-preview {
   border-radius: 50%;
-  height: 42px;
-  width: 42px;
-  margin-left: 14px;
-  margin-top: 5px;
+  height: 40px;
+  width: 40px;
+  margin-left: 17px;
+  margin-top: 12px;
 }
 .react-mui-context .main-file-list .material-list-entry .material-list-icon > div {
   width: 100%;
@@ -1055,13 +1050,27 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
-  font-size: 35px;
+  font-size: 28px;
   text-align: center;
   color: #607d8b;
+  padding-bottom: 10px;
+}
+.react-mui-context .main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont.mdi-folder {
+  color: #5c7885;
+}
+.react-mui-context .main-file-list .material-list-entry .material-list-line-2 {
+  line-height: 22px;
+}
+.react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.metadata_chunk {
+  color: rgba(0, 0, 0, 0.33);
+}
+.react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
+  color: rgba(0, 0, 0, 0.73);
 }
 .react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.icon-angle-right {
   display: inline-block;
-  margin: 0 5px;
+  margin: 0 1px;
+  visibility: hidden;
 }
 .react-mui-context .main-file-list.table-mode span.cell {
   color: rgba(0, 0, 0, 0.53);
@@ -1088,6 +1097,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   height: 200px;
   position: relative;
   display: block;
+  padding: 1px;
 }
 .react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-icon {
   width: 100%;
@@ -1104,11 +1114,15 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 }
 .react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-text {
   position: absolute;
-  bottom: 0;
-  width: 100%;
+  bottom: 1px;
+  left: 1px;
+  right: 1px;
   padding: 10px;
-  background-color: rgba(0, 0, 0, 0.53);
+  background-color: rgba(0, 0, 0, 0.33);
   color: white;
+}
+.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-actions {
+  display: none;
 }
 .react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry {
   padding: 0.5px 1px;

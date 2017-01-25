@@ -2792,6 +2792,28 @@
   line-height: 15px;
   margin-top: -2px;
 }
+.react-mui-context span.toolbars-button-menu {
+  display: inline-block;
+  position: relative;
+}
+.react-mui-context span.toolbars-button-menu .mui-menu {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 10;
+  min-width: 200px;
+  max-height: none !important;
+}
+.react-mui-context .mui-toolbar .mui-toolbar-group span.toolbars-button-menu {
+  margin-top: 5px;
+}
+.react-mui-context .mui-toolbar .mui-toolbar-group span.toolbars-button-menu .mui-font-icon {
+  line-height: 20px;
+  font-size: 18px;
+}
+.react-mui-context .mui-toolbar .mui-toolbar-group span.toolbars-button-menu .mui-menu-item .mui-menu-item-icon {
+  line-height: 48px;
+}
 .react-mui-context .main-layout-nav-to-stack,
 .react-mui-context .horizontal-layout,
 .react-mui-context .vertical-layout,
@@ -3541,6 +3563,24 @@
   padding-right: 10px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable {
+  cursor: pointer;
+}
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-asc,
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-desc {
+  color: rgba(0, 0, 0, 0.73);
+}
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-asc::before,
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-desc::before {
+  display: block;
+  position: absolute;
+  margin-left: -16px;
+  font-family: "Material Design Icons";
+  content: "\f156";
+}
+.react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-desc::before {
+  content: "\f144";
 }
 @media only screen and (max-width: 480px) {
   .react-mui-context .material-list.table-mode .cell {

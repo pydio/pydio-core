@@ -127,10 +127,31 @@
                 thumbSize   : 200,
                 elementsPerLine: 5,
                 columns     : {
-                    text:{label:'File Name', message:'1', width: '50%', renderCell:this.tableEntryRenderCell.bind(this)},
-                    filesize:{label:'File Size', message:'2'},
-                    mimestring:{label:'File Type', message:'3'},
-                    ajxp_modiftime:{label:'Mofidied on', message:'4'}
+                    text:{
+                        label:'File Name',
+                        message:'1',
+                        width: '50%',
+                        renderCell:this.tableEntryRenderCell.bind(this),
+                        sortType:'string',
+                        remoteSortAttribute:'ajxp_label'
+                    },
+                    filesize:{
+                        label:'File Size',
+                        message:'2',
+                        sortType:'number',
+                        sortAttribute:'bytesize',
+                        remoteSortAttribute:'filesize'
+                    },
+                    mimestring:{
+                        label:'File Type',
+                        message:'3',
+                        sortType:'string'
+                    },
+                    ajxp_modiftime:{
+                        label:'Mofidied on',
+                        message:'4',
+                        sortType:'number'
+                    }
                 },
                 parentIsScrolling: this.props.parentIsScrolling
             }
@@ -237,27 +258,27 @@
         },
 
         renderDisplaySwitcher: function(){
-            var modes = ['list', 'grid-160', 'grid-320', 'detail', 'grid-80'];
-            let nextMode = function(){
-                let current = this.state.displayMode;
-                let i = modes.indexOf(current);
-                let dMode = modes[(i == (modes.length - 1) ? 0 : i+1)];
+            let switchMode = function(object){
+                let dMode = object.payload;
                 if(dMode.indexOf('grid-') === 0){
                     let near = parseInt(dMode.split('-')[1]);
                     this.recomputeThumbnailsDimension(near);
                 }
                 this.setState({displayMode: dMode});
             }.bind(this);
-            return (<ReactMUI.FontIcon
-                tooltip="Display Mode"
-                className={"icon-th-large"}
-                onClick={nextMode}
-            />);
+            let menuItems = [
+                {payload:'detail', text:'Table View'},
+                {payload:'list', text:'List'},
+                {payload:'grid-160', text:'Thumbnails (medium)'},
+                {payload:'grid-320', text:'Thumbnails (large)'},
+                {payload:'grid-80', text:'Thumbnails (small)'}
+            ];
+            return <Toolbars.ButtonMenu buttonTitle="Display mode" buttonClassName="icon-th-large" menuItems={menuItems} onMenuClicked={switchMode}/>
         },
 
         render: function(){
 
-            let tableKeys, elementStyle, className = 'main-file-list layout-fill';
+            let tableKeys, sortKeys, elementStyle, className = 'main-file-list layout-fill';
             let elementHeight, entryRenderSecondLine, elementsPerLine = 1, near;
             let dMode = this.state.displayMode;
             if(dMode.indexOf('grid-') === 0){
@@ -273,6 +294,7 @@
 
             } else if(dMode === 'grid'){
 
+                sortKeys = this.state.columns;
                 className += ' material-list-grid grid-size-' + near;
                 elementHeight =  Math.ceil(this.state.thumbSize / this.state.elementsPerLine);
                 elementsPerLine = this.state.elementsPerLine;
@@ -287,6 +309,7 @@
 
             } else if(dMode === 'list'){
 
+                sortKeys = this.state.columns;
                 elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES;
                 entryRenderSecondLine = this.entryRenderSecondLine.bind(this);
 
@@ -296,13 +319,14 @@
                 <ReactPydio.SimpleList
                     ref="list"
                     tableKeys={tableKeys}
+                    sortKeys={sortKeys}
                     node={this.state.contextNode}
                     dataModel={this.props.pydio.getContextHolder()}
                     openEditor={this.selectNode}
                     openCollection={this.selectNode}
                     externalResize={true}
                     className={className}
-                    actionBarGroups={["get"]}
+                    actionBarGroups={["change_main"]}
                     infiniteSliceCount={infiniteSliceCount}
                     elementsPerLine={elementsPerLine}
                     elementHeight={elementHeight}
@@ -311,6 +335,7 @@
                     entryRenderIcon={this.entryRenderIcon}
                     entryRenderSecondLine={entryRenderSecondLine}
                     additionalActions={[this.renderDisplaySwitcher()]}
+//                    defaultGroupBy="mimestring" // Test grouping by a given field
                 />
             );
         }
@@ -330,7 +355,7 @@
 
     let ns = global.WSComponents || {};
     if(global.ReactDND){
-        ns.MainFilesList = ReactDND.DragDropContext(FakeDndBackend)(MainFilesList);
+        ns.MainFilesList = ReactDND.DragDropContext(ReactDND.HTML5Backend)(MainFilesList);
     }else{
         ns.MainFilesList = MainFilesList;
     }

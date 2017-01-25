@@ -65,8 +65,62 @@
         }
     });
 
+
+    var ButtonMenu = React.createClass({
+
+        propTypes: {
+            buttonTitle: React.PropTypes.string.isRequired,
+            buttonClassName: React.PropTypes.string.isRequired,
+            menuItems: React.PropTypes.array.isRequired,
+            onMenuClicked: React.PropTypes.func.isRequired
+        },
+
+        getInitialState(){
+            return {showMenu:false};
+        },
+        showMenu: function () {
+            this.setState({showMenu: true});
+        },
+        hideMenu: function(event){
+            if(!event){
+                this.setState({showMenu: false});
+                return;
+            }
+            let buttonElement = this.refs['menuButton'].getDOMNode();
+            if(! (buttonElement.contains(event.target) || buttonElement === event.target )){
+                this.setState({showMenu: false});
+            }
+        },
+        componentDidMount: function(){
+            this._observer = this.hideMenu.bind(this);
+            document.addEventListener('click', this._observer, false);
+        },
+        componentWillUnmount: function(){
+            document.removeEventListener('click', this._observer, false);
+        },
+
+        menuClicked:function(event, index, menuItem){
+            this.props.onMenuClicked(menuItem);
+            this.hideMenu();
+        },
+        render: function(){
+            var menuAnchor = <ReactMUI.IconButton ref="menuButton" tooltip={this.props.buttonTitle} iconClassName={this.props.buttonClassName} onClick={this.showMenu}/>;
+            if(this.state.showMenu) {
+                var menuBox = <ReactMUI.Menu onItemClick={this.menuClicked} menuItems={this.props.menuItems}/>;
+            }
+            return (
+                <span className="toolbars-button-menu">
+                    {menuAnchor}
+                    {menuBox}
+                </span>
+            );
+        }
+
+    });
+
     var ns = global.Toolbars || {};
     ns.MFB = MFB;
+    ns.ButtonMenu = ButtonMenu;
     global.Toolbars = ns;
 
 })(window);

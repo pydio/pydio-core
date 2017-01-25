@@ -23,6 +23,29 @@
     margin-top: -2px;
   }
 
+  span.toolbars-button-menu{
+    display: inline-block;
+    position: relative;
+    .mui-menu{
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      z-index: 10;
+      min-width: 200px;
+      max-height: none !important;
+    }
+  }
+  .mui-toolbar .mui-toolbar-group span.toolbars-button-menu{
+    margin-top: 5px;
+    .mui-font-icon{
+      line-height: 20px;
+      font-size: 18px;
+    }
+    .mui-menu-item .mui-menu-item-icon{
+      line-height: 48px;
+    }
+  }
+
   /*************/
   /* LAYOUTS   */
   /*************/
@@ -826,6 +849,24 @@
         padding-right: 10px;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        &.header_cell.sortable{
+          cursor: pointer;
+          &.active-sort-asc, &.active-sort-desc{
+            color: rgba(0,0,0,0.73);
+            &::before{
+              display: block;
+              position: absolute;
+              margin-left: -16px;
+              font-family: "Material Design Icons";
+              content: "\f156";
+            }
+          }
+          &.active-sort-desc::before{
+            content: "\f144";
+          }
+        }
+
 
         @media only screen and (max-width: 480px) {
           & {

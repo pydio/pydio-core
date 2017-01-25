@@ -524,25 +524,21 @@
 
 .react-mui-context{
 
+
+
   .main-file-list{
 
     opacity: 1;
-
-    .mui-toolbar .mui-toolbar-group .icon-th-large{
-      margin: 0 18px;
-      font-size: 15px;
-      display: inline-block;
-    }
 
     .material-list-entry{
 
       .material-list-icon{
         .covering-bg-preview{
           border-radius: 50%;
-          height: 42px;
-          width: 42px;
-          margin-left: 14px;
-          margin-top: 5px;
+          height: 40px;
+          width: 40px;
+          margin-left: 17px;
+          margin-top: 12px;
         }
         > div{
           width: 100%;
@@ -552,18 +548,30 @@
             align-items: center;
             div.mimefont{
               flex: 1;
-              font-size: 35px;
+              font-size: 28px;
               text-align: center;
               color: @thumbnail_mimefont_color;
+              padding-bottom: 10px;
+              &.mdi-folder{
+                color: darken(@thumbnail_mimefont_color,2);
+              }
             }
           }
         }
       }
 
       .material-list-line-2{
+        line-height: 22px;
+        span.metadata_chunk{
+          color: rgba(0,0,0,0.33);
+          &.metadata_chunk_description{
+            color: rgba(0,0,0,0.73);
+          }
+        }
         span.icon-angle-right{
           display:inline-block;
-          margin: 0 5px;
+          margin: 0 1px;
+          visibility: hidden;
         }
       }
     }
@@ -596,6 +604,7 @@
         height: 200px;
         position: relative;
         display: block;
+        padding: 1px;
         .material-list-icon{
           width: 100%;
           height: 100%;
@@ -611,12 +620,18 @@
         }
         .material-list-text{
           position: absolute;
-          bottom: 0;
-          width: 100%;
+          bottom: 1px;
+          left: 1px;
+          right: 1px;
           padding: 10px;
-          background-color: rgba(0,0,0,0.53);
+          background-color: rgba(0,0,0,0.33);
           color: white;
         }
+
+        .material-list-actions{
+          display: none;
+        }
+
       }
 
       &.grid-size-80{

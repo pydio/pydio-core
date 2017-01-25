@@ -1216,6 +1216,77 @@
     }
 
 
+    var SortColumns = React.createClass({
+
+        mixins:[MessagesConsumerMixin],
+
+        propTypes:{
+            tableKeys:React.PropTypes.object.isRequired,
+            columnClicked:React.PropTypes.func,
+            sortingInfo:React.PropTypes.object,
+            displayMode:React.PropTypes.string
+        },
+
+        onMenuClicked: function(object){
+            this.props.columnClicked(object.payload);
+        },
+
+        onHeaderClick: function(key, ev){
+            let data = this.props.tableKeys[key];
+            if(data && data['sortType'] && this.props.columnClicked){
+                data['name'] = key;
+                this.props.columnClicked(data);
+            }
+        },
+
+        render: function(){
+            let items = [];
+            for(var key in this.props.tableKeys){
+                if(!this.props.tableKeys.hasOwnProperty(key)) continue;
+                let data = this.props.tableKeys[key];
+                let style = data['width']?{width:data['width']}:null;
+                let icon;
+                let className = 'cell header_cell cell-' + key;
+                if(data['sortType']){
+                    className += ' sortable';
+                    if(this.props.sortingInfo && (
+                        this.props.sortingInfo.attribute === key
+                        || this.props.sortingInfo.attribute === data['sortAttribute']
+                        || this.props.sortingInfo.attribute === data['remoteSortAttribute'])){
+                        icon = this.props.sortingInfo.direction === 'asc' ? 'mdi mdi-arrow-up' : 'mdi mdi-arrow-down';
+                        className += ' active-sort-' + this.props.sortingInfo.direction;
+                    }
+                }
+                if(this.props.displayMode === 'menu'){
+                    data['name'] = key;
+                    items.push({
+                        payload: data,
+                        text : data['label'],
+                        iconClassName: icon
+                    });
+                }else{
+                    items.push(<span
+                        key={key}
+                        className={className}
+                        style={style}
+                        onClick={this.onHeaderClick.bind(this, key)}
+                    >{data['label']}</span>);
+
+                }
+            }
+            if(this.props.displayMode === 'menu'){
+                return (
+                    <Toolbars.ButtonMenu buttonTitle="Sort by..." buttonClassName="icon-sort" menuItems={items} onMenuClicked={this.onMenuClicked}/>
+                );
+            }else{
+                return (
+                    <ReactMUI.ToolbarGroup float="left">{items}</ReactMUI.ToolbarGroup>
+                );
+            }
+
+        }
+    });
+
     /**
      * Specific header for Table layout, reading metadata from node and using keys
      */
@@ -1228,24 +1299,19 @@
             loading:React.PropTypes.bool,
             reload:React.PropTypes.func,
             dm:React.PropTypes.instanceOf(PydioDataModel),
-            node:React.PropTypes.instanceOf(AjxpNode)
+            node:React.PropTypes.instanceOf(AjxpNode),
+            onHeaderClick:React.PropTypes.func,
+            sortingInfo:React.PropTypes.object
         },
 
         render: function(){
-            let cells = [];
-            for(var key in this.props.tableKeys){
-                if(!this.props.tableKeys.hasOwnProperty(key)) continue;
-                var data = this.props.tableKeys[key];
-                var style = data['width']?{width:data['width']}:null;
-                cells.push(<span key={key} className={'cell header_cell cell-' + key} style={style}>{data['label']}</span>);
-            }
-            let paginator;
-            if(this.props.node.getMetadata().get("paginationData")){
+            let headers, paginator;
+            if(this.props.node.getMetadata().get("paginationData") && this.props.node.getMetadata().get("paginationData").get('total') > 1){
                 paginator = <ListPaginator dataModel={this.props.dm} node={this.props.node}/>;
             }
             return (
                 <ReactMUI.Toolbar className="toolbarTableHeader">
-                    <ReactMUI.ToolbarGroup float="left">{cells}</ReactMUI.ToolbarGroup>
+                    <SortColumns displayMode="tableHeader" {...this.props} columnClicked={this.props.onHeaderClick}/>
                     <ReactMUI.ToolbarGroup float="right">
                         {paginator}
                         <ReactMUI.FontIcon
@@ -1436,6 +1502,40 @@
                     this.props.dataModel.setSelectedNodes([node]);
                 }
             }
+        },
+
+        onColumnSort: function(column){
+
+            let pagination = this.props.node.getMetadata().get('paginationData');
+            if(pagination && pagination.get('total') > 1 && pagination.get('remote_order')){
+
+                let dir = 'asc';
+                if(this.props.node.getMetadata().get('paginationData').get('currentOrderDir')){
+                    dir = this.props.node.getMetadata().get('paginationData').get('currentOrderDir') === 'asc' ? 'desc' : 'asc';
+                }
+                let orderData = new Map();
+                orderData.set('order_column', column['remoteSortAttribute']?column.remoteSortAttribute:column.name);
+                orderData.set('order_direction', dir);
+                this.props.node.getMetadata().set("remote_order", orderData);
+                this.props.dataModel.requireContextChange(this.props.node, true);
+
+            }else{
+
+                let att = column['sortAttribute']?column['sortAttribute']:column.name;
+                let dir = 'asc';
+                if(this.state && this.state.sortingInfo && this.state.sortingInfo.attribute === att){
+                    dir = this.state.sortingInfo.direction === 'asc' ? 'desc' : 'asc';
+                }
+                this.setState({sortingInfo:{
+                    attribute : att,
+                    sortType  : column.sortType,
+                    direction : dir
+                }}, function(){
+                    this.rebuildLoadedElements();
+                }.bind(this));
+
+            }
+
         },
 
         getInitialState: function(){
@@ -1857,7 +1957,6 @@
                     var groupKeys = [];
                 }
 
-
                 if (!this.props.skipParentNavigation && theNode.getParent() && this.props.dataModel.getContextNode() !== theNode) {
                     this.indexedElements.push({node: theNode.getParent(), parent: true, actions: null});
                 }
@@ -1893,7 +1992,25 @@
 
             }
 
-
+            if(this.state && this.state.sortingInfo && !this.remoteSortingInfo()){
+                let sortingInfo = this.state.sortingInfo;
+                let sortingMeta = sortingInfo.attribute;
+                let sortingDirection = sortingInfo.direction;
+                let sortingType = sortingInfo.sortType;
+                this.indexedElements.sort(function(a, b){
+                    let aMeta = a.node.getMetadata().get(sortingMeta) || "";
+                    let bMeta = b.node.getMetadata().get(sortingMeta) || "";
+                    let res;
+                    if(sortingType === 'number'){
+                        aMeta = parseFloat(aMeta);
+                        bMeta = parseFloat(bMeta);
+                        res  = (sortingDirection === 'asc' ? aMeta - bMeta : bMeta - aMeta);
+                    }else if(sortingType === 'string'){
+                        res = (sortingDirection === 'asc'? aMeta.localeCompare(bMeta) : bMeta.localeCompare(aMeta));
+                    }
+                    return res;
+                });
+            }
 
             if(this.props.elementPerLine > 1){
                 end = end * this.props.elementPerLine;
@@ -1940,22 +2057,55 @@
             });
         },
 
+        /**
+         * Extract remote sorting info from current node metadata
+         */
+        remoteSortingInfo: function(){
+            let meta = this.props.node.getMetadata().get('paginationData');
+            if(meta && meta.get('total') > 1 && meta.has('remote_order')){
+                let col = meta.get('currentOrderCol');
+                let dir = meta.get('currentOrderDir');
+                if(col && dir){
+                    return {
+                        remote: true,
+                        attribute: col,
+                        direction:dir
+                    };
+                }
+            }
+            return null;
+        },
 
         renderToolbar: function(){
 
-            var rightButtons = <ReactMUI.FontIcon
+            var rightButtons = [<ReactMUI.FontIcon
                 key={1}
                         tooltip="Reload"
                         className={"icon-refresh" + (this.state.loading?" rotating":"")}
                         onClick={this.reload}
-            />;
-            if(this.props.additionalActions){
-                rightButtons = [rightButtons, this.props.additionalActions];
+            />];
+            if(this.props.sortKeys){
+
+                let sortingInfo, remoteSortingInfo = this.remoteSortingInfo();
+                if(remoteSortingInfo){
+                    sortingInfo = remoteSortingInfo;
+                }else{
+                    sortingInfo = this.state?this.state.sortingInfo:null;
+                }
+                rightButtons.push(<SortColumns
+                    displayMode="menu"
+                    tableKeys={this.props.sortKeys}
+                    columnClicked={this.onColumnSort}
+                    sortingInfo={sortingInfo}
+                />);
             }
+            if(this.props.additionalActions){
+                rightButtons.push(this.props.additionalActions);
+            }
+
             var leftToolbar;
             var paginator;
-
-            if(this.props.node.getMetadata().get("paginationData")){
+            if(this.props.node.getMetadata().get("paginationData") && this.props.node.getMetadata().get("paginationData").get('total') > 1){
                 paginator = (
                     <ListPaginator dataModel={this.dm} node={this.props.node}/>
                 );
@@ -2041,6 +2191,12 @@
                 }else{
                     tableKeys = this.props.tableKeys;
                 }
+                let sortingInfo, remoteSortingInfo = this.remoteSortingInfo();
+                if(remoteSortingInfo){
+                    sortingInfo = remoteSortingInfo;
+                }else{
+                    sortingInfo = this.state?this.state.sortingInfo:null;
+                }
                 toolbar = <TableListHeader
                     tableKeys={tableKeys}
                     loading={this.state.loading}
@@ -2049,6 +2205,8 @@
                     dm={this.props.dataModel}
                     node={this.props.node}
                     additionalActions={this.props.additionalActions}
+                    onHeaderClick={this.onColumnSort}
+                    sortingInfo={sortingInfo}
                 />
             }else{
                 toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
