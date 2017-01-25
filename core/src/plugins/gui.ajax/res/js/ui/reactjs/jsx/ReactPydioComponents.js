@@ -1370,6 +1370,20 @@
             renderActions:React.PropTypes.func
         },
 
+        componentDidMount: function(){
+            this._nodeListener = function(){
+                if(!this.isMounted()) return;
+                this.forceUpdate();
+            }.bind(this);
+            this.props.node.observe("node_replaced", this._nodeListener);
+        },
+
+        componentWillUnmount: function(){
+            if(this._nodeListener){
+                this.props.node.stopObserving("node_replaced", this._nodeListener);
+            }
+        },
+
         render: function(){
 
             var actions = this.props.actions;
