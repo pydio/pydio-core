@@ -68,6 +68,10 @@
     content: "\f250";
 }
 
+.mdi-window-minimize:before {
+    content: "\f69d";
+}
+
 .mdi-radar:before {
     content: "\f526";
 }

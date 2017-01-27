@@ -1,5 +1,56 @@
 (function(global){
 
+    class OpenNodesModel extends Observable{
+
+        constructor(){
+            super();
+            this._openNodes = [];
+            global.pydio.UI.registerEditorOpener(this);
+        }
+
+        static getInstance(){
+            if(!OpenNodesModel.__INSTANCE){
+                OpenNodesModel.__INSTANCE = new OpenNodesModel();
+            }
+            return OpenNodesModel.__INSTANCE;
+        }
+
+        openEditorForNode(selectedNode, editorData){
+            this.pushNode(selectedNode, editorData);
+        }
+
+        pushNode(node, editorData){
+            let found = false;
+            let editorClass = editorData ? editorData.editorClass : null;
+            let object = {node:node, editorData:editorData};
+            this.notify('willPushNode', object);
+            this._openNodes.map(function(o){
+                if(o.node === node && (o.editorData && o.editorData.editorClass == editorClass) || (!o.editorData && !editorClass)){
+                    found = true;
+                    object = o;
+                }
+            });
+            if(!found){
+                this._openNodes.push(object);
+            }
+            this.notify('nodePushed', object);
+            this.notify('update', this._openNodes);
+        }
+
+        removeNode(object){
+            this.notify('willRemoveNode', object);
+            let index = this._openNodes.indexOf(object);
+            this._openNodes = LangUtils.arrayWithout(this._openNodes, index);
+            this.notify('nodeRemovedAtIndex', index);
+            this.notify('update', this._openNodes);
+        }
+
+        getNodes(){
+            return this._openNodes;
+        }
+
+    }
+
     let MessagesProviderMixin = {
 
         childContextTypes: {
@@ -110,6 +161,159 @@
 
     });
 
+    let EditionPanel = React.createClass({
+
+        propTypes: {
+            pydio: React.PropTypes.instanceOf(Pydio)
+        },
+
+        updateNodesFromModel: function(pushed, removedAtIndex){
+            
+            let nodes = OpenNodesModel.getInstance().getNodes();
+            let active = this.state.activeTab;
+            if(pushed){
+                active = nodes.indexOf(pushed);
+            }else if(removedAtIndex !== undefined){
+                active = Math.max(0, removedAtIndex - 1);
+            }
+            if(pushed){
+                this.setState({
+                    nodes:nodes,
+                    visible: false,
+                    activeTab:active
+                }, this.toggle.bind(this));
+            }else{
+                if(!nodes.length && this.state.visible){
+                    this.setState({visible:!this.state.visible}, function(){
+                        global.setTimeout(function(){
+                            this.setState({closed:true, opened:false, nodes:[]});
+                        }.bind(this), 800);
+                    }.bind(this));
+                }else{
+                    this.setState({
+                        nodes:nodes,
+                        activeTab:active
+                    });
+                }
+            }
+
+        },
+
+        componentDidMount: function(){
+            this._nodesModelObserver = this.updateNodesFromModel.bind(this);
+            this._nodesRemoveObserver = function(index){
+                this.updateNodesFromModel(null, index);
+            }.bind(this);
+            OpenNodesModel.getInstance().observe("nodePushed", this._nodesModelObserver);
+            OpenNodesModel.getInstance().observe("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        },
+
+        componentWillUnmount: function(){
+            OpenNodesModel.getInstance().stopObserving("nodePushed", this._nodesModelObserver);
+            OpenNodesModel.getInstance().stopObserving("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        },
+
+        getInitialState: function(){
+            return {nodes:[], visible: false, activeTab:0};
+        },
+
+        toggle: function(){
+            let visible = this.state.visible;
+            this.setState({visible:!this.state.visible}, function(){
+                global.setTimeout(function(){
+                    if(visible) this.setState({closed:true, opened:false});
+                    else this.setState({closed:false, opened:true});
+                }.bind(this), 800);
+            }.bind(this));
+        },
+
+        onChange: function(index, tab){
+            this.setState({activeTab: index});
+        },
+
+        render: function(){
+            if(this.state.nodes.length){
+                let style = {};
+                let overlay;
+                let className = 'editor-window react-mui-context vertical_layout', iconClassName='mdi mdi-pencil';
+                if(this.state.closed) className += ' closed';
+                else if(this.state.opened) className += ' opened';
+                
+                let tabs = [], title, nodeTitle, mfbMenus = [];
+                let index = 0;
+                let editors = this.state.nodes.map(function(object){
+                    if(this.state.visible && this.state.opened){
+                        let closeTab = function(e){
+                            OpenNodesModel.getInstance().removeNode(object);
+                        };
+                        let label = <span className="closeable-tab"><span className="label">{object.node.getLabel()}</span><ReactMUI.FontIcon className="mdi mdi-close" onClick={closeTab}/></span>;
+                        tabs.push(<ReactMUI.Tab label={label} selected={index === this.state.activeTab}></ReactMUI.Tab>);
+                    }else{
+                        mfbMenus.push(<ReactMFB.ChildButton icon="mdi mdi-file" label={object.node.getLabel()} onClick={this.toggle}/>);
+                    }
+                    if(index === this.state.activeTab){
+                        nodeTitle = object.node.getLabel();
+                    }
+                    let style={display:(index === this.state.activeTab ? 'flex' : 'none')};
+                    index ++;
+                    return (
+                        <div className="editor_container vertical_layout vertical_fit" style={style}>
+                            <ReactPydio.ReactEditorOpener
+                                node={object.node}
+                                editorData={object.editorData}
+                                registry={this.props.pydio.Registry}
+                                closeEditorContainer={function(){return true;}}
+                            />
+                        </div>
+                    );
+                }.bind(this));
+
+                let mainIcon;
+                if(this.state.visible) {
+                    className += ' open';
+                    title = <div>{nodeTitle}</div>;
+                    let overlayClass = "editor-overlay";
+                    if(this.state.opened) {
+                        iconClassName = 'mdi mdi-window-minimize';
+                        overlayClass += ' opened';
+                    }
+                    overlay = <div key="overlay" onClick={this.toggle} className={overlayClass}></div>;
+                    mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
+                }else{
+                    if(this.state.nodes && this.state.nodes.length > 1){
+                        mainIcon = (
+                            <ReactMFB.Menu effect="slidein" position="br" icon={iconClassName} ref="menu">
+                                <ReactMFB.MainButton iconResting={iconClassName} iconActive="mdi mdi-close"/>
+                                {mfbMenus}
+                            </ReactMFB.Menu>
+                        );
+                    }else{
+                        mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
+                    }
+                }
+                
+
+                return (
+                    <div>
+                        {overlay}
+                        <div className={className} style={style}>
+                            <div className="editor-title">
+                                {mainIcon}
+                                {title}
+                            </div>
+                            <ReactMUI.Tabs onChange={this.onChange} initialSelectedIndex={this.state.activeTab} tabWidth={200}>
+                                {tabs}
+                            </ReactMUI.Tabs>
+                            {editors}
+                        </div>
+                    </div>
+                );
+            }else{
+                return <span></span>
+            }
+        }
+
+    });
 
     let MainFilesList = React.createClass({
 
@@ -206,6 +410,22 @@
 
         entryRenderIcon: function(node, entryProps = {}){
             return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
+        },
+
+        entryRenderActions: function(node){
+            if(node.isLeaf()){
+                return null;
+                let pushNodeToEditor = function(){
+                    OpenNodesModel.getInstance().pushNode(node);
+                };
+                return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={pushNodeToEditor}/>;
+            }else{
+                let selectFolder = function(e){
+                    e.stopPropagation();
+                    this.props.pydio.getContextHolder().setSelectedNodes([node]);
+                }.bind(this);
+                return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={selectFolder}/>;
+            }
         },
 
         tableEntryRenderCell: function(node){
@@ -334,6 +554,7 @@
                     passScrollingStateToChildren={true}
                     entryRenderIcon={this.entryRenderIcon}
                     entryRenderSecondLine={entryRenderSecondLine}
+                    entryRenderActions={this.entryRenderActions}
                     additionalActions={[this.renderDisplaySwitcher()]}
 //                    defaultGroupBy="mimestring" // Test grouping by a given field
                 />
@@ -359,6 +580,8 @@
     }else{
         ns.MainFilesList = MainFilesList;
     }
+    ns.OpenNodesModel = OpenNodesModel;
+    ns.EditionPanel = EditionPanel;
     global.WSComponents = ns;
 
 })(window);

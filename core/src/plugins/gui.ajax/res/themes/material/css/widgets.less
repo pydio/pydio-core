@@ -28,7 +28,7 @@
 }
 #files_list_header{
   .primaryColorPane;
-  box-shadow: @reactBoxShadowDepthHalf;
+  /*box-shadow: @reactBoxShadowDepthHalf;   */
   padding-left: 20px;
   .action_bar{
     a{
@@ -75,16 +75,30 @@
     background-color: transparent;
     padding-top: 5px;
   }
+  #react-main-fileslist{
+    .material-list-actions{
+      .mui-font-icon{
+        font-size: 18px;
+        color: rgba(0,0,0,0.23);
+        padding: 10px 18px;
+        cursor: pointer;
+        border-radius: 50%;
+        &:hover{
+          background-color: #ffffff;
+        }
+      }
+    }
+  }
   #right_split{
     .primaryLightPane;
-    background-color: lighten(@applicationPrimaryLight, 2);
+    background-color: #CFD8DC;
     #ipanel_header{
-      border-left: 1px solid lighten(@applicationPrimaryColor, 10);
+      border-left: 1px solid darken(@applicationPrimaryColor, 10);
       box-sizing: border-box;
       padding: 10px;
       .primaryColorPane;
       height: 42px;
-      box-shadow: @reactBoxShadowDepthHalf;
+      /*box-shadow: @reactBoxShadowDepthHalf; */
       z-index: 10;
       #display_toolbar_right{
         float: right;
@@ -95,7 +109,14 @@
       }
     }
     #info_panel{
-      border-left: 1px solid @infopanel_section_separator_color;
+      .ipanelCard{
+        background-color: white;
+        margin: 10px !important;
+        margin-bottom: 0;
+        box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
+        border-radius: 3px;
+      }
+      /*border-left: 1px solid @infopanel_section_separator_color;*/
       .panelContent{
         background-color: transparent;
       }
@@ -103,10 +124,18 @@
         display: none;
       }
       .infoPanelImagePreview{
+        .ipanelCard;
+        div.bgCoverImage{
+          border-radius: 3px 3px 0 0 ;
+        }
         margin: 0;
         img.thumbnail_iconlike_shadow{
           box-shadow: 0 0 0;
         }
+      }
+      div.infoPanelAllMetadata > div{
+        .ipanelCard;
+        border: 0;
       }
       #ip_scroller_info_panel{
         margin-top:45px;

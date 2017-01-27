@@ -852,7 +852,8 @@
         propTypes:{
             node:React.PropTypes.instanceOf(AjxpNode),
             registry:React.PropTypes.instanceOf(Registry).isRequired,
-            closeEditorContainer:React.PropTypes.func,
+            closeEditorContainer:React.PropTypes.func.isRequired,
+            editorData:React.PropTypes.object,
             registerCloseCallback:React.PropTypes.func
         },
 
@@ -870,9 +871,10 @@
 
         closeEditor: function(){
             if(this.editor){
+                console.log(this.editor);
                 var el = this.editor.element;
                 this.editor.destroy();
-                el.remove();
+                try{el.remove();}catch(e){}
                 this.editor = null;
             }
             if(this.props.closeEditorContainer() !== false){
@@ -880,28 +882,61 @@
             }
         },
 
-        loadEditor: function(node){
+        loadEditor: function(node, editorData){
+            this._blockUpdates = false;
+
             if(this.editor){
                 this.closeEditor();
             }
-            var editorData = this._getEditorData(node);
+            if(!editorData){
+                editorData = this._getEditorData(node);
+            }
             if(editorData) {
                 this.props.registry.loadEditorResources(editorData.resourcesManager);
-                this.setState({editorData: editorData, node:node});
+                this.setState({editorData: editorData, node:node}, this._loadPydioEditor.bind(this));
             }else{
-                this.setState({editorData: null, node:null});
+                this.setState({editorData: null, node:null}, this._loadPydioEditor.bind(this));
             }
         },
 
         componentDidMount:function(){
-            if(this.props.node) this.loadEditor(this.props.node);
+            if(this.props.node) {
+                this.loadEditor(this.props.node, this.props.editorData);
+            }
         },
 
         componentWillReceiveProps:function(newProps){
-            if(newProps.node) this.loadEditor(newProps.node);
+            this._blockUpdates = false;
+            if(newProps.node && newProps.node !== this.props.node) {
+                this.loadEditor(newProps.node, newProps.editorData);
+            }else if(newProps.node && newProps.node === this.props.node){
+                this._blockUpdates = true;
+            }
+        },
+        
+        componentDidUpdate:function(){
+            if(this.editor && this.editor.resize){
+                this.editor.resize();
+            }
         },
 
-        componentDidUpdate: function(){
+        componentWillUnmount:function(){
+            if(this.editor){
+                this.editor.destroy();
+                this.editor = null;
+            }
+        },
+
+        shouldComponentUpdate:function(){
+            if(this._blockUpdates){
+                return false;
+            }else{
+                return true;
+            }
+        },
+
+        _loadPydioEditor: function(){
+            console.log('will destroy editor?');
             if(this.editor){
                 this.editor.destroy();
                 this.editor = null;
@@ -921,13 +956,6 @@
             }
         },
 
-        componentWillUnmount:function(){
-            if(this.editor){
-                this.editor.destroy();
-                this.editor = null;
-            }
-        },
-
         render: function(){
             var editor;
             if(this.state.editorData){
@@ -939,7 +967,8 @@
                             return {__html:''};
                         }
                     }.bind(this);
-                    editor = <div ref="editor" style={{height:"100vh"}} id="editor" key={this.state && this.props.node?this.props.node.getPath():null} dangerouslySetInnerHTML={content()}></div>;
+                    console.log('render editor');
+                    editor = <div ref="editor" className="vertical_layout vertical_fit" id="editor" key={this.state && this.props.node?this.props.node.getPath():null} dangerouslySetInnerHTML={content()}></div>;
                 }else if(global[this.state.editorData.editorClass]){
                     editor = React.createElement(global[this.state.editorData.editorClass], {
                         node:this.props.node,

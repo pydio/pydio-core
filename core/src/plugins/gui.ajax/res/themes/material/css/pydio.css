@@ -2938,7 +2938,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   height: 110px;
   width: 250px;
   position: fixed;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
+  /*box-shadow: @reactBoxShadowDepthHalf;*/
   z-index: 1002;
 }
 .user-widget .username {
@@ -5275,6 +5275,127 @@ div.menu.rootDirChooser span.rootDirTitle {
   border-bottom: 0 solid #ddd;
   text-align: left;
   font-style: italic;
+}
+.react-editor .editor-overlay {
+  position: absolute;
+  z-index: 10000;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.53);
+  opacity: 0.01;
+  transition: opacity 2Open 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+.react-editor .editor-overlay.opened {
+  opacity: 1;
+}
+.react-editor .editor-window {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  background-color: #009688;
+  position: absolute;
+  z-index: 100000;
+  transition: border-radius 500ms cubic-bezier(0.06, 0.73, 0.6, 0.95) 0ms, height 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms, width 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms, bottom 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms;
+  bottom: 20px;
+  right: 20px;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
+}
+.react-editor .editor-window .mui-tabs-container,
+.react-editor .editor-window .editor_container {
+  visibility: hidden;
+}
+.react-editor .editor-window .mui-tabs-container .mui-tab-item-container,
+.react-editor .editor-window .editor_container .mui-tab-item-container {
+  background-color: #009688 !important;
+}
+.react-editor .editor-window .mui-font-icon {
+  color: white;
+  font-size: 18px;
+}
+.react-editor .editor-window .editor-container {
+  background-color: #fafafa;
+}
+.react-editor .editor-window .mfb-component--br {
+  bottom: -6px;
+}
+.react-editor .editor-window .mfb-component--br a {
+  background-color: #009688;
+}
+.react-editor .editor-window .mfb-component--br .mfb-component__button--main {
+  width: 50px;
+  height: 50px;
+  box-shadow: none;
+}
+.react-editor .editor-window .mfb-component--br .mfb-component__button--main i {
+  line-height: 50px;
+}
+.react-editor .editor-window .mfb-component--br .mfb-component__list > li {
+  right: -1px;
+}
+.react-editor .editor-window.open {
+  overflow: hidden;
+  background-color: white;
+  bottom: 0;
+  border-radius: 4px 4px 0 0;
+  height: calc(100% - 11px);
+  width: calc(100% - 40px);
+}
+.react-editor .editor-window.open .mui-tabs-container,
+.react-editor .editor-window.open .editor_container {
+  visibility: visible;
+}
+.react-editor .editor-window.open .mui-tabs-container .mui-tab-item,
+.react-editor .editor-window.open .editor_container .mui-tab-item {
+  padding: 0 10px !important;
+}
+.react-editor .editor-window.open .mui-tabs-container .mui-tab-item span.closeable-tab,
+.react-editor .editor-window.open .editor_container .mui-tab-item span.closeable-tab {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+.react-editor .editor-window.open .mui-tabs-container .mui-tab-item span.closeable-tab .label,
+.react-editor .editor-window.open .editor_container .mui-tab-item span.closeable-tab .label {
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.react-editor .editor-window.open .mui-tabs-container .mui-tab-item span.closeable-tab .mui-font-icon,
+.react-editor .editor-window.open .editor_container .mui-tab-item span.closeable-tab .mui-font-icon {
+  font-size: 16px;
+  padding: 6px;
+}
+.react-editor .editor-window.open .editor-title {
+  background-color: #009688;
+  height: 51px;
+  font-size: 24px;
+  color: white;
+  padding: 14px 16px;
+  font-weight: 400;
+}
+.react-editor .editor-window.open .editor-title > div {
+  visibility: hidden;
+}
+.react-editor .editor-window.open .editor-title button.mui-icon-button {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+}
+.react-editor .editor-window.opened {
+  transition: border-radius 500ms cubic-bezier(0.06, 0.73, 0.6, 0.95) 300ms, height 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, width 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, bottom 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+}
+.react-editor .editor-window.opened .editor-title > div {
+  visibility: visible;
+}
+.react-editor .editor-window #diaporama_box > div.vertical_fit {
+  background-color: #fafafa !important;
 }
 .form-ip_content_info_panel .panelContent {
   background-color: white !important;
@@ -7997,7 +8118,7 @@ span.overlay-class-span.icon-bookmark-empty {
 #files_list_header {
   background-color: #546e7a;
   color: white;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
+  /*box-shadow: @reactBoxShadowDepthHalf;   */
   padding-left: 20px;
 }
 #files_list_header .action_bar a {
@@ -8056,19 +8177,29 @@ span.overlay-class-span.icon-bookmark-empty {
   background-color: transparent;
   padding-top: 5px;
 }
+#browser #react-main-fileslist .material-list-actions .mui-font-icon {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.23);
+  padding: 10px 18px;
+  cursor: pointer;
+  border-radius: 50%;
+}
+#browser #react-main-fileslist .material-list-actions .mui-font-icon:hover {
+  background-color: #ffffff;
+}
 #browser #right_split {
   background-color: #f5f6f9;
   color: #637e8a;
-  background-color: #fbfcfd;
+  background-color: #CFD8DC;
 }
 #browser #right_split #ipanel_header {
-  border-left: 1px solid #698998;
+  border-left: 1px solid #3f535c;
   box-sizing: border-box;
   padding: 10px;
   background-color: #546e7a;
   color: white;
   height: 42px;
-  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16), 0 2px 3px rgba(0, 0, 0, 0.43);
+  /*box-shadow: @reactBoxShadowDepthHalf; */
   z-index: 10;
 }
 #browser #right_split #ipanel_header #display_toolbar_right {
@@ -8093,7 +8224,14 @@ span.overlay-class-span.icon-bookmark-empty {
   display: none;
 }
 #browser #right_split #info_panel {
-  border-left: 1px solid #e5e8ef;
+  /*border-left: 1px solid @infopanel_section_separator_color;*/
+}
+#browser #right_split #info_panel .ipanelCard {
+  background-color: white;
+  margin: 10px !important;
+  margin-bottom: 0;
+  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
+  border-radius: 3px;
 }
 #browser #right_split #info_panel .panelContent {
   background-color: transparent;
@@ -8102,10 +8240,26 @@ span.overlay-class-span.icon-bookmark-empty {
   display: none;
 }
 #browser #right_split #info_panel .infoPanelImagePreview {
+  background-color: white;
+  margin: 10px !important;
+  margin-bottom: 0;
+  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
+  border-radius: 3px;
   margin: 0;
+}
+#browser #right_split #info_panel .infoPanelImagePreview div.bgCoverImage {
+  border-radius: 3px 3px 0 0 ;
 }
 #browser #right_split #info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
   box-shadow: 0 0 0;
+}
+#browser #right_split #info_panel div.infoPanelAllMetadata > div {
+  background-color: white;
+  margin: 10px !important;
+  margin-bottom: 0;
+  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
+  border-radius: 3px;
+  border: 0;
 }
 #browser #right_split #info_panel #ip_scroller_info_panel {
   margin-top: 45px;
