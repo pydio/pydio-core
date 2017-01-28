@@ -1,3 +1,6 @@
+ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
+
+
 (function(global){
 
     var MessagesConsumerMixin = {
@@ -871,7 +874,6 @@
 
         closeEditor: function(){
             if(this.editor){
-                console.log(this.editor);
                 var el = this.editor.element;
                 this.editor.destroy();
                 try{el.remove();}catch(e){}
@@ -936,7 +938,6 @@
         },
 
         _loadPydioEditor: function(){
-            console.log('will destroy editor?');
             if(this.editor){
                 this.editor.destroy();
                 this.editor = null;
@@ -967,7 +968,6 @@
                             return {__html:''};
                         }
                     }.bind(this);
-                    console.log('render editor');
                     editor = <div ref="editor" className="vertical_layout vertical_fit" id="editor" key={this.state && this.props.node?this.props.node.getPath():null} dangerouslySetInnerHTML={content()}></div>;
                 }else if(global[this.state.editorData.editorClass]){
                     editor = React.createElement(global[this.state.editorData.editorClass], {
@@ -1170,6 +1170,8 @@
      */
     var ListEntry = React.createClass({
 
+        mixins:[Toolbars.ContextMenuNodeProviderMixin],
+        
         propTypes:{
             showSelector:React.PropTypes.bool,
             selected:React.PropTypes.bool,
@@ -1197,7 +1199,13 @@
                 this.props.onClick(this.props.node);
             }
         },
-
+        
+        onDoubleClick: function(event){
+            if(this.props.onDoubleClick){
+                this.props.onDoubleClick(this.props.node);
+            }
+        },
+        
         render: function(){
             var selector;
             if(this.props.showSelector){
@@ -1224,7 +1232,11 @@
                 }
             }
             return (
-                <div onClick={this.onClick} className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")} style={this.props.style}>
+                <div onClick={this.onClick}
+                     onDoubleClick={this.props.showSelector?null:this.onDoubleClick}
+                     onContextMenu={this.contextMenuNodeResponder}
+                     className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}
+                     style={this.props.style}>
                     {selector}
                     <div className={"material-list-icon" + ((this.props.mainIcon || iconCell)?"":" material-list-icon-none")}>
                         {iconCell}
@@ -1527,7 +1539,7 @@
      */
     var SimpleFlatList = React.createClass({
 
-        mixins:[MessagesConsumerMixin],
+        mixins:[MessagesConsumerMixin, Toolbars.ContextMenuNodeProviderMixin],
 
         propTypes:{
             infiniteSliceCount:React.PropTypes.number,
@@ -1541,12 +1553,16 @@
             groupByFields:React.PropTypes.array,
             defaultGroupBy:React.PropTypes.string,
 
+            skipParentNavigation: React.PropTypes.bool,
+            skipInternalDataModel:React.PropTypes.bool,
+
             entryEnableSelector:React.PropTypes.func,
             entryRenderIcon:React.PropTypes.func,
             entryRenderActions:React.PropTypes.func,
             entryRenderFirstLine:React.PropTypes.func,
             entryRenderSecondLine:React.PropTypes.func,
             entryRenderThirdLine:React.PropTypes.func,
+            entryHandleClicks:React.PropTypes.func,
             
             openEditor:React.PropTypes.func,
             openCollection:React.PropTypes.func,
@@ -1562,7 +1578,9 @@
 
         statics:{
             HEIGHT_ONE_LINE:50,
-            HEIGHT_TWO_LINES:73
+            HEIGHT_TWO_LINES:73,
+            CLICK_TYPE_SIMPLE:'simple',
+            CLICK_TYPE_DOUBLE:'double'
         },
 
         getDefaultProps:function(){
@@ -1575,6 +1593,10 @@
                 node = gridRow.props.data.node;
             }else{
                 node = gridRow;
+            }
+            if(this.props.entryHandleClicks){
+                this.props.entryHandleClicks(node, SimpleFlatList.CLICK_TYPE_SIMPLE);
+                return;
             }
             if(node.isLeaf() && this.props.openEditor) {
                 var res = this.props.openEditor(node);
@@ -1590,6 +1612,18 @@
                 }else{
                     this.props.dataModel.setSelectedNodes([node]);
                 }
+            }
+        },
+        
+        doubleClickRow: function(gridRow){
+            var node;
+            if(gridRow.props){
+                node = gridRow.props.data.node;
+            }else{
+                node = gridRow;
+            }
+            if(this.props.entryHandleClicks){
+                this.props.entryHandleClicks(node, SimpleFlatList.CLICK_TYPE_DOUBLE);
             }
         },
 
@@ -1629,8 +1663,12 @@
 
         getInitialState: function(){
             this.actionsCache = {multiple:new Map()};
-            this.dm = new PydioDataModel();
-            this.dm.setContextNode(this.props.dataModel.getContextNode());
+            if(!this.props.skipInternalDataModel){
+                this.dm = new PydioDataModel();
+                this.dm.setContextNode(this.props.dataModel.getContextNode());
+            }else{
+                this.dm = this.props.dataModel;
+            }
             var state = {
                 loaded: this.props.node.isLoaded(),
                 loading: !this.props.node.isLoaded(),
@@ -1931,6 +1969,13 @@
                 }
                 this.updateElementHeightResponsive();
             }
+            this.props.dataModel.observe('selection_changed', function(){
+                let selection = new Map();
+                this.props.dataModel.getSelectedNodes().map(function(n){
+                    selection.set(n, true);
+                });
+                this.setState({selection: selection}, this.rebuildLoadedElements);
+            }.bind(this));
         },
 
         componentWillUnmount: function(){
@@ -2007,6 +2052,7 @@
                         firstLine: "..",
                         secondLine:this.context.getMessage('react.1'),
                         onClick: this.clickRow,
+                        onDoubleClick: this.doubleClickRow,
                         showSelector: false,
                         selectorDisabled: true
                     };
@@ -2027,7 +2073,8 @@
                 }else{
                     data = {
                         node:entry.node,
-                        onClick:this.clickRow,
+                        onClick: this.clickRow,
+                        onDoubleClick: this.doubleClickRow,
                         onSelect:this.toggleSelection,
                         key:entry.node.getPath(),
                         id:entry.node.getPath(),
@@ -2077,8 +2124,9 @@
                     var groups = {};
                     var groupKeys = [];
                 }
-
-                if (!this.props.skipParentNavigation && theNode.getParent() && this.props.dataModel.getContextNode() !== theNode) {
+                
+                if (!this.props.skipParentNavigation && theNode.getParent()
+                    && (this.props.dataModel.getContextNode() !== theNode || this.props.skipInternalDataModel)) {
                     this.indexedElements.push({node: theNode.getParent(), parent: true, actions: null});
                 }
 
@@ -2334,7 +2382,7 @@
 
             var elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
             return (
-                <div className={containerClasses}>
+                <div className={containerClasses} onContextMenu={this.contextMenuResponder}>
                     {toolbar}
                     <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
                         <Infinite
@@ -2650,3 +2698,5 @@
     global.ReactPydio = ReactPydio;
 
 })(window);
+
+});

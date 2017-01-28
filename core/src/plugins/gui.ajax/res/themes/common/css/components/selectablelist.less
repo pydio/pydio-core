@@ -526,7 +526,7 @@
 
 
 
-  .main-file-list{
+  .material-list.main-file-list{
 
     opacity: 1;
 
@@ -560,20 +560,41 @@
         }
       }
 
-      .material-list-line-2{
-        line-height: 22px;
-        span.metadata_chunk{
-          color: rgba(0,0,0,0.33);
-          &.metadata_chunk_description{
-            color: rgba(0,0,0,0.73);
+      &.material-list-entry-2-lines{
+        .material-list-line-2{
+          line-height: 22px;
+          span.metadata_chunk{
+            color: rgba(0,0,0,0.23);
+            &.metadata_chunk_description{
+              color: rgba(0,0,0,0.63);
+            }
+          }
+          span.icon-angle-right{
+            display:inline-block;
+            margin: 0 1px;
+            visibility: hidden;
           }
         }
-        span.icon-angle-right{
-          display:inline-block;
-          margin: 0 1px;
-          visibility: hidden;
+        .material-list-actions{
+          .overlay_icon_div .overlay-class-span{
+            display: inline-block;
+            padding: 14px;
+          }
         }
       }
+
+      &.selected{
+        background-color: #E3F2FD !important;
+        color: inherit;
+        border-bottom-color: transparent;
+        .material-list-line-1{
+          font-weight: inherit;
+        }
+        .overlay_icon_div span.overlay-class-span{
+          color: inherit;
+        }
+      }
+
     }
 
     &.table-mode{
@@ -591,6 +612,15 @@
             margin-top: -2px;
             margin-right: 10px;
             color: @thumbnail_mimefont_color;
+          }
+        }
+      }
+      .material-list-actions{
+        .overlay_icon_div{
+          padding-right: 8px;
+          .overlay-class-span{
+            display: inline-block;
+            padding: 18px 8px 0;
           }
         }
       }
@@ -629,7 +659,13 @@
         }
 
         .material-list-actions{
-          display: none;
+          position: absolute;
+          bottom: 9px;
+          right: 7px;
+          span.overlay-class-span {
+            color: white !important;
+            padding: 0 4px;
+          }
         }
 
       }

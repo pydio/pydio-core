@@ -6,6 +6,9 @@
             super();
             this._openNodes = [];
             global.pydio.UI.registerEditorOpener(this);
+            global.pydio.observe("repository_list_refreshed", function(){
+                this._openNodes = [];
+            }.bind(this));
         }
 
         static getInstance(){
@@ -50,7 +53,7 @@
         }
 
     }
-
+    
     let MessagesProviderMixin = {
 
         childContextTypes: {
@@ -152,7 +155,7 @@
                     if(!node.isLeaf()) src = ResourcesManager.resolveImageSource('folder.png', "mimes/ICON_SIZE", 64);
                     else src = ResourcesManager.resolveImageSource('mime_empty.png', "mimes/ICON_SIZE", 64);
                 }
-                object = <img src={src}/>
+                object = <img  src={src}/>
             }
 
             return object;
@@ -413,6 +416,8 @@
         },
 
         entryRenderActions: function(node){
+            // This would be for mobile actions
+            /*
             if(node.isLeaf()){
                 return null;
                 let pushNodeToEditor = function(){
@@ -425,6 +430,29 @@
                     this.props.pydio.getContextHolder().setSelectedNodes([node]);
                 }.bind(this);
                 return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={selectFolder}/>;
+            }*/
+            let content = null;
+            if(node.getMetadata().get('overlay_class')){
+                let elements = node.getMetadata().get('overlay_class').split(',').map(function(c){
+                    return <span className={c + ' overlay-class-span'}></span>;
+                });
+                content = <div className="overlay_icon_div">{elements}</div>;
+            }
+            return content;
+
+        },
+
+        entryHandleClicks: function(node, clickType){
+            let dm = this.props.pydio.getContextHolder();
+            if(!clickType || clickType == ReactPydio.SimpleList.CLICK_TYPE_SIMPLE){
+                dm.setSelectedNodes([node]);
+            }else if(clickType == ReactPydio.SimpleList.CLICK_TYPE_DOUBLE){
+                if(node.isLeaf()){
+                    dm.setSelectedNodes([node]);
+                    this.props.pydio.Controller.fireAction("open_with_unique");
+                }else{
+                    dm.requireContextChange(node);
+                }
             }
         },
 
@@ -542,12 +570,11 @@
                     sortKeys={sortKeys}
                     node={this.state.contextNode}
                     dataModel={this.props.pydio.getContextHolder()}
-                    openEditor={this.selectNode}
-                    openCollection={this.selectNode}
                     externalResize={true}
                     className={className}
                     actionBarGroups={["change_main"]}
                     infiniteSliceCount={infiniteSliceCount}
+                    skipInternalDataModel={true}
                     elementsPerLine={elementsPerLine}
                     elementHeight={elementHeight}
                     elementStyle={elementStyle}
@@ -555,8 +582,8 @@
                     entryRenderIcon={this.entryRenderIcon}
                     entryRenderSecondLine={entryRenderSecondLine}
                     entryRenderActions={this.entryRenderActions}
+                    entryHandleClicks={this.entryHandleClicks}
                     additionalActions={[this.renderDisplaySwitcher()]}
-//                    defaultGroupBy="mimestring" // Test grouping by a given field
                 />
             );
         }

@@ -1024,21 +1024,21 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   font-size: 7px;
   margin-top: 2px;
 }
-.react-mui-context .main-file-list {
+.react-mui-context .material-list.main-file-list {
   opacity: 1;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-icon .covering-bg-preview {
+.react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon .covering-bg-preview {
   border-radius: 50%;
   height: 40px;
   width: 40px;
   margin-left: 17px;
   margin-top: 12px;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-icon > div {
+.react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div {
   width: 100%;
   height: 100%;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-icon > div.mimefont-container {
+.react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div.mimefont-container {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -1046,7 +1046,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
       -ms-flex-align: center;
           align-items: center;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
+.react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
@@ -1055,43 +1055,65 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   color: #607d8b;
   padding-bottom: 10px;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont.mdi-folder {
+.react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont.mdi-folder {
   color: #5c7885;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-line-2 {
+.react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 {
   line-height: 22px;
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.metadata_chunk {
-  color: rgba(0, 0, 0, 0.33);
+.react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk {
+  color: rgba(0, 0, 0, 0.23);
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
-  color: rgba(0, 0, 0, 0.73);
+.react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
+  color: rgba(0, 0, 0, 0.63);
 }
-.react-mui-context .main-file-list .material-list-entry .material-list-line-2 span.icon-angle-right {
+.react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.icon-angle-right {
   display: inline-block;
   margin: 0 1px;
   visibility: hidden;
 }
-.react-mui-context .main-file-list.table-mode span.cell {
+.react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-actions .overlay_icon_div .overlay-class-span {
+  display: inline-block;
+  padding: 14px;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry.selected {
+  background-color: #E3F2FD !important;
+  color: inherit;
+  border-bottom-color: transparent;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry.selected .material-list-line-1 {
+  font-weight: inherit;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry.selected .overlay_icon_div span.overlay-class-span {
+  color: inherit;
+}
+.react-mui-context .material-list.main-file-list.table-mode span.cell {
   color: rgba(0, 0, 0, 0.53);
 }
-.react-mui-context .main-file-list.table-mode span.cell.cell-text {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text {
   color: rgba(0, 0, 0, 0.87);
   font-size: 14px;
   font-weight: 400;
 }
-.react-mui-context .main-file-list.table-mode span.cell.cell-text > span {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text > span {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
-.react-mui-context .main-file-list.table-mode span.cell.cell-text > span div.mimefont-container {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text > span div.mimefont-container {
   font-size: 17px;
   margin-top: -2px;
   margin-right: 10px;
   color: #607d8b;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry {
+.react-mui-context .material-list.main-file-list.table-mode .material-list-actions .overlay_icon_div {
+  padding-right: 8px;
+}
+.react-mui-context .material-list.main-file-list.table-mode .material-list-actions .overlay_icon_div .overlay-class-span {
+  display: inline-block;
+  padding: 18px 8px 0;
+}
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry {
   width: 230px;
   float: left;
   height: 200px;
@@ -1099,20 +1121,20 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: block;
   padding: 1px;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-icon {
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-icon {
   width: 100%;
   height: 100%;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-icon div.covering-bg-preview {
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-icon div.covering-bg-preview {
   border-radius: 0;
   width: 100%;
   height: 100%;
   margin: 0;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-icon div.mimefont {
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-icon div.mimefont {
   font-size: 70px !important;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-text {
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-text {
   position: absolute;
   bottom: 1px;
   left: 1px;
@@ -1121,24 +1143,30 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   background-color: rgba(0, 0, 0, 0.33);
   color: white;
 }
-.react-mui-context .main-file-list.material-list-grid .material-list-entry .material-list-actions {
-  display: none;
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-actions {
+  position: absolute;
+  bottom: 9px;
+  right: 7px;
 }
-.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry {
+.react-mui-context .material-list.main-file-list.material-list-grid .material-list-entry .material-list-actions span.overlay-class-span {
+  color: white !important;
+  padding: 0 4px;
+}
+.react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry {
   padding: 0.5px 1px;
 }
-.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text {
+.react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text {
   display: none;
   padding: 5px;
 }
-.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text .material-list-line-1 {
+.react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry .material-list-text .material-list-line-1 {
   font-size: 12px;
   line-height: 12px;
 }
-.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover {
+.react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover {
   background-color: #ff764b !important;
 }
-.react-mui-context .main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
+.react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
   display: block;
 }
 input {

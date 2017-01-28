@@ -1,5 +1,67 @@
 (function(global) {
 
+    class ContextMenuModel extends Observable{
+
+        super(){
+            this._currentNode = null;
+            this._position    = null;
+        }
+
+        static getInstance(){
+            if(!ContextMenuModel.__INSTANCE) {
+                ContextMenuModel.__INSTANCE = new ContextMenuModel();
+            }
+            return ContextMenuModel.__INSTANCE;
+        }
+
+        openAtPosition(clientX, clientY){
+            this._currentNode = null;
+            this._position    = {x: clientX, y: clientY};
+            this.notify("open");
+        }
+
+        openNodeAtPosition(node, clientX, clientY){
+            this._currentNode = node;
+            this._position    = {x: clientX, y: clientY};
+            this.notify("open", node);
+        }
+
+        getNode(){
+            return this._currentNode;
+        }
+
+        getPosition(){
+            return this._position;
+        }
+
+        close(){
+            this._currentNode = null;
+            this.notify("close");
+        }
+
+    }
+
+    let ContextMenuNodeProviderMixin = {
+
+        contextMenuNodeResponder: function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+            ContextMenuModel.getInstance().openNodeAtPosition(this.props.node, event.clientX, event.clientY);
+
+        },
+
+        contextMenuResponder: function(event){
+
+            event.preventDefault();
+            event.stopPropagation();
+            ContextMenuModel.getInstance().openAtPosition(event.clientX, event.clientY);
+
+        }
+
+    };
+
+
     var MFB = React.createClass({
 
         getDefaultProps: function(){
@@ -65,6 +127,94 @@
         }
     });
 
+    var PopupMenu = React.createClass({
+
+        propTypes: {
+            menuItems: React.PropTypes.array.isRequired,
+            onMenuClicked: React.PropTypes.func.isRequired,
+            onExternalClickCheckElements: React.PropTypes.func,
+            className: React.PropTypes.string,
+            style:React.PropTypes.object,
+            onMenuClosed: React.PropTypes.func
+        },
+
+        getInitialState(){
+            return {showMenu:false, menuItems:this.props.menuItems};
+        },
+        showMenu: function (style = null, menuItems = null) {
+            this.setState({
+                showMenu: true,
+                style: style,
+                menuItems:menuItems?menuItems:this.state.menuItems
+            });
+        },
+        hideMenu: function(event){
+            if(!event){
+                this.setState({showMenu: false});
+                if(this.props.onMenuClosed) this.props.onMenuClosed();
+                return;
+            }
+            let hide = true;
+            if(this.props.onExternalClickCheckElements){
+                let elements = this.props.onExternalClickCheckElements();
+                for(let i = 0; i < elements.length ; i ++){
+                    if(elements[i].contains(event.target) || elements[i] === event.target ){
+                        hide = false;
+                        break;
+                    }
+                }
+            }
+            if(hide){
+                this.setState({showMenu: false});
+                if(this.props.onMenuClosed) this.props.onMenuClosed();
+            }
+        },
+        componentDidMount: function(){
+            this._observer = this.hideMenu.bind(this);
+        },
+        componentWillUnmount: function(){
+            document.removeEventListener('click', this._observer, false);
+        },
+
+        componentDidUpdate: function(prevProps, nextProps){
+            if(this.state.showMenu){
+                document.addEventListener('click', this._observer, false);
+            }else{
+                document.removeEventListener('click', this._observer, false);
+            }
+        },
+
+        menuClicked:function(event, index, menuItem){
+            this.props.onMenuClicked(menuItem);
+            this.hideMenu();
+        },
+        render: function(){
+
+            //console.log(this.props.mouseEventAnchor);
+
+            if(this.state.showMenu) {
+                if(this.state.style){
+                    return (
+                        <div style={this.state.style} className="menu-positioner">
+                        <ReactMUI.Menu
+                            onItemClick={this.menuClicked}
+                            menuItems={this.state.menuItems}
+                        />
+                        </div>
+                    );
+                }
+                return (
+                    <ReactMUI.Menu
+                        onItemClick={this.menuClicked}
+                        menuItems={this.state.menuItems}
+                    />
+                );
+            }else{
+                return null;
+            }
+        }
+
+    });
 
     var ButtonMenu = React.createClass({
 
@@ -75,52 +225,113 @@
             onMenuClicked: React.PropTypes.func.isRequired
         },
 
-        getInitialState(){
-            return {showMenu:false};
-        },
-        showMenu: function () {
-            this.setState({showMenu: true});
-        },
-        hideMenu: function(event){
-            if(!event){
-                this.setState({showMenu: false});
-                return;
-            }
-            let buttonElement = this.refs['menuButton'].getDOMNode();
-            if(! (buttonElement.contains(event.target) || buttonElement === event.target )){
-                this.setState({showMenu: false});
-            }
-        },
-        componentDidMount: function(){
-            this._observer = this.hideMenu.bind(this);
-            document.addEventListener('click', this._observer, false);
-        },
-        componentWillUnmount: function(){
-            document.removeEventListener('click', this._observer, false);
+        collectElements: function(){
+            return [this.refs['menuButton'].getDOMNode()];
         },
 
-        menuClicked:function(event, index, menuItem){
-            this.props.onMenuClicked(menuItem);
-            this.hideMenu();
+        showMenu: function(){
+            this.refs['menu'].showMenu();
         },
+
         render: function(){
-            var menuAnchor = <ReactMUI.IconButton ref="menuButton" tooltip={this.props.buttonTitle} iconClassName={this.props.buttonClassName} onClick={this.showMenu}/>;
-            if(this.state.showMenu) {
-                var menuBox = <ReactMUI.Menu onItemClick={this.menuClicked} menuItems={this.props.menuItems}/>;
-            }
             return (
                 <span className="toolbars-button-menu">
-                    {menuAnchor}
-                    {menuBox}
+                    <ReactMUI.IconButton
+                        ref="menuButton"
+                        tooltip={this.props.buttonTitle}
+                        iconClassName={this.props.buttonClassName}
+                        onClick={this.showMenu}
+                    />
+                    <PopupMenu
+                        ref="menu"
+                        menuItems={this.props.menuItems}
+                        onMenuClicked={this.props.onMenuClicked}
+                        onExternalClickCheckElements={this.collectElements}
+                    />
                 </span>
             );
         }
 
     });
 
+
+    var ContextMenu = React.createClass({
+
+        statics:{
+            MENU_ITEM_HEIGHT: 48,
+            MENU_VERTICAL_PADDING: 8,
+            MENU_WIDTH: 250
+        },
+
+        modelOpen: function(node){
+            let position = ContextMenuModel.getInstance().getPosition();
+            let items;
+            if(node){
+                //items = [{payload:1, text:node.getLabel()},{payload:2, text:'hello'}];
+                pydio.getContextHolder().setSelectedNodes([node]);
+                items = this.computeMenuItems('selectionContext');
+            }else{
+                items = this.computeMenuItems('genericContext');
+            }
+            console.log(items);
+            position = this.computeVisiblePosition(position, items);
+            this.refs['menu'].showMenu({
+                top: position.y,
+                left: position.x
+            }, items);
+        },
+
+        computeMenuItems: function(context){
+            let actions = global.pydio.Controller.getContextActions(context, ['inline']);
+            return actions.map(function(action){
+                return {payload: action.action_id, text: action.name};
+            });
+        },
+
+        menuClicked: function(object){
+            pydio.Controller.fireAction(object.payload);
+        },
+
+        computeVisiblePosition: function(position, items){
+            let menuHeight  = ContextMenu.MENU_ITEM_HEIGHT * items.length + ContextMenu.MENU_VERTICAL_PADDING * 2;
+            let menuWidth   = ContextMenu.MENU_WIDTH;
+            let windowW     = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            let windowH     = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+            if(position.x + menuWidth > windowW) position.x = Math.max(position.x - menuWidth, 10);
+            if(position.y + menuHeight > windowH) position.y = Math.max(position.y - menuHeight, 10);
+            return position;
+        },
+
+        onMenuClosed: function(){
+            ContextMenuModel.getInstance().close();
+        },
+
+        componentDidMount: function(){
+            this._modelOpen = this.modelOpen.bind(this);
+            ContextMenuModel.getInstance().observe("open", this._modelOpen);
+        },
+
+        componentWillUnmount: function(){
+            ContextMenuModel.getInstance().stopObserving("open", this._modelOpen);
+        },
+
+        render: function(){
+            return (
+                <PopupMenu
+                    ref="menu"
+                    menuItems={[{payload:1, text:'toto'},{payload:2, text:'hello'}]}
+                    onMenuClicked={this.menuClicked}
+                    onMenuClosed={this.props.onMenuClosed}
+                />
+            );
+        }
+    });
+
     var ns = global.Toolbars || {};
     ns.MFB = MFB;
     ns.ButtonMenu = ButtonMenu;
+    ns.ContextMenu = ContextMenu;
+    ns.ContextMenuNodeProviderMixin = ContextMenuNodeProviderMixin;
     global.Toolbars = ns;
 
 })(window);

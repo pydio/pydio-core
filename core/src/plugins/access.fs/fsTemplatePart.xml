@@ -77,6 +77,7 @@
                 </div>
             </div>
             <div id="react-editor" class="react-editor" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"EditionPanel"}'></div>
+            <div id="context-menu" class="context-menu react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"Toolbars","componentName":"ContextMenu"}'></div>
         ]]></template_part>
     </client_configs>
 </registry_contributions>
