@@ -267,13 +267,22 @@
             let position = ContextMenuModel.getInstance().getPosition();
             let items;
             if(node){
-                //items = [{payload:1, text:node.getLabel()},{payload:2, text:'hello'}];
-                pydio.getContextHolder().setSelectedNodes([node]);
-                items = this.computeMenuItems('selectionContext');
+                let dm = pydio.getContextHolder();
+                if(dm.isUnique() && dm.getUniqueNode() === node){
+                    this.openMenu('selectionContext', position);
+                }else{
+                    pydio.observeOnce("actions_refreshed", function(dataModel){
+                        this.openMenu('selectionContext', position);
+                    }.bind(this));
+                    dm.setSelectedNodes([node]);
+                }
             }else{
-                items = this.computeMenuItems('genericContext');
+                this.openMenu('genericContext', position);
             }
-            console.log(items);
+        },
+
+        openMenu: function(context, position){
+            let items = this.computeMenuItems(context);
             position = this.computeVisiblePosition(position, items);
             this.refs['menu'].showMenu({
                 top: position.y,
@@ -282,14 +291,47 @@
         },
 
         computeMenuItems: function(context){
-            let actions = global.pydio.Controller.getContextActions(context, ['inline']);
-            return actions.map(function(action){
-                return {payload: action.action_id, text: action.name};
-            });
+            let actions = global.pydio.Controller.getContextActions(context, ['inline', 'info_panel', 'info_panel_share']);
+            return this.actionsToItems(actions);
+        },
+
+        actionsToItems: function(actions){
+            let items = [];
+            actions.map(function(action){
+                if(action.separator) return;
+                if(action.subMenu){
+                    let subItems;
+                    if(action.subMenuBeforeShow){
+                        let subActions = action.subMenuBeforeShow();
+                        subItems   = this.actionsToItems(subActions);
+                    }else{
+                        subItems = action.subMenu;
+                    }
+                    items.push({
+                        type:ReactMUI.MenuItem.Types.NESTED,
+                        text: action.raw_name?action.raw_name:action.name,
+                        iconClassName:action.icon_class,
+                        items: subItems
+                    });
+                }else{
+                    let payload;
+                    if(action.callback){
+                        payload = action.callback;
+                    }else{
+                        payload = function(){pydio.Controller.fireAction(action_id);};
+                    }
+                    items.push({
+                        payload: payload,
+                        text: action.raw_name?action.raw_name:action.name,
+                        iconClassName:action.icon_class
+                    });
+                }
+            }.bind(this));
+            return items;
         },
 
         menuClicked: function(object){
-            pydio.Controller.fireAction(object.payload);
+            object.payload();
         },
 
         computeVisiblePosition: function(position, items){

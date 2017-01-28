@@ -238,6 +238,7 @@ class Controller extends Observable{
             action.context.actionBarGroup.split(',').forEach(function(barGroup){
                 var menuItem = {
                     name:action.getKeyedText(),
+                    raw_name: action.options.text,
                     alt:action.options.title,
                     action_id:action.options.name,
                     image_unresolved: action.options.src,

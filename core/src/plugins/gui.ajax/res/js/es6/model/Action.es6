@@ -542,8 +542,8 @@ class Action extends Observable{
 	 */
 	prepareSubmenuDynamicBuilder (){
 		this.subMenuItems.dynamicBuilder = function(protoMenu){
-            var menuItems;
-            setTimeout(function(){
+            let builderFunction = function(){
+                var menuItems;
 				if(this.subMenuItems.dynamicBuilderCode){
 					window.builderContext = this;
                     window.builderProtoMenu = protoMenu;
@@ -577,9 +577,14 @@ class Action extends Observable{
                         menuItems.push(itemData);
 			  		}, this);
 				}
-			  	protoMenu.options.menuItems = menuItems;
-			  	protoMenu.refreshList();
-			}.bind(this),0);
+                if(protoMenu){
+                    protoMenu.options.menuItems = menuItems;
+                    protoMenu.refreshList();
+                }
+                return menuItems;
+			}.bind(this);
+            if(protoMenu) setTimeout(builderFunction, 0);
+            else return builderFunction();
 		}.bind(this);		
 	}
 	
