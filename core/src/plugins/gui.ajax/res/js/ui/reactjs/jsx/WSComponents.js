@@ -404,7 +404,6 @@
         getInitialState: function(){
             let configParser = new ComponentConfigsParser();
             let columns = configParser.loadConfigs('FilesList').get('columns');
-            console.log(columns);
             return {
                 contextNode : this.props.pydio.getContextHolder().getContextNode(),
                 displayMode : 'list',

@@ -111,9 +111,6 @@
             };
 
             let value = this.getRealValue();
-            console.log(value);
-            console.log(data);
-            console.log(data[value]);
             if(value && data[value]){
                 let dV = data[value];
                 return <span className={dV.cssClass}>{dV.label}</span>
