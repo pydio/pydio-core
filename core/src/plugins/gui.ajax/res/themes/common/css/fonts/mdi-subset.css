@@ -423,3 +423,23 @@
 .mdi-arrow-up-bold-hexagon-outline:before {
     content: "\f15a";
 }
+
+.mdi-star:before {
+    content: "\f5bc";
+}
+
+.mdi-star-circle:before {
+    content: "\f5bd";
+}
+
+.mdi-star-half:before {
+    content: "\f5be";
+}
+
+.mdi-star-off:before {
+    content: "\f5bf";
+}
+
+.mdi-star-outline:before {
+    content: "\f5c0";
+}

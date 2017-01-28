@@ -388,20 +388,25 @@ class ResourcesManager{
         }
     }
 
-    static detectModuleToLoadAndApply(callbackString, callbackFunc){
+    static detectModuleToLoadAndApply(callbackString, callbackFunc, async = true){
         if(!ResourcesManager.__modules){
             ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
         }
         var className = callbackString.split('.',1).shift();
         if(!window[className] && ResourcesManager.__modules.has(className)){
+            if(!async){
+                let loader = new ResourcesManager();
+                loader.loadJSResource(ResourcesManager.__modules.get(className), className, null, false);
+                return callbackFunc();
+            }
             if(window.requirejs){
                 requirejs([ResourcesManager.__modules.get(className).replace('.js','')], callbackFunc);
             }else{
-                var loader = new ResourcesManager();
+                let loader = new ResourcesManager();
                 loader.loadJSResource(ResourcesManager.__modules.get(className), className, callbackFunc, true);
             }
         }else{
-            callbackFunc();
+            return callbackFunc();
         }
     }
 

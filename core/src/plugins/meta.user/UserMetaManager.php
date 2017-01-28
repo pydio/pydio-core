@@ -119,12 +119,14 @@ class UserMetaManager extends AbstractMetaSource
             switch ($fieldType) {
                 case "stars_rate":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.starsRateFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderStars");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelStars";
                     break;
                 case "css_label":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderCSSLabel");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelCssLabels";
@@ -138,12 +140,14 @@ class UserMetaManager extends AbstractMetaSource
                 case "choice":
                     $searchables[$key] = $label;
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.selectorsFilter");
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderSelector");
                     $col->setAttribute("sortType", "CellSorterValue");
                     $col->setAttribute("metaAdditional", $this->fieldsAdditionalData[$key]);
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelSelectorFilter";
                     break;
                 case "tags":
                     $searchables[$key] = $label;
+                    $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderTagsCloud");
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelTags";
                     break;
                 default:

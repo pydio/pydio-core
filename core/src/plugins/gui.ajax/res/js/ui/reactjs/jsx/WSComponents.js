@@ -53,6 +53,75 @@
         }
 
     }
+
+    class ComponentConfigsParser{
+        
+        constructor(){
+            
+        }
+
+        getDefaultListColumns(){
+            return {
+                text:{
+                    label:'File Name',
+                    message:'1',
+                    width: '50%',
+                    renderCell:MainFilesList.tableEntryRenderCell,
+                    sortType:'string',
+                    remoteSortAttribute:'ajxp_label'
+                },
+                filesize:{
+                    label:'File Size',
+                    message:'2',
+                    sortType:'number',
+                    sortAttribute:'bytesize',
+                    remoteSortAttribute:'filesize'
+                },
+                mimestring:{
+                    label:'File Type',
+                    message:'3',
+                    sortType:'string'
+                },
+                ajxp_modiftime:{
+                    label:'Mofidied on',
+                    message:'4',
+                    sortType:'number'
+                }
+            };
+        }
+
+        loadConfigs(componentName){
+            let configs = new Map();
+            let columnsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@className="FilesList"]/columns/column|client_configs/component_config[@className="FilesList"]/columns/additional_column');
+            let columns = {};
+            let messages = global.pydio.MessageHash;
+            columnsNodes.forEach(function(colNode){
+                let name = colNode.getAttribute('attributeName');
+                columns[name] = {
+                    message : colNode.getAttribute('messageId'),
+                    label   : colNode.getAttribute('messageString') ? colNode.getAttribute('messageString') : messages[colNode.getAttribute('messageId')],
+                    sortType: messages[colNode.getAttribute('sortType')]
+                };
+                if(name === 'ajxp_label') {
+                    columns[name].renderCell = MainFilesList.tableEntryRenderCell;
+                }
+                if(colNode.getAttribute('reactModifier')){
+                    let reactModifier = colNode.getAttribute('reactModifier');
+                    columns[name].renderComponent = columns[name].renderCell = function(){
+                        var args = Array.from(arguments);
+                        return ResourcesManager.detectModuleToLoadAndApply(reactModifier, function(){
+                            let modifierFuncWrapped = eval(reactModifier);
+                            return modifierFuncWrapped.apply(null, args);
+                        }, false);
+                    };
+                }
+                columns[name]['sortType'] = 'string';
+            });
+            configs.set('columns', columns);
+            return configs;
+        }
+        
+    }
     
     let MessagesProviderMixin = {
 
@@ -326,40 +395,23 @@
             pydio: React.PropTypes.instanceOf(Pydio)
         },
 
+        statics: {
+            tableEntryRenderCell: function(node){
+                return <span><FilePreview noRichPreview={true} node={node}/> {node.getLabel()}</span>;
+            }
+        },
+
         getInitialState: function(){
+            let configParser = new ComponentConfigsParser();
+            let columns = configParser.loadConfigs('FilesList').get('columns');
+            console.log(columns);
             return {
                 contextNode : this.props.pydio.getContextHolder().getContextNode(),
                 displayMode : 'list',
                 thumbNearest: 200,
                 thumbSize   : 200,
                 elementsPerLine: 5,
-                columns     : {
-                    text:{
-                        label:'File Name',
-                        message:'1',
-                        width: '50%',
-                        renderCell:this.tableEntryRenderCell.bind(this),
-                        sortType:'string',
-                        remoteSortAttribute:'ajxp_label'
-                    },
-                    filesize:{
-                        label:'File Size',
-                        message:'2',
-                        sortType:'number',
-                        sortAttribute:'bytesize',
-                        remoteSortAttribute:'filesize'
-                    },
-                    mimestring:{
-                        label:'File Type',
-                        message:'3',
-                        sortType:'string'
-                    },
-                    ajxp_modiftime:{
-                        label:'Mofidied on',
-                        message:'4',
-                        sortType:'number'
-                    }
-                },
+                columns     : columns ? columns : configParser.getDefaultListColumns(),
                 parentIsScrolling: this.props.parentIsScrolling
             }
         },
@@ -456,10 +508,6 @@
             }
         },
 
-        tableEntryRenderCell: function(node){
-            return <span><FilePreview noRichPreview={true} node={node}/> {node.getLabel()}</span>;
-        },
-
         entryRenderSecondLine: function(node){
             let metaData = node.getMetadata();
             let pieces = [];
@@ -470,7 +518,8 @@
             var first = false;
             var attKeys = Object.keys(this.state.columns);
             for(var i = 0; i<attKeys.length;i++ ){
-                var s = attKeys[i];
+                let s = attKeys[i];
+                let columnDef = this.state.columns[s];
                 let label;
                 if(s === 'ajxp_label' || s === 'text'){
                     continue;
@@ -481,8 +530,11 @@
                 }else if(s == "ajxp_dirname" && metaData.get("filename")){
                     var dirName = getRepName(metaData.get("filename"));
                     label =  dirName?dirName:"/" ;
-                }else if(s == "filesize" && metaData.get(s) == "-"){
+                }else if(s == "filesize" && metaData.get(s) == "-") {
                     continue;
+                }else if(columnDef.renderComponent){
+                    columnDef['name'] = s;
+                    label = columnDef.renderComponent(node, columnDef);
                 }else{
                     var metaValue = metaData.get(s) || "";
                     if(!metaValue) continue;
@@ -494,12 +546,6 @@
                 }
                 let cellClass = 'metadata_chunk metadata_chunk_standard metadata_chunk_' + s;
                 pieces.push(<span className={cellClass}>{sep}<span className="text_label">{label}</span></span>);
-                /*
-                Modifier to be changed to react
-                if(attributeList.get(s).modifierFunc){
-                    attributeList.get(s).modifierFunc(cell, ajxpNode, 'detail', attributeList.get(s), largeRow);
-                }
-                */
             }
             return pieces;
 

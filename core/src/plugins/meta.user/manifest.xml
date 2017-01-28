@@ -5,6 +5,7 @@
 		<resources>
 			<i18n namespace="meta.user" path="plugins/meta.user/i18n" />
 			<js file="plugins/meta.user/class.MetaCellRenderer.js" className="MetaCellRenderer"/>
+			<js file="plugins/meta.user/js/build/ReactMeta.js" className="ReactMeta"/>
             <img_library alias="meta_user" path="plugins/meta.user/img"/>
 		</resources>
 	</client_settings>

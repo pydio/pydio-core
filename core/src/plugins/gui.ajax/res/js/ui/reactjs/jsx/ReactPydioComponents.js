@@ -1440,7 +1440,8 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 var style = data['width']?{width:data['width']}:null;
                 let value;
                 if(data.renderCell){
-                    value = data.renderCell(this.props.node);
+                    data['name'] = key;
+                    value = data.renderCell(this.props.node, data);
                 }else{
                     value = this.props.node.getMetadata().get(key);
                 }
