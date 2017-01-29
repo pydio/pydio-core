@@ -69,7 +69,7 @@ Proto.Menu = Class.create({
         this.mouseoutFunctionBound = this.mouseoutFunction.bind(this);
 
 		if(this.options.mouseClick == 'right'){			
-			$(document.body).observe('contextmenu', function(e){Event.stop(e);});
+			$(document.body).observe('contextmenu', Event.stop);
 			$(document.body).insert(this.container.observe('contextmenu', Event.stop));
 		}else{
 			$(document.body).insert(this.container);
@@ -93,6 +93,9 @@ Proto.Menu = Class.create({
 	
 	destroy : function(){
 		try{
+            if(this.options.mouseClick === 'right'){
+                $(document.body).stopObserving('contextmenu', Event.stop);
+            }
 			if(this.subMenus.length) this.subMenus.invoke("destroy");
 			if(this.ie) this.shim.remove();
 			this.container.remove();
