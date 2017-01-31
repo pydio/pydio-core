@@ -1,0 +1,70 @@
+<div style='font-family: "Roboto", "Open sans", "HelveticaNeue-Light","Helvetica Neue Light","Helvetica Neue",Helvetica,Arial,"Lucida Grande",sans-serif; font-size: 13px;line-height: 1.5em;'
+     xmlns="http://www.w3.org/1999/html">
+
+    <h2>Pydio 7.0.4 successfully installed</h2>
+
+    <p>
+        7.0.4 is a bugfixes and security release for 7.0.3.
+    </p>
+
+    <hr style="border: none; border-top: 1px solid black;"/>
+
+    <h2>Pydio 7 Important Features</h2>
+
+    <h3>Pydio Booster</h3>
+
+    <p>Pydio Go is a complement to Pydio that runs as a Server. It is based on GO, a performant language developed by Google. It will improve overall software performances, by delegating CPU-consuming task to this new tool. In this first version, it will handle uploads, scheduler triggers, and best of all, one-click install websocket server, which will especially improve scalability and performances by pushing events from server instead of polling all the time.<br/>
+        Pydio Go is available for Pydio Community and Pydio Enterprise.</p>
+
+    <h3>File Gateway improves your server security</h3>
+    Pydio offers a brand new SaaS-based service called FileGateway, a host proxy to send public links without disclosing your server URL.
+    Choose your domain name (filesend.cc / yoursha.re) and your region (US / EU).
+
+    <h3>Online Documents Edition</h3>
+
+    By hosting your own instance of Libreoffice Online from Collabora and using our new connector, you can now edit any office documents directly online, without the need to use third-party services like Zoho.
+
+    <h3>API, Performances</h3>
+    - Full rewrite of Pydio API, especially regarding provisioning, following Open API standards; there is now an extensive, accurate API REST documentation.
+    <br/>- Increased caching, especially files list, whick makes it mindblasting in terms of performances, especially for remote workspaces like S3 or FTP
+    <br/>- Search for files or information across several storages / workspaces at the same time, and get quicker search results with the upgrade of our Elastic Search plugin
+    <br/>- New Admin parameter to easily allow or prevent user to re-share files
+
+    <h3>Under the Hood</h3>
+    - Code refactoring, with PSR-7 pattern, Composer, Guzzle
+    <br/>- New Messaging Server based on NSQ, a language originally developed by Bitly
+    <br/>- Auto-complete command line makes it easier for Admins to look for specific actions with Pydio (thanks to @symfony)
+    <br/>- End of some unmaintained plugins (e.g. auth.serial, conf.serial)
+    <br/>- Internal router embeded solves deployment issues, simplifying RewriteRules at maximum
+    <br/>- New way of storing shares that will facilitate Pydio migrations
+    <br/> And many more... !!
+
+    <hr style="border: none; border-top: 1px solid black;"/>
+
+    <h2>7.0.4 detailed changelog</h2>
+    <ul>
+        <li>Make sure checking db version test does not break everything (if there is a missing table for example). (<a href="http://github.com/pydio/pydio-core/commit/5c39993186359640857c02dc99d0cd74953bbb8b">details</a>)</li>
+        <li>Fix throw error when accessing to prohibited path on smb wsp (<a href="http://github.com/pydio/pydio-core/commit/e51aa65e624bdb1e46aa98e868d973d4f57067c8">details</a>)</li>
+        <li>Fix EncFS and caching issues (<a href="http://github.com/pydio/pydio-core/commit/980895f69534b574f4091e883c0b2de59eb56411">details</a>)</li>
+        <li>Optim: make sure clear cache is called deferred. (<a href="http://github.com/pydio/pydio-core/commit/ea5c6c54aadc4eccdfd79108bd2491a0b62079d4">details</a>)</li>
+        <li>Do not use applyHook but load session manager directly instead for performances. (<a href="http://github.com/pydio/pydio-core/commit/205da54a5e72c3ee28218f8c7607d946861ac7aa">details</a>)</li>
+        <li>Mq.serial: make $channels static variable as in mq.sql (<a href="http://github.com/pydio/pydio-core/commit/b8ff26af04a7002493957504d2d4c8718971a5e0">details</a>)</li>
+        <li>Add an option to disable nodes caching (<a href="http://github.com/pydio/pydio-core/commit/0bec0a72f9dc1ddda066815e55b6511f5ca8d4b3">details</a>)</li>
+        <li>Add ldap support AD memberof values in nested group (<a href="http://github.com/pydio/pydio-core/commit/4311008a255e7e1173cec39ccca6dbd29541f121">details</a>)</li>
+        <li>Fix EncFS (<a href="http://github.com/pydio/pydio-core/commit/0058ca27237535fbfd15723b30cf9a5ab4a498f1">details</a>)</li>
+        <li>Make sure that unserialized object is a Notification instance (<a href="http://github.com/pydio/pydio-core/commit/85c6572c924f2adac3af0d9c589d94a1214223cd">details</a>)</li>
+        <li>Switch lite version to full version (<a href="http://github.com/pydio/pydio-core/commit/597a6f77589b735496c7230d38cf25b68013604a">details</a>)</li>
+        <li>Fix webDAV upload events. Should fix #1317 and fix #1318 (<a href="http://github.com/pydio/pydio-core/commit/1a7afbf29566d9ee3b85950d05bbc1cfff180d80">details</a>)</li>
+        <li>Replace check for bypass_pwd by check on empty $pwd variable. Should fix #1316, please confirm (<a href="http://github.com/pydio/pydio-core/commit/d0a823c369ffc93a1ffc5a887881cab2194ffa99">details</a>)</li>
+        <li>Test USE_SESSION_CREDENTIALS value, not just isset(). Should be the real cause of #1316 (<a href="http://github.com/pydio/pydio-core/commit/5908f027d68970fded96e5190928997542442506">details</a>)</li>
+        <li>Close session on possibly long requests that may block the UI (<a href="http://github.com/pydio/pydio-core/commit/120aaf99db13aa0cfed46bd60e678f3f8982b3df">details</a>)</li>
+        <li>Adding local cache per instance to MemorySafe and removing time limit on nodes cache (<a href="http://github.com/pydio/pydio-core/commit/52cf15caf2971c86271df901b1e9aa7d1d5afdd3">details</a>)</li>
+        <li>Adding interval for the Zoho Editor when in the minisite (<a href="http://github.com/pydio/pydio-core/commit/a92bf34ade4e207167a4c93455a286d9c4ca5652">details</a>)</li>
+        <li>Fix #1319, enable Copy action on readonly files. (<a href="http://github.com/pydio/pydio-core/commit/bf5d9a960f70674ba9c46620d03b92658a99351c">details</a>)</li>
+        <li>Making sure we don't break previous usage (<a href="http://github.com/pydio/pydio-core/commit/5d207a16fa3ac58fd6915a2419e0c6a7793124c7">details</a>)</li>
+        <li>Update tutorial videos. Open panel by default for the first connexion. (<a href="http://github.com/pydio/pydio-core/commit/f33bb1553074e504673c3aeeacc4e8cbbbc90464">details</a>)</li>
+        <li>Fix events forwarding for one-doc minisite (use ContentFilter instead of relative path re-compute). Zoho send a create event instead of a content event. (<a href="http://github.com/pydio/pydio-core/commit/39784b7e20e4e8229328ee36a89943e65a40f0c9">details</a>)</li>
+        <li>Fix for s3 shares (<a href="http://github.com/pydio/pydio-core/commit/1656daa60edf11986c8239e983788a91b77c2817">details</a>)</li>
+        <li>Typo error (<a href="http://github.com/pydio/pydio-core/commit/14a44a2d55af1c957085d4ecb52c88ab275cf0a3">details</a>)</li>
+    </ul>
+</div>
