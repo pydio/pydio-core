@@ -335,7 +335,7 @@
         closeGettingStarted: function(){
             this.setState({showGettingStarted:false});
             if(this.state.initiallyOpened){
-                let guiPrefs = this.props.user.getPreference("gui_preferences", true);
+                let guiPrefs = this.props.user.getPreference("gui_preferences", true) || {};
                 guiPrefs['WelcomeComponent.HomePanel.TutorialShown'] = true;
                 this.props.user.setPreference('gui_preferences', guiPrefs, true);
                 this.props.user.savePreference('gui_preferences');
@@ -343,7 +343,7 @@
         },
 
         getInitialState:function(){
-            let guiPrefs = this.props.user.getPreference('gui_preferences', true);
+            let guiPrefs = this.props.user.getPreference('gui_preferences', true) || {};
             return {showGettingStarted:false, initiallyOpened:!guiPrefs['WelcomeComponent.HomePanel.TutorialShown']};
         },
 
