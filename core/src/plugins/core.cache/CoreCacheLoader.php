@@ -110,7 +110,7 @@ class CoreCacheLoader extends Plugin implements CoreInstanceProvider
      */
     public function loadNodeInfoFromCache(&$node, $contextNode, $details, $forceRefresh = false){
         if($forceRefresh) {
-            Controller::applyHook("node.clear_cache_deferred", [&$node]);
+            $this->clearNodeInfoCache($node);
             return;
         }
         if(!$this->enableNodesCaching()) return;
