@@ -105,7 +105,8 @@ class Controller
         $paramNames = explode("/", trim($restPath, "/"));
         $exploded = explode("?", $path);
         $path = array_shift($exploded);
-        $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
+        //$paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
+        $paramValues = explode("/", trim($path, "/"), count($paramNames));
         foreach ($paramNames as $i => $pName) {
             if (strpos($pName, "+") !== false) {
                 $paramNames[$i] = str_replace("+", "", $pName);
@@ -129,7 +130,7 @@ class Controller
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @param callable|null $nextCallable
-     * @return ResponseInterface
+= strp     * @return ResponseInterface
      * @throws AuthRequiredException
      */
     public static function registryActionMiddleware(ServerRequestInterface $request, ResponseInterface $response, callable $nextCallable = null){
