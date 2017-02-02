@@ -130,7 +130,7 @@ class Controller
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @param callable|null $nextCallable
-= strp     * @return ResponseInterface
+     * @return ResponseInterface
      * @throws AuthRequiredException
      */
     public static function registryActionMiddleware(ServerRequestInterface $request, ResponseInterface $response, callable $nextCallable = null){
