@@ -228,6 +228,9 @@ class Pluploader extends Plugin
                     Controller::applyHook("node.change", array(null, $node, false));
                 }
             }
+            $createdNode = new AJXP_Node($destStreamURL.$filename);
+            $logFile = $createdNode->getRepository()->getSlug() . $createdNode->getParent()->getPath()."/".$createdNode->getLabel();
+            $this->logInfo("Upload File", ["file"=>$logFile, "files"=> $logFile]);
         }
         // Return JSON-RPC response
         echo('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
