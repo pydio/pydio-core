@@ -77,46 +77,97 @@
   }
   #right_split{
     .primaryLightPane;
-    background-color: #CFD8DC;
+    background-color: @infopanel_main_background_color;
     #ipanel_header{
-      border-left: 1px solid darken(@applicationPrimaryColor, 10);
+      background-color: darken(@applicationPrimaryColor, 5);
       box-sizing: border-box;
-      padding: 10px;
-      .primaryColorPane;
+      padding: 12px 16px;
+      font-weight: 500;
+      font-sze: 14px;
       height: 42px;
       /*box-shadow: @reactBoxShadowDepthHalf; */
       z-index: 10;
+      color: white;
       #display_toolbar_right{
         float: right;
-        margin: 3px 10px 3px;
+        margin-right: 8px;
         a{
           .icon_buttons_toolbar;
+          color: white;
         }
       }
     }
     #info_panel{
+      font-weight: 400;
       .ipanelCard{
         background-color: white;
         margin: 10px !important;
         margin-bottom: 0;
-        box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
-        border-radius: 3px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.33);
+        border-radius: 2px;
+        padding: 24px 16px 16px;
+        div.panelHeader{
+          font-size: 24px;
+          font-weight: 400;
+          padding: 0 0 12px 0;
+          span[data-ajxpAction]{
+            display: inline-block;
+            float: right;
+            font-size: 16px;
+            line-height: 23px;
+            color: #aeaeae;
+            cursor: pointer;
+            &.user_meta_change{
+              display:none !important;
+            }
+          }
+        }
       }
       /*border-left: 1px solid @infopanel_section_separator_color;*/
       .panelContent{
         background-color: transparent;
+        div.toolbars{
+          background-color: @infopanel_toolbar_buttons_bgcolor;
+        }
+        div.one_has_many, div.one_or_less{
+          margin-top: 0;
+          background-color: @infopanel_toolbar_buttons_bgcolor;
+          border-radius: 0 0 2px 2px;
+          div.toolbar_placeholder{
+            margin-top: 8px !important;
+          }
+          a{
+            color: @infopanel_toolbar_buttons_color;
+            span.actionbar_button_label{
+              text-transform: uppercase;
+              font-weight: 400;
+            }
+            &:hover, &:hover span.ajxp_icon_span{
+              color: @infopanel_toolbar_buttons_color;
+            }
+          }
+        }
+        div.one_or_less{
+          margin-top: 8px;
+        }
       }
       div.infoPanelBasenameTitle{
         display: none;
       }
       .infoPanelImagePreview{
         .ipanelCard;
+        padding: 0;
         div.bgCoverImage{
           border-radius: 3px 3px 0 0 ;
         }
         margin: 0;
         img.thumbnail_iconlike_shadow{
           box-shadow: 0 0 0;
+        }
+        div.mimefont{
+          background-color: #fafafa;
+          display: block;
+          padding: 34px;
         }
       }
       div.infoPanelAllMetadata > div{

@@ -1094,10 +1094,13 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   line-height: 22px;
 }
 .react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk {
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  opacity: 0;
   color: rgba(0, 0, 0, 0.23);
 }
 .react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
-  color: rgba(0, 0, 0, 0.63);
+  opacity: 1;
+  color: rgba(0, 0, 0, 0.43);
 }
 .react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.icon-angle-right {
   display: inline-block;
@@ -1116,8 +1119,20 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 .react-mui-context .material-list.main-file-list .material-list-entry.selected .material-list-line-1 {
   font-weight: inherit;
 }
+.react-mui-context .material-list.main-file-list .material-list-entry.selected .material-list-line-2 span.metadata_chunk {
+  opacity: 1;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry.selected .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
+  color: rgba(0, 0, 0, 0.63);
+}
 .react-mui-context .material-list.main-file-list .material-list-entry.selected .overlay_icon_div span.overlay-class-span {
   color: inherit;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry:hover .material-list-line-2 span.metadata_chunk {
+  opacity: 1;
+}
+.react-mui-context .material-list.main-file-list .material-list-entry:hover .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
+  color: rgba(0, 0, 0, 0.63);
 }
 .react-mui-context .material-list.main-file-list.table-mode span.cell {
   color: rgba(0, 0, 0, 0.53);
@@ -1204,6 +1219,16 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 .class-FilesList .thumbnail_selectable_cell.detailed div.thumbnail_selectable_cell {
   padding-left: 6px;
   margin: 4px 14px 4px 10px;
+}
+.react-mui-context .material-list.main-file-list .mui-toolbar {
+  background-color: transparent;
+  padding: 0;
+}
+.react-mui-context .material-list.main-file-list .mui-toolbar .mui-toolbar-group.mui-right:first-child {
+  display: none;
+}
+.react-mui-context .material-list.main-file-list .mui-toolbar .mui-toolbar-group.mui-right:last-child {
+  margin-right: 4px;
 }
 input {
   border-radius: 2px;
@@ -5521,7 +5546,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel div.infoPanelLabel,
 .form-ip_content_info_panel div.infoPanelLabel {
   width: 50%;
-  color: #b9c7cd;
+  color: rgba(179, 179, 179, 0.83);
   font-size: 0.9em;
   font-weight: 500;
 }
@@ -5531,7 +5556,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.infoPanelValue {
   padding: 0 0 10px;
   font-size: 1em;
-  color: #43555d;
+  color: rgba(0, 0, 0, 0.83);
   line-height: 1.3em;
   vertical-align: top;
 }
@@ -5559,14 +5584,14 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel {
   font-size: 15px;
-  color: #637e8a;
+  color: rgba(0, 0, 0, 0.83);
   white-space: normal;
   padding-top: 0;
   font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbLabel small {
-  color: #637e8a;
+  color: rgba(0, 0, 0, 0.83);
   display: block;
   font-size: 0.8em;
   line-height: 15px;
@@ -5580,7 +5605,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_description {
   font-size: 12px;
   opacity: 1 !important;
-  color: #637e8a !important;
+  color: rgba(0, 0, 0, 0.83) !important;
   white-space: normal;
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed div.thumbnail_cell_metadata .metadata_chunk.metadata_chunk_standard,
@@ -5593,12 +5618,12 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed.selected-focus div.thumbLabel {
-  color: #637e8a;
+  color: rgba(0, 0, 0, 0.83);
   font-weight: 400;
 }
 #info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel,
 .form-ip_content_info_panel div.class-FetchedResultPane.leaf_activity div.thumbnail_selectable_cell.detailed div.thumbLabel {
-  color: #637e8a;
+  color: rgba(0, 0, 0, 0.73);
   display: block;
   font-size: 13px;
   line-height: 17px;
@@ -5652,7 +5677,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 .form-ip_content_info_panel .panelContent div.panelHeader {
   font-size: 13px;
   padding: 8px 0 16px 0;
-  color: #58707b;
+  color: rgba(0, 0, 0, 0.83);
   font-weight: 500;
 }
 #info_panel .panelContent div.panelHeader span.user_meta_change,
@@ -7113,6 +7138,8 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   background-color: #f5f6f9;
   color: #637e8a;
 }
+/* INFO PANEL GENERIC APPLICATION COLOR */
+/* INFOPANEL GREY TINT */
 div.form-login_form,
 div.form-login_form_dynamic,
 div.form-switch_language_form,
@@ -8215,27 +8242,28 @@ span.overlay-class-span.icon-bookmark-empty {
   padding-top: 5px;
 }
 #browser #right_split {
-  background-color: #f5f6f9;
   color: #637e8a;
-  background-color: #CFD8DC;
+  background-color: #f5f6f9;
 }
 #browser #right_split #ipanel_header {
-  border-left: 1px solid #3f535c;
+  background-color: #4a606b;
   box-sizing: border-box;
-  padding: 10px;
-  background-color: #546e7a;
-  color: white;
+  padding: 12px 16px;
+  font-weight: 500;
+  font-sze: 14px;
   height: 42px;
   /*box-shadow: @reactBoxShadowDepthHalf; */
   z-index: 10;
+  color: white;
 }
 #browser #right_split #ipanel_header #display_toolbar_right {
   float: right;
-  margin: 3px 10px 3px;
+  margin-right: 8px;
 }
 #browser #right_split #ipanel_header #display_toolbar_right a {
   background-color: transparent;
   color: #35454d;
+  color: white;
 }
 #browser #right_split #ipanel_header #display_toolbar_right a:hover {
   background-color: transparent;
@@ -8251,17 +8279,66 @@ span.overlay-class-span.icon-bookmark-empty {
   display: none;
 }
 #browser #right_split #info_panel {
+  font-weight: 400;
   /*border-left: 1px solid @infopanel_section_separator_color;*/
 }
 #browser #right_split #info_panel .ipanelCard {
   background-color: white;
   margin: 10px !important;
   margin-bottom: 0;
-  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
-  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.33);
+  border-radius: 2px;
+  padding: 24px 16px 16px;
+}
+#browser #right_split #info_panel .ipanelCard div.panelHeader {
+  font-size: 24px;
+  font-weight: 400;
+  padding: 0 0 12px 0;
+}
+#browser #right_split #info_panel .ipanelCard div.panelHeader span[data-ajxpAction] {
+  display: inline-block;
+  float: right;
+  font-size: 16px;
+  line-height: 23px;
+  color: #aeaeae;
+  cursor: pointer;
+}
+#browser #right_split #info_panel .ipanelCard div.panelHeader span[data-ajxpAction].user_meta_change {
+  display: none !important;
 }
 #browser #right_split #info_panel .panelContent {
   background-color: transparent;
+}
+#browser #right_split #info_panel .panelContent div.toolbars {
+  background-color: #2196f3;
+}
+#browser #right_split #info_panel .panelContent div.one_has_many,
+#browser #right_split #info_panel .panelContent div.one_or_less {
+  margin-top: 0;
+  background-color: #2196f3;
+  border-radius: 0 0 2px 2px;
+}
+#browser #right_split #info_panel .panelContent div.one_has_many div.toolbar_placeholder,
+#browser #right_split #info_panel .panelContent div.one_or_less div.toolbar_placeholder {
+  margin-top: 8px !important;
+}
+#browser #right_split #info_panel .panelContent div.one_has_many a,
+#browser #right_split #info_panel .panelContent div.one_or_less a {
+  color: white;
+}
+#browser #right_split #info_panel .panelContent div.one_has_many a span.actionbar_button_label,
+#browser #right_split #info_panel .panelContent div.one_or_less a span.actionbar_button_label {
+  text-transform: uppercase;
+  font-weight: 400;
+}
+#browser #right_split #info_panel .panelContent div.one_has_many a:hover,
+#browser #right_split #info_panel .panelContent div.one_or_less a:hover,
+#browser #right_split #info_panel .panelContent div.one_has_many a:hover span.ajxp_icon_span,
+#browser #right_split #info_panel .panelContent div.one_or_less a:hover span.ajxp_icon_span {
+  color: white;
+}
+#browser #right_split #info_panel .panelContent div.one_or_less {
+  margin-top: 8px;
 }
 #browser #right_split #info_panel div.infoPanelBasenameTitle {
   display: none;
@@ -8270,9 +8347,27 @@ span.overlay-class-span.icon-bookmark-empty {
   background-color: white;
   margin: 10px !important;
   margin-bottom: 0;
-  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
-  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.33);
+  border-radius: 2px;
+  padding: 24px 16px 16px;
+  padding: 0;
   margin: 0;
+}
+#browser #right_split #info_panel .infoPanelImagePreview div.panelHeader {
+  font-size: 24px;
+  font-weight: 400;
+  padding: 0 0 12px 0;
+}
+#browser #right_split #info_panel .infoPanelImagePreview div.panelHeader span[data-ajxpAction] {
+  display: inline-block;
+  float: right;
+  font-size: 16px;
+  line-height: 23px;
+  color: #aeaeae;
+  cursor: pointer;
+}
+#browser #right_split #info_panel .infoPanelImagePreview div.panelHeader span[data-ajxpAction].user_meta_change {
+  display: none !important;
 }
 #browser #right_split #info_panel .infoPanelImagePreview div.bgCoverImage {
   border-radius: 3px 3px 0 0 ;
@@ -8280,13 +8375,35 @@ span.overlay-class-span.icon-bookmark-empty {
 #browser #right_split #info_panel .infoPanelImagePreview img.thumbnail_iconlike_shadow {
   box-shadow: 0 0 0;
 }
+#browser #right_split #info_panel .infoPanelImagePreview div.mimefont {
+  background-color: #fafafa;
+  display: block;
+  padding: 34px;
+}
 #browser #right_split #info_panel div.infoPanelAllMetadata > div {
   background-color: white;
   margin: 10px !important;
   margin-bottom: 0;
-  box-shadow: 0 2px 3px rgba(84, 110, 122, 0.16), 0 2px 3px rgba(96, 125, 139, 0.43);
-  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.33);
+  border-radius: 2px;
+  padding: 24px 16px 16px;
   border: 0;
+}
+#browser #right_split #info_panel div.infoPanelAllMetadata > div div.panelHeader {
+  font-size: 24px;
+  font-weight: 400;
+  padding: 0 0 12px 0;
+}
+#browser #right_split #info_panel div.infoPanelAllMetadata > div div.panelHeader span[data-ajxpAction] {
+  display: inline-block;
+  float: right;
+  font-size: 16px;
+  line-height: 23px;
+  color: #aeaeae;
+  cursor: pointer;
+}
+#browser #right_split #info_panel div.infoPanelAllMetadata > div div.panelHeader span[data-ajxpAction].user_meta_change {
+  display: none !important;
 }
 #browser #right_split #info_panel #ip_scroller_info_panel {
   margin-top: 45px;

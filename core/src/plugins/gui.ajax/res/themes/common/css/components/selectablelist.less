@@ -564,9 +564,12 @@
         .material-list-line-2{
           line-height: 22px;
           span.metadata_chunk{
+            transition: @bezier_transition;
+            opacity: 0;
             color: rgba(0,0,0,0.23);
             &.metadata_chunk_description{
-              color: rgba(0,0,0,0.63);
+              opacity: 1;
+              color: rgba(0,0,0,0.43);
             }
           }
           span.icon-angle-right{
@@ -590,8 +593,27 @@
         .material-list-line-1{
           font-weight: inherit;
         }
+        .material-list-line-2{
+          span.metadata_chunk{
+            opacity: 1;
+            &.metadata_chunk_description{
+              color: rgba(0,0,0,0.63);
+            }
+          }
+        }
         .overlay_icon_div span.overlay-class-span{
           color: inherit;
+        }
+      }
+
+      &:hover{
+        .material-list-line-2{
+          span.metadata_chunk{
+            opacity: 1;
+            &.metadata_chunk_description{
+              color: rgba(0,0,0,0.63);
+            }
+          }
         }
       }
 

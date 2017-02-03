@@ -88,7 +88,7 @@ class UserMetaManager extends AbstractMetaSource
         $editButton = '';
         $u = $ctx->getUser();
         if($u != null && $u->canWrite($ctx->getRepositoryId())){
-            $editButton = '<span class="icon-edit" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
+            $editButton = '<span class="mdi mdi-pencil" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
         }
         $cdataHead = '<div>
                         <div class="panelHeader infoPanelGroup">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>

@@ -1013,7 +1013,7 @@
 					</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_file" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
+			<infoPanel mime="generic_file" theme="orbit" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="size_string" id="127"/>
@@ -1050,7 +1050,47 @@
 				</div>
 				]]></html>
 			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="basename,icon,fonticon,formated_date,ajxp_description">
+			<infoPanel mime="generic_file" theme="material" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="size_string" id="127"/>
+					<message key="type_string" id="134"/>
+					<message key="modif_string" id="138"/>
+					<message key="header_string" id="341"/>
+				</messages>
+				<html><![CDATA[
+                <div class="infoPanelImagePreview">
+				    <div class="infoPanelBasenameTitle">#{basename}</div>
+                    #{preview_rich}
+                    <div class="toolbars">
+                        <div class="toolbar_placeholder" data-toolbarId="info_panel"></div>
+                        <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
+                    </div>
+                </div>
+				<div class="infoPanelAllMetadata">
+				    <div id="info_panel_primary">
+				        <div class="panelHeader">Information</div>
+                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                            <tr class="even">
+                                <td class="infoPanelLabel">#{size_string}</td>
+                                <td class="infoPanelLabel">#{type_string}</td>
+                            </tr>
+                            <tr>
+                                <td class="infoPanelValue">#{filesize}</td>
+                                <td class="infoPanelValue">#{mimestring}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                            </tr>
+                        </table>
+                    </div>
+				</div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" theme="orbit" attributes="basename,icon,fonticon,formated_date,ajxp_description">
 				<messages>
 					<message key="name_string" id="133"/>
 					<message key="modif_string" id="138"/>
@@ -1065,6 +1105,36 @@
                     </div>
                     <div class="infoPanelAllMetadata">
                         <div id="info_panel_primary">
+                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                                <tr>
+                                    <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+				]]></html>
+			</infoPanel>
+			<infoPanel mime="generic_dir" theme="material" attributes="basename,icon,fonticon,formated_date,ajxp_description">
+				<messages>
+					<message key="name_string" id="133"/>
+					<message key="modif_string" id="138"/>
+					<message key="header_string" id="342"/>
+				</messages>
+				<html><![CDATA[
+                    <div class="infoPanelImagePreview">
+                        <div class="infoPanelBasenameTitle">#{basename}</div>
+                        <div class="mimefont mdi mdi-#{fonticon}"></div>
+                        <div class="toolbars">
+                            <div class="toolbar_placeholder" data-toolbarId="info_panel"></div>
+                            <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
+                        </div>
+                    </div>
+                    <div class="infoPanelAllMetadata">
+                        <div id="info_panel_primary">
+                            <div class="panelHeader">Information</div>
                             <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                                 <tr>
                                     <td colspan="2" class="infoPanelLabel">#{modif_string}</td>

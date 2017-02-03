@@ -92,7 +92,7 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-				<infoPanelExtension mime="AJXP_MIMES_IMAGE" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" primary="true">
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" theme="orbit" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" primary="true">
                     <messages>
                         <message key="name_string" id="133"/>
                         <message key="size_string" id="127"/>
@@ -111,6 +111,46 @@
                         </div>
                         <div class="infoPanelAllMetadata">
                             <div id="info_panel_primary">
+                                <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
+                                    <tr class="even">
+                                        <td class="infoPanelLabel">#{size_string}</td>
+                                        <td class="infoPanelLabel">#{dim_string}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="infoPanelValue">#{filesize}</td>
+                                        <td class="infoPanelValue">W #{image_width} px <br> H  #{image_height} px</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    ]]></html>
+				</infoPanelExtension>
+				<infoPanelExtension mime="AJXP_MIMES_IMAGE" theme="material" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" primary="true">
+                    <messages>
+                        <message key="name_string" id="133"/>
+                        <message key="size_string" id="127"/>
+                        <message key="type_string" id="134"/>
+                        <message key="modif_string" id="138"/>
+                        <message key="dim_string" id="135"/>
+                    </messages>
+                    <html><![CDATA[
+                        <div class="infoPanelImagePreview">
+                            <div class="infoPanelBasenameTitle">#{basename}</div>
+                            #{preview_rich}
+                            <div>
+                                <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
+                                <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
+                            </div>
+                        </div>
+                        <div class="infoPanelAllMetadata">
+                            <div id="info_panel_primary">
+                                <div class="panelHeader">Image info</div>
                                 <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
                                     <tr class="even">
                                         <td class="infoPanelLabel">#{size_string}</td>
