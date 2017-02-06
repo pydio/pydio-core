@@ -382,7 +382,31 @@ class Action extends Observable{
 		this.enable();
 
 	}
-		
+
+    getMenuData(){
+        let menuItem = {
+            name:this.getKeyedText(),
+            raw_name: this.options.text,
+            alt:this.options.title,
+            action_id:this.options.name,
+            image_unresolved: this.options.src,
+            callback: function(e){this.apply();}.bind(this)
+        };
+        if(this.options.icon_class){
+            menuItem.icon_class = this.options.icon_class;
+        }
+        if(this.options.subMenu){
+            menuItem.subMenu = [];
+            if(this.subMenuItems.staticOptions){
+                menuItem.subMenu = this.subMenuItems.staticOptions;
+            }
+            if(this.subMenuItems.dynamicBuilder){
+                menuItem.subMenuBeforeShow = this.subMenuItems.dynamicBuilder;
+            }
+        }
+        return menuItem;
+    }
+
 	/**
 	 * Parses an XML fragment to configure this action
 	 * @param xmlNode Node XML Fragment describing the action

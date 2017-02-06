@@ -32,12 +32,12 @@ Class.create('AjxpReactComponent', AjxpPane, {
                 namespacesToLoad.push(d);
             });
         }
+        var props = options.props || {};
+        props['pydio'] = pydio;
+        props['pydioId'] = htmlElement.id;
         ResourcesManager.loadClassesAndApply(namespacesToLoad, function(){
             this.reactComponent = React.render(
-                React.createElement(window[options.componentNamespace][options.componentName], {
-                    pydio:pydio,
-                    pydioId:htmlElement.id
-                }),
+                React.createElement(window[options.componentNamespace][options.componentName], props),
                 $(htmlElement)
             );
         }.bind(this));

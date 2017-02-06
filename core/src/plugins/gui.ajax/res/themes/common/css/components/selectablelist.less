@@ -623,21 +623,39 @@
       span.cell{
         color: rgba(0,0,0,0.53);
       }
-      span.cell.cell-text{
+      span.cell.cell-ajxp_label{
         color: rgba(0,0,0,0.87);
         font-size: 14px;
         font-weight: 400;
+        min-width: 250px;
+        &.header_cell{
+          font-size: inherit;
+          font-weight:inherit;
+          color: inherit;
+          padding-left: 42px;
+        }
         > span{
           display: flex;
+          margin-left: 16px;
           div.mimefont-container{
             font-size: 17px;
             margin-top: -2px;
             margin-right: 10px;
             color: @thumbnail_mimefont_color;
           }
+          span:last-child{
+            display: inline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
         }
       }
+      .material-list-icon-none{
+        display: none;
+      }
       .material-list-actions{
+        display: none;
         .overlay_icon_div{
           padding-right: 8px;
           .overlay-class-span{

@@ -43,41 +43,6 @@
                 </div>
             </div>
         ]]></template_part>
-        <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" theme="material" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fitMinOffsetTop":"$(\"global_toolbar\").getHeight();"}'><![CDATA[
-            <div id="left_navigator" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"LeftNavigation","componentName":"PinnedLeftPanel"}'></div>
-            <div style="margin-left: 250px;"  ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"orbit_content"}' id="right-part">
-                <div id="workspace_toolbar" ajxpClass="AjxpPane" class="skipSibling">
-                    <div id="breadcrumb" class="breadcrumbs-one" ajxpClass="Breadcrumb" ajxpOptions='{"use_ul":true, "always_show_root":true, "hide_home_icon":true, "flexTo":"workspace_toolbar", "flexToMargin":80, "checkSiblings":true, "resize_events":["actions_refreshed"]}'></div>
-                    <div id="search_container" ajxpClass="SearchEngine" ajxpOptions='{"toggleResultsVisibility":"search_results_cont", "openSearchInput":"true", "openSearchStickLeftTo":"cpane_container","searchChooserAsResultsHeader":true, "toggleResultsFitTo":"cpane_tabs", "fitMarginBottom":0, "toggleResultsOffsetRight":0, "toggleResultsOffsetTop":0, "detailThumbSize":24}'></div>
-                </div>
-                <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"orbit_content"}'>
-                    <div id="cpane_container" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"browser", "flexTo":"browser"}'>
-                        <div id="files_list_pane" ajxpClass="AjxpPane" ajxpOptions='{"classNamesOn":{"infoPanelFolded":{"event":"vertical_splitter-fold-status","memoKey":"folded"}}}'>
-                            <div id="vertical_splitter" ajxpClass="Splitter" class="forceComputeFit" ajxpOptions='{"direction": "vertical", "initB":250, "minB":250,"fit":"height","fitParent":"browser", "minSize":250, "invisibleBar": true, "foldingButton":"B", "foldingButtonText":341, "foldingMinSize":0}'>
-                                <div id="center_split" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"files_list_pane"}' class="vertical_layout">
-                                    <div id="files_list_header" ajxpClass="AjxpPane">
-                                        <span id="mfb-create-button" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"Toolbars","componentName":"MFB"}'></span>
-                                        <div id="display_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["content_pane-actions","vertical_splitter-actions"],"submenuOffsetTop":5}'></div>
-                                        <div style="float:left;position:fixed;" ajxpClass="AjxpPane"  id="buttons_bar_cont" ajxpOptions='{"flexTo":"files_list_header", "flexToMargin":30, "resize_events":["switchDisplayMode-FilesList-content_pane"]}'>
-                                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"toolbarsList":["navigation", "info_panel","info_panel_share", "change_main"],"groupOtherToolbars":["more", "change", "remote"], "groupOtherLabel":"More","submenuOffsetTop":2}'></div>
-                                        </div>
-                                    </div>
-                                    <div id="react-main-fileslist" class="react-mui-context vertical_layout layout_fill vertical_fit" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"MainFilesList"}'></div>
-                                </div>
-                                <div id="right_split" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"files_list_pane"}' class="vertical_layout">
-                                    <div id="ipanel_header">
-                                        <div id="display_toolbar_right" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["vertical_splitter-actions"],"submenuOffsetTop":5}'></div>
-                                        Header
-                                    </div>
-                                    <div id="info_panel" ajxpClass="InfoPanel" class="vertical_fit" ajxpOptions='{"replaceScroller":"true", "skipActions":true, "previewUseCoveringBg": true}'></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="react-editor" class="react-editor" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"EditionPanel"}'></div>
-            <div id="context-menu" class="context-menu react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"Toolbars","componentName":"ContextMenu"}'></div>
-        ]]></template_part>
+        <template_part ajxpClass="AjxpReactComponent" ajxpId="orbit_content" theme="material" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"FSTemplate","dependencies":["Toolbars","ReactPydio","LeftNavigation"]}'><![CDATA[]]></template_part>
     </client_configs>
 </registry_contributions>

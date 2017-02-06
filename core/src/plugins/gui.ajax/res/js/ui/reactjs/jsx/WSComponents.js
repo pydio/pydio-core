@@ -366,7 +366,7 @@
                 
 
                 return (
-                    <div>
+                    <div className="react-editor">
                         {overlay}
                         <div className={className} style={style}>
                             <div className="editor-title">
@@ -427,18 +427,32 @@
             if(!nearest){
                 nearest = this.state.thumbNearest;
             }
-
             let containerWidth = this.refs['list'].getDOMNode().clientWidth;
 
             // Find nearest dim
             let blockNumber = Math.floor(containerWidth / nearest);
             let width = Math.floor(containerWidth / blockNumber);
 
+
+            // Recompute columns widths
+            let columns = this.state.columns;
+            let columnKeys = Object.keys(columns);
+            let defaultFirstWidthPercent = 10;
+            let defaultFirstMinWidthPx = 250;
+            let firstColWidth = Math.max(250, containerWidth * defaultFirstWidthPercent / 100);
+            let otherColWidth = (containerWidth - firstColWidth) / (Object.keys(this.state.columns).length - 1);
+            columnKeys.map(function(columnKey){
+                columns[columnKey]['width'] = otherColWidth;
+            });
+
             this.setState({
+                columns: columns,
                 elementsPerLine: blockNumber,
                 thumbSize: width,
                 thumbNearest:nearest
             });
+
+
         },
 
         componentDidMount: function(){
@@ -448,10 +462,15 @@
             }.bind(this);
             this.props.pydio.getContextHolder().observe("context_changed", this._contextObserver);
             this.recomputeThumbnailsDimension();
+            console.log("Did Mount");
+            this.props.pydio.getController().updateGuiActions(this.getPydioActions());
         },
 
         componentWillUnmount: function(){
             this.props.pydio.getContextHolder().stopObserving("context_changed", this._contextObserver);
+            this.getPydioActions().forEach(function(action, key){
+                this.props.pydio.getController().deleteFromGuiActions(key);
+            }.bind(this));
         },
 
         selectNode: function(node){
@@ -550,23 +569,46 @@
 
         },
 
-        renderDisplaySwitcher: function(){
-            let switchMode = function(object){
-                let dMode = object.payload;
-                if(dMode.indexOf('grid-') === 0){
-                    let near = parseInt(dMode.split('-')[1]);
-                    this.recomputeThumbnailsDimension(near);
-                }
-                this.setState({displayMode: dMode});
-            }.bind(this);
-            let menuItems = [
-                {payload:'detail', text:'Table View'},
-                {payload:'list', text:'List'},
-                {payload:'grid-160', text:'Thumbnails (medium)'},
-                {payload:'grid-320', text:'Thumbnails (large)'},
-                {payload:'grid-80', text:'Thumbnails (small)'}
-            ];
-            return <Toolbars.ButtonMenu buttonTitle="Display mode" buttonClassName="icon-th-large" menuItems={menuItems} onMenuClicked={switchMode}/>
+        switchDisplayMode: function(displayMode){
+            this.setState({displayMode: displayMode});
+            if(displayMode.indexOf('grid-') === 0){
+                let near = parseInt(displayMode.split('-')[1]);
+                this.recomputeThumbnailsDimension(near);
+            }else if(displayMode === 'detail'){
+                this.recomputeThumbnailsDimension();
+            }
+        },
+
+        getPydioActions: function(){
+            var multiAction = new Action({
+                name:'switch_display_mode',
+                icon_class:'icon-th-large',
+                text_id:150,
+                title_id:151,
+                text:MessageHash[150],
+                title:MessageHash[151],
+                hasAccessKey:false,
+                subMenu:true,
+                subMenuUpdateImage:true
+            }, {
+                selection:false,
+                dir:true,
+                actionBar:true,
+                actionBarGroup:'display_toolbar',
+                contextMenu:false,
+                infoPanel:false
+            }, {}, {}, {
+                staticItems:[
+                    {name:'List',title:227,icon_class:'icon-table',callback:function(){this.switchDisplayMode('list')}.bind(this),hasAccessKey:true,accessKey:'list_access_key'},
+                    {name:'Detail',title:461,src:'view_list_details.png',icon_class:'icon-th-list',callback:function(){this.switchDisplayMode('detail')}.bind(this),hasAccessKey:true,accessKey:'detail_access_key'},
+                    {name:'Thumbs',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-160')}.bind(this),hasAccessKey:true,accessKey:'thumbs_access_key'},
+                    {name:'Thumbs large',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-320')}.bind(this),hasAccessKey:false},
+                    {name:'Thumbs small',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-80')}.bind(this),hasAccessKey:false}
+                ]
+            });
+            let buttons = new Map();
+            buttons.set('switch_display_mode', multiAction);
+            return buttons;
         },
 
         render: function(){
@@ -628,13 +670,93 @@
                     entryRenderSecondLine={entryRenderSecondLine}
                     entryRenderActions={this.entryRenderActions}
                     entryHandleClicks={this.entryHandleClicks}
-                    additionalActions={[this.renderDisplaySwitcher()]}
                 />
             );
         }
 
     });
 
+    let SearchForm = React.createClass({
+
+        render: function(){
+            return (
+                <div className="top_search_form">
+                    <ReactMUI.TextField hintText="Search..."/>
+                </div>
+            );
+        }
+
+    });
+
+    let Breadcrumb = React.createClass({
+
+        getInitialState: function(){
+            return {node: null};
+        },
+
+        componentDidMount: function(){
+            let n = this.props.pydio.getContextHolder().getContextNode();
+            if(n){
+                this.setState({node: n});
+            }
+            this._observer = function(event){
+                this.setState({node: event.memo});
+            }.bind(this);
+            this.props.pydio.getContextHolder().observe("context_changed", this._observer);
+        },
+
+        componentWillUnmount: function(){
+            this.props.pydio.getContextHolder().stopObserving("context_changed", this._observer);
+        },
+
+        render: function(){
+            if(!this.state.node) return <span></span>;
+            return <span className="react_breadcrumb">{this.state.node.getPath()}</span>
+        }
+
+    });
+
+    let FSTemplate = React.createClass({
+
+        mixins: [MessagesProviderMixin],
+
+        propTypes: {
+            pydio:React.PropTypes.instanceOf(Pydio)
+        },
+
+        pydioResize: function(){
+            if(this.refs['list']){
+                this.refs['list'].pydioResize();
+            }
+        },
+
+        render: function () {
+            
+            return (
+                <div className="react-mui-context vertical_layout vertical_fit">
+                    <LeftNavigation.PinnedLeftPanel {...this.props}/>
+                    <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
+                        <div id="workspace_toolbar">
+                            <Breadcrumb {...this.props}/>
+                            <SearchForm {...this.props}/>
+                        </div>
+                        <div id="files_list_header">
+                            <Toolbars.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                            <Toolbars.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                            <Toolbars.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                        </div>
+                        <MainFilesList ref="list" {...this.props}/>
+                    </div>
+                    <ReactPydio.LegacyUIWrapper {...this.props} id="info_panel" componentName="InfoPanel" componentOptions={{replaceScroller:true, skipActions:true, previewUseCoveringBg: true}}/>
+                    <EditionPanel {...this.props}/>
+                    <span className="context-menu"><Toolbars.ContextMenu/></span>
+                </div>
+            );
+            
+        }
+        
+    });
+    
 
     var FakeDndBackend = function(){
         return{
@@ -648,12 +770,15 @@
 
     let ns = global.WSComponents || {};
     if(global.ReactDND){
-        ns.MainFilesList = ReactDND.DragDropContext(ReactDND.HTML5Backend)(MainFilesList);
+        ns.FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(FSTemplate);
     }else{
-        ns.MainFilesList = MainFilesList;
+        ns.FSTemplate = FSTemplate;
     }
     ns.OpenNodesModel = OpenNodesModel;
+    ns.MainFilesList = MainFilesList;
     ns.EditionPanel = EditionPanel;
+    ns.Breadcrumb = Breadcrumb;
+    ns.SearchForm = SearchForm;
     global.WSComponents = ns;
 
 })(window);

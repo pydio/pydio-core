@@ -61,8 +61,49 @@
 
     };
 
+    let pydioActionsToItems = function(actions){
+        let items = [];
+        let lastIsSeparator = false;
+        actions.map(function(action, index){
+            if(action.separator) {
+                if(lastIsSeparator) return;
+                items.push({type:ReactMUI.MenuItem.Types.SUBHEADER, text:''});
+                lastIsSeparator = true;
+                return;
+            }
+            lastIsSeparator = false;
+            if(action.subMenu){
+                let subItems;
+                if(action.subMenuBeforeShow){
+                    let subActions = action.subMenuBeforeShow();
+                    subItems   = pydioActionsToItems(subActions);
+                }else{
+                    subItems = action.subMenu;
+                }
+                items.push({
+                    type:ReactMUI.MenuItem.Types.NESTED,
+                    text: action.raw_name?action.raw_name:action.name,
+                    iconClassName:action.icon_class,
+                    items: subItems
+                });
+            }else{
+                let payload;
+                if(action.callback) {
+                    payload = action.callback;
+                }else{
+                    payload = function(){pydio.Controller.fireAction(action_id);};
+                }
+                items.push({
+                    payload: payload,
+                    text: action.raw_name?action.raw_name:action.name,
+                    iconClassName:action.icon_class
+                });
+            }
+        }.bind(this));
+        return items;
+    };
 
-    var MFB = React.createClass({
+    const MFB = React.createClass({
 
         getDefaultProps: function(){
             return {
@@ -127,7 +168,7 @@
         }
     });
 
-    var PopupMenu = React.createClass({
+    const PopupMenu = React.createClass({
 
         propTypes: {
             menuItems: React.PropTypes.array.isRequired,
@@ -190,8 +231,6 @@
         },
         render: function(){
 
-            //console.log(this.props.mouseEventAnchor);
-
             if(this.state.showMenu) {
                 if(this.state.style){
                     return (
@@ -216,7 +255,7 @@
 
     });
 
-    var ButtonMenu = React.createClass({
+    const IconButtonMenu = React.createClass({
 
         propTypes: {
             buttonTitle: React.PropTypes.string.isRequired,
@@ -254,11 +293,11 @@
 
     });
 
-
-    var ContextMenu = React.createClass({
+    const ContextMenu = React.createClass({
 
         statics:{
             MENU_ITEM_HEIGHT: 48,
+            MENU_SEP_HEIGHT: 9,
             MENU_VERTICAL_PADDING: 8,
             MENU_WIDTH: 250
         },
@@ -292,42 +331,7 @@
 
         computeMenuItems: function(context){
             let actions = global.pydio.Controller.getContextActions(context, ['inline', 'info_panel', 'info_panel_share']);
-            return this.actionsToItems(actions);
-        },
-
-        actionsToItems: function(actions){
-            let items = [];
-            actions.map(function(action){
-                if(action.separator) return;
-                if(action.subMenu){
-                    let subItems;
-                    if(action.subMenuBeforeShow){
-                        let subActions = action.subMenuBeforeShow();
-                        subItems   = this.actionsToItems(subActions);
-                    }else{
-                        subItems = action.subMenu;
-                    }
-                    items.push({
-                        type:ReactMUI.MenuItem.Types.NESTED,
-                        text: action.raw_name?action.raw_name:action.name,
-                        iconClassName:action.icon_class,
-                        items: subItems
-                    });
-                }else{
-                    let payload;
-                    if(action.callback){
-                        payload = action.callback;
-                    }else{
-                        payload = function(){pydio.Controller.fireAction(action_id);};
-                    }
-                    items.push({
-                        payload: payload,
-                        text: action.raw_name?action.raw_name:action.name,
-                        iconClassName:action.icon_class
-                    });
-                }
-            }.bind(this));
-            return items;
+            return pydioActionsToItems(actions);
         },
 
         menuClicked: function(object){
@@ -335,7 +339,11 @@
         },
 
         computeVisiblePosition: function(position, items){
-            let menuHeight  = ContextMenu.MENU_ITEM_HEIGHT * items.length + ContextMenu.MENU_VERTICAL_PADDING * 2;
+            let menuHeight  = ContextMenu.MENU_VERTICAL_PADDING * 2;
+            items.map(function(it){
+                if(it.type === ReactMUI.MenuItem.Types.SUBHEADER) menuHeight += ContextMenu.MENU_SEP_HEIGHT;
+                else menuHeight += ContextMenu.MENU_ITEM_HEIGHT;
+            });
             let menuWidth   = ContextMenu.MENU_WIDTH;
             let windowW     = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
             let windowH     = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
@@ -368,7 +376,7 @@
             return (
                 <PopupMenu
                     ref="menu"
-                    menuItems={[{payload:1, text:'toto'},{payload:2, text:'hello'}]}
+                    menuItems={[]}
                     onMenuClicked={this.menuClicked}
                     onMenuClosed={this.props.onMenuClosed}
                 />
@@ -376,10 +384,179 @@
         }
     });
 
-    var ns = global.Toolbars || {};
+    const ButtonMenu = React.createClass({
+
+        propTypes:{
+            buttonTitle: React.PropTypes.string.isRequired,
+            menuItems:React.PropTypes.array,
+            selectionContext:React.PropTypes.string,
+            toolbars:React.PropTypes.array.isRequired,
+            raised:React.PropTypes.boolean
+        },
+
+        showMenu: function(){
+            if(this.props.menuItems){
+                this.refs['menu'].showMenu(null, this.props.menuItems);
+            }else{
+                let actions = this.props.pydio.Controller.getContextActions('genericContext', null, this.props.toolbars);
+                let items   = pydioActionsToItems(actions);
+                this.refs['menu'].showMenu(null, items);
+            }
+        },
+
+        menuClicked: function(object){
+            object.payload();
+        },
+
+        render: function(){
+            let label = <span>{this.props.buttonTitle} <span className="icon-caret-down"></span></span>
+            let button;
+            if(this.props.raised){
+                button = <ReactMUI.RaisedButton
+                        primary={this.props.primary}
+                        secondary={this.props.secondary}
+                        disabled={this.props.disabled}
+                        primary={true}
+                        label={label}
+                        onClick={this.showMenu}
+                    />
+                ;
+            }else{
+                button = <ReactMUI.FlatButton
+                    primary={this.props.primary}
+                    secondary={this.props.secondary}
+                    disabled={this.props.disabled}
+                    label={label}
+                    onClick={this.showMenu}
+                />;
+
+            }
+            return (
+                <span id={this.props.id}>
+                    {button}
+                    <PopupMenu
+                        ref="menu"
+                        menuItems={[]}
+                        onMenuClicked={this.menuClicked}
+                    />
+                </span>
+            );
+        }
+
+    });
+
+    const Toolbar = React.createClass({
+
+        propTypes:{
+            toolbars:React.PropTypes.array,
+            groupOtherList:React.PropTypes.array,
+            renderingType:React.PropTypes.string,
+            controller:React.PropTypes.instanceOf(Controller)
+        },
+
+        componentDidMount: function(){
+            this._observer = function(){
+                this.setState({
+                    groups:this.props.controller.getToolbarsActions(this.props.toolbars, this.props.groupOtherList)
+                });
+            }.bind(this);
+            if(this.props.controller === pydio.Controller){
+                pydio.observe("actions_refreshed", this._observer);
+            }else{
+                this.props.controller.observe("actions_refreshed", this._observer);
+            }
+        },
+
+        componentWillUnmount: function(){
+            if(this.props.controller === pydio.Controller){
+                pydio.stopObserving("actions_refreshed", this._observer);
+            }else {
+                this.props.controller.stopObserving("actions_refreshed", this._observer);
+            }
+        },
+
+        getInitialState: function(){
+            return {
+                groups:this.props.controller.getToolbarsActions(this.props.toolbars, this.props.groupOtherList)
+            };
+        },
+
+        getDefaultProps:function(){
+            return {
+                controller: global.pydio.Controller,
+                renderingType:'button',
+                groupOtherList:[]
+            }
+        },
+
+        render: function(){
+            let groups = this.state.groups
+            let actions = [];
+            let toolbars = this.props.toolbars;
+            if(this.props.groupOtherList.length){
+                toolbars = toolbars.concat(['MORE_ACTION']);
+            }
+            let renderingType = this.props.renderingType;
+            toolbars.map(function(barName){
+                if(!groups.has(barName)) return;
+                groups.get(barName).map(function(action){
+                    if(action.deny) return;
+                    let menuItems = null;
+                    let menuTitle = null;
+                    let menuIcon  = null;
+
+                    if(barName === 'MORE_ACTION') {
+                        let subItems = action.subMenuItems.dynamicItems;
+                        let items = [];
+                        subItems.map(function (obj) {
+                            if (obj.separator) {
+                                items.push(obj);
+                            } else if (obj.actionId) {
+                                items.push(obj.actionId.getMenuData());
+                            }
+                        });
+                        menuTitle = "More";
+                        menuItems = pydioActionsToItems(items);
+                        menuIcon  = "icon icon-plus";
+                    }else if(action.subMenuItems.staticItems){
+                        menuTitle = action.options.text;
+                        menuItems = pydioActionsToItems(action.subMenuItems.staticItems);
+                        menuIcon  = action.options.icon_class;
+                    }else if(action.subMenuItems.dynamicBuilder){
+                        menuTitle = action.options.text;
+                        menuIcon  = action.options.icon_class;
+                        menuItems = pydioActionsToItems(action.subMenuItems.dynamicBuilder());
+                    }else{
+                        menuTitle = action.options.text;
+                        menuIcon  = action.options.icon_class;
+                    }
+                    if(menuItems){
+                        if(renderingType === 'button'){
+                            actions.push(<ButtonMenu buttonTitle={menuTitle} menuItems={menuItems}/>);
+                        }else{
+                            actions.push(<IconButtonMenu onMenuClicked={function(object){object.payload()}} buttonClassName={menuIcon} buttonTitle={menuTitle} menuItems={menuItems}/>);
+                        }
+                    }else{
+                        let click = function(synthEvent){action.apply();};
+                        if(renderingType === 'button'){
+                            actions.push(<ReactMUI.FlatButton onClick={click} label={menuTitle}/>);
+                        }else{
+                            actions.push(<ReactMUI.IconButton className={menuIcon} onClick={click} label={menuTitle}/>);
+                        }
+                    }
+                });
+            });
+            return <div id={this.props.id} style={{display:'flex'}}>{actions}</div>
+        }
+
+    });
+
+    let ns = global.Toolbars || {};
     ns.MFB = MFB;
+    ns.IconButtonMenu = IconButtonMenu;
     ns.ButtonMenu = ButtonMenu;
     ns.ContextMenu = ContextMenu;
+    ns.Toolbar = Toolbar;
     ns.ContextMenuNodeProviderMixin = ContextMenuNodeProviderMixin;
     global.Toolbars = ns;
 

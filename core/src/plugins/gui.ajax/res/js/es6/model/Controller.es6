@@ -236,27 +236,8 @@ class Controller extends Observable{
 				}
 			}
             action.context.actionBarGroup.split(',').forEach(function(barGroup){
-                var menuItem = {
-                    name:action.getKeyedText(),
-                    raw_name: action.options.text,
-                    alt:action.options.title,
-                    action_id:action.options.name,
-                    image_unresolved: action.options.src,
-                    isDefault:isDefault,
-                    callback: function(e){this.apply();}.bind(action)
-                };
-                if(action.options.icon_class){
-                    menuItem.icon_class = action.options.icon_class;
-                }
-                if(action.options.subMenu){
-                    menuItem.subMenu = [];
-                    if(action.subMenuItems.staticOptions){
-                        menuItem.subMenu = action.subMenuItems.staticOptions;
-                    }
-                    if(action.subMenuItems.dynamicBuilder){
-                        menuItem.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
-                    }
-                }
+                let menuItem = action.getMenuData();
+                menuItem.isDefault = isDefault;
                 contextActionsGroup.get(barGroup).push(menuItem);
                 if(isDefault){
                     defaultGroup = barGroup;
@@ -291,6 +272,69 @@ class Controller extends Observable{
 		return contextActions;
 	}
 	
+
+    getToolbarsActions(toolbarsList = [], groupOtherList = []){
+
+        let toolbars = new Map(), groupOtherBars = new Map();
+        let lastTbarAdded;
+        this.actions.forEach(function(action){
+            if(action.context.actionBar){
+                action.context.actionBarGroup.split(",").map(function(barGroup){
+                    if(toolbarsList.indexOf(barGroup) === -1 && groupOtherList.indexOf(barGroup) === -1 ) {
+                        return;
+                    }
+                    let tBarUpdate = (toolbarsList.indexOf(barGroup) !== -1 ? toolbars : groupOtherBars);
+                    if(tBarUpdate.get(barGroup) == null){
+                        tBarUpdate.set(barGroup, []);
+                    }
+                    tBarUpdate.get(barGroup).push(action);
+                    if(tBarUpdate === toolbars){
+                        lastTbarAdded = barGroup;
+                    }
+                }.bind(this));
+            }
+        }.bind(this));
+
+        // Regroup actions artificially
+        if(groupOtherList.length){
+            var submenuItems = [];
+            groupOtherList.map(function(otherToolbar){
+
+                var otherActions = groupOtherBars.get(otherToolbar);
+                if(!otherActions) return;
+                otherActions.map(function(act){
+                    submenuItems.push({actionId:act});
+                });
+                if(groupOtherList.indexOf(otherToolbar) < groupOtherList.length - 1){
+                    submenuItems.push({separator:true});
+                }
+
+            }.bind(this) );
+            var moreAction = new Action({
+                name:'group_more_action',
+                icon_class:'icon-none',
+                text:MessageHash[456],
+                title:MessageHash[456],
+                hasAccessKey:false,
+                subMenu:true,
+                callback:function(){}
+            }, {
+                selection:false,
+                dir:true,
+                actionBar:true,
+                actionBarGroup:'get',
+                contextMenu:false,
+                infoPanel:false
+
+            }, {}, {}, {dynamicItems: submenuItems});
+            this.registerAction(moreAction);
+            this.actions.set("group_more_action", moreAction);
+            toolbars.set('MORE_ACTION', [moreAction]);
+        }
+
+        return toolbars;
+
+    }
 
 	/**
 	 * Generic method to get actions for a given component part.

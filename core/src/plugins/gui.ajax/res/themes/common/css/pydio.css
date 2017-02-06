@@ -1105,21 +1105,41 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
 .react-mui-context .material-list.main-file-list.table-mode span.cell {
   color: rgba(0, 0, 0, 0.53);
 }
-.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label {
   color: rgba(0, 0, 0, 0.87);
   font-size: 14px;
   font-weight: 400;
+  min-width: 250px;
 }
-.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text > span {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label.header_cell {
+  font-size: inherit;
+  font-weight: inherit;
+  color: inherit;
+  padding-left: 42px;
+}
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label > span {
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
+  margin-left: 16px;
 }
-.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-text > span div.mimefont-container {
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label > span div.mimefont-container {
   font-size: 17px;
   margin-top: -2px;
   margin-right: 10px;
   color: #607d8b;
+}
+.react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label > span span:last-child {
+  display: inline;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.react-mui-context .material-list.main-file-list.table-mode .material-list-icon-none {
+  display: none;
+}
+.react-mui-context .material-list.main-file-list.table-mode .material-list-actions {
+  display: none;
 }
 .react-mui-context .material-list.main-file-list.table-mode .material-list-actions .overlay_icon_div {
   padding-right: 8px;

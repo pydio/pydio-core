@@ -1,14 +1,30 @@
 #orbit_content{
   -webkit-font-smoothing: antialiased;
+  .vertical_fit;
+  .vertical_layout;
+
+  .material-list.main-file-list{
+    margin-right: 250px;
+  }
 }
 
 #workspace_toolbar{
   .primaryColorPane;
   display: flex;
-  #breadcrumb{
+  .react_breadcrumb{
     flex: 1;
+    padding: 20px;
+    font-size: 22px;
+    line-height: 24px;
+  }
+  .top_search_form{
+    padding: 0 20px;
+    .mui-text-field{
+      width: 216px;
+    }
   }
 }
+
 .icon_buttons_toolbar{
   background-color: transparent;
   color: darken(@applicationPrimaryColor, 15);
@@ -26,160 +42,154 @@
     display: none;
   }
 }
+
 #files_list_header{
-  .primaryColorPane;
-  /*box-shadow: @reactBoxShadowDepthHalf;   */
-  padding-left: 20px;
-  .action_bar{
-    a{
-      color: @applicationPrimaryFontColor;
-      font-weight: 400;
-      border-radius: 2px;
-      &:hover{
-        background-color: fade(@applicationPrimaryFontColor, 10);
+  background-color: @applicationPrimaryColor;
+  display: flex;
+  height: 42px;
+  color: inherit;
+  font-size: inherit;
+
+  span.toolbars-button-menu{
+    position: inherit;
+    .mui-menu{
+      right: inherit;
+    }
+  }
+
+  .mui-flat-button-label{
+    color: rgba(255,255,255,0.87);
+  }
+
+  #create-button-menu{
+    margin-right: 5px;
+    margin-left: 12px;
+    margin-top: 3px;
+
+    @buttonHeight: 30px;
+    .mui-raised-button{
+      height: @buttonHeight;
+      .mui-raised-button-label{
+        line-height: @buttonHeight;
       }
     }
   }
-  #display_toolbar a{
-    .icon_buttons_toolbar;
-  }
-  .mfb-component--tl{
-    .mfb-component__button, .mfb-component__button--child, .mfb-component__button--main{
-      background-color: @applicationSecondaryColor;
-      color: @applicationSecondaryFontColor;
-    }
-    .mfb-component__button--main {
-      height: 50px;
-      width: 50px;
-      i{
-        line-height: 50px;
-      }
-    }
-    .mfb-component__icon, .mfb-component__main-icon--active, .mfb-component__main-icon--resting{
-      font-size: 24px;
+
+  .mui-menu{
+    position: absolute;
+    z-index: 1;
+    margin-top: 1px;
+    .mui-subheader{
+      height: 0;
     }
   }
-  #vertical_splitter-actions_toolbar{
-    display: none;
+
+  #main-toolbar{
+    flex: 1;
   }
-}
-.infoPanelFolded{
-  #files_list_header #vertical_splitter-actions_toolbar{
-    display: inline-block;
+
+  #display-toolbar{
+    margin-top: -4px;
+    .mui-font-icon{
+      font-size: 16px;
+      color: darken(@applicationPrimaryColor, 18);
+    }
+    .mui-menu{
+      right: 5px;
+      top: 70px;
+    }
   }
+
 }
 
-#browser {
-  background-color: white;
-  #cpane_container #cpane_tabs #content_pane.class-FilesList{
-    background-color: transparent;
-    padding-top: 5px;
-  }
-  #right_split{
-    .primaryLightPane;
-    background-color: @infopanel_main_background_color;
-    #ipanel_header{
-      background-color: darken(@applicationPrimaryColor, 5);
-      box-sizing: border-box;
-      padding: 12px 16px;
-      font-weight: 500;
-      font-sze: 14px;
-      height: 42px;
-      /*box-shadow: @reactBoxShadowDepthHalf; */
-      z-index: 10;
-      color: white;
-      #display_toolbar_right{
-        float: right;
-        margin-right: 8px;
-        a{
-          .icon_buttons_toolbar;
-          color: white;
-        }
-      }
-    }
-    #info_panel{
+#info_panel{
+
+  position: absolute;
+  width: 250px;
+  right: 0;
+  top: 110px;
+  bottom: 0;
+
+  font-weight: 400;
+  .ipanelCard{
+    background-color: #f5f5f5;
+    margin: 10px !important;
+    margin-bottom: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.33);
+    border-radius: 2px;
+    padding: 24px 16px 16px;
+    div.panelHeader{
+      font-size: 24px;
       font-weight: 400;
-      .ipanelCard{
-        background-color: white;
-        margin: 10px !important;
-        margin-bottom: 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.33);
-        border-radius: 2px;
-        padding: 24px 16px 16px;
-        div.panelHeader{
-          font-size: 24px;
+      padding: 0 0 12px 0;
+      span[data-ajxpAction]{
+        display: inline-block;
+        float: right;
+        font-size: 16px;
+        line-height: 23px;
+        color: #aeaeae;
+        cursor: pointer;
+        &.user_meta_change{
+          display:none !important;
+        }
+      }
+    }
+  }
+
+  .panelContent{
+    background-color: transparent;
+    div.toolbars{
+      background-color: @infopanel_toolbar_buttons_bgcolor;
+    }
+    div.one_has_many, div.one_or_less{
+      margin-top: 0;
+      background-color: @infopanel_toolbar_buttons_bgcolor;
+      border-radius: 0 0 2px 2px;
+      div.toolbar_placeholder{
+        margin-top: 8px !important;
+      }
+      a{
+        color: @infopanel_toolbar_buttons_color;
+        span.actionbar_button_label{
+          text-transform: uppercase;
           font-weight: 400;
-          padding: 0 0 12px 0;
-          span[data-ajxpAction]{
-            display: inline-block;
-            float: right;
-            font-size: 16px;
-            line-height: 23px;
-            color: #aeaeae;
-            cursor: pointer;
-            &.user_meta_change{
-              display:none !important;
-            }
-          }
         }
-      }
-      /*border-left: 1px solid @infopanel_section_separator_color;*/
-      .panelContent{
-        background-color: transparent;
-        div.toolbars{
-          background-color: @infopanel_toolbar_buttons_bgcolor;
+        &:hover, &:hover span.ajxp_icon_span{
+          color: @infopanel_toolbar_buttons_color;
         }
-        div.one_has_many, div.one_or_less{
-          margin-top: 0;
-          background-color: @infopanel_toolbar_buttons_bgcolor;
-          border-radius: 0 0 2px 2px;
-          div.toolbar_placeholder{
-            margin-top: 8px !important;
-          }
-          a{
-            color: @infopanel_toolbar_buttons_color;
-            span.actionbar_button_label{
-              text-transform: uppercase;
-              font-weight: 400;
-            }
-            &:hover, &:hover span.ajxp_icon_span{
-              color: @infopanel_toolbar_buttons_color;
-            }
-          }
-        }
-        div.one_or_less{
-          margin-top: 8px;
-        }
-      }
-      div.infoPanelBasenameTitle{
-        display: none;
-      }
-      .infoPanelImagePreview{
-        .ipanelCard;
-        padding: 0;
-        div.bgCoverImage{
-          border-radius: 3px 3px 0 0 ;
-        }
-        margin: 0;
-        img.thumbnail_iconlike_shadow{
-          box-shadow: 0 0 0;
-        }
-        div.mimefont{
-          background-color: #fafafa;
-          display: block;
-          padding: 34px;
-        }
-      }
-      div.infoPanelAllMetadata > div{
-        .ipanelCard;
-        border: 0;
-      }
-      #ip_scroller_info_panel{
-        margin-top:45px;
       }
     }
-    div.infoPanelLabel, td.infoPanelLabel{
-      padding-bottom: 5px;
+    div.one_or_less{
+      margin-top: 8px;
     }
+  }
+  div.infoPanelBasenameTitle{
+    display: none;
+  }
+  .infoPanelImagePreview{
+    .ipanelCard;
+    padding: 0;
+    div.bgCoverImage{
+      border-radius: 3px 3px 0 0 ;
+    }
+    margin: 0;
+    img.thumbnail_iconlike_shadow{
+      box-shadow: 0 0 0;
+    }
+    div.mimefont{
+      background-color: #fafafa;
+      display: block;
+      padding: 34px;
+    }
+  }
+  div.infoPanelAllMetadata > div{
+    .ipanelCard;
+    border: 0;
+  }
+  #ip_scroller_info_panel{
+    margin-top:45px;
+  }
+  div.infoPanelLabel, td.infoPanelLabel{
+    padding-bottom: 5px;
   }
 }

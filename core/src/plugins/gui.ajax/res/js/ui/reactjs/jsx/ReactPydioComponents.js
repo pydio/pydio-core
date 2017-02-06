@@ -1312,7 +1312,8 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             }
         },
 
-        render: function(){
+        getColumnsItems: function(displayMode){
+
             let items = [];
             for(var key in this.props.tableKeys){
                 if(!this.props.tableKeys.hasOwnProperty(key)) continue;
@@ -1330,12 +1331,18 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         className += ' active-sort-' + this.props.sortingInfo.direction;
                     }
                 }
-                if(this.props.displayMode === 'menu'){
+                if(displayMode === 'menu') {
                     data['name'] = key;
                     items.push({
                         payload: data,
-                        text : data['label'],
+                        text: data['label'],
                         iconClassName: icon
+                    });
+                }else if(displayMode === 'menu_data'){
+                    items.push({
+                        name: data['label'],
+                        callback:this.onHeaderClick.bind(this, key),
+                        icon_class:icon
                     });
                 }else{
                     items.push(<span
@@ -1347,13 +1354,54 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
                 }
             }
+            return items;
+
+        },
+
+        buildSortingMenuItems: function(){
+            return this.getColumnsItems('menu_data');
+        },
+
+        componentDidMount: function(){
+
+            var sortAction = new Action({
+                name:'sort_action',
+                icon_class:'icon-sort',
+                text_id:150,
+                title_id:151,
+                text:MessageHash[150],
+                title:MessageHash[151],
+                hasAccessKey:false,
+                subMenu:true,
+                subMenuUpdateImage:true
+            }, {
+                selection:false,
+                dir:true,
+                actionBar:true,
+                actionBarGroup:'display_toolbar',
+                contextMenu:false,
+                infoPanel:false
+            }, {}, {}, {
+                dynamicBuilder:this.buildSortingMenuItems.bind(this)
+            });
+            let buttons = new Map();
+            buttons.set('sort_action', sortAction);
+            global.pydio.getController().updateGuiActions(buttons);
+
+        },
+
+        componentWillUnmount: function(){
+            global.pydio.getController().deleteFromGuiActions('sort_action');
+        },
+
+        render: function(){
             if(this.props.displayMode === 'menu'){
                 return (
-                    <Toolbars.ButtonMenu buttonTitle="Sort by..." buttonClassName="icon-sort" menuItems={items} onMenuClicked={this.onMenuClicked}/>
+                    <Toolbars.IconButtonMenu buttonTitle="Sort by..." buttonClassName="icon-sort" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
                 );
             }else{
                 return (
-                    <ReactMUI.ToolbarGroup float="left">{items}</ReactMUI.ToolbarGroup>
+                    <ReactMUI.ToolbarGroup float="left">{this.getColumnsItems('header')}</ReactMUI.ToolbarGroup>
                 );
             }
 

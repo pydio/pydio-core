@@ -8,11 +8,29 @@
     .mui-toolbar{
       background-color: transparent;
       padding: 0;
-      .mui-toolbar-group.mui-right:first-child {
+      display: inline;
+      height: 0;
+      border-bottom: 0;
+      .mui-toolbar-group.mui-left:first-child {
         display:none;
       }
       .mui-toolbar-group.mui-right:last-child {
-        margin-right: 4px;
+        display: none;
+      }
+    }
+    &.table-mode{
+      .mui-toolbar {
+        display: block;
+        height: 56px;
+        position: absolute;
+        .mui-toolbar-group.mui-left:first-child {
+          display:block;
+          width: 100%;
+          padding: 20px 0;
+        }
+      }
+      > div.layout-fill{
+        margin-top: 56px;
       }
     }
   }
