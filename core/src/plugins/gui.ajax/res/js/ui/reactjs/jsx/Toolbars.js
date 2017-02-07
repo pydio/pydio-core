@@ -216,7 +216,11 @@
         componentWillUnmount: function(){
             document.removeEventListener('click', this._observer, false);
         },
-
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.menuItems){
+                this.setState({menuItems:nextProps.menuItems});
+            }
+        },
         componentDidUpdate: function(prevProps, nextProps){
             if(this.state.showMenu){
                 document.addEventListener('click', this._observer, false);

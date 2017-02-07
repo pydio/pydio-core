@@ -462,13 +462,12 @@
             }.bind(this);
             this.props.pydio.getContextHolder().observe("context_changed", this._contextObserver);
             this.recomputeThumbnailsDimension();
-            console.log("Did Mount");
             this.props.pydio.getController().updateGuiActions(this.getPydioActions());
         },
 
         componentWillUnmount: function(){
             this.props.pydio.getContextHolder().stopObserving("context_changed", this._contextObserver);
-            this.getPydioActions().forEach(function(action, key){
+            this.getPydioActions(true).map(function(key){
                 this.props.pydio.getController().deleteFromGuiActions(key);
             }.bind(this));
         },
@@ -579,7 +578,10 @@
             }
         },
 
-        getPydioActions: function(){
+        getPydioActions: function(keysOnly = false){
+            if(keysOnly){
+                return ['switch_display_mode'];
+            }
             var multiAction = new Action({
                 name:'switch_display_mode',
                 icon_class:'icon-th-large',
@@ -733,7 +735,7 @@
         render: function () {
             
             return (
-                <div className="react-mui-context vertical_layout vertical_fit">
+                <div className="react-mui-context vertical_layout vertical_fit react-fs-template">
                     <LeftNavigation.PinnedLeftPanel {...this.props}/>
                     <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
                         <div id="workspace_toolbar">
