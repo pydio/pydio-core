@@ -610,7 +610,7 @@
             }
 
             return (
-                <div>
+                <div className="user-workspaces-list">
                     {workspacesTitle}
                     <div className="workspaces">
                         {entries}

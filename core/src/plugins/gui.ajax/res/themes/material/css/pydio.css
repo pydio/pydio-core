@@ -3002,8 +3002,6 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   color: #ffffff;
   height: 110px;
   width: 250px;
-  position: fixed;
-  /*box-shadow: @reactBoxShadowDepthHalf;*/
   z-index: 1002;
 }
 .user-widget .username {
@@ -3012,11 +3010,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   line-height: 24px;
 }
 .user-widget .action_bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 6px;
+  padding: 10px;
 }
 .user-widget .action_bar a {
   cursor: pointer;
@@ -6031,7 +6025,6 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .section-title:first-of-type {
   border-top: none;
-  margin-top: 110px;
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
   background-color: #96adb7;
@@ -6041,6 +6034,7 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 1;
+  position: relative;
   /*background-color: @selectionMainTint;*/
   font-weight: 500;
   color: #546e7a;
@@ -8061,6 +8055,15 @@ span.overlay-class-span.icon-bookmark-empty {
 }
 #orbit_content .material-list.main-file-list {
   margin-right: 250px;
+}
+#orbit_content .react-fs-template .left-panel {
+  display: flex;
+  flex-direction: column;
+  overflow-y: hidden;
+}
+#orbit_content .react-fs-template .left-panel .user-workspaces-list {
+  flex: 1;
+  overflow-y: auto;
 }
 #workspace_toolbar {
   background-color: #546e7a;
