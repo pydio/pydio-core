@@ -50,8 +50,54 @@
             return <TagsCloud node={node} column={column}/>;
         }
 
+        static formPanelStars(props){
+            return <StarsFormPanel {...props}/>;
+        }
+
+        static formPanelCssLabels(props){
+
+            const menuItems = Object.keys(CSSLabelsFilter.CSS_LABELS).map(function(id){
+                let label = CSSLabelsFilter.CSS_LABELS[id];
+                return {payload:label.cssClass, text:label.label};
+            }.bind(this));
+
+            return <MetaSelectorFormPanel {...props} menuItems={menuItems}/>;
+        }
+
+        static formPanelSelectorFilter(props){
+
+            let configs = Renderer.getMetadataConfigs().get(props.fieldname);
+            let menuItems = [];
+            if(configs && configs.data){
+                configs.data.forEach(function(value, key){
+                    menuItems.push({payload:key, text:value});
+                });
+            }
+
+            return <MetaSelectorFormPanel {...props} menuItems={menuItems}/>;
+        }
+
+        static formPanelTags(props){
+            return <div>Tags</div>
+        }
 
     }
+
+    let MetaFieldFormPanelMixin = {
+
+        propTypes:{
+            label:React.PropTypes.string,
+            fieldname:React.PropTypes.string
+        },
+
+        updateValue:function(value){
+            this.setState({value:value});
+            let object = {};
+            object[this.props.fieldname] = value;
+            this.props.onChange(object);
+        }
+
+    };
 
     let MetaFieldRendererMixin = {
 
@@ -65,6 +111,29 @@
         }
 
     };
+
+    let StarsFormPanel = React.createClass({
+
+        mixins:[MetaFieldFormPanelMixin],
+
+        getInitialState: function(){
+            return {value: 0};
+        },
+
+        render: function(){
+            let value = this.state.value;
+            let stars = [0,1,2,3,4].map(function(v){
+                return <span onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
+            }.bind(this));
+            return (
+                <div>
+                    <div>{this.props.label}</div>
+                    <div>{stars}</div>
+                </div>
+            );
+        }
+
+    });
 
     let MetaStarsRenderer = React.createClass({
 
@@ -100,23 +169,57 @@
 
         mixins:[MetaFieldRendererMixin],
 
-        render: function(){
-            let MessageHash = global.pydio.MessageHash;
-            const data = {
+        statics:{
+            CSS_LABELS : {
                 'low'       : {cssClass:'meta_low',         label:MessageHash['meta.user.4'], sortValue:'5'},
                 'todo'      : {cssClass:'meta_todo',        label:MessageHash['meta.user.5'], sortValue:'4'},
                 'personal'  : {cssClass:'meta_personal',    label:MessageHash['meta.user.6'], sortValue:'3'},
                 'work'      : {cssClass:'meta_work',        label:MessageHash['meta.user.7'], sortValue:'2'},
                 'important' : {cssClass:'meta_important',   label:MessageHash['meta.user.8'], sortValue:'1'}
-            };
+            }
+        },
 
+        render: function(){
+            let MessageHash = global.pydio.MessageHash;
             let value = this.getRealValue();
+            const data = CSSLabelsFilter.CSS_LABELS;
             if(value && data[value]){
                 let dV = data[value];
                 return <span className={dV.cssClass}>{dV.label}</span>
             }else{
                 return <span>{value}</span>;
             }
+        }
+
+    });
+
+    let MetaSelectorFormPanel = React.createClass({
+
+        mixins:[MetaFieldFormPanelMixin],
+
+        changeSelector: function(e, selectedIndex, menuItem){
+            this.updateValue(menuItem.payload);
+        },
+
+        getInitialState: function(){
+            return {value: null};
+        },
+
+        render: function(){
+            let index = 0, i = 1;
+            this.props.menuItems.map(function(item, i){
+                if(item.payload === this.state.value) index = i + 1;
+            }.bind(this));
+            this.props.menuItems.unshift({payload:null, text:''});
+            return (
+                <div>
+                    <div>{this.props.label}</div>
+                    <ReactMUI.DropDownMenu
+                        menuItems={this.props.menuItems}
+                        selectedIndex={index}
+                        onChange={this.changeSelector}/>
+                </div>
+            );
         }
 
     });

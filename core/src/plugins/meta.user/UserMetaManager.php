@@ -99,8 +99,7 @@ class UserMetaManager extends AbstractMetaSource
         $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
         $contrib = $selection->item(0);
         $even = false;
-        $searchables = array();
-        $searchablesRenderers = array();
+        $searchables = []; $searchablesRenderers = []; $searchablesReactRenderers = [];
         $index = 0;
 
         foreach ($def as $key=> $data) {
@@ -123,6 +122,7 @@ class UserMetaManager extends AbstractMetaSource
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelStars";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelStars";
                     break;
                 case "css_label":
                     $col->setAttribute("modifier", "MetaCellRenderer.prototype.cssLabelsFilter");
@@ -130,6 +130,7 @@ class UserMetaManager extends AbstractMetaSource
                     $col->setAttribute("sortType", "CellSorterValue");
                     $searchables[$key] = $label;
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelCssLabels";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelCssLabels";
                     break;
                 case "textarea":
                     $searchables[$key] = $label;
@@ -144,11 +145,13 @@ class UserMetaManager extends AbstractMetaSource
                     $col->setAttribute("sortType", "CellSorterValue");
                     $col->setAttribute("metaAdditional", $this->fieldsAdditionalData[$key]);
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelSelectorFilter";
+                    $searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelSelectorFilter";
                     break;
                 case "tags":
                     $searchables[$key] = $label;
                     $col->setAttribute("reactModifier", "ReactMeta.Renderer.renderTagsCloud");
                     $searchablesRenderers[$key] = "MetaCellRenderer.prototype.formPanelTags";
+                    //$searchablesReactRenderers[$key] = "ReactMeta.Renderer.formPanelTags";
                     break;
                 default:
                     break;
@@ -175,16 +178,16 @@ class UserMetaManager extends AbstractMetaSource
         $selection = $this->getXPath()->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
         foreach ($selection as $tag) {
             $v = $tag->attributes->getNamedItem("ajxpOptions")->nodeValue;
-            $metaV = count($searchables)? '"metaColumns":'.json_encode($searchables): "";
-            if (count($searchablesRenderers)) {
-                $metaV .= ',"metaColumnsRenderers":'.json_encode($searchablesRenderers);
+            if(!empty($v)) $vDat = json_decode($v, true);
+            else $vDat = [];
+            if(count($searchables)){
+                $vDat['metaColumns'] = $searchables;
             }
-            if (!empty($v) && trim($v) != "{}" && !empty($metaV)) {
-                $v = str_replace("}", ", ".$metaV."}", $v);
-            } else {
-                $v = "{".$metaV."}";
+            if(count($searchablesRenderers)){
+                $vDat['metaColumnsRenderers'] = $searchablesRenderers;
+                $vDat['reactColumnsRenderers'] = $searchablesReactRenderers;
             }
-            $tag->setAttribute("ajxpOptions", $v);
+            $tag->setAttribute("ajxpOptions", json_encode($vDat));
         }
 
         parent::init($ctx, $this->options);

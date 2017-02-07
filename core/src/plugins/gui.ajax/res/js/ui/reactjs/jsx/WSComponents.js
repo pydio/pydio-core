@@ -678,23 +678,358 @@
 
     });
 
+    let SearchDatePanel = React.createClass({
+
+        mixins:[MessagesProviderMixin],
+
+        recomputeStart: function(event, value){
+            this.setState({startDate: value}, this.dateToChange);
+        },
+        recomputeEnd: function(event, value){
+            this.setState({endDate: value}, this.dateToChange);
+        },
+        clearStart:function(){
+            this.setState({startDate: null}, this.dateToChange);
+            this.refs['startDate'].refs.input.setValue("");
+        },
+        clearEnd :function(){
+            this.setState({endDate: null}, this.dateToChange);
+            this.refs['endDate'].refs.input.setValue("");
+        },
+
+        getInitialState: function(){
+            return {
+                value:'custom',
+                startDate: null,
+                endDate: null,
+            };
+        },
+
+        dateToChange: function(){
+            if(!this.state.startDate && !this.state.endDate){
+                this.props.onChange({ajxp_modiftime:null});
+            }else{
+                let s = this.state.startDate || 'XXX';
+                let e = this.state.endDate || 'XXX';
+                this.props.onChange({ajxp_modiftime:'['+s+' TO '+e+']'});
+            }
+        },
+
+        changeSelector: function(e, selectedIndex, menuItem){
+            this.setState({value: menuItem.payload});
+            if(menuItem.payload === 'custom'){
+                this.dateToChange();
+            }else{
+                this.props.onChange({ajxp_modiftime:menuItem.payload});
+            }
+        },
+
+        render: function () {
+            const today = new Date();
+            let getMessage = function(messageId){return this.props.pydio.MessageHash[messageId]}.bind(this);
+            let values = [
+                {payload: 'custom', text: 'Custom Dates'},
+                {payload: 'AJXP_SEARCH_RANGE_TODAY', text: getMessage('493')},
+                {payload: 'AJXP_SEARCH_RANGE_YESTERDAY', text : getMessage('494')},
+                {payload: 'AJXP_SEARCH_RANGE_LAST_WEEK', text : getMessage('495')},
+                {payload: 'AJXP_SEARCH_RANGE_LAST_MONTH', text : getMessage('496')},
+                {payload: 'AJXP_SEARCH_RANGE_LAST_YEAR', text : getMessage('497')}
+            ];
+            let value = this.state.value;
+            let index = 0;
+            values.map(function(el, id){
+                if(el.payload === value) {
+                    index = id;
+                }
+            });
+            let selector = <ReactMUI.DropDownMenu menuItems={values} selectedIndex={index} onChange={this.changeSelector}/>;
+
+            let customDate;
+            if(value === 'custom'){
+                customDate = (
+                    <div className="paginator-dates">
+                        <ReactMUI.DatePicker
+                            ref="startDate"
+                            onChange={this.recomputeStart}
+                            key="start"
+                            hintText={"From..."}
+                            autoOk={true}
+                            maxDate={this.state.endDate || today}
+                            defaultDate={this.state.startDate}
+                            showYearSelector={true}
+                            onShow={this.props.pickerOnShow}
+                            onDismiss={this.props.pickerOnDismiss}
+                        /> <span className="mdi mdi-close" onClick={this.clearStart}></span>
+                        <ReactMUI.DatePicker
+                            ref="endDate"
+                            onChange={this.recomputeEnd}
+                            key="end"
+                            hintText={"To..."}
+                            autoOk={true}
+                            minDate={this.state.startDate}
+                            maxDate={today}
+                            defaultDate={this.state.endDate}
+                            showYearSelector={true}
+                            onShow={this.props.pickerOnShow}
+                            onDismiss={this.props.pickerOnDismiss}
+                        /> <span className="mdi mdi-close" onClick={this.clearEnd}></span>
+                    </div>
+                );
+            }
+            return (
+                <div>
+                    {selector}
+                    {customDate}
+                </div>
+            );
+        }
+
+    });
+
+    let SearchFileFormatPanel = React.createClass({
+
+        getInitialState: function(){
+            return {folder:false, ext: null};
+        },
+
+        changeExt: function(){
+            this.setState({ext: this.refs.ext.getValue()}, this.stateChanged);
+        },
+
+        toggleFolder: function(e, toggled){
+            this.setState({folder: toggled}, this.stateChanged);
+        },
+
+        stateChanged: function(){
+            let value = null;
+            if(this.state.folder){
+                value = 'ajxp_folder';
+            }else if(this.state.ext){
+                value = this.state.ext;
+            }
+            this.props.onChange({ajxp_mime:value});
+        },
+
+        render: function(){
+            let textField;
+            if(!this.state.folder){
+                textField = (
+                    <ReactMUI.TextField
+                        ref="ext"
+                        hintText="Extension"
+                        floatingLabelText="File extension"
+                        onChange={this.changeExt}
+                        onFocus={this.props.fieldsFocused}
+                        onBlur={this.props.fieldsBlurred}
+                    />
+                );
+            }
+            return (
+                <div>
+                    <ReactMUI.Toggle
+                        ref="folder"
+                        name="toggleFolder"
+                        value="ajxp_folder"
+                        label="Folders Only"
+                        onToggle={this.toggleFolder}
+                    />
+                    {textField}
+                </div>
+            );
+        }
+
+    });
+
+    let SearchFileSizePanel = React.createClass({
+
+        getInitialState: function(){
+            return {from:false, to: null};
+        },
+
+        changeFrom: function(){
+            this.setState({from: this.refs.from.getValue()}, this.stateChanged);
+        },
+
+        changeTo: function(){
+            this.setState({to: this.refs.to.getValue()}, this.stateChanged);
+        },
+
+        stateChanged: function(){
+            if(!this.state.to && !this.state.from){
+                this.props.onChange({ajxp_bytesize:null});
+            }else{
+                let from = this.state.from || 0;
+                let to   = this.state.to   || 1099511627776;
+                this.props.onChange({ajxp_bytesize:'['+from+' TO '+to+']'});
+            }
+        },
+
+        render: function(){
+            return (
+                <div>
+                    <ReactMUI.TextField
+                        ref="from"
+                        hintText="1Mo,1Go,etc"
+                        floatingLabelText="Size greater than..."
+                        onChange={this.changeFrom}
+                        onFocus={this.props.fieldsFocused}
+                        onBlur={this.props.fieldsBlurred}
+                    />
+                    <ReactMUI.TextField
+                        ref="to"
+                        hintText="1Mo,1Go,etc"
+                        floatingLabelText="Size bigger than..."
+                        onChange={this.changeTo}
+                        onFocus={this.props.fieldsFocused}
+                        onBlur={this.props.fieldsBlurred}
+                    />
+                </div>
+            );
+        }
+
+    });
+
     let SearchForm = React.createClass({
+
+        fieldsFocused: function(){
+            this.props.pydio.UI.disableAllKeyBindings();
+        },
+
+        fieldsBlurred: function(){
+            this.props.pydio.UI.enableAllKeyBindings();
+        },
 
         focused: function(){
             this.setState({focused: true});
-            this.props.pydio.UI.disableAllKeyBindings();
+            this.fieldsFocused();
         },
 
         blurred: function(){
             this.setState({focused: false});
-            this.props.pydio.UI.enableAllKeyBindings();
+            this.fieldsBlurred();
+        },
+
+        getInitialState: function(){
+            return {
+                focused: true,
+                metaFields: {basename:{label:'Filename'}},
+                searchMode:'remote'
+            };
+        },
+
+        updateFormValues: function(object){
+            let current = this.state.formValues || {};
+            for(var k in object){
+                if(!object.hasOwnProperty(k)) continue;
+                if(object[k] === null && current[k]) delete current[k];
+                else current[k] = object[k];
+            }
+            console.log(current);
+            this.setState({formValues: current});
+        },
+
+        parseMetaColumns(){
+            let metaFields = {basename:{label:'Filename'}}, searchMode = 'remote', registry = this.props.pydio.getXmlRegistry();
+            // Parse client configs
+            let options = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'client_configs/template_part[@ajxpClass="SearchEngine" and @theme="material"]/@ajxpOptions'));
+            if(options && options.metaColumns){
+                metaFields = Object.assign(metaFields, options.metaColumns);
+                Object.keys(metaFields).map(function(key){
+                    let cData = {
+                        key: key,
+                        label: metaFields[key]
+                    };
+                    if(options.reactColumnsRenderers && options.reactColumnsRenderers[key]) {
+                        let renderer = cData['renderer'] = options.reactColumnsRenderers[key];
+                        cData.renderComponent = function(){
+                            var args = Array.from(arguments);
+                            return ResourcesManager.detectModuleToLoadAndApply(renderer, function(){
+                                let modifierFuncWrapped = eval(renderer);
+                                return modifierFuncWrapped.apply(null, args);
+                            }, false);
+                        };
+                    }
+                    metaFields[key] = cData;
+                });
+            }
+            // Parse Indexer data (e.g. Lucene)
+            let indexerNode = XMLUtils.XPathSelectSingleNode(registry, 'plugins/indexer');
+            if(indexerNode){
+                let indexerOptions = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'plugins/indexer/@indexed_meta_fields'));
+                if(indexerOptions && indexerOptions.additional_meta_columns){
+                    Object.keys(indexerOptions.additional_meta_columns).map(function(aKey){
+                        if(!metaFields[aKey]) {
+                            metaFields[aKey] = {label:indexerOptions.additional_meta_columns};
+                        }
+                    });
+                }
+            }else{
+                searchMode = 'local';
+            }
+            this.setState({
+                metaFields:metaFields,
+                searchMode: searchMode
+            });
+        },
+
+        componentDidMount: function(){
+            this.parseMetaColumns();
         },
 
         render: function(){
-            let focused = this.state && this.state.focused ? ' focused' : '';
+            let focused = this.state.focused ? ' focused' : '';
+            let columnsDesc;
+            let tmpStyle = {
+                position: 'absolute',
+                height: 500,
+                right: 0,
+                width: 370,
+                zIndex: 10000000,
+                backgroundColor: 'white',
+                color: 'rgba(0,0,0,0.87)'
+            };
+            if(this.state.focused){
+                let cols = Object.keys(this.state.metaFields).map(function(k){
+                    return <div>{this.state.metaFields[k].label} : {this.state.metaFields[k].renderer || "no renderer"}</div>
+                }.bind(this));
+                columnsDesc = <div>{cols}</div>
+            }
+            let props = {
+                fieldsFocused : this.fieldsFocused.bind(this),
+                fieldsBlurred : this.fieldsBlurred.bind(this),
+                onChange : this.updateFormValues.bind(this)
+            };
+            let cols = Object.keys(this.state.metaFields).map(function(k){
+                let label = this.state.metaFields[k].label;
+                if(this.state.metaFields[k].renderComponent){
+                    let fullProps = Object.assign(this.props, props, {label:label, fieldname: k});
+                    return this.state.metaFields[k].renderComponent(fullProps);
+                }else{
+                    let onChange = function(event){
+                        let object = {};
+                        object[k] = event.target.getValue();
+                        this.updateFormValues(object);
+                    }.bind(this);
+                    return (
+                        <ReactMUI.TextField
+                            {...this.props}
+                            onFocus={this.fieldsFocused}
+                            onBlur={this.fieldsBlurred}
+                            floatingLabelText={label}
+                            onChange={onChange}
+                        />);
+                }
+            }.bind(this));
+            columnsDesc = <div>{cols}</div>
             return (
                 <div className={"top_search_form" + focused}>
                     <ReactMUI.TextField onFocus={this.focused} onBlur={this.blurred} hintText="Search..."/>
+                    <div style={tmpStyle}>
+                        {columnsDesc}
+                        <SearchDatePanel {...this.props} {...props}/>
+                        <SearchFileFormatPanel {...this.props} {...props}/>
+                        <SearchFileSizePanel {...this.props} {...props}/>
+                    </div>
                 </div>
             );
         }
