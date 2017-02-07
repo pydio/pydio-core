@@ -2236,6 +2236,11 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     }else if(sortingType === 'string'){
                         res = (sortingDirection === 'asc'? aMeta.localeCompare(bMeta) : bMeta.localeCompare(aMeta));
                     }
+                    if(res === 0){
+                        // Resort by label to make it stable
+                        let labComp = a.node.getLabel().localeCompare(b.node.getLabel());
+                        res = (sortingDirection === 'asc' ? labComp : -labComp);
+                    }
                     return res;
                 });
             }

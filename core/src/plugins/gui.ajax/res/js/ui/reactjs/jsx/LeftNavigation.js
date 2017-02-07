@@ -271,7 +271,7 @@
                         <a><span className="icon-bell" onClick={this.applyAction.bind(this, 'alerts')}></span></a>
                         <a><span className="icon-home" onClick={this.applyAction.bind(this, 'home')}></span></a>
                         <a><span className="icon-cog" onClick={this.applyAction.bind(this, 'cog')}></span></a>
-                        <a><span className="icon-signout" onClick={this.applyAction.bind(this, 'signout')}></span></a>
+                        <a><span className="icon-signout" onClick={this.applyAction.bind(this, 'logout')}></span></a>
                     </div>
                 </div>
             );
@@ -641,7 +641,7 @@
         getInitialState:function(){
             return {
                 openAlert:false,
-                openFoldersTree: true,
+                openFoldersTree: false,
                 currentContextNode: this.props.pydio.getContextHolder().getContextNode()
             };
         },
@@ -810,7 +810,7 @@
             }
 
             if(this.props.showFoldersTree){
-                let fTCName = this.state.openFoldersTree ? "workspace-additional-action icon-angle-down" : "workspace-additional-action icon-angle-up";
+                let fTCName = this.state.openFoldersTree ? "workspace-additional-action icon-angle-up" : "workspace-additional-action icon-angle-down";
                 additionalAction = <span className={fTCName} onClick={this.toggleFoldersPanelOpen}></span>;
             }
 

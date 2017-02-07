@@ -680,10 +680,21 @@
 
     let SearchForm = React.createClass({
 
+        focused: function(){
+            this.setState({focused: true});
+            this.props.pydio.UI.disableAllKeyBindings();
+        },
+
+        blurred: function(){
+            this.setState({focused: false});
+            this.props.pydio.UI.enableAllKeyBindings();
+        },
+
         render: function(){
+            let focused = this.state && this.state.focused ? ' focused' : '';
             return (
-                <div className="top_search_form">
-                    <ReactMUI.TextField hintText="Search..."/>
+                <div className={"top_search_form" + focused}>
+                    <ReactMUI.TextField onFocus={this.focused} onBlur={this.blurred} hintText="Search..."/>
                 </div>
             );
         }
@@ -711,9 +722,22 @@
             this.props.pydio.getContextHolder().stopObserving("context_changed", this._observer);
         },
 
+        goTo: function(target, event){
+            this.props.pydio.getContextHolder().requireContextChange(new AjxpNode(target));
+        },
+
         render: function(){
-            if(!this.state.node) return <span></span>;
-            return <span className="react_breadcrumb">{this.state.node.getPath()}</span>
+            var pydio = this.props.pydio;
+            let repoLabel = pydio.user.repositories.get(pydio.user.activeRepository).getLabel();
+            let segments = [];
+            let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
+            let rebuilt = '';
+            path.split('/').map(function(seg){
+                rebuilt += '/' + seg;
+                segments.push(<span className="separator"> / </span>);
+                segments.push(<span className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
+            }.bind(this));
+            return <span className="react_breadcrumb"><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</span>
         }
 
     });

@@ -31,9 +31,28 @@
     line-height: 24px;
   }
   .top_search_form{
-    padding: 0 20px;
+    margin: 8px 8px;
+    height: 42px;
+    padding: 0px 10px;
+    transition: @bezier_transition;
+    border-radius: 2px;
     .mui-text-field{
       width: 216px;
+      margin-top: -4px;
+      .mui-text-field-hint{
+        color: rgba(255,255,255,0.47);
+      }
+    }
+    &.focused{
+      background-color: white;
+      box-shadow: @reactBoxShadowDepthMini;
+      .mui-text-field {
+        transition: @bezier_transition;
+        width: 256px;
+        .mui-text-field-hint{
+          color: rgba(0, 0, 0, 0.3);
+        }
+      }
     }
   }
 }
@@ -125,7 +144,7 @@
 
   font-weight: 400;
   .ipanelCard{
-    background-color: #f5f5f5;
+    background-color: #fafafa;
     margin: 10px !important;
     margin-bottom: 0;
     box-shadow: 0 1px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.33);

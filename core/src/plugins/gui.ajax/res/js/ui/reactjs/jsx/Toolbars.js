@@ -100,6 +100,9 @@
                 });
             }
         }.bind(this));
+        if(lastIsSeparator){
+            items = items.slice(0, items.length - 1);
+        }
         return items;
     };
 
