@@ -2097,14 +2097,21 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         node: entry.node,
                         key: entry.node.getPath(),
                         id: entry.node.getPath(),
-                        mainIcon: "icon-level-up",
+                        mainIcon: "mdi mdi-arrow-up",
                         firstLine: "..",
+                        className: "list-parent-node",
                         secondLine:this.context.getMessage('react.1'),
                         onClick: this.clickRow,
                         onDoubleClick: this.doubleClickRow,
                         showSelector: false,
                         selectorDisabled: true
                     };
+                    if(this.props.elementStyle){
+                        data['style'] = this.props.elementStyle;
+                    }
+                    if(this.props.passScrollingStateToChildren){
+                        data['parentIsScrolling'] = this.state.isScrolling;
+                    }
                     components.push(React.createElement(ListEntry, data));
                 }else if(entry.groupHeader){
                     data = {
@@ -2118,6 +2125,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         showSelector: false,
                         selectorDisabled: true
                     };
+                    if(this.props.passScrollingStateToChildren){
+                        data['parentIsScrolling'] = this.state.isScrolling;
+                    }
                     components.push(React.createElement(ListEntry, data));
                 }else{
                     data = {

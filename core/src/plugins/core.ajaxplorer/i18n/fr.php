@@ -658,5 +658,7 @@ $mess=array(
 "559" => "L'authentification pour accéder au workspace a échoué.",
 "560" => "Authentification requise",
 "561" => "Vous allez être redirigé vers la page d'authentification du fournisseur. Si vous n'êtes pas redirigé automaiquement, cliquez sur OK pour réessayer...",
+"react.1" => "Répertoire parent",
+"react.2" => "Actions groupées",
 /* END SENTENCE */
 );

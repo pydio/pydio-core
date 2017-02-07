@@ -657,5 +657,7 @@ $mess=array(
 "558" => "Please provide a password to enter this workspace.",
 "559" => "Authentication failed for this workspace.",
 "560" => "Authentication required",
-"561" => "We will redirect you to the Authentication page of the provider. If you are not redirected automatically, press OK to retry..."
+"561" => "We will redirect you to the Authentication page of the provider. If you are not redirected automatically, press OK to retry...",
+"react.1" => "parent folder",
+"react.2" => "bulk actions"
 ); 

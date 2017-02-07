@@ -28,6 +28,10 @@
     content: "\f340";
 }
 
+.mdi-folder-outline:before {
+    content: "\f34b";
+}
+
 .mdi-share:before {
     content: "\f585";
 }
