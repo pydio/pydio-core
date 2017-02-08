@@ -58,7 +58,7 @@
 
             const menuItems = Object.keys(CSSLabelsFilter.CSS_LABELS).map(function(id){
                 let label = CSSLabelsFilter.CSS_LABELS[id];
-                return {payload:label.cssClass, text:label.label};
+                return {payload:id, text:label.label};
             }.bind(this));
 
             return <MetaSelectorFormPanel {...props} menuItems={menuItems}/>;
@@ -90,11 +90,11 @@
             fieldname:React.PropTypes.string
         },
 
-        updateValue:function(value){
+        updateValue:function(value, submit = true){
             this.setState({value:value});
             let object = {};
-            object[this.props.fieldname] = value;
-            this.props.onChange(object);
+            object['ajxp_meta_' + this.props.fieldname] = value;
+            this.props.onChange(object, submit);
         }
 
     };

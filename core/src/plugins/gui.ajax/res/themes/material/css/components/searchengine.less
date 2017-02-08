@@ -1,15 +1,179 @@
-#search_container{
-  float: none;
-  #search_panel{
-    input{
+.top_search_form{
+
+  margin-right: 10px !important;
+  margin-top:   10px !important;
+  width: 186px;
+  height: 42px;
+  z-index: 100000;
+  overflow: hidden;
+  background-color: transparent;
+  transition: @bezier_transition;
+
+  .search-input{
+    background-color: transparent;
+    padding: 5px;
+    .mui-text-field{
+      width: 100%;
+      padding: 0 10px;
+      box-shadow: @reactBoxShadowDepth1;
       background-color: white;
-      box-shadow: @reactBoxShadowDepthHalf;
-      margin: 16px;
-      height: 30px;
+      height: 36px;
+      .mui-text-field-hint{
+        margin-top: -5px;
+        color: rgba(0,0,0,0.47);
+      }
+      .mui-text-field-underline, .mui-text-field-focus-underline{
+        display: none;
+      }
     }
-    a#search_button{
-      top: 24px;
-      right: 22px;
+    .panel-header{
+      height: 0;
+      overflow: hidden;
+      padding: 0 6px;
+      font-size: 22px;
+      color: @applicationPrimaryFontColor;
+      transition: @bezier_transition;
+
+      .panel-header-close{
+        float: right;
+        cursor: pointer;
+      }
     }
   }
+
+  .search-advanced, .search-advanced-button{
+    display: none;
+    .mui-text-field{
+      width: 210px ;
+      margin: 0 5px;
+    }
+    .mui-drop-down-menu, .mui-menu{
+      width: 210px !important;
+    }
+  }
+
+  .search-results{
+    display: none;
+    .mui-toolbar{
+      display: none;
+    }
+  }
+
+  .search-more-container{
+    padding: 5px;
+    text-align: right;
+    background-color: #fafafa;
+  }
+
+  &.small, &.more, &.advanced{
+    background-color: white;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 256px;
+    height: auto;
+
+    box-shadow: @reactBoxShadowDepth1;
+    .search-input{
+      background-color: #2196F3;
+      box-shadow: @reactBoxShadowDepth1;
+    }
+    .search-results {
+      display: block;
+    }
+    .search-advanced-button{
+      display: block;
+      position: absolute;
+      right: 17px;
+      top: 16px;
+      width: 0;
+      overflow: hidden;
+      text-align: right;
+      transition: @bezier_transition;
+      color: rgba(0,0,0,0.53);
+      font-weight: 500;
+      cursor: pointer;
+    }
+  }
+
+  &.small{
+    .search-results{
+      .material-list-entry.material-list-entry-1-lines{
+        border-bottom: 1px solid rgba(0,0,0,0.13);
+        .material-list-icon {
+          width: 42px;
+          .mui-font-icon{
+            background-color: transparent;
+            font-size: 16px;
+            margin: 8px 4px 0;
+            color: rgba(0,0,0,0.83);
+          }
+        }
+        .material-list-line-1{
+          font-size: 14px;
+          line-height: 16px;
+        }
+      }
+    }
+  }
+
+  &.more, &.advanced{
+    background-color: @applicationPrimaryLight;
+    width: 512px;
+    height: 512px;
+    .search-results{
+      height: 412px;
+      .material-list-entry.material-list-entry-2-lines {
+        background-color: white;
+        border-bottom: 0;
+        margin: 5px;
+        box-shadow: @reactBoxShadowDepthMini;
+      }
+    }
+    .panel-header{
+      display: block;
+      height: 54px;
+      padding: 23px 6px 10px;
+    }
+    .search-advanced-button{
+      width: 120px;
+      overflow: visible;
+      top: 69px;
+    }
+  }
+
+  &.advanced{
+
+    .search-advanced-button{
+      display: none;
+    }
+
+    .search-input{
+      .panel-header{
+        padding: 63px 12px 10px;
+        height: 90px;
+      }
+      .mui-text-field{
+        display: none;
+      }
+    }
+
+    width: 512px + 256px;
+    .search-advanced{
+      display: block;
+      position: absolute;
+      left:6px;
+      width: 220px;
+      background-color: white;
+      top: 104px;
+      bottom: 7px;
+      overflow-y: scroll;
+      box-shadow: @reactBoxShadowDepth1;
+    }
+
+    .search-results{
+      margin-left: 229px;
+    }
+  }
+
 }

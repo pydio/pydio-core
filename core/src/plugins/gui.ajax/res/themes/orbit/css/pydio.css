@@ -83,16 +83,14 @@ html {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
-      user-select: none;
+  user-select: none;
 }
 input,
 textarea,
 .selectable {
   -khtml-user-select: auto;
   -webkit-user-select: auto;
-  -ms-user-select: auto;
-      user-select: auto;
+  user-select: auto;
   -moz-user-select: text;
 }
 input {
@@ -100,9 +98,6 @@ input {
 }
 *::-moz-focus-inner {
   border: none;
-}
-.no_select_bg::-moz-selection {
-  background: transparent;
 }
 .no_select_bg::selection {
   background: transparent;
@@ -139,6 +134,8 @@ span.letter_badge {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -153,6 +150,8 @@ kbd {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -178,31 +177,23 @@ kbd {
 }
 .vertical_layout {
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
   -webkit-flex-direction: column;
 }
 .vertical_layout > * {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
 }
 .horizontal_layout {
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
   -webkit-flex-direction: row;
-  -ms-flex-align: stretch;
-      align-items: stretch;
+  align-items: stretch;
   -webkit-align-items: stretch;
 }
 .vertical_fit {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   -webkit-flex: 1;
   overflow-y: hidden;
 }
@@ -219,33 +210,19 @@ kbd {
   display: table-cell;
 }
 .flexbox {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column;
-      -ms-flex-flow: column;
-          flex-flow: column;
+  flex-flow: column;
 }
 .flexbox .row {
-  -webkit-flex: 0 1 30px;
-      -ms-flex: 0 1 30px;
-          flex: 0 1 30px;
+  flex: 0 1 30px;
 }
 .flexbox .row.header {
-  -webkit-flex: 0 1 auto;
-      -ms-flex: 0 1 auto;
-          flex: 0 1 auto;
+  flex: 0 1 auto;
 }
 .flexbox .row.content {
-  -webkit-flex: 1 1 auto;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
-  display: -webkit-flex;
-  display: -ms-flexbox;
+  flex: 1 1 auto;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .text-right {
   text-align: right;
@@ -662,6 +639,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   float: left;
   text-align: center;
   margin: 4px;
+  -moz-border-radius: 2px;
   border-radius: 2px;
   padding: 4px 6px;
   color: rgba(0, 0, 0, 0.87);
@@ -1039,17 +1017,11 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   height: 100%;
 }
 .react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div.mimefont-container {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .react-mui-context .material-list.main-file-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   font-size: 28px;
   text-align: center;
   color: #607d8b;
@@ -1118,8 +1090,6 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   padding-left: 42px;
 }
 .react-mui-context .material-list.main-file-list.table-mode span.cell.cell-ajxp_label > span {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   margin-left: 16px;
 }
@@ -1205,6 +1175,8 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   display: block;
 }
 input {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
   border-radius: 2px;
   border: 1px solid #aaaaaa;
   font-size: 13px;
@@ -1224,6 +1196,8 @@ textarea {
   padding: 2px;
 }
 select {
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
   border-radius: 2px;
   border: 1px solid #aaaaaa;
   font-size: 13px;
@@ -1313,7 +1287,6 @@ div.wizard_buttons div {
 }
 div.wizard_progress {
   display: -webkit-flex !important;
-  display: -ms-flexbox !important;
   display: flex !important;
 }
 .wizard_previous {
@@ -1326,9 +1299,7 @@ span.wizard_progress_element {
   background-color: #ffffff;
   border-bottom: 3px solid #D8D7D7;
   color: #555555;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   font-size: 11px;
   padding: 28px 0 14px;
   position: relative;
@@ -1678,6 +1649,7 @@ DIALOG BOXES
   display: block;
 }
 div.shadow_class {
+  -moz-border-radius: 5px;
   border-radius: 5px;
 }
 .dialogBox {
@@ -1831,8 +1803,7 @@ div.shadow_class {
   background: none;
   border-radius: 0;
   border: none;
-  -webkit-filter: none;
-          filter: none;
+  filter: none;
   height: auto;
   margin-right: 0;
   width: auto;
@@ -2570,6 +2541,7 @@ div#multiple_download_container div div a:hover {
   margin-bottom: 0;
   margin-top: 5px;
   background-position: center;
+  -moz-border-radius: 5px;
   border-radius: 5px;
 }
 #uploaderTextActions span.disabled {
@@ -2936,6 +2908,7 @@ div.detailed div.FL-inlineToolbar div.toolbarGroup {
   bottom: 0;
 }
 .scroller_handle {
+  -webkit-border-radius: 5px;
   border-radius: 5px;
   background: #bebebe !important;
   transition: background-color 0.3s ease, height 0.1s ease;
@@ -3226,7 +3199,6 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
 }
 .flexbox #search_container #search_results_cont #search_results {
   display: -webkit-flex !important;
-  display: -ms-flexbox !important;
   display: flex !important;
 }
 #search_container #search_results_cont #search_results.fl-displayMode-detail div.scroller_track {
@@ -3329,7 +3301,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
 }
 #search_container #search_results_cont #search_meta {
   font-size: 12px;
-  background-color: white;
+  background-color: #ffffff;
   color: #424242;
   padding: 0;
   float: left;
@@ -3700,15 +3672,13 @@ div.flat_tabulator span.toggleInactive span.tab_close_button {
   background-color: #30383a;
 }
 .flexbox div.horizontal_tabulator {
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
   -webkit-flex-direction: row;
 }
 .flexbox div.horizontal_tabulator div.tabulatorContainer {
   float: none;
   height: auto;
-  -ms-flex: 0 0 240px;
-      flex: 0 0 240px;
+  flex: 0 0 240px;
   -webkit-flex: 0 0 240px;
 }
 div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer {
@@ -3735,8 +3705,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
   width: 78%;
 }
 .flexbox div.horizontal_tabulator > div.tabulatorPanelsContainer {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   -webkit-flex: 1;
 }
 #breadcrumb {
@@ -3891,6 +3860,30 @@ span.first-bread em {
     -webkit-transform: rotate(360deg);
   }
 }
+@-moz-keyframes rotate {
+  from {
+    -moz-transform: rotate(0deg);
+  }
+  to {
+    -moz-transform: rotate(360deg);
+  }
+}
+@-ms-keyframes rotate {
+  from {
+    -ms-transform: rotate(0deg);
+  }
+  to {
+    -ms-transform: rotate(360deg);
+  }
+}
+@-o-keyframes rotate {
+  from {
+    -o-transform: rotate(0deg);
+  }
+  to {
+    -o-transform: rotate(360deg);
+  }
+}
 .rotating,
 .icon-spinner,
 .mdi.mdi-radar {
@@ -3928,6 +3921,7 @@ span.first-bread em {
 }
 #progressBox {
   z-index: 2002;
+  -moz-border-radius: 5px;
   border-radius: 5px;
   width: 305px !important;
   padding: 3px;
@@ -4009,29 +4003,7 @@ span.first-bread em {
   width: 200px;
   height: 4px;
   background-color: #03A9F4;
-  -webkit-animation: connexionLoading 1.5s linear infinite;
-          animation: connexionLoading 1.5s linear infinite;
-}
-@-webkit-keyframes connexionLoading {
-  from {
-    left: -200px;
-    width: 30%;
-  }
-  50% {
-    width: 30%;
-  }
-  70% {
-    width: 70%;
-  }
-  80% {
-    left: 50%;
-  }
-  95% {
-    left: 120%;
-  }
-  to {
-    left: 100%;
-  }
+  animation: connexionLoading 1.5s linear infinite;
 }
 @keyframes connexionLoading {
   from {
@@ -4144,36 +4116,31 @@ span.first-bread em {
   border-color: #3498db;
 }
 .radial-progress .pie-wrapper.progress-30 .pie .left-side {
-  -webkit-transform: rotate(108deg);
-          transform: rotate(108deg);
+  transform: rotate(108deg);
 }
 .radial-progress .pie-wrapper.progress-60 .pie {
   clip: rect(auto, auto, auto, auto);
 }
 .radial-progress .pie-wrapper.progress-60 .pie .right-side {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .radial-progress .pie-wrapper.progress-60 .pie .half-circle {
   border-color: #9b59b6;
 }
 .radial-progress .pie-wrapper.progress-60 .pie .left-side {
-  -webkit-transform: rotate(216deg);
-          transform: rotate(216deg);
+  transform: rotate(216deg);
 }
 .radial-progress .pie-wrapper.progress-90 .pie {
   clip: rect(auto, auto, auto, auto);
 }
 .radial-progress .pie-wrapper.progress-90 .pie .right-side {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .radial-progress .pie-wrapper.progress-90 .pie .half-circle {
   border-color: #e67e22;
 }
 .radial-progress .pie-wrapper.progress-90 .pie .left-side {
-  -webkit-transform: rotate(324deg);
-          transform: rotate(324deg);
+  transform: rotate(324deg);
 }
 .radial-progress .pie-wrapper.progress-45 .pie .right-side {
   display: none;
@@ -4182,36 +4149,31 @@ span.first-bread em {
   border-color: #1abc9c;
 }
 .radial-progress .pie-wrapper.progress-45 .pie .left-side {
-  -webkit-transform: rotate(162deg);
-          transform: rotate(162deg);
+  transform: rotate(162deg);
 }
 .radial-progress .pie-wrapper.progress-75 .pie {
   clip: rect(auto, auto, auto, auto);
 }
 .radial-progress .pie-wrapper.progress-75 .pie .right-side {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .radial-progress .pie-wrapper.progress-75 .pie .half-circle {
   border-color: #8e44ad;
 }
 .radial-progress .pie-wrapper.progress-75 .pie .left-side {
-  -webkit-transform: rotate(270deg);
-          transform: rotate(270deg);
+  transform: rotate(270deg);
 }
 .radial-progress .pie-wrapper.progress-95 .pie {
   clip: rect(auto, auto, auto, auto);
 }
 .radial-progress .pie-wrapper.progress-95 .pie .right-side {
-  -webkit-transform: rotate(180deg);
-          transform: rotate(180deg);
+  transform: rotate(180deg);
 }
 .radial-progress .pie-wrapper.progress-95 .pie .half-circle {
   border-color: #e74c3c;
 }
 .radial-progress .pie-wrapper.progress-95 .pie .left-side {
-  -webkit-transform: rotate(342deg);
-          transform: rotate(342deg);
+  transform: rotate(342deg);
 }
 .radial-progress .pie-wrapper--solid {
   border-radius: 50%;
@@ -4223,8 +4185,7 @@ span.first-bread em {
   display: block;
   height: 100%;
   margin-left: 50%;
-  -webkit-transform-origin: left;
-          transform-origin: left;
+  transform-origin: left;
 }
 .radial-progress .pie-wrapper--solid .label {
   background: transparent;
@@ -4234,808 +4195,707 @@ span.first-bread em {
 }
 .radial-progress .pie-wrapper--solid.progress-100:before {
   background: #009688;
-  -webkit-transform: rotate(0deg);
-          transform: rotate(0deg);
+  transform: rotate(0deg);
 }
 .radial-progress .pie-wrapper--solid.progress-99 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-99:before {
   background: #009688;
-  -webkit-transform: rotate(3.6deg);
-          transform: rotate(3.6deg);
+  transform: rotate(3.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-98 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-98:before {
   background: #009688;
-  -webkit-transform: rotate(7.2deg);
-          transform: rotate(7.2deg);
+  transform: rotate(7.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-97 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-97:before {
   background: #009688;
-  -webkit-transform: rotate(10.8deg);
-          transform: rotate(10.8deg);
+  transform: rotate(10.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-96 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-96:before {
   background: #009688;
-  -webkit-transform: rotate(14.4deg);
-          transform: rotate(14.4deg);
+  transform: rotate(14.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-95 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-95:before {
   background: #009688;
-  -webkit-transform: rotate(18deg);
-          transform: rotate(18deg);
+  transform: rotate(18deg);
 }
 .radial-progress .pie-wrapper--solid.progress-94 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-94:before {
   background: #009688;
-  -webkit-transform: rotate(21.6deg);
-          transform: rotate(21.6deg);
+  transform: rotate(21.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-93 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-93:before {
   background: #009688;
-  -webkit-transform: rotate(25.2deg);
-          transform: rotate(25.2deg);
+  transform: rotate(25.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-92 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-92:before {
   background: #009688;
-  -webkit-transform: rotate(28.8deg);
-          transform: rotate(28.8deg);
+  transform: rotate(28.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-91 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-91:before {
   background: #009688;
-  -webkit-transform: rotate(32.4deg);
-          transform: rotate(32.4deg);
+  transform: rotate(32.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-90 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-90:before {
   background: #009688;
-  -webkit-transform: rotate(36deg);
-          transform: rotate(36deg);
+  transform: rotate(36deg);
 }
 .radial-progress .pie-wrapper--solid.progress-89 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-89:before {
   background: #009688;
-  -webkit-transform: rotate(39.6deg);
-          transform: rotate(39.6deg);
+  transform: rotate(39.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-88 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-88:before {
   background: #009688;
-  -webkit-transform: rotate(43.2deg);
-          transform: rotate(43.2deg);
+  transform: rotate(43.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-87 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-87:before {
   background: #009688;
-  -webkit-transform: rotate(46.8deg);
-          transform: rotate(46.8deg);
+  transform: rotate(46.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-86 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-86:before {
   background: #009688;
-  -webkit-transform: rotate(50.4deg);
-          transform: rotate(50.4deg);
+  transform: rotate(50.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-85 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-85:before {
   background: #009688;
-  -webkit-transform: rotate(54deg);
-          transform: rotate(54deg);
+  transform: rotate(54deg);
 }
 .radial-progress .pie-wrapper--solid.progress-84 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-84:before {
   background: #009688;
-  -webkit-transform: rotate(57.6deg);
-          transform: rotate(57.6deg);
+  transform: rotate(57.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-83 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-83:before {
   background: #009688;
-  -webkit-transform: rotate(61.2deg);
-          transform: rotate(61.2deg);
+  transform: rotate(61.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-82 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-82:before {
   background: #009688;
-  -webkit-transform: rotate(64.8deg);
-          transform: rotate(64.8deg);
+  transform: rotate(64.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-81 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-81:before {
   background: #009688;
-  -webkit-transform: rotate(68.4deg);
-          transform: rotate(68.4deg);
+  transform: rotate(68.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-80 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-80:before {
   background: #009688;
-  -webkit-transform: rotate(72deg);
-          transform: rotate(72deg);
+  transform: rotate(72deg);
 }
 .radial-progress .pie-wrapper--solid.progress-79 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-79:before {
   background: #009688;
-  -webkit-transform: rotate(75.6deg);
-          transform: rotate(75.6deg);
+  transform: rotate(75.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-78 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-78:before {
   background: #009688;
-  -webkit-transform: rotate(79.2deg);
-          transform: rotate(79.2deg);
+  transform: rotate(79.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-77 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-77:before {
   background: #009688;
-  -webkit-transform: rotate(82.8deg);
-          transform: rotate(82.8deg);
+  transform: rotate(82.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-76 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-76:before {
   background: #009688;
-  -webkit-transform: rotate(86.4deg);
-          transform: rotate(86.4deg);
+  transform: rotate(86.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-75 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-75:before {
   background: #009688;
-  -webkit-transform: rotate(90deg);
-          transform: rotate(90deg);
+  transform: rotate(90deg);
 }
 .radial-progress .pie-wrapper--solid.progress-74 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-74:before {
   background: #009688;
-  -webkit-transform: rotate(93.6deg);
-          transform: rotate(93.6deg);
+  transform: rotate(93.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-73 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-73:before {
   background: #009688;
-  -webkit-transform: rotate(97.2deg);
-          transform: rotate(97.2deg);
+  transform: rotate(97.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-72 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-72:before {
   background: #009688;
-  -webkit-transform: rotate(100.8deg);
-          transform: rotate(100.8deg);
+  transform: rotate(100.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-71 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-71:before {
   background: #009688;
-  -webkit-transform: rotate(104.4deg);
-          transform: rotate(104.4deg);
+  transform: rotate(104.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-70 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-70:before {
   background: #009688;
-  -webkit-transform: rotate(108deg);
-          transform: rotate(108deg);
+  transform: rotate(108deg);
 }
 .radial-progress .pie-wrapper--solid.progress-69 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-69:before {
   background: #009688;
-  -webkit-transform: rotate(111.6deg);
-          transform: rotate(111.6deg);
+  transform: rotate(111.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-68 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-68:before {
   background: #009688;
-  -webkit-transform: rotate(115.2deg);
-          transform: rotate(115.2deg);
+  transform: rotate(115.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-67 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-67:before {
   background: #009688;
-  -webkit-transform: rotate(118.8deg);
-          transform: rotate(118.8deg);
+  transform: rotate(118.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-66 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-66:before {
   background: #009688;
-  -webkit-transform: rotate(122.4deg);
-          transform: rotate(122.4deg);
+  transform: rotate(122.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-65 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-65:before {
   background: #009688;
-  -webkit-transform: rotate(126deg);
-          transform: rotate(126deg);
+  transform: rotate(126deg);
 }
 .radial-progress .pie-wrapper--solid.progress-64 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-64:before {
   background: #009688;
-  -webkit-transform: rotate(129.6deg);
-          transform: rotate(129.6deg);
+  transform: rotate(129.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-63 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-63:before {
   background: #009688;
-  -webkit-transform: rotate(133.2deg);
-          transform: rotate(133.2deg);
+  transform: rotate(133.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-62 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-62:before {
   background: #009688;
-  -webkit-transform: rotate(136.8deg);
-          transform: rotate(136.8deg);
+  transform: rotate(136.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-61 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-61:before {
   background: #009688;
-  -webkit-transform: rotate(140.4deg);
-          transform: rotate(140.4deg);
+  transform: rotate(140.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-60 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-60:before {
   background: #009688;
-  -webkit-transform: rotate(144deg);
-          transform: rotate(144deg);
+  transform: rotate(144deg);
 }
 .radial-progress .pie-wrapper--solid.progress-59 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-59:before {
   background: #009688;
-  -webkit-transform: rotate(147.6deg);
-          transform: rotate(147.6deg);
+  transform: rotate(147.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-58 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-58:before {
   background: #009688;
-  -webkit-transform: rotate(151.2deg);
-          transform: rotate(151.2deg);
+  transform: rotate(151.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-57 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-57:before {
   background: #009688;
-  -webkit-transform: rotate(154.8deg);
-          transform: rotate(154.8deg);
+  transform: rotate(154.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-56 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-56:before {
   background: #009688;
-  -webkit-transform: rotate(158.4deg);
-          transform: rotate(158.4deg);
+  transform: rotate(158.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-55 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-55:before {
   background: #009688;
-  -webkit-transform: rotate(162deg);
-          transform: rotate(162deg);
+  transform: rotate(162deg);
 }
 .radial-progress .pie-wrapper--solid.progress-54 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-54:before {
   background: #009688;
-  -webkit-transform: rotate(165.6deg);
-          transform: rotate(165.6deg);
+  transform: rotate(165.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-53 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-53:before {
   background: #009688;
-  -webkit-transform: rotate(169.2deg);
-          transform: rotate(169.2deg);
+  transform: rotate(169.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-52 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-52:before {
   background: #009688;
-  -webkit-transform: rotate(172.8deg);
-          transform: rotate(172.8deg);
+  transform: rotate(172.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-51 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-51:before {
   background: #009688;
-  -webkit-transform: rotate(176.4deg);
-          transform: rotate(176.4deg);
+  transform: rotate(176.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-50 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-50:before {
   background: #ffffff;
-  -webkit-transform: rotate(-360deg);
-          transform: rotate(-360deg);
+  transform: rotate(-360deg);
 }
 .radial-progress .pie-wrapper--solid.progress-49 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-49:before {
   background: #ffffff;
-  -webkit-transform: rotate(-356.4deg);
-          transform: rotate(-356.4deg);
+  transform: rotate(-356.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-48 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-48:before {
   background: #ffffff;
-  -webkit-transform: rotate(-352.8deg);
-          transform: rotate(-352.8deg);
+  transform: rotate(-352.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-47 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-47:before {
   background: #ffffff;
-  -webkit-transform: rotate(-349.2deg);
-          transform: rotate(-349.2deg);
+  transform: rotate(-349.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-46 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-46:before {
   background: #ffffff;
-  -webkit-transform: rotate(-345.6deg);
-          transform: rotate(-345.6deg);
+  transform: rotate(-345.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-45 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-45:before {
   background: #ffffff;
-  -webkit-transform: rotate(-342deg);
-          transform: rotate(-342deg);
+  transform: rotate(-342deg);
 }
 .radial-progress .pie-wrapper--solid.progress-44 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-44:before {
   background: #ffffff;
-  -webkit-transform: rotate(-338.4deg);
-          transform: rotate(-338.4deg);
+  transform: rotate(-338.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-43 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-43:before {
   background: #ffffff;
-  -webkit-transform: rotate(-334.8deg);
-          transform: rotate(-334.8deg);
+  transform: rotate(-334.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-42 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-42:before {
   background: #ffffff;
-  -webkit-transform: rotate(-331.2deg);
-          transform: rotate(-331.2deg);
+  transform: rotate(-331.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-41 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-41:before {
   background: #ffffff;
-  -webkit-transform: rotate(-327.6deg);
-          transform: rotate(-327.6deg);
+  transform: rotate(-327.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-40 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-40:before {
   background: #ffffff;
-  -webkit-transform: rotate(-324deg);
-          transform: rotate(-324deg);
+  transform: rotate(-324deg);
 }
 .radial-progress .pie-wrapper--solid.progress-39 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-39:before {
   background: #ffffff;
-  -webkit-transform: rotate(-320.4deg);
-          transform: rotate(-320.4deg);
+  transform: rotate(-320.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-38 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-38:before {
   background: #ffffff;
-  -webkit-transform: rotate(-316.8deg);
-          transform: rotate(-316.8deg);
+  transform: rotate(-316.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-37 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-37:before {
   background: #ffffff;
-  -webkit-transform: rotate(-313.2deg);
-          transform: rotate(-313.2deg);
+  transform: rotate(-313.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-36 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-36:before {
   background: #ffffff;
-  -webkit-transform: rotate(-309.6deg);
-          transform: rotate(-309.6deg);
+  transform: rotate(-309.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-35 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-35:before {
   background: #ffffff;
-  -webkit-transform: rotate(-306deg);
-          transform: rotate(-306deg);
+  transform: rotate(-306deg);
 }
 .radial-progress .pie-wrapper--solid.progress-34 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-34:before {
   background: #ffffff;
-  -webkit-transform: rotate(-302.4deg);
-          transform: rotate(-302.4deg);
+  transform: rotate(-302.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-33 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-33:before {
   background: #ffffff;
-  -webkit-transform: rotate(-298.8deg);
-          transform: rotate(-298.8deg);
+  transform: rotate(-298.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-32 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-32:before {
   background: #ffffff;
-  -webkit-transform: rotate(-295.2deg);
-          transform: rotate(-295.2deg);
+  transform: rotate(-295.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-31 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-31:before {
   background: #ffffff;
-  -webkit-transform: rotate(-291.6deg);
-          transform: rotate(-291.6deg);
+  transform: rotate(-291.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-30 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-30:before {
   background: #ffffff;
-  -webkit-transform: rotate(-288deg);
-          transform: rotate(-288deg);
+  transform: rotate(-288deg);
 }
 .radial-progress .pie-wrapper--solid.progress-29 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-29:before {
   background: #ffffff;
-  -webkit-transform: rotate(-284.4deg);
-          transform: rotate(-284.4deg);
+  transform: rotate(-284.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-28 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-28:before {
   background: #ffffff;
-  -webkit-transform: rotate(-280.8deg);
-          transform: rotate(-280.8deg);
+  transform: rotate(-280.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-27 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-27:before {
   background: #ffffff;
-  -webkit-transform: rotate(-277.2deg);
-          transform: rotate(-277.2deg);
+  transform: rotate(-277.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-26 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-26:before {
   background: #ffffff;
-  -webkit-transform: rotate(-273.6deg);
-          transform: rotate(-273.6deg);
+  transform: rotate(-273.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-25 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-25:before {
   background: #ffffff;
-  -webkit-transform: rotate(-270deg);
-          transform: rotate(-270deg);
+  transform: rotate(-270deg);
 }
 .radial-progress .pie-wrapper--solid.progress-24 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-24:before {
   background: #ffffff;
-  -webkit-transform: rotate(-266.4deg);
-          transform: rotate(-266.4deg);
+  transform: rotate(-266.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-23 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-23:before {
   background: #ffffff;
-  -webkit-transform: rotate(-262.8deg);
-          transform: rotate(-262.8deg);
+  transform: rotate(-262.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-22 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-22:before {
   background: #ffffff;
-  -webkit-transform: rotate(-259.2deg);
-          transform: rotate(-259.2deg);
+  transform: rotate(-259.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-21 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-21:before {
   background: #ffffff;
-  -webkit-transform: rotate(-255.6deg);
-          transform: rotate(-255.6deg);
+  transform: rotate(-255.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-20 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-20:before {
   background: #ffffff;
-  -webkit-transform: rotate(-252deg);
-          transform: rotate(-252deg);
+  transform: rotate(-252deg);
 }
 .radial-progress .pie-wrapper--solid.progress-19 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-19:before {
   background: #ffffff;
-  -webkit-transform: rotate(-248.4deg);
-          transform: rotate(-248.4deg);
+  transform: rotate(-248.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-18 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-18:before {
   background: #ffffff;
-  -webkit-transform: rotate(-244.8deg);
-          transform: rotate(-244.8deg);
+  transform: rotate(-244.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-17 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-17:before {
   background: #ffffff;
-  -webkit-transform: rotate(-241.2deg);
-          transform: rotate(-241.2deg);
+  transform: rotate(-241.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-16 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-16:before {
   background: #ffffff;
-  -webkit-transform: rotate(-237.6deg);
-          transform: rotate(-237.6deg);
+  transform: rotate(-237.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-15 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-15:before {
   background: #ffffff;
-  -webkit-transform: rotate(-234deg);
-          transform: rotate(-234deg);
+  transform: rotate(-234deg);
 }
 .radial-progress .pie-wrapper--solid.progress-14 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-14:before {
   background: #ffffff;
-  -webkit-transform: rotate(-230.4deg);
-          transform: rotate(-230.4deg);
+  transform: rotate(-230.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-13 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-13:before {
   background: #ffffff;
-  -webkit-transform: rotate(-226.8deg);
-          transform: rotate(-226.8deg);
+  transform: rotate(-226.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-12 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-12:before {
   background: #ffffff;
-  -webkit-transform: rotate(-223.2deg);
-          transform: rotate(-223.2deg);
+  transform: rotate(-223.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-11 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-11:before {
   background: #ffffff;
-  -webkit-transform: rotate(-219.6deg);
-          transform: rotate(-219.6deg);
+  transform: rotate(-219.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-10 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-10:before {
   background: #ffffff;
-  -webkit-transform: rotate(-216deg);
-          transform: rotate(-216deg);
+  transform: rotate(-216deg);
 }
 .radial-progress .pie-wrapper--solid.progress-9 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-9:before {
   background: #ffffff;
-  -webkit-transform: rotate(-212.4deg);
-          transform: rotate(-212.4deg);
+  transform: rotate(-212.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-8 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-8:before {
   background: #ffffff;
-  -webkit-transform: rotate(-208.8deg);
-          transform: rotate(-208.8deg);
+  transform: rotate(-208.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-7 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-7:before {
   background: #ffffff;
-  -webkit-transform: rotate(-205.2deg);
-          transform: rotate(-205.2deg);
+  transform: rotate(-205.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-6 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-6:before {
   background: #ffffff;
-  -webkit-transform: rotate(-201.6deg);
-          transform: rotate(-201.6deg);
+  transform: rotate(-201.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-5 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-5:before {
   background: #ffffff;
-  -webkit-transform: rotate(-198deg);
-          transform: rotate(-198deg);
+  transform: rotate(-198deg);
 }
 .radial-progress .pie-wrapper--solid.progress-4 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-4:before {
   background: #ffffff;
-  -webkit-transform: rotate(-194.4deg);
-          transform: rotate(-194.4deg);
+  transform: rotate(-194.4deg);
 }
 .radial-progress .pie-wrapper--solid.progress-3 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-3:before {
   background: #ffffff;
-  -webkit-transform: rotate(-190.8deg);
-          transform: rotate(-190.8deg);
+  transform: rotate(-190.8deg);
 }
 .radial-progress .pie-wrapper--solid.progress-2 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-2:before {
   background: #ffffff;
-  -webkit-transform: rotate(-187.2deg);
-          transform: rotate(-187.2deg);
+  transform: rotate(-187.2deg);
 }
 .radial-progress .pie-wrapper--solid.progress-1 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-1:before {
   background: #ffffff;
-  -webkit-transform: rotate(-183.6deg);
-          transform: rotate(-183.6deg);
+  transform: rotate(-183.6deg);
 }
 .radial-progress .pie-wrapper--solid.progress-0 {
   background: linear-gradient(to right, #009688 50%, #ffffff 50%);
 }
 .radial-progress .pie-wrapper--solid.progress-0:before {
   background: #ffffff;
-  -webkit-transform: rotate(-180deg);
-          transform: rotate(-180deg);
+  transform: rotate(-180deg);
 }
 /************************/
 /* CONTEXT MENU STYLES  */
@@ -5046,6 +4906,7 @@ div.menu {
   position: absolute;
   top: 0;
   left: 0;
+  -moz-border-radius: 1px;
   border-radius: 1px;
   box-shadow: 0px 1px 6px rgba(0, 0, 0, 0.16), 0px 1px 6px rgba(0, 0, 0, 0.23);
 }
@@ -5167,6 +5028,8 @@ div.menu.desktop li.menuAnchorSelected a u {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -5221,6 +5084,8 @@ div.menu.desktop li a.enabled:hover u {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -5696,12 +5561,8 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 #info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container,
 .form-ip_content_info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   height: 60px;
 }
 #info_panel .panelContent .info_panel_multiple_tile div.tile_preview_container div.tile_preview,
@@ -5883,8 +5744,6 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .nav-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -5893,9 +5752,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .nav-list-entry-icon {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -5909,8 +5766,6 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .workspaces .workspace-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -5919,9 +5774,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -5980,8 +5833,6 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .simple-provider .material-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -5990,9 +5841,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .simple-provider .material-list-entry .material-list-icon {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -6001,9 +5850,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   font-size: 1.2em;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   overflow: hidden;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text .material-list-line-1 > div {
@@ -6086,17 +5933,11 @@ div.pydio-tasks-panel.invisible {
 div.pydio-tasks-panel div.task {
   padding: 10px;
   border-bottom: 1px solid #f2f2f2;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  flex-direction: row;
 }
 div.pydio-tasks-panel div.task .task_texts {
-  -webkit-flex: 5;
-      -ms-flex: 5;
-          flex: 5;
+  flex: 5;
   max-width: 296px;
 }
 div.pydio-tasks-panel div.task .task_texts div {
@@ -6345,7 +6186,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component__main-icon--resting {
   -webkit-transform: scale(1) rotate(360deg);
   transform: scale(1) rotate(360deg);
-  transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
+  -webkit-transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
   transition: transform 150ms cubic-bezier(0.4, 0, 1, 1);
 }
 .mfb-component__child-icon,
@@ -6880,6 +6721,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /**
  * Apply this class to the html tag when developing the slide-in button
  */
+/*# sourceMappingURL=mfb.css.map */
 .mfb-component__button--child {
   height: 40px;
   width: 40px;
@@ -7853,11 +7695,9 @@ div.dialogButtons.inlineEdition input {
   line-height: 18px;
 }
 .flexbox #browser {
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
   -webkit-flex-direction: row;
-  -ms-flex-align: stretch;
-      align-items: stretch;
+  align-items: stretch;
   -webkit-align-items: stretch;
 }
 #browser #topPane {

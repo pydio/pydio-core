@@ -707,11 +707,11 @@
 
         dateToChange: function(){
             if(!this.state.startDate && !this.state.endDate){
-                this.props.onChange({ajxp_modiftime:null});
+                this.props.onChange({ajxp_modiftime:null}, true);
             }else{
                 let s = this.state.startDate || 'XXX';
                 let e = this.state.endDate || 'XXX';
-                this.props.onChange({ajxp_modiftime:'['+s+' TO '+e+']'});
+                this.props.onChange({ajxp_modiftime:'['+s+' TO '+e+']'}, true);
             }
         },
 
@@ -720,7 +720,7 @@
             if(menuItem.payload === 'custom'){
                 this.dateToChange();
             }else{
-                this.props.onChange({ajxp_modiftime:menuItem.payload});
+                this.props.onChange({ajxp_modiftime:menuItem.payload}, true);
             }
         },
 
@@ -797,17 +797,17 @@
         },
 
         toggleFolder: function(e, toggled){
-            this.setState({folder: toggled}, this.stateChanged);
+            this.setState({folder: toggled}, () => {this.stateChanged(true);});
         },
 
-        stateChanged: function(){
+        stateChanged: function(submit = false){
             let value = null;
             if(this.state.folder){
                 value = 'ajxp_folder';
             }else if(this.state.ext){
                 value = this.state.ext;
             }
-            this.props.onChange({ajxp_mime:value});
+            this.props.onChange({ajxp_mime:value}, submit);
         },
 
         render: function(){
@@ -821,6 +821,7 @@
                         onChange={this.changeExt}
                         onFocus={this.props.fieldsFocused}
                         onBlur={this.props.fieldsBlurred}
+                        onKeyPress={this.props.fieldsKeyPressed}
                     />
                 );
             }
@@ -874,6 +875,7 @@
                         onChange={this.changeFrom}
                         onFocus={this.props.fieldsFocused}
                         onBlur={this.props.fieldsBlurred}
+                        onKeyPress={this.props.fieldsKeyPressed}
                     />
                     <ReactMUI.TextField
                         ref="to"
@@ -882,6 +884,7 @@
                         onChange={this.changeTo}
                         onFocus={this.props.fieldsFocused}
                         onBlur={this.props.fieldsBlurred}
+                        onKeyPress={this.props.fieldsKeyPressed}
                     />
                 </div>
             );
@@ -899,33 +902,96 @@
             this.props.pydio.UI.enableAllKeyBindings();
         },
 
+        fieldsKeyPressed: function(e){
+            if(e.key === 'Enter'){
+                this.submitSearch();
+            }
+        },
+
         focused: function(){
-            this.setState({focused: true});
+            if(this.state.display === 'closed'){
+                this.setState({display: 'small'});
+            }
             this.fieldsFocused();
         },
 
         blurred: function(){
-            this.setState({focused: false});
+            if(this.state.display === 'small'){
+                //this.setState({display: 'closed'});
+            }
             this.fieldsBlurred();
         },
 
         getInitialState: function(){
+
+            let dataModel = new PydioDataModel(true);
+            let rNodeProvider = new RemoteNodeProvider();
+            dataModel.setAjxpNodeProvider(rNodeProvider);
+            rNodeProvider.initProvider({});
+            let rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
+            rootNode.setLoaded(true);
+            dataModel.setRootNode(rootNode);
+
             return {
-                focused: true,
+                quickSearch:true,
+                display: 'closed',
                 metaFields: {basename:{label:'Filename'}},
-                searchMode:'remote'
+                searchMode:'remote',
+                dataModel: dataModel,
+                nodeProvider: rNodeProvider
             };
         },
 
-        updateFormValues: function(object){
+        mainFieldQuickSearch: function(event){
+            let current = {basename:event.target.getValue()};
+            this.setState({
+                quickSearch: true,
+                formValues: current,
+                query:this.buildQuery(current)
+            }, this.submitSearch);
+
+        },
+
+        mainFieldEnter: function(event){
+            if(event.key !== 'Enter') return;
+            let current = {basename:event.target.getValue()};
+            this.setState({
+                quickSearch: false,
+                formValues: current,
+                query:this.buildQuery(current)
+            }, this.submitSearch);
+
+        },
+
+        updateFormValues: function(object, submit = false){
             let current = this.state.formValues || {};
             for(var k in object){
                 if(!object.hasOwnProperty(k)) continue;
                 if(object[k] === null && current[k]) delete current[k];
                 else current[k] = object[k];
             }
-            console.log(current);
-            this.setState({formValues: current});
+            let afterFunction = submit ? this.submitSearch.bind(this) :  () => {};
+            this.setState({
+                quickSearch: false,
+                formValues: current,
+                query:this.buildQuery(current)
+            }, afterFunction);
+        },
+
+        submitSearch: function(){
+            this.refs.results.reload();
+        },
+
+        buildQuery: function(formValues){
+            let keys = Object.keys(formValues);
+            if(keys.length === 1 && keys[0] === 'basename'){
+                return formValues['basename'];
+            }
+            let parts = [];
+            keys.map(function(k){
+                parts.push(k + ':' + formValues[k]);
+            });
+            return parts.join(' AND ');
         },
 
         parseMetaColumns(){
@@ -976,28 +1042,22 @@
             this.parseMetaColumns();
         },
 
-        render: function(){
-            let focused = this.state.focused ? ' focused' : '';
-            let columnsDesc;
-            let tmpStyle = {
-                position: 'absolute',
-                height: 500,
-                right: 0,
-                width: 370,
-                zIndex: 10000000,
-                backgroundColor: 'white',
-                color: 'rgba(0,0,0,0.87)'
-            };
-            if(this.state.focused){
-                let cols = Object.keys(this.state.metaFields).map(function(k){
-                    return <div>{this.state.metaFields[k].label} : {this.state.metaFields[k].renderer || "no renderer"}</div>
-                }.bind(this));
-                columnsDesc = <div>{cols}</div>
+        componentDidUpdate: function(){
+            if(this.refs.results && this.refs.results.refs.list){
+                this.refs.results.refs.list.updateInfiniteContainerHeight();
+                bufferCallback('search_results_resize_list', 550, ()=>{
+                    this.refs.results.refs.list.updateInfiniteContainerHeight();
+                });
             }
+        },
+
+        render: function(){
+            let columnsDesc;
             let props = {
-                fieldsFocused : this.fieldsFocused.bind(this),
-                fieldsBlurred : this.fieldsBlurred.bind(this),
-                onChange : this.updateFormValues.bind(this)
+                fieldsFocused       : this.fieldsFocused.bind(this),
+                fieldsBlurred       : this.fieldsBlurred.bind(this),
+                fieldsKeyPressed    : this.fieldsKeyPressed.bind(this),
+                onChange            : this.updateFormValues.bind(this)
             };
             let cols = Object.keys(this.state.metaFields).map(function(k){
                 let label = this.state.metaFields[k].label;
@@ -1007,7 +1067,8 @@
                 }else{
                     let onChange = function(event){
                         let object = {};
-                        object[k] = event.target.getValue();
+                        let objectKey = (k === 'basename') ? k : 'ajxp_meta_' + k;
+                        object[objectKey] = event.target.getValue() || null;
                         this.updateFormValues(object);
                     }.bind(this);
                     return (
@@ -1015,20 +1076,73 @@
                             {...this.props}
                             onFocus={this.fieldsFocused}
                             onBlur={this.fieldsBlurred}
+                            onKeyPress={this.fieldsKeyPressed}
                             floatingLabelText={label}
                             onChange={onChange}
                         />);
                 }
             }.bind(this));
-            columnsDesc = <div>{cols}</div>
+            columnsDesc = <div>{cols}</div>;
+            if(this.state.query){
+                // Refresh nodeProvider query
+                this.state.nodeProvider.initProvider({
+                    get_action:'search',
+                    query:this.state.query,
+                    limit:this.state.quickSearch?9:100
+                });
+            }
+            let moreButton, renderSecondLine = null, elementHeight = 49;
+            if(this.state.display === 'small'){
+                let openMore = function(){
+                    this.setState({display:'more', quickSearch:false}, this.submitSearch);
+                }.bind(this);
+                moreButton = (
+                    <div className="search-more-container">
+                        <ReactMUI.FlatButton secondary={true} label={"Show more..."} onClick={openMore}/>
+                    </div>
+                );
+            }else{
+                elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES + 10;
+                renderSecondLine = function(node){
+                    return <div>{node.getPath()}</div>
+                };
+            }
+            let advancedButton = (
+                <span className="search-advanced-button" onClick={()=>{this.setState({display:'advanced'})}}>Advanced search</span>
+            );
             return (
-                <div className={"top_search_form" + focused}>
-                    <ReactMUI.TextField onFocus={this.focused} onBlur={this.blurred} hintText="Search..."/>
-                    <div style={tmpStyle}>
-                        {columnsDesc}
-                        <SearchDatePanel {...this.props} {...props}/>
-                        <SearchFileFormatPanel {...this.props} {...props}/>
-                        <SearchFileSizePanel {...this.props} {...props}/>
+                <div className={"top_search_form " + this.state.display}>
+                    <div className="search-input">
+                        <div className="panel-header">
+                            <span className="panel-header-label">{this.state.display === 'advanced'?'Advanced Search' : 'Search ...'}</span>
+                            <span className="panel-header-close mdi mdi-close" onClick={()=>{this.setState({display:'closed'});}}></span>
+                        </div>
+                        <ReactMUI.TextField
+                            onFocus={this.focused}
+                            onBlur={this.blurred}
+                            hintText="Search..."
+                            onChange={this.mainFieldQuickSearch}
+                            onKeyPress={this.mainFieldEnter}
+                        />
+                        {advancedButton}
+                    </div>
+                    <div className="search-advanced">
+                            {columnsDesc}
+                            <SearchDatePanel {...this.props} {...props}/>
+                            <SearchFileFormatPanel {...this.props} {...props}/>
+                            <SearchFileSizePanel {...this.props} {...props}/>
+                    </div>
+                    <div className="search-results">
+                        <ReactPydio.NodeListCustomProvider
+                            ref="results"
+                            elementHeight={elementHeight}
+                            entryRenderActions={function(){return null}}
+                            entryRenderSecondLine={renderSecondLine}
+                            presetDataModel={this.state.dataModel}
+                            heightAutoWithMax={this.state.display === 'small' ? 500  : 412}
+                            nodeClicked={(node)=>{this.props.pydio.goTo(node);this.setState({display:'closed'})}}
+                        />
+                        {moreButton}
                     </div>
                 </div>
             );

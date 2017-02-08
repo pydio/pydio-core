@@ -22,38 +22,14 @@
 }
 
 #workspace_toolbar{
-  .primaryColorPane;
+  background-color: @applicationPrimaryColor;
   display: flex;
   .react_breadcrumb{
     flex: 1;
     padding: 20px;
     font-size: 22px;
     line-height: 24px;
-  }
-  .top_search_form{
-    margin: 8px 8px;
-    height: 42px;
-    padding: 0px 10px;
-    transition: @bezier_transition;
-    border-radius: 2px;
-    .mui-text-field{
-      width: 216px;
-      margin-top: -4px;
-      .mui-text-field-hint{
-        color: rgba(255,255,255,0.47);
-      }
-    }
-    &.focused{
-      background-color: white;
-      box-shadow: @reactBoxShadowDepthMini;
-      .mui-text-field {
-        transition: @bezier_transition;
-        width: 256px;
-        .mui-text-field-hint{
-          color: rgba(0, 0, 0, 0.3);
-        }
-      }
-    }
+    color: @applicationPrimaryFontColor;
   }
 }
 
