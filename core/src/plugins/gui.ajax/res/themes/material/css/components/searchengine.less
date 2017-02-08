@@ -1,5 +1,7 @@
 .top_search_form{
 
+  @search_main_color: #2196F3;
+
   margin-right: 10px !important;
   margin-top:   10px !important;
   width: 186px;
@@ -43,12 +45,56 @@
 
   .search-advanced, .search-advanced-button{
     display: none;
+    .advanced-section{
+      font-weight: 500;
+      color: darken(@search_main_color, 20);
+      padding: 40px 10px 0;
+      &:first-child{
+        padding-top: 10px;
+      }
+    }
     .mui-text-field{
       width: 210px ;
-      margin: 0 5px;
+      margin: -16px 15px 0;
     }
-    .mui-drop-down-menu, .mui-menu{
-      width: 210px !important;
+    .mui-drop-down-menu{
+      width: 256px !important;
+      margin-left: -8px;
+    }
+    .mui-menu{
+      width: 216px !important;
+      margin-left: 20px;
+    }
+    .advanced-search-stars {
+      display: flex;
+      margin: 16px 0 5px !important;
+      .stars-label{
+        padding: 0 15px !important;
+        display: inline-block;
+        font-size: 17px;
+        color: #b4b4b4;
+      }
+      .stars-icons{
+        padding-top: 1px;
+      }
+    }
+    .paginator-dates{
+      margin-top: 20px;
+      display: flex;
+      .mui-text-field{
+        width: 98px;
+      }
+      span.mdi-close{
+        display: inline-block;
+        padding: 3px 1px;
+        margin-left: -30px;
+        color: rgba(0,0,0,0.33);
+      }
+    }
+    .mui-toggle{
+      width: 215px;
+      margin-left: 15px;
+      margin-top: 16px;
     }
   }
 
@@ -75,7 +121,7 @@
 
     box-shadow: @reactBoxShadowDepth1;
     .search-input{
-      background-color: #2196F3;
+      background-color: @search_main_color;
       box-shadow: @reactBoxShadowDepth1;
     }
     .search-results {
@@ -118,7 +164,7 @@
   }
 
   &.more, &.advanced{
-    background-color: @applicationPrimaryLight;
+    background-color: #fafafa;
     width: 512px;
     height: 512px;
     .search-results{
@@ -128,6 +174,17 @@
         border-bottom: 0;
         margin: 5px;
         box-shadow: @reactBoxShadowDepthMini;
+      }
+    }
+    .material-list-icon{
+      img{
+        border-radius: 0;
+        background-color: transparent;
+      }
+      .covering-bg-preview{
+        height: 50px;
+        width: 50px;
+        margin: 9px;
       }
     }
     .panel-header{
@@ -163,7 +220,7 @@
       display: block;
       position: absolute;
       left:6px;
-      width: 220px;
+      width: 240px;
       background-color: white;
       top: 104px;
       bottom: 7px;
@@ -172,7 +229,7 @@
     }
 
     .search-results{
-      margin-left: 229px;
+      margin-left: 249px;
     }
   }
 

@@ -1091,7 +1091,7 @@
                     limit:this.state.quickSearch?9:100
                 });
             }
-            let moreButton, renderSecondLine = null, elementHeight = 49;
+            let moreButton, renderSecondLine = null, renderIcon = null, elementHeight = 49;
             if(this.state.display === 'small'){
                 let openMore = function(){
                     this.setState({display:'more', quickSearch:false}, this.submitSearch);
@@ -1106,6 +1106,10 @@
                 renderSecondLine = function(node){
                     return <div>{node.getPath()}</div>
                 };
+                renderIcon = function(node, entryProps = {}){
+                    return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
+                };
+
             }
             let advancedButton = (
                 <span className="search-advanced-button" onClick={()=>{this.setState({display:'advanced'})}}>Advanced search</span>
@@ -1127,15 +1131,20 @@
                         {advancedButton}
                     </div>
                     <div className="search-advanced">
-                            {columnsDesc}
-                            <SearchDatePanel {...this.props} {...props}/>
-                            <SearchFileFormatPanel {...this.props} {...props}/>
-                            <SearchFileSizePanel {...this.props} {...props}/>
+                        <div className="advanced-section">User Metadata</div>
+                        {columnsDesc}
+                        <div className="advanced-section">Modification Date</div>
+                        <SearchDatePanel {...this.props} {...props}/>
+                        <div className="advanced-section">File format</div>
+                        <SearchFileFormatPanel {...this.props} {...props}/>
+                        <div className="advanced-section">Bytesize ranges</div>
+                        <SearchFileSizePanel {...this.props} {...props}/>
                     </div>
                     <div className="search-results">
                         <ReactPydio.NodeListCustomProvider
                             ref="results"
                             elementHeight={elementHeight}
+                            entryRenderIcon={renderIcon}
                             entryRenderActions={function(){return null}}
                             entryRenderSecondLine={renderSecondLine}
                             presetDataModel={this.state.dataModel}

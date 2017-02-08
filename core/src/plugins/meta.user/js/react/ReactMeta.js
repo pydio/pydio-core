@@ -126,9 +126,9 @@
                 return <span onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
             }.bind(this));
             return (
-                <div>
-                    <div>{this.props.label}</div>
-                    <div>{stars}</div>
+                <div className="advanced-search-stars">
+                    <div className="stars-label">{this.props.label}</div>
+                    <div className="stars-icons">{stars}</div>
                 </div>
             );
         }
@@ -210,10 +210,9 @@
             this.props.menuItems.map(function(item, i){
                 if(item.payload === this.state.value) index = i + 1;
             }.bind(this));
-            this.props.menuItems.unshift({payload:null, text:''});
+            this.props.menuItems.unshift({payload:null, text:this.props.label});
             return (
                 <div>
-                    <div>{this.props.label}</div>
                     <ReactMUI.DropDownMenu
                         menuItems={this.props.menuItems}
                         selectedIndex={index}
