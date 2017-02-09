@@ -1217,9 +1217,10 @@
                             <Breadcrumb {...this.props}/>
                             <SearchForm {...this.props}/>
                         </div>
-                        <div id="files_list_header">
+                        <div id="main_toolbar">
                             <Toolbars.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
                             <Toolbars.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                            <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
                             <Toolbars.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
                         </div>
                         <MainFilesList ref="list" {...this.props}/>

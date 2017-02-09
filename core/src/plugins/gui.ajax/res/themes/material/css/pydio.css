@@ -8133,8 +8133,9 @@ span.overlay-class-span.icon-bookmark-empty {
 .icon_buttons_toolbar span.actionbar_button_label {
   display: none;
 }
-#files_list_header {
+#main_toolbar {
   background-color: #546e7a;
+  padding: 3px 12px 4px 8px;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
@@ -8142,49 +8143,72 @@ span.overlay-class-span.icon-bookmark-empty {
   color: inherit;
   font-size: inherit;
 }
-#files_list_header span.toolbars-button-menu {
-  position: inherit;
+#main_toolbar span.toolbars-button-menu {
+  position: relative;
 }
-#files_list_header span.toolbars-button-menu .mui-menu {
-  right: inherit;
+#main_toolbar span.toolbars-button-menu .mui-menu {
+  right: 5px;
+  top: 0;
 }
-#files_list_header .mui-flat-button-label {
+#main_toolbar .mui-flat-button-label {
   color: rgba(255, 255, 255, 0.87);
 }
-#files_list_header #create-button-menu {
+#main_toolbar #create-button-menu {
   margin-right: 5px;
   margin-left: 12px;
   margin-top: 3px;
 }
-#files_list_header #create-button-menu .mui-raised-button {
+#main_toolbar #create-button-menu .mui-raised-button {
   height: 30px;
 }
-#files_list_header #create-button-menu .mui-raised-button .mui-raised-button-label {
+#main_toolbar #create-button-menu .mui-raised-button .mui-raised-button-label {
   line-height: 30px;
 }
-#files_list_header .mui-menu {
+#main_toolbar .mui-menu {
   position: absolute;
   z-index: 1;
   margin-top: 1px;
 }
-#files_list_header .mui-menu .mui-subheader {
+#main_toolbar .mui-menu .mui-subheader {
   height: 0;
 }
-#files_list_header #main-toolbar {
+#main_toolbar #main-toolbar {
   -webkit-flex: 1;
       -ms-flex: 1;
           flex: 1;
 }
-#files_list_header #display-toolbar {
+#main_toolbar #display-toolbar,
+#main_toolbar #paginator-toolbar {
   margin-top: -4px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
 }
-#files_list_header #display-toolbar .mui-font-icon {
+#main_toolbar #display-toolbar .mui-font-icon,
+#main_toolbar #paginator-toolbar .mui-font-icon {
   font-size: 16px;
   color: #2f3d44;
 }
-#files_list_header #display-toolbar .mui-menu {
-  right: 5px;
-  top: 70px;
+#main_toolbar .mui-drop-down-menu {
+  color: rgba(255, 255, 255, 0.87);
+  width: 135px !important;
+  margin-top: -6px;
+  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 500;
+}
+#main_toolbar .mui-drop-down-menu .mui-menu-control .mui-menu-control-bg {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+#main_toolbar .mui-drop-down-menu .mui-menu-drop-down-icon * {
+  fill: rgba(255, 255, 255, 0.87);
+}
+#main_toolbar .mui-drop-down-menu .mui-menu-control-underline {
+  display: none;
+}
+#main_toolbar .mui-drop-down-menu .mui-menu {
+  width: 150px !important;
+  color: rgba(0, 0, 0, 0.83);
 }
 #info_panel {
   position: absolute;
