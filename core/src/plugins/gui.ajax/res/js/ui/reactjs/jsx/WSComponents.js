@@ -472,14 +472,6 @@
             }.bind(this));
         },
 
-        selectNode: function(node){
-            if(node.isLeaf()){
-                this.props.pydio.getContextHolder().setSelectedNodes([node]);
-            }else{
-                this.props.pydio.getContextHolder().requireContextChange(node);
-            }
-        },
-
         entryRenderIcon: function(node, entryProps = {}){
             return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
         },
@@ -1143,6 +1135,7 @@
                     <div className="search-results">
                         <ReactPydio.NodeListCustomProvider
                             ref="results"
+                            className={this.state.display !== 'small' ? 'main-file-list' : null}
                             elementHeight={elementHeight}
                             entryRenderIcon={renderIcon}
                             entryRenderActions={function(){return null}}

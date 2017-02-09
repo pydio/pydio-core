@@ -80,9 +80,15 @@
                 }else{
                     subItems = action.subMenu;
                 }
+                let iconLabel = (
+                    <span>
+                        <span className={"mui-menu-item-icon " + action.icon_class}></span>
+                        <span>{action.raw_name?action.raw_name:action.name}</span>
+                    </span>
+                );
                 items.push({
                     type:ReactMUI.MenuItem.Types.NESTED,
-                    text: action.raw_name?action.raw_name:action.name,
+                    text: iconLabel,
                     iconClassName:action.icon_class,
                     items: subItems
                 });

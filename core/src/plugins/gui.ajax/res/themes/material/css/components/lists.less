@@ -25,6 +25,22 @@
         padding: 5px;
       }
     }
+    .inline-editor{
+      position: absolute;
+      background-color: white;
+      margin-top: -11px;
+      z-index: 1;
+      > .mui-paper-container{
+        padding: 8px 24px;
+        .modal-buttons{
+          text-align: right;
+        }
+      }
+      &.detached{
+        margin-top: 10px;
+        margin-left: 10px;
+      }
+    }
     &.table-mode{
       .mui-toolbar {
         display: block;
@@ -56,6 +72,9 @@
           }
         }
       }
+      .inline-editor{
+        margin-left: 40px;
+      }
     }
     &.material-list-grid{
       .material-list-entry.list-parent-node {
@@ -64,6 +83,9 @@
             display: none;
           }
         }
+      }
+      .material-list-text{
+        overflow: visible;
       }
     }
   }

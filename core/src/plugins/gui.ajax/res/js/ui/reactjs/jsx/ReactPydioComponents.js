@@ -1165,6 +1165,47 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
     });
 
+    let ListEntryNodeListenerMixin = {
+
+        attach: function(node){
+            this._nodeListener = function(){
+                if(!this.isMounted()) {
+                    this.detach(node);
+                    return;
+                }
+                this.forceUpdate();
+            }.bind(this);
+            this._actionListener = function(eventMemo){
+                if(!this.isMounted()) {
+                    this.detach(node);
+                    return;
+                }
+                if(eventMemo && eventMemo.type === 'prompt-rename' && eventMemo.callback){
+                    this.setState({inlineEdition:true, inlineEditionCallback:eventMemo.callback});
+                }
+                return true;
+            }.bind(this);
+            node.observe("node_replaced", this._nodeListener);
+            node.observe("node_action", this._actionListener);
+        },
+
+        detach: function(node){
+            if(this._nodeListener){
+                node.stopObserving("node_replaced", this._nodeListener);
+                node.stopObserving("node_action", this._actionListener);
+            }
+        },
+
+        componentDidMount: function(){
+            this.attach(this.props.node);
+        },
+
+        componentWillUnmount: function(){
+            this.detach(this.props.node);
+        },
+
+    };
+
     /**
      * Material List Entry
      */
@@ -1454,46 +1495,50 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
      */
     var TableListEntry = React.createClass({
 
+        mixins:[ListEntryNodeListenerMixin],
+
         propTypes:{
+            node:React.PropTypes.instanceOf(AjxpNode),
             tableKeys:React.PropTypes.object.isRequired,
             renderActions:React.PropTypes.func
-        },
-
-        componentDidMount: function(){
-            this._nodeListener = function(){
-                if(!this.isMounted()) return;
-                this.forceUpdate();
-            }.bind(this);
-            this.props.node.observe("node_replaced", this._nodeListener);
-        },
-
-        componentWillUnmount: function(){
-            if(this._nodeListener){
-                this.props.node.stopObserving("node_replaced", this._nodeListener);
-            }
+            // See also ListEntry nodes
         },
 
         render: function(){
 
-            var actions = this.props.actions;
+            let actions = this.props.actions;
             if(this.props.renderActions) {
                 actions = this.props.renderActions(this.props.node);
             }
 
-            var cells = [];
+            let cells = [];
+            let firstKey = true;
             for(var key in this.props.tableKeys){
                 if(!this.props.tableKeys.hasOwnProperty(key)) continue;
 
-                var data = this.props.tableKeys[key];
-                var style = data['width']?{width:data['width']}:null;
-                let value;
+                let data = this.props.tableKeys[key];
+                let style = data['width']?{width:data['width']}:null;
+                let value, rawValue;
                 if(data.renderCell){
                     data['name'] = key;
                     value = data.renderCell(this.props.node, data);
                 }else{
                     value = this.props.node.getMetadata().get(key);
                 }
-                cells.push(<span key={key} className={'cell cell-' + key} title={value} style={style} data-label={data['label']}>{value}</span>);
+                rawValue = this.props.node.getMetadata().get(key);
+                let inlineEditor;
+                if(this.state && this.state.inlineEdition && firstKey){
+                    inlineEditor = <InlineEditor
+                        node={this.props.node}
+                        onClose={()=>{this.setState({inlineEdition:false})}}
+                        callback={this.state.inlineEditionCallback}
+                    />
+                    let style = this.props.style || {};
+                    style.position = 'relative';
+                    this.props.style = style;
+                }
+                cells.push(<span key={key} className={'cell cell-' + key} title={rawValue} style={style} data-label={data['label']}>{inlineEditor}{value}</span>);
+                firstKey = false;
             }
 
             return (
@@ -1516,7 +1561,10 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
      */
     var ConfigurableListEntry = React.createClass({
 
+        mixins:[ListEntryNodeListenerMixin],
+
         propTypes: {
+            node:React.PropTypes.instanceOf(AjxpNode),
             // SEE ALSO ListEntry PROPS
             renderIcon: React.PropTypes.func,
             renderFirstLine:React.PropTypes.func,
@@ -1524,20 +1572,6 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             renderThirdLine:React.PropTypes.func,
             renderActions:React.PropTypes.func,
             style: React.PropTypes.object
-        },
-
-        componentDidMount: function(){
-            this._nodeListener = function(){
-                if(!this.isMounted()) return;
-                this.forceUpdate();
-            }.bind(this);
-            this.props.node.observe("node_replaced", this._nodeListener);
-        },
-
-        componentWillUnmount: function(){
-            if(this._nodeListener){
-                this.props.node.stopObserving("node_replaced", this._nodeListener);
-            }
         },
 
         render: function(){
@@ -1555,7 +1589,21 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             } else {
                 firstLine = this.props.node.getLabel();
             }
-
+            if(this.state && this.state.inlineEdition){
+                firstLine = (
+                    <span>
+                        <InlineEditor
+                            node={this.props.node}
+                            onClose={()=>{this.setState({inlineEdition:false})}}
+                            callback={this.state.inlineEditionCallback}
+                        />
+                        {firstLine}
+                    </span>
+                );
+                let style = this.props.style || {};
+                style.position = 'relative';
+                this.props.style = style;
+            }
             if(this.props.renderSecondLine) {
                 secondLine = this.props.renderSecondLine(this.props.node);
             }
@@ -1579,6 +1627,69 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     />
             );
 
+        }
+
+    });
+
+    var InlineEditor = React.createClass({
+
+        propTypes:{
+            node: React.PropTypes.instanceOf(AjxpNode),
+            callback:React.PropTypes.func,
+            onClose:React.PropTypes.func,
+            detached:React.PropTypes.bool
+        },
+
+        submit: function(){
+            if(!this.state || !this.state.value || this.state.value === this.props.node.getLabel()){
+                global.alert('Please use a different value for renaming!');
+            }else{
+                this.props.callback(this.state.value);
+                this.props.onClose();
+            }
+        },
+
+        focused: function(){
+            global.pydio.UI.disableAllKeyBindings();
+        },
+
+        blurred: function(){
+            global.pydio.UI.enableAllKeyBindings();
+        },
+
+        componentDidMount:function(){
+            this.refs.text.focus();
+        },
+
+        catchClicks: function(e){
+            e.stopPropagation();
+        },
+
+        onKeyDown: function(e){
+            if(e.key === 'Enter') {
+                this.submit();
+            }
+            e.stopPropagation();
+        },
+
+        render: function(){
+            return (
+                <ReactMUI.Paper className={"inline-editor" + (this.props.detached ? " detached" : "")} zDepth={2}>
+                    <ReactMUI.TextField
+                        ref="text"
+                        defaultValue={this.props.node.getLabel()}
+                        onChange={(e)=>{this.setState({value:e.target.getValue()})}}
+                        onFocus={this.focused}
+                        onBlur={this.blurred}
+                        onClick={this.catch} onDoubleClick={this.catchClicks}
+                        tabIndex="0" onKeyDown={this.onKeyDown}
+                    />
+                    <div className="modal-buttons">
+                        <ReactMUI.FlatButton label="Cancel" onClick={this.props.onClose}/>
+                        <ReactMUI.FlatButton label="Submit" onClick={this.submit}/>
+                    </div>
+                </ReactMUI.Paper>
+            );
         }
 
     });
@@ -1612,7 +1723,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             entryRenderSecondLine:React.PropTypes.func,
             entryRenderThirdLine:React.PropTypes.func,
             entryHandleClicks:React.PropTypes.func,
-            
+
             openEditor:React.PropTypes.func,
             openCollection:React.PropTypes.func,
 
@@ -1663,7 +1774,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 }
             }
         },
-        
+
         doubleClickRow: function(gridRow){
             var node;
             if(gridRow.props){
@@ -1706,6 +1817,72 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     this.rebuildLoadedElements();
                 }.bind(this));
 
+            }
+
+        },
+
+        onKeyDown: function(e){
+            let currentIndexStart, currentIndexEnd;
+            let contextHolder = global.pydio.getContextHolder();
+            const elementsPerLine = this.props.elementsPerLine || 1;
+            const shiftKey = e.shiftKey;
+            const key = e.key;
+
+            if(contextHolder.isEmpty()) return;
+            let downKeys = ['ArrowDown', 'ArrowRight', 'PageDown', 'End'];
+
+            let position = (shiftKey && downKeys.indexOf(key) > -1) ? 'first' : 'last';
+            let currentSelection = contextHolder.getSelectedNodes();
+
+            let firstSelected = currentSelection[0];
+            let lastSelected = currentSelection[currentSelection.length - 1];
+
+            if(key === 'Enter'){
+                this.doubleClickRow(firstSelected);
+                return;
+            }
+
+            for(let i=0; i< this.indexedElements.length; i++){
+                if(this.indexedElements[i].node === firstSelected) {
+                    currentIndexStart = i;
+                }
+                if(this.indexedElements[i].node === lastSelected) {
+                    currentIndexEnd = i;
+                    break;
+                }
+            }
+            let selectionIndex;
+            let maxIndex = this.indexedElements.length - 1;
+            let increment = (key === 'PageDown' || key === 'PageUp' ? 10 : 1);
+            if(key === 'ArrowDown' || key === 'PageDown'){
+                selectionIndex = Math.min(currentIndexEnd + elementsPerLine * increment, maxIndex);
+            }else if(key === 'ArrowUp' || key === 'PageUp'){
+                selectionIndex = Math.max(currentIndexStart - elementsPerLine * increment, 0);
+            }else if(key === 'Home'){
+                selectionIndex = 0;
+            }else if(key === 'End'){
+                selectionIndex = maxIndex;
+            }
+            if(elementsPerLine > 1){
+                if(key === 'ArrowRight'){
+                    selectionIndex = currentIndexEnd + 1;
+                }else if(key === 'ArrowLeft'){
+                    selectionIndex = currentIndexStart - 1;
+                }
+            }
+
+            if(shiftKey && selectionIndex !== undefined){
+                const min = Math.min(currentIndexStart, currentIndexEnd, selectionIndex);
+                const max = Math.max(currentIndexStart, currentIndexEnd, selectionIndex);
+                if(min !== max){
+                    let selection = [];
+                    for(let i=min; i<max+1; i++){
+                        if(this.indexedElements[i]) selection.push(this.indexedElements[i].node);
+                    }
+                    contextHolder.setSelectedNodes(selection);
+                }
+            }else if(this.indexedElements[selectionIndex] && this.indexedElements[selectionIndex].node){
+                contextHolder.setSelectedNodes([this.indexedElements[selectionIndex].node]);
             }
 
         },
@@ -1767,12 +1944,21 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     this.rebuildLoadedElements();
                 }.bind(this);
             }
+            if(!this._childrenActionsObserver){
+                this._childrenActionsObserver = function(eventMemo){
+                    if(eventMemo.type === 'prompt-rename'){
+                        this.setState({inlineEditionForNode:eventMemo.child, inlineEditionCallback:eventMemo.callback});
+                    }
+                }.bind(this);
+            }
             if(stop){
                 node.stopObserving("child_added", this._childrenObserver);
                 node.stopObserving("child_removed", this._childrenObserver);
+                node.stopObserving("child_node_action", this._childrenActionsObserver);
             }else{
                 node.observe("child_added", this._childrenObserver);
                 node.observe("child_removed", this._childrenObserver);
+                node.observe("child_node_action", this._childrenActionsObserver);
             }
         },
 
@@ -2183,7 +2369,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     var groups = {};
                     var groupKeys = [];
                 }
-                
+
                 if (!this.props.skipParentNavigation && theNode.getParent()
                     && (this.props.dataModel.getContextNode() !== theNode || this.props.skipInternalDataModel)) {
                     this.indexedElements.push({node: theNode.getParent(), parent: true, actions: null});
@@ -2443,11 +2629,21 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             }else{
                 toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
             }
+            let inlineEditor;
+            if(this.state.inlineEditionForNode){
+                inlineEditor = <InlineEditor
+                    detached={true}
+                    node={this.state.inlineEditionForNode}
+                    callback={this.state.inlineEditionCallback}
+                    onClose={()=>{this.setState({inlineEditionForNode:null});}}
+                />
+            }
 
             var elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
             return (
-                <div className={containerClasses} onContextMenu={this.contextMenuResponder}>
+                <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown}>
                     {toolbar}
+                    {inlineEditor}
                     <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
                         <Infinite
                             elementHeight={this.state.elementHeight?this.state.elementHeight:this.props.elementHeight}

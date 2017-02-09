@@ -606,12 +606,24 @@
 						};
 						conn.sendAsync();
 					};
+					var found = false;
 					if(pydio.getUserSelection() && pydio.getUserSelection().getSelectionSource() && pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
 					    pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
+					    found = true;
                     }else{
                         var test = pydio.UI._focusables.detect(function(obj){return obj.hasFocus;});
                         if (test && test.switchCurrentLabelToEdition){
                             test.switchCurrentLabelToEdition(callback);
+                            found = true;
+                        }
+                    }
+                    if(!found){
+                        var n = pydio.getUserSelection().getSelectedNodes()[0];
+                        if(n){
+                            let res = n.notify("node_action", {type:"prompt-rename", callback:(value)=>{callback(n, value);}});
+                            if((!res || res[0] !== true) && n.getParent()){
+                                n.getParent().notify("child_node_action", {type:"prompt-rename", child:n, callback:(value)=>{callback(n, value);}});
+                            }
                         }
                     }
 				]]></clientCallback>
