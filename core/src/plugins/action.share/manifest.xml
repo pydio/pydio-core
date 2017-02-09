@@ -413,6 +413,7 @@
                 </script>
 			]]></template>
             <component_config className="InfoPanel">
+                <infoPanel mime="meta:ajxp_shared" attributes="" reactComponent="ShareInfoPanel.InfoPanel"/>
                 <infoPanelExtension mime="meta:ajxp_shared" attributes="" modifier="ShareInfoPanel.loader">
                     <messages>
                         <message key="type_string" id="share_center.50"/>

@@ -323,8 +323,31 @@
 
     });
 
+    var ReactInfoPanel = React.createClass({
+
+        render: function(){
+
+            let actions = [
+                <ReactMUI.FlatButton
+                    label="Edit share"
+                    secondary={true}
+                    onClick={()=>{global.pydio.getController().fireAction("share-edit-shared");}}
+                />
+            ];
+
+            return (
+                <DetailPanes.InfoPanelCard title="Shared" actions={actions}>
+                    <InfoPanel {...this.props}/>
+                </DetailPanes.InfoPanelCard>
+            );
+
+        }
+
+    });
+
     global.ShareInfoPanel = {};
     global.ShareInfoPanel.loader = Loader.loadInfoPanel;
+    global.ShareInfoPanel.InfoPanel = ReactInfoPanel;
 
 
 })(window);

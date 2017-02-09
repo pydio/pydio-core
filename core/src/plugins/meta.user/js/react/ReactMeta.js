@@ -242,9 +242,54 @@
 
     });
 
+    let InfoPanel = React.createClass({
+
+        render: function(){
+
+            let configs = Renderer.getMetadataConfigs();
+            let data = [];
+            let node = this.props.node;
+            let metadata = node.getMetadata();
+            configs.forEach(function(meta, key){
+                let label = meta.label;
+                let type = meta.type;
+                let value = metadata.get(key);
+                let column = {name:key}
+                if(type === 'stars_rate'){
+                    value = <MetaStarsRenderer node={node} column={column}/>
+                }else if(type === 'css_label'){
+                    value = <CSSLabelsFilter node={node} column={column}/>
+                }else if(type === 'choice'){
+                    value = <SelectorFilter node={node} column={column}/>
+                }
+                data.push(
+                    <div className="infoPanelRow" key={key}>
+                        <div className="infoPanelLabel">{label}</div>
+                        <div className="infoPanelValue">{value}</div>
+                    </div>
+                );
+            });
+
+            let actions = [
+                <ReactMUI.FlatButton
+                    label="Edit Meta"
+                    secondary={true}
+                    onClick={()=>{global.pydio.getController().fireAction("edit_user_meta");}}
+                />
+            ];
+
+            return (
+                <DetailPanes.InfoPanelCard title={"Metadata"} actions={actions}>
+                    {data}
+                </DetailPanes.InfoPanelCard>
+            );
+        }
+
+    });
 
     let ns = global.ReactMeta || {};
     ns.Renderer = Renderer;
+    ns.InfoPanel = InfoPanel;
     global.ReactMeta = ns;
 
 })(window);

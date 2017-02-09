@@ -21,6 +21,11 @@
 
 }
 
+.toolbar{
+  display: flex;
+  align-items: center;
+}
+
 #workspace_toolbar{
   background-color: @applicationPrimaryColor;
   display: flex;
@@ -136,6 +141,8 @@
 
 #info_panel{
 
+  @primary-bar-color:@infopanel_toolbar_buttons_bgcolor;
+
   position: absolute;
   width: 250px;
   right: 0;
@@ -143,85 +150,95 @@
   bottom: 0;
 
   font-weight: 400;
-  .ipanelCard{
+  .panelCard{
     background-color: #fafafa;
     margin: 10px !important;
     margin-bottom: 0;
     box-shadow: 0 1px 3px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.33);
     border-radius: 2px;
-    padding: 24px 16px 16px;
-    div.panelHeader{
+    .panelHeader{
+      padding: 24px 16px 16px;
       font-size: 24px;
       font-weight: 400;
-      padding: 0 0 12px 0;
-      span[data-ajxpAction]{
-        display: inline-block;
-        float: right;
-        font-size: 16px;
-        line-height: 23px;
-        color: #aeaeae;
-        cursor: pointer;
-        &.user_meta_change{
-          display:none !important;
+    }
+    .panelContent{
+      background-color: transparent;
+      padding-bottom: 0;
+      > div{
+        padding: 0 16px;
+      }
+      div.mimefont-container{
+        display: flex;
+        width: 100%;
+        height: 120px;
+        text-align: center;
+        align-items: center;
+        div.mimefont{
+          flex: 1;
+          color: @applicationPrimaryColor;
+          font-size: 74px;
+        }
+      }
+      div.bgCoverImage{
+        border-radius: 3px 3px 0 0 ;
+      }
+
+    }
+    .panelActions{
+      padding: 8px;
+      text-align: right;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+    }
+    .primaryToolbar{
+      padding: 16px 4px 16px !important;
+      background-color: @primary-bar-color;
+      align-items: flex-start;
+      .mui-flat-button{
+        min-width: 0;
+        .mui-flat-button-label{
+          color: white;
+          display: block;
+          padding: 0 5px;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          line-height: 19px;
+          span.button-icon{
+            span.button-icon-icon {
+              display: block;
+              font-size: 17px;
+              height: 24px;
+              line-height: 20px;
+            }
+            span.button-icon-label{
+              font-size: 13px;
+            }
+          }
+        }
+      }
+      .action-open_with{
+        .mui-flat-button-label{
+          > span{
+            > span{
+              display: none;
+              &.icon-caret-down{
+                display: inline-block;
+                margin-top: 26px;
+                margin-left: -5px;
+              }
+            }
+          }
+        }
+      }
+      .mui-menu{
+        position: absolute;
+        width: 230px;
+        right: 10px;
+        z-index: 2;
+        .mui-subheader{
+          height: 0;
         }
       }
     }
   }
 
-  .panelContent{
-    background-color: transparent;
-    div.toolbars{
-      background-color: @infopanel_toolbar_buttons_bgcolor;
-    }
-    div.one_has_many, div.one_or_less{
-      margin-top: 0;
-      background-color: @infopanel_toolbar_buttons_bgcolor;
-      border-radius: 0 0 2px 2px;
-      div.toolbar_placeholder{
-        margin-top: 8px !important;
-      }
-      a{
-        color: @infopanel_toolbar_buttons_color;
-        span.actionbar_button_label{
-          text-transform: uppercase;
-          font-weight: 400;
-        }
-        &:hover, &:hover span.ajxp_icon_span{
-          color: @infopanel_toolbar_buttons_color;
-        }
-      }
-    }
-    div.one_or_less{
-      margin-top: 8px;
-    }
-  }
-  div.infoPanelBasenameTitle{
-    display: none;
-  }
-  .infoPanelImagePreview{
-    .ipanelCard;
-    padding: 0;
-    div.bgCoverImage{
-      border-radius: 3px 3px 0 0 ;
-    }
-    margin: 0;
-    img.thumbnail_iconlike_shadow{
-      box-shadow: 0 0 0;
-    }
-    div.mimefont{
-      background-color: #fafafa;
-      display: block;
-      padding: 34px;
-    }
-  }
-  div.infoPanelAllMetadata > div{
-    .ipanelCard;
-    border: 0;
-  }
-  #ip_scroller_info_panel{
-    margin-top:45px;
-  }
-  div.infoPanelLabel, td.infoPanelLabel{
-    padding-bottom: 5px;
-  }
 }

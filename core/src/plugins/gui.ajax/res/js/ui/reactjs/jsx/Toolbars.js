@@ -273,6 +273,7 @@
         propTypes: {
             buttonTitle: React.PropTypes.string.isRequired,
             buttonClassName: React.PropTypes.string.isRequired,
+            className: React.PropTypes.string,
             menuItems: React.PropTypes.array.isRequired,
             onMenuClicked: React.PropTypes.func.isRequired
         },
@@ -287,7 +288,7 @@
 
         render: function(){
             return (
-                <span className="toolbars-button-menu">
+                <span className={"toolbars-button-menu " + (this.props.className ? this.props.className  : '')}>
                     <ReactMUI.IconButton
                         ref="menuButton"
                         tooltip={this.props.buttonTitle}
@@ -401,6 +402,7 @@
 
         propTypes:{
             buttonTitle: React.PropTypes.string.isRequired,
+            className: React.PropTypes.string,
             menuItems:React.PropTypes.array,
             selectionContext:React.PropTypes.string,
             toolbars:React.PropTypes.array.isRequired,
@@ -445,7 +447,7 @@
 
             }
             return (
-                <span id={this.props.id}>
+                <span id={this.props.id} className={this.props.className}>
                     {button}
                     <PopupMenu
                         ref="menu"
@@ -543,23 +545,43 @@
                         menuTitle = action.options.text;
                         menuIcon  = action.options.icon_class;
                     }
+                    let id = 'action-' + action.options.name;
+                    if(renderingType === 'button-icon'){
+                        menuTitle = <span className="button-icon"><span className={"button-icon-icon " + menuIcon}></span><span className="button-icon-label">{menuTitle}</span></span>;
+                    }
                     if(menuItems){
-                        if(renderingType === 'button'){
-                            actions.push(<ButtonMenu buttonTitle={menuTitle} menuItems={menuItems}/>);
+                        if(renderingType === 'button' || renderingType === 'button-icon'){
+                            actions.push(<ButtonMenu
+                                className={id}
+                                buttonTitle={menuTitle}
+                                menuItems={menuItems}/>);
                         }else{
-                            actions.push(<IconButtonMenu onMenuClicked={function(object){object.payload()}} buttonClassName={menuIcon} buttonTitle={menuTitle} menuItems={menuItems}/>);
+                            actions.push(<IconButtonMenu
+                                className={id}
+                                onMenuClicked={function(object){object.payload()}}
+                                buttonClassName={menuIcon}
+                                buttonTitle={menuTitle}
+                                menuItems={menuItems}/>);
                         }
                     }else{
                         let click = function(synthEvent){action.apply();};
-                        if(renderingType === 'button'){
-                            actions.push(<ReactMUI.FlatButton onClick={click} label={menuTitle}/>);
+                        if(renderingType === 'button' || renderingType === 'button-icon'){
+                            actions.push(<ReactMUI.FlatButton
+                                className={id}
+                                onClick={click}
+                                label={menuTitle}/>);
                         }else{
-                            actions.push(<ReactMUI.IconButton className={menuIcon} onClick={click} label={menuTitle}/>);
+                            actions.push(<ReactMUI.IconButton
+                                className={menuIcon + ' ' + id}
+                                onClick={click}
+                                label={menuTitle}/>);
                         }
                     }
                 });
             });
-            return <div id={this.props.id} style={{display:'flex'}}>{actions}</div>
+            let cName = this.props.className ? this.props.className : '';
+            cName += ' ' + 'toolbar';
+            return <div className={cName} id={this.props.id}>{actions}</div>
         }
 
     });

@@ -123,7 +123,7 @@
         
     }
     
-    let MessagesProviderMixin = {
+    let MessagesConsumerMixin = {
 
         childContextTypes: {
             messages:React.PropTypes.object,
@@ -190,10 +190,14 @@
                 let loader = function(){
                     if(!this.isMounted) return;
                     bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
-                    let element = (<div className="covering-bg-preview" style={{
+                    let style = {
                         backgroundImage:'url(' + bgUrl + ')',
                         backgroundSize : 'cover'
-                    }}></div>);
+                    };
+                    if(this.props.style){
+                        style = Object.assign(style, this.props.style);
+                    }
+                    let element = (<div className="covering-bg-preview" style={style}></div>);
                     this.setState({loading: false, element: element});
                 }.bind(this);
                 this.setState({loading: true});
@@ -389,7 +393,7 @@
 
     let MainFilesList = React.createClass({
 
-        mixins: [MessagesProviderMixin],
+        mixins: [MessagesConsumerMixin],
 
         propTypes: {
             pydio: React.PropTypes.instanceOf(Pydio)
@@ -672,7 +676,7 @@
 
     let SearchDatePanel = React.createClass({
 
-        mixins:[MessagesProviderMixin],
+        mixins:[MessagesConsumerMixin],
 
         recomputeStart: function(event, value){
             this.setState({startDate: value}, this.dateToChange);
@@ -1195,7 +1199,7 @@
 
     let FSTemplate = React.createClass({
 
-        mixins: [MessagesProviderMixin],
+        mixins: [MessagesConsumerMixin],
 
         propTypes: {
             pydio:React.PropTypes.instanceOf(Pydio)
@@ -1225,7 +1229,7 @@
                         </div>
                         <MainFilesList ref="list" {...this.props}/>
                     </div>
-                    <ReactPydio.LegacyUIWrapper {...this.props} id="info_panel" componentName="InfoPanel" componentOptions={{replaceScroller:true, skipActions:true, previewUseCoveringBg: true}}/>
+                    <DetailPanes.InfoPanel {...this.props} dataModel={this.props.pydio.getContextHolder()}/>
                     <EditionPanel {...this.props}/>
                     <span className="context-menu"><Toolbars.ContextMenu/></span>
                 </div>
@@ -1257,6 +1261,7 @@
     ns.EditionPanel = EditionPanel;
     ns.Breadcrumb = Breadcrumb;
     ns.SearchForm = SearchForm;
+    ns.FilePreview = FilePreview;
     global.WSComponents = ns;
 
 })(window);

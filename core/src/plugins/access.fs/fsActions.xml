@@ -1102,6 +1102,8 @@
 				</div>
 				]]></html>
 			</infoPanel>
+            <infoPanel attributes="" mime="generic_file" reactComponent="DetailPanes.GenericFile"/>
+            <infoPanel attributes="" mime="generic_dir" reactComponent="DetailPanes.GenericDir"/>
 			<infoPanel mime="generic_dir" theme="orbit" attributes="basename,icon,fonticon,formated_date,ajxp_description">
 				<messages>
 					<message key="name_string" id="133"/>
