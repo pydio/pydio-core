@@ -576,7 +576,7 @@
             }
             var multiAction = new Action({
                 name:'switch_display_mode',
-                icon_class:'icon-th-large',
+                icon_class:'mdi mdi-view-list',
                 text_id:150,
                 title_id:151,
                 text:MessageHash[150],
@@ -593,11 +593,11 @@
                 infoPanel:false
             }, {}, {}, {
                 staticItems:[
-                    {name:'List',title:227,icon_class:'icon-table',callback:function(){this.switchDisplayMode('list')}.bind(this),hasAccessKey:true,accessKey:'list_access_key'},
-                    {name:'Detail',title:461,src:'view_list_details.png',icon_class:'icon-th-list',callback:function(){this.switchDisplayMode('detail')}.bind(this),hasAccessKey:true,accessKey:'detail_access_key'},
-                    {name:'Thumbs',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-160')}.bind(this),hasAccessKey:true,accessKey:'thumbs_access_key'},
-                    {name:'Thumbs large',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-320')}.bind(this),hasAccessKey:false},
-                    {name:'Thumbs small',title:229,src:'view_icon.png',icon_class:'icon-th',callback:function(){this.switchDisplayMode('grid-80')}.bind(this),hasAccessKey:false}
+                    {name:'List',title:227,icon_class:'mdi mdi-view-list',callback:function(){this.switchDisplayMode('list')}.bind(this),hasAccessKey:true,accessKey:'list_access_key'},
+                    {name:'Detail',title:461,icon_class:'mdi mdi-view-headline',callback:function(){this.switchDisplayMode('detail')}.bind(this),hasAccessKey:true,accessKey:'detail_access_key'},
+                    {name:'Thumbs',title:229,icon_class:'mdi mdi-view-grid',callback:function(){this.switchDisplayMode('grid-160')}.bind(this),hasAccessKey:true,accessKey:'thumbs_access_key'},
+                    {name:'Thumbs large',title:229,icon_class:'mdi mdi-view-agenda',callback:function(){this.switchDisplayMode('grid-320')}.bind(this),hasAccessKey:false},
+                    {name:'Thumbs small',title:229,icon_class:'mdi mdi-view-module',callback:function(){this.switchDisplayMode('grid-80')}.bind(this),hasAccessKey:false}
                 ]
             });
             let buttons = new Map();

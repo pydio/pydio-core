@@ -1438,7 +1438,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
             var sortAction = new Action({
                 name:'sort_action',
-                icon_class:'icon-sort',
+                icon_class:'mdi mdi-sort-descending',
                 text_id:150,
                 title_id:151,
                 text:MessageHash[150],
@@ -1469,7 +1469,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         render: function(){
             if(this.props.displayMode === 'menu'){
                 return (
-                    <Toolbars.IconButtonMenu buttonTitle="Sort by..." buttonClassName="icon-sort" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
+                    <Toolbars.IconButtonMenu buttonTitle="Sort by..." buttonClassName="mdi mdi-sort-descending" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
                 );
             }else{
                 return (

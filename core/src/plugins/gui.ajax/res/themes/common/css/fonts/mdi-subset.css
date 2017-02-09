@@ -447,3 +447,79 @@
 .mdi-star-outline:before {
     content: "\f5c0";
 }
+
+.mdi-sort:before {
+    content: "\f5a8";
+}
+
+.mdi-sort-alphabetical:before {
+    content: "\f5a9";
+}
+
+.mdi-sort-ascending:before {
+    content: "\f5aa";
+}
+
+.mdi-sort-descending:before {
+    content: "\f5ab";
+}
+
+.mdi-sort-numeric:before {
+    content: "\f5ac";
+}
+
+.mdi-sort-variant:before {
+    content: "\f5ad";
+}
+
+.mdi-view-agenda:before {
+    content: "\f658";
+}
+
+.mdi-view-array:before {
+    content: "\f659";
+}
+
+.mdi-view-carousel:before {
+    content: "\f65a";
+}
+
+.mdi-view-column:before {
+    content: "\f65b";
+}
+
+.mdi-view-dashboard:before {
+    content: "\f65c";
+}
+
+.mdi-view-day:before {
+    content: "\f65d";
+}
+
+.mdi-view-grid:before {
+    content: "\f65e";
+}
+
+.mdi-view-headline:before {
+    content: "\f65f";
+}
+
+.mdi-view-list:before {
+    content: "\f660";
+}
+
+.mdi-view-module:before {
+    content: "\f661";
+}
+
+.mdi-view-quilt:before {
+    content: "\f662";
+}
+
+.mdi-view-stream:before {
+    content: "\f663";
+}
+
+.mdi-view-week:before {
+    content: "\f664";
+}
