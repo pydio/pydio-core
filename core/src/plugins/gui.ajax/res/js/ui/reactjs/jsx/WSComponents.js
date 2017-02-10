@@ -149,30 +149,57 @@
     let FilePreview = React.createClass({
 
         propTypes: {
-            node: React.PropTypes.instanceOf(AjxpNode),
-            noRichPreview: React.PropTypes.bool
+            node            : React.PropTypes.instanceOf(AjxpNode),
+            loadThumbnail   : React.PropTypes.bool,
+            richPreview     : React.PropTypes.bool
         },
 
         getInitialState: function(){
             return {loading: false, element: null}
         },
 
+        insertPreviewNode: function(previewNode){
+            this._previewNode = previewNode;
+            let containerNode = this.refs.container.getDOMNode();
+            containerNode.innerHTML = '';
+            containerNode.className='richPreviewContainer';
+            containerNode.appendChild(this._previewNode);
+        },
+
+        destroyPreviewNode: function(){
+            if(this._previewNode) {
+                this._previewNode.destroyElement();
+                if(this._previewNode.parentNode) {
+                    this._previewNode.parentNode.removeChild(this._previewNode);
+                }
+                this._previewNode = null;
+            }
+        },
+
         componentDidMount: function(){
             this.loadCoveringImage();
         },
 
+        componentWillUnmount: function(){
+            this.destroyPreviewNode();
+        },
+
         componentWillReceiveProps: function(nextProps){
             if(nextProps.node.getPath() !== this.props.node.getPath()){
+                this.destroyPreviewNode();
                 this.loadCoveringImage();
                 return;
             }
-            if(nextProps.noRichPreview !== this.props.noRichPreview && !nextProps.noRichPreview){
+            if(this._previewNode){
+                return;
+            }
+            if(nextProps.loadThumbnail !== this.props.loadThumbnail && nextProps.loadThumbnail){
                 this.loadCoveringImage(true);
             }
         },
 
         loadCoveringImage: function(force = false){
-            if(this.props.noRichPreview && !force){
+            if(!this.props.loadThumbnail && !force){
                 return;
             }
             let pydio = global.pydio, node = this.props.node;
@@ -182,10 +209,22 @@
             }
             let editor = editors[0];
             pydio.Registry.loadEditorResources(editors[0].resourcesManager);
-            var editorClass = Class.getByName(editors[0].editorClass);
-            if(editorClass.prototype.getCoveringBackgroundSource){
+            let editorClassName = editors[0].editorClass;
+            ResourcesManager.loadClassesAndApply([editorClassName], function(){
+                if(!global[editorClassName]){
+                    if(console) console.debug('Cannot load class ' + editorClassName);
+                    return;
+                }
+                this.loadPreviewFromEditor(global[editorClassName], node);
+            }.bind(this));
+
+        },
+
+        loadPreviewFromEditor: function(editorClass, node){
+
+            if(editorClass.getCoveringBackgroundSource || editorClass.prototype.getCoveringBackgroundSource){
                 let image = new Image();
-                let bgUrl = editorClass.prototype.getCoveringBackgroundSource(node);
+                let bgUrl = editorClass.getCoveringBackgroundSource ? editorClass.getCoveringBackgroundSource(node) : editorClass.prototype.getCoveringBackgroundSource(node);
 
                 let loader = function(){
                     if(!this.isMounted) return;
@@ -207,8 +246,18 @@
                 }else{
                     image.onload = loader();
                 }
+            }else if(this.props.richPreview){
+                if(editorClass.getPreviewComponent){
+                    this.setState({element: editorClass.getPreviewComponent(node, true)});
+                }else{
+                    this.insertPreviewNode(editorClass.prototype.getPreview(node, true));
+                }
             }
 
+        },
+
+        shouldComponentUpdate: function(){
+            return !!!this._previewNode;
         },
 
         render: function(){
@@ -221,14 +270,14 @@
             let svg = AbstractEditor.prototype.getSvgSource(node);
             let object;
             if(svg){
-                object = <div className="mimefont-container"><div className={"mimefont mdi mdi-" + svg}></div></div>;
+                object = <div ref="container" className="mimefont-container"><div className={"mimefont mdi mdi-" + svg}></div></div>;
             }else{
                 var src = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/ICON_SIZE", 64);
                 if(!src){
                     if(!node.isLeaf()) src = ResourcesManager.resolveImageSource('folder.png', "mimes/ICON_SIZE", 64);
                     else src = ResourcesManager.resolveImageSource('mime_empty.png', "mimes/ICON_SIZE", 64);
                 }
-                object = <img  src={src}/>
+                object = <div ref="container"><img  src={src}/></div>;
             }
 
             return object;
@@ -401,7 +450,7 @@
 
         statics: {
             tableEntryRenderCell: function(node){
-                return <span><FilePreview noRichPreview={true} node={node}/> {node.getLabel()}</span>;
+                return <span><FilePreview loadThumbnail={false} node={node}/> {node.getLabel()}</span>;
             }
         },
 
@@ -418,17 +467,10 @@
                 parentIsScrolling: this.props.parentIsScrolling
             }
         },
-
-        pydioResize: function(){
-            if(this.refs['list']){
-                this.refs['list'].updateInfiniteContainerHeight();
-            }
-            this.recomputeThumbnailsDimension();
-        },
-
+        
         recomputeThumbnailsDimension: function(nearest){
 
-            if(!nearest){
+            if(!nearest || nearest instanceof Event){
                 nearest = this.state.thumbNearest;
             }
             let containerWidth = this.refs['list'].getDOMNode().clientWidth;
@@ -465,8 +507,14 @@
                 this.setState({contextNode: this.props.pydio.getContextHolder().getContextNode()});
             }.bind(this);
             this.props.pydio.getContextHolder().observe("context_changed", this._contextObserver);
-            this.recomputeThumbnailsDimension();
             this.props.pydio.getController().updateGuiActions(this.getPydioActions());
+
+            this.recomputeThumbnailsDimension();
+            if(global.addEventListener){
+                global.addEventListener('resize', this.recomputeThumbnailsDimension);
+            }else{
+                global.attachEvent('onresize', this.recomputeThumbnailsDimension);
+            }
         },
 
         componentWillUnmount: function(){
@@ -474,10 +522,20 @@
             this.getPydioActions(true).map(function(key){
                 this.props.pydio.getController().deleteFromGuiActions(key);
             }.bind(this));
+            if(global.addEventListener){
+                global.removeEventListener('resize', this.recomputeThumbnailsDimension);
+            }else{
+                global.detachEvent('onresize', this.recomputeThumbnailsDimension);
+            }
         },
 
         entryRenderIcon: function(node, entryProps = {}){
-            return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
+            return (
+                <FilePreview
+                    loadThumbnail={!entryProps['parentIsScrolling']}
+                    node={node}
+                />
+            );
         },
 
         entryRenderActions: function(node){
@@ -655,7 +713,6 @@
                     sortKeys={sortKeys}
                     node={this.state.contextNode}
                     dataModel={this.props.pydio.getContextHolder()}
-                    externalResize={true}
                     className={className}
                     actionBarGroups={["change_main"]}
                     infiniteSliceCount={infiniteSliceCount}
@@ -1103,7 +1160,7 @@
                     return <div>{node.getPath()}</div>
                 };
                 renderIcon = function(node, entryProps = {}){
-                    return <FilePreview noRichPreview={!!entryProps['parentIsScrolling']} node={node}/>;
+                    return <FilePreview loadThumbnail={!entryProps['parentIsScrolling']} node={node}/>;
                 };
 
             }
@@ -1204,13 +1261,7 @@
         propTypes: {
             pydio:React.PropTypes.instanceOf(Pydio)
         },
-
-        pydioResize: function(){
-            if(this.refs['list']){
-                this.refs['list'].pydioResize();
-            }
-        },
-
+        
         render: function () {
             
             return (

@@ -8,3 +8,15 @@
 .video-js-box.vjs-fullscreen .vjs-big-play-button { z-index: 1024; }
 .video-js-box.vjs-fullscreen .vjs-subtitles { z-index: 1024; }
 .video-js-box .vjs-controls {z-index: 10001;}
+
+.richPreviewContainer .video-js-box{
+    margin-left:0 !important;
+}
+
+.richPreviewContainer .video-js-box video{
+    width: 100%;
+}
+
+.richPreviewContainer .video-js-box p{
+    display: none;
+}

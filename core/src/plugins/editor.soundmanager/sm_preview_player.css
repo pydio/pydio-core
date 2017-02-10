@@ -62,3 +62,7 @@
     margin: 0 auto;
     width: 242px;
 }
+
+.richPreviewContainer .ui360-vis .sm2-360ui{
+    margin-left: -10px !important;
+}
