@@ -366,6 +366,9 @@ Class.create("PydioUI", {
             if(parts[i].getAttribute("theme") && parts[i].getAttribute("theme") != ajxpBootstrap.parameters.get("theme")){
                 continue;
             }
+            if(parts[i].getAttribute("namespace") && parts[i].getAttribute("component")) {
+                continue;
+            }
             var ajxpId = parts[i].getAttribute("ajxpId");
             var ajxpClassName = parts[i].getAttribute("ajxpClass");
             var ajxpOptionsString = parts[i].getAttribute("ajxpOptions");

@@ -1,6 +1,6 @@
 (function(global){
 
-    var ProfilePane = React.createClass({
+    let ProfilePane = React.createClass({
 
         componentDidMount: function(){
             this.props.pydio.UI.disableAllKeyBindings();
@@ -95,7 +95,7 @@
 
     });
 
-    var WebDAVURL = React.createClass({
+    let WebDAVURL = React.createClass({
 
         propTypes:{
             url: React.PropTypes.string,
@@ -168,7 +168,7 @@
 
     });
 
-    var WebDAVPane = React.createClass({
+    let WebDAVPane = React.createClass({
 
         componentDidMount: function(){
             this.props.pydio.UI.disableAllKeyBindings();
@@ -284,9 +284,18 @@
 
     });
 
+    let Dashboard = React.createClass({
+        
+        render: function(){
+            return <ProfilePane {...this.props}/>;
+        }
+        
+    });
+    
     let ns = global.UserAccount || {};
     ns.ProfilePane = ProfilePane;
     ns.WebDAVPane = WebDAVPane;
+    ns.Dashboard = Dashboard;
     global.UserAccount = ns;
 
 

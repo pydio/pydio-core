@@ -1215,7 +1215,7 @@
             
             return (
                 <div className="react-mui-context vertical_layout vertical_fit react-fs-template">
-                    <LeftNavigation.PinnedLeftPanel {...this.props}/>
+                    <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
                     <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
                         <div id="workspace_toolbar">
                             <Breadcrumb {...this.props}/>

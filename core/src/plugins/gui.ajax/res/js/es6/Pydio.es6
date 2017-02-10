@@ -48,10 +48,18 @@ class Pydio extends Observable{
             return;
         }
 
-        if(window.PydioUI){
+        if(!window.useReactPydioUI){
+
             this.UI = new PydioUI(this);
+
+        }
+
+        /*
+        if(window.PydioUI){
+
+
         }else{
-            // FAKE CLASSE
+            // FAKE CLASS
             this.UI = {
                 guiLoaded: true,
                 modal: {
@@ -74,8 +82,12 @@ class Pydio extends Observable{
                 mountComponents: function(componentsNodes){}
             };
         }
+        */
+
+        let modal = this.UI && this.UI.modal ? this.UI.modal : (window.modal ? window.modal : null);
 
         this.observe("registry_loaded", function(){
+
             this.Registry.refreshExtensionsRegistry();
             this.Registry.logXmlUser(false);
             if(this.user){
@@ -106,12 +118,18 @@ class Pydio extends Observable{
             }
         }.bind(this));
 
-        if(this.UI.modal) this.UI.modal.setLoadingStepCounts(5);
+        if(modal) modal.setLoadingStepCounts(window.useReactPydioUI ? 1 : 5);
 
         var starterFunc = function(){
 
+            if(!this.UI && window.useReactPydioUI){
+                ResourcesManager.loadClassesAndApply(["React", "ReactUI"], function(){
+                    this.UI = new ReactUI.Builder(this);
+                }.bind(this));
+            }
+
             this.UI.initTemplates();
-            if(this.UI.modal) this.UI.modal.initForms();
+            this.UI.modal.initForms();
             this.UI.initObjects();
 
             if(!this.user) {
@@ -131,7 +149,7 @@ class Pydio extends Observable{
         if(this.Parameters.get("PRELOADED_REGISTRY")){
             this.Registry.loadFromString(this.Parameters.get("PRELOADED_REGISTRY"));
             this.Parameters.delete("PRELOADED_REGISTRY");
-            if(this.UI.modal) this.UI.modal.updateLoadingProgress('XML Registry loaded');
+            if(modal) modal.updateLoadingProgress('XML Registry loaded');
             starterFunc();
         }else{
             this.loadXmlRegistry(false, null, starterFunc);

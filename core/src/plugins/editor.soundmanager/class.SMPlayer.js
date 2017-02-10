@@ -111,6 +111,9 @@ if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager){
 }
 
 function hookToFilesList(){
+    if(!pydio.UI || !pydio.UI.getRegisteredComponentsByClassName){
+        return;
+    }
     var fLists = pydio.UI.getRegisteredComponentsByClassName("FilesList");
     if(!fLists.length){
         return;

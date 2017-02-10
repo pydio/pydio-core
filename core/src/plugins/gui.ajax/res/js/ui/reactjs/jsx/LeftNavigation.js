@@ -298,53 +298,57 @@
         }
     });
 
-    class AlertTask extends PydioTasks.Task{
+    if(global.PydioTasks){
 
-        constructor(label, statusMessage){
-            super({
-                id              : 'local-alert-task-' + Math.random(),
-                userId          : global.pydio.user.id,
-                wsId            : global.pydio.user.activeRepository,
-                label           : label,
-                status          : PydioTasks.Task.STATUS_PENDING,
-                statusMessage   : statusMessage,
-                className       : 'alert-task'
-            });
-        }
+        class AlertTask extends PydioTasks.Task{
 
-        show(){
-            this._timer = global.setTimeout(function(){
-                this.updateStatus(PydioTasks.Task.STATUS_COMPLETE);
-            }.bind(this), 7000);
-            PydioTasks.Store.getInstance().enqueueLocalTask(this);
-        }
+            constructor(label, statusMessage){
+                super({
+                    id              : 'local-alert-task-' + Math.random(),
+                    userId          : global.pydio.user.id,
+                    wsId            : global.pydio.user.activeRepository,
+                    label           : label,
+                    status          : PydioTasks.Task.STATUS_PENDING,
+                    statusMessage   : statusMessage,
+                    className       : 'alert-task'
+                });
+            }
 
-        updateStatus(status, statusMessage = ''){
-            this._internal['status'] = status;
-            this._internal['statusMessage'] = statusMessage;
-            this.notifyMainStore();
-        }
+            show(){
+                this._timer = global.setTimeout(function(){
+                    this.updateStatus(PydioTasks.Task.STATUS_COMPLETE);
+                }.bind(this), 7000);
+                PydioTasks.Store.getInstance().enqueueLocalTask(this);
+            }
 
-        notifyMainStore(){
-            PydioTasks.Store.getInstance().notify("tasks_updated");
-        }
+            updateStatus(status, statusMessage = ''){
+                this._internal['status'] = status;
+                this._internal['statusMessage'] = statusMessage;
+                this.notifyMainStore();
+            }
 
-        hasOpenablePane(){
-            return true;
-        }
-        openDetailPane(){
-            AlertTask.close();
-        }
+            notifyMainStore(){
+                PydioTasks.Store.getInstance().notify("tasks_updated");
+            }
 
-        static setCloser(click){
-            AlertTask.__CLOSER = click;
-        }
+            hasOpenablePane(){
+                return true;
+            }
+            openDetailPane(){
+                AlertTask.close();
+            }
 
-        static close(){
-            AlertTask.__CLOSER();
-        }
+            static setCloser(click){
+                AlertTask.__CLOSER = click;
+            }
 
+            static close(){
+                AlertTask.__CLOSER();
+            }
+
+        }
     }
+
 
 
 

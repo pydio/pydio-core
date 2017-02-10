@@ -47,6 +47,7 @@
             <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}'><![CDATA[
                 <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
 			]]></template_part>
+            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="UserDashboard" dependencies="ReactPydio,PydioTasks,LeftNavigation" props='{"rootId":"home_account_pane"}'/>
         </client_configs>
 	</registry_contributions>
     <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>

@@ -386,7 +386,7 @@
                 gettingStartedPanel = <TutorialPane closePane={this.closeGettingStarted} open={this.state.showGettingStarted}/>;
             }
             let a = this.props.controller.getActionByName('switch_to_settings');
-            if(!a.deny){
+            if(a && !a.deny){
                 let func = function(){
                     this.props.controller.fireAction('switch_to_settings');
                 }.bind(this);
@@ -732,7 +732,7 @@
             var simpleClickOpen = this.props.pydio.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
             var enableGettingStarted = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED");
             return (
-                <div className="horizontal_layout vertical_fit">
+                <div className="horizontal_layout vertical_fit" id={this.props.rootId}>
                     <div id="home_left_bar" className="vertical_layout">
                         <HomeWorkspaceUserCartridge style={{minHeight:'94px'}}
                             controller={this.props.pydio.getController()}

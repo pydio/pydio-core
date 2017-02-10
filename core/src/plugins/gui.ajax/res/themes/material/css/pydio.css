@@ -7896,6 +7896,13 @@ span.overlay-class-span.icon-bookmark-empty {
 .colorcode-folder {
   color: #ff796b;
 }
+body,
+#ajxp_desktop,
+#background-imager {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
 #orbit_content {
   -webkit-font-smoothing: antialiased;
   flex: 1;

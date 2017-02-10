@@ -44,5 +44,6 @@
             </div>
         ]]></template_part>
         <template_part ajxpClass="AjxpReactComponent" ajxpId="orbit_content" theme="material" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"FSTemplate","dependencies":["Toolbars","ReactPydio","LeftNavigation"]}'><![CDATA[]]></template_part>
+        <template_part ajxpId="orbit_content" theme="material" namespace="WSComponents" component="FSTemplate" dependencies="ReactPydio,Toolbars,PydioTasks,LeftNavigation" props="{}"/>
     </client_configs>
 </registry_contributions>
