@@ -431,7 +431,6 @@
                         primary={this.props.primary}
                         secondary={this.props.secondary}
                         disabled={this.props.disabled}
-                        primary={true}
                         label={label}
                         onClick={this.showMenu}
                     />
