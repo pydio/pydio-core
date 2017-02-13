@@ -1115,7 +1115,7 @@
             let cols = Object.keys(this.state.metaFields).map(function(k){
                 let label = this.state.metaFields[k].label;
                 if(this.state.metaFields[k].renderComponent){
-                    let fullProps = Object.assign(this.props, props, {label:label, fieldname: k});
+                    let fullProps = Object.assign(props, this.props, {label:label, fieldname: k});
                     return this.state.metaFields[k].renderComponent(fullProps);
                 }else{
                     let onChange = function(event){

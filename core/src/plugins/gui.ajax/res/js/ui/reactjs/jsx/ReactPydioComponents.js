@@ -97,14 +97,21 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             if(this.props.removable){
                 remove = <span className="button mdi mdi-close" onClick={this.removeClicked}></span>
             }
-            return connectDragSource(connectDropTarget(
-                <ReactMUI.Paper zDepth={1} style={{opacity:isDragging?0:1}}>
+            return (
+                <ReactMUI.Paper
+                    ref={instance => {
+                        connectDropTarget(ReactDOM.findDOMNode(instance));
+                        connectDragSource(ReactDOM.findDOMNode(instance));
+                    }}
+                    zDepth={1}
+                    style={{opacity:isDragging?0:1}}
+                >
                     <div className={this.props.className}>
                         {this.props.label}
                         {remove}
                     </div>
                 </ReactMUI.Paper>
-            ));
+            );
         }
     });
 
@@ -494,7 +501,10 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             if(global.ReactDND && this.props.connectDropTarget && this.props.connectDragSource){
                 let connectDragSource = this.props.connectDragSource;
                 let connectDropTarget = this.props.connectDropTarget;
-                connector = (instance) => connectDragSource(connectDropTarget(ReactDOM.findDOMNode(instance)));
+                connector = (instance) => {
+                    connectDragSource(ReactDOM.findDOMNode(instance));
+                    connectDropTarget(ReactDOM.findDOMNode(instance));
+                };
             }
             return (
                 <li ref={connector} className={"treenode" + this.props.node.getPath().replace(/\//g, '_')}>
@@ -1294,7 +1304,10 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             if(global.ReactDND && this.props.connectDragSource && this.props.connectDropTarget){
                 let connectDragSource = this.props.connectDragSource;
                 let connectDropTarget = this.props.connectDropTarget;
-                connector = (instance) => connectDragSource(connectDropTarget(ReactDOM.findDOMNode(instance)));
+                connector = (instance) => {
+                    connectDragSource(ReactDOM.findDOMNode(instance));
+                    connectDropTarget(ReactDOM.findDOMNode(instance));
+                };
             }
             return (
                 <div
@@ -1831,7 +1844,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             const shiftKey = e.shiftKey;
             const key = e.key;
 
-            if(contextHolder.isEmpty()) return;
+            if(contextHolder.isEmpty() || !this.indexedElements ) {
+                return;
+            }
             let downKeys = ['ArrowDown', 'ArrowRight', 'PageDown', 'End'];
 
             let position = (shiftKey && downKeys.indexOf(key) > -1) ? 'first' : 'last';
