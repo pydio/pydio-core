@@ -325,7 +325,7 @@
         },
 
         componentDidMount: function(){
-            this._nodesModelObserver = this.updateNodesFromModel.bind(this);
+            this._nodesModelObserver = this.updateNodesFromModel;
             this._nodesRemoveObserver = function(index){
                 this.updateNodesFromModel(null, index);
             }.bind(this);
@@ -702,7 +702,7 @@
 
                 sortKeys = this.state.columns;
                 elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES;
-                entryRenderSecondLine = this.entryRenderSecondLine.bind(this);
+                entryRenderSecondLine = this.entryRenderSecondLine;
 
             }
 
@@ -1107,10 +1107,10 @@
         render: function(){
             let columnsDesc;
             let props = {
-                fieldsFocused       : this.fieldsFocused.bind(this),
-                fieldsBlurred       : this.fieldsBlurred.bind(this),
-                fieldsKeyPressed    : this.fieldsKeyPressed.bind(this),
-                onChange            : this.updateFormValues.bind(this)
+                fieldsFocused       : this.fieldsFocused,
+                fieldsBlurred       : this.fieldsBlurred,
+                fieldsKeyPressed    : this.fieldsKeyPressed,
+                onChange            : this.updateFormValues
             };
             let cols = Object.keys(this.state.metaFields).map(function(k){
                 let label = this.state.metaFields[k].label;
@@ -1127,6 +1127,7 @@
                     return (
                         <ReactMUI.TextField
                             {...this.props}
+                            key={k}
                             onFocus={this.fieldsFocused}
                             onBlur={this.fieldsBlurred}
                             onKeyPress={this.fieldsKeyPressed}
@@ -1244,10 +1245,12 @@
             let segments = [];
             let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
             let rebuilt = '';
+            let i = 0;
             path.split('/').map(function(seg){
                 rebuilt += '/' + seg;
-                segments.push(<span className="separator"> / </span>);
-                segments.push(<span className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
+                segments.push(<span key={'bread_sep_' + i} className="separator"> / </span>);
+                segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
+                i++;
             }.bind(this));
             return <span className="react_breadcrumb"><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</span>
         }

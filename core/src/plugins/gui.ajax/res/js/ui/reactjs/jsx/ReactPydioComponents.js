@@ -1454,7 +1454,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 contextMenu:false,
                 infoPanel:false
             }, {}, {}, {
-                dynamicBuilder:this.buildSortingMenuItems.bind(this)
+                dynamicBuilder:this.buildSortingMenuItems
             });
             let buttons = new Map();
             buttons.set('sort_action', sortAction);

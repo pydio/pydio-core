@@ -779,7 +779,7 @@
                 }.bind(this);
             }
 
-            onClick = this.onClick.bind(this);
+            onClick = this.onClick;
 
             // Icons
             if (this.props.workspace.getAccessType() == "inbox") {

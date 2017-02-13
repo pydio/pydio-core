@@ -51,7 +51,7 @@
             inputValue: React.PropTypes.string,
             inputClassName: React.PropTypes.string,
             getMessage: React.PropTypes.func,
-            inputCopyMessage: React.PropTypes.object
+            inputCopyMessage: React.PropTypes.string
         },
 
         getInitialState: function(){
@@ -156,7 +156,10 @@
             let tplString ;
             let messKey = "61";
             let newlink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
-            let template = global.pydio.UI.getSharedPreviewTemplateForEditor(editors[0], this.props.node);
+            let template;
+            if(this.props.pydio.UI.getSharedPreviewTemplateForEditor){
+                template = this.props.pydio.UI.getSharedPreviewTemplateForEditor(editors[0], this.props.node);
+            }
             if(template){
                 tplString = template.evaluate({WIDTH:350, HEIGHT:350, DL_CT_LINK:newlink});
             }else{

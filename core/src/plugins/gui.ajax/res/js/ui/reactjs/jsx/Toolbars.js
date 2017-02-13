@@ -220,7 +220,7 @@
             }
         },
         componentDidMount: function(){
-            this._observer = this.hideMenu.bind(this);
+            this._observer = this.hideMenu;
         },
         componentWillUnmount: function(){
             document.removeEventListener('click', this._observer, false);
@@ -378,7 +378,7 @@
                 global.pydio.UI.contextMenu.destroy();
                 delete global.pydio.UI.contextMenu;
             }
-            this._modelOpen = this.modelOpen.bind(this);
+            this._modelOpen = this.modelOpen;
             ContextMenuModel.getInstance().observe("open", this._modelOpen);
         },
 
@@ -405,8 +405,8 @@
             className: React.PropTypes.string,
             menuItems:React.PropTypes.array,
             selectionContext:React.PropTypes.string,
-            toolbars:React.PropTypes.array.isRequired,
-            raised:React.PropTypes.boolean
+            toolbars:React.PropTypes.array,
+            raised:React.PropTypes.bool
         },
 
         showMenu: function(){
@@ -518,6 +518,7 @@
                     let menuItems = null;
                     let menuTitle = null;
                     let menuIcon  = null;
+                    let actionName = action.options.name;
 
                     if(barName === 'MORE_ACTION') {
                         let subItems = action.subMenuItems.dynamicItems;
@@ -551,11 +552,13 @@
                     if(menuItems){
                         if(renderingType === 'button' || renderingType === 'button-icon'){
                             actions.push(<ButtonMenu
+                                key={actionName}
                                 className={id}
                                 buttonTitle={menuTitle}
                                 menuItems={menuItems}/>);
                         }else{
                             actions.push(<IconButtonMenu
+                                key={actionName}
                                 className={id}
                                 onMenuClicked={function(object){object.payload()}}
                                 buttonClassName={menuIcon}
@@ -566,11 +569,13 @@
                         let click = function(synthEvent){action.apply();};
                         if(renderingType === 'button' || renderingType === 'button-icon'){
                             actions.push(<ReactMUI.FlatButton
+                                key={actionName}
                                 className={id}
                                 onClick={click}
                                 label={menuTitle}/>);
                         }else{
                             actions.push(<ReactMUI.IconButton
+                                key={actionName}
                                 className={menuIcon + ' ' + id}
                                 onClick={click}
                                 label={menuTitle}/>);

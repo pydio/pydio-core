@@ -170,6 +170,7 @@
                     <ReactPydio.AsyncComponent
                         {...tplData.DATA}
                         {...this.props}
+                        key={"ip_" + component}
                         namespace={namespace}
                         componentName={name}
                     />
