@@ -490,8 +490,14 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         />);
                 }.bind(this));
             }
+            let connector = (instance) => instance;
+            if(global.ReactDND && this.props.connectDropTarget && this.props.connectDragSource){
+                let connectDragSource = this.props.connectDragSource;
+                let connectDropTarget = this.props.connectDropTarget;
+                connector = (instance) => connectDragSource(connectDropTarget(ReactDOM.findDOMNode(instance)));
+            }
             return (
-                <li ref="node" className={"treenode" + this.props.node.getPath().replace(/\//g, '_')}>
+                <li ref={connector} className={"treenode" + this.props.node.getPath().replace(/\//g, '_')}>
                     {selfLabel}
                     <ul>
                         {children}
@@ -501,31 +507,12 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         }
     });
 
-    var WrappedTreeNode = React.createClass({
-        propTypes:{
-            connectDragSource: React.PropTypes.func.isRequired,
-            connectDropTarget: React.PropTypes.func.isRequired,
-            isDragging: React.PropTypes.bool.isRequired,
-            isOver: React.PropTypes.bool.isRequired,
-            canDrop: React.PropTypes.bool.isRequired
-        },
-
-        render: function () {
-            var connectDragSource = this.props.connectDragSource;
-            var connectDropTarget = this.props.connectDropTarget;
-
-            return connectDragSource(connectDropTarget(
-                <SimpleTreeNode {...this.props}/>
-            ));
-        }
-    });
-
     var DragDropTreeNode;
     if(global.ReactDND){
         DragDropTreeNode = ReactDND.flow(
             ReactDND.DragSource(Types.NODE_PROVIDER, nodeDragSource, collect),
             ReactDND.DropTarget(Types.NODE_PROVIDER, nodeDropTarget, collectDrop)
-        )(WrappedTreeNode);
+        )(SimpleTreeNode);
     }else{
         DragDropTreeNode = SimpleTreeNode;
     }
@@ -1303,12 +1290,20 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     additionalClassName += ' ajxp_mime_' + this.props.node.getAjxpMime() + ' ';
                 }
             }
+            let connector = (instance) => instance;
+            if(global.ReactDND && this.props.connectDragSource && this.props.connectDropTarget){
+                let connectDragSource = this.props.connectDragSource;
+                let connectDropTarget = this.props.connectDropTarget;
+                connector = (instance) => connectDragSource(connectDropTarget(ReactDOM.findDOMNode(instance)));
+            }
             return (
-                <div onClick={this.onClick}
-                     onDoubleClick={this.props.showSelector?null:this.onDoubleClick}
-                     onContextMenu={this.contextMenuNodeResponder}
-                     className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}
-                     style={this.props.style}>
+                <div
+                    ref={connector}
+                    onClick={this.onClick}
+                    onDoubleClick={this.props.showSelector?null:this.onDoubleClick}
+                    onContextMenu={this.contextMenuNodeResponder}
+                    className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}
+                    style={this.props.style}>
                     {selector}
                     <div className={"material-list-icon" + ((this.props.mainIcon || iconCell)?"":" material-list-icon-none")}>
                         {iconCell}
@@ -1327,35 +1322,12 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         }
     });
 
-    var WrappedListEntry = React.createClass({
-
-        propTypes:{
-            connectDragSource: React.PropTypes.func.isRequired,
-            connectDropTarget: React.PropTypes.func.isRequired,
-            isDragging: React.PropTypes.bool.isRequired,
-            isOver: React.PropTypes.bool.isRequired,
-            canDrop: React.PropTypes.bool.isRequired
-        },
-
-        render: function () {
-            // These two props are injected by React DnD,
-            // as defined by your `collect` function above:
-            var isDragging = this.props.isDragging;
-            var connectDragSource = this.props.connectDragSource;
-            var connectDropTarget = this.props.connectDropTarget;
-
-            return connectDragSource(connectDropTarget(
-                <ListEntry {...this.props}/>
-            ));
-        }
-    });
-
     var DragDropListEntry;
     if(global.ReactDND){
         var DragDropListEntry = ReactDND.flow(
             ReactDND.DragSource(Types.NODE_PROVIDER, nodeDragSource, collect),
             ReactDND.DropTarget(Types.NODE_PROVIDER, nodeDropTarget, collectDrop)
-        )(WrappedListEntry);
+        )(ListEntry);
     }else{
         DragDropListEntry = ListEntry;
     }

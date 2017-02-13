@@ -116,7 +116,7 @@
                         ref="autosuggest"
                         cache={true}
                         showWhen = {input => true }
-                        inputAttributes={inputAttributes}
+                        inputProps={inputAttributes}
                         suggestions={this.getSuggestions}
                         suggestionRenderer={this.renderSuggestion}
                         suggestionValue={this.suggestionValue}
