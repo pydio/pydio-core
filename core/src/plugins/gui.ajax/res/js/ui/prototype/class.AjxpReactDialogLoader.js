@@ -94,7 +94,7 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
             });
         }
         ResourcesManager.loadClassesAndApply(namespacesToLoad, function(){
-            this.reactComponent = React.render(
+            this.reactComponent = ReactDOM.render(
                 React.createElement(window[this.componentNamespace][this.componentName], this.options),
                 oForm.down('#'+this.rootNodeId));
         }.bind(this));
@@ -103,7 +103,7 @@ Class.create('AjxpReactDialogLoader', AjxpPane, {
     dialogWillClose: function(oForm){
         document.stopObserving("keydown", this._enterKeyEvent);
         this.reactComponent = null;
-        React.unmountComponentAtNode(oForm.down('#'+this.rootNodeId));
+        ReactDOM.unmountComponentAtNode(oForm.down('#'+this.rootNodeId));
     }
 
 });

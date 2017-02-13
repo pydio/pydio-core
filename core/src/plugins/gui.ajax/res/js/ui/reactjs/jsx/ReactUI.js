@@ -98,11 +98,11 @@
                         // Do not unmount / remount, just refresh
                         element.__REACT_COMPONENT.forceUpdate();
                     }else{
-                        React.unmountComponentAtNode(document.getElementById(existingId));
+                        ReactDOM.unmountComponentAtNode(document.getElementById(existingId));
                         this._componentsRegistry.delete(existingId);
                         element.__REACT_COMPONENT = null;
                         ResourcesManager.loadClassesAndApply(toMount.namespacesToLoad, function(){
-                            element.__REACT_COMPONENT = React.render(
+                            element.__REACT_COMPONENT = ReactDOM.render(
                                 React.createElement(window[toMount.namespace][toMount.componentName], toMount.props),
                                 element
                             );
@@ -110,7 +110,7 @@
                         }.bind(this));
                     }
                 }else {
-                    React.unmountComponentAtNode(element);
+                    ReactDOM.unmountComponentAtNode(element);
                     element.__REACT_COMPONENT = null;
                     this._componentsRegistry.delete(existingId);
                 }
@@ -126,7 +126,7 @@
 
                 let element = document.getElementById(newId);
                 ResourcesManager.loadClassesAndApply(toMount.namespacesToLoad, function(){
-                    element.__REACT_COMPONENT = React.render(
+                    element.__REACT_COMPONENT = ReactDOM.render(
                         React.createElement(window[toMount.namespace][toMount.componentName], toMount.props),
                         element
                     );

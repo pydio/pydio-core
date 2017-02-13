@@ -72,7 +72,7 @@
             if(!this.refs['copy-button']) {
                 return;
             }
-            this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
+            this._clip = new Clipboard(this.refs['copy-button'], {
                 text: function(trigger) {
                     return this.props.inputValue;
                 }.bind(this)
@@ -87,7 +87,7 @@
                 }else{
                     copyMessage = this.props.getMessage('143');
                 }
-                this.refs['input'].getDOMNode().focus();
+                this.refs['input'].focus();
                 this.setState({copyMessage:copyMessage}, this.clearCopyMessage);
             }.bind(this));
         },
@@ -332,6 +332,7 @@
 
             let actions = [
                 <ReactMUI.FlatButton
+                    key="edit-share"
                     label="Edit share"
                     secondary={true}
                     onClick={()=>{global.pydio.getController().fireAction("share-edit-shared");}}

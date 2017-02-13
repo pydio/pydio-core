@@ -202,7 +202,7 @@
 
         componentDidMount: function(){
             let dm = this.props.dataModel;
-            this._dmObs = this.nodeObserver.bind(this);
+            this._dmObs = this.nodeObserver;
             dm.observe("context_changed", this._dmObs);
             dm.observe("root_node_changed", this._dmObs);
             this.nodeObserver();
@@ -711,7 +711,7 @@
             var replacements = {
                 '%%OWNER%%': this.props.workspace.getOwner()
             };
-            React.render(
+            ReactDOM.render(
                 <Confirm
                     {...this.props}
                     mode={mode}
@@ -723,7 +723,7 @@
         },
 
         handleCloseAlert: function() {
-            React.unmountComponentAtNode(this.wrapper);
+            ReactDOM.unmountComponentAtNode(this.wrapper);
             this.wrapper.remove();
         },
 

@@ -674,7 +674,7 @@
                 this.uploadComplete(result);
                 global.formManagerHiddenIFrameSubmission = null;
             }.bind(this);
-            this.refs.uploadForm.getDOMNode().submit();
+            this.refs.uploadForm.submit();
         },
 
         onDrop: function(files, event, dropzone){
@@ -921,7 +921,7 @@
         },
 
         open: function() {
-            this.refs.fileInput.getDOMNode().click();
+            this.refs.fileInput.click();
         },
 
         onFolderPicked: function(e){
@@ -931,8 +931,8 @@
         },
 
         openFolderPicker: function(){
-            this.refs.folderInput.getDOMNode().setAttribute("webkitdirectory", "true");
-            this.refs.folderInput.getDOMNode().click();
+            this.refs.folderInput.setAttribute("webkitdirectory", "true");
+            this.refs.folderInput.click();
         },
 
         render: function() {

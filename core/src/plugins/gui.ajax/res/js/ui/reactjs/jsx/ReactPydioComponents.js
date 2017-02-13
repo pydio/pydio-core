@@ -822,7 +822,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
         componentDidMount(){
             if(window[this.props.componentName]){
-                var element = this.refs.wrapper.getDOMNode();
+                var element = this.refs.wrapper;
                 var options = this.props.componentOptions;
                 this.legacyComponent = new window[this.props.componentName](element, options);
                 if(this.props.onLoadCallback){
@@ -943,7 +943,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 this.editor = null;
             }
             if(this.state.editorData && this.state.editorData.formId && this.props.node){
-                var editorElement = $(this.refs.editor.getDOMNode()).down('#'+this.state.editorData.formId);
+                var editorElement = $(this.refs.editor).down('#'+this.state.editorData.formId);
                 if(editorElement){
                     var editorOptions = {
                         closable: false,
@@ -1314,9 +1314,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         {iconCell}
                     </div>
                     <div className="material-list-text">
-                        <div className="material-list-line-1">{this.props.firstLine}</div>
-                        <div className="material-list-line-2">{this.props.secondLine}</div>
-                        <div className="material-list-line-3">{this.props.thirdLine}</div>
+                        <div key="line-1" className="material-list-line-1">{this.props.firstLine}</div>
+                        <div key="line-2" className="material-list-line-2">{this.props.secondLine}</div>
+                        <div key="line-3" className="material-list-line-3">{this.props.thirdLine}</div>
                     </div>
                     <div className="material-list-actions">
                         {this.props.actions}
@@ -2156,7 +2156,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         },
 
         updateInfiniteContainerHeight: function(){
-            var containerHeight = this.refs.infiniteParent.getDOMNode().clientHeight;
+            var containerHeight = this.refs.infiniteParent.clientHeight;
             if(this.props.heightAutoWithMax){
                 var elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;
                 containerHeight = Math.min(this.props.node.getChildren().size * elementHeight ,this.props.heightAutoWithMax);
@@ -2236,6 +2236,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 this.updateElementHeightResponsive();
             }
             this.props.dataModel.observe('selection_changed', function(){
+                if(!this.isMounted()) return;
                 let selection = new Map();
                 this.props.dataModel.getSelectedNodes().map(function(n){
                     selection.set(n, true);
@@ -2529,10 +2530,11 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
             var rightButtons = [<ReactMUI.FontIcon
                 key={1}
-                        tooltip="Reload"
-                        className={"icon-refresh" + (this.state.loading?" rotating":"")}
-                        onClick={this.reload}
+                tooltip="Reload"
+                className={"icon-refresh" + (this.state.loading?" rotating":"")}
+                onClick={this.reload}
             />];
+            let i = 2;
             if(this.props.sortKeys){
 
                 let sortingInfo, remoteSortingInfo = this.remoteSortingInfo();
@@ -2542,11 +2544,13 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     sortingInfo = this.state?this.state.sortingInfo:null;
                 }
                 rightButtons.push(<SortColumns
+                    key={i}
                     displayMode="menu"
                     tableKeys={this.props.sortKeys}
                     columnClicked={this.onColumnSort}
                     sortingInfo={sortingInfo}
                 />);
+                i++;
             }
             if(this.props.additionalActions){
                 rightButtons.push(this.props.additionalActions);
@@ -2678,8 +2682,8 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">
                         <Infinite
                             elementHeight={this.state.elementHeight?this.state.elementHeight:this.props.elementHeight}
-                            containerHeight={this.state.containerHeight}
-                            infiniteLoadBeginBottomOffset={this.state.infiniteLoadBeginBottomOffset}
+                            containerHeight={this.state.containerHeight ? this.state.containerHeight : 1}
+                            infiniteLoadBeginEdgeOffset={this.state.infiniteLoadBeginBottomOffset}
                             onInfiniteLoad={this.handleInfiniteLoad}
                             handleScroll={this.onScroll}
                             ref="infinite"

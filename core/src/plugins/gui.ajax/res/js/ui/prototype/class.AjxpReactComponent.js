@@ -36,7 +36,7 @@ Class.create('AjxpReactComponent', AjxpPane, {
         props['pydio'] = pydio;
         props['pydioId'] = htmlElement.id;
         ResourcesManager.loadClassesAndApply(namespacesToLoad, function(){
-            this.reactComponent = React.render(
+            this.reactComponent = ReactDOM.render(
                 React.createElement(window[options.componentNamespace][options.componentName], props),
                 $(htmlElement)
             );
@@ -45,7 +45,7 @@ Class.create('AjxpReactComponent', AjxpPane, {
 
     destroy: function($super){
         this.reactComponent = null;
-        React.unmountComponentAtNode(this.htmlElement);
+        ReactDOM.unmountComponentAtNode(this.htmlElement);
         $super();
     },
 

@@ -133,14 +133,14 @@ Class.create("PydioUI", {
                 }
                 if(namespace){
                     ResourcesManager.loadClassesAndApply([namespace], function(){
-                        React.render(
+                        ReactDOM.render(
                             React.createElement(window[namespace][compName], {}),
                             hookElement
                         )
                     });
                 }else{
                     ResourcesManager.loadClassesAndApply([compName], function(){
-                        React.render(
+                        ReactDOM.render(
                             React.createElement(window[compName], {}),
                             hookElement
                         )

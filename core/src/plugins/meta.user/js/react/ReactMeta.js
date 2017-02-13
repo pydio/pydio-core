@@ -272,6 +272,7 @@
 
             let actions = [
                 <ReactMUI.FlatButton
+                    key="edit"
                     label="Edit Meta"
                     secondary={true}
                     onClick={()=>{global.pydio.getController().fireAction("edit_user_meta");}}

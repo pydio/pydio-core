@@ -95,7 +95,7 @@
             if(blur){
                 this.setState({showComplete: false}, function(){
                     global.setTimeout(function(){
-                        this.refs['autosuggest'].refs['input'].getDOMNode().blur();
+                        this.refs['autosuggest'].refs['input'].blur();
                     }.bind(this), 10);
                 });
             }

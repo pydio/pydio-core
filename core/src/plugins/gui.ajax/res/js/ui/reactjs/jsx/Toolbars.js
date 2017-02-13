@@ -279,7 +279,7 @@
         },
 
         collectElements: function(){
-            return [this.refs['menuButton'].getDOMNode()];
+            return [ReactDOM.findDOMNode(this.refs['menuButton'])];
         },
 
         showMenu: function(){
@@ -401,7 +401,7 @@
     const ButtonMenu = React.createClass({
 
         propTypes:{
-            buttonTitle: React.PropTypes.string.isRequired,
+            buttonTitle: React.PropTypes.oneOfType([React.PropTypes.string,React.PropTypes.object]).isRequired,
             className: React.PropTypes.string,
             menuItems:React.PropTypes.array,
             selectionContext:React.PropTypes.string,
@@ -470,6 +470,7 @@
 
         componentDidMount: function(){
             this._observer = function(){
+                if(!this.isMounted()) return;
                 this.setState({
                     groups:this.props.controller.getToolbarsActions(this.props.toolbars, this.props.groupOtherList)
                 });

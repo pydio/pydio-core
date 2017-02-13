@@ -160,7 +160,7 @@
 
         insertPreviewNode: function(previewNode){
             this._previewNode = previewNode;
-            let containerNode = this.refs.container.getDOMNode();
+            let containerNode = this.refs.container;
             containerNode.innerHTML = '';
             containerNode.className='richPreviewContainer';
             containerNode.appendChild(this._previewNode);
@@ -473,7 +473,7 @@
             if(!nearest || nearest instanceof Event){
                 nearest = this.state.thumbNearest;
             }
-            let containerWidth = this.refs['list'].getDOMNode().clientWidth;
+            let containerWidth = ReactDOM.findDOMNode(this.refs['list']).clientWidth;
 
             // Find nearest dim
             let blockNumber = Math.floor(containerWidth / nearest);
@@ -1131,7 +1131,7 @@
                             onFocus={this.fieldsFocused}
                             onBlur={this.fieldsBlurred}
                             onKeyPress={this.fieldsKeyPressed}
-                            floatingLabelText={label}
+                            floatingLabelText={label instanceof String ? label : 'STRANGE LABEL NOT STRING HERE - WSComponent 1134'}
                             onChange={onChange}
                         />);
                 }

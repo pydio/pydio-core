@@ -1,10 +1,10 @@
 {
   "name": "gui.ajax",
-  "version": "6.5.1",
+  "version": "8.0.0",
   "description": "",
   "main": "index.js",
   "source_path":"res/js",
-  "css_path":"res/themes/orbit/css",
+  "css_path":"res/themes/common/css",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,19 +12,21 @@
   "license": "AGPL-v3",
   "dependencies": {
     "chart.js": "^1.0.2",
+    "react": "0.14.8",
+    "react-dom": "^0.14.3",
+    "react-addons-css-transition-group": "^0.14.8",
+    "react-addons-pure-render-mixin": "^0.14.8",
+    "react-addons-update": "^0.14.8",
+    "react-chartjs": "^0.8.0",
+    "react-grid-layout": "^0.10.0",
+    "react-infinite": "^0.7.1",
     "material-ui": "git://github.com/pydio/material-ui.git#pydio",
-    "react": "0.13.3",
-    "react-chartjs": "git://github.com/dehbmarques/react-chartjs.git#master",
-    "react-grid-layout": "^0.8.5",
-    "react-infinite": "^0.3.4",
     "reactify": "^1.1.1",
     "react-select": "^0.6.5",
     "react-dnd": "^1.1.5",
-    "react-tap-event-plugin": "0.1.7",
+    "react-autosuggest": "2.1.0",
     "lodash": "^3.10.1",
     "classnames": "~2.1.3",
-    "react-autosuggest": "1.18.2",
-    "react-mfb":"0.2.1",
     "clipboard":"^1.5.8",
     "qrcode.react":"0.6.1",
     "cronstrue":"0.3.1",
@@ -41,6 +43,7 @@
     "grunt-run":"~0.5.2",
     "grunt-contrib-cssmin":"~0.14.0",
     "assemble-less": "~0.7.0",
-    "less-plugin-autoprefix": "~1.5.1"
+    "less-plugin-autoprefix": "~1.5.1",
+    "envify": "3.4.0"
   }
 }
