@@ -1563,7 +1563,6 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     iconCell={null}
                     firstLine={cells}
                     actions={actions}
-                    key={'list-' + this.props.key}
                 />
             );
 
@@ -1639,8 +1638,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     secondLine={secondLine}
                     thirdLine={thirdLine}
                     actions={actions}
-                    key={'list-' + this.props.key}
-                    />
+                />
             );
 
         }

@@ -123,7 +123,7 @@
         render: function(){
             let value = this.state.value;
             let stars = [0,1,2,3,4].map(function(v){
-                return <span onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
+                return <span key={"star-" + v} onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
             }.bind(this));
             return (
                 <div className="advanced-search-stars">
@@ -142,7 +142,7 @@
         render: function(){
             let value = this.getRealValue() || 0;
             let stars = [0,1,2,3,4].map(function(v){
-                return <span className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
+                return <span key={"star-" + v} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
             });
             return <span>{stars}</span>;
         }
@@ -235,7 +235,7 @@
                 let removeTag = function(){
                     console.debug("Remove tag " + tag);
                 };
-                return <span className="meta_user_tag_block">{tag} <span className="mdi mdi-close" onClick={removeTag}></span></span>;
+                return <span key={tag} className="meta_user_tag_block">{tag} <span className="mdi mdi-close" onClick={removeTag}></span></span>;
             });
             return <span>{tags}</span>;
         }

@@ -557,7 +557,7 @@
             let content = null;
             if(node.getMetadata().get('overlay_class')){
                 let elements = node.getMetadata().get('overlay_class').split(',').map(function(c){
-                    return <span className={c + ' overlay-class-span'}></span>;
+                    return <span key={c} className={c + ' overlay-class-span'}></span>;
                 });
                 content = <div className="overlay_icon_div">{elements}</div>;
             }
@@ -583,7 +583,7 @@
             let metaData = node.getMetadata();
             let pieces = [];
             if(metaData.get("ajxp_description")){
-                pieces.push(<span className="metadata_chunk metadata_chunk_description">{metaData.get('ajxp_description')}</span>);
+                pieces.push(<span key="ajxp_description" className="metadata_chunk metadata_chunk_description">{metaData.get('ajxp_description')}</span>);
             }
 
             var first = false;
@@ -616,7 +616,7 @@
                     sep = <span className="icon-angle-right"></span>;
                 }
                 let cellClass = 'metadata_chunk metadata_chunk_standard metadata_chunk_' + s;
-                pieces.push(<span className={cellClass}>{sep}<span className="text_label">{label}</span></span>);
+                pieces.push(<span key={s} className={cellClass}>{sep}<span className="text_label">{label}</span></span>);
             }
             return pieces;
 
@@ -1048,7 +1048,7 @@
         },
 
         parseMetaColumns(){
-            let metaFields = {basename:{label:'Filename'}}, searchMode = 'remote', registry = this.props.pydio.getXmlRegistry();
+            let metaFields = {basename:'Filename'}, searchMode = 'remote', registry = this.props.pydio.getXmlRegistry();
             // Parse client configs
             let options = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'client_configs/template_part[@ajxpClass="SearchEngine" and @theme="material"]/@ajxpOptions'));
             if(options && options.metaColumns){
@@ -1078,7 +1078,7 @@
                 if(indexerOptions && indexerOptions.additional_meta_columns){
                     Object.keys(indexerOptions.additional_meta_columns).map(function(aKey){
                         if(!metaFields[aKey]) {
-                            metaFields[aKey] = {label:indexerOptions.additional_meta_columns};
+                            metaFields[aKey] = {label:indexerOptions.additional_meta_columns[aKey]};
                         }
                     });
                 }
@@ -1126,12 +1126,11 @@
                     }.bind(this);
                     return (
                         <ReactMUI.TextField
-                            {...this.props}
                             key={k}
                             onFocus={this.fieldsFocused}
                             onBlur={this.fieldsBlurred}
                             onKeyPress={this.fieldsKeyPressed}
-                            floatingLabelText={label instanceof String ? label : 'STRANGE LABEL NOT STRING HERE - WSComponent 1134'}
+                            floatingLabelText={label}
                             onChange={onChange}
                         />);
                 }
