@@ -1918,7 +1918,8 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 loading: !this.props.node.isLoaded(),
                 showSelector:false,
                 elements: this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
-                containerHeight:this.props.heightAutoWithMax?0:500
+                containerHeight:this.props.heightAutoWithMax?0:500,
+                filterNodes:this.props.filterNodes
             };
             if(this.props.defaultGroupBy){
                 state.groupBy = this.props.defaultGroupBy;
@@ -1932,14 +1933,14 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
         componentWillReceiveProps: function(nextProps) {
             this.indexedElements = null;
-            if(nextProps.filterNodes) this.props.filterNodes = nextProps.filterNodes;
             var currentLength = Math.max(this.state.elements.length, nextProps.infiniteSliceCount);
             this.setState({
                 loaded: nextProps.node.isLoaded(),
                 loading:!nextProps.node.isLoaded(),
                 showSelector:false,
                 elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
-                infiniteLoadBeginBottomOffset:200
+                infiniteLoadBeginBottomOffset:200,
+                filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes
             });
             if(!nextProps.autoRefresh&& this.refreshInterval){
                 global.clearInterval(this.refreshInterval);
@@ -2084,7 +2085,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             }else{
                 var selection = new Map();
                 this.props.node.getChildren().forEach(function(child){
-                    if(this.props.filterNodes && !this.props.filterNodes(child)){
+                    if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
                         return;
                     }
                     if(child.isLeaf()){
@@ -2399,7 +2400,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                         var childCursor = parseInt(child.getMetadata().get('cursor'));
                         this._currentCursor = Math.max((this._currentCursor ? this._currentCursor : 0), childCursor);
                     }
-                    if(this.props.filterNodes && !this.props.filterNodes(child)){
+                    if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
                         return;
                     }
                     var nodeActions = this.getActionsForNode(this.dm, child);
