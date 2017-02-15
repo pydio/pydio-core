@@ -33,21 +33,6 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-						var path;
-						if(window.actionArguments && window.actionArguments.length>0){
-							path = window.actionArguments[0];
-							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
-						}else{
-							userSelection = ajaxplorer.getUserSelection();
-							if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
-								path = userSelection.getUniqueNode();
-							}
-						}
-						if(path){
-							ajaxplorer.updateContextData(path);
-						}
-						]]></clientCallback>
 					<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>

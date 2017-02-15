@@ -27,6 +27,7 @@
             <i18n namespace="share_center" path="plugins/action.share/res/i18n"/>
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
+            <js file="plugins/action.share/res/build/model/ShareActions.js" className="ShareActions"/>
             <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
@@ -41,14 +42,7 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!pydio.getController().shareDialogLoader) {
-                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                                selection:pydio.getUserSelection()
-                            });
-                        }
-                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.share" prepareModal="true"/>
                     <clientForm id="react_share_form"><![CDATA[
                         <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>
@@ -60,14 +54,7 @@
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(!pydio.getController().shareDialogLoader) {
-                            pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                                selection:pydio.getUserSelection()
-                            });
-                        }
-                        pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.editShare" prepareModal="true"/>
                 </processing>
             </action>
             <action name="share">
@@ -154,16 +141,7 @@
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var dataModel;
-                        if(window.actionArguments && window.actionArguments.length){
-                            dataModel = window.actionArguments[0];
-                        }else if(window.actionManager){
-                            dataModel = window.actionManager.getDataModel();
-                        }
-                        var dialog = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {selection:dataModel, readonly:true});
-                        dialog.openDialog('react_share_form', true);
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.editFromList" prepareModal="true"/>
                     <clientForm id="react_share_form"><![CDATA[
                         <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>
@@ -174,11 +152,7 @@
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        if(window.actionManager){
-                            window.actionManager.getDataModel().requireContextChange(window.actionManager.getDataModel().getRootNode(), true);
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.loadList" prepareModal="true"/>
                 </processing>
                 <processing>
                     <serverCallback restParams="/" methodName="switchAction" sdkMethodName="loadShareList">
@@ -195,18 +169,7 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-						var conn = new Connexion();
-						conn.addParameter("get_action", "sharelist-clearExpired");
-						var dm = window.actionManager.getDataModel();
-						conn.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                            if(window.actionManager){
-                                dm.requireContextChange(dm.getRootNode(), true);
-                            }
-						};
-						conn.sendAsync();
-					]]></clientCallback>
+                    <clientCallback module="ShareActions.Callbacks.clearExpired" prepareModal="true"/>
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
                 </processing>
             </action>

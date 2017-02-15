@@ -9,6 +9,7 @@
     <client_settings>
         <resources>
             <i18n namespace="skeleton" path="plugins/action.skeleton/res/i18n"/>
+            <js className="SkeletonActions" file="plugins/action.skeleton/res/build/SkeletonActions.js"/>
             <img_library alias="skeleton_images" path="plugins/action.skeleton/res/images"/>
         </resources>
     </client_settings>
@@ -28,13 +29,7 @@
                     <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
-                        var confs = ajaxplorer.getPluginConfigs("ajxp_plugin[@name='skeleton']");
-                        var target = confs.get('CUSTOM_BUTTON_TARGET');
-                        if(window.confirm(MessageHash['skeleton.3'].replace('%s', target))){
-                            window.open(target, "my_popup");
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="SkeletonActions.Callbacks.alertButton" prepareModal="false"/>
                 </processing>
             </action>
             <action name="my_skeleton_button_frame">
@@ -42,17 +37,7 @@
                     <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var dialogLoadFunction = function(){
-                            var conn = new Connexion();
-                            conn.addParameter("get_action", "my_skeleton_button_frame");
-                            conn.onComplete = function(transport){
-                                $('loaded_content').update(transport.responseText);
-                            }
-                            conn.sendAsync();
-                        };
-                        modal.showDialogForm("My Link", "my_skeleton_form", dialogLoadFunction);
-                    ]]></clientCallback>
+                    <clientCallback module="SkeletonActions.Callbacks.frameButton" prepareModal="true"/>
                     <clientForm id="my_skeleton_form"><![CDATA[
                         <div id="my_skeleton_form" box_width="450">
                             <h3>AJXP_MESSAGE[skeleton.6]</h3>
