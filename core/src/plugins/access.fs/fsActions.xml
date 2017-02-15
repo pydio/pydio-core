@@ -201,45 +201,7 @@
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <subMenu>
-                <dynamicBuilder><![CDATA[
-                    var context = window.builderContext;
-                    context.builderMenuItems = $A([]);
-                    var node = pydio.getUserSelection().getUniqueNode();
-                    var selectedMime = getAjxpMimeType(node);
-                    var nodeHasReadonly = node.getMetadata().get("ajxp_readonly") === "true";
-                    var editors = pydio.Registry.findEditorsForMime(selectedMime);
-                    if(editors.length){
-                        var index = 0;
-                        var sepAdded = false;
-                        editors.each(function(el){
-                            if(!el.openable) return;
-                            if(el.write && nodeHasReadonly) return;
-                            if(el.mimes.include('*')){
-                                if(!sepAdded && index > 0){
-                                    context.builderMenuItems.push({separator:true});
-                                }
-                                sepAdded = true;
-                            }
-                            context.builderMenuItems.push({
-                                name:el.text,
-                                alt:el.title,
-                                isDefault : (index == 0),
-                                image:ResourcesManager.resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
-                                icon_class: el.icon_class,
-                                callback:function(e){this.apply([el]);}.bind(context)
-                            } );
-                            index++;
-                        } );
-                    }
-                    if(!index){
-                        context.builderMenuItems.push({
-                            name:MessageHash[324],
-                            alt:MessageHash[324],
-                            image:ResourcesManager.resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
-                            callback:function(e){}
-                        } );
-                    }
-                ]]></dynamicBuilder>
+                <dynamicBuilder module="FSActions.Listeners.openWithDynamicBuilder"/>
             </subMenu>
             <processing>
                 <clientCallback module="FSActions.Callbacks.openInEditor" prepareModal="false"/>

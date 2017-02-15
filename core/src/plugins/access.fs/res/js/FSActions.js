@@ -444,7 +444,7 @@
         }
 
         static openInEditor(manager, otherArguments){
-            var editorData = otherArguments[0];
+            var editorData = otherArguments && otherArguments.length ? otherArguments[0] : null;
             pydio.UI.openCurrentSelectionInEditor(editorData);
         }
         
@@ -535,6 +535,49 @@
                 this.setIconSrc('editcopy.png');
             }
         }
+        
+        static openWithDynamicBuilder(){
+
+            let builderMenuItems = [];
+            var node = pydio.getUserSelection().getUniqueNode();
+            var selectedMime = PathUtils.getAjxpMimeType(node);
+            var nodeHasReadonly = node.getMetadata().get("ajxp_readonly") === "true";
+            var editors = pydio.Registry.findEditorsForMime(selectedMime);
+            if(editors.length){
+                var index = 0;
+                var sepAdded = false;
+                editors.each(function(el){
+                    if(!el.openable) return;
+                    if(el.write && nodeHasReadonly) return;
+                    if(el.mimes.include('*')){
+                        if(!sepAdded && index > 0){
+                            builderMenuItems.push({separator:true});
+                        }
+                        sepAdded = true;
+                    }
+                    builderMenuItems.push({
+                        name:el.text,
+                        alt:el.title,
+                        isDefault : (index == 0),
+                        image:ResourcesManager.resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
+                        icon_class: el.icon_class,
+                        callback:function(e){this.apply([el]);}.bind(this)
+                    });
+                    index++;
+                });
+            }
+            if(!index){
+                builderMenuItems.push({
+                    name:MessageHash[324],
+                    alt:MessageHash[324],
+                    image:ResourcesManager.resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
+                    callback:function(e){}
+                } );
+            }
+            return builderMenuItems;
+            
+        }
+        
     }
 
     let ns = global.FSActions || {};

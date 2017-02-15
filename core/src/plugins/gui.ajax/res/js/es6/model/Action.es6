@@ -124,7 +124,9 @@ class Action extends Observable{
 			}
 			if(this.subMenuItems.dynamicItems || this.subMenuItems.dynamicBuilderCode){
 				this.prepareSubmenuDynamicBuilder();
-			}
+			}else if(this.subMenuItems.dynamicBuilderModule){
+                ResourcesManager.detectModuleToLoadAndApply(this.subMenuItems.dynamicBuilderModule, this.prepareSubmenuDynamicBuilder.bind(this));
+            }
 		}
 		if(this.options.listeners['init']){				
 			try{
@@ -543,7 +545,11 @@ class Action extends Observable{
 							}
 						}
 					}else if(node.childNodes[j].nodeName == "dynamicBuilder"){
-						this.subMenuItems.dynamicBuilderCode = node.childNodes[j].firstChild.nodeValue;
+                        if(node.childNodes[j].getAttribute("module")){
+                            this.subMenuItems.dynamicBuilderModule = node.childNodes[j].getAttribute("module");
+                        }else{
+    						this.subMenuItems.dynamicBuilderCode = node.childNodes[j].firstChild.nodeValue;
+                        }
 					}
 				}
 			}
@@ -592,11 +598,13 @@ class Action extends Observable{
 		this.subMenuItems.dynamicBuilder = function(protoMenu){
             let builderFunction = function(){
                 var menuItems;
-				if(this.subMenuItems.dynamicBuilderCode){
-					window.builderContext = this;
+				if(this.subMenuItems.dynamicBuilderCode) {
+                    window.builderContext = this;
                     window.builderProtoMenu = protoMenu;
-					this._evalScripts(this.subMenuItems.dynamicBuilderCode);
-					menuItems = this.builderMenuItems || [];
+                    this._evalScripts(this.subMenuItems.dynamicBuilderCode);
+                    menuItems = this.builderMenuItems || [];
+                }else if(this.subMenuItems.dynamicBuilderModule){
+                    menuItems = LangUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window).apply(this);
 				}else{
 			  		menuItems = [];
 			  		this.subMenuItems.dynamicItems.forEach(function(item){

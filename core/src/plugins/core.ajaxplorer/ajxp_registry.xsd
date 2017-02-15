@@ -112,7 +112,11 @@
             </xs:choice>
         </xs:complexType>
     </xs:element>
-    <xs:element name="dynamicBuilder" type="xs:string"/>
+    <xs:element name="dynamicBuilder">
+        <xs:complexType>
+            <xs:attribute name="module" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="post_processing">
         <xs:complexType>
             <xs:sequence>
