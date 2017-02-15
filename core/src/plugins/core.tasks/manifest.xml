@@ -54,6 +54,7 @@
             <template name="pydio-tasks-panel" element="ajxp_desktop" position="bottom"><![CDATA[
                 <div id="tasks_panel" class="react-mui-context" ajxpClass="AjxpReactComponent" ajxpOptions='{"componentNamespace":"PydioTasks","componentName":"Panel"}'></div>
             ]]></template>
+            <template_part ajxpId="tasks_panel" theme="material" namespace="PydioTasks" component="Panel" dependencies="" props="{}"/>
         </client_configs>
     </registry_contributions>
 </ajxp_plugin>

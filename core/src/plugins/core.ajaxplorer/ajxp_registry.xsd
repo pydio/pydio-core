@@ -493,9 +493,15 @@
     <xs:element name="template_part">
         <xs:complexType mixed="true">
             <xs:attribute name="theme" use="optional" type="xs:NCName"/>
-            <xs:attribute name="ajxpClass" use="required" type="xs:NCName"/>
             <xs:attribute name="ajxpId" use="required" type="xs:NCName"/>
-            <xs:attribute name="ajxpOptions" use="required"/>
+            <!-- legacy components -->
+            <xs:attribute name="ajxpClass" type="xs:NCName"/>
+            <xs:attribute name="ajxpOptions" />
+            <!-- react components -->
+            <xs:attribute name="component" type="xs:NCName"/>
+            <xs:attribute name="namespace" type="xs:NCName"/>
+            <xs:attribute name="dependencies" type="xs:NCName"/>
+            <xs:attribute name="props" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="hooks">
