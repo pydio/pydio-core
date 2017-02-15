@@ -253,7 +253,7 @@ module.exports = function(grunt) {
         hub: {
             all: {
                 options:{
-                    concurrent: 20,
+                    concurrent: 80,
                     allowSelf:true
                 },
                 src: ['../*/Gruntfile.js'],

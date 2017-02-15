@@ -10,6 +10,7 @@
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
             <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
+            <js className="OTPAuthfrontActions" file="plugins/authfront.otp/res/build/OTPAuthfrontActions.js"/>
             <css file="plugins/authfront.otp/configurator.css" autoload="true"/>
         </resources>
     </client_settings>
@@ -39,39 +40,7 @@
                     <context dir="true" recycle="false" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback prepareModal="true" dialogOpenForm="otp_setup_screen" dialogOkButtonOnly="true" dialogSkipButtons="false">
-                        <dialogOnOpen><![CDATA[
-                            PydioApi.getClient().request({get_action:"otp_show_setup_screen"}, function(t){
-                                if(t.responseJSON){
-                                    modal.getForm().down("#google_otp").setValue(t.responseJSON.key);
-                                    React.render(
-                                        React.createElement(ReactQRCode, {
-                                            size:200,
-                                            value:t.responseJSON.qrcode,
-                                            level:'L'
-                                        }),
-                                        modal.getForm().down("#qrcode")
-                                    );
-                                }
-                            });
-                            modal.refreshDialogPosition();
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            if(!modal.getForm().down("#google_otp_verification").getValue()){
-                                pydio.displayMessage('ERROR', 'Please set up verification code');
-                                return false;
-                            }
-                            PydioApi.getClient().request({
-                                get_action:"otp_show_setup_screen",
-                                step:"verify",
-                                otp:modal.getForm().down("#google_otp_verification").getValue()
-                            }, function(t){
-                                if(t.responseJSON && t.responseJSON.RESULT === "OK"){
-                                    location.reload();
-                                }
-                            });
-                        ]]></dialogOnComplete>
-                    </clientCallback>
+                    <clientCallback module="OTPAuthfrontActions.Callbacks.setupScreen" prepareModal="true"/>
                     <clientForm id="otp_setup_screen"><![CDATA[
                          <div id="otp_setup_screen" box_width="500">
                             <div data:ajxp_message_id="authfront.otp.2">AJXP_MESSAGE[authfront.otp.2]</div>

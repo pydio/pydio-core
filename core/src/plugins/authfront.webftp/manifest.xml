@@ -12,43 +12,14 @@
         <actions>
             <action name="login">
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
+                    <clientCallback prepareModal="false"><![CDATA[
 						var loginRedirect = AJXP_LOGIN_REDIRECT;
 						if(loginRedirect){
 							document.location.href=loginRedirect;
 						}else{
-    					    modal.setCloseValidation(function(){
-                                return (!!ajaxplorer && !!ajaxplorer.user)
+                            ResourcesManager.loadClassesAndApply(["AuthfrontCoreActions"], function(){
+                                AuthfrontCoreActions.Callbacks.webFTP();
                             });
-							modal.showDialogForm('Log In', 'ftp_login_form',
-							function(oForm){
-                                ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-							},
-							function(){
-								var oForm = modal.getForm();
-
-								var connexion = new Connexion();
-								connexion.addParameter("get_action", "set_ftp_data");
-								oForm.getElements().each(function(el){
-									if(el.name != "userid" && el.name!="password" && el.name != "get_action" && el.name!="login_seed"){
-										connexion.addParameter(el.name, el.getValue());
-									}
-								});
-								connexion.onComplete = function(transport){
-									PydioApi.getClient().submitForm(oForm, true, function(transport){
-                                        var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                                        if(success){
-    									    modal.setCloseValidation(null);
-    									    hideLightBox(true);
-                                        }else if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-                                            ajaxplorer.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-                                        }
-                                    });
-									oForm.reset();
-								};
-								connexion.sendSync();
-								return false;
-							});
 						}
 						]]></clientCallback>
                 </processing>
