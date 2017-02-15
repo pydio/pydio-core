@@ -27,12 +27,7 @@
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId}, function(){
-                            pydio.fireContextRefresh();
-                        });
-                    ]]></clientCallback>
+                    <clientCallback module="InboxWidgets.Callbacks.acceptInvitation"/>
                 </processing>
             </action>
             <action name="inbox_reject_invitation">
@@ -41,12 +36,7 @@
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="invitation"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
-                            pydio.fireContextRefresh();
-                        });
-                    ]]></clientCallback>
+                    <clientCallback module="InboxWidgets.Callbacks.rejectInvitation"/>
                 </processing>
             </action>
             <action name="inbox_reject_remote_share">
@@ -55,12 +45,7 @@
                     <selectionContext dir="true" file="true" behaviour="hidden" recycle="false" unique="true" evalMetadata="metadata.get('remote_share_accepted')"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
-                        PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
-                            pydio.fireContextRefresh();
-                        });
-                    ]]></clientCallback>
+                    <clientCallback module="InboxWidgets.Callbacks.rejectRemoteShare"/>
                 </processing>
             </action>
             <action name="download" fileDefault="false">
@@ -72,16 +57,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" enableRoot="false"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                        var userSelection = ajaxplorer.getUserSelection();
-                        if(window.gaTrackEvent){
-                            var fileNames = userSelection.getFileNames();
-                            for(var i=0; i<fileNames.length;i++){
-                                window.gaTrackEvent("Data", "Download", fileNames[i]);
-                            }
-                        }
-                        PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
-                        ]]></clientCallback>
+                    <clientCallback module="InboxWidgets.Callbacks.download" prepareModal="true"/>
                     <serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                         <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <output type="stream"/>
@@ -97,67 +73,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="false"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-					if(pydio.user){
-						var user = pydio.user;
-						var activeRepository = user.getActiveRepository();
-					}
-					var context = pydio.getController();
-					var onLoad = function(oForm){
-						var getAction = oForm.select('input[name="get_action"]')[0];
-						getAction.value = 'copy';
-						this.treeSelector = new TreeSelector(oForm, {
-                            nodeFilter : function(ajxpNode){
-                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
-                            }
-                        });
-						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
-							var firstKey ;
-							var reposList = new Hash();
-							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
-								if(!firstKey) firstKey = pair.key;
-								reposList.set(pair.key, pair.value.getLabel());
-							}.bind(this));
-
-                            var nodeProvider = new RemoteNodeProvider();
-                            nodeProvider.initProvider({tmp_repository_id:firstKey});
-                            var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);
-                            this.treeSelector.load(rootNode);
-
-							this.treeSelector.setFilterShow(true);
-							reposList.each(function(pair){
-								this.treeSelector.appendFilterValue(pair.key, pair.value);
-							}.bind(this));
-
-							this.treeSelector.setFilterSelectedIndex(0);
-							this.treeSelector.setFilterChangeCallback(function(e){
-								var externalRepo = this.filterSelector.getValue();
-								var nodeProvider = new RemoteNodeProvider();
-								nodeProvider.initProvider({tmp_repository_id:externalRepo});
-								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
-							});
-						}else{
-							this.treeSelector.load();
-						}
-					}.bind(context);
-					var onCancel = function(){
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					var onSubmit = function(){
-						var oForm = modal.getForm();
-						var getAction = oForm.select('input[name="get_action"]')[0];
-						var selectedNode = this.treeSelector.getSelectedNode();
-						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
-							getAction.value = "cross_copy" ;
-						}
-						pydio.getUserSelection().updateFormOrUrl(oForm);
-						this.submitForm(oForm);
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
-					]]></clientCallback>
+                    <clientCallback module="InboxWidgets.Callbacks.copyInbox" prepareModal="true"/>
                     <clientForm id="copymove_form"><![CDATA[
 					<div id="copymove_form" action="copy" box_width="272">
 						<input type="hidden" name="dest_node" value=""/>
@@ -169,30 +85,7 @@
 						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
 					</div>
 				]]></clientForm>
-                    <clientListener name="contextChange"><![CDATA[
-				if(pydio){
-					var action = pydio.getController().getActionByName("copy");
-					if(action){
-						action.rightsContext.write = true;
-						var ajxpUser = pydio.user;
-						if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
-							action.rightsContext.write = false;
-							pydio.getController().defaultActions['delete']('ctrldragndrop');
-							pydio.getController().defaultActions['delete']('dragndrop');
-						}
-						if(ajxpUser && ajxpUser.canWrite() && pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
-						    action.rightsContext.write = false;
-						}
-						if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
-							action.setLabel(247, 248);
-							action.setIconSrc('ark_extract.png');
-						}else{
-							action.setLabel(66, 159);
-							action.setIconSrc('editcopy.png');
-						}
-					}
-				}
-				]]></clientListener>
+                    <clientListener module="InboxWidgets.Callbacks.copyContextListener" name="contextChange"/>
                     <serverCallback methodName="switchAction" restParams="/" developerComment="Copy one or more items to a given target">
                         <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <input_param description="Target folder where to copy" name="dest" type="path" mandatory="true"/>

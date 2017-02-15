@@ -104,6 +104,127 @@
 
     }
 
+    let pydio = global.pydio;
+
+    class Callbacks{
+
+        static download(){
+            var userSelection = ajaxplorer.getUserSelection();
+            if(window.gaTrackEvent){
+                var fileNames = userSelection.getFileNames();
+                for(var i=0; i<fileNames.length;i++){
+                    window.gaTrackEvent("Data", "Download", fileNames[i]);
+                }
+            }
+            PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
+        }
+
+        static copyInbox(){
+            if(pydio.user){
+                var user = pydio.user;
+                var activeRepository = user.getActiveRepository();
+            }
+            var context = pydio.getController();
+            var onLoad = function(oForm){
+                var getAction = oForm.select('input[name="get_action"]')[0];
+                getAction.value = 'copy';
+                this.treeSelector = new TreeSelector(oForm, {
+                    nodeFilter : function(ajxpNode){
+                        return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
+                    }
+                });
+                if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+                    var firstKey ;
+                    var reposList = new Hash();
+                    ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
+                        if(!firstKey) firstKey = pair.key;
+                        reposList.set(pair.key, pair.value.getLabel());
+                    }.bind(this));
+
+                    var nodeProvider = new RemoteNodeProvider();
+                    nodeProvider.initProvider({tmp_repository_id:firstKey});
+                    var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);
+                    this.treeSelector.load(rootNode);
+
+                    this.treeSelector.setFilterShow(true);
+                    reposList.each(function(pair){
+                        this.treeSelector.appendFilterValue(pair.key, pair.value);
+                    }.bind(this));
+
+                    this.treeSelector.setFilterSelectedIndex(0);
+                    this.treeSelector.setFilterChangeCallback(function(e){
+                        var externalRepo = this.filterSelector.getValue();
+                        var nodeProvider = new RemoteNodeProvider();
+                        nodeProvider.initProvider({tmp_repository_id:externalRepo});
+                        this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
+                    });
+                }else{
+                    this.treeSelector.load();
+                }
+            }.bind(context);
+            var onCancel = function(){
+                this.treeSelector.unload();
+                hideLightBox();
+            }.bind(context);
+            var onSubmit = function(){
+                var oForm = modal.getForm();
+                var getAction = oForm.select('input[name="get_action"]')[0];
+                var selectedNode = this.treeSelector.getSelectedNode();
+                if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
+                    getAction.value = "cross_copy" ;
+                }
+                pydio.getUserSelection().updateFormOrUrl(oForm);
+                this.submitForm(oForm);
+                this.treeSelector.unload();
+                hideLightBox();
+            }.bind(context);
+            modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
+        }
+
+        static acceptInvitation(){
+            var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'accept_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+
+        static rejectInvitation(){
+            var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+
+        static rejectRemoteShare(){
+            var remoteShareId = pydio.getUserSelection().getUniqueNode().getMetadata().get("remote_share_id");
+            PydioApi.getClient().request({get_action:'reject_invitation', remote_share_id:remoteShareId}, function(){
+                pydio.fireContextRefresh();
+            });
+        }
+        
+        static copyContextListener(){
+            this.rightsContext.write = true;
+            var ajxpUser = pydio.user;
+            if(ajxpUser && !ajxpUser.canWrite() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
+                this.rightsContext.write = false;
+                pydio.getController().defaultActions['delete']('ctrldragndrop');
+                pydio.getController().defaultActions['delete']('dragndrop');
+            }
+            if(ajxpUser && ajxpUser.canWrite() && pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+                this.rightsContext.write = false;
+            }
+            if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
+                this.setLabel(247, 248);
+                this.setIconSrc('ark_extract.png');
+            }else{
+                this.setLabel(66, 159);
+                this.setIconSrc('editcopy.png');
+            }
+        }
+
+
+    }
+
     ns.filesListCellModifier = filesListCellModifier;
     ns.LeftPanel = LeftPanel;
     global.InboxWidgets = ns;

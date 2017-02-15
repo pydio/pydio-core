@@ -55,21 +55,6 @@
 					write="false" adminOnly="false">
 				</rightsContext>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-						var path;
-						if(window.actionArguments && window.actionArguments.length>0){
-							path = window.actionArguments[0];
-							if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
-						}else{
-							userSelection = ajaxplorer.getUserSelection();
-							if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(["zip"]))){
-								path = userSelection.getUniqueNode();
-							}
-						}
-						if(path){
-							ajaxplorer.updateContextData(path);
-						}
-						]]></clientCallback>
 					<serverCallback methodName="switchAction"/>
 				</processing>
 			</action>
@@ -88,26 +73,7 @@
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
-					    var dModel = window.actionManager.getDataModel();
-                        var mime = dModel.getUniqueNode().getAjxpMime();
-						var onLoad = function(oForm){
-			   		    	$(oForm).down('span[id="delete_message"]').update(MessageHash['user_dash.11']);
-			   		    	$(oForm).down('input[name="ajxp_mime"]').value = dModel.getUniqueNode().getAjxpMime();
-						};
-						modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
-							var oForm = modal.getForm();
-							dModel.updateFormOrUrl(oForm);
-							var client = PydioApi.getClient();
-							client.submitForm(oForm, true, function(transport){
-							    client.parseXmlMessage(transport.responseXML);
-							    if(mime == "shared_user" && $('address_book')) $('address_book').ajxpPaneObject.reloadDataModel();
-							    else if(mime == "team" && $('team_panel')) $('team_panel').ajxpPaneObject.reloadDataModel();
-							});
-							hideLightBox(true);
-							return false;
-						});
-						]]></clientCallback>
+					<clientCallback module="UserAccount.Callbacks.delete" prepareModal="true"/>
 					<clientForm id="delete_shared_form"><![CDATA[
 					<div id="delete_shared_form" action="delete" box_width="200">
 					<span id="delete_message"></span>

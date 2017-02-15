@@ -794,6 +794,11 @@
 
     });
 
+    QRCodeDialogLoader.open = function(){
+        var dialog = new AjxpReactDialogLoader('WelcomeComponents', 'QRCodeDialogLoader', {});
+        dialog.openDialog('qrcode_dialog_form', true);
+    };
+
     var WelcomeComponents = global.WelcomeComponents || {};
     WelcomeComponents.UserDashboard = UserDashboard;
     WelcomeComponents.TutorialPane = TutorialPane;

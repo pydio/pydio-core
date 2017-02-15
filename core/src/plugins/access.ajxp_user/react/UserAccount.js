@@ -291,11 +291,39 @@
         }
         
     });
-    
+
+    class Callbacks {
+
+        static delete(){
+
+            var dModel = window.actionManager.getDataModel();
+            var mime = dModel.getUniqueNode().getAjxpMime();
+            var onLoad = function(oForm){
+                $(oForm).down('span[id="delete_message"]').update(MessageHash['user_dash.11']);
+                $(oForm).down('input[name="ajxp_mime"]').value = dModel.getUniqueNode().getAjxpMime();
+            };
+            modal.showDialogForm('Delete', 'delete_shared_form', onLoad, function(){
+                var oForm = modal.getForm();
+                dModel.updateFormOrUrl(oForm);
+                var client = PydioApi.getClient();
+                client.submitForm(oForm, true, function(transport){
+                    client.parseXmlMessage(transport.responseXML);
+                    if(mime == "shared_user" && $('address_book')) $('address_book').ajxpPaneObject.reloadDataModel();
+                    else if(mime == "team" && $('team_panel')) $('team_panel').ajxpPaneObject.reloadDataModel();
+                });
+                hideLightBox(true);
+                return false;
+            });
+
+        }
+
+    }
+
     let ns = global.UserAccount || {};
     ns.ProfilePane = ProfilePane;
     ns.WebDAVPane = WebDAVPane;
     ns.Dashboard = Dashboard;
+    ns.Callbacks = Callbacks;
     global.UserAccount = ns;
 
 
