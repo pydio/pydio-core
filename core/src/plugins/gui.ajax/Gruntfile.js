@@ -146,9 +146,9 @@ module.exports = function(grunt) {
                     {
                         mode: {loose: false},
                         expand: true,
-                        cwd: 'node_modules/material-ui/src/',
+                        cwd: 'node_modules/material-ui-legacy/src/',
                         src: ['**/*.js', '**/*.jsx'],
-                        dest: 'node_modules/material-ui/lib/',
+                        dest: 'node_modules/material-ui-legacy/lib/',
                         ext: '.js'
                     }]
             },
@@ -248,6 +248,16 @@ module.exports = function(grunt) {
                     ]
                 }
             }
+        },
+        hub: {
+            all: {
+                options:{
+                    concurrent: 20,
+                    allowSelf:true
+                },
+                src: ['../*/Gruntfile.js'],
+                tasks: ['default']
+            }
         }
     });
     grunt.loadNpmTasks('grunt-env');
@@ -258,6 +268,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
+    grunt.loadNpmTasks('grunt-hub');
     grunt.loadNpmTasks('assemble-less');
     grunt.registerTask('type:js', [
         'copy:debug',

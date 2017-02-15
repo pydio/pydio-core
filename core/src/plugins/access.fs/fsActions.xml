@@ -14,21 +14,6 @@
 				write="false" adminOnly="false">
 			</rightsContext>
 			<processing>
-				<clientCallback prepareModal="false"><![CDATA[
-					var path;
-					if(window.actionArguments && window.actionArguments.length>0){
-						path = window.actionArguments[0];
-						if(Object.isString(path)){path = new AjxpNode(path,false,getBaseName(path));}
-					}else{
-						var userSelection = pydio.getUserSelection();
-						if(userSelection && userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime("AJXP_MIMES_ZIP".split(",")))){
-							path = userSelection.getUniqueNode();
-						}
-					}
-					if(path){
-						pydio.updateContextData(path);
-					}
-					]]></clientCallback>
 				<serverCallback methodName="switchAction" restParams="/dir+" preferredHttp="GET" sdkMethodName="listNodes" checkParams="true" developerComment="Standard listing action
 				    to retrieve the list of children for a given directory. For the main parameters, use {nodes} parameter, the {dir}+{file} are kept for backward compatibility.">
                     <input_param description="Directory to browse, from the repository root" name="dir" type="string" mandatory="false"/>
@@ -59,26 +44,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-                    modal.showDialogForm('Create', 'mkdir_form', function(form){
-                        if(form.down('a.create_file_alt_link')){
-                            form.down('a.create_file_alt_link').observe('click', function(){
-                                pydio.getController().fireAction('mkfile');
-                            });
-                        }
-                    }, function(){
-                        var oForm = $(modal.getForm());
-                        var elementToCheck=(oForm['dirname']);
-                        if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
-                        {
-                            alert(MessageHash[125]);
-                            return false;
-                        }
-                        PydioApi.getClient().submitForm(oForm);
-                        hideLightBox(true);
-                        return false;
-                    });
-                    ]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.mkdir" prepareModal="true"/>
                 <clientForm id="mkdir_form"><![CDATA[
                 <div id="mkdir_form" action="mkdir" box_width="200">
                     <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
@@ -99,20 +65,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-                    modal.showDialogForm('Create', 'mkfile_form', null, function(){
-                        var oForm = $(modal.getForm());
-                        var elementToCheck=(oForm['filename']);
-                        if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
-                        {
-                            alert(MessageHash[125]);
-                            return false;
-                        }
-                        PydioApi.getClient().submitForm(oForm);
-                        hideLightBox(true);
-                        return false;
-                    });
-                    ]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.mkfile" prepareModal="true"/>
                 <clientForm id="mkfile_form"><![CDATA[
                 <div id="mkfile_form" action="mkfile" box_width="200">
                 <div class="dialogLegend" ajxp_message_id="174">AJXP_MESSAGE[174]</div>
@@ -132,57 +85,7 @@
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var uploaders = pydio.Registry.getActiveExtensionByType("uploader");
-                    uploaders.sort(function(objA, objB){
-                        return objA.order - objB.order;
-                    });
-					if(uploaders.length){
-					    var uploader;
-					    if(window.actionArguments[0]){
-                            uploader = window.actionArguments[0];
-					    }else{
-    						uploader = uploaders[0];
-                        }
-						if(pydio.getController().getActionByName("trigger_remote_copy")){
-                            modal.setCloseAction(function(){
-                                pydio.fireContextRefresh();
-                                PydioApi.getClient().request({get_action:'trigger_remote_copy'});
-                            });
-						}
-						if(uploader.dialogOnOpen){
-							uploader.resourcesManager.load();
-							var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
-						}
-						if(uploader.dialogOnComplete){
-							uploader.resourcesManager.load();
-							var dialogOnComplete = new Function("oForm", uploader.dialogOnComplete);
-							modal.setCloseAction(dialogOnComplete);
-						}
-						var dialogOpen = function(form){
-						    if (form.down('#uploader_chooser')) form.down('#uploader_chooser').remove();
-						    var chooser = new Element('div', {id:'uploader_chooser'});
-						    form.insert({top:chooser});
-						    var chooserList = new Element('ul');
-                            chooser.insert(chooserList);
-                            uploaders.each(function(up){
-                                var label = up.xmlNode.getAttribute("label");
-                                var desc = up.xmlNode.getAttribute("description")
-                                var item = new Element('li', {title:desc}).update(label).observe("click", function(){
-                                    pydio.getController().fireAction("upload", up);
-                                });
-                                if(up == uploader) item.addClassName('current');
-                                chooserList.insert(item);
-                            });
-                            if(uploader.dialogOnOpen){
-                                uploader.resourcesManager.load();
-                                var dialogOnOpen = new Function("oForm", uploader.dialogOnOpen);
-                                dialogOnOpen(form);
-                            }
-						};
-						modal.showDialogForm('Upload', uploader.formId, dialogOpen, null, dialogOnComplete, true, true);
-					}
-				]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.upload" prepareModal="true"/>
 				<serverCallback methodName="uploadAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
                     <input_param description="Target path in the workspace of the file to upload" name="node" type="string" mandatory="true"/>
                     <input_param description="Flag that the file content is passed via the php://input stream instead of standard $_FILES data" name="input_upload" type="boolean" default="false"/>
@@ -201,15 +104,7 @@
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
                 <serverCallback methodName="switchAction" restParams="/"/>
-				<clientCallback prepareModal="false"><![CDATA[
-					modal.showDialogForm('EmptyRecycle', 'empty_recycle_form', null, function(){
-						PydioApi.getClient().request({get_action:'empty_recycle'}, function(transport){
-						    PydioApi.getClient().parseXmlMessage(transport.responseXML);
-						});
-						hideLightBox(true);
-						return false;
-					});
-                ]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.emptyRecycle" prepareModal="false"/>
                 <clientForm id="empty_recycle_form"><![CDATA[
                     <div id="empty_recycle_form" action="empty_recycle" box_width="200">
                         <span ajxp_message_id="177">AJXP_MESSAGE[177]</span>
@@ -226,38 +121,8 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = pydio.getUserSelection();
-					if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled'))
-					{
-						if(window.gaTrackEvent){
-							var fileNames = userSelection.getFileNames();
-							for(var i=0; i<fileNames.length;i++){
-								window.gaTrackEvent("Data", "Download", fileNames[i]);
-							}
-						}
-						PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
-					}
-					else
-					{
-						var loadFunc = function(oForm){
-							var dObject = oForm.getElementsBySelector('div[id="multiple_download_container"]')[0];
-							var downloader = new MultiDownloader(dObject, ajxpServerAccessPath+'&action=download&file=');
-							downloader.triggerEnd = function(){hideLightBox()};
-							var fileNames = userSelection.getFileNames();
-							for(var i=0; i<fileNames.length;i++)
-							{
-								downloader.addListRow(fileNames[i]);
-							}
-						};
-						var closeFunc = function(){
-							hideLightBox();
-							return false;
-						};
-						modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
-					}
-					]]></clientCallback>
-					<clientForm id="multi_download_form"><![CDATA[
+				<clientCallback module="FSActions.Callbacks.download" prepareModal="true"/>
+                <clientForm id="multi_download_form"><![CDATA[
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
 					<div id="multiple_download_container"></div>
@@ -267,26 +132,8 @@
 					</form>
 					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>
 					</div>]]>
-					</clientForm>
-					<clientListener name="selectionChange"><![CDATA[
-					if(pydio){
-						var userSelection = pydio.getUserSelection();
-						var action = pydio.getController().getActionByName("download");
-						if(window.zipEnabled && window.multipleFilesDownloadEnabled){
-							if(action){
-								if((userSelection.isUnique() && !userSelection.hasDir()) || userSelection.isEmpty()){
-									action.setIconSrc('download_manager.png');
-								}else{
-									action.setIconSrc('accessories-archiver.png');
-								}
-							}
-						}else{
-							if(userSelection.hasDir() && action){
-								action.selectionContext.dir = false;
-							}
-						}
-					}
-					]]></clientListener>
+                </clientForm>
+                <clientListener module="FSActions.Listeners.downloadSelectionChange" name="selectionChange"/>
 				<serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                     <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <output type="stream"/>
@@ -301,21 +148,8 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-                        var dm = pydio.getContextHolder();
-                        dm._selectedNodes = $A([dm.getRootNode()]);
-                        dm._bEmpty = dm._bDir = true; dm._bFile = false;
-                        dm.publish("selection_changed", dm);
-                        window.setTimeout(function(){
-                            pydio.getController().fireAction("download");
-                        }, 200);
-                ]]></clientCallback>
-                <clientListener name="init"><![CDATA[
-                    if(!pydio.Parameters.get('zipEnabled') || !pydio.Parameters.get('multipleFilesDownloadEnabled')){
-                        pydio.Controller.getActionByName("download_all").hide();
-                        pydio.Controller.actions["delete"]("download_all");
-                    }
-                ]]></clientListener>
+                <clientCallback module="FSActions.Callbacks.downloadAll" prepareModal="true"/>
+                <clientListener module="FSActions.Listeners.downloadAllInit" name="init"/>
             </processing>
         </action>
 		<action name="compress">
@@ -336,52 +170,14 @@
 				<selectionContext dir="true" file="file" recycle="false" unique="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var userSelection = pydio.getUserSelection();
-					if((multipleFilesDownloadEnabled))
-					{
-						var loadFunc = function(oForm){
-							var zipName;
-							if(userSelection.isUnique()){
-								zipName = getBaseName(userSelection.getUniqueFileName());
-								if(!userSelection.hasDir()) zipName = zipName.substr(0, zipName.lastIndexOf("\."));
-							}else{
-								zipName = getBaseName(userSelection.getContextNode().getPath());
-								if(zipName == "") zipName = "Archive";
-							}
-							var index=1;
-							var buff = zipName;
-							while(userSelection.fileNameExists(zipName + ".zip")){
-								zipName = buff + "-" + index; index ++ ;
-							}
-							oForm.select('input[id="archive_name"]')[0].value = zipName + ".zip" ;
-						};
-						var closeFunc = function(){
-							userSelection.updateFormOrUrl(modal.getForm());
-							PydioApi.getClient().submitForm(modal.getForm(), true);
-							hideLightBox();
-						};
-						modal.showDialogForm('Compress selection to ...', 'compress_form', loadFunc, closeFunc);
-					}
-				]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.compressUI"  prepareModal="true"/>
 				<clientForm id="compress_form"><![CDATA[
 				<div id="compress_form" action="compress" box_width="200">
 					AJXP_MESSAGE[315]<br/>
 					<input type="text" name="archive_name" value="" id="archive_name" class="dialogFocus initFicName">
 				</div>
 				]]></clientForm>
-				<clientListener name="selectionChange"><![CDATA[
-				if(pydio){
-					var userSelection = pydio.getUserSelection();
-					var action = pydio.getController().getActionByName("compress_ui");
-					if(!window.zipEnabled || !window.multipleFilesDownloadEnabled){
-						if(action){
-							if(userSelection.isUnique()) action.selectionContext.multipleOnly = true;
-							else action.selectionContext.unique = true;
-						}
-					}
-				}
-				]]></clientListener>
+				<clientListener module="FSActions.Listeners.compressUiSelectionChange" name="selectionChange"/>
             </processing>
 		</action>
         <action name="open_with_unique">
@@ -393,10 +189,7 @@
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="false"><![CDATA[
-                    var editorData = window.actionArguments[0];
-                    pydio.UI.openCurrentSelectionInEditor(editorData);
-                ]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.openInEditor" prepareModal="false"/>
             </processing>
         </action>
         <action name="open_with" fileDefault="true">
@@ -449,10 +242,7 @@
                 ]]></dynamicBuilder>
             </subMenu>
             <processing>
-                <clientCallback prepareModal="false"><![CDATA[
-                    var editorData = window.actionArguments[0];
-                    pydio.UI.openCurrentSelectionInEditor(editorData);
-                ]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.openInEditor" prepareModal="false"/>
                 </processing>
         </action>
 		<action name="ajxp_link">
@@ -463,35 +253,7 @@
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var loadFunc = function (oForm){
-						var link;
-						var input = oForm.down('input[type="text"]');
-						var url = document.location.href;
-						if(url.indexOf('#') > 0){
-							url = url.substring(0, url.indexOf('#'));
-						}
-						if(url.indexOf('?') > 0){
-							url = url.substring(0, url.indexOf('?'));
-						}
-						var repoId = pydio.repositoryId || (pydio.user ? pydio.user.activeRepository : null);
-						if(pydio.user){
-							var slug = pydio.user.repositories.get(repoId).getSlug();
-							if(slug) repoId = slug;
-						}
-						link = url + '?goto=' + repoId + encodeURIComponent(pydio.getUserSelection().getUniqueNode().getPath());
-						input.value = link;
-                        var email = oForm.down('a[id="email"]');
-                        if (email){
-                            email.setAttribute('href', 'mailto:unknown@unknown.com?Subject=UPLOAD&Body='+encodeURIComponent(link));
-                        }
-						input.select();
-					};
-                    modal.showDialogForm('Get', 'ajxp_link_form', loadFunc, function(){
-                        hideLightBox(true);
-                        return false;
-                    }, null, true);
-				]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.ajxpLink" prepareModal="true"/>
 				<clientForm id="ajxp_link_form"><![CDATA[
 				<div id="ajxp_link_form" title="AJXP_MESSAGE[369]"  box_width="280" action="ajxp_link">
 				<fieldset>
@@ -559,23 +321,10 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-				   var userSelection = pydio.getUserSelection();
-				   var fileNames = $A(userSelection.getFileNames());
-				   var connexion = new Connexion();
-				   connexion.addParameter('get_action', 'restore');
-				   connexion.addParameter('dir', userSelection.getContextNode().getPath());
-				   connexion.onComplete = function(transport){
-				   		PydioApi.getClient().parseXmlMessage(transport.responseXML);
-				   };
-				   fileNames.each(function(filename){
-				   		connexion.addParameter('file', filename);
-				   		connexion.sendAsync();
-				   });
-					]]></clientCallback>
-                    <serverCallback methodName="switchAction" restParams="/node+" developerComment="For an item located inside the recycle bin, tries to find its original location and move it there.">
-                        <input_param description="Path of the node inside the recycle bin" name="node" type="path" mandatory="true"/>
-                    </serverCallback>
+				<clientCallback module="FSActions.Callbacks.restore" prepareModal="true"/>
+                <serverCallback methodName="switchAction" restParams="/node+" developerComment="For an item located inside the recycle bin, tries to find its original location and move it there.">
+                    <input_param description="Path of the node inside the recycle bin" name="node" type="path" mandatory="true"/>
+                </serverCallback>
 				</processing>
 		</action>
 		<action name="rename">
@@ -587,46 +336,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-				    if(pydio.getUserSelection()){
-				        var orig = pydio.getUserSelection().getSelectionSource();
-				    }
-					var callback = function(node, newValue){
-					    if(!node) node = pydio.getUserSelection().getUniqueNode();
-						var filename = node.getPath();
-						var conn = new Connexion();
-						conn.addParameter('get_action', 'rename');
-						conn.addParameter('file', filename);
-						conn.addParameter('filename_new', newValue);
-						conn.onComplete = function(transport){
-							PydioApi.getClient().parseXmlMessage(transport.responseXML);
-							if(orig && pydio.getUserSelection()){
-								pydio.getUserSelection().setSelectionSource(orig);
-							}
-						};
-						conn.sendAsync();
-					};
-					var found = false;
-					if(pydio.getUserSelection() && pydio.getUserSelection().getSelectionSource() && pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition) {
-					    pydio.getUserSelection().getSelectionSource().switchCurrentLabelToEdition(callback);
-					    found = true;
-                    }else{
-                        var test = pydio.UI._focusables.detect(function(obj){return obj.hasFocus;});
-                        if (test && test.switchCurrentLabelToEdition){
-                            test.switchCurrentLabelToEdition(callback);
-                            found = true;
-                        }
-                    }
-                    if(!found){
-                        var n = pydio.getUserSelection().getSelectedNodes()[0];
-                        if(n){
-                            let res = n.notify("node_action", {type:"prompt-rename", callback:(value)=>{callback(n, value);}});
-                            if((!res || res[0] !== true) && n.getParent()){
-                                n.getParent().notify("child_node_action", {type:"prompt-rename", child:n, callback:(value)=>{callback(n, value);}});
-                            }
-                        }
-                    }
-				]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.rename" prepareModal="false"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Rename a resource, file or folder.">
                     <input_param description="Full path to the resource that will be renamed" name="file" type="path" mandatory="true"/>
                     <input_param description="New basename of the resource, in that case the new fullname will be the parent folder of source plus this filename_new." name="filename_new" type="string"/>
@@ -648,69 +358,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					if(pydio.user){
-						var user = pydio.user;
-						var activeRepository = user.getActiveRepository();
-					}
-					var context = pydio.getController();
-					var onLoad = function(oForm){
-						var getAction = oForm.select('input[name="get_action"]')[0];
-						getAction.value = 'copy';
-						this.treeSelector = new TreeSelector(oForm, {
-                            nodeFilter : function(ajxpNode){
-                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
-                            }
-                        });
-						if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
-							var firstKey ;
-							var reposList = new Hash();
-							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
-								if(!firstKey) firstKey = pair.key;
-								reposList.set(pair.key, pair.value.getLabel());
-							}.bind(this));
-							if(!user.canWrite()){
-								var nodeProvider = new RemoteNodeProvider();
-								nodeProvider.initProvider({tmp_repository_id:firstKey});
-								var rootNode = new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider);
-								this.treeSelector.load(rootNode);
-							}else{
-								this.treeSelector.load();
-							}
-							this.treeSelector.setFilterShow(true);
-							reposList.each(function(pair){
-								this.treeSelector.appendFilterValue(pair.key, pair.value);
-							}.bind(this));
-							if(user.canWrite()) this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
-							this.treeSelector.setFilterSelectedIndex(0);
-							this.treeSelector.setFilterChangeCallback(function(e){
-								var externalRepo = this.filterSelector.getValue();
-								var nodeProvider = new RemoteNodeProvider();
-								nodeProvider.initProvider({tmp_repository_id:externalRepo});
-								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
-							});
-						}else{
-							this.treeSelector.load();
-						}
-					}.bind(context);
-					var onCancel = function(){
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					var onSubmit = function(){
-						var oForm = modal.getForm();
-						var getAction = oForm.select('input[name="get_action"]')[0];
-						var selectedNode = this.treeSelector.getSelectedNode();
-						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
-							getAction.value = "cross_copy" ;
-						}
-						pydio.getUserSelection().updateFormOrUrl(oForm);
-						this.submitForm(oForm);
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
-					]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.copy" prepareModal="true"/>
 				<clientForm id="copymove_form"><![CDATA[
 					<div id="copymove_form" action="copy" box_width="272">
 						<input type="hidden" name="dest_node" value=""/>
@@ -723,32 +371,7 @@
 						<a id="selector_create_folder"><span class="mdi mdi-folder-plus"></span></a>
 					</div>
 				]]></clientForm>
-				<clientListener name="contextChange"><![CDATA[
-				if(pydio){
-					var action = pydio.getController().getActionByName("copy");
-					if(action){
-						action.rightsContext.write = true;
-						var ajxpUser = pydio.user;
-						if(ajxpUser && ajxpUser.canRead() && ajxpUser.canCrossRepositoryCopy() && ajxpUser.hasCrossRepositories()){
-							action.rightsContext.write = false;
-							if(!ajxpUser.canWrite()){
-							    pydio.getController().defaultActions['delete']('ctrldragndrop');
-							    pydio.getController().defaultActions['delete']('dragndrop');
-                            }
-						}
-						if(ajxpUser && ajxpUser.canWrite() && pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
-						    action.rightsContext.write = false;
-						}
-						if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
-							action.setLabel(247, 248);
-							action.setIconSrc('ark_extract.png');
-						}else{
-							action.setLabel(66, 159);
-							action.setIconSrc('editcopy.png');
-						}
-					}
-				}
-				]]></clientListener>
+				<clientListener name="contextChange" module="FSActions.Listeners.copyContextChange"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Copy one or more items to a given target">
                     <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <input_param description="Target folder where to copy" name="dest" type="path" mandatory="true"/>
@@ -764,68 +387,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var context = pydio.getController();
-					if(pydio.user){
-						var user = pydio.user;
-						var activeRepository = user.getActiveRepository();
-					}
-					var context = pydio.getController();
-					var onLoad = function(oForm){
-						var getAction = oForm.select('input[name="get_action"]')[0];
-						getAction.value = 'move';
-						this.treeSelector = new TreeSelector(oForm, {
-						    nodeFilter : function(ajxpNode){
-                                return (!ajxpNode.isLeaf() && !ajxpNode.hasMetadataInBranch("ajxp_readonly", "true"));
-                            }
-						});
-						this.treeSelector.load();
-						if(!pydio.getUserSelection().hasDir() && user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
-							this.treeSelector.setFilterShow(true);
-							ProtoCompat.map2hash(user.getCrossRepositories()).each(function(pair){
-								this.treeSelector.appendFilterValue(pair.key, pair.value.getLabel());
-							}.bind(this));
-							this.treeSelector.appendFilterValue(activeRepository, "&lt;"+MessageHash[372]+"&gt;", 'top');
-							this.treeSelector.setFilterSelectedIndex(0);
-							this.treeSelector.setFilterChangeCallback(function(e){
-								var externalRepo = this.filterSelector.getValue();
-								var nodeProvider = new RemoteNodeProvider();
-								nodeProvider.initProvider({tmp_repository_id:externalRepo});
-								this.resetAjxpRootNode(new AjxpNode("/", false, MessageHash[373], "folder.png", nodeProvider));
-							});
-						}
-					}.bind(context);
-					var onCancel = function(){
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					var onSubmit = function(){
-						var oForm = modal.getForm();
-						var getAction = oForm.down('input[name="get_action"]');
-						var selectedNode = this.treeSelector.getSelectedNode();
-						if(!this.treeSelector.getFilterActive(activeRepository) && selectedNode == pydio.getContextNode().getPath()){
-							alert(MessageHash[183]);
-							return false;
-						}
-						pydio.getUserSelection().updateFormOrUrl(oForm);
-						if(activeRepository && this.treeSelector.getFilterActive(activeRepository)){
-							getAction.value = "cross_copy" ;
-							var subAction = new Element('input', {type:'hidden',name:'moving_files',value:'true'});
-							oForm.insert(subAction);
-							this.submitForm(oForm, false, function(transport){
-							    var res = this.parseXmlMessage(transport.responseXML);
-							    if(!res) return;
-
-								pydio.fireContextRefresh();
-							}.bind(this));
-						}else{
-							this.submitForm(oForm);
-						}
-						this.treeSelector.unload();
-						hideLightBox();
-					}.bind(context);
-					modal.showDialogForm('Move/Copy', 'copymove_form', onLoad, onSubmit, onCancel);
-					]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.move" prepareModal="true"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Move a resource at a given target">
                     <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <input_param description="Target folder where to copy" name="dest" type="path" mandatory="true"/>
@@ -843,25 +405,7 @@
             </gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[
-					var onLoad = function(oForm){
-				    	var message = MessageHash[177];
-				    	var repoHasRecycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
-				    	if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
-				    		message = MessageHash[176];
-				    	}
-		   		    	$(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
-					};
-					modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
-						var oForm = modal.getForm();
-						pydio.getUserSelection().updateFormOrUrl(oForm);
-						PydioApi.getClient().submitForm(oForm, true, function(transport){
-						    var result = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-						}.bind(pydio.getController()));
-						hideLightBox(true);
-						return false;
-					});
-					]]></clientCallback>
+				<clientCallback module="FSActions.Callbacks.deleteAction" prepareModal="true"/>
 				<clientForm id="delete_form"><![CDATA[
 				<div id="delete_form" action="delete" box_width="200">
 				<span id="delete_message"></span>
@@ -881,23 +425,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-                    var userSelection =  pydio.getUserSelection();
-                    var loadFunc = function(oForm){
-                        pydio.getController().propertyPane = new PropertyPanel(userSelection, oForm);
-                    };
-                    var completeFunc = function(){
-                        if(!pydio.getController().propertyPane.valueChanged()){
-                            hideLightBox();
-                            return false;
-                        }
-                        userSelection.updateFormOrUrl(modal.getForm());
-                        PydioApi.getClient().submitForm(modal.getForm());
-                        hideLightBox();
-                        return false;
-                    };
-                    modal.showDialogForm('Edit Online', 'properties_box', loadFunc, completeFunc);
-                    ]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.chmod" prepareModal="true"/>
                 <clientForm id="properties_box"><![CDATA[
                     <div id="properties_box" action="chmod" box_width="180"></div>
                 ]]></clientForm>
@@ -928,47 +456,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-					var userSelection = pydio.getUserSelection();
-
-					var loadFunc = function(oForm){
-						var dObject = oForm.down('div[id="multiple_download_container"]');
-						var legendDiv = oForm.down('div.dialogLegend');
-						legendDiv.next("br").remove();
-						legendDiv.update(MessageHash[399]+'<br>'+MessageHash[401]+'<a href="'+MessageHash[402]+'" target="_blank">'+MessageHash[402]+'</a>');
-						dObject.insert({before:'\
-							<div id="chunk_dl_form" style="height:36px;"> \
-								<span style="display:inline-block;float:left;margin-top: 11px;margin-left: 4px;margin-right: 4px;">'+MessageHash[400]+'</span> <input type="text" style="float:left;margin-top:5px; text-align:right; width:30px;height:24px;" name="chunk_count" id="chunk_count" value="4"> \
-								<a id="dl_form_submit" class="dialogButton dialogFocus">OK</a>\
-							</div> \
-						'});
-						$("dl_form_submit").observe("click", function(e){
-							Event.stop(e);
-							var conn = new Connexion();
-							conn.addParameter("get_action", "prepare_chunk_dl");
-							conn.addParameter("chunk_count", $("chunk_count").value );
-							conn.addParameter("file", userSelection.getUniqueNode().getPath());
-							var downloader = new MultiDownloader(dObject, '');
-							conn.onComplete = function(transp){
-								var chunkData = transp.responseJSON;
-								downloader.setDownloadUrl(ajxpServerAccessPath+'&action=download_chunk&file_id='+chunkData.file_id);
-								downloader.triggerEnd = function(){hideLightBox();};
-								for(var i=0; i<chunkData.chunk_count;i++){
-									downloader.addListRow("&chunk_index=" + i, chunkData.localname + " (part " + (i + 1) + ")");
-								}
-								downloader.removeOnLoad();
-							};
-							downloader.setOnLoad();
-							conn.sendAsync();
-						});
-					};
-					var closeFunc = function(){
-						hideLightBox();
-						return false;
-					};
-					modal.showDialogForm('Download Multiple', 'multi_download_form', loadFunc, closeFunc, null, true);
-
-					]]></clientCallback>
+                <clientCallback module="FSActions.Callbacks.downloadChunked" prepareModal="true"/>
                 <clientForm id="multi_download_form"><![CDATA[
 					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
 					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>

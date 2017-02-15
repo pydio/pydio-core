@@ -160,10 +160,10 @@
                             ref="autosuggest"
                             cache={false}
                             showWhen = {input => true }
-                            inputAttributes={inputAttributes}
+                            inputProps={inputAttributes}
                             suggestions={this.getSuggestions}
-                            suggestionRenderer={this.props.renderSuggestion}
-                            suggestionValue={this.suggestionValue}
+                            getSuggestionValue={this.suggestionValue}
+                            renderSuggestion={this.props.renderSuggestion}
                             onSuggestionSelected={this.onSuggestionSelected}
                         />
                     </div>

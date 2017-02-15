@@ -8,6 +8,7 @@
             this._focusables = [];
             this.modal = window.modal;
             this._componentsRegistry = new Map();
+            this.modalSupportsComponents = false;
         }
 
         insertChildFromString(parent, html){
@@ -194,6 +195,20 @@
             }
         }
 
+        registerModalOpener(component){
+            this._modalOpener = component;
+            this.modalSupportsComponents = true;
+        }
+
+        unregisterModalOpener(){
+            this._modalOpener = null;
+            this.modalSupportsComponents = false;
+        }
+
+        openComponentInModal(namespace, componentName, props){
+            this._modalOpener.open(namespace, componentName, props);
+        }
+
         /**
          * PROXY TO PROTOTYPE UI
          * @param seedInputField
@@ -233,7 +248,7 @@
         blurAll(){}
         focusOn(){}
         focusLast(){}
-
+        
     }
 
     let ns = global.ReactUI || {};

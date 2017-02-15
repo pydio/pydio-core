@@ -335,7 +335,7 @@
         hideMenu: function(event){
             if(event && ( event.target.hasClassName('mui-icon-button') || event.target.up('.mui-icon-button'))){
                 var tg = event.target.hasClassName('mui-icon-button') ? event.target : event.target.up('.mui-icon-button');
-                if(this.refs["menuButton"] && tg == this.refs["menuButton"].getDOMNode()){
+                if(this.refs["menuButton"] && tg == ReactDOM.findDOMNode(this.refs["menuButton"])){
                     return;
                 }
             }
@@ -913,7 +913,7 @@
         attachClipboard: function(){
             this.detachClipboard();
             if(this.refs['copy-button']){
-                this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
+                this._clip = new Clipboard(this.refs['copy-button'], {
                     text: function(trigger) {
                         return this.props.linkData['public_link'];
                     }.bind(this)
@@ -1207,7 +1207,7 @@
                 expDate.setDate(today.getDate() + parseInt(expirationDateValue));
                 var clearValue = function(){
                     this.props.shareModel.setExpirationFor(linkId, "days", "");
-                    this.refs['expirationDate'].getDOMNode().querySelector(".mui-text-field-input").value = "";
+                    ReactDOM.findDOMNode(this.refs['expirationDate']).querySelector(".mui-text-field-input").value = "";
                 }.bind(this);
                 calIcon = <span className="ajxp_icon_span mdi mdi-close-circle" onClick={clearValue}/>;
                 var calLabel = <span className="calLabelHasValue">{this.context.getMessage(dateExpired?'21b':'21')}</span>

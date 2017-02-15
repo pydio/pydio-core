@@ -473,6 +473,7 @@
             <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
+            <xs:attribute name="reactComponent" type="xs:NCName"/>
             <xs:attribute name="primary" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
@@ -537,6 +538,7 @@
                 <xs:element ref="dialogOnCancel"/>
                 <xs:element ref="dialogOnComplete"/>
             </xs:choice>
+            <xs:attribute name="module" type="xs:NCName"/>
             <xs:attribute name="dialogOkButtonOnly" type="xs:boolean"/>
             <xs:attribute name="dialogOpenForm" type="xs:NCName"/>
             <xs:attribute name="dialogSkipButtons" type="xs:boolean"/>
@@ -556,6 +558,7 @@
     <xs:element name="clientListener">
         <xs:complexType mixed="true">
             <xs:attribute name="name" use="required" type="xs:NCName"/>
+            <xs:attribute name="module" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="activeCondition" type="xs:string"/>

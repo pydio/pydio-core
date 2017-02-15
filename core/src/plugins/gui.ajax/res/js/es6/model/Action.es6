@@ -197,7 +197,7 @@ class Action extends Observable{
             var components = XMLUtils.XPathSelectNodes(this.options.callbackDialogNode, "component");
             this.manager.uiMountComponents(components);
         }else if(this.options.callback){
-			this.options.callback();
+			this.options.callback(this.manager, arguments[0]);
 		}
 		if(this.options.subMenu && arguments[0] && arguments[0][0]){
 			this.notify("submenu_active", arguments[0][0]);
@@ -232,11 +232,15 @@ class Action extends Observable{
         }
 
 		if(this.options.listeners["contextChange"]){
-			window.listenerContext = this;
-            try{
-                this._evalScripts(this.options.listeners["contextChange"]);
-            }catch(e){
-                Logger.error("Error while evaluating script for contextChange event - action " + this.options.name);
+            if(this.options.listeners["contextChange"] instanceof Function){
+                this.options.listeners["contextChange"]();
+            }else{
+                window.listenerContext = this;
+                try{
+                    this._evalScripts(this.options.listeners["contextChange"]);
+                }catch(e){
+                    Logger.error("Error while evaluating script for contextChange event - action " + this.options.name);
+                }
             }
 		}
 		var rightsContext = this.rightsContext;
@@ -294,11 +298,15 @@ class Action extends Observable{
 	 */
 	fireSelectionChange(){
 		if(this.options.listeners["selectionChange"]){
-			window.listenerContext = this;
-            try{
-    			this._evalScripts(this.options.listeners["selectionChange"]);
-            }catch(e){
-                Logger.error("Error while evaluating script for selectionChange event - action " + this.options.name);
+            if(this.options.listeners["selectionChange"] instanceof Function){
+                this.options.listeners["selectionChange"]();
+            } else {
+                window.listenerContext = this;
+                try {
+                    this._evalScripts(this.options.listeners["selectionChange"]);
+                } catch (e) {
+                    Logger.error("Error while evaluating script for selectionChange event - action " + this.options.name);
+                }
             }
 		}
         if(this.options.activeCondition){
@@ -444,15 +452,31 @@ class Action extends Observable{
                         }
 					}else if(processNode.nodeName == "clientCallback"){
 						if(processNode.getAttribute('prepareModal') && processNode.getAttribute('prepareModal') == "true"){
-							this.options.prepareModal = true;						
+							this.options.prepareModal = true;
 						}
 						if(processNode.getAttribute('dialogOpenForm') || processNode.getAttribute("components")){
 							this.options.callbackDialogNode = processNode;
-						}else if(processNode.firstChild){
+						}else if(processNode.getAttribute('module')){
+                            let fName = processNode.getAttribute('module');
+                            this.options.callback = function(manager, otherArguments){
+                                ResourcesManager.detectModuleToLoadAndApply(fName, function(){
+                                    LangUtils.executeFunctionByName(fName, window, manager, otherArguments);
+                                });
+                            };
+                        }else if(processNode.firstChild){
 							this.options.callbackCode = processNode.firstChild.nodeValue.trim();
 						}
-					}else if(processNode.nodeName == "clientListener" && processNode.firstChild){						
-						this.options.listeners[processNode.getAttribute('name')] = processNode.firstChild.nodeValue.trim();
+					}else if(processNode.nodeName == "clientListener"){
+                        if(processNode.getAttribute('module')){
+                            let moduleName = processNode.getAttribute('module');
+                            this.options.listeners[processNode.getAttribute('name')] = function(){
+                                ResourcesManager.detectModuleToLoadAndApply(moduleName, function(){
+                                    LangUtils.getFunctionByName(moduleName, window).apply(this);
+                                }.bind(this));
+                            }.bind(this);
+                        }else if(processNode.firstChild){
+    						this.options.listeners[processNode.getAttribute('name')] = processNode.firstChild.nodeValue.trim();
+                        }
 					}else if(processNode.nodeName == "activeCondition" && processNode.firstChild){
 						this.options.activeCondition = new Function(processNode.firstChild.nodeValue.trim());
 					}

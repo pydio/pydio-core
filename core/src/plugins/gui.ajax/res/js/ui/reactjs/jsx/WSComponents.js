@@ -372,7 +372,7 @@
                             OpenNodesModel.getInstance().removeNode(object);
                         };
                         let label = <span className="closeable-tab"><span className="label">{object.node.getLabel()}</span><ReactMUI.FontIcon className="mdi mdi-close" onClick={closeTab}/></span>;
-                        tabs.push(<ReactMUI.Tab label={label} selected={index === this.state.activeTab}></ReactMUI.Tab>);
+                        tabs.push(<MaterialUI.Tab key={index} label={label} value={index}></MaterialUI.Tab>);
                     }else{
                         mfbMenus.push(<ReactMFB.ChildButton icon="mdi mdi-file" label={object.node.getLabel()} onClick={this.toggle}/>);
                     }
@@ -426,9 +426,11 @@
                                 {mainIcon}
                                 {title}
                             </div>
-                            <ReactMUI.Tabs onChange={this.onChange} initialSelectedIndex={this.state.activeTab} tabWidth={200}>
+                            <MaterialUI.Tabs
+                                onChange={this.onChange}
+                                value={this.state.activeTab}>
                                 {tabs}
-                            </ReactMUI.Tabs>
+                            </MaterialUI.Tabs>
                             {editors}
                         </div>
                     </div>
@@ -1256,6 +1258,70 @@
 
     });
 
+    let Modal = React.createClass({
+
+        componentDidMount: function(){
+            this.props.pydio.UI.registerModalOpener(this);
+        },
+
+        componentWillUnmount: function(){
+            this.props.pydio.UI.unregisterModalOpener();
+        },
+
+        open:function(namespace, component, props){
+            this.setState({
+                open: true,
+                namespace:namespace,
+                component: component,
+                props: props
+            });
+        },
+
+        getInitialState:function(){
+            return {open: false};
+        },
+
+        handleClose: function(){
+            this.setState({open: false});
+        },
+
+        render: function(){
+            const actions = [
+                <MaterialUI.FlatButton
+                    label="Cancel"
+                    primary={true}
+                    onTouchTap={this.handleClose}
+                />,
+                <MaterialUI.FlatButton
+                    label="Submit"
+                    primary={true}
+                    keyboardFocused={true}
+                    onTouchTap={this.handleClose}
+                />,
+            ];
+            return (
+                <MaterialUI.Dialog
+                actions={[]}
+                modal={false}
+                open={this.state.open}
+                className="react-mui-context"
+                id="react_share_form"
+                style={{backgroundColor:'transparent'}}
+                contentClassName="react-dialog-content"
+                contentStyle={{height: 500, width: 420, padding:0}}
+                onRequestClose={this.handleClose}>
+                    <ReactPydio.AsyncComponent
+                        namespace={this.state.namespace}
+                        componentName={this.state.component}
+                        {...this.props}
+                        {...this.state.props}
+                    />
+                </MaterialUI.Dialog>
+            );
+        }
+
+    });
+
     let FSTemplate = React.createClass({
 
         mixins: [MessagesConsumerMixin],
@@ -1267,25 +1333,28 @@
         render: function () {
             
             return (
-                <div className="react-mui-context vertical_layout vertical_fit react-fs-template">
-                    <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
-                    <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
-                        <div id="workspace_toolbar">
-                            <Breadcrumb {...this.props}/>
-                            <SearchForm {...this.props}/>
+                <MaterialUI.MuiThemeProvider>
+                    <div className="react-mui-context vertical_layout vertical_fit react-fs-template">
+                        <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
+                        <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
+                            <div id="workspace_toolbar">
+                                <Breadcrumb {...this.props}/>
+                                <SearchForm {...this.props}/>
+                            </div>
+                            <div id="main_toolbar">
+                                <Toolbars.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                                <Toolbars.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                                <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                                <Toolbars.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                            </div>
+                            <MainFilesList ref="list" {...this.props}/>
                         </div>
-                        <div id="main_toolbar">
-                            <Toolbars.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
-                            <Toolbars.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                            <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            <Toolbars.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
-                        </div>
-                        <MainFilesList ref="list" {...this.props}/>
+                        <DetailPanes.InfoPanel {...this.props} dataModel={this.props.pydio.getContextHolder()}/>
+                        <EditionPanel {...this.props}/>
+                        <span className="context-menu"><Toolbars.ContextMenu/></span>
+                        <Modal {...this.props}/>
                     </div>
-                    <DetailPanes.InfoPanel {...this.props} dataModel={this.props.pydio.getContextHolder()}/>
-                    <EditionPanel {...this.props}/>
-                    <span className="context-menu"><Toolbars.ContextMenu/></span>
-                </div>
+                </MaterialUI.MuiThemeProvider>
             );
             
         }
