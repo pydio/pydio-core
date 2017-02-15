@@ -1,32 +1,64 @@
 (function(global){
 
     let pydio = global.pydio;
+    let MessageHash = global.MessageHash;
 
     class Callbacks {
 
         static mkdir(){
-            pydio.UI.modal.showDialogForm('Create', 'mkdir_form', function(form){
-                if(form.down('a.create_file_alt_link')){
-                    form.down('a.create_file_alt_link').observe('click', function(){
-                        pydio.getController().fireAction('mkfile');
+
+            if(pydio.UI.modalSupportsComponents){
+                let submit = function(value){
+                    PydioApi.getClient().request({
+                        get_action:'mkdir',
+                        dir: pydio.getContextNode().getPath(),
+                        dirname:value
                     });
-                }
-            }, function(){
-                var oForm = $(pydio.UI.modal.getForm());
-                var elementToCheck=(oForm['dirname']);
-                if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
-                {
-                    alert(MessageHash[125]);
+                };
+                pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+                    dialogTitleId:154,
+                    legendId:155,
+                    fieldLabelId:173,
+                    submitValue:submit
+                });
+            }else {
+                pydio.UI.modal.showDialogForm('Create', 'mkdir_form', function (form) {
+                    if (form.down('a.create_file_alt_link')) {
+                        form.down('a.create_file_alt_link').observe('click', function () {
+                            pydio.getController().fireAction('mkfile');
+                        });
+                    }
+                }, function () {
+                    var oForm = $(pydio.UI.modal.getForm());
+                    var elementToCheck = (oForm['dirname']);
+                    if (pydio.getContextHolder().fileNameExists($(elementToCheck).getValue())) {
+                        alert(MessageHash[125]);
+                        return false;
+                    }
+                    PydioApi.getClient().submitForm(oForm);
+                    hideLightBox(true);
                     return false;
-                }
-                PydioApi.getClient().submitForm(oForm);
-                hideLightBox(true);
-                return false;
-            });
+                });
+            }
         }
 
         static mkfile(){
-            pydio.UI.modal.showDialogForm('Create', 'mkfile_form', null, function(){
+            if(pydio.UI.modalSupportsComponents) {
+                let submit = function(value){
+                    PydioApi.getClient().request({
+                        get_action:'mkfile',
+                        dir: pydio.getContextNode().getPath(),
+                        filename:value
+                    });
+                };
+                pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+                    dialogTitleId:156,
+                    legendId:157,
+                    fieldLabelId:174,
+                    submitValue:submit
+                });
+            }else{
+                pydio.UI.modal.showDialogForm('Create', 'mkfile_form', null, function(){
                 var oForm = $(pydio.UI.modal.getForm());
                 var elementToCheck=(oForm['filename']);
                 if(pydio.getContextHolder().fileNameExists($(elementToCheck).getValue()))
@@ -37,7 +69,8 @@
                 PydioApi.getClient().submitForm(oForm);
                 hideLightBox(true);
                 return false;
-            });
+                });
+            }
         }
 
         static rename(){
@@ -212,23 +245,28 @@
         }
 
         static deleteAction(){
-            var onLoad = function(oForm){
-                var message = MessageHash[177];
-                var repoHasRecycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
-                if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
-                    message = MessageHash[176];
-                }
-                $(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
-            };
-            modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
-                var oForm = modal.getForm();
-                pydio.getUserSelection().updateFormOrUrl(oForm);
-                PydioApi.getClient().submitForm(oForm, true, function(transport){
-                    var result = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                }.bind(pydio.getController()));
-                hideLightBox(true);
-                return false;
-            });
+
+            if(pydio.UI.modalSupportsComponents){
+                pydio.UI.openComponentInModal('FSActions', 'DeleteDialog');
+            }else{
+                var onLoad = function(oForm){
+                    var message = MessageHash[177];
+                    var repoHasRecycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
+                    if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
+                        message = MessageHash[176];
+                    }
+                    $(oForm).getElementsBySelector('span[id="delete_message"]')[0].innerHTML = message;
+                };
+                modal.showDialogForm('Delete', 'delete_form', onLoad, function(){
+                    var oForm = modal.getForm();
+                    pydio.getUserSelection().updateFormOrUrl(oForm);
+                    PydioApi.getClient().submitForm(oForm, true, function(transport){
+                        var result = PydioApi.getClient().parseXmlMessage(transport.responseXML);
+                    }.bind(pydio.getController()));
+                    hideLightBox(true);
+                    return false;
+                });
+            }
         }
         
         static chmod(){
@@ -580,9 +618,104 @@
         
     }
 
+    let EmptyDialog = React.createClass({
+
+        mixins:[
+            ReactPydio.ActionDialogMixin,
+            ReactPydio.CancelButtonProviderMixin,
+            ReactPydio.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: "Title",
+                dialogIsModal: true
+            };
+        },
+        submit(){
+            this.dismiss();
+        },
+        render: function(){
+            return <div>Empty</div>;
+        }
+
+    });
+
+    let DeleteDialog = React.createClass({
+
+        mixins:[
+            ReactPydio.ActionDialogMixin,
+            ReactPydio.CancelButtonProviderMixin,
+            ReactPydio.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: MessageHash[7],
+                dialogIsModal: true
+            };
+        },
+        submit(){
+            PydioApi.getClient().postSelectionWithAction('delete');
+            this.dismiss();
+        },
+        render: function(){
+            let message = MessageHash[177];
+            const repoHasRecycle = pydio.getContextHolder().getRootNode().getMetadata().get("repo_has_recycle");
+            if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
+                message = MessageHash[176];
+            }
+            return <div>{message}</div>;
+        }
+
+    });
+
+    let PromptDialog = React.createClass({
+
+        propTypes: {
+            dialogTitleId:React.PropTypes.integer,
+            legendId:React.PropTypes.integer,
+            fieldLabelId:React.PropTypes.integer,
+            submitValue:React.PropTypes.func.isRequired
+        },
+
+        mixins:[
+            ReactPydio.ActionDialogMixin,
+            ReactPydio.CancelButtonProviderMixin,
+            ReactPydio.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogIsModal: true
+            };
+        },
+        submit(){
+            this.props.submitValue(this.refs.input.getValue());
+            this.dismiss();
+        },
+        render: function(){
+            return (
+                <div>
+                    <div className="dialogLegend">{MessageHash[this.props.legendId]}</div>
+                    <MaterialUI.TextField
+                        floatingLabelText={MessageHash[this.props.fieldLabelId]}
+                        ref="input"
+                        onKeyDown={this.submitOnEnterKey}
+                    />
+                </div>
+            );
+        }
+
+    });
+
     let ns = global.FSActions || {};
     ns.Callbacks = Callbacks;
     ns.Listeners = Listeners;
+
+    ns.DeleteDialog = DeleteDialog;
+    ns.PromptDialog = PromptDialog;
     global.FSActions = ns;
 
 })(window);

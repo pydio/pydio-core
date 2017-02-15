@@ -1271,9 +1271,11 @@
         open:function(namespace, component, props){
             this.setState({
                 open: true,
-                namespace:namespace,
-                component: component,
-                props: props
+                modalData:{
+                    namespace:namespace,
+                    compName: component,
+                    payload: props
+                }
             });
         },
 
@@ -1300,23 +1302,12 @@
                 />,
             ];
             return (
-                <MaterialUI.Dialog
-                actions={[]}
-                modal={false}
-                open={this.state.open}
-                className="react-mui-context"
-                id="react_share_form"
-                style={{backgroundColor:'transparent'}}
-                contentClassName="react-dialog-content"
-                contentStyle={{height: 500, width: 420, padding:0}}
-                onRequestClose={this.handleClose}>
-                    <ReactPydio.AsyncComponent
-                        namespace={this.state.namespace}
-                        componentName={this.state.component}
-                        {...this.props}
-                        {...this.state.props}
-                    />
-                </MaterialUI.Dialog>
+                <ReactPydio.AsyncModal
+                    ref="modal"
+                    open={this.state.open}
+                    componentData={this.state.modalData}
+                    onDismiss={this.handleClose}
+                />
             );
         }
 

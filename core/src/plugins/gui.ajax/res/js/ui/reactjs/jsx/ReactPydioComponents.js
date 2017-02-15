@@ -2833,6 +2833,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                 var nsObject = global[this.props.namespace];
                 if(nsObject && nsObject[this.props.componentName]){
                     var props = LangUtils.simpleCopy(this.props);
+                    if(this.props.modalData && this.props.modalData.payload){
+                        props = Object.assign(props, this.props.modalData.payload);
+                    }
                     props['ref'] = 'component';
                     return React.createElement(nsObject[this.props.componentName], props, null);
                 }else{
@@ -2863,10 +2866,18 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
         componentWillReceiveProps: function(nextProps){
             var componentData = nextProps.componentData;
-            var state = {componentData:componentData, async:true};
+            var state = {
+                componentData:componentData,
+                async:true,
+                actions:[],
+                title:null
+            };
             if(componentData && (!componentData instanceof Object || !componentData['namespace'])){
                 state['async'] = false;
                 this.initModalFromComponent(componentData);
+            }
+            if(this.refs.modalAsync){
+                this.refs.modalAsync.loadFired = false;
             }
             this.setState(state);
         },
@@ -2899,7 +2910,38 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
         initModalFromComponent:function(component){
             if(component.getButtons){
-                this.setState({actions:component.getButtons()});
+                let buttons = component.getButtons();
+                if(buttons && buttons.length){
+                    this.setState({actions:component.getButtons()});
+                }
+            }else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback){
+                let actions = [];
+                if(component.getCancelCallback){
+                    actions.push(
+                        <MaterialUI.FlatButton
+                            key="cancel"
+                            label="Cancel1"
+                            primary={false}
+                            onTouchTap={component.getCancelCallback()}
+                        />);
+                }
+                if(component.getSubmitCallback){
+                    actions.push(<MaterialUI.FlatButton
+                        label="Submit2"
+                        primary={true}
+                        keyboardFocused={true}
+                        onTouchTap={component.getSubmitCallback()}
+                    />);
+                }
+                if(component.getNextCallback){
+                    actions.push(<MaterialUI.FlatButton
+                        label="Nextw"
+                        primary={true}
+                        keyboardFocused={true}
+                        onTouchTap={component.getNextCallback()}
+                    />);
+                }
+                this.setState({actions: actions});
             }
             if(component.getTitle){
                 this.setState({title:component.getTitle()});
@@ -2909,6 +2951,17 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
             }
             if(component.setModal){
                 component.setModal(this);
+            }
+            if(component.isModal){
+                this.setState({modal:component.isModal()});
+            }else{
+                this.setState({modal:false});
+            }
+        },
+
+        componentDidUpdate(){
+            if(this.props.open){
+                this.refs.dialog.show();
             }
         },
 
@@ -2939,10 +2992,10 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
                     ref="dialog"
                     title={this.state.title}
                     actions={this.state.actions}
-                    actionFocus="submit"
-                    modal={false}
+                    modal={this.state.modal}
                     className={this.state.className}
                     dismissOnClickAway={true}
+                    open={this.props.open}
                     onShow={this.props.onShow}
                     onDismiss={this.props.onDismiss}
                     contentClassName={this.state.className}
@@ -2951,6 +3004,35 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         }
 
     });
+
+    let ActionDialogMixin = {
+        getTitle: function(){
+            return this.props.dialogTitleId ? global.pydio.MessageHash[this.props.dialogTitleId] : this.props.dialogTitle;
+        },
+        isModal: function(){
+            return this.props.dialogIsModal || false;
+        },
+        dismiss: function(){
+            this.props.dismiss();
+        }
+    };
+
+    let CancelButtonProviderMixin = {
+        getCancelCallback(){
+            return this.props.dismiss;
+        }
+    };
+
+    let SubmitButtonProviderMixin = {
+        getSubmitCallback(){
+            return this.submit;
+        },
+        submitOnEnterKey:function(event){
+            if(event.key === 'Enter'){
+                this.submit();
+            }
+        }
+    };
 
     var ReactPydio = global.ReactPydio || {};
 
@@ -2974,6 +3056,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
 
     ReactPydio.AsyncComponent = AsyncComponent;
     ReactPydio.AsyncModal = AsyncModal;
+    ReactPydio.ActionDialogMixin = ActionDialogMixin;
+    ReactPydio.CancelButtonProviderMixin = CancelButtonProviderMixin;
+    ReactPydio.SubmitButtonProviderMixin = SubmitButtonProviderMixin;
 
     ReactPydio.LabelWithTip = LabelWithTip;
 
