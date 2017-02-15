@@ -564,7 +564,7 @@
                         callback:function(e){this.apply([el]);}.bind(this)
                     });
                     index++;
-                });
+                }.bind(this));
             }
             if(!index){
                 builderMenuItems.push({
