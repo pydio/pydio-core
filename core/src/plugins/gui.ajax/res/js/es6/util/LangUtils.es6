@@ -160,27 +160,7 @@ class LangUtils{
     static trim(string, charlist){
         return LangUtils.trimLeft(LangUtils.trimRight(string, charlist), charlist);
     }
-
-    static executeFunctionByName(functionName, context) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        var namespaces = functionName.split(".");
-        var func = namespaces.pop();
-        for (var i = 0; i < namespaces.length; i++) {
-            context = context[namespaces[i]];
-        }
-        return context[func].apply(context, args);
-    }
-
-    static getFunctionByName(functionName, context) {
-        var args = Array.prototype.slice.call(arguments, 2);
-        var namespaces = functionName.split(".");
-        var func = namespaces.pop();
-        for (var i = 0; i < namespaces.length; i++) {
-            context = context[namespaces[i]];
-        }
-        return context[func];
-    }
-
+    
 }
 
 LangUtils.slugTable = [

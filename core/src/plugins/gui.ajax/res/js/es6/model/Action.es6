@@ -462,7 +462,7 @@ class Action extends Observable{
                             let fName = processNode.getAttribute('module');
                             this.options.callback = function(manager, otherArguments){
                                 ResourcesManager.detectModuleToLoadAndApply(fName, function(){
-                                    LangUtils.executeFunctionByName(fName, window, manager, otherArguments);
+                                    FuncUtils.executeFunctionByName(fName, window, manager, otherArguments);
                                 });
                             };
                         }else if(processNode.firstChild){
@@ -473,7 +473,7 @@ class Action extends Observable{
                             let moduleName = processNode.getAttribute('module');
                             this.options.listeners[processNode.getAttribute('name')] = function(){
                                 ResourcesManager.detectModuleToLoadAndApply(moduleName, function(){
-                                    LangUtils.getFunctionByName(moduleName, window).apply(this);
+                                    FuncUtils.getFunctionByName(moduleName, window).apply(this);
                                 }.bind(this));
                             }.bind(this);
                         }else if(processNode.firstChild){
@@ -604,7 +604,7 @@ class Action extends Observable{
                     this._evalScripts(this.subMenuItems.dynamicBuilderCode);
                     menuItems = this.builderMenuItems || [];
                 }else if(this.subMenuItems.dynamicBuilderModule){
-                    menuItems = LangUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window).apply(this);
+                    menuItems = FuncUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window).apply(this);
 				}else{
 			  		menuItems = [];
 			  		this.subMenuItems.dynamicItems.forEach(function(item){

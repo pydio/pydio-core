@@ -4,6 +4,7 @@ js/core/lang/Logger.js
 js/core/util/LangUtils.js
 js/core/util/XMLUtils.js
 js/core/util/PathUtils.js
+js/core/util/FuncUtils.js
 js/core/util/HasherUtils.js
 js/core/util/PassUtils.js
 js/core/util/CookiesManager.js

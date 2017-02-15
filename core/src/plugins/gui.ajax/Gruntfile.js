@@ -3,6 +3,7 @@ var gui_ajax_core = [
     'res/js/core/lang/Observable.js',
     'res/js/core/lang/Logger.js',
     'res/js/core/util/LangUtils.js',
+    'res/js/core/util/FuncUtils.js',
     'res/js/core/util/XMLUtils.js',
     'res/js/core/util/PathUtils.js',
     'res/js/core/util/HasherUtils.js',
