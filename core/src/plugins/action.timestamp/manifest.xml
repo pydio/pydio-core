@@ -10,6 +10,7 @@
         <resources>
             <img_library alias="timestamp_images" path="plugins/action.timestamp/images"/>
             <i18n path="plugins/action.timestamp/i18n" namespace="timestamp"/>
+            <js file="plugins/action.timestamp/res/build/TimestampActions.js" className="TimestampActions"/>
         </resources>
 	</client_settings>
 
@@ -33,40 +34,7 @@
 			</gui>
 
 			<processing>
-                <clientCallback prepareModal="true"><![CDATA[
-
-                        var onLoad = function(oForm){
-                             $(oForm).getElementsBySelector('span[id="timestamp_message"]')[0].innerHTML = "CONF_MESSAGE[msgBox1]";
-                        };
-                       var onok = function(){
-                            var oForm = modal.getForm();
-                            var userSelection = ajaxplorer.getUserSelection();
-                            var selected = userSelection.getFileNames()
-
-						var conn = new Connexion();
-						conn.addParameter('get_action', 'get_timestamp');
-						conn.addParameter('file', selected);
-						conn.addParameter('dir', userSelection.getContextNode().getPath());
-						conn.onComplete = function(transport){
-							this.parseXmlMessage(transport.responseXML);
-						};
-						conn.sendSync();
-
-						hideLightBox(true);
-                        ajaxplorer.fireContextRefresh()
-						return false;
-					};
-
-				var closeFunc = function(){
-                    hideLightBox();
-                    return false;
-                };
-
-				modal.showDialogForm('Horodater', 'timestamp_form', onLoad, onok);
-
-				]]></clientCallback>
-
-
+                <clientCallback module="TimestampActions.Callbacks.getTimestamp" prepareModal="true"/>
 				<clientForm id="timestamp_form"><![CDATA[
 				<div id="timestamp_form" action="get_timestamp" box_width="200">
 				<span id="timestamp_message"></span>

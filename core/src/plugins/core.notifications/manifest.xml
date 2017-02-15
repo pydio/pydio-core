@@ -24,33 +24,7 @@
     <registry_contributions>
         <actions>
             <action name="get_my_feed">
-                <gui text="notification_center.1" title="notification_center.2" iconClass="icon-rss" src="notification_center/ICON_SIZE/feed.png" accessKey="" hasAccessKey="false">
-             		<context selection="false" dir="" recycle="true" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
-                </gui>
-                <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
-                <subMenu>
-                    <dynamicBuilder><![CDATA[
-                        var context = window.builderContext;
-                        var protoMenu = window.builderProtoMenu;
-                        if(!window.ajxpMinisite){
-                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader', function(){
-                                NotificationLoader.getInstance().dynamicBuilderLoader(context, protoMenu);
-                            });
-                        }
-                    ]]></dynamicBuilder>
-                </subMenu>
                 <processing>
-                    <clientCallback><![CDATA[
-                    ]]></clientCallback>
-                    <clientForm id="user_feed"><![CDATA[
-                        <div id="user_feed" box_padding="0" class="dialogBox css_boxshadow">
-                        </div>
-                    ]]></clientForm>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(!window.NotificationLoader && ajaxplorer.user && !window.ajxpMinisite){
-                            ResourcesManager.prototype.loadJSResource('plugins/core.notifications/class.NotificationLoader.js', 'NotificationLoader');
-                        }
-                    ]]></clientListener>
                     <serverCallback methodName="loadUserFeed"/>
                 </processing>
             </action>
@@ -83,23 +57,7 @@
                 </gui>
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
-                    <clientCallback><![CDATA[
-                    var selection = window.actionArguments[0];
-                    if(selection.getUniqueNode) selection = selection.getUniqueNode();
-                    if(selection && selection.getMetadata && selection.getMetadata().get("alert_id")){
-                        var elMeta = selection.getMetadata();
-                        var params = {
-                            get_action:'dismiss_user_alert',
-                            alert_id:elMeta.get('alert_id')
-                        };
-                        if(elMeta.get("event_occurence")){
-                            params['occurrences'] = elMeta.get("event_occurence");
-                        }
-                        PydioApi.getClient().request(params, function(){
-                            ajaxplorer.notify("server_message:tree/reload_user_feed");
-                        });
-                    }
-                    ]]></clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.dismissUserAlert"/>
                     <serverCallback methodName="dismissUserAlert" restParams="/alert_id/occurences" developerComment="Dismiss one or more occurences of alerts">
                         <input_param name="alert_id" type="integer" description="Id passed in /feed action list"/>
                         <input_param name="occurences" type="integer" description="1 or more"/>
@@ -111,16 +69,7 @@
                     <context dir="true" recycle="true" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                        if(window.Notification){
-                            alert(pydio.MessageHash["notification_center.12"]);
-                            window.Notification.requestPermission(function(grant) {
-                                ['default', 'granted', 'denied'].indexOf(grant) === true
-                            });
-                        }else{
-                            alert(pydio.MessageHash["notification_center.13"]);
-                        }
-                    ]]></clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.activateDesktopNotifications"/>
                 </processing>
             </action>
         </actions>

@@ -287,7 +287,18 @@
     let Dashboard = React.createClass({
         
         render: function(){
-            return <ProfilePane {...this.props}/>;
+            return (
+                <MaterialUI.MuiThemeProvider>
+                    <MaterialUI.Tabs>
+                        <MaterialUI.Tab label="Profile">
+                            <ProfilePane {...this.props}/>
+                        </MaterialUI.Tab>
+                        <MaterialUI.Tab label="WebDAV Preferences">
+                            <WebDAVPane {...this.props}/>
+                        </MaterialUI.Tab>
+                    </MaterialUI.Tabs>
+                </MaterialUI.MuiThemeProvider>
+            );
         }
         
     });

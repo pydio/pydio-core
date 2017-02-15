@@ -21,20 +21,7 @@
                     <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
                 </gui>
                 <processing>
-                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
-                        <dialogOnOpen><![CDATA[
-                            var oForm = modal.getForm();
-                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                                TeamEditor.prototype.getInstance().open(oForm);
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            TeamEditor.prototype.getInstance().complete(oForm);
-                        ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[
-                            TeamEditor.prototype.getInstance().close(oForm);
-                        ]]></dialogOnCancel>
-                    </clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.userCreateTeam" prepareModal="true"/>
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>
@@ -49,21 +36,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
                 </gui>
                 <processing>
-                    <clientCallback dialogOpenForm="team_edit_form" prepareModal="true">
-                        <dialogOnOpen><![CDATA[
-                            var contextHolder = window.actionManager.getDataModel();
-                            var oForm = modal.getForm();
-                            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                                TeamEditor.prototype.getInstance().open(oForm, contextHolder);
-                            });
-                        ]]></dialogOnOpen>
-                        <dialogOnComplete><![CDATA[
-                            TeamEditor.prototype.getInstance().complete(oForm);
-                        ]]></dialogOnComplete>
-                        <dialogOnCancel><![CDATA[
-                            TeamEditor.prototype.getInstance().close(oForm);
-                        ]]></dialogOnCancel>
-                    </clientCallback>
+                    <clientCallback module="PydioCoreActions.Callbacks.userUpdateTeam" prepareModal="true"/>
                     <clientForm id="team_edit_form"><![CDATA[
                          <div id="team_edit_form" box_width="420">
                             <div class="dialogContentMainTitle" ajxp_message_id="user_dash.59">AJXP_MESSAGE[user_dash.59]</div>
@@ -88,20 +61,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
                 </gui>
                 <processing>
-                    <clientCallback><![CDATA[
-                    if(window.confirm(MessageHash["user_dash.52"])){
-                        var sel = window.actionManager.getDataModel().getUniqueNode();
-                        var conn = new Connexion();
-                        conn.setParameters($H({
-                            get_action: "user_team_delete",
-                            team_id: getBaseName(sel.getPath())
-                        }));
-                        conn.onComplete = function(){
-                            $("team_panel").ajxpPaneObject.reloadDataModel();
-                        };
-                        conn.sendAsync();
-                    }
-                    ]]></clientCallback>
+                    <clientCallback  module="PydioCoreActions.Callbacks.userDeleteTeam"/>
                     <serverCallback methodName="userTeamsActions"/>
                 </processing>
             </action>

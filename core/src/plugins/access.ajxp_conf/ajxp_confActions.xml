@@ -541,11 +541,7 @@
                 <context dir="true" recycle="true" allowedMimes="plugins_zone" selection="false" actionBar="true" actionBarGroup="get"/>
             </gui>
             <processing>
-                <clientCallback><![CDATA[
-                    var conn = new Connexion();
-                    conn.setParameters($H({get_action:'clear_plugins_cache'}));
-                    conn.sendAsync();
-                ]]></clientCallback>
+                <clientCallback module="PydioCoreActions.Callbacks.clearPluginsCache"/>
                 <serverCallback methodName="pluginsAction"/>
             </processing>
         </action>
@@ -603,9 +599,7 @@
                 <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="admin"/>
             </gui>
             <processing>
-                <clientCallback><![CDATA[
-                    var win = window.open('https://pydio.com/en/go-pro?referrer=settings');
-                ]]></clientCallback>
+                <clientCallback module="PydioCoreActions.Navigation.openGoPro"/>
             </processing>
         </action>
         <action name="display_enterprise">

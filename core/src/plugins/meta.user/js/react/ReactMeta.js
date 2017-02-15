@@ -83,6 +83,54 @@
 
     }
 
+    class Callbacks{
+
+        static editMeta(){
+
+            ResourcesManager.detectModuleToLoadAndApply('MetaCellRenderer', function(){
+                var userSelection = global.pydio.getUserSelection();
+                var loadFunc = function(oForm){
+                    var form = $(oForm).select('div[id="user_meta_form"]')[0];
+                    var nodeMeta = $H();
+                    var firstNodeMeta = userSelection.getUniqueNode().getMetadata();
+                    var metaConfigs = MetaCellRenderer.prototype.staticGetMetaConfigs();
+                    if(userSelection.isUnique()){
+                        nodeMeta = firstNodeMeta;
+                    }
+                    metaConfigs.each(function(pair){
+                        var value = nodeMeta.get(pair.key) || '';
+                        form.insert('<div class="SF_element"><div class="SF_label">'+pair.value.label+' : </div><input class="SF_input" name="'+pair.key+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');
+                        var element = form.down('input[name="'+pair.key+'"]');
+                        var fieldType = pair.value.type;
+                        if(fieldType == 'stars_rate'){
+                            MetaCellRenderer.prototype.formPanelStars(element, form);
+                        }else if(fieldType == 'css_label'){
+                            MetaCellRenderer.prototype.formPanelCssLabels(element, form);
+                        }else if(fieldType == 'textarea'){
+                            MetaCellRenderer.prototype.formTextarea(element, form);
+                        }else if(fieldType == 'choice'){
+                            MetaCellRenderer.prototype.formPanelSelectorFilter(element, form);
+                        }else if(fieldType == 'tags'){
+                            MetaCellRenderer.prototype.formPanelTags(element, form);
+                        }else if(fieldType == 'updater' || fieldType == 'creator'){
+                            element.disabled = true;
+                        }
+                    });
+                }
+                var closeFunc = function(){
+                    var oForm = $(modal.getForm());
+                    userSelection.updateFormOrUrl(modal.getForm());
+                    PydioApi.getClient().submitForm(oForm, true);
+                    hideLightBox(true);
+                    return false;
+                };
+                modal.showDialogForm('Meta Edit', 'user_meta_form', loadFunc, closeFunc);
+            });
+
+        }
+
+    }
+
     let MetaFieldFormPanelMixin = {
 
         propTypes:{
@@ -291,6 +339,7 @@
     let ns = global.ReactMeta || {};
     ns.Renderer = Renderer;
     ns.InfoPanel = InfoPanel;
+    ns.Callbacks = Callbacks;
     global.ReactMeta = ns;
 
 })(window);

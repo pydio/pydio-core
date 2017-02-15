@@ -40,104 +40,7 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-				<clientCallback prepareModal="true" dialogOpenForm="user_create_repository_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
-					<dialogOnOpen><![CDATA[
-                       var conn = new Connexion();
-                       var okButton = oForm.down('.dialogButtons input');
-                       var backButton = new Element('img', {
-                            src:ResourcesManager.resolveImageSource('actions/22/back_22.png'),
-                            style:'float: left;margin-top: 7px;margin-left: 4px;cursor: pointer;',
-                            title:'Back'
-                       }).observe('click', function(e){
-                            Event.stop(e);
-                            new Effect.Parallel([
-                                new Effect.Morph('user_templates_selector', {style:'left:0px;'}),
-                                new Effect.Morph('user_template_parameters', {style:'left:420px;'}),
-                                new Effect.Morph('user_tpl_container', {style:'height:'+conn.ORIGINAL_HEIGHT+'px;'}),
-                                new Effect.Opacity(okButton, {sync:true,from:1.0,to:0}),
-                                new Effect.Opacity(backButton, {sync:true,from:1.0,to:0})
-                            ], {
-                                afterFinish:function(){
-                                    $('user_templates_selector').select('div').invoke('removeClassName', 'selected-focus');
-                                    modal.refreshDialogPosition();
-                                }
-                            });
-                       }).setStyle({opacity:0});
-                       okButton.setStyle({opacity:0});
-                       okButton.insert({before:backButton});
-                       conn.addParameter("get_action", "get_user_templates_definition");
-                       conn.parseTplParameters = function(tplDiv){
-                            if(!conn.TPL_XML) return;
-                            if(!conn.FORM_MANAGER) conn.FORM_MANAGER = new FormManager();
-                            var tplId = tplDiv.getAttribute('data-templateId');
-                            var tplLabel = tplDiv.getAttribute('data-templateLabel');
-                            tplDiv.addClassName('selected-focus');
-                            $('user_tpl_params_title').update('<img style="top:3px;left:4px;" src="'+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=small'+'" class="panelHeaderIcon"> '+MessageHash[421].replace('%s',tplLabel));
-                            $('user_template_parameters').select('div.SF_element').invoke('remove');
-                            $('user_tpl_params_parameters').update('');
-                            var params = conn.FORM_MANAGER.parseParameters(conn.TPL_XML, '//template[@repository_id="'+tplId+'"]/param');
-                            //params.push(new Hash({name:"DISPLAY", type:"string", label:"Label", mandatory:"true", description:"Label of your repository"}));
-                            conn.FORM_MANAGER.createParametersInputs($('user_tpl_params_parameters'), params, true, null, false, true, false);
-                            $('user_tpl_params_parameters').insert(new Element('input', {type:'hidden',name:'template_id',value:tplId}));
-                            var elements = $('user_tpl_params_parameters').select("div.SF_element");
-                            $('user_template_parameters').down('div.dialogLegend').insert({before:elements[elements.length-1]});
-                            var targetHeight = parseInt($('user_template_parameters').getHeight());
-                             if(!targetHeight) targetHeight = params.length * 44 + 80;
-                            new Effect.Parallel([
-                                new Effect.Morph('user_templates_selector', {style:'left:-420px;'}),
-                                new Effect.Morph('user_template_parameters', {style:'left:0px;'}),
-                                new Effect.Morph('user_tpl_container', {style:'height:'+targetHeight+'px;'}),
-                                new Effect.Opacity(okButton, {sync:true,from:0,to:1.0}),
-                                new Effect.Opacity(backButton, {sync:true,from:0,to:1.0})
-                            ], {afterFinish : function(){modal.refreshDialogPosition();}});
-                       }
-                       conn.onComplete = function(transport){
-                            conn.TPL_XML = transport.responseXML;
-                            var templates = XPathSelectNodes(conn.TPL_XML, "//template");
-                            conn.ORIGINAL_HEIGHT = (templates.length*47 + 21);
-                            $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
-                            $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
-                            for(var i=0;i<templates.length;i++){
-                                var label = templates[i].getAttribute('repository_label');
-                                var tplId = templates[i].getAttribute('repository_id');
-                                var labelDiv = new Element('div').update(label);
-                                labelDiv.setStyle({
-                                    padding:'12px 6px 12px 35px',
-                                    fontSize:'1.3em',
-                                    cursor:'pointer',
-                                    borderBottom:'1px solid #EEE',
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: '5px 10px',
-                                    backgroundImage:'url('+conn._baseUrl+'&get_action=get_user_template_logo&template_id='+tplId+'&icon_format=big)'
-                                });
-                                var tplDiv = new Element('div', {"data-templateId":tplId,"data-templateLabel":label}).update(labelDiv);
-                                tplDiv.observe('click', function(e){
-                                    conn.parseTplParameters(( e.target.getAttribute("data-templateId")?e.target:e.target.up('div') ));
-                                });
-                                labelDiv.observe('mouseover', function(e){e.target.up('div').addClassName('selected');}).observe('mouseout', function(e){e.target.up('div').removeClassName('selected');});
-                                $('user_templates_selector').insert(tplDiv);
-                            }
-                       };
-                       conn.sendAsync();
-					]]></dialogOnOpen>
-					<dialogOnComplete hideDialog="true"><![CDATA[
-                            var formManager = new FormManager();
-                            var params = $H({get_action:'user_create_repository'});
-                            formManager.serializeParametersInputs($('user_template_parameters'), params, "DRIVER_OPTION_");
-                            $('user_tpl_params_parameters').select('input[type="hidden"]').each(function(el){
-                                params.set(el.name,el.value);
-                            });
-                            params.set("DISPLAY", params.get("DRIVER_OPTION_DISPLAY"));
-                            params.unset("DRIVER_OPTION_DISPLAY");
-                            params.unset("DRIVER_OPTION_DISPLAY_ajxptype");
-                            var conn = new Connexion();
-                            conn.setParameters(params);
-                            conn.onComplete = function(transport){
-                                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                            }
-                            conn.sendAsync();
-					]]></dialogOnComplete>
-				</clientCallback>
+				<clientCallback module="PydioCoreActions.Callbacks.userCreateRepository" prepareModal="true"/>
 				<clientForm id="user_create_repository_form"><![CDATA[
 					<div id="user_create_repository_form" action="user_create_repository" box_width="420" box_padding="0">
 					    <div id="user_tpl_container" style="position:relative;width:418px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
@@ -184,40 +87,6 @@
             </gui>
             <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback><![CDATA[
-
-                ]]></clientCallback>
-                <clientListener name="init"><![CDATA[
-                window.setTimeout(function(){
-                    if(!$('get_bookmarks_button')) {
-                        if(!pydio.bookmarkBar) pydio.bookmarkBar = new BookmarksBar(null, {});
-                        return;
-                    }
-                    if(!window.BookmarksBar) return;
-                    var bmBar = new BookmarksBar($('get_bookmarks_button'), {bookmarksMenuOptions:{
-                        className: 'menu desktop toolbarmenu panelHeaderMenu bmbarMenu',
-                        mouseClick:'over',
-                        topOffset:2,
-                        leftOffset:0,
-                        position:'bottom right'
-                    }});
-                    var bmAction = pydio.getController().actions.get('bookmark');
-                    bmBar.addBookmarkObject = {
-                        name:bmAction.getKeyedText(),
-                        alt:bmAction.options.title,
-                        image:ResourcesManager.resolveImageSource('actions/16/bookmark_add.png'),
-                        icon_class:'icon-plus-sign',
-                        callback:function(e){
-                            var node = pydio.getContextNode();
-                            node.getMetadata().set('ajxp_bookmarked', 'true');
-                            node.getMetadata().set('overlay_icon', 'bookmark.png');
-                            node.getMetadata().set('overlay_class', 'icon-bookmark');
-                            bmBar.addBookmark(node.getPath(), node.getLabel());
-                        }.bind(this)
-                    };
-                    bmBar.load($H(), true);
-                }, 500);
-                ]]></clientListener>
                 <serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
@@ -265,37 +134,6 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback prepareModal="true" dialogOpenForm="custom_data_edit" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                    <dialogOnOpen><![CDATA[
-                        var f = new FormManager();
-                          var definitions = f.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed]|//param[contains(@scope,'user')]");
-                          f.createParametersInputs(oForm.down('#custom_data_edit'), definitions, true, pydio.user.preferences, false, true);
-                          modal.refreshDialogPosition();
-                    ]]></dialogOnOpen>
-                    <dialogOnComplete hideDialog="true"><![CDATA[
-                        var params = $H();
-                        var f = new FormManager();
-                          f.serializeParametersInputs(oForm.down('#custom_data_edit'), params, 'PREFERENCES_');
-                          var conn = new Connexion();
-                          params.set("get_action", "custom_data_edit");
-                          conn.setParameters(params);
-                          conn.setMethod("POST");
-                          conn.onComplete = function(transport){
-                              PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                              document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
-                                  if(event.memo != "user/preferences") return;
-                                  pydio.Registry.logXmlUser();
-                              });
-                              pydio.loadXmlRegistry(false, "user/preferences");
-                          };
-                          conn.sendAsync();
-                    ]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
-                </clientCallback>
-                <clientForm id="custom_data_edit"><![CDATA[
-                    <div id="custom_data_edit" action="custom_data_edit" box_width="320">
-                    </div>
-                ]]></clientForm>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -306,64 +144,7 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                    <dialogOnOpen><![CDATA[
-
-                        var user = window.actionManager.getDataModel().getUniqueNode();
-                        if(user && user.getAjxpMime() == "shared_user"){
-                            var user_id = getBaseName(user.getPath());
-                            var conn = new Connexion();
-                            conn.setParameters({
-                                get_action:'user_update_user',
-                                user_id:user_id
-                            });
-                            conn.onComplete = function(transport){
-                                var values = $H(transport.responseJSON);
-                                values.set("existing_user_id", user_id);
-
-                                var f = new FormManager();
-                                var parameters = [];
-                                PydioUsers.Client.getCreateUserParameters().map(function(obj){
-                                    if(obj.type === 'valid-password') {
-                                        obj.type = 'password-create';
-                                    }
-                                    if(obj.name === 'new_user_id'){
-                                        obj.name = 'existing_user_id';
-                                        obj.type = 'hidden';
-                                    }
-                                    if(obj.name === 'send_email'){
-                                        return;
-                                    }
-                                    parameters.push($H(obj));
-                                });
-
-                                f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, values, false, true);
-                                modal.refreshDialogPosition();
-
-                            };
-                            conn.sendAsync();
-                        }
-                    ]]></dialogOnOpen>
-                    <dialogOnComplete hideDialog="true"><![CDATA[
-                        var params = $H();
-                        var f = new FormManager();
-                          f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-                          var conn = new Connexion();
-                          params.set("get_action", "user_create_user");
-                          conn.setParameters(params);
-                          conn.setMethod("POST");
-                          conn.onComplete = function(transport){
-                                if(transport.responseText == "SUCCESS"){
-                                   if($("address_book")){
-                                        $("address_book").ajxpPaneObject.reloadDataModel();
-                                  }
-                                  pydio.displayMessage("SUCCESS", MessageHash[521]);
-                                }
-                          };
-                          conn.sendAsync();
-                    ]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
-                </clientCallback>
+                <clientCallback module="PydioCoreActions.Callbacks.userUpdateUser" prepareModal="true"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -373,32 +154,7 @@
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback prepareModal="true" dialogOpenForm="user_create_user" dialogOkButtonOnly="false" dialogSkipButtons="false">
-                    <dialogOnOpen><![CDATA[
-                        var parameters = PydioUsers.Client.getCreateUserParameters().map(function(obj){
-                            if(obj.type === 'valid-password') obj.type = 'password-create';
-                            return $H(obj)
-                        });
-                        var f = new FormManager();
-                        f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, $H(), false, true);
-                        modal.refreshDialogPosition();
-                    ]]></dialogOnOpen>
-                    <dialogOnComplete hideDialog="true"><![CDATA[
-                        var params = $H();
-                        var f = new FormManager();
-                        f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-                        var conn = new Connexion();
-                        params.set("get_action", "user_create_user");
-                        conn.setParameters(params);
-                        conn.setMethod("POST");
-                        conn.onComplete = function(transport){
-                           if($("address_book")){
-                                $("address_book").ajxpPaneObject.reloadDataModel();
-                          }
-                        };
-                        conn.sendAsync();
-                    ]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[]]></dialogOnCancel>
+                <clientCallback  module="PydioCoreActions.Callbacks.userCreateUser" prepareModal="true">
                 </clientCallback>
                 <clientForm id="user_create_user"><![CDATA[
                     <div id="user_create_user" action="custom_data_edit" box_width="320">
@@ -412,48 +168,7 @@
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
 			<processing>
-				<clientCallback prepareModal="true" dialogOpenForm="switch_language_form" dialogOkButtonOnly="false" dialogSkipButtons="false">
-					<dialogOnOpen><![CDATA[
-					    if(pydio.user) var userLang = pydio.user.getPreference("lang");
-						if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
-						var selector = $(oForm).select('select[id="language_selector"]')[0];
-						pydio.listLanguagesWithCallback(function(key, label){
-							var option = new Element('option', {value:key,id:'lang_'+key});
-							option.update(label);
-							selector.insert(option);
-						});
-						selector.setValue(userLang);
-						selector.observe("change", function(){
-							var value = selector.getValue();
-							if(pydio.user){
-    							pydio.user.setPreference("lang", selector.getValue());
-	    						pydio.user.savePreference("lang");
-	    					}
-						});
-						$(oForm).up('.dialogContent').previous('.dialogTitle').select('span').invoke('remove');
-					]]></dialogOnOpen>
-					<dialogOnComplete hideDialog="true"><![CDATA[
-                        if(pydio.user){
-                            var oUser = pydio.user;
-                            if(oUser.getPreference('lang') != null
-                                && oUser.getPreference('lang') != ""
-                                && oUser.getPreference('lang') != pydio.currentLanguage)
-                            {
-                                pydio.loadI18NMessages(oUser.getPreference('lang'));
-                                pydio.displayMessage('SUCCESS', MessageHash[241]);
-                            }
-                        }else{
-                            var selector = $(oForm).select('select[id="language_selector"]')[0];
-                            var value = selector.getValue();
-                            pydio.loadI18NMessages(value);
-                            window.ajxpBootstrap.parameters.set("currentLanguage", value);
-                        }
-					]]></dialogOnComplete>
-                    <dialogOnCancel><![CDATA[
-                        pydio.Controller.fireAction("login");
-                    ]]></dialogOnCancel>
-					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
-				</clientCallback>
+				<clientCallback module="PydioCoreActions.Callbacks.switchLanguage" prepareModal="true"/>
 				<clientForm id="switch_language_form"><![CDATA[
 					<div id="switch_language_form" action="switch_language_form" box_width="320">
 					    <div class="dialogLegend"  style="margin-left:50px; font-size: 15px;">AJXP_MESSAGE[190]</div>
@@ -469,106 +184,6 @@
 			</gui>
             <rightsContext noUser="false" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback prepareModal="true" dialogOpenForm="webdav_pref_form" dialogOkButtonOnly="true" dialogSkipButtons="false">
-					<dialogOnOpen><![CDATA[
-					if(!pydio.user) return;
-					var cont = $('webdav_repo_list');
-					cont.update('');
-					var even = false;
-					var conn = new Connexion();
-					conn.setParameters(new Hash({get_action:'webdav_preferences'}));
-					conn.onComplete = function(transport){
-						pydio.webdavCurrentPreferences = transport.responseJSON;
-						$('webdav_activator').checked = pydio.webdavCurrentPreferences.webdav_active;
-						if($('webdav_activator').checked && !pydio.webdavCurrentPreferences.digest_set
-						    && !pydio.webdavCurrentPreferences.webdav_force_basic) {
-						    $('webdav_password_form').show();
-						}
-                        ProtoCompat.map2hash(pydio.user.getRepositoriesList()).each(function(pair){
-                            if(pydio.webdavCurrentPreferences.webdav_repositories[pair.key]){
-                                var div = new Element('div', {className:(even?'even':'')});
-                                div.update('<span>'+pair.value.label+'</span><input readonly type="text" value="'+ pydio.webdavCurrentPreferences.webdav_repositories[pair.key] +'">' );
-                                cont.insert(div);
-                                even = !even;
-                            }
-                        });
-                        modal.getForm().down('#webdav_main_access').setValue(pydio.webdavCurrentPreferences.webdav_base_url);
-                        modal.getForm().down('#webdav_main_access').observe("click", function(){
-                            modal.getForm().down('#webdav_main_access').select();
-                        });
-                        modal.getForm().down('#perworkspace-urls-toggle').observe("click", function(event){
-                            modal.getForm().down('#webdav_repo_list').toggle();
-                            var span = modal.getForm().down('#perworkspace-urls-toggle').down("span");
-                            var open = span.hasClassName("icon-caret-right");
-                            span.removeClassName(open ? "icon-caret-right" : "icon-caret-down");
-                            span.addClassName(!open ? "icon-caret-right" : "icon-caret-down");
-                            modal.refreshDialogPosition();
-                        });
-
-                        modal.getForm().down('input[name="ok"]').observe("click", hideLightBox);
-                        if(!$('webdav_activator').hasObserver){
-                            $('webdav_activator').observe("change", function(e){
-                                var checked = $('webdav_activator').checked;
-                                var conn = new Connexion();
-                                conn.setParameters(new Hash({
-                                    get_action:'webdav_preferences',
-                                    activate:(checked?'true':'false')
-                                }));
-                                conn.onComplete = function(transport){
-                                    pydio.webdavCurrentPreferences = transport.responseJSON;
-                                    if(pydio.webdavCurrentPreferences.webdav_active){
-                                        if(!pydio.webdavCurrentPreferences.digest_set
-                                        || pydio.webdavCurrentPreferences.webdav_force_basic) {
-                                            $('webdav_password_form').show();
-                                        }
-                                        pydio.displayMessage("SUCCESS", MessageHash[408]);
-                                    }else {
-                                        $('webdav_password_form').hide();
-                                        pydio.displayMessage("SUCCESS", MessageHash[409]);
-                                    }
-                                };
-                                conn.sendAsync();
-                            });
-                            if(!pydio.webdavCurrentPreferences.digest_set){
-                                $('webdav_pass_saver').observe("click", function(){
-                                    var conn = new Connexion();
-                                    conn.setMethod('POST');
-                                    conn.setParameters(new Hash({
-                                        get_action:'webdav_preferences',
-                                        webdav_pass: $('webdav_password').value
-                                    }));
-                                    conn.onComplete = function(transport){
-                                        pydio.displayMessage("SUCCESS", MessageHash[410]);
-                                    };
-                                    conn.sendAsync();
-                                });
-                            }
-                            $('webdav_activator').hasObserver = true;
-                        }
-					};
-					conn.sendAsync();
-
-					]]></dialogOnOpen>
-					<dialogOnComplete hideDialog="false"><![CDATA[
-					]]></dialogOnComplete>
-					<dialogOnCancel><![CDATA[]]></dialogOnCancel>
-				</clientCallback>
-				<clientForm id="webdav_pref_form"><![CDATA[
-					<div id="webdav_pref_form" action="webdav_pref_form" box_width="450">
-					    <div class="dialogContentMainTitle">WebDAV Access</div>
-						<div class="dialogLegend" style="margin-bottom: 2px;padding: 0 5px;" ajxp_message_id="404">AJXP_MESSAGE[404]</div>
-						<div style="padding:10px;"><input type="checkbox" id="webdav_activator" style="width:16px;" name="webdav_activator"> <label for="webdav_activator">AJXP_MESSAGE[406]</label></div>
-						<div id="webdav_password_form" style="display:none;text-align: left;padding-left: 15px;height: 42px;font-size: 0.9em;padding-top: 5px;">
-							<div style="width: 70%; float: left; padding-right: 5px; text-align: right;">AJXP_MESSAGE[407]</div><input type="password" id="webdav_password" style="float:left;height: 24px;width: 80px;"> <input type="image" src="AJXP_IMAGES_FOLDER/actions/22/dialog_ok_apply.png" height="22" width="22" title="OK" id="webdav_pass_saver">
-						</div>
-						<div class="dialogLegend" style="margin: 5px;" ajxp_message_id="405">AJXP_MESSAGE[405]</div>
-						<input type="text" id="webdav_main_access" value="AJXP_MESSAGE[466]" readonly/>
-						<div class="dialogLegend" id="perworkspace-urls-toggle" style="margin-bottom: 2px; padding:5px;" ajxp_message_id="405">
-						<span class="icon-caret-right"></span>AJXP_MESSAGE[465]</div>
-						<div id="webdav_repo_list" style="display:none; height: 200px; overflow:auto;"></div>
-						<input type="hidden" name="get_action" value="webdav_preferences">
-					</div>
-				]]></clientForm>
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
@@ -578,11 +193,7 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback><![CDATA[
-                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_user"){
-                        pydio.triggerRepositoryChange('ajxp_user');
-                    }
-                ]]></clientCallback>
+                <clientCallback module="PydioCoreActions.Navigation.switchToUserDashboard"/>
             </processing>
         </action>
         <action name="switch_to_settings">
@@ -591,11 +202,7 @@
             </gui>
             <rightsContext adminOnly="true" noUser="true" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback><![CDATA[
-                    if(!pydio.repositoryId || pydio.repositoryId != "ajxp_conf"){
-                        pydio.triggerRepositoryChange('ajxp_conf');
-                    }
-                ]]></clientCallback>
+                <clientCallback module="PydioCoreActions.Navigation.switchToSettings"/>
             </processing>
         </action>
 	</actions>

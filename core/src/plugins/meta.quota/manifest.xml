@@ -15,6 +15,7 @@
         <resources>
             <img_library alias="meta_quota" path="plugins/meta.quota/img"/>
             <i18n namespace="meta.quota" path="plugins/meta.quota/i18n"/>
+            <js className="QuotaActions" file="plugins/meta.quota/res/build/QuotaActions.js"/>
         </resources>
     </client_settings>
    	<registry_contributions>
@@ -32,60 +33,8 @@
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
-                    <clientCallback><![CDATA[
-                        bufferCallback("ajxp_meta_quota_loader", 5, function(){
-                            if(window.ajxp_meta_quota_loading) return;
-                            var c = new Connexion();
-                            c.setParameters(new Hash({get_action:'monitor_quota'}));
-                            c.discrete = true;
-                            c.onComplete = function(transport){
-                                window.ajxp_meta_quota_loading = false;
-                                var action = pydio.getController().getActionByName("monitor_quota");
-                                if(!action) return;
-                                var data = transport.responseJSON;
-                                ajaxplorer.meta_quota_text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
-                                action.options.text = ajaxplorer.meta_quota_text;
-                                if($('ajxp_quota_panel_content')){
-                                    $('ajxp_quota_panel_content').update(ajaxplorer.meta_quota_text);
-                                }
-                                action.refreshInstances();
-                            };
-                            window.ajxp_meta_quota_loading = true;
-                            c.sendAsync();
-                        });
-                    ]]></clientCallback>
-                    <clientListener name="contextChange"><![CDATA[
-                        if(ajaxplorer && !ajaxplorer.meta_quota_pe_created){
-                            var configs = ajaxplorer.getPluginConfigs("mq");
-                            if(configs){
-                                ajaxplorer.observe("server_message", function(event){
-                                    var newValue = XPathSelectSingleNode(event, "/tree/metaquota");
-                                    if(newValue){
-                                        var action = pydio.getController().getActionByName("monitor_quota");
-                                        if(!action) return;
-                                        ajaxplorer.meta_quota_text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
-                                        action.options.text = ajaxplorer.meta_quota_text;
-                                        if($('ajxp_quota_panel_content')){
-                                            $('ajxp_quota_panel_content').update(ajaxplorer.meta_quota_text);
-                                        }
-                                        action.refreshInstances();
-                                    }
-                                });
-                                pydio.getController().fireAction('monitor_quota');
-                            }else{
-                                new PeriodicalExecuter(function(pe){
-                                    var action = pydio.getController().getActionByName("monitor_quota");
-                                    if(!action) {
-                                        pe.stop();
-                                        ajaxplorer.meta_quota_pe_created = false;
-                                        return;
-                                    }
-                                    pydio.getController().fireAction('monitor_quota');
-                                }, 20);
-                            }
-                            ajaxplorer.meta_quota_pe_created = true;
-                        }
-                        ]]></clientListener>
+                    <clientCallback module="QuotaActions.Callbacks.computeQuota"/>
+                    <clientListener module="QuotaActions.Listeners.contextChange" name="contextChange"/>
                     <serverCallback methodName="getCurrentQuota" restParams="/" developerComment="Get current quota usage information">
                         <output type="JSON" description="A Json structure containing usage and authorized quota"/>
                     </serverCallback>

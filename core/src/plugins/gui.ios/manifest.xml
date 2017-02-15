@@ -37,7 +37,7 @@
 	<!-- Override a simple action -->
 		<action name="login">
 			<processing>
-				<clientCallback prepareModal="true"><![CDATA[ /* BLOCK LOGIN OPENING */ ]]></clientCallback>
+				<clientCallback module="FuncUtils.Empty" prepareModal="true"/>
 			</processing>
 		</action>
 	</actions>
