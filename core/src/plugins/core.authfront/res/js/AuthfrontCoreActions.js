@@ -45,8 +45,10 @@
                     }else{
                         oForm.down('.dialogLegend').update(pydio.MessageHash[180]);
                     }
-                    $("generic_dialog_box").down(".titleString").hide();
-                    $("generic_dialog_box").down("#modalCloseBtn").hide();
+                    if($("generic_dialog_box").down(".titleString")){
+                        $("generic_dialog_box").down(".titleString").hide();
+                        $("generic_dialog_box").down("#modalCloseBtn").hide();
+                    }
                     $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
                     if(!$("generic_dialog_box").down("#progressCustomMessage")){
                         if($("progressBox").down("#progressCustomMessage")) $("generic_dialog_box").down(".dialogContent").insert({top:$("progressBox").down("#progressCustomMessage").cloneNode(true)});

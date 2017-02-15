@@ -43,6 +43,7 @@
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback module="ShareActions.Callbacks.share" prepareModal="true"/>
+                    <clientListener name="init" module="ShareActions.Listeners.hookAfterDelete"/>
                     <clientForm id="react_share_form"><![CDATA[
                         <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>
