@@ -44,9 +44,7 @@
         <pluginClass pluginName="gui.ajax"/>
     </dependencies>
 	<processing>
-        <clientForm id="upload_main_container"><![CDATA[
-			<div id="upload_main_container" box_width="60%" box_padding="0" style="padding:10px;"><div>
-		]]></clientForm>
+        <clientForm module="UploaderView.DropUploader"/>
 		<dialogOnOpen><![CDATA[
 			if(typeof File != "undefined" && typeof (new XMLHttpRequest()).upload != "undefined"  && 'draggable' in new Element('span')){
                 pydio.getController().react_selector = new AjxpReactComponent(oForm.down("#upload_main_container"), {

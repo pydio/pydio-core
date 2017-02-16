@@ -160,10 +160,13 @@ class Registry{
             if(!clientForm){
                 clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/clientForm');
             }
-            if(clientForm && clientForm.firstChild && clientForm.getAttribute('id'))
-            {
-                extensionDefinition.formId = clientForm.getAttribute('id');
-                this._pydioObject.UI.insertForm(clientForm.getAttribute('id'), clientForm.firstChild.nodeValue);
+            if(clientForm){
+                if(clientForm.firstChild && clientForm.getAttribute('id')){
+                    extensionDefinition.formId = clientForm.getAttribute('id');
+                    this._pydioObject.UI.insertForm(clientForm.getAttribute('id'), clientForm.firstChild.nodeValue);
+                }else if(clientForm.getAttribute('module')){
+                    extensionDefinition.moduleName = clientForm.getAttribute('module');
+                }
             }
             if(xmlNode.getAttribute("order")){
                 extensionDefinition.order = parseInt(xmlNode.getAttribute("order"));

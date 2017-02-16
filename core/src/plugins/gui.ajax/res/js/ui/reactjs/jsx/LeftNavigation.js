@@ -235,7 +235,7 @@
                     nodeIsSelected={this.nodeIsSelected}
                     dataModel={this.props.dataModel}
                     node={this.props.dataModel.getRootNode()}
-                    showRoot={false}
+                    showRoot={this.props.showRoot ? true : false}
                     className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
                 />
             );
@@ -920,6 +920,7 @@
         ns.Panel = LeftPanel;
         ns.PinnedLeftPanel = PinnedLeftPanel;
     }
+    ns.FoldersTree = FoldersTree;
     ns.UserWorkspacesList = UserWorkspacesList;
     global.LeftNavigation=ns;
 

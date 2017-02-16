@@ -734,7 +734,7 @@ Class.create("Modal", {
         }
 
         var container;
-        if(pydio.UI.getMessageBoxReference()){
+        if(pydio.UI.getMessageBoxReference && pydio.UI.getMessageBoxReference()){
             container = pydio.UI.getMessageBoxReference();
         }else if($('content_pane')) {
             container = $('content_pane');

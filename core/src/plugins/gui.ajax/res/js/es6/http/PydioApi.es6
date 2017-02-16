@@ -555,7 +555,7 @@ class PydioApi{
         this.request(params, onComplete, null, {method:post?'post':'get'});
     }
 
-    postSelectionWithAction(actionName, callback=null, selectionModel=null){
+    postSelectionWithAction(actionName, callback=null, selectionModel=null, additionalParameters=null){
         if(!selectionModel){
             selectionModel = this._pydioObject.getContextHolder();
         }
@@ -564,6 +564,9 @@ class PydioApi{
             dir: selectionModel.getContextNode().getPath()
         };
         params['nodes[]'] = selectionModel.getFileNames();
+        if(additionalParameters){
+            params = Object.assign(params, additionalParameters);
+        }
         this.request(params, callback || FuncUtils.Empty);
 
     }

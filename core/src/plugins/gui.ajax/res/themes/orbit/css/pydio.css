@@ -6182,6 +6182,10 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   height: 56px;
   width: 56px;
 }
+.mfb-component__button--disabled {
+  background-color: #e0e0e0;
+  color: #9e9e9e;
+}
 .mfb-component__main-icon--active,
 .mfb-component__main-icon--resting {
   -webkit-transform: scale(1) rotate(360deg);

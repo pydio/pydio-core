@@ -3014,6 +3014,9 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         },
         dismiss: function(){
             this.props.dismiss();
+        },
+        getDialogClassName: function(){
+            return this.props.dialogClassName || 'dialog-max-420';
         }
     };
 
