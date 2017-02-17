@@ -270,9 +270,10 @@ class Registry{
     /**
      * Trigger the load method of the resourcesManager.
      * @param resourcesManager ResourcesManager
+     * @param callback triggered after JS loaded
      */
-    loadEditorResources (resourcesManager){
-        resourcesManager.load(this._resourcesRegistry);
+    loadEditorResources (resourcesManager, callback){
+        resourcesManager.load(this._resourcesRegistry, false, callback);
     }
 
     /**

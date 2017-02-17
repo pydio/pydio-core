@@ -85,28 +85,47 @@ class ResourcesManager{
 	}
 	/**
 	 * Load resources
-	 * @param resourcesRegistry $H Ajaxplorer ressources registry
+	 * @param resourcesRegistry Pydio resources registry
 	 */
-	load(resourcesRegistry, jsAutoloadOnly=false){
-		if(this.loaded) return;
-		if(this.hasDependencies()){
+	load(resourcesRegistry, jsAutoloadOnly=false, callback = FuncUtils.Empty){
+		if(this.loaded) {
+            callback();
+            return;
+        }
+		if(this.hasDependencies() && !this.dependenciesLoaded){
 			this.resources.dependencies.forEach(function(el){
 				if(resourcesRegistry[el]){
-					resourcesRegistry[el].load(resourcesRegistry);
+                    // Load dependencies and try again
+					resourcesRegistry[el].load(resourcesRegistry, false, function(){
+                        this.dependenciesLoaded = true;
+                        this.load(resourcesRegistry, false, callback);
+                    }.bind(this));
 				}
 			}.bind(this) );
-		}		
+		}
 		if(this.resources.forms){
 			this.resources.forms.forEach(function(value,key){
 				this.loadGuiForm(key, value);
 			}.bind(this) );
 		}
-		if(this.resources.js){
-			this.resources.js.forEach(function(value){
-                if(jsAutoloadOnly && !value.autoload) return;
-				this.loadJSResource(value.fileName, value.className);
-			}.bind(this));
-		}
+        if(this.resources.js){
+            let it = this.resources.js.values();
+            let cb = function(){
+                let object = it.next();
+                if(object.value){
+                    if(jsAutoloadOnly && !object.value.autoload) {
+                        cb();
+                        return;
+                    }
+                    this.loadJSResource(object.value.fileName, object.value.className, cb, true);
+                }else{
+                    callback();
+                }
+            }.bind(this);
+            cb();
+        }else{
+            callback();
+        }
 		if(this.resources.css){
 			this.resources.css.forEach(function(value){
 				this.loadCSSResource(value);
@@ -381,10 +400,16 @@ class ResourcesManager{
         }else{
             // Load sync and apply the callback manually
             var loader = new ResourcesManager();
-            modules.forEach(function(element){
-                loader.loadJSResource(element.fileName, element.className, null, false);
-            });
-            callbackFunc();
+            let it = modules.values();
+            let cb = function(){
+                let object = it.next();
+                if(object.value){
+                    loader.loadJSResource(object.value.fileName, object.value.className, cb, true);
+                }else{
+                    callbackFunc();
+                }
+            };
+            cb();
         }
     }
 

@@ -17,97 +17,107 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+function threeSixtyLoaded(){
+
+    if(!window.threeSixtyPlayer) return;
+
+    window.threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
+    window.threeSixtyPlayer.config.showHMSTime = true;
+    window.threeSixtyPlayer.config.useWaveformData = true;
+    window.threeSixtyPlayer.config.useEQData = true;
+    // enable this in SM2 as well, as needed
+    if (window.threeSixtyPlayer.config.useWaveformData) {
+        window.soundManager.flash9Options.useWaveformData = true;
+    }
+    if (window.threeSixtyPlayer.config.useEQData) {
+        window.soundManager.flash9Options.useEQData = true;
+    }
+    if (window.threeSixtyPlayer.config.usePeakData) {
+        window.soundManager.flash9Options.usePeakData = true;
+    }
+    if (window.threeSixtyPlayer.config.useWaveformData || window.threeSixtyPlayer.flash9Options.useEQData || window.threeSixtyPlayer.flash9Options.usePeakData) {
+        // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
+        window.soundManager.preferFlash = true;
+    }
+
+    window.soundManager.useFastPolling = true; // increased JS callback frequency, combined with useHighPerformance = true
+    window.threeSixtyPlayer.config.onfinish = function(smPlayer){
+        try{
+            var finishingPlayer = smPlayer._360data.oUI360;
+            if(finishingPlayer.hasClassName("ui360-vis")) {
+                window.setTimeout(function(){
+                    finishingPlayer.addClassName("ui360-vis-retracted");
+                }, 1000);
+            }else{
+                var links = $$("div.ui360").reject(function(el){
+                    return el.hasClassName("ui360-vis");
+                });
+                var index = links.indexOf(finishingPlayer);
+                if(index < links.length-1 ){
+                    window.threeSixtyPlayer.handleClick({'target':links[index+1].down("a.sm2_link")});
+                }
+                if(finishingPlayer.up('.ajxpNodeProvider')){
+                    finishingPlayer.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
+                }
+            }
+        }catch(e){}
+    };
+
+    window.threeSixtyPlayer.config.onplay = function(smPlayer){
+        try{
+            var playerDiv = smPlayer._360data.oUI360;
+            if(!playerDiv.hasClassName("ui360-vis")) {
+                if(playerDiv.up('.ajxpNodeProvider')){
+                    playerDiv.up('.ajxpNodeProvider').addClassName("SMNodePlaying");
+                }
+            }else{
+                playerDiv.removeClassName("ui360-vis-retracted");
+            }
+        }catch(e){}
+    };
+
+    window.threeSixtyPlayer.config.onstop = function(smPlayer){
+        try{
+            var playerDiv = smPlayer._360data.oUI360;
+            if(!playerDiv.hasClassName("ui360-vis")) {
+                if(playerDiv.up('.ajxpNodeProvider')){
+                    playerDiv.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
+                }
+            }else{
+                window.setTimeout(function(){
+                    playerDiv.addClassName("ui360-vis-retracted");
+                }, 1000);
+            }
+        }catch(e){}
+    };
+
+    window.soundManager.beginDelayedInit();
+}
+
+
 window.SM2_DEFER = true;
 if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager){
+
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
-    conn.loadLibrary('360-player/script/berniecode-animator.js');
-    conn.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
-        window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
-        window.soundManager.url = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/swf/';
-        if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("soundmanager.volume") !== undefined){
-            soundManager.defaultOptions.volume = ajaxplorer.user.getPreference("soundmanager.volume");
-        }
-        var conn2 = new Connexion();
-        conn2._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
-        conn2.loadLibrary('360-player/script/360player.js', function(){
+    conn.loadLibrary('360-player/script/berniecode-animator.js', function(){
+        var conn3 = new Connexion();
+        conn3._libUrl = conn._libUrl;
+        conn3.loadLibrary('script/soundmanager2-nodebug-jsmin.js', function(){
 
-            if(!window.threeSixtyPlayer) return;
-
-            window.threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
-            window.threeSixtyPlayer.config.showHMSTime = true;
-            window.threeSixtyPlayer.config.useWaveformData = true;
-            window.threeSixtyPlayer.config.useEQData = true;
-            // enable this in SM2 as well, as needed
-            if (window.threeSixtyPlayer.config.useWaveformData) {
-              window.soundManager.flash9Options.useWaveformData = true;
+            window.soundManager = new SoundManager('plugins/editor.soundmanager/sm/swf/');
+            window.soundManager.url = conn._libUrl + 'swf/';
+            if(ajaxplorer && ajaxplorer.user && ajaxplorer.user.getPreference("soundmanager.volume") !== undefined){
+                soundManager.defaultOptions.volume = ajaxplorer.user.getPreference("soundmanager.volume");
             }
-            if (window.threeSixtyPlayer.config.useEQData) {
-              window.soundManager.flash9Options.useEQData = true;
-            }
-            if (window.threeSixtyPlayer.config.usePeakData) {
-              window.soundManager.flash9Options.usePeakData = true;
-            }
-            if (window.threeSixtyPlayer.config.useWaveformData || window.threeSixtyPlayer.flash9Options.useEQData || window.threeSixtyPlayer.flash9Options.usePeakData) {
-              // even if HTML5 supports MP3, prefer flash so the visualization features can be used.
-              window.soundManager.preferFlash = true;
-            }
+            var conn2 = new Connexion();
+            conn2._libUrl = conn._libUrl;
+            conn2.loadLibrary('360-player/script/360player.js', threeSixtyLoaded, true);
 
-            window.soundManager.useFastPolling = true; // increased JS callback frequency, combined with useHighPerformance = true
-            window.threeSixtyPlayer.config.onfinish = function(smPlayer){
-                try{
-                    var finishingPlayer = smPlayer._360data.oUI360;
-                    if(finishingPlayer.hasClassName("ui360-vis")) {
-                        window.setTimeout(function(){
-                            finishingPlayer.addClassName("ui360-vis-retracted");
-                        }, 1000);
-                    }else{
-                        var links = $$("div.ui360").reject(function(el){
-                            return el.hasClassName("ui360-vis");
-                        });
-                        var index = links.indexOf(finishingPlayer);
-                        if(index < links.length-1 ){
-                            window.threeSixtyPlayer.handleClick({'target':links[index+1].down("a.sm2_link")});
-                        }
-                        if(finishingPlayer.up('.ajxpNodeProvider')){
-                            finishingPlayer.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
-                        }
-                    }
-                }catch(e){}
-            };
-
-            window.threeSixtyPlayer.config.onplay = function(smPlayer){
-                try{
-                    var playerDiv = smPlayer._360data.oUI360;
-                    if(!playerDiv.hasClassName("ui360-vis")) {
-                        if(playerDiv.up('.ajxpNodeProvider')){
-                            playerDiv.up('.ajxpNodeProvider').addClassName("SMNodePlaying");
-                        }
-                    }else{
-                        playerDiv.removeClassName("ui360-vis-retracted");
-                    }
-                }catch(e){}
-            };
-
-            window.threeSixtyPlayer.config.onstop = function(smPlayer){
-                try{
-                    var playerDiv = smPlayer._360data.oUI360;
-                    if(!playerDiv.hasClassName("ui360-vis")) {
-                        if(playerDiv.up('.ajxpNodeProvider')){
-                            playerDiv.up('.ajxpNodeProvider').removeClassName("SMNodePlaying");
-                        }
-                    }else{
-                        window.setTimeout(function(){
-                            playerDiv.addClassName("ui360-vis-retracted");
-                        }, 1000);
-                    }
-                }catch(e){}
-            };
-
-            window.soundManager.beginDelayedInit();
-        });
-    });
+        }, true);
+    }, true);
     hookToFilesList();
+
 }
 
 function hookToFilesList(){

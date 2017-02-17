@@ -224,50 +224,14 @@ class PydioApi{
         if(window.pydio && pydio.Parameters.get('SERVER_PREFIX_URI')){
             PydioApi._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
         }
-        //var path = (PydioApi._libUrl?PydioApi._libUrl+'/'+fileName:fileName);
 
-        /*if(window.jQuery && window.jQuery.ajax){
-            jQuery.ajax(path,
-                {
-                    method:'get',
-                    async: (aSync?true:false),
-                    complete:function(transport){
-                        if(transport.responseText)
-                        {
-                            try
-                            {
-                                var script = transport.responseText;
-                                if (window.execScript){
-                                    window.execScript( script );
-                                }
-                                else{
-                                    // TO TEST, THIS SEEM TO WORK ON SAFARI
-                                    window.my_code = script;
-                                    var script_tag = document.createElement('script');
-                                    script_tag.type = 'text/javascript';
-                                    script_tag.innerHTML = 'eval(window.my_code)';
-                                    document.getElementsByTagName('head')[0].appendChild(script_tag);
-                                }
-                                if(onLoadedCode != null) onLoadedCode();
-                            }
-                            catch(e)
-                            {
-                                alert('error loading '+fileName+':'+ e.message);
-                            }
-                        }
-                        pydio.fire("server_answer");
-                    }
-                });
-        }else */if(window.Connexion){
-
-            var conn = new Connexion();
-            conn._libUrl = false;
-            if(pydio.Parameters.get('SERVER_PREFIX_URI')){
-                conn._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
-            }
-            conn.loadLibrary(fileName, onLoadedCode, aSync);
-
+        var conn = new Connexion();
+        conn._libUrl = false;
+        if(pydio.Parameters.get('SERVER_PREFIX_URI')){
+            conn._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
         }
+        conn.loadLibrary(fileName, onLoadedCode, aSync);
+
 
     }
 

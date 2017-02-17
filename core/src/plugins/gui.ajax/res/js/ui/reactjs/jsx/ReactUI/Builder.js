@@ -181,13 +181,14 @@
                 }
             }
             if(editorData){
-                this._pydio.Registry.loadEditorResources(editorData.resourcesManager);
-                var editorOpener = this.getEditorOpener();
-                if(!editorOpener || editorData.modalOnly){
-                    modal.openEditorDialog(editorData);
-                }else{
-                    editorOpener.openEditorForNode(selectedNode, editorData);
-                }
+                this._pydio.Registry.loadEditorResources(editorData.resourcesManager, function(){
+                    var editorOpener = this.getEditorOpener();
+                    if(!editorOpener || editorData.modalOnly){
+                        modal.openEditorDialog(editorData);
+                    }else{
+                        editorOpener.openEditorForNode(selectedNode, editorData);
+                    }
+                });
             }else{
                 if(this._pydio.Controller.getActionByName("download")){
                     this._pydio.Controller.getActionByName("download").apply();

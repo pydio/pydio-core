@@ -8,7 +8,7 @@
     <class_definition filename="plugins/editor.audio/AudioPreviewer.php" classname="Pydio\Editor\Audio\AudioPreviewer"/>
     <client_settings>
         <resources>
-            <js className="SMPlayer" file="plugins/editor.soundmanager/class.SMPlayer.js" autoload="true"/>
+            <js className="SMPlayer" file="plugins/editor.soundmanager/class.SMPlayer.js"/>
             <i18n namespace="sm_editor" path="plugins/editor.soundmanager/i18n"/>
             <css file="plugins/editor.soundmanager/sm/360-player/360player.css"/>
             <css file="plugins/editor.soundmanager/sm/360-player/360player-visualization.css"/>

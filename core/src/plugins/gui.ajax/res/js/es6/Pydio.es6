@@ -125,23 +125,23 @@ class Pydio extends Observable{
             if(!this.UI && window.useReactPydioUI){
                 ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], function(){
                     this.UI = new PydioReactUI.Builder(this);
+                    this.UI.initTemplates();
+                    this.UI.modal.initForms();
+                    this.UI.initObjects();
+
+                    if(!this.user) {
+                        PydioApi.getClient().tryToLogUserFromRememberData();
+                    }
+                    this.fire("registry_loaded", this.Registry.getXML());
+
+                    window.setTimeout(function(){
+                        this.fire('loaded');
+                    }.bind(this), 200);
+
+                    this.Router = new Router(this);
+
                 }.bind(this));
             }
-
-            this.UI.initTemplates();
-            this.UI.modal.initForms();
-            this.UI.initObjects();
-
-            if(!this.user) {
-                PydioApi.getClient().tryToLogUserFromRememberData();
-            }
-            this.fire("registry_loaded", this.Registry.getXML());
-
-            window.setTimeout(function(){
-                this.fire('loaded');
-            }.bind(this), 200);
-
-            this.Router = new Router(this);
 
         }.bind(this);
 
