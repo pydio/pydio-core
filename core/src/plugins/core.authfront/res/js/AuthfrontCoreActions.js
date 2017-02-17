@@ -289,7 +289,7 @@
                         });
                         oForm.reset();
                     };
-                    connexion.sendSync();
+                    connexion.sendAsync();
                     return false;
                 }
             );

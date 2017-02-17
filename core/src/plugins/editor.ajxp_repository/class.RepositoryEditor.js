@@ -515,22 +515,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
     },
 
     encodePassword : function(password){
-        // First get a seed to check whether the pass should be encoded or not.
-        var sync = new Connexion();
-        var seed;
-        sync.addParameter('get_action', 'get_seed');
-        sync.onComplete = function(transport){
-            seed = transport.responseText;
-        };
-        sync.sendSync();
-        var encoded;
-        if(seed != '-1'){
-            encoded = HasherUtils.hex_md5(password);
-        }else{
-            encoded = password;
-        }
-        return encoded;
-
+        return password;
     }
 
 

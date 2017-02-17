@@ -164,7 +164,7 @@ Class.create("AjxpBootstrap", {
 			this.refreshContextVariablesAndInit(connexion);
 			
 		}.bind(this);
-		connexion.sendSync();
+		connexion.sendAsync();
 		
 	},
 	

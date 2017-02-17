@@ -29,7 +29,8 @@
                     }
                     hideLightBox();
                 }
-                conn.sendSync();
+                conn.sendAsync();
+                return false;
             };
             modal.showDialogForm("Validation", "disclaimer_form", dialogLoadFunction, completeFunction);
             

@@ -21,7 +21,7 @@
                 conn.onComplete = function(transport){
                     this.parseXmlMessage(transport.responseXML);
                 };
-                conn.sendSync();
+                conn.sendAsync();
 
                 hideLightBox(true);
                 pydio.fireContextRefresh()

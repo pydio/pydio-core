@@ -99,7 +99,7 @@ Class.create("BrowserOpener", AbstractEditor, {
                 this.element.update(this.contentMainContainer);
             }
 		}.bind(this);
-		connexion.sendSync();		
+		connexion.sendAsync();
 	},
 
     /**
