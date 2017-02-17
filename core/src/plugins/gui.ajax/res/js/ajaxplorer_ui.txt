@@ -17,7 +17,6 @@ js/vendor/leightbox/lightbox.js
 js/vendor/scriptaculous/src/builder.js
 js/vendor/scriptaculous/src/effects.js
 js/vendor/scriptaculous/src/dragdrop.js
-js/vendor/scriptaculous/src/controls.js
 js/vendor/scriptaculous/src/slider.js
 js/vendor/prototype/cssfx.js
 js/vendor/prototype/proto.scroller.js
@@ -36,8 +35,6 @@ js/ui/prototype/class.RepositorySimpleLabel.js
 js/ui/prototype/class.Breadcrumb.js
 js/ui/prototype/class.UserWidget.js
 js/ui/prototype/class.LogoWidget.js
-js/ui/prototype/class.AjxpAutoCompleter.js
-js/ui/prototype/class.AjxpUsersCompleter.js
 js/ui/prototype/class.TreeSelector.js
 js/ui/prototype/class.SliderInput.js
 js/ui/prototype/class.ActionsToolbar.js

@@ -1,6 +1,6 @@
 (function(global){
 
-    class Builder{
+    export default class Builder{
 
         constructor(pydio){
             this._pydio = pydio;
@@ -142,14 +142,14 @@
         updateHrefBase(cdataContent){
             return cdataContent;
             /*
-            if(Prototype.Browser.IE10){
-                var base = document.getElementsByTagName('base')[0].getAttribute("href");
-                if(!base){
-                    return cdataContent;
-                }
-                return cdataContent.replace('data-hrefRebase="', 'href="'+base);
-            }
-            */
+             if(Prototype.Browser.IE10){
+             var base = document.getElementsByTagName('base')[0].getAttribute("href");
+             if(!base){
+             return cdataContent;
+             }
+             return cdataContent.replace('data-hrefRebase="', 'href="'+base);
+             }
+             */
         }
 
         /**
@@ -248,11 +248,8 @@
         blurAll(){}
         focusOn(){}
         focusLast(){}
-        
+
     }
 
-    let ns = global.ReactUI || {};
-    ns.Builder = Builder;
-    global.ReactUI = ns;
-
 })(window);
+

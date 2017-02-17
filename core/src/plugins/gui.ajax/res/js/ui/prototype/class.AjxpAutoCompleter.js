@@ -62,8 +62,7 @@ Class.create("AjxpAutocompleter", Autocompleter.Base, {
 
     if(this.options.defaultParams) 
       this.options.parameters += '&' + this.options.defaultParams;
-    
-    new Ajax.Request(this.url, this.options);
+    //new Ajax.Request(this.url, this.options);
   },
 
   /**

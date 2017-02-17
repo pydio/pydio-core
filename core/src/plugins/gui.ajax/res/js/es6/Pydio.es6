@@ -123,8 +123,8 @@ class Pydio extends Observable{
         var starterFunc = function(){
 
             if(!this.UI && window.useReactPydioUI){
-                ResourcesManager.loadClassesAndApply(["React", "ReactUI"], function(){
-                    this.UI = new ReactUI.Builder(this);
+                ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], function(){
+                    this.UI = new PydioReactUI.Builder(this);
                 }.bind(this));
             }
 

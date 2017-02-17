@@ -23,73 +23,7 @@
         }
     }
 
-    let InfoPanelCard = React.createClass({
-
-        propTypes: {
-            title:React.PropTypes.string,
-            actions:React.PropTypes.array
-        },
-
-        render: function(){
-            let title = this.props.title ? <div className="panelHeader">{this.props.title}</div> : null;
-            let actions = this.props.actions ? <div className="panelActions">{this.props.actions}</div> : null;
-
-            return (
-                <ReactMUI.Paper zDepth={1} className="panelCard">
-                    {title}
-                    <div className="panelContent">{this.props.children}</div>
-                    {actions}
-                </ReactMUI.Paper>
-            );
-        }
-
-    });
-
-    let GenericFile = React.createClass({
-
-        render: function(){
-            return (
-                <InfoPanelCard>
-                    <WSComponents.FilePreview
-                        key={this.props.node.getPath()}
-                        style={{height:200}}
-                        node={this.props.node}
-                        loadThumbnail={true}
-                        richPreview={true}
-                    />
-                    <Toolbars.Toolbar className="primaryToolbar" renderingType="button-icon" toolbars={["info_panel", "info_panel_share"]} controller={this.props.pydio.getController()}/>
-                </InfoPanelCard>
-            );
-        }
-
-    });
-
-    let GenericDir = React.createClass({
-
-        render: function(){
-            return (
-                <InfoPanelCard>
-                    <div className="mimefont-container"><div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div></div>
-                    <Toolbars.Toolbar className="primaryToolbar" renderingType="button-icon" toolbars={["info_panel", "info_panel_share"]} controller={this.props.pydio.getController()}/>
-                </InfoPanelCard>
-            );
-        }
-
-    });
-
-    let ImagePreview = React.createClass({
-
-        render: function(){
-            return (
-                <InfoPanelCard title="Image Information">
-                    Image Data ?
-                </InfoPanelCard>
-            );
-        }
-
-    });
-
-    let InfoPanel = React.createClass({
+    const InfoPanel = React.createClass({
 
         propTypes: {
             dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
@@ -180,14 +114,8 @@
             return <div id="info_panel">{templates}</div>;
 
         }
-    })
+    });
 
-    let ns = global.DetailPanes || {};
-    ns.InfoPanel = InfoPanel;
-    ns.InfoPanelCard = InfoPanelCard;
-    ns.GenericFile = GenericFile;
-    ns.GenericDir = GenericDir;
-    ns.ImagePreview = ImagePreview;
-    global.DetailPanes  = ns;
+    export {InfoPanel as default};
 
 })(window);

@@ -37,48 +37,28 @@ class PydioApi{
     }
 
     request(parameters, onComplete=null, onError=null, settings={}){
-        if(window.Connexion){
-            // Connexion already handles secure_token
-            var c = new Connexion();
-            if(settings.discrete){
-                c.discrete = true;
-            }
-            c.setParameters($H(parameters));
-            if(settings.method){
-                c.setMethod(settings.method);
-            }
-            c.onComplete = onComplete;
-            if(settings.async === false){
-                c.sendSync();
-            }else{
-                c.sendAsync();
-            }
-        }else if(window.jQuery){
-            parameters['secure_token'] = this._secureToken;
-            jQuery.ajax(this._baseUrl,{
-                method:settings.method ||'post',
-                data: parameters,
-                async: (settings && settings.async!==undefined)?settings.async:true,
-                complete:onComplete,
-                error:onError
-            });
+        // Connexion already handles secure_token
+        var c = new Connexion();
+        if(settings.discrete){
+            c.discrete = true;
+        }
+        c.setParameters(parameters);
+        if(settings.method){
+            c.setMethod(settings.method);
+        }
+        c.onComplete = onComplete;
+        if(settings.async === false){
+            c.sendSync();
+        }else{
+            c.sendAsync();
         }
     }
 
     loadFile(filePath, onComplete=null, onError=null){
-        if(window.Connexion){
-            var c = new Connexion(filePath);
-            c.setMethod('GET');
-            c.onComplete = onComplete;
-            c.sendAsync();
-        }else if(window.jQuery){
-            jQuery.ajax(filePath, {
-                method:'GET',
-                async:true,
-                complete:onComplete,
-                error:onError
-            });
-        }
+        var c = new Connexion(filePath);
+        c.setMethod('GET');
+        c.onComplete = onComplete;
+        c.sendAsync();
     }
 
     /**

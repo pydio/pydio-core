@@ -139,7 +139,6 @@
                         }
 
                     };
-                    connexion.setMethod('put');
                     connexion.sendAsync();
                     return false;
                 }, function(){}, true);
@@ -242,7 +241,6 @@
                         }
 
                     };
-                    connexion.setMethod('put');
                     document.observeOnce("ajaxplorer:user_logged", function(){
                         if($('logging_string') && $('logging_string').down('i')){
                             var ht = $('logging_string').down('i').innerHTML;

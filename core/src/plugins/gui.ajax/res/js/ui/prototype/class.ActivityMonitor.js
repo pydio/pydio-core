@@ -69,14 +69,14 @@ Class.create("ActivityMonitor", {
 			$(document.body).stopObserving("keypress", activityObserver);
 			$(document.body).stopObserving("mouseover", activityObserver);
 			$(document.body).stopObserving("mousemove", activityObserver);
-			document.stopObserving("ajaxplorer:server_answer", activityObserver);
+			pydio.stopObserving("server_answer", activityObserver);
 			this._state = 'inactive';
 			if(ajaxplorer.user) {
 				this._state = 'active';
 				$(document.body).observe("keypress", activityObserver );
 				$(document.body).observe("mouseover", activityObserver );
 				$(document.body).observe("mousemove", activityObserver );
-				document.observe("ajaxplorer:server_answer", activityObserver );
+				pydio.observe("server_answer", activityObserver );
 				this.interval = window.setInterval(this.idleObserver.bind(this), 5000);
 				this.serverInterval = window.setInterval(this.serverObserver.bind(this), Math.min((Math.pow(2,31)-1), this._renewTime*1000));
 			}
@@ -115,11 +115,7 @@ Class.create("ActivityMonitor", {
 	 * Pings the server
 	 */
 	serverObserver : function(){
-		new Ajax.Request(window.ajxpServerAccessPath, 
-		{
-			method:'get',
-			parameters:{get_action:'ping'}
-		});		
+        PydioApi.getClient().request({get_action:'ping'}, null, null, {method:'get'});
 	},
 	
 	/**

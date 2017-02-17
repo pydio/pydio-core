@@ -1333,16 +1333,16 @@
                                 <SearchForm {...this.props}/>
                             </div>
                             <div id="main_toolbar">
-                                <Toolbars.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
-                                <Toolbars.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                                <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                                <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
                                 <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                                <Toolbars.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                                <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
                             </div>
                             <MainFilesList ref="list" {...this.props}/>
                         </div>
                         <DetailPanes.InfoPanel {...this.props} dataModel={this.props.pydio.getContextHolder()}/>
                         <EditionPanel {...this.props}/>
-                        <span className="context-menu"><Toolbars.ContextMenu/></span>
+                        <span className="context-menu"><PydioMenus.ContextMenu/></span>
                         <Modal {...this.props}/>
                     </div>
                 </MaterialUI.MuiThemeProvider>

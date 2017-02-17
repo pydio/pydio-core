@@ -34,7 +34,8 @@
     "react-mfb": "0.4.1",
     "react-select": "^0.6.5",
     "react-tap-event-plugin": "^2.0.1",
-    "reactify": "^1.1.1"
+    "reactify": "^1.1.1",
+    "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
     "assemble-less": "~0.7.0",

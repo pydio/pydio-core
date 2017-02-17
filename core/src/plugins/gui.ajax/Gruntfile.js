@@ -30,7 +30,6 @@ var gui_ajax_core = [
     'res/js/vendor/scriptaculous/src/builder.js',
     'res/js/vendor/scriptaculous/src/effects.js',
     'res/js/vendor/scriptaculous/src/dragdrop.js',
-    'res/js/vendor/scriptaculous/src/controls.js',
     'res/js/vendor/scriptaculous/src/slider.js',
     'res/js/vendor/prototype/cssfx.js',
     'res/js/vendor/prototype/proto.scroller.js',
@@ -62,8 +61,6 @@ var gui_ajax_core = [
     'res/js/ui/prototype/class.Breadcrumb.js',
     'res/js/ui/prototype/class.UserWidget.js',
     'res/js/ui/prototype/class.LogoWidget.js',
-    'res/js/ui/prototype/class.AjxpAutoCompleter.js',
-    'res/js/ui/prototype/class.AjxpUsersCompleter.js',
     'res/js/ui/prototype/class.TreeSelector.js',
     'res/js/ui/prototype/class.SliderInput.js',
     'res/js/ui/prototype/class.ActionsToolbar.js',
@@ -171,6 +168,13 @@ module.exports = function(grunt) {
                     'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js',
                     'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js'
                 }
+            },
+            ui : {
+                files: {
+                    'res/js/ui/reactjs/build/PydioReactUI.js':'res/js/ui/reactjs/build/ReactUI/index.js',
+                    'res/js/ui/reactjs/build/DetailPanes.js':'res/js/ui/reactjs/build/DetailPanes/index.js',
+                    'res/js/ui/reactjs/build/PydioMenus.js':'res/js/ui/reactjs/build/Menus/index.js'
+                }
             }
         },
         less: {
@@ -206,9 +210,9 @@ module.exports = function(grunt) {
             },
             pydio:{
                 files: [
-                    'res/js/ui/reactjs/jsx/*.js'
+                    'res/js/ui/reactjs/jsx/**/*.js'
                 ],
-                tasks:['babel:pydio'],
+                tasks:['babel:pydio','browserify:ui'],
                 options: {
                     spawn: false
                 }

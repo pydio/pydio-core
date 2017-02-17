@@ -1,4 +1,4 @@
-ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
+ResourcesManager.loadClassesAndApply(['PydioMenus'], function(){
 
 
 (function(global){
@@ -1239,7 +1239,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
      */
     var ListEntry = React.createClass({
 
-        mixins:[Toolbars.ContextMenuNodeProviderMixin],
+        mixins:[PydioMenus.ContextMenuNodeProviderMixin],
         
         propTypes:{
             showSelector:React.PropTypes.bool,
@@ -1454,7 +1454,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
         render: function(){
             if(this.props.displayMode === 'menu'){
                 return (
-                    <Toolbars.IconButtonMenu buttonTitle="Sort by..." buttonClassName="mdi mdi-sort-descending" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
+                    <PydioMenus.IconButtonMenu buttonTitle="Sort by..." buttonClassName="mdi mdi-sort-descending" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
                 );
             }else{
                 return (
@@ -1713,7 +1713,7 @@ ResourcesManager.loadClassesAndApply(['Toolbars'], function(){
      */
     var SimpleFlatList = React.createClass({
 
-        mixins:[MessagesConsumerMixin, Toolbars.ContextMenuNodeProviderMixin],
+        mixins:[MessagesConsumerMixin, PydioMenus.ContextMenuNodeProviderMixin],
 
         propTypes:{
             infiniteSliceCount:React.PropTypes.number,

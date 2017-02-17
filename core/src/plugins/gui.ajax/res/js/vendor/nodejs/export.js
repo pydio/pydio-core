@@ -18,5 +18,6 @@ window.Clipboard = require('clipboard');
 window.ReactQRCode = require('qrcode.react');
 window.ReactMFB = require('react-mfb');
 window.Cronstrue = require("cronstrue");
+require("whatwg-fetch");
 window.injectTapEventPlugin = require('react-tap-event-plugin');
 window.injectTapEventPlugin();
