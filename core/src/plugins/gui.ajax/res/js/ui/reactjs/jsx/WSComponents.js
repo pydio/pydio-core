@@ -348,7 +348,7 @@
                 global.setTimeout(function(){
                     if(visible) this.setState({closed:true, opened:false});
                     else this.setState({closed:false, opened:true});
-                }.bind(this), 800);
+                }.bind(this), 500);
             }.bind(this));
         },
 
@@ -397,12 +397,12 @@
                 if(this.state.visible) {
                     className += ' open';
                     title = <div>{nodeTitle}</div>;
-                    let overlayClass = "editor-overlay";
+                    let overlayClass = "editor-overlay opening";
                     if(this.state.opened) {
                         iconClassName = 'mdi mdi-window-minimize';
                         overlayClass += ' opened';
                     }
-                    overlay = <div key="overlay" onClick={this.toggle} className={overlayClass}></div>;
+                    overlay = <div key="overlay" onClick={this.toggle} className={overlayClass}/>;
                     mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
                 }else{
                     if(this.state.nodes && this.state.nodes.length > 1){
@@ -415,6 +415,7 @@
                     }else{
                         mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
                     }
+                    overlay = <div key="overlay" onClick={this.toggle} className="editor-overlay hidden"/>;
                 }
                 
 

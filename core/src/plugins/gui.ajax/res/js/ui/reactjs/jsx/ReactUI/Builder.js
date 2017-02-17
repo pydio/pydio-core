@@ -188,7 +188,7 @@
                     }else{
                         editorOpener.openEditorForNode(selectedNode, editorData);
                     }
-                });
+                }.bind(this));
             }else{
                 if(this._pydio.Controller.getActionByName("download")){
                     this._pydio.Controller.getActionByName("download").apply();

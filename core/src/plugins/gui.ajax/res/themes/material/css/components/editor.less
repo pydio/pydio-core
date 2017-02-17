@@ -1,6 +1,6 @@
 .react-editor{
 
-  @header_color:@primary-1-color;
+  @header_color:white;
 
   .editor-overlay{
     position: absolute;
@@ -9,10 +9,14 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0,0,0,0.53);
+    background-color: rgba(0,0,0,0.43);
     opacity: 0.01;
-    transition: opacity 2Open00ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-    &.opened{
+    transition: opacity 600ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+    &.hidden{
+      opacity: 0.01;
+      display: none;
+    }
+    &.opened, &.opening{
       opacity: 1;
     }
   }
@@ -21,10 +25,10 @@
     background-color: @header_color;
     position: absolute;
     z-index: 100000;
-    transition: border-radius 500ms cubic-bezier(0.06, 0.73, 0.60, 0.95) 0ms,
-                height 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms,
-                width 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms,
-                bottom 400ms cubic-bezier(0.23, 1, 0.32, 1) 300ms;
+    transition: border-radius 250ms cubic-bezier(0.06, 0.73, 0.60, 0.95) 0ms,
+                height 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms,
+                width 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms,
+                bottom 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms;
     bottom: 20px;
     right: 20px;
     height: 50px;
@@ -36,8 +40,12 @@
         background-color: @header_color !important;
       }
     }
+    button.mui-icon-button{
+      margin-top: 2px;
+      margin-left: 1px;
+    }
     .mui-font-icon{
-      color: white;
+      /*color: white;*/
       font-size: 18px;
     }
     .editor-container{
@@ -62,10 +70,8 @@
     }
     &.open{
       overflow: hidden;
-      background-color: white;
-      bottom: 0;
-      border-radius: 4px 4px 0 0;
-      height: calc(~"100% - 11px");
+      border-radius: 2px;
+      height: calc(~"100% - 41px");
       width: calc(~"100% - 40px");
       .mui-tabs-container, .editor_container{
         visibility: visible;
@@ -91,7 +97,6 @@
         background-color: @header_color;
         height: 51px;
         font-size: 24px;
-        color: white;
         padding: 14px 16px;
         font-weight: 400;
         > div{
