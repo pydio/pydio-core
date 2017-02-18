@@ -280,11 +280,11 @@ module.exports = function(grunt) {
         'babel:dist',
         'uglify:js',
         'babel:materialui',
+        'babel:pydio',
         'env:build',
         'browserify',
         'env:dev',
-        'uglify:nodejs',
-        'babel:pydio'
+        'uglify:nodejs'
     ]);
     grunt.registerTask('type:css', [
         'cssmin'
