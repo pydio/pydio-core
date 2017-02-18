@@ -186,11 +186,11 @@ Class.create("PydioInstantMessenger", {
     unregisterCurrentChannel : function(callback){
 
         var conn = new Connexion();
-        conn.setParameters($H({
+        conn.setParameters({
             get_action:'client_unregister_channel',
             channel:'nodes:' + this.currentRepo,
             client_id:this.clientId
-        }));
+        });
         conn.discrete = true;
         conn.onComplete = function(transp){
             this.currentRepo = null;
@@ -213,11 +213,11 @@ Class.create("PydioInstantMessenger", {
 
         this.currentRepo = repoId;
         var conn = new Connexion();
-        conn.setParameters($H({
+        conn.setParameters({
             get_action:'client_register_channel',
             channel:'nodes:' + repoId,
             client_id:this.clientId
-        }));
+        });
         conn.discrete = true;
         conn.sendAsync();
 
@@ -252,11 +252,11 @@ Class.create("PydioInstantMessenger", {
         }
         pydio.notify("poller.event");
         var conn = new Connexion();
-        conn.setParameters($H({
+        conn.setParameters({
             get_action:'client_consume_channel',
             channel:'nodes:' + this.currentRepo,
             client_id:this.clientId
-        }));
+        });
         conn.discrete = true;
         conn.onComplete = function(transport){
             this.channel_pending = false;

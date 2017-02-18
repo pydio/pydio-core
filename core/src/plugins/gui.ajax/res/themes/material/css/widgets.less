@@ -10,8 +10,14 @@ body,#ajxp_desktop,#background-imager{
   .vertical_layout;
 
   .material-list.main-file-list{
-    margin-right: 250px;
+    transition: @bezier_transition;
   }
+  .info-panel-open{
+    .material-list.main-file-list{
+      margin-right: 250px;
+    }
+  }
+
 
   .react-fs-template{
     .left-panel{
@@ -151,9 +157,14 @@ body,#ajxp_desktop,#background-imager{
 
   position: absolute;
   width: 250px;
-  right: 0;
+  right: -250px;
   top: 110px;
   bottom: 0;
+  transition: @bezier_transition;
+
+  .info-panel-open &{
+    right: 0;
+  }
 
   font-weight: 400;
   .panelCard{
@@ -183,10 +194,10 @@ body,#ajxp_desktop,#background-imager{
         height: 120px;
         text-align: center;
         align-items: center;
+        font-size: 74px;
+        color: @applicationPrimaryColor;
         div.mimefont{
           flex: 1;
-          color: @applicationPrimaryColor;
-          font-size: 74px;
         }
       }
       div.bgCoverImage{

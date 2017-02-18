@@ -107,13 +107,9 @@
                 }
                 if(colNode.getAttribute('reactModifier')){
                     let reactModifier = colNode.getAttribute('reactModifier');
-                    columns[name].renderComponent = columns[name].renderCell = function(){
-                        var args = Array.from(arguments);
-                        return ResourcesManager.detectModuleToLoadAndApply(reactModifier, function(){
-                            let modifierFuncWrapped = eval(reactModifier);
-                            return modifierFuncWrapped.apply(null, args);
-                        }, false);
-                    };
+                    ResourcesManager.detectModuleToLoadAndApply(reactModifier, function(){
+                        columns[name].renderComponent = columns[name].renderCell = FuncUtils.getFunctionByName(reactModifier, global);
+                    }, true);
                 }
                 columns[name]['sortType'] = 'string';
             });
@@ -280,7 +276,7 @@
             }
 
             return (
-                <div ref="container" className={className}>{object}</div>
+                <div ref="container" style={this.props.style} className={className}>{object}</div>
             );
 
         }
@@ -1083,13 +1079,9 @@
                     };
                     if(options.reactColumnsRenderers && options.reactColumnsRenderers[key]) {
                         let renderer = cData['renderer'] = options.reactColumnsRenderers[key];
-                        cData.renderComponent = function(){
-                            var args = Array.from(arguments);
-                            return ResourcesManager.detectModuleToLoadAndApply(renderer, function(){
-                                let modifierFuncWrapped = eval(renderer);
-                                return modifierFuncWrapped.apply(null, args);
-                            }, false);
-                        };
+                        return ResourcesManager.detectModuleToLoadAndApply(renderer, function(){
+                            cData.renderComponent = FuncUtils.getFunctionByName(renderer, global);
+                        }, true);
                     }
                     metaFields[key] = cData;
                 });
@@ -1341,12 +1333,26 @@
         propTypes: {
             pydio:React.PropTypes.instanceOf(Pydio)
         },
-        
+
+        statics: {
+            INFO_PANEL_WIDTH: 250
+        },
+
+        getInitialState: function(){
+            return {
+                infoPanelOpen: false
+            };
+        },
+
+        infoPanelContentChange(numberOfCards){
+            this.setState({infoPanelOpen: (numberOfCards > 0)})
+        },
+
         render: function () {
             
             return (
                 <MaterialUI.MuiThemeProvider>
-                    <div className="react-mui-context vertical_layout vertical_fit react-fs-template">
+                    <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
                         <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
                         <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
                             <div id="workspace_toolbar">
@@ -1361,7 +1367,11 @@
                             </div>
                             <MainFilesList ref="list" {...this.props}/>
                         </div>
-                        <DetailPanes.InfoPanel {...this.props} dataModel={this.props.pydio.getContextHolder()}/>
+                        <DetailPanes.InfoPanel
+                            {...this.props}
+                            dataModel={this.props.pydio.getContextHolder()}
+                            onContentChange={this.infoPanelContentChange}
+                        />
                         <EditionPanel {...this.props}/>
                         <span className="context-menu"><PydioMenus.ContextMenu/></span>
                         <Modal {...this.props}/>

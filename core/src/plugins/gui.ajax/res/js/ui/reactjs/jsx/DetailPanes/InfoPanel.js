@@ -31,15 +31,16 @@
         },
 
         getInitialState: function(){
+            let initTemplates = ConfigsParser.parseConfigs();
             return ({
-                templates:ConfigsParser.parseConfigs(),
-                nodes: this.props.dataModel.getSelectedNodes()
+                templates:initTemplates,
+                displayData: this.selectionToTemplates(initTemplates)
             });
         },
 
         componentDidMount: function(){
             this._updateHandler = function(){
-                this.setState({nodes: this.props.dataModel.getSelectedNodes()});
+                this.setState({displayData: this.selectionToTemplates()});
             }.bind(this);
             this._componentConfigHandler = function(event){
                 if(event.memo.className == "InfoPanel"){
@@ -56,9 +57,10 @@
             this.props.pydio.stopObserving("component_config_changed", this._componentConfigHandler );
         },
 
-        selectionToTemplates: function(){
+        selectionToTemplates: function(initTemplates = null){
 
-            let selection = this.state.nodes;
+            let refTemplates = initTemplates || this.state.templates;
+            let selection = this.props.dataModel.getSelectedNodes();
             let primaryMime, templates = [], uniqueNode;
             let data = {};
             if(!selection || selection.length < 1){
@@ -75,11 +77,11 @@
                 }
                 data.node = uniqueNode;
             }
-            if(this.state.templates.has(primaryMime)){
-                templates = templates.concat(this.state.templates.get(primaryMime));
+            if(refTemplates.has(primaryMime)){
+                templates = templates.concat(refTemplates.get(primaryMime));
             }
             if(uniqueNode){
-                this.state.templates.forEach(function(list, mimeName){
+                refTemplates.forEach(function(list, mimeName){
                     if(mimeName === primaryMime) return;
                     if(mimeName.indexOf('meta:') === 0 && uniqueNode.getMetadata().has(mimeName.substr(5))){
                         templates = templates.concat(list);
@@ -89,20 +91,21 @@
                 });
             }
 
+            if(this.props.onContentChange){
+                this.props.onContentChange(templates.length);
+            }
             return {TEMPLATES:templates, DATA:data};
         },
 
         render: function(){
 
-            let tplData = this.selectionToTemplates();
-            let templates = tplData.TEMPLATES.map(function(tpl){
-
+            let templates = this.state.displayData.TEMPLATES.map(function(tpl){
                 let component = tpl.COMPONENT;
                 let namespace = component.split(".")[0];
                 let name = component.split(".")[1];
                 return (
                     <ReactPydio.AsyncComponent
-                        {...tplData.DATA}
+                        {...this.state.displayData.DATA}
                         {...this.props}
                         key={"ip_" + component}
                         namespace={namespace}

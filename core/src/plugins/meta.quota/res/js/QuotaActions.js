@@ -11,7 +11,7 @@
                 
                 if(global.ajxp_meta_quota_loading) return;
                 var c = new Connexion();
-                c.setParameters(new Hash({get_action:'monitor_quota'}));
+                c.setParameters({get_action:'monitor_quota'});
                 c.discrete = true;
                 c.onComplete = function(transport){
                     global.ajxp_meta_quota_loading = false;

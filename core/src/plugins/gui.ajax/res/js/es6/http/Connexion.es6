@@ -70,6 +70,10 @@ class Connexion{
         if(hParameters instanceof Map){
     		this._parameters = hParameters;
         }else{
+            if(hParameters._object){
+                console.error('Passed a legacy Hash object to Connexion.setParameters');
+                hParameters = hParameters._object;
+            }
             for(let key in hParameters){
                 if(hParameters.hasOwnProperty(key)){
                     this._parameters.set(key, hParameters[key]);

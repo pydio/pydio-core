@@ -231,11 +231,13 @@
             }
         }
         removeForm(formId){
-            let formsContainer = document.getElementById("all_forms");
-            let child = formsContainer.querySelector('#' + formId);
-            if(child){
-                formsContainer.removeChild(child);
-            }
+            try{
+                let formsContainer = document.getElementById("all_forms");
+                let child = formsContainer.querySelector('#' + formId);
+                if(child){
+                    formsContainer.removeChild(child);
+                }
+            }catch(e){}
         }
         mountComponents(componentsNodes){}
 

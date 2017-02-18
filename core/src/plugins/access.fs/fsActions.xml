@@ -446,6 +446,9 @@
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">
+            <infoPanel attributes="" mime="generic_file" reactComponent="DetailPanes.GenericFile"/>
+            <infoPanel attributes="" mime="generic_dir" reactComponent="DetailPanes.GenericDir"/>
+            <infoPanel attributes="" mime="generic_multiple" reactComponent="DetailPanes.GenericMultiple"/>
 			<infoPanel mime="no_selection" attributes="">
 				<messages>
 					<message key="folders_string" id="130"/>
@@ -553,8 +556,6 @@
 				</div>
 				]]></html>
 			</infoPanel>
-            <infoPanel attributes="" mime="generic_file" reactComponent="DetailPanes.GenericFile"/>
-            <infoPanel attributes="" mime="generic_dir" reactComponent="DetailPanes.GenericDir"/>
 			<infoPanel mime="generic_dir" theme="orbit" attributes="basename,icon,fonticon,formated_date,ajxp_description">
 				<messages>
 					<message key="name_string" id="133"/>
