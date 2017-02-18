@@ -119,11 +119,13 @@ class ResourcesManager{
                     }
                     this.loadJSResource(object.value.fileName, object.value.className, cb, true);
                 }else{
+                    this.loaded = true;
                     callback();
                 }
             }.bind(this);
             cb();
         }else{
+            this.loaded = true;
             callback();
         }
 		if(this.resources.css){
@@ -131,7 +133,6 @@ class ResourcesManager{
 				this.loadCSSResource(value);
 			}.bind(this));
 		}
-		this.loaded = true;
 	}
 	/**
 	 * Load a javascript file

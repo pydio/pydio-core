@@ -891,8 +891,9 @@ ResourcesManager.loadClassesAndApply(['PydioMenus'], function(){
                 editorData = this._getEditorData(node);
             }
             if(editorData) {
-                this.props.registry.loadEditorResources(editorData.resourcesManager);
-                this.setState({editorData: editorData, node:node}, this._loadPydioEditor.bind(this));
+                this.props.registry.loadEditorResources(editorData.resourcesManager, function(){
+                    this.setState({editorData: editorData, node:node}, this._loadPydioEditor.bind(this));
+                }.bind(this));
             }else{
                 this.setState({editorData: null, node:null}, this._loadPydioEditor.bind(this));
             }
@@ -957,6 +958,7 @@ ResourcesManager.loadClassesAndApply(['PydioMenus'], function(){
         render: function(){
             var editor;
             if(this.state.editorData){
+                let className = this.state.editorData.editorClass;
                 if(this.state.editorData.formId){
                     var content = function(){
                         if(this.state && this.state.editorData && $(this.state.editorData.formId)){
@@ -966,12 +968,14 @@ ResourcesManager.loadClassesAndApply(['PydioMenus'], function(){
                         }
                     }.bind(this);
                     editor = <div ref="editor" className="vertical_layout vertical_fit" id="editor" key={this.state && this.props.node?this.props.node.getPath():null} dangerouslySetInnerHTML={content()}></div>;
-                }else if(global[this.state.editorData.editorClass]){
-                    editor = React.createElement(global[this.state.editorData.editorClass], {
+                }else if(FuncUtils.getFunctionByName(className, global)){
+                    editor = React.createElement(FuncUtils.getFunctionByName(className, global), {
                         node:this.props.node,
                         closeEditor:this.closeEditor,
                         registerCloseCallback:this.props.registerCloseCallback
                     });
+                }else{
+                    editor = <div>{"Cannot find editor component (" + className + ")!"}</div>
                 }
             }
             return editor || null;

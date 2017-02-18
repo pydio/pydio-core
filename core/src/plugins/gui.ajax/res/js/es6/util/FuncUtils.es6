@@ -44,6 +44,9 @@ class FuncUtils{
         var namespaces = functionName.split(".");
         var func = namespaces.pop();
         for (var i = 0; i < namespaces.length; i++) {
+            if(!context[namespaces[i]]){
+                return null;
+            }
             context = context[namespaces[i]];
         }
         return context[func];

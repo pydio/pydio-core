@@ -208,14 +208,12 @@
                 return;
             }
             let editor = editors[0];
-            pydio.Registry.loadEditorResources(editors[0].resourcesManager);
             let editorClassName = editors[0].editorClass;
-            ResourcesManager.loadClassesAndApply([editorClassName], function(){
-                if(!global[editorClassName]){
-                    if(console) console.debug('Cannot load class ' + editorClassName);
-                    return;
+            pydio.Registry.loadEditorResources(editors[0].resourcesManager, function(){
+                let component = FuncUtils.getFunctionByName(editorClassName, global);
+                if(component){
+                    this.loadPreviewFromEditor(component, node);
                 }
-                this.loadPreviewFromEditor(global[editorClassName], node);
             }.bind(this));
 
         },
@@ -268,19 +266,22 @@
 
             let node  = this.props.node;
             let svg = AbstractEditor.prototype.getSvgSource(node);
-            let object;
+            let object, className;
             if(svg){
-                object = <div ref="container" className="mimefont-container"><div className={"mimefont mdi mdi-" + svg}></div></div>;
+                object = <div key="icon" className={"mimefont mdi mdi-" + svg}></div>;
+                className = 'mimefont-container';
             }else{
                 var src = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/ICON_SIZE", 64);
                 if(!src){
                     if(!node.isLeaf()) src = ResourcesManager.resolveImageSource('folder.png', "mimes/ICON_SIZE", 64);
                     else src = ResourcesManager.resolveImageSource('mime_empty.png', "mimes/ICON_SIZE", 64);
                 }
-                object = <div ref="container"><img  src={src}/></div>;
+                object = <img key="image" src={src}/>;
             }
 
-            return object;
+            return (
+                <div ref="container" className={className}>{object}</div>
+            );
 
         }
 
@@ -357,9 +358,9 @@
         },
 
         render: function(){
+            let overlay, editorWindow;
             if(this.state.nodes.length){
                 let style = {};
-                let overlay;
                 let className = 'editor-window react-mui-context vertical_layout', iconClassName='mdi mdi-pencil';
                 if(this.state.closed) className += ' closed';
                 else if(this.state.opened) className += ' opened';
@@ -400,7 +401,7 @@
                     let overlayClass = "editor-overlay opening";
                     if(this.state.opened) {
                         iconClassName = 'mdi mdi-window-minimize';
-                        overlayClass += ' opened';
+                        //overlayClass += ' opened';
                     }
                     overlay = <div key="overlay" onClick={this.toggle} className={overlayClass}/>;
                     mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
@@ -415,30 +416,49 @@
                     }else{
                         mainIcon = <ReactMUI.IconButton iconClassName={iconClassName} onClick={this.toggle}/>;
                     }
-                    overlay = <div key="overlay" onClick={this.toggle} className="editor-overlay hidden"/>;
+                    /*overlay = <div key="overlay" onClick={this.toggle} className="editor-overlay hidden"/>;*/
                 }
-                
 
-                return (
-                    <div className="react-editor">
-                        {overlay}
-                        <div className={className} style={style}>
-                            <div className="editor-title">
-                                {mainIcon}
-                                {title}
-                            </div>
-                            <MaterialUI.Tabs
-                                onChange={this.onChange}
-                                value={this.state.activeTab}>
-                                {tabs}
-                            </MaterialUI.Tabs>
-                            {editors}
+                let tabStyle={};
+                if(tabs.length == 1){
+                    tabStyle = {/*display:'none'*/};
+                }
+                editorWindow = (
+                    <div className={className} style={style}>
+                        <div className="editor-title">
+                            {mainIcon}
+                            {title}
                         </div>
+                        <MaterialUI.Tabs
+                            onChange={this.onChange}
+                            value={this.state.activeTab}
+                            tabItemContainerStyle={tabStyle}
+                            inkBarStyle={tabStyle}
+                        >
+                            {tabs}
+                        </MaterialUI.Tabs>
+                        {editors}
                     </div>
                 );
-            }else{
-                return <span></span>
+
             }
+            return (
+                <div className="react-editor">
+                    <ReactCSSTransitionGroup
+                        transitionName="fade-in"
+                        transitionAppear={true}
+                        transitionAppearTimeout={300}
+                        transitionEnter={true}
+                        transitionEnterTimeout={300}
+                        transitionLeave={true}
+                        transitionLeaveTimeout={300}
+                    >
+                        {overlay}
+                    </ReactCSSTransitionGroup>
+                    {editorWindow}
+                </div>
+            );
+
         }
 
     });
