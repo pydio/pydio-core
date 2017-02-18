@@ -1051,6 +1051,9 @@
         },
 
         submitSearch: function(){
+            if(this.state.display !== 'advanced' && !(this.state.formValues && this.state.formValues.basename)){
+                return;
+            }
             this.refs.results.reload();
         },
 
@@ -1066,8 +1069,13 @@
             return parts.join(' AND ');
         },
 
-        parseMetaColumns(){
+        parseMetaColumns(force = false){
+            if(!force && this._currentWorkspaceParsed && pydio.repositoryId === this._currentWorkspaceParsed){
+                return;
+            }
             let metaFields = {basename:'Filename'}, searchMode = 'remote', registry = this.props.pydio.getXmlRegistry();
+            this._currentWorkspaceParsed = pydio.repositoryId;
+            console.log('parsing columns');
             // Parse client configs
             let options = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'client_configs/template_part[@ajxpClass="SearchEngine" and @theme="material"]/@ajxpOptions'));
             if(options && options.metaColumns){
@@ -1079,12 +1087,17 @@
                     };
                     if(options.reactColumnsRenderers && options.reactColumnsRenderers[key]) {
                         let renderer = cData['renderer'] = options.reactColumnsRenderers[key];
-                        return ResourcesManager.detectModuleToLoadAndApply(renderer, function(){
+                        let namespace = renderer.split('.',1).shift();
+                        if(global[namespace]){
                             cData.renderComponent = FuncUtils.getFunctionByName(renderer, global);
-                        }, true);
+                        }else{
+                            return ResourcesManager.detectModuleToLoadAndApply(renderer, function(){
+                                this.parseMetaColumns(true);
+                            }.bind(this), true);
+                        }
                     }
                     metaFields[key] = cData;
-                });
+                }.bind(this));
             }
             // Parse Indexer data (e.g. Lucene)
             let indexerNode = XMLUtils.XPathSelectSingleNode(registry, 'plugins/indexer');
@@ -1106,8 +1119,26 @@
             });
         },
 
+        hideOnExternalClick(event){
+            if(this.state.display !== 'small') return;
+            const root = this.refs.root;
+            if(root !== event.target && !root.contains(event.target)){
+                this.setState({display:'closed'});
+            }
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            this.parseMetaColumns();
+        },
+
         componentDidMount: function(){
             this.parseMetaColumns();
+            this._clickObserver = this.hideOnExternalClick.bind(this);
+            document.addEventListener('click', this._clickObserver);
+        },
+
+        componentWillUnmount: function(){
+            document.removeEventListener('click', this._clickObserver);
         },
 
         componentDidUpdate: function(){
@@ -1183,7 +1214,7 @@
                 <span className="search-advanced-button" onClick={()=>{this.setState({display:'advanced'})}}>Advanced search</span>
             );
             return (
-                <div className={"top_search_form " + this.state.display}>
+                <div ref="root" className={"top_search_form " + this.state.display}>
                     <div className="search-input">
                         <div className="panel-header">
                             <span className="panel-header-label">{this.state.display === 'advanced'?'Advanced Search' : 'Search ...'}</span>

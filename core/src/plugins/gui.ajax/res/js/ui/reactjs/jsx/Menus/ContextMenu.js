@@ -69,13 +69,6 @@ import PopupMenu from './PopupMenu'
         },
 
         componentDidMount: function(){
-            if(global.pydio.UI.contextMenu){
-                // Make sure "contextmenu" events are not stopped
-                // by proto.menu.
-                // TO BE REMOVED when no more PrototypeJS.
-                global.pydio.UI.contextMenu.destroy();
-                delete global.pydio.UI.contextMenu;
-            }
             this._modelOpen = this.modelOpen;
             ContextMenuModel.getInstance().observe("open", this._modelOpen);
         },
