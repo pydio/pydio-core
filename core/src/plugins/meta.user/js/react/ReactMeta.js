@@ -135,14 +135,20 @@
 
         propTypes:{
             label:React.PropTypes.string,
-            fieldname:React.PropTypes.string
+            fieldname:React.PropTypes.string,
+            onChange:React.PropTypes.func,
+            onValueChange:React.PropTypes.func
         },
 
         updateValue:function(value, submit = true){
             this.setState({value:value});
-            let object = {};
-            object['ajxp_meta_' + this.props.fieldname] = value;
-            this.props.onChange(object, submit);
+            if(this.props.onChange){
+                let object = {};
+                object['ajxp_meta_' + this.props.fieldname] = value;
+                this.props.onChange(object, submit);
+            }else if(this.props.onValueChange){
+                this.props.onValueChange(this.props.fieldname, value);
+            }
         }
 
     };
@@ -290,46 +296,160 @@
 
     });
 
-    let InfoPanel = React.createClass({
+    let UserMetaPanel = React.createClass({
+
+        propTypes:{
+            editMode: React.PropTypes.bool
+        },
+
+        getDefaultProps: function(){
+            return {editMode: false};
+        },
+
+        getInitialState: function(){
+            return { updateMeta: new Map() };
+        },
+
+        updateValue: function(name, value){
+            this.state.updateMeta.set(name, value);
+            this.setState({
+                updateMeta: this.state.updateMeta
+            });
+        },
+
+        getUpdateData: function(){
+            return this.state.updateMeta;
+        },
+
+        resetUpdateData: function(){
+            this.setState({
+                updateMeta: new Map()
+            });
+        },
 
         render: function(){
 
             let configs = Renderer.getMetadataConfigs();
             let data = [];
             let node = this.props.node;
-            let metadata = node.getMetadata();
+            let metadata = this.props.node.getMetadata();
+            let updateMeta = this.state.updateMeta;
+
             configs.forEach(function(meta, key){
                 let label = meta.label;
                 let type = meta.type;
                 let value = metadata.get(key);
-                let column = {name:key}
-                if(type === 'stars_rate'){
-                    value = <MetaStarsRenderer node={node} column={column}/>
-                }else if(type === 'css_label'){
-                    value = <CSSLabelsFilter node={node} column={column}/>
-                }else if(type === 'choice'){
-                    value = <SelectorFilter node={node} column={column}/>
+                if(updateMeta.has(key)){
+                    value = updateMeta.get(key);
                 }
-                data.push(
-                    <div className="infoPanelRow" key={key}>
-                        <div className="infoPanelLabel">{label}</div>
-                        <div className="infoPanelValue">{value}</div>
-                    </div>
-                );
-            });
+                let realValue = value;
 
-            let actions = [
+                if(this.props.editMode){
+                    let field;
+                    let baseProps = {
+                        fieldname: key,
+                        label: label,
+                        value: value,
+                        onValueChange: this.updateValue
+                    };
+                    if(type === 'stars_rate'){
+                        field = <StarsFormPanel {...baseProps}/>;
+                    }else if(type === 'choice') {
+                        field = Renderer.formPanelSelectorFilter(baseProps);
+                    }else if(type === 'css_label'){
+                        field = Renderer.formPanelCssLabels(baseProps);
+                    }else if(type === 'tags'){
+                        field = <span></span>
+                    }else{
+                        field = (
+                            <MaterialUI.TextField
+                                floatingLabelText={label}
+                                value={value}
+                                style={{width:'100%'}}
+                                onChange={(event, value)=>{this.updateValue(key, value);}}
+                            />
+                        );
+                    }
+                    data.push(field);
+                }else{
+                    let column = {name:key};
+                    if(type === 'stars_rate'){
+                        value = <MetaStarsRenderer node={node} column={column}/>
+                    }else if(type === 'css_label'){
+                        value = <CSSLabelsFilter node={node} column={column}/>
+                    }else if(type === 'choice'){
+                        value = <SelectorFilter node={node} column={column}/>
+                    }else if(type === 'tags'){
+                        value = <TagsCloud node={node} column={column}/>
+                    }
+                    data.push(
+                        <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key}>
+                            <div className="infoPanelLabel">{label}</div>
+                            <div className="infoPanelValue">{value}</div>
+                        </div>
+                    );
+                }
+            }.bind(this));
+
+            return (<div>{data}</div>);
+        }
+
+    });
+
+    let InfoPanel = React.createClass({
+
+        getInitialState: function(){
+            return {editMode: false};
+        },
+
+        openEditMode: function(){
+            this.setState({editMode:true });
+        },
+
+        reset: function(){
+            this.refs.panel.resetUpdateData();
+            this.setState({editMode: false});
+        },
+
+        saveChanges: function(){
+            let values = this.refs.panel.getUpdateData();
+            let params = {};
+            values.forEach(function(v, k){
+                params[k] = v;
+            });
+            PydioApi.getClient().postSelectionWithAction("edit_user_meta", function(){
+                this.setState({editMode:false});
+            }.bind(this), null, params);
+        },
+
+        render: function(){
+            let actions = [];
+
+            if(this.state.editMode){
+                actions.push(
+                    <ReactMUI.FlatButton
+                        key="cancel"
+                        label={"Cancel"}
+                        onClick={()=>{this.reset()}}
+                    />
+                );
+            }
+            actions.push(
                 <ReactMUI.FlatButton
                     key="edit"
-                    label="Edit Meta"
+                    label={this.state.editMode?"Save Meta":"Edit Meta"}
                     secondary={true}
-                    onClick={()=>{global.pydio.getController().fireAction("edit_user_meta");}}
+                    onClick={()=>{!this.state.editMode?this.openEditMode():this.saveChanges()}}
                 />
-            ];
+            );
 
             return (
                 <DetailPanes.InfoPanelCard title={"Metadata"} actions={actions}>
-                    {data}
+                    <UserMetaPanel
+                        ref="panel"
+                        node={this.props.node}
+                        editMode={this.state.editMode}
+                    />
                 </DetailPanes.InfoPanelCard>
             );
         }

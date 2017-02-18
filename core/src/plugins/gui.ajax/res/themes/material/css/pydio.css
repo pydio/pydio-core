@@ -7303,6 +7303,16 @@ body,
 #info_panel .panelCard .panelContent div.bgCoverImage {
   border-radius: 3px 3px 0 0 ;
 }
+#info_panel .panelCard .panelContent .infoPanelRow {
+  padding-bottom: 12px;
+}
+#info_panel .panelCard .panelContent .infoPanelRow.no-value {
+  display: none;
+}
+#info_panel .panelCard .panelContent .infoPanelRow .infoPanelLabel {
+  color: rgba(0, 0, 0, 0.33);
+  font-weight: 500;
+}
 #info_panel .panelCard .panelActions {
   padding: 8px;
   text-align: right;

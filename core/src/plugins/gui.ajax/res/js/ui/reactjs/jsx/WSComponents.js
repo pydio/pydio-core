@@ -1075,7 +1075,6 @@
             }
             let metaFields = {basename:'Filename'}, searchMode = 'remote', registry = this.props.pydio.getXmlRegistry();
             this._currentWorkspaceParsed = pydio.repositoryId;
-            console.log('parsing columns');
             // Parse client configs
             let options = JSON.parse(XMLUtils.XPathGetSingleNodeText(registry, 'client_configs/template_part[@ajxpClass="SearchEngine" and @theme="material"]/@ajxpOptions'));
             if(options && options.metaColumns){
