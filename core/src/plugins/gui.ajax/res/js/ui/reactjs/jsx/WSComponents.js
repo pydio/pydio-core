@@ -1379,54 +1379,74 @@
         },
 
         render: function () {
-            
+
+            var connectDropTarget = this.props.connectDropTarget;
+            var isOver = this.props.isOver;
+            var canDrop = this.props.canDrop;
+
+            let dropzone = connectDropTarget(
+                <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
+                    <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
+                    <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
+                        <div id="workspace_toolbar">
+                            <Breadcrumb {...this.props}/>
+                            <SearchForm {...this.props}/>
+                        </div>
+                        <div id="main_toolbar">
+                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                            <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                        </div>
+                        <MainFilesList ref="list" {...this.props}/>
+                    </div>
+                    <DetailPanes.InfoPanel
+                        {...this.props}
+                        dataModel={this.props.pydio.getContextHolder()}
+                        onContentChange={this.infoPanelContentChange}
+                    />
+                    <EditionPanel {...this.props}/>
+                    <span className="context-menu"><PydioMenus.ContextMenu/></span>
+                    <Modal {...this.props}/>
+                </div>
+            );
+
             return (
                 <MaterialUI.MuiThemeProvider>
-                    <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
-                        <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
-                        <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
-                            <div id="workspace_toolbar">
-                                <Breadcrumb {...this.props}/>
-                                <SearchForm {...this.props}/>
-                            </div>
-                            <div id="main_toolbar">
-                                <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
-                                <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                                <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                                <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
-                            </div>
-                            <MainFilesList ref="list" {...this.props}/>
-                        </div>
-                        <DetailPanes.InfoPanel
-                            {...this.props}
-                            dataModel={this.props.pydio.getContextHolder()}
-                            onContentChange={this.infoPanelContentChange}
-                        />
-                        <EditionPanel {...this.props}/>
-                        <span className="context-menu"><PydioMenus.ContextMenu/></span>
-                        <Modal {...this.props}/>
-                    </div>
+                    {dropzone}
                 </MaterialUI.MuiThemeProvider>
             );
             
         }
         
     });
-    
 
-    var FakeDndBackend = function(){
-        return{
-            setup:function(){},
-            teardown:function(){},
-            connectDragSource:function(){},
-            connectDragPreview:function(){},
-            connectDropTarget:function(){}
-        };
+    var fileTarget = {
+        drop: function (props, monitor) {
+            let dataTransfer = monitor.getItem().dataTransfer;
+            let passItems;
+            if (dataTransfer.items.length && dataTransfer.items[0] && (dataTransfer.items[0].getAsEntry || dataTransfer.items[0].webkitGetAsEntry)) {
+                passItems = dataTransfer.items;
+            }
+            if(global['UploaderModel'] && pydio.getController().getActionByName('upload')){
+                UploaderModel.Store.getInstance().handleDropEventResults(passItems, dataTransfer.files, global.pydio.getContextHolder().getContextNode());
+                if(!UploaderModel.Store.getInstance().getAutoStart()){
+                    pydio.getController().fireAction('upload');
+                }
+            }
+        }
     };
 
     let ns = global.WSComponents || {};
     if(global.ReactDND){
-        ns.FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(FSTemplate);
+        let DropTemplate = ReactDND.DropTarget(ReactDND.HTML5Backend.NativeTypes.FILE, fileTarget, function (connect, monitor) {
+            return {
+                connectDropTarget: connect.dropTarget(),
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop()
+            };
+        })(FSTemplate);
+        ns.FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropTemplate);
     }else{
         ns.FSTemplate = FSTemplate;
     }
