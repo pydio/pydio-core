@@ -98,7 +98,7 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-                <infoPanel mime="AJXP_MIMES_IMAGE" theme="material" reactComponent="DetailPanes.ImagePreview" attributes=""/>
+                <infoPanel mime="AJXP_MIMES_IMAGE" theme="material" reactComponent="PydioDetailPanes.ImagePreview" attributes=""/>
 				<infoPanelExtension mime="AJXP_MIMES_IMAGE" theme="orbit" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description,image_width,image_height,image_type" primary="true">
                     <messages>
                         <message key="name_string" id="133"/>

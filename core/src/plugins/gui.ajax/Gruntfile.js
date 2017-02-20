@@ -178,8 +178,8 @@ module.exports = function(grunt) {
             ui : {
                 files: {
                     'res/js/ui/reactjs/build/PydioReactUI.js':'res/js/ui/reactjs/build/ReactUI/index.js',
-                    'res/js/ui/reactjs/build/DetailPanes.js':'res/js/ui/reactjs/build/DetailPanes/index.js',
-                    'res/js/ui/reactjs/build/PydioComponents.js':'res/js/ui/reactjs/build/Components/index.js'
+                    'res/js/ui/reactjs/build/PydioComponents.js':'res/js/ui/reactjs/build/Components/index.js',
+                    'res/js/ui/reactjs/build/PydioWorkspaces.js':'res/js/ui/reactjs/build/Workspaces/index.js'
                 }
             }
         },

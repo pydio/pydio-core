@@ -444,13 +444,13 @@
             );
 
             return (
-                <DetailPanes.InfoPanelCard title={"Metadata"} actions={actions}>
+                <PydioDetailPanes.InfoPanelCard title={"Metadata"} actions={actions}>
                     <UserMetaPanel
                         ref="panel"
                         node={this.props.node}
                         editMode={this.state.editMode}
                     />
-                </DetailPanes.InfoPanelCard>
+                </PydioDetailPanes.InfoPanelCard>
             );
         }
 

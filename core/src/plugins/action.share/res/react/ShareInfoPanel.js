@@ -311,9 +311,9 @@
             ];
 
             return (
-                <DetailPanes.InfoPanelCard title="Shared" actions={actions}>
+                <PydioDetailPanes.InfoPanelCard title="Shared" actions={actions}>
                     <InfoPanel {...this.props}/>
-                </DetailPanes.InfoPanelCard>
+                </PydioDetailPanes.InfoPanelCard>
             );
 
         }

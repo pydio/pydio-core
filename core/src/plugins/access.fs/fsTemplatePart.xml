@@ -43,7 +43,7 @@
                 </div>
             </div>
         ]]></template_part>
-        <template_part ajxpClass="AjxpReactComponent" ajxpId="orbit_content" theme="material" ajxpOptions='{"componentNamespace":"WSComponents","componentName":"FSTemplate","dependencies":["PydioComponents","LeftNavigation"]}'><![CDATA[]]></template_part>
-        <template_part ajxpId="orbit_content" theme="material" namespace="WSComponents" component="FSTemplate" dependencies="PydioComponents,PydioTasks,LeftNavigation" props="{}"/>
+        <template_part ajxpClass="AjxpReactComponent" ajxpId="orbit_content" theme="material" ajxpOptions='{"componentNamespace":"PydioWorkspaces","componentName":"FSTemplate","dependencies":["PydioComponents","LeftNavigation"]}'><![CDATA[]]></template_part>
+        <template_part ajxpId="orbit_content" theme="material" namespace="PydioWorkspaces" component="FSTemplate" dependencies="PydioComponents,PydioTasks,LeftNavigation" props="{}"/>
     </client_configs>
 </registry_contributions>

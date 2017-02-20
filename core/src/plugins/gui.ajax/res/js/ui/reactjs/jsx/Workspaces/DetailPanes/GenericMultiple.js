@@ -16,7 +16,7 @@ export default React.createClass({
                     {nodes.map(function(node){
                         return (
                             <div style={{display:'flex', alignItems:'center', borderBottom:'1px solid #eeeeee'}}>
-                                <WSComponents.FilePreview
+                                <PydioWorkspaces.FilePreview
                                     key={node.getPath()}
                                     style={{height:50, width:50, fontSize: 25}}
                                     node={node}
