@@ -36,10 +36,10 @@ let FSTemplate = React.createClass({
 
         let dropzone = connectDropTarget(
             <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
-                <PydioComponents.AsyncComponent
+                <PydioReactUI.AsyncComponent
                     namespace="LeftNavigation"
                     componentName="PinnedLeftPanel"
-                    {...this.props}
+                    pydio={this.props.pydio}
                 />
                 <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
                     <div id="workspace_toolbar">

@@ -4,7 +4,7 @@
 /**
  * Load a component from server (if not already loaded) based on its namespace.
  */
-export default React.createClass({
+const AsyncComponent = React.createClass({
 
     propTypes: {
         namespace:React.PropTypes.string.isRequired,
@@ -60,7 +60,7 @@ export default React.createClass({
                     props = Object.assign(props, this.props.modalData.payload);
                 }
                 props['ref'] = 'component';
-                return React.createElement(nsObject[this.props.componentName], props, null);
+                return React.createElement(nsObject[this.props.componentName], props);
             }else{
                 return <div>Component {this.props.namespace}.{this.props.componentName} not found!</div>;
             }
@@ -70,3 +70,6 @@ export default React.createClass({
     }
 
 });
+
+
+export {AsyncComponent as default}

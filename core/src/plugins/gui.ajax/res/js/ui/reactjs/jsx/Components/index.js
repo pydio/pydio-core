@@ -13,9 +13,8 @@ import SearchBox from './SearchBox'
 import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
-import AsyncComponent from './AsyncComponent'
 
-import AsyncModal from './modal/AsycnModal'
+import AsyncModal from './modal/AsyncModal'
 import ActionDialogMixin from './modal/ActionDialogMixin'
 import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
@@ -40,7 +39,6 @@ window.PydioComponents = {
     PaperEditorNavEntry     : PaperEditorNavEntry,
     PaperEditorNavHeader    : PaperEditorNavHeader,
 
-    AsyncComponent          : AsyncComponent,
     AsyncModal              : AsyncModal,
     ActionDialogMixin       : ActionDialogMixin,
     CancelButtonProviderMixin : CancelButtonProviderMixin,

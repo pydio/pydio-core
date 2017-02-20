@@ -23,11 +23,21 @@
 
             if(!this._pydio.getXmlRegistry()) return;
 
-            const tNodes = XPathSelectNodes(this._pydio.getXmlRegistry(), "client_configs/template");
+            const tNodes = XMLUtils.XPathSelectNodes(this._pydio.getXmlRegistry(), "client_configs/template[@component]");
             for(let i=0;i<tNodes.length;i++){
 
                 let target = tNodes[i].getAttribute("element");
                 let themeSpecific = tNodes[i].getAttribute("theme");
+                let props = {};
+                if(tNodes[i].getAttribute("props")){
+                    props = JSON.parse(tNodes[i].getAttribute("props"));
+                }
+                props.pydio = this._pydio;
+
+                let containerId = props.containerId;
+                let namespace = tNodes[i].getAttribute("namespace");
+                let component = tNodes[i].getAttribute("component");
+
                 if(themeSpecific && this._pydio.Parameters.get("theme") && this._pydio.Parameters.get("theme") != themeSpecific){
                     continue;
                 }
@@ -38,9 +48,22 @@
                 }
                 if(targetObj){
                     let position = tNodes[i].getAttribute("position");
-                    const HTMLString = this.updateHrefBase(tNodes[i].firstChild.nodeValue);
-                    this.insertChildFromString(targetObj, HTMLString);
-                    //obj[position].evalScripts();
+                    let name = tNodes[i].getAttribute('name');
+                    if(position === 'bottom' && name){
+                        let newDiv = document.createElement('div');
+                        targetObj.parentNode.appendChild(newDiv);
+                        newDiv.id=name;
+                        target = name;
+                        targetObj = newDiv;
+                    }
+                    ResourcesManager.loadClassesAndApply([namespace], function(){
+                        let el = ReactDOM.render(
+                            React.createElement(global[namespace][component], props),
+                            targetObj
+                        );
+                        this._componentsRegistry.set(target, el);
+                    }.bind(this));
+
                 }
             }
             this.guiLoaded = true;
@@ -50,92 +73,9 @@
 
         refreshTemplateParts(){
 
-            let componentsToMount = new Map();
-            let parts = XPathSelectNodes(this._pydio.getXmlRegistry(), "client_configs/template_part[@component]");
-            parts.map(function(node){
-                if(node.getAttribute("theme") && node.getAttribute("theme") != this._pydio.Parameters.get("theme")){
-                    return;
-                }
-                let pydioId = node.getAttribute("ajxpId");
-                let element = document.getElementById(pydioId);
-                let namespace = node.getAttribute("namespace");
-                let componentName = node.getAttribute("component");
-                if(!element){
-                    return;
-                }
-                let namespacesToLoad = [namespace];
-                if(node.getAttribute("dependencies")){
-                    node.getAttribute("dependencies").split(",").forEach(function(d){
-                        namespacesToLoad.push(d);
-                    });
-                }
-                let props = {};
-                if(node.getAttribute("props")){
-                    props = JSON.parse(node.getAttribute("props"));
-                }
-                props['pydio']      = this._pydio;
-                props['pydioId']    = pydioId;
-
-                componentsToMount.set(pydioId, {
-                    namespace:namespace,
-                    componentName:componentName,
-                    namespacesToLoad:namespacesToLoad,
-                    props:props
-                });
-
-            }.bind(this));
-
-            let componentsToRegister = new Map();
-
-            // Now compare current and new
-            this._componentsRegistry.forEach(function(existing, existingId){
-
-                let element = document.getElementById(existingId);
-                if(componentsToMount.has(existingId)){
-                    let registered = existing;
-                    let toMount = componentsToMount.get(existingId);
-
-                    if(registered.namespace === toMount.namespace && registered.componentName === toMount.componentName){
-                        // Do not unmount / remount, just refresh
-                        element.__REACT_COMPONENT.forceUpdate();
-                    }else{
-                        ReactDOM.unmountComponentAtNode(document.getElementById(existingId));
-                        this._componentsRegistry.delete(existingId);
-                        element.__REACT_COMPONENT = null;
-                        ResourcesManager.loadClassesAndApply(toMount.namespacesToLoad, function(){
-                            element.__REACT_COMPONENT = ReactDOM.render(
-                                React.createElement(window[toMount.namespace][toMount.componentName], toMount.props),
-                                element
-                            );
-                            componentsToRegister.set(existingId, toMount);
-                        }.bind(this));
-                    }
-                }else {
-                    ReactDOM.unmountComponentAtNode(element);
-                    element.__REACT_COMPONENT = null;
-                    this._componentsRegistry.delete(existingId);
-                }
-                componentsToMount.delete(existingId);
-
-            }.bind(this));
-
-            componentsToRegister.forEach(function(c, k){
-                this._componentsRegistry.set(k, c);
-            }.bind(this));
-
-            componentsToMount.forEach(function(toMount, newId){
-
-                let element = document.getElementById(newId);
-                ResourcesManager.loadClassesAndApply(toMount.namespacesToLoad, function(){
-                    element.__REACT_COMPONENT = ReactDOM.render(
-                        React.createElement(window[toMount.namespace][toMount.componentName], toMount.props),
-                        element
-                    );
-                    this._componentsRegistry.set(newId, toMount);
-                }.bind(this));
-
-            }.bind(this));
-
+            this._componentsRegistry.forEach(function(reactElement){
+                reactElement.forceUpdate();
+            });
 
         }
 

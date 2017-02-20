@@ -670,7 +670,7 @@
 
         getInitialState:function(){
             return {
-                workspaces: this.props.pydio.user.getRepositoriesList()
+                workspaces: this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []
             };
         },
 
@@ -682,7 +682,7 @@
 
                 if(this.isMounted()){
                     this.setState({
-                        workspaces:this.props.pydio.user.getRepositoriesList()
+                        workspaces:this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []
                     });
                 }
             }.bind(this);
@@ -731,14 +731,20 @@
         render:function(){
             var simpleClickOpen = this.props.pydio.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
             var enableGettingStarted = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED");
+            let UserCartridge;
+            if(this.props.pydio.user){
+                UserCartridge = (
+                    <HomeWorkspaceUserCartridge style={{minHeight:'94px'}}
+                                                controller={this.props.pydio.getController()}
+                                                user={this.props.pydio.user}
+                                                enableGettingStarted={enableGettingStarted}
+                    />
+                );
+            }
             return (
                 <div className="horizontal_layout vertical_fit" id={this.props.rootId}>
                     <div id="home_left_bar" className="vertical_layout">
-                        <HomeWorkspaceUserCartridge style={{minHeight:'94px'}}
-                            controller={this.props.pydio.getController()}
-                            user={this.props.pydio.user}
-                            enableGettingStarted={enableGettingStarted}
-                        />
+                        {UserCartridge}
                         <div id="workspaces_center" className="vertical_layout vertical_fit">
                             <LeftNavigation.UserWorkspacesList
                                 pydio={this.props.pydio}

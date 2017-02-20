@@ -124,7 +124,7 @@ export default React.createClass({
         if(this.state.componentData){
             if(this.state.async){
                 modalContent = (
-                    <AsyncComponent
+                    <PydioReactUI.AsyncComponent
                         {...this.props}
                         namespace={this.state.componentData.namespace}
                         componentName={this.state.componentData.compName}

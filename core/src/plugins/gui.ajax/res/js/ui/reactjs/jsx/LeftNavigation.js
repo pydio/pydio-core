@@ -65,7 +65,7 @@
                 try{
                     if(this.isMounted()){
                         this.setState({
-                            workspaces:this.props.pydio.user.getRepositoriesList()
+                            workspaces:this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []
                         });
                     }
                 }catch(e){
@@ -290,8 +290,8 @@
                 <UserWidget pydio={this.props.pydio}/>
                 <UserWorkspacesList
                     pydio={this.props.pydio}
-                    workspaces={this.props.pydio.user.getRepositoriesList()}
-                    showTreeForWorkspace={this.props.pydio.user.activeRepository}
+                    workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
+                    showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}
                 />
             </div>
             );

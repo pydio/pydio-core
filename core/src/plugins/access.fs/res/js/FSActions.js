@@ -895,7 +895,7 @@
                     let parts = uploader.moduleName.split('.');
                     tabs.push(
                         <MaterialUI.Tab label={MessageHash[uploader.xmlNode.getAttribute('text')]} key={uploader.id}>
-                            <PydioComponents.AsyncComponent
+                            <PydioReactUI.AsyncComponent
                                 pydio={pydio}
                                 namespace={parts[0]}
                                 componentName={parts[1]}

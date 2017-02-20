@@ -11,7 +11,7 @@
             <js className="PydioComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js" depends="React"/>
             <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
             <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,PydioComponents,PydioTasks"/>
-            <js className="PydioWorkspaces" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js" depends="React,PydioComponents"/>
+            <js className="PydioWorkspaces" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js" depends="React,PydioComponents,PydioTasks,LeftNavigation"/>
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>
@@ -213,11 +213,7 @@
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>
 			]]></template>
-            <template name="main_material" element="ajxp_desktop" position="top" theme="material"><![CDATA[
-                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
-                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
-                </div>
-			]]></template>
+            <template name="main_material" element="ajxp_desktop" position="top" theme="material" component="TemplateBuilder" namespace="PydioReactUI" props='{"imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_", "containerId":"orbit_content"}'/>
             <template name="widget_orbit" element="ajxp_widget" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>

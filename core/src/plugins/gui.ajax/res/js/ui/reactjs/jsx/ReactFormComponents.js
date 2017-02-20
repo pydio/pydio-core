@@ -991,7 +991,7 @@
                             Pydio Companion
                         </div>
                         <div className="helper-content">
-                            <PydioComponents.AsyncComponent
+                            <PydioReactUI.AsyncComponent
                                 {...this.props.helperData}
                                 namespace={pluginHelperNamespace}
                                 componentName="Helper"
