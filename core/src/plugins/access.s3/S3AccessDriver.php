@@ -99,18 +99,23 @@ class S3AccessDriver extends FsAccessDriver
      */
     public function directoryUsage(AJXP_Node $node){
         $client = $this->getS3Service();
-        $bucket = $node->getRepository()->getContextOption($node->getContext(), "CONTAINER"); //(isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTAINER"]:$this->repository->getOption("CONTAINER"));
-        $path   = rtrim($node->getRepository()->getContextOption($node->getContext(), "PATH"), "/").$node->getPath(); //(isSet($repositoryResolvedOptions["PATH"])?$repositoryResolvedOptions["PATH"]:"");
-        $objects = $client->getIterator('ListObjects', array(
-            'Bucket' => $bucket,
-            'Prefix' => $path
-        ));
+        $bucket = $node->getRepository()->getContextOption($node->getContext(), "CONTAINER"); //(isSet($repositoryResolvedOptions["CONTAINER"])?$repositoryResolvedOptions["CONTA$
+        $path   = rtrim($node->getRepository()->getContextOption($node->getContext(), "PATH"), "/").$node->getPath(); //(isSet($repositoryResolvedOptions["PATH"])?$repositoryRes$
 
-        $usage = 0;
-        foreach ($objects as $object) {
-            $usage += (double)$object['Size'];
+        $usage = 0; 
+        if(!empty($client)){
+                $objects = $client->getIterator('ListObjects', array(
+                    'Bucket' => $bucket,
+                    'Prefix' => $path
+                ));
+
+
+                foreach ($objects as $object) {
+                    $usage += (double)$object['Size'];
+                }
         }
-        return $usage;
+
+		return $usage;
 
     }
 
