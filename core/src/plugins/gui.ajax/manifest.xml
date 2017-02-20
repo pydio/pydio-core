@@ -8,12 +8,11 @@
             <js className="PydioCoreActions" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioCoreActions.js"/>
             <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
             <js className="PydioReactUI" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioReactUI.js" depends="React"/>
-            <js className="PydioMenus" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioMenus.js" depends="React,ReactMFB"/>
-            <js className="ReactPydio" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactPydioComponents.js" depends="React,PydioMenus"/>
+            <js className="PydioComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js" depends="React"/>
             <js className="UsersCompleter" file="plugins/gui.ajax/res/js/ui/reactjs/build/UsersCompleter.js" depends="React"/>
-            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,PydioMenus,ReactPydio,PydioTasks"/>
-            <js className="DetailPanes" file="plugins/gui.ajax/res/js/ui/reactjs/build/DetailPanes.js" depends="React,ReactPydio"/>
-            <js className="WSComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/WSComponents.js" depends="React,PydioMenus,DetailPanes,ReactPydio"/>
+            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,PydioComponents,PydioTasks"/>
+            <js className="DetailPanes" file="plugins/gui.ajax/res/js/ui/reactjs/build/DetailPanes.js" depends="React,PydioComponents"/>
+            <js className="WSComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/WSComponents.js" depends="React,PydioComponents,DetailPanes"/>
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>

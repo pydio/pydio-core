@@ -380,7 +380,7 @@
                     index ++;
                     return (
                         <div className="editor_container vertical_layout vertical_fit" style={style}>
-                            <ReactPydio.ReactEditorOpener
+                            <PydioComponents.ReactEditorOpener
                                 node={object.node}
                                 editorData={object.editorData}
                                 registry={this.props.pydio.Registry}
@@ -586,9 +586,9 @@
 
         entryHandleClicks: function(node, clickType){
             let dm = this.props.pydio.getContextHolder();
-            if(!clickType || clickType == ReactPydio.SimpleList.CLICK_TYPE_SIMPLE){
+            if(!clickType || clickType == PydioComponents.SimpleList.CLICK_TYPE_SIMPLE){
                 dm.setSelectedNodes([node]);
-            }else if(clickType == ReactPydio.SimpleList.CLICK_TYPE_DOUBLE){
+            }else if(clickType == PydioComponents.SimpleList.CLICK_TYPE_DOUBLE){
                 if(node.isLeaf()){
                     dm.setSelectedNodes([node]);
                     this.props.pydio.Controller.fireAction("open_with_unique");
@@ -699,7 +699,7 @@
 
             if(dMode === 'detail'){
 
-                elementHeight = ReactPydio.SimpleList.HEIGHT_ONE_LINE;
+                elementHeight = PydioComponents.SimpleList.HEIGHT_ONE_LINE;
                 tableKeys = this.state.columns;
 
             } else if(dMode === 'grid'){
@@ -720,13 +720,13 @@
             } else if(dMode === 'list'){
 
                 sortKeys = this.state.columns;
-                elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES;
+                elementHeight = PydioComponents.SimpleList.HEIGHT_TWO_LINES;
                 entryRenderSecondLine = this.entryRenderSecondLine;
 
             }
 
             return (
-                <ReactPydio.SimpleList
+                <PydioComponents.SimpleList
                     ref="list"
                     tableKeys={tableKeys}
                     sortKeys={sortKeys}
@@ -1200,7 +1200,7 @@
                     </div>
                 );
             }else{
-                elementHeight = ReactPydio.SimpleList.HEIGHT_TWO_LINES + 10;
+                elementHeight = PydioComponents.SimpleList.HEIGHT_TWO_LINES + 10;
                 renderSecondLine = function(node){
                     return <div>{node.getPath()}</div>
                 };
@@ -1239,7 +1239,7 @@
                         <SearchFileSizePanel {...this.props} {...props}/>
                     </div>
                     <div className="search-results">
-                        <ReactPydio.NodeListCustomProvider
+                        <PydioComponents.NodeListCustomProvider
                             ref="results"
                             className={this.state.display !== 'small' ? 'main-file-list' : null}
                             elementHeight={elementHeight}
@@ -1345,7 +1345,7 @@
                 />,
             ];
             return (
-                <ReactPydio.AsyncModal
+                <PydioComponents.AsyncModal
                     ref="modal"
                     open={this.state.open}
                     componentData={this.state.modalData}
@@ -1386,7 +1386,7 @@
 
             let dropzone = connectDropTarget(
                 <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
-                    <ReactPydio.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
+                    <PydioComponents.AsyncComponent namespace="LeftNavigation" componentName="PinnedLeftPanel" {...this.props}/>
                     <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
                         <div id="workspace_toolbar">
                             <Breadcrumb {...this.props}/>
@@ -1395,7 +1395,7 @@
                         <div id="main_toolbar">
                             <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
                             <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                            <ReactPydio.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                            <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
                             <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
                         </div>
                         <MainFilesList ref="list" {...this.props}/>

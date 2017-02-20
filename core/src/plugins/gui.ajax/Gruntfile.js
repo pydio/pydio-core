@@ -103,6 +103,12 @@ module.exports = function(grunt) {
                 dest: 'res/js/ui/prototype/util',
                 flatten:true
             },
+            dndpatch: {
+                expand: true,
+                src: 'res/js/vendor/dnd-html5-backend-patch/NativeDragSources.js',
+                dest: 'node_modules/react-dnd-html5-backend/lib/',
+                flatten:true
+            }
         },
         uglify: {
             options: {
@@ -162,14 +168,6 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        copy: {
-            dndpatch: {
-                expand: true,
-                src: 'res/js/vendor/dnd-html5-backend-patch/NativeDragSources.js',
-                dest: 'node_modules/react-dnd-html5-backend/lib/',
-                flatten:true
-            },
-        },
         browserify: {
             dist: {
                 files: {
@@ -181,7 +179,7 @@ module.exports = function(grunt) {
                 files: {
                     'res/js/ui/reactjs/build/PydioReactUI.js':'res/js/ui/reactjs/build/ReactUI/index.js',
                     'res/js/ui/reactjs/build/DetailPanes.js':'res/js/ui/reactjs/build/DetailPanes/index.js',
-                    'res/js/ui/reactjs/build/PydioMenus.js':'res/js/ui/reactjs/build/Menus/index.js'
+                    'res/js/ui/reactjs/build/PydioComponents.js':'res/js/ui/reactjs/build/Components/index.js'
                 }
             }
         },

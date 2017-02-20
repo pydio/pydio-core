@@ -160,13 +160,13 @@
 
         render: function(){
             return (
-                <ReactPydio.LabelWithTip className="dl_tooltip_container" tooltip={MessageHash[this.props.tooltipId]}>
+                <PydioComponents.LabelWithTip className="dl_tooltip_container" tooltip={MessageHash[this.props.tooltipId]}>
                     <div id={this.props.id}>
                         <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
                         <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
                         <div style={{color:'white'}}>{MessageHash[this.props.messageId]}</div>
                     </div>
-                </ReactPydio.LabelWithTip>
+                </PydioComponents.LabelWithTip>
             );
         }
     });

@@ -4,7 +4,7 @@
     <class_definition classname="Pydio\Tasks\TaskController" filename="plugins/core.tasks/src/TaskController.php"/>
     <client_settings>
         <resources>
-            <js className="PydioTasks" file="plugins/core.tasks/js/build/PydioTasks.js" depends="React,ReactPydio"/>
+            <js className="PydioTasks" file="plugins/core.tasks/js/build/PydioTasks.js" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
     <registry_contributions>

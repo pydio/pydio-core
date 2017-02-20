@@ -230,7 +230,7 @@
 
         render: function(){
             return (
-                <ReactPydio.SimpleTree
+                <PydioComponents.SimpleTree
                     onNodeSelect={this.treeNodeSelected}
                     nodeIsSelected={this.nodeIsSelected}
                     dataModel={this.props.dataModel}
@@ -510,7 +510,7 @@
                     };
                 }
                 component = (
-                    <ReactPydio.NodeListCustomProvider
+                    <PydioComponents.NodeListCustomProvider
                         pydio={this.props.pydio}
                         ref={paneData.id}
                         title={title}
@@ -632,7 +632,7 @@
 
     var WorkspaceEntry = React.createClass({
 
-        mixins:[ReactPydio.MessagesConsumerMixin],
+        mixins:[PydioComponents.MessagesConsumerMixin],
 
         propTypes:{
             pydio:React.PropTypes.instanceOf(Pydio).isRequired,

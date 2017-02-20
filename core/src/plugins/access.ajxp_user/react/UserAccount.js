@@ -284,9 +284,28 @@
 
     });
 
+    /**
+     * Add to tabs - Requires MessagesProviderMixin & DND Context...
+     */
+    let UsersPane = React.createClass({
+
+        render: function(){
+
+            return (
+                <PydioComponents.NodeListCustomProvider
+                    nodeProviderProperties={{get_action:'ls', dir:'users', tmp_repository_id:'ajxp_user'}}
+                    elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                />
+            );
+
+        }
+
+    });
+
     let Dashboard = React.createClass({
         
         render: function(){
+
             return (
                 <MaterialUI.MuiThemeProvider>
                     <MaterialUI.Tabs>

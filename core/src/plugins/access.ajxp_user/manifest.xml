@@ -25,7 +25,7 @@
                     <div id="account_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"ProfilePane"}'></div>
                 </div>
 			]]></template_part>
-            <template_part ajxpId="orbit_content" theme="material" namespace="UserAccount" component="Dashboard" dependencies="ReactPydio"/>
+            <template_part ajxpId="orbit_content" theme="material" namespace="UserAccount" component="Dashboard" dependencies="PydioComponents"/>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="my-users-pane"
                                 tabInfo='{"id":"contacts","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'

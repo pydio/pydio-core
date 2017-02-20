@@ -104,7 +104,7 @@
                 let namespace = component.split(".")[0];
                 let name = component.split(".")[1];
                 return (
-                    <ReactPydio.AsyncComponent
+                    <PydioComponents.AsyncComponent
                         {...this.state.displayData.DATA}
                         {...this.props}
                         key={"ip_" + component}
