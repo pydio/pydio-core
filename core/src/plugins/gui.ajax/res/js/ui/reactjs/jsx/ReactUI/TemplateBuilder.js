@@ -9,8 +9,6 @@ export default React.createClass({
 
     render: function(){
 
-        console.log('Rendering now');
-
         let pydio = this.props.pydio;
         let containerId = this.props.containerId;
 
@@ -36,7 +34,6 @@ export default React.createClass({
             }
             props['pydio']      = pydio;
 
-            console.log('AsyncProps', namespace, componentName, props);
             components.push(
                 <AsyncComponent
                     namespace={namespace}
@@ -44,7 +41,6 @@ export default React.createClass({
                     {...props}
                 />
             );
-            console.log(components);
 
         }.bind(this));
 
