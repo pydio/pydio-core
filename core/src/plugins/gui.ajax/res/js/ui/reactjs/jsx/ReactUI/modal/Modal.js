@@ -1,3 +1,5 @@
+import AsyncModal from './AsyncModal'
+
 let Modal = React.createClass({
 
     componentDidMount: function(){
@@ -29,12 +31,15 @@ let Modal = React.createClass({
 
     render: function(){
         return (
-            <PydioComponents.AsyncModal
-                ref="modal"
-                open={this.state.open}
-                componentData={this.state.modalData}
-                onDismiss={this.handleClose}
-            />
+            <MaterialUI.MuiThemeProvider>
+                <AsyncModal
+                    ref="modal"
+                    open={this.state.open}
+                    componentData={this.state.modalData}
+                    onDismiss={this.handleClose}
+                />
+            </MaterialUI.MuiThemeProvider>
+
         );
     }
 

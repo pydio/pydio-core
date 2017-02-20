@@ -136,6 +136,16 @@
             }
         }
 
+        registerRootModal(component){
+            this._rootModal = component;
+        }
+
+        openRootModal(){
+            if(this._rootModal){
+                this._rootModal.show();
+            }
+        }
+
         registerModalOpener(component){
             this._modalOpener = component;
             this.modalSupportsComponents = true;

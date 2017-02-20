@@ -847,9 +847,9 @@
     let EmptyDialog = React.createClass({
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.CancelButtonProviderMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
 
         getDefaultProps: function(){
@@ -870,8 +870,8 @@
     let UploadDialog = React.createClass({
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
 
         getDefaultProps: function(){
@@ -924,9 +924,9 @@
         },
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.CancelButtonProviderMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
         getDefaultProps: function(){
             return {
@@ -1085,9 +1085,9 @@
         },
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.CancelButtonProviderMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
 
         getDefaultProps: function(){
@@ -1219,9 +1219,9 @@
         },
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.CancelButtonProviderMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
 
         getDefaultProps: function(){
@@ -1252,9 +1252,9 @@
         },
 
         mixins:[
-            PydioComponents.ActionDialogMixin,
-            PydioComponents.CancelButtonProviderMixin,
-            PydioComponents.SubmitButtonProviderMixin
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
         ],
 
         getDefaultProps: function(){

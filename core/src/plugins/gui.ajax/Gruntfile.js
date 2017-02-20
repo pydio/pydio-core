@@ -287,7 +287,7 @@ module.exports = function(grunt) {
         'uglify:js',
         'babel:materialui',
         'babel:pydio',
-        'env:build',
+        'env:dev',
         'browserify',
         'env:dev',
         'uglify:nodejs'

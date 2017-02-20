@@ -14,11 +14,6 @@ import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
 
-import AsyncModal from './modal/AsyncModal'
-import ActionDialogMixin from './modal/ActionDialogMixin'
-import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
-import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
-
 window.PydioComponents = {
     
     SortableList            : SortableList,
@@ -37,12 +32,7 @@ window.PydioComponents = {
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,
-    PaperEditorNavHeader    : PaperEditorNavHeader,
-
-    AsyncModal              : AsyncModal,
-    ActionDialogMixin       : ActionDialogMixin,
-    CancelButtonProviderMixin : CancelButtonProviderMixin,
-    SubmitButtonProviderMixin : SubmitButtonProviderMixin
+    PaperEditorNavHeader    : PaperEditorNavHeader
 
 };
 

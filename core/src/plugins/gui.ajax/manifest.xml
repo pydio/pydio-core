@@ -213,7 +213,8 @@
                     <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
                 </div>
 			]]></template>
-            <template name="main_material" element="ajxp_desktop" position="top" theme="material" component="TemplateBuilder" namespace="PydioReactUI" props='{"imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_", "containerId":"orbit_content"}'/>
+            <template name="main_material" element="ajxp_desktop" position="top" theme="material" namespace="PydioReactUI" component="TemplateBuilder" props='{"imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_", "containerId":"orbit_content"}'/>
+            <template name="material_modal" element="ajxp_desktop" position="bottom" theme="material" namespace="PydioReactUI" component="Modal" props='{"containerId":"pydio_modal"}'/>
             <template name="widget_orbit" element="ajxp_widget" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>

@@ -61,7 +61,6 @@ let FSTemplate = React.createClass({
                 />
                 <EditionPanel {...this.props}/>
                 <span className="context-menu"><PydioMenus.ContextMenu/></span>
-                <Modal {...this.props}/>
             </div>
         );
 

@@ -382,6 +382,7 @@ class Connexion{
                 if(onLoadedCode != null) onLoadedCode();
             }catch(e){
                 alert('error loading '+fileName+':'+ e.message);
+                if(console) console.error(e);
             }
             pydio.fire("server_answer");
         }
