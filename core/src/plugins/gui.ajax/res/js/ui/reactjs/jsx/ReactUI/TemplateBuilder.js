@@ -16,7 +16,6 @@ export default React.createClass({
 
         let parts = XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), "client_configs/template_part[@component]");
         parts.map(function(node){
-            console.log(node);
             if(node.getAttribute("theme") && node.getAttribute("theme") != pydio.Parameters.get("theme")){
                 return;
             }
