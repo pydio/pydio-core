@@ -742,7 +742,7 @@
                 );
             }
             return (
-                <div className="horizontal_layout vertical_fit" id={this.props.rootId}>
+                <div className="horizontal_layout vertical_fit" id={this.props.rootId} style={this.props.style}>
                     <div id="home_left_bar" className="vertical_layout">
                         {UserCartridge}
                         <div id="workspaces_center" className="vertical_layout vertical_fit">
