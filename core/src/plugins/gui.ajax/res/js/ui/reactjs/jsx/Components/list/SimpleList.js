@@ -7,6 +7,7 @@ import SortColumns from './SortColumns'
 import ListPaginator from './ListPaginator'
 import SimpleReactActionBar from '../SimpleReactActionBar'
 import ContextMenuNodeProviderMixin from '../menu/ContextMenuNodeProviderMixin'
+import InlineEditor from './InlineEditor'
 
 /**
  * Main List component

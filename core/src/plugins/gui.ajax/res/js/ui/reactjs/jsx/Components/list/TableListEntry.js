@@ -1,5 +1,7 @@
 import ListEntryNodeListenerMixin from './ListEntryNodeListenerMixin'
 import ListEntry from './ListEntry'
+import InlineEditor from './InlineEditor'
+
 
 /**
  * Specific list entry rendered as a table row. Not a real table, CSS used.

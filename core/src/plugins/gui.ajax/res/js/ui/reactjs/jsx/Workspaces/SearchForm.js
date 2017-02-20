@@ -1,3 +1,5 @@
+import FilePreview from './FilePreview'
+
 let SearchDatePanel = React.createClass({
 
     recomputeStart: function(event, value){

@@ -1,11 +1,12 @@
 import InfoPanelCard from './InfoPanelCard'
+import FilePreview from '../FilePreview'
 
 export default React.createClass({
 
     render: function(){
         return (
             <InfoPanelCard>
-                <PydioWorkspaces.FilePreview
+                <FilePreview
                     key={this.props.node.getPath()}
                     style={{height:200}}
                     node={this.props.node}
