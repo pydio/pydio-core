@@ -286,9 +286,11 @@
 
         render: function(){
             return (
-            <div className="left-panel">
+            <div className="left-panel vertical_fit vertical_layout">
                 <UserWidget pydio={this.props.pydio}/>
                 <UserWorkspacesList
+                    className={"vertical_fit"}
+                    style={{overflowY:'auto'}}
                     pydio={this.props.pydio}
                     workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
                     showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}
@@ -543,11 +545,13 @@
     var UserWorkspacesList = React.createClass({
 
         propTypes:{
-            pydio:React.PropTypes.instanceOf(Pydio),
-            workspaces:React.PropTypes.instanceOf(Map),
-            showTreeForWorkspace:React.PropTypes.string,
-            onHoverLink:React.PropTypes.func,
-            onOutLink:React.PropTypes.func
+            pydio                   : React.PropTypes.instanceOf(Pydio),
+            workspaces              : React.PropTypes.instanceOf(Map),
+            showTreeForWorkspace    : React.PropTypes.string,
+            onHoverLink             : React.PropTypes.func,
+            onOutLink               : React.PropTypes.func,
+            className               : React.PropTypes.string,
+            style                   : React.PropTypes.object
         },
 
         createRepositoryEnabled:function(){
@@ -614,7 +618,7 @@
             }
 
             return (
-                <div className="user-workspaces-list">
+                <div className={"user-workspaces-list" + (this.props.className ? ' ' + this.props.className  : '')} style={this.props.style}>
                     {workspacesTitle}
                     <div className="workspaces">
                         {entries}

@@ -42,7 +42,6 @@
         },
 
         propTypes: {
-            closeAjxpDialog: React.PropTypes.func.isRequired,
             pydio:React.PropTypes.instanceOf(Pydio).isRequired,
             selection:React.PropTypes.instanceOf(PydioDataModel).isRequired,
             readonly:React.PropTypes.bool
@@ -120,7 +119,7 @@
         },
 
         clicked: function(){
-            this.props.closeAjxpDialog();
+            this.dismiss();
         },
 
         getMessage: function(key, namespace = 'share_center'){

@@ -58,7 +58,8 @@
 
             const menuItems = Object.keys(CSSLabelsFilter.CSS_LABELS).map(function(id){
                 let label = CSSLabelsFilter.CSS_LABELS[id];
-                return {payload:id, text:label.label};
+                //return {payload:id, text:label.label};
+                return <MaterialUI.MenuItem value={id} primaryText={label.label}/>
             }.bind(this));
 
             return <MetaSelectorFormPanel {...props} menuItems={menuItems}/>;
@@ -70,7 +71,8 @@
             let menuItems = [];
             if(configs && configs.data){
                 configs.data.forEach(function(value, key){
-                    menuItems.push({payload:key, text:value});
+                    //menuItems.push({payload:key, text:value});
+                    menuItems.push(<MaterialUI.MenuItem value={key} primaryText={value}/>);
                 });
             }
 
@@ -251,26 +253,23 @@
 
         mixins:[MetaFieldFormPanelMixin],
 
-        changeSelector: function(e, selectedIndex, menuItem){
-            this.updateValue(menuItem.payload);
+        changeSelector: function(e, selectedIndex, payload){
+            this.updateValue(payload);
         },
 
         getInitialState: function(){
-            return {value: null};
+            return {value: this.props.value};
         },
 
         render: function(){
             let index = 0, i = 1;
-            this.props.menuItems.map(function(item, i){
-                if(item.payload === this.state.value) index = i + 1;
-            }.bind(this));
-            this.props.menuItems.unshift({payload:null, text:this.props.label});
+            this.props.menuItems.unshift(<MaterialUI.MenuItem value={null} primaryText={this.props.label}/>);
             return (
                 <div>
-                    <ReactMUI.DropDownMenu
-                        menuItems={this.props.menuItems}
-                        selectedIndex={index}
-                        onChange={this.changeSelector}/>
+                    <MaterialUI.SelectField
+                        style={{width:'100%'}}
+                        value={this.state.value}
+                        onChange={this.changeSelector}>{this.props.menuItems}</MaterialUI.SelectField>
                 </div>
             );
         }
@@ -438,7 +437,7 @@
 
             if(this.state.editMode){
                 actions.push(
-                    <ReactMUI.FlatButton
+                    <MaterialUI.FlatButton
                         key="cancel"
                         label={"Cancel"}
                         onClick={()=>{this.reset()}}
@@ -446,7 +445,7 @@
                 );
             }
             actions.push(
-                <ReactMUI.FlatButton
+                <MaterialUI.FlatButton
                     key="edit"
                     label={this.state.editMode?"Save Meta":"Edit Meta"}
                     secondary={true}
