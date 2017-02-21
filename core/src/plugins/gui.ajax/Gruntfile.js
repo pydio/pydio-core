@@ -287,9 +287,9 @@ module.exports = function(grunt) {
         'uglify:js',
         'babel:materialui',
         'babel:pydio',
-        'env:dev',
-        'browserify',
         'env:build',
+        'browserify',
+        'env:dev',
         'uglify:nodejs'
     ]);
     grunt.registerTask('type:css', [

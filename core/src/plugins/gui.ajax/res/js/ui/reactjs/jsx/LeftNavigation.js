@@ -268,7 +268,11 @@
                 <div className="user-widget">
                     <div className="username">John Doe</div>
                     <div className="action_bar">
-                        <a><span className="icon-bell" onClick={this.applyAction.bind(this, 'alerts')}></span></a>
+                        <PydioReactUI.AsyncComponent
+                            namespace="PydioNotifications"
+                            componentName="Panel"
+                            {...this.props}
+                        />
                         <a><span className="icon-home" onClick={this.applyAction.bind(this, 'home')}></span></a>
                         <a><span className="icon-cog" onClick={this.applyAction.bind(this, 'cog')}></span></a>
                         <a><span className="icon-signout" onClick={this.applyAction.bind(this, 'logout')}></span></a>
