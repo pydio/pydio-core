@@ -8,6 +8,7 @@ import ActionDialogMixin from './modal/ActionDialogMixin'
 import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
 import Modal from './modal/Modal'
+import AbstractDialogModifier from './modal/AbstractDialogModifier'
 
 window.PydioReactUI = {
     Builder             : Builder,
@@ -18,6 +19,7 @@ window.PydioReactUI = {
     ActionDialogMixin       : ActionDialogMixin,
     CancelButtonProviderMixin : CancelButtonProviderMixin,
     SubmitButtonProviderMixin : SubmitButtonProviderMixin,
+    AbstractDialogModifier      : AbstractDialogModifier,
     Modal                       : Modal
 
 };

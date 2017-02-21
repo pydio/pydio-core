@@ -21,13 +21,22 @@
                             document.location.href=loginRedirect;
                         }else{
                             ResourcesManager.loadClassesAndApply(["AuthfrontCoreActions"], function(){
-                                AuthfrontCoreActions.Callbacks.multiAuth(authSources, masterAuthSource, userIdSeparator);
+                                AuthfrontCoreActions.Callbacks.loginPassword({
+                                    authSources: authSources,
+                                    masterAuthSource: masterAuthSource,
+                                    userIdSeparator: userIdSeparator
+                                });
                             });
                         }
                     ]]></clientCallback>
                 </processing>
             </action>
         </actions>
+        <client_configs>
+            <component_config className="AuthfrontCoreActions.LoginPasswordDialog">
+                <modifier module="AuthfrontCoreActions.MultiAuthModifier"/>
+            </component_config>
+        </client_configs>
     </registry_contributions>
     <dependencies>
         <activePlugin pluginName="auth.multi"/>

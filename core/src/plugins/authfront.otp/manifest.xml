@@ -9,7 +9,6 @@
     <client_settings>
         <resources>
             <i18n namespace="authfront.otp" path="plugins/authfront.otp/i18n"/>
-            <js className="OTP_LoginForm" file="plugins/authfront.otp/class.OTP_LoginForm.js" autoload="true"/>
             <js className="OTPAuthfrontActions" file="plugins/authfront.otp/res/build/OTPAuthfrontActions.js"/>
             <css file="plugins/authfront.otp/configurator.css" autoload="true"/>
         </resources>
@@ -41,52 +40,14 @@
                 </gui>
                 <processing>
                     <clientCallback module="OTPAuthfrontActions.Callbacks.setupScreen" prepareModal="true"/>
-                    <clientForm id="otp_setup_screen"><![CDATA[
-                         <div id="otp_setup_screen" box_width="500">
-                            <div data:ajxp_message_id="authfront.otp.2">AJXP_MESSAGE[authfront.otp.2]</div>
-                            <div data:ajxp_message_id="authfront.otp.3">AJXP_MESSAGE[authfront.otp.3]</div>
-                            <div data:ajxp_message_id="authfront.otp.4">AJXP_MESSAGE[authfront.otp.4]</div>
-                            <div class="codes">
-                                <div id="qrcode"></div>
-                                <input id="google_otp" type="text"/>
-                            </div>
-                            <div class="verif">
-                                <div data:ajxp_message_id="authfront.otp.5">AJXP_MESSAGE[authfront.otp.5]</div>
-                                <input id="google_otp_verification" type="text"/>
-                            </div>
-                         </div>
-					]]></clientForm>
                     <serverCallback methodName="getConfigurationCode"/>
                 </processing>
             </action>
         </actions>
         <client_configs>
-            <template element="ajxp_desktop" name="otp_script" position="bottom"><![CDATA[
-            <script>
-                  document.observe("ajaxplorer:afterApply-login", function(){
-                    var f= modal.getForm();
-
-                    var enableModifyGUI = ajaxplorer.getPluginConfigs("authfront.otp").get('MODIFY_LOGIN_SCREEN');
-
-                    if(!enableModifyGUI) return;
-
-                    if(f.down('input[name="otp_code"]')){
-                        return;
-                    }
-                    try{
-                        var el = f.down('input[name="password"]').up("div.SF_element");
-                        var clone = el.cloneNode(true);
-                        el.insert({after:clone});
-                        var newField = clone.down('input[name="password"]');
-                        newField.writeAttribute('name', 'otp_code');
-                        newField.writeAttribute('data-ajxpLoginAdditionalParameter', 'true');
-                        clone.down('div.SF_label').update('Unique Code (6 digits)');
-                    }catch(e){
-                        if(console) console.log('Error while replacing OTP field', e);
-                    }
-                  });
-            </script>
-            ]]></template>
+            <component_config className="AuthfrontCoreActions.LoginPasswordDialog">
+                <modifier module="OTPAuthfrontActions.LoginDialogModifier"/>
+            </component_config>
         </client_configs>
     </registry_contributions>
 </authdriver>

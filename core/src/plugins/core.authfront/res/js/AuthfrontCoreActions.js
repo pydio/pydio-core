@@ -2,19 +2,7 @@
 
     let pydio = global.pydio;
 
-    let LoginPasswordDialog = React.createClass({
-
-        mixins:[
-            PydioReactUI.ActionDialogMixin,
-            PydioReactUI.SubmitButtonProviderMixin
-        ],
-
-        getDefaultProps: function(){
-            return {
-                dialogTitle: pydio.MessageHash[163],
-                dialogIsModal: true
-            };
-        },
+    let LoginDialogMixin = {
 
         getInitialState: function(){
             return {
@@ -25,15 +13,8 @@
             };
         },
 
-        componentWillReceiveProps: function(){
-            this.setState({displayCaptcha: false});
-            PydioApi.getClient().request({get_action:"get_seed"}, function(transport){
-                if(transport.responseJSON)  this.setState({displayCaptcha: true});
-            }.bind(this));
-        },
+        postLoginData: function(client){
 
-        submit: function(){
-            let client = PydioApi.getClient();
             let params = {
                 get_action  : 'login',
                 userid      : this.refs.login.getValue(),
@@ -45,6 +26,11 @@
             }
             if(this.refs.remember_me && this.refs.remember_me.isChecked()){
                 params['remember_me'] = 'true' ;
+            }
+            if(this.props.modifiers){
+                this.props.modifiers.map(function(m){
+                    m.enrichSubmitParameters(this.props, this.state, this.refs, params);
+                }.bind(this));
             }
             client.request(params, function(responseObject){
                 let success = client.parseXmlMessage(responseObject.responseXML);
@@ -59,9 +45,38 @@
                     if(responseObject.responseXML && XMLUtils.XPathGetSingleNodeText(responseObject.responseXML.documentElement, "logging_result/@value") === '-4'){
                         this.setState({displayCaptcha: true});
                     }
-                    
+
                 }
             }.bind(this));
+
+        }
+    };
+
+    let LoginPasswordDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin,
+            LoginDialogMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: pydio.MessageHash[163],
+                dialogIsModal: true
+            };
+        },
+
+        componentWillReceiveProps: function(){
+            this.setState({displayCaptcha: false});
+            PydioApi.getClient().request({get_action:"get_seed"}, function(transport){
+                if(transport.responseJSON)  this.setState({displayCaptcha: true});
+            }.bind(this));
+        },
+
+        submit: function(){
+            let client = PydioApi.getClient();
+            this.postLoginData(client);
         },
 
         fireForgotPassword: function(e){
@@ -101,20 +116,198 @@
                     <div className="forgot-password-link"><a onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a></div>
                 );
             }
+            let additionalComponentsTop, additionalComponentsBottom;
+            if(this.props.modifiers){
+                let comps = {top: [], bottom: []};
+                this.props.modifiers.map(function(m){
+                    m.renderAdditionalComponents(this.props, this.state, comps);
+                }.bind(this));
+                if(comps.top.length) additionalComponentsTop = <div>{comps.top}</div>;
+                if(comps.bottom.length) additionalComponentsBottom = <div>{comps.bottom}</div>;
+            }
 
             return (
 
                 <div>
                     <div className="dialogLegend">{pydio.MessageHash[180]}</div>
                     {captcha}
-                    <MaterialUI.TextField floatingLabelText={pydio.MessageHash[181]} ref="login"/>
-                    <MaterialUI.TextField type="password" floatingLabelText={pydio.MessageHash[182]} ref="password"/>
+                    {additionalComponentsTop}
+                    <form autoComplete={secureLoginForm?"off":"on"}>
+                        <MaterialUI.TextField autoComplete={secureLoginForm?"off":"on"} floatingLabelText={pydio.MessageHash[181]} ref="login"/>
+                        <MaterialUI.TextField autoComplete={secureLoginForm?"off":"on"} type="password" floatingLabelText={pydio.MessageHash[182]} ref="password"/>
+                    </form>
+                    {additionalComponentsBottom}
                     {remember}
                     {forgotLink}
                     {errorMessage}
                 </div>
 
             );
+        }
+
+    });
+
+    let MultiAuthSelector = React.createClass({
+
+        getValue: function(){
+            return this.state.value;
+        },
+
+        getInitialState: function(){
+            return {value:Object.keys(this.props.authSources).shift()}
+        },
+
+        onChange: function(object, key, payload){
+            this.setState({value: payload});
+        },
+
+        render: function(){
+            let menuItems = [];
+            for (let key in this.props.authSources){
+                menuItems.push(<MaterialUI.MenuItem value={key} primaryText={this.props.authSources[key]}/>);
+            }
+            return (
+                <MaterialUI.SelectField
+                    value={this.state.value}
+                    onChange={this.onChange}
+                    floatingLabelText="Login as..."
+                >{menuItems}</MaterialUI.SelectField>);
+
+        }
+    });
+
+    class MultiAuthModifier extends PydioReactUI.AbstractDialogModifier{
+
+        constructor(){
+            super();
+        }
+
+        enrichSubmitParameters(props, state, refs, params){
+
+            const selectedSource = refs.multi_selector.getValue();
+            params['auth_source'] = selectedSource
+            if(props.masterAuthSource && selectedSource === props.masterAuthSource){
+                params['userid'] = selectedSource + props.userIdSeparator + params['userid'];
+            }
+
+        }
+
+        renderAdditionalComponents(props, state, accumulator){
+
+            if(!props.authSources){
+                console.error('Could not find authSources');
+                return;
+            }
+            accumulator.top.push( <MultiAuthSelector ref="multi_selector" {...props} parentState={state}/> );
+
+        }
+
+    }
+
+
+    let WebFTPDialog = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin,
+            LoginDialogMixin
+        ],
+
+        getDefaultProps: function () {
+            return {
+                dialogTitle: pydio.MessageHash[163],
+                dialogIsModal: true
+            };
+        },
+
+        submit: function(){
+
+            let client = PydioApi.getClient();
+            client.request({
+                get_action      :'set_ftp_data',
+                FTP_HOST        :this.refs.FTP_HOST.getValue(),
+                FTP_PORT        :this.refs.FTP_PORT.getValue(),
+                PATH            :this.refs.PATH.getValue(),
+                CHARSET         :this.refs.CHARSET.getValue(),
+                FTP_SECURE      :this.refs.FTP_SECURE.isToggled()?'TRUE':'FALSE',
+                FTP_DIRECT      :this.refs.FTP_DIRECT.isToggled()?'TRUE':'FALSE',
+            }, function(){
+
+                this.postLoginData(client);
+
+            }.bind(this));
+
+        },
+
+        render: function(){
+
+            let messages = pydio.MessageHash;
+            let tFieldStyle={width:'100%'};
+            let errorMessage;
+            if(this.state.errorId){
+                errorMessage = <div class="ajxp_login_error">{pydio.MessageHash[this.state.errorId]}</div>;
+            }
+            let captcha;
+            if(this.state.displayCaptcha){
+                captcha = (
+                    <div className="captcha_container">
+                        <img src={this.state.globalParameters.get('ajxpServerAccess') + '&get_action=get_captcha&sid='+Math.random()}/>
+                        <MaterialUI.TextField floatingLabelText={pydio.MessageHash[390]} ref="captcha_input"/>
+                    </div>
+                );
+            }
+
+            return (
+                <div>
+                    {captcha}
+                    <table cellpadding="2" border="0" cellspacing="0">
+                        <tr>
+                            <td colspan="2">
+                                <div class="dialogLegend">{messages['ftp_auth.1']}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <MaterialUI.TextField style={tFieldStyle} ref="FTP_HOST" floatingLabelText={messages['ftp_auth.2']}/>
+                            </td>
+                            <td>
+                                <MaterialUI.TextField ref="FTP_PORT" style={tFieldStyle} defaultValue="21" floatingLabelText={messages['ftp_auth.8']}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <MaterialUI.TextField style={tFieldStyle} ref="userid" floatingLabelText={messages['181']}/>
+                            </td>
+                            <td>
+                                <MaterialUI.TextField style={tFieldStyle} ref="password" type="password" floatingLabelText={messages['182']}/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <div class="dialogLegend">{messages['ftp_auth.3']}</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <MaterialUI.TextField style={tFieldStyle} ref="PATH" defaultValue="/" floatingLabelText={messages['ftp_auth.4']}/>
+                            </td>
+                            <td>
+                                <MaterialUI.Toggle ref="FTP_SECURE" label={messages['ftp_auth.5']} labelPosition="right"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <MaterialUI.TextField style={tFieldStyle} ref="CHARSET" floatingLabelText={messages['ftp_auth.6']}/>
+                            </td>
+                            <td>
+                                <MaterialUI.Toggle ref="FTP_DIRECT" label={messages['ftp_auth.7']} labelPosition="right"/>
+                            </td>
+                        </tr>
+                    </table>
+                    {errorMessage}
+                </div>
+            );
+
         }
 
     });
@@ -131,125 +324,17 @@
 
         }
 
-        static loginPassword() {
-
-            pydio.UI.openComponentInModal('AuthfrontCoreActions', 'LoginPasswordDialog');
-
-        }
-
-        static multiAuth(authSources, masterAuthSource, userIdSeparator){
-
-            modal.showDialogForm('Log In', ($('login_form')?'login_form':'login_form_dynamic'),
-                function(oForm){
-                    $("generic_dialog_box").setStyle({
-                        top:$("progressBox").getStyle('top'),
-                        left:$("progressBox").getStyle('left')
-                    });
-                    if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
-                    $("generic_dialog_box").down(".titleString").hide();
-                    $("generic_dialog_box").down("#modalCloseBtn").hide();
-                    $("generic_dialog_box").down(".dialogTitle").setAttribute("style", $("progressBox").down(".dialogTitle").getAttribute("style"));
-                    if(!$("generic_dialog_box").down("#progressCustomMessage")){
-                        if($("progressBox").down("#progressCustomMessage")) $("generic_dialog_box").down(".dialogContent").insert({top:$("progressBox").down("#progressCustomMessage").cloneNode(true)});
-                    }
-                    oForm.setStyle({display:'block'});
-                    oForm.up(".dialogContent").setStyle({backgroundImage:'none', borderWidth:0});
-
-                    if(!$('auth_source')){
-                        var auth_chooser = '<div class="SF_element"> \
-                                        <div class="SF_label"><ajxp:message ajxp_message_id="396">'+MessageHash[396]+'</ajxp:message></div> \
-                                        <div class="SF_input"><select id="auth_source" name="auth_source" style="width: 210px; height:28px; padding:3px 0px; font-size:14px;" class="dialogFocus"></select></div> \
-                                    </div>';
-                        oForm.down('div.SF_element').insert({before:auth_chooser});
-                        $H(authSources).each(function(pair){
-                            $('auth_source').insert(new Element("option", {value:pair.key}).update(pair.value));
-                        });
-                    }
-                    pydio.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-                    if(Prototype.Browser.IE && !oForm.down('input[type="text"]').key_enter_attached){
-                        oForm.select('input').invoke("observe", "keydown", function(event){
-                            if(event.keyCode == Event.KEY_RETURN){
-                                var el = Event.findElement(event);
-                                if(el.hasClassName('dialogButton')){
-                                    el.click();
-                                }else{
-                                    el.form.down('input.dialogButton').click();
-                                }
-                            }
-                        });
-                        oForm.down('input[type="text"]').key_enter_attached = true;
-                    }
-                    var authConfs = pydio.getPluginConfigs("auth");
-                    if(authConfs && authConfs.get("SECURE_LOGIN_FORM")){
-                        try{
-                            oForm.down('input[name="remember_me"]').up("div.SF_element").remove();
-                            oForm.down('input[name="userid"]').setAttribute("autocomplete", "off");
-                            oForm.down('input[name="password"]').setAttribute("autocomplete", "off");
-                            oForm.setAttribute("autocomplete", "off");
-                        }catch(e){}
-                    }
-                    if(authConfs && authConfs.get("ENABLE_FORGOT_PASSWORD") && !oForm.down('a.forgot-password-link')){
-                        try{
-                            oForm.down('input[name="password"]').up("div.SF_element").insert({after:'<div class="SF_element"><a href="#" class="forgot-password-link">AJXP_MESSAGE[479]</a></div>'});
-                            oForm.down('a.forgot-password-link').observe("click", function(e){
-                                Event.stop(e);
-                                pydio.getController().fireAction(authConfs.get("FORGOT_PASSWORD_ACTION"));
-                            });
-                        }catch(e){ if(console) console.log(e); }
-                    }
-                    modal.refreshDialogPosition();
-                },
-                function(){
-                    var oForm = modal.getForm();
-                    var connexion = new Connexion();
-                    connexion.addParameter('get_action', 'login');
-                    var selectedSource = oForm.auth_source.value;
-                    if(selectedSource == masterAuthSource){
-                        connexion.addParameter('userid', oForm.userid.value);
-                    }else{
-                        connexion.addParameter('userid', selectedSource+userIdSeparator+oForm.userid.value);
-                    }
-                    connexion.addParameter('login_seed', oForm.login_seed.value);
-                    connexion.addParameter('auth_source', selectedSource);
-                    connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
-                    if(oForm.login_seed.value != '-1'){
-                        connexion.addParameter('password', HasherUtils.hex_md5(HasherUtils.hex_md5(oForm.password.value)+oForm.login_seed.value));
-                    }else{
-                        connexion.addParameter('password', oForm.password.value);
-                    }
-                    if(oForm.captcha_code){
-                        connexion.addParameter('captcha_code', oForm.captcha_code.value);
-                    }
-                    connexion.onComplete = function(transport){
-                        var success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                        if(XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
-                            pydio.UI.loadSeedOrCaptcha(oForm.down('#login_seed'), oForm.down('img#captcha_image'), oForm.down('div.dialogLegend'), 'before');
-                        }
-                        if(success){
-                            $("generic_dialog_box").down(".dialogTitle").writeAttribute("style", "");
-                            oForm.up('.dialogContent').writeAttribute("style", "");
-                            $("generic_dialog_box").select("#progressCustomMessage").invoke("remove");
-                        }
-
-                    };
-                    document.observeOnce("ajaxplorer:user_logged", function(){
-                        if($('logging_string') && $('logging_string').down('i')){
-                            var ht = $('logging_string').down('i').innerHTML;
-                            var exp = ht.split(userIdSeparator);
-                            if(exp.length > 1){
-                                $('logging_string').down('i').update(exp[1]);
-                            }
-                        }
-                    });
-                    connexion.sendAsync();
-                    oForm.userid.value = '';
-                    oForm.password.value = '';
-                    return false;
-                });
+        static loginPassword(props = {}) {
+            
+            pydio.UI.openComponentInModal('AuthfrontCoreActions', 'LoginPasswordDialog', props);
 
         }
 
         static webFTP(){
+
+            pydio.UI.openComponentInModal('AuthfrontCoreActions', 'WebFTPDialog');
+
+            return;
 
             modal.setCloseValidation(function(){
                 return (!!pydio && !!pydio.user)
@@ -584,7 +669,9 @@
 
     global.AuthfrontCoreActions = {
         Callbacks: Callbacks,
-        LoginPasswordDialog: LoginPasswordDialog
+        LoginPasswordDialog: LoginPasswordDialog,
+        WebFTPDialog: WebFTPDialog,
+        MultiAuthModifier: MultiAuthModifier
     };
 
 })(window)

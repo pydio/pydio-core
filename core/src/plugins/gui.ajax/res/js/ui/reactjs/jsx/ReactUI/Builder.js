@@ -136,16 +136,6 @@
             }
         }
 
-        registerRootModal(component){
-            this._rootModal = component;
-        }
-
-        openRootModal(){
-            if(this._rootModal){
-                this._rootModal.show();
-            }
-        }
-
         registerModalOpener(component){
             this._modalOpener = component;
             this.modalSupportsComponents = true;
@@ -157,7 +147,31 @@
         }
 
         openComponentInModal(namespace, componentName, props){
-            this._modalOpener.open(namespace, componentName, props);
+            // Collect modifiers
+            let modifiers = [];
+            let namespaces = [];
+            XMLUtils.XPathSelectNodes(this._pydio.getXmlRegistry(), '//client_configs/component_config[@className="'+namespace + '.' + componentName +'"]/modifier').map(function(node){
+                const module = node.getAttribute('module');
+                modifiers.push(module);
+                namespaces.push(module.split('.').shift());
+            });
+            if(modifiers.length){
+                ResourcesManager.loadClassesAndApply(namespaces, function(){
+                    let modObjects = [];
+                    modifiers.map(function(mString){
+                        try{
+                            let classObject = FuncUtils.getFunctionByName(mString, window);
+                            modObjects.push(new classObject());
+                        }catch(e){
+                            console.log(e);
+                        }
+                    });
+                    props['modifiers'] = modObjects;
+                    this._modalOpener.open(namespace, componentName, props);
+                }.bind(this));
+            }else{
+                this._modalOpener.open(namespace, componentName, props);
+            }
         }
 
         /**

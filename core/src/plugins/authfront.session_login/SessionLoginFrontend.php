@@ -112,7 +112,15 @@ class SessionLoginFrontend extends AbstractAuthFrontend
         $secureToken = "";
         $loggedUser = null;
         $cookieLogin = (isSet($httpVars["cookie_login"]) ? true : false);
-        if (BruteForceHelper::suspectBruteForceLogin() && (!isSet($httpVars["captcha_code"]) || !CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]))) {
+        $bruteForce = BruteForceHelper::suspectBruteForceLogin();
+        $captchaPassed = false;
+        if(isSet($httpVars["captcha_code"]) && empty($httpVars["captcha_code"])) {
+            $bruteForce = true;
+        }
+        if(isSet($httpVars["captcha_code"]) && !empty($httpVars["captcha_code"])){
+            $captchaPassed = CaptchaProvider::checkCaptchaResult($httpVars["captcha_code"]);
+        }
+        if ($bruteForce && !$captchaPassed) {
 
             $loggingResult = -4;
 
