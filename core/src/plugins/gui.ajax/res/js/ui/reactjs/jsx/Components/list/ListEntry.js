@@ -29,17 +29,17 @@ var ListEntry = React.createClass({
     onClick: function(event){
         if(this.props.showSelector) {
             if(this.props.selectorDisabled) return;
-            this.props.onSelect(this.props.node);
+            this.props.onSelect(this.props.node, event);
             event.stopPropagation();
             event.preventDefault();
         }else if(this.props.onClick){
-            this.props.onClick(this.props.node);
+            this.props.onClick(this.props.node, event);
         }
     },
 
     onDoubleClick: function(event){
         if(this.props.onDoubleClick){
-            this.props.onDoubleClick(this.props.node);
+            this.props.onDoubleClick(this.props.node, event);
         }
     },
 

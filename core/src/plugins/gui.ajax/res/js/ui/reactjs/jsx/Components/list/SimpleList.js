@@ -62,7 +62,7 @@ let SimpleList = React.createClass({
         return {infiniteSliceCount:30}
     },
 
-    clickRow: function(gridRow){
+    clickRow: function(gridRow, event){
         var node;
         if(gridRow.props){
             node = gridRow.props.data.node;
@@ -70,7 +70,7 @@ let SimpleList = React.createClass({
             node = gridRow;
         }
         if(this.props.entryHandleClicks){
-            this.props.entryHandleClicks(node, SimpleList.CLICK_TYPE_SIMPLE);
+            this.props.entryHandleClicks(node, SimpleList.CLICK_TYPE_SIMPLE, event);
             return;
         }
         if(node.isLeaf() && this.props.openEditor) {
@@ -90,7 +90,7 @@ let SimpleList = React.createClass({
         }
     },
 
-    doubleClickRow: function(gridRow){
+    doubleClickRow: function(gridRow, event){
         var node;
         if(gridRow.props){
             node = gridRow.props.data.node;
@@ -98,7 +98,7 @@ let SimpleList = React.createClass({
             node = gridRow;
         }
         if(this.props.entryHandleClicks){
-            this.props.entryHandleClicks(node, SimpleList.CLICK_TYPE_DOUBLE);
+            this.props.entryHandleClicks(node, SimpleList.CLICK_TYPE_DOUBLE, event);
         }
     },
 
@@ -134,6 +134,40 @@ let SimpleList = React.createClass({
 
         }
 
+    },
+
+    computeSelectionFromCurrentPlusTargetNode: function(currentSelection, targetNode){
+
+        let currentIndexStart, currentIndexEnd, nodeBefore = false;
+        if(!this.indexedElements ) {
+            return [];
+        }
+        let firstSelected = currentSelection[0];
+        let lastSelected = currentSelection[currentSelection.length - 1];
+        let newSelection = [];
+        for(let i=0; i< this.indexedElements.length; i++){
+            if(currentIndexStart !== undefined){
+                newSelection.push(this.indexedElements[i].node);
+            }
+            if(this.indexedElements[i].node === targetNode){
+                if(currentIndexStart !== undefined && currentIndexEnd === undefined){
+                    currentIndexEnd = i;
+                    break;
+                }
+                currentIndexStart = i;
+                nodeBefore = true;
+                newSelection.push(this.indexedElements[i].node);
+            }
+            if(this.indexedElements[i].node === firstSelected && currentIndexStart === undefined) {
+                currentIndexStart = i;
+                newSelection.push(this.indexedElements[i].node);
+            }
+            if(this.indexedElements[i].node === lastSelected && nodeBefore) {
+                currentIndexEnd = i;
+                break;
+            }
+        }
+        return newSelection;
     },
 
     onKeyDown: function(e){
