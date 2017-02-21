@@ -11,29 +11,107 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitle: '',
+                dialogTitle: pydio.MessageHash[163],
                 dialogIsModal: true
             };
         },
 
+        getInitialState: function(){
+            return {
+                globalParameters: pydio.Parameters,
+                authParameters: pydio.getPluginConfigs('auth'),
+                errorId: null,
+                displayCaptcha: false
+            };
+        },
+
+        componentWillReceiveProps: function(){
+            this.setState({displayCaptcha: false});
+            PydioApi.getClient().request({get_action:"get_seed"}, function(transport){
+                if(transport.responseJSON)  this.setState({displayCaptcha: true});
+            }.bind(this));
+        },
+
         submit: function(){
-            PydioApi.getClient().request({
+            let client = PydioApi.getClient();
+            let params = {
                 get_action  : 'login',
                 userid      : this.refs.login.getValue(),
                 password    : this.refs.password.getValue(),
                 login_seed  : -1
-            }, function(){
-                this.dismiss();
-                pydio.Registry.load();
+            };
+            if(this.refs.captcha_input){
+                params['captcha_code'] = this.refs.captcha_input.getValue();
+            }
+            if(this.refs.remember_me && this.refs.remember_me.isChecked()){
+                params['remember_me'] = 'true' ;
+            }
+            client.request(params, function(responseObject){
+                let success = client.parseXmlMessage(responseObject.responseXML);
+                if(success){
+                    this.dismiss();
+                }else{
+                    let errorId = PydioApi.getClient().LAST_ERROR_ID;
+                    if(errorId == '285' && this.state.globalParameters.get('PASSWORD_AUTH_ONLY')){
+                        errorId = '553';
+                    }
+                    this.setState({errorId: errorId});
+                    if(responseObject.responseXML && XMLUtils.XPathGetSingleNodeText(responseObject.responseXML.documentElement, "logging_result/@value") === '-4'){
+                        this.setState({displayCaptcha: true});
+                    }
+                    
+                }
             }.bind(this));
         },
 
+        fireForgotPassword: function(e){
+            e.stopPropagation();
+            pydio.getController().fireAction(this.state.authParameters.get("FORGOT_PASSWORD_ACTION"));
+        },
+
         render: function(){
+            const passwordOnly = this.state.globalParameters.get('PASSWORD_AUTH_ONLY');
+            const secureLoginForm = passwordOnly || this.state.authParameters.get('SECURE_LOGIN_FORM');
+            const forgotPasswordLink = this.state.authParameters.get('ENABLE_FORGOT_PASSWORD') && !passwordOnly;
+
+            let errorMessage;
+            if(this.state.errorId){
+                errorMessage = <div class="ajxp_login_error">{pydio.MessageHash[this.state.errorId]}</div>;
+            }
+            let captcha;
+            if(this.state.displayCaptcha){
+                captcha = (
+                    <div className="captcha_container">
+                        <img src={this.state.globalParameters.get('ajxpServerAccess') + '&get_action=get_captcha&sid='+Math.random()}/>
+                        <MaterialUI.TextField floatingLabelText={pydio.MessageHash[390]} ref="captcha_input"/>
+                    </div>
+                );
+            }
+            let remember;
+            if(!secureLoginForm){
+                remember = (
+                    <div className="remember_container">
+                        <MaterialUI.Checkbox ref="remember_me" label={pydio.MessageHash[261]}/>
+                    </div>
+                );
+            }
+            let forgotLink;
+            if(forgotPasswordLink){
+                forgotLink = (
+                    <div className="forgot-password-link"><a onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a></div>
+                );
+            }
+
             return (
 
                 <div>
-                    <MaterialUI.TextField floatingLabelText="Login" ref="login"/>
-                    <MaterialUI.TextField type="password" floatingLabelText="Password" ref="password"/>
+                    <div className="dialogLegend">{pydio.MessageHash[180]}</div>
+                    {captcha}
+                    <MaterialUI.TextField floatingLabelText={pydio.MessageHash[181]} ref="login"/>
+                    <MaterialUI.TextField type="password" floatingLabelText={pydio.MessageHash[182]} ref="password"/>
+                    {remember}
+                    {forgotLink}
+                    {errorMessage}
                 </div>
 
             );
@@ -44,8 +122,13 @@
     class Callbacks{
 
         static sessionLogout(){
+
             global.clearRememberData();
-            PydioApi.getClient().request({get_action:'logout'});
+            let client = PydioApi.getClient();
+            client.request({get_action:'logout'}, function(responseObject){
+                client.parseXmlMessage(responseObject.responseXML);
+            });
+
         }
 
         static loginPassword() {

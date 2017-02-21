@@ -74,14 +74,14 @@ export default React.createClass({
                 actions.push(
                     <MaterialUI.FlatButton
                         key="cancel"
-                        label="Cancel1"
+                        label={window.pydio.MessageHash['49']}
                         primary={false}
                         onTouchTap={component.getCancelCallback()}
                     />);
             }
             if(component.getSubmitCallback){
                 actions.push(<MaterialUI.FlatButton
-                    label="Submit2"
+                    label={window.pydio.MessageHash['48']}
                     primary={true}
                     keyboardFocused={true}
                     onTouchTap={component.getSubmitCallback()}
