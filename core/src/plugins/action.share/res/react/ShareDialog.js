@@ -29,6 +29,18 @@
 
     var MainPanel = React.createClass({
 
+        mixins:[
+            PydioReactUI.ActionDialogMixin
+        ],
+        
+        getDefaultProps: function(){
+            return {
+                dialogTitle:'',
+                dialogIsModal:false,
+                dialogClassName:"dialog-max-420 dialog-no-padding react_share_form"
+            };
+        },
+
         propTypes: {
             closeAjxpDialog: React.PropTypes.func.isRequired,
             pydio:React.PropTypes.instanceOf(Pydio).isRequired,

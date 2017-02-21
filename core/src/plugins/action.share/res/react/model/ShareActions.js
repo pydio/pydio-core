@@ -5,25 +5,11 @@
     class Callbacks{
 
         static share(){
-            if(pydio.UI.modalSupportsComponents){
-                pydio.UI.openComponentInModal('ShareDialog', 'MainPanel', {selection:pydio.getUserSelection()});
-            }else{
-                if(!pydio.getController().shareDialogLoader) {
-                    pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                        selection:pydio.getUserSelection()
-                    });
-                }
-                pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
-            }
+            pydio.UI.openComponentInModal('ShareDialog', 'MainPanel', {pydio:pydio, selection:pydio.getUserSelection()});
         }
         
         static editShare(){
-            if(!pydio.getController().shareDialogLoader) {
-                pydio.getController().shareDialogLoader = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {
-                    selection:pydio.getUserSelection()
-                });
-            }
-            pydio.getController().shareDialogLoader.openDialog('react_share_form', true);
+            pydio.UI.openComponentInModal('ShareDialog', 'MainPanel', {pydio:pydio, selection:pydio.getUserSelection()});
         }
         
         static loadList(){
