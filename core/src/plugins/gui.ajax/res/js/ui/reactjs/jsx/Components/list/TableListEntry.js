@@ -1,5 +1,5 @@
 import ListEntryNodeListenerMixin from './ListEntryNodeListenerMixin'
-import ListEntry from './ListEntry'
+import {ListEntry} from './ListEntry'
 import InlineEditor from './InlineEditor'
 
 

@@ -398,6 +398,10 @@
 
     let InfoPanel = React.createClass({
 
+        propTypes: {
+            node: React.PropTypes.instanceOf(AjxpNode)
+        },
+
         getInitialState: function(){
             return {editMode: false};
         },
@@ -411,14 +415,21 @@
             this.setState({editMode: false});
         },
 
+        componentWillReceiveProps: function(newProps){
+            if(newProps.node !== this.props.node && this.refs.panel){
+                this.reset();
+            }
+        },
+
         saveChanges: function(){
             let values = this.refs.panel.getUpdateData();
             let params = {};
             values.forEach(function(v, k){
                 params[k] = v;
             });
-            PydioApi.getClient().postSelectionWithAction("edit_user_meta", function(){
-                this.setState({editMode:false});
+            PydioApi.getClient().postSelectionWithAction("edit_user_meta", function(t){
+                PydioApi.getClient().parseXmlMessage(t.responseXML);
+                this.reset();
             }.bind(this), null, params);
         },
 
