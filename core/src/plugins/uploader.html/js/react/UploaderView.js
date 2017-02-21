@@ -1,6 +1,10 @@
 (function(global){
-    
+
     var DropUploader = React.createClass({
+
+        getInitialState: function() {
+            return {};
+        },
 
         onDrop: function(files, event, sourceComponent){
             var items, files;
@@ -28,9 +32,12 @@
             UploaderModel.Store.getInstance().clearAll();
         },
         toggleOptions: function(e){
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
             let crtOptions = this.state && this.state.options ? this.state.options : false;
-            this.setState({options:!crtOptions});
+            this.setState({
+                options: !crtOptions,
+                optionsAnchorEl: e.currentTarget,
+            });
         },
 
         openFilePicker: function(e){
@@ -45,38 +52,45 @@
 
         render: function(){
 
-            let options;
+            let optionsEl;
             let messages = global.pydio.MessageHash;
 
-            if(this.state && this.state.options){
-                let dismiss = function(e){
-                    this.toggleOptions(e);
-                    if(UploaderModel.Configs.getInstance().getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
-                        UploaderModel.Store.getInstance().processNext();
-                    }
-                }.bind(this);
-                options = <UploadOptionsPane onDismiss={dismiss}/>
-            }
+            const {options} = this.state;
+
+            let dismiss = function(e){
+                this.toggleOptions(e);
+                if(UploaderModel.Configs.getInstance().getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
+                    UploaderModel.Store.getInstance().processNext();
+                }
+            }.bind(this);
+            optionsEl = <UploadOptionsPane open={options} anchorEl={this.state.optionsAnchorEl} onDismiss={dismiss}/>
+
             let folderButton, startButton;
             let e = global.document.createElement('input');
             e.setAttribute('type', 'file');
             if('webkitdirectory' in e){
-                folderButton = <ReactMUI.RaisedButton label={messages['html_uploader.5']} onClick={this.openFolderPicker}/>;
+                folderButton = <ReactMUI.RaisedButton style={{marginRight: 10}} label={messages['html_uploader.5']} onClick={this.openFolderPicker}/>;
             }
             e = null;
             let configs = UploaderModel.Configs.getInstance();
             if(!configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
-                startButton = <ReactMUI.FlatButton label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
+                startButton = <ReactMUI.FlatButton style={{marginRight: 10}} label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
             }
             return (
-                <div style={{position:'relative'}}>
-                    <div className="react-mui-context uploader-action-bar">
-                        <ReactMUI.FlatButton style={{float: 'right'}} label="Options"  onClick={this.toggleOptions}/>
-                        <ReactMUI.RaisedButton secondary={true} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
-                        {folderButton}
-                        {startButton}
-                        <ReactMUI.FlatButton label={messages['html_uploader.12']} onClick={this.clear}/>
-                    </div>
+                <div style={{position:'relative', padding: '10px'}}>
+                    <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
+                        <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
+                            <div style={{display:'flex', alignItems: 'center', marginLeft: '-48px'}}>
+                                <MaterialUI.RaisedButton secondary={true} style={{marginRight: 10}} label={messages['html_uploader.4']} onClick={this.openFilePicker}/>
+                                {folderButton}
+                                {startButton}
+                                <MaterialUI.FlatButton label={messages['html_uploader.12']} style={{marginRight: 10}} onClick={this.clear}/>
+                            </div>
+                            <div style={{display:'flex', alignItems: 'center', marginRight: '-48px'}}>
+                                <MaterialUI.FlatButton style={{float: 'right'}} label="Options" onClick={this.toggleOptions}/>
+                            </div>
+                        </div>
+                    </MaterialUI.Toolbar>
                     <PydioForm.FileDropZone
                         ref="dropzone"
                         multiple={true}
@@ -88,7 +102,7 @@
                     >
                         <TransfersList/>
                     </PydioForm.FileDropZone>
-                    {options}
+                    {optionsEl}
                 </div>
             );
 
@@ -243,16 +257,16 @@
     var UploadOptionsPane = React.createClass({
 
         propTypes: {
+            open: React.PropTypes.boolean,
+            anchorEl: React.PropTypes.string,
             onDismiss: React.PropTypes.func.isRequired
         },
 
         getInitialState: function(){
-
             let configs = UploaderModel.Configs.getInstance();
             return {
                 configs: configs
             };
-
         },
 
         updateField: function(fName, event){
@@ -278,7 +292,7 @@
             this.state.configs.updateOption('upload_existing', newValue);
             this.setState({random: Math.random()});
         },
-        
+
         render: function(){
 
             let maxUploadMessage
@@ -293,21 +307,33 @@
             let overwriteType = this.state.configs.getOption('DEFAULT_EXISTING', 'upload_existing');
 
             return (
-                <div className="upload-options-pane react-mui-context">
-                    <span className="close-options mdi mdi-close" onClick={this.props.onDismiss}></span>
-                    {maxUploadMessage}
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[337]} labelPosition="right" toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash[338]} labelPosition="right"  toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')}/></div>
-                    <div className="option-row"><ReactMUI.Toggle label={global.pydio.MessageHash['html_uploader.17']} labelPosition="right"  toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')}/></div>
-                    <div className="option-row">
-                        <div style={{marginBottom: 10}}>{global.pydio.MessageHash['html_uploader.18']}</div>
-                        <ReactMUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
-                            <ReactMUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']}/>
-                            <ReactMUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']}/>
-                            <ReactMUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
-                        </ReactMUI.RadioButtonGroup>
-                    </div>
-                </div>
+                <MaterialUI.Popover
+                  open={this.props.open}
+                  anchorEl={this.props.anchorEl}
+                  anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                  targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                  onRequestClose={this.props.onDismiss}
+                >
+                    <MaterialUI.List>
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash[337]} rightToggle={<MaterialUI.Toggle toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')} />} />
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash[338]} rightToggle={<MaterialUI.Toggle toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')} />} />
+                        <MaterialUI.ListItem primaryText={global.pydio.MessageHash['html_uploader.17']} rightToggle={<MaterialUI.Toggle toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')} />} />
+                    </MaterialUI.List>
+
+                    <MaterialUI.Divider />
+
+                    <MaterialUI.List>
+                        <MaterialUI.Subheader>{global.pydio.MessageHash['html_uploader.18']}</MaterialUI.Subheader>
+
+                        <MaterialUI.ListItem>
+                            <MaterialUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
+                                <MaterialUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']}/>
+                                <MaterialUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']}/>
+                                <MaterialUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
+                            </MaterialUI.RadioButtonGroup>
+                        </MaterialUI.ListItem>
+                    </MaterialUI.List>
+                </MaterialUI.Popover>
             );
         }
 

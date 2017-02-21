@@ -937,7 +937,7 @@
 
         render: function() {
 
-            var className = this.props.className || 'dropzone';
+            var className = this.props.className || 'file-dropzone';
             if (this.state.isDragActive) {
                 className += ' active';
             }

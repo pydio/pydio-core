@@ -130,6 +130,7 @@
         static upload(manager, uploaderArguments){
 
             pydio.UI.openComponentInModal('FSActions', 'UploadDialog');
+
             return;
 
         }
@@ -149,7 +150,7 @@
                 pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', props);
             }
         }
-        
+
         static downloadAll(){
             let dm = pydio.getContextHolder();
             dm.setSelectedNodes([dm.getRootNode()]);
@@ -157,7 +158,7 @@
         }
 
         static downloadChunked(){
-            
+
             var userSelection = pydio.getUserSelection();
             pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', {
                 buildChunks:true,
@@ -223,7 +224,7 @@
             var editorData = otherArguments && otherArguments.length ? otherArguments[0] : null;
             pydio.UI.openCurrentSelectionInEditor(editorData);
         }
-        
+
         static ajxpLink(){
             let link;
             let url = global.document.location.href;
@@ -258,7 +259,7 @@
 
 
     }
-    
+
     class LegacyCallbacks {
 
         static ls(){
@@ -515,6 +516,7 @@
 
         static upload(manager, uploaderArguments){
             var uploaders = pydio.Registry.getActiveExtensionByType("uploader");
+
             uploaders.sort(function(objA, objB){
                 return objA.order - objB.order;
             });
@@ -547,6 +549,7 @@
                 form.insert({top:chooser});
                 var chooserList = new Element('ul');
                 chooser.insert(chooserList);
+
                 uploaders.each(function(up){
                     var label = up.xmlNode.getAttribute("label");
                     var desc = up.xmlNode.getAttribute("description")
@@ -745,7 +748,7 @@
     }
 
     class Listeners {
-        
+
         static downloadSelectionChange(){
 
             var userSelection = pydio.getUserSelection();
@@ -799,7 +802,7 @@
                 this.setIconSrc('editcopy.png');
             }
         }
-        
+
         static openWithDynamicBuilder(){
 
             let builderMenuItems = [];
@@ -839,9 +842,9 @@
                 } );
             }
             return builderMenuItems;
-            
+
         }
-        
+
     }
 
     let EmptyDialog = React.createClass({
@@ -876,25 +879,31 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitle: '',
+                dialogTitle: 'Upload',
                 dialogClassName:'dialog-large dialog-no-padding',
                 dialogIsModal: true
             };
         },
+
         submit(){
             this.dismiss();
         },
+
         render: function(){
             let tabs = [];
             let uploaders = pydio.Registry.getActiveExtensionByType("uploader");
+
             uploaders.sort(function(objA, objB){
                 return objA.order - objB.order;
             });
+
             uploaders.map(function(uploader){
+
                 if(uploader.moduleName){
                     let parts = uploader.moduleName.split('.');
                     tabs.push(
-                        <MaterialUI.Tab label={MessageHash[uploader.xmlNode.getAttribute('text')]} key={uploader.id}>
+
+                        <MaterialUI.Tab label={uploader.xmlNode.getAttribute('label')} key={uploader.id}>
                             <PydioReactUI.AsyncComponent
                                 pydio={pydio}
                                 namespace={parts[0]}
@@ -903,7 +912,7 @@
                         </MaterialUI.Tab>
                     );
                 }else{
-                    
+
                 }
             });
 
