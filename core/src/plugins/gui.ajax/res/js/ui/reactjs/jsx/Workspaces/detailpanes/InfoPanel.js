@@ -47,9 +47,12 @@
                     this.setState({templates:ConfigsParser.parseConfigs()});
                 }
             }.bind(this);
-
             this.props.pydio.observe("actions_refreshed", this._updateHandler );
             this.props.pydio.observe("component_config_changed", this._componentConfigHandler );
+            // Trigger contentChange
+            if(this.state.displayData && this.state.displayData.TEMPLATES && this.props.onContentChange){
+                this.props.onContentChange(this.state.displayData.TEMPLATES.length);
+            }
         },
 
         componentWillUnmount: function(){
@@ -91,7 +94,7 @@
                 });
             }
 
-            if(this.props.onContentChange){
+            if(this.props.onContentChange && !initTemplates){
                 this.props.onContentChange(templates.length);
             }
             return {TEMPLATES:templates, DATA:data};
