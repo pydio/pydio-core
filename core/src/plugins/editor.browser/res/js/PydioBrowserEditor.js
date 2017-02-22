@@ -17,6 +17,81 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+
+(function(global){
+
+    let BrowserOpener = React.createClass({
+
+        componentDidMount: function(){
+            let node = this.props.node;
+            if(node.getAjxpMime() == "url" || node.getAjxpMime() == "website"){
+                this.openURL(node.getPath());
+                return;
+            }
+
+        },
+
+        getInitialState: function(){
+            return {loading: true, frameSrc:null};
+        },
+
+        openURL(nodePath){
+
+            var configs = this.props.pydio.getPluginConfigs("editor.browser");
+            let alwaysOpenLinksInBrowser = !(configs.get('OPEN_LINK_IN_TAB') === 'browser');
+
+            PydioApi.getClient().request({get_action:'get_content', file:nodePath}, function(transp){
+                var url = transp.responseText;
+                if(url.indexOf('URL=') !== -1){
+                    url = url.split('URL=')[1];
+                    if(url.indexOf('\n') !== -1){
+                        url = url.split('\n')[0];
+                    }
+                }
+                if(alwaysOpenLinksInBrowser){
+                    global.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
+                    if(this.props.onRequestTabClose){
+                        this.props.onRequestTabClose();
+                    }
+                }else{
+                    if(this.props.onRequestTabTitleUpdate){
+                        this.props.onRequestTabTitleUpdate(url);
+                    }
+                    this.setState({loading:false, frameSrc:url});
+                }
+
+            }.bind(this));
+        },
+
+        render: function(){
+
+            let content;
+            if(this.state.loading){
+                content = <div>Loading</div>;
+            }else{
+                content = (
+                    <iframe
+                        style={{border:0}}
+                        className="vertical_fit"
+                        src={this.state.frameSrc}
+                    ></iframe>
+                );
+            }
+            return (
+                <PydioComponents.AbstractEditor {...this.props}>
+                    {content}
+                </PydioComponents.AbstractEditor>
+            );
+
+        }
+
+    });
+
+    window.PydioBrowserEditor = BrowserOpener;
+
+})(window);
+
+/*
 Class.create("BrowserOpener", AbstractEditor, {
 
 	initialize: function($super, oFormObject, options){
@@ -102,10 +177,6 @@ Class.create("BrowserOpener", AbstractEditor, {
 		connexion.sendAsync();
 	},
 
-    /**
-     * Resizes the main container
-     * @param size int|null
-     */
     resize : function(size){
         if(size){
             this.element.setStyle({height:size+"px"});
@@ -118,3 +189,4 @@ Class.create("BrowserOpener", AbstractEditor, {
     }
 
 });
+*/

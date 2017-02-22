@@ -9,7 +9,8 @@ export default React.createClass({
         registry:React.PropTypes.instanceOf(Registry).isRequired,
         closeEditorContainer:React.PropTypes.func.isRequired,
         editorData:React.PropTypes.object,
-        registerCloseCallback:React.PropTypes.func
+        registerCloseCallback:React.PropTypes.func,
+        onRequestTabTitleUpdate:React.PropTypes.func
     },
 
     getInitialState: function(){
@@ -47,10 +48,10 @@ export default React.createClass({
         }
         if(editorData) {
             this.props.registry.loadEditorResources(editorData.resourcesManager, function(){
-                this.setState({editorData: editorData, node:node}, this._loadPydioEditor.bind(this));
+                this.setState({editorData: editorData, node:node}, this._loadPydioEditor);
             }.bind(this));
         }else{
-            this.setState({editorData: null, node:null}, this._loadPydioEditor.bind(this));
+            this.setState({editorData: null, node:null}, this._loadPydioEditor);
         }
     },
 
@@ -95,39 +96,19 @@ export default React.createClass({
             this.editor.destroy();
             this.editor = null;
         }
-        if(this.state.editorData && this.state.editorData.formId && this.props.node){
-            var editorElement = $(this.refs.editor).down('#'+this.state.editorData.formId);
-            if(editorElement){
-                var editorOptions = {
-                    closable: false,
-                    context: this,
-                    editorData: this.state.editorData
-                };
-                this.editor = new window[editorOptions.editorData['editorClass']](editorElement, editorOptions);
-                this.editor.open(this.props.node);
-                fitHeightToBottom(editorElement);
-            }
-        }
     },
 
     render: function(){
         var editor;
         if(this.state.editorData){
             let className = this.state.editorData.editorClass;
-            if(this.state.editorData.formId){
-                var content = function(){
-                    if(this.state && this.state.editorData && $(this.state.editorData.formId)){
-                        return {__html:$(this.state.editorData.formId).outerHTML};
-                    }else{
-                        return {__html:''};
-                    }
-                }.bind(this);
-                editor = <div ref="editor" className="vertical_layout vertical_fit" id="editor" key={this.state && this.props.node?this.props.node.getPath():null} dangerouslySetInnerHTML={content()}></div>;
-            }else if(FuncUtils.getFunctionByName(className, window)){
+            if(FuncUtils.getFunctionByName(className, window)){
                 editor = React.createElement(FuncUtils.getFunctionByName(className, window), {
-                    node:this.props.node,
-                    closeEditor:this.closeEditor,
-                    registerCloseCallback:this.props.registerCloseCallback
+                    pydio       : this.props.pydio,
+                    node        : this.props.node,
+                    registerCloseCallback:this.props.registerCloseCallback,
+                    onRequestTabClose:this.props.onRequestTabClose,
+                    onRequestTabTitleUpdate:this.props.onRequestTabTitleUpdate
                 });
             }else{
                 editor = <div>{"Cannot find editor component (" + className + ")!"}</div>

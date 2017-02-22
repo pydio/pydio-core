@@ -3,6 +3,7 @@ class OpenNodesModel extends Observable{
     constructor(){
         super();
         this._openNodes = [];
+        this._updatedTitles = new Map();
         pydio.UI.registerEditorOpener(this);
         pydio.observe("repository_list_refreshed", function(){
             this._openNodes = [];
@@ -18,6 +19,19 @@ class OpenNodesModel extends Observable{
 
     openEditorForNode(selectedNode, editorData){
         this.pushNode(selectedNode, editorData);
+    }
+
+    updateNodeTitle(object, newTitle){
+        this._updatedTitles.set(object, newTitle);
+        this.notify('titlesUpdated');
+    }
+
+    getObjectLabel(object){
+        if(this._updatedTitles.has(object)){
+            return this._updatedTitles.get(object);
+        }else{
+            return object.node.getLabel();
+        }
     }
 
     pushNode(node, editorData){
@@ -41,6 +55,9 @@ class OpenNodesModel extends Observable{
     removeNode(object){
         this.notify('willRemoveNode', object);
         let index = this._openNodes.indexOf(object);
+        if(this._updatedTitles.has(object)){
+            this._updatedTitles.delete(object);
+        }
         this._openNodes = LangUtils.arrayWithout(this._openNodes, index);
         this.notify('nodeRemovedAtIndex', index);
         this.notify('update', this._openNodes);

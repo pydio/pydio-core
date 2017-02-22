@@ -74,16 +74,6 @@
                         <select name=format id="formats_selector"></select>
                     </div>
                 ]]></clientForm>
-                    <clientListener name="init"><![CDATA[
-                    document.observe("ajaxplorer:afterApply-mkdir", function(){
-                        if(modal.getForm().down("#libreoffice_mkfile")) return;
-                        var link = '<div class="dialogLegend" style="padding-top:20px;" id="libreoffice_mkfile"><span class="icon-chevron-right"></span> '+MessageHash["libreoffice.12"]+'</div>';
-                        modal.getForm().down("div.dialogButtons").insert({before:link});
-                        modal.getForm().down("#libreoffice_mkfile").down("a").addClassName("create_file_alt_link").observe("click", function(){
-                            pydio.getController().fireAction("libreoffice_mkempty_file");
-                        });
-                    });
-                ]]></clientListener>
                     <serverCallback methodName="createEmptyAction" restParams="/format/dir+"/>
                 </processing>
             </action>

@@ -40,9 +40,11 @@
 
         render: function(){
             return (
-                <div style={{widht:'100%',height:'100%', textAlign:'center'}}>
-                    <img style={{height:'98%', maxWidth:'98%', margin:'1%'}} src={Editor.getOriginalSource(this.props.node)}/>
-                </div>
+                <PydioComponents.AbstractEditor {...this.props}>
+                    <div className="vertical_fit" style={{textAlign:'center'}}>
+                        <img style={{height:'92%', maxWidth:'98%', margin:'2%'}} src={Editor.getOriginalSource(this.props.node)}/>
+                    </div>
+                </PydioComponents.AbstractEditor>
             );
         }
 

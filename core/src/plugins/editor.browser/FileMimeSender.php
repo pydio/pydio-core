@@ -93,7 +93,7 @@ class FileMimeSender extends Plugin
                 $fileMime = "application/octet-stream";
             else {
                 $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileExt\s)/i";
-                $lines = file( $this->getBaseDir()."/resources/other/mime.types");
+                $lines = file( $this->getBaseDir()."/res/other/mime.types");
                 foreach ($lines as $line) {
                     if(substr($line, 0, 1) == '#')
                         continue; // skip comments

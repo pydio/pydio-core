@@ -40,16 +40,17 @@ let EditionPanel = React.createClass({
 
     componentDidMount: function(){
         this._nodesModelObserver = this.updateNodesFromModel;
-        this._nodesRemoveObserver = function(index){
-            this.updateNodesFromModel(null, index);
-        }.bind(this);
+        this._nodesRemoveObserver = (index) => { this.updateNodesFromModel(null, index) };
+        this._titlesObserver = () =>{ this.forceUpdate() }
         OpenNodesModel.getInstance().observe("nodePushed", this._nodesModelObserver);
         OpenNodesModel.getInstance().observe("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        OpenNodesModel.getInstance().observe("titlesUpdated", this._titlesObserver);
     },
 
     componentWillUnmount: function(){
         OpenNodesModel.getInstance().stopObserving("nodePushed", this._nodesModelObserver);
         OpenNodesModel.getInstance().stopObserving("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        OpenNodesModel.getInstance().stopObserving("titlesUpdated", this._titlesObserver);
     },
 
     getInitialState: function(){
@@ -81,11 +82,14 @@ let EditionPanel = React.createClass({
             let tabs = [], title, nodeTitle, mfbMenus = [];
             let index = 0;
             let editors = this.state.nodes.map(function(object){
+                let closeTab = function(e){
+                    OpenNodesModel.getInstance().removeNode(object);
+                };
+                let updateTabTitle=function(newTitle){
+                    OpenNodesModel.getInstance().updateNodeTitle(object, newTitle);
+                };
                 if(this.state.visible && this.state.opened){
-                    let closeTab = function(e){
-                        OpenNodesModel.getInstance().removeNode(object);
-                    };
-                    let label = <span className="closeable-tab"><span className="label">{object.node.getLabel()}</span><ReactMUI.FontIcon className="mdi mdi-close" onClick={closeTab}/></span>;
+                    let label = <span className="closeable-tab"><span className="label">{OpenNodesModel.getInstance().getObjectLabel(object)}</span><ReactMUI.FontIcon className="mdi mdi-close" onClick={closeTab}/></span>;
                     tabs.push(<MaterialUI.Tab key={index} label={label} value={index}></MaterialUI.Tab>);
                 }else{
                     mfbMenus.push(<ReactMFB.ChildButton icon="mdi mdi-file" label={object.node.getLabel()} onClick={this.toggle}/>);
@@ -98,10 +102,13 @@ let EditionPanel = React.createClass({
                 return (
                     <div className="editor_container vertical_layout vertical_fit" style={style}>
                         <PydioComponents.ReactEditorOpener
+                            pydio={this.props.pydio}
                             node={object.node}
                             editorData={object.editorData}
                             registry={this.props.pydio.Registry}
                             closeEditorContainer={function(){return true;}}
+                            onRequestTabClose={closeTab}
+                            onRequestTabTitleUpdate={updateTabTitle}
                         />
                     </div>
                 );

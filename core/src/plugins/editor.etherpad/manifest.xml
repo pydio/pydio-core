@@ -106,16 +106,6 @@
                         <input type="hidden" id="content" name="content" value="">
                     </div>
                 ]]></clientForm>
-                    <clientListener name="init"><![CDATA[
-                    document.observe("ajaxplorer:afterApply-mkdir", function(){
-                        if(modal.getForm().down("#alt_mkpad")) return;
-                        var link = '<div class="dialogLegend" style="padding-top:20px;" id="alt_mkpad"><span class="icon-chevron-right"></span> '+MessageHash["etherpad.9"]+'</div>';
-                        modal.getForm().down("div.dialogButtons").insert({before:link});
-                        modal.getForm().down("#alt_mkpad").down("a").addClassName("create_file_alt_link").observe("click", function(){
-                            pydio.getController().fireAction("mkpad");
-                        });
-                    });
-                ]]></clientListener>
                 </processing>
             </action>
         </actions>

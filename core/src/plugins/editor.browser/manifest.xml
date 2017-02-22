@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.browser" openable="true" order="1000" text="openbrowser.1"
 		title="openbrowser.2" icon="openbrowser_images/actions/ICON_SIZE/project-open.png" iconClass="icon-laptop"
-		className="BrowserOpener" mimes="*" formId="open_box" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
+		className="PydioBrowserEditor" mimes="*" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
         <global_param name="OPEN_DOCS_IN_TAB" type="select" label="CONF_MESSAGE[Open documents in...]"
@@ -13,9 +13,9 @@
     </server_settings>
     <client_settings>
         <resources>
-            <js file="plugins/editor.browser/class.BrowserOpener.js" className="BrowserOpener"/>
-            <i18n namespace="openbrowser" path="plugins/editor.browser/resources/i18n" />
-            <img_library alias="openbrowser_images" path="plugins/editor.browser/resources/images" />
+            <js file="plugins/editor.browser/res/build/PydioBrowserEditor.js" className="PydioBrowserEditor"/>
+            <i18n namespace="openbrowser" path="plugins/editor.browser/res/i18n" />
+            <img_library alias="openbrowser_images" path="plugins/editor.browser/res/images" />
         </resources>
     </client_settings>
     
@@ -63,16 +63,6 @@
                         <input type="text" id="filename" style="width:390px;" name="filename" value="">
                     </div>
                 ]]></clientForm>
-                <clientListener name="init"><![CDATA[
-                    document.observe("ajaxplorer:afterApply-mkdir", function(){
-                        if(modal.getForm().down("#alt_mklink")) return;
-                        var link = '<div class="dialogLegend" style="padding-top:20px;" id="alt_mklink"><span class="icon-chevron-right"></span> '+MessageHash["openbrowser.5"]+'</div>';
-                        modal.getForm().down("div.dialogButtons").insert({before:link});
-                        modal.getForm().down("#alt_mklink").down("a").addClassName("create_file_alt_link").observe("click", function(){
-                            pydio.getController().fireAction("mklink");
-                        });
-                    });
-                ]]></clientListener>
                 </processing>
             </action>
     	</actions>
