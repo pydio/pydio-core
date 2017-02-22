@@ -1,3 +1,4 @@
+import Loader from './Loader'
 /********************/
 /* ASYNC COMPONENTS */
 /********************/
@@ -8,7 +9,8 @@ const AsyncComponent = React.createClass({
 
     propTypes: {
         namespace:React.PropTypes.string.isRequired,
-        componentName:React.PropTypes.string.isRequired
+        componentName:React.PropTypes.string.isRequired,
+        noLoader:React.PropTypes.bool
     },
 
     _asyncLoad:function(){
@@ -64,8 +66,10 @@ const AsyncComponent = React.createClass({
             }else{
                 return <div>Component {this.props.namespace}.{this.props.componentName} not found!</div>;
             }
+        }else if(!this.props.noLoader){
+            return <Loader style={this.props.style}/>;
         }else{
-            return <div>Loading ...</div>;
+            return null;
         }
     }
 });

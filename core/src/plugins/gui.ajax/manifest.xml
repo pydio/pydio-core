@@ -121,7 +121,7 @@
                       editable="true"
                       uploadAction="store_binary_temp"
                       loadAction="get_global_binary_param"
-                      defaultImage="plugins/gui.ajax/res/themes/orbit/images/hires-photos/06.jpg"
+                      defaultImage="AJXP_IMAGES_FOLDER/hires-photos/06.jpg"
                       expose="true"
                 />
         <global_param name="WELCOME_PAGE_BACKGROUND_ATTRIBUTES_6" group="CONF_MESSAGE[Page Background Images]" type="select"

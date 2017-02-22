@@ -35,7 +35,7 @@ class BackgroundImage{
         var exp = configName.split("/");
         var plugin = exp[0];
         paramPrefix = exp[1];
-        var registry = ajaxplorer.getXmlRegistry();
+        var registry = pydio.getXmlRegistry();
         var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
         var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
 
@@ -50,8 +50,8 @@ class BackgroundImage{
             if(!bgrounds[n]){
                 bgrounds[n] = d.getAttribute("defaultImage");
             }else{
-                if(getBaseName(bgrounds[n]) == bgrounds[n]){
-                    bgrounds[n] = window.ajxpServerAccessPath+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
+                if(PathUtils.getBasename(bgrounds[n]) == bgrounds[n]){
+                    bgrounds[n] = pydio.Parameters.get('ajxpServerAccess')+"&get_action=get_global_binary_param&binary_id="+bgrounds[n];
                 }
             }
         });
@@ -65,7 +65,7 @@ class BackgroundImage{
             });
             index++;
         }
-        let windowWith = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        let windowWith = DOMUtils.getViewportWidth();
         if(windowWith < 600 && bgrounds[paramPrefix+'LOWRES']){
             // This is probably a mobile, let's force switching to low res.
             bStyles = [{

@@ -209,6 +209,7 @@
                         <PydioReactUI.AsyncComponent
                             namespace="PydioNotifications"
                             componentName="Panel"
+                            noLoader={true}
                             {...this.props}
                         />
                         <a><span className="icon-home" onClick={this.applyAction.bind(this, 'home')}></span></a>
