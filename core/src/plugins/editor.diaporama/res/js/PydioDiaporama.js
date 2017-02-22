@@ -87,9 +87,6 @@
                 return SizeComputer.getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed);
             }
         }
-
-
-
     }
 
     class SelectionModel{
@@ -143,6 +140,71 @@
         }
 
     }
+
+    const IMAGE_PANEL_MARGIN = 10;
+
+    let ImagePanel = React.createClass({
+
+        propTypes: {
+            url: React.PropTypes.string,
+            width:React.PropTypes.int,
+            height:React.PropTypes.int,
+            fit:React.PropTypes.bool
+        },
+
+        getInitialState: function(){
+            return {...this.props};
+        },
+
+        componentDidMount: function(){
+            this._observer = function(e){this.resize()}.bind(this);
+            DOMUtils.observeWindowResize(this._observer);
+            this.resize();
+            setTimeout(this.resize, 1000);
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            this.setState({url: nextProps.url}, function(){
+                this.resize(nextProps);
+            });
+        },
+
+        componentWillUnmount: function(){
+            DOMUtils.stopObservingWindowResize(this._observer);
+        },
+
+        resize: function(props = null){
+            if(!this.refs.container) return;
+            if(!props) props = this.props;
+            let w = this.refs.container.clientWidth - 2 * IMAGE_PANEL_MARGIN;
+            let h = this.refs.container.clientHeight - 2 * IMAGE_PANEL_MARGIN;
+            let imgW = props.width;
+            let imgH = props.height;
+            let newW, newH = imgH;
+            if((imgW < w && imgH < h) || !this.props.fit){
+                this.setState({width: imgW,height: imgH});
+                return;
+            }
+            if(imgW >= w){
+                this.setState({width: w,height: imgH * w / imgW});
+                newH = imgH * w / imgW;
+            }
+            if(newH >= h){
+                this.setState({height: h,width: imgW * h / imgH});
+            }
+        },
+
+        render: function(){
+            if(!this.props.url) return null;
+            return (
+                <div ref="container" className="vertical_fit" style={{textAlign:'center', overflow:(!this.props.fit?'auto':null)}}>
+                    <img style={{height:this.state.height, width:this.state.width, margin:IMAGE_PANEL_MARGIN, transition:DOMUtils.getBeziersTransition()}} src={this.props.url}/>
+                </div>
+            );
+        }
+
+
+    });
 
     let Editor = React.createClass({
 
@@ -198,7 +260,8 @@
                 }
             }.bind(this));
             return {
-                currentNode: this.selectionModel.current()
+                currentNode: this.selectionModel.current(),
+                displayOriginal: false
             };
         },
 
@@ -208,6 +271,9 @@
                     this.setState({imageDimension: dimension});
                 }
             }.bind(this));
+            if(this.props.onRequestTabTitleUpdate){
+                this.props.onRequestTabTitleUpdate(node.getLabel());
+            }
             this.setState({
                 currentNode: node
             });
@@ -217,6 +283,7 @@
             let actions = [];
             actions.push(<MaterialUI.FlatButton label="Previous" disabled={!this.selectionModel.hasPrevious()} onClick={()=>{this.updateStateNode(this.selectionModel.previous())}}/>);
             actions.push(<MaterialUI.FlatButton label="Next" disabled={!this.selectionModel.hasNext()} onClick={()=>{this.updateStateNode(this.selectionModel.next())}}/>);
+            actions.push(<MaterialUI.FlatButton label="Toggle Mode" onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
             return actions;
         },
 
@@ -225,16 +292,18 @@
             let baseURL = this.props.baseUrl;
             let editorConfigs = this.props.editorConfigs;
             let img;
+            let data = {};
             if(this.state.imageDimension){
-                let data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
-                img = <img style={{height:data.height, width:data.width}} src={data.url}/>
+                if(this.state.displayOriginal){
+                    data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
+                }else{
+                    data = SizeComputer.getLowResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
+                }
             }
 
             return (
                 <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
-                    <div className="vertical_fit" style={{textAlign:'center'}}>
-                        {img}
-                    </div>
+                    <ImagePanel {...data} fit={!this.state.displayOriginal}/>
                 </PydioComponents.AbstractEditor>
             );
         }
