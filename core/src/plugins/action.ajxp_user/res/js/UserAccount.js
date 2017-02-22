@@ -129,8 +129,8 @@
 
         attachClipboard: function(){
             this.detachClipboard();
-            if(this.refs['copy-button']){
-                this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
+            if(this.refs['copy-button']) {
+                this._clip = new Clipboard(ReactDOM.findDOMNode(this.refs['copy-button']), {
                     text: function(trigger) {
                         return this.props.url;
                     }.bind(this)
@@ -362,11 +362,9 @@
     class Callbacks {
 
         static openDashboard(){
-
             ResourcesManager.loadClassesAndApply(['PydioForm'], function(){
                 global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
             });
-
         }
 
         static delete(){

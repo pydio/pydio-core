@@ -23,13 +23,14 @@ export default React.createClass({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            marginTop: -64,
+
             padding: '0px !important'
         },
         dialogContent: {
             position: 'relative',
             paddingTop: 0,
-            paddingBottom: 0
+            paddingBottom: 0,
+            transform: ""
         },
         dialogBody: {
             paddingTop: 0,
