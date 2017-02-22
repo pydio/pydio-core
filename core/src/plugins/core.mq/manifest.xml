@@ -4,7 +4,7 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mq" path="plugins/core.mq/i18n"/>
-            <js className="PydioInstantMessenger" file="plugins/core.mq/class.PydioInstantMessenger.js"/>
+            <js className="PydioInstantMessenger" file="plugins/core.mq/res/build/PydioInstantMessenger.js"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -76,9 +76,9 @@
                     <clientListener name="init"><![CDATA[
                         if(!pydio.mqObserver && !pydio.mqObserverLoading){
                             pydio.mqObserverLoading = true;
-                            ResourcesManager.prototype.loadJSResource('plugins/core.mq/class.PydioInstantMessenger.js', 'PydioInstantMessenger', function(){
+                            ResourcesManager.loadClassesAndApply(['PydioInstantMessenger'], function(){
                                 pydio.mqObserver = new PydioInstantMessenger();
-                            }, true);
+                            });
                         }
                     ]]></clientListener>
                     <serverCallback methodName="clientChannelMethod" restParams="/channel/client_id" developerComment="Subscribe to given queue of events.">
