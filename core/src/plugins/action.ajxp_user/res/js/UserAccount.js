@@ -362,7 +362,9 @@
 
         static openDashboard(){
 
-            global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
+            ResourcesManager.loadClassesAndApply(['PydioForm'], function(){
+                global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
+            });
 
         }
 
