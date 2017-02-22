@@ -185,24 +185,29 @@ class ResourcesManager{
 	 */
 	loadCSSResource(fileName){
 
-		var head = document.getElementsByTagName('head')[0];
-        if(head && head.down){
-            if(pydio.Parameters.get('SERVER_PREFIX_URI')){
-                fileName = pydio.Parameters.get('SERVER_PREFIX_URI')+fileName;
-            }
-            fileName = fileName+"?v="+pydio.Parameters.get("ajxpVersion");
-            // WARNING PROTOTYPE STUFF
-            var select = head.down('[href="'+fileName+'"]');
-            if(!select){
-                var cssNode = new Element('link', {
-                    type : 'text/css',
-                    rel  : 'stylesheet',
-                    href : fileName,
-                    media : 'screen'
-                });
-                head.insert(cssNode);
+        if(pydio.Parameters.get('SERVER_PREFIX_URI')){
+            fileName = pydio.Parameters.get('SERVER_PREFIX_URI')+fileName;
+        }
+        fileName = fileName+"?v="+pydio.Parameters.get("ajxpVersion");
+
+        let found = false;
+        const links = document.getElementsByTagName('link');
+        for(let i=0; i<links.length; i++){
+            let link = links[i];
+            if(link.href === fileName){
+                found = true; break;
             }
         }
+        if(!found){
+            let head = document.getElementsByTagName('head')[0];
+            let cssNode = document.createElement('link');
+            cssNode.type = 'text/css';
+            cssNode.rel  = 'stylesheet';
+            cssNode.href = fileName;
+            cssNode.media = 'screen';
+            head.appendChild(cssNode);
+        }
+        
 	}
 	/**
 	 * Insert the HTML snipper and evaluate scripts

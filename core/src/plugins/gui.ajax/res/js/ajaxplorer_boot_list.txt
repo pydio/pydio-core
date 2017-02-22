@@ -1,7 +1,5 @@
 js/vendor/es6/browser-polyfill.js
-js/vendor/prototype/prototype.js
-js/vendor/prototype/prototype.livepipe.js
-js/vendor/prototype/prototype.oo.js
+js/vendor/nodejs/boot.prod.js
 js/core/util/HasherUtils.js
 js/core/http/Connexion.js
-js/ui/prototype/class.AjxpBootstrap.js
+js/core/PydioBootstrap.js

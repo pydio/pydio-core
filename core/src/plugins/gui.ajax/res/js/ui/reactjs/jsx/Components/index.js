@@ -13,6 +13,7 @@ import SearchBox from './SearchBox'
 import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
+import AbstractEditor from './editor/AbstractEditor'
 
 window.PydioComponents = {
     
@@ -31,6 +32,7 @@ window.PydioComponents = {
     SearchBox               : SearchBox,
     LegacyUIWrapper         : LegacyUIWrapper,
 
+    AbstractEditor          : AbstractEditor,
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,

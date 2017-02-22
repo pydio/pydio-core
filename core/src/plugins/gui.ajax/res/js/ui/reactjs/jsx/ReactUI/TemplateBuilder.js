@@ -41,10 +41,10 @@ class BackgroundImage{
 
 
         bgrounds = {};
-        configs.each(function(c){
+        configs.map(function(c){
             bgrounds[c.getAttribute("name")] = c.firstChild.nodeValue.replace(/"/g, '');
         });
-        defaults.each(function(d){
+        defaults.map(function(d){
             if(!d.getAttribute('defaultImage')) return;
             var n = d.getAttribute("name");
             if(!bgrounds[n]){
@@ -65,7 +65,8 @@ class BackgroundImage{
             });
             index++;
         }
-        if(document.viewport.getWidth() < 600 && bgrounds[paramPrefix+'LOWRES']){
+        let windowWith = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        if(windowWith < 600 && bgrounds[paramPrefix+'LOWRES']){
             // This is probably a mobile, let's force switching to low res.
             bStyles = [{
                 backgroundImage:"url('"+bgrounds[paramPrefix+'LOWRES']+"')" + (important?' !important':''),

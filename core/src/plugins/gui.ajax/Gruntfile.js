@@ -172,7 +172,8 @@ module.exports = function(grunt) {
             dist: {
                 files: {
                     'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js',
-                    'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js'
+                    'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js',
+                    'res/js/vendor/nodejs/boot.prod.js': 'res/js/vendor/nodejs/boot.js'
                 }
             },
             ui : {

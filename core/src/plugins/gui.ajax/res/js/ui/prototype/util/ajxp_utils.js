@@ -117,37 +117,6 @@ function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, 
 }
 
 
-function storeRememberData(user, pass){
-	setAjxpCookie('remember', {user:user,pass:pass});
-}
-
-function retrieveRememberData(){
-	return getAjxpCookie('remember');
-}
-
-function clearRememberData(){
-	deleteAjxpCookie('remember');
-}
-
-function setAjxpCookie(name, value){
-	var cookieJar = new CookieJar({
-		expires: 3600*24*10,
-		path: '/',
-		secure: true
-	});
-	cookieJar.put('ajxp_'+name, value);	
-}
-
-function getAjxpCookie(name){
-	var cookieJar = new CookieJar({path: '/',secure:true});
-	return cookieJar.get('ajxp_'+name);	
-}
-
-function deleteAjxpCookie(name){
-	var cookieJar = new CookieJar({path: '/',secure:true});
-	cookieJar.remove('ajxp_'+name);	
-}
-
 function refreshPNGImages(element){
 	if(element.getAttribute('is_image') && element.getAttribute('is_image')=='1'){
 		return element;

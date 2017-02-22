@@ -253,7 +253,7 @@ class Controller extends Observable{
         if(defaultGroup && contextActionsGroup.has(defaultGroup)){
             keys.unshift(defaultGroup);
         }
-        keys.each(function(key){
+        keys.map(function(key){
             var value = contextActionsGroup.get(key);
             if(!first){
                 contextActions.push({separator:true});

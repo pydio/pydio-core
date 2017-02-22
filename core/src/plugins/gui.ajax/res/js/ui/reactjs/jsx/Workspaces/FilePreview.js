@@ -117,7 +117,7 @@ let FilePreview = React.createClass({
         }
 
         let node  = this.props.node;
-        let svg = AbstractEditor.prototype.getSvgSource(node);
+        let svg = PydioComponents.AbstractEditor.getSvgSource(node);
         let object, className;
         if(svg){
             object = <div key="icon" className={"mimefont mdi mdi-" + svg}></div>;

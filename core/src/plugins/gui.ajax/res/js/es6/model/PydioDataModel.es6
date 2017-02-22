@@ -150,7 +150,7 @@ class PydioDataModel extends Observable{
         var onComplete = null;
         if(this._selectedNodes.length) {
             var found = false;
-            this._selectedNodes.each(function(node){
+            this._selectedNodes.map(function(node){
                 if(node.getPath() == nodeOrPath.getPath()) found = node;
             });
             if(found){
@@ -291,10 +291,10 @@ class PydioDataModel extends Observable{
 			}
 			return 0;
 		});
-		children.each(function(c){
-			nodes = nodes.without(c);
+		children.map(function(c){
+			nodes = LangUtils.arrayWithout(nodes, c);
 		});
-		nodes.each(this.queueNodeReload.bind(this));
+		nodes.map(this.queueNodeReload.bind(this));
 		this.nextNodeReloader();
 	}
 	
@@ -596,11 +596,14 @@ class PydioDataModel extends Observable{
 	hasMime (mimeTypes){
 		if(mimeTypes.length==1 && mimeTypes[0] == "*") return true;
 		var has = false;
-		mimeTypes.each(function(mime){
+		mimeTypes.map(function(mime){
 			if(has) return;
-			has = this._selectedNodes.any(function(node){
-				return (getAjxpMimeType(node) == mime);
-			});
+            for(let i=0; i<this._selectedNodes; i++){
+                if(PathUtils.getAjxpMimeType(this._selectedNodes[i]) === mime){
+                    has = true;
+                    break;
+                }
+            }
 		}.bind(this) );
 		return has;
 	}
@@ -737,7 +740,7 @@ class PydioDataModel extends Observable{
 		// CLEAR FROM PREVIOUS ACTIONS!
 		if(oFormElement)	
 		{
-			$(oFormElement).select('input[type="hidden"]').each(function(element){
+			$(oFormElement).select('input[type="hidden"]').map(function(element){
 				if(element.name == "nodes[]" || element.name == "file")element.remove();
 			});
 		}
