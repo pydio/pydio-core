@@ -24,9 +24,12 @@
 
         componentDidMount: function(){
             let node = this.props.node;
+            const configs = this.props.pydio.getPluginConfigs("editor.browser");
+
             if(node.getAjxpMime() == "url" || node.getAjxpMime() == "website"){
-                this.openURL(node.getPath());
-                return;
+                this.openBookmark(node, configs);
+            }else{
+                this.openNode(node, configs);
             }
 
         },
@@ -35,12 +38,11 @@
             return {loading: true, frameSrc:null};
         },
 
-        openURL(nodePath){
+        openBookmark(node, configs){
 
-            var configs = this.props.pydio.getPluginConfigs("editor.browser");
-            let alwaysOpenLinksInBrowser = !(configs.get('OPEN_LINK_IN_TAB') === 'browser');
+            let alwaysOpenLinksInBrowser = (configs.get('OPEN_LINK_IN_TAB') === 'browser');
 
-            PydioApi.getClient().request({get_action:'get_content', file:nodePath}, function(transp){
+            PydioApi.getClient().request({get_action:'get_content', file:node.getPath()}, function(transp){
                 var url = transp.responseText;
                 if(url.indexOf('URL=') !== -1){
                     url = url.split('URL=')[1];
@@ -48,19 +50,39 @@
                         url = url.split('\n')[0];
                     }
                 }
-                if(alwaysOpenLinksInBrowser){
-                    global.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
-                    if(this.props.onRequestTabClose){
-                        this.props.onRequestTabClose();
-                    }
-                }else{
-                    if(this.props.onRequestTabTitleUpdate){
-                        this.props.onRequestTabTitleUpdate(url);
-                    }
-                    this.setState({loading:false, frameSrc:url});
-                }
-
+                this._openURL(url, alwaysOpenLinksInBrowser, true);
             }.bind(this));
+        },
+
+        openNode(node, configs){
+
+            var repo = pydio.user.getActiveRepository();
+            var loc = document.location.href.split('?').shift().split('#').shift();
+            var url = loc.substring(0, loc.lastIndexOf('/'));
+            if(document.getElementsByTagName('base').length){
+                url = document.getElementsByTagName('base')[0].href;
+                if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
+            }
+            var open_file_url = LangUtils.trimRight(url, "\/") + "/" + pydio.Parameters.get('ajxpServerAccess') + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
+            var configs = this.props.pydio.getPluginConfigs("editor.browser");
+            let alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') === "browser";
+
+            this._openURL(open_file_url, alwaysOpenDocsInBrowser, false);
+
+        },
+
+        _openURL(url, modal=false, updateTitle = false){
+            if(modal){
+                global.open(url, '', "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
+                if(this.props.onRequestTabClose){
+                    this.props.onRequestTabClose();
+                }
+            }else{
+                if(updateTitle && this.props.onRequestTabTitleUpdate){
+                    this.props.onRequestTabTitleUpdate(url);
+                }
+                this.setState({loading:false, frameSrc:url});
+            }
         },
 
         render: function(){
@@ -90,103 +112,3 @@
     window.PydioBrowserEditor = BrowserOpener;
 
 })(window);
-
-/*
-Class.create("BrowserOpener", AbstractEditor, {
-
-	initialize: function($super, oFormObject, options){
-        this.editorOptions = options;
-        this.element = oFormObject;
-        var configs = ajaxplorer.getPluginConfigs("editor.browser");
-        this.alwaysOpenLinksInBrowser = configs.get('OPEN_LINK_IN_TAB') == "browser";
-        this.alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') == "browser";
-    },
-	
-	open : function($super, node){
-        if(node.getAjxpMime() == "url" || node.getAjxpMime() == "website"){
-        	this.openURL(node.getPath());
-        	return;
-        } 
-        var repo = ajaxplorer.user.getActiveRepository();
-        var loc = document.location.href.split('?').shift().split('#').shift();
-        var url = loc.substring(0, loc.lastIndexOf('/'));
-        if($$('base').length){
-            url = $$("base")[0].getAttribute("href");
-            if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
-        }
-        //var nonSecureAccessPath = window.ajxpServerAccessPath.substring(0, window.ajxpServerAccessPath.lastIndexOf('?'));
-        var open_file_url = LangUtils.trimRight(url, "\/") + "/" + window.ajxpServerAccessPath + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
-
-        if(this.editorOptions.context.__className == 'Modal'){
-            window.open(open_file_url);
-            if(!Modernizr.boxshadow){
-                window.setTimeout('hideLightBox()', 1500);
-            }else{
-                hideLightBox();
-            }
-        }else if(this.alwaysOpenDocsInBrowser){
-            window.open(open_file_url);
-            window.setTimeout(function(){
-                this.editorOptions.context.closeTab("editor.browser:/" + node.getPath());
-            }.bind(this), 500);
-        }else{
-            this.element.fire("editor:updateTitle", node.getLabel());
-            this.contentMainContainer = new Element('iframe', {
-                width:'100%',
-                height:'100%',
-                src:open_file_url,
-                border:0,
-                style: 'border: 0'
-            });
-            this.element.update(this.contentMainContainer);
-        }
-	},
-	
-	openURL : function(fileName){
-		var connexion = new Connexion();
-		connexion.addParameter('get_action', 'get_content');
-		connexion.addParameter('file', fileName);
-		connexion.onComplete = function(transp){
-			var url = transp.responseText;
-            if(url.indexOf('URL=') !== -1){
-                url = url.split('URL=')[1];
-                if(url.indexOf('\n') !== -1){
-                    url = url.split('\n')[0];
-                }
-            }
-            if(this.editorOptions.context.__className == 'Modal'){
-                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
-                hideLightBox();
-            }else if(this.alwaysOpenLinksInBrowser){
-                window.open(url, "Pydio Bookmark", "location=yes,menubar=yes,resizable=yes,scrollbars=yes,toolbar=yes,status=yes");
-                window.setTimeout(function(){
-                    this.editorOptions.context.closeTab("editor.browser:/" + fileName);
-                }.bind(this), 500);
-            }else{
-                this.element.fire("editor:updateTitle", url);
-                this.contentMainContainer = new Element('iframe', {
-                    width:'100%',
-                    height:'100%',
-                    src:url,
-                    border:0,
-                    style: 'border: 0'
-                });
-                this.element.update(this.contentMainContainer);
-            }
-		}.bind(this);
-		connexion.sendAsync();
-	},
-
-    resize : function(size){
-        if(size){
-            this.element.setStyle({height:size+"px"});
-            if(this.contentMainContainer) this.contentMainContainer.setStyle({height:size+"px"});
-        }else{
-            fitHeightToBottom(this.element);
-            if(this.contentMainContainer) fitHeightToBottom(this.contentMainContainer, this.element);
-        }
-        this.element.fire("editor:resize", size);
-    }
-
-});
-*/
