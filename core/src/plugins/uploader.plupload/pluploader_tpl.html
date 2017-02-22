@@ -2,7 +2,7 @@
 "http://www.w3.org/TR/html4/strict.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body bgcolor="ffffff" style="overflow:hidden; padding: 0px; padding-left: 0px; margin: 0px;">
 
@@ -14,7 +14,7 @@
 
 <script language="javascript" type="text/javascript">
 // Fix height of modal box
-//$(window.parent.document).find("#generic_dialog_box").height(355); 
+//$(window.parent.document).find("#generic_dialog_box").height(355);
 
 
 var clientId = '<?php echo session_id(); ?>';
@@ -57,7 +57,7 @@ $(function() {
 		// attach callbacks before queue
 		preinit: attachCallbacks
 	});
-	
+
 	// attach callbacks for FileUploaded
 	function attachCallbacks(Uploader) {
         Uploader.bind('FilesAdded', function(up, files){
@@ -72,12 +72,12 @@ $(function() {
             });
         });
 		Uploader.bind('UploadFile', function(up, file, res) {
-            parent.document.fire("ajaxplorer:longtask_starting");
+            parent.pydio.notify("longtask_starting");
 		});
 		Uploader.bind('FileUploaded', function(up, file, res) {
 			if(this.total.queued <= 1) {
 				parent.pydio.fireContextRefresh();
-                parent.document.fire("ajaxplorer:longtask_finished");
+                parent.pydio.notify("longtask_finished");
 			}
 		});
 	}

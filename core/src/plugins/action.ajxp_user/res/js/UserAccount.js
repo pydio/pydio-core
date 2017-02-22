@@ -303,7 +303,7 @@
     });
 
     let Dashboard = React.createClass({
-        
+
         render: function(){
 
             return (
@@ -319,7 +319,7 @@
                 </MaterialUI.MuiThemeProvider>
             );
         }
-        
+
     });
 
     let ModalDashboard = React.createClass({
@@ -332,8 +332,9 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: '',
-                dialogClassName: 'dialog-large dialog-no-padding',
-                dialogIsModal: false
+                dialogSize: 'lg',
+                dialogPadding: false,
+                dialogIsModal: true
             };
         },
 

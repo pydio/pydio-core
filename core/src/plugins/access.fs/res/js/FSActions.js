@@ -880,7 +880,8 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: 'Upload',
-                dialogClassName:'dialog-large dialog-no-padding',
+                dialogSize: 'lg',
+                dialogPadding: false,
                 dialogIsModal: true
             };
         },
@@ -898,11 +899,9 @@
             });
 
             uploaders.map(function(uploader){
-
-                if(uploader.moduleName){
+                if(uploader.moduleName) {
                     let parts = uploader.moduleName.split('.');
                     tabs.push(
-
                         <MaterialUI.Tab label={uploader.xmlNode.getAttribute('label')} key={uploader.id}>
                             <PydioReactUI.AsyncComponent
                                 pydio={pydio}
@@ -911,8 +910,6 @@
                             />
                         </MaterialUI.Tab>
                     );
-                }else{
-
                 }
             });
 
@@ -937,12 +934,14 @@
             PydioReactUI.CancelButtonProviderMixin,
             PydioReactUI.SubmitButtonProviderMixin
         ],
+
         getDefaultProps: function(){
             return {
                 dialogTitle: 'Copy Selection to...',
                 dialogIsModal: true
             };
         },
+
         submit(){
             this.props.submitValue(this.state.selectedNode.getPath(), (this.state.wsId === '__CURRENT__' ? null : this.state.wsId));
             this.dismiss();

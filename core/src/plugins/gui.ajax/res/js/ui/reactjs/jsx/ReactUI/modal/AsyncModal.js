@@ -6,17 +6,53 @@ import AsyncComponent from '../AsyncComponent'
  */
 export default React.createClass({
 
-    getInitialState:function(){
-        return {
-            async:true,
-            componentData:null,
-            open: !!this.props.open,
-            actions:[],
-            title:null
+    propTypes: {
+        size: React.PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+        padding: React.PropTypes.boolean
+    },
+
+    sizes: {
+        'xs': {width: 120},
+        'sm': {width: 210},
+        'md': {width: 420},
+        'lg': {width: 720}
+    },
+
+    styles: {
+        dialogRoot: {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginTop: -64,
+            padding: '0px !important'
+        },
+        dialogContent: {
+            position: 'relative',
+            paddingTop: 0,
+            paddingBottom: 0
+        },
+        dialogBody: {
+            paddingTop: 0,
+            paddingBottom: 0
+        },
+        dialogTitle: {
         }
     },
 
-    componentWillReceiveProps: function(nextProps){
+    getInitialState:function(){
+        return {
+            async: true,
+            componentData: null,
+            open: !!this.props.open,
+            actions: [],
+            title: null,
+            size: this.props.size || 'md',
+            padding: !!this.props.padding
+        }
+    },
+
+    componentWillReceiveProps: function(nextProps) {
+
         var componentData = nextProps.componentData;
         var state = {
             componentData:componentData,
@@ -35,39 +71,14 @@ export default React.createClass({
         this.setState(state);
     },
 
-    show: function(){
-        this.setState({open: true});
-    },
+    initModalFromComponent: function(component) {
 
-    hide:function(){
-        this.setState({open: false});
-    },
-
-    onActionsUpdate:function(component){
-        if(component.getButtons){
-            this.setState({actions:component.getButtons()});
-        }
-    },
-
-    onTitleUpdate:function(component){
-        if(component.getTitle){
-            this.setState({title:component.getTitle()});
-        }
-    },
-
-    onDialogClassNameUpdate:function(component){
-        if(component.getDialogClassName){
-            this.setState({className:component.getDialogClassName()});
-        }
-    },
-
-    initModalFromComponent:function(component){
-        if(component.getButtons){
+        if(component.getButtons) {
             let buttons = component.getButtons();
             if(buttons && buttons.length){
                 this.setState({actions:component.getButtons()});
             }
-        }else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback){
+        } else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback) {
             let actions = [];
             if(component.getCancelCallback){
                 actions.push(
@@ -88,7 +99,7 @@ export default React.createClass({
             }
             if(component.getNextCallback){
                 actions.push(<MaterialUI.FlatButton
-                    label="Nextw"
+                    label="Next"
                     primary={true}
                     keyboardFocused={true}
                     onTouchTap={component.getNextCallback()}
@@ -97,57 +108,80 @@ export default React.createClass({
             this.setState({actions: actions});
         }
         if(component.getTitle){
-            this.setState({title:component.getTitle()});
+            this.setState({title: component.getTitle()});
         }
-        if(component.getDialogClassName){
-            this.setState({className:component.getDialogClassName()});
+        if(component.getSize){
+            this.setState({size: component.getSize()});
+        }
+        if(component.getPadding){
+            this.setState({padding: component.getPadding()});
         }
         if(component.setModal){
             component.setModal(this);
         }
         if(component.isModal){
-            this.setState({modal:component.isModal()});
+            this.setState({modal: component.isModal()});
         }else{
             this.setState({modal:false});
         }
+
     },
 
     render: function(){
+
         var modalContent;
-        if(this.state.componentData){
-            if(this.state.async){
-                modalContent = (
+
+        const { state, sizes, styles } = this
+        const { async, componentData, title, actions, modal, className, open, size, padding } = state
+
+        if (componentData) {
+            if(async) {
+                modalContent =
                     <PydioReactUI.AsyncComponent
                         {...this.props}
-                        namespace={this.state.componentData.namespace}
-                        componentName={this.state.componentData.compName}
+                        namespace={componentData.namespace}
+                        componentName={componentData.compName}
                         ref="modalAsync"
                         onLoad={this.initModalFromComponent}
                         dismiss={this.hide}
-                        actionsUpdated={this.onActionsUpdate}
-                        titleUpdated={this.onTitleUpdate}
-                        classNameUpdated={this.onDialogClassNameUpdate}
-                        modalData={{modal:this, payload: this.state.componentData['payload']}}
+                        modalData={{modal:this, payload: componentData['payload']}}
                     />
-                );
-            }else{
-                modalContent = this.state.componentData;
+            } else {
+                modalContent = componentData;
             }
         }
+
+        let dialogRoot = {...styles.dialogRoot}
+        let dialogBody = {...styles.dialogBody}
+        let dialogContent = {...styles.dialogContent, width: sizes[size].width, minWidth: sizes[size].width, maxWidth: sizes[size].width}
+        let dialogTitle = {...styles.dialogTitle}
+
+        if (!padding) {
+            dialogRoot = {...dialogRoot, padding: 0}
+            dialogBody = {...dialogBody, padding: 0}
+            dialogContent = {...dialogContent, padding: 0}
+        }
+
+        if (title === "") {
+            dialogTitle = {...dialogTitle, display: 'none'}
+        }
+
         return (
             <MaterialUI.Dialog
                 ref="dialog"
-                title={this.state.title}
-                actions={this.state.actions}
-                modal={this.state.modal}
-                className={this.state.className}
-                open={this.state.open}
-                onRequestClose={this.hide}
-                contentClassName={this.state.className}
-                repositionOnUpdate={true}
+                title={title}
+                actions={actions}
+                modal={modal}
+                className={className}
+                open={open}
+                contentClassName={className}
+                repositionOnUpdate={false}
+
+                contentStyle={dialogContent}
+                bodyStyle={dialogBody}
+                titleStyle={dialogTitle}
+                style={dialogRoot}
             >{modalContent}</MaterialUI.Dialog>
         );
     }
-
 });
-
