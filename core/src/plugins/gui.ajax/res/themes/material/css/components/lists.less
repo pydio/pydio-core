@@ -1,5 +1,213 @@
 .react-mui-context{
+
   .material-list.main-file-list{
+
+    opacity: 1;
+
+    .material-list-entry{
+
+      .material-list-icon{
+        .covering-bg-preview{
+          border-radius: 50%;
+          height: 40px;
+          width: 40px;
+          margin-left: 17px;
+          margin-top: 12px;
+        }
+        > div{
+          width: 100%;
+          height: 100%;
+          &.mimefont-container{
+            display: flex;
+            align-items: center;
+            div.mimefont{
+              flex: 1;
+              font-size: 28px;
+              text-align: center;
+              color: @thumbnail_mimefont_color;
+              padding-bottom: 10px;
+              &.mdi-folder{
+                color: darken(@thumbnail_mimefont_color,2);
+              }
+            }
+          }
+        }
+      }
+
+      &.material-list-entry-2-lines{
+        .material-list-line-2{
+          line-height: 22px;
+          span.metadata_chunk{
+            transition: @bezier_transition;
+            opacity: 0;
+            color: rgba(0,0,0,0.23);
+            &.metadata_chunk_description{
+              opacity: 1;
+              color: rgba(0,0,0,0.43);
+            }
+          }
+          span.icon-angle-right{
+            display:inline-block;
+            margin: 0 1px;
+            visibility: hidden;
+          }
+        }
+        .material-list-actions{
+          .overlay_icon_div .overlay-class-span{
+            display: inline-block;
+            padding: 14px;
+          }
+        }
+      }
+
+      &.selected{
+        background-color: #E3F2FD !important;
+        color: inherit;
+        border-bottom-color: transparent;
+        .material-list-line-1{
+          font-weight: inherit;
+        }
+        .material-list-line-2{
+          span.metadata_chunk{
+            opacity: 1;
+            &.metadata_chunk_description{
+              color: rgba(0,0,0,0.63);
+            }
+          }
+        }
+        .overlay_icon_div span.overlay-class-span{
+          color: inherit;
+        }
+      }
+
+      &:hover{
+        .material-list-line-2{
+          span.metadata_chunk{
+            opacity: 1;
+            &.metadata_chunk_description{
+              color: rgba(0,0,0,0.63);
+            }
+          }
+        }
+      }
+
+    }
+
+    &.table-mode{
+      span.cell{
+        color: rgba(0,0,0,0.53);
+      }
+      span.cell.cell-ajxp_label{
+        color: rgba(0,0,0,0.87);
+        font-size: 14px;
+        font-weight: 400;
+        min-width: 250px;
+        &.header_cell{
+          font-size: inherit;
+          font-weight:inherit;
+          color: inherit;
+          padding-left: 42px;
+        }
+        > span{
+          display: flex;
+          margin-left: 16px;
+          div.mimefont-container{
+            font-size: 17px;
+            margin-top: -2px;
+            margin-right: 10px;
+            color: @thumbnail_mimefont_color;
+          }
+          span:last-child{
+            display: inline;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+        }
+      }
+      .material-list-icon-none{
+        display: none;
+      }
+      .material-list-actions{
+        display: none;
+        .overlay_icon_div{
+          padding-right: 8px;
+          .overlay-class-span{
+            display: inline-block;
+            padding: 18px 8px 0;
+          }
+        }
+      }
+    }
+
+    &.material-list-grid{
+
+      .material-list-entry{
+        width: 230px;
+        float: left;
+        height: 200px;
+        position: relative;
+        display: block;
+        padding: 1px;
+        .material-list-icon{
+          width: 100%;
+          height: 100%;
+          div.covering-bg-preview{
+            border-radius: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+          }
+          div.mimefont{
+            font-size: 70px !important;
+          }
+        }
+        .material-list-text{
+          position: absolute;
+          bottom: 1px;
+          left: 1px;
+          right: 1px;
+          padding: 10px;
+          background-color: rgba(0,0,0,0.33);
+          color: white;
+        }
+
+        .material-list-actions{
+          position: absolute;
+          bottom: 9px;
+          right: 7px;
+          span.overlay-class-span {
+            color: white !important;
+            padding: 0 4px;
+          }
+        }
+
+      }
+
+      &.grid-size-80{
+
+        .material-list-entry{
+          padding: 0.5px 1px;
+          .material-list-text{
+            display:none;
+            padding: 5px;
+            .material-list-line-1{
+              font-size: 12px;
+              line-height: 12px;
+            }
+          }
+          &:hover{
+            background-color: @selectionMainTint !important;
+            .material-list-text{
+              display: block;
+            }
+          }
+        }
+
+      }
+
+    }
+
     .mui-toolbar{
       background-color: transparent;
       padding: 0;

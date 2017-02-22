@@ -150,6 +150,8 @@
             // Collect modifiers
             let modifiers = [];
             let namespaces = [];
+            props = props || {};
+            props['pydio'] = this._pydio;
             XMLUtils.XPathSelectNodes(this._pydio.getXmlRegistry(), '//client_configs/component_config[@className="'+namespace + '.' + componentName +'"]/modifier').map(function(node){
                 const module = node.getAttribute('module');
                 modifiers.push(module);

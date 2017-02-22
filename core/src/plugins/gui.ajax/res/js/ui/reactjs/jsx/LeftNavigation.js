@@ -253,7 +253,8 @@
                     this.props.pydio.triggerRepositoryChange('ajxp_home');
                     break;
                 case 'cog':
-                    this.props.pydio.Controller.fireAction('switch_to_user_dashboard');
+                    // Open dashboard in modal
+                    this.props.pydio.Controller.fireAction('open_user_dashboard');
                     break;
                 case 'logout':
                     this.props.pydio.Controller.fireAction('logout');

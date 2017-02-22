@@ -322,7 +322,49 @@
         
     });
 
+    let ModalDashboard = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogClassName: 'dialog-large dialog-no-padding',
+                dialogIsModal: false
+            };
+        },
+
+        submit: function(){
+            this.dismiss();
+        },
+
+        render: function(){
+
+            return (
+                <MaterialUI.Tabs>
+                    <MaterialUI.Tab label="Profile">
+                        <ProfilePane {...this.props}/>
+                    </MaterialUI.Tab>
+                    <MaterialUI.Tab label="WebDAV Preferences">
+                        <WebDAVPane {...this.props}/>
+                    </MaterialUI.Tab>
+                </MaterialUI.Tabs>
+            );
+
+        }
+
+    });
+
     class Callbacks {
+
+        static openDashboard(){
+
+            global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
+
+        }
 
         static delete(){
 
@@ -353,6 +395,7 @@
     ns.ProfilePane = ProfilePane;
     ns.WebDAVPane = WebDAVPane;
     ns.Dashboard = Dashboard;
+    ns.ModalDashboard = ModalDashboard;
     ns.Callbacks = Callbacks;
     global.UserAccount = ns;
 

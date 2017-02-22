@@ -3,29 +3,10 @@
 	<client_settings icon="plugins/access.ajxp_user/share.png">
 		<resources>
 			<i18n namespace="user_dash" path="plugins/access.ajxp_user/i18n" />
-            <css file="plugins/editor.ajxp_role/rolesEditor.css" />
-            <js className="UserProfileEditor" file="plugins/access.ajxp_user/class.UserProfileEditor.js"/>
-            <js className="WebDAVprefsEditor" file="plugins/access.ajxp_user/class.WebDAVprefsEditor.js"/>
-            <js className="UserAccount" file="plugins/access.ajxp_user/build/UserAccount.js" depends="React,PydioForm"/>
-            <css file="plugins/access.ajxp_user/dashboard.css"/>
 		</resources>
-        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
-    <server_settings>
-        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="CONF_MESSAGE[Disable Address Book]" description="CONF_MESSAGE[Do not display address book in user account panel.]"/>
-    </server_settings>
 	<registry_contributions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "fakeOptionUser":"true", "messageBoxReference":true}'><![CDATA[
-                <div id="userdashboard_myparams_title" style="opacity:0;" ajxp_message_id="user_dash.title">
-                    <a id="dash_back_workspace" onclick="ajaxplorer.triggerRepositoryChange('ajxp_home'); return false;"><span class="icon-chevron-left"></span> AJXP_MESSAGE[user_dash.53]</a>
-                    <span id="dash_title">AJXP_MESSAGE[user_dash.title]</span>
-                </div>
-                <div id="userdashboard_main_tab" style="opacity:0;" ajxpClass="AjxpTabulator" class="dashboard_main_pane horizontal_tabulator left_tabulator" ajxpOptions='{"fit":"height", "fitMarginBottom":0, "fitParent":"orbit_content", "registerAsEditorOpener":false, "saveState":false, "route":{"base":"/dashboard"}, "events":{}, "tabsTips":"middle right", "defaultTabId": "profile","tabInfos" : [{"id":"profile","label":"user_dash.43", "title":"user_dash.43t","iconClass":"icon-cog", "element":"account_pane"}]}'>
-                    <div id="account_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"ProfilePane"}'></div>
-                </div>
-			]]></template_part>
-            <template_part ajxpId="orbit_content" theme="material" namespace="UserAccount" component="Dashboard" dependencies="PydioComponents"/>
             <component_config className="AjxpTabulator::userdashboard_main_tab">
                 <additional_tab id="my-users-pane"
                                 tabInfo='{"id":"contacts","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'

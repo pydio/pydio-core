@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ajxpdriver id="action.ajxp_user" enabled="always" label="CONF_MESSAGE[User Dashboard]" description="CONF_MESSAGE[User home dashboard, can be displayed before accessing to workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings icon="plugins/action.ajxp_user/share.png">
+		<resources>
+			<i18n namespace="user_dash" path="plugins/action.ajxp_user/res/i18n" />
+            <css file="plugins/editor.ajxp_role/rolesEditor.css" />
+            <js className="UserProfileEditor" file="plugins/action.ajxp_user/class.UserProfileEditor.js"/>
+            <js className="WebDAVprefsEditor" file="plugins/action.ajxp_user/class.WebDAVprefsEditor.js"/>
+            <js className="UserAccount" file="plugins/action.ajxp_user/res/build/UserAccount.js" depends="React,PydioForm"/>
+            <css file="plugins/action.ajxp_user/dashboard.css"/>
+		</resources>
+        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
+	</client_settings>
+    <server_settings>
+        <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="CONF_MESSAGE[Disable Address Book]" description="CONF_MESSAGE[Do not display address book in user account panel.]"/>
+    </server_settings>
+	<registry_contributions>
+		<client_configs>
+            <component_config className="AjxpTabulator::userdashboard_main_tab">
+                <additional_tab id="my-users-pane"
+                                tabInfo='{"id":"contacts","label":"user_dash.46", "title":"user_dash.47","iconClass":"icon-book", "element":"my-users-pane", "position":2,"dontFocus":true}'
+                                paneInfo='{"type":"widget"}'><![CDATA[
+                    <div id="my-users-pane" ajxpClass="AjxpPane" class="tabbed_editor">
+                        <div class="title-flex">
+                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[user_dash.46]<div class="legend">AJXP_MESSAGE[user_dash.49]</div></h3>
+                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"address_book","toolbarsList":["change","address_book"],"submenuOffsetTop":2}'></div>
+                        </div>
+                        <div id="address_book" ajxpClass="FetchedResultPane" ajxpOptions='{"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"ls","dir":"users"}, "displayMode":"detail","replaceScroller":true, "fit":"height", "cellPaddingCorrection":6, "iconBgPosition" : "5px 4px"}'></div>
+                    </div>
+                ]]></additional_tab>
+            </component_config>
+        </client_configs>
+		<actions>
+			<action name="open_user_dashboard">
+				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
+					<context selection="false" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"/>
+				</gui>
+				<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
+				<processing>
+					<clientCallback module="UserAccount.Callbacks.openDashboard"/>
+				</processing>
+			</action>
+		</actions>
+	</registry_contributions>
+</ajxpdriver>
