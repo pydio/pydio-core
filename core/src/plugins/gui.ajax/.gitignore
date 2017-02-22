@@ -1,6 +1,7 @@
 /res/js/ui/prototype/util/he.js
 res/js/core
 res/js/vendor/nodejs/bundle*
+res/js/vendor/nodejs/boot.prod.js
 res/js/pydio.min.js
 res/js/ui/reactjs/build/
 res/mui/mui-sources
