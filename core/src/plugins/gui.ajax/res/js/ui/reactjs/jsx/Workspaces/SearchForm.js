@@ -391,7 +391,7 @@ let SearchForm = React.createClass({
     componentDidUpdate: function(){
         if(this.refs.results && this.refs.results.refs.list){
             this.refs.results.refs.list.updateInfiniteContainerHeight();
-            bufferCallback('search_results_resize_list', 550, ()=>{
+            FuncUtils.bufferCallback('search_results_resize_list', 550, ()=>{
                 this.refs.results.refs.list.updateInfiniteContainerHeight();
             });
         }

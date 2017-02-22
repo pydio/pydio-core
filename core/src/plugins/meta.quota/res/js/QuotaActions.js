@@ -7,7 +7,7 @@
 
         static computeQuota(manager, args){
 
-            bufferCallback("ajxp_meta_quota_loader", 5, function(){
+            FuncUtils.bufferCallback("ajxp_meta_quota_loader", 5, function(){
                 
                 if(global.ajxp_meta_quota_loading) return;
                 var c = new Connexion();
@@ -18,7 +18,7 @@
                     var action = pydio.getController().getActionByName("monitor_quota");
                     if(!action) return;
                     var data = transport.responseJSON;
-                    pydio.meta_quota_text = roundSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + roundSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
+                    pydio.meta_quota_text = PathUtils.roundFileSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + PathUtils.roundFileSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
                     action.options.text = pydio.meta_quota_text;
                     if($('ajxp_quota_panel_content')){
                         $('ajxp_quota_panel_content').update(pydio.meta_quota_text);
@@ -47,7 +47,7 @@
                         if(newValue){
                             var action = pydio.getController().getActionByName("monitor_quota");
                             if(!action) return;
-                            pydio.meta_quota_text = roundSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + roundSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
+                            pydio.meta_quota_text = PathUtils.roundFileSize(newValue.getAttribute("usage"), MessageHash["byte_unit_symbol"]) + "/" + PathUtils.roundFileSize(newValue.getAttribute("total"), MessageHash["byte_unit_symbol"]);
                             action.options.text = pydio.meta_quota_text;
                             if($('ajxp_quota_panel_content')){
                                 $('ajxp_quota_panel_content').update(pydio.meta_quota_text);

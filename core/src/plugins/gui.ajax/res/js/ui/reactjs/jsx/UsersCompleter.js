@@ -71,7 +71,7 @@
                 callback(null, []);
                 return;
             }
-            bufferCallback('suggestion-loader-users', 400, function(){
+            FuncUtils.bufferCallback('suggestion-loader-users', 400, function(){
                 this.suggestionLoader(input, callback);
             }.bind(this));
         },

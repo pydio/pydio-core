@@ -236,7 +236,7 @@
                                 if(cacheService.hasKey('workspace.info', repoKey)){
                                     render(cacheService.getByKey('workspace.info', repoKey));
                                 }else{
-                                    bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+                                    FuncUtils.bufferCallback("ajxp_load_repo_info_timer", 300,function(){
                                         if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
                                             return;
                                         }

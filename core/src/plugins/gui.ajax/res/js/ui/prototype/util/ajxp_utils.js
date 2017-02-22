@@ -22,20 +22,8 @@ function getBaseName(fileName){
     return PathUtils.getBasename(fileName);
 }
 
-function getRepName(fileName){
-    return PathUtils.getDirname(fileName);
-}
-
-function getAjxpMimeType(item){
-    return PathUtils.getAjxpMimeType(item);
-}
-
 function getFileExtension(fileName){
     return PathUtils.getFileExtension(fileName);
-}
-
-function roundSize(filesize, size_unit){
-    return PathUtils.roundFileSize(filesize, size_unit);
 }
 
 function formatDate(dateObject, format){
@@ -68,64 +56,6 @@ function parseXml(xmlStr){
 
 function base64_encode( data ) {
     return HasherUtils.base64_encode(data);
-}
-
-function slugString(value){
-    return LangUtils.computeStringSlug(value);
-}
-
-function bufferCallback(name, time, callback){
-    if(window[name]){
-        window.clearTimeout(window[name]);
-    }
-    window[name] = window.setTimeout(callback, time);
-}
-
-function getUrlFromBase(){
-    return $$('base')[0].href;
-}
-
-function simpleButton(id, cssClass, messageId, messageTitle, iconSrc, iconSize, hoverClass, callback, skipIconResolution, addArrow){
-	var button = new Element("div", {id:id, className:cssClass});
-	var img = new Element("img", {
-		src:(skipIconResolution?iconSrc:ResourcesManager.resolveImageSource(iconSrc, 'actions/ICON_SIZE', iconSize)),
-		width:iconSize,
-		height:iconSize,
-		title:MessageHash[messageTitle],
-		ajxp_message_title:MessageHash[messageTitle]
-	});
-	button.update(img);
-	if(hoverClass){
-		button.observe("mouseover", function(){button.addClassName(hoverClass);});
-		button.observe("mouseout", function(){button.removeClassName(hoverClass);});
-	}
-	if(callback){
-		button.observe("click", callback);
-	}
-	button.setSrc = function(src){img.src=src;};
-    if(addArrow){
-        button.setStyle({position:'relative'});
-        var arrowImg = new Element('img', {
-            src: ResourcesManager.resolveImageSource('arrow_down.png', ''),
-            width:10,
-            height:6,
-            className:'simple_button_arrow'
-        });
-        button.insert(arrowImg);
-    }
-	return button;
-}
-
-
-function refreshPNGImages(element){
-	if(element.getAttribute('is_image') && element.getAttribute('is_image')=='1'){
-		return element;
-	}
-	var imgs = $(element).getElementsBySelector('img');
-	if(imgs.length) imgs.each(function(img){
-		if(img.original_src) img.src = img.original_src;
-	});
-	return element;
 }
 
 var messageDivOpen = false;

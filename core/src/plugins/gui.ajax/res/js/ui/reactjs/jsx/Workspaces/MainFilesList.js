@@ -227,7 +227,7 @@ let MainFilesList = React.createClass({
                 date.setTime(parseInt(metaData.get(s))*1000);
                 label = PathUtils.formatModifDate(date);
             }else if(s == "ajxp_dirname" && metaData.get("filename")){
-                var dirName = getRepName(metaData.get("filename"));
+                var dirName = PathUtils.getDirname(metaData.get("filename"));
                 label =  dirName?dirName:"/" ;
             }else if(s == "filesize" && metaData.get(s) == "-") {
                 continue;

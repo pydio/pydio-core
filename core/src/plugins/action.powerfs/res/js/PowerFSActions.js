@@ -39,7 +39,7 @@
                         var dir = userSelection.getContextNode().getPath();
                         for(var i=0;i<selected.length;i++){
                             conn.addParameter("file_"+i, selected[i]);
-                            dir = getRepName(selected[i]);
+                            dir = PathUtils.getDirname(selected[i]);
                         }
                         conn.addParameter("dir", dir);
                         conn.onComplete = function(transport){

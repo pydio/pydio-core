@@ -59,7 +59,7 @@ Class.create("InfoPanel", AjxpPane, {
 
 		//this.updateHandler = this.update.bind(this);
         this.updateHandler = function(objectOrEvent){
-            bufferCallback('InfoPanelUpdater', 100, function(){
+            FuncUtils.bufferCallback('InfoPanelUpdater', 100, function(){
                 this.update(objectOrEvent);
             }.bind(this));
         }.bind(this);

@@ -61,7 +61,7 @@
                 callback(null, []);
                 return;
             }
-            bufferCallback('suggestion-loader-search', 350, function(){
+            FuncUtils.bufferCallback('suggestion-loader-search', 350, function(){
                 this.suggestionLoader(input, callback);
             }.bind(this));
         },
@@ -512,7 +512,7 @@
             }
             this._internalState = ws;
             if(!ws){
-                bufferCallback('homeWorkspaceTimer', 7000, function(){
+                FuncUtils.bufferCallback('homeWorkspaceTimer', 7000, function(){
                     this.setState({workspace:null});
                     this.props.onHideLegend();
                 }.bind(this));
@@ -601,7 +601,7 @@
                         <div className="table">
                             <div>
                                 <div>{parseInt(100*data['meta.quota']['usage']/data['meta.quota']['total'])}%</div>
-                                <div className='text-right'><small>{roundSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small></div>
+                                <div className='text-right'><small>{PathUtils.roundFileSize(data['meta.quota']['total'], MessageHash["byte_unit_symbol"])}</small></div>
                             </div>
                         </div>
                     </HomeWorkspaceLegendInfoBlock>
@@ -716,7 +716,7 @@
             $('home_center_panel').removeClassName('legend_visible');
         },
         onHoverLink:function(event, ws){
-            bufferCallback('hoverWorkspaceTimer', 400, function(){
+            FuncUtils.bufferCallback('hoverWorkspaceTimer', 400, function(){
                 if(this.refs && this.refs.legend){
                     this.refs.legend.setWorkspace(ws);
                 }

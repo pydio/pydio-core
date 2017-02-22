@@ -400,7 +400,7 @@
         },
 
         getSuggestions(input, callback){
-            bufferCallback('suggestion-loader-search', 350, function(){
+            FuncUtils.bufferCallback('suggestion-loader-search', 350, function(){
                 this.suggestionLoader(input, callback);
             }.bind(this));
         },

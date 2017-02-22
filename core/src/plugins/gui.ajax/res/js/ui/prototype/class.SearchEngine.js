@@ -397,8 +397,8 @@ Class.create("SearchEngine", AjxpPane, {
 		}.bind(this));
         this._inputBox.observe("input", function(e){
             if(this._inputBox.getValue().length > 2){
-                bufferCallback('searchByTyping', 300, this.searchWhenTyping.bind(this));
-                bufferCallback('fullSearch', 1000, this.searchCompleteTypedResults.bind(this));
+                FuncUtils.bufferCallback('searchByTyping', 300, this.searchWhenTyping.bind(this));
+                FuncUtils.bufferCallback('fullSearch', 1000, this.searchCompleteTypedResults.bind(this));
             }
         }.bind(this));
 

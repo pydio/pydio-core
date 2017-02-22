@@ -68,7 +68,7 @@ Class.create("PixlrEditor", AbstractEditor, {
 		this.setOnLoad(true);
 		this.currentNode = node;
 		var fName = this.currentNode.getPath();
-        this.contentMainContainer.src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=base64encoded:" + base64_encode(fName) + "&parent_url=" + base64_encode(getUrlFromBase());
+        this.contentMainContainer.src = ajxpBootstrap.parameters.get('ajxpServerAccess')+"&get_action=post_to_server&file=base64encoded:" + base64_encode(fName) + "&parent_url=" + base64_encode(DOMUtils.getUrlFromBase());
 		var pe = new PeriodicalExecuter(function(){
 			var href;
 			try{

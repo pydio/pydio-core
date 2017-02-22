@@ -52,5 +52,11 @@ class FuncUtils{
         return context[func];
     }
 
+    static bufferCallback(name, time, callback){
+        if(window[name]){
+            window.clearTimeout(window[name]);
+        }
+        window[name] = window.setTimeout(callback, time);
+    }
 
 }

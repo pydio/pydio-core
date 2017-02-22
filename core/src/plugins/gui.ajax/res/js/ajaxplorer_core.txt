@@ -7,6 +7,7 @@ js/core/util/PathUtils.js
 js/core/util/FuncUtils.js
 js/core/util/HasherUtils.js
 js/core/util/PassUtils.js
+js/core/util/DOMUtils.js
 js/core/util/PeriodicalExecuter.js
 js/core/util/CookiesManager.js
 js/core/model/Router.js

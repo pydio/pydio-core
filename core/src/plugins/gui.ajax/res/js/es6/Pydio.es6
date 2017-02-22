@@ -54,36 +54,6 @@ class Pydio extends Observable{
 
         }
 
-        /*
-        if(window.PydioUI){
-
-
-        }else{
-            // FAKE CLASS
-            this.UI = {
-                guiLoaded: true,
-                modal: {
-                    setLoadingStepCounts: function(){},
-                    refreshDialogAppearance: function(){},
-                    displayMessage: function(){},
-                    initForms: function(){},
-                    updateLoadingProgress:function(progress){
-                        Logger.log(progress);
-                    },
-                    prepareHeader: function(){},
-                    showModalDialog: function(){}
-                },
-                refreshTemplateParts: function(){},
-                initTemplates: function(){},
-                initObjects: function(){},
-                updateI18nTags: function(){},
-                insertForm:function(formId, formCode){},
-                removeForm: function(formId){},
-                mountComponents: function(componentsNodes){}
-            };
-        }
-        */
-
         let modal = this.UI && this.UI.modal ? this.UI.modal : (window.modal ? window.modal : null);
 
         this.observe("registry_loaded", function(){

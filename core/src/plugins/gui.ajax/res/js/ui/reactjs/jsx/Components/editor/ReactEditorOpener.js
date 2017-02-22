@@ -18,7 +18,7 @@ export default React.createClass({
     },
 
     _getEditorData: function(node){
-        var selectedMime = getAjxpMimeType(node);
+        var selectedMime = PathUtils.getAjxpMimeType(node);
         var editors = this.props.registry.findEditorsForMime(selectedMime, false);
         if(editors.length && editors[0].openable){
             return editors[0];

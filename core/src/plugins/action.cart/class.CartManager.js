@@ -77,7 +77,7 @@ Class.create("CartManager", FetchedResultPane, {
 
         // Replace "search" by "search-cart-download"
         delete props['get_action'];
-        if(paneLabel) props["archive_name"] = slugString(paneLabel)+".zip";
+        if(paneLabel) props["archive_name"] = LangUtils.computeStringSlug(paneLabel)+".zip";
 
         var form = $('download_form');
         form.action = window.ajxpServerAccessPath;

@@ -24,7 +24,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 	initialize: function($super, oFormObject, options)
 	{
 		$super(oFormObject, options);
-        window.CKEDITOR_BASEPATH = CKEDITOR.basePath = getUrlFromBase() +"plugins/editor.ckeditor/ckeditor/";
+        window.CKEDITOR_BASEPATH = CKEDITOR.basePath = DOMUtils.getUrlFromBase() +"plugins/editor.ckeditor/ckeditor/";
 
 		this.editorConfig = {
 			resize_enabled:false,
@@ -82,7 +82,7 @@ Class.create("AjxpCkEditor", TextEditor, {
 		this.inputNode = node;
 		var fileName = node.getPath();
 		var textarea;
-        this.editorInstanceId = slugString(node.getPath());
+        this.editorInstanceId = LangUtils.computeStringSlug(node.getPath());
 
 		this.textareaContainer = new Element('div');
 		this.textarea = new Element('textarea');
