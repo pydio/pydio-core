@@ -26,4 +26,12 @@ class DOMUtils {
     static getUrlFromBase(){
         return document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '';
     }
+
+    static getViewportWidth(){
+        return window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    }
+
+    static getViewportHeight(){
+        return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    }
 }

@@ -17,7 +17,6 @@
     <client_settings>
         <resources>
             <js file="plugins/editor.diaporama/res/build/PydioDiaporama.js" className="PydioDiaporama"/>
-            <js file="plugins/editor.diaporama/class.Diaporama.js" className="Diaporama"/>
             <i18n namespace="diaporama" path="plugins/editor.diaporama/i18n"/>
             <css file="plugins/editor.diaporama/rotator.css"/>
         </resources>

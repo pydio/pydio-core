@@ -18,7 +18,18 @@ let AbstractEditor = React.createClass({
 
     render: function(){
 
-        return <div className="vertical_fit vertical_layout">{this.props.children}</div>
+        let actionBar;
+        if(this.props.actions){
+            actionBar = (
+                <MaterialUI.Toolbar>
+                    <MaterialUI.ToolbarGroup>
+                        {this.props.actions}
+                    </MaterialUI.ToolbarGroup>
+                </MaterialUI.Toolbar>
+            );
+        }
+
+        return <div className="vertical_fit vertical_layout">{actionBar}{this.props.children}</div>
 
     }
 

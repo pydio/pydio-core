@@ -500,7 +500,7 @@ let SimpleList = React.createClass({
                 }
             }
         }else{
-            var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            var width = DOMUtils.getViewportWidth();
             if(width < 480) return breaks["max-width:480px"];
             else return breaks["max-width:480px"];
         }
