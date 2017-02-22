@@ -15,31 +15,29 @@
             return mtimeString;
         }
 
-        static loadImageSize(node, callback){
+        static loadImageSize(baseUrl, node, callback){
 
-            if(node.getMetadata().get('image_width')){
+            let loadUrl = baseUrl + SizeComputer.buildRandomSeed(node) + "&file=" + encodeURIComponent(node.getPath());
+            let getDimFromNode = function(n){
                 return {
-                    width:parseInt(node.getMetadata().get('image_width')),
-                    height: parseInt(node.getMetadata().get('image_height'))
+                    width: parseInt(n.getMetadata().get('image_width')),
+                    height: parseInt(n.getMetadata().get('image_height'))
                 };
-            }else{
-                var sizeLoader = document.createElement('image');
-                var tmpThis = this;
-                sizeLoader.onload = function(){
+            };
+
+            DOMUtils.imageLoader(loadUrl, function(){
+                if(!node.getMetadata().has('image_width')){
                     node.getMetadata().set("image_width", this.width);
                     node.getMetadata().set("image_height", this.height);
-                    callback(node, {
-                        width: this.width,
-                        height: this.height
-                    })
-                }.bind(sizeLoader);
-                sizeLoader.onerror = function(){
-                    callback(node, {width:200, height: 200, default:true});
                 }
-                sizeLoader.src = this.baseUrl + SizeComputer.buildRandomSeed(node) + "&file=" + encodeURIComponent(node.getPath());
-                return {width:200, height: 200, default:true};
-            }
-
+                callback(node, getDimFromNode(node))
+            }, function(){
+                let dim = {width:200, height: 200, default:true};
+                if(node.getMetadata().has('image_width')){
+                    let dim = getDimFromNode(node);
+                }
+                callback(node, dim);
+            });
         }
 
         static getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
@@ -182,28 +180,36 @@
             }
         },
 
+        getDefaultProps: function(){
+            let baseURL = pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy';
+            let editorConfigs = pydio.getPluginConfigs('editor.diaporama');
+            return {
+                baseUrl: baseURL,
+                editorConfigs: editorConfigs,
+            }
+        },
+
         getInitialState: function(){
             this.selectionModel = new SelectionModel(this.props.node);
-            let initDimension = SizeComputer.loadImageSize(this.props.node, function(node, dimension){
+
+            SizeComputer.loadImageSize(this.props.baseUrl, this.props.node, function(node, dimension){
                 if(this.state.currentNode === node){
                     this.setState({imageDimension: dimension});
                 }
             }.bind(this));
             return {
-                currentNode: this.selectionModel.current(),
-                imageDimension: initDimension
+                currentNode: this.selectionModel.current()
             };
         },
 
         updateStateNode: function(node){
-            let initDimension = SizeComputer.loadImageSize(node, function(passedNode, dimension){
+            SizeComputer.loadImageSize(this.props.baseUrl, node, function(passedNode, dimension){
                 if(this.state.currentNode === passedNode){
                     this.setState({imageDimension: dimension});
                 }
             }.bind(this));
             this.setState({
-                currentNode: node,
-                imageDimension:initDimension
+                currentNode: node
             });
         },
 
@@ -216,16 +222,18 @@
 
         render: function(){
 
-            let baseURL = pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy';
-            let editorConfigs = pydio.getPluginConfigs('editor.diaporama');
-            let data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
-
-            console.log(data);
+            let baseURL = this.props.baseUrl;
+            let editorConfigs = this.props.editorConfigs;
+            let img;
+            if(this.state.imageDimension){
+                let data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
+                img = <img style={{height:data.height, width:data.width}} src={data.url}/>
+            }
 
             return (
                 <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
                     <div className="vertical_fit" style={{textAlign:'center'}}>
-                        <img style={{height:data.height, width:data.width}} src={data.url}/>
+                        {img}
                     </div>
                 </PydioComponents.AbstractEditor>
             );

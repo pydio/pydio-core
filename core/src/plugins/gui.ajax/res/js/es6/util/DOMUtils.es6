@@ -34,4 +34,11 @@ class DOMUtils {
     static getViewportHeight(){
         return window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
     }
+
+    static imageLoader(imageUrl, onLoad, onError){
+        let loader = document.createElement('img');
+        loader.onload = onLoad.bind(loader);
+        loader.onerror = onError.bind(loader);
+        loader.src = imageUrl;
+    }
 }
