@@ -263,7 +263,9 @@ let SearchForm = React.createClass({
     },
 
     mainFieldQuickSearch: function(event){
-        let current = {basename:event.target.getValue()};
+        let current = {
+            basename:this.refs.main_search_input.getValue()
+        };
         this.setState({
             quickSearch: true,
             formValues: current,
@@ -274,7 +276,9 @@ let SearchForm = React.createClass({
 
     mainFieldEnter: function(event){
         if(event.key !== 'Enter') return;
-        let current = {basename:event.target.getValue()};
+        let current = {
+            basename:this.refs.main_search_input.getValue()
+        };
         this.setState({
             quickSearch: false,
             formValues: current,
@@ -468,6 +472,7 @@ let SearchForm = React.createClass({
                         <span className="panel-header-close mdi mdi-close" onClick={()=>{this.setState({display:'closed'});}}></span>
                     </div>
                     <ReactMUI.TextField
+                        ref="main_search_input"
                         onFocus={this.focused}
                         onBlur={this.blurred}
                         hintText="Search..."

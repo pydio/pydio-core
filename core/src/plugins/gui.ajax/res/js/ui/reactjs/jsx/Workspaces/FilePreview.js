@@ -72,9 +72,9 @@ let FilePreview = React.createClass({
 
     loadPreviewFromEditor: function(editorClass, node){
 
-        if(editorClass.getCoveringBackgroundSource || editorClass.prototype.getCoveringBackgroundSource){
+        if(editorClass.getCoveringBackgroundSource){
             let image = new Image();
-            let bgUrl = editorClass.getCoveringBackgroundSource ? editorClass.getCoveringBackgroundSource(node) : editorClass.prototype.getCoveringBackgroundSource(node);
+            let bgUrl = editorClass.getCoveringBackgroundSource(node);
 
             let loader = function(){
                 if(!this.isMounted) return;
@@ -96,12 +96,8 @@ let FilePreview = React.createClass({
             }else{
                 image.onload = loader();
             }
-        }else if(this.props.richPreview){
-            if(editorClass.getPreviewComponent){
-                this.setState({element: editorClass.getPreviewComponent(node, true)});
-            }else{
-                this.insertPreviewNode(editorClass.prototype.getPreview(node, true));
-            }
+        }else if(this.props.richPreview && editorClass.getPreviewComponent){
+            this.setState({element: editorClass.getPreviewComponent(node, true)});
         }
 
     },
