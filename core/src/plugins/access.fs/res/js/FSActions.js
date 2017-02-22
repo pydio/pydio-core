@@ -813,10 +813,10 @@
             if(editors.length){
                 var index = 0;
                 var sepAdded = false;
-                editors.each(function(el){
+                editors.forEach(function(el){
                     if(!el.openable) return;
                     if(el.write && nodeHasReadonly) return;
-                    if(el.mimes.include('*')){
+                    if(el.mimes.indexOf('*') > -1){
                         if(!sepAdded && index > 0){
                             builderMenuItems.push({separator:true});
                         }

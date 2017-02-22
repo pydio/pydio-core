@@ -105,7 +105,8 @@ class ResourcesManager{
 		}
 		if(this.resources.forms){
 			this.resources.forms.forEach(function(value,key){
-				this.loadGuiForm(key, value);
+                // REMOVED
+				//this.loadGuiForm(key, value);
 			}.bind(this) );
 		}
         if(this.resources.js){
@@ -207,19 +208,7 @@ class ResourcesManager{
             cssNode.media = 'screen';
             head.appendChild(cssNode);
         }
-        
-	}
-	/**
-	 * Insert the HTML snipper and evaluate scripts
-	 * @param formId String
-	 * @param htmlSnippet String
-	 */
-	loadGuiForm(formId, htmlSnippet){
-		if(!$(this.mainFormContainerId).select('[id="'+formId+'"]').length){
-            // TODO - PROTOTYPE STUFF
-			htmlSnippet.evalScripts();
-			$(this.mainFormContainerId).insert(htmlSnippet.stripScripts());
-		}
+
 	}
 	/**
 	 * Load the resources from XML

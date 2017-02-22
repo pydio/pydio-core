@@ -96,7 +96,7 @@ function threeSixtyLoaded(){
 
 
 window.SM2_DEFER = true;
-if(!$$("html")[0].hasClassName("no-canvas") && !window.soundManager){
+if(document.getElementsByTagName("html")[0].className.indexOf("no-canvas") === -1 && !window.soundManager){
 
     var conn = new Connexion();
     conn._libUrl = (ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+'plugins/editor.soundmanager/sm/';
