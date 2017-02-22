@@ -180,69 +180,6 @@
         }
     });
 
-    var FoldersTree = React.createClass({
-
-        propTypes: {
-            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
-            dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
-            className: React.PropTypes.string,
-            onNodeSelected: React.PropTypes.func
-        },
-
-        nodeObserver: function(){
-            let r = this.props.dataModel.getRootNode();
-            if(!r.isLoaded()) {
-                r.observeOnce("loaded", function(){
-                    this.forceUpdate();
-                }.bind(this));
-            }else{
-                this.forceUpdate();
-            }
-        },
-
-        componentDidMount: function(){
-            let dm = this.props.dataModel;
-            this._dmObs = this.nodeObserver;
-            dm.observe("context_changed", this._dmObs);
-            dm.observe("root_node_changed", this._dmObs);
-            this.nodeObserver();
-        },
-
-        componentWillUnmount: function(){
-            if(this._dmObs){
-                let dm = this.props.dataModel;
-                dm.stopObserving("context_changed", this._dmObs);
-                dm.stopObserving("root_node_changed", this._dmObs);
-            }
-        },
-
-        treeNodeSelected: function(n){
-            if(this.props.onNodeSelected){
-                this.props.onNodeSelected(n);
-            }else{
-                this.props.pydio.goTo(n);
-            }
-        },
-
-        nodeIsSelected: function(n){
-            return n === this.props.dataModel.getContextNode();
-        },
-
-        render: function(){
-            return (
-                <PydioComponents.SimpleTree
-                    onNodeSelect={this.treeNodeSelected}
-                    nodeIsSelected={this.nodeIsSelected}
-                    dataModel={this.props.dataModel}
-                    node={this.props.dataModel.getRootNode()}
-                    showRoot={this.props.showRoot ? true : false}
-                    className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
-                />
-            );
-        }
-
-    });
-
     var UserWidget = React.createClass({
 
         applyAction: function(actionName){
@@ -846,10 +783,11 @@
                 return (
                     <div>
                         {wsBlock}
-                        <FoldersTree
+                        <PydioComponents.FoldersTree
                             pydio={this.props.pydio}
                             dataModel={this.props.pydio.getContextHolder()}
                             className={this.state.openFoldersTree?"open":"closed"}
+                            draggable={true}
                         />
                     </div>
                 )
@@ -929,7 +867,6 @@
         ns.Panel = LeftPanel;
         ns.PinnedLeftPanel = PinnedLeftPanel;
     }
-    ns.FoldersTree = FoldersTree;
     ns.UserWorkspacesList = UserWorkspacesList;
     global.LeftNavigation=ns;
 

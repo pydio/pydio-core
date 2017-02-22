@@ -185,26 +185,8 @@ var SimpleTreeNode = React.createClass({
         }
 
         var children = [];
-        if(this.state.showChildren || this.props.forceExpand){
-            children = this.state.children.map(function(child) {
-                return (<DragDropTreeNode
-                    childrenOnly={false}
-                    forceExpand={this.props.forceExpand}
-                    key={child.getPath()}
-                    dataModel={this.props.dataModel}
-                    node={child}
-                    onNodeSelect={this.props.onNodeSelect}
-                    nodeIsSelected={this.props.nodeIsSelected}
-                    collapse={this.props.collapse}
-                    depth={this.props.depth+1}
-                    checkboxes={this.props.checkboxes}
-                    checkboxesValues={this.props.checkboxesValues}
-                    checkboxesComputeStatus={this.props.checkboxesComputeStatus}
-                    onCheckboxCheck={this.props.onCheckboxCheck}
-                />);
-            }.bind(this));
-        }
         let connector = (instance) => instance;
+        let draggable = false;
         if(window.ReactDND && this.props.connectDropTarget && this.props.connectDragSource){
             let connectDragSource = this.props.connectDragSource;
             let connectDropTarget = this.props.connectDropTarget;
@@ -212,6 +194,28 @@ var SimpleTreeNode = React.createClass({
                 connectDragSource(ReactDOM.findDOMNode(instance));
                 connectDropTarget(ReactDOM.findDOMNode(instance));
             };
+            draggable = true;
+        }
+
+        if(this.state.showChildren || this.props.forceExpand){
+            children = this.state.children.map(function(child) {
+                const props = {
+                    childrenOnly:false,
+                    forceExpand:this.props.forceExpand,
+                    key:child.getPath(),
+                    dataModel:this.props.dataModel,
+                    node:child,
+                    onNodeSelect: this.props.onNodeSelect,
+                    nodeIsSelected: this.props.nodeIsSelected,
+                    collapse: this.props.collapse,
+                    depth:this.props.depth+1,
+                    checkboxes:this.props.checkboxes,
+                    checkboxesValues:this.props.checkboxesValues,
+                    checkboxesComputeStatus:this.props.checkboxesComputeStatus,
+                    onCheckboxCheck:this.props.onCheckboxCheck
+                };
+                return React.createElement(draggable?DragDropTreeNode:SimpleTreeNode, props);
+            }.bind(this));
         }
         return (
             <li ref={connector} className={"treenode" + this.props.node.getPath().replace(/\//g, '_')}>
@@ -240,7 +244,7 @@ if(window.ReactDND){
 /**
  * Simple openable / loadable tree taking AjxpNode as inputs
  */
-export default React.createClass({
+let DNDTreeView = React.createClass({
 
     propTypes:{
         showRoot:React.PropTypes.bool,
@@ -298,3 +302,142 @@ export default React.createClass({
     }
 });
 
+let TreeView = React.createClass({
+
+    propTypes:{
+        showRoot:React.PropTypes.bool,
+        rootLabel:React.PropTypes.string,
+        onNodeSelect:React.PropTypes.func,
+        node:React.PropTypes.instanceOf(AjxpNode).isRequired,
+        dataModel:React.PropTypes.instanceOf(PydioDataModel).isRequired,
+        selectable:React.PropTypes.bool,
+        selectableMultiple:React.PropTypes.bool,
+        initialSelectionModel:React.PropTypes.array,
+        onSelectionChange:React.PropTypes.func,
+        forceExpand:React.PropTypes.bool,
+        // Optional currently selected detection
+        nodeIsSelected: React.PropTypes.func,
+        // Optional checkboxes
+        checkboxes:React.PropTypes.array,
+        checkboxesValues:React.PropTypes.object,
+        checkboxesComputeStatus:React.PropTypes.func,
+        onCheckboxCheck:React.PropTypes.func
+    },
+
+    getDefaultProps:function(){
+        return {
+            showRoot:true,
+            onNodeSelect: this.onNodeSelect
+        }
+    },
+
+    onNodeSelect: function(node){
+        if(this.props.onNodeSelect){
+            this.props.onNodeSelect(node);
+        }else{
+            this.props.dataModel.setSelectedNodes([node]);
+        }
+    },
+
+    render: function(){
+        return(
+            <ul className={this.props.className}>
+                <SimpleTreeNode
+                    childrenOnly={!this.props.showRoot}
+                    forceExpand={this.props.forceExpand}
+                    node={this.props.node?this.props.node:this.props.dataModel.getRootNode()}
+                    dataModel={this.props.dataModel}
+                    onNodeSelect={this.onNodeSelect}
+                    nodeIsSelected={this.props.nodeIsSelected}
+                    forceLabel={this.props.rootLabel}
+                    checkboxes={this.props.checkboxes}
+                    checkboxesValues={this.props.checkboxesValues}
+                    checkboxesComputeStatus={this.props.checkboxesComputeStatus}
+                    onCheckboxCheck={this.props.onCheckboxCheck}
+                />
+            </ul>
+        )
+    }
+
+});
+
+let FoldersTree = React.createClass({
+
+    propTypes: {
+        pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+        dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
+        className: React.PropTypes.string,
+        onNodeSelected: React.PropTypes.func,
+        draggable:React.PropTypes.bool
+    },
+
+    nodeObserver: function(){
+        let r = this.props.dataModel.getRootNode();
+        if(!r.isLoaded()) {
+            r.observeOnce("loaded", function(){
+                this.forceUpdate();
+            }.bind(this));
+        }else{
+            this.forceUpdate();
+        }
+    },
+
+    componentDidMount: function(){
+        let dm = this.props.dataModel;
+        this._dmObs = this.nodeObserver;
+        dm.observe("context_changed", this._dmObs);
+        dm.observe("root_node_changed", this._dmObs);
+        this.nodeObserver();
+    },
+
+    componentWillUnmount: function(){
+        if(this._dmObs){
+            let dm = this.props.dataModel;
+            dm.stopObserving("context_changed", this._dmObs);
+            dm.stopObserving("root_node_changed", this._dmObs);
+        }
+    },
+
+    treeNodeSelected: function(n){
+        if(this.props.onNodeSelected){
+            this.props.onNodeSelected(n);
+        }else{
+            this.props.pydio.goTo(n);
+        }
+    },
+
+    nodeIsSelected: function(n){
+        return n === this.props.dataModel.getContextNode();
+    },
+
+    render: function(){
+        if(this.props.draggable){
+            return (
+                <PydioComponents.DNDTreeView
+                    onNodeSelect={this.treeNodeSelected}
+                    nodeIsSelected={this.nodeIsSelected}
+                    dataModel={this.props.dataModel}
+                    node={this.props.dataModel.getRootNode()}
+                    showRoot={this.props.showRoot ? true : false}
+                    className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
+                />
+            );
+        }else{
+            return (
+                <PydioComponents.TreeView
+                    onNodeSelect={this.treeNodeSelected}
+                    nodeIsSelected={this.nodeIsSelected}
+                    dataModel={this.props.dataModel}
+                    node={this.props.dataModel.getRootNode()}
+                    showRoot={this.props.showRoot ? true : false}
+                    className={"folders-tree" + (this.props.className ? ' '+this.props.className : '')}
+                />
+            );
+        }
+    }
+
+});
+
+
+
+export {TreeView, DNDTreeView, FoldersTree}

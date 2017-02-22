@@ -1042,11 +1042,12 @@
                 <div>
                     {wsSelector}
                     <MaterialUI.Paper zDepth={1} style={{height: 300, overflowX:'auto'}}>
-                        <LeftNavigation.FoldersTree
+                        <PydioComponents.FoldersTree
                             pydio={pydio}
                             dataModel={this.state.dataModel}
                             onNodeSelected={this.onNodeSelected}
                             showRoot={true}
+                            draggable={false}
                         />
                     </MaterialUI.Paper>
                     <div style={{display:'flex',alignItems:'baseline'}}>

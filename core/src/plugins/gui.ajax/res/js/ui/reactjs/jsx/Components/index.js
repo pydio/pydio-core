@@ -4,7 +4,7 @@ import NodeListCustomProvider from './list/NodeListCustomProvider'
 import {ListEntry} from './list/ListEntry'
 import ListPaginator from './list/ListPaginator'
 
-import SimpleTree from './SimpleTree'
+import {TreeView, DNDTreeView, FoldersTree} from './TreeView'
 
 import LabelWithTip from './LabelWithTip'
 import SimpleFigureBadge from './SimpleFigureBadge'
@@ -22,7 +22,9 @@ window.PydioComponents = {
     ListEntry               : ListEntry,
     ListPaginator           : ListPaginator,
 
-    SimpleTree              : SimpleTree,
+    TreeView                : TreeView,
+    DNDTreeView             : DNDTreeView,
+    FoldersTree             : FoldersTree,
 
     LabelWithTip            : LabelWithTip,
     SimpleFigureBadge       : SimpleFigureBadge,

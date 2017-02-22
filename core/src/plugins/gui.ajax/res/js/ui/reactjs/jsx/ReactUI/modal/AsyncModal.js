@@ -10,10 +10,8 @@ export default React.createClass({
         return {
             async:true,
             componentData:null,
-            actions:[
-                { text: 'Cancel', ref: 'cancel' },
-                { text: 'Submit', ref: 'submit' }
-            ],
+            open: !!this.props.open,
+            actions:[],
             title:null
         }
     },
@@ -24,7 +22,8 @@ export default React.createClass({
             componentData:componentData,
             async:true,
             actions:[],
-            title:null
+            title:null,
+            open: !!nextProps.open
         };
         if(componentData && (!componentData instanceof Object || !componentData['namespace'])){
             state['async'] = false;
@@ -37,11 +36,11 @@ export default React.createClass({
     },
 
     show: function(){
-        if(this.refs.dialog) this.refs.dialog.show();
+        this.setState({open: true});
     },
 
     hide:function(){
-        this.refs.dialog.dismiss();
+        this.setState({open: false});
     },
 
     onActionsUpdate:function(component){
@@ -113,12 +112,6 @@ export default React.createClass({
         }
     },
 
-    componentDidUpdate(){
-        if(this.props.open){
-            this.refs.dialog.show();
-        }
-    },
-
     render: function(){
         var modalContent;
         if(this.state.componentData){
@@ -142,18 +135,17 @@ export default React.createClass({
             }
         }
         return (
-            <ReactMUI.Dialog
+            <MaterialUI.Dialog
                 ref="dialog"
                 title={this.state.title}
                 actions={this.state.actions}
                 modal={this.state.modal}
                 className={this.state.className}
-                dismissOnClickAway={true}
-                open={this.props.open}
-                onShow={this.props.onShow}
-                onDismiss={this.props.onDismiss}
+                open={this.state.open}
+                onRequestClose={this.hide}
                 contentClassName={this.state.className}
-            >{modalContent}</ReactMUI.Dialog>
+                repositionOnUpdate={true}
+            >{modalContent}</MaterialUI.Dialog>
         );
     }
 
