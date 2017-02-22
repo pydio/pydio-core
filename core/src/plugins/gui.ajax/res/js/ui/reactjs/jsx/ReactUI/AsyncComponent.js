@@ -21,18 +21,18 @@ const AsyncComponent = React.createClass({
         }.bind(this));
     },
 
-    componentDidMount: function(){
+    componentDidMount: function() {
         this._asyncLoad();
     },
 
-    componentWillReceiveProps:function(newProps){
+    componentWillReceiveProps:function(newProps) {
         if(this.props.namespace != newProps.namespace){
             this.loadFired = false;
             this.setState({loaded:false});
         }
     },
 
-    componentDidUpdate:function(){
+    componentDidUpdate:function() {
         if(!this.state.loaded){
             this._asyncLoad();
         }else{
@@ -43,16 +43,16 @@ const AsyncComponent = React.createClass({
         }
     },
 
-    getInitialState: function(){
+    getInitialState: function() {
         return {loaded: false};
     },
 
-    getComponent:function(){
+    getComponent:function() {
         return (this.refs.component ? this.refs.component : null);
     },
 
-    render: function(){
-        if(this.state && this.state.loaded){
+    render: function() {
+        if(this.state && this.state.loaded) {
             var nsObject = window[this.props.namespace];
             if(nsObject && nsObject[this.props.componentName]){
                 var props = LangUtils.simpleCopy(this.props);
@@ -68,8 +68,6 @@ const AsyncComponent = React.createClass({
             return <div>Loading ...</div>;
         }
     }
-
 });
-
 
 export {AsyncComponent as default}

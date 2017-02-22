@@ -5,10 +5,13 @@ export default {
     isModal: function(){
         return this.props.dialogIsModal || false;
     },
-    dismiss: function(){
-        this.props.dismiss();
+    dismiss: function() {
+        return this.props.onDismiss()
     },
-    getDialogClassName: function(){
-        return this.props.dialogClassName || 'dialog-max-420';
+    getSize: function() {
+        return this.props.dialogSize || 'md'
+    },
+    getPadding: function() {
+        return typeof this.props.dialogPadding !== "undefined" ? this.props.dialogPadding : true
     }
 };

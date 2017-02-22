@@ -3,7 +3,6 @@ import Breadcrumb from './Breadcrumb'
 import SearchForm from './SearchForm'
 import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
-import Modal from './Modal'
 import InfoPanel from './detailpanes/InfoPanel'
 
 let FSTemplate = React.createClass({

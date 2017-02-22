@@ -129,8 +129,8 @@
 
         attachClipboard: function(){
             this.detachClipboard();
-            if(this.refs['copy-button']){
-                this._clip = new Clipboard(this.refs['copy-button'].getDOMNode(), {
+            if(this.refs['copy-button']) {
+                this._clip = new Clipboard(ReactDOM.findDOMNode(this.refs['copy-button']), {
                     text: function(trigger) {
                         return this.props.url;
                     }.bind(this)
@@ -303,7 +303,7 @@
     });
 
     let Dashboard = React.createClass({
-        
+
         render: function(){
 
             return (
@@ -319,7 +319,7 @@
                 </MaterialUI.MuiThemeProvider>
             );
         }
-        
+
     });
 
     let ModalDashboard = React.createClass({
@@ -332,8 +332,9 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: '',
-                dialogClassName: 'dialog-large dialog-no-padding',
-                dialogIsModal: false
+                dialogSize: 'lg',
+                dialogPadding: false,
+                dialogIsModal: true
             };
         },
 
@@ -361,11 +362,9 @@
     class Callbacks {
 
         static openDashboard(){
-
             ResourcesManager.loadClassesAndApply(['PydioForm'], function(){
                 global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
             });
-
         }
 
         static delete(){

@@ -10,11 +10,11 @@ let Modal = React.createClass({
         this.props.pydio.UI.unregisterModalOpener();
     },
 
-    open:function(namespace, component, props){
+    open:function(namespace, component, props) {
         this.setState({
             open: true,
             modalData:{
-                namespace:namespace,
+                namespace: namespace,
                 compName: component,
                 payload: props
             }
@@ -25,7 +25,11 @@ let Modal = React.createClass({
         return {open: false};
     },
 
-    handleClose: function(){
+    handleLoad: function() {
+        this.setState({open: true})
+    },
+
+    handleClose: function() {
         this.setState({open: false});
     },
 
@@ -36,13 +40,12 @@ let Modal = React.createClass({
                     ref="modal"
                     open={this.state.open}
                     componentData={this.state.modalData}
+                    onLoad={this.handleLoad}
                     onDismiss={this.handleClose}
                 />
             </MaterialUI.MuiThemeProvider>
-
         );
     }
-
 });
 
 export {Modal as default}
