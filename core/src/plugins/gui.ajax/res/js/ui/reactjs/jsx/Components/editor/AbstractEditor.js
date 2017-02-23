@@ -21,11 +21,7 @@ let AbstractEditor = React.createClass({
         let actionBar;
         if(this.props.actions){
             actionBar = (
-                <MaterialUI.Toolbar>
-                    <MaterialUI.ToolbarGroup>
-                        {this.props.actions}
-                    </MaterialUI.ToolbarGroup>
-                </MaterialUI.Toolbar>
+                <MaterialUI.Toolbar>{this.props.actions}</MaterialUI.Toolbar>
             );
         }
 

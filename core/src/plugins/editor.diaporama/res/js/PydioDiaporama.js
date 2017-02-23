@@ -113,6 +113,10 @@
             }
         }
 
+        length(){
+            return this.selection.length;
+        }
+
         hasNext(){
             return this.currentIndex < this.selection.length - 1;
         }
@@ -139,6 +143,12 @@
             return this.current();
         }
 
+        nextOrFirst(){
+            if(this.hasNext()) this.currentIndex ++;
+            else this.currentIndex = 0;
+            return this.current();
+        }
+
     }
 
     const IMAGE_PANEL_MARGIN = 10;
@@ -147,9 +157,12 @@
 
         propTypes: {
             url: React.PropTypes.string,
-            width:React.PropTypes.int,
-            height:React.PropTypes.int,
-            fit:React.PropTypes.bool
+            width:React.PropTypes.number,
+            height:React.PropTypes.number,
+            imageClassName:React.PropTypes.string,
+
+            fit:React.PropTypes.bool,
+            zoomFactor:React.PropTypes.number
         },
 
         getInitialState: function(){
@@ -180,9 +193,14 @@
             let h = this.refs.container.clientHeight - 2 * IMAGE_PANEL_MARGIN;
             let imgW = props.width;
             let imgH = props.height;
+            if((imgW === -1 && imgH === -1) || h < 0 || w < 0){
+                this.setState({width: null,height: '98%'});
+                return;
+            }
             let newW, newH = imgH;
             if((imgW < w && imgH < h) || !this.props.fit){
-                this.setState({width: imgW,height: imgH});
+                let zoomFactor = this.props.zoomFactor || 1;
+                this.setState({width: imgW * zoomFactor,height: imgH * zoomFactor});
                 return;
             }
             if(imgW >= w){
@@ -196,9 +214,16 @@
 
         render: function(){
             if(!this.props.url) return null;
+            const style={
+                boxShadow: DOMUtils.getBoxShadowDepth(1),
+                height:this.state.height,
+                width:this.state.width,
+                margin:IMAGE_PANEL_MARGIN,
+                transition:DOMUtils.getBeziersTransition()
+            };
             return (
                 <div ref="container" className="vertical_fit" style={{textAlign:'center', overflow:(!this.props.fit?'auto':null)}}>
-                    <img style={{height:this.state.height, width:this.state.width, margin:IMAGE_PANEL_MARGIN, transition:DOMUtils.getBeziersTransition()}} src={this.props.url}/>
+                    <img className={this.props.imageClassName} style={style} src={this.props.url}/>
                 </div>
             );
         }
@@ -228,6 +253,17 @@
 
             getOriginalSource : function(ajxpNode) {
                 return pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy'+Editor.buildRandomSeed(ajxpNode)+'&file='+encodeURIComponent(ajxpNode.getPath());
+            },
+
+            getSharedPreviewTemplate : function(node, link){
+                return <img src={link}/>;
+            },
+
+            getRESTPreviewLinks:function(node){
+                return {
+                    "Original image": "",
+                    "Thumbnail (200px)": "&get_thumb=true&dimension=200"
+                };
             },
 
             buildRandomSeed : function(ajxpNode){
@@ -261,7 +297,9 @@
             }.bind(this));
             return {
                 currentNode: this.selectionModel.current(),
-                displayOriginal: false
+                displayOriginal: false,
+                fitToScreen:true,
+                zoomFactor: 1
             };
         },
 
@@ -279,11 +317,60 @@
             });
         },
 
+        onSliderChange: function(event, newValue){
+            this.setState({zoomFactor:newValue});
+        },
+
+        play: function(){
+            this.pe = new PeriodicalExecuter(function(){
+                this.updateStateNode(this.selectionModel.nextOrFirst());
+            }.bind(this), 3);
+            this.setState({playing:true});
+        },
+
+        stop: function(){
+            if(this.pe) {
+                this.pe.stop();
+            }
+            this.setState({playing:false});
+        },
+
         buildActions: function(){
             let actions = [];
-            actions.push(<MaterialUI.FlatButton label="Previous" disabled={!this.selectionModel.hasPrevious()} onClick={()=>{this.updateStateNode(this.selectionModel.previous())}}/>);
-            actions.push(<MaterialUI.FlatButton label="Next" disabled={!this.selectionModel.hasNext()} onClick={()=>{this.updateStateNode(this.selectionModel.next())}}/>);
-            actions.push(<MaterialUI.FlatButton label="Toggle Mode" onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
+            if(this.selectionModel.length()){
+                actions.push(
+                    <MaterialUI.ToolbarGroup
+                        firstChild={true}
+                        key="left"
+                    >
+                        <MaterialUI.FlatButton label="Previous" disabled={!this.selectionModel.hasPrevious()} onClick={()=>{this.updateStateNode(this.selectionModel.previous())}}/>
+                        <MaterialUI.FlatButton label={this.state.playing?'Stop':'Play'} onClick={()=>{this.state.playing?this.stop():this.play()}}/>
+                        <MaterialUI.FlatButton label="Next" disabled={!this.selectionModel.hasNext()} onClick={()=>{this.updateStateNode(this.selectionModel.next())}}/>
+                    </MaterialUI.ToolbarGroup>
+                );
+            }
+
+            let rightActions = [];
+            rightActions.push(<MaterialUI.FlatButton key="resolution" label={this.state.displayOriginal?"Low Resolution":"Hi Resolution"} onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
+            rightActions.push(<MaterialUI.ToolbarSeparator key="separator"/>);
+
+            if(this.state.fitToScreen){
+                rightActions.push(<MaterialUI.FlatButton key="fit" label="Manual Zoom" onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+            }else{
+                rightActions.push(<MaterialUI.FlatButton key="fit" label="Fit to Screen" onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+                rightActions.push(
+                    <div key="zoom" style={{display:'flex', height:56}}>
+                        <MaterialUI.Slider style={{width:150, marginTop:-4}} min={0.25} max={4} defaultValue={1} value={this.state.zoomFactor} onChange={this.onSliderChange}/>
+                        <span style={{padding:18,fontSize: 16}}>{Math.round(this.state.zoomFactor * 100)} %</span>
+                    </div>
+                );
+            }
+
+            actions.push(
+                <MaterialUI.ToolbarGroup key="right" lastChild={true}>
+                    {rightActions}
+                </MaterialUI.ToolbarGroup>
+            );
             return actions;
         },
 
@@ -291,19 +378,27 @@
 
             let baseURL = this.props.baseUrl;
             let editorConfigs = this.props.editorConfigs;
-            let img;
-            let data = {};
+            let data = {}, imgClassName;
+            let dimension = {width: -1, height: -1};
             if(this.state.imageDimension){
-                if(this.state.displayOriginal){
-                    data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
-                }else{
-                    data = SizeComputer.getLowResUrl(baseURL, editorConfigs, this.state.currentNode, this.state.imageDimension, '');
+                dimension = this.state.imageDimension;
+            }
+            if(this.state.displayOriginal){
+                data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, dimension, '');
+                if(this.state.currentNode.getMetadata().get("image_exif_orientation")){
+                    data['imageClassName'] = 'ort-rotate-' + this.state.currentNode.getMetadata().get("image_exif_orientation");
                 }
+            }else{
+                data = SizeComputer.getLowResUrl(baseURL, editorConfigs, this.state.currentNode, dimension, '');
             }
 
             return (
                 <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
-                    <ImagePanel {...data} fit={!this.state.displayOriginal}/>
+                    <ImagePanel
+                        {...data}
+                        fit={this.state.fitToScreen}
+                        zoomFactor={this.state.zoomFactor}
+                    />
                 </PydioComponents.AbstractEditor>
             );
         }

@@ -27,6 +27,10 @@ class DOMUtils {
         return 'all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms';
     }
 
+    static getBoxShadowDepth(depth = 1){
+        return '0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23)';
+    }
+
     static getUrlFromBase(){
         return document.getElementsByTagName('base').length ? document.getElementsByTagName('base')[0].href : '';
     }

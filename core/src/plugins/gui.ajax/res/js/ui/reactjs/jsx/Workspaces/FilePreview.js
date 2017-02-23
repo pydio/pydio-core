@@ -63,7 +63,7 @@ let FilePreview = React.createClass({
         let editorClassName = editors[0].editorClass;
         pydio.Registry.loadEditorResources(editors[0].resourcesManager, function(){
             let component = FuncUtils.getFunctionByName(editorClassName, global);
-            if(component){
+            if(component && this.isMounted()){
                 this.loadPreviewFromEditor(component, node);
             }
         }.bind(this));
@@ -77,7 +77,7 @@ let FilePreview = React.createClass({
             let bgUrl = editorClass.getCoveringBackgroundSource(node);
 
             let loader = function(){
-                if(!this.isMounted) return;
+                if(!this.isMounted()) return;
                 bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
                 let style = {
                     backgroundImage:'url(' + bgUrl + ')',
