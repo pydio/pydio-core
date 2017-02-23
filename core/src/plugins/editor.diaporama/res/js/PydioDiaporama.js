@@ -234,7 +234,8 @@
     let Editor = React.createClass({
 
         propTypes:{
-            node: React.PropTypes.instanceOf(AjxpNode)
+            node: React.PropTypes.instanceOf(AjxpNode),
+            pydio:React.PropTypes.instanceOf(Pydio)
         },
 
         statics:{
@@ -337,27 +338,29 @@
 
         buildActions: function(){
             let actions = [];
+            let mess = this.props.pydio.MessageHash;
             if(this.selectionModel.length()){
+
                 actions.push(
                     <MaterialUI.ToolbarGroup
                         firstChild={true}
                         key="left"
                     >
-                        <MaterialUI.FlatButton label="Previous" disabled={!this.selectionModel.hasPrevious()} onClick={()=>{this.updateStateNode(this.selectionModel.previous())}}/>
-                        <MaterialUI.FlatButton label={this.state.playing?'Stop':'Play'} onClick={()=>{this.state.playing?this.stop():this.play()}}/>
-                        <MaterialUI.FlatButton label="Next" disabled={!this.selectionModel.hasNext()} onClick={()=>{this.updateStateNode(this.selectionModel.next())}}/>
+                        <MaterialUI.FlatButton label={mess[178]} disabled={!this.selectionModel.hasPrevious()} onClick={()=>{this.updateStateNode(this.selectionModel.previous())}}/>
+                        <MaterialUI.FlatButton label={this.state.playing?mess[232]:mess[230]} onClick={()=>{this.state.playing?this.stop():this.play()}}/>
+                        <MaterialUI.FlatButton label={mess[179]} disabled={!this.selectionModel.hasNext()} onClick={()=>{this.updateStateNode(this.selectionModel.next())}}/>
                     </MaterialUI.ToolbarGroup>
                 );
             }
 
             let rightActions = [];
-            rightActions.push(<MaterialUI.FlatButton key="resolution" label={this.state.displayOriginal?"Low Resolution":"Hi Resolution"} onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
+            rightActions.push(<MaterialUI.FlatButton key="resolution" label={this.state.displayOriginal?mess[526]:mess[525]} onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
             rightActions.push(<MaterialUI.ToolbarSeparator key="separator"/>);
 
             if(this.state.fitToScreen){
-                rightActions.push(<MaterialUI.FlatButton key="fit" label="Manual Zoom" onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[326]} onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
             }else{
-                rightActions.push(<MaterialUI.FlatButton key="fit" label="Fit to Screen" onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[325]} onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
                 rightActions.push(
                     <div key="zoom" style={{display:'flex', height:56}}>
                         <MaterialUI.Slider style={{width:150, marginTop:-4}} min={0.25} max={4} defaultValue={1} value={this.state.zoomFactor} onChange={this.onSliderChange}/>
