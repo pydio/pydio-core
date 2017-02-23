@@ -34,14 +34,25 @@
             });
         },
 
-        openGpsLocator: function(){
-            console.log(this.state.gpsData);
+        toggleGpsLocator: function(){
+            if(this.state.openMap){
+                this.setState({openMap: false});
+            }else{
+                ResourcesManager.loadClassesAndApply(['OpenLayers', 'PydioMaps'], function(){
+                    this.setState({openMap: true});
+                }.bind(this));
+            }
         },
 
         render:function(){
 
-            let content, actions=null;
-            if(this.state.loaded && !this.state.error){
+            let content, actions=null, error;
+            if(this.state.openMap && global.PydioMaps){
+
+                content = <PydioMaps.OLMap centerNode={this.props.node} onMapLoaded={this.onMapLoaded}/>;
+
+            } else if(this.state.loaded && !this.state.error) {
+
                 const data = this.state.data;
                 let sectionItems = [];
                 for(let section in data){
@@ -61,23 +72,32 @@
                         {sectionItems}
                     </div>
                 );
-                if(this.state.gpsData){
-                    actions = [
-                        <MaterialUI.ToolbarGroup firstChild={true}>
-                            <MaterialUI.FlatButton label="Locate" onClick={this.openGpsLocator}/>
-                        </MaterialUI.ToolbarGroup>
-                    ];
-                }
 
             }else if(this.state.loaded && this.state.error){
-                content = <div>{this.state.error}</div>
+
+                error = <div>{this.state.error}</div>
+
             }else{
+
                 content = <PydioReactUI.Loader/>;
+
             }
 
+            if(this.state.gpsData){
+                actions = [
+                    <MaterialUI.ToolbarGroup firstChild={true}>
+                        <MaterialUI.FlatButton label={this.state.openMap?"Close map":"Locate on a map"} onClick={this.toggleGpsLocator}/>
+                    </MaterialUI.ToolbarGroup>
+                ];
+            }
 
             return (
-                <PydioComponents.AbstractEditor {...this.props} actions={actions}>{content}</PydioComponents.AbstractEditor>
+                <PydioComponents.AbstractEditor
+                    {...this.props}
+                    actions={actions}
+                    errorString={error}>
+                    {content}
+                </PydioComponents.AbstractEditor>
             );
 
         }
