@@ -1,37 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.openlayer" openable="true" mimes="wms_layer,ol_layer" iconClass="icon-map-marker" text="openlayer.1" title="openlayer.1" icon="frame_image.png" className="OLViewer" formId="openlayer_box" label="CONF_MESSAGE[Map viewer]" description="CONF_MESSAGE[Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.openlayer" openable="true" mimes="wms_layer,ol_layer,jpg" iconClass="icon-map-marker" text="openlayer.1" title="openlayer.1"
+        icon="frame_image.png" className="PydioMaps.Viewer" label="CONF_MESSAGE[Map viewer]"
+        description="CONF_MESSAGE[Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <js file="plugins/editor.openlayer/class.OLViewer.js" className="OLViewer"/>
+            <js file="plugins/editor.openlayer/openlayer/OpenLayers.js" className="OpenLayers"/>
+            <js file="plugins/editor.openlayer/res/build/PydioMaps.js" className="PydioMaps" depends="OpenLayers"/>
             <css file="plugins/editor.openlayer/openlayer/theme/default/style.css"/>
-            <i18n namespace="openlayer" path="plugins/editor.openlayer/i18n"/>
+            <i18n namespace="openlayer" path="plugins/editor.openlayer/res/i18n"/>
         </resources>
     </client_settings>
 	<processing>
-		<!-- Hack : use activeCondition as an extension starter, we should enable extensionOnInit instead
-			Cannot use the standard library mechanism for OpenLayer otherwise it cannot find the images and styles.
-		 -->
-        <!--
-		<activeCondition><![CDATA[
-			if(!window.OpenLayers && !window.OpenLayersLoading){
-				window.OpenLayersLoading = true;
-				if(Prototype.Browser.IE) window.originalEvent = window.Event;
-				var script = new Element('script', {
-					src:(ajxpBootstrap.parameters.get('SERVER_PREFIX_URI')?ajxpBootstrap.parameters.get('SERVER_PREFIX_URI'):'')+"plugins/editor.openlayer/openlayer/OpenLayers.js",
-					type:"text/javascript"}
-				);
-				if(Prototype.Browser.IE){
-					script.attachEvent("onreadystatechange", function(){
-						 if(script.readyState == "loaded"){
-						  window.Event = window.originalEvent;
-						 }
-					}, false);
-				}
-				$(document.body).insert(script);
-			}
-			return true;
-		]]></activeCondition>
-		-->
 	</processing>
 	<clientForm id="openlayer_box"><![CDATA[
 		<div id="openlayer_box" action="ol_view" box_width="80%" box_height="90%" box_padding="0">
