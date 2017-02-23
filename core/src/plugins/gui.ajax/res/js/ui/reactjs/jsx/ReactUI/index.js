@@ -9,17 +9,19 @@ import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
 import Modal from './modal/Modal'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
+import Loader from './Loader'
 
 window.PydioReactUI = {
-    Builder             : Builder,
-    TemplateBuilder     : TemplateBuilder,
-    AsyncComponent      : AsyncComponent,
+    Builder                     : Builder,
+    TemplateBuilder             : TemplateBuilder,
+    AsyncComponent              : AsyncComponent,
 
-    AsyncModal              : AsyncModal,
-    ActionDialogMixin       : ActionDialogMixin,
-    CancelButtonProviderMixin : CancelButtonProviderMixin,
-    SubmitButtonProviderMixin : SubmitButtonProviderMixin,
+    AsyncModal                  : AsyncModal,
+    ActionDialogMixin           : ActionDialogMixin,
+    CancelButtonProviderMixin   : CancelButtonProviderMixin,
+    SubmitButtonProviderMixin   : SubmitButtonProviderMixin,
     AbstractDialogModifier      : AbstractDialogModifier,
-    Modal                       : Modal
+    Modal                       : Modal,
+    Loader                      : Loader
 
 };

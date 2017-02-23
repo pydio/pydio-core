@@ -1,8 +1,8 @@
 (function(global){
 
     let pydio = global.pydio;
-    
-    class SizeComputer{
+
+    class UrlProvider{
 
         static buildRandomSeed(ajxpNode){
             var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
@@ -15,32 +15,7 @@
             return mtimeString;
         }
 
-        static loadImageSize(baseUrl, node, callback){
-
-            let loadUrl = baseUrl + SizeComputer.buildRandomSeed(node) + "&file=" + encodeURIComponent(node.getPath());
-            let getDimFromNode = function(n){
-                return {
-                    width: parseInt(n.getMetadata().get('image_width')),
-                    height: parseInt(n.getMetadata().get('image_height'))
-                };
-            };
-
-            DOMUtils.imageLoader(loadUrl, function(){
-                if(!node.getMetadata().has('image_width')){
-                    node.getMetadata().set("image_width", this.width);
-                    node.getMetadata().set("image_height", this.height);
-                }
-                callback(node, getDimFromNode(node))
-            }, function(){
-                let dim = {width:200, height: 200, default:true};
-                if(node.getMetadata().has('image_width')){
-                    let dim = getDimFromNode(node);
-                }
-                callback(node, dim);
-            });
-        }
-
-        static getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
+        getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
 
             var h = parseInt(imageDimensions.height);
             var w = parseInt(imageDimensions.width);
@@ -49,7 +24,7 @@
 
         }
 
-        static getLowResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
+        getLowResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
 
             var h = parseInt(imageDimensions.height);
             var w = parseInt(imageDimensions.width);
@@ -84,14 +59,45 @@
                     height:crtHeight
                 };
             }else{
-                return SizeComputer.getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed);
+                return this.getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed);
             }
         }
+
+
     }
 
-    class SelectionModel{
+    class SizeComputer{
+
+        static loadImageSize(loadUrl, node, callback){
+
+            let getDimFromNode = function(n){
+                return {
+                    width: parseInt(n.getMetadata().get('image_width')),
+                    height: parseInt(n.getMetadata().get('image_height'))
+                };
+            };
+
+            DOMUtils.imageLoader(loadUrl, function(){
+                if(!node.getMetadata().has('image_width')){
+                    node.getMetadata().set("image_width", this.width);
+                    node.getMetadata().set("image_height", this.height);
+                }
+                callback(node, getDimFromNode(node))
+            }, function(){
+                let dim = {width:200, height: 200, default:true};
+                if(node.getMetadata().has('image_width')){
+                    let dim = getDimFromNode(node);
+                }
+                callback(node, dim);
+            });
+        }
+
+    }
+
+    class SelectionModel extends Observable{
 
         constructor(node){
+            super();
             this.currentNode = node;
             this.selection = [];
             this.buildSelection();
@@ -141,6 +147,14 @@
                 this.currentIndex --;
             }
             return this.current();
+        }
+
+        first(){
+            return this.selection[0];
+        }
+
+        last(){
+            return this.selection[this.selection.length -1];
         }
 
         nextOrFirst(){
@@ -234,8 +248,14 @@
     let Editor = React.createClass({
 
         propTypes:{
-            node: React.PropTypes.instanceOf(AjxpNode),
-            pydio:React.PropTypes.instanceOf(Pydio)
+            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
+
+            urlProvider: React.PropTypes.instanceOf(UrlProvider),
+            selectionModel:React.PropTypes.instanceOf(SelectionModel),
+            editorConfigs:React.PropTypes.instanceOf(Map),
+            baseUrl: React.PropTypes.string,
+            showResolutionToggle: React.PropTypes.bool
         },
 
         statics:{
@@ -248,12 +268,12 @@
                 if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){
                     repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
                 }
-                var mtimeString = Editor.buildRandomSeed(ajxpNode);
+                var mtimeString = UrlProvider.buildRandomSeed(ajxpNode);
                 return pydio.Parameters.get('ajxpServerAccess') + repoString + mtimeString + "&get_action=preview_data_proxy&get_thumb=true&file="+encodeURIComponent(ajxpNode.getPath());
             },
 
             getOriginalSource : function(ajxpNode) {
-                return pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy'+Editor.buildRandomSeed(ajxpNode)+'&file='+encodeURIComponent(ajxpNode.getPath());
+                return pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy'+UrlProvider.buildRandomSeed(ajxpNode)+'&file='+encodeURIComponent(ajxpNode.getPath());
             },
 
             getSharedPreviewTemplate : function(node, link){
@@ -265,17 +285,6 @@
                     "Original image": "",
                     "Thumbnail (200px)": "&get_thumb=true&dimension=200"
                 };
-            },
-
-            buildRandomSeed : function(ajxpNode){
-                var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
-                if(ajxpNode.getParent()){
-                    var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
-                    if(preview_seed){
-                        mtimeString += "&rand="+preview_seed;
-                    }
-                }
-                return mtimeString;
             }
         },
 
@@ -285,17 +294,27 @@
             return {
                 baseUrl: baseURL,
                 editorConfigs: editorConfigs,
+                urlProvider:new UrlProvider(),
+                showResolutionToggle: true
+            }
+        },
+
+        imageSizeCallback: function(node, dimension){
+            if(this.state.currentNode === node){
+                this.setState({imageDimension: dimension});
             }
         },
 
         getInitialState: function(){
-            this.selectionModel = new SelectionModel(this.props.node);
 
-            SizeComputer.loadImageSize(this.props.baseUrl, this.props.node, function(node, dimension){
-                if(this.state.currentNode === node){
-                    this.setState({imageDimension: dimension});
-                }
+            this.selectionModel = this.props.selectionModel || new SelectionModel(this.props.node);
+            this.selectionModel.observe('selectionChanged', function(){
+                this.updateStateNode(this.selectionModel.current());
             }.bind(this));
+
+            let {url} = this.computeImageData(this.props.node);
+            SizeComputer.loadImageSize(url, this.props.node, this.imageSizeCallback);
+
             return {
                 currentNode: this.selectionModel.current(),
                 displayOriginal: false,
@@ -305,11 +324,9 @@
         },
 
         updateStateNode: function(node){
-            SizeComputer.loadImageSize(this.props.baseUrl, node, function(passedNode, dimension){
-                if(this.state.currentNode === passedNode){
-                    this.setState({imageDimension: dimension});
-                }
-            }.bind(this));
+            let {url} = this.computeImageData(node);
+            SizeComputer.loadImageSize(url, node, this.imageSizeCallback);
+
             if(this.props.onRequestTabTitleUpdate){
                 this.props.onRequestTabTitleUpdate(node.getLabel());
             }
@@ -336,10 +353,29 @@
             this.setState({playing:false});
         },
 
+        computeImageData(node){
+            let baseURL = this.props.baseUrl;
+            let editorConfigs = this.props.editorConfigs;
+            let data = {};
+            let dimension = {width: -1, height: -1};
+            if(this.state && this.state.imageDimension){
+                dimension = this.state.imageDimension;
+            }
+            if(!this.state || this.state.displayOriginal){
+                data = this.props.urlProvider.getHiResUrl(baseURL, editorConfigs, node, dimension, '');
+                if(node.getMetadata().get("image_exif_orientation")){
+                    data['imageClassName'] = 'ort-rotate-' + node.getMetadata().get("image_exif_orientation");
+                }
+            }else{
+                data = this.props.urlProvider.getLowResUrl(baseURL, editorConfigs, node, dimension, '');
+            }
+            return data;
+        },
+
         buildActions: function(){
             let actions = [];
             let mess = this.props.pydio.MessageHash;
-            if(this.selectionModel.length()){
+            if(this.selectionModel.length() > 1){
 
                 actions.push(
                     <MaterialUI.ToolbarGroup
@@ -354,8 +390,10 @@
             }
 
             let rightActions = [];
-            rightActions.push(<MaterialUI.FlatButton key="resolution" label={this.state.displayOriginal?mess[526]:mess[525]} onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
-            rightActions.push(<MaterialUI.ToolbarSeparator key="separator"/>);
+            if(this.props.showResolutionToggle){
+                rightActions.push(<MaterialUI.FlatButton key="resolution" label={this.state.displayOriginal?mess[526]:mess[525]} onClick={()=>{this.setState({displayOriginal:!this.state.displayOriginal})}}/>);
+                rightActions.push(<MaterialUI.ToolbarSeparator key="separator"/>);
+            }
 
             if(this.state.fitToScreen){
                 rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[326]} onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
@@ -378,39 +416,35 @@
         },
 
         render: function(){
-
-            let baseURL = this.props.baseUrl;
-            let editorConfigs = this.props.editorConfigs;
-            let data = {}, imgClassName;
-            let dimension = {width: -1, height: -1};
-            if(this.state.imageDimension){
-                dimension = this.state.imageDimension;
-            }
-            if(this.state.displayOriginal){
-                data = SizeComputer.getHiResUrl(baseURL, editorConfigs, this.state.currentNode, dimension, '');
-                if(this.state.currentNode.getMetadata().get("image_exif_orientation")){
-                    data['imageClassName'] = 'ort-rotate-' + this.state.currentNode.getMetadata().get("image_exif_orientation");
-                }
+            
+            if(!this.state.currentNode || this.props.showLoader){
+                return (
+                    <PydioComponents.AbstractEditor {...this.props} actions={[]}>
+                        <PydioReactUI.Loader/>
+                    </PydioComponents.AbstractEditor>
+                );
             }else{
-                data = SizeComputer.getLowResUrl(baseURL, editorConfigs, this.state.currentNode, dimension, '');
+                let imgProps = this.computeImageData(this.state.currentNode);
+                return (
+                    <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
+                        <ImagePanel
+                            {...imgProps}
+                            fit={this.state.fitToScreen}
+                            zoomFactor={this.state.zoomFactor}
+                        />
+                    </PydioComponents.AbstractEditor>
+                );
             }
 
-            return (
-                <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
-                    <ImagePanel
-                        {...data}
-                        fit={this.state.fitToScreen}
-                        zoomFactor={this.state.zoomFactor}
-                    />
-                </PydioComponents.AbstractEditor>
-            );
         }
 
     });
 
 
     global.PydioDiaporama = {
-        Editor: Editor
+        Editor: Editor,
+        SelectionModel: SelectionModel,
+        UrlProvider:UrlProvider
     };
 
 })(window)
