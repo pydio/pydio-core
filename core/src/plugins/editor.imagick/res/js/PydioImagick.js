@@ -51,6 +51,31 @@
 
     const Editor = React.createClass({
 
+        statics: {
+            getCoveringBackgroundSource: function (ajxpNode) {
+                return this.getThumbnailSource(ajxpNode);
+            },
+
+            getThumbnailSource: function (ajxpNode) {
+                var repoString = "";
+                if(pydio.repositoryId && ajxpNode.getMetadata().get("repository_id") && ajxpNode.getMetadata().get("repository_id") != pydio.repositoryId){
+                    repoString = "&tmp_repository_id=" + ajxpNode.getMetadata().get("repository_id");
+                }
+                var mtimeString = UrlProvider.buildRandomSeed(ajxpNode);
+                return pydio.Parameters.get('ajxpServerAccess') + "&get_action=imagick_data_proxy"+repoString + mtimeString +"&file="+encodeURIComponent(ajxpNode.getPath());
+            },
+
+            getSharedPreviewTemplate : function(node, link){
+                return <img src={link}/>;
+            },
+
+            getRESTPreviewLinks:function(node){
+                return {
+                    "First Page Thumbnail": ""
+                };
+            }
+        },
+
         getInitialState: function(){
             let s = new SelectionModel(this.props.node);
             s.observe('selectionChanged', ()=>{this.setState({selectionLoaded:true})});
