@@ -185,3 +185,4 @@ var SortableList = React.createClass({
     }
 });
 
+export {SortableList as default}

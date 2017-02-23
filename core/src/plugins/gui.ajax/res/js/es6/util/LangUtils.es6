@@ -43,7 +43,7 @@ class LangUtils{
     }
 
     static parseUrl(data) {
-        var matches = $A();
+        var matches = [];
         //var e=/((http|ftp):\/)?\/?([^:\/\s]+)((\/\w+)*\/)([\w\-\.]+\.[^#?\s]+)(#[\w\-]+)?/;
         var detect = /(pydio:\/)?\/?([^:\/\s]+)((\/\w+)*\/)(.*)(#[\w\-]+)?/g;
         var results = data.match(detect);

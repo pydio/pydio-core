@@ -54,7 +54,9 @@
         },
 
         onChange:function(event, value){
-            if(value === undefined) value = event.currentTarget.getValue();
+            if(value === undefined) {
+                value = event.currentTarget.getValue ? event.currentTarget.getValue() : event.currentTarget.value;
+            }
             if(this.changeTimeout){
                 global.clearTimeout(this.changeTimeout);
             }
@@ -150,7 +152,7 @@
                 output.set('0', pydio.MessageHash['ajxp_admin.home.6']);
                 PydioApi.getClient().loadFile(list_action, function(transport){
                     var newOutput = new Map();
-                    transport.responseJSON.each(function(entry){
+                    transport.responseJSON.map(function(entry){
                         newOutput.set(entry.key, entry.label);
                     });
                     this.setState({choices:newOutput});
@@ -1943,7 +1945,7 @@
             allKeys.sort();
             allKeys.reverse();
             var treeKeys = {};
-            allKeys.each(function(key){
+            allKeys.map(function(key){
                 if(key.indexOf("/") === -1) return;
                 if(key.endsWith("_ajxptype")) return;
                 var typeKey = key + "_ajxptype";
