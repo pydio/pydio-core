@@ -1,7 +1,7 @@
 {
-  "name": "editor.exif",
+  "name": "meta.exif",
   "version": "8.0.0",
-  "description": "Exif data viewer",
+  "description": "Exif data extraction and viewers",
   "source_path": "res/js",
   "main": "index.js",
   "scripts": {

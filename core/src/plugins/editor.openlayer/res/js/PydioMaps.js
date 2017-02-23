@@ -21,6 +21,9 @@
         attachMap : function(){
 
             // PARSE METADATA
+            if(this.state && this.state.map){
+                this.state.map.destroy();
+            }
 
             let layersDefinitions = [{type:'OSM'}], latitude, longitude;
 
@@ -156,14 +159,26 @@
         componentDidMount: function(){
             this.attachMap();
         },
+        
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.centerNode !== this.props.centerNode){
+                this.attachMap();
+            }
+        },
 
         componentWillUnmount: function(){
-            //this.state.map.destroy() ??
+            if(this.state && this.state.map){
+                this.state.map.destroy();
+            }
         },
 
         render: function(){
 
-            return <div style={{width:'100%',height:'100%'}} ref="target"></div>;
+            let style = {width:'100%',height:'100%'};
+            if(this.props.style){
+                style = Object.assign(style, this.props.style);
+            }
+            return <div style={style} ref="target"></div>;
 
         }
 

@@ -6,12 +6,11 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
-            <js file="plugins/editor.exif/res/build/PydioExif.js" className="PydioExif"/>
-            <i18n namespace="editor.exif" path="plugins/editor.exif/res/i18n" />
+            <i18n namespace="editor.exif" path="plugins/editor.exif/i18n" />
         </resources>
     </client_settings>
 	<dependencies>
 		<!-- Stream Wrapper Access -->
-		<activePlugin pluginName="meta.exif|image.diaporama"/>
+		<activePlugin pluginName="meta.exif"/>
 	</dependencies>
 </editor>
