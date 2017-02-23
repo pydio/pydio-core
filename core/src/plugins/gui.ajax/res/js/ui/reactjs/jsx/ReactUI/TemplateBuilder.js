@@ -133,7 +133,7 @@ export default React.createClass({
                     namespace={namespace}
                     componentName={componentName}
                     {...props}
-                    style={style}
+                    loaderStyle={style}
                 />
             );
 

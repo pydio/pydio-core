@@ -9,6 +9,7 @@ import {TreeView, DNDTreeView, FoldersTree} from './TreeView'
 import LabelWithTip from './LabelWithTip'
 import SimpleFigureBadge from './SimpleFigureBadge'
 import SearchBox from './SearchBox'
+import ClipboardTextField from './ClipboardTextField'
 
 import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
@@ -26,8 +27,9 @@ window.PydioComponents = {
     TreeView                : TreeView,
     DNDTreeView             : DNDTreeView,
     FoldersTree             : FoldersTree,
-
+    ClipboardTextField      : ClipboardTextField,
     LabelWithTip            : LabelWithTip,
+
     SimpleFigureBadge       : SimpleFigureBadge,
     SearchBox               : SearchBox,
     LegacyUIWrapper         : LegacyUIWrapper,

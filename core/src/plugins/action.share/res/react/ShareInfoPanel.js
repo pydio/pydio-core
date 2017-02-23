@@ -104,6 +104,19 @@
 
     });
 
+    InfoPanelInputRow = React.createClass({
+
+        render: function(){
+            return (
+                <div className="infoPanelRow">
+                    <PydioComponents.ClipboardTextField {...this.props} floatingLabelText={this.props.getMessage(this.props.inputTitle)}/>
+                </div>
+            );
+        }
+
+    });
+
+
     var TemplatePanel = React.createClass({
 
         propTypes: {
@@ -119,6 +132,7 @@
 
         generateTplHTML: function(){
 
+            return null;
             let editors = this.props.pydio.Registry.findEditorsForMime(this.props.node.getAjxpMime(), true);
             if(!editors.length){
                 return null;

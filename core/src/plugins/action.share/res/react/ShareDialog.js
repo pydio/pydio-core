@@ -37,7 +37,7 @@
             return {
                 dialogTitle:'',
                 dialogIsModal:false,
-                dialogClassName:"dialog-max-420 dialog-no-padding react_share_form"
+                dialogPadding:false
             };
         },
 
@@ -70,18 +70,12 @@
             };
         },
 
-        refreshDialogPosition:function(){
-            global.pydio.UI.modal.refreshDialogPosition();
-        },
-
         modelUpdated: function(eventData){
             if(this.isMounted()){
                 this.setState({
                     status: eventData.status,
                     model:eventData.model
-                }, function(){
-                    this.refreshDialogPosition();
-                }.bind(this));
+                });
             }
         },
 
@@ -183,9 +177,9 @@
             }
 
             return(
-                <div style={{width:420}}>
+                <div className="react_share_form" style={{width:420}}>
                     <HeaderPanel {...this.props} shareModel={this.state.model}/>
-                    <ReactMUI.Tabs onChange={this.refreshDialogPosition}>{panels}</ReactMUI.Tabs>
+                    <ReactMUI.Tabs>{panels}</ReactMUI.Tabs>
                     <ButtonsPanel {...this.props} shareModel={this.state.model} onClick={this.clicked}/>
                     {mailer}
                 </div>
