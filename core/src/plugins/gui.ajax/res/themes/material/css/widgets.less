@@ -279,4 +279,47 @@ body,#ajxp_desktop,#background-imager{
     }
   }
 
+  .img-dimension-div {
+    width: 120px;
+    height: 80px;
+    border: 2px solid #EEEEEE;
+    margin: 0 auto;
+    position: relative;
+    font-size: 18px;
+    color: #90CAF9;
+    border-radius: 1px;
+    transition:@bezier_transition;
+    white-space:nowrap;
+    &:before {
+      content: attr(data-height);
+      position: absolute;
+      transform: translateX(-57px) translateY(28px) rotate(-90deg);
+    }
+    &:after {
+      content: attr(data-width);
+      position: absolute;
+      transform: translateY(54px) translateX(30px);
+    }
+    &.portrait{
+      width:80px;
+      height: 120px;
+      &:before{
+        transform: translateX(-55px) translateY(52px) rotate(-90deg);
+      }
+      &:after{
+        transform: translateY(95px) translateX(5px);
+      }
+    }
+    &.square{
+      width: 100px;
+      height: 100px;
+      &:before{
+        transform: translateX(-57px) translateY(35px) rotate(-90deg);
+      }
+      &:after{
+        transform: translateY(74px) translateX(15px);
+      }
+    }
+  }
+
 }
