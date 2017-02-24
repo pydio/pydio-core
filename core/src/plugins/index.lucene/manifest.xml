@@ -8,6 +8,7 @@
         </resources>
     </client_settings>
     <server_settings>
+        <param name="folder_search" type="boolean" label="CONF_MESSAGE[Search in current folder and subfolders only]" description="CONF_MESSAGE[When enabled, the searches are performed only in the current folder and subfolders. If disabled, the search always pertains to the whole workspace.]" mandatory="true" default="false"/>
         <param name="index_content" type="boolean" label="CONF_MESSAGE[Index Content]" description="CONF_MESSAGE[Parses the file when possible and index its content (see plugin global options)]" mandatory="true" default="false"/>
         <param name="index_meta_fields" type="string" label="CONF_MESSAGE[Index Meta Fields]" description="CONF_MESSAGE[Which additionnal fields to index and search]" mandatory="false" />
         <param name="repository_specific_keywords" type="string" label="CONF_MESSAGE[Repository keywords]" description="CONF_MESSAGE[If your repository path is defined dynamically by specific keywords like AJXP_USER, or your own, mention them here.]" mandatory="false"/>

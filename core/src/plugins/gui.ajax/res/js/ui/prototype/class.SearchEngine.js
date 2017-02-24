@@ -910,6 +910,8 @@ Class.create("SearchEngine", AjxpPane, {
             connexion.discrete = true;
             connexion.addParameter('get_action', 'search');
             connexion.addParameter('query', this.crtText);
+            connexion.addParameter('dir', currentFolder);
+
             if(limit && limit !== -1){
                 connexion.addParameter('limit', limit);
             }
