@@ -3,7 +3,7 @@
     class Loader{
 
         static loadInfoPanel(container, node){
-            var mainCont = container.querySelectorAll("#ajxp_shared_info_panel .infoPanelTable")[0];
+            let mainCont = container.querySelectorAll("#ajxp_shared_info_panel .infoPanelTable")[0];
             mainCont.destroy = function(){
                 React.unmountComponentAtNode(mainCont);
             };
@@ -15,96 +15,7 @@
         }
     }
 
-    var InfoPanelInputRow = React.createClass({
-
-        propTypes: {
-            inputTitle: React.PropTypes.string,
-            inputValue: React.PropTypes.string,
-            inputClassName: React.PropTypes.string,
-            getMessage: React.PropTypes.func,
-            inputCopyMessage: React.PropTypes.string
-        },
-
-        getInitialState: function(){
-            return {copyMessage: null};
-        },
-
-        componentDidMount:function(){
-            this.attachClipboard();
-        },
-        componentDidUpdate:function(){
-            this.attachClipboard();
-        },
-
-        attachClipboard:function(){
-            if(this._clip){
-                this._clip.destroy();
-            }
-            if(!this.refs['copy-button']) {
-                return;
-            }
-            this._clip = new Clipboard(this.refs['copy-button'], {
-                text: function(trigger) {
-                    return this.props.inputValue;
-                }.bind(this)
-            });
-            this._clip.on('success', function(){
-                this.setState({copyMessage:this.props.getMessage(this.props.inputCopyMessage)}, this.clearCopyMessage);
-            }.bind(this));
-            this._clip.on('error', function(){
-                var copyMessage;
-                if( global.navigator.platform.indexOf("Mac") === 0 ){
-                    copyMessage = this.props.getMessage('144');
-                }else{
-                    copyMessage = this.props.getMessage('143');
-                }
-                this.refs['input'].focus();
-                this.setState({copyMessage:copyMessage}, this.clearCopyMessage);
-            }.bind(this));
-        },
-
-        clearCopyMessage:function(){
-            global.setTimeout(function(){
-                this.setState({copyMessage:''});
-            }.bind(this), 3000);
-        },
-
-        render: function(){
-
-            let select = function(e){
-                e.currentTarget.select();
-            };
-
-            let copyMessage = null;
-            if(this.state.copyMessage){
-                var setHtml = function(){
-                    return {__html:this.state.copyMessage};
-                }.bind(this);
-                copyMessage = <div className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
-            }
-            return (
-                <div className="infoPanelRow">
-                    <div className="infoPanelLabel">{this.props.getMessage(this.props.inputTitle)}</div>
-                    <div className="infoPanelValue" style={{position:'relative'}}>
-                        <input
-                            ref="input"
-                            type="text"
-                            className={this.props.inputClassName}
-                            readOnly={true}
-                            onClick={select}
-                            value={this.props.inputValue}
-                        />
-                        <span ref="copy-button" title={this.props.getMessage('191')} className="copy-button icon-paste"/>
-                        {copyMessage}
-                    </div>
-                </div>
-            );
-
-        }
-
-    });
-
-    InfoPanelInputRow = React.createClass({
+    const InfoPanelInputRow = React.createClass({
 
         render: function(){
             return (
@@ -117,7 +28,7 @@
     });
 
 
-    var TemplatePanel = React.createClass({
+    const TemplatePanel = React.createClass({
 
         propTypes: {
             node:React.PropTypes.instanceOf(AjxpNode),
@@ -132,26 +43,23 @@
 
         generateTplHTML: function(){
 
-            return null;
             let editors = this.props.pydio.Registry.findEditorsForMime(this.props.node.getAjxpMime(), true);
             if(!editors.length){
                 return null;
             }
-
-            let tplString ;
-            let messKey = "61";
-            let newlink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
-            let template;
-            if(this.props.pydio.UI.getSharedPreviewTemplateForEditor){
-                template = this.props.pydio.UI.getSharedPreviewTemplateForEditor(editors[0], this.props.node);
-            }
-            if(template){
-                tplString = template.evaluate({WIDTH:350, HEIGHT:350, DL_CT_LINK:newlink});
+            let newLink = ReactModel.Share.buildDirectDownloadUrl(this.props.node, this.props.publicLink, true);
+            let editor = FuncUtils.getFunctionByName(editors[0].editorClass, global);
+            if(editor && editor.getSharedPreviewTemplate){
+                return {
+                    messKey:61,
+                    templateString:editor.getSharedPreviewTemplate(this.props.node, newLink, {WIDTH:350, HEIGHT:350, DL_CT_LINK:newLink})
+                };
             }else{
-                tplString = newlink;
-                messKey = "60";
+                return{
+                    messKey:60,
+                    templateString:newLink
+                }
             }
-            return {messageKey:messKey, templateString:tplString};
 
         },
 
@@ -171,7 +79,7 @@
 
     });
 
-    var InfoPanel = React.createClass({
+    const InfoPanel = React.createClass({
 
         propTypes: {
             node:React.PropTypes.instanceOf(AjxpNode),
@@ -311,7 +219,7 @@
 
     });
 
-    var ReactInfoPanel = React.createClass({
+    const ReactInfoPanel = React.createClass({
 
         render: function(){
 

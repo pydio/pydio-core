@@ -66,7 +66,7 @@
             },
 
             getSharedPreviewTemplate : function(node, link){
-                return <img src={link}/>;
+                return '<img src="' + link + '"/>';
             },
 
             getRESTPreviewLinks:function(node){

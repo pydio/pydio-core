@@ -147,15 +147,15 @@ class PydioDataModel extends Observable{
         if(nodeOrPath instanceof String){
             nodeOrPath = new AjxpNode(nodeOrPath);
         }
-        var onComplete = null;
+        let onComplete = null;
         if(this._selectedNodes.length) {
-            var found = false;
-            this._selectedNodes.map(function(node){
-                if(node.getPath() == nodeOrPath.getPath()) found = node;
+            let found = -1;
+            this._selectedNodes.map(function(node, key){
+                if(node.getPath() == nodeOrPath.getPath()) found = key;
             });
-            if(found){
+            if(found !== -1){
                 // MAKE SURE SELECTION IS OK AFTER RELOAD
-                this._selectedNodes = this._selectedNodes.without(found);
+                this._selectedNodes = LangUtils.arrayWithout(this._selectedNodes, found);
                 this.publish("selection_changed", this);
                 onComplete = function(newNode){
                     this._selectedNodes.push(newNode);

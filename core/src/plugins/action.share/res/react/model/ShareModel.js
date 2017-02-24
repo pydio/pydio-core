@@ -121,7 +121,7 @@
         }
 
         getSharedUsers(){
-            var data = [], sharedData = [];
+            let data = [], sharedData = [];
             if(this._pendingData['entries']){
                 data = this._pendingData['entries'];
             }else if(this._data['entries']){
@@ -135,7 +135,7 @@
         }
 
         getSharedUser(userId){
-            var data = [], user = null;
+            let data = [], user = null;
             if(this._pendingData['entries']){
                 data = this._pendingData['entries'];
             }else if(this._data['entries']){
@@ -624,6 +624,7 @@
             let remoteLoader = function(transport){
                 if(transport.responseJSON){
                     this._data = transport.responseJSON;
+                    if(this._data instanceof Array) this._data = {};
                     this._pendingData = {};
                     this._setStatus('idle');
                     return this._data;
@@ -739,6 +740,7 @@
                 var _data = transport.responseJSON;
                 if(_data !== null){
                     this._data = _data;
+                    if(this._data instanceof Array) this._data = {};
                     this._pendingData = {};
                     this._setStatus('saved');
                     this._pydio.fireNodeRefresh(this._node);

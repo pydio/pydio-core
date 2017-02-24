@@ -49,10 +49,10 @@
             // Check Google layer
             var mapsFound = (global.google && global.google.maps?true:false);
             var googleRejected = false;
-            layersDefinitions.map(function(definition){
+            layersDefinitions.map(function(definition, key){
                 if(definition.type=='Google'){
                     if(!mapsFound){
-                        layersDefinitions = LangUtils.arrayWithout(layersDefinitions, definition);
+                        layersDefinitions = LangUtils.arrayWithout(layersDefinitions, key);
                         googleRejected = true;
                         return;
                     }

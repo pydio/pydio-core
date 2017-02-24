@@ -277,7 +277,8 @@
             },
 
             getSharedPreviewTemplate : function(node, link){
-                return <img src={link}/>;
+                // Return string
+                return '<img src="' + link + '"/>';
             },
 
             getRESTPreviewLinks:function(node){
