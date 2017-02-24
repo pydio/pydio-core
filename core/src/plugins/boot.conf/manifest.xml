@@ -11,11 +11,11 @@
     </client_settings>
     <server_settings>
         <global_param group="CONF_MESSAGE[Application Settings]" name="sysLegend" type="legend" label="" description="CONF_MESSAGE[Set up application title and create a connexion identifier for the super-administrator user. Make sure to use a strong password, as this user will have full access to the server.]"/>
-        <global_param group="CONF_MESSAGE[Application Settings]" name="APPLICATION_TITLE" type="string" label="CONF_MESSAGE[Application Title]" description="CONF_MESSAGE[Your system title]" default="Pydio" mandatory="false"/>
+        <global_param group="CONF_MESSAGE[Application Settings]" name="APPLICATION_TITLE" type="string" label="CONF_MESSAGE[Application Title]" description="CONF_MESSAGE[Your system title]" default="Pydio" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Application Settings]" name="APPLICATION_WELCOME" type="string" label="CONF_MESSAGE[Welcome Message]" description="CONF_MESSAGE[An additional message displayed at startup, on the splash screen and the login screen.]" default="CONF_MESSAGE[Welcome to Pydio]" mandatory="false"/>
         <global_param group="CONF_MESSAGE[Authentification]" name="ADMIN_USER_LOGIN" type="string" label="CONF_MESSAGE[Admin Login]" description="CONF_MESSAGE[Alphanumeric login]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Authentification]" name="ADMIN_USER_NAME" type="string" label="CONF_MESSAGE[Admin Display Name]" description="CONF_MESSAGE[User-friendly name of the user]" mandatory="true"/>
-        <global_param group="CONF_MESSAGE[Authentification]" name="ADMIN_USER_PASS" type="password" label="CONF_MESSAGE[Admin Password]" description="CONF_MESSAGE[Use a strong password (more than 8 characters, complicated ones.]" mandatory="true"/>
+        <global_param group="CONF_MESSAGE[Authentification]" name="ADMIN_USER_PASS" type="valid-password" label="CONF_MESSAGE[Admin Password]" description="CONF_MESSAGE[Use a strong password (more than 8 characters, complicated ones.]" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Database Connection]" name="StorageLegend" type="legend" label="" description="CONF_MESSAGE[How the application configuration data will be stored (users, plugins, etc. not how your actual documents are managed). To get started rapidly, select No Database. To enable more advanced features, configure a database connection.]"/>
         <!--
         <global_param group="CONF_MESSAGE[Database Connection]" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connection]" description="CONF_MESSAGE[Test Connexion]" mandatory="false"/>

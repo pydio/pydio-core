@@ -227,6 +227,7 @@
                         multiLine={this.props.attributes['type'] == 'textarea'}
                         disabled={this.props.disabled}
                         errorText={this.props.errorText}
+                        autoComplete="off"
                     />
                 );
                 if(this.props.attributes['type'] === 'password'){
@@ -248,7 +249,8 @@
         mixins:[FormMixin],
 
         isValid:function(){
-            return (this.state.value && this.checkMinLength(this.state.value));
+            return (this.state.value && this.checkMinLength(this.state.value) &&
+                this.state.confirmValue && this.state.confirmValue === this.state.value);
         },
 
         checkMinLength:function(value){
@@ -282,33 +284,66 @@
             return response;
         },
 
+        onConfirmChange:function(event){
+            this.setState({confirmValue:event.target.value});
+            this.onChange(event, this.state.value);
+        },
+
         render:function(){
             if(this.isDisplayGrid() && !this.state.editMode){
                 var value = this.state.value;
                 return <div onClick={this.props.disabled?function(){}:this.toggleEditMode} className={value?'':'paramValue-empty'}>{!value?'Empty':value}</div>;
             }else{
-                var errorText = this.state.errorText;
+                let errorText = this.state.errorText;
+                let className, confirmError;
                 if(this.state.value){
                     var response = this.getComplexityString(this.state.value);
                     errorText = <span style={{color: response.color}}>{response.responseString}</span>;
                     if(response.segment > 1){
-                        var className = "mui-error-as-hint";
+                        className = "mui-error-as-hint";
                     }
                 }
-                return(
-                    <span>
+                if(this.state.confirmValue && this.state.confirmValue !== this.state.value){
+                    errorText = 'Passwords differ';
+                    className = undefined;
+                    confirmError = '   ';
+                }
+                let confirm;
+                if(this.state.value && !this.props.disabled){
+                    confirm = [
+                        <div key="sep" style={{width: 20}}></div>,
                         <ReactMUI.TextField
-                            floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                            key="confirm"
+                            floatingLabelText={'Please Confirm Password'}
                             className={className}
-                            value={this.state.value}
-                            onChange={this.onChange}
-                            onKeyDown={this.enterToToggle}
+                            value={this.state.confirmValue}
+                            onChange={this.onConfirmChange}
                             type='password'
                             multiLine={false}
                             disabled={this.props.disabled}
-                            errorText={errorText}
+                            style={{flex:1}}
+                            errorText={confirmError}
                         />
-                    </span>
+                    ];
+                }
+                return(
+                    <form autoComplete="off">
+                        <div style={{display:'flex'}}>
+                            <ReactMUI.TextField
+                                floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                                className={className}
+                                value={this.state.value}
+                                onChange={this.onChange}
+                                onKeyDown={this.enterToToggle}
+                                type='password'
+                                multiLine={false}
+                                disabled={this.props.disabled}
+                                errorText={errorText}
+                                style={{flex:1}}
+                            />
+                            {confirm}
+                        </div>
+                    </form>
                 );
             }
         }
@@ -1471,6 +1506,13 @@
             this.onChange(values, dirty, removeValues);
         },
 
+        onSubformValidStatusChange:function(newValidValue, failedMandatories){
+            if((newValidValue !== this._internalValid || this.props.forceValidStatusCheck) && this.props.onValidStatusChange) {
+                this.props.onValidStatusChange(newValidValue, failedMandatories);
+            }
+            this._internalValid = newValidValue;
+        },
+
         applyButtonAction: function(parameters, callback){
             if(this.props.applyButtonAction){
                 this.props.applyButtonAction(parameters, callback);
@@ -1492,11 +1534,16 @@
                         failedMandatories.push(p);
                     }
                 }
-            });
+                if( ( p.type === 'valid-password' ) && this.refs['form-element-' + p.name]){
+                    if(!this.refs['form-element-' + p.name].isValid()){
+                        failedMandatories.push(p);
+                    }
+                }
+            }.bind(this));
             var previousValue, newValue;
             previousValue = this._internalValid;//(this._internalValid !== undefined ? this._internalValid : true);
             newValue = failedMandatories.length ? false : true;
-            if(newValue !== this._internalValid && this.props.onValidStatusChange) {
+            if((newValue !== this._internalValid || this.props.forceValidStatusCheck) && this.props.onValidStatusChange) {
                 this.props.onValidStatusChange(newValue, failedMandatories);
             }
             this._internalValid = newValue;
@@ -1580,6 +1627,7 @@
                                 key={paramName}
                                 onScrollCallback={null}
                                 limitToGroups={null}
+                                onValidStatusChange={this.onSubformValidStatusChange}
                             />
                         );
 
@@ -1611,7 +1659,7 @@
                         }
 
                         var props = {
-                            ref:"formElement",
+                            ref:"form-element-" + paramName,
                             attributes:attributes,
                             name:paramName,
                             value:values[paramName],
