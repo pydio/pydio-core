@@ -1392,6 +1392,8 @@
             onTabChange:React.PropTypes.func,
             accordionizeIfGroupsMoreThan:React.PropTypes.number,
             onScrollCallback:React.PropTypes.func,
+            limitToGroups:React.PropTypes.array,
+            skipFieldsTypes:React.PropTypes.array,
 
             /* Helper Options */
             setHelperData:React.PropTypes.func,
@@ -1534,6 +1536,9 @@
             this.props.parameters.map(function(attributes){
 
                 var type = attributes['type'];
+                if(this.props.skipFieldsTypes && this.props.skipFieldsTypes.indexOf(type) > -1){
+                    return;
+                }
                 var paramName = attributes['name'];
                 var field;
                 if(attributes['group_switch_name']) return;
@@ -1574,6 +1579,7 @@
                                 values={this.props.values}
                                 key={paramName}
                                 onScrollCallback={null}
+                                limitToGroups={null}
                             />
                         );
 
@@ -1663,6 +1669,9 @@
             var accordionize = (this.props.accordionizeIfGroupsMoreThan && groupsOrdered.length > this.props.accordionizeIfGroupsMoreThan);
             var currentActiveGroup = (this.state && this.state.currentActiveGroup) ? this.state.currentActiveGroup : 0;
             groupsOrdered.map(function(g, gIndex) {
+                if(this.props.limitToGroups && this.props.limitToGroups.indexOf(g) === -1){
+                    return;
+                }
                 var header, gData = allGroups[g];
                 var className = 'pydio-form-group', active = false;
                 if(accordionize){
@@ -1671,7 +1680,9 @@
                     else className += ' form-group-inactive';
                 }
                 if (!gData.FIELDS.length) return;
-                if (gData.LABEL) header = this.renderGroupHeader(gData.LABEL, accordionize, gIndex, active);
+                if (gData.LABEL && !(this.props.skipFieldsTypes && this.props.skipFieldsTypes.indexOf('GroupHeader') > -1)) {
+                    header = this.renderGroupHeader(gData.LABEL, accordionize, gIndex, active);
+                }
                 if(this.props.depth == 0){
                     groupPanes.push(
                         <ReactMUI.Paper className={className} key={'pane-'+g}>
