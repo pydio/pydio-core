@@ -54,26 +54,6 @@
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="false" write="false"/>
                 <processing>
                     <clientCallback module="PydioInstaller.openDialog"/>
-                    <clientForm id="installer_form"><![CDATA[
-                        <div id="installer_form" box_padding="0" box_resize="true" box_width="460" overlayStyle='{"backgroundColor":"black","opacity":10,"backgroundImage":"url(\"AJXP_IMAGES_FOLDER/grid_t.png\")"}' style="padding: 20px 20px; overflow:auto; background-color: white;">
-                            <img class="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style="display:block;margin:20px auto;">
-                            <div class="installerWelcome">
-                                <span ajxp_message_id="installer.3">AJXP_MESSAGE[installer.3]</span>
-                            </div>
-                            <div style="margin-top:40px;" class="dialogLegend installerLang SF_material">
-                                <div class="SF_element" style="float: left;"><select class="SF_input" id="installer_lang"></select><span class="select-styler"></span></div>
-                                <div id="start_button" class="SF_input SF_inlineButton" style="display:block; float:right; width:180px; margin-top: 7px !important; background-color:#F47561 !important;" ajxp_message_id="installer.4">AJXP_MESSAGE[installer.4] <span class="icon-chevron-right"></span></div>
-                            </div>
-                            <div id="the_form" class="SF_material" style="display:none; margin:0 5px;"></div>
-                            <div id="configuration_progress" class="dialogLegend installerWelcome" style="display:none; margin:0 5px;">
-                                <span ajxp_message_id="installer.5">AJXP_MESSAGE[installer.5]</span>
-                                <div style="margin: 20px auto; width: 40px;">
-                                    <span class="icon-spinner rotating spinner_large"></span>
-                                </div>
-                            </div>
-                            <div class="SF_input SF_inlineButton" style="display:none; width:180px;" tabIndex="0"><span class="icon-play-circle"></span><span ajxp_message_id="installer.6">AJXP_MESSAGE[installer.6]</span></div>
-                        </div>
-                    ]]></clientForm>
                     <clientListener name="init"><![CDATA[
                         ResourcesManager.loadClassesAndApply(['PydioForm', 'PydioInstaller'], function(){
                             pydio.getController().fireAction("ajxp_installer");

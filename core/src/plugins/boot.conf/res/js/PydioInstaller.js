@@ -66,6 +66,9 @@
                 && this.state.values['ADMIN_USER_LOGIN'] === this.state.values['ADMIN_USER_NAME']){
                 values['ADMIN_USER_NAME'] = values['ADMIN_USER_LOGIN'];
             }
+            if(this.props.onFormChange){
+                this.props.onFormChange(values);
+            }
             this.setState({values: values});
         },
 
@@ -126,7 +129,8 @@
             }.bind(this));
         },
 
-        installPydio: function(){
+        computeInstallationParams(){
+
             let allParams = {
                 get_action:'apply_installer_form',
                 installer_lang:global.pydio.currentLanguage
@@ -136,8 +140,18 @@
                 let formPanel = this.refs[key];
                 allParams = Object.assign(allParams, formPanel.getValuesForPOST(this.state.values, ''));
             }
-            console.log(allParams);
+
+            return allParams;
+        },
+
+        installPydio: function(){
+
+            let allParams = this.state.installationParams || this.computeInstallationParams();
+
             PydioApi.getClient().request(allParams, function(transp){
+                if(this.props.beforeInstallStep){
+                    this.setState({customPanel: null});
+                }
                 if(transp.responseText && transp.responseText === 'OK'){
                     this.setState({INSTALLED: true});
                     global.setTimeout(function(){
@@ -149,7 +163,6 @@
                         HTACCESS_NOTIF: transp.responseJSON
                     });
                 }
-
             }.bind(this));
         },
 
@@ -169,8 +182,28 @@
                 }.bind(this);
             }
             if(LAST_STEP){
-                nextCallback = this.installPydio.bind(this);
+                if(this.props.beforeInstallStep){
+                    nextCallback = ()=> {
+                        this.setState({
+                            installationParams:this.computeInstallationParams(),
+                            customPanel:this.props.beforeInstallStep
+                        })
+                    };
+                }else{
+                    nextCallback = this.installPydio.bind(this);
+                }
             }
+
+            if(this.props.renderStepActions){
+                let test = this.props.renderStepActions(step, groupKey, LAST_STEP, this.state, nextCallback);
+                if(test){
+                    return test;
+                }
+            }
+
+            // For testing purpose, disable validations
+            // nextDisabled = false;
+            // nextCallback = this.handleNext.bind(this);
 
             return (
                 <div style={{margin: '12px 0'}}>
@@ -204,11 +237,15 @@
 
         render: function(){
 
-            if(!this.state.parameters){
-                return <PydioReactUI.Loader/>;
-            }
+            if(this.state.customPanel){
 
-            if(this.state.welcomeScreen){
+                return this.state.customPanel;
+
+            }else if(!this.state.parameters){
+
+                return <PydioReactUI.Loader/>;
+
+            }else if(this.state.welcomeScreen){
 
                 let languages = [], currentLanguage;
                 global.pydio.listLanguagesWithCallback(function(key, label, selected){
@@ -228,9 +265,9 @@
                         </div>
                     </div>
                 );
-            }
 
-            if(this.state.INSTALLED){
+            }else if(this.state.INSTALLED){
+
                 if(this.state.HTACCESS_NOTIF){
 
                     return <div>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
