@@ -2,10 +2,18 @@
 
     const WelcomeScreen = React.createClass({
 
+        getDefaultProps: function(){
+            return {logoSrc: 'plugins/gui.ajax/PydioLogo250.png'};
+        },
+
         switchLanguage: function(event, key, payload){
             global.pydio.fire('language_changed');
             global.pydio.currentLanguage = payload;
             global.pydio.loadI18NMessages(payload);
+        },
+
+        getDangerousHtmlLanguage: function(id){
+            return {__html: global.pydio.MessageHash['installer.3']};
         },
 
         render: function(){
@@ -18,8 +26,8 @@
 
             return (
                 <div id="installer_form" style={{fontSize:13, paddingBottom:24}}>
-                    <img className="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style={{display:'block', margin:'20px auto'}}/>
-                    <div className="installerWelcome">{global.pydio.MessageHash['installer.3']}</div>
+                    <img className="install_pydio_logo" src={this.props.logoSrc} style={{display:'block', margin:'20px auto', maxHeight:180}}/>
+                    <div className="installerWelcome" dangerouslySetInnerHTML={this.getDangerousHtmlLanguage('installer.3')}/>
                     <MaterialUI.SelectField floatingLabelText="Pick your language" value={currentLanguage} onChange={this.switchLanguage}>
                         {languages}
                     </MaterialUI.SelectField>
@@ -51,7 +59,7 @@
                         groups.set(g, {
                             title:g,
                             legend:'',
-                            valid:true,
+                            valid:false,
                             switches:[]
                         });
                     }
@@ -110,6 +118,15 @@
             }
         },
 
+        isValid: function(){
+            if(!this.state || !this.state.groups) return false;
+            let valid = true;
+            this.state.groups.forEach(function(g){
+                valid = valid && g.valid;
+            });
+            return valid;
+        },
+
         onValidStatusChange: function(groupKey, status, missingFields){
             // IGNORE SWITCH_GROUP FIELDS UNTIL PROPERLY IMPLEMENTED IN THE FORMS
             let groupMissing = 0;
@@ -123,7 +140,7 @@
                 }
             });
             groups.get(groupKey).valid = groupMissing > 0 ? false: true;
-            this.setState({groups: groups});
+            this.setState({groups: groups}, () => {this.props.refreshModal();});
         },
 
         checkDBPanelValidity: function(){
@@ -172,7 +189,7 @@
 
             const {minorStep} = this.state;
             let LAST_STEP = (minorStep === this.state.groups.size - 1);
-            let forwardLabel = LAST_STEP ? 'Install Pydio Now' : 'Next';
+            let forwardLabel = 'Next';
             let nextDisabled = !this.state.groups.get(groupKey).valid;
             let nextCallback = this.handleNext.bind(this);
 
@@ -183,19 +200,6 @@
                     let testValues = this.refs['form-' + groupKey].getValuesForPOST(this.props.parentState.values);
                     this.testDBConnection(testValues);
                 }.bind(this);
-            }
-            if(LAST_STEP){
-                /*
-                if(this.props.beforeInstallStep){
-                    nextCallback = ()=> {
-                        this.setState({
-                            installationParams:this.computeInstallationParams(),
-                            customPanel:this.props.beforeInstallStep
-                        })
-                    };
-                }else{
-                    nextCallback = this.installPydio.bind(this);
-                }*/
             }
 
             if(this.props.renderStepActions){
@@ -237,7 +241,7 @@
 
             if(!this.state.parameters){
 
-                return <PydioReactUI.Loader/>;
+                return <PydioReactUI.Loader style={{minHeight: 500}}/>;
 
             }
 
@@ -319,14 +323,14 @@
 
             }else  if(this.state.HTACCESS_NOTIF){
 
-                return <div>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
+                return <div style={{margin:'24px 0'}}>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
                     Please update the file <em>{this.state.HTACCESS_NOTIF.file}</em> !
                     After applying this, just reload the page and can log in with
                     the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined.</div>;
 
             }else{
 
-                return <div>Pydio Installation succeeded! The page will now reload automatically. You can log in with
+                return <div style={{margin:'24px 0'}}>Pydio Installation succeeded! The page will now reload automatically. You can log in with
                     the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined. The page with reload automatically in 3s.</div>;
 
             }
