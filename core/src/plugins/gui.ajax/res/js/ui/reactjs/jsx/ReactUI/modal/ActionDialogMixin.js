@@ -13,5 +13,8 @@ export default {
     },
     getPadding: function() {
         return typeof this.props.dialogPadding !== "undefined" ? this.props.dialogPadding : true
+    },
+    scrollBody: function(){
+        return this.props.dialogScrollBody || false;
     }
 };

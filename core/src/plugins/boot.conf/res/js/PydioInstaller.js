@@ -1,20 +1,39 @@
 (function(global){
 
-    const InstallerDialog = React.createClass({
+    const WelcomeScreen = React.createClass({
 
-        mixins:[
-            PydioReactUI.ActionDialogMixin
-        ],
-
-        getDefaultProps: function(){
-            return {
-                dialogTitle: "Welcome to Pydio",
-                dialogIsModal: true,
-                dialogSize:'lg'
-            };
+        switchLanguage: function(event, key, payload){
+            global.pydio.fire('language_changed');
+            global.pydio.currentLanguage = payload;
+            global.pydio.loadI18NMessages(payload);
         },
 
+        render: function(){
+
+            let languages = [], currentLanguage;
+            global.pydio.listLanguagesWithCallback(function(key, label, selected){
+                if(selected) currentLanguage = key;
+                languages.push(<MaterialUI.MenuItem value={key} primaryText={label}/>);
+            });
+
+            return (
+                <div id="installer_form" style={{fontSize:13, paddingBottom:24}}>
+                    <img className="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style={{display:'block', margin:'20px auto'}}/>
+                    <div className="installerWelcome">{global.pydio.MessageHash['installer.3']}</div>
+                    <MaterialUI.SelectField floatingLabelText="Pick your language" value={currentLanguage} onChange={this.switchLanguage}>
+                        {languages}
+                    </MaterialUI.SelectField>
+                </div>
+            );
+
+        }
+
+    });
+
+    const Configurator = React.createClass({
+
         componentDidMount: function() {
+
             PydioApi.getClient().request({
                 get_action:'load_installer_form',
                 lang:this.props.pydio.currentLanguage
@@ -46,43 +65,48 @@
 
                 this.setState({
                     parameters: formParameters,
-                    groups: groups,
-                    values: values
+                    groups: groups
+                });
+                this.props.setParentState({
+                    values: values,
+                    installationParams: this.computeInstallationParams(values)
                 });
 
             }.bind(this));
         },
 
+
         getInitialState: function(){
-            return {
-                welcomeScreen: true,
-                stepIndex: 0,
-                maxHeight: DOMUtils.getViewportHeight() - 40
-            }
+            return {minorStep: 0};
         },
 
         onFormChange: function(values){
-            if(values['ADMIN_USER_LOGIN'] !== this.state.values['ADMIN_USER_LOGIN']
-                && this.state.values['ADMIN_USER_LOGIN'] === this.state.values['ADMIN_USER_NAME']){
+            if(values['ADMIN_USER_LOGIN'] !== this.props.parentState.values['ADMIN_USER_LOGIN']
+                && this.props.parentState.values['ADMIN_USER_LOGIN'] === this.props.parentState.values['ADMIN_USER_NAME']){
                 values['ADMIN_USER_NAME'] = values['ADMIN_USER_LOGIN'];
             }
             if(this.props.onFormChange){
                 this.props.onFormChange(values);
             }
-            this.setState({values: values});
-        },
-
-        handleNext : function(){
-            const {stepIndex} = this.state;
-            this.setState({
-                stepIndex: stepIndex + 1
+            this.props.setParentState({
+                values: values,
+                installationParams: this.computeInstallationParams(values)
             });
         },
 
+        handleNext : function(){
+            const {minorStep} = this.state;
+            this.setState({
+                minorStep: minorStep + 1
+            }, () => {this.props.refreshModal()});
+        },
+
         handlePrev: function(){
-            const {stepIndex} = this.state;
-            if (stepIndex > 0) {
-                this.setState({stepIndex: stepIndex - 1});
+            const {minorStep} = this.state;
+            if (minorStep > 0) {
+                this.setState({
+                    minorStep: minorStep - 1
+                }, () => {this.props.refreshModal()});
             }
         },
 
@@ -103,9 +127,9 @@
         },
 
         checkDBPanelValidity: function(){
-            let db_type = this.state.values['db_type'];
+            let values = this.props.parentState.values;
+            let db_type = values['db_type'];
             if(!db_type) return false;
-            let values = this.state.values;
             let params = this.state.parameters;
             let missing = 0;
             params.map(function(p){
@@ -129,7 +153,7 @@
             }.bind(this));
         },
 
-        computeInstallationParams(){
+        computeInstallationParams(values){
 
             let allParams = {
                 get_action:'apply_installer_form',
@@ -138,37 +162,16 @@
             for(var key in this.refs){
                 if(!this.refs.hasOwnProperty(key) || key.indexOf('form-') !== 0) continue;
                 let formPanel = this.refs[key];
-                allParams = Object.assign(allParams, formPanel.getValuesForPOST(this.state.values, ''));
+                allParams = Object.assign(allParams, formPanel.getValuesForPOST(values, ''));
             }
 
             return allParams;
         },
 
-        installPydio: function(){
-
-            let allParams = this.state.installationParams || this.computeInstallationParams();
-
-            PydioApi.getClient().request(allParams, function(transp){
-                if(this.props.beforeInstallStep){
-                    this.setState({customPanel: null});
-                }
-                if(transp.responseText && transp.responseText === 'OK'){
-                    this.setState({INSTALLED: true});
-                    global.setTimeout(function(){
-                        global.document.location.reload(true);
-                    }, 3000);
-                }else if(transp.responseJSON){
-                    this.setState({
-                        INSTALLED: true,
-                        HTACCESS_NOTIF: transp.responseJSON
-                    });
-                }
-            }.bind(this));
-        },
-
         renderStepActions(step, groupKey) {
-            const {stepIndex} = this.state;
-            let LAST_STEP = (stepIndex === this.state.groups.size - 1);
+
+            const {minorStep} = this.state;
+            let LAST_STEP = (minorStep === this.state.groups.size - 1);
             let forwardLabel = LAST_STEP ? 'Install Pydio Now' : 'Next';
             let nextDisabled = !this.state.groups.get(groupKey).valid;
             let nextCallback = this.handleNext.bind(this);
@@ -177,11 +180,12 @@
                 nextDisabled = this.checkDBPanelValidity();
                 forwardLabel = this.state.dbTestFailed ? "Cannot connect, try again" : "Test DB Connection";
                 nextCallback = function(){
-                    let testValues = this.refs['form-' + groupKey].getValuesForPOST(this.state.values);
+                    let testValues = this.refs['form-' + groupKey].getValuesForPOST(this.props.parentState.values);
                     this.testDBConnection(testValues);
                 }.bind(this);
             }
             if(LAST_STEP){
+                /*
                 if(this.props.beforeInstallStep){
                     nextCallback = ()=> {
                         this.setState({
@@ -191,7 +195,7 @@
                     };
                 }else{
                     nextCallback = this.installPydio.bind(this);
-                }
+                }*/
             }
 
             if(this.props.renderStepActions){
@@ -219,7 +223,7 @@
                     {step > 0 && (
                         <MaterialUI.FlatButton
                             label="Back"
-                            disabled={stepIndex === 0}
+                            disabled={minorStep === 0}
                             disableTouchRipple={true}
                             disableFocusRipple={true}
                             onTouchTap={this.handlePrev}
@@ -229,60 +233,15 @@
             );
         },
 
-        switchLanguage: function(event, key, payload){
-            global.pydio.fire('language_changed');
-            global.pydio.currentLanguage = payload;
-            global.pydio.loadI18NMessages(payload);
-        },
-
         render: function(){
 
-            if(this.state.customPanel){
-
-                return this.state.customPanel;
-
-            }else if(!this.state.parameters){
+            if(!this.state.parameters){
 
                 return <PydioReactUI.Loader/>;
 
-            }else if(this.state.welcomeScreen){
-
-                let languages = [], currentLanguage;
-                global.pydio.listLanguagesWithCallback(function(key, label, selected){
-                    if(selected) currentLanguage = key;
-                    languages.push(<MaterialUI.MenuItem value={key} primaryText={label}/>);
-                });
-
-                return (
-                    <div id="installer_form">
-                        <img className="install_pydio_logo" src="plugins/gui.ajax/PydioLogo250.png" style={{display:'block', margin:'20px auto'}}/>
-                        <div className="installerWelcome">{global.pydio.MessageHash['installer.3']}</div>
-                        <MaterialUI.SelectField floatingLabelText="Pick your language" value={currentLanguage} onChange={this.switchLanguage}>
-                            {languages}
-                        </MaterialUI.SelectField>
-                        <div>
-                            <MaterialUI.RaisedButton label="Start Installation" onTouchTap={()=>{this.setState({welcomeScreen:false});}}/>
-                        </div>
-                    </div>
-                );
-
-            }else if(this.state.INSTALLED){
-
-                if(this.state.HTACCESS_NOTIF){
-
-                    return <div>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
-                        Please update the file <em>{this.state.HTACCESS_NOTIF.file}</em> !
-                        After applying this, just reload the page and can log in with
-                        the admin user {this.state.values['ADMIN_USER_LOGIN']} you have just defined.</div>;
-
-                }else{
-                    return <div>Pydio Installation succeeded! The page will now reload automatically. You can log in with
-                        the admin user {this.state.values['ADMIN_USER_LOGIN']} you have just defined. The page with reload automatically in 3s.</div>;
-                }
-
             }
 
-            const {stepIndex} = this.state;
+            const {minorStep} = this.state;
 
             let forms = [], index = 0;
             this.state.groups.forEach(function(gData, groupKey){
@@ -295,7 +254,7 @@
                                 ref={"form-" + groupKey}
                                 className="stepper-form-panel"
                                 parameters={this.state.parameters}
-                                values={this.state.values}
+                                values={this.props.parentState.values}
                                 onChange={this.onFormChange}
                                 disabled={false}
                                 limitToGroups={[groupKey]}
@@ -312,8 +271,8 @@
             }.bind(this));
 
             return (
-                <div style={{maxHeight: this.state.maxHeight, overflowY: 'auto', paddingBottom: 24}}>
-                    <MaterialUI.Stepper activeStep={stepIndex} orientation="vertical">
+                <div style={{paddingBottom: 24}}>
+                    <MaterialUI.Stepper activeStep={minorStep} orientation="vertical">
                         {forms}
                     </MaterialUI.Stepper>
                 </div>
@@ -322,10 +281,145 @@
 
     });
 
+    const Installer = React.createClass({
+
+        getInitialState: function(){
+            return {INSTALLED: false};
+        },
+
+        componentDidMount: function(){
+            this.installPydio();
+        },
+
+        installPydio: function(){
+
+            const allParams = this.props.parentState.installationParams;
+            PydioApi.getClient().request(allParams, function(transp){
+                if(transp.responseText && transp.responseText === 'OK'){
+                    this.setState({INSTALLED: true});
+                    global.setTimeout(function(){
+                        global.document.location.reload(true);
+                    }, 3000);
+                }else if(transp.responseJSON){
+                    this.setState({
+                        INSTALLED: true,
+                        HTACCESS_NOTIF: transp.responseJSON
+                    });
+                }
+            }.bind(this));
+
+        },
+
+
+        render: function(){
+
+            if(!this.state.INSTALLED){
+
+                return <PydioReactUI.Loader/>
+
+            }else  if(this.state.HTACCESS_NOTIF){
+
+                return <div>Pydio Installation succeeded, but we could not successfully edit the .htaccess file.<br/>
+                    Please update the file <em>{this.state.HTACCESS_NOTIF.file}</em> !
+                    After applying this, just reload the page and can log in with
+                    the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined.</div>;
+
+            }else{
+
+                return <div>Pydio Installation succeeded! The page will now reload automatically. You can log in with
+                    the admin user {this.props.parentState.values['ADMIN_USER_LOGIN']} you have just defined. The page with reload automatically in 3s.</div>;
+
+            }
+
+        }
+    });
+
+    const InstallerDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: "Welcome to Pydio",
+                dialogIsModal: true,
+                dialogSize:'lg',
+                dialogScrollBody:true,
+                majorSteps: [
+                    {componentClass: WelcomeScreen, button: "Start Configuration"},
+                    {componentClass: Configurator, button: "Install Pydio Now"},
+                    {componentClass: Installer}
+                ]
+            };
+        },
+
+        getInitialState: function(){
+            return {
+                majorStep: 0,
+                values: []
+            }
+        },
+
+        refreshModal: function(){
+            if(this.props.modalData && this.props.modalData.modal){
+                this.props.modalData.modal.initModalFromComponent(this);
+            }
+        },
+
+        updateMajorStep: function(){
+            const {majorStep} = this.state;
+            this.setState({majorStep: majorStep + 1}, () => {this.refreshModal()});
+        },
+
+        getButtons: function(){
+
+            const {button} = this.props.majorSteps[this.state.majorStep];
+            if(!button){
+                return [];
+            }
+            let disabled = false;
+            if(this.refs.currentPanel && this.refs.currentPanel.isValid){
+                disabled = !this.refs.currentPanel.isValid();
+            }
+            return ([<MaterialUI.FlatButton
+                    label={button}
+                    primary={true}
+                    disabled={disabled}
+                    onTouchTap={()=>{this.updateMajorStep();}}/>
+            ]);
+
+        },
+
+        updateMainState: function(partialState){
+            this.setState(partialState, () => {this.refreshModal});
+        },
+
+
+        render: function(){
+
+            const {componentClass} = this.props.majorSteps[this.state.majorStep];
+
+            const props = Object.assign({
+                ref               :'currentPanel',
+                refreshModal      : this.refreshModal,
+                parentState       : this.state,
+                setParentState    : this.updateMainState
+            }, this.props);
+
+            return React.createElement(componentClass, props);
+
+        }
+
+    });
+
 
 
     global.PydioInstaller = {
         Dialog: InstallerDialog,
+        Configurator: Configurator,
+        Installer: Installer,
+        WelcomeScreen: WelcomeScreen,
         openDialog: function(){
             global.pydio.UI.openComponentInModal('PydioInstaller', 'Dialog');
         }

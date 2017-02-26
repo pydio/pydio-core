@@ -117,6 +117,9 @@ export default React.createClass({
         if(component.getPadding){
             this.setState({padding: component.getPadding()});
         }
+        if(component.scrollBody && component.scrollBody()){
+            this.setState({scrollBody:true});
+        }
         if(component.setModal){
             component.setModal(this);
         }
@@ -133,7 +136,7 @@ export default React.createClass({
         var modalContent;
 
         const { state, sizes, styles } = this
-        const { async, componentData, title, actions, modal, className, open, size, padding } = state
+        const { async, componentData, title, actions, modal, className, open, size, padding, scrollBody } = state
 
         if (componentData) {
             if(async) {
@@ -177,6 +180,7 @@ export default React.createClass({
                 open={open}
                 contentClassName={className}
                 repositionOnUpdate={false}
+                autoScrollBodyContent={scrollBody}
 
                 contentStyle={dialogContent}
                 bodyStyle={dialogBody}
