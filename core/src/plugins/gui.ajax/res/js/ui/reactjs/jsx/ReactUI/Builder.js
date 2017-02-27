@@ -38,7 +38,6 @@
                 let namespace = tNodes[i].getAttribute("namespace");
                 let component = tNodes[i].getAttribute("component");
 
-                console.log(namespace, component, containerId);
                 if(themeSpecific && this._pydio.Parameters.get("theme") && this._pydio.Parameters.get("theme") != themeSpecific){
                     continue;
                 }
