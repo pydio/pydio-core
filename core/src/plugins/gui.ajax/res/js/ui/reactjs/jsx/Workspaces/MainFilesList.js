@@ -88,7 +88,47 @@ let MainFilesList = React.createClass({
             thumbSize   : 200,
             elementsPerLine: 5,
             columns     : columns ? columns : configParser.getDefaultListColumns(),
-            parentIsScrolling: this.props.parentIsScrolling
+            parentIsScrolling: this.props.parentIsScrolling,
+            repositoryId: this.props.pydio.repositoryId
+        }
+    },
+
+    componentDidMount: function(){
+        // Hook to the central datamodel
+        this._contextObserver = function(){
+            this.setState({contextNode: this.props.pydio.getContextHolder().getContextNode()});
+        }.bind(this);
+        this.props.pydio.getContextHolder().observe("context_changed", this._contextObserver);
+        this.props.pydio.getController().updateGuiActions(this.getPydioActions());
+
+        this.recomputeThumbnailsDimension();
+        if(window.addEventListener){
+            window.addEventListener('resize', this.recomputeThumbnailsDimension);
+        }else{
+            window.attachEvent('onresize', this.recomputeThumbnailsDimension);
+        }
+    },
+
+    componentWillUnmount: function(){
+        this.props.pydio.getContextHolder().stopObserving("context_changed", this._contextObserver);
+        this.getPydioActions(true).map(function(key){
+            this.props.pydio.getController().deleteFromGuiActions(key);
+        }.bind(this));
+        if(window.addEventListener){
+            window.removeEventListener('resize', this.recomputeThumbnailsDimension);
+        }else{
+            window.detachEvent('onresize', this.recomputeThumbnailsDimension);
+        }
+    },
+
+    componentWillReceiveProps: function(){
+        if(this.state && this.state.repositoryId !== this.props.pydio.repositoryId ){
+            this.props.pydio.getController().updateGuiActions(this.getPydioActions());
+            let configParser = new ComponentConfigsParser();
+            const columns = configParser.loadConfigs('FilesList').get('columns');
+            this.setState({
+                columns: columns ? columns : configParser.getDefaultListColumns(),
+            })
         }
     },
 
@@ -129,34 +169,6 @@ let MainFilesList = React.createClass({
         });
 
 
-    },
-
-    componentDidMount: function(){
-        // Hook to the central datamodel
-        this._contextObserver = function(){
-            this.setState({contextNode: this.props.pydio.getContextHolder().getContextNode()});
-        }.bind(this);
-        this.props.pydio.getContextHolder().observe("context_changed", this._contextObserver);
-        this.props.pydio.getController().updateGuiActions(this.getPydioActions());
-
-        this.recomputeThumbnailsDimension();
-        if(window.addEventListener){
-            window.addEventListener('resize', this.recomputeThumbnailsDimension);
-        }else{
-            window.attachEvent('onresize', this.recomputeThumbnailsDimension);
-        }
-    },
-
-    componentWillUnmount: function(){
-        this.props.pydio.getContextHolder().stopObserving("context_changed", this._contextObserver);
-        this.getPydioActions(true).map(function(key){
-            this.props.pydio.getController().deleteFromGuiActions(key);
-        }.bind(this));
-        if(window.addEventListener){
-            window.removeEventListener('resize', this.recomputeThumbnailsDimension);
-        }else{
-            window.detachEvent('onresize', this.recomputeThumbnailsDimension);
-        }
     },
 
     entryRenderIcon: function(node, entryProps = {}){
