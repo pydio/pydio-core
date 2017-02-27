@@ -476,11 +476,16 @@ let SimpleList = React.createClass({
         return nodeActions;
     },
 
-    updateInfiniteContainerHeight: function(){
+    updateInfiniteContainerHeight: function(retries = false){
         var containerHeight = this.refs.infiniteParent.clientHeight;
         if(this.props.heightAutoWithMax){
             var elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;
             containerHeight = Math.min(this.props.node.getChildren().size * elementHeight ,this.props.heightAutoWithMax);
+        }
+        if(!containerHeight && !retries ){
+            global.setTimeout(function(){
+                this.updateInfiniteContainerHeight(true);
+            }.bind(this), 50);
         }
         this.setState({containerHeight:containerHeight});
     },
@@ -715,7 +720,7 @@ let SimpleList = React.createClass({
         var theShowSelector = this.state && this.state.showSelector;
         if(showSelector !== undefined) theShowSelector = showSelector;
 
-        if(!this.indexedElements) {
+        if(!this.indexedElements || this.indexedElements.length !== theNode.getChildren().size) {
             this.indexedElements = [];
             if(this.state && this.state.groupBy){
                 var groupBy = this.state.groupBy;
