@@ -1317,6 +1317,9 @@ div.shadow_class {
 .react-mui-context .mui-dialog-window .mui-dialog-window-contents.dialog-no-padding .mui-dialog-content {
   padding: 0 !important;
 }
+.react-mui-context input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset;
+}
 #activity_monitor_warning {
   box-shadow: none;
   cursor: pointer;

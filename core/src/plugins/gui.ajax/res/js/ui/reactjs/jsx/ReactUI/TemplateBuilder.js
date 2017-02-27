@@ -134,13 +134,15 @@ export default React.createClass({
                     componentName={componentName}
                     {...props}
                     loaderStyle={style}
+                    style={style}
                 />
             );
 
         }.bind(this));
 
-        if(components.length === 1) return components[0];
-        else {
+        if(components.length === 1) {
+            return components[0];
+        } else {
             return <div style={style} id={this.props.containerId}>{components}</div>
         }
 

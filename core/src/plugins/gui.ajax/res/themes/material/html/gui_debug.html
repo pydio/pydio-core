@@ -43,7 +43,7 @@ window.ajxpThemeSkipLoaderProgress = true;
 window.useReactPydioUI = true;
 var ajaxplorer, startParameters = {};
 <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
-window.ajxpBootstrap = new PydioBootstrap(startParameters);
+window.pydioBootstrap = new PydioBootstrap(startParameters);
     </script>
     <?php
 $list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_core.txt";
