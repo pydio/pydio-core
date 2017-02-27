@@ -306,15 +306,14 @@
             }
         },
 
-        getInitialState: function(){
-
-            this.selectionModel = this.props.selectionModel || new SelectionModel(this.props.node);
+        computeStateFromProps: function(props){
+            this.selectionModel = props.selectionModel || new SelectionModel(props.node);
             this.selectionModel.observe('selectionChanged', function(){
                 this.updateStateNode(this.selectionModel.current());
             }.bind(this));
 
-            let {url} = this.computeImageData(this.props.node);
-            SizeComputer.loadImageSize(url, this.props.node, this.imageSizeCallback);
+            let {url} = this.computeImageData(props.node);
+            SizeComputer.loadImageSize(url, props.node, this.imageSizeCallback);
 
             return {
                 currentNode: this.selectionModel.current(),
@@ -322,6 +321,18 @@
                 fitToScreen:true,
                 zoomFactor: 1
             };
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.node !== this.props.node){
+                this.setState(this.computeStateFromProps(nextProps));
+            }
+        },
+
+        getInitialState: function(){
+
+            return this.computeStateFromProps(this.props);
+
         },
 
         updateStateNode: function(node){
