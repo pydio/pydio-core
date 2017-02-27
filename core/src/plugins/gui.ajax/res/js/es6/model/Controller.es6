@@ -135,25 +135,6 @@ class Controller extends Observable{
         }
     }
 
-    uiInsertForm(formId, formCode){
-        if(this._pydioObject.UI){
-            this._pydioObject.UI.insertForm(formId, formCode);
-        }
-    }
-
-    uiRemoveForm(formId){
-        if(this._pydioObject.UI){
-            this._pydioObject.UI.removeForm(formId);
-        }
-    }
-
-    uiGetModal(){
-        if(this._pydioObject && this._pydioObject.UI){
-            return this._pydioObject.UI.modal
-        }
-        return null;
-    }
-
     uiMountComponents(componentsNodes){
         if(this._pydioObject && this._pydioObject.UI){
             return this._pydioObject.UI.mountComponents(componentsNodes);

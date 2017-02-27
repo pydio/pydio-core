@@ -110,12 +110,11 @@ class PydioBootstrap{
                 return;
             }
             var phpError;
-            try{
-                var data = transport.responseText.evalJSON();
-            }catch(e){
-                phpError = 'Error while parsing JSON response : ' + e.message;
+            let data;
+            if(transport.responseJSON) {
+                data = transport.responseJSON;
             }
-            if(!typeof data == "object"){
+            if(!typeof data === "object"){
                 phpError = 'Exception uncaught by application : ' + transport.responseText;
             }
             if(phpError){
@@ -125,7 +124,9 @@ class PydioBootstrap{
                 }
                 return;
             }
-            this.parameters.update(data);
+            for(let key in data){
+                if(data.hasOwnProperty(key)) this.parameters.set(key, data[key]);
+            }
 
             if(this.parameters.get('SECURE_TOKEN')){
                 Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');

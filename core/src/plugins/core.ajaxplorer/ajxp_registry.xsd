@@ -486,6 +486,9 @@
             <xs:attribute name="element" use="required" type="xs:NCName"/>
             <xs:attribute name="name" use="required" type="xs:NCName"/>
             <xs:attribute name="position" use="required" type="xs:NCName"/>
+            <xs:attribute name="namespace" type="xs:NCName"/>
+            <xs:attribute name="component" type="xs:NCName"/>
+            <xs:attribute name="props" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
             <xs:attribute name="label" type="xs:all"/>
         </xs:complexType>

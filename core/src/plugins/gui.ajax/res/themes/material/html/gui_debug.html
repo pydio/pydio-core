@@ -38,10 +38,7 @@ foreach ($lines as $line){
     <div id="ajxp_desktop"></div>
 
         <script type="text/javascript">
-window.ajxpNoNotifLoader = true;
-window.ajxpThemeSkipLoaderProgress = true;
-window.useReactPydioUI = true;
-var ajaxplorer, startParameters = {};
+var pydio, startParameters = {};
 <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
 window.pydioBootstrap = new PydioBootstrap(startParameters);
     </script>
@@ -57,10 +54,5 @@ foreach ($lines as $line){
     print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
     }
     ?>
-    <div id="all_forms">
-        <div id="generic_dialog_box" class="dialogBox form-login_form"><div class="dialogTitle"></div><div class="dialogContent"></div></div>
-        <div id="hidden_frames" style="display:none;"></div>
-        <div id="hidden_forms" style="position:absolute;left:-1000px;"></div>
-    </div>
     </body>
 </html>

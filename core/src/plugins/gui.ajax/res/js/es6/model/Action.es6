@@ -148,16 +148,6 @@ class Action extends Observable{
 	apply(){
 		if(this.deny) return;
         this.manager.publishActionEvent("beforeApply-"+this.options.name);
-		if(this.options.prepareModal){
-            var modal = this.manager.uiGetModal();
-            if(modal){
-                modal.prepareHeader(
-                    this.options.title,
-                    this.options.src,
-                    this.options.icon_class
-                );
-            }
-		}
 		window.actionArguments = [];
 		window.actionManager = this.manager;
 		if(arguments[0]) window.actionArguments = arguments[0];
@@ -188,10 +178,12 @@ class Action extends Observable{
 			if(onCancelNode && onCancelNode.firstChild) onCancelFunc = new Function("oForm", onCancelNode.firstChild.nodeValue);
 			
 			this.options.callback = function(){
+			    /*
                 var modal = this.manager.uiGetModal();
                 if(modal){
                      modal.showDialogForm('Dialog', dialogFormId, onOpenFunc, onCompleteFunc, onCancelFunc, okButtonOnly, skipButtons);
                 }
+                */
             }.bind(this);
 			this.options.callback();
 			this.options.callbackDialogNode = null;
@@ -483,13 +475,6 @@ class Action extends Observable{
 						this.options.activeCondition = new Function(processNode.firstChild.nodeValue.trim());
 					}
 				}
-                if(clientFormData.formId){
-                    this.options.formId = clientFormData.formId;
-                    this.options.formCode = clientFormData.formCode;
-                    if(this.options.formCode && this.options.formId){
-                        this.manager.uiInsertForm(this.options.formId, this.options.formCode);
-                    }
-                }
 			}else if(node.nodeName == "gui"){
 				this.options.text_id = node.getAttribute('text');
 				this.options.title_id = node.getAttribute('title');
@@ -774,9 +759,6 @@ class Action extends Observable{
 	 */
 	remove(){
         this.notify("remove");
-        if(this.options.formId){
-            this.manager.uiRemoveForm(this.options.formId);
-        }
 	}
 	
 	/**

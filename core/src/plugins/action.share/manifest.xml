@@ -28,7 +28,7 @@
             <css file="plugins/action.share/res/react-share-form.css" autoload="true"/>
             <js file="plugins/action.share/res/build/model/ShareModel.js" className="ReactModelShare"/>
             <js file="plugins/action.share/res/build/model/ShareActions.js" className="ShareActions"/>
-            <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React"/>
+            <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React,PydioWorkspaces"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
         </resources>
@@ -222,6 +222,8 @@
             </action>
         </actions>
         <client_configs>
+            <template name="minisite_orbit" element="ajxp_shared_folder" namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_shared_folder"}' position="top"/>
+            <!--
             <template name="minisite_orbit" element="ajxp_shared_folder" position="top" label="share_center.153"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget"  ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>
@@ -242,6 +244,7 @@
                 });
                 </script>
 			]]></template>
+			-->
             <template name="minisite_film_strip" element="ajxp_film_strip" position="top" label="share_center.154"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
                     <div id="logo_widget" class="widget_logo" ajxpClass="LogoWidget" ajxpOptions='{"imageParameter":"gui.ajax/CUSTOM_MINISITE_LOGO"}'></div>

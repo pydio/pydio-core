@@ -91,7 +91,7 @@
 
             let errorMessage;
             if(this.state.errorId){
-                errorMessage = <div class="ajxp_login_error">{pydio.MessageHash[this.state.errorId]}</div>;
+                errorMessage = <div className="ajxp_login_error">{pydio.MessageHash[this.state.errorId]}</div>;
             }
             let captcha;
             if(this.state.displayCaptcha){

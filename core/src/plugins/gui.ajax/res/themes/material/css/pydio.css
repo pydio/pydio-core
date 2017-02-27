@@ -1320,6 +1320,11 @@ div.shadow_class {
 .react-mui-context input:-webkit-autofill {
   -webkit-box-shadow: 0 0 0px 1000px white inset;
 }
+.react-mui-context .ajxp_login_error {
+  margin-top: 12px;
+  color: #D32F2F;
+  font-size: 14px;
+}
 #activity_monitor_warning {
   box-shadow: none;
   cursor: pointer;

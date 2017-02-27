@@ -116,7 +116,7 @@ class Connexion{
      * Show a small loader
      */
     showLoader(){
-        if(this.discrete) return;
+        if(this.discrete || !pydio) return;
         pydio.notify("connection-start");
     }
 
@@ -124,7 +124,7 @@ class Connexion{
      * Hide a small loader
      */
     hideLoader(){
-        if(this.discrete) return;
+        if(this.discrete || !pydio) return;
         pydio.notify("connection-end");
     }
 
@@ -279,7 +279,9 @@ class Connexion{
 			this.onComplete(parsedBody);
 
 		}
-		pydio.fire("server_answer", this);
+		if(pydio){
+    		pydio.fire("server_answer", this);
+        }
 	}
 
     uploadFile(file, fileParameterName, uploadUrl, onComplete, onError, onProgress, xhrSettings){

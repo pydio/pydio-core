@@ -38,6 +38,7 @@
                 let namespace = tNodes[i].getAttribute("namespace");
                 let component = tNodes[i].getAttribute("component");
 
+                console.log(namespace, component, containerId);
                 if(themeSpecific && this._pydio.Parameters.get("theme") && this._pydio.Parameters.get("theme") != themeSpecific){
                     continue;
                 }
@@ -190,21 +191,6 @@
         }
         initObjects(){}
         updateI18nTags(){}
-        insertForm(formId, formCode){
-            let formsContainer = document.getElementById("all_forms");
-            if(!formsContainer.querySelector('#' + formId)){
-                this.insertChildFromString(formsContainer, formCode);
-            }
-        }
-        removeForm(formId){
-            try{
-                let formsContainer = document.getElementById("all_forms");
-                let child = formsContainer.querySelector('#' + formId);
-                if(child){
-                    formsContainer.removeChild(child);
-                }
-            }catch(e){}
-        }
         mountComponents(componentsNodes){}
 
         disableShortcuts(){}

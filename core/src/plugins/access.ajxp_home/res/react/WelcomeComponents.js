@@ -709,11 +709,11 @@
         },
         onShowLegend: function(){
             // PROTO STUFF!
-            $('home_center_panel').addClassName('legend_visible');
+            //$('home_center_panel').addClassName('legend_visible');
         },
         onHideLegend: function(){
             // PROTO STUFF!
-            $('home_center_panel').removeClassName('legend_visible');
+            //$('home_center_panel').removeClassName('legend_visible');
         },
         onHoverLink:function(event, ws){
             FuncUtils.bufferCallback('hoverWorkspaceTimer', 400, function(){

@@ -29,10 +29,6 @@ class Pydio extends Observable{
 
     fire(eventName, data){
         this.notify(eventName, data);
-        // Backward compatibility
-        if(document.fire){
-            document.fire("ajaxplorer:" + eventName, data);
-        }
     }
 
 
@@ -46,12 +42,6 @@ class Pydio extends Observable{
                 this.init();
             }.bind(this));
             return;
-        }
-
-        if(!window.useReactPydioUI){
-
-            this.UI = new PydioUI(this);
-
         }
 
         let modal = this.UI && this.UI.modal ? this.UI.modal : (window.modal ? window.modal : null);
@@ -92,24 +82,23 @@ class Pydio extends Observable{
 
         var starterFunc = function(){
 
-            if(!this.UI && window.useReactPydioUI){
-                ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], function(){
-                    this.UI = new PydioReactUI.Builder(this);
-                    this.UI.initTemplates();
+            ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], function(){
 
-                    if(!this.user) {
-                        PydioApi.getClient().tryToLogUserFromRememberData();
-                    }
-                    this.fire("registry_loaded", this.Registry.getXML());
+                this.UI = new PydioReactUI.Builder(this);
+                this.UI.initTemplates();
 
-                    window.setTimeout(function(){
-                        this.fire('loaded');
-                    }.bind(this), 200);
+                if(!this.user) {
+                    PydioApi.getClient().tryToLogUserFromRememberData();
+                }
+                this.fire("registry_loaded", this.Registry.getXML());
 
-                    this.Router = new Router(this);
+                window.setTimeout(function(){
+                    this.fire('loaded');
+                }.bind(this), 200);
 
-                }.bind(this));
-            }
+                this.Router = new Router(this);
+
+            }.bind(this));
 
         }.bind(this);
 

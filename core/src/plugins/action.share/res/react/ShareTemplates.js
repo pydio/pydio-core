@@ -97,8 +97,58 @@
 
     });
 
+    const {Breadcrumb, SearchForm, MainFilesList} = PydioWorkspaces;
+
+    var FolderMinisite = React.createClass({
+
+        childContextTypes: {
+            messages:React.PropTypes.object,
+            getMessage:React.PropTypes.func
+        },
+
+        getChildContext: function() {
+            var messages = this.props.pydio.MessageHash;
+            return {
+                messages: messages,
+                getMessage: function(messageId){
+                    try{
+                        return messages[messageId] || messageId;
+                    }catch(e){
+                        return messageId;
+                    }
+                }
+            };
+        },
+
+        render: function(){
+            return (
+                <div className="vertical_fit vertical_layout">
+                    <div id="workspace_toolbar">
+                        <Breadcrumb {...this.props}/>
+                        <SearchForm {...this.props}/>
+                    </div>
+                    <MainFilesList ref="list" {...this.props}/>
+                </div>
+            );
+        }
+
+    });
+
+
+    if(window.ReactDND){
+        let DropMinisite = ReactDND.DropTarget(ReactDND.HTML5Backend.NativeTypes.FILE, {drop:function(props, monitor){}}, function (connect, monitor) {
+            return {
+                connectDropTarget: connect.dropTarget(),
+                isOver: monitor.isOver(),
+                canDrop: monitor.canDrop()
+            };
+        })(FolderMinisite);
+        FolderMinisite = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropMinisite);
+    }
+
     var ns = global.ShareTemplates || {};
     ns.DLTemplate = DLTemplate;
+    ns.FolderMinisite = FolderMinisite;
     global.ShareTemplates = ns;
 
 })(window);
