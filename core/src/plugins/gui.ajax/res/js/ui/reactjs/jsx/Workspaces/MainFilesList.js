@@ -68,7 +68,8 @@ class ComponentConfigsParser{
 let MainFilesList = React.createClass({
 
     propTypes: {
-        pydio: React.PropTypes.instanceOf(Pydio)
+        pydio: React.PropTypes.instanceOf(Pydio),
+        horizontalRibbon: React.PropTypes.bool
     },
 
     statics: {
@@ -82,7 +83,7 @@ let MainFilesList = React.createClass({
         let columns = configParser.loadConfigs('FilesList').get('columns');
         return {
             contextNode : this.props.pydio.getContextHolder().getContextNode(),
-            displayMode : 'list',
+            displayMode : this.props.displayMode?this.props.displayMode:'list',
             thumbNearest: 200,
             thumbSize   : 200,
             elementsPerLine: 5,
@@ -101,7 +102,13 @@ let MainFilesList = React.createClass({
         // Find nearest dim
         let blockNumber = Math.floor(containerWidth / nearest);
         let width = Math.floor(containerWidth / blockNumber);
-
+        if(this.props.horizontalRibbon){
+            blockNumber = this.state.contextNode.getChildren().size;
+            if(this.state.displayMode === 'grid-160') width = 160;
+            else if(this.state.displayMode === 'grid-320') width = 320;
+            else if(this.state.displayMode === 'grid-80') width = 80;
+            else width = 200;
+        }
 
         // Recompute columns widths
         let columns = this.state.columns;
@@ -316,11 +323,17 @@ let MainFilesList = React.createClass({
             sortKeys = this.state.columns;
             className += ' material-list-grid grid-size-' + near;
             elementHeight =  Math.ceil(this.state.thumbSize / this.state.elementsPerLine);
+            if(!elementHeight || this.props.horizontalRibbon){
+                elementHeight = 1;
+            }
             elementsPerLine = this.state.elementsPerLine;
             elementStyle={
                 width: this.state.thumbSize,
                 height: this.state.thumbSize
             };
+            if(this.props.horizontalRibbon){
+                className += ' horizontal-ribbon';
+            }
             // Todo: compute a more real number of elements visible per page.
             if(near === 320) infiniteSliceCount = 25;
             else if(near === 160) infiniteSliceCount = 80;
@@ -353,6 +366,7 @@ let MainFilesList = React.createClass({
                 entryRenderSecondLine={entryRenderSecondLine}
                 entryRenderActions={this.entryRenderActions}
                 entryHandleClicks={this.entryHandleClicks}
+                horizontalRibbon={this.props.horizontalRibbon}
             />
         );
     }

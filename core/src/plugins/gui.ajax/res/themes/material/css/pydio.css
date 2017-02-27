@@ -557,6 +557,13 @@ div.dialogBox div#element_overlay {
 .react-mui-context .material-list.main-file-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
   display: block;
 }
+.react-mui-context .material-list.main-file-list.material-list-grid.horizontal-ribbon > div.layout-fill > div {
+  overflow-y: hidden !important;
+  overflow-x: auto !important;
+}
+.react-mui-context .material-list.main-file-list.material-list-grid.horizontal-ribbon > div.layout-fill > div > div {
+  width: 100000px;
+}
 .react-mui-context .material-list.main-file-list .mui-toolbar {
   background-color: transparent;
   padding: 0;
