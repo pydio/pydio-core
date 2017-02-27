@@ -65,7 +65,7 @@
         <noscript><h2>AJXP_MESSAGE[share_center.77]</h2></noscript>
     </head>
 
-    <body style="overflow: hidden;" class="AJXP_PRELOGED_USER">
-        <div id="AJXP_TEMPLATE_NAME" class="react-mui-context vertical_fit vertical_layout"></div>
+    <body style="overflow: hidden;" class="react-mui-context AJXP_PRELOGED_USER">
+        <div id="AJXP_TEMPLATE_NAME" class="vertical_fit vertical_layout"></div>
     </body>
 </html>
