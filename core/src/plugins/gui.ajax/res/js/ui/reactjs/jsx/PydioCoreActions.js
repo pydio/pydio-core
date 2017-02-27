@@ -10,7 +10,7 @@
             modal.showDialogForm('Switch', 'switch_language_form', function(oForm){
                 
                 if(pydio.user) var userLang = pydio.user.getPreference("lang");
-                if(!userLang) userLang = window.ajxpBootstrap.parameters.get("currentLanguage");
+                if(!userLang) userLang = window.pydioBootstrap.parameters.get("currentLanguage");
                 var selector = $(oForm).select('select[id="language_selector"]')[0];
                 pydio.listLanguagesWithCallback(function(key, label){
                     var option = new Element('option', {value:key,id:'lang_'+key});
@@ -42,7 +42,7 @@
                     var selector = $(oForm).select('select[id="language_selector"]')[0];
                     var value = selector.getValue();
                     pydio.loadI18NMessages(value);
-                    window.ajxpBootstrap.parameters.set("currentLanguage", value);
+                    window.pydioBootstrap.parameters.set("currentLanguage", value);
                 }
                 
             }, function(oForm){

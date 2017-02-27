@@ -833,7 +833,7 @@
             if(tmpl.length == 1){
                 return [{LAYOUT_NAME:tmpl[0].getAttribute('element'), LAYOUT_LABEL:''}];
             }
-            var crtTheme = ajxpBootstrap.parameters.get('theme');
+            var crtTheme = pydio.Parameters.get('theme');
             var values = [];
             var noEditorsFound = false;
             tmpl.map(function(node){

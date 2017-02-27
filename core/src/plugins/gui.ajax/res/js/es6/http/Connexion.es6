@@ -363,8 +363,8 @@ class Connexion{
 	 */
 	loadLibrary(fileName, onLoadedCode, aSync){
 
-        if(window.ajxpBootstrap && window.ajxpBootstrap.parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
-            fileName += "?v="+window.ajxpBootstrap.parameters.get("ajxpVersion");
+        if(window.pydioBootstrap && window.pydioBootstrap.parameters.get("ajxpVersion") && fileName.indexOf("?")==-1){
+            fileName += "?v="+window.pydioBootstrap.parameters.get("ajxpVersion");
         }
         const url = (this._libUrl?this._libUrl+'/'+fileName:fileName);
 

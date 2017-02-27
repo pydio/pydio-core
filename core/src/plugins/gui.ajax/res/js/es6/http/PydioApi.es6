@@ -391,9 +391,9 @@ class PydioApi{
                     // BACKWARD COMPAT
                     window.ajxpServerAccessPath = serverAccessPath;
                     this._pydioObject.Parameters.set("ajxpServerAccess", serverAccessPath);
-                    if(window.ajxpBootstrap && ajxpBootstrap.parameters){
-                        ajxpBootstrap.parameters.set("ajxpServerAccess", serverAccessPath);
-                        ajxpBootstrap.parameters.set("SECURE_TOKEN", secure_token);
+                    if(window.pydioBootstrap && pydioBootstrap.parameters){
+                        pydioBootstrap.parameters.set("ajxpServerAccess", serverAccessPath);
+                        pydioBootstrap.parameters.set("SECURE_TOKEN", secure_token);
                     }
                     if(window.Connexion) Connexion.SECURE_TOKEN = secure_token;
                 }

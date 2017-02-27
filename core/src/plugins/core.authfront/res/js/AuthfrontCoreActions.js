@@ -397,15 +397,15 @@
                     var authConfs = pydio.getPluginConfigs("auth");
                     if(!authConfs) authConfs = $H();
                     if(!Modernizr.input.placeholder) oForm.addClassName('no_placeholder');
-                    if(global.ajxpBootstrap.parameters.get('PRESET_LOGIN')){
+                    if(global.pydioBootstrap.parameters.get('PRESET_LOGIN')){
                         oForm.addClassName('ajxp_preset_login');
-                        oForm.down('input[name="userid"]').setValue(global.ajxpBootstrap.parameters.get('PRESET_LOGIN'));
+                        oForm.down('input[name="userid"]').setValue(global.pydioBootstrap.parameters.get('PRESET_LOGIN'));
                     }
-                    if(global.ajxpBootstrap.parameters.get('PRESET_PASSWORD')){
+                    if(global.pydioBootstrap.parameters.get('PRESET_PASSWORD')){
                         oForm.addClassName('ajxp_preset_password');
-                        oForm.down('input[name="password"]').setValue(global.ajxpBootstrap.parameters.get('PRESET_PASSWORD'));
+                        oForm.down('input[name="password"]').setValue(global.pydioBootstrap.parameters.get('PRESET_PASSWORD'));
                     }
-                    if(global.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
+                    if(global.pydioBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
                         oForm.addClassName('ajxp_password_auth');
                         authConfs.set('SECURE_LOGIN_FORM', true);
                         authConfs.set('ENABLE_FORGOT_PASSWORD', false);
@@ -463,7 +463,7 @@
                     var oForm = modal.getForm();
                     var connexion = new Connexion();
                     connexion.addParameter('get_action', 'login');
-                    connexion.addParameter('userid', global.ajxpBootstrap.parameters.get('PRESET_LOGIN')?global.ajxpBootstrap.parameters.get('PRESET_LOGIN'):oForm.userid.value);
+                    connexion.addParameter('userid', global.pydioBootstrap.parameters.get('PRESET_LOGIN')?global.pydioBootstrap.parameters.get('PRESET_LOGIN'):oForm.userid.value);
                     connexion.addParameter('login_seed', oForm.login_seed.value);
                     connexion.addParameter('remember_me', (oForm.remember_me && oForm.remember_me.checked?"true":"false"));
                     if(oForm.login_seed.value != '-1'){
@@ -492,7 +492,7 @@
                             hideLightBox(true);
                         }else{
                             var errorId = PydioApi.getClient().LAST_ERROR_ID;
-                            if(errorId == '285' && global.ajxpBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
+                            if(errorId == '285' && global.pydioBootstrap.parameters.get('PASSWORD_AUTH_ONLY')){
                                 errorId = '553';
                             }
                             if(transport.responseXML && XPathGetSingleNodeText(transport.responseXML.documentElement, "logging_result/@value") == "-4"){
