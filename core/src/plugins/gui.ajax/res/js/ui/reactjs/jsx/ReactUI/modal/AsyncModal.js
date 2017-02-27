@@ -119,6 +119,8 @@ export default React.createClass({
         }
         if(component.scrollBody && component.scrollBody()){
             this.setState({scrollBody:true});
+        }else{
+            this.setState({scrollBody:false});
         }
         if(component.setModal){
             component.setModal(this);
