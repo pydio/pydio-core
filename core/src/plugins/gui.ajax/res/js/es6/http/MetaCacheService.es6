@@ -100,7 +100,12 @@ class MetaCacheService extends Observable{
             let cacheCallback = function(transport){
                 let newData = remoteParser(transport);
                 if(newData !== null){
-                    def.get('data').set(key, newData);
+                    let cachedData = newData;
+                    if(newData instanceof AjxpNode){
+                        cachedData = new AjxpNode();
+                        cachedData.replaceBy(newData);
+                    }
+                    def.get('data').set(key, cachedData);
                     if(expirationPolicy == MetaCacheService.EXPIRATION_LOCAL_NODE){
                         ajxpNode.observeOnce("node_removed", clearValueObserver);
                         ajxpNode.observeOnce("node_replaced", clearValueObserver);
