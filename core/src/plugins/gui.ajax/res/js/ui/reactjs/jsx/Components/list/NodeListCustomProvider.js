@@ -30,6 +30,21 @@ export default React.createClass({
         }
     },
 
+    componentWillReceiveProps: function(nextProps){
+        if(this.props.nodeProviderProperties && this.props.nodeProviderProperties !== nextProps.nodeProviderProperties){
+            let {dataModel, node} = this.state;
+            const provider = new RemoteNodeProvider(nextProps.nodeProviderProperties);
+            dataModel.setAjxpNodeProvider(provider);
+            node.updateProvider(provider);
+            this.setState({dataModel: dataModel, node: node});
+        }else if(this.props.presetDataModel && this.props.presetDataModel !== nextProps.presetDataModel){
+            this.setState({
+                dataModel: nextProps.presetDataModel,
+                node: nextProps.presetDataModel.getRootNode()
+            });
+        }
+    },
+
     getInitialState:function(){
 
         var dataModel, rootNode;
