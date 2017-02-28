@@ -37,7 +37,6 @@ use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\Reflection\DiagnosticRunner;
 use Pydio\Core\Utils\Reflection\DocsParser;
 use Pydio\Core\Utils\Vars\InputFilter;
-use Pydio\Core\Utils\Reflection\JSPacker;
 use Pydio\Core\Utils\Reflection\LocaleExtractor;
 
 use Pydio\Core\Utils\Vars\XMLFilter;
@@ -115,9 +114,6 @@ class RichClient extends Plugin
 
         if (isSet($parameters["skipDebug"])) {
             ConfService::setConf("JS_DEBUG", false);
-        }
-        if (ConfService::getConf("JS_DEBUG") && isSet($parameters["compile"])) {
-            JSPacker::pack();
         }
         if (ConfService::getConf("JS_DEBUG") && isSet($parameters["update_i18n"])) {
             if (isSet($parameters["extract"])) {

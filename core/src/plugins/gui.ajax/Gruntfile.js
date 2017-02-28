@@ -183,6 +183,10 @@ module.exports = function(grunt) {
                 options: {
                     nospawn: true
                 }
+            },
+            manifests: {
+                files: ['../*/manifest.xml'],
+                tasks: ['clean:cache']
             }
         },
         cssmin: {
@@ -207,6 +211,12 @@ module.exports = function(grunt) {
                 }
             }
         },
+        clean: {
+            options: {
+                force: true
+            },
+            cache: ['../../data/cache/plugins_*.*']
+        },
         hub: {
             all: {
                 options:{
@@ -228,6 +238,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-hub');
     grunt.loadNpmTasks('assemble-less');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask('type:js', [
         'copy:debug',
         'babel:dist',

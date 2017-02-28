@@ -26,7 +26,7 @@
                 </gui>
                 <rightsContext noUser="false" userLogged="hidden" guestLogged="show" read="false" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
+                    <clientCallback><![CDATA[
 					var loginRedirect = AJXP_LOGIN_REDIRECT;
 					if(loginRedirect){
 						document.location.href=loginRedirect;
@@ -48,7 +48,7 @@
                 </gui>
                 <rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
                 <processing>
-                    <clientCallback module="AuthfrontCoreActions.Callbacks.sessionLogout" prepareModal="false"/>
+                    <clientCallback module="AuthfrontCoreActions.Callbacks.sessionLogout"/>
                     <serverCallback methodName="switchAction"></serverCallback>
                 </processing>
             </action>
