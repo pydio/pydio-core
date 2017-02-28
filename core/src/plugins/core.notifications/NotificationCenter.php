@@ -211,8 +211,9 @@ class NotificationCenter extends Plugin
         $ctx = $requestInterface->getAttribute("ctx");
         $u = $ctx->getUser();
 
+        $crtPath = isSet($httpVars["path"])? InputFilter::sanitize($httpVars["path"], InputFilter::SANITIZE_DIRNAME) :"";
         $mess = LocaleService::getMessages();
-        $nodesList = new \Pydio\Access\Core\Model\NodesList();
+        $nodesList = new \Pydio\Access\Core\Model\NodesList($crtPath);
         $format = "html";
         if (isSet($httpVars["format"])) {
             $format = $httpVars["format"];
@@ -248,7 +249,7 @@ class NotificationCenter extends Plugin
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
         $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]): 15;
         if(!isSet($httpVars["feed_type"]) || $httpVars["feed_type"] == "notif" || $httpVars["feed_type"] == "all"){
-            $res = $this->eventStore->loadEvents($authRepos, isSet($httpVars["path"])?$httpVars["path"]:"", $userGroup, $offset, $limit, false, $userId);
+            $res = $this->eventStore->loadEvents($authRepos, $crtPath, $userGroup, $offset, $limit, false, $userId);
         }else{
             $res = array();
         }

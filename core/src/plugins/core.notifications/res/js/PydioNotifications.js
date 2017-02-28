@@ -1,5 +1,66 @@
 (function(global){
 
+    let ActivityPanel = React.createClass({
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.node !== this.props.node){
+                this.forceUpdate(function(){
+                    console.log("reload?");
+                    this.refs.provider.reload();
+                }.bind(this));
+            }
+        },
+
+        getProviderProperties: function(node){
+
+            return {
+                "get_action":"get_my_feed",
+                "connexion_discrete":true,
+                "format":"xml", "current_repository":"true",
+                "feed_type":"notif",
+                "limit":(node.isLeaf() || node.isRoot() ? 18 : 4),
+                "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
+                "merge_description":"true",
+                "description_as_label":node.isLeaf()?"true":"false",
+                "cache_service":{
+                    "metaStreamName":"files.activity" + node.getPath(),
+                    "expirationPolicy":MetaCacheService.EXPIRATION_MANUAL_TRIGGER
+                }
+            };
+
+        },
+
+        render: function(){
+
+            const {node, pydio} = this.props;
+
+            let dataModel = new PydioDataModel(true);
+            const rNodeProvider = new RemoteNodeProvider(this.getProviderProperties(node));
+            const rootNode = new AjxpNode(node.getPath(), false, "Activity", "", rNodeProvider);
+            dataModel.setAjxpNodeProvider(rNodeProvider);
+            dataModel.setRootNode(rootNode);
+
+
+            return (
+
+                <PydioDetailPanes.InfoPanelCard title="Activity">
+                    <PydioComponents.NodeListCustomProvider
+                        pydio={pydio}
+                        className="small"
+                        elementHeight={53}
+                        heightAutoWithMax={500}
+                        presetDataModel={dataModel}
+                        actionBarGroups={[]}
+                        ref="provider"
+                    />
+                </PydioDetailPanes.InfoPanelCard>
+
+            );
+
+        }
+
+    });
+
     let NotificationsPanel = React.createClass({
 
         getInitialState: function(){
@@ -23,6 +84,16 @@
         },
 
         render: function() {
+
+            let providerProperties = {
+                get_action:"get_my_feed",
+                connexion_discrete:true,
+                format:"xml",
+                current_repository:"true",
+                feed_type:"alert",
+                merge_description:"false"
+            };
+
             return (
                 <span>
                     <MaterialUI.IconButton
@@ -43,7 +114,7 @@
                             pydio={this.props.pydio}
                             elementHeight={53}
                             heightAutoWithMax={500}
-                            nodeProviderProperties={{get_action:"get_my_feed", connexion_discrete:true, format:"xml", current_repository:"true", feed_type:"alert", merge_description:"false"}}
+                            nodeProviderProperties={providerProperties}
                             actionBarGroups={[]}
                         />
                     </MaterialUI.Popover>
@@ -54,7 +125,8 @@
     });
 
     global.PydioNotifications = {
-        Panel: NotificationsPanel
+        Panel: NotificationsPanel,
+        ActivityPanel: ActivityPanel
     };
 
 })(window);

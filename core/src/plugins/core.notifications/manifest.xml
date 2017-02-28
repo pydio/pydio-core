@@ -81,15 +81,7 @@
         </hooks>
         <client_configs>
             <component_config className="InfoPanel">
-                <infoPanelExtension mime="ajxp_root_node,generic_dir,generic_file" attributes="" modifier="NotificationLoader.prototype.loadInfoPanel">
-                    <messages>
-                        <message key="type_string" id="share_center.50"/>
-                    </messages>
-                    <html><![CDATA[
-                        <div id="ajxp_activity_panel" data-infoPanelPosition="last">
-                        </div>
-                    ]]></html>
-                </infoPanelExtension>
+                <infoPanel mime="ajxp_root_node,generic_dir,generic_file" reactComponent="PydioNotifications.ActivityPanel"/>
             </component_config>
             <component_config className="AjxpReactComponent::left_navigator">
                 <additional_content
