@@ -21,6 +21,7 @@ class PydioRouter extends React.PureComponent {
 
 const routes = (
     <Route path="/">
+        <IndexRoute component={HomeRouter} />
         <Route path=":workspaceId" component={WorkspaceRouter}>
             <IndexRoute component={PathRouter} />
             <Route path="*" component={PathRouter} />

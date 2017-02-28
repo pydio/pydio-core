@@ -8,7 +8,8 @@ class WorkspaceRouter extends React.PureComponent {
         let targetSlug = props.params.workspaceId.replace("ws-", "")
 
         this.state = {
-            init: false
+            init: false,
+            history: true
         }
 
         // Watching all repository changes
@@ -77,19 +78,21 @@ class WorkspaceRouter extends React.PureComponent {
         // than the one active, we redirect
         if (nextState.target) {
             if (nextState.target !== nextState.active) {
-                pydio.triggerRepositoryChange(nextState.target);
-
                 // We don't want history to be touched if we've triggered ourselves the repository change
                 this.setState({
                     history: false
                 })
+
+                pydio.triggerRepositoryChange(nextState.target);
             }
-        } else {
+        } else if (nextState.list && nextState.active){
             // If we've switched repo and this was triggered elsewhere,
             // navigate to new url and record history
             if (this.state.history && this.state.active !== nextState.active) {
                 browserHistory.push("/ws-" + nextState.list.get(nextState.active).getSlug() + "/")
             }
+        } else {
+            browserHistory.push("/");
         }
     }
 
