@@ -1,3 +1,10 @@
+var gui_ajax_boot = [
+    'res/js/vendor/es6/browser-polyfill.js',
+    'res/js/vendor/nodejs/boot.prod.js',
+    'res/js/core/http/Connexion.js',
+    'res/js/core/PydioBootstrap.js'
+];
+
 var gui_ajax_core = [
     'res/js/vendor/modernizr/modernizr.min.js',
     'res/js/core/lang/Observable.js',
@@ -41,12 +48,6 @@ module.exports = function(grunt) {
             }
         },
         copy: {
-            debug: {
-                expand: true,
-                src: 'node_modules/he/he.js',
-                dest: 'res/js/ui/prototype/util',
-                flatten:true
-            },
             dndpatch: {
                 expand: true,
                 src: 'res/js/vendor/dnd-html5-backend-patch/NativeDragSources.js',
@@ -63,7 +64,8 @@ module.exports = function(grunt) {
             },
             js: {
                 files: {
-                    'res/js/pydio.min.js': gui_ajax_core
+                    'res/js/pydio.min.js': gui_ajax_core,
+                    'res/js/pydio.boot.min.js': gui_ajax_boot
                 }
             },
             nodejs: {

@@ -229,13 +229,13 @@ class PydioBootstrap{
         const scripts = document.getElementsByTagName('script');
         for(let i=0; i<scripts.length; i++){
             const scriptTag = scripts[i];
-            if(scriptTag.src.match("/js/ajaxplorer_boot") || scriptTag.src.match("/js/core/PydioBootstrap.js")){
-                if(scriptTag.src.match("/js/ajaxplorer_boot")){
+            if(scriptTag.src.match("/js/pydio.boot.min.js") || scriptTag.src.match("/js/core/PydioBootstrap.js")){
+                if(scriptTag.src.match("/js/pydio.boot.min.js")){
                     this.parameters.set("debugMode", false);
                 }else{
                     this.parameters.set("debugMode", true);
                 }
-                var src = scriptTag.src.replace('/js/core/PydioBootstrap.js','').replace('/js/ajaxplorer_boot.js', '').replace('/js/ajaxplorer_boot_protolegacy.js', '');
+                var src = scriptTag.src.replace('/js/core/PydioBootstrap.js','').replace('/js/pydio.boot.min.js', '');
                 if(src.indexOf("?")!=-1) src = src.split("?")[0];
                 this.parameters.set("ajxpResourcesFolder", src);
             }
