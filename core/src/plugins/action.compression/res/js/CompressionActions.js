@@ -2,99 +2,132 @@
 
     let pydio = global.pydio;
 
+    let CompressionDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            let formats = ['zip', 'tar', 'tar.gz', 'tar.bz2'];
+            if(!global.pydio.Parameters.get('multipleFilesDownloadEnabled')){
+                formats.pop();
+            }
+            return {
+                dialogTitleId: 313,
+                legendId: 314,
+                dialogIsModal: true,
+                formats: formats
+            };
+        },
+
+        getInitialState: function(){
+
+            let baseName;
+            const {userSelection} = this.props;
+            if(userSelection.isUnique()){
+                baseName = PathUtils.getBasename(userSelection.getUniqueFileName());
+                if(!userSelection.hasDir()) baseName = baseName.substr(0, baseName.lastIndexOf("\."));
+            }else{
+                baseName = PathUtils.getBasename(userSelection.getContextNode().getPath());
+                if(baseName == "") baseName = "Archive";
+            }
+            let defaultCompression = this.props.formats[0];
+
+
+            return {
+                archiveBase:baseName,
+                compression:defaultCompression,
+                fileName: this.buildUniqueFileName(baseName, defaultCompression)
+            }
+        },
+
+        buildUniqueFileName: function(base, extension){
+            var index=1;
+            let result = base;
+            var buff = base;
+            while(this.props.userSelection.fileNameExists(result + '.' + extension, true)){
+                result = buff + "-" + index; index ++ ;
+            }
+            return result;
+        },
+
+        textFieldChange: function(event, newValue){
+            this.setState({
+                archiveBase:newValue,
+                fileName: this.buildUniqueFileName(newValue, this.state.compression)
+            });
+        },
+
+        selectFieldChange: function(event, index, payload){
+            console.log(payload);
+            this.setState({
+                compression:payload,
+                fileName: this.buildUniqueFileName(this.state.archiveBase, payload)
+            });
+        },
+
+        submit(){
+            const client = PydioApi.getClient();
+            client.postSelectionWithAction(this.state.compression === 'zip' ? 'compress' : 'compression',
+                function(transp){
+                    client.parseXmlMessage(transp.responseXML);
+                    this.dismiss();
+                }.bind(this),
+                this.props.userSelection,
+                {
+                    type_archive: this.state.compression,
+                    archive_name: this.state.fileName + '.' + this.state.compression
+                }
+            );
+        },
+
+        render: function(){
+            const formatMenus = this.props.formats.map(function(f){
+                return <MaterialUI.MenuItem value={f} primaryText={'.' + f}/>
+            });
+
+            const messages = pydio.MessageHash;
+            const {compression, fileName} = this.state;
+
+            return (
+                <div style={{display:'flex'}}>
+                    <MaterialUI.TextField onChange={this.textFieldChange} value={fileName} floatingLabelText={messages['compression.4']}/>
+                    <MaterialUI.SelectField onChange={this.selectFieldChange} value={compression} floatingLabelText={messages['compression.3']}>{formatMenus}</MaterialUI.SelectField>
+                </div>
+            );
+        }
+
+    });
+
     class Callbacks{
 
         static compressUI(){
-            var crtDir = pydio.getContextHolder().getContextNode().getPath();
             var userSelection = pydio.getUserSelection();
-            if (!userSelection.isEmpty()) {
-                var loadFunc = function (oForm) {
-                    if (userSelection.isEmpty()) {
-                        return;
-                    }
-                    var archive_nameInput = oForm.down('input[id="archive_name"]');
-                    var changeDuplicateArchiveName = function (name, extension) {
-                        var nameLastIndexOf = name.lastIndexOf("-");
-                        var tmpFileName = name.substr(0, nameLastIndexOf);
-                        var compteurFileName = name.substr(nameLastIndexOf + 1);
-                        if (nameLastIndexOf == -1) {
-                            tmpFileName = name;
-                            compteurFileName = 1;
-                        }
-                        while(userSelection.fileNameExists(name + extension)){
-                            name = tmpFileName + "-" + compteurFileName;
-                            compteurFileName ++;
-                            if(compteurFileName > 20){
-                                break;
-                            }
-                        }
-                        archive_nameInput.setValue(name + extension);
-                        return name;
-                    };
-                    var archive_name = archive_nameInput.getValue();
-                    var archiveTypeSelect = oForm.down('select[id="type_archive"]');
-                    if(window.multipleFilesDownloadEnabled){
-                        archiveTypeSelect.insert({top:'<option value=".zip">ZIP</option>'});
-                    }
-                    var archiveExtension = archiveTypeSelect.getValue();
-                    if (userSelection.isUnique()) {
-                        if (userSelection.getUniqueNode().isLeaf() == true) {
-                            archive_name = getBaseName(userSelection.getUniqueFileName()).split(".").shift();
-                        } else {
-                            archive_name = getBaseName(userSelection.getUniqueFileName());
-                        }
-                    } else if (crtDir.length == 1) {
-                        archive_name = "Archive";
-                    } else {
-                        archive_name = getBaseName(crtDir);
-                    }
-                    var updateFormAndArchiveName = function (){
-                        var archiveExtension = archiveTypeSelect.getValue();
-                        if(archiveExtension == ".zip"){
-                            oForm.setAttribute("action", "compress");
-                            oForm.down("#compression_form").setAttribute("action", "compress");
-                            oForm.down('input[name="get_action"]').value = "compress";
-                        }else{
-                            oForm.setAttribute("action", "compression");
-                            oForm.down("#compression_form").setAttribute("action", "compression");
-                            oForm.down('input[name="get_action"]').value = "compression";
-                        }
-                        changeDuplicateArchiveName(archive_name, archiveExtension);
-                    };
-                    updateFormAndArchiveName();
-                    archiveTypeSelect.observe("change", updateFormAndArchiveName);
-                    archive_nameInput.observe("change", function () {
-                        archive_name = archive_nameInput.getValue().slice(0, -archiveTypeSelect.getValue().length);
-                        changeDuplicateArchiveName(archive_name, archiveTypeSelect.getValue());
-                    });
-                };
-                var closeFunc = function(){
-                    userSelection.updateFormOrUrl(modal.getForm());
-                    PydioApi.getClient().submitForm(modal.getForm(), true);
-                    hideLightBox();
-                };
-                modal.showDialogForm('Compress selection to ...', 'compression_form', loadFunc, closeFunc);
+            if(!pydio.Parameters.get('multipleFilesDownloadEnabled')){
+                return;
             }
+            pydio.UI.openComponentInModal('CompressionActions', 'CompressionDialog', {userSelection:userSelection});
 
         }
-        
+
+
         static extract(){
-            var crtDir = pydio.getContextHolder().getContextNode().getPath();
+            console.log("Toto1?");
             var userSelection = pydio.getUserSelection();
             if (!userSelection.isEmpty()) {
-                var file = userSelection.getFileNames();
-                var dir = userSelection.getContextNode().getPath();
-                var connexion = new Connexion();
-                connexion.setParameters({get_action : "extraction", file : file, currentDir : dir});
-                connexion.sendAsync();
-                connexion.onComplete=function(transport){
+                PydioApi.getClient().postSelectionWithAction('extraction', function(transport){
                     PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                };
+                }, userSelection);
+
             }
         }
     }
 
     global.CompressionActions = {
+        CompressionDialog: CompressionDialog,
         Callbacks: Callbacks
     };
 

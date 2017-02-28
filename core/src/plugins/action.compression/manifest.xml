@@ -23,21 +23,7 @@
             </action>
             <action name="compress_ui">
                 <processing>
-                    <clientCallback module="CompressionActions.Callbacks.compressUI" prepareModal="true"/>
-                    <clientForm id="compression_form"><![CDATA[
-                        <div id="compression_form" action="compression" box_width="272">
-                            <label class="dialogLegend" id="type_archive" style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.3]</label>
-                            <select style="width:100px;"  name="type_archive" id="type_archive" class="dialogFocus initFicName">
-                                <option value=".tar">TAR</option>
-                                <option value=".tar.gz">TAR.GZ</option>
-                                <option value=".tar.bz2">TAR.BZ2</option>
-                            </select>
-                            <br/>
-                            <label class="dialogLegend" for="archive_name"  style="display: inline-block;margin-top: 11px;">AJXP_MESSAGE[compression.4]</label>
-                            <br/>
-                            <input style="width: 93%;margin-left: 9px;margin-top: 7px; margin-bottom:12px;" type="text" name="archive_name" id="archive_name" class="dialogFocus initFicName" />
-                        </div>
-				]]></clientForm>
+                    <clientCallback module="CompressionActions.Callbacks.compressUI"/>
                 </processing>
             </action>
             <action name="extraction">
@@ -49,7 +35,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="tar,gz,bz2"/>
                 </gui>
                 <processing>
-                    <clientCallback module="CompressionActions.Callbacks.extract" prepareModal="false"/>
+                    <clientCallback module="CompressionActions.Callbacks.extract"/>
                     <serverCallback methodName="receiveAction" pluginId="action.compression" />
                 </processing>
             </action>
