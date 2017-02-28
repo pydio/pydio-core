@@ -47,6 +47,14 @@ class AjxpNode extends Observable{
     }
 
     /**
+     * Update node provider
+     * @param iAjxpNodeProvider
+     */
+    updateProvider(iAjxpNodeProvider){
+        this._iNodeProvider = iAjxpNodeProvider;
+    }
+
+    /**
      * Loads the node using its own provider or the one passed
      * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
      * @param additionalParameters Object of optional parameters

@@ -27,8 +27,9 @@ class RemoteNodeProvider{
     /**
      * Constructor
      */
-    constructor(){
+    constructor(properties = null){
         this.discrete = false;
+        if(properties) this.initProvider(properties);
     }
     /**
      * Initialize properties
