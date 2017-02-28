@@ -5,7 +5,6 @@
         componentWillReceiveProps: function(nextProps){
             if(nextProps.node !== this.props.node){
                 this.forceUpdate(function(){
-                    console.log("reload?");
                     this.refs.provider.reload();
                 }.bind(this));
             }
