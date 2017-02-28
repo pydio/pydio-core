@@ -356,7 +356,7 @@ class RichClient extends Plugin
 
             break;
 
-            
+
             default;
             break;
         }

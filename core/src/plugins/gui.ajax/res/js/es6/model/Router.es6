@@ -9,6 +9,7 @@ class Router{
                 ":workspace/*path":"switchToWorkspace"
             },
             switchToWorkspace: function(workspace, path) {
+
                 if(!pydioObject.user) {return;}
                 if(path) path = '/' + path;
                 else path = '/';
@@ -88,6 +89,7 @@ class Router{
                     slug = "ws-" + slug;
                 }
                 var path = pydioObject.getContextNode().getPath();
+
                 this.router.navigate(slug + path);
             }
         }.bind(this));

@@ -44,10 +44,10 @@ class PydioDataModel extends Observable{
         this._rootNode = null;
 
 	}
-	
+
 	/**
 	 * Sets the data source that will feed the nodes with children.
-	 * @param iAjxpNodeProvider IAjxpNodeProvider 
+	 * @param iAjxpNodeProvider IAjxpNodeProvider
 	 */
 	setAjxpNodeProvider (iAjxpNodeProvider){
 		this._iAjxpNodeProvider = iAjxpNodeProvider;
@@ -75,7 +75,7 @@ class PydioDataModel extends Observable{
 		if(ajxpNode.getMetadata().has('paginationData') && ajxpNode.getMetadata().get('paginationData').has('new_page')
 			&& ajxpNode.getMetadata().get('paginationData').get('new_page') != ajxpNode.getMetadata().get('paginationData').get('current')){
 				var paginationPage = ajxpNode.getMetadata().get('paginationData').get('new_page');
-				forceReload = true;			
+				forceReload = true;
 		}
 		if(ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)){
 			// Find in arbo or build fake arbo
@@ -83,7 +83,7 @@ class PydioDataModel extends Observable{
 			ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
 			if(fakeNodes.length){
 				var firstFake = fakeNodes.shift();
-				firstFake.observeOnce("first_load", function(e){					
+				firstFake.observeOnce("first_load", function(e){
 					this.requireContextChange(ajxpNode);
 				}.bind(this));
 				firstFake.observeOnce("error", function(message){
@@ -98,9 +98,9 @@ class PydioDataModel extends Observable{
 				firstFake.load(this._iAjxpNodeProvider);
 				return;
 			}
-		}		
+		}
 		ajxpNode.observeOnce("loaded", function(){
-			this.setContextNode(ajxpNode, true);			
+			this.setContextNode(ajxpNode, true);
 			this.publish("context_loaded");
             if(this.getPendingSelection()){
                 var selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/" ) +this.getPendingSelection();
@@ -189,7 +189,7 @@ class PydioDataModel extends Observable{
 		this.publish("root_node_changed", this._rootNode);
 		this.setContextNode(this._rootNode);
 	}
-	
+
 	/**
 	 * Gets the current root node
 	 * @returns AjxpNode
@@ -197,7 +197,7 @@ class PydioDataModel extends Observable{
 	getRootNode (){
 		return this._rootNode;
 	}
-	
+
 	/**
 	 * Sets the current context node
 	 * @param ajxpDataNode AjxpNode
@@ -260,7 +260,7 @@ class PydioDataModel extends Observable{
 	getContextNode (){
 		return this._contextNode;
 	}
-	
+
 	/**
 	 * After a copy or move operation, many nodes may have to be reloaded
 	 * This function tries to reload them in the right order and if necessary.
@@ -271,13 +271,13 @@ class PydioDataModel extends Observable{
 			var nodePathOrNode = nodes[i];
 			var node;
 			if(nodePathOrNode instanceof String){
-				node = new AjxpNode(nodePathOrNode);	
+				node = new AjxpNode(nodePathOrNode);
 				if(node.getPath() == this._rootNode.getPath()) node = this._rootNode;
 				else node = node.findInArbo(this._rootNode, []);
 			}else{
 				node = nodePathOrNode;
 			}
-			nodes[i] = node;		
+			nodes[i] = node;
 		}
 		var children = [];
 		nodes.sort(function(a,b){
@@ -297,7 +297,7 @@ class PydioDataModel extends Observable{
 		nodes.map(this.queueNodeReload.bind(this));
 		this.nextNodeReloader();
 	}
-	
+
 	/**
 	 * Add a node to the queue of nodes to reload.
 	 * @param node AjxpNode
@@ -308,7 +308,7 @@ class PydioDataModel extends Observable{
 			this.queue.push(node);
 		}
 	}
-	
+
 	/**
 	 * Queue processor for the nodes to reload
 	 */
@@ -417,7 +417,7 @@ class PydioDataModel extends Observable{
 	setPendingSelection (selection){
 		this._pendingSelection = selection;
 	}
-	
+
 	/**
 	 * Gets the array of nodes to be selected after the context is (re)loaded
 	 * @returns AjxpNode[]
@@ -425,14 +425,14 @@ class PydioDataModel extends Observable{
 	getPendingSelection (){
 		return this._pendingSelection;
 	}
-	
+
 	/**
 	 * Clears the nodes to be selected
 	 */
 	clearPendingSelection (){
 		this._pendingSelection = null;
 	}
-	
+
 	/**
 	 * Set an array of nodes as the current selection
 	 * @param ajxpDataNodes AjxpNode[] The nodes to select
@@ -471,7 +471,7 @@ class PydioDataModel extends Observable{
 		}
 		this.publish("selection_changed", this);
 	}
-	
+
 	/**
 	 * Gets the currently selected nodes
 	 * @returns AjxpNode[]
@@ -479,7 +479,7 @@ class PydioDataModel extends Observable{
 	getSelectedNodes (){
 		return this._selectedNodes;
 	}
-	
+
 	/**
 	 * Gets the source of the last selection action
 	 * @returns String
@@ -502,7 +502,7 @@ class PydioDataModel extends Observable{
 	getSelectedItems (){
 		throw new Error("Deprecated : use getSelectedNodes() instead");
 	}
-	
+
 	/**
 	 * Select all the children of the current context node
 	 */
@@ -512,7 +512,7 @@ class PydioDataModel extends Observable{
         childrenMap.forEach(function(child){nodes.push(child)});
 		this.setSelectedNodes(nodes, "dataModel");
 	}
-	
+
 	/**
 	 * Whether the selection is empty
 	 * @returns Boolean
@@ -554,7 +554,7 @@ class PydioDataModel extends Observable{
 	isUnique  (){
 		return this._selectedNodes && this._selectedNodes.length === 1;
 	}
-	
+
 	/**
 	 * Whether the selection has a file selected.
 	 * Should be hasLeaf
@@ -563,7 +563,7 @@ class PydioDataModel extends Observable{
 	hasFile  (){
 		return this._bFile;
 	}
-	
+
 	/**
 	 * Whether the selection has a dir selected
 	 * @returns Boolean
@@ -571,7 +571,7 @@ class PydioDataModel extends Observable{
 	hasDir  (){
 		return this._bDir;
 	}
-			
+
 	/**
 	 * Whether the current context is the recycle bin
 	 * @returns Boolean
@@ -579,7 +579,7 @@ class PydioDataModel extends Observable{
 	isRecycle  (){
 		return this._isRecycle;
 	}
-	
+
 	/**
 	 * Whether the selection has more than one node selected
 	 * @returns Boolean
@@ -587,7 +587,7 @@ class PydioDataModel extends Observable{
 	isMultiple (){
 		return this._selectedNodes && this._selectedNodes.length > 1;
 	}
-	
+
 	/**
 	 * Whether the selection has a file with one of the mimes
 	 * @param mimeTypes Array Array of mime types
@@ -607,7 +607,7 @@ class PydioDataModel extends Observable{
 		}.bind(this) );
 		return has;
 	}
-	
+
 	/**
 	 * Get all selected filenames as an array.
 	 * @param separator String Is a separator, will return a string joined
@@ -630,7 +630,7 @@ class PydioDataModel extends Observable{
 			return tmp;
 		}
 	}
-	
+
 	/**
 	 * Get all the filenames of the current context node children
 	 * @param separator String If passed, will join the array as a string
@@ -639,7 +639,7 @@ class PydioDataModel extends Observable{
 	getContextFileNames (separator){
 		var allItems = this._contextNode.getChildren();
 		if(!allItems.length)
-		{		
+		{
 			return false;
 		}
 		var names = [];
@@ -689,7 +689,7 @@ class PydioDataModel extends Observable{
 	}
 
     applyCheckHook (node, additionalParams = null){
-        
+
         var client = PydioApi.getClient();
         var result;
         client.applyCheckHook(node, "before_create", node.getMetadata().get("filesize") || -1, function(transport){
@@ -699,16 +699,16 @@ class PydioDataModel extends Observable{
             throw new Error("Check failed");
         }
     }
-	
+
 	/**
 	 * Gets the first name of the current selection
 	 * @returns String
 	 */
-	getUniqueFileName (){	
+	getUniqueFileName (){
 		if(this.getFileNames().length) return this.getFileNames()[0];
-		return null;	
+		return null;
 	}
-	
+
 	/**
 	 * Gets the first node of the selection, or Null
 	 * @returns AjxpNode
@@ -728,9 +728,9 @@ class PydioDataModel extends Observable{
     getNode (i) {
         return this._selectedNodes[i];
     }
-	
+
     /**
-     * Will add the current selection nodes as serializable data to the element passed : 
+     * Will add the current selection nodes as serializable data to the element passed :
      * either as hidden input elements if it's a form, or as query parameters if it's an url
      * @param oFormElement HTMLForm The form
      * @param sUrl String An url to complete
@@ -738,7 +738,7 @@ class PydioDataModel extends Observable{
      */
 	updateFormOrUrl  (oFormElement, sUrl){
 		// CLEAR FROM PREVIOUS ACTIONS!
-		if(oFormElement)	
+		if(oFormElement)
 		{
 			$(oFormElement).select('input[type="hidden"]').map(function(element){
 				if(element.name == "nodes[]" || element.name == "file")element.remove();
@@ -747,7 +747,7 @@ class PydioDataModel extends Observable{
 		// UPDATE THE 'DIR' FIELDS
 		if(oFormElement && oFormElement['rep']) oFormElement['rep'].value = this._currentRep;
 		sUrl += '&dir='+encodeURIComponent(this._currentRep);
-		
+
 		// UPDATE THE 'file' FIELDS
 		if(this.isEmpty()) return sUrl;
 		var fileNames = this.getFileNames();
@@ -762,7 +762,7 @@ class PydioDataModel extends Observable{
         }
 		return sUrl;
 	}
-	
+
 	_addHiddenField (oFormElement, sFieldName, sFieldValue){
         oFormElement.insert(new Element('input', {type:'hidden', name:sFieldName, value:sFieldValue}));
 	}
