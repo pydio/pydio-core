@@ -1,4 +1,8 @@
-import {Router, Route, IndexRoute, browserHistory } from 'react-router';
+import Router from 'react-router/lib/Router';
+import Route from 'react-router/lib/Route';
+import IndexRoute from 'react-router/lib/IndexRoute';
+import browserHistory from 'react-router/lib/browserHistory';
+
 import WorkspaceRouter from './WorkspaceRouter';
 import PathRouter from './PathRouter';
 import HomeRouter from './HomeRouter';
