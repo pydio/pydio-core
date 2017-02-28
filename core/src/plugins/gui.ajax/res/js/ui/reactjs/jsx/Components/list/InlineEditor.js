@@ -42,10 +42,10 @@ export default React.createClass({
     render: function(){
         return (
             <ReactMUI.Paper className={"inline-editor" + (this.props.detached ? " detached" : "")} zDepth={2}>
-                <ReactMUI.TextField
+                <MaterialUI.TextField
                     ref="text"
                     defaultValue={this.props.node.getLabel()}
-                    onChange={(e)=>{this.setState({value:e.target.getValue()})}}
+                    onChange={(e, value)=>{this.setState({value:value})}}
                     onFocus={this.focused}
                     onBlur={this.blurred}
                     onClick={this.catch} onDoubleClick={this.catchClicks}
