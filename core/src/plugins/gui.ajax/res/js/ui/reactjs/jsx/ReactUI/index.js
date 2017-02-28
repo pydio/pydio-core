@@ -10,6 +10,7 @@ import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
 import Modal from './modal/Modal'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
+import Router from './router/Router'
 
 window.PydioReactUI = {
     Builder                     : Builder,
@@ -22,6 +23,6 @@ window.PydioReactUI = {
     SubmitButtonProviderMixin   : SubmitButtonProviderMixin,
     AbstractDialogModifier      : AbstractDialogModifier,
     Modal                       : Modal,
-    Loader                      : Loader
-
+    Loader                      : Loader,
+    Router                      : Router,
 };

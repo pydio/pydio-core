@@ -96,8 +96,6 @@ class Pydio extends Observable{
                     this.fire('loaded');
                 }.bind(this), 200);
 
-                this.Router = new Router(this);
-
             }.bind(this));
 
         }.bind(this);
@@ -297,7 +295,7 @@ class Pydio extends Observable{
      * Change the repository of the current user and reload list and current.
      * @param repositoryId String Id of the new repository
      */
-    triggerRepositoryChange(repositoryId){
+    triggerRepositoryChange(repositoryId, callback){
         this.fire("trigger_repository_switch");
         var onComplete = function(transport){
             if(transport.responseXML){
@@ -305,7 +303,10 @@ class Pydio extends Observable{
             }
             this.loadXmlRegistry(false,  null, null, repositoryId);
             this.repositoryId = null;
+
+            if (typeof callback == "function") callback()
         }.bind(this);
+
         var root = this._contextHolder.getRootNode();
         if(root){
             this.skipLsHistory = true;
@@ -447,4 +448,3 @@ class Pydio extends Observable{
 
 
 }
-
