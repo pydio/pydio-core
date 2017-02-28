@@ -144,7 +144,13 @@ class Connexion{
         }
         let bodyParts = [];
         this._parameters.forEach(function(value, key){
-            bodyParts.push( key + '=' + encodeURIComponent(value) );
+            if(value instanceof Array){
+                value.map(function(oneV){
+                    bodyParts.push( key + '=' + encodeURIComponent(oneV) );
+                })
+            }else{
+                bodyParts.push( key + '=' + encodeURIComponent(value) );
+            }
         });
         const queryString = bodyParts.join('&');
         if(this._method === 'post'){
