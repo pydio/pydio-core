@@ -97,8 +97,8 @@
                 <span>
                     <MaterialUI.IconButton
                         onTouchTap={this.handleTouchTap}
-                        iconClassName="icon-bell"
-                        tooltip="Notifications"
+                        iconClassName={this.props.iconClassName || "icon-bell"}
+                        tooltip="Alerts"
                     />
                     <MaterialUI.Popover
                         open={this.state.open}

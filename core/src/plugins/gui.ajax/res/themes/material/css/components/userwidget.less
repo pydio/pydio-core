@@ -3,19 +3,24 @@
   height: 110px;
   width: 250px;
   z-index: 1002;
-  .username{
-    padding: 20px 16px;
+  .user-display{
+    padding: 0 16px;
     font-size: 22px;
-    line-height: 24px;
+    display: flex;
+    align-items: center;
+    height: 62px;
+    .userLabel{
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
   }
   .action_bar{
-    padding: 10px;
-    a{
-      cursor: pointer;
-      font-size: 16px;
-      background-color: transparent;
-      color: white;
-      padding: 5px 9px;
+    padding: 8px;
+    text-align: left;
+    span.userActionButton {
+      font-size: 18px !important;
+      color: rgba(255, 255, 255, 0.93) !important;
     }
   }
 }
