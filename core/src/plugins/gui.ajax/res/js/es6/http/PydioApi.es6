@@ -298,6 +298,16 @@ class PydioApi{
 
     }
 
+    buildUserAvatarUrl(oUser){
+
+        if(oUser.getPreference("avatar")){
+            return this._pydioObject.Parameters.get('ajxpServerAccess') + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+        }else{
+            return null;
+        }
+
+    }
+
     applyCheckHook(node, hookName, hookArg, completeCallback, additionalParams){
         var params = {
             get_action : "apply_check_hook",
@@ -564,6 +574,5 @@ class PydioApi{
             }.bind(this), null, {async:false});
         }
     }
-
 
 }

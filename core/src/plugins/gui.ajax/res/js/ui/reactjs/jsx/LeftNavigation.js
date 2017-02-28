@@ -201,20 +201,66 @@
             }
         },
 
+        getInitialState: function(){
+            return {userName: '', avatarUrl: null};
+        },
+
+        componentDidMount: function(){
+            this.loadUserData();
+            const obs = this.loadUserData.bind(this);
+            this.props.pydio.observe('user_logged', obs);
+        },
+
+        loadUserData: function(){
+
+            let userName, avatarUrl;
+            if(pydio.user){
+                userName = pydio.user.getPreference('USER_DISPLAY_NAME') || pydio.user.id;
+                avatarUrl = PydioApi.getClient().buildUserAvatarUrl(pydio.user);
+                if(!avatarUrl && this.props.pydio.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")){
+                    PydioApi.getClient().request({
+                        get_action  : 'get_avatar_url',
+                        userid      : pydio.user.id
+                    }, function(transport){
+                        this.setState({avatarUrl: transport.responseText});
+                    }.bind(this));
+                }
+            }
+            this.setState({userName: userName, avatarUrl: avatarUrl});
+        },
+
         render: function(){
+
+            const {userName, avatarUrl} = this.state;
+
             return (
                 <div className="user-widget">
-                    <div className="username">John Doe</div>
+                    <div className="user-display">
+                        {avatarUrl && <MaterialUI.Avatar src={avatarUrl} style={{marginRight: 20}}/>}<div className="userLabel">{userName}</div>
+                    </div>
                     <div className="action_bar">
+                        <MaterialUI.IconButton
+                            onTouchTap={this.applyAction.bind(this, 'home')}
+                            iconClassName="userActionButton mdi mdi-home"
+                            tooltip="Back to home"
+                        />
+                        <MaterialUI.IconButton
+                            onTouchTap={this.applyAction.bind(this, 'cog')}
+                            iconClassName="userActionButton mdi mdi-settings"
+                            tooltip="Settings"
+                        />
                         <PydioReactUI.AsyncComponent
                             namespace="PydioNotifications"
                             componentName="Panel"
                             noLoader={true}
+                            iconClassName="userActionButton mdi mdi-bell"
                             {...this.props}
                         />
-                        <a><span className="icon-home" onClick={this.applyAction.bind(this, 'home')}></span></a>
-                        <a><span className="icon-cog" onClick={this.applyAction.bind(this, 'cog')}></span></a>
-                        <a><span className="icon-signout" onClick={this.applyAction.bind(this, 'logout')}></span></a>
+                        <MaterialUI.IconButton
+                            onTouchTap={this.applyAction.bind(this, 'logout')}
+                            iconClassName="userActionButton mdi mdi-logout"
+                            tooltip="Log out"
+                        />
                     </div>
                 </div>
             );

@@ -523,3 +523,59 @@
 .mdi-view-week:before {
     content: "\f664";
 }
+
+.mdi-settings:before {
+    content: "\f582";
+}
+
+.mdi-settings-box:before {
+    content: "\f583";
+}
+
+.mdi-login:before {
+    content: "\f434";
+}
+
+.mdi-logout:before {
+    content: "\f435";
+}
+
+.mdi-bell:before {
+    content: "\f191";
+}
+
+.mdi-bell-off:before {
+    content: "\f192";
+}
+
+.mdi-bell-outline:before {
+    content: "\f193";
+}
+
+.mdi-bell-plus:before {
+    content: "\f194";
+}
+
+.mdi-bell-ring:before {
+    content: "\f195";
+}
+
+.mdi-bell-ring-outline:before {
+    content: "\f196";
+}
+
+.mdi-bell-sleep:before {
+    content: "\f197";
+}
+
+.mdi-home:before {
+    content: "\f3cf";
+}
+
+.mdi-home-modern:before {
+    content: "\f3d0";
+}
+
+.mdi-home-variant:before {
+    content: "\f3d1";
+}
