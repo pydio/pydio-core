@@ -1,44 +1,83 @@
 (function(global){
 
+    let DisclaimerDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: global.pydio.MessageHash['disclaimer.3'],
+                dialogIsModal: true,
+                dialogSize:'lg'
+            };
+        },
+
+        getInitialState: function(){
+            return {disclaimer:'', accepted: false}
+        },
+
+        submit(){
+            PydioApi.getClient().request({
+                get_action:'validate_disclaimer',
+                validate: this.state.accepted ? 'true' : 'false'
+            }, function(t){
+                if(this.state.accepted){
+                    global.setTimeout(function(){
+                        global.pydio.loadXmlRegistry();
+                    }, 400);
+                    this.dismiss();
+                }
+            }.bind(this));
+        },
+        onCheck(object, isChecked){
+            this.setState({accepted: isChecked});
+        },
+        componentDidMount: function(){
+            PydioApi.getClient().request({
+                get_action:'load_disclaimer'
+            },function(transport){
+                var resp = transport.responseText;
+                var state = resp.substring(0, resp.indexOf(":")) == "yes" ? true : false;
+                var text = resp.substring(resp.indexOf(":")+1);
+                this.setState({
+                    disclaimer: text,
+                    accepted: state
+                });
+            }.bind(this));
+        },
+        render: function(){
+            let content = function(){
+                return {__html:this.state.disclaimer}
+            }.bind(this);
+            let messages = global.pydio.MessageHash;
+            return (
+                <div>
+                    <div id="disclaimer_content" style={{height: 350, overflow:'auto', margin:'15px 0', padding: 10}} dangerouslySetInnerHTML={content()}></div>
+                    <div>
+                        <MaterialUI.Checkbox label={messages['disclaimer.4']} onCheck={this.onCheck} checked={this.state.accepted}/>
+                    </div>
+                </div>
+
+            );
+        }
+
+    });
+
     class Callbacks{
 
         static validate(){
 
-            var dialogLoadFunction = function(){
-                var conn = new Connexion();
-                conn.addParameter("get_action", "load_disclaimer");
-                conn.onComplete = function(transport){
-                    var resp = transport.responseText;
-                    var state = resp.substring(0, resp.indexOf(":")) == "yes" ? true : false;
-                    var text = resp.substring(resp.indexOf(":")+1);
-                    modal.getForm().down('div#disclaimer_content').update(text);
-                    modal.getForm().down('input#accept_disclaimer').checked = state;
-                }
-                conn.sendAsync();
-            };
-            var completeFunction = function(){
-                var value = modal.getForm().down("input#accept_disclaimer").checked ? "true" : "false";
-                var conn = new Connexion();
-                conn.addParameter("get_action", "validate_disclaimer");
-                conn.addParameter("validate", value);
-                conn.onComplete = function(transport){
-                    if(value == "true"){
-                        window.setTimeout(function(){
-                            ajaxplorer.loadXmlRegistry();
-                        }, 400);
-                    }
-                    hideLightBox();
-                }
-                conn.sendAsync();
-                return false;
-            };
-            modal.showDialogForm("Validation", "disclaimer_form", dialogLoadFunction, completeFunction);
-            
+            pydio.UI.openComponentInModal('DisclaimerActions', 'DisclaimerDialog', {});
+
         }
 
     }
 
     global.DisclaimerActions = {
+        DisclaimerDialog: DisclaimerDialog,
         Callbacks: Callbacks
     };
 
