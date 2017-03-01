@@ -332,7 +332,7 @@ class Pydio extends Observable{
      * @param newLanguage String
      */
     loadI18NMessages(newLanguage){
-        var onComplete = function(transport){
+        this.ApiClient.switchLanguage(newLanguage, function(transport){
             if(transport.responseJSON){
                 this.MessageHash = transport.responseJSON;
                 if(window && window.MessageHash) {
@@ -343,15 +343,13 @@ class Pydio extends Observable{
                         this.MessageHash[key] = this.MessageHash[key].replace("\\n", "\n");
                     }
                 }
-                this.UI.updateI18nTags();
                 this.Controller.refreshGuiActionsI18n();
-
                 this.loadXmlRegistry();
                 this.fireContextRefresh();
                 this.currentLanguage = newLanguage;
             }
-        }.bind(this);
-        this.ApiClient.switchLanguage(newLanguage, onComplete);
+
+        }.bind(this));
     }
 
     /**
@@ -378,7 +376,9 @@ class Pydio extends Observable{
         }
         if(messageType == 'ERROR') Logger.error(message);
         else Logger.log(message);
-        if(this.UI.modal) this.UI.modal.displayMessage(messageType, message);
+        if(this.UI) {
+            this.UI.displayMessage(messageType, message);
+        }
     }
 
 

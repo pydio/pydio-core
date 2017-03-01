@@ -192,6 +192,9 @@ let SimpleList = React.createClass({
             this.doubleClickRow(firstSelected);
             return;
         }
+        if(key === 'Delete' && global.pydio.Controller.fireActionByKey('key_delete')){
+            return;
+        }
 
         for(let i=0; i< this.indexedElements.length; i++){
             if(this.indexedElements[i].node === firstSelected) {

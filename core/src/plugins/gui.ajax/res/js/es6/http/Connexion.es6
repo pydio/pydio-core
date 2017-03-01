@@ -398,7 +398,7 @@ class Connexion{
         if(aSync){
             window.fetch(url, {
                 method:'GET',
-                credentials:true
+                credentials:'same-origin'
             }).then(function(response){
                 return response.text();
             }).then(function(script){

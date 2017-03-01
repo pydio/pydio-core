@@ -5,10 +5,7 @@
         constructor(pydio){
             this._pydio = pydio;
             this.guiLoaded = false;
-            this._focusables = [];
-            this.modal = window.modal;
             this._componentsRegistry = new Map();
-            this.modalSupportsComponents = false;
         }
 
         insertChildFromString(parent, html){
@@ -57,10 +54,8 @@
                         targetObj = newDiv;
                     }
                     ResourcesManager.loadClassesAndApply([namespace], function(){
-                        let el = ReactDOM.render(
-                            React.createElement(global[namespace][component], props),
-                            targetObj
-                        );
+                        const element = React.createElement(PydioReactUI.PydioContextProvider(global[namespace][component], this._pydio), props);
+                        const el = ReactDOM.render(element, targetObj);
                         this._componentsRegistry.set(target, el);
                     }.bind(this));
 
@@ -138,15 +133,17 @@
 
         registerModalOpener(component){
             this._modalOpener = component;
-            this.modalSupportsComponents = true;
         }
 
         unregisterModalOpener(){
             this._modalOpener = null;
-            this.modalSupportsComponents = false;
         }
 
         openComponentInModal(namespace, componentName, props){
+            if(!this._modalOpener){
+                Logger.error('Cannot find any modal opener for opening component ' + namespace + '.' + componentName);
+                return;
+            }
             // Collect modifiers
             let modifiers = [];
             let namespaces = [];
@@ -177,19 +174,31 @@
         }
 
         /**
-         * PROXY TO PROTOTYPE UI
-         * @param seedInputField
-         * @param existingCaptcha
-         * @param captchaAnchor
-         * @param captchaPosition
-         * @returns {*}
+         *
+         * @param component
          */
-        loadSeedOrCaptcha(seedInputField, existingCaptcha, captchaAnchor, captchaPosition){
-            let p = new PydioUI(this._pydio);
-            return p.loadSeedOrCaptcha(seedInputField, existingCaptcha, captchaAnchor, captchaPosition);
+        registerMessageBar(component){
+            this._messageBar = component;
         }
-        initObjects(){}
-        updateI18nTags(){}
+
+        unregisterMessageBar(){
+            this._messageBar = null;
+        }
+
+        displayMessage(type, message, actionLabel = null, actionCallback = null){
+            if(!this._messageBar){
+                Logger.error('Cannot find any messageBar for displaying message ' + message);
+                return;
+            }
+            if(type === 'ERROR'){
+                this._messageBar.error(message, actionLabel, actionCallback);
+            }else{
+                this._messageBar.info(message, actionLabel, actionCallback);
+            }
+        }
+
+
+
         mountComponents(componentsNodes){}
 
         disableShortcuts(){}

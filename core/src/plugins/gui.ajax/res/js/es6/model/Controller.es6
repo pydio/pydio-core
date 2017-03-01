@@ -389,10 +389,9 @@ class Controller extends Observable{
 	}
 	/**
 	 * Triggers an action by its access key.
-	 * @param event Event The key event (will be stopped)
 	 * @param keyName String A key name
 	 */
-	fireActionByKey(event, keyName)
+	fireActionByKey(keyName)
 	{	
 		if(this._registeredKeys.get(keyName))
 		{
@@ -402,13 +401,9 @@ class Controller extends Observable{
 			}else{
 				this.fireAction(this._registeredKeys.get(keyName));
 			}
-            try{
-                event.preventDefault();
-                event.stopPropagation();
-            }catch(e){
-                Logger.error("Error trying to stop event propagation");
-            }
+			return true;
 		}
+		return false;
 	}
 	
 	/**

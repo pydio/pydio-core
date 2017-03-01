@@ -465,7 +465,8 @@ class Action extends Observable{
                             let moduleName = processNode.getAttribute('module');
                             this.options.listeners[processNode.getAttribute('name')] = function(){
                                 ResourcesManager.detectModuleToLoadAndApply(moduleName, function(){
-                                    FuncUtils.getFunctionByName(moduleName, window).apply(this);
+                                    let func = FuncUtils.getFunctionByName(moduleName, window);
+                                    if(func) func.apply(this);
                                 }.bind(this));
                             }.bind(this);
                         }else if(processNode.firstChild){
@@ -589,7 +590,10 @@ class Action extends Observable{
                     this._evalScripts(this.subMenuItems.dynamicBuilderCode);
                     menuItems = this.builderMenuItems || [];
                 }else if(this.subMenuItems.dynamicBuilderModule){
-                    menuItems = FuncUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window).apply(this);
+				    let func = FuncUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window);
+				    if(func){
+                        menuItems = func.apply(this);
+                    }
 				}else{
 			  		menuItems = [];
 			  		this.subMenuItems.dynamicItems.forEach(function(item){
