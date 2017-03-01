@@ -21,7 +21,7 @@ export default React.createClass({
     },
 
     render: function(){
-        var icon, firstLine, secondLine, thirdLine;
+        let icon, firstLine, secondLine, thirdLine, style = this.props.style || {};
         if(this.props.renderIcon) {
             icon = this.props.renderIcon(this.props.node, this.props);
         } else {
@@ -46,9 +46,7 @@ export default React.createClass({
                     {firstLine}
                     </span>
             );
-            let style = this.props.style || {};
             style.position = 'relative';
-            this.props.style = style;
         }
         if(this.props.renderSecondLine) {
             secondLine = this.props.renderSecondLine(this.props.node);
@@ -69,6 +67,7 @@ export default React.createClass({
                 secondLine={secondLine}
                 thirdLine={thirdLine}
                 actions={actions}
+                style={style}
             />
         );
 

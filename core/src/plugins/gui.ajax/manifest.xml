@@ -203,17 +203,9 @@
         </hooks>
 		<external_file filename="plugins/gui.ajax/ajxpclient_actions.xml" include="actions/*" exclude=""/>
 		<client_configs uuidAttr="name">
-            <template name="main_orbit" element="ajxp_desktop" position="top" theme="orbit"><![CDATA[
-                <div id="background-imager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'>
-                    <div id="global_toolbar" ajxpClass="LogoWidget" ajxpOptions='{"link":"triggerRepositoryChange:ajxp_home", "linkTitle":"Back to Home"}'>
-                        <div id="logging_string" ajxpClass="UserWidget" ajxpOptions='{"menuEvent" : "over","menuOffsetLeft":11,"menuOffsetTop":11}'></div>
-						<div id="top_toolbar" ajxpClass="ActionsToolbar" ajxpOptions='{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["admin"],"submenuOffsetTop":2}'></div>
-                    </div>
-                    <div id="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height", "fitParent":"ajxp_desktop"}'></div>
-                </div>
-			]]></template>
             <template name="main_material" element="ajxp_desktop" position="top" theme="material" namespace="PydioReactUI" component="TemplateBuilder" props='{"imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_", "containerId":"orbit_content"}'/>
             <template name="material_modal" element="ajxp_desktop" position="bottom" theme="material" namespace="PydioReactUI" component="Modal" props='{"containerId":"pydio_modal"}'/>
+            <template name="material_snack" element="ajxp_desktop" position="bottom" theme="material" namespace="PydioReactUI" component="MessageBar" props='{"containerId":"pydio_message_bar"}'/>
             <template name="material_router" element="ajxp_desktop" position="bottom" theme="material" namespace="PydioReactUI" component="Router" props='{"containerId":"pydio_router"}'/>
             <template name="widget_orbit" element="ajxp_widget" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>

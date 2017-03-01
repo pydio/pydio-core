@@ -1,14 +1,16 @@
-import MessagesConsumerMixin from '../MessagesConsumerMixin'
 import AsyncComponent from '../AsyncComponent'
+import PydioContextConsumerMixin from '../PydioContextConsumerMixin'
 
 /**
  * Specific AsyncComponent for Modal Dialog
  */
 export default React.createClass({
 
+    mixins:[PydioContextConsumerMixin],
+
     propTypes: {
         size: React.PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
-        padding: React.PropTypes.boolean
+        padding: React.PropTypes.bool
     },
 
     sizes: {
@@ -85,14 +87,14 @@ export default React.createClass({
                 actions.push(
                     <MaterialUI.FlatButton
                         key="cancel"
-                        label={window.pydio.MessageHash['49']}
+                        label={this.context.getMessage('49')}
                         primary={false}
                         onTouchTap={component.getCancelCallback()}
                     />);
             }
             if(component.getSubmitCallback){
                 actions.push(<MaterialUI.FlatButton
-                    label={window.pydio.MessageHash['48']}
+                    label={this.context.getMessage('48')}
                     primary={true}
                     keyboardFocused={true}
                     onTouchTap={component.getSubmitCallback()}

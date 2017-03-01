@@ -1,5 +1,7 @@
 export default React.createClass({
 
+    mixins:[PydioReactUI.PydioContextConsumerMixin],
+
     propTypes:{
         node: React.PropTypes.instanceOf(AjxpNode),
         callback:React.PropTypes.func,
@@ -9,7 +11,8 @@ export default React.createClass({
 
     submit: function(){
         if(!this.state || !this.state.value || this.state.value === this.props.node.getLabel()){
-            alert('Please use a different value for renaming!');
+            this.setState({errorString: 'Please use a different value for renaming!'});
+            this.context.getPydio().displayMessage('ERROR', 'Please use a different value for renaming!');
         }else{
             this.props.callback(this.state.value);
             this.props.onClose();
@@ -17,11 +20,11 @@ export default React.createClass({
     },
 
     focused: function(){
-        pydio.UI.disableAllKeyBindings();
+        this.context.getPydio().UI.disableAllKeyBindings();
     },
 
     blurred: function(){
-        pydio.UI.enableAllKeyBindings();
+        this.context.getPydio().UI.enableAllKeyBindings();
     },
 
     componentDidMount:function(){
@@ -36,6 +39,7 @@ export default React.createClass({
         if(e.key === 'Enter') {
             this.submit();
         }
+        this.setState({errorString: ''});
         e.stopPropagation();
     },
 
@@ -50,6 +54,7 @@ export default React.createClass({
                     onBlur={this.blurred}
                     onClick={this.catch} onDoubleClick={this.catchClicks}
                     tabIndex="0" onKeyDown={this.onKeyDown}
+                    errorText={this.state ? this.state.errorString : null}
                 />
                 <div className="modal-buttons">
                     <ReactMUI.FlatButton label="Cancel" onClick={this.props.onClose}/>

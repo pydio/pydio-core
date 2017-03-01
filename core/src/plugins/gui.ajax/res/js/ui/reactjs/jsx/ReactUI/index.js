@@ -8,9 +8,13 @@ import ActionDialogMixin from './modal/ActionDialogMixin'
 import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
 import Modal from './modal/Modal'
+import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
 import Router from './router/Router'
+
+import PydioContextProvider from './PydioContextProvider'
+import PydioContextConsumerMixin from './PydioContextConsumerMixin'
 
 window.PydioReactUI = {
     Builder                     : Builder,
@@ -25,4 +29,9 @@ window.PydioReactUI = {
     Modal                       : Modal,
     Loader                      : Loader,
     Router                      : Router,
+    MessageBar                  : MessageBar,
+
+    PydioContextProvider        : PydioContextProvider,
+    PydioContextConsumerMixin   : PydioContextConsumerMixin
+
 };

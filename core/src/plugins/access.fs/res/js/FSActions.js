@@ -3,10 +3,6 @@
     let pydio = global.pydio;
     let MessageHash = global.MessageHash;
 
-    if(pydio.UI.modalSupportsComponents){
-
-    }
-
     class Callbacks {
 
         static ls(){
