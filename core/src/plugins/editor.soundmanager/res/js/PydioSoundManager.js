@@ -44,7 +44,7 @@ class Preview extends React.Component {
 
         const {pydio, node, rich} = this.props
 
-        let url = pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(base64_encode(node.getPath())) + '&z=' + guid();
+        let url = pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid();
 
         this.state = {
             url: url,
