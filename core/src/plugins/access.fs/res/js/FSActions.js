@@ -889,6 +889,7 @@
         render: function(){
             let tabs = [];
             let uploaders = pydio.Registry.getActiveExtensionByType("uploader");
+            const dismiss = () => {this.dismiss()};
 
             uploaders.sort(function(objA, objB){
                 return objA.order - objB.order;
@@ -903,7 +904,7 @@
                                 pydio={pydio}
                                 namespace={parts[0]}
                                 componentName={parts[1]}
-                                onDismiss={this.dismiss}
+                                onDismiss={dismiss}
                             />
                         </MaterialUI.Tab>
                     );

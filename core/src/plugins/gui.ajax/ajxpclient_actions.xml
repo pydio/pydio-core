@@ -24,7 +24,7 @@
 			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-left" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
-					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="navigation">
+					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="00_navigation">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
@@ -36,7 +36,7 @@
 			<gui text="149" title="149" iconClass="icon-refresh" src="reload.png" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
-					actionBar="false" actionBarGroup="navigation" contextMenu="true" infoPanel="false">
+					actionBar="false" actionBarGroup="00_navigation" contextMenu="true" infoPanel="false">
 				</context>
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
