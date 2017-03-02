@@ -9,7 +9,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build/',
+                        dest: 'res/build/PydioSoundManager/',
                         ext: '.js'
                     }
                 ]
@@ -18,7 +18,7 @@ module.exports = function(grunt) {
         browserify: {
             ui : {
                 files: {
-                    'res/build/PydioSoundManager.js':'res/build/*.js'
+                    'res/build/PydioSoundManager.js':'res/build/PydioSoundManager/*.js'
                 }
             }
         },
