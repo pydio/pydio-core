@@ -102,13 +102,32 @@
 
             pydio.UI.openComponentInModal('FSActions', 'TreeDialog', {
                 isMove: false,
-                dialogTitle:'Copy Selection To...',
+                dialogTitle:MessageHash[159],
                 submitValue:submit
             });
 
         }
 
-        static move(){
+        static move(controller, dndActionParameter = null){
+
+            if(dndActionParameter && dndActionParameter instanceof PydioComponents.DNDActionParameter){
+                if(dndActionParameter.getStep() === PydioComponents.DNDActionParameter.STEP_CAN_DROP){
+
+                    if(dndActionParameter.getTarget().isLeaf()){
+                       throw new Error('Cannot drop');
+                    }else {
+                        return false;
+                    }
+
+                }else if(dndActionParameter.getStep() === PydioComponents.DNDActionParameter.STEP_END_DRAG){
+                    let selection = controller.getDataModel();
+                    let path = dndActionParameter.getTarget().getPath();
+                    Callbacks.applyCopyOrMove('move', selection, path);
+                    return;
+                }
+
+                return;
+            }
 
             let selection = pydio.getUserSelection();
             let submit = function(path, wsId = null){
@@ -117,7 +136,7 @@
 
             pydio.UI.openComponentInModal('FSActions', 'TreeDialog', {
                 isMove: true,
-                dialogTitle:'Move Selection To...',
+                dialogTitle:MessageHash[160],
                 submitValue:submit
             });
 

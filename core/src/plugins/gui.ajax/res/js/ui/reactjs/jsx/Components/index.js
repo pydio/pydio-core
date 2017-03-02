@@ -16,6 +16,8 @@ import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
 import AbstractEditor from './editor/AbstractEditor'
 
+import {DNDActionParameter} from './DND'
+
 window.PydioComponents = {
     
     SortableList            : SortableList,
@@ -38,7 +40,9 @@ window.PydioComponents = {
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,
-    PaperEditorNavHeader    : PaperEditorNavHeader
+    PaperEditorNavHeader    : PaperEditorNavHeader,
+
+    DNDActionParameter      : DNDActionParameter
 
 };
 
