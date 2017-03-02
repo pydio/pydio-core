@@ -206,7 +206,7 @@ function addVolumeButton(){
 Class.create("SMPlayer", AbstractEditor, {
 
 	fullscreenMode: false,
-	
+
 	initialize: function($super, oFormObject, options){
         this.element = oFormObject;
         this.editorOptions = options;
@@ -344,7 +344,7 @@ soundManager.setup({\n\
     },
 
     filterElement : function(element, ajxpNode){
-        
+
     }
 
 });
