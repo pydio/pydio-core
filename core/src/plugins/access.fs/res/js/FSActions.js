@@ -903,6 +903,7 @@
                                 pydio={pydio}
                                 namespace={parts[0]}
                                 componentName={parts[1]}
+                                onDismiss={this.dismiss}
                             />
                         </MaterialUI.Tab>
                     );

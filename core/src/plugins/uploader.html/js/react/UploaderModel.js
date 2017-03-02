@@ -547,7 +547,7 @@
                 dirReader.readEntries (function(results) {
                     if (!results.length) {
 
-                        $A(entries).each(function(e){
+                        entries.map(function(e){
                             if(e.isDirectory){
                                 folderHandler(e);
                                 recurseDir(e, fileHandler, folderHandler, errorHandler);

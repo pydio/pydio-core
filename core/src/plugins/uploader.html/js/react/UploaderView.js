@@ -2,6 +2,10 @@
 
     var DropUploader = React.createClass({
 
+        propTypes: {
+            onDismiss: React.PropTypes.func
+        },
+
         getInitialState: function() {
             return {};
         },
@@ -100,7 +104,7 @@
                         onFolderPicked={this.onFolderPicked}
                         style={{width:'100%'}}
                     >
-                        <TransfersList/>
+                        <TransfersList onDismiss={this.props.onDismiss}/>
                     </PydioForm.FileDropZone>
                     {optionsEl}
                 </div>
@@ -197,6 +201,10 @@
 
     var TransfersList = React.createClass({
 
+        propTypes: {
+            onDismiss: React.PropTypes.func
+        },
+
         componentDidMount: function(){
             let store = UploaderModel.Store.getInstance();
             this._storeObserver = function(){
@@ -205,8 +213,8 @@
             }.bind(this);
             store.observe("update", this._storeObserver);
             store.observe("auto_close", function(){
-                pydio.UI.modal.dismiss();
-            });
+                this.props.onDismiss();
+            }.bind(this));
             this.setState({items: store.getItems()});
         },
 
