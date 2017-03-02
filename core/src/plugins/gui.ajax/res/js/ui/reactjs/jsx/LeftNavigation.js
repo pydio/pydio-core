@@ -909,11 +909,10 @@
     var ns = global.LeftNavigation || {};
     if(global.ReactDND){
         ns.Panel = ReactDND.DragDropContext(FakeDndBackend)(LeftPanel);
-        ns.PinnedLeftPanel = ReactDND.DragDropContext(FakeDndBackend)(PinnedLeftPanel);
     }else{
         ns.Panel = LeftPanel;
-        ns.PinnedLeftPanel = PinnedLeftPanel;
     }
+    ns.PinnedLeftPanel = PinnedLeftPanel;
     ns.UserWorkspacesList = UserWorkspacesList;
     global.LeftNavigation=ns;
 
