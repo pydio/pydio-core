@@ -61,8 +61,10 @@ let FilePreview = React.createClass({
         }
         let editor = editors[0];
         let editorClassName = editors[0].editorClass;
+
         pydio.Registry.loadEditorResources(editors[0].resourcesManager, function(){
             let component = FuncUtils.getFunctionByName(editorClassName, global);
+            console.log("loadCoveringImage ", editorClassName, component)
             if(component && this.isMounted()){
                 this.loadPreviewFromEditor(component, node);
             }
@@ -96,8 +98,9 @@ let FilePreview = React.createClass({
             }else{
                 image.onload = loader();
             }
-        }else if(this.props.richPreview && editorClass.getPreviewComponent){
-            this.setState({element: editorClass.getPreviewComponent(node, true)});
+        }else if(editorClass.getPreviewComponent){
+            console.log("Get Preview ",this.props.richPreview)
+            this.setState({element: editorClass.getPreviewComponent(node, this.props.richPreview)});
         }
 
     },
