@@ -5,7 +5,7 @@
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
             <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"
                 fallbackCondition="!window.addEventListener" fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"/>
-            <js className="PydioCoreActions" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioCoreActions.js"/>
+            <js className="PydioCoreActions" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioCoreActions.js" depends="React"/>
             <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
             <js className="PydioReactUI" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioReactUI.js" depends="React"/>
             <js className="PydioComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js" depends="React"/>

@@ -189,6 +189,10 @@
                 case 'home':
                     this.props.pydio.triggerRepositoryChange('ajxp_home');
                     break;
+                case 'info':
+                    this.props.pydio.Controller.getActionByName('splash').deny = false;
+                    this.props.pydio.Controller.fireAction('splash');
+                    break;
                 case 'cog':
                     // Open dashboard in modal
                     this.props.pydio.Controller.fireAction('open_user_dashboard');
@@ -232,34 +236,46 @@
         render: function(){
 
             const {userName, avatarUrl} = this.state;
+            const messages = this.props.pydio.MessageHash;
 
             return (
                 <div className="user-widget">
                     <div className="user-display">
-                        {avatarUrl && <MaterialUI.Avatar src={avatarUrl} style={{marginRight: 20}}/>}<div className="userLabel">{userName}</div>
+                        {avatarUrl && <MaterialUI.Avatar src={avatarUrl} style={{marginRight: 20}}/>}
+                        <div className="userLabel">{userName}</div>
+                        <MaterialUI.IconButton
+                            onTouchTap={this.applyAction.bind(this, 'cog')}
+                            iconClassName="mdi mdi-settings"
+                            tooltip={messages['165']}
+                            style={{width: 38, height: 38}}
+                            iconStyle={{fontSize: 16, color: 'rgba(255,255,255,0.87)'}}
+                        />
                     </div>
                     <div className="action_bar">
                         <MaterialUI.IconButton
                             onTouchTap={this.applyAction.bind(this, 'home')}
-                            iconClassName="userActionButton mdi mdi-home"
-                            tooltip="Back to home"
+                            iconClassName="userActionIcon mdi mdi-home"
+                            className="userActionButton"
+                            tooltip={messages['305']}
                         />
                         <MaterialUI.IconButton
-                            onTouchTap={this.applyAction.bind(this, 'cog')}
-                            iconClassName="userActionButton mdi mdi-settings"
-                            tooltip="Settings"
+                            onTouchTap={this.applyAction.bind(this, 'info')}
+                            iconClassName="userActionIcon mdi mdi-information-outline"
+                            className="userActionButton"
+                            tooltip={messages['166']}
                         />
                         <PydioReactUI.AsyncComponent
                             namespace="PydioNotifications"
                             componentName="Panel"
                             noLoader={true}
-                            iconClassName="userActionButton mdi mdi-bell"
+                            iconClassName="userActionIcon mdi mdi-bell-outline"
                             {...this.props}
                         />
                         <MaterialUI.IconButton
                             onTouchTap={this.applyAction.bind(this, 'logout')}
-                            iconClassName="userActionButton mdi mdi-logout"
-                            tooltip="Log out"
+                            iconClassName="userActionIcon mdi mdi-logout"
+                            className="userActionButton"
+                            tooltip={messages['169']}
                         />
                     </div>
                 </div>

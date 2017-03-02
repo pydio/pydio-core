@@ -10,6 +10,10 @@ let FilePreview = React.createClass({
         return {loading: false, element: null}
     },
 
+    getDefaultProps: function(){
+        return {richPreview: false}
+    },
+
     insertPreviewNode: function(previewNode){
         this._previewNode = previewNode;
         let containerNode = this.refs.container;
@@ -64,7 +68,6 @@ let FilePreview = React.createClass({
 
         pydio.Registry.loadEditorResources(editors[0].resourcesManager, function(){
             let component = FuncUtils.getFunctionByName(editorClassName, global);
-            console.log("loadCoveringImage ", editorClassName, component)
             if(component && this.isMounted()){
                 this.loadPreviewFromEditor(component, node);
             }
@@ -99,7 +102,6 @@ let FilePreview = React.createClass({
                 image.onload = loader();
             }
         }else if(editorClass.getPreviewComponent){
-            console.log("Get Preview ",this.props.richPreview)
             this.setState({element: editorClass.getPreviewComponent(node, this.props.richPreview)});
         }
 

@@ -53,7 +53,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="PydioCoreActions.Navigation.ecternalSelection" prepareModal="false"/>
+				<clientCallback module="PydioCoreActions.Navigation.externalSelection" prepareModal="false"/>
 				</processing>
 		</action>
 		<action name="bookmark">
@@ -75,18 +75,11 @@
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string">
+					actionBarGroup="utils" ajxpWidgets="UserWidget">
 				</context>
 			</gui>
 			<processing>
-				<clientCallback module="PydioCoreActions.Navigation.splash" prepareModal="true"/>
-				<clientForm id="splash_form"><![CDATA[
-					<div id="splash_form" box_width="600" box_padding="0">
-						<div id="docDiv" style="padding: 5px;overflow: auto;height: 410px;font-size: 12px;line-height: 16px; padding-bottom:52px;">
-							<div class="dialogButtons" style="text-align:right;padding-right:10px;"><input type="submit" value="Close" width="16" height="16" class="dialogButton"/></div>
-						</div>
-					</div>
-				]]></clientForm>
+				<clientCallback module="PydioCoreActions.Navigation.splash"/>
 			</processing>
 		</action>
 	</actions>

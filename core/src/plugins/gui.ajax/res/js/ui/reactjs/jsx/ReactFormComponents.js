@@ -979,13 +979,13 @@
                 className += ' active';
             }
 
-            var style = this.props.style || {
-                    width: this.props.size || 100,
-                    height: this.props.size || 100,
-                    borderStyle: this.state.isDragActive ? "solid" : "dashed"
-                };
+            let style = {
+                width: this.props.size || 100,
+                height: this.props.size || 100,
+                borderStyle: this.state.isDragActive ? "solid" : "dashed"
+            };
             if(this.props.style){
-                style = LangUtils.objectMerge(this.props.style, style);
+                style = Object.assign(style, this.props.style);
             }
             if(this.props.enableFolders){
                 var folderInput = <input style={{display:'none'}} name="userfolder" type="file" ref="folderInput" onChange={this.onFolderPicked}/>;

@@ -2109,7 +2109,7 @@ div#multiple_download_container div div a:hover {
   z-index: 1002;
 }
 .user-widget .user-display {
-  padding: 0 16px;
+  padding: 0 10px;
   font-size: 22px;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -2125,10 +2125,14 @@ div#multiple_download_container div div a:hover {
   white-space: nowrap;
 }
 .user-widget .action_bar {
-  padding: 8px;
+  padding: 6px 8px;
   text-align: left;
 }
-.user-widget .action_bar span.userActionButton {
+.user-widget .action_bar button.userActionButton {
+  width: 40px !important;
+  height: 40px !important;
+}
+.user-widget .action_bar button.userActionButton span.userActionIcon {
   font-size: 18px !important;
   color: rgba(255, 255, 255, 0.93) !important;
 }
