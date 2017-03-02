@@ -72,13 +72,13 @@ import ButtonMenu from './ButtonMenu'
                         subItems.map(function (obj) {
                             if (obj.separator) {
                                 items.push(obj);
-                            } else if (obj.actionId) {
+                            } else if (obj.actionId && !obj.actionId.deny) {
                                 items.push(obj.actionId.getMenuData());
                             }
                         });
-                        menuTitle = "More";
+                        menuTitle = action.options.text;
                         menuItems = Utils.pydioActionsToItems(items);
-                        menuIcon  = "icon icon-plus";
+                        menuIcon  = action.options.icon_class;
                     }else if(action.subMenuItems.staticItems){
                         menuTitle = action.options.text;
                         menuItems = Utils.pydioActionsToItems(action.subMenuItems.staticItems);

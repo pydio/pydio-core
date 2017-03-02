@@ -598,7 +598,7 @@ class PydioDataModel extends Observable{
 		var has = false;
 		mimeTypes.map(function(mime){
 			if(has) return;
-            for(let i=0; i<this._selectedNodes; i++){
+            for(let i=0; i<this._selectedNodes.length; i++){
                 if(PathUtils.getAjxpMimeType(this._selectedNodes[i]) === mime){
                     has = true;
                     break;
