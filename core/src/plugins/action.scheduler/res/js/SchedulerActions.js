@@ -34,7 +34,7 @@
             modal.showDialogForm('', 'scheduler-task-form', function(oForm){
                 this.currentFormManager = new FormManager();
                 var xmlDefinition = pydio.getXmlRegistry();
-                var node = XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
+                var node = XMLUtils.XPathSelectSingleNode(xmlDefinition, 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
 
                 this.currentFormManager.params = this.currentFormManager.parseParameters(node, "param");
 

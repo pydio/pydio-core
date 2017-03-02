@@ -136,7 +136,7 @@ class XMLUtils{
      * @signature function(element, query)
      */
     static XPathGetSingleNodeText(element, query){
-        var node = XPathSelectSingleNode(element, query);
+        var node = XMLUtils.XPathSelectSingleNode(element, query);
         return XMLUtils.getDomNodeText(node);
     }
 

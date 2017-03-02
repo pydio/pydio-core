@@ -46,7 +46,7 @@ let FSTemplate = React.createClass({
                         <SearchForm {...this.props}/>
                     </div>
                     <div id="main_toolbar">
-                        <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                        <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} primary={true}/>
                         <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
                         <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
                         <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>

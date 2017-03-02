@@ -25,6 +25,39 @@ function collectDrop(connect, monitor){
     };
 }
 
+class DNDActionParameter{
+    constructor(source, target, step){
+        this._source = source;
+        this._target = target;
+        this._step = step;
+    }
+    getSource(){
+        return this._source;
+    }
+    getTarget(){
+        return this._target;
+    }
+    getStep(){
+        return this._step;
+    }
+}
+
+DNDActionParameter.STEP_BEGIN_DRAG = 'beginDrag';
+DNDActionParameter.STEP_END_DRAG = 'endDrag';
+DNDActionParameter.STEP_CAN_DROP = 'canDrop';
+DNDActionParameter.STEP_HOVER_DROP = 'hover';
+
+let applyDNDAction = function(source, target, step){
+    const dnd = pydio.Controller.defaultActions.get("dragndrop");
+    if(dnd){
+        const dndAction = pydio.Controller.getActionByName(dnd);
+        dndAction.enable();
+        dndAction.apply(new DNDActionParameter(source, target, step));
+    }else{
+        throw new Error('No DND Actions available');
+    }
+};
+
 /****************************/
 /* REACT DND DRAG/DROP NODES
  /***************************/
@@ -41,14 +74,9 @@ var nodeDragSource = {
         }
         var item = monitor.getItem();
         var dropResult = monitor.getDropResult();
-        var dnd = pydio.Controller.defaultActions.get("dragndrop");
-        if(dnd){
-            var dndAction = pydio.Controller.getActionByName(dnd);
-            // Make sure to enable
-            dndAction.enable();
-            dndAction.apply([item.node, dropResult.node]);
-        }
-
+        try{
+            applyDNDAction(item.node, dropResult.node, DNDActionParameter.STEP_END_DRAG);
+        }catch(e){}
     }
 };
 
@@ -62,22 +90,13 @@ var nodeDropTarget = {
         var source = monitor.getItem().node;
         var target = props.node;
 
-        var dnd = pydio.Controller.defaultActions.get("dragndrop");
-        if(dnd){
-            var dndAction = pydio.Controller.getActionByName(dnd);
-            // Make sure to enable
-            dndAction.enable();
-            // Manually apply, do not use action.apply(), as it will
-            // catch the exception we are trying to detect.
-            window.actionArguments = [source, target, "canDrop"];
-            try {
-                eval(dndAction.options.callbackCode);
-            } catch (e) {
-                return false;
-            }
-            return true;
+        try{
+            applyDNDAction(source, target, DNDActionParameter.STEP_CAN_DROP);
+        }catch(e){
+            console.log('error ? ');
+            return false;
         }
-        return false;
+        return true;
     },
 
     drop: function(props, monitor){
@@ -92,4 +111,4 @@ var nodeDropTarget = {
 
 
 
-export {Types, collect, collectDrop, nodeDragSource, nodeDropTarget}
+export {Types, collect, collectDrop, nodeDragSource, nodeDropTarget, DNDActionParameter}

@@ -485,7 +485,7 @@ class PydioApi{
         $(formName).getElements().each(function(fElement){
             var fValue = fElement.getValue();
             if(fElement.name == 'get_action' && fValue.substr(0,4) == 'http'){
-                fValue = getBaseName(fValue);
+                fValue = PathUtils.getBasename(fValue);
             }
             if(fElement.type == 'radio' && !fElement.checked) return;
             if(params[fElement.name] && fElement.name.endsWith('[]')){

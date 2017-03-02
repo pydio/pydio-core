@@ -2662,71 +2662,16 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
       flex: 1;
   -webkit-flex: 1;
 }
-#breadcrumb {
-  display: block;
-  margin-top: 0;
-  overflow: hidden;
-  font-size: 22px;
-  line-height: 24px;
-  /*
-  span.reduced111 {
-    &::before{
-      content: "...";
-    }
-    em {
-      display:none;
-    }
-    &:hover {
-      padding: 20px 15px 20px 35px;
-      transition:padding 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-      width: auto;
-      em {
-        visibility:visible;
-      }
-    }
-    &.first-bread {
-      height: auto;
-      padding: 20px 15px 20px 1em;
-      transition:none;
-      em {
-        visibility:visible;
-      }
-    }
-  }
-  */
-}
-#breadcrumb div.inner_bread {
-  width: 5000px;
-  padding: 20px;
-}
-#breadcrumb ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-#breadcrumb em {
-  font-style: normal;
-  font-weight: 400;
-}
-#breadcrumb li {
+.react_breadcrumb span.segment {
   display: inline-block;
-}
-#breadcrumb li::after {
-  content: "/";
-  display: inline-block;
-  padding: 0 4px;
-}
-#breadcrumb li:last-of-type::after {
-  display: none;
-}
-#breadcrumb span.ajxp-goto {
   cursor: pointer;
 }
-#breadcrumb span.ajxp-goto:hover em {
-  font-weight: 400;
+.react_breadcrumb span.segment:hover {
+  font-weight: 500;
 }
-#breadcrumb i.ajxp-goto .icon-refresh {
-  font-size: 16px;
+.react_breadcrumb span.segment:last-of-type:hover {
+  cursor: default;
+  font-weight: 400;
 }
 /* rotation animation */
 @-webkit-keyframes rotate {
@@ -6457,7 +6402,9 @@ body,
   z-index: 3;
 }
 #main_toolbar #display-toolbar .mui-font-icon,
-#main_toolbar #paginator-toolbar .mui-font-icon {
+#main_toolbar #paginator-toolbar .mui-font-icon,
+#main_toolbar #display-toolbar .mui-icon-button,
+#main_toolbar #paginator-toolbar .mui-icon-button {
   font-size: 24px;
   color: #2f3d44;
 }
@@ -6489,6 +6436,7 @@ body,
   top: 110px;
   bottom: 0;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  overflow-y: auto;
   font-weight: 400;
 }
 .info-panel-open #info_panel {

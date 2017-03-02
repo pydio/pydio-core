@@ -36,8 +36,8 @@ class BackgroundImage{
         var plugin = exp[0];
         paramPrefix = exp[1];
         var registry = pydio.getXmlRegistry();
-        var configs = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
-        var defaults = XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
+        var configs = XMLUtils.XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/plugin_configs/property[contains(@name, '"+paramPrefix+"')]");
+        var defaults = XMLUtils.XPathSelectNodes(registry, "plugins/*[@id='"+plugin+"']/server_settings/global_param[contains(@name, '"+paramPrefix+"')]");
 
 
         bgrounds = {};

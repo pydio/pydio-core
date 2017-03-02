@@ -237,6 +237,7 @@ class Controller extends Observable{
         if(defaultGroup && contextActionsGroup.has(defaultGroup)){
             keys.unshift(defaultGroup);
         }
+        let actionsPushed = {};
         keys.map(function(key){
             var value = contextActionsGroup.get(key);
             if(!first){
@@ -250,7 +251,11 @@ class Controller extends Observable{
             }
             first = false;
             value.forEach(function(mItem){
-                contextActions.push(mItem);
+                const actionId = mItem.action_id;
+                if(!actionsPushed[actionId]){
+                    contextActions.push(mItem);
+                    actionsPushed[actionId] = true;
+                }
             });
         });
 		return contextActions;

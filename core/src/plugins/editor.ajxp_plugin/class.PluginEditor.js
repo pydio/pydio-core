@@ -129,9 +129,9 @@ Class.create("PluginEditor", AbstractEditor, {
             this.docPane.update("");
 
             var xmlData = transport.responseXML;
-            var params = XPathSelectNodes(xmlData, "//global_param");
-            var values = XPathSelectNodes(xmlData, "//plugin_settings_values/param");
-            var documentation = XPathSelectSingleNode(xmlData, "//plugin_doc");
+            var params = XMLUtils.XPathSelectNodes(xmlData, "//global_param");
+            var values = XMLUtils.XPathSelectNodes(xmlData, "//plugin_settings_values/param");
+            var documentation = XMLUtils.XPathSelectSingleNode(xmlData, "//plugin_doc");
             var enabledAlways = false;
             try{enabledAlways = xmlData.firstChild.firstChild.attributes['enabled'].value === 'always';}catch (e){}
 

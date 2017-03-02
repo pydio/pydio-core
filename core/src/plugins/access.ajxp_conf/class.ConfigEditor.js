@@ -57,8 +57,8 @@ Class.create("ConfigEditor",{
 
 	populateRoles : function(xmlData){
 		var rolesPane = this.form.down('[id="roles_pane"]');
-		var availableRoles = XPathSelectNodes(xmlData, "admin_data/ajxp_roles/role");
-		var userRoles = XPathSelectNodes(xmlData, "admin_data/user/ajxp_roles/role");
+		var availableRoles = XMLUtils.XPathSelectNodes(xmlData, "admin_data/ajxp_roles/role");
+		var userRoles = XMLUtils.XPathSelectNodes(xmlData, "admin_data/user/ajxp_roles/role");
 		var availSelect = rolesPane.down('div#available_roles');
 		var userSelect = rolesPane.down('div#user_roles');
 		var rolesId = $A();
@@ -278,19 +278,19 @@ Class.create("ConfigEditor",{
 		this.drivers = new Hash();
 		this.templates = new Hash();
 		this.submitForm('create_repository', 'get_drivers_definition', new Hash(), null, function(xmlData){
-            var root = XPathSelectSingleNode(xmlData, "drivers");
+            var root = XMLUtils.XPathSelectSingleNode(xmlData, "drivers");
             if(root.getAttribute("allowed") == "false"){
                 this.drivers.NOT_ALLOWED = true;
             }
-			var driverNodes = XPathSelectNodes(xmlData, "drivers/ajxpdriver");
+			var driverNodes = XMLUtils.XPathSelectNodes(xmlData, "drivers/ajxpdriver");
 			for(var i=0;i<driverNodes.length;i++){				
 				var driver = driverNodes[i];
 				var driverDef = new Hash();
-				var driverLabel = XPathGetSingleNodeText(driver, "@label");
-				var driverName = XPathGetSingleNodeText(driver, "@name");
-				var driverParams = XPathSelectNodes(driver, "param");
+				var driverLabel = XMLUtils.XPathGetSingleNodeText(driver, "@label");
+				var driverName = XMLUtils.XPathGetSingleNodeText(driver, "@name");
+				var driverParams = XMLUtils.XPathSelectNodes(driver, "param");
 				driverDef.set('label', driverLabel);
-				driverDef.set('description', XPathGetSingleNodeText(driver, "@description"));
+				driverDef.set('description', XMLUtils.XPathGetSingleNodeText(driver, "@description"));
 				driverDef.set('name', driverName);
 				var driverParamsArray = $A();
 				for(var j=0;j<driverParams.length;j++){
@@ -309,15 +309,15 @@ Class.create("ConfigEditor",{
 				this.updateDriverSelector();
 			}else{
 				this.submitForm('create_repository', 'get_templates_definition', new Hash(), null, function(xmlData){			
-					var driverNodes = XPathSelectNodes(xmlData, "repository_templates/template");			
+					var driverNodes = XMLUtils.XPathSelectNodes(xmlData, "repository_templates/template");
 					for(var i=0;i<driverNodes.length;i++){				
 						var driver = driverNodes[i];
 						var driverDef = new Hash();
-						var driverName = XPathGetSingleNodeText(driver, "@repository_id");
-						driverDef.set('label', XPathGetSingleNodeText(driver, "@repository_label"));
-						driverDef.set('type', XPathGetSingleNodeText(driver, "@repository_type"));
+                        var driverName = XMLUtils.XPathGetSingleNodeText(driver, "@repository_id");
+                        driverDef.set('label', XMLUtils.XPathGetSingleNodeText(driver, "@repository_label"));
+                        driverDef.set('type', XMLUtils.XPathGetSingleNodeText(driver, "@repository_type"));
 						driverDef.set('name', driverName);
-						var driverParams = XPathSelectNodes(driver, "option");
+						var driverParams = XMLUtils.XPathSelectNodes(driver, "option");
 						var optionsList = $A();
 						for(var k=0;k<driverParams.length;k++){
 							optionsList.push(driverParams[k].getAttribute("name"));
@@ -436,7 +436,7 @@ Class.create("ConfigEditor",{
 		}		
 		this.submitForm('edit_repository', 'create_repository', toSubmit, null, function(responseXML){
 			//hideLightBox();
-            var reloadNode = XPathSelectSingleNode(responseXML.documentElement, "//reload_instruction/@file");
+            var reloadNode = XMLUtils.XPathSelectSingleNode(responseXML.documentElement, "//reload_instruction/@file");
             if(reloadNode && reloadNode.nodeValue){
                 var newRepoId = reloadNode.nodeValue;
                 var editors = pydio.Registry.findEditorsForMime("repository");
@@ -558,7 +558,7 @@ Class.create("ConfigEditor",{
 		}
         PydioApi.getClient().parseXmlMessage(xmlResponse);
         if(xmlResponse.documentElement){
-            if(XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
+            if(XMLUtils.XPathSelectSingleNode(xmlResponse.documentElement, 'message[@type="ERROR"]') != null){
                 return false;
             }
         }

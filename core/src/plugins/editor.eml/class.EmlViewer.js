@@ -189,7 +189,7 @@ Class.create("EmlViewer", AbstractEditor, {
 	
 	parseBodies : function (transport){
 		var xmlDoc = transport.responseXML;
-		var html = XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]');
+		var html = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]');
 		if(html){
 			this.iFrame = new Element('iframe');
 			this.textareaContainer.insert(this.iFrame);
@@ -212,7 +212,7 @@ Class.create("EmlViewer", AbstractEditor, {
 			}
 		}else{
 			var pre = new Element("pre");
-			pre.insert(XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue);
+			pre.insert(XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue);
 			this.textareaContainer.insert(pre);
             this.textareaContainer.setStyle({overflowY:'auto'});
 			pre.setStyle({display:'block',height: '100%',margin:0});
@@ -223,12 +223,12 @@ Class.create("EmlViewer", AbstractEditor, {
 		var xmlDoc = transport.responseXML;
 		var hContainer = this.element.down("#emlHeaderContainer");
 		// PARSE HEADERS
-		var headers = XPathSelectNodes(xmlDoc, "email/header");
+		var headers = XMLUtils.XPathSelectNodes(xmlDoc, "email/header");
 		var labels = {"From":"editor.eml.1", "To":"editor.eml.2", "Cc":"editor.eml.12", "Date":"editor.eml.4", "Subject":"editor.eml.3"};
 		var searchedHeaders = {"From":[], "To":[], "Cc":[], "Date":[], "Subject":[]};
 		headers.each(function(el){
-			var hName = XPathGetSingleNodeText(el, "headername");
-			var hValue = XPathGetSingleNodeText(el, "headervalue");
+			var hName = XMLUtils.XPathGetSingleNodeText(el, "headername");
+			var hValue = XMLUtils.XPathGetSingleNodeText(el, "headervalue");
 			if(searchedHeaders[hName]){
 				if(hValue.strip() != ''){ 
 					searchedHeaders[hName].push(hValue.strip().escapeHTML());
@@ -250,29 +250,29 @@ Class.create("EmlViewer", AbstractEditor, {
 		
 		// PARSE ATTACHEMENTS
 		// Go throught headers and find Content-Disposition: attachment ones
-		var allHeaders = XPathSelectNodes(xmlDoc, "//header");
+		var allHeaders = XMLUtils.XPathSelectNodes(xmlDoc, "//header");
 		var attachments = {};
 		var id = 0;
 		allHeaders.each(function(el){
-			var hName = XPathGetSingleNodeText(el, "headername");
-			var hValue = XPathGetSingleNodeText(el, "headervalue");
+			var hName = XMLUtils.XPathGetSingleNodeText(el, "headername");
+			var hValue = XMLUtils.XPathGetSingleNodeText(el, "headervalue");
 			if(hName != "Content-Disposition" || hValue != "attachment") return;
 			var mimepart = el.parentNode;
 			var filename = "";
 			// Find filename
-			var params = XPathSelectNodes(el, "parameter");
+			var params = XMLUtils.XPathSelectNodes(el, "parameter");
 			params.each(function(c){
-				if(XPathGetSingleNodeText(c, "paramname") == "filename"){
-					filename = XPathGetSingleNodeText(c, "paramvalue");
+				if(XMLUtils.XPathGetSingleNodeText(c, "paramname") == "filename"){
+					filename = XMLUtils.XPathGetSingleNodeText(c, "paramvalue");
 				}
 			});
 			// Find attachment ID - not always
 			var foundId = false;
 			allHeaders.each(function(h){
 				if(h.parentNode != mimepart) return;
-				var siblingName = XPathGetSingleNodeText(h, "headername");
+				var siblingName = XMLUtils.XPathGetSingleNodeText(h, "headername");
 				if(siblingName == "X-Attachment-Id"){
-					id = XPathGetSingleNodeText(h, "headervalue");
+					id = XMLUtils.XPathGetSingleNodeText(h, "headervalue");
 					foundId = true;
 				}
 			});

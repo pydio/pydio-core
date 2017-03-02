@@ -186,9 +186,9 @@ Class.create("RepositoryEditor", AbstractEditor, {
     feedRepositoryForm: function(xmlData, metaTab){
 
         this.infoPane.update("");
-        var repo = XPathSelectSingleNode(xmlData, "admin_data/repository");
-        var driverParams = XPathSelectNodes(xmlData, "admin_data/ajxpdriver/param");
-        var tplParams = XPathSelectNodes(xmlData, "admin_data/template/option");
+        var repo = XMLUtils.XPathSelectSingleNode(xmlData, "admin_data/repository");
+        var driverParams = XMLUtils.XPathSelectNodes(xmlData, "admin_data/ajxpdriver/param");
+        var tplParams = XMLUtils.XPathSelectNodes(xmlData, "admin_data/template/option");
         this.currentRepoIsTemplate = (repo.getAttribute("isTemplate") === "true");
 
         if(tplParams.length){
@@ -258,12 +258,12 @@ Class.create("RepositoryEditor", AbstractEditor, {
         metaTabHead.update("");
         metaTabBody.update("");
         var id, i;
-        var data = XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
+        var data = XMLUtils.XPathSelectSingleNode(xmlData, 'admin_data/repository/param[@name="META_SOURCES"]');
         if(data && data.firstChild && data.firstChild.nodeValue){
             var metaSourcesData = data.firstChild.nodeValue.evalJSON();
             for(var plugId in metaSourcesData){
-                var metaLabel = XPathSelectSingleNode(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/@label').nodeValue;
-                var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
+                var metaLabel = XMLUtils.XPathSelectSingleNode(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/@label').nodeValue;
+                var metaDefNodes = XMLUtils.XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
 
                 id = this.repositoryId+"-meta-"+plugId.replace(".", "-");
                 var title = new Element('li',{tabIndex:0, "data-PaneID":id}).update(metaLabel);
@@ -318,7 +318,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             var addForm = new Element("div", {className:"metaPane"});
             var formEl = new Element("div", {className:"SF_element"}).update("<div class='SF_label'>"+MessageHash['ajxp_repository_editor.12']+" :</div>");
             this.metaSelector = new Element("select", {name:'new_meta_source', className:'SF_input'});
-            var choices = XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
+            var choices = XMLUtils.XPathSelectNodes(xmlData, 'admin_data/metasources/meta');
             this.metaSelector.insert(new Element("option", {value:"", selected:"true"}));
             var prevType = "";
             var currentGroup;
@@ -351,7 +351,7 @@ Class.create("RepositoryEditor", AbstractEditor, {
             addFormDetail.addClassName("empty");
             if(plugId){
                 addFormDetail.removeClassName("empty");
-                var metaDefNodes = XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
+                var metaDefNodes = XMLUtils.XPathSelectNodes(xmlData, 'admin_data/metasources/meta[@id="'+plugId+'"]/param');
                 var driverParamsHash = $A([]);
                 for(var i=0;i<metaDefNodes.length;i++){
                     driverParamsHash.push(this.formManager.parameterNodeToHash(metaDefNodes[i]));

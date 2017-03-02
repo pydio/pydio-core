@@ -105,7 +105,7 @@
                 }
                 conn.onComplete = function(transport){
                     conn.TPL_XML = transport.responseXML;
-                    var templates = XPathSelectNodes(conn.TPL_XML, "//template");
+                    var templates = XMLUtils.XPathSelectNodes(conn.TPL_XML, "//template");
                     conn.ORIGINAL_HEIGHT = (templates.length*47 + 21);
                     $('user_tpl_container').setStyle({height:conn.ORIGINAL_HEIGHT+'px'});
                     $('user_templates_selector').update('<div class="panelHeader">'+MessageHash[420]+'</div>');
@@ -196,7 +196,7 @@
 
                 var user = window.actionManager.getDataModel().getUniqueNode();
                 if(user && user.getAjxpMime() == "shared_user"){
-                    var user_id = getBaseName(user.getPath());
+                    var user_id = PathUtils.getBasename(user.getPath());
                     var conn = new Connexion();
                     conn.setParameters({
                         get_action:'user_update_user',
@@ -283,7 +283,7 @@
                 var conn = new Connexion();
                 conn.setParameters($H({
                     get_action: "user_team_delete",
-                    team_id: getBaseName(sel.getPath())
+                    team_id: PathUtils.getBasename(sel.getPath())
                 }));
                 conn.onComplete = function(){
                     $("team_panel").ajxpPaneObject.reloadDataModel();

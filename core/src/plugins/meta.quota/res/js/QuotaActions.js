@@ -20,9 +20,11 @@
                     var data = transport.responseJSON;
                     pydio.meta_quota_text = PathUtils.roundFileSize(data.USAGE, MessageHash["byte_unit_symbol"]) + "/" + PathUtils.roundFileSize(data.TOTAL, MessageHash["byte_unit_symbol"]);
                     action.options.text = pydio.meta_quota_text;
+                    /*
                     if($('ajxp_quota_panel_content')){
                         $('ajxp_quota_panel_content').update(pydio.meta_quota_text);
                     }
+                    */
                     action.refreshInstances();
                 };
                 global.ajxp_meta_quota_loading = true;
@@ -43,7 +45,7 @@
                 var configs = pydio.getPluginConfigs("mq");
                 if(configs){
                     pydio.observe("server_message", function(event){
-                        var newValue = XPathSelectSingleNode(event, "/tree/metaquota");
+                        var newValue = XMLUtils.XPathSelectSingleNode(event, "/tree/metaquota");
                         if(newValue){
                             var action = pydio.getController().getActionByName("monitor_quota");
                             if(!action) return;

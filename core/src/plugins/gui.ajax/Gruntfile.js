@@ -20,7 +20,6 @@ var gui_ajax_core = [
     'res/js/core/util/PeriodicalExecuter.js',
     'res/js/core/model/Router.js',
     'res/js/core/model/AjxpNode.js',
-    'res/js/ui/prototype/util/ajxp_utils.js',
     'res/js/core/model/User.js',
     'res/js/core/http/ResourcesManager.js',
     'res/js/core/model/RemoteNodeProvider.js',
