@@ -46,10 +46,14 @@
                 if(targetObj){
                     let position = tNodes[i].getAttribute("position");
                     let name = tNodes[i].getAttribute('name');
-                    if(position === 'bottom' && name){
+                    if((position === 'bottom' && name) || target === 'body'){
                         let newDiv = document.createElement('div');
-                        targetObj.parentNode.appendChild(newDiv);
-                        newDiv.id=name;
+                        if(target === 'body') {
+                            targetObj.appendChild(newDiv);
+                        } else {
+                            targetObj.parentNode.appendChild(newDiv);
+                        }
+                        newDiv.id = name;
                         target = name;
                         targetObj = newDiv;
                     }
