@@ -105,7 +105,7 @@ class PydioBootstrap{
         var connexion = new Connexion(url);
         connexion.onComplete = function(transport){
             if(transport.responseXML && transport.responseXML.documentElement && transport.responseXML.documentElement.nodeName == "tree"){
-                var alert = XPathSelectSingleNode(transport.responseXML.documentElement, "message");
+                var alert = XMLUtils.XPathSelectSingleNode(transport.responseXML.documentElement, "message");
                 window.alert('Exception caught by application : ' + alert.firstChild.nodeValue);
                 return;
             }

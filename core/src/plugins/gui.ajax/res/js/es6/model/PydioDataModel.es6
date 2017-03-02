@@ -645,7 +645,7 @@ class PydioDataModel extends Observable{
 		var names = [];
 		for(var i=0;i<allItems.length;i++)
 		{
-			names.push(getBaseName(allItems[i].getPath()));
+			names.push(PathUtils.getBasename(allItems[i].getPath()));
 		}
 		if(separator){
 			return names.join(separator);

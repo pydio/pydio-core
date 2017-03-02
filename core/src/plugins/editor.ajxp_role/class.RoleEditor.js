@@ -709,7 +709,7 @@ Class.create("RoleEditor", AbstractEditor, {
             // Parse result as a standard form
             var xml = transport.responseXML;
             var formManager = this.getFormManager();
-            var scopes = XPathSelectNodes(xml, "standard_form/repoScope");
+            var scopes = XMLUtils.XPathSelectNodes(xml, "standard_form/repoScope");
             if(!scopes.length) return;
             for(var i=0;i<scopes.length;i++){
                 var id = scopes[i].getAttribute("id");

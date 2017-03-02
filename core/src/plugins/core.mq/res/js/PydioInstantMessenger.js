@@ -99,7 +99,7 @@
                         var url = "ws" + (secure ? "s" : "") + "://" + host + ":" + port + "/" + this.configs.get("WS_PATH");
                         this.ws = new WebSocket(url);
                         this.ws.onmessage = function (event) {
-                            var obj = parseXml(event.data);
+                            var obj = XMLUtils.parseXml(event.data);
                             if (obj) {
                                 PydioApi.getClient().parseXmlMessage(obj);
                                 pydio.notify("server_message", obj);
