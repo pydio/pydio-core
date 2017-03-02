@@ -30,7 +30,7 @@ class PydioSoundManager extends React.Component {
     render() {
         return (
             <PydioComponents.AbstractEditor {...this.props}>
-                <Preview node={node} pydio={window.pydio} rich={true} />;
+                <Preview node={this.props.node} pydio={window.pydio} rich={true} />;
             </PydioComponents.AbstractEditor>
         );
     }
