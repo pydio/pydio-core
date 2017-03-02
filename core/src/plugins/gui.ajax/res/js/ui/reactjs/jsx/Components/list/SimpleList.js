@@ -245,6 +245,7 @@ let SimpleList = React.createClass({
         this.actionsCache = {multiple:new Map()};
         if(!this.props.skipInternalDataModel){
             this.dm = new PydioDataModel();
+            this.dm.setRootNode(this.props.dataModel.getContextNode());
             this.dm.setContextNode(this.props.dataModel.getContextNode());
         }else{
             this.dm = this.props.dataModel;
@@ -1005,7 +1006,7 @@ let SimpleList = React.createClass({
 
         var elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
         return (
-            <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown}>
+            <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown} style={this.props.style}>
                 {toolbar}
                 {inlineEditor}
                 <div className={this.props.heightAutoWithMax?"infinite-parent-smooth-height":"layout-fill"} ref="infiniteParent">

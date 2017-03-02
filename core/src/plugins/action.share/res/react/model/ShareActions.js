@@ -38,8 +38,7 @@
             }else if(window.actionManager){
                 dataModel = window.actionManager.getDataModel();
             }
-            var dialog = new AjxpReactDialogLoader('ShareDialog', 'MainPanel', {selection:dataModel, readonly:true});
-            dialog.openDialog('react_share_form', true);
+            pydio.UI.openComponentInModal('ShareDialog', 'MainPanel', {pydio:pydio, readonly:true, selection:dataModel});
         }
 
     }

@@ -1,5 +1,22 @@
 (function(global){
 
+    class ComponentConfigParser {
+
+        static getAccountTabs(pydio){
+
+            return XMLUtils.XPathSelectNodes(pydio.getXmlRegistry(), 'client_configs/component_config[@className="UserAccountTabs"]/additional_tab').map(function(node){
+                return {
+                    id: node.getAttribute("id"),
+                    tabInfo: JSON.parse(node.getAttribute('tabInfo')),
+                    paneInfo: JSON.parse(node.getAttribute('paneInfo'))
+                };
+
+            });
+
+        }
+
+    }
+
     let ProfilePane = React.createClass({
 
         componentDidMount: function(){
@@ -57,13 +74,13 @@
             postValues['get_action'] = 'custom_data_edit';
             PydioApi.getClient().request(postValues, function(transport){
                 PydioApi.getClient().parseXmlMessage(transport.responseXML);
-                global.document.observeOnce("ajaxplorer:registry_part_loaded", function(event){
+                this.props.pydio.observeOnce("registry_part_loaded", function(event){
                     if(event.memo != "user/preferences") return;
                     pydio.Registry.logXmlUser(false);
                 });
                 pydio.loadXmlRegistry(false, "user/preferences");
                 this.setState({dirty: false});
-            });
+            }.bind(this));
         },
 
         render: function(){
@@ -71,16 +88,10 @@
 
             let saveButton = <ReactMUI.RaisedButton disabled={!this.state.dirty} label={pydio.MessageHash[53]} onClick={this.saveForm}/>;
             return (
-                <div className="react-mui-context">
-                    <div className="title-flex">
-                        <h3 style={{paddingLeft:20}}>
-                            {pydio.MessageHash['user_dash.43']}
-                            <div className="legend">{pydio.MessageHash['user_dash.43t']}</div>
-                        </h3>
-                        <div className="actionBar">
-                            {saveButton}&nbsp;&nbsp;
-                            {this.getButton('pass_change', 194)}
-                        </div>
+                <div>
+                    <div className="actionBar">
+                        {saveButton}&nbsp;&nbsp;
+                        {this.getButton('pass_change', 194)}
                     </div>
                     <PydioForm.FormPanel
                         parameters={this.state.definitions}
@@ -261,15 +272,11 @@
         render: function(){
             let webdavActive = this.state && this.state.preferences.webdav_active;
             return (
-                <div className="react-mui-context">
-                    <div className="title-flex">
-                        <h3 style={{paddingLeft:20}}>
-                            {this.getMessage(403)}
-                            <div className="legend">{this.getMessage(404)}</div>
-                        </h3>
-                    </div>
+                <div>
+                    <div className="legend">{this.getMessage(404)}</div>
                     <div style={{padding:20}}>
-                        <ReactMUI.Toggle
+                        <MaterialUI.Toggle
+                            labelPosition="right"
                             label={this.getMessage(406)}
                             toggled={webdavActive}
                             onToggle={this.onToggleChange}/>
@@ -284,40 +291,23 @@
 
     });
 
-    /**
-     * Add to tabs - Requires MessagesProviderMixin & DND Context...
-     */
     let UsersPane = React.createClass({
 
         render: function(){
 
             return (
                 <PydioComponents.NodeListCustomProvider
-                    nodeProviderProperties={{get_action:'ls', dir:'users', tmp_repository_id:'ajxp_user'}}
+                    nodeProviderProperties={{
+                        get_action:'ls',
+                        dir:'users',
+                        tmp_repository_id:'ajxp_user'
+                    }}
                     elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                    style={{maxWidth:720}}
+                    actionBarGroups={['change', 'address_book']}
                 />
             );
 
-        }
-
-    });
-
-    let Dashboard = React.createClass({
-
-        render: function(){
-
-            return (
-                <MaterialUI.MuiThemeProvider>
-                    <MaterialUI.Tabs>
-                        <MaterialUI.Tab label="Profile">
-                            <ProfilePane {...this.props}/>
-                        </MaterialUI.Tab>
-                        <MaterialUI.Tab label="WebDAV Preferences">
-                            <WebDAVPane {...this.props}/>
-                        </MaterialUI.Tab>
-                    </MaterialUI.Tabs>
-                </MaterialUI.MuiThemeProvider>
-            );
         }
 
     });
@@ -334,7 +324,8 @@
                 dialogTitle: '',
                 dialogSize: 'lg',
                 dialogPadding: false,
-                dialogIsModal: true
+                dialogIsModal: false,
+                dialogScrollBody: false
             };
         },
 
@@ -344,14 +335,30 @@
 
         render: function(){
 
+            let tabs = [
+                (<MaterialUI.Tab key="account" label={this.props.pydio.MessageHash['user_dash.43']} icon={<MaterialUI.FontIcon className="mdi mdi-account"/>}>
+                    <ProfilePane {...this.props}/>
+                </MaterialUI.Tab>)
+            ];
+
+            ComponentConfigParser.getAccountTabs(this.props.pydio).map(function(tab){
+                tabs.push(
+                    <MaterialUI.Tab key={tab.id} label={this.props.pydio.MessageHash[tab.tabInfo.label]} icon={<MaterialUI.FontIcon className={tab.tabInfo.icon}/>}>
+                        <PydioReactUI.AsyncComponent
+                            {...tab.paneInfo}
+                            pydio={this.props.pydio}
+                        />
+                    </MaterialUI.Tab>
+                );
+            }.bind(this));
+
             return (
-                <MaterialUI.Tabs>
-                    <MaterialUI.Tab label="Profile">
-                        <ProfilePane {...this.props}/>
-                    </MaterialUI.Tab>
-                    <MaterialUI.Tab label="WebDAV Preferences">
-                        <WebDAVPane {...this.props}/>
-                    </MaterialUI.Tab>
+                <MaterialUI.Tabs
+                    style={{display:'flex', flexDirection:'column'}}
+                    tabItemContainerStyle={{minHeight:72}}
+                    contentContainerStyle={{overflowY:'auto', minHeight: 350}}
+                >
+                    {tabs}
                 </MaterialUI.Tabs>
             );
 
@@ -392,10 +399,21 @@
 
     }
 
+    const FakeDndBackend = function(){
+        return{
+            setup:function(){},
+            teardown:function(){},
+            connectDragSource:function(){},
+            connectDragPreview:function(){},
+            connectDropTarget:function(){}
+        };
+    };
+
+
     let ns = global.UserAccount || {};
     ns.ProfilePane = ProfilePane;
     ns.WebDAVPane = WebDAVPane;
-    ns.Dashboard = Dashboard;
+    ns.UsersPane = ReactDND.DragDropContext(FakeDndBackend)(UsersPane);
     ns.ModalDashboard = ModalDashboard;
     ns.Callbacks = Callbacks;
     global.UserAccount = ns;

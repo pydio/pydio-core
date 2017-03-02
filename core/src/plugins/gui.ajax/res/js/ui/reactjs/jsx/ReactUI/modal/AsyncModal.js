@@ -160,7 +160,7 @@ export default React.createClass({
         }
 
         let dialogRoot = {...styles.dialogRoot}
-        let dialogBody = {...styles.dialogBody}
+        let dialogBody = {...styles.dialogBody, display:'flex'}
         let dialogContent = {...styles.dialogContent, width: sizes[size].width, minWidth: sizes[size].width, maxWidth: sizes[size].width}
         let dialogTitle = {...styles.dialogTitle}
 

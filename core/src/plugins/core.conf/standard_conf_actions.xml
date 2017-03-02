@@ -207,12 +207,10 @@
         </action>
 	</actions>
     <client_configs>
-        <component_config className="AjxpTabulator::userdashboard_main_tab">
+        <component_config className="UserAccountTabs">
             <additional_tab id="webdav_pane"
-                            tabInfo='{"id":"webdav","iconClass":"icon-cog","element":"webdav_pane","closeable":false,"label":"403","title":"403","dontFocus":true,"position":3}'
-                            paneInfo='{"type":"widget"}'><![CDATA[
-                <div id="webdav_pane" ajxpClass="AjxpReactComponent" class="tabbed_editor" ajxpOptions='{"componentNamespace":"UserAccount","componentName":"WebDAVPane"}'></div>
-                ]]></additional_tab>
+                            tabInfo='{"icon":"mdi mdi-account-network","label":"403","title":"403","position":3}'
+                            paneInfo='{"namespace":"UserAccount", "componentName":"WebDAVPane"}'/>
         </component_config>
         <component_config className="InfoPanel">
             <infoPanelExtension mime="ajxp_root_node" attributes="">
