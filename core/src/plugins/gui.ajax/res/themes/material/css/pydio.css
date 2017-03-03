@@ -1387,6 +1387,68 @@ div#multiple_download_container div div a:hover {
   color: #39c0be !important;
   text-decoration: underline;
 }
+.indeterminate-loader {
+  left: 0 !important;
+  top: 0 !important;
+  z-index: 1022 !important;
+  height: 2px;
+  width: 100%;
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.26);
+}
+.indeterminate-loader:before {
+  display: block;
+  position: absolute;
+  content: "";
+  left: -200px;
+  width: 200px;
+  height: 2px;
+  background-color: #03A9F4;
+  -webkit-animation: connexionLoading 1.5s linear infinite;
+          animation: connexionLoading 1.5s linear infinite;
+}
+@-webkit-keyframes connexionLoading {
+  from {
+    left: -200px;
+    width: 30%;
+  }
+  50% {
+    width: 30%;
+  }
+  70% {
+    width: 70%;
+  }
+  80% {
+    left: 50%;
+  }
+  95% {
+    left: 120%;
+  }
+  to {
+    left: 100%;
+  }
+}
+@keyframes connexionLoading {
+  from {
+    left: -200px;
+    width: 30%;
+  }
+  50% {
+    width: 30%;
+  }
+  70% {
+    width: 70%;
+  }
+  80% {
+    left: 50%;
+  }
+  95% {
+    left: 120%;
+  }
+  to {
+    left: 100%;
+  }
+}
 .backgroundPanel {
   position: absolute;
   bottom: -1px;

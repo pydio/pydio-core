@@ -12,6 +12,7 @@ import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
 import Router from './router/Router'
+import NetworkLoader from './modal/NetworkLoader'
 
 import PydioContextProvider from './PydioContextProvider'
 import PydioContextConsumerMixin from './PydioContextConsumerMixin'
@@ -30,6 +31,8 @@ window.PydioReactUI = {
     Loader                      : Loader,
     Router                      : Router,
     MessageBar                  : MessageBar,
+    NetworkLoader               : NetworkLoader,
+
 
     PydioContextProvider        : PydioContextProvider,
     PydioContextConsumerMixin   : PydioContextConsumerMixin
