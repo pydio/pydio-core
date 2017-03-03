@@ -31,6 +31,7 @@
             <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React,PydioWorkspaces,PydioComponents,PydioMenus"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
             <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
+            <js file="plugins/action.share/res/build/UserShares.js" className="UserShares" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
     <registry_contributions>
@@ -243,18 +244,10 @@
             <component_config className="InfoPanel">
                 <infoPanel mime="meta:ajxp_shared" attributes="" reactComponent="ShareInfoPanel.InfoPanel"/>
             </component_config>
-            <component_config className="AjxpTabulator::userdashboard_main_tab">
-                <additional_tab id="shared_pane2"
-                                tabInfo='{"id":"shares","iconClass":"mdi mdi-share-variant","element":"shared_pane2","closeable":false,"label":"share_center.98","title":"share_center.99","dontFocus":true,"position":4}'
-                                paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="shared_pane2" ajxpClass="AjxpPane" class="tabbed_editor">
-                        <div class="title-flex">
-                            <h3 class="dashboard_panel_title">AJXP_MESSAGE[share_center.98]<div class="legend">AJXP_MESSAGE[share_center.99]</div></h3>
-                            <div id="buttons_bar" class="action_bar" ajxpClass="ActionsToolbar" ajxpOptions='{"dataModelElementId":"shared_files_list","toolbarsList":["share_list_toolbar-selection", "share_list_toolbar"],"submenuOffsetTop":2}'></div>
-                        </div>
-                        <div id="shared_files_list" ajxpClass="FetchedResultPane" ajxpOptions='{"displayMode":"list", "fixedDisplayMode":"list", "groupByData":"1", "fit":"height","selectionChangeCallback":false,"updateGlobalContext":false,"nodeProviderProperties":{"get_action":"sharelist-load","user_context":"current"}}'></div>
-                    </div>
-                ]]></additional_tab>
+            <component_config className="UserAccountTabs">
+                <additional_tab id="shares_pane"
+                                tabInfo='{"icon":"mdi mdi-share-variant","label":"share_center.98","title":"share_center.99","position":3}'
+                                paneInfo='{"namespace":"UserShares", "componentName":"SharesList"}'/>
             </component_config>
         </client_configs>
         <hooks>

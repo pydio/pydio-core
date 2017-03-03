@@ -74,7 +74,7 @@
         statics:{
 
             getPreviewComponent: function(node, rich = true){
-                if(global.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')){
+                if(rich && global.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')){
                     return <Viewer style={{width:'100%', height:250}} node={node} pydio={global.pydio}/>;
                 }else{
                     return null;

@@ -93,7 +93,7 @@ export default React.createClass({
                     {...this.props}
                     openEditor={this.openEditor}
                     ref="list"
-                    style={{height:'100%'}}
+                    style={Object.assign({height:'100%'}, this.props.style || {})}
                     node={this.state.node}
                     dataModel={this.state.dataModel}
                     actionBarGroups={this.props.actionBarGroups}

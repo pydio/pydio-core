@@ -583,3 +583,15 @@
 .mdi-home-variant:before {
     content: "\f3d1";
 }
+
+.mdi-wrench:before {
+    content: "\f6a4";
+}
+
+.mdi-information:before {
+    content: "\f3ef";
+}
+
+.mdi-information-outline:before {
+    content: "\f3f0";
+}

@@ -10,6 +10,10 @@ let FilePreview = React.createClass({
         return {loading: false, element: null}
     },
 
+    getDefaultProps: function(){
+        return {richPreview: false}
+    },
+
     insertPreviewNode: function(previewNode){
         this._previewNode = previewNode;
         let containerNode = this.refs.container;

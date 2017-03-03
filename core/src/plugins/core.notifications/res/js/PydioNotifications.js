@@ -98,7 +98,8 @@
                     <MaterialUI.IconButton
                         onTouchTap={this.handleTouchTap}
                         iconClassName={this.props.iconClassName || "icon-bell"}
-                        tooltip="Alerts"
+                        tooltip={this.props.pydio.MessageHash['notification_center.4']}
+                        className="userActionButton"
                     />
                     <MaterialUI.Popover
                         open={this.state.open}

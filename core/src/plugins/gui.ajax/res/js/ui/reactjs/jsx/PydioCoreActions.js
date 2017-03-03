@@ -3,6 +3,101 @@
     let pydio = global.pydio;
     let MessageHash = global.pydio.MessageHash;
 
+    let SplashDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogSize:'lg',
+                dialogIsModal: false,
+                dialogPadding: false,
+                dialogScrollBody: true
+            };
+        },
+        submit(){
+            this.dismiss();
+        },
+
+        getInitialState: function(){
+            return {aboutContent: null};
+        },
+
+        componentDidMount: function(){
+
+            PydioApi.getClient().request({
+                get_action:'display_doc',
+                doc_file:'CREDITS'
+            }, function(transport){
+                this.setState({
+                    aboutContent: transport.responseText
+                });
+            }.bind(this));
+
+        },
+
+        render: function(){
+            if(!this.state.aboutContent){
+                return <PydioReactUI.Loader style={{minHeight: 200}}/>;
+            }else{
+                let ct = () => {return {__html: this.state.aboutContent}};
+                return <div style={{fontSize:13, padding: '0 10px'}} dangerouslySetInnerHTML={ct()}/>;
+            }
+        }
+
+    });
+
+
+    let PasswordDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+        getInitialState: function(){
+            return {passValid: false};
+        },
+        getDefaultProps: function(){
+            return {
+                dialogTitle: pydio.MessageHash[194],
+                dialogIsModal: true
+            };
+        },
+        submit(){
+            if(!this.state.passValid){
+                return false;
+            }
+            this.refs.passwordForm.getComponent().post(function(value){
+                if(value) this.dismiss();
+            }.bind(this));
+        },
+
+        passValidStatusChange: function(status){
+            this.setState({passValid: status});
+        },
+
+        render: function(){
+
+            return (
+                <PydioReactUI.AsyncComponent
+                    namespace="UserAccount"
+                    componentName="PasswordForm"
+                    pydio={this.props.pydio}
+                    ref="passwordForm"
+                    onValidStatusChange={this.passValidStatusChange}
+                />
+            );
+        }
+
+    });
+
+
+
     class Callbacks{
 
         static switchLanguage(){
@@ -294,90 +389,7 @@
 
         static changePass(){
 
-            modal.showDialogForm('', 'pass_change_form', function(oForm){
-
-                if(pydio.user.lock){
-                    modal.getForm().insert({top:new Element("div", {className:"dialogLegend"}).update(MessageHash[444])});
-                }
-                $('user_change_ownpass_old').value = $('user_change_ownpass1').value = $('user_change_ownpass2').value = '';
-                // Update pass_seed
-                var connexion = new Connexion();
-                connexion.addParameter("get_action", "get_seed");
-                connexion.onComplete = function(transport){
-                    $('pass_seed').value = transport.responseText;
-                };
-                connexion.sendSync();
-                new Protopass($('user_change_ownpass1'), {
-                    barContainer:$('pwd_strength_container'),
-                    barPosition:'bottom'
-                });
-
-            }, function(oForm){
-                var userOldPass = null;
-                var userPass = null;
-                var passSeed = null;
-                if($('user_change_ownpass1') && $('user_change_ownpass1').value && $('user_change_ownpass2').value)
-                {
-                    if($('user_change_ownpass1').value.length < parseInt(window.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"))){
-                        alert(MessageHash[378]);
-                        return false;
-                    }
-                    if($('user_change_ownpass1').value != $('user_change_ownpass2').value){
-                        alert(MessageHash[238]);
-                        return false;
-                    }
-                    if($('user_change_ownpass_old').value == ''){
-                        alert(MessageHash[239]);
-                        return false;
-                    }
-                    passSeed = $('pass_seed').value;
-                    if(passSeed == '-1'){
-                        userPass = $('user_change_ownpass1').value;
-                        userOldPass = $('user_change_ownpass_old').value;
-                    }else{
-                        userPass = HasherUtils.hex_md5($('user_change_ownpass1').value);
-                        userOldPass = HasherUtils.hex_md5( HasherUtils.hex_md5($('user_change_ownpass_old').value)+$('pass_seed').value);
-                    }
-                    var onComplete = function(transport){
-                        var addition = '';
-                        var logout = false;
-                        if(pydio.user.lock){
-                            addition = '\n ' + MessageHash[445];
-                        }
-                        if(userPass != null){
-                            if(transport.responseText == 'PASS_ERROR'){
-                                alert(MessageHash[240]);
-                            }else if(transport.responseText == 'SUCCESS'){
-                                pydio.displayMessage('SUCCESS', MessageHash[197] + addition);
-                                if(addition) logout = true;
-                                hideLightBox(true);
-                            }
-                        }else{
-                            pydio.displayMessage('SUCCESS', MessageHash[241] + addition);
-                            if(addition) logout = true;
-                            hideLightBox(true);
-                        }
-                        if(logout){
-                            pydio.getController().fireAction("logout");
-                        }
-                    };
-                    var conn = new Connexion();
-                    conn.setMethod('POST');
-                    conn.addParameter("get_action", "pass_change");
-                    conn.addParameter("old_pass", userOldPass);
-                    conn.addParameter("new_pass", userPass);
-                    conn.addParameter("pass_seed", passSeed);
-                    conn.onComplete = onComplete;
-                    conn.sendAsync();
-                }
-
-            }, function(oForm){
-
-                if(pydio.user.lock){
-                    throw new Error();
-                }
-
-            });
+            pydio.UI.openComponentInModal('PydioCoreActions', 'PasswordDialog');
 
         }
 
@@ -390,13 +402,11 @@
         }
 
         static toggleBookmark(){
-            global.document.fire("ajaxplorer:add_bookmark");
+            pydio.notify("add_bookmark");
         }
         
         static clearPluginsCache(){
-            var conn = new Connexion();
-            conn.setParameters($H({get_action:'clear_plugins_cache'}));
-            conn.sendAsync();
+            PydioApi.getClient().request({get_action:'clear_plugins_cache'});
         }
 
         static dismissUserAlert(manager, args){
@@ -433,26 +443,7 @@
     class Navigation{
 
         static splash(){
-
-            modal.showDialogForm(
-                'Pydio',
-                'splash_form',
-                function(oForm){
-                    var docDiv = $(oForm).down('#docDiv');
-                    if(!docDiv.isLoaded){
-                        var conn = new Connexion(window.ajxpServerAccessPath + '&get_action=display_doc&doc_file=CREDITS');
-                        conn.onComplete = function(transport){
-                            docDiv.insert({top:transport.responseText});
-                            docDiv.isLoaded = true;
-                            var updateLink = docDiv.down('#software_update');
-                        };
-                        conn.sendAsync();
-                    }
-                },
-                function(){hideLightBox();return false;},
-                null,
-                true, true);
-
+            pydio.UI.openComponentInModal('PydioCoreActions', 'SplashDialog');
         }
 
         static up(){
@@ -484,7 +475,7 @@
         }
 
         static openGoPro(){
-            window.open('https://pydio.com/en/go-pro?referrer=settings');
+            global.open('https://pydio.com/en/go-pro?referrer=settings');
         }
 
         static switchToUserDashboard(){
@@ -510,6 +501,8 @@
     ns.Callbacks = Callbacks;
     ns.Listeners = Listeners;
     ns.Navigation = Navigation;
+    ns.SplashDialog = SplashDialog;
+    ns.PasswordDialog = PasswordDialog;
     global.PydioCoreActions = ns;
 
 })(window);
