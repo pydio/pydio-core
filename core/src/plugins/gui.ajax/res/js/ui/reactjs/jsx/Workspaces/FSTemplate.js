@@ -41,16 +41,18 @@ let FSTemplate = React.createClass({
                     pydio={this.props.pydio}
                 />
                 <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
-                    <div id="workspace_toolbar">
-                        <Breadcrumb {...this.props}/>
-                        <SearchForm {...this.props}/>
-                    </div>
-                    <div id="main_toolbar">
-                        <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} primary={true}/>
-                        <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                        <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                        <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
-                    </div>
+                    <MaterialUI.Paper zDepth={1} style={{zIndex:1}} className="primaryColorPaper" rounded={false}>
+                        <div id="workspace_toolbar">
+                            <Breadcrumb {...this.props}/>
+                            <SearchForm {...this.props}/>
+                        </div>
+                        <div id="main_toolbar">
+                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} primary={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                            <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                        </div>
+                    </MaterialUI.Paper>
                     <MainFilesList ref="list" {...this.props}/>
                 </div>
                 <InfoPanel

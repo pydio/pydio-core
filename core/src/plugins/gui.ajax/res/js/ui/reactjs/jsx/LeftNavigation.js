@@ -239,7 +239,7 @@
             const messages = this.props.pydio.MessageHash;
 
             return (
-                <div className="user-widget">
+                <MaterialUI.Paper zDepth={1} rounded={false} className="user-widget primaryColorDarkerPaper">
                     <div className="user-display">
                         {avatarUrl && <MaterialUI.Avatar src={avatarUrl} style={{marginRight: 20}}/>}
                         <div className="userLabel">{userName}</div>
@@ -278,7 +278,7 @@
                             tooltip={messages['169']}
                         />
                     </div>
-                </div>
+                </MaterialUI.Paper>
             );
         }
     });
