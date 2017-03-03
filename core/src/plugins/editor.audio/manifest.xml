@@ -3,7 +3,6 @@
 	<class_definition filename="plugins/editor.audio/AudioPreviewer.php" classname="Pydio\Editor\Audio\AudioPreviewer"/>
     <client_settings>
         <resources>
-            <js file="plugins/editor.audio/class.AudioPreviewer.js" className="AudioPreviewer"/>
             <i18n namespace="audio_editor" path="plugins/editor.audio/i18n"/>
         </resources>
     </client_settings>
@@ -14,25 +13,6 @@
 					<serverCallback methodName="switchAction" restParams="/file+" developerComment="Server an audio file as a stream">
                         <input_param name="file" type="AJXP_NODE" description="Path to the file"/>
 					</serverCallback>
-				</processing>
-			</action>
-			<action name="play_whole_folder">
-				<gui text="140" title="140" src="player_play.png" accessKey="">
-                    <context selection="true" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="true"/>
-                    <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_AUDIO"/>
-                </gui>
-				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
-				<processing>
-					<clientCallback><![CDATA[
-					var editor = pydio.Registry.findEditorById('editor.audio');
-					if(editor){
-						pydio.Registry.loadEditorResources(editor.resourcesManager);
-						var editorClass = Class.getByName(editor.editorClass);
-						if(editorClass){
-							editorClass.prototype.createFolderPlayer(ajaxplorer.getContextNode());
-						}
-					}
-					]]></clientCallback>
 				</processing>
 			</action>
 			<!-- This one will happen a post-processing filter when ls is called with parameter playlist=true -->

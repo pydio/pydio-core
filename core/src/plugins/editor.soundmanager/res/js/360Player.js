@@ -4,6 +4,11 @@ import ReactDOM from 'react-dom';
 import { soundManager } from 'soundmanager2';
 import { threeSixtyPlayer } from '../../../sm/360-player/script/360player';
 
+soundManager.setup({
+    // path to directory containing SM2 SWF
+    url: 'plugins/editor.soundmanager/sm/swf/'
+});
+
 class Player extends React.Component {
     constructor(props) {
         super(props)
@@ -11,11 +16,6 @@ class Player extends React.Component {
         this.state = {
             visualization: props.visualization
         }
-
-        soundManager.setup({
-            // path to directory containing SM2 SWF
-            url: 'plugins/editor.soundmanager/sm/swf/'
-        });
 
         threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
         threeSixtyPlayer.config.showHMSTime = true;
@@ -49,23 +49,11 @@ class Player extends React.Component {
           // for testing IE 9, etc.
           soundManager.useHTML5Audio = true;
         }
-
-        soundManager.debugMode = true
-
-        this.onClick = this._handleClick.bind(this)
     }
 
     componentDidMount() {
         soundManager.onready(threeSixtyPlayer.init);
         soundManager.beginDelayedInit();
-    }
-
-    _handleClick() {
-        console.log(this, ReactDOM.findDOMNode(this))
-
-
-        console.log(threeSixtyPlayer, threeSixtyPlayer.config.items)
-        threeSixtyPlayer.init()
     }
 
     render() {
@@ -76,7 +64,7 @@ class Player extends React.Component {
 
         return (
             <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
-                <div className={className} onClick={this.onClick}>
+                <div className={className} >
                     {this.props.children}
                 </div>
             </div>
