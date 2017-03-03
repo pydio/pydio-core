@@ -63,7 +63,8 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: pydio.MessageHash[163],
-                dialogIsModal: true
+                dialogIsModal: true,
+                dialogSize:'sm'
             };
         },
 
@@ -82,6 +83,10 @@
         fireForgotPassword: function(e){
             e.stopPropagation();
             pydio.getController().fireAction(this.state.authParameters.get("FORGOT_PASSWORD_ACTION"));
+        },
+
+        useBlur: function(){
+            return true;
         },
 
         render: function(){
@@ -126,15 +131,46 @@
                 if(comps.bottom.length) additionalComponentsBottom = <div>{comps.bottom}</div>;
             }
 
+            const custom = this.props.pydio.Parameters.get('customWording');
+            let logoUrl = custom.icon;
+            if(custom.icon_binary_url){
+                logoUrl = this.props.pydio.Parameters.get('ajxpServerAccess') + '&' + custom.icon_binary_url;
+            }
+
+            const logoStyle = {
+                backgroundSize: 'contain',
+                backgroundImage: 'url('+logoUrl+')',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                position:'absolute',
+                top: -130,
+                left: 0,
+                width: 320,
+                height: 120
+            };
             return (
 
                 <div>
+                    <div style={logoStyle}></div>
                     <div className="dialogLegend">{pydio.MessageHash[180]}</div>
                     {captcha}
                     {additionalComponentsTop}
                     <form autoComplete={secureLoginForm?"off":"on"}>
-                        <MaterialUI.TextField autoComplete={secureLoginForm?"off":"on"} floatingLabelText={pydio.MessageHash[181]} ref="login"/>
-                        <MaterialUI.TextField autoComplete={secureLoginForm?"off":"on"} type="password" floatingLabelText={pydio.MessageHash[182]} ref="password"/>
+                        <MaterialUI.TextField
+                            className="blurDialogTextField"
+                            autoComplete={secureLoginForm?"off":"on"}
+                            floatingLabelText={pydio.MessageHash[181]}
+                            ref="login"
+                            onKeyDown={this.submitOnEnterKey}
+                        />
+                        <MaterialUI.TextField
+                            className="blurDialogTextField"
+                            autoComplete={secureLoginForm?"off":"on"}
+                            type="password"
+                            floatingLabelText={pydio.MessageHash[182]}
+                            ref="password"
+                            onKeyDown={this.submitOnEnterKey}
+                        />
                     </form>
                     {additionalComponentsBottom}
                     {remember}

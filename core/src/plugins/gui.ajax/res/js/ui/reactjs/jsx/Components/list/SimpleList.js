@@ -481,6 +481,9 @@ let SimpleList = React.createClass({
     },
 
     updateInfiniteContainerHeight: function(retries = false){
+        if(!this.refs.infiniteParent){
+            return;
+        }
         var containerHeight = this.refs.infiniteParent.clientHeight;
         if(this.props.heightAutoWithMax){
             var elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;

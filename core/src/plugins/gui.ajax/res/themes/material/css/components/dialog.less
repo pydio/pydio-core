@@ -25,4 +25,34 @@
     font-size: 14px;
   }
 
+  div[data-reactroot].dialogRootBlur{
+    & > div > div.dialogRootBlur {
+      & > div{
+        background-color: rgba(0,0,0,0.3) !important;
+        position: relative;
+      }
+      &:before{
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-size: cover;
+        background-position: center center;
+        filter: blur(7px);
+      }
+      div.blurDialogTextField{
+        label{
+          color: rgba(255,255,255,0.73) !important;
+        }
+        input{
+          color: white !important;
+          height: 26px !important;
+          margin-top: 37px !important;
+        }
+      }
+    }
+  }
+
 }

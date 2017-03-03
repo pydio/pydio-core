@@ -10,13 +10,14 @@ export default React.createClass({
 
     propTypes: {
         size: React.PropTypes.oneOf(['xxs', 'xs', 'sm', 'md', 'lg', 'xl']),
-        padding: React.PropTypes.bool
+        padding: React.PropTypes.bool,
+        bgBlur: React.PropTypes.bool
     },
 
     sizes: {
-        'xxs': {width: 320},
-        'xs': {width: 120},
-        'sm': {width: 210},
+        'xxs': {width: 120},
+        'xs': {width: 210},
+        'sm': {width: 320},
         'md': {width: 420},
         'lg': {width: 720},
         'xl': {width: '80%'}
@@ -44,6 +45,21 @@ export default React.createClass({
         }
     },
 
+    blurStyles:{
+        overlayStyle:{
+            backgroundColor: 'rgba(0,0,0,0)'
+        },
+        dialogContent: {
+
+        },
+        dialogTitle:{
+            color: 'rgba(255,255,255,0.9)'
+        },
+        dialogBody:{
+            color: 'rgba(255,255,255,0.9)'
+        }
+    },
+
     getInitialState:function(){
         return {
             async: true,
@@ -52,7 +68,26 @@ export default React.createClass({
             actions: [],
             title: null,
             size: this.props.size || 'md',
-            padding: !!this.props.padding
+            padding: !!this.props.padding,
+            blur: false
+        }
+    },
+
+    componentWillUnmount: function(){
+        this.deactivateResizeObserver();
+    },
+
+    activateResizeObserver: function(){
+        if(this._resizeObserver) return;
+        this._resizeObserver = () => {this.computeBackgroundData()};
+        DOMUtils.observeWindowResize(this._resizeObserver);
+        this.computeBackgroundData();
+    },
+
+    deactivateResizeObserver: function(){
+        if(this._resizeObserver){
+            DOMUtils.stopObservingWindowResize(this._resizeObserver);
+            this._resizeObserver = null;
         }
     },
 
@@ -64,7 +99,8 @@ export default React.createClass({
             async:true,
             actions:[],
             title:null,
-            open: !!nextProps.open
+            open: !!nextProps.open,
+            blur: !!nextProps.blur
         };
         if(componentData && (!componentData instanceof Object || !componentData['namespace'])){
             state['async'] = false;
@@ -134,15 +170,58 @@ export default React.createClass({
         }else{
             this.setState({modal:false});
         }
+        if(component.useBlur){
+            this.setState({blur: component.useBlur()}, () => {this.activateResizeObserver()});
+        }else{
+            this.setState({blur: false}, () => {this.deactivateResizeObserver()});
+        }
 
+    },
+
+    computeBackgroundData: function(){
+        const pydioMainElement = document.getElementById(window.pydio.Parameters.get('MAIN_ELEMENT'));
+        const reference = pydioMainElement.querySelector('div[data-reactroot]');
+        const url = window.getComputedStyle(reference).getPropertyValue('background-image');
+
+        let backgroundImage = new Image();
+        backgroundImage.src = url.replace(/"/g,"").replace(/url\(|\)$/ig, "");
+
+        let oThis = this;
+        backgroundImage.onload = function() {
+            const width = this.width;
+            const height = this.height;
+
+            const screenWidth = DOMUtils.getViewportWidth();
+            const screenHeight = DOMUtils.getViewportHeight();
+
+            const imageRatio = width/height;
+            const coverRatio = screenWidth/screenHeight;
+
+            let coverHeight, scale, coverWidth;
+            if (imageRatio >= coverRatio) {
+                coverHeight = screenHeight;
+                scale = (coverHeight / height);
+                coverWidth = width * scale;
+            } else {
+                coverWidth = screenWidth;
+                scale = (coverWidth / width);
+                coverHeight = height * scale;
+            }
+            let cover = coverWidth + 'px ' + coverHeight + 'px';
+            oThis.setState({
+                backgroundImage: url,
+                backgroundSize: cover
+            });
+        };
     },
 
     render: function(){
 
         var modalContent;
 
-        const { state, sizes, styles } = this
-        const { async, componentData, title, actions, modal, className, open, size, padding, scrollBody } = state
+        const { state, sizes, styles, blurStyles } = this
+        const { async, componentData, title, actions, modal, open, size, padding, scrollBody, blur } = state
+        let { className } = state;
 
         if (componentData) {
             if(async) {
@@ -165,6 +244,7 @@ export default React.createClass({
         let dialogBody = {...styles.dialogBody, display:'flex'}
         let dialogContent = {...styles.dialogContent, width: sizes[size].width, minWidth: sizes[size].width, maxWidth: sizes[size].width}
         let dialogTitle = {...styles.dialogTitle}
+        let overlayStyle;
 
         if (!padding) {
             dialogRoot = {...dialogRoot, padding: 0}
@@ -175,6 +255,33 @@ export default React.createClass({
         if (title === "") {
             dialogTitle = {...dialogTitle, display: 'none'}
         }
+
+        if(blur){
+
+            overlayStyle = {...blurStyles.overlayStyle};
+            dialogContent = {...dialogContent, ...blurStyles.dialogContent};
+            dialogBody = {...dialogBody, ...blurStyles.dialogBody};
+            dialogTitle = {...dialogTitle, ...blurStyles.dialogTitle};
+            className = className ? className + ' dialogRootBlur' : 'dialogRootBlur';
+            dialogRoot = {...dialogRoot, backgroundImage:'url()', backgroundPosition:'center center', backgroundSize:'cover'}
+
+            if(state.backgroundImage){
+                const styleBox = (
+                    <style dangerouslySetInnerHTML={{
+                        __html: [
+                            '.react-mui-context div[data-reactroot].dialogRootBlur > div > div.dialogRootBlur:before {',
+                            '  background-image: '+state.backgroundImage+';',
+                            '  background-size: '+state.backgroundSize+';',
+                            '}'
+                        ].join('\n')
+                    }}>
+                    </style>
+                );
+                modalContent = <span>{styleBox}{modalContent}</span>;
+            }
+
+        }
+
 
         return (
             <MaterialUI.Dialog
@@ -192,6 +299,7 @@ export default React.createClass({
                 bodyStyle={dialogBody}
                 titleStyle={dialogTitle}
                 style={dialogRoot}
+                overlayStyle={overlayStyle}
             >{modalContent}</MaterialUI.Dialog>
         );
     }
