@@ -482,7 +482,7 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: '',
-                dialogSize: 'lg',
+                dialogSize: 'xl',
                 dialogPadding: false,
                 dialogIsModal: false,
                 dialogScrollBody: false

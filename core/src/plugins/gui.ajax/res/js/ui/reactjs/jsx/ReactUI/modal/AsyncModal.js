@@ -9,15 +9,17 @@ export default React.createClass({
     mixins:[PydioContextConsumerMixin],
 
     propTypes: {
-        size: React.PropTypes.oneOf(['xs', 'sm', 'md', 'lg']),
+        size: React.PropTypes.oneOf(['xxs', 'xs', 'sm', 'md', 'lg', 'xl']),
         padding: React.PropTypes.bool
     },
 
     sizes: {
+        'xxs': {width: 320},
         'xs': {width: 120},
         'sm': {width: 210},
         'md': {width: 420},
-        'lg': {width: 720}
+        'lg': {width: 720},
+        'xl': {width: '80%'}
     },
 
     styles: {

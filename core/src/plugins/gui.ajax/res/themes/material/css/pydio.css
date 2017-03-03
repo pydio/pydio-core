@@ -1429,6 +1429,14 @@ div.menu.desktop a span.ajxp_icon_span {
   text-align: center;
   width: 20px;
 }
+.menuPopover,
+.menuPopover > div {
+  overflow: visible !important;
+}
+.menuPopover .mui-subheader,
+.menuPopover > div .mui-subheader {
+  height: 0;
+}
 .react-editor .editor-overlay {
   position: absolute;
   z-index: 10000;
