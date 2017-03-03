@@ -201,7 +201,23 @@
             }
         }
 
+        hasHiddenDownloadForm(){
+            return this._hiddenDownloadForm;
+        }
 
+        registerHiddenDownloadForm(component){
+            this._hiddenDownloadForm = component;
+        }
+
+        unRegisterHiddenDownloadForm(component){
+            this._hiddenDownloadForm = null;
+        }
+
+        sendDownloadToHiddenForm(selection, parameters){
+            if(this._hiddenDownloadForm){
+                this._hiddenDownloadForm.triggerDownload(selection, parameters);
+            }
+        }
 
         mountComponents(componentsNodes){}
 

@@ -207,7 +207,8 @@
             <template name="material_modal" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="Modal" props='{"containerId":"pydio_modal"}'/>
             <template name="material_snack" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="MessageBar" props='{"containerId":"pydio_message_bar"}'/>
             <template name="material_router" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="Router" props='{"containerId":"pydio_router"}'/>
-            <template name="network_loader" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="NetworkLoader" props='{"containerId":"network_loader"}'/>
+            <template name="network_loader" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="NetworkLoader" props='{}'/>
+            <template name="hidden_download" element="body" position="bottom" theme="material" namespace="PydioReactUI" component="HiddenDownloadForm" props='{}'/>
             <template name="widget_orbit" element="ajxp_widget" position="top"><![CDATA[
 				<div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_widget"}'>
 					<div id="content_pane" ajxpClass="FilesList"  ajxpOptions='{"fit":"height","fitParent":"browser"}'  style="margin:0px;"></div>

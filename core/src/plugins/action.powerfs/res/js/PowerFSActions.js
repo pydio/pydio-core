@@ -49,7 +49,7 @@
 
                     }else{
 
-                        PydioApi.getClient().downloadSelection(userSelection, $('download_form'));
+                        PydioApi.getClient().downloadSelection(userSelection);
 
                     }
                 }

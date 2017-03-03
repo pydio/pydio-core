@@ -116,7 +116,7 @@
                     window.gaTrackEvent("Data", "Download", fileNames[i]);
                 }
             }
-            PydioApi.getClient().downloadSelection(userSelection, $('download_form'), 'download');
+            PydioApi.getClient().downloadSelection(userSelection, 'download');
         }
 
         static copyInbox(){

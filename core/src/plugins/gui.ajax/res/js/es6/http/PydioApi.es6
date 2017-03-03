@@ -113,12 +113,13 @@ class PydioApi{
      * @param dlActionName String Action name to trigger, download by default.
      * @param additionalParameters Object Optional set of key/values to pass to the download.
      */
-    downloadSelection(userSelection, prototypeHiddenForm = null, dlActionName='download', additionalParameters = {}){
+    downloadSelection(userSelection, dlActionName='download', additionalParameters = {}){
 
         var ajxpServerAccess = this._pydioObject.Parameters.get("ajxpServerAccess");
         var agent = navigator.userAgent || '';
         var agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
-        if(agentIsMobile || !prototypeHiddenForm){
+        const hiddenForm = pydio && pydio.UI && pydio.UI.hasHiddenDownloadForm();
+        if(agentIsMobile || !hiddenForm){
             var downloadUrl = ajxpServerAccess + '&get_action=' + dlActionName;
             if(additionalParameters){
                 for(var param in additionalParameters){
@@ -130,28 +131,14 @@ class PydioApi{
             }
             document.location.href=downloadUrl;
         }else{
-            prototypeHiddenForm.action = window.ajxpServerAccessPath;
-            prototypeHiddenForm.secure_token.value = this._secureToken;
-            prototypeHiddenForm.get_action.value = dlActionName;
-            prototypeHiddenForm.select("input").each(function(input){
-                if(input.name!='get_action' && input.name!='secure_token') input.remove();
-            });
-            var minisite_session = PydioApi.detectMinisiteSession(ajxpServerAccess);
+
+            let parameters = {...additionalParameters, secure_token:this._secureToken, get_action: dlActionName};
+            const minisite_session = PydioApi.detectMinisiteSession(ajxpServerAccess);
             if(minisite_session){
-                prototypeHiddenForm.insert(new Element('input', {type:'hidden', name:'minisite_session', value:minisite_session}));
-            }
-            if(additionalParameters){
-                for(var parameter in additionalParameters){
-                    if(additionalParameters.hasOwnProperty(parameter)) {
-                        prototypeHiddenForm.insert(new Element('input', {type:'hidden', name:parameter, value:additionalParameters[parameter]}));
-                    }
-                }
-            }
-            if(userSelection) {
-                userSelection.updateFormOrUrl(prototypeHiddenForm);
+                parameters['minisite_session'] = minisite_session;
             }
             try{
-                prototypeHiddenForm.submit();
+                pydio.UI.sendDownloadToHiddenForm(userSelection, parameters);
             }catch(e){
                 if(window.console) window.console.error("Error while submitting hidden form for download", e);
             }

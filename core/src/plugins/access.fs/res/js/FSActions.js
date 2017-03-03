@@ -152,15 +152,13 @@
 
         static download(){
             const userSelection = pydio.getUserSelection();
-            const downloadId = Math.random();
             const props = {
                 actionName:'download',
                 selection : userSelection,
-                downloadId: downloadId,
                 dialogTitleId:88
             } ;
             if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled')){
-                pydio.UI.openComponentInModal('FSActions', 'HiddenDownloadForm', props);
+                PydioApi.getClient().downloadSelection(userSelection, 'download');
             } else {
                 pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', props);
             }
@@ -703,53 +701,6 @@
 
     });
 
-    let HiddenDownloadForm = React.createClass({
-
-        propTypes:{
-            actionName:React.PropTypes.string,
-            selection: React.PropTypes.instanceOf(PydioDataModel),
-            additionalParameters:React.PropTypes.object
-        },
-
-        componentDidUpdate: function(prevProps, prevState){
-            if(!HiddenDownloadForm.LAST_DOWNLOAD || HiddenDownloadForm.LAST_DOWNLOAD !== this.props.downloadId){
-                this.refs.form.submit();
-            }
-            HiddenDownloadForm.LAST_DOWNLOAD = this.props.downloadId;
-        },
-
-        render: function(){
-            let ajxpServerAccess = pydio.Parameters.get('ajxpServerAccess');
-            let inputs = new Map();
-            inputs.set('secure_token', PydioApi.getClient()._secureToken);
-            inputs.set('get_action', this.props.actionName);
-            if(this.props.additionalParameters){
-                this.props.additionalParameters.forEach(function(value, key){
-                    inputs.set(key, value);
-                });
-            }
-            let minisite_session = PydioApi.detectMinisiteSession(ajxpServerAccess);
-            if(minisite_session) {
-                inputs.set('minisite_session', minisite_session);
-            }
-            let inputFields = [];
-            inputs.forEach(function(value, key){
-                inputFields.push(<input type="hidden" name={key} key={key} value={value}/>);
-            });
-            this.props.selection.getSelectedNodes().map(function(node){
-                inputFields.push(<input type="hidden" name="nodes[]" key={node.getPath()} value={node.getPath()}/>);
-            });
-
-            return (
-                <div>
-                    <form ref="form" action={ajxpServerAccess} target="dl_form_iframe">{inputFields}</form>
-                    <iframe ref="iframe" name="dl_form_iframe"></iframe>
-                </div>
-            );
-        }
-
-    });
-
     let ConfirmDialog = React.createClass({
 
         propTypes: {
@@ -830,7 +781,6 @@
     }
     ns.Listeners = Listeners;
 
-    ns.HiddenDownloadForm = HiddenDownloadForm;
     ns.MultiDownloadDialog = MultiDownloadDialog;
     ns.ConfirmDialog = ConfirmDialog;
     ns.PromptDialog = PromptDialog;
