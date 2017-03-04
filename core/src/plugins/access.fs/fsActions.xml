@@ -45,14 +45,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.mkdir" prepareModal="true"/>
-                <clientForm id="mkdir_form"><![CDATA[
-                <div id="mkdir_form" action="mkdir" box_width="200">
-                    <div class="dialogLegend" ajxp_message_id="173">AJXP_MESSAGE[173]</div>
-                    <input type="text" name="dirname" size="30" class="dialogFocus" is="core-input">
-                    <div class="dialogLegend" style="padding-top:20px;" id="alt_mkfile"><span class="icon-chevron-right"></span> AJXP_MESSAGE[518]</div>
-                </div>
-                ]]></clientForm>
+                <clientCallback module="FSActions.Callbacks.mkdir"/>
                 <serverCallback methodName="switchAction" sdkMethodName="mkdir" restParams="/file+" checkParams="false" developerComment="Creates a directory with name {dirname} at the given location.">
                     <input_param description="Folder parent" name="dir" type="AJXP_NODE" mandatory="true"/>
                     <input_param description="Folder name" name="dirname" type="string" mandatory="true"/>
@@ -66,13 +59,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.mkfile" prepareModal="true"/>
-                <clientForm id="mkfile_form"><![CDATA[
-                <div id="mkfile_form" action="mkfile" box_width="200">
-                <div class="dialogLegend" ajxp_message_id="174">AJXP_MESSAGE[174]</div>
-                <input type="text" name="filename" size="30" class="dialogFocus">
-                </div>
-                ]]></clientForm>
+                <clientCallback module="FSActions.Callbacks.mkfile"/>
                 <serverCallback methodName="switchAction" restParams="/node+" sdkMethodName="mkfile" developerComment="Creates a file at the given path. Optionally sets a content.">
                     <input_param description="New file path" name="node" type="AJXP_NODE"/>
                 </serverCallback>
@@ -86,7 +73,7 @@
 				</context></gui>
 			<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.upload" prepareModal="true"/>
+				<clientCallback module="FSActions.Callbacks.upload"/>
 				<serverCallback methodName="uploadAction" restParams="/input_stream/dir+" preferredHttp="PUT" sdkMethodName="upload" developerComment="Post a file content for upload, by default as x-www-form-urlencoded, but can be passed as input stream as well." checkParams="false">
                     <input_param description="Target path in the workspace of the file to upload" name="node" type="string" mandatory="true"/>
                     <input_param description="Flag that the file content is passed via the php://input stream instead of standard $_FILES data" name="input_upload" type="boolean" default="false"/>
@@ -105,12 +92,7 @@
 			<rightsContext noUser="true" userLogged="" read="true" write="true" adminOnly=""/>
 			<processing>
                 <serverCallback methodName="switchAction" restParams="/"/>
-				<clientCallback module="FSActions.Callbacks.emptyRecycle" prepareModal="false"/>
-                <clientForm id="empty_recycle_form"><![CDATA[
-                    <div id="empty_recycle_form" action="empty_recycle" box_width="200">
-                        <span ajxp_message_id="177">AJXP_MESSAGE[177]</span>
-                    </div>
-				]]></clientForm>
+				<clientCallback module="FSActions.Callbacks.emptyRecycle"/>
             </processing>
 		</action>
 		<action name="download" fileDefault="false">
@@ -122,18 +104,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" enableRoot="true"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.download" prepareModal="true"/>
-                <clientForm id="multi_download_form"><![CDATA[
-					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
-					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
-					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="index.php" method="POST" id="download_form" target="download_iframe">
-						<input type="hidden" name="get_action" value="download">
-						<input type="hidden" name="secure_token" value="">
-					</form>
-					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>
-					</div>]]>
-                </clientForm>
+				<clientCallback module="FSActions.Callbacks.download"/>
                 <clientListener module="FSActions.Listeners.downloadSelectionChange" name="selectionChange"/>
 				<serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                     <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
@@ -149,7 +120,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.downloadAll" prepareModal="true"/>
+                <clientCallback module="FSActions.Callbacks.downloadAll"/>
                 <clientListener module="FSActions.Listeners.downloadAllInit" name="init"/>
             </processing>
         </action>
@@ -171,13 +142,7 @@
 				<selectionContext dir="true" file="file" recycle="false" unique="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.compressUI"  prepareModal="true"/>
-				<clientForm id="compress_form"><![CDATA[
-				<div id="compress_form" action="compress" box_width="200">
-					AJXP_MESSAGE[315]<br/>
-					<input type="text" name="archive_name" value="" id="archive_name" class="dialogFocus initFicName">
-				</div>
-				]]></clientForm>
+				<clientCallback module="FSActions.Callbacks.compressUI" />
 				<clientListener module="FSActions.Listeners.compressUiSelectionChange" name="selectionChange"/>
             </processing>
 		</action>
@@ -190,7 +155,7 @@
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="AJXP_MIMES_EDITABLE,^ajxp_browsable_archive,^zip" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.openInEditor" prepareModal="false"/>
+                <clientCallback module="FSActions.Callbacks.openInEditor"/>
             </processing>
         </action>
         <action name="open_with" fileDefault="true">
@@ -205,7 +170,7 @@
                 <dynamicBuilder module="FSActions.Listeners.openWithDynamicBuilder"/>
             </subMenu>
             <processing>
-                <clientCallback module="FSActions.Callbacks.openInEditor" prepareModal="false"/>
+                <clientCallback module="FSActions.Callbacks.openInEditor"/>
                 </processing>
         </action>
 		<action name="ajxp_link">
@@ -216,16 +181,7 @@
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly="false"/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.ajxpLink" prepareModal="true"/>
-				<clientForm id="ajxp_link_form"><![CDATA[
-				<div id="ajxp_link_form" title="AJXP_MESSAGE[369]"  box_width="280" action="ajxp_link">
-				<fieldset>
-					<legend ajxp_message_id="296">AJXP_MESSAGE[296]</legend>
-					<input type="text" style="width:195px;margin-right:5px;" id="ajxp_link_container" class="dialogFocus"/>
-                    <a id="email" title="AJXP_MESSAGE[323]"><span class="icon-envelope-alt"></span><img style="border:none;" align="absmiddle" src="AJXP_IMAGES_FOLDER/actions/22/mail_generic.png" height="22" width="22"/></a>
-                  </fieldset>
-				</div>
-				]]></clientForm>
+				<clientCallback module="FSActions.Callbacks.ajxpLink"/>
 			</processing>
 		</action>
 		<action name="stat">
@@ -284,7 +240,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.restore" prepareModal="true"/>
+				<clientCallback module="FSActions.Callbacks.restore"/>
                 <serverCallback methodName="switchAction" restParams="/node+" developerComment="For an item located inside the recycle bin, tries to find its original location and move it there.">
                     <input_param description="Path of the node inside the recycle bin" name="node" type="path" mandatory="true"/>
                 </serverCallback>
@@ -299,7 +255,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="true" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.rename" prepareModal="false"/>
+				<clientCallback module="FSActions.Callbacks.rename"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Rename a resource, file or folder.">
                     <input_param description="Full path to the resource that will be renamed" name="file" type="path" mandatory="true"/>
                     <input_param description="New basename of the resource, in that case the new fullname will be the parent folder of source plus this filename_new." name="filename_new" type="string"/>
@@ -321,19 +277,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.copy" prepareModal="true"/>
-				<clientForm id="copymove_form"><![CDATA[
-					<div id="copymove_form" action="copy" box_width="272">
-						<input type="hidden" name="dest_node" value=""/>
-						<div class="dialogLegend">AJXP_MESSAGE[175]</div>
-						<select id="external_repository" name="dest_repository_id" style="width: 248px; font-size: 12px; height: 21px; margin-top:5px; margin-bottom:7px; border: 1px solid #ccc;"></select>
-						<div style="height:200px; width:246px; padding: 0px 0px; border: 1px solid #ccc;">
-							<div id="treeCopy" style="height:194px; padding: 3px 2px; overflow:auto; text-align:left;" class="treeCopyContainer"></div>
-						</div>
-						<input type="text" name="dest" value="/" readonly  style="width:248px; border: 1px solid #ccc; margin-top:7px; margin-bottom:2px;background-image:none;"/>
-						<a id="selector_create_folder"><span class="mdi mdi-folder-plus"></span></a>
-					</div>
-				]]></clientForm>
+				<clientCallback module="FSActions.Callbacks.copy"/>
 				<clientListener name="contextChange" module="FSActions.Listeners.copyContextChange"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Copy one or more items to a given target">
                     <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
@@ -350,7 +294,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false" image="false" editable="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.move" prepareModal="true"/>
+				<clientCallback module="FSActions.Callbacks.move"/>
 				<serverCallback methodName="switchAction" restParams="/" developerComment="Move a resource at a given target">
                     <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                     <input_param description="Target folder where to copy" name="dest" type="path" mandatory="true"/>
@@ -368,11 +312,7 @@
             </gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 			<processing>
-				<clientCallback module="FSActions.Callbacks.deleteAction" prepareModal="true"/>
-				<clientForm id="delete_form"><![CDATA[
-				<div id="delete_form" action="delete" box_width="200">
-				<span id="delete_message"></span>
-				</div>				]]></clientForm>
+				<clientCallback module="FSActions.Callbacks.deleteAction"/>
 				<serverCallback methodName="switchAction" restParams="/nodes+" developerComment="Delete one or more resources. If the workspace supports Recycle Bin features, resource is actually moved to the recycle bin.">
                     <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                 </serverCallback>
@@ -388,10 +328,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.chmod" prepareModal="true"/>
-                <clientForm id="properties_box"><![CDATA[
-                    <div id="properties_box" action="chmod" box_width="180"></div>
-                ]]></clientForm>
+                <clientCallback module="FSActions.Callbacks.chmod"/>
                 <serverCallback methodName="switchAction" restParams="/node+" developerComment="Change the FS permissions of the selected item.">
                     <input_param description="Selected node" name="node" type="path" mandatory="true"/>
                     <input_param description="Chmod value" name="chmod_value" type="string" mandatory="true"/>
@@ -419,18 +356,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
             <processing>
-                <clientCallback module="FSActions.Callbacks.downloadChunked" prepareModal="true"/>
-                <clientForm id="multi_download_form"><![CDATA[
-					<div id="multi_download_form" title="AJXP_MESSAGE[118]"  box_width="345">
-					<div class="dialogLegend">AJXP_MESSAGE[119]</div><br/>
-					<div id="multiple_download_container"></div>
-					<form style="display:inline;" action="index.php" method="GET" id="download_form" target="download_iframe">
-						<input type="hidden" name="get_action" value="download">
-						<input type="hidden" name="secure_token" value="">
-					</form>
-					<iframe id="download_iframe" name="download_iframe" style="display:none"></iframe>
-					</div>]]>
-                </clientForm>
+                <clientCallback module="FSActions.Callbacks.downloadChunked"/>
                 <serverCallback methodName="downloadAction" restParams="/chunk_index/file_id" developerComment="Chunk file into pieces before downloading the pieces. Can be handy for problematic and limited servers.">
                     <input_param description="Unique key generated during the {prepare_chunk_dl} action." name="file_id" type="string"/>
                     <input_param description="Position of the file to download" name="chunk_index" type="integer"/>
@@ -446,194 +372,9 @@
 	</actions>
 	<client_configs>
 		<component_config className="InfoPanel">
-            <infoPanel attributes="" mime="generic_file" reactComponent="PydioDetailPanes.GenericFile"/>
-            <infoPanel attributes="" mime="generic_dir" reactComponent="PydioDetailPanes.GenericDir"/>
-            <infoPanel attributes="" mime="generic_multiple" reactComponent="PydioDetailPanes.GenericMultiple"/>
-			<infoPanel mime="no_selection" attributes="">
-				<messages>
-					<message key="folders_string" id="130"/>
-					<message key="files_string" id="265"/>
-					<message key="totalsize_string" id="259"/>
-					<message key="select_something_string" id="477"/>
-				</messages>
-				<html><![CDATA[
-				    <div class="ipanel_no_selection_select">
-                            <span class="icon-info-sign"></span>
-                            <span class="label">#{select_something_string}</span>
-				    </div>
-					<div class="ipanel_no_selection_data">
-						<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-							<tr>
-								<td class="infoPanelLabel">#{folders_string}</td>
-								<td class="infoPanelValue">#{filelist_folders_count}</td>
-							</tr>
-							<tr class="even">
-								<td class="infoPanelLabel">#{files_string}</td>
-								<td class="infoPanelValue">#{filelist_files_count}</td>
-							</tr>
-							<tr>
-								<td class="infoPanelLabel">#{totalsize_string}</td>
-								<td class="infoPanelValue">#{filelist_totalsize}</td>
-							</tr>
-						</table>
-					</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_file" theme="orbit" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="341"/>
-				</messages>
-				<html><![CDATA[
-                <div class="infoPanelImagePreview">
-				    <div class="infoPanelBasenameTitle">#{basename}</div>
-                    #{preview_rich}
-                    <br><div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
-                    <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
-                </div>
-				<div class="infoPanelAllMetadata">
-				    <div id="info_panel_primary">
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                            <tr class="even">
-                                <td class="infoPanelLabel">#{size_string}</td>
-                                <td class="infoPanelLabel">#{type_string}</td>
-                            </tr>
-                            <tr>
-                                <td class="infoPanelValue">#{filesize}</td>
-                                <td class="infoPanelValue">#{mimestring}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
-                            </tr>
-                        </table>
-                    </div>
-				</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_file" theme="material" attributes="basename,preview_rich,filesize,mimestring,formated_date,ajxp_description" primary="true">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="341"/>
-				</messages>
-				<html><![CDATA[
-                <div class="infoPanelImagePreview">
-				    <div class="infoPanelBasenameTitle">#{basename}</div>
-                    #{preview_rich}
-                    <div class="toolbars">
-                        <div class="toolbar_placeholder" data-toolbarId="info_panel"></div>
-                        <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
-                    </div>
-                </div>
-				<div class="infoPanelAllMetadata">
-				    <div id="info_panel_primary">
-				        <div class="panelHeader">Information</div>
-                        <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                            <tr class="even">
-                                <td class="infoPanelLabel">#{size_string}</td>
-                                <td class="infoPanelLabel">#{type_string}</td>
-                            </tr>
-                            <tr>
-                                <td class="infoPanelValue">#{filesize}</td>
-                                <td class="infoPanelValue">#{mimestring}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
-                            </tr>
-                        </table>
-                    </div>
-				</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_dir" theme="orbit" attributes="basename,icon,fonticon,formated_date,ajxp_description">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="342"/>
-				</messages>
-				<html><![CDATA[
-                    <div class="infoPanelImagePreview">
-                        <div class="infoPanelBasenameTitle">#{basename}</div>
-                        <div class="mimefont mdi mdi-#{fonticon}"></div>
-                        <br><div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px;"></div>
-                        <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
-                    </div>
-                    <div class="infoPanelAllMetadata">
-                        <div id="info_panel_primary">
-                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                                <tr>
-                                    <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_dir" theme="material" attributes="basename,icon,fonticon,formated_date,ajxp_description">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="modif_string" id="138"/>
-					<message key="header_string" id="342"/>
-				</messages>
-				<html><![CDATA[
-                    <div class="infoPanelImagePreview">
-                        <div class="infoPanelBasenameTitle">#{basename}</div>
-                        <div class="mimefont mdi mdi-#{fonticon}"></div>
-                        <div class="toolbars">
-                            <div class="toolbar_placeholder" data-toolbarId="info_panel"></div>
-                            <div class="toolbar_placeholder" data-toolbarId="info_panel_share"></div>
-                        </div>
-                    </div>
-                    <div class="infoPanelAllMetadata">
-                        <div id="info_panel_primary">
-                            <div class="panelHeader">Information</div>
-                            <table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-                                <tr>
-                                    <td colspan="2" class="infoPanelLabel">#{modif_string}</td>
-                                </tr>
-                                <tr>
-                                    <td colspan="2" class="infoPanelValue">#{ajxp_description}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="ajxp_root_node" attributes="">
-				<html><![CDATA[
-                    <div class="infoPanelAllMetadata">
-                        <div id="info_panel_primary"></div>
-                    </div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_multiple" attributes="preview_simple">
-				<html><![CDATA[
-                    <div class="infoPanelAllMetadata">
-                        <div id="info_panel_primary" class="info_panel_primary_multiple">
-                            <center><i>#{selectedCountSentence}</i></center>
-                            <div style="margin-top:10px;">
-                            #{preview_simple}
-                            </div>
-                            <br style="clear:left;">
-                            <div class="toolbar_placeholder" data-toolbarId="info_panel" style="margin-top: 15px; width:89%; text-align:center;"></div>
-                        </div>
-                    </div>
-				]]></html>
-			</infoPanel>
+            <infoPanel mime="generic_file" reactComponent="PydioDetailPanes.GenericFile"/>
+            <infoPanel mime="generic_dir" reactComponent="PydioDetailPanes.GenericDir"/>
+            <infoPanel mime="generic_multiple" reactComponent="PydioDetailPanes.GenericMultiple"/>
 		</component_config>
 	</client_configs>
 </registry_contributions>

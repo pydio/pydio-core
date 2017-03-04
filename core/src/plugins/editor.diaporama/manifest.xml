@@ -77,7 +77,7 @@
 				</columns>
 			</component_config>
 			<component_config className="InfoPanel">
-                <infoPanel mime="AJXP_MIMES_IMAGE" theme="material" reactComponent="PydioDetailPanes.ImagePreview" attributes=""/>
+                <infoPanel mime="AJXP_MIMES_IMAGE" theme="material" reactComponent="PydioDetailPanes.ImagePreview"/>
 			</component_config>
 		</client_configs>
 	</registry_contributions>

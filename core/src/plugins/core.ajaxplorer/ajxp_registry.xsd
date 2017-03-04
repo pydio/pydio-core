@@ -470,11 +470,6 @@
     </xs:element>
     <xs:element name="infoPanel">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="messages"/>
-                <xs:element ref="html"/>
-            </xs:sequence>
-            <xs:attribute name="attributes" use="required"/>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
             <xs:attribute name="reactComponent" type="xs:NCName"/>
