@@ -18,6 +18,8 @@ import AbstractEditor from './editor/AbstractEditor'
 
 import {DNDActionParameter} from './DND'
 
+import UserAvatar from './UserAvatar'
+
 window.PydioComponents = {
     
     SortableList            : SortableList,
@@ -42,7 +44,8 @@ window.PydioComponents = {
     PaperEditorNavEntry     : PaperEditorNavEntry,
     PaperEditorNavHeader    : PaperEditorNavHeader,
 
-    DNDActionParameter      : DNDActionParameter
+    DNDActionParameter      : DNDActionParameter,
+    UserAvatar              : UserAvatar
 
 };
 

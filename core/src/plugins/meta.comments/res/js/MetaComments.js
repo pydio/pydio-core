@@ -111,11 +111,10 @@
                 }
                 return (
                     <div key={c.uuid} className="comment">
-                        <div className="author">{c.author}</div>
+                        <PydioComponents.UserAvatar pydio={this.props.pydio} userId={c.author} displayLabel={false}/>
                         <div className="date">{c.hdate}</div>
                         <div className="content">{contents}</div>
                         {link}
-                        <div className="author">{c.author}</div>
                         <div className="delete-comment mdi mdi-close" onTouchTap={remove}/>
                     </div>
                 );

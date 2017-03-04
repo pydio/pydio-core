@@ -285,10 +285,12 @@ class PydioApi{
 
     }
 
-    buildUserAvatarUrl(oUser){
+    buildUserAvatarUrl(userId, avatarId = null){
 
-        if(oUser.getPreference("avatar")){
-            return this._pydioObject.Parameters.get('ajxpServerAccess') + "&get_action=get_binary_param&binary_id=" + oUser.getPreference("avatar") + "&user_id=" + oUser.id;
+        if(avatarId){
+            return this._pydioObject.Parameters.get('ajxpServerAccess')
+                + "&get_action=get_binary_param&binary_id="
+                + avatarId + "&user_id=" + userId;
         }else{
             return null;
         }

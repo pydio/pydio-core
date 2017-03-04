@@ -205,52 +205,34 @@
             }
         },
 
-        getInitialState: function(){
-            return {userName: '', avatarUrl: null};
-        },
-
-        componentDidMount: function(){
-            this.loadUserData();
-            const obs = this.loadUserData.bind(this);
-            this.props.pydio.observe('user_logged', obs);
-        },
-
-        loadUserData: function(){
-
-            let userName, avatarUrl;
-            if(pydio.user){
-                userName = pydio.user.getPreference('USER_DISPLAY_NAME') || pydio.user.id;
-                avatarUrl = PydioApi.getClient().buildUserAvatarUrl(pydio.user);
-                if(!avatarUrl && this.props.pydio.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")){
-                    PydioApi.getClient().request({
-                        get_action  : 'get_avatar_url',
-                        userid      : pydio.user.id
-                    }, function(transport){
-                        this.setState({avatarUrl: transport.responseText});
-                    }.bind(this));
-                }
-            }
-            this.setState({userName: userName, avatarUrl: avatarUrl});
-        },
-
         render: function(){
 
-            const {userName, avatarUrl} = this.state;
             const messages = this.props.pydio.MessageHash;
+
+            let avatar;
+            if(this.props.pydio.user){
+                avatar = (
+                        <PydioComponents.UserAvatar
+                            pydio={this.props.pydio}
+                            userId={this.props.pydio.user.id}
+                            avatarStyle={{marginRight:20}}
+                            className="user-display"
+                            labelClassName="userLabel"
+                        >
+                            <MaterialUI.IconButton
+                                onTouchTap={this.applyAction.bind(this, 'cog')}
+                                iconClassName="mdi mdi-settings"
+                                tooltip={messages['165']}
+                                style={{width: 38, height: 38}}
+                                iconStyle={{fontSize: 16, color: 'rgba(255,255,255,0.87)'}}
+                            />
+                        </PydioComponents.UserAvatar>
+                );
+            }
 
             return (
                 <MaterialUI.Paper zDepth={1} rounded={false} className="user-widget primaryColorDarkerPaper">
-                    <div className="user-display">
-                        {avatarUrl && <MaterialUI.Avatar src={avatarUrl} style={{marginRight: 20}}/>}
-                        <div className="userLabel">{userName}</div>
-                        <MaterialUI.IconButton
-                            onTouchTap={this.applyAction.bind(this, 'cog')}
-                            iconClassName="mdi mdi-settings"
-                            tooltip={messages['165']}
-                            style={{width: 38, height: 38}}
-                            iconStyle={{fontSize: 16, color: 'rgba(255,255,255,0.87)'}}
-                        />
-                    </div>
+                    {avatar}
                     <div className="action_bar">
                         <MaterialUI.IconButton
                             onTouchTap={this.applyAction.bind(this, 'home')}

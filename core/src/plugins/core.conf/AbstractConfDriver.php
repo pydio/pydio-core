@@ -904,6 +904,25 @@ abstract class AbstractConfDriver extends Plugin
 
             break;
 
+            case "user_public_data":
+
+                $userId = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $responseInterface = $responseInterface->withHeader("Content-type", "application/json");
+                try{
+                    $userObject = UsersService::getUserById($userId);
+                }catch(UserNotFoundException $e){
+                    $responseInterface->getBody()->write(json_encode(["error"=>"not_found"]));
+                    break;
+                }
+                $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+                $responseInterface->getBody()->write(json_encode([
+                    "label"     =>  $userLabel,
+                    "avatar"    =>  $userAvatar
+                ]));
+
+            break;
+
             //------------------------------------
             // WEBDAV PREFERENCES
             //------------------------------------

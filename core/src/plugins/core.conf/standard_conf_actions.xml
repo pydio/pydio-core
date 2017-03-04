@@ -81,6 +81,12 @@
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
+		<action name="user_public_data">
+            <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
+			<processing>
+				<serverCallback methodName="switchAction"/>
+			</processing>
+		</action>
 		<action name="get_bookmarks">
             <gui text="145" title="145" src="edit_user.png" iconClass="icon-bookmark" accessKey="" hasAccessKey="false">
                 <context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="filter" contextMenu="false" infoPanel="false"/>

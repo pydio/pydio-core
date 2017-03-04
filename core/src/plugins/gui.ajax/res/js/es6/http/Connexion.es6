@@ -177,6 +177,10 @@ class Connexion{
             }
             return response;
 
+        }).catch(function(error) {
+            if(pydio){
+                pydio.displayMessage('ERROR', 'Network error ' + error.message);
+            }
         });
 
     }
