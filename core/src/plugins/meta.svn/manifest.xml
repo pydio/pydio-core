@@ -18,34 +18,6 @@
 					<additional_column messageId="243" attributeName="last_revision" sortType="String"/>
 				</columns>
 			</component_config>
-			<component_config className="InfoPanel">
-				<infoPanelExtension mime="generic_file,generic_dir" attributes="last_revision,last_revision_author,last_revision_date">
-					<messages>
-						<message key="type_string" id="134"/>
-						<message key="dim_string" id="135"/>
-						<message key="header_string" id="343"/>
-					</messages>
-					<html><![CDATA[
-						<div style="">
-							<div class="panelHeader infoPanelGroup" colspan="2">AJXP_MESSAGE[meta.svn.4]</div>
-							<table class="infoPanelTable" cellspacing="0" border="0" cellpadding="0">
-								<tr>
-									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.41]</td>
-									<td class="infoPanelValue">#{last_revision}</td>
-								</tr>
-								<tr class="even">
-									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.42]</td>
-									<td class="infoPanelValue">#{last_revision_date}</td>
-								</tr>
-								<tr>
-									<td class="infoPanelLabel">AJXP_MESSAGE[meta.svn.43]</td>
-									<td class="infoPanelValue">#{last_revision_author}</td>
-								</tr>
-							</table>
-						</div>
-					]]></html>
-				</infoPanelExtension>
-			</component_config>
 		</client_configs>
 		<actions>
 			<action name="svnlog">

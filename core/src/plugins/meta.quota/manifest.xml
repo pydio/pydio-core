@@ -13,8 +13,7 @@
     </server_settings>
     <client_settings>
         <resources>
-            <img_library alias="meta_quota" path="plugins/meta.quota/img"/>
-            <i18n namespace="meta.quota" path="plugins/meta.quota/i18n"/>
+            <i18n namespace="meta.quota" path="plugins/meta.quota/res/i18n"/>
             <js className="QuotaActions" file="plugins/meta.quota/res/build/QuotaActions.js"/>
         </resources>
     </client_settings>
@@ -28,13 +27,13 @@
    		</hooks>
         <actions>
             <action name="monitor_quota">
-                <gui src="meta_quota/ICON_SIZE/progressbar.png" iconClass="icon-tasks" text="meta.quota.1" title="meta.quota.2" hasAccessKey="false">
-                    <context dir="true" recycle="true" selection="false" actionBarGroup="utils" ajxpWidgets="UserWidget::logging_string"/>
+                <gui iconClass="icon-tasks" text="meta.quota.1" title="meta.quota.2" hasAccessKey="false">
+                    <context dir="true" recycle="true" selection="false" actionBarGroup="utils"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="true" write="false"/>
                 <processing>
                     <clientCallback module="QuotaActions.Callbacks.computeQuota"/>
-                    <clientListener module="QuotaActions.Listeners.contextChange" name="contextChange"/>
+                    <clientListener module="QuotaActions.Listeners.init" name="init"/>
                     <serverCallback methodName="getCurrentQuota" restParams="/" developerComment="Get current quota usage information">
                         <output type="JSON" description="A Json structure containing usage and authorized quota"/>
                     </serverCallback>
@@ -43,22 +42,7 @@
         </actions>
         <client_configs>
             <component_config className="InfoPanel">
-                <infoPanelExtension mime="ajxp_root_node" attributes="" >
-                    <messages>
-                        <message key="quota_string" id="meta.quota.4"/>
-                    </messages>
-                    <html><![CDATA[
-                        <div id="ajxp_quota_panel" data-infoPanelPosition="top">
-                            <div class="panelHeader">#{quota_string}</div>
-                            <div id="ajxp_quota_panel_content" style="padding:5px 0;font-size:20px;"></div>
-                            <script>
-                                if(pydio.getController().getActionByName("monitor_quota")){
-                                    pydio.getController().fireAction('monitor_quota');
-                                }
-                            </script>
-                        </div>
-                    ]]></html>
-                </infoPanelExtension>
+                <infoPanel mime="ajxp_root_node" reactComponent="QuotaActions.QuotaPanel"/>
             </component_config>
         </client_configs>
     </registry_contributions>

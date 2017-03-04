@@ -85,16 +85,6 @@ class UserMetaManager extends AbstractMetaSource
         $this->exposeConfigInManifest("meta_definitions", json_encode($def));
         if(!isSet($this->options["meta_visibility"])) $visibilities = array("visible");
         else $visibilities = explode(",", $this->options["meta_visibility"]);
-        $editButton = '';
-        $u = $ctx->getUser();
-        if($u != null && $u->canWrite($ctx->getRepositoryId())){
-            $editButton = '<span class="mdi mdi-pencil" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]"></span><span class="user_meta_change" style="display: none;" data-ajxpAction="edit_user_meta" title="AJXP_MESSAGE[meta.user.1]">AJXP_MESSAGE[457]</span>';
-        }
-        $cdataHead = '<div>
-                        <div class="panelHeader infoPanelGroup">'.$editButton.'AJXP_MESSAGE[meta.user.1]</div>
-                     ';
-        $cdataFoot = '</div>';
-        $cdataParts = "";
 
         $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="FilesList"]/columns');
         $contrib = $selection->item(0);
@@ -157,23 +147,7 @@ class UserMetaManager extends AbstractMetaSource
                     break;
             }
             $contrib->appendChild($col);
-            $trClass = ($even?" class=\"even infoPanelRow\"":" class=\"infoPanelRow\"");
-            $even = !$even;
-            $cdataParts .= '<div'.$trClass.'><div class="infoPanelLabel">'.$label.'</div><div class="infoPanelValue" data-metaType="'.$fieldType.'" id="ip_'.$key.'">#{'.$key.'}</div></div>';
         }
-
-        $selection = $this->getXPath()->query('registry_contributions/client_configs/component_config[@className="InfoPanel"]/infoPanelExtension');
-        $contrib = $selection->item(0);
-        $contrib->setAttribute("attributes", implode(",", array_keys($def)));
-        if (!empty($this->fieldsAdditionalData)) {
-            $contrib->setAttribute("metaAdditional", json_encode($this->fieldsAdditionalData));
-        }
-        $contrib->setAttribute("modifier", "MetaCellRenderer.prototype.infoPanelModifier");
-
-        $htmlSel = $this->getXPath()->query('html', $contrib);
-        $html = $htmlSel->item(0);
-        $cdata = $this->manifestDoc->createCDATASection($cdataHead . $cdataParts . $cdataFoot);
-        $html->appendChild($cdata);
 
         $selection = $this->getXPath()->query('registry_contributions/client_configs/template_part[@ajxpClass="SearchEngine"]');
         foreach ($selection as $tag) {

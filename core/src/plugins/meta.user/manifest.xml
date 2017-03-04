@@ -30,9 +30,6 @@
 			</component_config>
 			<component_config className="InfoPanel">
                 <infoPanel mime="generic_file,generic_dir" attributes="" reactComponent="ReactMeta.InfoPanel" theme="material"/>
-				<infoPanelExtension mime="generic_file,generic_dir" attributes="">
-					<html></html>
-				</infoPanelExtension>
 			</component_config>
 		</client_configs>
 		<actions>

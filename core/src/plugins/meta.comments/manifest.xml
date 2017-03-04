@@ -20,18 +20,6 @@
 		<client_configs>
 			<component_config className="InfoPanel">
                 <infoPanel mime="meta:ajxp_has_comments_feed,ajxp_root_node" reactComponent="MetaComments.Panel"/>
-                <infoPanelExtension mime="meta:ajxp_has_comments_feed,ajxp_root_node" attributes="" modifier="CommentsPanel.prototype.loadInfoPanel">
-					<html><![CDATA[
-                        <div id="ajxp_comments_info_panel">
-                            <div class="panelHeader infoPanelGroup" colspan="2"><span class="icon-comments-alt" data-ajxpAction="comments" title="AJXP_MESSAGE[meta.comments.1]"></span>AJXP_MESSAGE[meta.comments.1]</div>
-                            <div id="comments_container"></div>
-                            <div id="comments_form">
-                                <textarea class="comments_textarea" placeholder="AJXP_MESSAGE[meta.comments.2]"></textarea>
-                                <div><input type="button" value="AJXP_MESSAGE[meta.comments.3]" id="comments_submit"></div>
-                            </div>
-                        </div>
-                    ]]></html>
-				</infoPanelExtension>
 			</component_config>
 		</client_configs>
 		<actions>
