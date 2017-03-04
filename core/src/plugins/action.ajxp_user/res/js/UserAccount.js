@@ -116,6 +116,7 @@
                             onChange={newChange}
                             attributes={{name:'pass',label:messages[199]}}
                             value={this.state.newPass}
+                            name="newpassword"
                             ref="newpass"
                         />
                     </div>
