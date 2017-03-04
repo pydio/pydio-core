@@ -16,7 +16,7 @@
                 }else{
                     this.loadQuota();
                 }
-            });
+            }.bind(this));
         }
 
         quotaEnabled(){
@@ -47,7 +47,9 @@
         }
 
         loadQuota(){
+            if(!this.quotaEnabled()) return;
             PydioApi.getClient().request({get_action:'monitor_quota'}, function(transport){
+                if(!this.quotaEnabled()) return;
                 const data = transport.responseJSON;
                 this.usage = data.USAGE;
                 this.total = data.TOTAL;

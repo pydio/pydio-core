@@ -363,6 +363,7 @@ let SimpleList = React.createClass({
             this.loadStartingAtCursor();
             return;
         }
+        this.props.dataModel.setSelectedNodes([]);
         this._loadingListener();
         this.props.node.observeOnce("loaded", this._loadedListener);
         this.props.node.reload();
