@@ -10,7 +10,7 @@ export default React.createClass({
         if(w & h){
             return (
                 <InfoPanelCard title="Image Dimension">
-                    <div className={"img-dimension-div " + (w > h ? "landscape":(w===h ?"square":"portrait"))} data-width={w + ' px'} data-height={h + ' px'} style={{marginBottom:16}}/>
+                    <div style={{padding:'20px 20px 40px',fontSize:20, color:'rgba(0,0,0,0.53)', textAlign:'center'}}>{w} px X {h} px</div>
                 </InfoPanelCard>
             );
         }else{

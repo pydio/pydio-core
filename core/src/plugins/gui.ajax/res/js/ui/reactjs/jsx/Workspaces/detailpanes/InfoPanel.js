@@ -77,6 +77,9 @@
                     primaryMime = 'generic_file';
                 }else{
                     primaryMime = 'generic_dir';
+                    if(this.props.dataModel.getRootNode() === uniqueNode){
+                        primaryMime = 'ajxp_root_node';
+                    }
                 }
                 data.node = uniqueNode;
             }

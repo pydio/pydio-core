@@ -40,7 +40,7 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-				<clientCallback module="PydioCoreActions.Callbacks.userCreateRepository" prepareModal="true"/>
+				<clientCallback module="PydioCoreActions.Callbacks.userCreateRepository"/>
 				<clientForm id="user_create_repository_form"><![CDATA[
 					<div id="user_create_repository_form" action="user_create_repository" box_width="420" box_padding="0">
 					    <div id="user_tpl_container" style="position:relative;width:418px;overflow:hidden;height:130px;border:1px solid #ddd; background-color: #f4f4f4;">
@@ -144,7 +144,7 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback module="PydioCoreActions.Callbacks.userUpdateUser" prepareModal="true"/>
+                <clientCallback module="PydioCoreActions.Callbacks.userUpdateUser"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -154,12 +154,7 @@
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback  module="PydioCoreActions.Callbacks.userCreateUser" prepareModal="true">
-                </clientCallback>
-                <clientForm id="user_create_user"><![CDATA[
-                    <div id="user_create_user" action="custom_data_edit" box_width="320">
-                    </div>
-                ]]></clientForm>
+                <clientCallback  module="PydioCoreActions.Callbacks.userCreateUser"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -168,13 +163,7 @@
 				<context selection="false" dir="" recycle="true" actionBar="false" actionBarGroup="utils" contextMenu="false" infoPanel="false"/>
 			</gui>
 			<processing>
-				<clientCallback module="PydioCoreActions.Callbacks.switchLanguage" prepareModal="true"/>
-				<clientForm id="switch_language_form"><![CDATA[
-					<div id="switch_language_form" action="switch_language_form" box_width="320">
-					    <div class="dialogLegend"  style="margin-left:50px; font-size: 15px;">AJXP_MESSAGE[190]</div>
-						<select id="language_selector" style="margin-left:50px; margin-bottom: 20px;"></select>
-					</div>
-				]]></clientForm>
+				<clientCallback module="PydioCoreActions.Callbacks.switchLanguage"/>
 				<serverCallback methodName="switchAction"/>
 			</processing>
 		</action>
@@ -213,51 +202,7 @@
                             paneInfo='{"namespace":"UserAccount", "componentName":"WebDAVPane"}'/>
         </component_config>
         <component_config className="InfoPanel">
-            <infoPanelExtension mime="ajxp_root_node" attributes="">
-                <messages>
-                    <message key="shared_string" id="527"/>
-                    <message key="internal_string" id="531"/>
-                    <message key="external_string" id="532"/>
-                </messages>
-                <html><![CDATA[
-                    <div id="ajxp_workspace_info_panel" data-infoPanelPosition="top" style="margin:6px 20px;">
-                        <div class="panelHeader">#{shared_string}</div>
-                        <div id="ajxp_workspace_info_panel_content"></div>
-                        <script>
-                            if(pydio.user) {
-                                var cacheService = MetaCacheService.getInstance();
-                                cacheService.registerMetaStream('workspace.info', 'MANUAL_TRIGGER');
-                                var render = function(data){
-                                    $('ajxp_workspace_info_panel_content').update('#{internal_string}: ' + data['core.users']['users'] + ' <br/> #{external_string}: ' + data['core.users']['groups']);
-                                };
-                                var repoKey = pydio.user.getActiveRepository();
-                                if(cacheService.hasKey('workspace.info', repoKey)){
-                                    render(cacheService.getByKey('workspace.info', repoKey));
-                                }else{
-                                    FuncUtils.bufferCallback("ajxp_load_repo_info_timer", 300,function(){
-                                        if(!$('ajxp_workspace_info_panel_content') || !$('ajxp_workspace_info_panel_content').visible()){
-                                            return;
-                                        }
-                                        $("ajxp_workspace_info_panel").addClassName("infopanel_loading");
-                                        PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport){
-                                            $("ajxp_workspace_info_panel").addClassName("infopanel_loading_finished");
-                                            if(transport.responseJSON && $('ajxp_workspace_info_panel_content')){
-                                                var data = transport.responseJSON;
-                                                if(!data['core.users']['groups']){
-                                                    data['core.users']['groups'] = 0;
-                                                }
-                                            }
-                                            cacheService.setKey('workspace.info', repoKey, data);
-                                            render(data);
-                                        }, null, {discrete:true});
-                                    });
-                                }
-                            }
-
-                        </script>
-                    </div>
-                ]]></html>
-            </infoPanelExtension>
+            <infoPanel mime="ajxp_root_node" reactComponent="PydioDetailPanes.RootNode"/>
         </component_config>
     </client_configs>
 </registry_contributions>
