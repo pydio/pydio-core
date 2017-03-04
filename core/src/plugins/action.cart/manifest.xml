@@ -8,8 +8,7 @@
 
     <client_settings>
         <resources>
-            <js className="LocalCartNodeProvider" file="plugins/action.cart/class.LocalCartNodeProvider.js"/>
-            <js className="CartManager" file="plugins/action.cart/class.CartManager.js" depends="LocalCartNodeProvider"/>
+            <js className="PydioCart" file="plugins/action.cart/res/build/PydioCart.js"/>
             <i18n namespace="action.cart" path="plugins/action.cart/i18n"/>
         </resources>
     </client_settings>
@@ -20,114 +19,9 @@
 
     <registry_contributions>
         <client_configs>
-            <component_config className="AjxpTabulator::topPane">
-                <additional_tab id="ajxp-cart-manager"
-                                tabInfo='{"id":"cart-manager","iconClass":"icon-suitcase","element":"ajxp-cart-manager","closeable":false,"label":"action.cart.10","title":"action.cart.15","dontFocus":true}'
-                                paneInfo='{"type":"widget"}'><![CDATA[
-                    <div id="ajxp-cart-manager" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height"}'>
-                        <div id="cart-manager-header" class="innerTabulator" ajxpClass="AjxpTabulator" ajxpOptions='{"fit":"height", "saveState":true, "fitParent":"browser","defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"submenuOffsetTop":2}}'>
-                            <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"nodeProviderProperties":{}}'></div>
-                        </div>
-                    </div>
-                ]]></additional_tab>
-            </component_config>
-            <component_config className="AjxpPane::navigation_scroller">
-                <additional_content id="action_cart"><![CDATA[
-                        <div ajxp_position="9" id="action_cart">
-                            <h3 style="color:#E2DECB;" ajxp_message_id="action.cart.10">AJXP_MESSAGE[action.cart.10]</h3>
-                            <div id="cart-manager-header" class="innerTabulator" style="height: 200px;" ajxpClass="AjxpTabulator" ajxpOptions='{"saveState":true, "defaultTabId": "default-cart","tabInfos": [{"id":"default-cart","label":"action.cart.9","iconClass":"icon-suitcase", "element":"default-cart"}], "headerToolbarOptions":{"submenuClassName":"panelHeaderMenu","submenuPosition":"bottom right","submenuOffsetTop":12,"toolbarsList":["ajxp-cart-manager", "ajxp-cart-actions"],"submenuOffsetTop":2}}'>
-                                <div id="default-cart" ajxpClass="CartManager" ajxpOptions='{"fit":"content", "nodeProviderProperties":{}}'></div>
-                            </div>
-                        </div>
-                        <style>
-                        #action_cart{
-                            position: relative;
-                        }
-                        #action_cart #display_toolbar{
-                            position: absolute;
-                            display: block;
-                            top: 12px;
-                            right: 10px;
-                        }
-                        #action_cart #display_toolbar span.actionbar_button_label,
-                        #search_panel div#display_toolbar span.actionbar_button_label
-                        {
-                            display: none;
-                        }
-                        #action_cart #display_toolbar a{
-                            padding: 0 4px;
-                        }
-                        #action_cart #display_toolbar a.disabled {
-                            display: none;
-                        }
-                        #action_cart div.tabulatorContainer.panelHeader{
-                            margin: 0 15px;
-                            border-radius: 5px;
-                            padding: 3px 2px;
-                            background-color: transparent;
-                        }
-                        #action_cart div.tabulatorContainer.panelHeader div.toolbarGroup a{
-                            color: #ccc !important;
-                        }
-                        div[ajxpClass="CartManager"]{
-                            height: auto !important;
-                            min-height: 180px;
-                        }
-                        #action_cart .innerTabulator span.toggleHeader{
-                            border: 0;
-                            border-bottom: 2px solid #E2DECB;
-                            border-radius: 0;
-                            margin-right: 4px;
-                            padding: 2px 6px;
-                            background: transparent;
-                            color: white;
-                        }
-                        #action_cart .innerTabulator span.toggleHeader.toggleInactive{
-                            background-color: transparent;
-                            color: rgba(255, 255, 255, 0.47);
-                            border-color: transparent;
-                        }
-                        #search_panel div#display_toolbar {
-                            float: right;
-                            display: inline-block;
-                            min-width: 60px;
-                            text-align: right;
-                            margin-right: 40px;
-                            margin-top: 5px;
-                        }
-                        a#create-cart-from-search_button{
-                            color: #999 !important;
-                            font-size: 1.4em;
-                        }
-                        #action_cart div.class-FetchedResultPane{
-                            border-radius: 8px;
-                            margin: 0px 15px 10px;
-                            background-color: rgba(255, 255, 255, 0.1);
-                        }
-                        #action_cart div.class-FetchedResultPane div.thumbnail_selectable_cell.detailed{
-                            padding: 2px 0px;
-                        }
-                        </style>
-                ]]></additional_content>
-            </component_config>
+            <template element="body" name="cart-panel" position="bottom" namespace="PydioCart" component="CartMounter"/>
         </client_configs>
         <actions>
-            <action name="create-cart">
-                <gui src="" iconClass="icon-plus" text="action.cart.5" title="action.cart.6">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-manager"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var tabulator = $('cart-manager-header').ajxpPaneObject;
-                        if(tabulator){
-                            var newLabel = window.prompt(MessageHash['action.cart.13']);
-                            if(newLabel){
-                                tabulator.addTab({"id":"new-cart-"+new Date().getTime(),"label":newLabel,"iconClass":"icon-suitcase", closeable:true, dontFocus:true}, {type:"widget", widgetClass:CartManager, widgetOptions:{label:newLabel}});
-                            }
-                        }
-                    ]]></clientCallback>
-                </processing>
-            </action>
             <action name="create-cart-from-search">
                 <gui src="" iconClass="icon-save" text="action.cart.5" title="action.cart.6">
                     <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-search-result-bar"/>
@@ -152,139 +46,13 @@
                 </processing>
             </action>
             <action name="send-selection-to-cart">
-                <gui src="" text="action.cart.1" title="action.cart.2" iconClass="icon-suitcase">
-                    <context dir="true" recycle="true" selection="true" actionBar="false" contextMenu="true" actionBarGroup="more"/>
+                <gui src="" text="action.cart.1" title="action.cart.2" iconClass="mdi mdi-cart-plus">
+                    <context dir="true" recycle="true" selection="true" actionBar="true" contextMenu="true" actionBarGroup="more"/>
                     <selectionContext dir="true" file="true" recycle="false" unique="false"  evalMetadata="!metadata.get('ajxp_mime') || !metadata.get('ajxp_mime').startsWith('shared_')"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="false" read="true" userLogged="true" write="false"/>
                 <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object){
-                            object.addCurrentSelection();
-                        }
-                    ]]></clientCallback>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || !object.getRootNode){
-                                return false;
-                            }
-                        }
-                        return true;
-                    ]]></activeCondition>
-                </processing>
-            </action>
-            <action name="current-cart-empty">
-                <gui src="" iconClass="icon-trash" text="action.cart.3" title="action.cart.4">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-manager"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object && object.clearContent){
-                            object.clearContent();
-                        }
-                    ]]></clientCallback>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || !object.getRootNode || object.getRootNode().getChildren().size == 0){
-                                return false;
-                            }
-                        }
-                        return true;
-                    ]]></activeCondition>
-                </processing>
-            </action>
-            <action name="current-cart-download">
-                <gui src="" iconClass="icon-download-alt" text="action.cart.7" title="action.cart.8">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object && $('download_form')){
-                            object.downloadContent();
-                        }
-                    ]]></clientCallback>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || !object.downloadContent){
-                                return false;
-                            }
-                        }
-                         return pydio.getController().actions.get('download') != null;
-                    ]]></activeCondition>
-                </processing>
-            </action>
-            <action name="search-cart-download">
-                <gui src="" iconClass="icon-download-alt" text="action.cart.7" title="action.cart.8">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object && $('download_form')){
-                            var label = $('cart-manager-header').ajxpPaneObject.selectedTabInfo.label;
-                            CartManager.prototype.downloadFetchedPaneContent(object, label);
-                        }
-                    ]]></clientCallback>
-                    <serverCallback methodName="switchAction"/>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || object.__className!='FetchedResultPane'){
-                                return false;
-                            }
-                        }
-                        return pydio.getController().actions.get('download') != null;
-                    ]]></activeCondition>
-                </processing>
-            </action>
-            <action name="current-cart-share">
-                <gui src="" iconClass="mdi mdi-share-variant" text="action.cart.10" title="action.cart.11">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object && $('download_form')){
-                            object.compressContentAndShare();
-                        }
-                    ]]></clientCallback>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || !object.compressContentAndShare){
-                                return false;
-                            }
-                        }
-                        return pydio.getController().actions.get('compress') != null && pydio.getController().actions.get('share') != null;
-                    ]]></activeCondition>
-                </processing>
-            </action>
-            <action name="current-cart-refresh-search">
-                <gui src="" iconClass="icon-refresh" text="action.cart.10" title="action.cart.11">
-                    <context dir="true" recycle="true" selection="false" actionBar="true" actionBarGroup="ajxp-cart-actions"/>
-                </gui>
-                <processing>
-                    <clientCallback><![CDATA[
-                        var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                        if(object && object.__className == 'FetchedResultPane'){
-                            object._dataModel.requireContextChange(object._rootNode, true);
-                        }
-                    ]]></clientCallback>
-                    <activeCondition><![CDATA[
-                        if($('cart-manager-header') && $('cart-manager-header').ajxpPaneObject){
-                            var object = $('cart-manager-header').ajxpPaneObject.getAndSetAjxpObject( $('cart-manager-header').ajxpPaneObject.selectedTabInfo );
-                            if(!object || object.__className != 'FetchedResultPane'){
-                                return false;
-                            }
-                        }
-                        return true;
-                    ]]></activeCondition>
+                    <clientCallback module="PydioCart.Callbacks.addCurrentSelection"/>
                 </processing>
             </action>
         </actions>

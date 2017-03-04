@@ -595,3 +595,15 @@
 .mdi-information-outline:before {
     content: "\f3f0";
 }
+
+.mdi-cart:before {
+    content: "\f206";
+}
+
+.mdi-cart-outline:before {
+    content: "\f207";
+}
+
+.mdi-cart-plus:before {
+    content: "\f208";
+}

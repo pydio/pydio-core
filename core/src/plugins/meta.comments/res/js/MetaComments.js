@@ -96,7 +96,8 @@
         },
 
         render: function(){
-            const comments = this.state.comments.map(function(c){
+            const stateComments = this.state.comments || [];
+            const comments = stateComments.map(function(c){
                 const remove = () => {this.removeComment(c)};
                 const contents = c.content.split('<br>').map(function(part){
                     return <div className="part">{part}</div>

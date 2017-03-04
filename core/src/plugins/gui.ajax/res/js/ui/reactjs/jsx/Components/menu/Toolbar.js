@@ -1,6 +1,7 @@
 import Utils from './Utils'
 import IconButtonMenu from './IconButtonMenu'
 import ButtonMenu from './ButtonMenu'
+import IconButtonPopover from './IconButtonPopover'
 
 (function(global){
 
@@ -61,10 +62,11 @@ import ButtonMenu from './ButtonMenu'
                 if(!groups.has(barName)) return;
                 groups.get(barName).map(function(action){
                     if(action.deny) return;
-                    let menuItems = null;
-                    let menuTitle = null;
-                    let menuIcon  = null;
+                    let menuItems, popoverContent, menuTitle , menuIcon;
                     let actionName = action.options.name;
+
+                    menuTitle = action.options.text;
+                    menuIcon  = action.options.icon_class;
 
                     if(barName === 'MORE_ACTION') {
                         let subItems = action.subMenuItems.dynamicItems;
@@ -76,41 +78,44 @@ import ButtonMenu from './ButtonMenu'
                                 items.push(obj.actionId.getMenuData());
                             }
                         });
-                        menuTitle = action.options.text;
                         menuItems = Utils.pydioActionsToItems(items);
-                        menuIcon  = action.options.icon_class;
                     }else if(action.subMenuItems.staticItems){
-                        menuTitle = action.options.text;
                         menuItems = Utils.pydioActionsToItems(action.subMenuItems.staticItems);
-                        menuIcon  = action.options.icon_class;
-                    }else if(action.subMenuItems.dynamicBuilder){
-                        menuTitle = action.options.text;
-                        menuIcon  = action.options.icon_class;
+                    }else if(action.subMenuItems.dynamicBuilder) {
                         menuItems = Utils.pydioActionsToItems(action.subMenuItems.dynamicBuilder());
+                    }else if(action.subMenuItems.popoverContent) {
+                        popoverContent = action.subMenuItems.popoverContent;
                     }else{
-                        menuTitle = action.options.text;
-                        menuIcon  = action.options.icon_class;
                     }
                     let id = 'action-' + action.options.name;
                     if(renderingType === 'button-icon'){
                         menuTitle = <span className="button-icon"><span className={"button-icon-icon " + menuIcon}></span><span className="button-icon-label">{menuTitle}</span></span>;
                     }
-                    if(menuItems){
-                        if(renderingType === 'button' || renderingType === 'button-icon'){
+                    if(menuItems) {
+                        if (renderingType === 'button' || renderingType === 'button-icon') {
                             actions.push(<ButtonMenu
                                 key={actionName}
                                 className={id}
                                 buttonTitle={menuTitle}
                                 menuItems={menuItems}/>);
-                        }else{
+                        } else {
                             actions.push(<IconButtonMenu
                                 key={actionName}
                                 className={id}
-                                onMenuClicked={function(object){object.payload()}}
+                                onMenuClicked={function (object) {
+                                    object.payload()
+                                }}
                                 buttonClassName={menuIcon}
                                 buttonTitle={menuTitle}
                                 menuItems={menuItems}/>);
                         }
+                    }else if(popoverContent){
+                        actions.push(<IconButtonPopover
+                            key={actionName}
+                            className={id}
+                            buttonClassName={menuIcon}
+                            buttonTitle={menuTitle}
+                            popoverContent={popoverContent}/>);
                     }else{
                         let click = function(synthEvent){action.apply();};
                         if(renderingType === 'button' || renderingType === 'button-icon'){

@@ -93,7 +93,8 @@ class Action extends Observable{
 		this.subMenuItems = LangUtils.objectMerge({
 			staticItems:null,
 			dynamicItems:null,
-			dynamicBuilderCode:null
+			dynamicBuilderCode:null,
+            popoverContent: null
 		}, arguments[4] || {});
 
 		this.elements = [];
