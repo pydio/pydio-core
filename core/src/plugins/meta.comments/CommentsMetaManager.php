@@ -143,9 +143,9 @@ class CommentsMetaManager extends AbstractMetaSource
                 $uId = $ctx->getUser()->getId();
                 $limit = $this->getContextualOption($ctx, "COMMENT_SIZE_LIMIT");
                 if (!empty($limit)) {
-                    $content = substr(InputFilter::decodeSecureMagic($httpVars["content"]), 0, $limit);
+                    $content = substr(InputFilter::decodeSecureMagic($httpVars["content"], InputFilter::SANITIZE_HTML), 0, $limit);
                 } else {
-                    $content = InputFilter::decodeSecureMagic($httpVars["content"]);
+                    $content = InputFilter::decodeSecureMagic($httpVars["content"], InputFilter::SANITIZE_HTML);
                 }
                 $com = array(
                     "date"      => time(),
