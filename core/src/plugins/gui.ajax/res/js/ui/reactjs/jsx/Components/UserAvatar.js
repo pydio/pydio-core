@@ -11,7 +11,6 @@ class UserAvatar extends React.Component{
     }
 
     componentDidMount(){
-        console.log('DID MOUNT WITH ' + this.props.userId);
         if(this.props.pydio.user && this.props.pydio.user.id === this.props.userId){
             this.loadLocalData();
             if(!this._userLoggedObs){
@@ -24,7 +23,6 @@ class UserAvatar extends React.Component{
     }
 
     componentWillReceiveProps(nextProps){
-        console.log('WILL RECEIVE PROPS WITH ' + nextProps.userId);
         if(!this.props.userId || this.props.userId !== nextProps.userId){
             this.setState({label: nextProps.userId});
         }
