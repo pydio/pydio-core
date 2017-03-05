@@ -32,7 +32,9 @@ use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Access\Meta\Core\AbstractMetaSource;
 use Pydio\Access\Metastore\Core\IMetaStoreProvider;
+use Pydio\Core\Utils\XMLHelper;
 use Pydio\Notification\Core\IFeedStore;
+use Pydio\Core\Controller\Controller;
 
 define("AJXP_META_SPACE_COMMENTS", "AJXP_META_SPACE_COMMENTS");
 
@@ -170,6 +172,9 @@ class CommentsMetaManager extends AbstractMetaSource
                 $com["hdate"] = StatHelper::relativeDate($com["date"], $mess);
                 $com["path"] = $uniqNode->getPath();
                 echo json_encode($com);
+                $imMessage = '<![CDATA[' . json_encode($com) . ']]>';
+                $imMessage = XMLHelper::toXmlElement("metacomments", ["event" => "newcomment", "path" => $uniqNode->getPath()], $imMessage);
+                Controller::applyHook("msg.instant", array($uniqNode->getContext(), $imMessage));
 
                 break;
 
@@ -246,6 +251,8 @@ class CommentsMetaManager extends AbstractMetaSource
                 } else {
                     $feedStore->dismissMetaObjectById($ctx, $data["uuid"]);
                 }
+                $imMessage = XMLHelper::toXmlElement("metacomments", ["event" => "deletecomment", "path" => $uniqNode->getPath()]);
+                Controller::applyHook("msg.instant", array($uniqNode->getContext(), $imMessage));
 
                 break;
 

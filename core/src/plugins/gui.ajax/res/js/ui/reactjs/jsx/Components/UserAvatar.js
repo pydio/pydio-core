@@ -1,25 +1,47 @@
 class UserAvatar extends React.Component{
 
-    constructor(){
-        super();
+    constructor(props, context){
+        super(props, context);
         this.state = {
-            label : null,
+            label : props.userId,
             avatar: null
         };
         this.cache = MetaCacheService.getInstance();
         this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
     }
 
+    componentDidMount(){
+        console.log('DID MOUNT WITH ' + this.props.userId);
+        if(this.props.pydio.user && this.props.pydio.user.id === this.props.userId){
+            this.loadLocalData();
+            if(!this._userLoggedObs){
+                this._userLoggedObs = this.loadLocalData.bind(this);
+                this.props.pydio.observe('user_logged', this._userLoggedObs);
+            }
+        }else{
+            this.loadPublicData();
+        }
+    }
+
     componentWillReceiveProps(nextProps){
+        console.log('WILL RECEIVE PROPS WITH ' + nextProps.userId);
         if(!this.props.userId || this.props.userId !== nextProps.userId){
-            this.setState({label: userId});
+            this.setState({label: nextProps.userId});
         }
         if(this.props.pydio && this.props.pydio.user && this.props.pydio.user.id === nextProps.userId){
             this.loadLocalData();
-            const obs = this.loadLocalData.bind(this);
-            this.props.pydio.observe('user_logged', obs);
+            if(!this._userLoggedObs){
+                this._userLoggedObs = this.loadLocalData.bind(this);
+                this.props.pydio.observe('user_logged', this._userLoggedObs);
+            }
         }else{
             this.loadPublicData();
+        }
+    }
+
+    componentWillUnmount(){
+        if(this._userLoggedObs){
+            this.props.pydio.stopObserving('user_logged', this._userLoggedObs);
         }
     }
 
@@ -79,20 +101,21 @@ class UserAvatar extends React.Component{
     render(){
 
         const {avatar, label} = this.state;
-        const {style, labelStyle, avatarStyle, className, avatarClassName, labelClassName, displayLabel, displayAvatar} = this.props;
+        const {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar} = this.props;
         let avatarContent;
         if(displayAvatar && !avatar && !displayLabel && label){
             avatarContent = label.toUpperCase().substring(0,2);
         }
         return (
-            <div className={className || 'user-widget'} style={style}>
+            <div className={className} style={style}>
                 {displayAvatar && (avatar || avatarContent) && <MaterialUI.Avatar
                     src={avatar}
                     style={avatarStyle}
-                    className={avatarClassName || 'user-avatar'}
+                    className={avatarClassName}
+                    size={avatarSize}
                 >{avatarContent}</MaterialUI.Avatar>}
                 {displayLabel && <div
-                    className={labelClassName || 'user-label'}
+                    className={labelClassName}
                     style={labelStyle}>{label}</div>}
                 {this.props.children}
             </div>
@@ -108,6 +131,7 @@ UserAvatar.propTypes = {
 
     displayLabel: React.PropTypes.bool,
     displayAvatar: React.PropTypes.bool,
+    avatarSize:React.PropTypes.number,
 
     className: React.PropTypes.string,
     labelClassName: React.PropTypes.string,
@@ -119,7 +143,11 @@ UserAvatar.propTypes = {
 
 UserAvatar.defaultProps = {
     displayLabel: true,
-    displayAvatar: true
+    displayAvatar: true,
+    avatarSize: 40,
+    className: 'user-avatar-widget',
+    avatarClassName:'user-avatar',
+    labelClassName:'user-label'
 };
 
 export {UserAvatar as default}
