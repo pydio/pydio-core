@@ -43,15 +43,19 @@
             return (
 
                 <PydioDetailPanes.InfoPanelCard title="Activity">
-                    <PydioComponents.NodeListCustomProvider
-                        pydio={pydio}
-                        className="small"
-                        elementHeight={53}
-                        heightAutoWithMax={500}
-                        presetDataModel={dataModel}
-                        actionBarGroups={[]}
-                        ref="provider"
-                    />
+                    <div style={{padding: 0, paddingBottom: 16}}>
+                        <PydioComponents.NodeListCustomProvider
+                            pydio={pydio}
+                            className="files-list card-list"
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE + 11}
+                            heightAutoWithMax={320}
+                            presetDataModel={dataModel}
+                            actionBarGroups={[]}
+                            ref="provider"
+                            hideToolbar={true}
+                            entryRenderIcon={(node) => {return null}}
+                        />
+                    </div>
                 </PydioDetailPanes.InfoPanelCard>
 
             );
@@ -80,6 +84,46 @@
             this.setState({
                 open: false,
             });
+        },
+
+        renderIcon: function(node){
+            return (
+                <PydioWorkspaces.FilePreview
+                    loadThumbnail={true}
+                    node={node}
+                    pydio={this.props.pydio}
+                />
+            );
+        },
+
+        renderSecondLine: function(node){
+            return node.getMetadata().get('event_description');
+        },
+
+        renderActions: function(node){
+            return <MaterialUI.IconButton
+                iconClassName="mdi mdi-close"
+                onTouchTap={(event) => {event.stopPropagation(); this.dismissAlert(node);}}
+                style={{width: 36, height: 36, padding: 6}}
+                iconStyle={{color: 'rgba(0,0,0,.23)', hoverColor:'rgba(0,0,0,.73)'}}
+            />;
+        },
+
+        entryClicked: function(node){
+            this.handleRequestClose();
+            this.props.pydio.goTo(node);
+        },
+
+        dismissAlert: function(node){
+            const alertId = node.getMetadata().get('alert_id');
+            const occurences = node.getMetadata().get('event_occurence');
+            PydioApi.getClient().request({
+                get_action:'dismiss_user_alert',
+                alert_id:alertId,
+                occurences:occurences
+            }, function(t){
+                this.refs.list.reload();
+            }.bind(this));
         },
 
         render: function() {
@@ -111,11 +155,18 @@
 
                     >
                         <PydioComponents.NodeListCustomProvider
+                            ref="list"
+                            className={'files-list card-list'}
+                            hideToolbar={true}
                             pydio={this.props.pydio}
-                            elementHeight={53}
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 11}
                             heightAutoWithMax={500}
                             nodeProviderProperties={providerProperties}
                             actionBarGroups={[]}
+                            entryRenderIcon={this.renderIcon}
+                            entryRenderSecondLine={this.renderSecondLine}
+                            entryRenderActions={this.renderActions}
+                            nodeClicked={this.entryClicked}
                         />
                     </MaterialUI.Popover>
                 </span>

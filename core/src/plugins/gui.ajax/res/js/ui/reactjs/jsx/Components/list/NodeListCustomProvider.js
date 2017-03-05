@@ -14,7 +14,8 @@ export default React.createClass({
         heightAutoWithMax:React.PropTypes.number,
         elementHeight:React.PropTypes.number.isRequired,
         nodeClicked:React.PropTypes.func,
-        reloadOnServerMessage:React.PropTypes.string
+        reloadOnServerMessage:React.PropTypes.string,
+        entryRenderAsCard:React.PropTypes.func
     },
 
     reload: function(){

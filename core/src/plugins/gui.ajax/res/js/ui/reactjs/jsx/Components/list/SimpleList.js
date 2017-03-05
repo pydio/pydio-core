@@ -38,6 +38,7 @@ let SimpleList = React.createClass({
         entryRenderSecondLine:React.PropTypes.func,
         entryRenderThirdLine:React.PropTypes.func,
         entryHandleClicks:React.PropTypes.func,
+        hideToolbar:React.PropTypes.bool,
 
         openEditor:React.PropTypes.func,
         openCollection:React.PropTypes.func,
@@ -996,7 +997,7 @@ let SimpleList = React.createClass({
                 sortingInfo={sortingInfo}
             />
         }else{
-            toolbar = this.props.customToolbar ? this.props.customToolbar : this.renderToolbar();
+            toolbar = this.props.customToolbar ? this.props.customToolbar : ( !this.props.hideToolbar ? this.renderToolbar() : null );
         }
         let inlineEditor;
         if(this.state.inlineEditionForNode){
