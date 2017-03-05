@@ -110,7 +110,6 @@
 
         downloadContent(){
             const sel = this.buildSelection();
-            console.log(sel);
             if(!Object.keys(sel).length) return;
             let params = {...sel, dir:'__AJXP_ZIP_FLAT__/', archive_name:'Cart.zip'};
             PydioApi.getClient().downloadSelection(null, 'download', params);
@@ -207,6 +206,7 @@
 
         updateActions: function(){
             pydio.getController().updateGuiActions(this.getPydioActions());
+            pydio.getController().notify("actions_refreshed");
         },
 
         getInitialState: function(){

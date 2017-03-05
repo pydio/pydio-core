@@ -105,12 +105,12 @@ class Controller extends Observable{
             this._guiActions.set(k, v);
             this.registerAction(v);
         }.bind(this));
-        this.notify("actions_refreshed");
+        //this.notify("actions_refreshed");
     }
 
     deleteFromGuiActions(actionName){
         this._guiActions.delete(actionName);
-        this.notify("actions_refreshed");
+        //this.notify("actions_refreshed");
     }
 
     refreshGuiActionsI18n(){
@@ -469,11 +469,7 @@ class Controller extends Observable{
 		this.actions.forEach(function(action){
 			action.fireSelectionChange(this._dataModel);
 		}.bind(this));
-        if(this.localDataModel){
-            this.notify("actions_refreshed");
-        }else{
-            this._pydioObject.fire("actions_refreshed");
-        }
+        this.notify("actions_refreshed");
 	}
 	
 	/**
@@ -486,13 +482,17 @@ class Controller extends Observable{
                                      this.usersEnabled,
 									 this.oUser);
 		}.bind(this));
+        this.notify("actions_refreshed");
+	}
+
+	notify(eventName, memo){
         if(this.localDataModel){
-            this.notify("actions_refreshed");
+            super("actions_refreshed", memo);
         }else{
             this._pydioObject.fire("actions_refreshed");
         }
-	}
-			
+    }
+
 	/**
 	 * Remove all actions
 	 */
@@ -517,11 +517,7 @@ class Controller extends Observable{
         this._guiActions.forEach(function(act){
             this.registerAction(act);
         }.bind(this));
-        if(this.localDataModel){
-            this.notify("actions_loaded");
-        }else{
-            this._pydioObject.fire("actions_loaded", this.actions);
-        }
+        this.notify("actions_loaded");
 		this.fireContextChange();
 		this.fireSelectionChange();		
 	}
