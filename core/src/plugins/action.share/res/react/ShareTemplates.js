@@ -156,7 +156,7 @@
             return (
                 <MaterialUI.MuiThemeProvider>
                     <div className="vertical_fit vertical_layout">
-                        <MaterialUI.Paper zDepth={1}>
+                        <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
                             {minisiteMode !== 'embed' &&
                                 <div id="workspace_toolbar">
                                     <Breadcrumb {...this.props}/>

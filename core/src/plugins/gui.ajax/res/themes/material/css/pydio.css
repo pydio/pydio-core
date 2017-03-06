@@ -3517,7 +3517,7 @@ body,
 .material-list.files-list {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
-.info-panel-open .material-list.files-list {
+.info-panel-open .material-list.main-files-list {
   margin-right: 250px;
 }
 #orbit_content {
