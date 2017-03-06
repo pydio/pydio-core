@@ -239,6 +239,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('assemble-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask('type:js', [
+        'copy',
         'babel:dist',
         'uglify:js',
         'babel:materialui',
