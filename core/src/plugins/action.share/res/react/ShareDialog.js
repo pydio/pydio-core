@@ -460,7 +460,7 @@
             if(!this.context.isReadonly()){
                 const excludes = this.props.users.map(function(u){return u.ID});
                 var usersInput = (
-                    <UsersCompleter.Input
+                    <PydioComponents.UsersCompleter
                         className="share-form-users"
                         fieldLabel={this.context.getMessage('34')}
                         renderSuggestion={this.completerRenderSuggestion}

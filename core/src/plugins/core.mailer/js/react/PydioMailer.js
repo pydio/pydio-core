@@ -163,7 +163,7 @@
                     <h3>{this.props.panelTitle}</h3>
                     {errorDiv}
                     <div className="users-block">
-                        <UsersCompleter.Input
+                        <PydioComponents.UsersCompleter
                             fieldLabel={this.getMessage('8')}
                             usersOnly={true}
                             existingOnly={true}

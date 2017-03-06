@@ -30,7 +30,7 @@
             <js file="plugins/action.share/res/build/model/ShareActions.js" className="ShareActions"/>
             <js file="plugins/action.share/res/build/ShareTemplates.js" className="ShareTemplates" depends="React,PydioWorkspaces,PydioComponents,PydioMenus"/>
             <js file="plugins/action.share/res/build/ShareInfoPanel.js" className="ShareInfoPanel" depends="React,ReactModelShare"/>
-            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,UsersCompleter"/>
+            <js file="plugins/action.share/res/build/ShareDialog.js" className="ShareDialog" depends="React,ReactModelShare,PydioForm,PydioComponents"/>
             <js file="plugins/action.share/res/build/UserShares.js" className="UserShares" depends="React,PydioComponents"/>
         </resources>
     </client_settings>
