@@ -3,7 +3,8 @@
     <class_definition filename="plugins/gui.mobile/MobileGuiPlugin.php" classname="Pydio\Gui\MobileGuiPlugin"/>
     <client_settings>
         <resources>
-            <i18n namespace="mobile_gui" path="plugins/gui.mobile/i18n"/>
+            <i18n namespace="mobile_gui" path="plugins/gui.mobile/res/i18n"/>
+            <js className="MobileExtensions" file="plugins/gui.mobile/res/build/mobile-build.js" depends="React"/>
         </resources>
     </client_settings>
 	<registry_contributions>
@@ -38,12 +39,8 @@
             </action>
         </actions>
 		<client_configs uuidAttr="name">
-			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
-				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
-				<script type="text/javascript">
-					window.ajxpMobile = true;
-				</script>
-			]]></template>
+            <template name="mobile_ext" element="body" position="bottom" namespace="MobileExtensions" component="Template"/>
+
             <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'><![CDATA[
             <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
                 <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>
