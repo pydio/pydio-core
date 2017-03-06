@@ -328,77 +328,37 @@
             type:React.PropTypes.string,
             menus: React.PropTypes.object
         },
-        getInitialState(){
-            return {showMenu:false};
-        },
-        showMenu: function () {
-            this.setState({showMenu: true});
-        },
-        /****************************/
-        /* WARNING: PROTOTYPE CODE
-         */
-        hideMenu: function(event){
-            if(event && ( event.target.hasClassName('mui-icon-button') || event.target.up('.mui-icon-button'))){
-                var tg = event.target.hasClassName('mui-icon-button') ? event.target : event.target.up('.mui-icon-button');
-                if(this.refs["menuButton"] && tg == ReactDOM.findDOMNode(this.refs["menuButton"])){
-                    return;
-                }
-            }
-            this.setState({showMenu: false});
-        },
-        componentDidMount: function(){
-            this._observer = this.hideMenu.bind(this);
-            document.observe('click', this._observer);
-        },
-        componentWillUnmount: function(){
-            document.stopObserving('click', this._observer);
-        },
-        /*
-        /* END PROTOTYPE CODE
-        /***************************/
 
-        menuClicked:function(event, index, menuItem){
-            if(menuItem.payload){
-                menuItem.payload();
-            }
-            this.hideMenu();
-        },
         renderMenu: function(){
             if (!this.props.menus || !this.props.menus.length) {
                 return null;
             }
-            var menuAnchor = <ReactMUI.IconButton ref="menuButton" iconClassName="icon-ellipsis-vertical" onClick={this.showMenu}/>;
-            if(this.state.showMenu) {
-                const menuItems = this.props.menus.map(function(m){
-                    var text = m.text;
-                    if(m.checked){
-                        text = <span><span className="icon-check"/>{m.text}</span>;
-                    }
-                    return {text:text, payload:m.callback};
-                });
-                var menuBox = <ReactMUI.Menu onItemClick={this.menuClicked} zDepth={0} menuItems={menuItems}/>;
-            }
-            return (
-                <div className="user-badge-menu-box">
-                    {menuAnchor}
-                    {menuBox}
-                </div>
+            const menuItems = this.props.menus.map(function(m){
+                let rightIcon;
+                if(m.checked){
+                    rightIcon = <span className="icon-check"/>;
+                }
+                return (
+                    <MaterialUI.MenuItem
+                        primaryText={m.text}
+                        onTouchTap={m.callback}
+                        rightIcon={rightIcon}/>
+                );
+            });
+            const iconStyle = {fontSize: 18};
+            return(
+                <MaterialUI.IconMenu
+                    iconButtonElement={<MaterialUI.IconButton style={{padding: 16}} iconStyle={iconStyle} iconClassName="icon-ellipsis-vertical"/>}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                    targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                >
+                    {menuItems}
+                </MaterialUI.IconMenu>
             );
         },
 
         render: function () {
             var avatar;
-            /*
-            if (this.props.avatar) {
-                avatar = (
-                    <span className="user-badge-avatar">
-                        <img src="" width={40} height={40}
-                             src={global.pydio.Parameters.get('ajxpServerAccess')+'&get_action=get_binary_param&binary_id='+this.props.avatar}/>
-                    </span>
-                );
-            }else{
-                avatar = <span className="icon-user"/>;
-            }*/
             if(this.props.type == 'group') {
                 avatar = <span className="avatar icon-group"/>;
             }else if(this.props.type == 'temporary') {
@@ -452,7 +412,7 @@
         completerRenderSuggestion: function(userObject){
             return (
                 <UserBadge
-                    label={userObject.getExtendedLabel() || userObject.getLabel()}
+                    label={(userObject.getExtendedLabel() || userObject.getLabel())}
                     avatar={userObject.getAvatar()}
                     type={userObject.getGroup() ? 'group' : (userObject.getTemporary()?'temporary' : (userObject.getExternal()?'tmp_user':'user'))}
                 />
