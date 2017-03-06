@@ -64,6 +64,23 @@ class MobileGuiPlugin extends Plugin
 
     }
 
+    public function filterHTML(ContextInterface $ctx, &$htmlContent){
+
+        $confs = $this->getConfigs();
+        $iosAppId = $confs['IOS_APP_ID'];
+        $iosAppIcon = $confs['IOS_APP_ICON'];
+        $androidAppId = $confs['ANDROID_APP_ID'];
+        $androidAppIcon = $confs['ANDROID_APP_ICON'];
+        $meta = "    
+            <meta name=\"apple-itunes-app\" content=\"app-id=$iosAppId\"/>
+            <meta name=\"google-play-app\" content=\"app-id=$androidAppId\"/>
+            <link rel=\"apple-touch-icon\" href=\"$iosAppIcon\">
+            <link rel=\"android-touch-icon\" href=\"$androidAppIcon\" />
+        ";
+        $htmlContent = str_replace("</head>", "$meta\n</head>", $htmlContent);
+
+    }
+
     /**
      * @param ContextInterface $ctx
      * @return bool
