@@ -4,6 +4,15 @@ export default React.createClass({
 
     componentDidMount: function(){
 
+        // @TODO
+        // PASS THIS URL TO THE NATIVE APP FOR AUTO REGISTRATION OF THE SERVER
+        var currentHref = document.location.href;
+        $("ajxpserver-redir").href = cleanURL(currentHref).replace("http://", "ajxpserver://").replace("https://", "ajxpservers://");
+        if(currentHref.indexOf("#") > -1){
+            currentHref = currentHref.substr(0, currentHref.indexOf("#"));
+        }
+
+
         global.ajxpMobile = true;
         global.pydioSmartBanner = new SmartBanner({
             daysHidden: 15,   // days to hide banner after close button is clicked (defaults to 15)

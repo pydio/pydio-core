@@ -66,6 +66,11 @@ class MobileGuiPlugin extends Plugin
 
     public function filterHTML(ContextInterface $ctx, &$htmlContent){
 
+        if (ApplicationState::hasMinisiteHash()) {
+            // Do not activate smart banner for minisites
+            return;
+        }
+
         $confs = $this->getConfigs();
         $iosAppId = $confs['IOS_APP_ID'];
         $iosAppIcon = $confs['IOS_APP_ICON'];
