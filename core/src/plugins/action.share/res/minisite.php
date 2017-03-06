@@ -14,13 +14,11 @@
         <!--[if IE 7]>
         <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
         <![endif]-->
-
-        <link rel="stylesheet" href="plugins/gui.ajax/res/themes/AJXP_THEME/css/animate-custom.css"/>
         <link rel="stylesheet" href="plugins/action.share/res/minisite.css"/>
         <style type="text/css">
 
         </style>
-        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/ajaxplorer_boot.js"></script>
+        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/pydio.boot.min.js"></script>
         <script type="text/javascript">
             var pydio, MessageHash={};
             var startParameters = {

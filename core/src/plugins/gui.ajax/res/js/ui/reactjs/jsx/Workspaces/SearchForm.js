@@ -494,7 +494,7 @@ let SearchForm = React.createClass({
                 <div className="search-results">
                     <PydioComponents.NodeListCustomProvider
                         ref="results"
-                        className={this.state.display !== 'small' ? 'main-file-list' : null}
+                        className={this.state.display !== 'small' ? 'files-list' : null}
                         elementHeight={elementHeight}
                         entryRenderIcon={renderIcon}
                         entryRenderActions={function(){return null}}
