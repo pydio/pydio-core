@@ -306,6 +306,7 @@ class RichClient extends Plugin
             if ($JSON_START_PARAMETERS) {
                 $content = str_replace("//AJXP_JSON_START_PARAMETERS", "startParameters = ".$JSON_START_PARAMETERS.";", $content);
             }
+            Controller::applyHook("tpl.filter_html", [$ctx, &$content]);
             $response->getBody()->write($content);
         }
 

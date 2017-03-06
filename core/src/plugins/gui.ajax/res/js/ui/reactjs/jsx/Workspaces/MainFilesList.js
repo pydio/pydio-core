@@ -316,7 +316,7 @@ let MainFilesList = React.createClass({
 
     render: function(){
 
-        let tableKeys, sortKeys, elementStyle, className = 'files-list layout-fill';
+        let tableKeys, sortKeys, elementStyle, className = 'files-list layout-fill main-files-list';
         let elementHeight, entryRenderSecondLine, elementsPerLine = 1, near;
         let dMode = this.state.displayMode;
         if(dMode.indexOf('grid-') === 0){

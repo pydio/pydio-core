@@ -7,6 +7,9 @@
         echo '<base href="'.$START_PARAMETERS["REBASE"].'"/>';
     }?>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <!-- Added automatically in the non-debug version -->
+    <meta name="apple-itunes-app" content="app-id=709275884">
+    <meta name="google-play-app" content="app-id=com.pydio.android.pydioPro">
     <link rel="icon" type="image/x-png" href="<?php print(AJXP_THEME_FOLDER);?>/images/html-folder.png">
     <!--[if IE 8]>
     <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
@@ -16,8 +19,6 @@
     <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
     <![endif]-->
     <?php
-    print($ADDITIONAL_FRAMEWORKS);
-
 $list = AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz_list.txt";
 $lines = file($list);
 foreach ($lines as $line){

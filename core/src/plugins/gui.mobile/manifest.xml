@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<guidriver name="ajxp_mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<guidriver id="gui.mobile" label="CONF_MESSAGE[Mobile]" description="CONF_MESSAGE[Template extending gui.ajax for small screen terminals.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <class_definition filename="plugins/gui.mobile/MobileGuiPlugin.php" classname="Pydio\Gui\MobileGuiPlugin"/>
+    <server_settings>
+        <global_param description="CONF_MESSAGE[iOS Application ID on the store]" label="CONF_MESSAGE[iOS Application ID]" name="IOS_APP_ID" type="string" default="709275884" expose="true"/>
+        <global_param description="CONF_MESSAGE[iOS Application Icon]" label="CONF_MESSAGE[iOS Application Icon]" name="IOS_APP_ICON" type="string" default="plugins/gui.mobile/res/icons/pydio-pro-icon.png" expose="true"/>
+        <global_param description="CONF_MESSAGE[Android Application ID]" label="CONF_MESSAGE[Android App ID]" name="ANDROID_APP_ID" type="string" default="com.pydio.android.pydioPro" expose="true"/>
+        <global_param description="CONF_MESSAGE[Android Application Icon]" label="CONF_MESSAGE[Android App Icon]" name="ANDROID_APP_ICON" type="string" default="plugins/gui.mobile/res/icons/pydio-pro-icon.png" expose="true"/>
+    </server_settings>
     <client_settings>
         <resources>
-            <i18n namespace="mobile_gui" path="plugins/gui.mobile/i18n"/>
+            <i18n namespace="mobile_gui" path="plugins/gui.mobile/res/i18n"/>
+            <js className="MobileExtensions" file="plugins/gui.mobile/res/build/mobile-build.js" depends="React"/>
+            <css file="plugins/gui.mobile/res/smart-app-banner.css" autoload="true"/>
         </resources>
     </client_settings>
 	<registry_contributions>
+        <hooks>
+            <serverCallback methodName="filterHTML" hookName="tpl.filter_html" pluginId="gui.mobile"/>
+        </hooks>
         <actions>
             <action name="ls_inline" dirDefault="true">
                 <gui text="32" title="32" src="fileopen.png" iconClass="icon-chevron-right"
@@ -38,12 +49,8 @@
             </action>
         </actions>
 		<client_configs uuidAttr="name">
-			<template name="mobile_extensions" element="head" position="bottom"><![CDATA[
-				<link type="text/css" rel="stylesheet" href="plugins/gui.mobile/ajxp-mobile.css" media="screen">
-				<script type="text/javascript">
-					window.ajxpMobile = true;
-				</script>
-			]]></template>
+            <template name="mobile_ext" element="body" position="bottom" namespace="MobileExtensions" component="Template"/>
+
             <template_part ajxpClass="AjxpPane" ajxpId="orbit_content" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'><![CDATA[
             <div id="browser" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop"}'>
                 <div id="topPane" ajxpClass="AjxpPane" ajxpOptions=''>

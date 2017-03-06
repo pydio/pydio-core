@@ -19,12 +19,14 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"1.ios" => "Für den Zugriff auf %s steht ein Nativer iOs Client zu Verfügung.",
-"2.ios" => "Ich habe den Client bereits. Öffne ihn und füge diesen Server zu meinen Remote Servern hinzu.",
-"3.ios" => "Ich habe den Client nicht. Jetzt im App Store öffnen!",
-"4.ios" => "Ich habe kein Interesse, lass mich die Webversion von %s benutzen.",
-"1.android" => "Für den Zugriff auf %s steht ein Nativer Android Client zu Verfügung.",
-"2.android" => "Ich habe den Client bereits. Öffne ihn und füge diesen Server zu meinen Remote Servern hinzu.",
-"3.android" => "Ich habe den Client nicht. Jetzt im Play Store öffnen!",
-"4.android" => "Ich habe kein Interesse, lass mich die Webversion von %s benutzen.",
+"Mobile" => "Mobile",
+"Template extending gui.ajax for small screen terminals." => "Extension de gui.ajax pour les petits écrans.",
+    "1.ios" => "Il existe un client natif pour accéder à %s sur l'iPhone/iPad.",
+    "2.ios" => "Je l'ai déjà, l'ouvrir et ajouter ce serveur à mes serveurs distants",
+    "3.ios" => "Je ne l'ai pas, envoyez moi vers l'App Store maintenant !",
+    "4.ios" => "Je n'en veux pas, laissez moi utiliser la version web de %s.",
+    "1.android" => "Il existe un client natif pour accéder à %s sur Android.",
+    "2.android" => "Je l'ai déjà, l'ouvrir et ajouter ce serveur à mes serveurs distants",
+    "3.android" => "Je ne l'ai pas, envoyez moi vers Google Play Store maintenant!",
+    "4.android" => "Je n'en veux pas, laissez moi utiliser la version web de %s.",
 );
