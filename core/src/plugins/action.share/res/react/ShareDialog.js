@@ -400,12 +400,12 @@
                 this.props.onUserUpdate('remove', entry.ID, entry);
             }.bind(this));
         },
-        valueSelected: function(id, label, type){
+        valueSelected: function(userObject){
             var newEntry = {
-                ID: id,
-                RIGHT:'r',
-                LABEL: label,
-                TYPE:type
+                ID      : userObject.getId(),
+                RIGHT   :'r',
+                LABEL   : userObject.getLabel(),
+                TYPE    : userObject.getType()
             };
             this.props.onUserUpdate('add', newEntry.ID, newEntry);
         },

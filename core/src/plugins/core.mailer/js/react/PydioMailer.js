@@ -100,9 +100,9 @@
             this.setState({message:event.currentTarget.getValue()});
         },
 
-        addUser: function(userId, userLabel, type, userObject){
+        addUser: function(userObject){
             var users = this.state.users;
-            users[userId] = userObject;
+            users[userObject.getId()] = userObject;
             this.setState({users:users, errorMessage:null});
         },
 

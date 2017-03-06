@@ -105,7 +105,6 @@
             this.setState({loading:this.state.loading + 1});
             PydioUsers.Client.authorizedUsersStartingWith(input, function(users){
                 this.setState({loading:this.state.loading - 1});
-                console.log(users);
                 if(disallowTemporary){
                     users = users.filter(function(user){
                         return !user.getTemporary();
@@ -147,7 +146,6 @@
 
         onCompleterRequest: function(value, index){
 
-            console.log(value, index);
             if(index === -1){
                 this.state.dataSource.map(function(entry){
                     if(entry.text === value){
@@ -155,16 +153,21 @@
                     }
                 });
                 if(value && !value.userObject && this.props.freeValueAllowed){
-                    this.props.onValueSelected(value, value, '');
+                    const fake = new PydioUsers.User(value, value, 'user');
+                    this.props.onValueSelected(fake);
                     return;
                 }
             }
             if(value && value.userObject){
                 const object = value.userObject;
                 if(object.getTemporary()){
-                    this.setState({createUser: object.getLabel()});
+                    if(this.props.freeValueAllowed){
+                        this.props.onValueSelected(object);
+                    }else{
+                        this.setState({createUser: object.getLabel()});
+                    }
                 }else{
-                    this.props.onValueSelected(object.getId(), object.getLabel(), object.getType());
+                    this.props.onValueSelected(object);
                 }
                 this.setState({searchText: '', dataSource:[]});
             }
@@ -184,7 +187,7 @@
                 }
                 var display = values[prefix + 'USER_DISPLAY_NAME'] || id;
                 var fakeUser = new PydioUsers.User(id, display, 'user');
-                this.props.onValueSelected(id, display, 'user', fakeUser);
+                this.props.onValueSelected(fakeUser);
                 this.setState({createUser:null});
             }.bind(this));
 
