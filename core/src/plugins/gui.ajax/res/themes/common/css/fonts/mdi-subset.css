@@ -607,3 +607,23 @@
 .mdi-cart-plus:before {
     content: "\f208";
 }
+
+.mdi-content-save:before {
+  content: "\f289";
+}
+
+.mdi-undo:before {
+  content: "\f639";
+}
+
+.mdi-redo:before {
+  content: "\f53d";
+}
+
+.mdi-format-list-numbers:before {
+  content: "\f370";
+}
+
+.mdi-wrap:before {
+  content: "\f6a3";
+}

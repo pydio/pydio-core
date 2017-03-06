@@ -1,6 +1,3 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-
 import { soundManager } from 'soundmanager2';
 import { threeSixtyPlayer } from '../../../sm/360-player/script/360player';
 

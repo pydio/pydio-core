@@ -1,3 +1,7 @@
+.CodeMirror {
+	height: 100%;
+}
+
 .CodeMirror-line-numbers {
 	width: 2.2em;
 	color: #aaa;
