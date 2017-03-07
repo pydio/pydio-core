@@ -1,40 +1,26 @@
 (function(global){
 
-    let pydio = global.pydio;
+    const pydio = global.pydio;
+    const MessageHash = pydio.MessageHash;
 
     class Callbacks{
 
         static getTimestamp(){
 
-            var onLoad = function(oForm){
-                $(oForm).getElementsBySelector('span[id="timestamp_message"]')[0].innerHTML = "CONF_MESSAGE[msgBox1]";
-            };
-            var onok = function(){
-                var oForm = modal.getForm();
-                var userSelection = pydio.getUserSelection();
-                var selected = userSelection.getFileNames()
+            const userSelection = pydio.getUserSelection();
 
-                var conn = new Connexion();
-                conn.addParameter('get_action', 'get_timestamp');
-                conn.addParameter('file', selected);
-                conn.addParameter('dir', userSelection.getContextNode().getPath());
-                conn.onComplete = function(transport){
-                    this.parseXmlMessage(transport.responseXML);
-                };
-                conn.sendAsync();
-
-                hideLightBox(true);
-                pydio.fireContextRefresh()
-                return false;
-            };
-
-            var closeFunc = function(){
-                hideLightBox();
-                return false;
-            };
-
-            modal.showDialogForm('Horodater', 'timestamp_form', onLoad, onok);
-
+            pydio.UI.openComponentInModal('PydioReactUI', 'ConfirmDialog', {
+                message         : MessageHash['timestamp.5'],
+                dialogTitleId   : 443,
+                validCallback:function(){
+                    PydioApi.getClient().request({
+                        get_action: 'get_timestamp',
+                        file      : userSelection.getUniqueNode().getPath()
+                    },  function(transport){
+                        PydioApi.getClient().parseXmlMessage(transport.responseXML);
+                    });
+                }
+            });
 
         }
 

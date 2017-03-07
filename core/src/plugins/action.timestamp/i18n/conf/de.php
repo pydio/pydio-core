@@ -21,7 +21,6 @@
 $mess=array(
 "timestamp" => "Universign",
 "Allow timestamp files with Universign." => "Dokumente mit Universign digital signieren und mit einem Zeitstempel versehen.",
-"msgBox1" => "Soll diese Datei wirklich mit Universign signiert werden?",
 "URL" => "URL zum Universign API Webservice",
 "Timestamp provider API URL" => "Universign-API URL",
 "User Mail" => "E-Mail-Adresse",
