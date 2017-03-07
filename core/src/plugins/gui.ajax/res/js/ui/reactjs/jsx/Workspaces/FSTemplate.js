@@ -48,11 +48,12 @@ let FSTemplate = React.createClass({
         return connectDropTarget(
             <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
                 <PydioReactUI.AsyncComponent
+                    className="left-panel"
                     namespace="LeftNavigation"
                     componentName="PinnedLeftPanel"
                     pydio={this.props.pydio}
                 />
-                <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
+                <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
                             <Breadcrumb {...this.props}/>
