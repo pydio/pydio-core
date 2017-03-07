@@ -56,8 +56,6 @@ export default function(PydioComponent, pydio){
 
             const theme = MaterialUI.Style.getMuiTheme(themeCusto);
 
-            console.log(theme);
-
             return (
                 <MaterialUI.MuiThemeProvider muiTheme={theme}>
                     <PydioComponent {...this.props}/>
