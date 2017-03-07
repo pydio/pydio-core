@@ -11,6 +11,7 @@
             <js file="plugins/editor.soundmanager/sm/360-player/script/berniecode-animator.js" className="Animator"/>
             <js file="plugins/editor.soundmanager/res/build/PydioSoundManager.js" className="PydioSoundManager"/>
             <i18n namespace="sm_editor" path="plugins/editor.soundmanager/i18n"/>
+            <css file="plugins/editor.soundmanager/soundmanager.css" />
             <css file="plugins/editor.soundmanager/sm/360-player/360player.css"/>
             <css file="plugins/editor.soundmanager/sm/360-player/360player-visualization.css"/>
         </resources>
