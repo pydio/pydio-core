@@ -3159,19 +3159,19 @@ body,
 .react-mui-context #info_panel {
   right: -250px;
 }
-.react-mui-context.info-panel-open #info_panel {
+.react-mui-context .info-panel-open #info_panel {
   right: 0;
 }
 @media only screen and (max-width: 420px) {
-  .react-mui-context.info-panel-open #info_panel {
+  .react-mui-context .info-panel-open #info_panel {
     right: -250px;
   }
 }
-.react-mui-context.info-panel-open .material-list.main-files-list {
+.react-mui-context .info-panel-open .material-list.main-files-list {
   margin-right: 250px;
 }
 @media only screen and (max-width: 420px) {
-  .react-mui-context.info-panel-open .material-list.main-files-list {
+  .react-mui-context .info-panel-open .material-list.main-files-list {
     margin-right: 0;
   }
 }
