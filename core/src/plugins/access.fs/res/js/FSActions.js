@@ -18,7 +18,7 @@
                     dirname:value
                 });
             };
-            pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
                 dialogTitleId:154,
                 legendId:155,
                 fieldLabelId:173,
@@ -34,7 +34,7 @@
                     filename:value
                 });
             };
-            pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
                 dialogTitleId:156,
                 legendId:157,
                 fieldLabelId:174,
@@ -49,7 +49,7 @@
             if(repoHasRecycle && pydio.getContextNode().getAjxpMime() != "ajxp_recycle"){
                 message = MessageHash[176];
             }
-            pydio.UI.openComponentInModal('FSActions', 'ConfirmDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'ConfirmDialog', {
                 message:message,
                 dialogTitleId: 7,
                 validCallback:function(){
@@ -184,7 +184,7 @@
 
         static emptyRecycle(){
 
-            pydio.UI.openComponentInModal('FSActions', 'ConfirmDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'ConfirmDialog', {
                 message:MessageHash[177],
                 dialogTitleId: 220,
                 validCallback:function(){
@@ -220,7 +220,7 @@
                 zipName = buff + "-" + index; index ++ ;
             }
 
-            pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
                 dialogTitleId:313,
                 legendId:314,
                 fieldLabelId:315,
@@ -254,7 +254,7 @@
             }
             link = url + '?goto=' + repoId + encodeURIComponent(pydio.getUserSelection().getUniqueNode().getPath());
 
-            pydio.UI.openComponentInModal('FSActions', 'PromptDialog', {
+            pydio.UI.openComponentInModal('PydioReactUI', 'PromptDialog', {
                 dialogTitleId:369,
                 fieldLabelId:296,
                 defaultValue:link,
@@ -372,29 +372,6 @@
         }
 
     }
-
-    let EmptyDialog = React.createClass({
-
-        mixins:[
-            PydioReactUI.ActionDialogMixin,
-            PydioReactUI.CancelButtonProviderMixin,
-            PydioReactUI.SubmitButtonProviderMixin
-        ],
-
-        getDefaultProps: function(){
-            return {
-                dialogTitle: "Title",
-                dialogIsModal: true
-            };
-        },
-        submit(){
-            this.dismiss();
-        },
-        render: function(){
-            return <div>Empty</div>;
-        }
-
-    });
 
     let UploadDialog = React.createClass({
 
@@ -701,77 +678,6 @@
 
     });
 
-    let ConfirmDialog = React.createClass({
-
-        propTypes: {
-            message: React.PropTypes.string,
-            validCallback: React.PropTypes.func
-        },
-
-        mixins:[
-            PydioReactUI.ActionDialogMixin,
-            PydioReactUI.CancelButtonProviderMixin,
-            PydioReactUI.SubmitButtonProviderMixin
-        ],
-
-        getDefaultProps: function(){
-            return {
-                dialogTitle: 'Confirm',
-                dialogIsModal: true
-            };
-        },
-        submit(){
-            this.props.validCallback();
-            this.dismiss();
-        },
-        render: function(){
-            return <div>{this.props.message}</div>;
-        }
-
-    });
-
-    let PromptDialog = React.createClass({
-
-        propTypes: {
-            dialogTitleId:React.PropTypes.integer,
-            legendId:React.PropTypes.integer,
-            fieldLabelId:React.PropTypes.integer,
-            submitValue:React.PropTypes.func.isRequired,
-            defaultValue:React.PropTypes.string,
-            defaultInputSelection:React.PropTypes.string
-        },
-
-        mixins:[
-            PydioReactUI.ActionDialogMixin,
-            PydioReactUI.CancelButtonProviderMixin,
-            PydioReactUI.SubmitButtonProviderMixin
-        ],
-
-        getDefaultProps: function(){
-            return {
-                dialogTitle: '',
-                dialogIsModal: true
-            };
-        },
-        submit(){
-            this.props.submitValue(this.refs.input.getValue());
-            this.dismiss();
-        },
-        render: function(){
-            return (
-                <div>
-                    <div className="dialogLegend">{MessageHash[this.props.legendId]}</div>
-                    <MaterialUI.TextField
-                        floatingLabelText={MessageHash[this.props.fieldLabelId]}
-                        ref="input"
-                        onKeyDown={this.submitOnEnterKey}
-                        defaultValue={this.props.defaultValue}
-                    />
-                </div>
-            );
-        }
-
-    });
 
     let ns = global.FSActions || {};
     if(pydio.UI.openComponentInModal){
@@ -782,8 +688,7 @@
     ns.Listeners = Listeners;
 
     ns.MultiDownloadDialog = MultiDownloadDialog;
-    ns.ConfirmDialog = ConfirmDialog;
-    ns.PromptDialog = PromptDialog;
+
     ns.TreeDialog = TreeDialog;
     ns.UploadDialog = UploadDialog;
     global.FSActions = ns;
