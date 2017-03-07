@@ -19,7 +19,7 @@ import PopupMenu from './PopupMenu'
             let items;
             if(node){
                 let dm = pydio.getContextHolder();
-                if(dm.isUnique() && dm.getUniqueNode() === node){
+                if(dm.getSelectedNodes().indexOf(node) !== -1){
                     this.openMenu('selectionContext', position);
                 }else{
                     pydio.observeOnce("actions_refreshed", function(dataModel){
