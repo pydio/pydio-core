@@ -18,7 +18,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import React from 'react';
 import Player from './360Player';
 
 class PydioSoundManager extends React.Component {

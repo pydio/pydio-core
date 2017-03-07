@@ -62,8 +62,6 @@
                 return this.getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed);
             }
         }
-
-
     }
 
     class SizeComputer{
@@ -428,7 +426,7 @@
         },
 
         render: function(){
-            
+
             if(!this.state.currentNode || this.props.showLoader){
                 return (
                     <PydioComponents.AbstractEditor {...this.props} actions={[]}>
@@ -456,7 +454,7 @@
     global.PydioDiaporama = {
         Editor: Editor,
         SelectionModel: SelectionModel,
-        UrlProvider:UrlProvider
+        UrlProvider: UrlProvider
     };
 
 })(window)
