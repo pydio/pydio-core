@@ -100,9 +100,9 @@
             this.setState({message:event.currentTarget.getValue()});
         },
 
-        addUser: function(userId, userLabel, type, userObject){
+        addUser: function(userObject){
             var users = this.state.users;
-            users[userId] = userObject;
+            users[userObject.getId()] = userObject;
             this.setState({users:users, errorMessage:null});
         },
 
@@ -163,7 +163,7 @@
                     <h3>{this.props.panelTitle}</h3>
                     {errorDiv}
                     <div className="users-block">
-                        <UsersCompleter.Input
+                        <PydioComponents.UsersCompleter
                             fieldLabel={this.getMessage('8')}
                             usersOnly={true}
                             existingOnly={true}

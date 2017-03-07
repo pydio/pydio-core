@@ -2,7 +2,7 @@
 <ajxp_plugin id="action.timestamp"  enabled="false" label="CONF_MESSAGE[timestamp]" description="CONF_MESSAGE[Allow timestamp files with Universign.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <plugin_info>
         <core_relation packaged="true" tested_version="7.0"/>
-        <plugin_author>FDecourt</plugin_author>
+        <plugin_author>FDecourt / Charles du Jeu</plugin_author>
         <plugin_version>1.0</plugin_version>
     </plugin_info>
 	<class_definition filename="plugins/action.timestamp/TimestampCreator.php" classname="Pydio\Action\Timestamp\TimestampCreator"/>
@@ -35,12 +35,6 @@
 
 			<processing>
                 <clientCallback module="TimestampActions.Callbacks.getTimestamp" prepareModal="true"/>
-				<clientForm id="timestamp_form"><![CDATA[
-				<div id="timestamp_form" action="get_timestamp" box_width="200">
-				<span id="timestamp_message"></span>
-				</div>				]]></clientForm>
-
-
 				<serverCallback methodName="switchAction"></serverCallback>
 				</processing>
 			</action>

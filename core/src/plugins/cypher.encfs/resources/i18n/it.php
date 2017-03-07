@@ -24,5 +24,9 @@ $mess=array(
 "3" => "Cartella Decifratore",
 "4" => "Dati della cartella per la decifratura",
 "5" => "Cartella Cifratore",
-"6" => "Dati della cartella per la cifratura"
+"6" => "Dati della cartella per la cifratura",
+    "7" => "Enter the encryption key you have chosen when first encrypting this folder.",
+    "8" => "Encryption Key",
+    "9" => "Confirm Encryption Key",
+    "10" => "Choose an encryption key to make your data inaccessible by anyone but you. Be aware that if you loose the key, your data will be lost forever!",
 );

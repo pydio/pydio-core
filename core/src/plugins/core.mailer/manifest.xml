@@ -20,7 +20,7 @@
     <client_settings>
         <resources>
             <i18n namespace="core.mailer" path="plugins/core.mailer/i18n"/>
-            <js className="PydioMailer" file="plugins/core.mailer/js/build/PydioMailer.js" depends="React,PydioComponents,PydioForm,UsersCompleter"/>
+            <js className="PydioMailer" file="plugins/core.mailer/js/build/PydioMailer.js" depends="React,PydioComponents,PydioForm"/>
         </resources>
     </client_settings>
     <registry_contributions>

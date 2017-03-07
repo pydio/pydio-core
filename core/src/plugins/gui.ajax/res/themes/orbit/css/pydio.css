@@ -83,14 +83,16 @@ html {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
-  user-select: none;
+  -ms-user-select: none;
+      user-select: none;
 }
 input,
 textarea,
 .selectable {
   -khtml-user-select: auto;
   -webkit-user-select: auto;
-  user-select: auto;
+  -ms-user-select: auto;
+      user-select: auto;
   -moz-user-select: text;
 }
 input {
@@ -98,6 +100,9 @@ input {
 }
 *::-moz-focus-inner {
   border: none;
+}
+.no_select_bg::-moz-selection {
+  background: transparent;
 }
 .no_select_bg::selection {
   background: transparent;
@@ -134,8 +139,6 @@ span.letter_badge {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
-  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -150,8 +153,6 @@ kbd {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
-  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -177,23 +178,31 @@ kbd {
 }
 .vertical_layout {
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
   -webkit-flex-direction: column;
 }
 .vertical_layout > * {
-  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 .horizontal_layout {
   display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
   -webkit-flex-direction: row;
-  align-items: stretch;
+  -ms-flex-align: stretch;
+      align-items: stretch;
   -webkit-align-items: stretch;
 }
 .vertical_fit {
-  flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   -webkit-flex: 1;
   overflow-y: hidden;
 }
@@ -210,19 +219,33 @@ kbd {
   display: table-cell;
 }
 .flexbox {
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-flow: column;
+  -webkit-flex-flow: column;
+      -ms-flex-flow: column;
+          flex-flow: column;
 }
 .flexbox .row {
-  flex: 0 1 30px;
+  -webkit-flex: 0 1 30px;
+      -ms-flex: 0 1 30px;
+          flex: 0 1 30px;
 }
 .flexbox .row.header {
-  flex: 0 1 auto;
+  -webkit-flex: 0 1 auto;
+      -ms-flex: 0 1 auto;
+          flex: 0 1 auto;
 }
 .flexbox .row.content {
-  flex: 1 1 auto;
+  -webkit-flex: 1 1 auto;
+      -ms-flex: 1 1 auto;
+          flex: 1 1 auto;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
 }
 .text-right {
   text-align: right;
@@ -692,7 +715,6 @@ div#multiple_download_container div div a:hover {
   margin-bottom: 0;
   margin-top: 5px;
   background-position: center;
-  -moz-border-radius: 5px;
   border-radius: 5px;
 }
 #uploaderTextActions span.disabled {
@@ -843,6 +865,8 @@ div#multiple_download_container div div a:hover {
 }
 .left-panel .nav-list-entry {
   padding: 6px 1px 6px 16px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -851,7 +875,9 @@ div#multiple_download_container div div a:hover {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .nav-list-entry-icon {
-  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -865,6 +891,8 @@ div#multiple_download_container div div a:hover {
 }
 .left-panel .workspaces .workspace-entry {
   padding: 6px 1px 6px 16px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -873,7 +901,9 @@ div#multiple_download_container div div a:hover {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
-  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -932,6 +962,8 @@ div#multiple_download_container div div a:hover {
 }
 .left-panel .simple-provider .material-list-entry {
   padding: 6px 1px 6px 16px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -940,7 +972,9 @@ div#multiple_download_container div div a:hover {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .simple-provider .material-list-entry .material-list-icon {
-  flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -949,7 +983,9 @@ div#multiple_download_container div div a:hover {
   font-size: 1.2em;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text {
-  flex: 1;
+  -webkit-flex: 1;
+      -ms-flex: 1;
+          flex: 1;
   overflow: hidden;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text .material-list-line-1 > div {
@@ -1032,11 +1068,17 @@ div.pydio-tasks-panel.invisible {
 div.pydio-tasks-panel div.task {
   padding: 10px;
   border-bottom: 1px solid #f2f2f2;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: row;
+  -webkit-flex-direction: row;
+      -ms-flex-direction: row;
+          flex-direction: row;
 }
 div.pydio-tasks-panel div.task .task_texts {
-  flex: 5;
+  -webkit-flex: 5;
+      -ms-flex: 5;
+          flex: 5;
   max-width: 296px;
 }
 div.pydio-tasks-panel div.task .task_texts div {
@@ -1289,7 +1331,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component__main-icon--resting {
   -webkit-transform: scale(1) rotate(360deg);
   transform: scale(1) rotate(360deg);
-  -webkit-transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
+  transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
   transition: transform 150ms cubic-bezier(0.4, 0, 1, 1);
 }
 .mfb-component__child-icon,
@@ -1824,7 +1866,6 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /**
  * Apply this class to the html tag when developing the slide-in button
  */
-/*# sourceMappingURL=mfb.css.map */
 .mfb-component__button--child {
   height: 40px;
   width: 40px;
@@ -2798,9 +2839,11 @@ div.dialogButtons.inlineEdition input {
   line-height: 18px;
 }
 .flexbox #browser {
-  flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
   -webkit-flex-direction: row;
-  align-items: stretch;
+  -ms-flex-align: stretch;
+      align-items: stretch;
   -webkit-align-items: stretch;
 }
 #browser #topPane {

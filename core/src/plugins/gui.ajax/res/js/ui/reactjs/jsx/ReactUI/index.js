@@ -8,6 +8,9 @@ import ActionDialogMixin from './modal/ActionDialogMixin'
 import CancelButtonProviderMixin from './modal/CancelButtonProviderMixin'
 import SubmitButtonProviderMixin from './modal/SubmitButtonProviderMixin'
 import Modal from './modal/Modal'
+import ConfirmDialog from './modal/ConfirmDialog'
+import PromptDialog from './modal/PromptDialog'
+
 import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
@@ -29,6 +32,9 @@ window.PydioReactUI = {
     SubmitButtonProviderMixin   : SubmitButtonProviderMixin,
     AbstractDialogModifier      : AbstractDialogModifier,
     Modal                       : Modal,
+    ConfirmDialog               : ConfirmDialog,
+    PromptDialog                : PromptDialog,
+
     Loader                      : Loader,
     Router                      : Router,
     MessageBar                  : MessageBar,
