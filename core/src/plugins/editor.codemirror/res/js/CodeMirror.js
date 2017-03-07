@@ -96,7 +96,6 @@ class Editor extends React.Component {
 				if (nextProps.options.hasOwnProperty(optionName)) {
                     let optionVal = nextProps.options[optionName]
                     this.codeMirror.setOption(optionName, optionVal);
-                    break;
 				}
             }
 		}
