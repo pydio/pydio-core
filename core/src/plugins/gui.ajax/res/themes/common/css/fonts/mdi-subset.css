@@ -627,3 +627,23 @@
 .mdi-wrap:before {
   content: "\f6a3";
 }
+
+.mdi-menu:before {
+    content: "\f44e";
+}
+
+.mdi-menu-down:before {
+    content: "\f44f";
+}
+
+.mdi-menu-left:before {
+    content: "\f450";
+}
+
+.mdi-menu-right:before {
+    content: "\f451";
+}
+
+.mdi-menu-up:before {
+    content: "\f452";
+}

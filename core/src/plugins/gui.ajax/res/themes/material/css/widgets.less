@@ -13,6 +13,12 @@ body,#ajxp_desktop,#background-imager{
     }
   }
 
+  .drawer-open .left-panel{
+    @media @screenwidth-small{
+      transform: translateX(0px);
+    }
+  }
+
   .desktop-container{
     transition: @bezier_transition;
     margin-left: 250px;
@@ -29,6 +35,13 @@ body,#ajxp_desktop,#background-imager{
         font-size: 22px;
         line-height: 24px;
         color: @applicationPrimaryFontColor;
+      }
+      .drawer-button{
+        display: none;
+        @media @screenwidth-small{
+          display: block;
+          margin: 6px 0;
+        }
       }
     }
 

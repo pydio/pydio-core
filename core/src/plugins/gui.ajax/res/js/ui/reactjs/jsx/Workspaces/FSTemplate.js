@@ -19,12 +19,22 @@ let FSTemplate = React.createClass({
 
     getInitialState: function(){
         return {
-            infoPanelOpen: false
+            infoPanelOpen: false,
+            drawerOpen: false
         };
     },
 
     infoPanelContentChange(numberOfCards){
         this.setState({infoPanelOpen: (numberOfCards > 0)})
+    },
+
+    openDrawer: function(event){
+        event.stopPropagation();
+        this.setState({drawerOpen: true});
+    },
+
+    closeDrawer: function(){
+        this.setState({drawerOpen: false});
     },
 
     render: function () {
@@ -45,8 +55,12 @@ let FSTemplate = React.createClass({
             lineHeight: '30px'
         };
 
+        let classes = ['vertical_layout', 'vertical_fit', 'react-fs-template'];
+        if(this.state.infoPanelOpen) classes.push('info-panel-open');
+        if(this.state.drawerOpen) classes.push('drawer-open');
+
         return connectDropTarget(
-            <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
+            <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
                 <PydioReactUI.AsyncComponent
                     className="left-panel"
                     namespace="LeftNavigation"
@@ -56,6 +70,7 @@ let FSTemplate = React.createClass({
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
+                            <span className="drawer-button"><MaterialUI.IconButton iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...this.props}/>
                             <SearchForm {...this.props}/>
                         </div>
