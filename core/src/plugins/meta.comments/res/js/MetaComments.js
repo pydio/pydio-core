@@ -10,7 +10,6 @@
 
         render: function(){
             const c = this.props.comment;
-            const pydio = this.props.pydio;
             const {comment, pydio, removeComment} = this.props;
 
             const contents = comment.content.split('<br>').map(function(part){
