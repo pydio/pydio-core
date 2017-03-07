@@ -3164,13 +3164,17 @@ body,
 #info_panel .panelCard .primaryToolbar .mui-flat-button .mui-flat-button-label span.button-icon span.button-icon-label {
   font-size: 13px;
 }
-#info_panel .panelCard .primaryToolbar .action-open_with .mui-flat-button-label > span > span {
+#info_panel .panelCard .primaryToolbar .action-open_with button {
+  min-width: 0 !important;
+}
+#info_panel .panelCard .primaryToolbar .action-open_with button > div > span {
+  padding: 0 !important;
+}
+#info_panel .panelCard .primaryToolbar .action-open_with button > div > span > span .button-icon {
   display: none;
 }
-#info_panel .panelCard .primaryToolbar .action-open_with .mui-flat-button-label > span > span.icon-caret-down {
-  display: inline-block;
-  margin-top: 26px;
-  margin-left: -5px;
+#info_panel .panelCard .primaryToolbar .action-open_with button > div > span > span .icon-caret-down {
+  color: white;
 }
 #info_panel .panelCard .primaryToolbar .mui-menu {
   position: absolute;

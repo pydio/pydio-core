@@ -47,10 +47,8 @@ export default function(PydioComponent, pydio){
             const themeCusto = {
                 palette: {
                     primary1Color       : MaterialUI.Style.colors.blueGrey500,
-                    primary2Color       : MaterialUI.Style.colors.orange500,
-                    primary3Color       : MaterialUI.Style.colors.blue500,
-
-                    accent1Color        : MaterialUI.Style.colors.orange500
+                    primary2Color       : MaterialUI.Style.colors.deepOrange500,
+                    accent1Color        : MaterialUI.Style.colors.deepOrange500
                 }
             };
 

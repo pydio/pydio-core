@@ -20,7 +20,7 @@ let GenericFile = React.createClass({
 
         const themePalette = this.props.muiTheme.palette;
         const tBarStyle = {
-            backgroundColor: themePalette.primary3color
+            backgroundColor: themePalette.primary1Color
         };
 
         return (
