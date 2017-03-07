@@ -8,6 +8,7 @@ export default React.createClass({
         dialogTitleId:React.PropTypes.integer,
         legendId:React.PropTypes.integer,
         fieldLabelId:React.PropTypes.integer,
+        fieldType: React.PropTypes.oneOf(['text', 'password']),
         submitValue:React.PropTypes.func.isRequired,
         defaultValue:React.PropTypes.string,
         defaultInputSelection:React.PropTypes.string
@@ -22,7 +23,8 @@ export default React.createClass({
     getDefaultProps: function(){
         return {
             dialogTitle: '',
-            dialogIsModal: true
+            dialogIsModal: true,
+            fieldType: 'text'
         };
     },
     submit(){
@@ -38,6 +40,7 @@ export default React.createClass({
                     ref="input"
                     onKeyDown={this.submitOnEnterKey}
                     defaultValue={this.props.defaultValue}
+                    type={this.props.fieldType}
                 />
             </div>
         );
