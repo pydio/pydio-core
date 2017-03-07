@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_configs>
-        <template_part ajxpId="orbit_content" theme="material" namespace="PydioWorkspaces" component="FSTemplate" dependencies="PydioComponents,PydioTasks,LeftNavigation" props="{}"/>
+        <template_part
+            name="orbit_content"
+            ajxpId="orbit_content"
+            theme="material"
+            namespace="PydioWorkspaces"
+            component="FSTemplate"
+            dependencies="PydioComponents,PydioTasks,LeftNavigation"
+            props="{}"
+        />
     </client_configs>
 </registry_contributions>
