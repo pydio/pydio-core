@@ -3022,6 +3022,24 @@ body,
       -ms-flex: 1;
           flex: 1;
 }
+#orbit_content {
+  -webkit-font-smoothing: antialiased;
+  -ms-flex: 1;
+      flex: 1;
+  -webkit-flex: 1;
+  overflow-y: hidden;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  -webkit-flex-direction: column;
+}
+#orbit_content > * {
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
 .react-mui-context .left-panel {
   width: 250px;
 }
