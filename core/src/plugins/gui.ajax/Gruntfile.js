@@ -137,7 +137,6 @@ module.exports = function(grunt) {
                     ]
                 },
                 files: {
-                    "res/themes/orbit/css/pydio.css": "res/themes/orbit/css/pydio.less",
                     "res/themes/material/css/pydio.css": "res/themes/material/css/pydio.less"
                 }
             }
@@ -169,13 +168,6 @@ module.exports = function(grunt) {
                     spawn: false
                 }
             },
-            styles_orbit: {
-                files: ['res/themes/orbit/css/**/*.less'],
-                tasks: ['less', 'cssmin'],
-                options: {
-                    nospawn: true
-                }
-            },
             styles_material: {
                 files: ['res/themes/material/css/**/*.less'],
                 tasks: ['less', 'cssmin'],
@@ -195,12 +187,6 @@ module.exports = function(grunt) {
             },
             target: {
                 files: {
-                    'res/themes/orbit/css/allz.css': [
-                        'res/themes/orbit/css/pydio.css',
-                        'res/themes/common/css/animate-custom.css',
-                        'res/themes/common/css/chosen.css',
-                        'res/themes/common/css/media.css'
-                    ],
                     'res/themes/material/css/allz.css': [
                         'res/themes/material/css/pydio.css',
                         'res/themes/common/css/animate-custom.css',
@@ -244,7 +230,7 @@ module.exports = function(grunt) {
         'uglify:js',
         'babel:materialui',
         'babel:pydio',
-        //'env:build',
+        'env:build',
         'browserify',
         'env:dev',
         'uglify:nodejs'

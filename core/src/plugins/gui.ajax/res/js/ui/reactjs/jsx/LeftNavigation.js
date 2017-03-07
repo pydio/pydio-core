@@ -231,7 +231,7 @@
             }
 
             return (
-                <MaterialUI.Paper zDepth={1} rounded={false} className="user-widget primaryColorDarkerPaper">
+                <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
                     {avatar}
                     <div className="action_bar">
                         <MaterialUI.IconButton
@@ -272,20 +272,27 @@
         },
 
         render: function(){
+            const palette = this.props.muiTheme.palette;
+            const Color = MaterialUI.Color;
+            const widgetStyle = {
+                backgroundColor: Color(palette.primary1Color).darken(0.2)
+            };
             return (
-            <div className="left-panel vertical_fit vertical_layout">
-                <UserWidget pydio={this.props.pydio}/>
-                <UserWorkspacesList
-                    className={"vertical_fit"}
-                    style={{overflowY:'auto'}}
-                    pydio={this.props.pydio}
-                    workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
-                    showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}
-                />
-            </div>
+                <div className="left-panel vertical_fit vertical_layout">
+                    <UserWidget pydio={this.props.pydio} style={widgetStyle}/>
+                    <UserWorkspacesList
+                        className={"vertical_fit"}
+                        style={{overflowY:'auto'}}
+                        pydio={this.props.pydio}
+                        workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
+                        showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}
+                    />
+                </div>
             );
         }
     });
+
+    PinnedLeftPanel = MaterialUI.Style.muiThemeable()(PinnedLeftPanel);
 
     if(global.PydioTasks){
 

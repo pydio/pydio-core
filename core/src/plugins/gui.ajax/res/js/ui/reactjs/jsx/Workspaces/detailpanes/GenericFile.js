@@ -1,7 +1,7 @@
 import InfoPanelCard from './InfoPanelCard'
 import FilePreview from '../FilePreview'
 
-export default React.createClass({
+let GenericFile = React.createClass({
 
     render: function(){
 
@@ -18,6 +18,10 @@ export default React.createClass({
             {key:'date',label:'Modified on',value:formattedDate}
         ];
 
+        const themePalette = this.props.muiTheme.palette;
+        const tBarStyle = {
+            backgroundColor: themePalette.primary1Color
+        };
 
         return (
             <span>
@@ -29,7 +33,13 @@ export default React.createClass({
                         loadThumbnail={true}
                         richPreview={true}
                     />
-                    <PydioMenus.Toolbar className="primaryToolbar" renderingType="button-icon" toolbars={["info_panel", "info_panel_share"]} controller={this.props.pydio.getController()}/>
+                    <PydioMenus.Toolbar
+                        toolbarStyle={tBarStyle}
+                        className="primaryToolbar"
+                        renderingType="button-icon"
+                        toolbars={["info_panel", "info_panel_share"]}
+                        controller={this.props.pydio.getController()}
+                    />
                 </InfoPanelCard>
                 <InfoPanelCard title="File Information" standardData={stdData}/>
             </span>
@@ -37,3 +47,7 @@ export default React.createClass({
     }
 
 });
+
+GenericFile = MaterialUI.Style.muiThemeable()(GenericFile);
+
+export {GenericFile as default}

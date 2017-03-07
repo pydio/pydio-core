@@ -35,15 +35,13 @@ let Modal = React.createClass({
 
     render: function(){
         return (
-            <MaterialUI.MuiThemeProvider>
-                <AsyncModal
-                    ref="modal"
-                    open={this.state.open}
-                    componentData={this.state.modalData}
-                    onLoad={this.handleLoad}
-                    onDismiss={this.handleClose}
-                />
-            </MaterialUI.MuiThemeProvider>
+            <AsyncModal
+                ref="modal"
+                open={this.state.open}
+                componentData={this.state.modalData}
+                onLoad={this.handleLoad}
+                onDismiss={this.handleClose}
+            />
         );
     }
 });

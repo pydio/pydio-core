@@ -226,7 +226,6 @@ body,#ajxp_desktop,#background-imager{
     }
     .primaryToolbar{
       padding: 16px 4px 16px !important;
-      background-color: @primary-bar-color;
       align-items: flex-start;
       justify-content: center;
       .mui-flat-button{
@@ -252,14 +251,16 @@ body,#ajxp_desktop,#background-imager{
         }
       }
       .action-open_with{
-        .mui-flat-button-label{
-          > span{
+        button{
+          min-width: 0 !important;
+          > div > span{
+            padding: 0 !important;
             > span{
-              display: none;
-              &.icon-caret-down{
-                display: inline-block;
-                margin-top: 26px;
-                margin-left: -5px;
+              .button-icon{
+                display:none;
+              }
+              .icon-caret-down{
+                color: white;
               }
             }
           }
