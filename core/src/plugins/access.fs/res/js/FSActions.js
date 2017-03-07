@@ -152,15 +152,14 @@
 
         static download(){
             const userSelection = pydio.getUserSelection();
-            const props = {
-                actionName:'download',
-                selection : userSelection,
-                dialogTitleId:88
-            } ;
             if(( userSelection.isUnique() && !userSelection.hasDir() ) || pydio.Parameters.get('multipleFilesDownloadEnabled')){
                 PydioApi.getClient().downloadSelection(userSelection, 'download');
             } else {
-                pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', props);
+                pydio.UI.openComponentInModal('FSActions', 'MultiDownloadDialog', {
+                    actionName:'download',
+                    selection : userSelection,
+                    dialogTitleId:88
+                });
             }
         }
 
