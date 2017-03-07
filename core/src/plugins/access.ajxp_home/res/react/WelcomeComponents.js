@@ -478,7 +478,7 @@
             }
             let searchBlock;
             if(pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH")){
-                searchBlock = <HomeSearchEngine className="react-mui-context"/>;
+                //searchBlock = <HomeSearchEngine className="react-mui-context"/>;
             }
             return (
                 <div id="tutorial_dl_apps_pane">

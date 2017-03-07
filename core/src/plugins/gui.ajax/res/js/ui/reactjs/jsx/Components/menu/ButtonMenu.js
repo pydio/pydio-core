@@ -48,9 +48,9 @@ export default React.createClass({
             onTouchTap: this.showMenu
         };
         if(this.props.raised){
-            button = <ReactMUI.RaisedButton {...props}/>;
+            button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
         }else{
-            button = <ReactMUI.FlatButton {...props}/>;
+            button = <MaterialUI.FlatButton {...props}/>;
         }
         return (
             <span id={this.props.id} className={this.props.className}>

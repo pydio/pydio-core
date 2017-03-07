@@ -154,26 +154,24 @@
             const {minisiteMode} = this.props;
 
             return (
-                <MaterialUI.MuiThemeProvider>
-                    <div className="vertical_fit vertical_layout">
-                        <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
-                            {minisiteMode !== 'embed' &&
-                                <div id="workspace_toolbar">
-                                    <Breadcrumb {...this.props}/>
-                                </div>
-                            }
-                            <div id="main_toolbar">
-                                <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
-                                <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                                <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                                <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                <div className="vertical_fit vertical_layout">
+                    <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
+                        {minisiteMode !== 'embed' &&
+                            <div id="workspace_toolbar">
+                                <Breadcrumb {...this.props}/>
                             </div>
-                        </MaterialUI.Paper>
-                        {this.props.children}
-                        <PydioReactUI.Modal {...this.props} containerId="pydio_modal"/>
-                        <span className="context-menu"><PydioMenus.ContextMenu/></span>
-                    </div>
-                </MaterialUI.MuiThemeProvider>
+                        }
+                        <div id="main_toolbar">
+                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                            <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                        </div>
+                    </MaterialUI.Paper>
+                    {this.props.children}
+                    <PydioReactUI.Modal {...this.props} containerId="pydio_modal"/>
+                    <span className="context-menu"><PydioMenus.ContextMenu/></span>
+                </div>
             );
 
         }

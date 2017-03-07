@@ -42,16 +42,14 @@ let MessageBar = React.createClass({
 
     render: function(){
         return (
-            <MaterialUI.MuiThemeProvider>
-                <MaterialUI.Snackbar
-                    open={this.state.open}
-                    message={this.state.message || ''}
-                    onRequestClose={this.handleClose}
-                    autoHideDuration={4000}
-                    action={this.state.actionLabel}
-                    onActionTouchTap={this.state.actionCallback}
-                />
-            </MaterialUI.MuiThemeProvider>
+            <MaterialUI.Snackbar
+                open={this.state.open}
+                message={this.state.message || ''}
+                onRequestClose={this.handleClose}
+                autoHideDuration={4000}
+                action={this.state.actionLabel}
+                onActionTouchTap={this.state.actionCallback}
+            />
         );
     }
 });

@@ -11,7 +11,8 @@ import IconButtonPopover from './IconButtonPopover'
             toolbars:React.PropTypes.array,
             groupOtherList:React.PropTypes.array,
             renderingType:React.PropTypes.string,
-            controller:React.PropTypes.instanceOf(Controller)
+            controller:React.PropTypes.instanceOf(Controller),
+            toolbarStyle: React.PropTypes.object
         },
 
         componentDidMount: function(){
@@ -136,7 +137,7 @@ import IconButtonPopover from './IconButtonPopover'
             });
             let cName = this.props.className ? this.props.className : '';
             cName += ' ' + 'toolbar';
-            return <div className={cName} id={this.props.id}>{actions}</div>
+            return <div className={cName} style={this.props.toolbarStyle} id={this.props.id}>{actions}</div>
         }
 
     });

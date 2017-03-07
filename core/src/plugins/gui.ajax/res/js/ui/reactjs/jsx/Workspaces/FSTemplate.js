@@ -33,7 +33,19 @@ let FSTemplate = React.createClass({
         var isOver = this.props.isOver;
         var canDrop = this.props.canDrop;
 
-        let dropzone = connectDropTarget(
+        const appBarStyle = {
+            zIndex: 1,
+            backgroundColor: this.props.muiTheme.appBar.color
+        };
+        const raisedButtonStyle = {
+            height: 30
+        };
+        const raisedButtonLabelStyle = {
+            height: 30,
+            lineHeight: '30px'
+        };
+
+        return connectDropTarget(
             <div className={"react-mui-context vertical_layout vertical_fit react-fs-template " + (this.state.infoPanelOpen ? 'info-panel-open':'')}>
                 <PydioReactUI.AsyncComponent
                     namespace="LeftNavigation"
@@ -41,16 +53,40 @@ let FSTemplate = React.createClass({
                     pydio={this.props.pydio}
                 />
                 <div style={{marginLeft:250}} className="vertical_layout vertical_fit">
-                    <MaterialUI.Paper zDepth={1} style={{zIndex:1}} className="primaryColorPaper" rounded={false}>
+                    <MaterialUI.Paper zDepth={1} style={appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
                             <Breadcrumb {...this.props}/>
                             <SearchForm {...this.props}/>
                         </div>
                         <div id="main_toolbar">
-                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} primary={true}/>
-                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
-                            <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                            <PydioMenus.ButtonMenu
+                                {...this.props}
+                                buttonStyle={raisedButtonStyle}
+                                buttonLabelStyle={raisedButtonLabelStyle}
+                                id="create-button-menu"
+                                toolbars={["upload", "create"]}
+                                buttonTitle="New..."
+                                raised={true}
+                                secondary={true}
+                            />
+                            <PydioMenus.Toolbar
+                                {...this.props}
+                                id="main-toolbar"
+                                toolbars={["change_main"]}
+                                groupOtherList={["more", "change", "remote"]}
+                                renderingType="button"
+                            />
+                            <PydioComponents.ListPaginator
+                                id="paginator-toolbar"
+                                dataModel={this.props.pydio.getContextHolder()}
+                                toolbarDisplay={true}
+                            />
+                            <PydioMenus.Toolbar
+                                {...this.props}
+                                id="display-toolbar"
+                                toolbars={["display_toolbar"]}
+                                renderingType="icon-font"
+                            />
                         </div>
                     </MaterialUI.Paper>
                     <MainFilesList ref="list" {...this.props}/>
@@ -63,12 +99,6 @@ let FSTemplate = React.createClass({
                 <EditionPanel {...this.props}/>
                 <span className="context-menu"><PydioMenus.ContextMenu/></span>
             </div>
-        );
-
-        return (
-            <MaterialUI.MuiThemeProvider>
-                {dropzone}
-            </MaterialUI.MuiThemeProvider>
         );
 
     }
@@ -101,4 +131,7 @@ if(window.ReactDND){
     })(FSTemplate);
     FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropTemplate);
 }
+
+FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);
+
 export {FSTemplate as default}
