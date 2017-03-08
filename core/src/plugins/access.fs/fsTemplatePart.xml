@@ -7,7 +7,7 @@
             theme="material"
             namespace="PydioWorkspaces"
             component="FSTemplate"
-            dependencies="PydioComponents,PydioTasks,LeftNavigation"
+            dependencies="PydioComponents,PydioTasks"
             props="{}"
         />
     </client_configs>

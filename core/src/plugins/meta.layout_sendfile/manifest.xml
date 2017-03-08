@@ -16,7 +16,7 @@
                     theme="material"
                     namespace="SendFile"
                     component="Template"
-                    dependencies="PydioComponents,PydioTasks,LeftNavigation"
+                    dependencies="PydioComponents,PydioTasks"
                     props="{}"/>
         </client_configs>
     </registry_contributions>

@@ -33,6 +33,9 @@ class UserAvatar extends React.Component{
                 this.props.pydio.observe('user_logged', this._userLoggedObs);
             }
         }else{
+            if(this._userLoggedObs){
+                this.props.pydio.stopObserving('user_logged', this._userLoggedObs);
+            }
             this.loadPublicData();
         }
     }
@@ -45,6 +48,10 @@ class UserAvatar extends React.Component{
 
     loadLocalData(){
         const {pydio} = this.props;
+        if(!pydio.user){
+            this.setState({label: '', avatar: null});
+            return;
+        }
         const userName = pydio.user.getPreference('USER_DISPLAY_NAME') || pydio.user.id;
         const avatarId = pydio.user.getPreference('avatar');
         const avatarUrl = PydioApi.getClient().buildUserAvatarUrl(pydio.user.id, avatarId);

@@ -80,6 +80,54 @@
     Task.FLAG_RESUMABLE = 2;
     Task.FLAG_HAS_PROGRESS = 4;
 
+    class AlertTask extends Task{
+
+        constructor(label, statusMessage){
+            super({
+                id              : 'local-alert-task-' + Math.random(),
+                userId          : global.pydio.user.id,
+                wsId            : global.pydio.user.activeRepository,
+                label           : label,
+                status          : PydioTasks.Task.STATUS_PENDING,
+                statusMessage   : statusMessage,
+                className       : 'alert-task'
+            });
+        }
+
+        show(){
+            this._timer = global.setTimeout(function(){
+                this.updateStatus(PydioTasks.Task.STATUS_COMPLETE);
+            }.bind(this), 7000);
+            PydioTasks.Store.getInstance().enqueueLocalTask(this);
+        }
+
+        updateStatus(status, statusMessage = ''){
+            this._internal['status'] = status;
+            this._internal['statusMessage'] = statusMessage;
+            this.notifyMainStore();
+        }
+
+        notifyMainStore(){
+            PydioTasks.Store.getInstance().notify("tasks_updated");
+        }
+
+        hasOpenablePane(){
+            return true;
+        }
+        openDetailPane(){
+            AlertTask.close();
+        }
+
+        static setCloser(click){
+            AlertTask.__CLOSER = click;
+        }
+
+        static close(){
+            AlertTask.__CLOSER();
+        }
+
+    }
+
     class TaskAPI{
         
         static createTask(task, targetUsers = null, targetRepositories = null){
@@ -377,6 +425,7 @@
     var ns = global.PydioTasks || {};
     ns.Store = TaskStore;
     ns.Task = Task;
+    ns.AlertTask = AlertTask;
     ns.API = TaskAPI;
     ns.Panel = TasksPanel;
     ns.TaskEntry = TaskEntry;

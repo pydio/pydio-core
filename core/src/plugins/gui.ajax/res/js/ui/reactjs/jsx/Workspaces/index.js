@@ -6,6 +6,10 @@ import FilePreview from './FilePreview'
 import FSTemplate from './FSTemplate'
 import EditionPanel from './EditionPanel'
 
+import WorkspacesList from './wslist/WorkspacesList'
+import LeftPanel from './leftnav/LeftPanel'
+import DynamicLeftPanel from './leftnav/DynamicLeftPanel'
+
 window.PydioWorkspaces = {
     OpenNodesModel      : OpenNodesModel,
     MainFilesList       : MainFilesList,
@@ -13,7 +17,10 @@ window.PydioWorkspaces = {
     Breadcrumb          : Breadcrumb,
     SearchForm          : SearchForm,
     FilePreview         : FilePreview,
-    FSTemplate          : FSTemplate
+    FSTemplate          : FSTemplate,
+    WorkspacesList      : WorkspacesList,
+    LeftPanel           : LeftPanel,
+    DynamicLeftPanel    : DynamicLeftPanel
 }
 
 import InfoPanel from './detailpanes/InfoPanel'

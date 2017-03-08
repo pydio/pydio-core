@@ -9,8 +9,7 @@
             <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
             <js className="PydioReactUI" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioReactUI.js" depends="React"/>
             <js className="PydioComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js" depends="React"/>
-            <js className="LeftNavigation" file="plugins/gui.ajax/res/js/ui/reactjs/build/LeftNavigation.js" depends="React,PydioComponents,PydioTasks"/>
-            <js className="PydioWorkspaces" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js" depends="React,PydioComponents,PydioTasks,LeftNavigation"/>
+            <js className="PydioWorkspaces" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js" depends="React,PydioComponents,PydioTasks"/>
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>
     </client_settings>

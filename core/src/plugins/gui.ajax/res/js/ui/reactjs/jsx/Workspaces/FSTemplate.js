@@ -63,8 +63,8 @@ let FSTemplate = React.createClass({
             <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
                 <PydioReactUI.AsyncComponent
                     className="left-panel"
-                    namespace="LeftNavigation"
-                    componentName="PinnedLeftPanel"
+                    namespace="PydioWorkspaces"
+                    componentName="LeftPanel"
                     pydio={this.props.pydio}
                 />
                 <div className="desktop-container vertical_layout vertical_fit">
