@@ -15,7 +15,8 @@
             return {
                 "get_action":"get_my_feed",
                 "connexion_discrete":true,
-                "format":"xml", "current_repository":"true",
+                "format":"xml",
+                "current_repository":"true",
                 "feed_type":"notif",
                 "limit":(node.isLeaf() || node.isRoot() ? 18 : 4),
                 "path":(node.isLeaf() || node.isRoot()?node.getPath():node.getPath()+'/'),
@@ -67,16 +68,66 @@
     let NotificationsPanel = React.createClass({
 
         getInitialState: function(){
-            return {open: false};
+
+            let providerProperties = {
+                get_action:"get_my_feed",
+                connexion_discrete:true,
+                format:"xml",
+                feed_type:"alert",
+                merge_description:"false"
+            };
+            let repositoryScope = 'all';
+            if(!(pydio && pydio.user && pydio.user.activeRepository === 'ajxp_home')){
+                providerProperties['current_repository'] = 'true';
+                repositoryScope = pydio.user.activeRepository;
+            }
+            const dataModel = PydioDataModel.RemoteDataModelFactory(providerProperties, 'Notifications');
+            const rNode = dataModel.getRootNode();
+            rNode.observe("loaded", function(){
+                const unread = parseInt(rNode.getMetadata().get('unread_notifications_count')) || 0;
+                if(unread) {
+                    this.setState({unreadStatus: unread});
+                }
+            }.bind(this));
+            rNode.load();
+
+            if(repositoryScope === 'all'){
+                this._pe = new PeriodicalExecuter(() => {rNode.reload(null, true)}, 8);
+            }else{
+                this._smObs = function(event){
+                    if(XMLUtils.XPathSelectSingleNode(event, 'tree/reload_user_feed')) {
+                        rNode.reload(null, true);
+                    }
+                }.bind(this);
+            }
+            this.props.pydio.observe("server_message", this._smObs);
+
+            return {
+                open: false,
+                dataModel:dataModel,
+                repositoryScope: repositoryScope,
+                unreadStatus: 0
+            };
+        },
+
+        componentWillUnmount: function(){
+            if(this._smObs){
+                this.props.pydio.stopObserving("server_message", this._smObs);
+            }else if(this._pe){
+                this._pe.stop();
+            }
         },
 
         handleTouchTap:function(event){
             // This prevents ghost click.
             event.preventDefault();
-
+            if(this.state.unreadStatus){
+                this.updateAlertsLastRead();
+            }
             this.setState({
                 open: true,
                 anchorEl: event.currentTarget,
+                unreadStatus: 0
             });
         },
 
@@ -101,9 +152,13 @@
         },
 
         renderActions: function(node){
+            const touchTap = function(event){
+                event.stopPropagation();
+                this.dismissAlert(node);
+            }.bind(this);
             return <MaterialUI.IconButton
                 iconClassName="mdi mdi-close"
-                onTouchTap={(event) => {event.stopPropagation(); this.dismissAlert(node);}}
+                onClick={touchTap}
                 style={{width: 36, height: 36, padding: 6}}
                 iconStyle={{color: 'rgba(0,0,0,.23)', hoverColor:'rgba(0,0,0,.73)'}}
             />;
@@ -120,31 +175,40 @@
             PydioApi.getClient().request({
                 get_action:'dismiss_user_alert',
                 alert_id:alertId,
-                occurences:occurences
+                // Warning, occurrences parameter expects 2 'r'
+                occurrences:occurences
             }, function(t){
                 this.refs.list.reload();
             }.bind(this));
         },
 
+        updateAlertsLastRead: function(){
+            PydioApi.getClient().request({
+                get_action          : 'update_alerts_last_read',
+                repository_scope    : this.state.repositoryScope
+            });
+        },
+
         render: function() {
 
-            let providerProperties = {
-                get_action:"get_my_feed",
-                connexion_discrete:true,
-                format:"xml",
-                current_repository:"true",
-                feed_type:"alert",
-                merge_description:"false"
-            };
+            let button;
+            const buttonIcon = (
+                <MaterialUI.IconButton
+                    onTouchTap={this.handleTouchTap}
+                    iconClassName={this.props.iconClassName || "icon-bell"}
+                    tooltip={this.props.pydio.MessageHash['notification_center.4']}
+                    className="userActionButton"
+                />
+            );
 
             return (
                 <span>
-                    <MaterialUI.IconButton
-                        onTouchTap={this.handleTouchTap}
-                        iconClassName={this.props.iconClassName || "icon-bell"}
-                        tooltip={this.props.pydio.MessageHash['notification_center.4']}
-                        className="userActionButton"
-                    />
+                    <MaterialUI.Badge
+                        badgeContent={this.state.unreadStatus}
+                        secondary={true}
+                        style={this.state.unreadStatus  ? {padding: '0 24px 0 0'} : {padding: 0}}
+                        badgeStyle={!this.state.unreadStatus ? {display:'none'} : null}
+                    >{buttonIcon}</MaterialUI.Badge>
                     <MaterialUI.Popover
                         open={this.state.open}
                         anchorEl={this.state.anchorEl}
@@ -161,7 +225,8 @@
                             pydio={this.props.pydio}
                             elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 11}
                             heightAutoWithMax={500}
-                            nodeProviderProperties={providerProperties}
+                            presetDataModel={this.state.dataModel}
+                            reloadAtCursor={true}
                             actionBarGroups={[]}
                             entryRenderIcon={this.renderIcon}
                             entryRenderSecondLine={this.renderSecondLine}

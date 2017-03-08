@@ -743,10 +743,28 @@
             }
             return (
                 <div className="horizontal_layout vertical_fit" id={this.props.rootId} style={this.props.style}>
+                    <PydioReactUI.AsyncComponent
+                        pydio={this.props.pydio}
+                        className="left-panel"
+                        namespace="PydioWorkspaces"
+                        componentName="LeftPanel"
+                    />
+                    <HomeWorkspaceLegendPanel
+                        ref="legend"
+                        pydio={this.props.pydio}
+                        onShowLegend={this.onShowLegend}
+                        onHideLegend={this.onHideLegend}
+                        onOpenLink={this.onOpenLink}
+                    />
+                </div>
+            );
+
+            return (
+                <div className="horizontal_layout vertical_fit" id={this.props.rootId} style={this.props.style}>
                     <div id="home_left_bar" className="vertical_layout">
                         {UserCartridge}
                         <div id="workspaces_center" className="vertical_layout vertical_fit">
-                            <LeftNavigation.UserWorkspacesList
+                            <PydioWorkspaces.WorkspacesList
                                 pydio={this.props.pydio}
                                 workspaces={this.state.workspaces}
                                 onHoverLink={this.onHoverLink}
@@ -806,7 +824,11 @@
     };
 
     var WelcomeComponents = global.WelcomeComponents || {};
-    WelcomeComponents.UserDashboard = UserDashboard;
+    if(global.ReactDND){
+        WelcomeComponents.UserDashboard = global.ReactDND.DragDropContext(ReactDND.HTML5Backend)(UserDashboard);
+    }else{
+        WelcomeComponents.UserDashboard = UserDashboard;
+    }
     WelcomeComponents.TutorialPane = TutorialPane;
     WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
     global.WelcomeComponents = WelcomeComponents;

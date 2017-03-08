@@ -64,6 +64,13 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="update_alerts_last_read">
+                <processing>
+                    <serverCallback methodName="updateAlertsLastRead" restParams="/repository_scope">
+                        <input_param name="repository_scope" type="string" description="all|repositoryId"/>
+                    </serverCallback>
+                </processing>
+            </action>
             <action name="activateDesktopNotifications">
                 <gui src="" iconClass="icon-rss" text="notification_center.1" title="notification_title.2">
                     <context dir="true" recycle="true" selection="false"/>

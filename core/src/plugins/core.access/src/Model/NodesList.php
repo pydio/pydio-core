@@ -69,6 +69,11 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
     public function setParentNode(AJXP_Node $parentNode){
         $this->parentNode = $parentNode;
     }
+
+    public function getParentNode(){
+        return $this->parentNode;
+    }
+
     /**
      * @param AJXP_Node|NodesList $nodeOrList
      */

@@ -69,7 +69,7 @@ export default React.createClass({
                 }
             }catch(e){
                 if(global.console){
-                    console.error('Error while setting state on LeftNavigation component - Probably height error on IE8', e);
+                    console.error('Error while setting state on LeftPanel component - Probably height error on IE8', e);
                 }
             }
         }.bind(this);

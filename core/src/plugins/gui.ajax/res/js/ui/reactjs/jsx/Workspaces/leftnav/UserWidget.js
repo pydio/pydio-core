@@ -28,11 +28,13 @@ export default React.createClass({
         const messages = this.props.pydio.MessageHash;
 
         let avatar;
+        let homeButton, infoButton, logoutButton, notificationsButton;
         if(this.props.pydio.user){
+            const user = this.props.pydio.user;
             avatar = (
                 <PydioComponents.UserAvatar
                     pydio={this.props.pydio}
-                    userId={this.props.pydio.user.id}
+                    userId={user.id}
                     avatarStyle={{marginRight:20}}
                     className="user-display"
                     labelClassName="userLabel"
@@ -46,24 +48,18 @@ export default React.createClass({
                     />
                 </PydioComponents.UserAvatar>
             );
-        }
-
-        return (
-            <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
-                {avatar}
-                <div className="action_bar">
+            if(user.getRepositoriesList().has('ajxp_home') && user.activeRepository !== 'ajxp_home'){
+                homeButton = (
                     <MaterialUI.IconButton
                         onTouchTap={this.applyAction.bind(this, 'home')}
                         iconClassName="userActionIcon mdi mdi-home"
                         className="userActionButton"
                         tooltip={messages['305']}
                     />
-                    <MaterialUI.IconButton
-                        onTouchTap={this.applyAction.bind(this, 'info')}
-                        iconClassName="userActionIcon mdi mdi-information-outline"
-                        className="userActionButton"
-                        tooltip={messages['166']}
-                    />
+                );
+            }
+            if(this.props.pydio.Controller.getActionByName('get_my_feed')){
+                notificationsButton = (
                     <PydioReactUI.AsyncComponent
                         namespace="PydioNotifications"
                         componentName="Panel"
@@ -71,12 +67,38 @@ export default React.createClass({
                         iconClassName="userActionIcon mdi mdi-bell-outline"
                         {...this.props}
                     />
-                    <MaterialUI.IconButton
-                        onTouchTap={this.applyAction.bind(this, 'logout')}
-                        iconClassName="userActionIcon mdi mdi-logout"
-                        className="userActionButton"
-                        tooltip={messages['169']}
-                    />
+                );
+            }
+        }
+        if(this.props.pydio.Controller.getActionByName('splash')){
+            infoButton =(
+                <MaterialUI.IconButton
+                    onTouchTap={this.applyAction.bind(this, 'info')}
+                    iconClassName="userActionIcon mdi mdi-information-outline"
+                    className="userActionButton"
+                    tooltip={messages['166']}
+                />
+            ) ;
+        }
+        if(this.props.pydio.Controller.getActionByName('logout')){
+            logoutButton = (
+                <MaterialUI.IconButton
+                    onTouchTap={this.applyAction.bind(this, 'logout')}
+                    iconClassName="userActionIcon mdi mdi-logout"
+                    className="userActionButton"
+                    tooltip={messages['169']}
+                />
+            );
+        }
+
+        return (
+            <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
+                {avatar}
+                <div className="action_bar">
+                    {homeButton}
+                    {notificationsButton}
+                    {infoButton}
+                    {logoutButton}
                 </div>
             </MaterialUI.Paper>
         );

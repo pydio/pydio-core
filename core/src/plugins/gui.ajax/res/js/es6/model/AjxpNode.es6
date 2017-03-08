@@ -86,12 +86,12 @@ class AjxpNode extends Observable{
      * Remove children and reload node
      * @param iAjxpNodeProvider IAjxpNodeProvider Optionnal
      */
-    reload(iAjxpNodeProvider){
+    reload(iAjxpNodeProvider, silentClear = false){
         this._children.forEach(function(child,key){
-            child.notify("node_removed");
+            if(!silentClear) child.notify("node_removed");
             child._parentNode = null;
             this._children.delete(key);
-            this.notify("child_removed", child);
+            if(!silentClear) this.notify("child_removed", child);
         }, this);
         this._isLoaded = false;
         this.load(iAjxpNodeProvider);

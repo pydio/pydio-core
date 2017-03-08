@@ -3,7 +3,7 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/res/i18n" />
-            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,PydioComponents,LeftNavigation"/>
+            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,PydioComponents,PydioWorkspaces"/>
             <css file="plugins/access.ajxp_home/res/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
@@ -41,10 +41,7 @@
             </action>
         </actions>
 		<client_configs>
-            <template_part ajxpId="orbit_content" ajxpClass="AjxpPane" ajxpOptions='{"fit":"height","fitParent":"ajxp_desktop", "imageBackgroundFromConfigs":"access.ajxp_home/WELCOME_PAGE_BACKGROUND_","messageBoxReference":true}'><![CDATA[
-                <div id="home_account_pane" style="opacity:0;" ajxpClass="AjxpReactComponent" ajxpOptions='{"fit":"height", "componentNamespace":"WelcomeComponents", "componentName":"UserDashboard"}' class="horizontal_layout"></div>
-			]]></template_part>
-            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="UserDashboard" dependencies="PydioComponents,PydioTasks,LeftNavigation" props='{"rootId":"home_account_pane"}'/>
+            <template_part ajxpId="orbit_content" theme="material" namespace="WelcomeComponents" component="UserDashboard" dependencies="PydioComponents,PydioTasks" props='{"rootId":"home_account_pane"}'/>
         </client_configs>
 	</registry_contributions>
     <class_definition filename="plugins/access.ajxp_home/HomePagePlugin.php" classname="Pydio\Access\Driver\DataProvider\HomePagePlugin"/>

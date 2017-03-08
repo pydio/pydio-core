@@ -45,6 +45,15 @@ class PydioDataModel extends Observable{
 
 	}
 
+	static RemoteDataModelFactory(providerProperties, rootLabel=''){
+        let dataModel = new PydioDataModel(true);
+        let rNodeProvider = new RemoteNodeProvider(providerProperties);
+        dataModel.setAjxpNodeProvider(rNodeProvider);
+        const rootNode = new AjxpNode("/", false, rootLabel, '', rNodeProvider);
+        dataModel.setRootNode(rootNode);
+	    return dataModel;
+    }
+
 	/**
 	 * Sets the data source that will feed the nodes with children.
 	 * @param iAjxpNodeProvider IAjxpNodeProvider

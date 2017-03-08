@@ -396,7 +396,9 @@ let SearchForm = React.createClass({
         if(this.refs.results && this.refs.results.refs.list){
             this.refs.results.refs.list.updateInfiniteContainerHeight();
             FuncUtils.bufferCallback('search_results_resize_list', 550, ()=>{
-                this.refs.results.refs.list.updateInfiniteContainerHeight();
+                try{
+                    this.refs.results.refs.list.updateInfiniteContainerHeight();
+                }catch(e){}
             });
         }
     },

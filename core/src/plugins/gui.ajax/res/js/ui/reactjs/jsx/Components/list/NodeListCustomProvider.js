@@ -48,18 +48,13 @@ export default React.createClass({
 
     getInitialState:function(){
 
-        var dataModel, rootNode;
+        let dataModel;
         if(this.props.presetDataModel){
             dataModel = this.props.presetDataModel;
-            rootNode = dataModel.getRootNode();
         }else{
-            dataModel = new PydioDataModel(true);
-            var rNodeProvider = new RemoteNodeProvider();
-            dataModel.setAjxpNodeProvider(rNodeProvider);
-            rNodeProvider.initProvider(this.props.nodeProviderProperties);
-            rootNode = new AjxpNode("/", false, "loading", "folder.png", rNodeProvider);
-            dataModel.setRootNode(rootNode);
+            dataModel = PydioDataModel.RemoteDataModelFactory(this.props.nodeProviderProperties);
         }
+        const rootNode = dataModel.getRootNode();
         if(this.props.nodeClicked){
             // leaf
             this.openEditor = function(node){

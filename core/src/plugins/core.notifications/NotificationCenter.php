@@ -182,7 +182,7 @@ class NotificationCenter extends Plugin
     public function loadRepositoryInfo(ContextInterface $ctx, &$data){
         $body = [
             'format' => 'array',
-            'current_repository'=>true,
+            'current_repository'=>'true',
             'feed_type'=>'notif',
             'limit' => 1,
             'path'=>'/',
@@ -240,7 +240,7 @@ class NotificationCenter extends Plugin
         $crtRepId = $ctx->getRepositoryId();
         if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
             $authRepos[] = $httpVars["repository_id"];
-        } else if (isSet($httpVars["current_repository"])){
+        } else if (isSet($httpVars["current_repository"]) && $httpVars['current_repository'] === 'true'){
             $authRepos[] = $crtRepId;
         } else {
             $accessibleRepos =  \Pydio\Core\Services\UsersService::getRepositoriesForUser($u, false);
@@ -382,28 +382,51 @@ class NotificationCenter extends Plugin
     }
 
     /**
+     * Position a date saying when the last read was done
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function updateAlertsLastRead(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        /** @var ContextInterface $ctx */
+        $ctx = $requestInterface->getAttribute('ctx');
+        $u = $ctx->getUser();
+        $repositoryScope = $requestInterface->getParsedBody()['repository_scope'];
+        if(empty($repositoryScope)){
+            $repositoryScope = 'all';
+        }
+        $u->setPref('core.notifications.last_read.' . $repositoryScope, time());
+    }
+
+    /**
      * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @param \Pydio\Access\Core\Model\NodesList|null $nodesList
      */
-    public function loadUserAlerts(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface, \Pydio\Access\Core\Model\NodesList &$nodesList = null)
+    public function loadUserAlerts(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface, \Pydio\Access\Core\Model\NodesList &$nodesList = null)
     {
         if(!$this->eventStore) return;
         /** @var ContextInterface $ctx */
         $ctx = $requestInterface->getAttribute("ctx");
         $u = $ctx->getUser();
-        $userId = $u->getId();
         $repositoryFilter = null;
         $httpVars = $requestInterface->getParsedBody();
 
         if (isSet($httpVars["repository_id"]) && $u->getMergedRole()->canRead($httpVars["repository_id"])) {
             $repositoryFilter = $httpVars["repository_id"];
         }
-        if ($repositoryFilter == null) {
+        if ($repositoryFilter === null && isSet($httpVars['current_repository']) && $httpVars['current_repository'] === 'true') {
             $repositoryFilter = $ctx->getRepositoryId();
         }
         $res = $this->eventStore->loadAlerts($u, $repositoryFilter);
         if(!count($res)) return;
+
+        // Load last read status
+        $lastReadForListing = intval($u->getPref('core.notifications.last_read.all'));
+        if($repositoryFilter !== null){
+            $lastReadForRepo = intval($u->getPref('core.notifications.last_read.' . $repositoryFilter));
+            $lastReadForListing = max($lastReadForListing, $lastReadForRepo);
+        }
+        $unReadCount = 0;
 
         // Recompute children notifs
 
@@ -423,8 +446,7 @@ class NotificationCenter extends Plugin
                 $x->addChunk($nodesList);
             }
         }
-        $parentRepository = RepositoryService::getRepositoryById($repositoryFilter);
-        $parentRoot = $parentRepository->getContextOption($ctx, "PATH");
+
         $cumulated = array();
         foreach ($res as $notification) {
             if ($format == "html") {
@@ -441,7 +463,13 @@ class NotificationCenter extends Plugin
                 $path = $node->getPath();
                 $nodeRepo = $node->getRepository();
 
-                if($notification->getAction() !== "share" && $nodeRepo != null && $nodeRepo->hasParent() && $nodeRepo->getParentId() == $repositoryFilter){
+                if($notification->getAction() !== "share" && $nodeRepo != null
+                    && $nodeRepo->hasParent()){
+
+                    $parentId = $nodeRepo->getParentId();
+                    $parentRepository = RepositoryService::getRepositoryById($parentId);
+                    $parentRoot = $parentRepository->getContextOption($ctx, "PATH");
+
                     $newCtx = $node->getContext();
                     $currentRoot = $nodeRepo->getContextOption($newCtx, "PATH");
                     $contentFilter = $nodeRepo->getContentFilter();
@@ -455,7 +483,7 @@ class NotificationCenter extends Plugin
                         $nodePath = $node->getPath();
                     }
                     $relative = rtrim( substr($currentRoot, strlen($parentRoot)), "/"). rtrim($nodePath, "/");
-                    $parentNodeURL = $node->getScheme()."://".$node->getUser()->getId()."@".$repositoryFilter.$relative;
+                    $parentNodeURL = $node->getScheme()."://".$node->getUser()->getId()."@".$parentId.$relative;
                     $this->logDebug("action.share", "Recompute alert to ".$parentNodeURL);
                     $node = new AJXP_Node($parentNodeURL);
                     $path = $node->getPath();
@@ -463,9 +491,11 @@ class NotificationCenter extends Plugin
                     $path = $node->getPath()."#".$node->getRepositoryId();
                 }
 
-
                 if (isSet($cumulated[$path])) {
                     $cumulated[$path]->event_occurence ++;
+                    if($notification->getDate() > $lastReadForListing){
+                        $unReadCount ++;
+                    }
                     continue;
                 }
                 try {
@@ -476,6 +506,10 @@ class NotificationCenter extends Plugin
                     }
                     continue;
                 }
+
+                if($notification->getDate() > $lastReadForListing){
+                    $unReadCount ++;
+                }
                 $node->event_is_alert = true;
                 $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
                 $node->event_description_long = strip_tags($notification->getDescriptionLong(true));
@@ -485,7 +519,7 @@ class NotificationCenter extends Plugin
                 $node->alert_action = $notification->getAction();
                 if ($node->getRepository() != null) {
                     $node->repository_id = ''.$node->getRepository()->getId();
-                    if ($node->repository_id != $repositoryFilter && $node->getRepository()->getDisplay() != null) {
+                    if ($node->repository_id !== $repositoryFilter && $node->getRepository()->getDisplay() != null) {
                         $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
                     }
                 } else {
@@ -530,7 +564,7 @@ class NotificationCenter extends Plugin
             $nodesList->addBranch($nodeToSend);
 
         }
-
+        $nodesList->getParentNode()->mergeMetadata(['unread_notifications_count' => $unReadCount]);
 
     }
     /**
