@@ -28,7 +28,10 @@ export default function(PydioComponent, pydio){
             return {
                 pydio       : pydio,
                 messages    : messages,
-                getMessage  : function(messageId){
+                getMessage  : function(messageId, namespace = ''){
+                    if(namespace){
+                        messageId = namespace + '.' + messageId ;
+                    }
                     try{
                         return messages[messageId] || messageId;
                     }catch(e){
