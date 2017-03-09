@@ -11,8 +11,7 @@ class PathRouter extends React.PureComponent {
             init: false
         }
 
-        // Watching all path changes
-        pydio.getContextHolder().observe("context_changed", function(event) {
+        this._ctxObs = function(event) {
             let active = pydio.getContextNode().getPath();
             if (!this.state.init) {
                 target = props.params.splat;
@@ -26,7 +25,13 @@ class PathRouter extends React.PureComponent {
                 active:   active,
                 target:   target
             })
-        }.bind(this));
+        }.bind(this);
+        // Watching all path changes
+        pydio.getContextHolder().observe("context_changed", this._ctxObs);
+    }
+
+    componentWillUnmount(){
+        pydio.getContextHolder().stopObserving("context_changed", this._ctxObs);
     }
 
     //

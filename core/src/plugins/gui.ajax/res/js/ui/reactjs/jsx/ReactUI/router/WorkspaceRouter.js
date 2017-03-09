@@ -12,8 +12,7 @@ class WorkspaceRouter extends React.PureComponent {
             history: true
         }
 
-        // Watching all repository changes
-        pydio.observe("repository_list_refreshed", function(event) {
+        this._wsObs = function(event) {
             const {list, active} = event;
 
             // Upon initialisation, we set a target repository that comes from the url
@@ -32,7 +31,13 @@ class WorkspaceRouter extends React.PureComponent {
                 active:   active,
                 target:   target
             })
-        }.bind(this));
+        }.bind(this);
+        // Watching all repository changes
+        pydio.observe("repository_list_refreshed", this._wsObs);
+    }
+
+    componentWillUnmount(){
+        pydio.stopObserving("repository_list_refreshed", this._wsObs);
     }
 
     // Util function to find a repository by its slug from a list of reposiitories
