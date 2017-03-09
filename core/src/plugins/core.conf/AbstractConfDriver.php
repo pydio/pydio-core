@@ -26,6 +26,7 @@ use Psr\Http\Message\UploadedFileInterface;
 use Pydio\Access\Core\IAjxpWrapperProvider;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Http\Message\RegistryMessage;
 use Pydio\Core\Http\Message\ReloadMessage;
 use Pydio\Core\Http\Message\UserMessage;
@@ -320,16 +321,28 @@ abstract class AbstractConfDriver extends Plugin
     /**
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
-     * @param boolean $excludeReserved,
+     * @param boolean $excludeReserved
+     * @param $includeOwnedRoles boolean
      * @return array AJXP_Role[]
      */
-    abstract public function listRoles($roleIds = [], $excludeReserved = false);
+    abstract public function listRoles($roleIds = [], $excludeReserved = false, $includeOwnedRoles = false);
+
 
     /**
-     * @param AJXP_Role[] $roles
-     * @return mixed
+     * Get Roles owned by a given user ( = teams )
+     * @param $ownerId
+     * @return AJXP_Role[]
      */
-    abstract public function saveRoles($roles);
+    abstract public function listRolesOwnedBy($ownerId);
+
+    /**
+     * @param $roleId string
+     * @param bool $countOnly
+     * @return string[]
+     */
+    public function getUsersForRole($roleId, $countOnly = false){
+        return [];
+    }
 
     /**
      * @abstract
@@ -762,7 +775,98 @@ abstract class AbstractConfDriver extends Plugin
             break;
 
             //------------------------------------
-            //	SAVE USER PREFERENCE
+            // TEAMS MANAGEMENT
+            //------------------------------------
+            case "user_team_create":
+
+                $crtUser = $ctx->getUser()->getId();
+                $teamLabel = InputFilter::sanitize($httpVars["team_label"], InputFilter::SANITIZE_HTML_STRICT);
+                if(empty($teamLabel)){
+                    throw new PydioException("Empty Team Label!");
+                }
+                $teamId = StringHelper::slugify($teamLabel) ."-".intval(rand(0,1000));
+                $roleObject = RolesService::getOrCreateOwnedRole($teamId, $crtUser);
+                $roleObject->setLabel($teamLabel);
+
+                $userIds = isSet($httpVars["user_ids"]) ? $httpVars["user_ids"] : [];
+                foreach ($userIds as $userId) {
+                    $id = InputFilter::sanitize($userId, InputFilter::SANITIZE_EMAILCHARS);
+                    $uObject = UsersService::getUserById($id);
+                    $uObject->addRole($roleObject);
+                    $uObject->save();
+                }
+                $responseInterface = new JsonResponse(["message" => "Created Team with id " . $teamId]);
+
+                break;
+
+            case "user_team_delete":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $crtUser = $ctx->getUser()->getId();
+                RolesService::deleteRole($tId, $crtUser);
+                break;
+
+            case "user_team_add_user":
+
+                $id = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $uObject = UsersService::getUserById($id);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $uObject->addRole($roleObject);
+                $uObject->save("superuser");
+                $responseInterface = new JsonResponse(["message" => "User $id added to team " . $tId]);
+                break;
+
+            case "user_team_delete_user":
+
+                $id = InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS);
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $uObject = UsersService::getUserById($id);
+                $uObject->removeRole($tId);
+                $uObject->save("superuser");
+                $responseInterface = new JsonResponse(["message" => "User $id deleted from team " . $tId]);
+                break;
+
+            case "user_team_list_users":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $users = $this->getUsersForRole($tId);
+                $data = [];
+                foreach($users as $userId){
+                    try{
+                        $userObject = UsersService::getUserById($userId);
+                    }catch(UserNotFoundException $e){
+                        continue;
+                    }
+                    $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+                    $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+                    $data[$userId] = [
+                        "label"     =>  $userLabel,
+                        "avatar"    =>  $userAvatar
+                    ];
+                }
+                $responseInterface = new JsonResponse($data);
+
+                break;
+
+            case "user_team_edit_users":
+
+                throw new PydioException("Deprecated user_team_edit_users. Please use add / remove instead");
+                break;
+
+            //------------------------------------
+            //	USERS MANAGEMENT
             //------------------------------------
             case "custom_data_edit":
             case "user_create_user":
@@ -1158,12 +1262,12 @@ abstract class AbstractConfDriver extends Plugin
                 $skipDisplayWithoutRegexp = ConfService::getContextConf($ctx, "USERS_LIST_REGEXP_MANDATORY", "conf");
                 if($skipDisplayWithoutRegexp && $regexp == null){
                     $users = "";
-                    if (method_exists($this, "listUserTeams")) {
-                        $teams = $this->listUserTeams($ctx->getUser());
-                        foreach ($teams as $tId => $tData) {
-                            $label = htmlentities($tData["LABEL"]);
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$label."\"><span class='user_entry_label'>[team] ".$label."</span></li>";
-                        }
+
+                    $teams = $this->listRolesOwnedBy($ctx->getUser()->getId());
+                    foreach ($teams as $teamObject) {
+                        $teamLabel = StringHelper::xmlEntities($teamObject->getLabel());
+                        $tId = $teamObject->getId();
+                        $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-entry_id='/AJXP_TEAM/$tId' data-label=\"".$teamLabel."\"><span class='user_entry_label'>".$teamLabel."</span></li>";
                     }
                     print("<ul>$users</ul>");
                     break;
@@ -1262,12 +1366,14 @@ abstract class AbstractConfDriver extends Plugin
                         if($indexGroup == $limit) break;
                     }
                 }
-                if (method_exists($this, "listUserTeams") && !$usersOnly) {
-                    $teams = $this->listUserTeams($ctx->getUser());
-                    foreach ($teams as $tId => $tData) {
-                        if($regexp == null  ||  preg_match($pregexp, $tData["LABEL"])){
-                            $teamLabel = StringHelper::xmlEntities($tData["LABEL"]);
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-label=\"[team] ".$teamLabel."\"><span class='user_entry_label'>[team] ".$teamLabel."</span></li>";
+                if (!$usersOnly) {
+                    $teams = $this->listRolesOwnedBy($ctx->getUser()->getId());
+                    foreach ($teams as $teamObject) {
+                        $teamLabel = $teamObject->getLabel();
+                        if($regexp === null  ||  preg_match($pregexp, $teamLabel)){
+                            $teamLabel = StringHelper::xmlEntities($teamLabel);
+                            $tId = $teamObject->getId();
+                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-entry_id='/AJXP_TEAM/$tId' data-label=\"".$teamLabel."\"><span class='user_entry_label'>".$teamLabel."</span></li>";
                         }
                     }
                 }

@@ -790,7 +790,7 @@ abstract class AbstractUser implements UserInterface
         if($this->lastSessionSerialization && count($this->roles)
             && $this->storage->rolesLastUpdated(array_keys($this->roles)) > $this->lastSessionSerialization){
 
-            $newRoles = RolesService::getRolesList(array_keys($this->roles));
+            $newRoles = RolesService::getRolesList(array_keys($this->roles), false, true);
             foreach($newRoles as $rId => $newRole){
                 if(strpos($rId, "AJXP_USR_/") === 0){
                     $this->personalRole = $newRole;

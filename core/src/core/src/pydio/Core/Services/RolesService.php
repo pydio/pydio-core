@@ -109,10 +109,39 @@ class RolesService
     }
 
     /**
+     * @param $roleId
+     * @param $userId
+     * @return AJXP_Role
+     */
+    public static function getOrCreateOwnedRole($roleId, $userId){
+        $crtRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+        if(isSet($crtRoles[$roleId])) {
+            return $crtRoles[$roleId];
+        }
+        $r = new AJXP_Role($roleId);
+        $r->setOwnerId($userId);
+        ConfService::getConfStorageImpl()->updateRole($r);
+        return $r;
+    }
+
+    /**
+     * @param $roleId
+     * @param $userId
+     * @return AJXP_Role
+     */
+    public static function getOwnedRole($roleId, $userId){
+        $crtRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+        if(isSet($crtRoles[$roleId])) {
+            return $crtRoles[$roleId];
+        }
+        return null;
+    }
+
+    /**
      * Get Role by Id
      *
      * @param string $roleId
-     * @return AJXP_Role
+     * @return AJXP_Role|false
      */
     public static function getRole($roleId)
     {
@@ -162,10 +191,18 @@ class RolesService
      * Delete a role by its id
      * @static
      * @param string $roleId
+     * @param string $ownerId
      * @return void
+     * @throws PydioException
      */
-    public static function deleteRole($roleId)
+    public static function deleteRole($roleId, $ownerId = null)
     {
+        if(!empty($ownerId)){
+            $ownerRoles = ConfService::getConfStorageImpl()->listRolesOwnedBy($ownerId);
+            if(!isSet($ownerRoles[$roleId])){
+                throw new PydioException("Cannot delete this role");
+            }
+        }
         ConfService::getConfStorageImpl()->deleteRole($roleId);
         CacheService::delete(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:role:".$roleId);
         ConfService::getInstance()->invalidateLoadedRepositories();
@@ -237,7 +274,7 @@ class RolesService
      * @param boolean $excludeReserved,
      * @return AJXP_Role[]
      */
-    public static function getRolesList($roleIds = array(), $excludeReserved = false)
+    public static function getRolesList($roleIds = array(), $excludeReserved = false, $includeOwnedRoles = false)
     {
         if (self::$useCache && !count($roleIds) && $excludeReserved == true && self::$rolesCache != null) {
             return self::$rolesCache;
@@ -263,7 +300,7 @@ class RolesService
         }
 
         $confDriver = ConfService::getConfStorageImpl();
-        $roles = $confDriver->listRoles($roleIds, $excludeReserved);
+        $roles = $confDriver->listRoles($roleIds, $excludeReserved, $includeOwnedRoles);
         $repoList = null;
         foreach ($roles as $roleId => $roleObject) {
             if ($roleObject instanceof AjxpRole) {

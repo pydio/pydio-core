@@ -411,7 +411,7 @@ class SqlUser extends AbstractUser
 
         // NOW LOAD THEM
         if (count($rolesToLoad)) {
-            $allRoles = RolesService::getRolesList($rolesToLoad);
+            $allRoles = RolesService::getRolesList($rolesToLoad, false, true);
             foreach ($rolesToLoad as $roleId) {
                 if (!isSet($allRoles[$roleId]) && strpos($roleId, "AJXP_GRP_/") === 0){
                     $allRoles[$roleId] = RolesService::getOrCreateRole($roleId);

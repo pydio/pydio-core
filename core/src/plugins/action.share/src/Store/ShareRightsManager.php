@@ -241,21 +241,19 @@ class ShareRightsManager
 
                 if (strpos($u, "/AJXP_TEAM/") === 0) {
 
-                    if (method_exists($confDriver, "teamIdToUsers")) {
-                        $teamUsers = $confDriver->teamIdToUsers($this->context->getUser(), str_replace("/AJXP_TEAM/", "", $u));
-                        foreach ($teamUsers as $userId) {
-                            $users[$userId] = array("ID" => $userId, "TYPE" => "user", "RIGHT" => $rightString);
-                            if ($this->watcher !== false) {
-                                $users[$userId]["WATCH"] = $uWatch;
-                            }
-                        }
+                    $roleId = str_replace("/AJXP_TEAM/", "", $u);
+                    $roleObject = RolesService::getOwnedRole($roleId, $this->context->getUser()->getId());
+                    if(empty($roleObject)){
+                        $index++;
+                        continue;
+                    }else{
+                        // Replace now with roleId
+                        $u = $roleId;
                     }
-                    $index++;
-                    continue;
 
                 }
 
-                $entry = array("ID" => $u, "TYPE" => "group");
+                $entry = array("ID" => $u, "TYPE" => "group", "USER_TEAM" => true);
 
             }
             $entry["RIGHT"] = $rightString;
@@ -466,7 +464,11 @@ class ShareRightsManager
 
         foreach ($groups as $group => $groupEntry) {
             $r = $groupEntry["RIGHT"];
-            $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+            if($groupEntry["USER_TEAM"]){
+                $grRole = RolesService::getOwnedRole($group, $this->context->getUser()->getId());
+            }else{
+                $grRole = RolesService::getOrCreateRole($group, $this->context->hasUser() ? $this->context->getUser()->getGroupPath() : "/");
+            }
             $grRole->setAcl($childRepoId, $r);
             RolesService::updateRole($grRole);
             if(!empty($originalNode)) {

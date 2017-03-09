@@ -705,12 +705,22 @@ class BootConfLoader extends AbstractConfDriver
     /**
      * Must return an associative array of roleId => AjxpRole objects.
      * @param array $roleIds
-     * @param boolean $excludeReserved ,
+     * @param boolean $excludeReserved
+     * @param boolean $includeOwnedRoles
      * @return array AjxpRole[]
      */
-    public function listRoles($roleIds = array(), $excludeReserved = false)
+    public function listRoles($roleIds = array(), $excludeReserved = false, $includeOwnedRoles = false)
     {
         return array();
+    }
+
+    /**
+     * Get Roles owned by a given user ( = teams )
+     * @param $ownerId
+     * @return array
+     */
+    public function listRolesOwnedBy($ownerId){
+        return [];
     }
 
     /**

@@ -405,7 +405,7 @@
                 ID      : userObject.getId(),
                 RIGHT   :'r',
                 LABEL   : userObject.getLabel(),
-                TYPE    : userObject.getType()
+                TYPE    : userObject.getGroup() ? 'group' : 'user'
             };
             this.props.onUserUpdate('add', newEntry.ID, newEntry);
         },

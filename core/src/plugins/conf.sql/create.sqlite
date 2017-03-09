@@ -55,11 +55,13 @@ CREATE TABLE IF NOT EXISTS ajxp_roles (
   role_id text NOT NULL,
   serial_role blob NOT NULL,
   searchable_repositories text,
+  owner_user_id text DEFAULT NULL,
   last_updated INT(11)
 );
 
 CREATE INDEX roles_updated_idx ON ajxp_roles(last_updated);
-
+CREATE INDEX roles_owner_idx ON ajxp_roles(owner_user_id);
+CREATE UNIQUE INDEX owner_role ON ajxp_roles(`role_id`, `owner_user_id`);
 
 CREATE TABLE IF NOT EXISTS ajxp_groups (
   groupPath text NOT NULL,
