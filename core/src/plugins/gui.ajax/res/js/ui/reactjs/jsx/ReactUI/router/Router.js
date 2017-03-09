@@ -7,30 +7,32 @@ import WorkspaceRouter from './WorkspaceRouter';
 import PathRouter from './PathRouter';
 import HomeRouter from './HomeRouter';
 
+function getRoutes(pydio){
+    const routes = (
+        <Route path="/">
+            <IndexRoute component={HomeRouter}/>
+            <Route path=":workspaceId" component={WorkspaceRouter(pydio)}>
+                <IndexRoute component={PathRouter(pydio)}/>
+                <Route path="*" component={PathRouter(pydio)}/>
+            </Route>
+        </Route>
+    )
+    return routes;
+}
+
 class PydioRouter extends React.PureComponent {
 
     constructor(props) {
         super(props)
-
-        const {pydio} = props
     }
 
     render() {
         return (
             // Routes are defined as a constant to avoid warning about hot reloading
-            <Router history={browserHistory} routes={routes} />
+            <Router history={browserHistory} routes={getRoutes(this.props.pydio)} />
         );
     }
 }
 
-const routes = (
-    <Route path="/">
-        <IndexRoute component={HomeRouter} />
-        <Route path=":workspaceId" component={WorkspaceRouter}>
-            <IndexRoute component={PathRouter} />
-            <Route path="*" component={PathRouter} />
-        </Route>
-    </Route>
-)
 
 export default PydioRouter;
