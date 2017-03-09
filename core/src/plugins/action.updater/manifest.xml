@@ -38,7 +38,6 @@
                     </context>
                 </gui>
                 <processing>
-                    <clientListener module="UpdaterActions.Listeners.initListener" name="init"/>
                     <serverCallback methodName="switchAction" restParams="/" developerComment="Apply the update following available upgrade path."/>
                 </processing>
             </action>

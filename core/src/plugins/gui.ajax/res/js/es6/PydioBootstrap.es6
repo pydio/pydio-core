@@ -82,18 +82,6 @@ class PydioBootstrap{
                     this.parameters.set(k, preloaded[k]);
                 }
             }
-            if(this.parameters.get('SECURE_TOKEN')){
-                Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
-            }
-            if(this.parameters.get('SERVER_PREFIX_URI')){
-                this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));
-                this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
-            }else{
-                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
-            }
-            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
-                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
-            }
             this.refreshContextVariablesAndInit(new Connexion());
             return;
         }
@@ -128,19 +116,6 @@ class PydioBootstrap{
                 if(data.hasOwnProperty(key)) this.parameters.set(key, data[key]);
             }
 
-            if(this.parameters.get('SECURE_TOKEN')){
-                Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
-            }
-            if(this.parameters.get('SERVER_PREFIX_URI')){
-                this.parameters.set('ajxpResourcesFolder', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpResourcesFolder'));
-                this.parameters.set('ajxpServerAccess', this.parameters.get('SERVER_PREFIX_URI') + this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
-            }else{
-                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:''));
-            }
-            if(this.parameters.get('SERVER_PERMANENT_PARAMS')){
-                this.parameters.set('ajxpServerAccess', this.parameters.get('ajxpServerAccess') + '&' + this.parameters.get('SERVER_PERMANENT_PARAMS') + '&');
-            }
-
             this.refreshContextVariablesAndInit(connexion);
 
         }.bind(this);
@@ -149,12 +124,9 @@ class PydioBootstrap{
     }
 
     refreshContextVariablesAndInit(connexion){
-        if(this.parameters.get('SECURE_TOKEN') && !Connexion.SECURE_TOKEN){
-            Connexion.SECURE_TOKEN = this.parameters.get('SECURE_TOKEN');
-        }
 
-        // Refresh window variable
-        window.ajxpServerAccessPath = this.parameters.get('ajxpServerAccess');
+        Connexion.updateServerAccess(this.parameters);
+
         var cssRes = this.parameters.get("cssResources");
         if(cssRes) cssRes.map(this.loadCSSResource.bind(this));
 

@@ -29,7 +29,7 @@
                 "PRESET_LOGIN":"AJXP_PRELOGED_USER",
                 "HASH_LOAD_ERROR":"AJXP_HASH_LOAD_ERROR",
                 "PASSWORD_AUTH_ONLY":true,
-                "SERVER_PERMANENT_PARAMS":"minisite_session=AJXP_LINK_HASH"
+                "SERVER_PERMANENT_PARAMS":{"minisite_session":"AJXP_LINK_HASH"}
             };
             if(startParameters["PRESET_LOGIN"] == "ajxp_legacy_minisite"){
                 delete startParameters["PRESET_LOGIN"];

@@ -38,7 +38,7 @@ class PydioApi{
 
     request(parameters, onComplete=null, onError=null, settings={}){
         // Connexion already handles secure_token
-        var c = new Connexion();
+        let c = new Connexion();
         if(settings.discrete){
             c.discrete = true;
         }
@@ -55,7 +55,7 @@ class PydioApi{
     }
 
     loadFile(filePath, onComplete=null, onError=null){
-        var c = new Connexion(filePath);
+        let c = new Connexion(filePath);
         c.setMethod('GET');
         c.onComplete = onComplete;
         c.sendAsync();
@@ -87,12 +87,12 @@ class PydioApi{
                 if(!errorSent) onError('Request failed with status :' + xhr.status);
                 errorSent = true;
             };
-            var c = new Connexion();
+            let c = new Connexion();
             return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, localError, onProgress, xhrSettings);
 
         }else if(window.jQuery){
 
-            var formData = new FormData();
+            let formData = new FormData();
             formData.append(fileParameterName, file);
             return jQuery.ajax(uploadUrl, {
                 method:'POST',
@@ -115,14 +115,14 @@ class PydioApi{
      */
     downloadSelection(userSelection, dlActionName='download', additionalParameters = {}){
 
-        var ajxpServerAccess = this._pydioObject.Parameters.get("ajxpServerAccess");
-        var agent = navigator.userAgent || '';
-        var agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
+        const ajxpServerAccess = this._pydioObject.Parameters.get("ajxpServerAccess");
+        const agent = navigator.userAgent || '';
+        const agentIsMobile = (agent.indexOf('iPhone')!=-1||agent.indexOf('iPod')!=-1||agent.indexOf('iPad')!=-1||agent.indexOf('iOs')!=-1);
         const hiddenForm = pydio && pydio.UI && pydio.UI.hasHiddenDownloadForm();
         if(agentIsMobile || !hiddenForm){
-            var downloadUrl = ajxpServerAccess + '&get_action=' + dlActionName;
+            let downloadUrl = ajxpServerAccess + '&get_action=' + dlActionName;
             if(additionalParameters){
-                for(var param in additionalParameters){
+                for(let param in additionalParameters){
                     if(additionalParameters.hasOwnProperty(param)) downloadUrl += "&" + param + "=" + additionalParameters[param];
                 }
             }
@@ -153,7 +153,7 @@ class PydioApi{
             file: filePath,
             content: content
         }, function(transport){
-            var success = this.parseXmlMessage(transport.responseXML);
+            const success = this.parseXmlMessage(transport.responseXML);
             finishedCallback(success);
         }.bind(this), function(){
             finishedCallback(false);
@@ -168,9 +168,9 @@ class PydioApi{
      * @returns string|bool
      */
     static detectMinisiteSession(serverAccess){
-        var regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
-        var val = serverAccess.replace(regex, "$1");
-        return ( val == serverAccess ? false : val );
+        const regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+        const val = serverAccess.replace(regex, "$1");
+        return ( val === serverAccess ? false : val );
     }
 
     /**
@@ -192,7 +192,7 @@ class PydioApi{
      */
     static getClient(){
         if(PydioApi._PydioClient) return PydioApi._PydioClient;
-        var client = new PydioApi();
+        const client = new PydioApi();
         PydioApi._PydioClient = client;
         return client;
     }
@@ -212,7 +212,7 @@ class PydioApi{
             PydioApi._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
         }
 
-        var conn = new Connexion();
+        let conn = new Connexion();
         conn._libUrl = false;
         if(pydio.Parameters.get('SERVER_PREFIX_URI')){
             conn._libUrl = pydio.Parameters.get('SERVER_PREFIX_URI');
@@ -223,7 +223,7 @@ class PydioApi{
     }
 
     switchRepository(repositoryId, completeCallback){
-        var params = {
+        const params = {
             get_action: 'switch_repository',
             repository_id:repositoryId
         };
@@ -231,7 +231,7 @@ class PydioApi{
     }
 
     switchLanguage(lang, completeCallback){
-        var params = {
+        const params = {
             get_action: 'get_i18n_messages',
             lang:lang,
             format:'json'
@@ -240,14 +240,14 @@ class PydioApi{
     }
 
     loadXmlRegistry(completeCallback, xPath=null){
-        var params = {get_action:'get_xml_registry'};
+        let params = {get_action:'get_xml_registry'};
         if(xPath) params[xPath] = xPath;
         this.request(params, completeCallback);
     }
 
     getBootConf(completeCallback){
-        var params = {get_action:'get_boot_conf'};
-        var cB = function(transport){
+        const params = {get_action:'get_boot_conf'};
+        const cB = function(transport){
             if(transport.responseJSON && transport.responseJSON.SECURE_TOKEN){
                 this._pydioObject.Parameters.set('SECURE_TOKEN', transport.responseJSON.SECURE_TOKEN);
                 this.setSecureToken(transport.responseJSON.SECURE_TOKEN);
@@ -264,8 +264,8 @@ class PydioApi{
     }
 
     userSavePreferences(preferences, completeCallback){
-        var params = {'get_action':'save_user_pref'};
-        var i=0;
+        let params = {'get_action':'save_user_pref'};
+        let i=0;
         preferences.forEach(function(value, key){
             params["pref_name_"+i] = key;
             params["pref_value_"+i] = value;
@@ -298,7 +298,7 @@ class PydioApi{
     }
 
     applyCheckHook(node, hookName, hookArg, completeCallback, additionalParams){
-        var params = {
+        let params = {
             get_action : "apply_check_hook",
             file       : node.getPath(),
             hook_name  : hookName,
@@ -317,26 +317,25 @@ class PydioApi{
     parseXmlMessage(xmlResponse)
     {
         if(xmlResponse == null || xmlResponse.documentElement == null) return null;
-        var childs = xmlResponse.documentElement.childNodes;
-
-        var reloadNodes = [];
-        var error = false;
+        const childs = xmlResponse.documentElement.childNodes;
+        let reloadNodes = [], error = false;
         this.LAST_ERROR_ID = null;
 
-        for(var i=0; i<childs.length;i++)
+        for(let i=0; i<childs.length;i++)
         {
-            if(childs[i].tagName === "message")
+            const child = childs[i];
+            if(child.tagName === "message")
             {
-                var messageTxt = "No message";
-                if(childs[i].firstChild) messageTxt = childs[i].firstChild.nodeValue;
-                if(childs[i].getAttribute('type') == 'ERROR') {
+                let messageTxt = "No message";
+                if(child.firstChild) messageTxt = child.firstChild.nodeValue;
+                if(child.getAttribute('type') == 'ERROR') {
                     Logger.error(messageTxt);
                     error = true;
                 }else{
                     Logger.log(messageTxt);
                 }
 
-            }else if(childs[i].tagName === "prompt"){
+            } else if(child.tagName === "prompt") {
 
                 if(pydio && pydio.UI && pydio.UI.openPromptDialog){
                     let jsonData = XMLUtils.XPathSelectSingleNode(childs[i], "data").firstChild.nodeValue;
@@ -345,89 +344,68 @@ class PydioApi{
                 // Interrupt further process
                 throw new Error();
 
-            }
-            else if(childs[i].tagName == "reload_instruction")
-            {
-                var obName = childs[i].getAttribute('object');
-                if(obName == 'data')
-                {
-                    var node = childs[i].getAttribute('node');
+            } else if(child.tagName == "reload_instruction") {
+
+                const obName = child.getAttribute('object');
+                if(obName === 'data') {
+                    const node = child.getAttribute('node');
                     if(node){
                         reloadNodes.push(node);
                     }else{
-                        var file = childs[i].getAttribute('file');
+                        const file = child.getAttribute('file');
                         if(file){
                             this._pydioObject.getContextHolder().setPendingSelection(file);
                         }
                         reloadNodes.push(this._pydioObject.getContextNode());
                     }
-                }
-                else if(obName == 'repository_list')
-                {
+                } else if(obName == 'repository_list') {
                     this._pydioObject.reloadRepositoriesList();
                 }
-            } else if(childs[i].nodeName == 'nodes_diff') {
-                var dm = this._pydioObject.getContextHolder();
+
+            } else if(child.nodeName == 'nodes_diff') {
+
+                const dm = this._pydioObject.getContextHolder();
                 if(dm.getAjxpNodeProvider().parseAjxpNodesDiffs){
                     dm.getAjxpNodeProvider().parseAjxpNodesDiffs(childs[i], dm, this._pydioObject.user.activeRepository, !window.currentLightBox);
                 }
-            }
-            else if(childs[i].tagName == "logging_result")
-            {
-                if(childs[i].getAttribute("secure_token")){
 
-                    var serverAccessPath = this._pydioObject.Parameters.get("ajxpServerAccess");
-                    var minisite_session = PydioApi.detectMinisiteSession(serverAccessPath);
+            } else if(child.tagName == "logging_result") {
 
-                    var secure_token = childs[i].getAttribute("secure_token");
+                if(child.getAttribute("secure_token")){
 
-                    var parts = serverAccessPath.split("?secure_token");
-                    serverAccessPath = parts[0] + "?secure_token=" + secure_token;
-                    if(minisite_session) serverAccessPath += "&minisite_session=" + minisite_session;
-
-                    this.setSecureToken(secure_token);
-                    this._pydioObject.Parameters.set("SECURE_TOKEN", secure_token);
-                    // BACKWARD COMPAT
-                    window.ajxpServerAccessPath = serverAccessPath;
-                    this._pydioObject.Parameters.set("ajxpServerAccess", serverAccessPath);
-                    if(window.pydioBootstrap && pydioBootstrap.parameters){
-                        pydioBootstrap.parameters.set("ajxpServerAccess", serverAccessPath);
-                        pydioBootstrap.parameters.set("SECURE_TOKEN", secure_token);
-                    }
-                    if(window.Connexion) Connexion.SECURE_TOKEN = secure_token;
+                    this._pydioObject.Parameters.set('SECURE_TOKEN', child.getAttribute("secure_token"));
+                    Connexion.updateServerAccess(this._pydioObject.Parameters);
+                    
                 }
-                var result = childs[i].getAttribute('value');
-                var errorId = false;
-                if(result == '1')
-                {
-                    try{
-                        if(childs[i].getAttribute('remember_login') && childs[i].getAttribute('remember_pass')){
-                            PydioApi.storeRememberData();
+                const result = child.getAttribute('value');
+                let errorId = false;
+                switch(result){
+                    case '1':
+                        try{
+                            if(child.getAttribute('remember_login') && child.getAttribute('remember_pass')){
+                                PydioApi.storeRememberData();
+                            }
+                        }catch(e){
+                            Logger.error('Error after login, could prevent registry loading!', e);
                         }
-                    }catch(e){
-                        Logger.error('Error after login, could prevent registry loading!', e);
-                    }
-                    this._pydioObject.loadXmlRegistry();
-                }
-                else if(result == '0' || result == '-1')
-                {
-                    errorId = 285;
-                }
-                else if(result == '2')
-                {
-                    this._pydioObject.loadXmlRegistry();
-                }
-                else if(result == '-2')
-                {
-                    errorId = 285;
-                }
-                else if(result == '-3')
-                {
-                    errorId = 366;
-                }
-                else if(result == '-4')
-                {
-                    errorId = 386;
+                        this._pydioObject.loadXmlRegistry();
+                        break;
+                    case '0':
+                    case '-1':
+                        errorId = 285;
+                        break;
+                    case '2':
+                        this._pydioObject.loadXmlRegistry();
+                        break;
+                    case '-2':
+                        errorId = 285;
+                        break;
+                    case '-3':
+                        errorId = 366;
+                        break;
+                    case '-4':
+                        errorId = 386;
+                        break;
                 }
                 if(errorId){
                     error = true;
@@ -435,17 +413,23 @@ class PydioApi{
                     Logger.error(this._pydioObject.MessageHash[errorId]);
                 }
 
-            }else if(childs[i].tagName == "trigger_bg_action"){
-                var name = childs[i].getAttribute("name");
-                var messageId = childs[i].getAttribute("messageId");
-                var parameters = {};
-                for(var j=0;j<childs[i].childNodes.length;j++){
-                    var paramChild = childs[i].childNodes[j];
+            } else if(child.tagName == "trigger_bg_action") {
+
+                const name = child.getAttribute("name");
+                const messageId = child.getAttribute("messageId");
+                let parameters = {};
+                let callback;
+                for(let j=0;j<child.childNodes.length;j++){
+                    const paramChild = child.childNodes[j];
                     if(paramChild.tagName == 'param'){
+
                         parameters[paramChild.getAttribute("name")] = paramChild.getAttribute("value");
+
                     }else if(paramChild.tagName == 'clientCallback' && paramChild.firstChild && paramChild.firstChild.nodeValue){
-                        var callbackCode = paramChild.firstChild.nodeValue;
-                        var callback = new Function(callbackCode);
+
+                        const callbackCode = paramChild.firstChild.nodeValue;
+                        callback = new Function(callbackCode);
+
                     }
                 }
                 if(name == "javascript_instruction" && callback){
@@ -469,16 +453,16 @@ class PydioApi{
      */
     submitForm(formName, post = true, completeCallback = null)
     {
-        var params = {};
+        let params = {};
         // TODO: UI IMPLEMENTATION
         $(formName).getElements().each(function(fElement){
-            var fValue = fElement.getValue();
+            let fValue = fElement.getValue();
             if(fElement.name == 'get_action' && fValue.substr(0,4) == 'http'){
                 fValue = PathUtils.getBasename(fValue);
             }
             if(fElement.type == 'radio' && !fElement.checked) return;
             if(params[fElement.name] && fElement.name.endsWith('[]')){
-                var existing = params[fElement.name];
+                let existing = params[fElement.name];
                 if(typeof(existing) == 'string') existing = [existing];
                 existing.push(fValue);
                 params[fElement.name] = existing;
@@ -489,7 +473,7 @@ class PydioApi{
         if(this._pydioObject.getContextNode()){
             params['dir'] = this._pydioObject.getContextNode().getPath();
         }
-        var onComplete;
+        let onComplete;
         if(completeCallback){
             onComplete = completeCallback;
         }else{
@@ -524,7 +508,7 @@ class PydioApi{
 
     static storeRememberData(){
         if(!CookiesManager.supported()) return false;
-        var cManager = new CookiesManager({
+        let cManager = new CookiesManager({
             expires: 3600*24*10,
             path:'/',
             secure: true
@@ -534,7 +518,7 @@ class PydioApi{
 
     static clearRememberData(){
         if(!CookiesManager.supported()) return false;
-        var cManager = new CookiesManager({
+        let cManager = new CookiesManager({
             path:'/',
             secure: true
         });
@@ -543,7 +527,7 @@ class PydioApi{
 
     static hasRememberData(){
         if(!CookiesManager.supported()) return false;
-        var cManager = new CookiesManager({
+        let cManager = new CookiesManager({
             path:'/',
             secure: true
         });

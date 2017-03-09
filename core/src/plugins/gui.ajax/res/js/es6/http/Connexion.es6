@@ -37,6 +37,43 @@ class Connexion{
         this.discrete = false;
     }
 
+    static updateServerAccess(parameters){
+
+        if(parameters.get('SECURE_TOKEN')){
+            Connexion.SECURE_TOKEN = parameters.get('SECURE_TOKEN');
+        }
+        let serverAccessPath = parameters.get('ajxpServerAccess').split('?').shift();
+        if(parameters.get('SERVER_PREFIX_URI')){
+            parameters.set('ajxpResourcesFolder', parameters.get('SERVER_PREFIX_URI') + parameters.get('ajxpResourcesFolder'));
+            serverAccessPath = parameters.get('SERVER_PREFIX_URI') + serverAccessPath + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:'');
+        }else{
+            serverAccessPath = serverAccessPath + '?' + (Connexion.SECURE_TOKEN? 'secure_token='+Connexion.SECURE_TOKEN:'');
+        }
+        if(parameters.get('SERVER_PERMANENT_PARAMS')){
+            const permParams = parameters.get('SERVER_PERMANENT_PARAMS');
+            let permStrings = [];
+            for(let permanent in permParams){
+                if(permParams.hasOwnProperty(permanent)){
+                    permStrings.push(permanent + '=' + permParams[permanent]);
+                }
+            }
+            permStrings = permStrings.join('&');
+            if(permStrings) {
+                serverAccessPath += '&' + permStrings;
+            }
+        }
+
+        parameters.set('ajxpServerAccess', serverAccessPath);
+        // BACKWARD COMPAT
+        window.ajxpServerAccessPath = serverAccessPath;
+        if(window.pydioBootstrap && window.pydioBootstrap.parameters){
+            pydioBootstrap.parameters.set("ajxpServerAccess", serverAccessPath);
+            pydioBootstrap.parameters.set("SECURE_TOKEN", Connexion.SECURE_TOKEN);
+        }
+
+    }
+
+
     static log(action, syncStatus){
         if(!Connexion.PydioLogs){
             Connexion.PydioLogs = [];
@@ -102,36 +139,49 @@ class Connexion{
 		}else if(this._baseUrl.indexOf('secure_token=') !== -1){
 
             // Remove from baseUrl and set inside params
-            var parts = this._baseUrl.split('secure_token=');
-            var toks = parts[1].split('&');
-            var token = toks.shift();
-            var rest = toks.join('&');
+            const parts = this._baseUrl.split('secure_token=');
+            let toks = parts[1].split('&');
+            const token = toks.shift();
+            const rest = toks.join('&');
             this._baseUrl = parts[0] + (rest ? '&' + rest : '');
             this._parameters.set('secure_token', token);
 
         }
 	}
 
+	addServerPermanentParams(){
+	    if(!this._pydio || !this._pydio.Parameters.has('SERVER_PERMANENT_PARAMS')){
+	        return;
+        }
+        const permParams = this._pydio.Parameters.get('SERVER_PERMANENT_PARAMS');
+        for(let permanent in permParams){
+            if(permParams.hasOwnProperty(permanent)){
+                this.addParameter(permanent, permParams[permanent]);
+            }
+        }
+    }
+
     /**
      * Show a small loader
      */
     showLoader(){
-        if(this.discrete || !pydio) return;
-        pydio.notify("connection-start");
+        if(this.discrete || !this._pydio) return;
+        this._pydio.notify("connection-start");
     }
 
     /**
      * Hide a small loader
      */
     hideLoader(){
-        if(this.discrete || !pydio) return;
-        pydio.notify("connection-end");
+        if(this.discrete || !this._pydio) return;
+        this._pydio.notify("connection-end");
     }
 
     _send(aSync=true){
 
         Connexion.log(this._parameters.get("get_action"), aSync ? 'async' : 'sync');
 		this.addSecureToken();
+		this.addServerPermanentParams();
         this.showLoader();
         let oThis = this;
         let options = {
