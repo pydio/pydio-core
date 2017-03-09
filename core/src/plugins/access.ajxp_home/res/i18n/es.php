@@ -48,83 +48,84 @@ $mess=array(
     "59"=> "iPhone/iPad",
     "60"=>"Mac OS (Beta)",
     "61"=>"Windows (Beta)",
-    "62"=> "<h2>What is a workspace?</h2>
-            This video explains what Workspaces are in APPLICATION_TITLE
+    "62"=> "<h2>¿Qué es un Workspace?</h2>
+            Este vídeo explica que son los Workspaces en APPLICATION_TITLE
             <ul>
-                <li>Why are Workspaces central in APPLICATION_TITLE?</li>
-                <li>What are Workspaces from a technical perspective?</li>
-                <li>How do they allow you to organise your data?</li>
+                <li>¿Por qué APPLICATION_TITLE se centra en los Workspaces?</li>
+                <li>¿Qué son los Workspaces desde una perspectiva técnica?</li>
+                <li>¿Cómo te permiten organizar tus datos?</li>
             </ul>
             ",
 
-    "63"=> "<h2>Upload files to APPLICATION_TITLE</h2>
-            Get started with APPLICATION_TITLE and see how to upload files
+    "63"=> "<h2>Subir archivos a APPLICATION_TITLE</h2>
+            Cómo subir archivos a APPLICATION_TITLE
             <ul>
-                <li>Drag and drop files into APPLICATION_TITLE</li>
-                <li>Create a new folder</li>
-                <li>Rename files and folders</li>
-                <li>Download files to your Computer</li>
+                <li>Arrastra y suelta archivos en APPLICATION_TITLE</li>
+                <li>Crear un nuevo directorio</li>
+                <li>Renombrar archivos y directorios</li>
+                <li>Descargar archivos en tu ordenador</li>
             </ul>
             ",
 
-    "64"=> "<h2>Search, browse and manage your files</h2>
-            This video shows you various tips to efficiently manage your files in APPLICATION_TITLE
+    "64"=> "<h2>Busca, explora y gestiona tus archivos</h2>
+            Este vídeo muestra varios consejos para gestionar tus archivos en APPLICATION_TITLE
             <ul>
-                <li>Cross-workspaces search bar</li>
-                <li>Content display modes, Keyboard shortcuts</li>
-                <li>Sort Files</li>
-                <li>Meta Data, Bookmarks</li>
+                <li>Barra de búsqueda para todos los Workspaces</li>
+                <li>Modos de visualización de contenidos, Atajos de teclado</li>
+                <li>Ordenar archivos</li>
+                <li>Metadatos, Favoritos</li>
             </ul>
             ",
 
-    "79"=> "<h2>Sharing files and folders</h2>
-            This tutorial shows you how to share files and folders, internally or externally
+    "79"=> "<h2>Compartiendo archivos y carpetas</h2>
+            Este tutorial muestra como compartir archivos y carpetas interna o externamente
             <ul>
-                <li>Creating share links for external people</li>
-                <li>Sharing files and folders with internal collaborators</li>
-                <li>Sharing a folder as a workspace</li>
-                <li>Layout options of shared folders</li>
-                <li>Creating a blind drop folder</li>
-                <li>Managing users and share rights</li>
+                <li>Creando enlaces para compartir externamente</li>
+                <li>Compartiendo archivos y directorios con colaboradores internos</li>
+                <li>Compartiendo un directorio como Workspace</li>
+                <li>Opciones de disposición para directorios compartidos</li>
+                <li>Creando un directorio «blind drop»</li>
+                <li>Gestionando usuarios y permisos de archivos compartidos</li>
             </ul>
             ",
 
-    "80"=> "<h2>Sharing : security features</h2>
-            This video goes through the various share settings that help you secure your shares
+    "80"=> "<h2>Compartiendo: seguridad</h2>
+            Este video muestra opciones para compartir que ayudaran a hacer más seguros tus intercambios
             <ul>
-                <li>Password protection</li>
-                <li>Expiration date</li>
-                <li>Limit the number of downloads</li>
+                <li>Protección con contraseña</li>
+                <li>Tiempo de expiración</li>
+                <li>Limitar el número de descargas</li>
             </ul>
             ",
 
-    "81"=> "<h2>Customize your share links</h2>
-            See how you can customise the URL of your share links to make them look more user-friendly.
+    "81"=> "<h2>Personaliza tus enlaces</h2>
+            Aprende como personalizar la URL de tus enlaces de intercambio para hacerlos más amigables
             ",
 
     "82"=> "<h2>Shared links custom rights</h2>
-            This video shows you how to manage the permissions attached to your shares
+            Este vídeo muestra como gestionar los permisos de tus archivos compartidos
             <ul>
-                <li>Preview</li>
-                <li>Download</li>
-                <li>Upload / Edit</li>
+                <li>Previsualizar</li>
+                <li>Descargar</li>
+                <li>Subir / Editar</li>
             </ul>
             ",
 
-    "83"=> "<h2>Language</h2>
-            APPLICATION_TITLE is available in 28 languages. This video shows you how to change the language in APPLICATION_TITLE.
+    "83"=> "<h2>Idioma</h2>
+            APPLICATION_TITLE está disponible en 28 idiomas. Este vídeo muestra como cambiar el idioma de APPLICATION_TITLE
             ",
 
-    "84"=> "<h2>Alerts</h2>
+    "84"=> "<h2>Alertas</h2>
+            Aprende como configurar alertas en un archivo para ver cuando se modifica o se consulta.
             Learn how to set alerts on a file, in order to see when it has been modified or consulted.
             ",
 
-    "85"=> "<h2>Collaborative edition</h2>
-            This video shows you how to collaborate on office docs, thanks to Collabora online office suite
+    "85"=> "<h2>Edición Colaborativa</h2>
+            Este vídeo muestra como colaborar en documentos Office gracias a Collabora Online Office Suite
             <ul>
-                <li>Work on text docs, presentations, spreadsheets</li>
-                <li>Edit docs collaboratively in real time</li>
-                <li>Create new documents directly from your browser</li>
+                <li>Trabaja con documentos de texto, presentaciónes y tablas</li>
+                <li>Edita documentos de forma colaborativa en tiempo real</li>
+                <li>Crear documentos nuevos desde tu navegador</li>
             </ul>
             ",
     "65"=> "¡Descubre más en el canal de APPLICATION_TITLE!",

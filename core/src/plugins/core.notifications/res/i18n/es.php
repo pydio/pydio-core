@@ -32,7 +32,7 @@ $mess=array(
 "10" => "Actividad de la carpeta",
 "11" => "Actividad del archivo",
 "12" => "Dependiendo de su navegador, esto va a pedir un permiso específico. Para desactivar, ir a través de las preferencias del navegador y excepciones. Si ya ha activado esta función, probablemente no pasará nada.",
-"13" => "Su navegador parece no soportar de momento las notificaciones de escritorio."
+"13" => "Su navegador parece no soportar de momento las notificaciones de escritorio.",
 "14" => "Sin alertas",
 "15" => "Las notificaciones de archivos apareceran aquí",
 );

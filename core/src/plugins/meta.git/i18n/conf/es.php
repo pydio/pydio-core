@@ -23,5 +23,5 @@ defined('AJXP_EXEC') or die('Acceso no permitido');
 
 $mess = array(
     "Git-based Versioning" => "Versiones basadas en Git",
-    "Keep tracks of all files modifications using a local Git repository" => "Sigue todas las modificaciones de arivhos usando un repositorio Git local",
+    "Keep tracks of all files modifications using a local Git repository" => "Sigue todas las modificaciones de archivos usando un repositorio Git local",
 );
