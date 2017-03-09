@@ -74,6 +74,21 @@ class TopLevelRouter
         $textContent = str_replace("%PUBLIC_BASEURI%", ConfService::getGlobalConf("PUBLIC_BASEURI"), $textContent);
         $textContent = str_replace("%WEBDAV_BASEURI%", ConfService::getGlobalConf("WEBDAV_BASEURI"), $textContent);
         $routes = json_decode($textContent, true);
+        $adminURI = ConfService::getGlobalConf("ADMIN_URI");
+        if(!empty($adminURI)){
+            // Remove /settings from "*" route
+            $routes["/"]["routes"] = array_filter($routes["/"]["routes"], function($entry){
+                return strpos($entry, "/settings") !== 0;
+            });
+            $lastSlash = array_pop($routes);
+            $routes[$adminURI] = [
+                "methods" => "*",
+                "routes"  => [$adminURI."[{optional:.+}]"],
+                "class"   => "Pydio\\Core\\Http\\Base",
+                "method"  => "handleRoute"
+            ];
+            $routes["/"] = $lastSlash;
+        }
         foreach ($routes as $short => $data){
             $methods = $data["methods"] == "*" ? $allMethods : $data["methods"];
             foreach($data["routes"] as $route){

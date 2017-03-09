@@ -48,6 +48,11 @@ class ApplicationState
     private static $minisiteHash = null;
 
     /**
+     * @var bool
+     */
+    private static $isAdminMode = false;
+
+    /**
      * @param string $restBase
      */
     public static function setSapiRestBase($restBase){
@@ -99,6 +104,20 @@ class ApplicationState
      */
     public static function getMinisiteHash(){
         return self::$minisiteHash;
+    }
+
+    /**
+     * Set application in admin only mode
+     */
+    public static function setAdminMode(){
+        self::$isAdminMode = true;
+    }
+
+    /**
+     * @return bool
+     */
+    public static function isAdminMode(){
+        return self::$isAdminMode;
     }
 
     /**

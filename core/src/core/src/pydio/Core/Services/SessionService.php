@@ -28,6 +28,7 @@ use Pydio\Core\Model\UserInterface;
 defined('AJXP_EXEC') or die('Access not allowed');
 
 define('PYDIO_SESSION_NAME', 'AjaXplorer');
+define('PYDIO_SESSION_NAME_SETTINGS', 'Pydio_Settings');
 define('PYDIO_SESSION_QUERY_PARAM', 'ajxp_sessid');
 
 /**

@@ -27,6 +27,7 @@ use Pydio\Core\Http\Middleware\SecureTokenMiddleware;
 use Pydio\Core\Http\Response\FileReaderResponse;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Controller\Controller;
@@ -234,12 +235,19 @@ class RichClient extends Plugin
                 $root = substr($root, 0, $capture);
             }
         }
+        if(ApplicationState::isAdminMode()){
+            $adminURI = ConfService::getGlobalConf("ADMIN_URI");
+            $root = rtrim($root, '/') .'/'. ltrim($adminURI, '/');
+        }
         $START_PARAMETERS = array(
             "BOOTER_URL"        =>"index.php?get_action=get_boot_conf",
             "MAIN_ELEMENT"      => "ajxp_desktop",
             "APPLICATION_ROOT"  => $root,
             "REBASE"            => $root
         );
+        if(ApplicationState::isAdminMode()){
+            $START_PARAMETERS["SERVER_PERMANENT_PARAMS"] = ["settings_mode"=>"true"];
+        }
         if($request->getAttribute("flash") !== null){
             $START_PARAMETERS["ALERT"] = $request->getAttribute("flash");
         }

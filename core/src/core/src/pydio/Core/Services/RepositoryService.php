@@ -90,10 +90,15 @@ class RepositoryService
         if ($repositoryObject->isTemplate()) {
             return false;
         }
-        if (($repositoryObject->getAccessType()=="ajxp_conf" || $repositoryObject->getAccessType()=="ajxp_admin") && $userObject != null) {
+        $isAdminRepo = ($repositoryObject->getAccessType()==="ajxp_conf" || $repositoryObject->getAccessType()==="ajxp_admin");
+        if ($isAdminRepo && $userObject !== null) {
             if (UsersService::usersEnabled() && !$userObject->isAdmin()) {
                 return false;
             }
+        }
+        $adminURI = ConfService::getGlobalConf("ADMIN_URI");
+        if(!empty($adminURI) && (($isAdminRepo && !ApplicationState::isAdminMode()) || (!$isAdminRepo && ApplicationState::isAdminMode()))){
+            return false;
         }
         $repositoryId = $repositoryObject->getId();
         if ($repositoryObject->getAccessType()=="ajxp_user" && $userObject != null) {
