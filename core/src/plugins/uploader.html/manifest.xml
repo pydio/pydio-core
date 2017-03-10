@@ -10,8 +10,8 @@
         <resources>
             <js file="plugins/uploader.html/class.MultiUploader.js" className="MultiUploader"/>
             <js file="plugins/uploader.html/js/build/UploaderView.js" className="UploaderView" depends="React,PydioForm,UploaderModel"/>
-            <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel" depends="PydioTasks"/>
-            <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener"/>
+            <js file="plugins/uploader.html/js/build/UploaderModel.js" className="UploaderModel" depends="React,PydioTasks"/>
+            <js file="plugins/uploader.html/js/build/UploaderGlobalListener.js" className="UploaderGlobalListener" depends="React,PydioTasks,UploaderModel"/>
             <i18n path="plugins/uploader.html/i18n" namespace="html_uploader"/>
         </resources>
     </client_settings>

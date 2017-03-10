@@ -1452,7 +1452,11 @@
     });
 
     var DialogNamespace = global.ShareDialog || {};
+
     DialogNamespace.MainPanel = MainPanel;
+    DialogNamespace.PublicLinkField = PublicLinkField;
+    DialogNamespace.PublicLinkPanel = PublicLinkPanel;
+
     global.ShareDialog = DialogNamespace;
 
 })(window);

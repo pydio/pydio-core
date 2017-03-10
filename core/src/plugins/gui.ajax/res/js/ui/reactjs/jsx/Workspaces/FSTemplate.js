@@ -121,7 +121,7 @@ let FSTemplate = React.createClass({
 
 });
 
-var fileTarget = {
+const fileTarget = {
     drop: function (props, monitor) {
         let dataTransfer = monitor.getItem().dataTransfer;
         let passItems;

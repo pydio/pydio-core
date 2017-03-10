@@ -359,6 +359,7 @@
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', folderItem);
         }
         pushFile(uploadItem){
             this._uploads.push(uploadItem);
@@ -371,6 +372,7 @@
                 this.processNext();
             } // Autostart with queue was empty before
             this.notify('update');
+            this.notify('item_added', uploadItem);
         }
         log(){
         }

@@ -96,6 +96,7 @@
                         </div>
                     </MaterialUI.Toolbar>
                     <PydioForm.FileDropZone
+                        className="transparent-dropzone"
                         ref="dropzone"
                         multiple={true}
                         enableFolders={true}
@@ -213,7 +214,9 @@
             }.bind(this);
             store.observe("update", this._storeObserver);
             store.observe("auto_close", function(){
-                this.props.onDismiss();
+                if(this.props.onDismiss){
+                    this.props.onDismiss();
+                }
             }.bind(this));
             this.setState({items: store.getItems()});
         },
@@ -348,7 +351,12 @@
     });
 
     var ns = global.UploaderView || {};
+
     ns.DropUploader = DropUploader;
+    ns.TransfersList = TransfersList;
+    ns.TransferFile = TransferFile;
+    ns.TransferFolder = TransferFolder;
+
     global.UploaderView = ns;
 
 })(window);
