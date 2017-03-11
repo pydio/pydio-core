@@ -94,6 +94,7 @@
         },
         componentDidMount:function(){
             this.state.model.observe("status_changed", this.modelUpdated);
+            this.state.model.initLoad();
         },
 
         modelUpdated: function(){

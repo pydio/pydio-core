@@ -12,14 +12,17 @@
             this._data = {link:{}};
             this._pendingData = {};
             this._pydio = pydio;
-            if(this._node.getMetadata().get('ajxp_shared')){
-                this.load();
-            }
             if(this._node.isLeaf()){
                 this._previewEditors = pydio.Registry.findEditorsForMime(this._node.getAjxpMime()).filter(function(entry){
                     return !(entry.editorClass == "OtherEditorChooser" || entry.editorClass == "BrowserOpener");
                 });
 
+            }
+        }
+
+        initLoad(){
+            if(this._node.getMetadata().get('ajxp_shared')){
+                this.load();
             }
         }
 

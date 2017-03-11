@@ -43,11 +43,8 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback module="ShareActions.Callbacks.share" prepareModal="true"/>
+                    <clientCallback module="ShareActions.Callbacks.share"/>
                     <clientListener name="init" module="ShareActions.Listeners.hookAfterDelete"/>
-                    <clientForm id="react_share_form"><![CDATA[
-                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
                 </processing>
             </action>
             <action name="share-edit-shared">
@@ -56,7 +53,7 @@
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback module="ShareActions.Callbacks.editShare" prepareModal="true"/>
+                    <clientCallback module="ShareActions.Callbacks.editShare"/>
                 </processing>
             </action>
             <action name="share">
@@ -143,7 +140,7 @@
                     <selectionContext dir="true" file="true" evalMetadata="metadata.get('ajxp_shared')" recycle="false" unique="true" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback module="ShareActions.Callbacks.editFromList" prepareModal="true"/>
+                    <clientCallback module="ShareActions.Callbacks.editFromList"/>
                     <clientForm id="react_share_form"><![CDATA[
                         <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>
@@ -154,7 +151,7 @@
                     <context dir="true" recycle="false" selection="false" actionBar="true" actionBarGroup="share_list_toolbar" behaviour="hidden"/>
                 </gui>
                 <processing>
-                    <clientCallback module="ShareActions.Callbacks.loadList" prepareModal="true"/>
+                    <clientCallback module="ShareActions.Callbacks.loadList"/>
                 </processing>
                 <processing>
                     <serverCallback restParams="/" methodName="switchAction" sdkMethodName="loadShareList">
@@ -171,7 +168,7 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback module="ShareActions.Callbacks.clearExpired" prepareModal="true"/>
+                    <clientCallback module="ShareActions.Callbacks.clearExpired"/>
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
                 </processing>
             </action>
@@ -180,7 +177,7 @@
                     <context dir="true" recycle="false" selection="false" actionBarGroup="minisite-share-actions" actionBar="true"/>
                 </gui>
                 <processing>
-                    <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true" prepareModal="true">
+                    <clientCallback dialogOpenForm="share_current_url" dialogSkipButtons="true">
                         <dialogOnOpen><![CDATA[
                             modal.getForm().down("#crt-page-url").setValue(document.location.href);
                             if(pydioBootstrap.parameters.get('PRESET_LOGIN') === 'ajxp_preloged_user' && !ajaxplorer.getContextHolder().isEmpty() && pydio.getController().getActionByName("download")){
