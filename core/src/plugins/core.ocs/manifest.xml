@@ -10,6 +10,11 @@
     <server_settings>
         <global_param name="ENABLE_FEDERATED_SHARING" type="boolean" label="CONF_MESSAGE[Enable Federated Sharing]"
                       description="CONF_MESSAGE[Allow users to send / receive shares from other Pydio instances or from other Federated-Sharing-compatible systems]" default="false" mandatory="true" expose="true"/>
+        <global_param name="TRUSTED_SERVER_ID" group="CONF_MESSAGE[Trusted Servers]" type="string" replicationGroup="TRUSTED_SERVERS" label="CONF_MESSAGE[Server ID]" description="CONF_MESSAGE[Unique ID (use alphanumeric characters) identifying server]"/>
+        <global_param name="TRUSTED_SERVER_LABEL" group="CONF_MESSAGE[Trusted Servers]" type="string" replicationGroup="TRUSTED_SERVERS" label="CONF_MESSAGE[Label]" description="CONF_MESSAGE[User-friendly label to display the servers list]"/>
+        <global_param name="TRUSTED_SERVER_URL" group="CONF_MESSAGE[Trusted Servers]" type="string" replicationGroup="TRUSTED_SERVERS" label="CONF_MESSAGE[Server URL]" description="CONF_MESSAGE[Server URL including http/https protocol]"/>
+        <global_param name="TRUSTED_SERVER_USER" group="CONF_MESSAGE[Trusted Servers]" type="string" replicationGroup="TRUSTED_SERVERS" label="CONF_MESSAGE[Login]" description="CONF_MESSAGE[User name used to connect to remote server. Must be created on the remote server first]"/>
+        <global_param name="TRUSTED_SERVER_PASS" group="CONF_MESSAGE[Trusted Servers]" type="password" replicationGroup="TRUSTED_SERVERS" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[Password used to connect to remote server.]"/>
     </server_settings>
     <registry_contributions>
         <actions>
@@ -22,6 +27,11 @@
                 <processing>
                     <serverCallback methodName="switchAction" restParams="/remote_share_id" />
                 </processing>
+            </action>
+            <action name="user_list_authorized_users">
+                <pre_processing>
+                    <serverCallback methodName="switchAction"/>
+                </pre_processing>
             </action>
         </actions>
     </registry_contributions>
