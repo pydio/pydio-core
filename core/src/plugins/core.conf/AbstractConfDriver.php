@@ -36,6 +36,7 @@ use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Model\FilteredUsersList;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Serializer\UserXML;
@@ -1239,163 +1240,36 @@ abstract class AbstractConfDriver extends Plugin
 
             case "user_list_authorized_users" :
 
-                if(isSet($httpVars["format"]) && $httpVars["format"] == "xml"){
-                    header('Content-Type: text/xml; charset=UTF-8');
-                    header('Cache-Control: no-cache');
-                    print('<?xml version="1.0" encoding="UTF-8"?>');
-                }else{
-                    HTMLWriter::charsetHeader();
-                }
-                if (!ConfService::getAuthDriverImpl()->usersEditable()) {
+                if(isSet($httpVars["processed"])){
                     break;
                 }
 
-                $crtValue = $httpVars["value"];
-                $usersOnly = isSet($httpVars["users_only"]) && $httpVars["users_only"] == "true";
-                $existingOnly = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] == "true";
-                if(!empty($crtValue)) {
-                    $regexp = '^'.$crtValue;
-                    $pregexp = '/^'.preg_quote($crtValue).'/i';
-                } else {
-                    $regexp = $pregexp = null;
-                }
-                $skipDisplayWithoutRegexp = ConfService::getContextConf($ctx, "USERS_LIST_REGEXP_MANDATORY", "conf");
-                if($skipDisplayWithoutRegexp && $regexp == null){
-                    $users = "";
+                $crtValue       = InputFilter::sanitize($httpVars['value'], InputFilter::SANITIZE_HTML_STRICT);
+                $usersOnly      = isSet($httpVars["users_only"]) && $httpVars["users_only"] === "true";
+                $existingOnly   = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] === "true";
 
-                    $teams = $this->listRolesOwnedBy($ctx->getUser()->getId());
-                    foreach ($teams as $teamObject) {
-                        $teamLabel = StringHelper::xmlEntities($teamObject->getLabel());
-                        $tId = $teamObject->getId();
-                        $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-entry_id='/AJXP_TEAM/$tId' data-label=\"".$teamLabel."\"><span class='user_entry_label'>".$teamLabel."</span></li>";
-                    }
-                    print("<ul>$users</ul>");
-                    break;
-                }
-                $limit = intval(ConfService::getContextConf($ctx, "USERS_LIST_COMPLETE_LIMIT", "conf"));
-                $searchAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS", "conf");
-                $displayAll = ConfService::getContextConf($ctx, "CROSSUSERS_ALLGROUPS_DISPLAY", "conf");
-                $baseGroup = "/";
-                if( ($regexp == null && !$displayAll) || ($regexp != null && !$searchAll) && $ctx->hasUser()){
-                    $baseGroup = $ctx->getUser()->getGroupPath();
-                }
-                $allUsers = UsersService::listUsers($baseGroup, $regexp, 0, $limit, false);
-
-                if (!$usersOnly) {
-                    $allGroups = [];
-
-                    $roleOrGroup = ConfService::getContextConf($ctx, "GROUP_OR_ROLE", "conf");
-                    $rolePrefix = $excludeString = $includeString = null;
-                    if(!is_array($roleOrGroup)){
-                        $roleOrGroup = ["group_switch_value" => $roleOrGroup];
-                    }
-
-                    $listRoleType = false;
-
-                    if(isSet($roleOrGroup["PREFIX"])){
-                        $rolePrefix    = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "PREFIX", null, $roleOrGroup["PREFIX"]);
-                        $excludeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "EXCLUDED", null, $roleOrGroup["EXCLUDED"]);
-                        $includeString = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "INCLUDED", null, $roleOrGroup["INCLUDED"]);
-                        $listUserRolesOnly = $loggedUser->getMergedRole()->filterParameterValue("core.conf", "LIST_ROLE_BY", null, $roleOrGroup["LIST_ROLE_BY"]);
-                        if (is_array($listUserRolesOnly) && isset($listUserRolesOnly["group_switch_value"])) {
-                            switch ($listUserRolesOnly["group_switch_value"]) {
-                                case "userroles":
-                                    $listRoleType = true;
-                                    break;
-                                case "allroles":
-                                    $listRoleType = false;
-                                    break;
-                                default;
-                                    break;
-                            }
+                $list = new FilteredUsersList($ctx);
+                $items = $list->load($usersOnly, !$existingOnly, $crtValue, '');
+                $format = $httpVars["format"];
+                if(!isSet($format)) $format = 'json';
+                switch($format){
+                    case 'xml':
+                    case 'json':
+                        $x = new SerializableResponseStream($items);
+                        $x->forceArray();
+                        $responseInterface = $responseInterface->withBody($x);
+                        break;
+                    case 'html':
+                        $responseInterface = $responseInterface->withHeader('Content-type', 'text/html; charset=UTF-8');
+                        $responseInterface->getBody()->write('<ul>');
+                        foreach($items as $chunk){
+                            $responseInterface->getBody()->write($chunk->toXml());
                         }
-                    }
-
-                    switch (strtolower($roleOrGroup["group_switch_value"])) {
-                        case 'user':
-                            // donothing
-                            break;
-                        case 'group':
-                            $authGroups = UsersService::listChildrenGroups($baseGroup);
-                            foreach ($authGroups as $gId => $gName) {
-                                $allGroups["AJXP_GRP_" . rtrim($baseGroup, "/")."/".ltrim($gId, "/")] = $gName;
-                            }
-                            break;
-                        case 'role':
-                            $allGroups = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
-                            break;
-                        case 'rolegroup';
-                            $groups = [];
-                            $authGroups = UsersService::listChildrenGroups($baseGroup);
-                            foreach ($authGroups as $gId => $gName) {
-                                $groups["AJXP_GRP_" . rtrim($baseGroup, "/")."/".ltrim($gId, "/")] = $gName;
-                            }
-                            $roles = $this->getUserRoleList($loggedUser, $rolePrefix, $includeString, $excludeString, $listRoleType);
-
-                            empty($groups) ? $allGroups = $roles : (empty($roles) ? $allGroups = $groups : $allGroups = array_merge($groups, $roles));
-                            //$allGroups = array_merge($groups, $roles);
-                            break;
-                        default;
-                            break;
-                    }
-                }
-
-
-                $users = "";
-                $index = 0;
-                if(!empty($crtValue)){
-                    $crtValue = InputFilter::sanitize($crtValue, InputFilter::SANITIZE_HTML_STRICT);
-                }
-                if ($regexp != null && (!count($allUsers) || (!empty($crtValue) && !array_key_exists(strtolower($crtValue), $allUsers)))  && ConfService::getContextConf($ctx, "USER_CREATE_USERS", "conf") && !$existingOnly) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue." (".$mess["448"]).")</span></li>";
-                } else if ($existingOnly && !empty($crtValue)) {
-                    $users .= "<li class='complete_user_entry_temp' data-temporary='true' data-label=\"".StringHelper::xmlEntities($crtValue)."\" data-entry_id=\"".StringHelper::xmlEntities($crtValue)."\"><span class='user_entry_label'>".StringHelper::xmlEntities($crtValue)."</span></li>";
-                }
-                $mess = LocaleService::getMessages();
-                if (!$usersOnly && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
-                    $users .= "<li class='complete_group_entry' data-group='AJXP_GRP_/' data-label=\"".StringHelper::xmlEntities($mess["447"])."\"><span class='user_entry_label'>".StringHelper::xmlEntities($mess["447"])."</span></li>";
-                }
-                $indexGroup = 0;
-                if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
-                    foreach ($allGroups as $groupId => $groupLabel) {
-                        if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
-                            $groupLabel = StringHelper::xmlEntities($groupLabel);
-                            $users .= "<li class='complete_group_entry' data-group='$groupId' data-label=\"".$groupLabel."\" data-entry_id='$groupId'><span class='user_entry_label'>".$groupLabel."</span></li>";
-                            $indexGroup++;
-                        }
-                        if($indexGroup == $limit) break;
-                    }
-                }
-                if (!$usersOnly) {
-                    $teams = $this->listRolesOwnedBy($ctx->getUser()->getId());
-                    foreach ($teams as $teamObject) {
-                        $teamLabel = $teamObject->getLabel();
-                        if($regexp === null  ||  preg_match($pregexp, $teamLabel)){
-                            $teamLabel = StringHelper::xmlEntities($teamLabel);
-                            $tId = $teamObject->getId();
-                            $users.= "<li class='complete_group_entry' data-group='/AJXP_TEAM/$tId' data-entry_id='/AJXP_TEAM/$tId' data-label=\"".$teamLabel."\"><span class='user_entry_label'>".$teamLabel."</span></li>";
-                        }
-                    }
-                }
-                foreach ($allUsers as $userId => $userObject) {
-                    if($userObject->getId() == $loggedUser->getId()) continue;
-                    if ( ( !$userObject->hasParent() &&  ConfService::getContextConf($ctx, "ALLOW_CROSSUSERS_SHARING", "conf")) || $userObject->getParent() == $loggedUser->getId() ) {
-                        $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-                        $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
-                        //if($regexp != null && ! (preg_match("/$regexp/i", $userId) || preg_match("/$regexp/i", $userLabel)) ) continue;
-                        $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
-                        if (ConfService::getContextConf($ctx, "USERS_LIST_HIDE_LOGIN", "conf") == true && $userLabel != $userId) {
-                            $userDisplay = $userLabel;
-                        }
-                        $userIsExternal = $userObject->hasParent() ? "true":"false";
-                        $userLabel = StringHelper::xmlEntities($userLabel);
-                        $userDisplay = StringHelper::xmlEntities($userDisplay);
-                        $users .= "<li class='complete_user_entry' data-external=\"$userIsExternal\" data-label=\"".$userLabel."\" data-avatar='$userAvatar' data-entry_id='$userId'><span class='user_entry_label'>".$userDisplay."</span></li>";
-                        $index ++;
-                    }
-                    if($index == $limit) break;
-                }
-                print("<ul>".$users."</ul>");
+                        $responseInterface->getBody()->write('</ul>');
+                        break;
+                    default:
+                        break;
+                };
 
                 break;
 
@@ -1484,66 +1358,9 @@ abstract class AbstractConfDriver extends Plugin
     }
 
     /**
-     * @param UserInterface $userObject
-     * @param string $rolePrefix get all roles with prefix
-     * @param string $includeString get roles in this string
-     * @param string $excludeString eliminate roles in this string
-     * @param bool $byUserRoles
-     * @return array
-     */
-    public function getUserRoleList($userObject, $rolePrefix, $includeString, $excludeString, $byUserRoles = false)
-    {
-        if (!$userObject){
-            return [];
-        }
-        if ($byUserRoles) {
-            $allUserRoles = $userObject->getRoles();
-        } else {
-            $allUserRoles = RolesService::getRolesList([], true);
-        }
-        $allRoles = [];
-        if (isset($allUserRoles)) {
-
-            // Exclude
-            if ($excludeString) {
-                if (strpos($excludeString, "preg:") !== false) {
-                    $matchFilterExclude = "/" . str_replace("preg:", "", $excludeString) . "/i";
-                } else {
-                    $valueFiltersExclude = array_map("trim", explode(",", $excludeString));
-                    $valueFiltersExclude = array_map("strtolower", $valueFiltersExclude);
-                }
-            }
-
-            // Include
-            if ($includeString) {
-                if (strpos($includeString, "preg:") !== false) {
-                    $matchFilterInclude = "/" . str_replace("preg:", "", $includeString) . "/i";
-                } else {
-                    $valueFiltersInclude = array_map("trim", explode(",", $includeString));
-                    $valueFiltersInclude = array_map("strtolower", $valueFiltersInclude);
-                }
-            }
-
-            foreach ($allUserRoles as $roleId => $role) {
-                if (!empty($rolePrefix) && strpos($roleId, $rolePrefix) === false) continue;
-                if (isSet($matchFilterExclude) && preg_match($matchFilterExclude, substr($roleId, strlen($rolePrefix)))) continue;
-                if (isSet($valueFiltersExclude) && in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersExclude)) continue;
-                if (isSet($matchFilterInclude) && !preg_match($matchFilterInclude, substr($roleId, strlen($rolePrefix)))) continue;
-                if (isSet($valueFiltersInclude) && !in_array(strtolower(substr($roleId, strlen($rolePrefix))), $valueFiltersInclude)) continue;
-                if($role instanceof AJXP_Role) $roleObject = $role;
-                else $roleObject = RolesService::getRole($roleId);
-                $label = $roleObject->getLabel();
-                $label = !empty($label) ? $label : substr($roleId, strlen($rolePrefix));
-                $allRoles[$roleId] = $label;
-            }
-        }
-        return $allRoles;
-    }
-
-
-    /**
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
+     * @return ResponseInterface
      */
     public function publishPermissionsMask(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
         $mask = [];

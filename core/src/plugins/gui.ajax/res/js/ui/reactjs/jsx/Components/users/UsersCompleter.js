@@ -98,8 +98,8 @@ const UsersLoader = React.createClass({
 
     suggestionLoader:function(input, callback){
 
-        var excludes = this.props.excludes;
-        var disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
+        const excludes = this.props.excludes;
+        const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
         this.setState({loading:this.state.loading + 1});
         PydioUsers.Client.authorizedUsersStartingWith(input, function(users){
             this.setState({loading:this.state.loading - 1});
@@ -118,15 +118,24 @@ const UsersLoader = React.createClass({
 
     },
 
-
     textFieldUpdate: function(value){
 
         this.setState({searchText: value});
         if(this.state.minChars && value && value.length < this.state.minChars ){
             return;
         }
-        this.setState({loading: true});
-        FuncUtils.bufferCallback('remote_users_search', 300, function(){
+        this.loadBuffered(value, 350);
+
+    },
+
+    loadBuffered: function(value, timeout){
+
+        if(!value && this._emptyValueList){
+            this.setState({dataSource: this._emptyValueList});
+            return;
+        }
+        FuncUtils.bufferCallback('remote_users_search', timeout, function(){
+            this.setState({loading: true});
             this.suggestionLoader(value, function(users){
                 let crtValueFound = false;
                 const values = users.map(function(userObject){
@@ -137,10 +146,15 @@ const UsersLoader = React.createClass({
                         value       : component
                     };
                 }.bind(this));
+                if(!value){
+                    this._emptyValueList = values;
+                }
                 this.setState({dataSource: values, loading: false});
             }.bind(this));
         }.bind(this));
+
     },
+
 
     onCompleterRequest: function(value, index){
 
@@ -174,8 +188,8 @@ const UsersLoader = React.createClass({
 
     submitCreationForm: function(){
 
-        var prefix = PydioUsers.Client.getCreateUserPostPrefix();
-        var values = this.refs['creationForm'].getValuesForPost(prefix);
+        const prefix = PydioUsers.Client.getCreateUserPostPrefix();
+        const values = this.refs['creationForm'].getValuesForPost(prefix);
         PydioUsers.Client.createUserFromPost(values, function(values, jsonReponse){
             let id;
             if(jsonReponse['createdUserId']){
@@ -183,8 +197,8 @@ const UsersLoader = React.createClass({
             }else{
                 id = values[prefix + 'new_user_id'];
             }
-            var display = values[prefix + 'USER_DISPLAY_NAME'] || id;
-            var fakeUser = new PydioUsers.User(id, display, 'user');
+            const display = values[prefix + 'USER_DISPLAY_NAME'] || id;
+            const fakeUser = new PydioUsers.User(id, display, 'user');
             this.props.onValueSelected(fakeUser);
             this.setState({createUser:null});
         }.bind(this));
@@ -237,6 +251,7 @@ const UsersLoader = React.createClass({
                     fullWidth={true}
                     onNewRequest={this.onCompleterRequest}
                     listStyle={{maxHeight: 350, overflowY: 'auto'}}
+                    onFocus={() => {this.loadBuffered(this.state.searchText, 100)}}
                 />
                 <div style={{position:'absolute', right:4, bottom: 14, height: 20, width: 20}}>
                     <MaterialUI.RefreshIndicator

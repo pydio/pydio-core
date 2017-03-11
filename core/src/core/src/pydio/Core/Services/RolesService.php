@@ -109,6 +109,14 @@ class RolesService
     }
 
     /**
+     * @param $userId
+     * @return AJXP_Role[]
+     */
+    public static function getRolesOwnedBy($userId){
+        return ConfService::getConfStorageImpl()->listRolesOwnedBy($userId);
+    }
+
+    /**
      * @param $roleId
      * @param $userId
      * @return AJXP_Role

@@ -91,10 +91,10 @@
 
         static authorizedUsersStartingWith(token, callback, usersOnly=false, existingOnly=false){
 
-            var params = {
+            let params = {
                 get_action:'user_list_authorized_users',
                 value:token,
-                format:'xml'
+                format:'json'
             };
             if(usersOnly){
                 params['users_only'] = 'true';
@@ -103,21 +103,29 @@
                 params['existing_only'] = 'true';
             }
             PydioApi.getClient().request(params, function(transport){
-                var suggestions = [];
-                const lis = XMLUtils.XPathSelectNodes(transport.responseXML, '//li');
-                lis.map(function(li){
-                    var spanLabel = XMLUtils.XPathGetSingleNodeText(li, 'span[@class="user_entry_label"]');
-                    suggestions.push(new User(
-                        li.getAttribute('data-entry_id'),
-                        li.getAttribute('data-label'),
-                        li.getAttribute('class'),
-                        li.getAttribute('data-group'),
-                        li.getAttribute('data-avatar'),
-                        li.getAttribute('data-temporary')?true:false,
-                        li.getAttribute('data-external') == 'true',
-                        spanLabel
-                    ));
-                });
+                let suggestions = [];
+                if(transport.responseXML){
+                    const lis = XMLUtils.XPathSelectNodes(transport.responseXML, '//li');
+                    lis.map(function(li){
+                        const spanLabel = XMLUtils.XPathGetSingleNodeText(li, 'span[@class="user_entry_label"]');
+                        suggestions.push(new User(
+                            li.getAttribute('data-entry_id'),
+                            li.getAttribute('data-label'),
+                            li.getAttribute('class'),
+                            li.getAttribute('data-group'),
+                            li.getAttribute('data-avatar'),
+                            li.getAttribute('data-temporary')?true:false,
+                            li.getAttribute('data-external') == 'true',
+                            spanLabel
+                        ));
+                    });
+                }else if(transport.responseJSON){
+                    const data = transport.responseJSON;
+                    data.map(function(entry){
+                        const {id, label, type, group, avatar, temporary, external} = entry;
+                        suggestions.push(new User(id, label, type, group, avatar, temporary, external, label));
+                    });
+                }
                 callback(suggestions);
             });
 
