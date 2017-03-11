@@ -3,10 +3,8 @@
 	<client_settings icon="plugins/action.ajxp_user/share.png">
 		<resources>
 			<i18n namespace="user_dash" path="plugins/action.ajxp_user/res/i18n" />
-            <css file="plugins/editor.ajxp_role/rolesEditor.css" />
-            <js className="UserProfileEditor" file="plugins/action.ajxp_user/class.UserProfileEditor.js"/>
-            <js className="WebDAVprefsEditor" file="plugins/action.ajxp_user/class.WebDAVprefsEditor.js"/>
             <js className="UserAccount" file="plugins/action.ajxp_user/res/build/UserAccount.js" depends="React,PydioForm"/>
+            <js className="AddressBook" file="plugins/action.ajxp_user/res/build/AddressBook.js" depends="React"/>
             <css file="plugins/action.ajxp_user/dashboard.css"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
@@ -19,7 +17,7 @@
             <component_config className="UserAccountTabs">
                 <additional_tab id="users_pane"
                                 tabInfo='{"icon":"icon-group","label":"user_dash.46","title":"user_dash.47","position":2}'
-                                paneInfo='{"namespace":"UserAccount", "componentName":"UsersPane"}'/>
+                                paneInfo='{"namespace":"AddressBook", "componentName":"Panel"}'/>
             </component_config>
         </client_configs>
 		<actions>
