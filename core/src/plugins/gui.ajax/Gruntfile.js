@@ -54,6 +54,23 @@ module.exports = function(grunt) {
                 flatten:true
             }
         },
+        symlink: {
+            options: {
+                overwrite: false,
+                force: true
+            },
+            expanded: {
+                files : [
+                    {
+                        expand: true,
+                        overwrite: false,
+                        cwd: 'node_modules/material-ui-legacy/src',
+                        src: ['less'],
+                        dest : 'res/mui/'
+                    }
+                ]
+            }
+        },
         uglify: {
             options: {
                 mangle: false,
@@ -219,6 +236,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-symlink');
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-hub');
