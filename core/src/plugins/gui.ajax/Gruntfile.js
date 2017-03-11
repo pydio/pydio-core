@@ -52,6 +52,19 @@ module.exports = function(grunt) {
                 src: 'res/js/vendor/dnd-html5-backend-patch/NativeDragSources.js',
                 dest: 'node_modules/react-dnd-html5-backend/lib/',
                 flatten:true
+            },
+            mfb: {
+                expand: true,
+                src: 'node_modules/react-mfb/mfb.css',
+                dest: 'res/mui/',
+                flatten:true
+            }
+        },
+        rename: {
+            mfb: {
+                files: [
+                    {src: ['res/mui/mfb.css'], dest: 'res/mui/mfb.less'},
+                ]
             }
         },
         symlink: {
@@ -237,6 +250,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-symlink');
+    grunt.loadNpmTasks('grunt-contrib-rename');
     grunt.loadNpmTasks('grunt-run');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-hub');
@@ -244,6 +258,8 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.registerTask('type:js', [
         'copy',
+        'rename',
+        'symlink',
         'babel:dist',
         'uglify:js',
         'babel:materialui',

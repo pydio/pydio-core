@@ -6,3 +6,4 @@ res/js/pydio.min.js
 res/js/ui/reactjs/build/
 /res/mui/less/
 /res/themes/*/css/allz.css
+res/mui/mfb.less
