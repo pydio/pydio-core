@@ -284,7 +284,7 @@ class SerializableResponseStream implements StreamInterface
      */
     public function getSize()
     {
-        if(!empty($this->data)){
+        if(!empty($this->data) || $this->forceArray){
             $this->serializedContent = $this->getContents();
             return strlen($this->serializedContent);
         }else{

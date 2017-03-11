@@ -1245,11 +1245,21 @@ abstract class AbstractConfDriver extends Plugin
                 }
 
                 $crtValue       = InputFilter::sanitize($httpVars['value'], InputFilter::SANITIZE_HTML_STRICT);
-                $usersOnly      = isSet($httpVars["users_only"]) && $httpVars["users_only"] === "true";
+                $groupPath      = isSet($httpVars["group_path"]) ? InputFilter::sanitize($httpVars['group_path'], InputFilter::SANITIZE_DIRNAME) : '';
                 $existingOnly   = isSet($httpVars["existing_only"]) && $httpVars["existing_only"] === "true";
 
+                if(isSet($httpVars["filter_value"])){
+                    $filterValue = intval(InputFilter::sanitize($httpVars["filter_value"], InputFilter::SANITIZE_ALPHANUM));
+                }else{
+                    $usersOnly      = isSet($httpVars["users_only"]) && $httpVars["users_only"] === "true";
+                    $filterValue = FilteredUsersList::FILTER_USERS_INTERNAL | FilteredUsersList::FILTER_USERS_EXTERNAL;
+                    if(!$usersOnly){
+                        $filterValue |= FilteredUsersList::FILTER_GROUPS | FilteredUsersList::FILTER_TEAMS;
+                    }
+                }
+
                 $list = new FilteredUsersList($ctx);
-                $items = $list->load($usersOnly, !$existingOnly, $crtValue, '');
+                $items = $list->load($filterValue, !$existingOnly, $crtValue, $groupPath);
                 $format = $httpVars["format"];
                 if(!isSet($format)) $format = 'json';
                 switch($format){

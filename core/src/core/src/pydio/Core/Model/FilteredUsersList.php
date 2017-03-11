@@ -22,12 +22,11 @@ namespace Pydio\Core\Model;
 
 
 use Pydio\Conf\Core\AJXP_Role;
+use Pydio\Core\Exception\UserNotFoundException;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RolesService;
 use Pydio\Core\Services\UsersService;
-
-use GuzzleHttp\Client;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -36,6 +35,13 @@ defined('AJXP_EXEC') or die('Access not allowed');
  * @package Pydio\Core\Model
  */
 class FilteredUsersList{
+
+    const FILTER_USERS_INTERNAL = 1;
+    const FILTER_USERS_EXTERNAL = 2;
+    const FILTER_GROUPS = 4;
+    const FILTER_TEAMS = 8;
+
+    const TEAM_PREFIX = '/AJXP_TEAM';
 
     /**
      * @var ContextInterface
@@ -65,6 +71,10 @@ class FilteredUsersList{
      * @return string
      */
     protected function computeBaseGroup($groupPathFilter = '', $searchQuery = ''){
+
+        if(strpos($groupPathFilter, self::TEAM_PREFIX) === 0){
+            return $groupPathFilter;
+        }
 
         $searchAll      = $this->getConf('CROSSUSERS_ALLGROUPS');
         $displayAll     = $this->getConf('CROSSUSERS_ALLGROUPS_DISPLAY');
@@ -140,14 +150,45 @@ class FilteredUsersList{
     }
 
     /**
-     * @param $groupPath
-     * @param $searchTerm
-     * @param $searchLimit
+     * @param $groupPath string
+     * @param $searchTerm string
+     * @param $searchLimit int
+     * @param $filterArray array
+     * @param $recursive bool
      * @return UserInterface[]
      */
-    protected function listUsers($groupPath, $searchTerm, $searchLimit){
+    protected function listUsers($groupPath, $searchTerm, $searchLimit, $filterArray, $recursive = false){
 
-        $users =  UsersService::listUsers($groupPath, '^'.$searchTerm, 0, $searchLimit, false);
+        if(strpos($groupPath, self::TEAM_PREFIX) === 0){
+
+            $teamId = str_replace(self::TEAM_PREFIX.'/', '', $groupPath);
+            $userIds = ConfService::getConfStorageImpl()->getUsersForRole($teamId);
+            $users = [];
+            foreach($userIds as $userId) {
+                try {
+                    $userObject = UsersService::getUserById($userId);
+                } catch (UserNotFoundException $e) {
+                    continue;
+                }
+                if(!$filterArray['users_external'] && $userObject->hasParent()) continue;
+                if(!$filterArray['users_internal'] && !$userObject->hasParent()) continue;
+                $users[] = $userObject;
+            }
+
+        } else if($filterArray['users_internal']){
+            // only internal or both
+            $users = UsersService::listUsers($groupPath, '^'.$searchTerm, 0, $searchLimit, false, $recursive);
+            if(!$filterArray['users_external']){
+                $users = array_filter($users, function($userObject) {
+                    /** @var UserInterface $userObject */
+                    return !$userObject->hasParent();
+                });
+            }
+        } else {
+
+            $users = UsersService::getChildrenUsers($this->ctx->getUser()->getId());
+
+        }
 
         $crossUsers = $this->getConf('ALLOW_CROSSUSERS_SHARING');
         $loggedUser = $this->ctx->getUser();
@@ -239,24 +280,42 @@ class FilteredUsersList{
         $teams = RolesService::getRolesOwnedBy($this->ctx->getUser()->getId());
         foreach ($teams as $teamObject) {
             if(empty($pregexp) || preg_match($pregexp, $teamObject->getLabel()) || preg_match($pregexp, $teamObject->getId())){
-                $res[] = new AddressBookItem('group', '/AJXP_TEAM/'.$teamObject->getId(), $teamObject->getLabel());
+                $res[] = new AddressBookItem('group', self::TEAM_PREFIX.'/'.$teamObject->getId(), $teamObject->getLabel());
             }
         }
         return $res;
     }
 
     /**
-     * @param bool $usersOnly
+     * @param $value int
+     * @return array
+     */
+    private function parseFilterValue($value){
+        return [
+            'users_internal' => ($value & self::FILTER_USERS_INTERNAL) > 0,
+            'users_external' => ($value & self::FILTER_USERS_EXTERNAL) > 0,
+            'groups'         => ($value & self::FILTER_GROUPS) > 0,
+            'teams'          => ($value & self::FILTER_TEAMS) > 0
+        ];
+    }
+
+    /**
+     * @param int $filterValue
      * @param bool $allowCreation
      * @param string $searchQuery
      * @param string $groupPathFilter
      * @param string $remoteServerId
      * @return AddressBookItem[]
      */
-    public function load($usersOnly = false, $allowCreation = true, $searchQuery = '', $groupPathFilter = '', $remoteServerId = ''){
+    public function load($filterValue, $allowCreation = true, $searchQuery = '', $groupPathFilter = '', $remoteServerId = ''){
+
+        $FILTER = $this->parseFilterValue($filterValue);
+        if(!empty($groupPathFilter) && strpos($groupPathFilter, self::TEAM_PREFIX) !== 0){
+            $FILTER['users_external'] = false;
+        }
 
         // No Regexp and it's mandatory. Just return the current user teams.
-        if($this->getConf('USERS_LIST_REGEXP_MANDATORY') && empty($searchQuery)){
+        if($this->getConf('USERS_LIST_REGEXP_MANDATORY') && empty($searchQuery) && empty($groupPathFilter)){
             return $this->listTeams();
         }
 
@@ -273,41 +332,44 @@ class FilteredUsersList{
             $regexp = $pregexp = null;
         }
 
-
-        $allUsers = $this->listUsers($baseGroup, $searchQuery, $searchLimit);
-        if (!$usersOnly) {
+        $allGroups = [];
+        $allUsers = [];
+        if( $FILTER['users_internal'] || $FILTER['users_external'] ){
+            $allUsers = $this->listUsers($baseGroup, $searchQuery, $searchLimit, $FILTER, empty($groupPathFilter));
+        }
+        if( $FILTER['groups'] ) {
             $allGroups = $this->listGroupsOrRoles($baseGroup);
         }
 
-
-        $index = 0;
-        if (!empty($searchQuery) && (!count($allUsers) || !array_key_exists(strtolower($searchQuery), $allUsers))  && $allowCreation) {
+        if ( $allowCreation && !empty($searchQuery) && (!count($allUsers) || !array_key_exists(strtolower($searchQuery), $allUsers)) ) {
             $items[] = new AddressBookItem('user', '', $searchQuery, true);
         }
-        if (!$usersOnly && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
+        if ( $FILTER['groups'] && empty($groupPathFilter) && (empty($regexp)  ||  preg_match($pregexp, $mess["447"]))) {
             $items[] = new AddressBookItem('group', 'AJXP_GRP_/', $mess['447']);
         }
+
         $indexGroup = 0;
-        if (!$usersOnly && isset($allGroups) && is_array($allGroups)) {
-            foreach ($allGroups as $groupId => $groupLabel) {
-                if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
-                    $items[] = new AddressBookItem('group', $groupId, $groupLabel);
-                    $indexGroup++;
-                }
-                if($indexGroup == $searchLimit) break;
+        foreach ($allGroups as $groupId => $groupLabel) {
+            if ($regexp == null ||  preg_match($pregexp, $groupLabel)) {
+                $items[] = new AddressBookItem('group', $groupId, $groupLabel);
+                $indexGroup++;
             }
+            if($indexGroup == $searchLimit) break;
         }
-        if (!$usersOnly) {
+
+        if ( $FILTER['teams'] && empty($groupPathFilter) ) {
             $teams = $this->listTeams($searchQuery);
             foreach($teams as $t){
                 $items[] = $t;
             }
         }
 
-        foreach ($allUsers as $userId => $userObject) {
+        $index = 0;
+        foreach ($allUsers as $userObject) {
 
-            $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
-            $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+            $userId         = $userObject->getId();
+            $userLabel      = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
+            $userAvatar     = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
 
             $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
             if ($this->getConf('USERS_LIST_HIDE_LOGIN') === true && $userLabel !== $userId) {
