@@ -83,16 +83,14 @@ html {
   -moz-user-select: -moz-none;
   -khtml-user-select: none;
   -webkit-user-select: none;
-  -ms-user-select: none;
-      user-select: none;
+  user-select: none;
 }
 input,
 textarea,
 .selectable {
   -khtml-user-select: auto;
   -webkit-user-select: auto;
-  -ms-user-select: auto;
-      user-select: auto;
+  user-select: auto;
   -moz-user-select: text;
 }
 input {
@@ -100,9 +98,6 @@ input {
 }
 *::-moz-focus-inner {
   border: none;
-}
-.no_select_bg::-moz-selection {
-  background: transparent;
 }
 .no_select_bg::selection {
   background: transparent;
@@ -139,6 +134,8 @@ span.letter_badge {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -153,6 +150,8 @@ kbd {
   font-size: 11px;
   font-family: Arial, sans-serif;
   background-color: #f7f7f7;
+  -moz-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 2px #ffffff inset;
   border-radius: 3px;
   display: inline-block;
@@ -178,31 +177,23 @@ kbd {
 }
 .vertical_layout {
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
   -webkit-flex-direction: column;
 }
 .vertical_layout > * {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
 }
 .horizontal_layout {
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
+  flex-direction: row;
   -webkit-flex-direction: row;
-  -ms-flex-align: stretch;
-      align-items: stretch;
+  align-items: stretch;
   -webkit-align-items: stretch;
 }
 .vertical_fit {
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   -webkit-flex: 1;
   overflow-y: hidden;
 }
@@ -219,33 +210,19 @@ kbd {
   display: table-cell;
 }
 .flexbox {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-flow: column;
-      -ms-flex-flow: column;
-          flex-flow: column;
+  flex-flow: column;
 }
 .flexbox .row {
-  -webkit-flex: 0 1 30px;
-      -ms-flex: 0 1 30px;
-          flex: 0 1 30px;
+  flex: 0 1 30px;
 }
 .flexbox .row.header {
-  -webkit-flex: 0 1 auto;
-      -ms-flex: 0 1 auto;
-          flex: 0 1 auto;
+  flex: 0 1 auto;
 }
 .flexbox .row.content {
-  -webkit-flex: 1 1 auto;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto;
-  display: -webkit-flex;
-  display: -ms-flexbox;
+  flex: 1 1 auto;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .text-right {
   text-align: right;
@@ -392,17 +369,11 @@ div.dialogBox div#element_overlay {
   height: 100%;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   font-size: 28px;
   text-align: center;
   color: #607d8b;
@@ -471,8 +442,6 @@ div.dialogBox div#element_overlay {
   padding-left: 42px;
 }
 .react-mui-context .material-list.files-list.table-mode span.cell.cell-ajxp_label > span {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   margin-left: 16px;
 }
@@ -682,8 +651,7 @@ div.dialogBox div#element_overlay {
   left: 0;
   background-size: cover;
   background-position: center center;
-  -webkit-filter: blur(7px);
-          filter: blur(7px);
+  filter: blur(7px);
 }
 .react-mui-context div[data-reactroot].dialogRootBlur > div > div.dialogRootBlur div.blurDialogTextField label {
   color: rgba(255, 255, 255, 0.73) !important;
@@ -1092,6 +1060,7 @@ div#multiple_download_container div div a:hover {
   margin-bottom: 0;
   margin-top: 5px;
   background-position: center;
+  -moz-border-radius: 5px;
   border-radius: 5px;
 }
 #uploaderTextActions span.disabled {
@@ -1107,15 +1076,11 @@ div#multiple_download_container div div a:hover {
   z-index: 1002;
 }
 .user-widget .user-display {
-  color: white;
+  color: #ffffff;
   padding: 0 10px;
   font-size: 22px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   height: 62px;
 }
 .user-widget .user-display .userLabel {
@@ -1169,7 +1134,7 @@ div#multiple_download_container div div a:hover {
   overflow: hidden;
   padding: 0 6px;
   font-size: 22px;
-  color: white;
+  color: #ffffff;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .top_search_form .search-input .panel-header .panel-header-close {
@@ -1207,8 +1172,6 @@ div#multiple_download_container div div a:hover {
 }
 .top_search_form .search-advanced .advanced-search-stars,
 .top_search_form .search-advanced-button .advanced-search-stars {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   margin: 16px 0 5px !important;
 }
@@ -1226,8 +1189,6 @@ div#multiple_download_container div div a:hover {
 .top_search_form .search-advanced .paginator-dates,
 .top_search_form .search-advanced-button .paginator-dates {
   margin-top: 20px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
 }
 .top_search_form .search-advanced .paginator-dates .mui-text-field,
@@ -1398,29 +1359,7 @@ div#multiple_download_container div div a:hover {
   width: 200px;
   height: 2px;
   background-color: #03A9F4;
-  -webkit-animation: connexionLoading 1.5s linear infinite;
-          animation: connexionLoading 1.5s linear infinite;
-}
-@-webkit-keyframes connexionLoading {
-  from {
-    left: -200px;
-    width: 30%;
-  }
-  50% {
-    width: 30%;
-  }
-  70% {
-    width: 70%;
-  }
-  80% {
-    left: 50%;
-  }
-  95% {
-    left: 120%;
-  }
-  to {
-    left: 100%;
-  }
+  animation: connexionLoading 1.5s linear infinite;
 }
 @keyframes connexionLoading {
   from {
@@ -1521,7 +1460,7 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .react-editor .editor-window {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.12);
-  background-color: white;
+  background-color: #ffffff;
   position: absolute;
   z-index: 100000;
   transition: border-radius 250ms cubic-bezier(0.06, 0.73, 0.6, 0.95) 0ms, height 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms, width 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms, bottom 250ms cubic-bezier(0.23, 1, 0.32, 1) 250ms;
@@ -1537,7 +1476,7 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .react-editor .editor-window .mui-tabs-container .mui-tab-item-container,
 .react-editor .editor-window .editor_container .mui-tab-item-container {
-  background-color: white !important;
+  background-color: #ffffff !important;
 }
 .react-editor .editor-window button.mui-icon-button {
   margin-top: 2px;
@@ -1554,7 +1493,7 @@ div.menu.desktop a span.ajxp_icon_span {
   bottom: -6px;
 }
 .react-editor .editor-window .mfb-component--br a {
-  background-color: white;
+  background-color: #ffffff;
 }
 .react-editor .editor-window .mfb-component--br .mfb-component__button--main {
   width: 50px;
@@ -1583,18 +1522,12 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .react-editor .editor-window.open .mui-tabs-container .mui-tab-item span.closeable-tab,
 .react-editor .editor-window.open .editor_container .mui-tab-item span.closeable-tab {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .react-editor .editor-window.open .mui-tabs-container .mui-tab-item span.closeable-tab .label,
 .react-editor .editor-window.open .editor_container .mui-tab-item span.closeable-tab .label {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -1604,7 +1537,7 @@ div.menu.desktop a span.ajxp_icon_span {
   padding: 6px;
 }
 .react-editor .editor-window.open .editor-title {
-  background-color: white;
+  background-color: #ffffff;
   height: 51px;
   font-size: 24px;
   padding: 14px 16px;
@@ -1671,8 +1604,6 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .nav-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -1681,9 +1612,7 @@ div.menu.desktop a span.ajxp_icon_span {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .nav-list-entry-icon {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -1697,8 +1626,6 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .workspaces .workspace-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -1707,9 +1634,7 @@ div.menu.desktop a span.ajxp_icon_span {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -1768,8 +1693,6 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .simple-provider .material-list-entry {
   padding: 6px 1px 6px 16px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   line-height: 24px;
   cursor: pointer;
@@ -1778,9 +1701,7 @@ div.menu.desktop a span.ajxp_icon_span {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .left-panel .simple-provider .material-list-entry .material-list-icon {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
   display: inline-block;
   width: 24px;
   height: 24px;
@@ -1789,9 +1710,7 @@ div.menu.desktop a span.ajxp_icon_span {
   font-size: 1.2em;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   overflow: hidden;
 }
 .left-panel .simple-provider .material-list-entry .material-list-text .material-list-line-1 > div {
@@ -1947,22 +1866,16 @@ div.menu.desktop a span.ajxp_icon_span {
   overflow: hidden;
 }
 #info_panel .panelCard .panelContent div.mimefont-container {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   width: 100%;
   height: 120px;
   text-align: center;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
   font-size: 74px;
   color: #546e7a;
 }
 #info_panel .panelCard .panelContent div.mimefont-container div.mimefont {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
 }
 #info_panel .panelCard .panelContent div.bgCoverImage {
   border-radius: 3px 3px 0 0 ;
@@ -1984,12 +1897,8 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 #info_panel .panelCard .primaryToolbar {
   padding: 16px 4px 16px !important;
-  -webkit-align-items: flex-start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  align-items: flex-start;
+  justify-content: center;
 }
 #info_panel .panelCard .primaryToolbar .mui-flat-button {
   min-width: 0;
@@ -2051,17 +1960,11 @@ div.pydio-tasks-panel.invisible {
 div.pydio-tasks-panel div.task {
   padding: 10px;
   border-bottom: 1px solid #f2f2f2;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  flex-direction: row;
 }
 div.pydio-tasks-panel div.task .task_texts {
-  -webkit-flex: 5;
-      -ms-flex: 5;
-          flex: 5;
+  flex: 5;
   max-width: 296px;
 }
 div.pydio-tasks-panel div.task .task_texts div {
@@ -2314,7 +2217,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component__main-icon--resting {
   -webkit-transform: scale(1) rotate(360deg);
   transform: scale(1) rotate(360deg);
-  transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
+  -webkit-transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
   transition: transform 150ms cubic-bezier(0.4, 0, 1, 1);
 }
 .mfb-component__child-icon,
@@ -2849,6 +2752,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /**
  * Apply this class to the html tag when developing the slide-in button
  */
+/*# sourceMappingURL=mfb.css.map */
 .mfb-component__button--child {
   height: 40px;
   width: 40px;
@@ -2985,23 +2889,23 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 /*@selectionMainTint: rgba(0, 150, 136, 0.24);*/
 .primaryColorPane {
   background-color: #546e7a;
-  color: white;
+  color: #ffffff;
 }
 .primaryColorPaper {
   background-color: #546e7a !important;
-  color: white;
+  color: #ffffff;
 }
 .primaryColorDarkerPane {
   background-color: #3f535c;
-  color: white;
+  color: #ffffff;
 }
 .primaryColorDarkerPaper {
   /*background-color: darken(@applicationPrimaryColor, 10) !important;*/
-  color: white;
+  color: #ffffff;
 }
 .secondaryColorPane {
   background-color: #ff5722;
-  color: white;
+  color: #ffffff;
 }
 .primaryLightPane {
   background-color: #f5f6f9;
@@ -3012,47 +2916,34 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 body,
 #ajxp_desktop,
 #background-imager {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex-direction: column;
+  flex: 1;
 }
 #orbit_content {
   -webkit-font-smoothing: antialiased;
-  -ms-flex: 1;
-      flex: 1;
+  flex: 1;
   -webkit-flex: 1;
   overflow-y: hidden;
   display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
+  flex-direction: column;
   -webkit-flex-direction: column;
 }
 #orbit_content > * {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  flex-shrink: 0;
 }
 .react-mui-context .left-panel {
   width: 250px;
 }
 @media only screen and (max-width: 420px) {
   .react-mui-context .left-panel {
-    -webkit-transform: translateX(-250px);
-            transform: translateX(-250px);
+    transform: translateX(-250px);
   }
 }
 @media only screen and (max-width: 420px) {
   .react-mui-context .drawer-open .left-panel {
-    -webkit-transform: translateX(0px);
-            transform: translateX(0px);
+    transform: translateX(0px);
   }
 }
 .react-mui-context .desktop-container {
@@ -3065,19 +2956,15 @@ body,
   }
 }
 .react-mui-context .desktop-container #workspace_toolbar {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   height: 68px;
 }
 .react-mui-context .desktop-container #workspace_toolbar .react_breadcrumb {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
   padding: 20px;
   font-size: 22px;
   line-height: 24px;
-  color: white;
+  color: #ffffff;
 }
 .react-mui-context .desktop-container #workspace_toolbar .drawer-button {
   display: none;
@@ -3090,8 +2977,6 @@ body,
 }
 .react-mui-context .desktop-container #main_toolbar {
   padding: 3px 12px 4px 8px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   height: 42px;
   color: inherit;
@@ -3128,15 +3013,11 @@ body,
   height: 0;
 }
 .react-mui-context .desktop-container #main_toolbar #main-toolbar {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
 }
 .react-mui-context .desktop-container #main_toolbar #display-toolbar,
 .react-mui-context .desktop-container #main_toolbar #paginator-toolbar {
   margin-top: -4px;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
 }
 .react-mui-context .desktop-container #main_toolbar #display-toolbar .mui-tooltip,
@@ -3194,12 +3075,8 @@ body,
   }
 }
 .toolbar {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
+  align-items: center;
 }
 .icon_buttons_toolbar {
   background-color: transparent;
@@ -3209,7 +3086,7 @@ body,
   background-color: transparent;
 }
 .icon_buttons_toolbar:hover span.ajxp_icon_span {
-  color: white;
+  color: #ffffff;
 }
 .icon_buttons_toolbar span.ajxp_icon_span {
   font-size: 16px;

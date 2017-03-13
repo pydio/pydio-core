@@ -727,7 +727,7 @@
                     }.bind(this), function(transport){
                         // error
                         this.setState({loading:false});
-                    }, function(computableEvent){
+                    }.bind(this), function(computableEvent){
                         // progress
                         // console.log(computableEvent);
                     })
