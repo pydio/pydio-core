@@ -18,83 +18,78 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-(function(global){
+const Viewer = ({url, style}) => {
+    return (
+        <iframe src={url} style={{...style, border: 0, flex: 1}} className="vertical_fit"></iframe>
+    );
+};
 
-    const Viewer = React.createClass({
+class PydioPDFJSViewer extends React.Component {
 
-        propTypes: {
-            node: React.PropTypes.instanceOf(AjxpNode),
-            pydio:React.PropTypes.instanceOf(Pydio)
-        },
+    constructor(props) {
 
-        computeUrl: function(node){
+        super(props)
 
-            let url;
-            let base = DOMUtils.getUrlFromBase();
-            if(base){
-                url = base;
-                if(!url.startsWith('http') && !url.startsWith('https')){
-                    if (!window.location.origin) {
-                        // Fix for IE when Pydio is inside an iFrame
-                        window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
-                    }
-                    url = document.location.origin + url;
+        const {pydio, node} = props;
+
+        let url;
+        let base = DOMUtils.getUrlFromBase();
+
+        if(base) {
+            url = base;
+            if(!url.startsWith('http') && !url.startsWith('https')){
+                if (!window.location.origin) {
+                    // Fix for IE when Pydio is inside an iFrame
+                    window.location.origin = window.location.protocol + "//" + window.location.hostname + (window.location.port ? ':' + window.location.port: '');
                 }
-            }else{
-                // Get the URL for current workspace path.
-                url = document.location.href.split('#').shift().split('?').shift();
-                if(url[(url.length-1)] == '/'){
-                    url = url.substr(0, url.length-1);
-                }else if(url.lastIndexOf('/') > -1){
-                    url = url.substr(0, url.lastIndexOf('/'));
-                }
+                url = document.location.origin + url;
             }
-
-            // Get the direct PDF file link valid for this session.
-            const pdfurl = encodeURIComponent(LangUtils.trimRight(url, '\/')
-                + '/' + this.props.pydio.Parameters.get('ajxpServerAccess')
-                + '&action=get_content&file=base64encoded:' + HasherUtils.base64_encode(node.getPath())
-                + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(node.getPath())));
-
-            return 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl;
-
-        },
-
-        render: function(){
-
-            let src = this.computeUrl(this.props.node);
-            return (<iframe src={src} style={Object.assign({border:0}, this.props.style || {})} className="vertical_fit"></iframe>);
-
+        }else{
+            // Get the URL for current workspace path.
+            url = document.location.href.split('#').shift().split('?').shift();
+            if(url[(url.length-1)] == '/'){
+                url = url.substr(0, url.length-1);
+            }else if(url.lastIndexOf('/') > -1){
+                url = url.substr(0, url.lastIndexOf('/'));
+            }
         }
 
-    });
+        // Get the direct PDF file link valid for this session.
+        const pdfurl = encodeURIComponent(LangUtils.trimRight(url, '\/')
+            + '/' + pydio.Parameters.get('ajxpServerAccess')
+            + '&action=get_content&file=base64encoded:' + HasherUtils.base64_encode(node.getPath())
+            + '&fake_file_name=' + encodeURIComponent(PathUtils.getBasename(node.getPath())));
 
-    const PydioPDFJSViewer = React.createClass({
+        this.state = {
+            url: 'plugins/editor.pdfjs/pdfjs/web/viewer.html?file=' + pdfurl
+        }
+    }
 
-        statics:{
+    static getPreviewComponent(node, rich = true) {
 
-            getPreviewComponent: function(node, rich = true){
-                if(rich && global.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')){
-                    return <Viewer style={{width:'100%', height:250}} node={node} pydio={global.pydio}/>;
-                }else{
-                    return null;
+        if(rich && window.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')) {
+            return {
+                element: PydioPDFJSViewer,
+                props: {
+                    style: {width:'100%', height:250},
+                    node: node,
+                    rich: rich
                 }
             }
-
-        },
-
-        render(){
-
-            return (
-                <PydioComponents.AbstractEditor {...this.props}>
-                    <Viewer {...this.props}/>
-                </PydioComponents.AbstractEditor>
-            );
-
+        }else{
+            return null;
         }
+    }
 
-    });
+    render() {
 
-    global.PydioPDFJSViewer = PydioPDFJSViewer;
+        return (
+            <PydioComponents.AbstractEditor {...this.props}>
+                <Viewer {...this.props} url={this.state.url} />
+            </PydioComponents.AbstractEditor>
+        );
 
-})(window);
+    }
+}
+
+window.PydioPDFJSViewer = PydioPDFJSViewer;

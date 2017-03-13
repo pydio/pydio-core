@@ -18,7 +18,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import CodeMirror from './CodeMirror';
+import Editor from './Editor';
+import {MenuOptions, MenuActions} from './Menu';
 
 class PydioCodeMirror extends React.Component {
 
@@ -28,202 +29,102 @@ class PydioCodeMirror extends React.Component {
         const {pydio, node} = this.props
 
         this.state = {
-            name: node.getPath(),
+            url: node.getPath(),
             readOnly: false, // TODO replace
             lineNumbers: true, // TODO replace
             lineWrapping: true, // TODO replace
+            ready: false
         }
 
-        this.onUndo = this._handleUndo.bind(this)
-        this.onRedo = this._handleRedo.bind(this)
-        this.onToggleLineNumbers = this._handleToggleLineNumbers.bind(this)
-        this.onToggleTextWrap = this._handleToggleTextWrap.bind(this)
-        this.onJumpToLine = this._handleJumpToLine.bind(this)
-        this.onTextSearch = this._handleTextSearch.bind(this)
+        this.onReady = this.onReady.bind(this)
+        this.onLoad = this.onLoad.bind(this)
+        this.onChange = this.onChange.bind(this)
+        this.onCursorChange = this.onCursorChange.bind(this)
 
-        this.onDone = this._handleDone.bind(this)
-        this.onFound = this._handleFound.bind(this)
-        this.onJumped = this._handleJumped.bind(this)
-        this.onChange = this._handleChange.bind(this)
-        this.onSave = this._handleSave.bind(this)
+        this.save = this.save.bind(this)
+    }
+
+    // Static functions
+    static getPreviewComponent(node, rich = false) {
+        if (rich) {
+            return {
+                element: PydioCodeMirror,
+                props: {
+                    node: node,
+                    rich: rich
+                }
+            }
+        } else {
+            // We don't have a player for the file icon
+            return null;
+        }
     }
 
     componentDidMount() {
-        this.loadFileContent()
-    }
+        const {pydio} = this.props
 
-    loadFileContent() {
-        PydioApi.getClient().request({
+        pydio.ApiClient.request({
             get_action: 'get_content',
-            file: this.state.name
-        }, function(transport) {
-            this.setState({
-                code: transport.responseText
-            })
-        }.bind(this));
+            file: this.state.url
+        }, (transport) => this.setState({content: transport.responseText}));
     }
 
-    _handleSave() {
-        PydioApi.getClient().postPlainTextContent(this.state.name, this.state.code, (success) => this.setState({modified: !success}));
+    onReady() {
+        this.setState({ ready: true })
     }
 
-    _handleChange(code, e) {
-        this.setState({
-            code: code,
-            modified: true
-        })
+    onLoad(codemirror) {
+        this.setState({ codemirror: codemirror })
     }
 
-    _handleDone() {
-        this.setState({
-            undo: false,
-            redo: false,
-            save: false
-        })
+    onChange(content) {
+        this.setState({ content: content })
     }
 
-    _handleFound(pos) {
-        this.setState({
-            lastFoundPos: pos,
-            search: null
-        })
+    onCursorChange(cursor) {
+        this.setState({ cursor: cursor })
     }
 
-    _handleJumped(pos) {
-        this.setState({
-            jump: null
-        })
+    save() {
+        const {pydio} = this.props;
+
+        pydio.ApiClient.postPlainTextContent(this.state.url, this.state.content, (success) => {
+            if (!success) {
+                this.setState({error: "There was an error while saving"})
+            }
+        });
     }
-
-    _handleUndo() {
-        this.setState({
-            undo: true
-        })
-    }
-
-    _handleRedo() {
-        this.setState({
-            redo: true
-        })
-    }
-
-    _handleToggleLineNumbers() {
-        this.setState({
-            lineNumbers: !this.state.lineNumbers
-        })
-    }
-
-    _handleToggleTextWrap() {
-        this.setState({
-            lineWrapping: !this.state.lineWrapping
-        })
-    }
-
-    _handleTextSearch(e) {
-        switch (e.key) {
-            case 'Enter':
-                this.setState({
-                    search: {
-                        pos: this.state.lastFoundPos,
-                        query: parseQuery(e.target.value),
-                    }
-                })
-                break
-            default:
-                this.setState({
-                    lastFoundPos: 0
-                })
-        }
-    }
-
-    _handleJumpToLine(e) {
-        switch (e.key) {
-            case 'Enter':
-                this.setState({
-                    jump: {
-                        line: parseInt(e.target.value)
-                    }
-                })
-                break
-        }
-    }
-
-    getMenuActions() {
-        const {MessageHash} = this.props.pydio
-
-        return [(
-            <MaterialUI.ToolbarGroup key="left" firstChild={true}>
-                <MaterialUI.IconButton disabled={!this.state.modified} iconClassName="mdi mdi-content-save" tooltipPosition="bottom-right" tooltip={MessageHash[53]} onClick={this.onSave} />
-
-                <MaterialUI.IconButton disabled={!this.state.modified} iconClassName="mdi mdi-undo" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.7"]} onClick={this.onUndo}/>
-                <MaterialUI.IconButton disabled={!this.state.modified} iconClassName="mdi mdi-redo" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.8"]} onClick={this.onRedo}/>
-
-                <MaterialUI.IconButton iconClassName="mdi mdi-format-list-numbers" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.5"]} onClick={this.onToggleLineNumbers}/>
-                <MaterialUI.IconButton iconClassName="mdi mdi-wrap" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.3b"]} onClick={this.onToggleTextWrap}/>
-            </MaterialUI.ToolbarGroup>
-        ), (
-            <MaterialUI.ToolbarGroup key="right" lastChild={true}>
-                <MaterialUI.TextField hintText={MessageHash["code_mirror.6"]} onKeyUp={this.onJumpToLine} />
-                <MaterialUI.TextField hintText={MessageHash["code_mirror.9"]} onKeyUp={this.onTextSearch}/>
-            </MaterialUI.ToolbarGroup>
-        )];
-    }
-
 
     render() {
-        let menuActions = this.getMenuActions()
+        let editor = null;
+        let menu = null;
 
-        let options = {
-            readOnly: this.state.readOnly,
-			lineNumbers: this.state.lineNumbers,
-            lineWrapping: this.state.lineWrapping
-		};
-
-        let actions = {
-            undo: this.state.undo,
-            redo: this.state.redo,
-            search: this.state.search,
-            jump: this.state.jump
+        if (this.state.content) {
+            editor = <Editor
+                {...this.props}
+                url={this.state.url}
+                options={{lineNumbers: this.state.lineNumbers, lineWrapping: this.state.lineWrapping}}
+                content={this.state.content}
+                onReady={this.onReady}
+                onLoad={this.onLoad}
+                onChange={this.onChange}
+                onCursorChange={this.onCursorChange}
+            />
         }
 
-        if (!this.state.code) {
-            return (
-                <PydioComponents.AbstractEditor {...this.props} actions={[]}>
-                    <PydioReactUI.Loader/>
-                </PydioComponents.AbstractEditor>
-            )
+        if (this.state.codemirror) {
+            menu = [
+                <MenuOptions {...this.props} firstChild={true} codemirror={this.state.codemirror} onSave={this.save.bind(this)} />,
+                <MenuActions {...this.props} lastChild={true} codemirror={this.state.codemirror} cursor={this.state.cursor} />
+            ]
         }
 
         return (
-            <PydioComponents.AbstractEditor {...this.props} actions={menuActions}>
-                <CodeMirror name={this.state.name} value={this.state.code} options={options} actions={actions} onChange={this.onChange} onFound={this.onFound} onJumped={this.onJumped} onDone={this.onDone} />
+            <PydioComponents.AbstractEditor {...this.props} loading={!this.state.ready} preview={this.state.preview} errorString={this.state.error} actions={menu}>
+                {editor}
             </PydioComponents.AbstractEditor>
         );
     }
-}
-
-function parseString(string) {
-    return string.replace(/\\(.)/g, function(_, ch) {
-      if (ch == "n") return "\n"
-      if (ch == "r") return "\r"
-      return ch
-    })
-  }
-
-function parseQuery(query) {
-    var isRE = query.match(/^\/(.*)\/([a-z]*)$/);
-    if (isRE) {
-        try {
-            query = new RegExp(isRE[1], isRE[2].indexOf("i") == -1 ? "" : "i");
-        } catch(e) {
-
-        } // Not a regular expression after all, do a string search
-    } else {
-        query = parseString(query)
-    }
-    if (typeof query == "string" ? query == "" : query.test("")) query = /x^/;
-
-    return query;
 }
 
 // We need to attach the element to window else it won't be found

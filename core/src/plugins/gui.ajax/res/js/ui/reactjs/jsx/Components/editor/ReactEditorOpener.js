@@ -100,6 +100,7 @@ export default React.createClass({
 
     render: function(){
         var editor;
+
         if(this.state.editorData){
             let className = this.state.editorData.editorClass;
             if(FuncUtils.getFunctionByName(className, window)){
@@ -117,4 +118,3 @@ export default React.createClass({
         return editor || null;
     }
 });
-

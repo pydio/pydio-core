@@ -18,48 +18,51 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import Player from './Video';
+import Editor from './Editor';
 
 class PydioVideo extends React.Component {
 
-    static getPreviewComponent(node, rich = false) {
-        if (rich) {
-            return <Preview node={node} pydio={window.pydio} rich={rich} />
-        } else {
-            return null;
-        }
-    }
-
-    render() {
-        return (
-            <PydioComponents.AbstractEditor {...this.props}>
-                <Preview node={this.props.node} pydio={window.pydio} rich={true} />
-            </PydioComponents.AbstractEditor>
-        );
-    }
-}
-
-class Preview extends React.Component {
-
     constructor(props) {
-
         super(props)
 
-        const {pydio, node, rich} = this.props
+        const {pydio, node, preview} = props
 
-        let url = null
-
-        this.state = {}
-
-        this.onReady = this._handleReady.bind(this)
+        this.state = {
+            preview: preview
+        }
 
         this.getSessionId().then((sessionId) => this.setState({
             url: pydio.Parameters.get('ajxpServerAccess') + '&ajxp_sessid=' + sessionId + '&get_action=read_video_data&file=' + encodeURIComponent(node.getPath())
         }));
+
+        this.onReady = this._handleReady.bind(this)
     }
 
+    // Static functions
+    static getPreviewComponent(node, rich = false) {
+        if (rich) {
+            return {
+                element: PydioVideo,
+                props: {
+                    node: node,
+                    rich: rich
+                }
+            }
+        } else {
+            // We don't have a player for the file icon
+            return null;
+        }
+    }
+
+    _handleReady() {
+        this.setState({
+            ready: true
+        })
+    }
+
+    // Util functions
     getSessionId() {
-        const {pydio, node} = this.props
+        const {pydio} = this.props
 
         return new Promise((resolve, reject) => {
             pydio.ApiClient.request({
@@ -70,56 +73,34 @@ class Preview extends React.Component {
         });
     }
 
-    _handleReady() {
-        this.setState({
-            ready: true
-        })
-    }
-
+    // Plugin Main Editor rendering
     render() {
-        if (!this.state.url) {
-            return null
-        }
 
-        let options = {
-            preload: 'auto',
-            autoplay: false,
-            controls: true,
-            flash: {
-                swf: "plugins/editor.video/node_modules/video.js/dist/video-js.swf"
-            },
-            techOrder: ['flash', 'html5']
-        }
-
-        let loader = null;
-        let invisibleStyle = null;
-        if (!this.state.ready) {
-            loader = <PydioReactUI.Loader style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: 0}}/>
-            invisibleStyle = {
-                position: "relative",
-                zIndex: "-1"
-            }
+        // Only display the video when we know the URL
+        let editor = null;
+        if (this.state.url) {
+            editor = <Editor url={this.state.url} onReady={this.onReady} />
         }
 
         return (
-            <div style={{position: "relative", padding: 0, margin: 0}}>
-                {loader}
-                <div style={invisibleStyle}>
-                    <Player options={options} src={this.state.url} resize={true} onReady={this.onReady}></Player>
+            <PydioComponents.AbstractEditor {...this.props} loading={!this.state.ready || !this.state.url} preview={this.state.preview}>
+                <div style={{minHeight: 120, flex: 1}}>
+                    {editor}
                 </div>
-            </div>
-        )
+            </PydioComponents.AbstractEditor>
+        );
     }
 }
 
-function guid() {
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+PydioVideo.propTypes = {
+    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+    pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+
+    preview: React.PropTypes.bool.isRequired
 }
 
-function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
+PydioVideo.defaultProps = {
+    preview: false
 }
 
 // We need to attach the element to window else it won't be found
