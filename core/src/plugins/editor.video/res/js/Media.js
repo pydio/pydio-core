@@ -21,6 +21,7 @@ class Media extends React.Component {
         super(props)
 
         this.handleVideoPlayerReady = this.handleVideoPlayerReady.bind(this)
+        this.handleVideoPlayerResize = this.handleVideoPlayerResize.bind(this)
         this.getResizedVideoPlayerMeasurements = this.getResizedVideoPlayerMeasurements.bind(this)
     }
 

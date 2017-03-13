@@ -34,6 +34,7 @@
     "react-grid-layout": "^0.13.9",
     "react-infinite": "^0.7.1",
     "react-mfb": "0.4.1",
+    "react-motion": "0.4.7",
     "react-router": "^2.7.0",
     "react-select": "^0.6.5",
     "react-tap-event-plugin": "^2.0.1",

@@ -10,10 +10,6 @@ class Player extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = {
-            visualization: props.visualization
-        }
-
         threeSixtyPlayer.config.scaleFont = (navigator.userAgent.match(/msie/i)?false:true);
         threeSixtyPlayer.config.showHMSTime = true;
 
@@ -49,18 +45,20 @@ class Player extends React.Component {
     }
 
     componentDidMount() {
-        soundManager.onready(threeSixtyPlayer.init);
-        soundManager.beginDelayedInit();
+        //soundManager.reboot()
+        soundManager.onready(threeSixtyPlayer.init)
+        soundManager.onready(this.props.onReady)
+        soundManager.beginDelayedInit()
     }
 
     render() {
         let className="ui360"
-        if (this.state.visualization) {
+        if (this.props.rich) {
             className += " ui360-vis"
         }
 
         return (
-            <div style={{display: "flex", alignItems: "center", justifyContent: "center"}}>
+            <div style={{display: "flex", flex: 1, alignItems: "center", justifyContent: "center"}}>
                 <div className={className} >
                     {this.props.children}
                 </div>
@@ -68,5 +66,15 @@ class Player extends React.Component {
         )
     }
 }
+
+Player.propTypes = {
+    rich: React.PropTypes.bool.isRequired,
+    onReady: React.PropTypes.func
+}
+
+Player.defaultProps = {
+    rich: true
+}
+
 
 export default Player

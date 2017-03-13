@@ -16,7 +16,7 @@
  margin-bottom:-18px; /* approximate "line height" we want */
  padding-left:248px;
  margin-left:0px;
- background-position:22.6% 50%; /* (~109px) initial play button position */
+ background-position:50% 50%; /* (~109px) initial play button position */
 }
 
 .sm2-inline-list .ui360-vis {
@@ -139,8 +139,8 @@
 
 .ui360-vis {
  /* non-JS / before-loaded state */
- background:transparent url(360-button-vis-play.png) no-repeat 21% 50%;
- _background:transparent url(360-button-vis-play.gif) no-repeat 21% 50%; /* IE 6-only: special crap GIF */
+ background:transparent url(360-button-vis-play.png) no-repeat 50% 50%;
+ _background:transparent url(360-button-vis-play.gif) no-repeat 50% 50%; /* IE 6-only: special crap GIF */
 }
 
 .ui360-vis .sm2-360btn-default {

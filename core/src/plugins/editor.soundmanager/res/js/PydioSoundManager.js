@@ -18,46 +18,44 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import Player from './360Player';
+
+import Player from './Player';
 
 class PydioSoundManager extends React.Component {
 
-    static getPreviewComponent(node, rich = false) {
-        return <Preview node={node} pydio={window.pydio} rich={rich} />;
-    }
-
-    render() {
-        return (
-            <PydioComponents.AbstractEditor {...this.props}>
-                <Preview node={this.props.node} pydio={window.pydio} rich={true} />;
-            </PydioComponents.AbstractEditor>
-        );
-    }
-}
-
-class Preview extends React.Component {
-
     constructor(props) {
-
         super(props)
 
-        const {pydio, node, rich} = this.props
-
-        let url = pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid();
+        const {pydio, node, preview} = props
 
         this.state = {
-            url: url,
+            url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
             mimeType: "audio/" + node.getAjxpMime(),
-            richMode: rich
+            preview: preview
+        }
+
+        this.onReady = () => this.setState({ready: false})
+    }
+
+    // Static functions
+    static getPreviewComponent(node, rich = false) {
+        return {
+            element: PydioSoundManager,
+            props: {
+                node: node,
+                rich: rich
+            }
         }
     }
 
     render() {
         return (
-            <Player visualization={this.state.richMode}>
-                <a type={this.state.mimeType} href={this.state.url} />
-            </Player>
-        )
+            <PydioComponents.AbstractEditor {...this.props} loading={false} preview={this.state.preview}>
+                <Player rich={this.props.rich} onReady={this.onReady}>
+                    <a type={this.state.mimeType} href={this.state.url} />
+                </Player>
+            </PydioComponents.AbstractEditor>
+        );
     }
 }
 

@@ -1,15 +1,66 @@
 import OpenNodesModel from './OpenNodesModel'
 
-let EditionPanel = React.createClass({
+class EditionPanel extends React.Component {
 
-    propTypes: {
-        pydio: React.PropTypes.instanceOf(Pydio)
-    },
+    constructor(props) {
+        super(props)
+        
+        this.state = {
+            nodes:[],
+            visible: false,
+            activeTab:0
+        }
+    }
 
-    updateNodesFromModel: function(pushed, removedAtIndex){
+    componentDidMount() {
+        this._nodesModelObserver = (node) => this._handleNodePushed(node);
+        this._nodesRemoveObserver = (index) => this._handleNodeRemoved(index);
+        this._titlesObserver = () => this.forceUpdate()
 
+        OpenNodesModel.getInstance().observe("nodePushed", this._nodesModelObserver);
+        OpenNodesModel.getInstance().observe("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        OpenNodesModel.getInstance().observe("titlesUpdated", this._titlesObserver);
+    }
+
+    componentWillUnmount() {
+        OpenNodesModel.getInstance().stopObserving("nodePushed", this._nodesModelObserver);
+        OpenNodesModel.getInstance().stopObserving("nodeRemovedAtIndex", this._nodesRemoveObserver);
+        OpenNodesModel.getInstance().stopObserving("titlesUpdated", this._titlesObserver);
+    }
+
+    _handleNodePushed(node) {
         let nodes = OpenNodesModel.getInstance().getNodes();
-        let active = this.state.activeTab;
+        let active = nodes.indexOf(node);
+
+        if (active < 0) return
+
+        this.setState({
+            nodes:nodes,
+            visible: false,
+            activeTab: active
+        }, this.toggle.bind(this));
+    }
+
+    _handleNodeRemoved(index) {
+        let nodes = OpenNodesModel.getInstance().getNodes();
+        let active = Math.max(0, index - 1);
+
+        if(!nodes.length && this.state.visible) {
+            this.setState({
+                visible: false,
+                closed:  true,
+                opened:  false,
+                nodes:   []
+            });
+        }else{
+            this.setState({
+                nodes: nodes,
+                activeTab: active
+            });
+        }
+    }
+
+    updateNodesFromModel(pushed, removedAtIndex){
         if(pushed){
             active = nodes.indexOf(pushed);
         }else if(removedAtIndex !== undefined){
@@ -35,29 +86,10 @@ let EditionPanel = React.createClass({
                 });
             }
         }
+    }
 
-    },
-
-    componentDidMount: function(){
-        this._nodesModelObserver = this.updateNodesFromModel;
-        this._nodesRemoveObserver = (index) => { this.updateNodesFromModel(null, index) };
-        this._titlesObserver = () =>{ this.forceUpdate() }
-        OpenNodesModel.getInstance().observe("nodePushed", this._nodesModelObserver);
-        OpenNodesModel.getInstance().observe("nodeRemovedAtIndex", this._nodesRemoveObserver);
-        OpenNodesModel.getInstance().observe("titlesUpdated", this._titlesObserver);
-    },
-
-    componentWillUnmount: function(){
-        OpenNodesModel.getInstance().stopObserving("nodePushed", this._nodesModelObserver);
-        OpenNodesModel.getInstance().stopObserving("nodeRemovedAtIndex", this._nodesRemoveObserver);
-        OpenNodesModel.getInstance().stopObserving("titlesUpdated", this._titlesObserver);
-    },
-
-    getInitialState: function(){
-        return {nodes:[], visible: false, activeTab:0};
-    },
-
-    toggle: function(){
+    toggle() {
+        console.log("Toggle visible")
         let visible = this.state.visible;
         this.setState({visible:!this.state.visible}, function(){
             global.setTimeout(function(){
@@ -65,29 +97,34 @@ let EditionPanel = React.createClass({
                 else this.setState({closed:false, opened:true});
             }.bind(this), 500);
         }.bind(this));
-    },
+    }
 
-    onChange: function(index, tab){
+    onChange(index, tab) {
         this.setState({activeTab: index});
-    },
+    }
 
-    render: function(){
+    render() {
         let overlay, editorWindow;
+
         if(this.state.nodes.length){
             let style = {};
             let className = 'editor-window react-mui-context vertical_layout', iconClassName='mdi mdi-pencil';
+
             if(this.state.closed) className += ' closed';
             else if(this.state.opened) className += ' opened';
 
             let tabs = [], title, nodeTitle, mfbMenus = [];
             let index = 0;
             let editors = this.state.nodes.map(function(object){
+
                 let closeTab = function(e){
                     OpenNodesModel.getInstance().removeNode(object);
                 };
+
                 let updateTabTitle=function(newTitle){
                     OpenNodesModel.getInstance().updateNodeTitle(object, newTitle);
                 };
+
                 if(this.state.visible && this.state.opened){
                     let label = <span className="closeable-tab"><span className="label">{OpenNodesModel.getInstance().getObjectLabel(object)}</span><ReactMUI.FontIcon className="mdi mdi-close" onClick={closeTab}/></span>;
                     tabs.push(<MaterialUI.Tab key={index} label={label} value={index}></MaterialUI.Tab>);
@@ -178,9 +215,11 @@ let EditionPanel = React.createClass({
                 {editorWindow}
             </div>
         );
-
     }
+}
 
-});
+EditionPanel.PropTypes = {
+    pydio: React.PropTypes.instanceOf(Pydio)
+}
 
 export {EditionPanel as default}

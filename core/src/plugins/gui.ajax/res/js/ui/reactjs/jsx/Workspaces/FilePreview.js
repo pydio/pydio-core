@@ -92,17 +92,26 @@ let FilePreview = React.createClass({
                     style = Object.assign(style, this.props.style);
                 }
                 let element = (<div className="covering-bg-preview" style={style}></div>);
+
                 this.setState({loading: false, element: element});
             }.bind(this);
+
             this.setState({loading: true});
+
             image.src = bgUrl;
             if(image.readyState && image.readyState === 'complete'){
                 loader();
             }else{
                 image.onload = loader();
             }
-        }else if(editorClass.getPreviewComponent){
-            this.setState({element: editorClass.getPreviewComponent(node, this.props.richPreview)});
+        }  else if (editorClass.getPreviewComponent) {
+            var promise = editorClass.getPreviewComponent(node, this.props.richPreview)
+
+            Promise.resolve(promise).then(function (component) {
+                this.setState({
+                    preview: component
+                })
+            }.bind(this))
         }
 
     },
@@ -113,8 +122,10 @@ let FilePreview = React.createClass({
 
     render: function(){
 
-        if(this.state.element){
-            return this.state.element;
+        if (this.state.preview) {
+            return (
+                <this.state.preview.element {...this.state.preview.props} pydio={window.pydio} preview={true} />
+            )
         }
 
         let node  = this.props.node;
@@ -135,9 +146,7 @@ let FilePreview = React.createClass({
         return (
             <div ref="container" style={this.props.style} className={className}>{object}</div>
         );
-
     }
-
 });
 
 export {FilePreview as default}
