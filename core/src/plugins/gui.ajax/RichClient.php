@@ -155,9 +155,10 @@ class RichClient extends Plugin
     }
 
     /**
+     * @param ContextInterface $context
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled($context = null)
     {
         return true;
     }

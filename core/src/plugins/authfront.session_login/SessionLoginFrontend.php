@@ -23,6 +23,7 @@ namespace Pydio\Auth\Frontend;
 use Exception;
 use Pydio\Core\Http\Message\ReloadRepoListMessage;
 use Pydio\Core\Model\Context;
+use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
 use Pydio\Core\Services\AuthService;
 use Pydio\Auth\Frontend\Core\AbstractAuthFrontend;
@@ -46,12 +47,13 @@ class SessionLoginFrontend extends AbstractAuthFrontend
 
     /**
      * Override parent method : disable me if applicationFirstRun ( = installation steps ).
+     * @param ContextInterface $context
      * @inheritdoc
      */
-    function isEnabled()
+    function isEnabled($context = null)
     {
         if (ApplicationState::detectApplicationFirstRun()) return false;
-        return parent::isEnabled();
+        return parent::isEnabled($context);
     }
 
     /**
