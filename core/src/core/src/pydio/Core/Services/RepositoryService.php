@@ -97,7 +97,7 @@ class RepositoryService
             }
         }
         $adminURI = ConfService::getGlobalConf("ADMIN_URI");
-        if(!empty($adminURI) && (($isAdminRepo && !ApplicationState::isAdminMode()) || (!$isAdminRepo && ApplicationState::isAdminMode()))){
+        if(ApplicationState::sapiIsCli() && !empty($adminURI) && (($isAdminRepo && !ApplicationState::isAdminMode()) || (!$isAdminRepo && ApplicationState::isAdminMode()))){
             return false;
         }
         $repositoryId = $repositoryObject->getId();

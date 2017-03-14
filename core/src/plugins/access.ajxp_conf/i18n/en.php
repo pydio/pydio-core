@@ -191,5 +191,5 @@ $mess=array(
 "167" => "Successfully unlocked user (%s)",
 "168" => "%1 users were moved to group %2",
 "169" => "No users were moved, there must have been something wrong!",
-
+"170" => "Enable %1 (%2)",
 );

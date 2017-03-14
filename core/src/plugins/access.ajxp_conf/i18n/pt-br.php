@@ -182,4 +182,5 @@ $mess=array(
 "158" => "Compartilhado", // user type shared
 "159" => "Convidado",
 "160" => "Grupo criado com sucesso",
+"170" => "Enable %1 (%2)",
 );

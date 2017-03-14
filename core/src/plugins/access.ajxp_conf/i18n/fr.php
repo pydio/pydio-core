@@ -191,4 +191,5 @@ $mess=array(
 "167" => "Le blocage a bien été enlevé pour l'utilisateur %s",
 "168" => "%1 utilisateurs ont été bougés dans le groupe %2",
 "169" => "Aucun utilisateurs n'ont été modifié, il y a une erreur!",
+"170" => "Activer %1 (%2)",
 );

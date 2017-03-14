@@ -6,19 +6,21 @@ let LeftPanel = React.createClass({
     propTypes: {
         pydio: React.PropTypes.instanceOf(Pydio).isRequired,
         userWidgetProps: React.PropTypes.object,
-        workspacesListProps: React.PropTypes.object
+        workspacesListProps: React.PropTypes.object,
+        style: React.PropTypes.object
     },
 
     render: function(){
         const palette = this.props.muiTheme.palette;
         const Color = MaterialUI.Color;
         const widgetStyle = {
-            backgroundColor: Color(palette.primary1Color).darken(0.2)
+            backgroundColor: Color(palette.primary1Color).darken(0.2),
+            width:'100%'
         };
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
         return (
-            <div className="left-panel vertical_fit vertical_layout">
+            <div className="left-panel vertical_fit vertical_layout" style={this.props.style}>
                 <UserWidget
                     pydio={this.props.pydio}
                     style={widgetStyle}
