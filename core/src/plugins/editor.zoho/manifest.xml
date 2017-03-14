@@ -10,7 +10,7 @@
     </server_settings>
 	<client_settings>
         <resources>
-            <js file="plugins/editor.zoho/class.ZohoEditor.js" className="ZohoEditor"/>
+            <js file="plugins/editor.zoho/res/build/ZohoEditor.js" className="ZohoEditor"/>
             <i18n path="plugins/editor.zoho/i18n" namespace="zoho_editor"/>
             <img_library path="plugins/editor.zoho/images" alias="zoho_img"/>
         </resources>
