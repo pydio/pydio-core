@@ -60,8 +60,9 @@
     display: flex;
     line-height: 24px;
     cursor: pointer;
+    transition:@bezier_transition;
     &:hover{
-      background-color: rgba(255,255,255,0.25);
+      background-color: rgba(0,0,0,0.03);
     }
   }
   .nav-list-entry-icon{
@@ -123,7 +124,6 @@
         margin-bottom: 10px;
         .workspace-label{
           text-transform: uppercase;
-          color: white;
         }
       }
     }

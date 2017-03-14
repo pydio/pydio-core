@@ -14,8 +14,10 @@ body,#ajxp_desktop,#background-imager{
 
   .left-panel{
     width: 250px;
-    @media @screenwidth-small{
-      transform: translateX(-250px);
+    &:not(.expanded){
+      @media @screenwidth-small{
+        transform: translateX(-250px);
+      }
     }
   }
 

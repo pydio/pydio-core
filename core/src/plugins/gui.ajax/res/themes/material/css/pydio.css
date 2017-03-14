@@ -1607,9 +1607,10 @@ div.menu.desktop a span.ajxp_icon_span {
   display: flex;
   line-height: 24px;
   cursor: pointer;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .left-panel .nav-list-entry:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 .left-panel .nav-list-entry-icon {
   flex-shrink: 0;
@@ -1629,9 +1630,10 @@ div.menu.desktop a span.ajxp_icon_span {
   display: flex;
   line-height: 24px;
   cursor: pointer;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .left-panel .workspaces .workspace-entry:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 .left-panel .workspaces .workspace-entry .workspace-badge {
   flex-shrink: 0;
@@ -1683,7 +1685,6 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel .workspaces .workspace-entry.workspace-access-inbox .workspace-label {
   text-transform: uppercase;
-  color: white;
 }
 .left-panel .simple-provider {
   position: relative;
@@ -1696,9 +1697,10 @@ div.menu.desktop a span.ajxp_icon_span {
   display: flex;
   line-height: 24px;
   cursor: pointer;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .left-panel .simple-provider .material-list-entry:hover {
-  background-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 .left-panel .simple-provider .material-list-entry .material-list-icon {
   flex-shrink: 0;
@@ -1787,9 +1789,6 @@ div.menu.desktop a span.ajxp_icon_span {
 .left-panel .workspaces .workspace-entry .workspace-badge {
   background-color: #96adb7;
 }
-.left-panel .workspaces .workspace-entry:hover {
-  background-color: transparent;
-}
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 1;
   position: relative;
@@ -1818,6 +1817,43 @@ div.menu.desktop a span.ajxp_icon_span {
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down:hover,
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up:hover {
   background-color: rgba(255, 255, 255, 0.7);
+}
+.left-panel.expanded {
+  width: 100% !important;
+  overflow-y: auto;
+}
+.left-panel.expanded .workspaces .workspace-entry {
+  padding: 16px 1px 0px 16px;
+  line-height: 20px;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-badge {
+  width: 34px;
+  height: 34px;
+  line-height: 34px;
+  font-size: 1em;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-label-container {
+  display: block;
+  flex: 1;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  padding-bottom: 10px;
+  padding-left: 5px;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-label-container .workspace-label {
+  font-size: 16px;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-label-container .workspace-description {
+  display: block;
+  color: rgba(0, 0, 0, 0.33);
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-additional-action {
+  padding: 0 10px;
+  color: rgba(0, 0, 0, 0.23);
+  font-size: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-additional-action:hover {
+  color: rgba(0, 0, 0, 0.53);
 }
 .left-panel .folders-tree {
   color: #4a606b;
@@ -2937,7 +2973,7 @@ body,
   width: 250px;
 }
 @media only screen and (max-width: 420px) {
-  .react-mui-context .left-panel {
+  .react-mui-context .left-panel:not(.expanded) {
     transform: translateX(-250px);
   }
 }

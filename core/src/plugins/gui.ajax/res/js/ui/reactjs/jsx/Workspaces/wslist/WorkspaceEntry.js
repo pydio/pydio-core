@@ -245,8 +245,10 @@ export default React.createClass({
                 onMouseOut={onOut}
             >
                 {badge}
-                <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}{badgeNum}</span>
-                <span className="workspace-description">{this.props.workspace.getDescription()}</span>
+                <span className="workspace-label-container">
+                    <span className="workspace-label">{this.props.workspace.getLabel()}{newWorkspace}{badgeNum}</span>
+                    <span className="workspace-description">{this.props.workspace.getDescription()}</span>
+                </span>
                 {additionalAction}
             </div>
         );

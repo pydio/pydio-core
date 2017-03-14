@@ -506,10 +506,19 @@
      ***********************************************/
     var VideoCard = React.createClass({
 
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:2,
+            gridHeight:26,
+            builderDisplayName:'Video Tutorial',
+            builderFields:[]
+        },
+
         propTypes:{
-            youtubeId:React.PropTypes.string,
-            contentMessageId:React.PropTypes.string,
-            launchVideo:React.PropTypes.func
+            youtubeId           : React.PropTypes.string,
+            contentMessageId    : React.PropTypes.string,
+            launchVideo         : React.PropTypes.func
         },
 
         launchVideo: function(){
@@ -520,14 +529,27 @@
             var htmlMessage = function(id){
                 return {__html:MessageHash[id]};
             };
+            let props = {...this.props};
+            props.className += ' video-card';
+            props['zDepth'] = 1;
             return (
-                <div className="video-card">
+                <MaterialUI.Paper {...props}>
                     <div className="tutorial_legend">
-                        <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+this.props.youtubeId+'/0.jpg")'}}></div>
+                        <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+this.props.youtubeId+'/0.jpg")'}}>
+                            <div className="tutorial_title"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
+                        </div>
                         <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
-                        <div className="tutorial_load_button" onClick={this.launchVideo}><i className="icon-youtube-play"/> {MessageHash['user_home.86']}</div>
+                        <MaterialUI.Divider style={{minHeight: 1}}/>
+                        <div style={{textAlign:'right', padding: '8px 4px'}}>
+                            <MaterialUI.FlatButton
+                                onTouchTap={this.launchVideo}
+                                label={MessageHash['user_home.86']}
+                                primary={true}
+                                icon={<MaterialUI.FontIcon className="icon-youtube-play" />}
+                            />
+                        </div>
                     </div>
-                </div>
+                </MaterialUI.Paper>
             );
         }
     });
@@ -827,8 +849,8 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:3,
-            gridHeight:30,
+            gridWidth:4,
+            gridHeight:36,
             builderDisplayName:'My Workspaces',
             builderFields:[]
         },
@@ -853,34 +875,11 @@
     });
 
 
-    const TutorialCard = React.createClass({
-        mixins: [PydioComponents.DynamicGridItemMixin],
-
-        statics:{
-            gridWidth:3,
-            gridHeight:60,
-            builderDisplayName:'Tutorial',
-            builderFields:[]
-        },
-
-        render: function(){
-            let props = {...this.props};
-            if(props.style){
-                props.style = {...props.style, overflowY:'auto'};
-            }
-            return (
-                <MaterialUI.Paper zDepth={1} {...props} >
-                    <TutorialPane pydio={this.props.pydio} open={true}/>
-                </MaterialUI.Paper>
-            );
-        }
-    });
-
     const DlAppsCard = React.createClass({
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:6,
+            gridWidth:12,
             gridHeight:10,
             builderDisplayName:'Download Applications',
             builderFields:[]
@@ -893,7 +892,7 @@
             }
             return (
                 <MaterialUI.Paper zDepth={1} {...props} >
-                    <div style={{width: 380, margin:'10px auto'}}>
+                    <div style={{width: 380, margin:'10px auto', position:'relative'}}>
                         <DlAppsPanel pydio={this.props.pydio} open={true}/>
                     </div>
                 </MaterialUI.Paper>
@@ -905,8 +904,28 @@
 
     let UserDashboard = React.createClass({
 
+        closePlayer:function(){
+            this.setState({player:null});
+        },
+
+        launchVideo: function(videoSrc){
+            this.setState({player:videoSrc});
+        },
+
         getDefaultCards: function(){
-            return [
+
+            let videos = new Map();
+            videos.set('qvsSeLXr-T4', 'user_home.63');
+            videos.set('HViCWPpyZ6k', 'user_home.79');
+            videos.set('jBRNqwannJM', 'user_home.80');
+            videos.set('2jl1EsML5v8', 'user_home.81');
+            videos.set('28-t4dvhE6c', 'user_home.82');
+            videos.set('fP0MVejnVZE', 'user_home.83');
+            videos.set('TXFz4w4trlQ', 'user_home.84');
+            videos.set('OjHtgnL_L7Y', 'user_home.85');
+            videos.set('ot2Nq-RAnYE', 'user_home.66');
+
+            let baseCards = [
                 {
                     id:'my_workspaces',
                     componentClass:'WelcomeComponents.WorkspacesListCard',
@@ -924,14 +943,7 @@
                         filterByType:"shared",
                     },
                     defaultPosition:{
-                        x:3, y:0
-                    }
-                },
-                {
-                    id:'tutorial',
-                    componentClass:'WelcomeComponents.TutorialCard',
-                    defaultPosition:{
-                        x:6, y:0
+                        x:4, y:0
                     }
                 },
                 {
@@ -942,9 +954,38 @@
                     }
                 }
             ];
+
+            let x = 0, y = 36;
+            let launcher = this.launchVideo.bind(this);
+            videos.forEach(function(messageId, videoId){
+                baseCards.push({
+                    id:'video-' + videoId,
+                    componentClass:'WelcomeComponents.VideoCard',
+                    props:{
+                        launchVideo     : launcher,
+                        youtubeId       : videoId,
+                        contentMessageId: messageId
+                    },
+                    defaultPosition:{
+                        x:(x%4)*2, y:y
+                    }
+                });
+                x++;
+            }.bind(this));
+            return baseCards;
+        },
+
+        getInitialState:function(){
+            return {player: null};
         },
 
         render:function() {
+
+            var videoPlayer;
+            if(this.state && this.state.player){
+                videoPlayer = <VideoPlayer videoSrc={this.state.player} closePlayer={this.closePlayer}/>
+            }
+
             var simpleClickOpen = this.props.pydio.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
             var enableGettingStarted = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED");
 
@@ -952,12 +993,14 @@
             const Color = MaterialUI.Color;
             const widgetStyle = {
                 backgroundColor: Color(palette.primary1Color).darken(0.2),
-                width:'100%'
+                width:'100%',
+                position: 'fixed'
             };
             const uWidgetProps = this.props.userWidgetProps || {};
             const wsListProps = this.props.workspacesListProps || {};
             return (
-                <div className="left-panel vertical_fit vertical_layout" style={{width:'100%'}}>
+                <div className="left-panel expanded vertical_fit vertical_layout">
+                    {videoPlayer}
                     <PydioWorkspaces.UserWidget
                         pydio={this.props.pydio}
                         style={widgetStyle}
@@ -972,8 +1015,8 @@
                         defaultCards={this.getDefaultCards()}
                         builderNamespaces={["WelcomeComponents"]}
                         pydio={this.props.pydio}
-                        disableDrag={true}
-                        cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
+                        cols={{lg: 12, md: 8, sm: 6, xs: 6, xxs: 2}}
+                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0}}
                     />
                 </div>
             );
@@ -990,7 +1033,7 @@
         WelcomeComponents.UserDashboard = UserDashboard;
     }
     WelcomeComponents.TutorialPane = TutorialPane;
-    WelcomeComponents.TutorialCard = TutorialCard;
+    WelcomeComponents.VideoCard = VideoCard;
     WelcomeComponents.DlAppsCard = DlAppsCard;
     WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
     WelcomeComponents.WorkspacesListCard = WorkspacesListCard;

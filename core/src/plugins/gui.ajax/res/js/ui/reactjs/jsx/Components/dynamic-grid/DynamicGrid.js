@@ -95,7 +95,7 @@ export default React.createClass({
                 }
                 return;
             }
-            var props = LangUtils.deepCopy(item.props);
+            var props = {...item.props};
             var itemKey = props['key'] = item['id'] || 'item_' + index;
             props.showCloseAction = this.state.editMode;
             props.pydio=this.props.pydio;
@@ -165,6 +165,7 @@ export default React.createClass({
         const {Responsive, WidthProvider} = ReactGridLayout;
         const ResponsiveGridLayout = WidthProvider(Responsive);
         const propStyle = this.props.style || {};
+        const rglStyle  = this.props.rglStyle || {};
         return (
             <div style={{...this.props.style, width:'100%', flex:'1'}} className={this.state.editMode?"builder-open":""}>
                 <div style={{position:'absolute',bottom:30,right:18, zIndex:11}}>
@@ -185,7 +186,7 @@ export default React.createClass({
                         rowHeight={5}
                         onLayoutChange={this.onLayoutChange}
                         isDraggable={!this.props.disableDrag}
-                        style={{height: '100%'}}
+                        style={{...rglStyle, height: '100%'}}
                         autoSize={false}
                     >
                         {items}
