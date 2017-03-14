@@ -15,6 +15,8 @@ import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
 import AbstractEditor from './editor/AbstractEditor'
+import DynamicGrid from './dynamic-grid/DynamicGrid'
+import GridItemMixin from './dynamic-grid/GridItemMixin'
 
 import {DNDActionParameter} from './DND'
 
@@ -44,6 +46,8 @@ window.PydioComponents = {
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,
     PaperEditorNavHeader    : PaperEditorNavHeader,
+    DynamicGrid             : DynamicGrid,
+    DynamicGridItemMixin    : GridItemMixin,
 
     DNDActionParameter      : DNDActionParameter,
 
