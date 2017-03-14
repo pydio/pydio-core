@@ -30,7 +30,7 @@ export default {
     getCloseButton:function(){
         if(this.props.showCloseAction){
             var closeAction = function(){};
-            if(this.props.onCloseAction) closeAction = this.props.onCloseAction;:
+            if(this.props.onCloseAction) closeAction = this.props.onCloseAction;
             const overlayStyle = {
                 position:'absolute',
                 backgroundColor:'rgba(0,0,0,0.53)',
