@@ -509,8 +509,8 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:2,
-            gridHeight:26,
+            gridWidth:4,
+            gridHeight:36,
             builderDisplayName:'Video Tutorial',
             builderFields:[]
         },
@@ -521,26 +521,70 @@
             launchVideo         : React.PropTypes.func
         },
 
+        getInitialState: function(){
+            this._videos = [
+                ['qvsSeLXr-T4', 'user_home.63'],
+                ['HViCWPpyZ6k', 'user_home.79'],
+                ['jBRNqwannJM', 'user_home.80'],
+                ['2jl1EsML5v8', 'user_home.81'],
+                ['28-t4dvhE6c', 'user_home.82'],
+                ['fP0MVejnVZE', 'user_home.83'],
+                ['TXFz4w4trlQ', 'user_home.84'],
+                ['OjHtgnL_L7Y', 'user_home.85'],
+                ['ot2Nq-RAnYE', 'user_home.66']
+            ];
+            const k = Math.floor(Math.random() * this._videos.length);
+            const value = this._videos[k];
+            return {
+                youtubeId       : value[0],
+                contentMessageId: value[1]
+            };
+        },
+
         launchVideo: function(){
-            this.props.launchVideo("//www.youtube.com/embed/"+this.props.youtubeId+"?list=PLxzQJCqzktEbYm3U_O1EqFru0LsEFBca5&autoplay=1");
+            const url = "//www.youtube.com/embed/"+this.state.youtubeId+"?list=PLxzQJCqzktEbYm3U_O1EqFru0LsEFBca5&autoplay=1";
+            this._videoDiv = document.createElement('div');
+            document.body.appendChild(this._videoDiv);
+            ReactDOM.render(<VideoPlayer videoSrc={url} closePlayer={this.closePlayer}/>, this._videoDiv);
+        },
+
+        closePlayer: function(){
+            ReactDOM.unmountComponentAtNode(this._videoDiv);
+            document.body.removeChild(this._videoDiv);
+        },
+
+        getTitle: function(messId){
+            const text = this.props.pydio.MessageHash[messId];
+            return text.split('\n').shift().replace('<h2>', '').replace('</h2>', '');
         },
 
         render: function(){
+            const MessageHash = this.props.pydio.MessageHash;
             var htmlMessage = function(id){
                 return {__html:MessageHash[id]};
             };
+            const menus = this._videos.map(function(item){
+                return <MaterialUI.MenuItem primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1]})} }/>;
+            }.bind(this));
             let props = {...this.props};
+            const {youtubeId, contentMessageId} = this.state;
             props.className += ' video-card';
             props['zDepth'] = 1;
             return (
                 <MaterialUI.Paper {...props}>
+                    {this.getCloseButton()}
                     <div className="tutorial_legend">
-                        <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+this.props.youtubeId+'/0.jpg")'}}>
-                            <div className="tutorial_title"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
+                        <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
+                            <div className="tutorial_title"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
                         </div>
-                        <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(this.props.contentMessageId)}/></div>
+                        <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
                         <MaterialUI.Divider style={{minHeight: 1}}/>
                         <div style={{textAlign:'right', padding: '8px 4px'}}>
+                            <MaterialUI.IconMenu style={{float:'left'}}
+                                iconButtonElement={<MaterialUI.IconButton iconClassName="icon-reorder"/>}
+                                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
+                            >{menus}</MaterialUI.IconMenu>
                             <MaterialUI.FlatButton
                                 onTouchTap={this.launchVideo}
                                 label={MessageHash['user_home.86']}
@@ -862,6 +906,7 @@
             }
             return (
                 <MaterialUI.Paper zDepth={1} {...props} >
+                    {this.getCloseButton()}
                     <PydioWorkspaces.WorkspacesList
                         className={"vertical_fit"}
                         pydio={this.props.pydio}
@@ -892,6 +937,7 @@
             }
             return (
                 <MaterialUI.Paper zDepth={1} {...props} >
+                    {this.getCloseButton()}
                     <div style={{width: 380, margin:'10px auto', position:'relative'}}>
                         <DlAppsPanel pydio={this.props.pydio} open={true}/>
                     </div>
@@ -913,17 +959,6 @@
         },
 
         getDefaultCards: function(){
-
-            let videos = new Map();
-            videos.set('qvsSeLXr-T4', 'user_home.63');
-            videos.set('HViCWPpyZ6k', 'user_home.79');
-            videos.set('jBRNqwannJM', 'user_home.80');
-            videos.set('2jl1EsML5v8', 'user_home.81');
-            videos.set('28-t4dvhE6c', 'user_home.82');
-            videos.set('fP0MVejnVZE', 'user_home.83');
-            videos.set('TXFz4w4trlQ', 'user_home.84');
-            videos.set('OjHtgnL_L7Y', 'user_home.85');
-            videos.set('ot2Nq-RAnYE', 'user_home.66');
 
             let baseCards = [
                 {
@@ -947,6 +982,16 @@
                     }
                 },
                 {
+                    id:'videos',
+                    componentClass:'WelcomeComponents.VideoCard',
+                    props:{
+                        launchVideo     : this.launchVideo.bind(this)
+                    },
+                    defaultPosition:{
+                        x:8, y:0
+                    }
+                },
+                {
                     id:'downloads',
                     componentClass:'WelcomeComponents.DlAppsCard',
                     defaultPosition:{
@@ -955,23 +1000,6 @@
                 }
             ];
 
-            let x = 0, y = 36;
-            let launcher = this.launchVideo.bind(this);
-            videos.forEach(function(messageId, videoId){
-                baseCards.push({
-                    id:'video-' + videoId,
-                    componentClass:'WelcomeComponents.VideoCard',
-                    props:{
-                        launchVideo     : launcher,
-                        youtubeId       : videoId,
-                        contentMessageId: messageId
-                    },
-                    defaultPosition:{
-                        x:(x%4)*2, y:y
-                    }
-                });
-                x++;
-            }.bind(this));
             return baseCards;
         },
 
@@ -1007,7 +1035,7 @@
                         {...uWidgetProps}
                     >
                         <div>
-                            <PydioWorkspaces.SearchForm searchAction="multisearch" pydio={this.props.pydio}/>
+                            <PydioWorkspaces.SearchForm searchAction="multisearch" pydio={this.props.pydio} groupByField="repository_id"/>
                         </div>
                     </PydioWorkspaces.UserWidget>
                     <PydioComponents.DynamicGrid

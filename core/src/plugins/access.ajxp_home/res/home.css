@@ -25,8 +25,8 @@
   padding-left: 20px;
 }
 .react-mui-context .video-card div.tutorial_video_thumb {
-  height: 160px;
-  minHeight: 160px;
+  height: 250px;
+  minHeight: 250px;
   background-color: black;
   background-position: center center;
   background-size: cover;

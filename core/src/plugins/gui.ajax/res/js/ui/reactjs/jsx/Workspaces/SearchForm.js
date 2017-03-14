@@ -270,7 +270,8 @@ let SearchForm = React.createClass({
             quickSearch: true,
             formValues: current,
             query:this.buildQuery(current)
-        }, this.submitSearch);
+        });
+        FuncUtils.bufferCallback('search-form-submit-search', 350, this.submitSearch);
 
     },
 
@@ -438,9 +439,9 @@ let SearchForm = React.createClass({
         if(this.state.query){
             // Refresh nodeProvider query
             this.state.nodeProvider.initProvider({
-                get_action:this.props.searchAction || 'search',
-                query:this.state.query,
-                limit:this.state.quickSearch?9:100
+                get_action  : this.props.searchAction || 'search',
+                query       : this.state.query,
+                limit       : this.state.quickSearch?9:100
             });
         }
         let moreButton, renderSecondLine = null, renderIcon = null, elementHeight = 49;
@@ -504,6 +505,7 @@ let SearchForm = React.createClass({
                         presetDataModel={this.state.dataModel}
                         heightAutoWithMax={this.state.display === 'small' ? 500  : 412}
                         nodeClicked={(node)=>{this.props.pydio.goTo(node);this.setState({display:'closed'})}}
+                        defaultGroupBy={this.props.groupByField}
                     />
                     {moreButton}
                 </div>

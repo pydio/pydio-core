@@ -24,11 +24,15 @@ export default {
     },
 
     getInitialSate:function(){
-        return {focus:false};
+        return {focus:false, showCloseAction: false};
+    },
+
+    toggleEditMode: function(){
+        this.setState({showCloseAction:!(this.state && this.state.showCloseAction)});
     },
 
     getCloseButton:function(){
-        if(this.props.showCloseAction){
+        if(this.state && this.state.showCloseAction){
             var closeAction = function(){};
             if(this.props.onCloseAction) closeAction = this.props.onCloseAction;
             const overlayStyle = {

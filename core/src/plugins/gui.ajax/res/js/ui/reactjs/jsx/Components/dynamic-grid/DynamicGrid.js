@@ -1,42 +1,16 @@
 import Store from './Store'
 import GridBuilder from './GridBuilder'
 
-export default React.createClass({
-
-    propTypes: {
-        storeNamespace   : React.PropTypes.string.isRequired,
-        builderNamespaces: React.PropTypes.array,
-        defaultCards     : React.PropTypes.array,
-        pydio            : React.PropTypes.instanceOf(Pydio),
-        disableDrag      : React.PropTypes.bool
-    },
-
-    mixins:[PydioReactUI.PydioContextConsumerMixin],
-
-    removeCard:function(cardId){
-
-        this._store.removeCard(cardId);
-    },
-
-    addCard:function(cardDefinition){
-
-        this._store.addCard(cardDefinition);
-    },
-
-    resetCardsAndLayout:function(){
-        this._store.saveUserPreference('Layout', null);
-        this._store.setCards(null);
-        this.setState(this.getInitialState());
-    },
+const CardsGrid = React.createClass({
 
     saveFullLayouts:function(allLayouts){
-        var savedPref = this._store.getUserPreference('Layout');
+        var savedPref = this.props.store.getUserPreference('Layout');
         // Compare JSON versions to avoid saving unnecessary changes
         if(savedPref && this.previousLayout  && this.previousLayout == JSON.stringify(allLayouts)){
             return;
         }
         this.previousLayout = JSON.stringify(allLayouts);
-        this._store.saveUserPreference('Layout', allLayouts);
+        this.props.store.saveUserPreference('Layout', allLayouts);
     },
 
     onLayoutChange: function(currentLayout, allLayouts){
@@ -44,44 +18,47 @@ export default React.createClass({
         this.saveFullLayouts(allLayouts);
     },
 
-    componentDidMount: function(){
-    },
-
     componentWillUnmount: function(){
-        this._store.stopObserving("cards", this._storeObserver);
+        this.props.store.stopObserving("cards", this._storeObserver);
     },
 
-    getInitialState:function(){
-
-        this._store = new Store(this.props.storeNamespace, this.props.defaultCards, this.props.pydio);
-        this._storeObserver = function(e){
-            this.setState({
-                cards: this._store.getCards(),
-            });
-        }.bind(this);
-        this._store.observe("cards", this._storeObserver);
-
-        return {
-            cards: this._store.getCards(),
-            editMode:false
+    componentWillReceiveProps: function(nextProps){
+        if(this.props && nextProps.editMode !== this.props.editMode){
+            Object.keys(this.refs).forEach(function(k){
+                this.refs[k].toggleEditMode();
+            }.bind(this));
         }
     },
 
-    toggleEditMode:function(){
-        this.setState({editMode:!this.state.editMode});
+    shouldComponentUpdate: function(nextProps, nextState){
+        return this._forceUpdate || false;
     },
 
-    render: function(){
+    getInitialState:function(){
+        this._storeObserver = function(e){
+            this._forceUpdate = true;
+            this.setState({
+                cards: this.props.store.getCards()
+            }, ()=>{this._forceUpdate = false});
+        }.bind(this);
+        this.props.store.observe("cards", this._storeObserver);
+        return {cards: this.props.store.getCards()}
+    },
 
-        var index = 0;
-        var lgLayout = [];
-        var savedLayouts = this._store.getUserPreference('Layout');
+    removeCard: function(itemKey){
+        console.log(itemKey);
+        this.props.removeCard(itemKey);
+    },
 
-        var layouts = {lg:[], md:[], sm:[], xs:[], xxs:[]};
+    buildCards: function(cards){
 
+        let index = 0;
+        let layouts = {lg:[], md:[], sm:[], xs:[], xxs:[]};
         let items = [];
         let additionalNamespaces = [];
-        this.state.cards.map(function(item){
+        const rand = Math.random();
+        const savedLayouts = this.props.store.getUserPreference('Layout');
+        cards.map(function(item){
 
             var parts = item.componentClass.split(".");
             var classNS = parts[0];
@@ -97,12 +74,12 @@ export default React.createClass({
             }
             var props = {...item.props};
             var itemKey = props['key'] = item['id'] || 'item_' + index;
-            props.showCloseAction = this.state.editMode;
+            props.ref=itemKey;
             props.pydio=this.props.pydio;
             props.onCloseAction = function(){
                 this.removeCard(itemKey);
             }.bind(this);
-            props.preferencesProvider = this._store;
+            props.preferencesProvider = this.props.store;
             var defaultX = 0, defaultY = 0;
             if(item.defaultPosition){
                 defaultX = item.defaultPosition.x;
@@ -146,6 +123,71 @@ export default React.createClass({
                 }.bind(this));
             }.bind(this));
         }
+        return {cards: items, layouts: layouts};
+    },
+
+    render: function(){
+        const {cards, layouts} = this.buildCards(this.state.cards);
+        const {Responsive, WidthProvider} = ReactGridLayout;
+        const ResponsiveGridLayout = WidthProvider(Responsive);
+        return (
+            <ResponsiveGridLayout
+                className="dashboard-layout"
+                cols={this.props.cols || {lg: 10, md: 8, sm: 8, xs: 4, xxs: 2}}
+                layouts={layouts}
+                rowHeight={5}
+                onLayoutChange={this.onLayoutChange}
+                isDraggable={!this.props.disableDrag}
+                style={this.props.style}
+                autoSize={false}
+            >
+                {cards}
+            </ResponsiveGridLayout>
+        );
+    }
+
+});
+
+export default React.createClass({
+
+    propTypes: {
+        storeNamespace   : React.PropTypes.string.isRequired,
+        builderNamespaces: React.PropTypes.array,
+        defaultCards     : React.PropTypes.array,
+        pydio            : React.PropTypes.instanceOf(Pydio),
+        disableDrag      : React.PropTypes.bool
+    },
+
+    mixins:[PydioReactUI.PydioContextConsumerMixin],
+
+    removeCard:function(cardId){
+
+        this.state.store.removeCard(cardId);
+    },
+
+    addCard:function(cardDefinition){
+
+        this.state.store.addCard(cardDefinition);
+    },
+
+    resetCardsAndLayout:function(){
+        this.state.store.saveUserPreference('Layout', null);
+        this.state.store.setCards(this.props.defaultCards);
+    },
+
+    getInitialState: function(){
+        const store = new Store(this.props.storeNamespace, this.props.defaultCards, this.props.pydio);
+        return{
+            editMode: false,
+            store   : store
+        };
+    },
+
+    toggleEditMode:function(){
+        this.setState({editMode:!this.state.editMode});
+    },
+
+    render: function(){
 
         var monitorWidgetEditing = function(status){
             this.setState({widgetEditing:status});
@@ -162,8 +204,6 @@ export default React.createClass({
                     onEditStatusChange={monitorWidgetEditing}
                 />);
         }
-        const {Responsive, WidthProvider} = ReactGridLayout;
-        const ResponsiveGridLayout = WidthProvider(Responsive);
         const propStyle = this.props.style || {};
         const rglStyle  = this.props.rglStyle || {};
         return (
@@ -179,18 +219,15 @@ export default React.createClass({
                 </div>
                 {builder}
                 <div className="home-dashboard" style={{height:'100%'}}>
-                    <ResponsiveGridLayout
-                        className="dashboard-layout"
-                        cols={this.props.cols || {lg: 10, md: 8, sm: 8, xs: 4, xxs: 2}}
-                        layouts={layouts}
-                        rowHeight={5}
-                        onLayoutChange={this.onLayoutChange}
-                        isDraggable={!this.props.disableDrag}
-                        style={{...rglStyle, height: '100%'}}
-                        autoSize={false}
-                    >
-                        {items}
-                    </ResponsiveGridLayout>
+                    <CardsGrid
+                        disableDrag={this.props.disableDrag}
+                        cols={this.props.cols}
+                        store={this.state.store}
+                        style={rglStyle}
+                        pydio={this.props.pydio}
+                        editMode={this.state.editMode}
+                        removeCard={this.removeCard}
+                    />
                 </div>
             </div>
         );
