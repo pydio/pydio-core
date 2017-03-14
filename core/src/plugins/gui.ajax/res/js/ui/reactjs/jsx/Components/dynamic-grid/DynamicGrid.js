@@ -7,7 +7,8 @@ export default React.createClass({
         storeNamespace   : React.PropTypes.string.isRequired,
         builderNamespaces: React.PropTypes.array,
         defaultCards     : React.PropTypes.array,
-        pydio            : React.PropTypes.instanceOf(Pydio)
+        pydio            : React.PropTypes.instanceOf(Pydio),
+        disableDrag      : React.PropTypes.bool
     },
 
     mixins:[PydioReactUI.PydioContextConsumerMixin],
@@ -97,6 +98,7 @@ export default React.createClass({
             var props = LangUtils.deepCopy(item.props);
             var itemKey = props['key'] = item['id'] || 'item_' + index;
             props.showCloseAction = this.state.editMode;
+            props.pydio=this.props.pydio;
             props.onCloseAction = function(){
                 this.removeCard(itemKey);
             }.bind(this);
@@ -162,8 +164,9 @@ export default React.createClass({
         }
         const {Responsive, WidthProvider} = ReactGridLayout;
         const ResponsiveGridLayout = WidthProvider(Responsive);
+        const propStyle = this.props.style || {};
         return (
-            <div style={{width:'100%', height:'100%'}} className={this.state.editMode?"builder-open":""}>
+            <div style={{...this.props.style, width:'100%', flex:'1'}} className={this.state.editMode?"builder-open":""}>
                 <div style={{position:'absolute',bottom:30,right:18, zIndex:11}}>
                     <MaterialUI.FloatingActionButton
                         tooltip={this.context.getMessage('home.49')}
@@ -174,13 +177,16 @@ export default React.createClass({
                     />
                 </div>
                 {builder}
-                <div className="home-dashboard">
+                <div className="home-dashboard" style={{height:'100%'}}>
                     <ResponsiveGridLayout
                         className="dashboard-layout"
                         cols={{lg: 10, md: 8, sm: 8, xs: 4, xxs: 2}}
                         layouts={layouts}
                         rowHeight={5}
                         onLayoutChange={this.onLayoutChange}
+                        isDraggable={!this.props.disableDrag}
+                        style={{height: '100%'}}
+                        autoSize={false}
                     >
                         {items}
                     </ResponsiveGridLayout>

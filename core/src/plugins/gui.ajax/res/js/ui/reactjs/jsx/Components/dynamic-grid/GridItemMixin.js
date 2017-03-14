@@ -34,7 +34,7 @@ export default {
             const overlayStyle = {
                 position:'absolute',
                 backgroundColor:'rgba(0,0,0,0.53)',
-                zIndex10,
+                zIndex:10,
                 top:0,
                 left:0,
                 bottom:0,

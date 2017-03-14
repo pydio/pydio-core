@@ -9,6 +9,7 @@ import EditionPanel from './EditionPanel'
 import WorkspacesList from './wslist/WorkspacesList'
 import LeftPanel from './leftnav/LeftPanel'
 import DynamicLeftPanel from './leftnav/DynamicLeftPanel'
+import UserWidget from './leftnav/UserWidget'
 
 window.PydioWorkspaces = {
     OpenNodesModel      : OpenNodesModel,
@@ -20,7 +21,8 @@ window.PydioWorkspaces = {
     FSTemplate          : FSTemplate,
     WorkspacesList      : WorkspacesList,
     LeftPanel           : LeftPanel,
-    DynamicLeftPanel    : DynamicLeftPanel
+    DynamicLeftPanel    : DynamicLeftPanel,
+    UserWidget          : UserWidget
 }
 
 import InfoPanel from './detailpanes/InfoPanel'

@@ -46,6 +46,7 @@ window.PydioComponents = {
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,
     PaperEditorNavHeader    : PaperEditorNavHeader,
+
     DynamicGrid             : DynamicGrid,
     DynamicGridItemMixin    : GridItemMixin,
 

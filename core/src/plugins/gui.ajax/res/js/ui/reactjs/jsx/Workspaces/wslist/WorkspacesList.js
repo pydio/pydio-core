@@ -9,7 +9,8 @@ export default React.createClass({
         onHoverLink             : React.PropTypes.func,
         onOutLink               : React.PropTypes.func,
         className               : React.PropTypes.string,
-        style                   : React.PropTypes.object
+        style                   : React.PropTypes.object,
+        filterByType            : React.PropTypes.oneOf(['shared', 'entries', 'create'])
     },
 
     createRepositoryEnabled:function(){
@@ -19,8 +20,9 @@ export default React.createClass({
 
     render: function(){
         var entries = [], sharedEntries = [], inboxEntry;
+        const {workspaces, showTreeForWorkspace, pydio, className, style, filterByType} = this.props;
 
-        this.props.workspaces.forEach(function(object, key){
+        workspaces.forEach(function(object, key){
 
             if (object.getId().indexOf('ajxp_') === 0) return;
             if (object.hasContentFilter()) return;
@@ -31,7 +33,7 @@ export default React.createClass({
                     {...this.props}
                     key={key}
                     workspace={object}
-                    showFoldersTree={this.props.showTreeForWorkspace && this.props.showTreeForWorkspace===key}
+                    showFoldersTree={showTreeForWorkspace && showTreeForWorkspace===key}
                 />
             );
             if (object.getAccessType() == "inbox") {
@@ -47,11 +49,11 @@ export default React.createClass({
             sharedEntries.unshift(inboxEntry);
         }
 
-        var messages = this.props.pydio.MessageHash;
+        var messages = pydio.MessageHash;
 
         if(this.createRepositoryEnabled()){
             var createClick = function(){
-                this.props.pydio.Controller.fireAction('user_create_repository');
+                pydio.Controller.fireAction('user_create_repository');
             }.bind(this);
             var createAction = (
                 <div className="workspaces">
@@ -63,30 +65,51 @@ export default React.createClass({
                 </div>
             );
         }
-
-        let workspacesTitle, sharedEntriesTitle, createActionTitle;
+        
+        let sections = [];
         if(entries.length){
-            workspacesTitle = <div className="section-title">{messages[468]}</div>;
+            sections.push({
+                k:'entries', 
+                title: <div key="entries-title" className="section-title">{messages[468]}</div>, 
+                content: <div key="entries-ws" className="workspaces">{entries}</div>
+            });
         }
         if(sharedEntries.length){
-            sharedEntriesTitle = <div className="section-title">{messages[469]}</div>;
+            sections.push({
+                k:'shared', 
+                title: <div key="shared-title" className="section-title">{messages[469]}</div>, 
+                content: <div key="shared-ws" className="workspaces">{sharedEntries}</div> 
+            });
         }
         if(createAction){
-            createActionTitle = <div className="section-title"></div>;
+            sections.push({
+                k:'create', 
+                title: <div key="create-title" className="section-title"></div>, 
+                content: createAction
+            });
         }
 
+        let classNames = ['user-workspaces-list'];
+        if(className) classNames.push(className);
+
+        if(filterByType){
+            let ret;
+            sections.map(function(s){
+                if(filterByType && filterByType === s.k){
+                    ret = <div className={classNames.join(' ')} style={style}>{s.title}{s.content}</div>
+                }
+            });
+            return ret;
+        }
+
+        let elements = [];
+        sections.map(function(s) {
+            elements.push(s.title);
+            elements.push(s.content);
+        });
         return (
-            <div className={"user-workspaces-list" + (this.props.className ? ' ' + this.props.className  : '')} style={this.props.style}>
-                {workspacesTitle}
-                <div className="workspaces">
-                    {entries}
-                </div>
-                {sharedEntriesTitle}
-                <div className="workspaces">
-                    {sharedEntries}
-                </div>
-                {createActionTitle}
-                {createAction}
+            <div className={classNames.join(' ')} style={style}>
+                {elements}
             </div>
         );
     }
