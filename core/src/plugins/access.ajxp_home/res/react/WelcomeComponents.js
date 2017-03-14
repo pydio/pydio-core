@@ -411,7 +411,7 @@
                     <div id={this.props.id}>
                         <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
                         <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
-                        <div style={{color:'white'}}>{MessageHash[this.props.messageId]}</div>
+                        <div>{MessageHash[this.props.messageId]}</div>
                     </div>
                 </PydioComponents.LabelWithTip>
             );
@@ -421,7 +421,7 @@
     var DlAppsPanel = React.createClass({
 
         render: function(){
-            let configs = pydio.getPluginConfigs('access.ajxp_home');
+            let configs = this.props.pydio.getPluginConfigs('access.ajxp_home');
             let mobileBlocks = [], syncBlocks = [];
             if(configs.get('URL_APP_IOSAPPSTORE')){
                 mobileBlocks.push(
@@ -827,7 +827,7 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:4,
+            gridWidth:3,
             gridHeight:30,
             builderDisplayName:'My Workspaces',
             builderFields:[]
@@ -852,6 +852,57 @@
         }
     });
 
+
+    const TutorialCard = React.createClass({
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:3,
+            gridHeight:60,
+            builderDisplayName:'Tutorial',
+            builderFields:[]
+        },
+
+        render: function(){
+            let props = {...this.props};
+            if(props.style){
+                props.style = {...props.style, overflowY:'auto'};
+            }
+            return (
+                <MaterialUI.Paper zDepth={1} {...props} >
+                    <TutorialPane pydio={this.props.pydio} open={true}/>
+                </MaterialUI.Paper>
+            );
+        }
+    });
+
+    const DlAppsCard = React.createClass({
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:6,
+            gridHeight:10,
+            builderDisplayName:'Download Applications',
+            builderFields:[]
+        },
+
+        render: function(){
+            let props = {...this.props};
+            if(props.style){
+                props.style = {...props.style, overflowY:'auto'};
+            }
+            return (
+                <MaterialUI.Paper zDepth={1} {...props} >
+                    <div style={{width: 380, margin:'10px auto'}}>
+                        <DlAppsPanel pydio={this.props.pydio} open={true}/>
+                    </div>
+                </MaterialUI.Paper>
+            );
+        }
+    });
+
+
+
     let UserDashboard = React.createClass({
 
         getDefaultCards: function(){
@@ -875,6 +926,20 @@
                     defaultPosition:{
                         x:3, y:0
                     }
+                },
+                {
+                    id:'tutorial',
+                    componentClass:'WelcomeComponents.TutorialCard',
+                    defaultPosition:{
+                        x:6, y:0
+                    }
+                },
+                {
+                    id:'downloads',
+                    componentClass:'WelcomeComponents.DlAppsCard',
+                    defaultPosition:{
+                        x:0, y:30
+                    }
                 }
             ];
         },
@@ -897,12 +962,18 @@
                         pydio={this.props.pydio}
                         style={widgetStyle}
                         {...uWidgetProps}
-                    />
+                    >
+                        <div>
+                            <PydioWorkspaces.SearchForm searchAction="multisearch" pydio={this.props.pydio}/>
+                        </div>
+                    </PydioWorkspaces.UserWidget>
                     <PydioComponents.DynamicGrid
                         storeNamespace="WelcomePanel.Dashboard"
                         defaultCards={this.getDefaultCards()}
+                        builderNamespaces={["WelcomeComponents"]}
                         pydio={this.props.pydio}
                         disableDrag={true}
+                        cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
                     />
                 </div>
             );
@@ -919,6 +990,8 @@
         WelcomeComponents.UserDashboard = UserDashboard;
     }
     WelcomeComponents.TutorialPane = TutorialPane;
+    WelcomeComponents.TutorialCard = TutorialCard;
+    WelcomeComponents.DlAppsCard = DlAppsCard;
     WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
     WelcomeComponents.WorkspacesListCard = WorkspacesListCard;
     global.WelcomeComponents = WelcomeComponents;

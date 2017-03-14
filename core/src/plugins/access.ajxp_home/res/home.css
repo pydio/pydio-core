@@ -1,11 +1,3 @@
-@-webkit-keyframes fadein {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 @keyframes fadein {
   from {
     opacity: 0;
@@ -190,9 +182,7 @@
   height: 100%;
 }
 .flexbox #home_account_pane #home_center_panel {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  flex: 1;
 }
 .no-flexbox #home_account_pane #home_center_panel {
   position: absolute;
@@ -212,8 +202,7 @@
   margin: 0 20px;
 }
 #home_account_pane #home_center_panel.legend_visible div#ws_legend {
-  -webkit-animation: fadein 0.2s ease-in;
-          animation: fadein 0.2s ease-in;
+  animation: fadein 0.2s ease-in;
   top: 2%;
   position: relative;
   opacity: 1;
@@ -290,8 +279,7 @@
   top: 30px;
 }
 #home_account_pane #ws_legend .repoInfoBadge {
-  -webkit-animation: fadein 0.2s ease-in;
-          animation: fadein 0.2s ease-in;
+  animation: fadein 0.2s ease-in;
   position: relative;
   box-sizing: border-box;
   display: inline-block;
@@ -420,11 +408,13 @@
 #videos_pane {
   color: rgba(0, 0, 0, 0.87);
   background-color: transparent;
-  position: absolute;
   border-radius: 0;
+  /*
+  position: absolute;
   top: 0;
   right: 0;
-  width: 320px;
+  width: @videoPaneWidth;
+  */
   height: 100%;
   overflow: auto;
   opacity: 1;
@@ -552,7 +542,7 @@ div#tutorial_dl_apps_pane {
 }
 div#tutorial_dl_apps_pane a {
   text-decoration: none;
-  color: white;
+  color: rgba(0, 0, 0, 0.73);
 }
 div#tutorial_dl_apps_pane > div > div {
   text-align: center;
@@ -562,7 +552,7 @@ div#tutorial_dl_apps_pane > div > div {
 div#tutorial_dl_apps_pane div.dl_blocks_sep {
   float: left;
   height: 90px;
-  border-right: 2px solid white;
+  border-right: 2px solid rgba(0, 0, 0, 0.73);
   margin: 0 10px;
 }
 div#tutorial_dl_apps_pane div#dl_pydio_cont {
@@ -629,7 +619,7 @@ div#tutorial_dl_apps_pane div#dl_pydio_android a.icon-android {
   position: absolute;
   left: 0 ;
   top: 26px;
-  color: white;
+  color: rgba(0, 0, 0, 0.73);
   width: 90px;
 }
 div#tutorial_dl_apps_pane div#dl_pydio_win div,
@@ -759,6 +749,43 @@ div.home_search span.suggest-search {
 .form-qrcode_dialog_form .button-panel {
   text-align: right;
   padding: 10px;
+}
+.admin-helper-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-top: 110px;
+  right: 0;
+  z-index: 1;
+  width: 326px;
+  background-color: rgba(255, 255, 255, 0.99);
+}
+.admin-helper-panel .mui-paper-container {
+  height: 100%;
+  overflow-y: auto;
+}
+.admin-helper-panel h3 {
+  background-color: #FF6E40;
+  color: white;
+  text-align: center;
+  padding-bottom: 8px;
+  padding-top: 20px;
+}
+.admin-helper-panel .pydio-form-panel .pydio-form-group {
+  margin-top: 0;
+}
+.admin-helper-panel .legend {
+  padding: 0 17px;
+  color: #878787;
+  font-size: 12px;
+  line-height: 17px;
+}
+.admin-helper-panel .widget-type-selector {
+  border: 1px solid #E0E0E0;
+  margin-left: 16px;
+  border-radius: 3px;
+  margin-top: 8px;
+  width: 280px;
 }
 @media only screen and (max-width: 980px) {
   #notifications_center div.notif_event_container {

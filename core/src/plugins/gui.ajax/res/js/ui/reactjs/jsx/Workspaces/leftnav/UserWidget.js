@@ -91,16 +91,32 @@ export default React.createClass({
             );
         }
 
-        return (
-            <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
-                {avatar}
-                <div className="action_bar">
-                    {homeButton}
-                    {notificationsButton}
-                    {infoButton}
-                    {logoutButton}
-                </div>
-            </MaterialUI.Paper>
+        const actionBar = (
+            <div className="action_bar">
+                {homeButton}
+                {notificationsButton}
+                {infoButton}
+                {logoutButton}
+            </div>
         );
+
+        if(this.props.children){
+            return (
+                <MaterialUI.Paper zDepth={1} rounded={false} style={{...this.props.style, display:'flex'}} className="user-widget primaryColorDarkerPaper">
+                    <div style={{flex: 1}}>
+                        {avatar}
+                        {actionBar}
+                    </div>
+                    <div>{this.props.children}</div>
+                </MaterialUI.Paper>
+            );
+        }else{
+            return (
+                <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
+                    {avatar}
+                    {actionBar}
+                </MaterialUI.Paper>
+            );
+        }
     }
 });

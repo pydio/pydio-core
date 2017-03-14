@@ -180,7 +180,7 @@ export default React.createClass({
                 <div className="home-dashboard" style={{height:'100%'}}>
                     <ResponsiveGridLayout
                         className="dashboard-layout"
-                        cols={{lg: 10, md: 8, sm: 8, xs: 4, xxs: 2}}
+                        cols={this.props.cols || {lg: 10, md: 8, sm: 8, xs: 4, xxs: 2}}
                         layouts={layouts}
                         rowHeight={5}
                         onLayoutChange={this.onLayoutChange}

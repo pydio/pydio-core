@@ -438,7 +438,7 @@ let SearchForm = React.createClass({
         if(this.state.query){
             // Refresh nodeProvider query
             this.state.nodeProvider.initProvider({
-                get_action:'search',
+                get_action:this.props.searchAction || 'search',
                 query:this.state.query,
                 limit:this.state.quickSearch?9:100
             });

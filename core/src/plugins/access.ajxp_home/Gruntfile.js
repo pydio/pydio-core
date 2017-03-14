@@ -36,14 +36,14 @@ module.exports = function(grunt) {
                 options: {
                     spawn: false
                 }
-            },
+            }/*,
             styles: {
                 files: ['res/*.less'],
                 tasks: ['less'],
                 options: {
                     nospawn: true
                 }
-            }
+            }*/
         }
     });
     grunt.loadNpmTasks('grunt-babel');

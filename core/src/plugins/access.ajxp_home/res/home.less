@@ -469,11 +469,13 @@
 
   color: rgba(0, 0, 0, 0.87);
   background-color: transparent;
-  position: absolute;
   border-radius: 0;
+  /*
+  position: absolute;
   top: 0;
   right: 0;
   width: @videoPaneWidth;
+  */
   height: 100%;
   overflow: auto;
   opacity: 1;
@@ -599,6 +601,8 @@
 }
 
 div#tutorial_dl_apps_pane{
+
+  @color: rgba(0,0,0,0.73);
   width: 100%;
   position: absolute;
   margin-top: 10px;
@@ -606,7 +610,7 @@ div#tutorial_dl_apps_pane{
   z-index: 2;
   a{
     text-decoration: none;
-    color: white;
+    color: @color;
   }
 
   > div > div {
@@ -618,7 +622,7 @@ div#tutorial_dl_apps_pane{
   div.dl_blocks_sep{
     float: left;
     height: 90px;
-    border-right: 2px solid white;
+    border-right: 2px solid @color;
     margin: 0 10px;
   }
 
@@ -657,7 +661,7 @@ div#tutorial_dl_apps_pane{
       position: absolute;
       left:0 ;
       top: 26px;
-      color: white;
+      color: @color;
       width:@dl_element_width;
     }
     div{
@@ -798,6 +802,47 @@ div.home_search{
     padding: 10px;
   }
 }
+
+.admin-helper-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-top: 110px;
+  right: 0;
+  z-index: 1;
+  width: 326px;
+  background-color: rgba(255, 255, 255, 0.99);
+  .mui-paper-container {
+    height: 100%;
+    overflow-y: auto;
+  }
+  h3 {
+    background-color: #FF6E40;
+    color: white;
+    text-align: center;
+    padding-bottom: 8px;
+    padding-top: 20px;
+  }
+  .pydio-form-panel {
+    .pydio-form-group {
+      margin-top: 0;
+    }
+  }
+  .legend {
+    padding: 0 17px;
+    color: #878787;
+    font-size: 12px;
+    line-height: 17px;
+  }
+  .widget-type-selector {
+    border: 1px solid #E0E0E0;
+    margin-left: 16px;
+    border-radius: 3px;
+    margin-top: 8px;
+    width: 280px;
+  }
+}
+
 
 @media only screen
 and (max-width : 980px){
