@@ -20,7 +20,7 @@ module.exports = function(grunt) {
                 files: [
                     "res/**/*"
                 ],
-                tasks: ['babel', 'clean'],
+                tasks: ['babel'],
                 options: {
                     spawn: false
                 }
