@@ -24,7 +24,10 @@ let Breadcrumb = React.createClass({
     },
 
     render: function(){
-        var pydio = this.props.pydio;
+        const pydio = this.props.pydio;
+        if(!pydio.user){
+            return <span className="react_breadcrumb"></span>;
+        }
         let repoLabel = pydio.user.repositories.get(pydio.user.activeRepository).getLabel();
         let segments = [];
         let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';

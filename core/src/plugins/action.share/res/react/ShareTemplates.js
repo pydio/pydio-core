@@ -30,7 +30,7 @@
 
     }
 
-    var DLTemplate = React.createClass({
+    const DLTemplate = React.createClass({
 
         mixins:[UniqueNodeTemplateMixin],
 
@@ -54,9 +54,9 @@
                     repoObject:pydio.user.repositories.get(pydio.user.activeRepository)
                 });
             }else{
-                global.document.observe("ajaxplorer:repository_list_refreshed", function(e){
-                    let repositoryList = e.memo.list;
-                    let repositoryId = e.memo.active;
+                pydio.observe("repository_list_refreshed", function(e){
+                    let repositoryList = e.list;
+                    let repositoryId = e.active;
                     if(repositoryList && repositoryList.has(repositoryId)){
                         var repoObject = repositoryList.get(repositoryId);
                         this.setState({repoObject: repoObject});
@@ -67,8 +67,18 @@
 
         render: function(){
 
+            let style = {};
+            if(this.props.imageBackgroundFromConfigs){
+                if(PydioReactUI.BackgroundImage.SESSION_IMAGE){
+                    style = PydioReactUI.BackgroundImage.SESSION_IMAGE;
+                }else{
+                    style = PydioReactUI.BackgroundImage.getImageBackgroundFromConfig(this.props.imageBackgroundFromConfigs);
+                    PydioReactUI.BackgroundImage.SESSION_IMAGE = style;
+                }
+            }
+
             if(!this.props.pydio.user){
-                return <div></div>;
+                return <div className="vertical_fit" style={{...style, width:'100%'}}></div>;
             }
             let name1, name2, name3, owner;
             let classNames = ['download-block'];
@@ -107,7 +117,7 @@
                 );
             }
             return (
-                <div>
+                <div style={style}>
                     <div className={classNames.join(' ')} onClick={click}>
                         <span className="dl-filename">{name2}</span>
                         <div className="dl-icon">
@@ -132,7 +142,7 @@
         },
 
         getChildContext: function() {
-            var messages = this.props.pydio.MessageHash;
+            const messages = this.props.pydio.MessageHash;
             return {
                 messages: messages,
                 getMessage: function(messageId){
@@ -151,10 +161,24 @@
 
         render: function(){
 
+            let style = {};
+            if(this.props.imageBackgroundFromConfigs){
+                if(PydioReactUI.BackgroundImage.SESSION_IMAGE){
+                    style = PydioReactUI.BackgroundImage.SESSION_IMAGE;
+                }else{
+                    style = PydioReactUI.BackgroundImage.getImageBackgroundFromConfig(this.props.imageBackgroundFromConfigs);
+                    PydioReactUI.BackgroundImage.SESSION_IMAGE = style;
+                }
+            }
+
             const {minisiteMode} = this.props;
 
+            if(!this.props.pydio.user){
+                return <div className="vertical_fit vertical_layout" style={style}/>;
+            }
+
             return (
-                <div className="vertical_fit vertical_layout">
+                <div className="vertical_fit vertical_layout" style={style}>
                     <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
                         {minisiteMode !== 'embed' &&
                             <div id="workspace_toolbar">
@@ -169,8 +193,6 @@
                         </div>
                     </MaterialUI.Paper>
                     {this.props.children}
-                    <PydioReactUI.Modal {...this.props} containerId="pydio_modal"/>
-                    <span className="context-menu"><PydioMenus.ContextMenu/></span>
                 </div>
             );
 
@@ -191,7 +213,7 @@
 
 
 
-    var FolderMinisite = React.createClass({
+    const FolderMinisite = React.createClass({
 
         render: function(){
 
@@ -206,7 +228,7 @@
 
     });
 
-    var FileMinisite = React.createClass({
+    const FileMinisite = React.createClass({
 
         mixins: [UniqueNodeTemplateMixin],
 
@@ -245,7 +267,7 @@
 
     });
 
-    var DropZoneMinisite = React.createClass({
+    const DropZoneMinisite = React.createClass({
 
         render: function(){
 
@@ -262,7 +284,7 @@
 
     });
 
-    var FilmStripMinisite = React.createClass({
+    const FilmStripMinisite = React.createClass({
 
         mixins: [UniqueNodeTemplateMixin],
 
@@ -271,6 +293,7 @@
         },
 
         render: function(){
+
 
             let node = this.state && this.state.node ?  this.state.node : null;
 
@@ -305,7 +328,7 @@
 
     });
 
-    var ns = global.ShareTemplates || {};
+    let ns = global.ShareTemplates || {};
     ns.FolderMinisite = FolderMinisite;
     ns.FileMinisite = FileMinisite;
     ns.DLTemplate = DLTemplate;

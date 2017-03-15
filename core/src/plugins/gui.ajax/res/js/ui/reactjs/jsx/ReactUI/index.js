@@ -2,6 +2,7 @@
 import Builder from './Builder'
 import TemplateBuilder from './TemplateBuilder'
 import AsyncComponent from './AsyncComponent'
+import BackgroundImage from './BackgroundImage'
 
 import AsyncModal from './modal/AsyncModal'
 import ActionDialogMixin from './modal/ActionDialogMixin'
@@ -40,6 +41,7 @@ window.PydioReactUI = {
     MessageBar                  : MessageBar,
     NetworkLoader               : NetworkLoader,
     HiddenDownloadForm          : HiddenDownloadForm,
+    BackgroundImage             : BackgroundImage,
 
     PydioContextProvider        : PydioContextProvider,
     PydioContextConsumerMixin   : PydioContextConsumerMixin

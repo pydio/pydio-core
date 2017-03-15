@@ -4,6 +4,8 @@ export default {
     },
     submitOnEnterKey:function(event){
         if(event.key === 'Enter'){
+            event.stopPropagation();
+            event.preventDefault();
             this.submit();
         }
     }

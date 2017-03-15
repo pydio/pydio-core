@@ -181,6 +181,9 @@ export default React.createClass({
     computeBackgroundData: function(){
         const pydioMainElement = document.getElementById(window.pydio.Parameters.get('MAIN_ELEMENT'));
         const reference = pydioMainElement.querySelector('div[data-reactroot]');
+        if(!reference){
+            return;
+        }
         const url = window.getComputedStyle(reference).getPropertyValue('background-image');
 
         let backgroundImage = new Image();
