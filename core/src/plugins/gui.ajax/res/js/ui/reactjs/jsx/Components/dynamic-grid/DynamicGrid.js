@@ -58,6 +58,15 @@ const CardsGrid = React.createClass({
         let additionalNamespaces = [];
         const rand = Math.random();
         const savedLayouts = this.props.store.getUserPreference('Layout');
+        const buildLayout = function(classObject, itemKey, item, x, y){
+            let layout = classObject.getGridLayout(x, y);
+            layout['handle'] = 'h4';
+            if(item['gridHandle']){
+                layout['handle'] = item['gridHandle'];
+            }
+            layout['i'] = itemKey;
+            return layout;
+        }
         cards.map(function(item){
 
             var parts = item.componentClass.split(".");
@@ -85,12 +94,7 @@ const CardsGrid = React.createClass({
                 defaultX = item.defaultPosition.x;
                 defaultY = item.defaultPosition.y;
             }
-            var defaultLayout = classObject.getGridLayout(defaultX, defaultY);
-            defaultLayout['handle'] = 'h4';
-            if(item['gridHandle']){
-                defaultLayout['handle'] = item['gridHandle'];
-            }
-            defaultLayout['i'] = itemKey;
+            const defaultLayout = buildLayout(classObject, itemKey, item, defaultX, defaultY);
 
             for(var breakpoint in layouts){
                 if(!layouts.hasOwnProperty(breakpoint))continue;
@@ -104,8 +108,11 @@ const CardsGrid = React.createClass({
                         }
                     });
                 }
-                if(existing){
+                if(existing) {
                     breakLayout.push(existing);
+                }else if(item.defaultLayouts && item.defaultLayouts[breakpoint]){
+                    let crtLayout = buildLayout(classObject, itemKey, item, item.defaultLayouts[breakpoint].x, item.defaultLayouts[breakpoint].y);
+                    breakLayout.push(crtLayout);
                 }else{
                     breakLayout.push(defaultLayout);
                 }

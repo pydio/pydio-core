@@ -509,7 +509,7 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:4,
+            gridWidth:3,
             gridHeight:36,
             builderDisplayName:'Video Tutorial',
             builderFields:[]
@@ -570,6 +570,9 @@
             const {youtubeId, contentMessageId} = this.state;
             props.className += ' video-card';
             props['zDepth'] = 1;
+            const TMP_VIEW_MORE = (
+                <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
+            );
             return (
                 <MaterialUI.Paper {...props}>
                     {this.getCloseButton()}
@@ -616,220 +619,9 @@
         }
     });
 
-    var TutorialPane = React.createClass({
-
-        propTypes:{
-            closePane:React.PropTypes.func,
-            open:React.PropTypes.bool
-        },
-
-        closePane: function(){
-            this.props.closePane();
-        },
-
-        closePlayer:function(){
-            this.setState({player:null});
-        },
-
-        launchVideo: function(videoSrc){
-            this.setState({player:videoSrc});
-        },
-
-        render: function(){
-            var htmlMessage = function(id){
-                return {__html:MessageHash[id]};
-            };
-
-            var videoPlayer;
-            if(this.state && this.state.player){
-                videoPlayer = <VideoPlayer videoSrc={this.state.player} closePlayer={this.closePlayer}/>
-            }
-
-            return (
-                <span>
-                {videoPlayer}
-                    <div id="videos_pane" className={this.props.open?"open":"closed"}>
-                    <div onClick={this.closePane} className="mdi mdi-close"></div>
-                    <div className="tutorial_title">{MessageHash['user_home.56']}</div>
-                    <div className="videoCards">
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="nkfRn-MxezE"
-                            contentMessageId="user_home.62"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="qvsSeLXr-T4"
-                            contentMessageId="user_home.63"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="HViCWPpyZ6k"
-                            contentMessageId="user_home.79"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="jBRNqwannJM"
-                            contentMessageId="user_home.80"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="2jl1EsML5v8"
-                            contentMessageId="user_home.81"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="28-t4dvhE6c"
-                            contentMessageId="user_home.82"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="fP0MVejnVZE"
-                            contentMessageId="user_home.83"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="TXFz4w4trlQ"
-                            contentMessageId="user_home.84"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="OjHtgnL_L7Y"
-                            contentMessageId="user_home.85"
-                        />
-                        <VideoCard
-                            launchVideo={this.launchVideo}
-                            youtubeId="ot2Nq-RAnYE"
-                            contentMessageId="user_home.66"
-                        />
-                    </div>
-                    <div className="tutorial_more_videos_cont">
-                        <a  className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank">
-                            <i className="icon-youtube-play"/>
-                            <span dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
-                        </a>
-                    </div>
-                </div>
-                </span>
-            );
-        }
-
-    });
-
     /***********************************************
      * OTHERS
      ***********************************************/
-    var HomeSearchEngine = React.createClass({
-
-        getInitialState:function(){
-            return {
-                loading : 0,
-                value   : ''
-            };
-        },
-
-        suggestionLoader:function(input, callback) {
-
-            let nodeProvider = new RemoteNodeProvider();
-            nodeProvider.initProvider({get_action:'multisearch', query:input});
-            let rootNode     = new AjxpNode('/', false);
-            this.setState({loading:true, value: input});
-            nodeProvider.loadNode(rootNode, function(){
-                let results = [];
-                let previousRepo = -1;
-                rootNode.getChildren().forEach(function(v){
-                    let repoId = v.getMetadata().get("repository_id");
-                    if(repoId != previousRepo){
-                        let node = new AjxpNode('/', false, v.getMetadata().get("repository_display"));
-                        node.setRoot();
-                        node.getMetadata().set("repository_id", repoId);
-                        results.push(node);
-                    }
-                    results.push(v);
-                    previousRepo = repoId;
-                });
-                // Hack : force suggestions display
-                if(this.refs.autosuggest.lastSuggestionsInputValue && this.refs.autosuggest.lastSuggestionsInputValue.indexOf(input) === 0){
-                    this.refs.autosuggest.lastSuggestionsInputValue = input;
-                }
-                callback(null, results);
-                this.setState({loading:false});
-            }.bind(this));
-        },
-
-        getSuggestions(input, callback){
-            if(input.length < 3){
-                callback(null, []);
-                return;
-            }
-            FuncUtils.bufferCallback('suggestion-loader-search', 350, function(){
-                this.suggestionLoader(input, callback);
-            }.bind(this));
-        },
-
-        suggestionValue: function(suggestion){
-            return '';
-        },
-
-        onSuggestionSelected: function(resultNode, event){
-            if(typeof resultNode === "string"){
-                return ;
-            }
-            pydio.goTo(resultNode);
-        },
-
-        renderSuggestion(resultNode){
-            if(typeof resultNode === "string"){
-                return <span className="groupHeader">{resultNode}</span>;
-            }
-            if(resultNode.isRoot()){
-                return <span className="groupHeader">{resultNode.getLabel()}<span className="openicon icon-long-arrow-right"></span></span>;
-            }else{
-                let isLeaf = resultNode.isLeaf();
-                let label = resultNode.getLabel();
-                let value = this.state.value;
-                let r = new RegExp(value, 'gi');
-                label = label.replace(r, function(m){return '<span class="highlight">'+m+'</span>'});
-                let htmlFunc = function(){return {__html:label}};
-                return (
-                    <span className="nodeSuggestion">
-                        <span className={isLeaf ? "icon icon-file-alt" : "icon icon-folder-close-alt"}></span>
-                        <span dangerouslySetInnerHTML={htmlFunc()}/>
-                    </span>);
-            }
-        },
-
-        render: function(){
-
-            const inputAttributes = {
-                id: 'search-autosuggest',
-                name: 'search-autosuggest',
-                className: 'react-autosuggest__input',
-                placeholder: pydio.MessageHash['user_home.75'],
-                onBlur: event => pydio.UI.enableAllKeyBindings(),
-                onFocus: event => pydio.UI.disableAllKeyBindings(),
-                value: ''   // Initial value
-            };
-            return (
-                <div className={this.props.className + ' home_search'}>
-                    <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
-                    <ReactAutoSuggest
-                        ref="autosuggest"
-                        cache={true}
-                        showWhen = {input => true }
-                        inputProps={inputAttributes}
-                        suggestions={this.getSuggestions}
-                        suggestionRenderer={this.renderSuggestion}
-                        suggestionValue={this.suggestionValue}
-                        onSuggestionSelected={this.onSuggestionSelected}
-                    />
-                </div>
-
-            );
-        }
-
-    });
-
     var ConfigLogo = React.createClass({
         render: function(){
             var logo = this.props.pydio.Registry.getPluginConfigs(this.props.pluginName).get(this.props.pluginParameter);
@@ -893,7 +685,7 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:4,
+            gridWidth:3,
             gridHeight:36,
             builderDisplayName:'My Workspaces',
             builderFields:[]
@@ -969,7 +761,7 @@
                     },
                     defaultPosition:{
                         x:0, y:0
-                    }
+                    },
                 },
                 {
                     id:'shared_with_me',
@@ -978,17 +770,21 @@
                         filterByType:"shared",
                     },
                     defaultPosition:{
-                        x:4, y:0
+                        x:3, y:0
                     }
                 },
                 {
                     id:'videos',
                     componentClass:'WelcomeComponents.VideoCard',
                     props:{
-                        launchVideo     : this.launchVideo.bind(this)
+                        launchVideo : this.launchVideo.bind(this)
                     },
                     defaultPosition:{
-                        x:8, y:0
+                        x:6, y:0
+                    },
+                    defaultLayouts: {
+                        md: {x: 0, y: 30},
+                        sm: {x: 0, y: 30}
                     }
                 },
                 {
@@ -996,6 +792,10 @@
                     componentClass:'WelcomeComponents.DlAppsCard',
                     defaultPosition:{
                         x:0, y:30
+                    },
+                    defaultLayouts: {
+                        md: {x: 0, y: 60},
+                        sm: {x: 0, y: 60}
                     }
                 }
             ];
@@ -1060,7 +860,6 @@
     }else{
         WelcomeComponents.UserDashboard = UserDashboard;
     }
-    WelcomeComponents.TutorialPane = TutorialPane;
     WelcomeComponents.VideoCard = VideoCard;
     WelcomeComponents.DlAppsCard = DlAppsCard;
     WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
