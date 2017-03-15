@@ -35,6 +35,7 @@ import PopupMenu from './PopupMenu'
         openMenu: function(context, position){
             let items = this.computeMenuItems(context);
             position = this.computeVisiblePosition(position, items);
+            this._items = items;
             this.refs['menu'].showMenu({
                 top: position.y,
                 left: position.x
@@ -81,7 +82,7 @@ import PopupMenu from './PopupMenu'
             return (
                 <PopupMenu
                     ref="menu"
-                    menuItems={[]}
+                    menuItems={this._items || []}
                     onMenuClicked={this.menuClicked}
                     onMenuClosed={this.props.onMenuClosed}
                 />
