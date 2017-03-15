@@ -546,7 +546,7 @@ class ShareCenter extends Plugin
                 throw new \Exception('Link is expired');
             }
             if($share->hasDownloadLimit()){
-                $share->incrementDownloadCount();
+                $share->incrementDownloadCount($requestInterface->getAttribute('ctx'));
                 $share->save();
             }
         }
@@ -982,30 +982,23 @@ class ShareCenter extends Plugin
 
             break;
 
-            case "update_shared_element_data":
+            case "share_link_update_target_users":
 
-                if(!in_array($httpVars["p_name"], array("counter", "tags"))){
-                    return null;
+                $hash = InputFilter::decodeSecureMagic($httpVars["hash"]);
+                $shareLink = $this->getShareStore()->loadShareObject($hash);
+                $repository = $shareLink->getRepository();
+                $this->getShareStore()->testUserCanEditShare($repository->getOwner(), []);
+                if(isSet($httpVars['json_users'])){
+                    $values = json_decode($httpVars['json_users'], true);
                 }
-                $hash = InputFilter::decodeSecureMagic($httpVars["element_id"]);
-                $userSelection = UserSelection::fromContext($ctx, $httpVars);
-                $ajxpNode = $userSelection->getUniqueNode();
-                if($this->getShareStore()->shareIsLegacy($hash)){
-                    // Store in metadata
-                    $metadata = $this->getShareStore()->getMetaManager()->getNodeMeta($ajxpNode);
-                    if (isSet($metadata["shares"][$httpVars["element_id"]])) {
-                        if (!is_array($metadata["shares"][$httpVars["element_id"]])) {
-                            $metadata["shares"][$httpVars["element_id"]] = array();
-                        }
-                        $metadata["shares"][$httpVars["element_id"]][$httpVars["p_name"]] = $httpVars["p_value"];
-                        // Set Private=true by default.
-                        $this->getShareStore()->getMetaManager()->setNodeMeta($ajxpNode, $metadata, true);
-                    }
+                if(!empty($values)){
+                    $values = array_map( function($e){ return InputFilter::sanitize($e, InputFilter::SANITIZE_EMAILCHARS);}, $values );
+                    $shareLink->addTargetUsers($values, (isSet($httpVars['restrict']) && $httpVars['restrict'] === 'true'));
+                    $shareLink->save();
+                    $responseInterface = new JsonResponse(['success' => true, 'users' => $values]);
                 }else{
-                    $this->getShareStore()->testUserCanEditShare(($ctx->hasUser()?$ctx->getUser()->getId():null), $hash);
-                    $this->getShareStore()->updateShareProperty($hash, $httpVars["p_name"], $httpVars["p_value"]);
+                    $responseInterface = new JsonResponse(['success' => false]);
                 }
-
 
                 break;
 

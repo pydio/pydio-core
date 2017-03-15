@@ -119,13 +119,12 @@
                     </serverCallback>
                 </processing>
             </action>
-            <action name="update_shared_element_data">
+            <action name="share_link_update_target_users">
                 <processing>
-                    <serverCallback methodName="switchAction">
-                        <input_param description="Path of the resource to unshare" name="file" type="path" mandatory="true"/>
-                        <input_param description="Send also the element_id, as many links can be generated for one file" name="element_id" type="string"/>
-                        <input_param description="Name of the property to modify (only tags supported)" name="p_name" type="string" mandatory="true" default="tags"/>
-                        <input_param description="Value of the property to modify" name="p_value" type="string" mandatory="true"/>
+                    <serverCallback methodName="switchAction" restParams="/hash" developerComment="Store target users for a given link.">
+                        <input_param description="Hash of the link" name="hash" type="path" mandatory="true"/>
+                        <input_param description="Json encoded list of users, an associative array of unique keys and users label (e.g. email or label)." name="json_users" type="string"/>
+                        <input_param description="Restrict link access to these users" name="restrict" type="boolean"/>
                     </serverCallback>
                 </processing>
             </action>
@@ -227,10 +226,10 @@
                       namespace="ShareTemplates" component="FilmStripMinisite" props='{"containerId":"ajxp_film_strip"}'/>
 
             <template name="unique_preview_file" element="ajxp_unique_strip" position="top" label="Unique File Preview"
-                      namespace="ShareTemplates" component="FileMinisite" props='{"containerId":"ajxp_unique_strip"}'/>
+                      namespace="ShareTemplates" component="FileMinisite" props='{"containerId":"ajxp_unique_strip","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'/>
 
             <template name="unique_preview_download" element="ajxp_unique_dl" position="top" label="Big download button"
-                      namespace="ShareTemplates" component="DLTemplate" props='{"containerId":"ajxp_unique_dl"}'/>
+                      namespace="ShareTemplates" component="DLTemplate" props='{"containerId":"ajxp_unique_dl","imageBackgroundFromConfigs":"gui.ajax/WELCOME_PAGE_BACKGROUND_"}'/>
 
             <template name="minisite_embed_list" element="ajxp_embed_template" position="top" label="share_center.155"
                       namespace="ShareTemplates" component="FolderMinisite" props='{"containerId":"ajxp_embed_template","minisiteMode":"embed"}'/>

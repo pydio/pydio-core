@@ -22,6 +22,8 @@ namespace Pydio\Share\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\AuthRequiredException;
+use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Http\Server;
 use Pydio\Core\Model\Context;
 use Pydio\Core\Model\ContextInterface;
@@ -29,6 +31,8 @@ use Pydio\Core\Services\AuthService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Services\ApplicationState;
+use Pydio\Core\Utils\Vars\InputFilter;
+use Pydio\Share\ShareCenter;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -56,9 +60,26 @@ class MinisiteAuthMiddleware
             AuthService::disconnect();
         }
 
+        if(isSet($shareData['TARGET_USERS'])){
+            //$shareLink = ShareCenter::getShareCenter($requestInterface->getAttribute('ctx'))->getShareStore()->loadShareObject($hash);
+            if(array_key_exists("u", $requestInterface->getParsedBody())){
+                $targetUserId = $requestInterface->getParsedBody()["u"];
+                if(isSet($shareData['TARGET_USERS'][$targetUserId])){
+                    $userTemporaryLabel = $shareData['TARGET_USERS'][$targetUserId]['display'];
+                }else{
+                    throw new AuthRequiredException("User not recognized");
+                }
+            }else if(isSet($shareData['RESTRICT_TO_TARGET_USERS'])){
+                throw new PydioException("User not recognized");
+            }
+        }
+
         if (!empty($shareData["PRELOG_USER"])) {
 
             $loggedUser = AuthService::logUser($shareData["PRELOG_USER"], "", true);
+            if(!empty($userTemporaryLabel)){
+                $loggedUser->getPersonalRole()->setParameterValue("core.conf", "USER_TEMPORARY_DISPLAY_NAME", $userTemporaryLabel);
+            }
             $requestInterface = $requestInterface->withAttribute("ctx", Context::contextWithObjects($loggedUser, null));
             if($sessions){
                 AuthService::updateSessionUser($loggedUser);
@@ -70,6 +91,9 @@ class MinisiteAuthMiddleware
 
                 SessionService::save(SessionService::PENDING_REPOSITORY_ID, $shareData["REPOSITORY"]);
                 SessionService::save(SessionService::PENDING_FOLDER, "/");
+                if(!empty($userTemporaryLabel)){
+                    SessionService::save(SessionService::USER_TEMPORARY_DISPLAY_NAME, $userTemporaryLabel);
+                }
 
             } else {
                 $responseInterface = self::basicHttp($shareData["PRESET_LOGIN"], $requestInterface, $responseInterface);
@@ -116,7 +140,7 @@ class MinisiteAuthMiddleware
      * @param string $presetLogin
      * @param ServerRequestInterface $requestInterface
      * @param ResponseInterface $responseInterface
-     * @return ResponseInterface|static
+     * @return ResponseInterface
      * @throws \Pydio\Core\Exception\LoginException
      */
     public static function basicHttp($presetLogin, ServerRequestInterface &$requestInterface, ResponseInterface $responseInterface){

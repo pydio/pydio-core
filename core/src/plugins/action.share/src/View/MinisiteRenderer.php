@@ -188,7 +188,7 @@ class MinisiteRenderer
             if (strpos($logoPath, "plugins/") === 0 && is_file(AJXP_INSTALL_PATH."/".$logoPath)) {
                 $minisiteLogo = $logoPath;
             }else{
-                $minisiteLogo = "public/?get_action=get_global_binary_param&binary_id=". $logoPath;
+                $minisiteLogo = trim(ConfService::getGlobalConf("PUBLIC_BASEURI"), "/")."/?get_action=get_global_binary_param&binary_id=". $logoPath;
             }
         }
         // Default value
@@ -213,6 +213,7 @@ class MinisiteRenderer
         $html = file_get_contents(AJXP_INSTALL_PATH."/".AJXP_PLUGINS_FOLDER."/action.share/res/minisite.php");
         Controller::applyHook("tpl.filter_html", [$context, &$html]);
         $html = XMLFilter::resolveKeywords($html);
+        $html = str_replace("AJXP_PUBLIC_BASEURI", trim(ConfService::getGlobalConf("PUBLIC_BASEURI"), '/'), $html);
         $html = str_replace("AJXP_MINISITE_LOGO", $minisiteLogo, $html);
         $html = str_replace("AJXP_APPLICATION_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
         $html = str_replace("PYDIO_APP_TITLE", ConfService::getGlobalConf("APPLICATION_TITLE"), $html);
