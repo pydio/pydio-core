@@ -168,7 +168,7 @@ class PydioApi{
      * @returns string|bool
      */
     static detectMinisiteSession(serverAccess){
-        const regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&.*');
+        const regex = new RegExp('.*?[&\\?]' + 'minisite_session' + '=(.*?)&?.*?');
         const val = serverAccess.replace(regex, "$1");
         return ( val === serverAccess ? false : val );
     }
