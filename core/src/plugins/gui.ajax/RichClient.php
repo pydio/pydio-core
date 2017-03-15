@@ -484,7 +484,7 @@ class RichClient extends Plugin
         $config = array();
         $config["ajxpResourcesFolder"] = "plugins/gui.ajax/res";
         if ($currentIsMinisite) {
-            $config["ajxpServerAccess"] = "public/";
+            $config["ajxpServerAccess"] = trim(ConfService::getGlobalConf("PUBLIC_BASEURI"), "/")."/";
         } else {
             $config["ajxpServerAccess"] = AJXP_SERVER_ACCESS;
         }
