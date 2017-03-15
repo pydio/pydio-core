@@ -49,6 +49,8 @@ class SessionService implements RepositoriesCache
     const PENDING_REPOSITORY_ID = "PYDIO_PENDING_REPO_ID";
     const PENDING_FOLDER = "PYDIO_PENDING_FOLDER";
 
+    const USER_TEMPORARY_DISPLAY_NAME = "USER_TEMPORARY_DISPLAY_NAME";
+
     private static $sessionName = PYDIO_SESSION_NAME;
 
     /**
