@@ -15,9 +15,16 @@
 
         postLoginData: function(client){
 
+            const passwordOnly = this.state.globalParameters.get('PASSWORD_AUTH_ONLY');
+            let login;
+            if(passwordOnly){
+                login = this.state.globalParameters.get('PRESET_LOGIN');
+            }else{
+                login = this.refs.login.getValue();
+            }
             let params = {
                 get_action  : 'login',
-                userid      : this.refs.login.getValue(),
+                userid      : login,
                 password    : this.refs.password.getValue(),
                 login_seed  : -1
             };
@@ -38,7 +45,7 @@
                     this.dismiss();
                 }else{
                     let errorId = PydioApi.getClient().LAST_ERROR_ID;
-                    if(errorId == '285' && this.state.globalParameters.get('PASSWORD_AUTH_ONLY')){
+                    if(errorId == '285' && passwordOnly){
                         errorId = '553';
                     }
                     this.setState({errorId: errorId});
@@ -152,17 +159,17 @@
 
                 <div>
                     <div style={logoStyle}></div>
-                    <div className="dialogLegend">{pydio.MessageHash[180]}</div>
+                    <div className="dialogLegend">{pydio.MessageHash[passwordOnly ? 552 : 180]}</div>
                     {captcha}
                     {additionalComponentsTop}
                     <form autoComplete={secureLoginForm?"off":"on"}>
-                        <MaterialUI.TextField
+                        {!passwordOnly && <MaterialUI.TextField
                             className="blurDialogTextField"
                             autoComplete={secureLoginForm?"off":"on"}
                             floatingLabelText={pydio.MessageHash[181]}
                             ref="login"
                             onKeyDown={this.submitOnEnterKey}
-                        />
+                        />}
                         <MaterialUI.TextField
                             className="blurDialogTextField"
                             autoComplete={secureLoginForm?"off":"on"}

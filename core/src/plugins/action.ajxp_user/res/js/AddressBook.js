@@ -1,48 +1,82 @@
 (function(global){
 
+
     class Loaders{
 
-        static listUsers(params, callback){
+        static childrenAsPromise(item, leaf = false){
+
+            const {childrenLoader, itemsLoader, leafLoaded, collectionsLoaded, leafs, collections} = item;
+            let loader = leaf ? itemsLoader : childrenLoader;
+            let loaded = leaf ? leafLoaded : collectionsLoaded;
+            return new Promise((resolve, reject) => {
+                if(!loaded && loader){
+                    loader(item, (newChildren)=>{
+                        if(leaf) {
+                            item.leafs = newChildren;
+                            item.leafLoaded = true;
+                        }else {
+                            item.collections = newChildren;
+                            item.collectionsLoaded = true;
+                        }
+                        resolve(newChildren);
+                    });
+                }else{
+                    const res = ( leaf ? leafs : collections ) || [];
+                    resolve(res);
+                }
+            });
+
+        }
+
+        static listUsers(params, callback, parent = null){
             let baseParams = {get_action:'user_list_authorized_users',format:'json'};
             baseParams = {...baseParams, ...params};
+            let cb = callback;
+            if(parent){
+                cb = (children) => {
+                    callback(children.map(function(c){ c._parent = parent; return c; }));
+                };
+            }
             PydioApi.getClient().request(baseParams, function(transport){
-                callback(transport.responseJSON);
+                cb(transport.responseJSON);
             });
         }
 
         static loadTeams(entry, callback){
             const wrapped = (children) => {
                 children.map(function(child){
+                    child.icon = 'mdi mdi-account-multiple-outline';
                     child.itemsLoader = Loaders.loadTeamUsers;
                 });
                 callback(children);
             };
-            Loaders.listUsers({filter_value:8}, wrapped);
+            Loaders.listUsers({filter_value:8}, wrapped, entry);
         }
 
         static loadGroups(entry, callback){
             const wrapped = (children) => {
                 children.map(function(child){
+                    child.icon = 'mdi mdi-account-multiple-outline';
                     child.childrenLoader = Loaders.loadGroups;
                     child.itemsLoader = Loaders.loadGroupUsers;
                 });
                 callback(children);
             };
             const path = entry.id.replace('AJXP_GRP_', '');
-            Loaders.listUsers({filter_value:4, group_path:path}, wrapped);
+            Loaders.listUsers({filter_value:4, group_path:path}, wrapped, entry);
         }
 
         static loadExternalUsers(entry, callback){
-            Loaders.listUsers({filter_value:2}, callback);
+            Loaders.listUsers({filter_value:2}, callback, entry);
         }
 
         static loadGroupUsers(entry, callback){
             const path = entry.id.replace('AJXP_GRP_', '');
-            Loaders.listUsers({filter_value:1, group_path:path}, callback);
+            Loaders.listUsers({filter_value:1, group_path:path}, callback, entry);
         }
 
         static loadTeamUsers(entry, callback){
-            Loaders.listUsers({filter_value:3, group_path:entry.id}, callback);
+            Loaders.listUsers({filter_value:3, group_path:entry.id}, callback, entry);
         }
 
     }
@@ -51,23 +85,12 @@
 
         propTypes:{
             nestedLevel:React.PropTypes.number,
-            selected:React.PropTypes.string
-        },
-
-        getInitialState: function(){
-            return {
-                loaded: this.props.entry.children ? true: false,
-                children:this.props.entry.children || []
-            };
+            selected:React.PropTypes.string,
+            onTouchTap: React.PropTypes.func
         },
 
         onTouchTap: function(){
-            const {entry} = this.props;
-            const {childrenLoader} = entry;
-            if(!this.state.loaded && childrenLoader){
-                childrenLoader(entry, (newChildren)=>{this.setState({loaded:true, children:newChildren})} );
-            }
-            this.props.onTouchTap(entry);
+            this.props.onTouchTap(this.props.entry);
         },
 
         buildNestedItems: function(data){
@@ -83,9 +106,13 @@
         },
 
         render: function(){
-            const {id, label} = this.props.entry;
-            const children = this.state.children;
-            const nested = this.buildNestedItems(this.state.children);
+            const {id, label, icon} = this.props.entry;
+            const children = this.props.entry.collections || [];
+            const nested = this.buildNestedItems(children);
+            let fontIcon;
+            if(icon){
+                fontIcon = <MaterialUI.FontIcon className={icon}/>;
+            }
             return (
                 <MaterialUI.ListItem
                     nestedLevel={this.props.nestedLevel}
@@ -94,6 +121,7 @@
                     onTouchTap={this.onTouchTap}
                     nestedItems={nested}
                     initiallyOpen={true}
+                    leftIcon={fontIcon}
                     innerDivStyle={{fontWeight:this.props.selected === this.props.entry.id ? 500 : 400}}
                 />
             );
@@ -105,44 +133,45 @@
 
         propTypes:{
             item: React.PropTypes.object,
-            onItemClicked:React.PropTypes.func
-        },
-
-        getInitialState: function(){
-            return {items: [], loading: false};
-        },
-
-        loadProps: function(nextProps){
-            this.setState({items:[]});
-            const {item} = nextProps;
-            if(item.itemsLoader){
-                this.setState({loading: true});
-                item.itemsLoader(item, (newItems) => {
-                    this.setState({items: newItems, loading: false});
-                })
-            }else if(item.items){
-                this.setState({items: item.items});
-            }
-        },
-
-        componentDidMount: function(){
-            this.loadProps(this.props);
-        },
-
-        componentWillReceiveProps: function(nextProps){
-            if(nextProps.item.id !== this.props.item.id || nextProps.item.items){
-                this.loadProps(nextProps);
-            }
+            onItemClicked:React.PropTypes.func,
+            onFolderClicked:React.PropTypes.func,
         },
 
         render: function(){
-            if(this.state.loading){
+            if(this.props.loading){
                 return <PydioReactUI.Loader style={{flex:1}}/>;
             }
-            const total = this.state.items.length;
+            const {item} = this.props;
+            const folders = item.collections || [];
+            const leafs = item.leafs || [];
+            const items = [...folders, ...leafs];
+            const total = items.length;
             let elements = [];
-            this.state.items.forEach(function(item, index){
-                elements.push(<MaterialUI.ListItem key={item.id} primaryText={item.label} onTouchTap={()=>{this.props.onItemClicked(item)}}/>);
+            if(item._parent){
+                elements.push(
+                    <MaterialUI.ListItem
+                        key={'__parent__'}
+                        primaryText={".."}
+                        onTouchTap={() => {this.props.onFolderClicked(item._parent)}}
+                        leftIcon={<MaterialUI.FontIcon className={'mdi mdi-arrow-up-bold-circle-outline'}/>}
+                    />
+                );
+                if(total){
+                    elements.push(<MaterialUI.Divider key={'parent-divider'}/>);
+                }
+            }
+            items.forEach(function(item, index){
+                const fontIcon = <MaterialUI.FontIcon className={item.icon || 'mdi mdi-account-circle'}/>
+                let touchTap = ()=>{this.props.onItemClicked(item)};
+                if(folders.indexOf(item) > -1 && this.props.onFolderClicked){
+                    touchTap = ()=>{ this.props.onFolderClicked(item) };
+                }
+                elements.push(<MaterialUI.ListItem
+                    key={item.id}
+                    primaryText={item.label}
+                    onTouchTap={touchTap}
+                    leftIcon={fontIcon}
+                />);
                 if(index < total - 1){
                     elements.push(<MaterialUI.Divider key={item.id + '-divider'}/>);
                 }
@@ -199,7 +228,7 @@
                             />
                         </MaterialUI.Paper>
                     </div>
-                    <UsersList onItemClicked={this.props.onItemClicked} item={{items: this.state.items}}/>
+                    <UsersList onItemClicked={this.props.onItemClicked} item={{leafs: this.state.items}}/>
                 </div>
             );
 
@@ -231,10 +260,10 @@
 
         getInitialState: function(){
             let root = [
-                {id:'search', label:'Search Local Users', type:'search'},
-                {id:'ext', label:'Your Users', itemsLoader: Loaders.loadExternalUsers},
-                {id:'teams', label:'Your Teams', childrenLoader:Loaders.loadTeams},
-                {id:'AJXP_GRP_/', label:'All Users', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers}
+                {id:'search', label:'Search Local Users', icon:'mdi mdi-account-search', type:'search'},
+                {id:'ext', label:'Your Users', icon:'mdi mdi-account-network', itemsLoader: Loaders.loadExternalUsers},
+                {id:'teams', label:'Your Teams', icon:'mdi mdi-account-multiple', childrenLoader:Loaders.loadTeams},
+                {id:'AJXP_GRP_/', label:'All Users', icon:'mdi mdi-account-box', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers}
             ];
             const ocsRemotes = this.props.pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
             if(ocsRemotes){
@@ -242,10 +271,10 @@
                 let remotes = JSON.parse(ocsRemotes);
                 for(let k in remotes){
                     if(!remotes.hasOwnProperty(k)) continue;
-                    children.push({id:k, label:remotes[k], type:'remote'});
+                    children.push({id:k, label:remotes[k], icon:'mdi mdi-server-network', type:'remote'});
                 }
                 if(children.length){
-                    root.push({id:'remotes', label:'Remote Servers', children:children});
+                    root.push({id:'remotes', label:'Remote Servers', icon:'mdi mdi-server', collections:children});
                 }
             }
 
@@ -258,8 +287,13 @@
             };
         },
 
-        onBoxListItemClicked: function(item){
-            this.setState({selectedItem:item});
+        onFolderClicked: function(item){
+            this.setState({loading: true});
+            Loaders.childrenAsPromise(item, false).then((children) => {
+                Loaders.childrenAsPromise(item, true).then((children) => {
+                    this.setState({selectedItem:item, loading: false});
+                });
+            });
         },
 
         onUserListItemClicked: function(item){
@@ -271,15 +305,7 @@
             let items = this.state.items;
             let centerComponent, rightPanel;
             const {selectedItem, folders} = this.state;
-            if(selectedItem.itemsLoader){
-
-                centerComponent = (
-                    <UsersList
-                        item={selectedItem}
-                        onItemClicked={this.onUserListItemClicked}
-                    />);
-
-            }else if(selectedItem.id === 'search'){
+            if(selectedItem.id === 'search'){
 
                 centerComponent = (
                     <SearchForm
@@ -296,7 +322,18 @@
                         onItemClicked={this.onUserListItemClicked}
                     />);
 
+            }else{
+
+                centerComponent = (
+                    <UsersList
+                        item={selectedItem}
+                        onItemClicked={this.onUserListItemClicked}
+                        onFolderClicked={this.onFolderClicked}
+                        loading={this.state.loading}
+                    />);
+
             }
+
             if(this.state.rightPaneItem){
                 rightPanel = (
                     <UserCard
@@ -314,7 +351,8 @@
                                     selected={selectedItem.id}
                                     nestedLevel={0}
                                     entry={e}
-                                    onTouchTap={this.onBoxListItemClicked}/>
+                                    onTouchTap={this.onFolderClicked}
+                                />
                                 );
                         }.bind(this))}
                     </MaterialUI.List>

@@ -52,6 +52,12 @@ class NotificationCenter extends Plugin
      * @var String
      */
     private $userId;
+
+    /**
+     * @var String
+     */
+    private $userTemporaryLabel = '';
+
     /**
      * @var IFeedStore|bool
      */
@@ -64,6 +70,15 @@ class NotificationCenter extends Plugin
     public function init(ContextInterface $ctx, $options = [])
     {
         parent::init($ctx, $options);
+        $this->userId = "shared";
+        if($ctx->hasUser()){
+            $u = $ctx->getUser();
+            $this->userId = $u->getId();
+            $tempLabel = $u->getPersonalRole()->filterParameterValue("core.conf", "USER_TEMPORARY_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
+            if(!empty($tempLabel)){
+                $this->userTemporaryLabel = $tempLabel;
+            }
+        }
         $this->userId = $ctx->hasUser() ? $ctx->getUser()->getId() : "shared";
         $pService = PluginsService::getInstance($ctx);
         try {
@@ -685,6 +700,9 @@ class NotificationCenter extends Plugin
     public function prepareNotification(Notification &$notif)
     {
         $notif->setAuthor($this->userId);
+        if(!empty($this->userTemporaryLabel)){
+            $notif->setAuthorTemporaryLabel($this->userTemporaryLabel);
+        }
         $notif->setDate(time());
 
     }

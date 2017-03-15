@@ -183,6 +183,34 @@
     content: "\f522";
 }
 
+.mdi-server:before {
+    content: "\f57a";
+}
+
+.mdi-server-minus:before {
+    content: "\f57b";
+}
+
+.mdi-server-network:before {
+    content: "\f57c";
+}
+
+.mdi-server-network-off:before {
+    content: "\f57d";
+}
+
+.mdi-server-off:before {
+    content: "\f57e";
+}
+
+.mdi-server-remove:before {
+    content: "\f580";
+}
+
+.mdi-server-security:before {
+    content: "\f581";
+}
+
 .mdi-server-plus:before {
     content: "\f57f";
 }
