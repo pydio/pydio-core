@@ -22,7 +22,7 @@
         <script type="text/javascript">
             var pydio, MessageHash={};
             var startParameters = {
-                "BOOTER_URL":"public/?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=AJXP_LINK_HASH",
+                "BOOTER_URL":"AJXP_PUBLIC_BASEURI/?get_action=get_boot_conf&goto=AJXP_START_REPOSITORY&minisite_session=AJXP_LINK_HASH",
                 "EXT_REP":"\/",
                 "MAIN_ELEMENT":"AJXP_TEMPLATE_NAME",
                 "SERVER_PREFIX_URI": "",
