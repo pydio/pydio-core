@@ -93,11 +93,11 @@
         },
 
         updateSubject: function(event){
-            this.setState({subject:event.currentTarget.getValue()});
+            this.setState({subject:event.currentTarget.value});
         },
 
         updateMessage: function(event){
-            this.setState({message:event.currentTarget.getValue()});
+            this.setState({message:event.currentTarget.value});
         },
 
         addUser: function(userObject){
