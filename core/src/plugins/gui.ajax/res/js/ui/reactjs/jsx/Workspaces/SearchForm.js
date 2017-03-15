@@ -437,11 +437,14 @@ let SearchForm = React.createClass({
         }.bind(this));
         columnsDesc = <div>{cols}</div>;
         if(this.state.query){
+            let limit = 100;
+            if(this.state.quickSearch) limit = 9;
+            if(this.props.crossWorkspace) limit = 5;
             // Refresh nodeProvider query
             this.state.nodeProvider.initProvider({
-                get_action  : this.props.searchAction || 'search',
+                get_action  : this.props.crossWorkspace ? 'multisearch' : 'search',
                 query       : this.state.query,
-                limit       : this.state.quickSearch?9:100
+                limit       : limit
             });
         }
         let moreButton, renderSecondLine = null, renderIcon = null, elementHeight = 49;
@@ -478,7 +481,7 @@ let SearchForm = React.createClass({
                         ref="main_search_input"
                         onFocus={this.focused}
                         onBlur={this.blurred}
-                        hintText="Search..."
+                        hintText={this.props.crossWorkspace?"Search inside all workspaces...":"Search inside this workspace"}
                         onChange={this.mainFieldQuickSearch}
                         onKeyPress={this.mainFieldEnter}
                     />
@@ -505,7 +508,8 @@ let SearchForm = React.createClass({
                         presetDataModel={this.state.dataModel}
                         heightAutoWithMax={this.state.display === 'small' ? 500  : 412}
                         nodeClicked={(node)=>{this.props.pydio.goTo(node);this.setState({display:'closed'})}}
-                        defaultGroupBy={this.props.groupByField}
+                        defaultGroupBy={this.props.crossWorkspace?'repository_id':null}
+                        groupByLabel={this.props.crossWorkspace?'repository_display':null}
                     />
                     {moreButton}
                 </div>

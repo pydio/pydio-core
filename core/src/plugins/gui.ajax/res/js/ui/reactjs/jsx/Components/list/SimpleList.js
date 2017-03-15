@@ -672,7 +672,7 @@ let SimpleList = React.createClass({
                     key: entry.groupHeader,
                     id: entry.groupHeader,
                     mainIcon: null,
-                    firstLine: entry.groupHeader,
+                    firstLine: entry.groupHeaderLabel,
                     className:'list-group-header',
                     onClick: null,
                     showSelector: false,
@@ -733,8 +733,10 @@ let SimpleList = React.createClass({
             this.indexedElements = [];
             if(this.state && this.state.groupBy){
                 var groupBy = this.state.groupBy;
+                var groupByLabel = this.props.groupByLabel || false;
                 var groups = {};
                 var groupKeys = [];
+                var groupLabels = {};
             }
 
             if (!this.props.skipParentNavigation && theNode.getParent()
@@ -757,6 +759,9 @@ let SimpleList = React.createClass({
                         groups[groupValue] = [];
                         groupKeys.push(groupValue);
                     }
+                    if(groupByLabel && child.getMetadata().has(groupByLabel) && !groupLabels[groupValue]){
+                        groupLabels[groupValue] = child.getMetadata().get(groupByLabel);
+                    }
                     groups[groupValue].push({node: child, parent: false, actions: nodeActions});
                 }else{
                     this.indexedElements.push({node: child, parent: false, actions: nodeActions});
@@ -766,7 +771,19 @@ let SimpleList = React.createClass({
             if(groupBy){
                 groupKeys = groupKeys.sort();
                 groupKeys.map(function(k){
-                    this.indexedElements.push({node: null, groupHeader:k, parent: false, actions: null});
+                    let label = k;
+                    if(groupLabels[k]){
+                        label = groupLabels[k];
+                    }else if(this.props.renderGroupLabels){
+                        label = this.props.renderGroupLabels(groupBy, k);
+                    }
+                    this.indexedElements.push({
+                        node: null,
+                        groupHeader:k,
+                        groupHeaderLabel:label,
+                        parent: false,
+                        actions: null
+                    });
                     this.indexedElements = this.indexedElements.concat(groups[k]);
                 }.bind(this));
             }

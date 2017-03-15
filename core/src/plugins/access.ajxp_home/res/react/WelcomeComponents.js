@@ -835,7 +835,11 @@
                         {...uWidgetProps}
                     >
                         <div>
-                            <PydioWorkspaces.SearchForm searchAction="multisearch" pydio={this.props.pydio} groupByField="repository_id"/>
+                            <PydioWorkspaces.SearchForm
+                                crossWorkspace={true}
+                                pydio={this.props.pydio}
+                                groupByField="repository_id"
+                            />
                         </div>
                     </PydioWorkspaces.UserWidget>
                     <PydioComponents.DynamicGrid
