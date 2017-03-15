@@ -1063,7 +1063,7 @@
         },
 
         updateDLExpirationField: function(event){
-            var newValue = event.currentTarget.getValue();
+            var newValue = event.currentTarget.value;
             this.props.shareModel.setExpirationFor(this.props.linkData.hash, "downloads", newValue);
         },
 
@@ -1088,7 +1088,6 @@
         },
 
         updatePassword: function(newValue, oldValue){
-            //var newValue = event.currentTarget.getValue();
             this.props.shareModel.updatePassword(this.props.linkData.hash, newValue);
         },
 
