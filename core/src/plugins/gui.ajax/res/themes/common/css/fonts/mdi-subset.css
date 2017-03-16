@@ -675,3 +675,11 @@
 .mdi-menu-up:before {
     content: "\f452";
 }
+
+.mdi-dots-horizontal:before {
+    content: "\f2cd";
+}
+
+.mdi-dots-vertical:before {
+    content: "\f2ce";
+}
