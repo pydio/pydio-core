@@ -135,6 +135,7 @@
             item: React.PropTypes.object,
             onItemClicked:React.PropTypes.func,
             onFolderClicked:React.PropTypes.func,
+            mode:React.PropTypes.oneOf(['book', 'selector'])
         },
 
         render: function(){
@@ -161,16 +162,23 @@
                 }
             }
             items.forEach(function(item, index){
-                const fontIcon = <MaterialUI.FontIcon className={item.icon || 'mdi mdi-account-circle'}/>
+                let fontIcon = <MaterialUI.FontIcon className={item.icon || 'mdi mdi-account-circle'}/>
+                let addGroupButton
                 let touchTap = ()=>{this.props.onItemClicked(item)};
                 if(folders.indexOf(item) > -1 && this.props.onFolderClicked){
                     touchTap = ()=>{ this.props.onFolderClicked(item) };
+                    addGroupButton = (<MaterialUI.IconButton
+                        iconClassName={"mdi " + (this.props.mode === 'book' ? "mdi-dots-vertical":"mdi-account-multiple-plus")}
+                        tooltip={"Add this group / team"}
+                        onTouchTap={()=>{this.props.onItemClicked(item)}}
+                    />);
                 }
                 elements.push(<MaterialUI.ListItem
                     key={item.id}
                     primaryText={item.label}
                     onTouchTap={touchTap}
                     leftIcon={fontIcon}
+                    rightIconButton={addGroupButton}
                 />);
                 if(index < total - 1){
                     elements.push(<MaterialUI.Divider key={item.id + '-divider'}/>);
@@ -258,31 +266,45 @@
 
     const Panel = React.createClass({
 
+        propTypes: {
+            mode            : React.PropTypes.oneOf(['book', 'selector']).isRequired,
+            onItemSelected  : React.PropTypes.func
+        },
+
+        getDefaultProps: function(){
+            return {mode: 'book'};
+        },
+
         getInitialState: function(){
-            let root = [
-                {id:'search', label:'Search Local Users', icon:'mdi mdi-account-search', type:'search'},
-                {id:'ext', label:'Your Users', icon:'mdi mdi-account-network', itemsLoader: Loaders.loadExternalUsers},
-                {id:'teams', label:'Your Teams', icon:'mdi mdi-account-multiple', childrenLoader:Loaders.loadTeams},
-                {id:'AJXP_GRP_/', label:'All Users', icon:'mdi mdi-account-box', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers}
-            ];
+            let root = {
+                id:'root',
+                label:'',
+                type:'root',
+            };
+            let search = {id:'search', label:'Search Local Users', icon:'mdi mdi-account-search', type:'search', _parent:root};
+            root.collections = [
+                search,
+                {id:'ext', label:'Your Users', icon:'mdi mdi-account-network', itemsLoader: Loaders.loadExternalUsers, _parent:root},
+                {id:'teams', label:'Your Teams', icon:'mdi mdi-account-multiple', childrenLoader:Loaders.loadTeams, _parent:root},
+                {id:'AJXP_GRP_/', label:'All Users', icon:'mdi mdi-account-box', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers, _parent:root}
+            ]
+
             const ocsRemotes = this.props.pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
             if(ocsRemotes){
-                let children = [];
                 let remotes = JSON.parse(ocsRemotes);
+                let remotesNodes = {id:'remotes', label:'Remote Servers', icon:'mdi mdi-server', collections:[], _parent:root};
                 for(let k in remotes){
                     if(!remotes.hasOwnProperty(k)) continue;
-                    children.push({id:k, label:remotes[k], icon:'mdi mdi-server-network', type:'remote'});
+                    remotesNodes.collections.push({id:k, label:remotes[k], icon:'mdi mdi-server-network', type:'remote', parent:remotesNodes});
                 }
-                if(children.length){
-                    root.push({id:'remotes', label:'Remote Servers', icon:'mdi mdi-server', collections:children});
+                if(remotesNodes.collections.length){
+                    root.collections.push(remotesNodes);
                 }
             }
-
             return {
-                folders: root,
-                items: [],
+                root: root,
+                selectedItem:this.props.mode === 'selector' ? root : search,
                 loading: false,
-                selectedItem:{id:'search'},
                 rightPaneItem: null
             };
         },
@@ -301,16 +323,18 @@
         },
 
         render: function(){
+            const {selectedItem, root, rightPaneItem} = this.state;
+
             const leftColumnStyle = {width:'25%', minWidth: 256, maxWidth:400, overflowY:'auto', backgroundColor:'#fafafa'};
-            let items = this.state.items;
-            let centerComponent, rightPanel;
-            const {selectedItem, folders} = this.state;
+            let centerComponent, rightPanel, leftPanel;
+
             if(selectedItem.id === 'search'){
 
                 centerComponent = (
                     <SearchForm
                         searchLabel={"Search local users by identifier"}
                         onItemClicked={this.onUserListItemClicked}
+                        mode={this.props.mode}
                     />);
 
             }else if(selectedItem.type === 'remote'){
@@ -320,6 +344,7 @@
                         params={{trusted_server_id:selectedItem.id}}
                         searchLabel={"Search Remote Server '" + selectedItem.label + "'"}
                         onItemClicked={this.onUserListItemClicked}
+                        mode={this.props.mode}
                     />);
 
             }else{
@@ -330,22 +355,22 @@
                         onItemClicked={this.onUserListItemClicked}
                         onFolderClicked={this.onFolderClicked}
                         loading={this.state.loading}
+                        mode={this.props.mode}
                     />);
 
             }
-
-            if(this.state.rightPaneItem){
+            if(rightPaneItem){
                 rightPanel = (
                     <UserCard
                         onRequestClose={() => {this.setState({rightPaneItem:null})}}
                         style={leftColumnStyle}
-                        item={this.state.rightPaneItem}/>
+                        item={rightPaneItem}/>
                 );
             }
-            return (
-                <div style={{display:'flex', height: 600}}>
+            if(this.props.mode === 'book'){
+                leftPanel = (
                     <MaterialUI.List style={leftColumnStyle}>
-                        {folders.map(function(e){
+                        {root.collections.map(function(e){
                             return (
                                 <BoxListItem
                                     selected={selectedItem.id}
@@ -353,9 +378,14 @@
                                     entry={e}
                                     onTouchTap={this.onFolderClicked}
                                 />
-                                );
+                            );
                         }.bind(this))}
                     </MaterialUI.List>
+                );
+            }
+            return (
+                <div style={{display:'flex', height: 450}}>
+                    {leftPanel}
                     {centerComponent}
                     {rightPanel}
                 </div>

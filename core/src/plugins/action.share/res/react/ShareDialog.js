@@ -42,9 +42,9 @@
         },
 
         propTypes: {
-            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
-            selection:React.PropTypes.instanceOf(PydioDataModel).isRequired,
-            readonly:React.PropTypes.bool
+            pydio       : React.PropTypes.instanceOf(Pydio).isRequired,
+            selection   : React.PropTypes.instanceOf(PydioDataModel).isRequired,
+            readonly    : React.PropTypes.bool
         },
 
         childContextTypes: {
@@ -111,6 +111,13 @@
         componentDidMount: function(){
             this.state.model.observe("status_changed", this.modelUpdated);
             this.state.model.initLoad();
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.selection && nextProps.selection !== this.props.selection){
+                let nextModel = new ReactModel.Share(this.props.pydio, nextProps.selection.getUniqueNode(), nextProps.selection);
+                this.setState({model:nextModel, status:'idle', mailerData: false}, () => {this.componentDidMount()});
+            }
         },
 
         clicked: function(){

@@ -1089,9 +1089,9 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
     /**
      * @param $storeId
      * @param null $cursor
-     * @param string $dataIdLike
+     * @param string|array $dataIdLike
      * @param string $dataType
-     * @param string $serialDataLike
+     * @param string|array $serialDataLike
      * @param string $relatedObjectId
      * @return array
      */
@@ -1099,12 +1099,18 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
         $wheres = array();
         $wheres[] = array('[store_id]=%s', $storeId);
         if(!empty($dataIdLike)){
-            $wheres[] = array('[object_id] LIKE %s', $dataIdLike);
+            if(is_string($dataIdLike)) $dataIdLike = [$dataIdLike];
+            foreach($dataIdLike as $like){
+                $wheres[] = array('[object_id] LIKE %s', $like);
+            }
         }
         if(!empty($serialDataLike)){
-            $wheres[] = array('[serialized_data] LIKE %s', $serialDataLike);
+            if(is_string($serialDataLike)) $serialDataLike = [$serialDataLike];
+            foreach($serialDataLike as $like){
+                $wheres[] = array('[serialized_data] LIKE %s', $like);
+            }
         }
-        if($relatedObjectId != ""){
+        if($relatedObjectId !== ''){ // Do not use empty() here, or "0" can be seen as empty
             $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
         }
         if($cursor != null){
@@ -1127,6 +1133,48 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
                 $data = $value["binary_data"];
             }
             $result[$value['object_id']] = $data;
+        }
+        return $result;
+    }
+
+    /**
+     * @param $storeId
+     * @param string $dataIdLike
+     * @param string $dataType
+     * @param string $serialDataLike
+     * @param string $relatedObjectId
+     * @param bool   $groupByRelated
+     * @return array
+     */
+    public function simpleStoreCount($storeId, $dataIdLike="", $dataType="serial", $serialDataLike="", $relatedObjectId="", $groupByRelated = false){
+        $wheres = array();
+        $wheres[] = array('[store_id]=%s', $storeId);
+        if(!empty($dataIdLike)){
+            if(is_string($dataIdLike)) $dataIdLike = [$dataIdLike];
+            foreach($dataIdLike as $like){
+                $wheres[] = array('[object_id] LIKE %s', $like);
+            }
+        }
+        if(!empty($serialDataLike)){
+            if(is_string($serialDataLike)) $serialDataLike = [$serialDataLike];
+            foreach($serialDataLike as $like){
+                $wheres[] = array('[serialized_data] LIKE %s', $like);
+            }
+        }
+        if($relatedObjectId != ""){
+            $wheres[] = array('[related_object_id] = %s', $relatedObjectId);
+        }
+        if($groupByRelated){
+            $gBy = " GROUP BY ([related_object_id]) ORDER BY COUNT([object_id]) DESC";
+            $children_results = dibi::query("SELECT COUNT([object_id]) as related_count,[related_object_id] FROM [ajxp_simple_store] WHERE %and".$gBy, $wheres);
+            $values = $children_results->fetchAll();
+            $result = array();
+            foreach($values as $value){
+                $result[$value['related_object_id']] = $value['related_count'];
+            }
+        }else{
+            $children_results = dibi::query("SELECT COUNT([object_id]) as related_count FROM [ajxp_simple_store] WHERE %and", $wheres);
+            $result = $children_results->fetchSingle();
         }
         return $result;
     }

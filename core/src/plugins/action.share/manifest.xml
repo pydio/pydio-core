@@ -140,9 +140,6 @@
                 </gui>
                 <processing>
                     <clientCallback module="ShareActions.Callbacks.editFromList"/>
-                    <clientForm id="react_share_form"><![CDATA[
-                        <div id="react_share_form" box_padding="0" class="react-mui-context SF_material"></div>
-                    ]]></clientForm>
                 </processing>
             </action>
             <action name="sharelist-load">
@@ -169,6 +166,11 @@
                 <processing>
                     <clientCallback module="ShareActions.Callbacks.clearExpired"/>
                     <serverCallback methodName="switchAction" developerComment="Clear expired links" restParams="/"/>
+                </processing>
+            </action>
+            <action name="sharelist-migrate">
+                <processing>
+                    <serverCallback methodName="switchAction" developerComment="Migrate Internal repositories to store" restParams="/"/>
                 </processing>
             </action>
             <action name="share_current_page">
@@ -243,7 +245,7 @@
             <component_config className="UserAccountTabs">
                 <additional_tab id="shares_pane"
                                 tabInfo='{"icon":"mdi mdi-share-variant","label":"share_center.98","title":"share_center.99","position":3}'
-                                paneInfo='{"namespace":"UserShares", "componentName":"SharesList"}'/>
+                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser":true, "filters":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
             </component_config>
         </client_configs>
         <hooks>
