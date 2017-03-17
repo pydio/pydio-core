@@ -226,15 +226,30 @@
 
         render: function(){
             if(!this.props.url) return null;
-            const style={
+
+            let style = {
                 boxShadow: DOMUtils.getBoxShadowDepth(1),
-                height:this.state.height,
-                width:this.state.width,
                 margin:IMAGE_PANEL_MARGIN,
                 transition:DOMUtils.getBeziersTransition()
-            };
+            }
+
+            if (this.props.fit) {
+                style = {
+                    ...style,
+                    maxWidth: "90%",
+                    maxHeight: "90%",
+                    minHeight: "90%"
+                }
+            } else {
+                style= {
+                    ...style,
+                    height:this.state.height,
+                    width:this.state.width
+                }
+            }
+
             return (
-                <div ref="container" className="vertical_fit" style={{textAlign:'center', overflow:(!this.props.fit?'auto':null)}}>
+                <div ref="container" style={{textAlign:'center', overflow:(!this.props.fit?'auto':null), flex: 1}}>
                     <img className={this.props.imageClassName} style={style} src={this.props.url}/>
                 </div>
             );

@@ -112,7 +112,7 @@ class Editor extends React.Component {
 		);
 
 		return (
-			<div className={editorClassName} style={{height:"100%", zIndex: 0}}>
+			<div className={editorClassName} style={{width: "100%", height:"100%", zIndex: 0}}>
 				<textarea ref="textarea" defaultValue={this.props.value} autoComplete="off" />
 			</div>
 		);

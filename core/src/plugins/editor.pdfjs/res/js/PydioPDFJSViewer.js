@@ -66,7 +66,6 @@ class PydioPDFJSViewer extends React.Component {
     }
 
     static getPreviewComponent(node, rich = true) {
-
         if(rich && window.pydio.getPluginConfigs('editor.pdfjs').get('PDFJS_USE_PREVIEW')) {
             return {
                 element: PydioPDFJSViewer,
@@ -82,13 +81,11 @@ class PydioPDFJSViewer extends React.Component {
     }
 
     render() {
-
         return (
             <PydioComponents.AbstractEditor {...this.props}>
                 <Viewer {...this.props} url={this.state.url} />
             </PydioComponents.AbstractEditor>
         );
-
     }
 }
 

@@ -10,7 +10,8 @@ export default React.createClass({
         closeEditorContainer:React.PropTypes.func.isRequired,
         editorData:React.PropTypes.object,
         registerCloseCallback:React.PropTypes.func,
-        onRequestTabTitleUpdate:React.PropTypes.func
+        onRequestTabTitleUpdate:React.PropTypes.func,
+        icon: React.PropTypes.bool,
     },
 
     getInitialState: function(){
@@ -83,14 +84,6 @@ export default React.createClass({
         }
     },
 
-    shouldComponentUpdate:function(){
-        if(this._blockUpdates){
-            return false;
-        }else{
-            return true;
-        }
-    },
-
     _loadPydioEditor: function(){
         if(this.editor){
             this.editor.destroy();
@@ -107,6 +100,7 @@ export default React.createClass({
                 editor = React.createElement(FuncUtils.getFunctionByName(className, window), {
                     pydio       : this.props.pydio,
                     node        : this.props.node,
+                    icon        : this.props.icon,
                     registerCloseCallback:this.props.registerCloseCallback,
                     onRequestTabClose:this.props.onRequestTabClose,
                     onRequestTabTitleUpdate:this.props.onRequestTabTitleUpdate

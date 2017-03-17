@@ -30,8 +30,7 @@ class PydioSoundManager extends React.Component {
 
         this.state = {
             url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
-            mimeType: "audio/" + node.getAjxpMime(),
-            preview: preview
+            mimeType: "audio/" + node.getAjxpMime()
         }
 
         this.onReady = () => this.setState({ready: false})
@@ -49,9 +48,10 @@ class PydioSoundManager extends React.Component {
     }
 
     render() {
+
         return (
-            <PydioComponents.AbstractEditor {...this.props} loading={false} preview={this.state.preview}>
-                <Player rich={this.props.rich} onReady={this.onReady}>
+            <PydioComponents.AbstractEditor {...this.props} loading={false}>
+                <Player rich={!this.props.icon && this.props.rich} onReady={this.onReady}>
                     <a type={this.state.mimeType} href={this.state.url} />
                 </Player>
             </PydioComponents.AbstractEditor>
