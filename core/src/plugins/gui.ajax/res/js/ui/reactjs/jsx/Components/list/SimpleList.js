@@ -39,6 +39,7 @@ let SimpleList = React.createClass({
         entryRenderThirdLine:React.PropTypes.func,
         entryHandleClicks:React.PropTypes.func,
         hideToolbar:React.PropTypes.bool,
+        computeActionsForNode: React.PropTypes.bool,
 
         openEditor:React.PropTypes.func,
         openCollection:React.PropTypes.func,
@@ -458,6 +459,9 @@ let SimpleList = React.createClass({
     },
 
     getActionsForNode: function(dm, node){
+        if(!this.props.computeActionsForNode){
+            return [];
+        }
         var cacheKey = node.isLeaf() ? 'file-' + node.getAjxpMime() :'folder';
         var selectionType = node.isLeaf() ? 'file' : 'dir';
         var nodeActions = [];

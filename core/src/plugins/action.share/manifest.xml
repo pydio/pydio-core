@@ -240,12 +240,12 @@
                       namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed"}'/>
 
             <component_config className="InfoPanel">
-                <infoPanel mime="meta:ajxp_shared" attributes="" reactComponent="ShareInfoPanel.InfoPanel"/>
+                <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel"/>
             </component_config>
             <component_config className="UserAccountTabs">
                 <additional_tab id="shares_pane"
                                 tabInfo='{"icon":"mdi mdi-share-variant","label":"share_center.98","title":"share_center.99","position":3}'
-                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser":true, "filters":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
+                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser1":true, "filters1":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
             </component_config>
         </client_configs>
         <hooks>

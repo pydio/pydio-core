@@ -34,12 +34,15 @@ let FSTemplate = React.createClass({
     },
 
     closeDrawer: function(){
+        if(!this.state.drawerOpen){
+            return;
+        }
         this.setState({drawerOpen: false});
     },
 
     render: function () {
 
-        var connectDropTarget = this.props.connectDropTarget;
+        var connectDropTarget = this.props.connectDropTarget || function(c){return c;};
         var isOver = this.props.isOver;
         var canDrop = this.props.canDrop;
 

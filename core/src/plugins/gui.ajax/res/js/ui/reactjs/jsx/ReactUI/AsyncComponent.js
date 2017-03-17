@@ -55,9 +55,9 @@ const AsyncComponent = React.createClass({
 
     render: function() {
         if(this.state && this.state.loaded) {
-            var nsObject = window[this.props.namespace];
+            const nsObject = window[this.props.namespace];
             if(nsObject && nsObject[this.props.componentName]){
-                let props = LangUtils.simpleCopy(this.props);
+                let props = {...this.props};
                 if(props.loaderStyle){
                     delete props['loaderStyle'];
                 }
