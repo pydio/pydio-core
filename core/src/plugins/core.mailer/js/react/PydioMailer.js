@@ -19,6 +19,27 @@
  */
 (function(global){
 
+    const styles = {
+        chip: {
+            marginRight: 4,
+            marginBottom: 4
+        },
+        wrapper: {
+            display: 'flex',
+            flexWrap: 'wrap',
+        },
+        overlay:{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.33)',
+            paddingTop: 77,
+            zIndex: 100
+        }
+    };
+
     var DestBadge = React.createClass({
         propTypes:{
             user:React.PropTypes.instanceOf(PydioUsers.User)
@@ -65,6 +86,28 @@
         }
     });
 
+    var UserChip = React.createClass({
+        propTypes:{
+            user:React.PropTypes.instanceOf(PydioUsers.User),
+            onRemove:React.PropTypes.func
+        },
+        remove: function(){
+            this.props.onRemove(this.props.user.getId());
+        },
+        render: function(){
+            const icon = <MaterialUI.FontIcon className={"icon-" + (this.props.user.getTemporary()?"envelope":"user")} />;
+            return (
+                <MaterialUI.Chip
+                    onRequestDelete={this.remove}
+                    style={styles.chip}
+                >
+                    <MaterialUI.Avatar color="#444" icon={icon}/>
+                    {this.props.user.getLabel()}
+                </MaterialUI.Chip>
+            )
+        }
+    });
+
     var Mailer = React.createClass({
 
         propTypes:{
@@ -85,11 +128,6 @@
                 message:this.props.message,
                 errorMessage:null
             };
-        },
-
-        componentDidMount(){
-            var res = new ResourcesManager();
-            res.loadCSSResource("plugins/core.mailer/css/PydioMailer.css");
         },
 
         updateSubject: function(event){
@@ -149,20 +187,20 @@
         },
 
         render: function(){
-            const className = [this.props.className, "react-mailer", "react-mui-context", "reset-pydio-forms"].join(" ");
+            const className = [this.props.className, "react-mailer", "reset-pydio-forms"].join(" ");
             const users = Object.keys(this.state.users).map(function(uId){
                 return (
-                    <UserEntry key={uId} user={this.state.users[uId]} onRemove={this.removeUser}/>
+                    <UserChip key={uId} user={this.state.users[uId]} onRemove={this.removeUser}/>
                 );
             }.bind(this));
             if(this.state.errorMessage){
                 var errorDiv = <div className="error">{this.state.errorMessage}</div>
             }
             var content = (
-                <div className={className}>
-                    <h3>{this.props.panelTitle}</h3>
+                <MaterialUI.Paper zDepth={2} className={className} style={{margin:8}}>
+                    <h3  style={{padding:20, color:'rgba(0,0,0,0.87)', fontSize:25}}>{this.props.panelTitle}</h3>
                     {errorDiv}
-                    <div className="users-block">
+                    <div className="users-block" style={{padding:'0 20px'}}>
                         <PydioComponents.UsersCompleter
                             fieldLabel={this.getMessage('8')}
                             usersOnly={true}
@@ -171,20 +209,30 @@
                             onValueSelected={this.addUser}
                             excludes={Object.keys(this.state.users)}
                             renderSuggestion={this.usersLoaderRenderSuggestion}
+                            pydio={global.pydio}
+                            showAddressBook={true}
+                            underlineHide={true}
                         />
-                        <div className="pydio-mailer-users">{users}</div>
+                        <div style={styles.wrapper}>{users}</div>
                     </div>
-                    <ReactMUI.TextField floatingLabelText={this.getMessage('6')} value={this.state.subject} onChange={this.updateSubject}/>
-                    <ReactMUI.TextField floatingLabelText={this.getMessage('7')} value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
-                    <div style={{textAlign:'right'}}>
-                        <ReactMUI.FlatButton label={this.getMessage('54', '')} onClick={this.props.onDismiss}/>
-                        <ReactMUI.FlatButton primary={true} label={this.getMessage('77', '')} onClick={this.postEmail}/>
+                    <MaterialUI.Divider/>
+                    <div  style={{padding:'0 20px'}}>
+                        <MaterialUI.TextField fullWidth={true} underlineShow={false} floatingLabelText={this.getMessage('6')} value={this.state.subject} onChange={this.updateSubject}/>
                     </div>
-                </div>
+                    <MaterialUI.Divider/>
+                    <div style={{padding:'0 20px'}}>
+                        <MaterialUI.TextField fullWidth={true} underlineShow={false} floatingLabelText={this.getMessage('7')} value={this.state.message} multiLine={true} onChange={this.updateMessage}/>
+                    </div>
+                    <MaterialUI.Divider/>
+                    <div style={{textAlign:'right', padding: '8px 20px'}}>
+                        <MaterialUI.FlatButton label={this.getMessage('54', '')} onTouchTap={this.props.onDismiss}/>
+                        <MaterialUI.FlatButton primary={true} label={this.getMessage('77', '')} onTouchTap={this.postEmail}/>
+                    </div>
+                </MaterialUI.Paper>
             );
             if(this.props.overlay){
                 return (
-                    <div className="react-mailer-overlay">{content}</div>
+                    <div style={styles.overlay}>{content}</div>
                 );
             }else{
                 return {content};
