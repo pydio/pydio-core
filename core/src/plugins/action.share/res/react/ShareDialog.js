@@ -19,7 +19,7 @@
  */
 (function(global) {
 
-    var ContextConsumerMixin = {
+    const ContextConsumerMixin = {
         contextTypes: {
             messages:React.PropTypes.object,
             getMessage:React.PropTypes.func,
@@ -27,7 +27,7 @@
         }
     };
 
-    var MainPanel = React.createClass({
+    const MainPanel = React.createClass({
 
         mixins:[
             PydioReactUI.ActionDialogMixin
@@ -54,7 +54,7 @@
         },
 
         getChildContext: function() {
-            var messages = this.props.pydio.MessageHash;
+            const messages = this.props.pydio.MessageHash;
             return {
                 messages: messages,
                 getMessage: function(messageId, namespace='share_center'){
@@ -87,6 +87,30 @@
             };
         },
 
+        componentDidMount: function(){
+            this.state.model.observe("status_changed", this.modelUpdated);
+            this.state.model.initLoad();
+        },
+
+        componentWillUnmount: function(){
+            if(this.buttonsComputer) this.buttonsComputer.stop();
+        },
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.selection && nextProps.selection !== this.props.selection){
+                let nextModel = new ReactModel.Share(this.props.pydio, nextProps.selection.getUniqueNode(), nextProps.selection);
+                this.setState({model:nextModel, status:'idle', mailerData: false}, () => {this.componentDidMount()});
+            }
+        },
+
+        getButtons:function(updater){
+
+            this.buttonsComputer = new ButtonsComputer(this.props.pydio, this.state.model, updater, this.dismiss.bind(this), this.getMessage.bind(this));
+            this.buttonsComputer.start();
+            return this.buttonsComputer.getButtons();
+
+        },
+
         showMailer:function(subject, message, users = []){
             if(ReactModel.Share.forceMailerOldSchool()){
                 subject = encodeURIComponent(subject);
@@ -106,22 +130,6 @@
 
         dismissMailer:function(){
             this.setState({mailerData:false});
-        },
-
-        componentDidMount: function(){
-            this.state.model.observe("status_changed", this.modelUpdated);
-            this.state.model.initLoad();
-        },
-
-        componentWillReceiveProps: function(nextProps){
-            if(nextProps.selection && nextProps.selection !== this.props.selection){
-                let nextModel = new ReactModel.Share(this.props.pydio, nextProps.selection.getUniqueNode(), nextProps.selection);
-                this.setState({model:nextModel, status:'idle', mailerData: false}, () => {this.componentDidMount()});
-            }
-        },
-
-        clicked: function(){
-            this.dismiss();
         },
 
         getMessage: function(key, namespace = 'share_center'){
@@ -159,6 +167,7 @@
                         <UsersPanel
                             showMailer={showMailer}
                             shareModel={model}
+                            pydio={this.props.pydio}
                         />
                     </ReactMUI.Tab>
                 );
@@ -188,7 +197,6 @@
                 <div className="react_share_form" style={{width:420}}>
                     <HeaderPanel {...this.props} shareModel={this.state.model}/>
                     <ReactMUI.Tabs>{panels}</ReactMUI.Tabs>
-                    <ButtonsPanel {...this.props} shareModel={this.state.model} onClick={this.clicked}/>
                     {mailer}
                 </div>
             );
@@ -196,7 +204,7 @@
 
     });
 
-    var HeaderPanel = React.createClass({
+    const HeaderPanel = React.createClass({
         mixins:[ContextConsumerMixin],
         render: function(){
 
@@ -214,67 +222,70 @@
         }
     });
 
-    var ButtonsPanel = React.createClass({
+    class ButtonsComputer{
 
-        mixins:[ContextConsumerMixin],
-
-        propTypes: {
-            onClick: React.PropTypes.func.isRequired
-        },
-        getInitialState: function(){
-            return {disabled: false};
-        },
-        disableSave: function(){
-            this.setState({disabled: true});
-        },
-        enableSave: function(){
-            this.setState({disabled:false});
-        },
-        componentDidMount: function(){
-            this.props.shareModel.observe('saving', this.disableSave);
-            this.props.shareModel.observe('saved', this.enableSave);
-        },
-        componendWillUnmount: function(){
-            this.props.shareModel.stopObserving('saving', this.disableSave);
-            this.props.shareModel.stopObserving('saved', this.enableSave);
-        },
-        triggerModelSave: function(){
-            this.props.shareModel.save();
-        },
-        triggerModelRevert:function(){
-            this.props.shareModel.revertChanges();
-        },
-        disableAllShare:function(){
-            this.props.shareModel.stopSharing(this.props.onClick.bind(this));
-        },
-        render: function(){
-            if(this.props.shareModel.getStatus() == 'modified'){
-                return (
-                    <div style={{padding:16,textAlign:'right'}}>
-                        <a className="revert-button" onClick={this.triggerModelRevert}>{this.context.getMessage('179')}</a>
-                        <ReactMUI.FlatButton secondary={true} disabled={this.state.disabled} label={this.context.getMessage('53', '')} onClick={this.triggerModelSave}/>
-                        <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
-                    </div>
-                );
-            }else{
-                var unshareButton;
-                if((this.props.shareModel.hasActiveShares() && (this.props.shareModel.currentIsOwner())) || this.props.shareModel.getStatus() === 'error' || global.pydio.user.activeRepository === "ajxp_conf"){
-                    unshareButton = (<ReactMUI.FlatButton  disabled={this.state.disabled} secondary={true} label={this.context.getMessage('6')} onClick={this.disableAllShare}/>);
-                }
-                return (
-                    <div style={{padding:16,textAlign:'right'}}>
-                        {unshareButton}
-                        <ReactMUI.FlatButton secondary={false} label={this.context.getMessage('86', '')} onClick={this.props.onClick}/>
-                    </div>
-                );
-            }
+        constructor(pydio, shareModel, buttonsUpdater, dismissCallback, getMessage){
+            this.pydio = pydio;
+            this._buttonsUpdater = buttonsUpdater;
+            this._dismissCallback = dismissCallback;
+            this._shareModel = shareModel;
+            this._saveDisabled = false;
+            this._getMessage = getMessage;
         }
-    });
+        enableSave(){
+            this._saveDisabled = false;
+            this.modelUpdated();
+        }
+        disableSave(){
+            this._saveDisabled = true;
+            this.modelUpdated();
+        }
+        triggerModelSave(){
+            this._shareModel.save();
+        }
+        triggerModelRevert(){
+            this._shareModel.revertChanges();
+        }
+        disableAllShare(){
+            this._shareModel.stopSharing(this._dismissCallback.bind(this));
+        }
+        modelUpdated(){
+            this._buttonsUpdater(this.getButtons());
+        }
+        start(){
+            this._modelObserver = this.modelUpdated.bind(this);
+            this._disableSaveObserver = this.disableSave.bind(this);
+            this._enableSaveObserver = this.enableSave.bind(this);
+            this._shareModel.observe("status_changed", this._modelObserver);
+            this._shareModel.observe('saving', this._disableSaveObserver);
+            this._shareModel.observe('saved', this._enableSaveObserver);
+            console.log(this);
+        }
+        stop(){
+            this._shareModel.stopObserving("status_changed", this._modelObserver);
+            this._shareModel.stopObserving('saving', this._disableSaveObserver);
+            this._shareModel.stopObserving('saved', this._enableSaveObserver);
+        }
+        getButtons(){
+            let buttons = [];
+            if(this._shareModel.getStatus() == 'modified'){
+                buttons.push(<a style={{cursor:'pointer',color:'rgba(0,0,0,0.53)'}} onClick={this.triggerModelRevert.bind(this)}>{this._getMessage('179')}</a>);
+                buttons.push(<ReactMUI.FlatButton secondary={true} disabled={this._saveDisabled} label={this._getMessage('53', '')} onClick={this.triggerModelSave.bind(this)}/>);
+                buttons.push(<ReactMUI.FlatButton secondary={false} label={this._getMessage('86', '')} onClick={this._dismissCallback.bind(this)}/>);
+            }else{
+                if((this._shareModel.hasActiveShares() && (this._shareModel.currentIsOwner())) || this._shareModel.getStatus() === 'error' || this.pydio.user.activeRepository === "ajxp_conf"){
+                    buttons.push(<ReactMUI.FlatButton  disabled={this._saveDisabled} secondary={true} label={this._getMessage('6')} onClick={this.disableAllShare.bind(this)}/>);
+                }
+                buttons.push(<ReactMUI.FlatButton secondary={false} label={this._getMessage('86', '')} onClick={this._dismissCallback.bind(this)}/>);
+            }
+            return buttons;
+        }
+    }
 
     /**************************/
     /* USERS PANEL
     /**************************/
-    var UsersPanel = React.createClass({
+    const UsersPanel = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -322,6 +333,7 @@
                         sendInvitations={this.props.showMailer ? this.sendInvitations : null}
                         onUserUpdate={this.onUserUpdate}
                         saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
+                        pydio={this.props.pydio}
                     />
                     {remoteUsersBlock}
                 </div>
@@ -329,7 +341,7 @@
         }
     });
 
-    var UserBadge = React.createClass({
+    const UserBadge = React.createClass({
         propTypes: {
             label: React.PropTypes.string,
             avatar: React.PropTypes.string,
@@ -388,11 +400,12 @@
         }
     });
 
-    var SharedUsers = React.createClass({
+    const SharedUsers = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
         propTypes: {
+            pydio:React.PropTypes.instanceOf(pydio),
             users:React.PropTypes.array.isRequired,
             userObjects:React.PropTypes.object.isRequired,
             onUserUpdate:React.PropTypes.func.isRequired,
@@ -409,6 +422,7 @@
             }.bind(this));
         },
         valueSelected: function(userObject){
+            console.log(userObject);
             var newEntry = {
                 ID      : userObject.getId(),
                 RIGHT   :'r',
@@ -474,6 +488,8 @@
                         renderSuggestion={this.completerRenderSuggestion}
                         onValueSelected={this.valueSelected}
                         excludes={excludes}
+                        pydio={this.props.pydio}
+                        showAddressBook={true}
                     />
                 );
             }
@@ -494,7 +510,7 @@
         }
     });
 
-    var SharedUserEntry = React.createClass({
+    const SharedUserEntry = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -561,7 +577,7 @@
         }
     });
 
-    var RemoteUsers = React.createClass({
+    const RemoteUsers = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -645,7 +661,7 @@
         }
     });
 
-    var RemoteUserEntry = React.createClass({
+    const RemoteUserEntry = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -736,7 +752,7 @@
     /**************************/
     /* PUBLIC LINK PANEL
      /**************************/
-    var PublicLinkPanel = React.createClass({
+    const PublicLinkPanel = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -854,7 +870,7 @@
         }
     });
 
-    var PublicLinkField = React.createClass({
+    const PublicLinkField = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -992,7 +1008,7 @@
         }
     });
 
-    var PublicLinkPermissions = React.createClass({
+    const PublicLinkPermissions = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1060,7 +1076,7 @@
         }
     });
 
-    var PublicLinkSecureOptions = React.createClass({
+    const PublicLinkSecureOptions = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1244,7 +1260,7 @@
     /**************************/
     /* ADVANCED PANEL
     /**************************/
-    var AdvancedPanel = React.createClass({
+    const AdvancedPanel = React.createClass({
         propTypes:{
             pydio:React.PropTypes.instanceOf(Pydio),
             shareModel:React.PropTypes.instanceOf(ReactModel.Share)
@@ -1269,7 +1285,7 @@
         }
     });
 
-    var LabelDescriptionPanel = React.createClass({
+    const LabelDescriptionPanel = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1316,7 +1332,7 @@
         }
     });
 
-    var NotificationPanel = React.createClass({
+    const NotificationPanel = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1355,7 +1371,7 @@
         }
     });
 
-    var PublicLinkTemplate = React.createClass({
+    const PublicLinkTemplate = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1401,7 +1417,7 @@
         }
     });
 
-    var VisibilityPanel = React.createClass({
+    const VisibilityPanel = React.createClass({
 
         mixins:[ContextConsumerMixin],
 
@@ -1458,7 +1474,7 @@
         }
     });
 
-    var DialogNamespace = global.ShareDialog || {};
+    const DialogNamespace = global.ShareDialog || {};
 
     DialogNamespace.MainPanel = MainPanel;
     DialogNamespace.PublicLinkField = PublicLinkField;

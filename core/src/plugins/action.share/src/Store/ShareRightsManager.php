@@ -251,9 +251,13 @@ class ShareRightsManager
                         $u = $roleId;
                     }
 
-                }
+                    $entry = array("ID" => $u, "TYPE" => "group", "USER_TEAM" => true);
 
-                $entry = array("ID" => $u, "TYPE" => "group", "USER_TEAM" => true);
+                }else{
+
+                    $entry = array("ID" => $u, "TYPE" => "group");
+
+                }
 
             }
             $entry["RIGHT"] = $rightString;

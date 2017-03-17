@@ -33,7 +33,9 @@
             this._id = id;
             this._label = label;
             this._type = type;
-            this._group = group;
+            if(this._type === 'group'){
+                this._group = id;
+            }
             this._avatar = avatar;
             this._temporary = temporary;
             this._external = external;

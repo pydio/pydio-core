@@ -84,7 +84,6 @@ const UsersLoader = React.createClass({
         existingOnly    :React.PropTypes.bool,
         freeValueAllowed:React.PropTypes.bool,
         className       :React.PropTypes.string
-
     },
 
     getInitialState:function(){
@@ -209,6 +208,21 @@ const UsersLoader = React.createClass({
         this.setState({createUser:null});
     },
 
+    openAddressBook:function(event){
+        this.setState({
+            addressBookOpen: true,
+            addressBookAnchor: event.currentTarget
+        });
+    },
+
+    closeAddressBook: function(){
+        this.setState({addressBookOpen: false});
+    },
+
+    onAddressBookItemSelected: function(item){
+        console.log("Add item to list!", item);
+        this.props.onValueSelected(item);
+    },
 
     render: function(){
 
@@ -224,6 +238,7 @@ const UsersLoader = React.createClass({
                         value={global.pydio.MessageHash[485] + ' (' + this.state.createUser + ')'}
                         disabled={true}
                         fullWidth={true}
+                        underlineShow={!this.props.underlineHide}
                     />
                     <div style={{position: 'absolute', top: 73, left: 0, right: 0, zIndex: 10}}>
                         <UserCreationForm
@@ -248,6 +263,7 @@ const UsersLoader = React.createClass({
                     className={this.props.className}
                     openOnFocus={true}
                     floatingLabelText={this.props.fieldLabel}
+                    underlineShow={!this.props.underlineHide}
                     fullWidth={true}
                     onNewRequest={this.onCompleterRequest}
                     listStyle={{maxHeight: 350, overflowY: 'auto'}}
@@ -261,6 +277,30 @@ const UsersLoader = React.createClass({
                         status={this.state.loading ? 'loading' : 'hide' }
                     />
                 </div>
+                {this.props.showAddressBook && <MaterialUI.IconButton
+                    style={{position:'absolute', zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial'}}
+                    iconClassName={'mdi mdi-book-open-variant'}
+                    onTouchTap={this.openAddressBook}
+                />}
+                {this.props.showAddressBook && <MaterialUI.Popover
+                    open={this.state.addressBookOpen}
+                    anchorEl={this.state.addressBookAnchor}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                    onRequestClose={this.closeAddressBook}
+                    style={{marginLeft: 20}}
+                >
+                    <div style={{width: 256, height: 320}}>
+                        <PydioReactUI.AsyncComponent
+                            namespace="AddressBook"
+                            componentName="Panel"
+                            mode="selector"
+                            pydio={this.props.pydio}
+                            loaderStyle={{width: 320, height: 420}}
+                            onItemSelected={this.onAddressBookItemSelected}
+                        />
+                    </div>
+                </MaterialUI.Popover>}
             </div>
         );
 

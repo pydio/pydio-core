@@ -683,3 +683,7 @@
 .mdi-dots-vertical:before {
     content: "\f2ce";
 }
+
+.mdi-book-open-variant:before {
+    content: "\f1b4";
+}

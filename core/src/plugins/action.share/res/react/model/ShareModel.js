@@ -741,7 +741,7 @@
 
             PydioApi.getClient().request(params, function(transport){
                 var _data = transport.responseJSON;
-                if(_data !== null){
+                if(_data !== null && _data !== undefined){
                     this._data = _data;
                     if(this._data instanceof Array) this._data = {};
                     this._pendingData = {};
@@ -749,10 +749,12 @@
                     this._pydio.fireNodeRefresh(this._node);
                 }else{
                     // There must have been an error, revert
-                    this.load();
+                    this.revertChanges();
                 }
                 this.notify('saved');
             }.bind(this), function(){
+                // The must have been an error, revert
+                this.revertChanges();
                 this.notify('saved');
             }.bind(this));
         }

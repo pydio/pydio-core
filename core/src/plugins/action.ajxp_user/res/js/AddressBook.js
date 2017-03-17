@@ -167,11 +167,13 @@
                 let touchTap = ()=>{this.props.onItemClicked(item)};
                 if(folders.indexOf(item) > -1 && this.props.onFolderClicked){
                     touchTap = ()=>{ this.props.onFolderClicked(item) };
-                    addGroupButton = (<MaterialUI.IconButton
-                        iconClassName={"mdi " + (this.props.mode === 'book' ? "mdi-dots-vertical":"mdi-account-multiple-plus")}
-                        tooltip={"Add this group / team"}
-                        onTouchTap={()=>{this.props.onItemClicked(item)}}
-                    />);
+                    if(!item._notSelectable){
+                        addGroupButton = (<MaterialUI.IconButton
+                            iconClassName={"mdi " + (this.props.mode === 'book' ? "mdi-dots-vertical":"mdi-account-multiple-plus")}
+                            tooltip={"Add this group / team"}
+                            onTouchTap={()=>{this.props.onItemClicked(item)}}
+                        />);
+                    }
                 }
                 elements.push(<MaterialUI.ListItem
                     key={item.id}
@@ -282,20 +284,23 @@
                 type:'root',
             };
             let search = {id:'search', label:'Search Local Users', icon:'mdi mdi-account-search', type:'search', _parent:root};
-            root.collections = [
-                search,
-                {id:'ext', label:'Your Users', icon:'mdi mdi-account-network', itemsLoader: Loaders.loadExternalUsers, _parent:root},
-                {id:'teams', label:'Your Teams', icon:'mdi mdi-account-multiple', childrenLoader:Loaders.loadTeams, _parent:root},
-                {id:'AJXP_GRP_/', label:'All Users', icon:'mdi mdi-account-box', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers, _parent:root}
-            ]
+            root.collections = [];
+            if(!this.props.mode === 'selector'){
+                root.collections.push(search);
+            }
+            root.collections = root.collections.concat([
+                {id:'ext', label:'Your Users', icon:'mdi mdi-account-network', itemsLoader: Loaders.loadExternalUsers, _parent:root, _notSelectable:true},
+                {id:'teams', label:'Your Teams', icon:'mdi mdi-account-multiple', childrenLoader:Loaders.loadTeams, _parent:root, _notSelectable:true},
+                {id:'AJXP_GRP_/', label:'All Users', icon:'mdi mdi-account-box', childrenLoader:Loaders.loadGroups, itemsLoader: Loaders.loadGroupUsers, _parent:root, _notSelectable:true}
+            ]);
 
             const ocsRemotes = this.props.pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
             if(ocsRemotes){
                 let remotes = JSON.parse(ocsRemotes);
-                let remotesNodes = {id:'remotes', label:'Remote Servers', icon:'mdi mdi-server', collections:[], _parent:root};
+                let remotesNodes = {id:'remotes', label:'Remote Servers', icon:'mdi mdi-server', collections:[], _parent:root, _notSelectable:true};
                 for(let k in remotes){
                     if(!remotes.hasOwnProperty(k)) continue;
-                    remotesNodes.collections.push({id:k, label:remotes[k], icon:'mdi mdi-server-network', type:'remote', parent:remotesNodes});
+                    remotesNodes.collections.push({id:k, label:remotes[k], icon:'mdi mdi-server-network', type:'remote', parent:remotesNodes, _notSelectable:true});
                 }
                 if(remotesNodes.collections.length){
                     root.collections.push(remotesNodes);
@@ -319,7 +324,20 @@
         },
 
         onUserListItemClicked: function(item){
-            this.setState({rightPaneItem:item});
+            if(this.props.onItemSelected){
+                const uObject = new PydioUsers.User(
+                    item.id,
+                    item.label,
+                    item.type,
+                    item.group,
+                    item.avatar,
+                    item.temporary,
+                    item.external
+                );
+                this.props.onItemSelected(uObject);
+            }else{
+                this.setState({rightPaneItem:item});
+            }
         },
 
         render: function(){
