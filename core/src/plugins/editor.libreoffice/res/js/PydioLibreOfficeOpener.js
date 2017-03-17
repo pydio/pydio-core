@@ -19,6 +19,8 @@
  */
 
  const Viewer = ({url, style}) => {
+
+     console.log(url)
      return (
          <iframe src={url} style={{...style, border: 0, flex: 1}} className="vertical_fit"></iframe>
      );
@@ -49,10 +51,7 @@ class PydioLibreOfficeOpener extends React.Component {
                      }
                      let {host, uri, permission, jwt} = transport.responseJSON;
                      let fileSrcUrl = encodeURIComponent(`${host}${uri}`);
-                     this.setState({url: `${iframeUrl}?host=${webSocketUrl}
-                         &WOPISrc=${fileSrcUrl}
-                         &access_token=${jwt}
-                         &permisson=${permission}`});
+                     this.setState({url: `${iframeUrl}?host=${webSocketUrl}&WOPISrc=${fileSrcUrl}&access_token=${jwt}&permisson=${permission}`});
                  }.bind(this));
        }
 

@@ -51,11 +51,6 @@ class AbstractEditor extends React.Component {
     }
 
     render() {
-        let className = null;
-        if (!this.props.preview) {
-            className="vertical-fit vertical-layout"
-        }
-
         let style = null;
 
         if (this.props.loading) {
@@ -68,12 +63,11 @@ class AbstractEditor extends React.Component {
         }
 
         return (
-            <div className={className} style={{position: "relative", padding: 0, margin: 0, flex: 1}}>
+            <div style={{position: "relative", padding: 0, margin: 0, display: "flex", flexDirection: "column", flex: 1}}>
                 {this.getActions()}
                 {this.getError()}
-                {this.getLoader()}
-
                 <div style={{...style, display: "flex", flex: 1}}>
+                    {this.getLoader()}
                     {this.props.children}
                 </div>
             </div>
@@ -85,7 +79,7 @@ AbstractEditor.propTypes = {
     node: React.PropTypes.instanceOf(AjxpNode),
     pydio: React.PropTypes.instanceOf(Pydio),
 
-    preview: React.PropTypes.bool,
+    icon: React.PropTypes.bool,
 
     loading: React.PropTypes.bool,
     errorString: React.PropTypes.string,

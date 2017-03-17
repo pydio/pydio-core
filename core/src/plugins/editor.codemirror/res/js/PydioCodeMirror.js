@@ -55,6 +55,7 @@ class PydioCodeMirror extends React.Component {
                 }
             }
         } else {
+
             // We don't have a player for the file icon
             return null;
         }
