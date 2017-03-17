@@ -112,12 +112,16 @@ export default React.createClass({
         this.setState(state);
     },
 
+    updateButtons(actions){
+        this.setState({actions: actions});
+    },
+
     initModalFromComponent: function(component) {
 
         if(component.getButtons) {
-            let buttons = component.getButtons();
+            const buttons = component.getButtons(this.updateButtons.bind(this));
             if(buttons && buttons.length){
-                this.setState({actions:component.getButtons()});
+                this.setState({actions:buttons});
             }
         } else if(component.getSubmitCallback || component.getCancelCallback || component.getNextCallback) {
             let actions = [];
