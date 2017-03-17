@@ -126,6 +126,8 @@ let FilePreview = React.createClass({
             return (
                 <this.state.preview.element {...this.state.preview.props} pydio={window.pydio} preview={true} />
             )
+        }else if(this.state.element){
+            return this.state.element;
         }
 
         let node  = this.props.node;
