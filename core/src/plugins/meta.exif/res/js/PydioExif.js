@@ -30,7 +30,6 @@
             if(gpsData['COMPUTED_GPS-GPS_Longitude'] && gpsData['COMPUTED_GPS-GPS_Latitude']){
                 // Special Case
                 ResourcesManager.loadClassesAndApply(['OpenLayers', 'PydioMaps'], function(){
-                    console.log(gpsData);
                     this.setState({gpsData:gpsData});
                 }.bind(this));
             }
@@ -86,7 +85,9 @@
             }
             if(this.state && this.state.gpsData){
                 items.push(
-                    <PydioMaps.OLMap
+                    <PydioReactUI.AsyncComponent
+                        namespace="PydioMaps"
+                        componentName="OLMap"
                         key="map"
                         style={{height: 170,marginBottom:16}}
                         centerNode={this.props.node}
