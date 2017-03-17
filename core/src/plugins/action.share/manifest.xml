@@ -245,7 +245,7 @@
             <component_config className="UserAccountTabs">
                 <additional_tab id="shares_pane"
                                 tabInfo='{"icon":"mdi mdi-share-variant","label":"share_center.98","title":"share_center.99","position":3}'
-                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser1":true, "filters1":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
+                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser":true, "filters":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
             </component_config>
         </client_configs>
         <hooks>
