@@ -260,12 +260,15 @@ module.exports = function(grunt) {
         'copy',
         'rename',
         'symlink',
+        'env:build',
+        'browserify:dist',
+        'env:dev',
         'babel:dist',
         'uglify:js',
         'babel:materialui',
         'babel:pydio',
         'env:build',
-        'browserify',
+        'browserify:ui',
         'env:dev',
         'uglify:nodejs'
     ]);
