@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.codemirror" openable="true" canWrite="true" text="code_mirror.1" iconClass="icon-text-height" title="code_mirror.2" icon="codemirror_images/source_edit.png" className="PydioCodeMirror" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl," label="CONF_MESSAGE[Source Viewer]" description="CONF_MESSAGE[Syntax Highlighter for all major code source files]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.codemirror" openable="true" canWrite="true" text="code_mirror.1" iconClass="icon-text-height" title="code_mirror.2" icon="codemirror_images/source_edit.png"
+        className="PydioCodeMirror.PydioEditor" mimes="xml,html,htm,js,json,css,php,phtml,sparql,txt,py,c#,java,jsp,sql,cgi,pl,inc,xsl,"
+        label="CONF_MESSAGE[Source Viewer]" description="CONF_MESSAGE[Syntax Highlighter for all major code source files]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>
             <i18n namespace="code_mirror" path="plugins/editor.codemirror/i18n" autoload="true"/>
