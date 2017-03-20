@@ -97,6 +97,7 @@ let FSTemplate = React.createClass({
                                 buttonTitle="New..."
                                 raised={true}
                                 secondary={true}
+                                controller={this.props.pydio.Controller}
                             />
                             <PydioMenus.Toolbar
                                 {...this.props}

@@ -27,6 +27,9 @@ let Breadcrumb = React.createClass({
         const pydio = this.props.pydio;
         const styles = {
             main: {
+                fontSize: 22,
+                lineHeight:'24px',
+                padding: 20,
                 color: this.props.muiTheme.appBar.textColor
             }
         };
@@ -38,13 +41,16 @@ let Breadcrumb = React.createClass({
         let path = this.state.node ? LangUtils.trimLeft(this.state.node.getPath(), '/') : '';
         let rebuilt = '';
         let i = 0;
+        let mainStyle = this.props.rootStyle || {};
+        mainStyle = {...styles.main, ...mainStyle};
         path.split('/').map(function(seg){
+            if(!seg) return;
             rebuilt += '/' + seg;
             segments.push(<span key={'bread_sep_' + i} className="separator"> / </span>);
             segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
             i++;
         }.bind(this));
-        return <span className="react_breadcrumb" style={styles.main}><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</span>
+        return <div className="react_breadcrumb" style={mainStyle}><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</div>
     }
 
 });

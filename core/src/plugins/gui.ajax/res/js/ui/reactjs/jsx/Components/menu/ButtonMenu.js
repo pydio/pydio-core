@@ -14,20 +14,44 @@ export default React.createClass({
     },
 
     getInitialState: function(){
-        return {showMenu: false, menuItems: []};
+        return {showMenu: false, menuItems: this.props.menuItems || []};
+    },
+
+    componentDidMount: function(){
+        if(this.props.controller && !this.props.menuItems){
+            this._observer = () => {
+                const actions = this.props.controller.getContextActions('genericContext', null, this.props.toolbars);
+                const menuItems = Utils.pydioActionsToItems(actions);
+                this.setState({menuItems: menuItems});
+            };
+            if(this.props.controller === pydio.Controller){
+                pydio.observe("actions_refreshed", this._observer);
+            }else{
+                this.props.controller.observe("actions_refreshed", this._observer);
+            }
+            this._observer();
+        }
+    },
+
+    componentWillUnmount: function(){
+        if(this._observer){
+            if(this.props.controller === pydio.Controller){
+                pydio.stopObserving("actions_refreshed", this._observer);
+            }else{
+                this.props.controller.stopObserving("actions_refreshed", this._observer);
+            }
+        }
+    },
+
+    componentWillReceiveProps: function(nextProps){
+        if(nextProps.menuItems && nextProps.menuItems !== this.props.menuItems){
+            this.setState({menuItems: nextProps.menuItems});
+        }
     },
 
     showMenu: function(event){
-        let menuItems;
-        if(this.props.menuItems){
-            menuItems = this.props.menuItems;
-        }else{
-            let actions = this.props.pydio.Controller.getContextActions('genericContext', null, this.props.toolbars);
-            menuItems = Utils.pydioActionsToItems(actions);
-        }
         this.setState({
             showMenu: true,
-            menuItems: menuItems,
             anchor: event.currentTarget
         })
     },
@@ -47,25 +71,28 @@ export default React.createClass({
             label: label,
             onTouchTap: this.showMenu
         };
-        if(this.props.raised){
-            button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
-        }else{
-            button = <MaterialUI.FlatButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
+        const {menuItems, showMenu, anchor} = this.state;
+        if(menuItems.length){
+            if(this.props.raised){
+                button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
+            }else{
+                button = <MaterialUI.FlatButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
+            }
         }
         return (
             <span id={this.props.id} className={this.props.className}>
                 {button}
                 <MaterialUI.Popover
                     className="menuPopover"
-                    open={this.state.showMenu}
-                    anchorEl={this.state.anchor}
+                    open={showMenu}
+                    anchorEl={anchor}
                     anchorOrigin={{horizontal: this.props.direction || 'left', vertical: 'bottom'}}
                     targetOrigin={{horizontal: this.props.direction || 'left', vertical: 'top'}}
                     onRequestClose={() => {this.setState({showMenu: false})}}
                 >
                     <ReactMUI.Menu
                         onItemClick={this.menuClicked}
-                        menuItems={this.state.menuItems}
+                        menuItems={menuItems}
                     />
                 </MaterialUI.Popover>
             </span>
