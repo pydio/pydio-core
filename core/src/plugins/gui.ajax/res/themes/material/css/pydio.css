@@ -2997,10 +2997,6 @@ body,
 }
 .react-mui-context .desktop-container #workspace_toolbar .react_breadcrumb {
   flex: 1;
-  padding: 20px;
-  font-size: 22px;
-  line-height: 24px;
-  color: #ffffff;
 }
 .react-mui-context .desktop-container #workspace_toolbar .drawer-button {
   display: none;

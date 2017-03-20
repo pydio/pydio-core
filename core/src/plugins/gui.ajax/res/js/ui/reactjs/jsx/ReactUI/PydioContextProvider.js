@@ -47,11 +47,14 @@ export default function(PydioComponent, pydio){
 
         render: function(){
 
+            const customPalette = pydio.Parameters.get('palette') || {};
+
             const themeCusto = {
                 palette: {
                     primary1Color       : MaterialUI.Style.colors.blueGrey500,
                     primary2Color       : MaterialUI.Style.colors.deepOrange500,
-                    accent1Color        : MaterialUI.Style.colors.deepOrange500
+                    accent1Color        : MaterialUI.Style.colors.deepOrange500,
+                    ...customPalette
                 }
             };
 

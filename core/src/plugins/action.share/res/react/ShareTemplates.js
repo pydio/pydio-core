@@ -76,6 +76,13 @@
                     PydioReactUI.BackgroundImage.SESSION_IMAGE = style;
                 }
             }
+            style = {...style,
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                width: '100%'
+            };
 
             if(!this.props.pydio.user){
                 return <div className="vertical_fit" style={{...style, width:'100%'}}></div>;
@@ -161,6 +168,28 @@
 
         render: function(){
 
+            const Color = MaterialUI.Color;
+
+            const styles = {
+                appBarStyle : {
+                    zIndex: 1,
+                    backgroundColor: this.props.muiTheme.appBar.color
+                },
+                buttonsStyle : {
+                    color: this.props.muiTheme.appBar.textColor
+                },
+                iconButtonsStyle :{
+                    color: Color(this.props.muiTheme.appBar.color).darken(0.4)
+                },
+                raisedButtonStyle : {
+                    height: 30
+                },
+                raisedButtonLabelStyle : {
+                    height: 30,
+                    lineHeight: '30px'
+                }
+            }
+
             let style = {};
             if(this.props.imageBackgroundFromConfigs){
                 if(PydioReactUI.BackgroundImage.SESSION_IMAGE){
@@ -182,14 +211,15 @@
                     <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
                         {minisiteMode !== 'embed' &&
                             <div id="workspace_toolbar">
-                                <Breadcrumb {...this.props}/>
+                                <Breadcrumb {...this.props} rootStyle={{padding: 8}}/>
                             </div>
                         }
-                        <div id="main_toolbar">
-                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true}/>
-                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button"/>
+                        <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
+                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true} controller={this.props.pydio.Controller}/>
+                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
+                            <div style={{flex:1}}></div>
                             <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font"/>
+                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
                         </div>
                     </MaterialUI.Paper>
                     {this.props.children}
@@ -243,7 +273,7 @@
             let content;
             if(node){
                 content = (
-                    <div className="editor_container vertical_layout vertical_fit">
+                    <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
                         <PydioComponents.ReactEditorOpener
                             pydio={this.props.pydio}
                             node={node}
@@ -328,12 +358,12 @@
 
     });
 
-    let ns = global.ShareTemplates || {};
-    ns.FolderMinisite = FolderMinisite;
-    ns.FileMinisite = FileMinisite;
-    ns.DLTemplate = DLTemplate;
-    ns.DropZoneMinisite = DropZoneMinisite;
-    ns.FilmStripMinisite = FilmStripMinisite;
-    global.ShareTemplates = ns;
+    global.ShareTemplates = {
+        FolderMinisite      : MaterialUI.Style.muiThemeable()(FolderMinisite),
+        FileMinisite        : MaterialUI.Style.muiThemeable()(FileMinisite),
+        DLTemplate          : MaterialUI.Style.muiThemeable()(DLTemplate),
+        DropZoneMinisite    : MaterialUI.Style.muiThemeable()(DropZoneMinisite),
+        FilmStripMinisite   : MaterialUI.Style.muiThemeable()(FilmStripMinisite)
+    };
 
 })(window);

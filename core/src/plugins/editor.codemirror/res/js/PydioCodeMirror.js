@@ -129,6 +129,9 @@ class PydioCodeMirror extends React.Component {
 }
 
 // We need to attach the element to window else it won't be found
-window.PydioCodeMirror = PydioCodeMirror
+window.PydioCodeMirror = {
+    PydioEditor: PydioCodeMirror,
+    SourceEditor: Editor
+}
 
 export default PydioCodeMirror

@@ -46,17 +46,27 @@ let FSTemplate = React.createClass({
         var isOver = this.props.isOver;
         var canDrop = this.props.canDrop;
 
-        const appBarStyle = {
-            zIndex: 1,
-            backgroundColor: this.props.muiTheme.appBar.color
-        };
-        const raisedButtonStyle = {
-            height: 30
-        };
-        const raisedButtonLabelStyle = {
-            height: 30,
-            lineHeight: '30px'
-        };
+        const Color = MaterialUI.Color;
+
+        const styles = {
+            appBarStyle : {
+                zIndex: 1,
+                backgroundColor: this.props.muiTheme.appBar.color
+            },
+            buttonsStyle : {
+                color: this.props.muiTheme.appBar.textColor
+            },
+            iconButtonsStyle :{
+                color: Color(this.props.muiTheme.appBar.color).darken(0.4)
+            },
+            raisedButtonStyle : {
+                height: 30
+            },
+            raisedButtonLabelStyle : {
+                height: 30,
+                lineHeight: '30px'
+            }
+        }
 
         let classes = ['vertical_layout', 'vertical_fit', 'react-fs-template'];
         if(this.state.infoPanelOpen) classes.push('info-panel-open');
@@ -71,7 +81,7 @@ let FSTemplate = React.createClass({
                     pydio={this.props.pydio}
                 />
                 <div className="desktop-container vertical_layout vertical_fit">
-                    <MaterialUI.Paper zDepth={1} style={appBarStyle} rounded={false}>
+                    <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
                             <span className="drawer-button"><MaterialUI.IconButton iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...this.props}/>
@@ -80,13 +90,14 @@ let FSTemplate = React.createClass({
                         <div id="main_toolbar">
                             <PydioMenus.ButtonMenu
                                 {...this.props}
-                                buttonStyle={raisedButtonStyle}
-                                buttonLabelStyle={raisedButtonLabelStyle}
+                                buttonStyle={styles.raisedButtonStyle}
+                                buttonLabelStyle={styles.raisedButtonLabelStyle}
                                 id="create-button-menu"
                                 toolbars={["upload", "create"]}
                                 buttonTitle="New..."
                                 raised={true}
                                 secondary={true}
+                                controller={this.props.pydio.Controller}
                             />
                             <PydioMenus.Toolbar
                                 {...this.props}
@@ -94,6 +105,7 @@ let FSTemplate = React.createClass({
                                 toolbars={["change_main"]}
                                 groupOtherList={["more", "change", "remote"]}
                                 renderingType="button"
+                                buttonStyle={styles.buttonsStyle}
                             />
                             <PydioComponents.ListPaginator
                                 id="paginator-toolbar"
@@ -105,6 +117,7 @@ let FSTemplate = React.createClass({
                                 id="display-toolbar"
                                 toolbars={["display_toolbar"]}
                                 renderingType="icon-font"
+                                buttonStyle={styles.iconButtonsStyle}
                             />
                         </div>
                     </MaterialUI.Paper>

@@ -35,6 +35,7 @@ export default React.createClass({
                         tooltip={this.props.buttonTitle}
                         iconClassName={this.props.buttonClassName}
                         onTouchTap={this.showMenu}
+                        iconStyle={this.props.buttonStyle}
                     />
                     <MaterialUI.Popover
                         open={this.state.showMenu}
