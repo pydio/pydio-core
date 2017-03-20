@@ -71,12 +71,12 @@ class EditionPanel extends React.Component {
             right: "100px",
             cursor: "pointer",
             transform: "translate(50%, 50%)",
-            zIndex: 10000
+            zIndex: 1400
         }
 
         return (
             <Provider store={store}>
-                <div style={{position: "relative", zIndex: 10000}}>
+                <div style={{position: "relative", zIndex: 1400}}>
                     <Editor/>
                 </div>
             </Provider>

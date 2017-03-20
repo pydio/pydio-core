@@ -3,7 +3,7 @@
 	<class_definition filename="plugins/editor.eml/EmlParser.php" classname="Pydio\Editor\EML\EmlParser"/>
     <client_settings>
         <resources>
-            <js file="plugins/editor.eml/class.EmlViewer.js" className="EmlViewer"/>
+            <js file="plugins/editor.eml/res/build/EmlViewer.js" className="EmlViewer"/>
             <css file="plugins/editor.eml/emlViewer.css"/>
             <img_library alias="eml_images" path="plugins/editor.eml/img"/>
             <i18n namespace="editor.eml" path="plugins/editor.eml/i18n" />

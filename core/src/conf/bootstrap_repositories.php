@@ -153,7 +153,7 @@ $REPOSITORIES["ajxp_conf"] = array(
     "AJXP_SLUG"		    =>  "settings",
     "DISPLAY_ID"		=>	"165",
     "DESCRIPTION_ID"	=>	"506",
-    "DRIVER"		    =>	"ajxp_conf",
+    "DRIVER"		    =>	"ajxp_admin",
     "DRIVER_OPTIONS"    => array()
 );
 
