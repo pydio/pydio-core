@@ -88,7 +88,6 @@
                 if(groupBy){
                     params[groupBy] = '__GROUP__';
                 }
-                console.log(params);
                 PydioApi.getClient().request(params, (transp)=>{
                     const children = transp.responseJSON.data;
                     this._children = [];

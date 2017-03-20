@@ -139,17 +139,17 @@ body,#ajxp_desktop,#background-imager{
   }
 
   #info_panel{
-    right: -250px;
+    right: -@infopanel_width;
   }
   .info-panel-open {
     #info_panel{
       right: 0;
       @media @screenwidth-small{
-        right: -250px;
+        right: -@infopanel_width;
       }
     }
     .material-list.main-files-list{
-      margin-right: 250px;
+      margin-right: @infopanel_width;
       @media @screenwidth-small{
         margin-right: 0;
       }

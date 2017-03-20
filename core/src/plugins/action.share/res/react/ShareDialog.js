@@ -259,7 +259,6 @@
             this._shareModel.observe("status_changed", this._modelObserver);
             this._shareModel.observe('saving', this._disableSaveObserver);
             this._shareModel.observe('saved', this._enableSaveObserver);
-            console.log(this);
         }
         stop(){
             this._shareModel.stopObserving("status_changed", this._modelObserver);
@@ -422,7 +421,6 @@
             }.bind(this));
         },
         valueSelected: function(userObject){
-            console.log(userObject);
             var newEntry = {
                 ID      : userObject.getId(),
                 RIGHT   :'r',
