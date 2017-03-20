@@ -25,6 +25,11 @@ let Breadcrumb = React.createClass({
 
     render: function(){
         const pydio = this.props.pydio;
+        const styles = {
+            main: {
+                color: this.props.muiTheme.appBar.textColor
+            }
+        };
         if(!pydio.user){
             return <span className="react_breadcrumb"></span>;
         }
@@ -39,9 +44,11 @@ let Breadcrumb = React.createClass({
             segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
             i++;
         }.bind(this));
-        return <span className="react_breadcrumb"><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</span>
+        return <span className="react_breadcrumb" style={styles.main}><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</span>
     }
 
 });
+
+Breadcrumb = MaterialUI.Style.muiThemeable()(Breadcrumb);
 
 export {Breadcrumb as default}

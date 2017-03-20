@@ -50,7 +50,7 @@ export default React.createClass({
         if(this.props.raised){
             button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
         }else{
-            button = <MaterialUI.FlatButton {...props}/>;
+            button = <MaterialUI.FlatButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
         }
         return (
             <span id={this.props.id} className={this.props.className}>

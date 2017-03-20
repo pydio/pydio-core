@@ -12,7 +12,8 @@ import IconButtonPopover from './IconButtonPopover'
             groupOtherList:React.PropTypes.array,
             renderingType:React.PropTypes.string,
             controller:React.PropTypes.instanceOf(Controller),
-            toolbarStyle: React.PropTypes.object
+            toolbarStyle: React.PropTypes.object,
+            buttonStyle: React.PropTypes.object
         },
 
         componentDidMount: function(){
@@ -54,12 +55,12 @@ import IconButtonPopover from './IconButtonPopover'
         render: function(){
             let groups = this.state.groups
             let actions = [];
-            let toolbars = this.props.toolbars;
-            if(this.props.groupOtherList.length){
-                toolbars = toolbars.concat(['MORE_ACTION']);
+            const {toolbars, renderingType, groupOtherList, buttonStyle} = this.props;
+            let allToolbars = [...toolbars];
+            if(groupOtherList.length){
+                allToolbars = allToolbars.concat(['MORE_ACTION']);
             }
-            let renderingType = this.props.renderingType;
-            toolbars.map(function(barName){
+            allToolbars.map(function(barName){
                 if(!groups.has(barName)) return;
                 groups.get(barName).map(function(action){
                     if(action.deny) return;
@@ -98,7 +99,9 @@ import IconButtonPopover from './IconButtonPopover'
                                 key={actionName}
                                 className={id}
                                 buttonTitle={menuTitle}
-                                menuItems={menuItems}/>);
+                                menuItems={menuItems}
+                                buttonLabelStyle={buttonStyle}
+                            />);
                         } else {
                             actions.push(<IconButtonMenu
                                 key={actionName}
@@ -108,7 +111,9 @@ import IconButtonPopover from './IconButtonPopover'
                                 }}
                                 buttonClassName={menuIcon}
                                 buttonTitle={menuTitle}
-                                menuItems={menuItems}/>);
+                                menuItems={menuItems}
+                                buttonStyle={buttonStyle}
+                            />);
                         }
                     }else if(popoverContent){
                         actions.push(<IconButtonPopover
@@ -116,21 +121,35 @@ import IconButtonPopover from './IconButtonPopover'
                             className={id}
                             buttonClassName={menuIcon}
                             buttonTitle={menuTitle}
-                            popoverContent={popoverContent}/>);
+                            buttonStyle={buttonStyle}
+                            popoverContent={popoverContent}
+                        />);
                     }else{
                         let click = function(synthEvent){action.apply();};
-                        if(renderingType === 'button' || renderingType === 'button-icon'){
+                        if(renderingType === 'button-icon'){
                             actions.push(<ReactMUI.FlatButton
                                 key={actionName}
                                 className={id}
-                                onClick={click}
-                                label={menuTitle}/>);
-                        }else{
-                            actions.push(<ReactMUI.IconButton
+                                onTouchTap={click}
+                                label={menuTitle}
+                                labelStyle={buttonStyle}
+                            />);
+                        }else if(renderingType === 'button'){
+                            actions.push(<MaterialUI.FlatButton
                                 key={actionName}
-                                className={menuIcon + ' ' + id}
-                                onClick={click}
-                                label={menuTitle}/>);
+                                className={id}
+                                onTouchTap={click}
+                                label={menuTitle}
+                                labelStyle={buttonStyle}
+                            />);
+                        }else{
+                            actions.push(<MaterialUI.IconButton
+                                key={actionName}
+                                iconClassName={menuIcon + ' ' + id}
+                                iconStyle={buttonStyle}
+                                onTouchTap={click}
+                                tooltip={menuTitle}
+                            />);
                         }
                     }
                 });
