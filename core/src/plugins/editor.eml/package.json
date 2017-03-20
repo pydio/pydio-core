@@ -1,0 +1,17 @@
+{
+  "name": "editor.eml",
+  "version": "8.0.0",
+  "description": "Email Viewer",
+  "source_path": "res/js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Abstrium SAS",
+  "license": "agpl",
+  "dependencies": {
+    "grunt": "^1.0.1",
+    "grunt-babel": "~5.0.3",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}

@@ -1,4 +1,4 @@
-function pydioActionsToItems(actions){
+function pydioActionsToItems(actions = []){
     let items = [];
     let lastIsSeparator = false;
     actions.map(function(action, index){
@@ -50,6 +50,6 @@ function pydioActionsToItems(actions){
 }
 
 export default {
-    
+
     pydioActionsToItems : pydioActionsToItems
 }
