@@ -11,6 +11,7 @@ window.Infinite = require('react-infinite');
 window.ReactGridLayout = require('react-grid-layout');
 window.ReactChart = require('react-chartjs');
 window.ReactSelect = require('react-select');
+window.ReactColor = require('react-color');
 window.ReactDND = require('react-dnd');
 window.ReactDND.HTML5Backend = require('react-dnd-html5-backend');
 window.ReactDND.flow = require('lodash/function/flow');
