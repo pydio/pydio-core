@@ -3,11 +3,9 @@ class UserAvatar extends React.Component{
     constructor(props, context){
         super(props, context);
         this.state = {
-            label : props.userId,
+            label : props.userLabel || props.userId,
             avatar: null
         };
-        this.cache = MetaCacheService.getInstance();
-        this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
     }
 
     componentDidMount(){
@@ -18,6 +16,8 @@ class UserAvatar extends React.Component{
                 this.props.pydio.observe('user_logged', this._userLoggedObs);
             }
         }else{
+            this.cache = MetaCacheService.getInstance();
+            this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
             this.loadPublicData();
         }
     }
@@ -36,6 +36,8 @@ class UserAvatar extends React.Component{
             if(this._userLoggedObs){
                 this.props.pydio.stopObserving('user_logged', this._userLoggedObs);
             }
+            this.cache = MetaCacheService.getInstance();
+            this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
             this.loadPublicData();
         }
     }
@@ -106,9 +108,9 @@ class UserAvatar extends React.Component{
     render(){
 
         const {avatar, label} = this.state;
-        const {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar} = this.props;
+        const {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar, useDefaultAvatar} = this.props;
         let avatarContent;
-        if(displayAvatar && !avatar && !displayLabel && label){
+        if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
             avatarContent = label.toUpperCase().substring(0,2);
         }
         return (
@@ -133,9 +135,11 @@ class UserAvatar extends React.Component{
 UserAvatar.propTypes = {
     userId: React.PropTypes.string.isRequired,
     pydio : React.PropTypes.instanceOf(Pydio),
+    userLabel:React.PropTypes.string,
 
     displayLabel: React.PropTypes.bool,
     displayAvatar: React.PropTypes.bool,
+    useDefaultAvatar: React.PropTypes.bool,
     avatarSize:React.PropTypes.number,
 
     className: React.PropTypes.string,

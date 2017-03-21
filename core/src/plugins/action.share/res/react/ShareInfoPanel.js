@@ -19,9 +19,7 @@
 
         render: function(){
             return (
-                <div className="infoPanelRow">
-                    <PydioComponents.ClipboardTextField {...this.props} floatingLabelText={this.props.getMessage(this.props.inputTitle)}/>
-                </div>
+                <PydioComponents.ClipboardTextField {...this.props} floatingLabelText={this.props.getMessage(this.props.inputTitle)}/>
             );
         }
 
@@ -51,12 +49,12 @@
             let editor = FuncUtils.getFunctionByName(editors[0].editorClass, global);
             if(editor && editor.getSharedPreviewTemplate){
                 return {
-                    messKey:61,
+                    messageKey:61,
                     templateString:editor.getSharedPreviewTemplate(this.props.node, newLink, {WIDTH:350, HEIGHT:350, DL_CT_LINK:newLink})
                 };
             }else{
                 return{
-                    messKey:60,
+                    messageKey:60,
                     templateString:newLink
                 }
             }
@@ -143,22 +141,30 @@
                     />;
                 }
             }
-            var users = this.state.model.getSharedUsers();
-            var sharedUsersEntries = [], remoteUsersEntries = [];
+            const users = this.state.model.getSharedUsers();
+            let sharedUsersEntries = [], remoteUsersEntries = [], sharedUsersBlock;
+            const {pydio} = this.props;
             if(users.length){
                 sharedUsersEntries = users.map(function(u){
                     var rights = [];
                     if(u.RIGHT.indexOf('r') !== -1) rights.push(global.MessageHash["share_center.31"]);
                     if(u.RIGHT.indexOf('w') !== -1) rights.push(global.MessageHash["share_center.181"]);
                     return (
-                        <div key={u.ID} className="uUserEntry">
-                            <span className="uLabel">{u.LABEL}</span>
-                            <span className="uRight">{rights.join(' & ')}</span>
+                        <div key={u.ID} className="uUserEntry" title={rights.join(' & ')} style={{padding:'6px 0'}}>
+                            <PydioComponents.UserAvatar
+                                useDefaultAvatar={true}
+                                userId={u.ID}
+                                userLabel={u.LABEL}
+                                pydio={pydio}
+                                style={{flex:1, display:'flex', alignItems:'center'}}
+                                labelStyle={{fontSize: 16, paddingLeft: 5}}
+                                avatarSize={22}
+                            />
                         </div>
                     );
                 });
             }
-            var ocsLinks = this.state.model.getOcsLinks();
+            const ocsLinks = this.state.model.getOcsLinks();
             if(ocsLinks.length){
                 remoteUsersEntries = ocsLinks.map(function(link){
                     var i = link['invitation'];
@@ -185,8 +191,8 @@
                 }.bind(this));
             }
             if(sharedUsersEntries.length || remoteUsersEntries.length){
-                var sharedUsersBlock = (
-                    <div className="infoPanelRow">
+                sharedUsersBlock = (
+                    <div className="infoPanelRow" style={{paddingTop:10}}>
                         <div className="infoPanelLabel">{this.getMessage('54')}</div>
                         <div className="infoPanelValue">
                             {sharedUsersEntries}
@@ -208,12 +214,17 @@
             }
 
             return (
-                <div>
+                <div style={{padding: 0}}>
+                    <div style={{padding: '0px 20px'}}>
                     {linkField}
                     {downloadField}
                     {templateField}
+                    </div>
+                    {(linkField && downloadField && templateField) && (sharedUsersBlock || noEntriesFoundBlock) && <MaterialUI.Divider style={{marginTop:10}}/>}
+                    <div style={{padding: '0px 20px'}}>
                     {sharedUsersBlock}
                     {noEntriesFoundBlock}
+                    </div>
                 </div>
             );
         }

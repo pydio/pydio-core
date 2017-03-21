@@ -86,7 +86,8 @@ let FilePreview = React.createClass({
                 bgUrl = bgUrl.replace('(', '\\(').replace(')', '\\)').replace('\'', '\\\'');
                 let style = {
                     backgroundImage:'url(' + bgUrl + ')',
-                    backgroundSize : 'cover'
+                    backgroundSize : 'cover',
+                    backgroundPosition: 'center center'
                 };
                 if(this.props.style){
                     style = Object.assign(style, this.props.style);

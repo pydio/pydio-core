@@ -76,9 +76,6 @@
 					<additional_column messageId="135" attributeName="readable_dimension" sortType="String" defaultVisibilty="hidden"/>
 				</columns>
 			</component_config>
-			<component_config className="InfoPanel">
-                <infoPanel mime="AJXP_MIMES_IMAGE" theme="material" reactComponent="PydioDetailPanes.ImagePreview"/>
-			</component_config>
 		</client_configs>
 	</registry_contributions>
 </editor>

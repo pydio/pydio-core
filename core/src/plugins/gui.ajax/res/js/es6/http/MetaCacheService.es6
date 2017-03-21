@@ -36,21 +36,21 @@ class MetaCacheService extends Observable{
 
     hasKey(streamName, keyName){
         if(!this._streams.get(streamName)){
-            throw Error('Stream ' + streamName + ' not registered, please register first');
+            return false;
         }
         return this._streams.get(streamName).get('data').has(keyName);
     }
 
     getByKey(streamName, keyName){
         if(!this._streams.get(streamName)){
-            throw Error('Stream ' + streamName + ' not registered, please register first');
+            return null;
         }
         return this._streams.get(streamName).get('data').get(keyName);
     }
 
     deleteKey(streamName, keyName){
         if(!this._streams.get(streamName)){
-            throw Error('Stream ' + streamName + ' not registered, please register first');
+            return;
         }
         this._streams.get(streamName).get('data').delete(keyName);
     }

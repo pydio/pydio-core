@@ -43,12 +43,10 @@
                 this.setState({displayData: this.selectionToTemplates()});
             }.bind(this);
             this._componentConfigHandler = function(event){
-                if(event.memo.className == "InfoPanel"){
-                    this.setState({templates:ConfigsParser.parseConfigs()});
-                }
+                this.setState({templates:ConfigsParser.parseConfigs()});
             }.bind(this);
             this.props.pydio.observe("actions_refreshed", this._updateHandler );
-            this.props.pydio.observe("component_config_changed", this._componentConfigHandler );
+            this.props.pydio.observe("registry_loaded", this._componentConfigHandler );
             // Trigger contentChange
             if(this.state.displayData && this.state.displayData.TEMPLATES && this.props.onContentChange){
                 this.props.onContentChange(this.state.displayData.TEMPLATES.length);
@@ -57,7 +55,7 @@
 
         componentWillUnmount: function(){
             this.props.pydio.stopObserving("actions_refreshed", this._updateHandler );
-            this.props.pydio.stopObserving("component_config_changed", this._componentConfigHandler );
+            this.props.pydio.stopObserving("registry_loaded", this._componentConfigHandler );
         },
 
         selectionToTemplates: function(initTemplates = null){

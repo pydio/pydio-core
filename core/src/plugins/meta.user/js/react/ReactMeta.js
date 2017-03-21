@@ -333,6 +333,7 @@
             let node = this.props.node;
             let metadata = this.props.node.getMetadata();
             let updateMeta = this.state.updateMeta;
+            let nonEmptyDataCount = 0;
 
             configs.forEach(function(meta, key){
                 let label = meta.label;
@@ -381,6 +382,7 @@
                     }else if(type === 'tags'){
                         value = <TagsCloud node={node} column={column}/>
                     }
+                    if(realValue) nonEmptyDataCount ++;
                     data.push(
                         <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key}>
                             <div className="infoPanelLabel">{label}</div>
@@ -390,7 +392,11 @@
                 }
             }.bind(this));
 
-            return (<div>{data}</div>);
+            if(!this.props.editMode && !nonEmptyDataCount){
+                return <div><div style={{color: 'rgba(0,0,0,0.23)', paddingBottom:10}}>No metadata set. Click edit to add some.</div>{data}</div>
+            }else{
+                return (<div>{data}</div>);
+            }
         }
 
     });

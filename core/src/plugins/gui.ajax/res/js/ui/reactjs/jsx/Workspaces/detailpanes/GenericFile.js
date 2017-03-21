@@ -18,6 +18,14 @@ let GenericFile = React.createClass({
             {key:'date',label:'Modified on',value:formattedDate}
         ];
 
+        let w = meta.get('image_width');
+        let h = meta.get('image_height');
+        if(w && h){
+            stdData.push(
+                {key:'image', label:'Image Dimension', value:w + 'px X ' + h + 'px'}
+            );
+        }
+
         return (
             <span>
                 <InfoPanelCard {...this.props}

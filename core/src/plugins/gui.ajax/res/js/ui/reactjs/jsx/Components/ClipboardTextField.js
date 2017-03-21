@@ -64,21 +64,38 @@ export default React.createClass({
             var setHtml = function(){
                 return {__html:this.state.copyMessage};
             }.bind(this);
-            copyMessage = <div className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
+            copyMessage = <div style={{color:'rgba(0,0,0,0.53)'}} className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
         }
+
+        const buttonStyle = {
+            position    :'absolute',
+            right: 0,
+            bottom: 8,
+            fontSize: 16,
+            backgroundColor: 'rgba(242, 242, 242, 0.93)',
+            height: 30,
+            width: 28,
+            lineHeight: '32px',
+            textAlign: 'center',
+            cursor: 'pointer'
+        };
+
+
         return (
             <div>
-                <div style={{display:'flex', alignItems:'baseline'}}>
+                <div style={{position:'relative'}}>
                     <MaterialUI.TextField
-                        style={{flex:1,width:'100%'}}
+                        fullWidth={true}
                         ref="input"
                         floatingLabelText={this.props.floatingLabelText}
                         defaultValue={this.props.inputValue}
                         className={this.props.inputClassName}
                         readOnly={true}
                         onClick={select}
+                        floatingLabelStyle={{whiteSpace:'nowrap'}}
+                        style={{marginTop:-10}}
                     />
-                    <span ref="copy-button" style={{padding:'0 5px'}} title={this.props.getMessage('191')} className="copy-button icon-paste"/>
+                    <span ref="copy-button" style={buttonStyle} title={this.props.getMessage('191')} className="copy-button mdi mdi-content-copy"/>
                 </div>
                 {copyMessage}
             </div>
