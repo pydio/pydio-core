@@ -45,16 +45,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  .navigation-title{
-    display: none;
-    height: @workspacesToolbarHeight;
-    border-bottom: 1px solid ghostwhite;
-    padding-left: 16px;
-    font-size: 2em;
-    line-height: @workspacesToolbarHeight;
-  }
-
   .nav-list-entry{
     padding: 6px 1px 6px 16px;
     display: flex;
@@ -125,82 +115,6 @@
         .workspace-label{
           text-transform: uppercase;
         }
-      }
-    }
-  }
-
-  .simple-provider{
-    position: relative;
-    .infinite-parent-smooth-height > div{
-      overflow-y: auto !important;
-    }
-    .material-list-entry{
-      .nav-list-entry();
-      .material-list-icon{
-        .nav-list-entry-icon();
-        font-size: 1.2em;
-      }
-      .material-list-text{
-        flex: 1;
-        overflow: hidden;
-        .material-list-line-1 > div{
-          .nav-list-entry-label();
-        }
-      }
-      .material-list-actions{
-        padding: 0 12px 0 6px;
-        opacity: 0.1;
-        &:hover{
-          opacity: 1;
-        }
-      }
-    }
-    .mui-toolbar{
-      position: absolute;
-      top:16px;
-      right: 60px;
-      color:darken(@leftpanel_text_color, 30);
-    }
-    .toggle-button{
-      cursor: pointer;
-      float: right;
-      color:darken(@leftpanel_text_color, 30);
-      &:hover{
-        color:@leftpanel_text_color;
-      }
-    }
-    .section-title{
-      border-top:0;
-      margin-top: 0;
-    }
-    .alerts_number_badge{
-      background-color: @colorCodeAlert;
-      color:#555;
-      border-radius: 2px;
-      display: inline-block;
-      padding: 0 3px;
-    }
-    .icon-refresh{
-      cursor: pointer;
-      transition: @bezier_transition;
-      &.rotating{
-        opacity: 0.2;
-      }
-    }
-    .emptyMessage{
-      display: inline-block;
-      padding: 0 16px 8px;
-      opacity: 0.7;
-    }
-    &.closed{
-      .section-title{
-        padding-bottom: 6px;
-      }
-      .material-list{
-        display: none;
-      }
-      .emptyMessage{
-        display: none;
       }
     }
   }

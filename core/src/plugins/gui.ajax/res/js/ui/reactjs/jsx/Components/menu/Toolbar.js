@@ -38,6 +38,14 @@ import IconButtonPopover from './IconButtonPopover'
             }
         },
 
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.toolbars !== this.props.toolbars){
+                this.setState({
+                    groups:this.props.controller.getToolbarsActions(nextProps.toolbars, nextProps.groupOtherList)
+                });
+            }
+        },
+
         getInitialState: function(){
             return {
                 groups:this.props.controller.getToolbarsActions(this.props.toolbars, this.props.groupOtherList)

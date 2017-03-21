@@ -369,15 +369,20 @@ div.dialogBox div#element_overlay {
   height: 100%;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container {
+  background-color: #ECEFF1;
+  border-radius: 50%;
+  margin: 15px 15px;
+  height: 40px;
+  width: 40px;
+  line-height: 40px;
   display: flex;
   align-items: center;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont {
-  flex: 1;
-  font-size: 28px;
-  text-align: center;
   color: #607d8b;
-  padding-bottom: 10px;
+  font-size: 24px;
+  text-align: center;
+  flex: 1;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div.mimefont-container div.mimefont.mdi-folder {
   color: #5c7885;
@@ -392,7 +397,7 @@ div.dialogBox div#element_overlay {
 }
 .react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk.metadata_chunk_description {
   opacity: 1;
-  color: rgba(0, 0, 0, 0.43);
+  color: rgba(0, 0, 0, 0.33);
 }
 .react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.icon-angle-right {
   display: inline-block;
@@ -402,6 +407,15 @@ div.dialogBox div#element_overlay {
 .react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-actions .overlay_icon_div .overlay-class-span {
   display: inline-block;
   padding: 14px;
+}
+.react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-actions .overlay_icon_div .overlay-class-span.mdi.mdi-share-variant {
+  color: #009688;
+}
+.react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-actions .overlay_icon_div .overlay-class-span.icon-bookmark-empty {
+  color: #2196f3;
+}
+.react-mui-context .material-list.files-list .material-list-entry.material-list-entry-2-lines .material-list-actions .overlay_icon_div .overlay-class-span.icon-eye-open {
+  color: #ffc107;
 }
 .react-mui-context .material-list.files-list .material-list-entry.selected {
   background-color: #E3F2FD !important;
@@ -488,8 +502,21 @@ div.dialogBox div#element_overlay {
   height: 100%;
   margin: 0;
 }
-.react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont {
-  font-size: 70px !important;
+.react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container {
+  background-color: #ECEFF1;
+  border-radius: 50%;
+  margin: 22px 40px;
+  height: 90px;
+  width: 90px;
+  line-height: 90px;
+  display: flex;
+  align-items: center;
+}
+.react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-icon div.mimefont-container div.mimefont {
+  color: #607d8b;
+  font-size: 40px;
+  text-align: center;
+  flex: 1;
 }
 .react-mui-context .material-list.files-list.material-list-grid .material-list-entry .material-list-text {
   position: absolute;
@@ -520,11 +547,43 @@ div.dialogBox div#element_overlay {
   font-size: 12px;
   line-height: 12px;
 }
+.react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry div.mimefont-container {
+  background-color: #ECEFF1;
+  border-radius: 50%;
+  margin: 15px 15px;
+  height: 50px;
+  width: 50px;
+  line-height: 50px;
+  display: flex;
+  align-items: center;
+}
+.react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry div.mimefont-container div.mimefont {
+  color: #607d8b;
+  font-size: 24px;
+  text-align: center;
+  flex: 1;
+}
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry:hover {
   background-color: #ff7e55 !important;
 }
 .react-mui-context .material-list.files-list.material-list-grid.grid-size-80 .material-list-entry:hover .material-list-text {
   display: block;
+}
+.react-mui-context .material-list.files-list.material-list-grid.grid-size-320 .material-list-entry div.mimefont-container {
+  background-color: #ECEFF1;
+  border-radius: 50%;
+  margin: 120px 140px;
+  height: 120px;
+  width: 120px;
+  line-height: 120px;
+  display: flex;
+  align-items: center;
+}
+.react-mui-context .material-list.files-list.material-list-grid.grid-size-320 .material-list-entry div.mimefont-container div.mimefont {
+  color: #607d8b;
+  font-size: 40px;
+  text-align: center;
+  flex: 1;
 }
 .react-mui-context .material-list.files-list.material-list-grid.horizontal-ribbon > div.layout-fill > div {
   overflow-y: hidden !important;
@@ -1565,7 +1624,7 @@ div.menu.desktop a span.ajxp_icon_span {
   content: '\f01c';
 }
 .left-panel {
-  background-color: #f5f6f9;
+  background-color: #f6f8f8;
   position: absolute;
   top: 115px;
   left: 0;
@@ -1593,14 +1652,6 @@ div.menu.desktop a span.ajxp_icon_span {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.left-panel .navigation-title {
-  display: none;
-  height: 68px;
-  border-bottom: 1px solid ghostwhite;
-  padding-left: 16px;
-  font-size: 2em;
-  line-height: 68px;
 }
 .left-panel .nav-list-entry {
   padding: 6px 1px 6px 16px;
@@ -1645,7 +1696,7 @@ div.menu.desktop a span.ajxp_icon_span {
   font-size: 0.9em;
   font-weight: 500;
   background-color: #637e8a;
-  color: #f5f6f9;
+  color: #f6f8f8;
   border-radius: 50%;
   position: relative;
 }
@@ -1686,93 +1737,6 @@ div.menu.desktop a span.ajxp_icon_span {
 .left-panel .workspaces .workspace-entry.workspace-access-inbox .workspace-label {
   text-transform: uppercase;
 }
-.left-panel .simple-provider {
-  position: relative;
-}
-.left-panel .simple-provider .infinite-parent-smooth-height > div {
-  overflow-y: auto !important;
-}
-.left-panel .simple-provider .material-list-entry {
-  padding: 6px 1px 6px 16px;
-  display: flex;
-  line-height: 24px;
-  cursor: pointer;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-}
-.left-panel .simple-provider .material-list-entry:hover {
-  background-color: rgba(0, 0, 0, 0.03);
-}
-.left-panel .simple-provider .material-list-entry .material-list-icon {
-  flex-shrink: 0;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  margin-right: 16px;
-  text-align: center;
-  font-size: 1.2em;
-}
-.left-panel .simple-provider .material-list-entry .material-list-text {
-  flex: 1;
-  overflow: hidden;
-}
-.left-panel .simple-provider .material-list-entry .material-list-text .material-list-line-1 > div {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.left-panel .simple-provider .material-list-entry .material-list-actions {
-  padding: 0 12px 0 6px;
-  opacity: 0.1;
-}
-.left-panel .simple-provider .material-list-entry .material-list-actions:hover {
-  opacity: 1;
-}
-.left-panel .simple-provider .mui-toolbar {
-  position: absolute;
-  top: 16px;
-  right: 60px;
-  color: #232d31;
-}
-.left-panel .simple-provider .toggle-button {
-  cursor: pointer;
-  float: right;
-  color: #232d31;
-}
-.left-panel .simple-provider .toggle-button:hover {
-  color: #637e8a;
-}
-.left-panel .simple-provider .section-title {
-  border-top: 0;
-  margin-top: 0;
-}
-.left-panel .simple-provider .alerts_number_badge {
-  background-color: #f5c781;
-  color: #555;
-  border-radius: 2px;
-  display: inline-block;
-  padding: 0 3px;
-}
-.left-panel .simple-provider .icon-refresh {
-  cursor: pointer;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-}
-.left-panel .simple-provider .icon-refresh.rotating {
-  opacity: 0.2;
-}
-.left-panel .simple-provider .emptyMessage {
-  display: inline-block;
-  padding: 0 16px 8px;
-  opacity: 0.7;
-}
-.left-panel .simple-provider.closed .section-title {
-  padding-bottom: 6px;
-}
-.left-panel .simple-provider.closed .material-list {
-  display: none;
-}
-.left-panel .simple-provider.closed .emptyMessage {
-  display: none;
-}
 .left-panel.hidden {
   left: -255px;
 }
@@ -1780,30 +1744,24 @@ div.menu.desktop a span.ajxp_icon_span {
   top: 0;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 10px, rgba(0, 0, 0, 0.23) 0px 3px 10px;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-  background-color: #f5f6f9;
+  background-color: #f6f8f8;
   color: #637e8a;
 }
 .left-panel .section-title:first-of-type {
   border-top: none;
 }
+.left-panel .workspaces .workspace-entry {
+  padding: 10px 16px;
+  font-size: 15px;
+}
 .left-panel .workspaces .workspace-entry .workspace-badge {
-  background-color: #96adb7;
+  display: none;
 }
 .left-panel .workspaces .workspace-entry.workspace-current {
   opacity: 1;
   position: relative;
-  /*background-color: @selectionMainTint;*/
-  font-weight: 500;
-  color: #546e7a;
-}
-.left-panel .workspaces .workspace-entry.workspace-current .workspace-badge {
-  background-color: #546e7a;
-}
-.left-panel .workspaces .workspace-entry.workspace-current.workspace-current-node {
-  color: #ff7e55;
-}
-.left-panel .workspaces .workspace-entry.workspace-current.workspace-current-node .workspace-badge {
-  background-color: #ff7e55;
+  /*        background-color: @applicationSecondaryColor;*/
+  color: white;
 }
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down,
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up {
@@ -1811,12 +1769,17 @@ div.menu.desktop a span.ajxp_icon_span {
   position: absolute;
   right: 8px;
   margin-top: -2px;
-  padding: 5px 10px;
   border-radius: 50%;
+  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  height: 30px;
+  width: 30px;
+  line-height: 30px;
+  text-align: center;
+  padding: 0;
 }
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-down:hover,
 .left-panel .workspaces .workspace-entry.workspace-current .workspace-additional-action.icon-angle-up:hover {
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.2);
 }
 .left-panel.expanded {
   width: 100% !important;
@@ -1827,6 +1790,7 @@ div.menu.desktop a span.ajxp_icon_span {
   line-height: 20px;
 }
 .left-panel.expanded .workspaces .workspace-entry .workspace-badge {
+  display: inline-block;
   width: 34px;
   height: 34px;
   line-height: 34px;
@@ -1879,11 +1843,8 @@ div.menu.desktop a span.ajxp_icon_span {
   font-weight: 400;
 }
 #info_panel .panelCard {
-  background-color: #fafafa;
   margin: 10px !important;
   margin-bottom: 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.33);
-  border-radius: 2px;
 }
 #info_panel .panelCard .panelHeader {
   padding: 24px 16px 16px;
@@ -1893,6 +1854,7 @@ div.menu.desktop a span.ajxp_icon_span {
 #info_panel .panelCard .panelContent {
   background-color: transparent;
   padding-bottom: 0;
+  border-radius: 2px 2px 0 0 ;
 }
 #info_panel .panelCard .panelContent > div {
   padding: 0 16px;
@@ -1903,18 +1865,20 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 #info_panel .panelCard .panelContent div.mimefont-container {
   display: flex;
-  width: 100%;
-  height: 120px;
+  /*
+        width: 100%;
+        height: 200px;
+        */
   text-align: center;
   align-items: center;
-  font-size: 74px;
+  font-size: 60px;
   color: #546e7a;
 }
 #info_panel .panelCard .panelContent div.mimefont-container div.mimefont {
   flex: 1;
 }
-#info_panel .panelCard .panelContent div.bgCoverImage {
-  border-radius: 3px 3px 0 0 ;
+#info_panel .panelCard .panelContent div.covering-bg-preview {
+  border-radius: 2px 2px 0 0 ;
 }
 #info_panel .panelCard .panelContent .infoPanelRow {
   padding-bottom: 12px;
@@ -1932,12 +1896,14 @@ div.menu.desktop a span.ajxp_icon_span {
   border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 #info_panel .panelCard .primaryToolbar {
-  padding: 16px 4px 16px !important;
+  padding: 12px 4px 12px !important;
   align-items: flex-start;
   justify-content: center;
+  border-radius: 0 0 2px 2px;
 }
 #info_panel .panelCard .primaryToolbar .mui-flat-button {
   min-width: 0;
+  margin: 0 1px;
 }
 #info_panel .panelCard .primaryToolbar .mui-flat-button .mui-flat-button-label {
   color: white;
@@ -2944,7 +2910,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   color: #ffffff;
 }
 .primaryLightPane {
-  background-color: #f5f6f9;
+  background-color: #f6f8f8;
   color: #637e8a;
 }
 /* INFO PANEL GENERIC APPLICATION COLOR */
@@ -3014,6 +2980,7 @@ body,
   color: inherit;
   font-size: inherit;
   overflow-x: auto;
+  overflow-y: visible;
 }
 .react-mui-context .desktop-container #main_toolbar span.toolbars-button-menu {
   position: relative;

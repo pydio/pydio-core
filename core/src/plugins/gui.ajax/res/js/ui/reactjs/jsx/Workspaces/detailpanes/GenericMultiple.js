@@ -12,7 +12,7 @@ export default React.createClass({
             more = <div>... and {moreNumber} more.</div>
         }
         return (
-            <InfoPanelCard>
+            <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
                 <div style={{padding:'0'}}>
                     {nodes.map(function(node){
                         return (
@@ -30,7 +30,6 @@ export default React.createClass({
                     })}
                     {more}
                 </div>
-                <PydioMenus.Toolbar className="primaryToolbar" renderingType="button-icon" toolbars={["info_panel", "info_panel_share"]} controller={this.props.pydio.getController()}/>
             </InfoPanelCard>
         );
     }

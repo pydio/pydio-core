@@ -448,7 +448,6 @@
                 <MaterialUI.FlatButton
                     key="edit"
                     label={this.state.editMode?"Save Meta":"Edit Meta"}
-                    secondary={true}
                     onClick={()=>{!this.state.editMode?this.openEditMode():this.saveChanges()}}
                 />
             );

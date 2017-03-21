@@ -44,6 +44,7 @@
 				<clientCallback module="PydioCoreActions.Navigation.refresh" prepareModal="false"/>
 			</processing>
 		</action>
+        <!--
 		<action name="ext_select">
 			<gui text="321" title="322" src="download_manager.png" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false"
@@ -56,6 +57,7 @@
 				<clientCallback module="PydioCoreActions.Navigation.externalSelection" prepareModal="false"/>
 				</processing>
 		</action>
+		-->
 		<action name="bookmark">
 			<gui text="152" title="153" src="bookmark.png" iconClass="icon-bookmark-empty" hasAccessKey="true"
 				accessKey="bookmarks_access_key">

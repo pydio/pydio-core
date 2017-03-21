@@ -14,12 +14,53 @@ let FSTemplate = React.createClass({
     },
 
     statics: {
-        INFO_PANEL_WIDTH: 250
+        INFO_PANEL_WIDTH: 270
     },
+
+    componentDidMount: function(){
+        this.props.pydio.getController().updateGuiActions(this.getPydioActions());
+    },
+
+    componentWillUnmount: function(){
+        this.getPydioActions(true).map(function(key){
+            this.props.pydio.getController().deleteFromGuiActions(key);
+        }.bind(this));
+    },
+
+    getPydioActions: function(keysOnly = false){
+        if(keysOnly){
+            return ['toggle_info_panel'];
+        }
+        var multiAction = new Action({
+            name:'toggle_info_panel',
+            icon_class:'mdi mdi-information',
+            text_id:150,
+            title_id:151,
+            text:MessageHash[150],
+            title:MessageHash[151],
+            hasAccessKey:false,
+            subMenu:false,
+            subMenuUpdateImage:false,
+            callback: () => {this.setState({infoPanelToggle: !this.state.infoPanelToggle});}
+        }, {
+            selection:true,
+            dir:true,
+            file:true,
+            actionBar:true,
+            actionBarGroup:'display_toolbar',
+            contextMenu:true,
+            infoPanel:false
+        }, {dir:true,file:true}, {}, {});
+        let buttons = new Map();
+        buttons.set('toggle_info_panel', multiAction);
+        return buttons;
+    },
+
 
     getInitialState: function(){
         return {
             infoPanelOpen: false,
+            infoPanelToggle: true,
             drawerOpen: false
         };
     },
@@ -60,7 +101,8 @@ let FSTemplate = React.createClass({
                 color: Color(this.props.muiTheme.appBar.color).darken(0.4)
             },
             raisedButtonStyle : {
-                height: 30
+                height: 30,
+                minWidth: 0
             },
             raisedButtonLabelStyle : {
                 height: 30,
@@ -69,8 +111,15 @@ let FSTemplate = React.createClass({
         }
 
         let classes = ['vertical_layout', 'vertical_fit', 'react-fs-template'];
-        if(this.state.infoPanelOpen) classes.push('info-panel-open');
+        if(this.state.infoPanelOpen && this.state.infoPanelToggle) classes.push('info-panel-open');
         if(this.state.drawerOpen) classes.push('drawer-open');
+
+        let mainToolbars = ["info_panel", "info_panel_share"];
+        let mainToolbarsOthers = ["change_main", "more", "change", "remote"];
+        if(this.state.infoPanelOpen && this.state.infoPanelToggle){
+            mainToolbars = ["change_main"];
+            mainToolbarsOthers = ["more", "change", "remote"];
+        }
 
         return connectDropTarget(
             <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
@@ -83,7 +132,7 @@ let FSTemplate = React.createClass({
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
-                            <span className="drawer-button"><MaterialUI.IconButton iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
+                            <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             <Breadcrumb {...this.props}/>
                             <SearchForm {...this.props}/>
                         </div>
@@ -102,8 +151,8 @@ let FSTemplate = React.createClass({
                             <PydioMenus.Toolbar
                                 {...this.props}
                                 id="main-toolbar"
-                                toolbars={["change_main"]}
-                                groupOtherList={["more", "change", "remote"]}
+                                toolbars={mainToolbars}
+                                groupOtherList={mainToolbarsOthers}
                                 renderingType="button"
                                 buttonStyle={styles.buttonsStyle}
                             />

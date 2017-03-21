@@ -1,7 +1,14 @@
 /**
  * Default InfoPanel Card
  */
-export default React.createClass({
+
+const styles = {
+    card: {
+        backgroundColor: 'rgba(250,250,250,0.8)'
+    }
+};
+
+let InfoPanelCard = React.createClass({
 
     propTypes: {
         title:React.PropTypes.string,
@@ -11,7 +18,7 @@ export default React.createClass({
     render: function(){
         let title = this.props.title ? <div className="panelHeader">{this.props.title}</div> : null;
         let actions = this.props.actions ? <div className="panelActions">{this.props.actions}</div> : null;
-        let rows;
+        let rows, toolBar;
         if(this.props.standardData){
             rows = this.props.standardData.map(function(object){
                 return (
@@ -22,14 +29,36 @@ export default React.createClass({
                 );
             });
         }
+        if(this.props.primaryToolbars){
+            const themePalette = this.props.muiTheme.palette;
+            const tBarStyle = {
+                backgroundColor: themePalette.accent2Color
+            };
+            toolBar = (
+                <PydioMenus.Toolbar
+                    toolbarStyle={tBarStyle}
+                    className="primaryToolbar"
+                    renderingType="button-icon"
+                    toolbars={this.props.primaryToolbars}
+                    controller={this.props.pydio.getController()}
+                />
+            );
+        }
 
         return (
-            <ReactMUI.Paper zDepth={1} className="panelCard">
+            <MaterialUI.Paper zDepth={1} className="panelCard" style={styles.card}>
                 {title}
-                <div className="panelContent">{this.props.children}{rows}</div>
+                <div className="panelContent" style={this.props.contentStyle}>
+                    {this.props.children}
+                    {rows}
+                    {toolBar}
+                </div>
                 {actions}
-            </ReactMUI.Paper>
+            </MaterialUI.Paper>
         );
     }
 
 });
+
+InfoPanelCard = MaterialUI.Style.muiThemeable()(InfoPanelCard);
+export {InfoPanelCard as default}

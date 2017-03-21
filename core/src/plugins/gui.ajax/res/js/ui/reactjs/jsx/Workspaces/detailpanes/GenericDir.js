@@ -10,9 +10,8 @@ let GenericDir = React.createClass({
         };
 
         return (
-            <InfoPanelCard>
-                <div className="mimefont-container"><div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div></div>
-                <PydioMenus.Toolbar toolbarStyle={tBarStyle} className="primaryToolbar" renderingType="button-icon" toolbars={["info_panel", "info_panel_share"]} controller={this.props.pydio.getController()}/>
+            <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
+                <div className="mimefont-container" style={{width:'100%', height:200}}><div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div></div>
             </InfoPanelCard>
         );
     }

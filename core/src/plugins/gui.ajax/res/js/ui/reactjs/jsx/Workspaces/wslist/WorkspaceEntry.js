@@ -48,7 +48,7 @@ const Confirm = React.createClass({
     }
 });
 
-export default React.createClass({
+let WorkspaceEntry =React.createClass({
 
     mixins:[PydioComponents.MessagesConsumerMixin],
 
@@ -176,8 +176,11 @@ export default React.createClass({
             additionalAction,
             badge, badgeNum, newWorkspace;
 
+        let style = {};
+
         if (current) {
             currentClass +=" workspace-current";
+            style.backgroundColor = this.props.muiTheme.palette.accent2Color;
         }
         if(this.props.showFoldersTree && this.state.currentContextNode && this.state.currentContextNode.getPath() === '/' ){
             currentClass +=" workspace-current-node";
@@ -243,6 +246,7 @@ export default React.createClass({
                 title={this.props.workspace.getDescription()}
                 onMouseOver={onHover}
                 onMouseOut={onOut}
+                style={style}
             >
                 {badge}
                 <span className="workspace-label-container">
@@ -272,3 +276,6 @@ export default React.createClass({
     }
 
 });
+
+WorkspaceEntry = MaterialUI.Style.muiThemeable()(WorkspaceEntry);
+export {WorkspaceEntry as default}

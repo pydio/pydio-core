@@ -14,18 +14,14 @@ let GenericFile = React.createClass({
         let formattedDate = PathUtils.formatModifDate(date);
 
         let stdData = [
-            {key:'size',label:'Imgae Size',value:hSize},
+            {key:'size',label:'File Size',value:hSize},
             {key:'date',label:'Modified on',value:formattedDate}
         ];
 
-        const themePalette = this.props.muiTheme.palette;
-        const tBarStyle = {
-            backgroundColor: themePalette.primary1Color
-        };
-
         return (
             <span>
-                <InfoPanelCard>
+                <InfoPanelCard {...this.props}
+                               primaryToolbars={["info_panel", "info_panel_share"]}>
                     <FilePreview
                         key={this.props.node.getPath()}
                         style={{height:200}}
@@ -33,21 +29,12 @@ let GenericFile = React.createClass({
                         loadThumbnail={true}
                         richPreview={true}
                     />
-                    <PydioMenus.Toolbar
-                        toolbarStyle={tBarStyle}
-                        className="primaryToolbar"
-                        renderingType="button-icon"
-                        toolbars={["info_panel", "info_panel_share"]}
-                        controller={this.props.pydio.getController()}
-                    />
                 </InfoPanelCard>
-                <InfoPanelCard title="File Information" standardData={stdData}/>
+                <InfoPanelCard title="File Information" standardData={stdData} contentStyle={{paddingBottom: 10}}/>
             </span>
         );
     }
 
 });
-
-GenericFile = MaterialUI.Style.muiThemeable()(GenericFile);
 
 export {GenericFile as default}

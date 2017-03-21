@@ -54,6 +54,7 @@ export default function(PydioComponent, pydio){
                     primary1Color       : MaterialUI.Style.colors.blueGrey500,
                     primary2Color       : MaterialUI.Style.colors.deepOrange500,
                     accent1Color        : MaterialUI.Style.colors.deepOrange500,
+                    accent2Color        : MaterialUI.Style.colors.lightBlue500,
                     ...customPalette
                 }
             };

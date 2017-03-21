@@ -2,11 +2,29 @@
 
     let ActivityPanel = React.createClass({
 
+        getInitialState: function(){
+            return {
+                empty: true,
+                dataModel: this.initDataModel(this.props.node)
+            };
+        },
+
+        initDataModel: function(node){
+            const dataModel = PydioDataModel.RemoteDataModelFactory(this.getProviderProperties(node), "Activity");
+            dataModel.getRootNode().observe('loaded', () => {
+                this.setState({empty: !dataModel.getRootNode().getChildren().size});
+            });
+            dataModel.getRootNode().load();
+            return dataModel;
+        },
+
         componentWillReceiveProps: function(nextProps){
             if(nextProps.node !== this.props.node){
-                this.forceUpdate(function(){
-                    this.refs.provider.reload();
-                }.bind(this));
+                this.setState({
+                    dataModel: this.initDataModel(nextProps.node)
+                }, () => {
+                    if(this.refs.provider) this.refs.provider.reload();
+                });
             }
         },
 
@@ -30,31 +48,68 @@
 
         },
 
+        renderIcon: function(node){
+            let fileNode = new AjxpNode(node.getMetadata().get('real_path'), node.isLeaf(), node.getLabel());
+            fileNode.setMetadata(node.getMetadata());
+            return <PydioWorkspaces.FilePreview loadThumbnail={true} node={fileNode}/>;
+        },
+
+        renderFirstLineLeaf: function(node){
+            return <div style={{whiteSpace:'normal', lineHeight: '24px'}}>{node.getMetadata().get('event_description')}</div>
+        },
+
+        renderSecondLine: function(node){
+            return <div style={{whiteSpace:'normal'}}>{node.getMetadata().get('event_description')}</div>;
+        },
+
+        renderActions: function(node){
+            const {pydio} = this.props;
+            const open = function(){
+                pydio.goTo(node.getMetadata().get('real_path'));
+            };
+            return <MaterialUI.IconButton
+                iconClassName="mdi mdi-arrow-right"
+                onTouchTap={open}
+                iconStyle={{color: 'rgba(0,0,0,0.23)',iconHoverColor: 'rgba(0,0,0,0.63)'}}/>
+        },
+
         render: function(){
 
-            const {node, pydio} = this.props;
+            if(this.state.empty){
+                return null;
+            }
+            const {pydio} = this.props;
 
-            let dataModel = new PydioDataModel(true);
-            const rNodeProvider = new RemoteNodeProvider(this.getProviderProperties(node));
-            const rootNode = new AjxpNode(node.getPath(), false, "Activity", "", rNodeProvider);
-            dataModel.setAjxpNodeProvider(rNodeProvider);
-            dataModel.setRootNode(rootNode);
-
+            let renderIcon = this.renderIcon;
+            let renderFirstLine = null;
+            let renderSecondLine = this.renderSecondLine;
+            let nodeClicked = (node) => {
+                pydio.goTo(node.getMetadata().get('real_path'));
+            };
+            if(this.props.node.isLeaf()){
+                renderFirstLine = this.renderFirstLineLeaf;
+                renderSecondLine = null;
+                renderIcon = (node) => {return null;};
+                nodeClicked = null;
+            }
 
             return (
 
-                <PydioDetailPanes.InfoPanelCard title="Activity">
-                    <div style={{padding: 0, paddingBottom: 16}}>
+                <PydioDetailPanes.InfoPanelCard title={this.props.node.isLeaf() ? "File Activity" : "Folder Activity"}>
+                    <div style={{padding: 0}}>
                         <PydioComponents.NodeListCustomProvider
                             pydio={pydio}
-                            className="files-list card-list"
-                            elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE + 11}
+                            className="files-list"
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 20}
                             heightAutoWithMax={320}
-                            presetDataModel={dataModel}
+                            presetDataModel={this.state.dataModel}
                             actionBarGroups={[]}
                             ref="provider"
                             hideToolbar={true}
-                            entryRenderIcon={(node) => {return null}}
+                            entryRenderIcon={renderIcon}
+                            entryRenderFirstLine={renderFirstLine}
+                            entryRenderSecondLine={renderSecondLine}
+                            nodeClicked={nodeClicked}
                         />
                     </div>
                 </PydioDetailPanes.InfoPanelCard>

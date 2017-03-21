@@ -9,33 +9,30 @@
   }
   .workspaces {
     .workspace-entry {
+      padding: 10px 16px;
+      font-size: 15px;
       .workspace-badge{
-        background-color: lighten(@applicationPrimaryColor, 25);
+        display:none;
       }
       &.workspace-current{
         opacity: 1;
         position: relative;
-        /*background-color: @selectionMainTint;*/
-        font-weight: 500;
-        color: @applicationPrimaryColor;
-        .workspace-badge{
-          background-color: @applicationPrimaryColor;
-        }
-        &.workspace-current-node{
-          color: @selectionMainTint;
-          .workspace-badge{
-            background-color: @selectionMainTint;
-          }
-        }
+/*        background-color: @applicationSecondaryColor;*/
+        color: white;
         .workspace-additional-action.icon-angle-down, .workspace-additional-action.icon-angle-up{
           font-size: 16px;
           position: absolute;
           right: 8px;
           margin-top: -2px;
-          padding: 5px 10px;
           border-radius: 50%;
+          transition: @bezier_transition;
+          height: 30px;
+          width: 30px;
+          line-height: 30px;
+          text-align: center;
+          padding: 0;
           &:hover{
-            background-color: rgba(255,255,255,0.7);
+            background-color: rgba(255,255,255,0.2);
           }
         }
       }
@@ -49,6 +46,7 @@
         padding: 16px 1px 0px 16px;
         line-height: 20px;
         .workspace-badge{
+          display: inline-block;
           width: 34px;
           height: 34px;
           line-height: 34px;

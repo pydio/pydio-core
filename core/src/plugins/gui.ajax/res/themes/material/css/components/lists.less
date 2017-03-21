@@ -1,5 +1,25 @@
 .react-mui-context{
 
+  .mimefont-mixin(@size:40px, @fontsize:24px, @marginH:15px, @marginV:15px){
+
+    background-color: #ECEFF1;
+    border-radius: 50%;
+    margin: @marginV @marginH;
+    height: @size;
+    width: @size;
+    line-height: @size;
+    display: flex;
+    align-items: center;
+
+    div.mimefont{
+      color: @thumbnail_mimefont_color;
+      font-size: @fontsize;
+      text-align: center;
+      flex: 1;
+    }
+
+  }
+
   .material-list.files-list{
 
     opacity: 1;
@@ -18,17 +38,10 @@
           width: 100%;
           height: 100%;
           &.mimefont-container{
-            display: flex;
-            align-items: center;
-            div.mimefont{
-              flex: 1;
-              font-size: 28px;
-              text-align: center;
-              color: @thumbnail_mimefont_color;
-              padding-bottom: 10px;
-              &.mdi-folder{
-                color: darken(@thumbnail_mimefont_color,2);
-              }
+            .mimefont-mixin();
+
+            div.mimefont.mdi-folder{
+              color: darken(@thumbnail_mimefont_color,2);
             }
           }
         }
@@ -43,7 +56,7 @@
             color: rgba(0,0,0,0.23);
             &.metadata_chunk_description{
               opacity: 1;
-              color: rgba(0,0,0,0.43);
+              color: rgba(0,0,0,0.33);
             }
           }
           span.icon-angle-right{
@@ -56,6 +69,16 @@
           .overlay_icon_div .overlay-class-span{
             display: inline-block;
             padding: 14px;
+            &.mdi.mdi-share-variant{
+              color: #009688;
+            }
+            &.icon-bookmark-empty{
+              color: #2196f3;
+            }
+            &.icon-eye-open{
+              color: #ffc107;
+            }
+
           }
         }
       }
@@ -158,8 +181,8 @@
             height: 100%;
             margin: 0;
           }
-          div.mimefont{
-            font-size: 70px !important;
+          div.mimefont-container{
+            .mimefont-mixin(90px, 40px, 40px, 22px);
           }
         }
         .material-list-text{
@@ -196,6 +219,9 @@
               line-height: 12px;
             }
           }
+          div.mimefont-container{
+            .mimefont-mixin(50px, 24px, 15px, 15px);
+          }
           &:hover{
             background-color: @selectionMainTint !important;
             .material-list-text{
@@ -204,6 +230,14 @@
           }
         }
 
+      }
+
+      &.grid-size-320{
+        .material-list-entry{
+          div.mimefont-container{
+            .mimefont-mixin(120px, 40px, 140px, 120px);
+          }
+        }
       }
 
       &.horizontal-ribbon{
