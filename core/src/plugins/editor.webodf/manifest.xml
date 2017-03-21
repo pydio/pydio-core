@@ -5,7 +5,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.webodf/class.WebodfEditor.js" className="WebodfEditor"/>
+            <js file="plugins/editor.webodf/res/build/WebodfEditor.js" className="WebodfEditor"/>
             <i18n path="plugins/editor.webodf/i18n" namespace="webodf"/>
         </resources>
 	</client_settings>
