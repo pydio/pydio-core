@@ -4,7 +4,7 @@
 
 const styles = {
     card: {
-        backgroundColor: 'rgba(250,250,250,0.8)'
+        backgroundColor: 'white'
     }
 };
 
@@ -16,7 +16,10 @@ let InfoPanelCard = React.createClass({
     },
 
     render: function(){
-        let title = this.props.title ? <div className="panelHeader">{this.props.title}</div> : null;
+        let iconStyle = this.props.iconStyle || {};
+        iconStyle = {...iconStyle, color:this.props.iconColor, float:'right'};
+        let icon = this.props.icon ? <div style={iconStyle} className={"panelIcon mdi mdi-" + this.props.icon}/> : null;
+        let title = this.props.title ? <div className="panelHeader">{icon}{this.props.title}</div> : null;
         let actions = this.props.actions ? <div className="panelActions">{this.props.actions}</div> : null;
         let rows, toolBar;
         if(this.props.standardData){

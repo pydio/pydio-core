@@ -70,7 +70,7 @@
         },
 
         renderIconNotif: function(node){
-            const action = node.getMetadata().get('event_action');
+            let action = node.getMetadata().get('event_action');
             if(action === 'add' && node.isLeaf()){
                 action = 'add-file';
             }
@@ -107,7 +107,7 @@
             if(this.state.empty){
                 return null;
             }
-            const {pydio} = this.props;
+            const {pydio, node} = this.props;
 
             let renderIcon = this.renderIconFile;
             let renderFirstLine = null;
@@ -115,22 +115,29 @@
             let nodeClicked = (node) => {
                 pydio.goTo(node.getMetadata().get('real_path'));
             };
-            if(this.props.node.isLeaf()){
+            if(node.isLeaf()){
                 renderFirstLine = this.renderFirstLineLeaf;
                 renderSecondLine = null;
                 renderIcon = this.renderIconNotif;
                 nodeClicked = null;
             }
 
+            let label = node.isLeaf() ? "File Activity" : "Folder Activity";
+            let root = false;
+            if(node === pydio.getContextHolder().getRootNode()){
+                label = "Workspace Activity";
+                root = true;
+            }
+
             return (
 
-                <PydioDetailPanes.InfoPanelCard title={this.props.node.isLeaf() ? "File Activity" : "Folder Activity"}>
+                <PydioDetailPanes.InfoPanelCard title={label} icon="pulse" iconColor="#F57C00">
                     <div style={{padding: 0}}>
                         <PydioComponents.NodeListCustomProvider
                             pydio={pydio}
                             className="files-list"
                             elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 20}
-                            heightAutoWithMax={320}
+                            heightAutoWithMax={root ? 420 : 320}
                             presetDataModel={this.state.dataModel}
                             actionBarGroups={[]}
                             ref="provider"

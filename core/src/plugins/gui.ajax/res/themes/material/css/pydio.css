@@ -361,8 +361,7 @@ div.dialogBox div#element_overlay {
   border-radius: 50%;
   height: 40px;
   width: 40px;
-  margin-left: 17px;
-  margin-top: 12px;
+  margin: 15px;
 }
 .react-mui-context .material-list.files-list .material-list-entry .material-list-icon > div {
   width: 100%;
@@ -610,10 +609,10 @@ div.dialogBox div#element_overlay {
 }
 .react-mui-context .material-list.files-list .material-list-entry.list-parent-node .material-list-icon .mui-font-icon {
   background-color: rgba(84, 110, 122, 0.45);
-  margin: 22px;
-  width: 30px;
-  height: 30px;
-  padding: 5px;
+  margin: 15px;
+  width: 40px;
+  height: 40px;
+  padding: 10px;
 }
 .react-mui-context .material-list.files-list .inline-editor {
   position: absolute;
@@ -1848,7 +1847,7 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 #info_panel .panelCard .panelHeader {
   padding: 24px 16px 16px;
-  font-size: 24px;
+  font-size: 19px;
   font-weight: 400;
 }
 #info_panel .panelCard .panelContent {
@@ -2979,8 +2978,7 @@ body,
   height: 42px;
   color: inherit;
   font-size: inherit;
-  overflow-x: auto;
-  overflow-y: visible;
+  overflow: visible;
 }
 .react-mui-context .desktop-container #main_toolbar span.toolbars-button-menu {
   position: relative;
