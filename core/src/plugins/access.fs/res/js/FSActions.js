@@ -331,6 +331,9 @@
         static openWithDynamicBuilder(){
 
             let builderMenuItems = [];
+            if(pydio.getUserSelection().isEmpty()){
+                return builderMenuItems;
+            }
             var node = pydio.getUserSelection().getUniqueNode();
             var selectedMime = PathUtils.getAjxpMimeType(node);
             var nodeHasReadonly = node.getMetadata().get("ajxp_readonly") === "true";
