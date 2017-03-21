@@ -24,7 +24,7 @@
     <dependencies>
         <!-- Image proxy must be implemented -->
         <activePlugin pluginName="access.AJXP_STREAM_PROVIDER"/>
-        <activePlugin pluginName="access.ajxp_user"/>
+        <activePlugin pluginName="access.ajxp_home"/>
     </dependencies>
 	<registry_contributions>
 		<hooks>

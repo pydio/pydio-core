@@ -93,7 +93,6 @@ var nodeDropTarget = {
         try{
             applyDNDAction(source, target, DNDActionParameter.STEP_CAN_DROP);
         }catch(e){
-            console.log('error ? ');
             return false;
         }
         return true;

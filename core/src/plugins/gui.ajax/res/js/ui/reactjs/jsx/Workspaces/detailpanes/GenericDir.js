@@ -11,7 +11,9 @@ let GenericDir = React.createClass({
 
         return (
             <InfoPanelCard {...this.props} primaryToolbars={["info_panel", "info_panel_share"]}>
-                <div className="mimefont-container" style={{width:'100%', height:200}}><div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div></div>
+                <div className="mimefont-container" style={{width:'100%', height:200}}>
+                    <div className={"mimefont mdi mdi-" + this.props.node.getMetadata().get('fonticon')}></div>
+                </div>
             </InfoPanelCard>
         );
     }

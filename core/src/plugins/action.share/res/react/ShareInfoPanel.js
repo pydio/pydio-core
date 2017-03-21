@@ -234,7 +234,7 @@
             ];
 
             return (
-                <PydioDetailPanes.InfoPanelCard title="Shared" actions={actions}>
+                <PydioDetailPanes.InfoPanelCard title="Shared" actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
                     <InfoPanel {...this.props}/>
                 </PydioDetailPanes.InfoPanelCard>
             );

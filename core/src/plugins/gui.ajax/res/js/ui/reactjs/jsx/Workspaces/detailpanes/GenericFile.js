@@ -30,7 +30,7 @@ let GenericFile = React.createClass({
                         richPreview={true}
                     />
                 </InfoPanelCard>
-                <InfoPanelCard title="File Information" standardData={stdData} contentStyle={{paddingBottom: 10}}/>
+                <InfoPanelCard title="File Information" standardData={stdData} contentStyle={{paddingBottom: 10}} icon="information-outline" iconColor="#2196f3"/>
             </span>
         );
     }

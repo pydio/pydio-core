@@ -9,7 +9,7 @@ export default React.createClass({
         let dimDiv;
         if(w & h){
             return (
-                <InfoPanelCard title="Image Dimension">
+                <InfoPanelCard title="Image Dimension" icon="image" iconColor="#D32F2F">
                     <div style={{padding:'20px 20px 40px',fontSize:20, color:'rgba(0,0,0,0.53)', textAlign:'center'}}>{w} px X {h} px</div>
                 </InfoPanelCard>
             );

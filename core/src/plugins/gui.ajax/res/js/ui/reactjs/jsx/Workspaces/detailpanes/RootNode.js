@@ -54,7 +54,7 @@ export default React.createClass({
         }
 
         return (
-            <InfoPanelCard title="Workspace Users" standardData={panelData}>{content}</InfoPanelCard>
+            <InfoPanelCard title="Workspace Users" standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
         );
 
     }

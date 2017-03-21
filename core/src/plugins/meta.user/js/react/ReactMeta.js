@@ -453,7 +453,7 @@
             );
 
             return (
-                <PydioDetailPanes.InfoPanelCard title={"Metadata"} actions={actions}>
+                <PydioDetailPanes.InfoPanelCard title={"Metadata"} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
                     <UserMetaPanel
                         ref="panel"
                         node={this.props.node}

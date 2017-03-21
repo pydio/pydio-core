@@ -63,7 +63,11 @@
         selectionToTemplates: function(initTemplates = null){
 
             let refTemplates = initTemplates || this.state.templates;
-            let selection = this.props.dataModel.getSelectedNodes();
+            const {dataModel} = this.props;
+            let selection = dataModel.getSelectedNodes();
+            if((!selection || !selection.length) && dataModel.getContextNode() === dataModel.getRootNode()){
+                selection = [dataModel.getContextNode()];
+            }
             let primaryMime, templates = [], uniqueNode;
             let data = {};
             if(!selection || selection.length < 1){
@@ -120,7 +124,7 @@
                 );
 
             }.bind(this));
-            return <div id="info_panel">{templates}</div>;
+            return <div id="info_panel" style={{backgroundColor:'#eceff1'}}>{templates}</div>;
 
         }
     });
