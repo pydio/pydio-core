@@ -1,5 +1,20 @@
 (function(global){
 
+    const EventsIcons = {
+        'add'       : 'folder-plus',
+        'add-file'  : 'folder-upload',
+        'delete'    : 'delete',
+        'change'    : 'pencil',
+        'rename'    : 'rename-box',
+        'view'      : 'eye',
+        'copy'      : 'copy',
+        'move'      : 'folder-move',
+        'copy_to'   : 'folder-move',
+        'copy_from' : 'folder-move',
+        'move_from' : 'folder-move',
+        'move_to'   : 'folder-move'
+    };
+
     let ActivityPanel = React.createClass({
 
         getInitialState: function(){
@@ -48,10 +63,24 @@
 
         },
 
-        renderIcon: function(node){
+        renderIconFile: function(node){
             let fileNode = new AjxpNode(node.getMetadata().get('real_path'), node.isLeaf(), node.getLabel());
             fileNode.setMetadata(node.getMetadata());
             return <PydioWorkspaces.FilePreview loadThumbnail={true} node={fileNode}/>;
+        },
+
+        renderIconNotif: function(node){
+            const action = node.getMetadata().get('event_action');
+            if(action === 'add' && node.isLeaf()){
+                action = 'add-file';
+            }
+            if(action && EventsIcons[action]){
+                return (
+                    <div className="mimefont-container">
+                        <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
+                    </div>
+                );
+            }
         },
 
         renderFirstLineLeaf: function(node){
@@ -80,7 +109,7 @@
             }
             const {pydio} = this.props;
 
-            let renderIcon = this.renderIcon;
+            let renderIcon = this.renderIconFile;
             let renderFirstLine = null;
             let renderSecondLine = this.renderSecondLine;
             let nodeClicked = (node) => {
@@ -89,7 +118,7 @@
             if(this.props.node.isLeaf()){
                 renderFirstLine = this.renderFirstLineLeaf;
                 renderSecondLine = null;
-                renderIcon = (node) => {return null;};
+                renderIcon = this.renderIconNotif;
                 nodeClicked = null;
             }
 

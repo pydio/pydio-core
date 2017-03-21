@@ -316,6 +316,7 @@ class NotificationCenter extends Plugin
                     $node->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
                     $node->event_time = $notif->getDate();
                     $node->event_type = "notification";
+                    $node->event_action = $notif->getAction();
                     $node->event_id = $object->event_id;
                     if ($node->getRepository() != null) {
                         $node->repository_id = ''.$node->getRepository()->getId();

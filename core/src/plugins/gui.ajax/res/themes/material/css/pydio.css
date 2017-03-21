@@ -1,5 +1,5 @@
 @import "../../common/css/fonts/font-awesome.css";
-@import "../../common/css/fonts/mdi-subset.css";
+@import "../../common/css/fonts/mdi.css";
 .react-mui-context * {
   font-family: Roboto, sans-serif;
 }
