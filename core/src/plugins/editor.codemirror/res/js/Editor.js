@@ -22,8 +22,7 @@ import CodeMirror from './CodeMirror';
 
 import SystemJS from 'systemjs';
 
-window.define = SystemJS.amdDefine;
-window.require = window.requirejs = SystemJS.amdRequire;
+let {define, require} = window
 
 SystemJS.config({
     baseURL: 'plugins/editor.codemirror/node_modules',
@@ -38,9 +37,13 @@ class Editor extends React.Component {
     constructor(props) {
         super(props)
 
-        const {pydio, node, url} = props
+        const {pydio, node, url, onLoad} = props
 
         let loaded = new Promise((resolve, reject) => {
+
+            window.define = SystemJS.amdDefine;
+            window.require = window.requirejs = SystemJS.amdRequire;
+
             SystemJS.import('codemirror/lib/codemirror').then((m) => {
                 let CodeMirror = m
                 SystemJS.import('codemirror/addon/search/search')
@@ -57,13 +60,19 @@ class Editor extends React.Component {
             url: url,
             loaded: loaded
         }
+
+        this.onLoad = (codemirror) => {
+            this.props.onLoad(codemirror)
+
+            window.define = define
+            window.require = window.requirejs = require
+        }
     }
 
     // Handling loading
     componentDidMount() {
         this.state.loaded.then((CodeMirror) => {
             this.setState({codemirrorInstance: CodeMirror})
-            this.props.onReady()
         })
     }
 
@@ -79,13 +88,14 @@ class Editor extends React.Component {
                 codeMirrorInstance={this.state.codemirrorInstance}
                 options={this.props.options}
 
-                onLoad={this.props.onLoad}
+                onLoad={this.onLoad}
                 onChange={this.props.onChange}
                 onCursorChange={this.props.onCursorChange}
             />
         )
     }
 }
+
 
 Editor.propTypes = {
     url: React.PropTypes.string.isRequired,
