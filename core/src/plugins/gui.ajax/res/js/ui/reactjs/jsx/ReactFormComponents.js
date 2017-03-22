@@ -457,8 +457,6 @@
                 name: 'pydioform-autosuggest',
                 className: 'react-autosuggest__input',
                 placeholder: this.props.attributes['label'],
-                /*onBlur: event => pydio.UI.enableAllKeyBindings(),*/
-                onFocus: event => pydio.UI.disableAllKeyBindings(),
                 value: this.state.value   // Initial value
             };
             return (

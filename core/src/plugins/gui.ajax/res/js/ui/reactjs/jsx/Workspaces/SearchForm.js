@@ -215,11 +215,9 @@ let SearchFileSizePanel = React.createClass({
 let SearchForm = React.createClass({
 
     fieldsFocused: function(){
-        this.props.pydio.UI.disableAllKeyBindings();
     },
 
     fieldsBlurred: function(){
-        this.props.pydio.UI.enableAllKeyBindings();
     },
 
     fieldsKeyPressed: function(e){

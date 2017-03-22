@@ -19,14 +19,6 @@ export default React.createClass({
         }
     },
 
-    focused: function(){
-        this.context.getPydio().UI.disableAllKeyBindings();
-    },
-
-    blurred: function(){
-        this.context.getPydio().UI.enableAllKeyBindings();
-    },
-
     componentDidMount:function(){
         this.refs.text.focus();
     },
@@ -50,8 +42,6 @@ export default React.createClass({
                     ref="text"
                     defaultValue={this.props.node.getLabel()}
                     onChange={(e, value)=>{this.setState({value:value})}}
-                    onFocus={this.focused}
-                    onBlur={this.blurred}
                     onClick={this.catch} onDoubleClick={this.catchClicks}
                     tabIndex="0" onKeyDown={this.onKeyDown}
                     errorText={this.state ? this.state.errorString : null}

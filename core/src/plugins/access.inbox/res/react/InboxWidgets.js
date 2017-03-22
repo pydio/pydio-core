@@ -18,12 +18,6 @@
             document.getElementById('content_pane').ajxpPaneObject.addMetadataFilter('text', value);
         },
 
-        focus:function(){
-            this.props.pydio.UI.disableAllKeyBindings();
-        },
-        blur:function(){
-            this.props.pydio.UI.enableAllKeyBindings();
-        },
         filterByShareMetaType(type, event){
             if(type == '-1'){
                 type = '';
@@ -41,7 +35,7 @@
                     <h4>{messages['inbox_driver.8']}</h4>
                     <div>
                         <h5>{messages['inbox_driver.9']}</h5>
-                        <input type="text" placeholder="Filter..." onChange={this.handleChange} onFocus={this.focus} onBlur={this.blur}/>
+                        <input type="text" placeholder="Filter..." onChange={this.handleChange}/>
                     </div>
                     <div style={{paddingTop:20}}>
                         <h5><span className="clear" onClick={this.filterByShareMetaType.bind(this, '-1')}>{messages['inbox_driver.11']}</span>

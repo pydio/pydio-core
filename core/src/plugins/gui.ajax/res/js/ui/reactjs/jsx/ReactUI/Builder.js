@@ -221,17 +221,6 @@
 
         mountComponents(componentsNodes){}
 
-        disableShortcuts(){}
-        disableNavigation(){}
-        enableShortcuts(){}
-        enableNavigation(){}
-        disableAllKeyBindings(){}
-        enableAllKeyBindings(){}
-
-        blurAll(){}
-        focusOn(){}
-        focusLast(){}
-
     }
 
 })(window);

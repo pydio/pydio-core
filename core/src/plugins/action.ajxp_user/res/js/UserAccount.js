@@ -129,13 +129,6 @@
 
     let ProfilePane = React.createClass({
 
-        componentDidMount: function(){
-            this.props.pydio.UI.disableAllKeyBindings();
-        },
-        componentWillUnmount: function(){
-            this.props.pydio.UI.enableAllKeyBindings();
-        },
-
         getInitialState: function(){
             let objValues = {};
             let pydio = this.props.pydio;
@@ -343,11 +336,7 @@
     let WebDAVPane = React.createClass({
 
         componentDidMount: function(){
-            this.props.pydio.UI.disableAllKeyBindings();
             this.loadPrefs();
-        },
-        componentWillUnmount: function(){
-            this.props.pydio.UI.enableAllKeyBindings();
         },
         getMessage: function(id){
             return this.props.pydio.MessageHash[id];
