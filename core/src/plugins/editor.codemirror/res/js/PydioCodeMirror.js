@@ -36,7 +36,6 @@ class PydioCodeMirror extends React.Component {
             ready: false
         }
 
-        this.onReady = this.onReady.bind(this)
         this.onLoad = this.onLoad.bind(this)
         this.onChange = this.onChange.bind(this)
         this.onCursorChange = this.onCursorChange.bind(this)
@@ -70,10 +69,6 @@ class PydioCodeMirror extends React.Component {
         }, (transport) => this.setState({content: transport.responseText}));
     }
 
-    onReady() {
-        this.setState({ ready: true })
-    }
-
     onLoad(codemirror) {
         this.setState({ codemirror: codemirror })
     }
@@ -97,36 +92,26 @@ class PydioCodeMirror extends React.Component {
     }
 
     render() {
-        let editor = null;
-        let menu = null;
-
-        if (this.state.content) {
-            editor = <Editor
+        return (
+            <CompositeEditor
                 {...this.props}
+                actions={this.state.codemirror ? [
+                    <MenuOptions pydio={this.props.pydio} codemirror={this.state.codemirror} onSave={this.save.bind(this)} />,
+                    <MenuActions pydio={this.props.pydio} codemirror={this.state.codemirror} cursor={this.state.cursor} />
+                ] : []}
+                error={this.state.error}
                 url={this.state.url}
                 options={{lineNumbers: this.state.lineNumbers, lineWrapping: this.state.lineWrapping}}
                 content={this.state.content}
-                onReady={this.onReady}
                 onLoad={this.onLoad}
                 onChange={this.onChange}
                 onCursorChange={this.onCursorChange}
             />
-        }
-
-        if (this.state.codemirror) {
-            menu = [
-                <MenuOptions {...this.props} firstChild={true} codemirror={this.state.codemirror} onSave={this.save.bind(this)} />,
-                <MenuActions {...this.props} lastChild={true} codemirror={this.state.codemirror} cursor={this.state.cursor} />
-            ]
-        }
-
-        return (
-            <PydioComponents.AbstractEditor {...this.props} loading={!this.state.ready} preview={this.state.preview} errorString={this.state.error} actions={menu}>
-                {editor}
-            </PydioComponents.AbstractEditor>
         );
     }
 }
+
+let CompositeEditor = PydioHOCs.withActions(Editor)
 
 // We need to attach the element to window else it won't be found
 window.PydioCodeMirror = {
