@@ -2,7 +2,7 @@
 <editor id="editor.text" openable="true" iconClass="icon-edit" order="10" text="51" title="162" canWrite="true" icon="edit.png" className="TextEditor" mimes="none" formId="edit_box" label="CONF_MESSAGE[Text Editor]" description="CONF_MESSAGE[Very basic text editor]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.text/class.TextEditor.js" className="TextEditor"/>
+            <js file="plugins/editor.text/res/build/TextEditor.js" className="TextEditor"/>
             <i18n path="plugins/editor.text/i18n" namespace="text_editor"/>
         </resources>
 	</client_settings>
