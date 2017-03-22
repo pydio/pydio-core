@@ -46,6 +46,11 @@ class PydioApi{
         if(settings.method){
             c.setMethod(settings.method);
         }
+        if(!onComplete){
+            onComplete = function(transport){
+                if(transport.responseXML) return this.parseXmlMessage(transport.responseXML);
+            }.bind(this);
+        }
         c.onComplete = onComplete;
         if(settings.async === false){
             c.sendSync();
@@ -494,7 +499,7 @@ class PydioApi{
         if(additionalParameters){
             params = Object.assign(params, additionalParameters);
         }
-        this.request(params, callback || FuncUtils.Empty);
+        this.request(params, callback);
 
     }
 
