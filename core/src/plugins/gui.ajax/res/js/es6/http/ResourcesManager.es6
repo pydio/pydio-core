@@ -337,6 +337,15 @@ class ResourcesManager{
     }
 
     /**
+     * Check if a module is registered (not necessarily loaded yet)
+     * @param className
+     * @returns {Map|boolean}
+     */
+    static moduleIsAvailable(className){
+        return ResourcesManager.__modules && ResourcesManager.__modules.has(className);
+    }
+
+    /**
      *
      * @param className String
      * @param dependencies Set

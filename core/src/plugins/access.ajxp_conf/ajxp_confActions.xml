@@ -67,74 +67,7 @@
                 <selectionContext dir="true" file="true" recycle="false" unique="false"  allowedMimes="user_editable,repository_editable,role,group" image="false" editable="false" behaviour="hidden"/></gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
-				    var userSelection;
-				    if(window.actionArguments && window.actionArguments.length){
-				        userSelection = window.actionArguments[0];
-                    }else{
-                        userSelection =  ajaxplorer.getUserSelection();
-				    }
-				    var node = userSelection.getUniqueNode();
-					var meta = node.getMetadata();
-					var deleteMessage, fieldName, fieldValue;
-					if(meta.get("ajxp_mime") == "user_editable"){
-						deleteMessage = MessageHash['ajxp_conf.34'];
-						fieldName = "user_id";
-						fieldValue = getBaseName(meta.get("filename"));
-					}else if(meta.get("ajxp_mime") == "role"){
-						deleteMessage = MessageHash['ajxp_conf.126'];
-						fieldName = "role_id";
-						fieldValue = getBaseName(meta.get("filename"));
-					}else if(meta.get("ajxp_mime") == "group"){
-						deleteMessage = MessageHash['ajxp_conf.126'];
-						fieldName = "group";
-						fieldValue = meta.get("filename");
-					}else{
-						deleteMessage = MessageHash['ajxp_conf.35'];
-						fieldName = "repository_id";
-						fieldValue = meta.get("repository_id");
-					}
-					var onLoad = function(oForm){
-		   		    	$(oForm).select('span[id="delete_message"]')[0].update(deleteMessage);
-		   		    	var hidden = $(oForm).select('input[type="hidden"]')[0];
-		   		    	hidden.setAttribute("name", fieldName);
-		   		    	hidden.setAttribute("value", fieldValue);
-					};
-					modal.showDialogForm('Delete', 'delete_config_form', onLoad, function(){
-						var oForm = modal.getForm();
-						PydioApi.getClient().submitForm(oForm);
-                        if (userSelection.isMultiple()) {
-                           var i = 1;
-	   		    	       var hidden = $(oForm).select('input[type="hidden"]')[0];
-                           while (true) {
-                              try {
-                                  var node = userSelection.getNode(i);
-                                  var meta = node.getMetadata();
-                                  var value;
-                                  if(meta.get("ajxp_mime") == "user_editable"){
-                                  	value = meta.get("text");
-                                  }else{
-                                  	value = meta.get("text");
-                                  }
-                                  hidden.setAttribute("value", value);
-            					  PydioApi.getClient().submitForm(oForm);
-                                  i++;
-                              } catch (e)
-                              {
-                                  break;
-                              }
-                           }
-                        }
-						hideLightBox(true);
-						return false;
-					});
-					]]></clientCallback>
-                <clientForm id="delete_config_form"><![CDATA[
-				<div id="delete_config_form" action="delete" box_width="280">
-					<span id="delete_message"></span>
-					<input type="hidden" name="" value=""/>
-				</div>
-				]]></clientForm>
+                <clientCallback module="AdminActions.Callbacks.deleteAction"/>
                 <serverCallback methodName="deleteAction" restParams="/data_type/data_id+" developerComment="Generic delete action for config driver, used to delete users, workspaces, roles, etc.">
                     <input_param description="Type of the data to delete. Can be : user, group, role, repository" name="data_type" type="String"/>
                     <input_param description="Id of the data to delete. For groups, full group path." name="data_id"
@@ -648,51 +581,58 @@
         </action>
         <action name="share_react" forbidOverride="true"></action>
 
+
+        <!-- SCHEDULER ACTIONS -->
+        <action name="scheduler_listRepositories">
+            <processing>
+                <serverCallback methodName="handleTasks"/>
+            </processing>
+        </action>
+        <action name="scheduler_addTask" forbidOverride="true">
+            <gui text="action.scheduler.8" title="action.scheduler.9" iconClass="icon-plus" src="scheduler/22/task_add.png" hasAccessKey="false">
+                <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
+                         actionBar="false" contextMenu="true" infoPanel="true"
+                         actionBarGroup="put">
+                </context>
+            </gui>
+            <processing>
+                <clientCallback module="AdminActions.Callbacks.addSchedulerTask"/>
+                <clientForm id="react_scheduler_editor"><![CDATA[
+                        <div id="react_scheduler_editor" box_width="420" box_padding="0" class="react-mui-context reset-pydio-forms"></div>
+                    ]]></clientForm>
+                <standardFormDefinition name="main">
+                    <!-- LABEL -->
+                    <param name="label" group="action.scheduler.12" label="action.scheduler.12" description="action.scheduler.12d" type="string" mandatory="true"/>
+                    <!-- SCHEDULE -->
+                    <param name="legend" group="action.scheduler.2" type="legend" description="Set up task label and schedule: use a crontab-like expression to define the frequency of this job." label=""/>
+                    <param name="schedule" group="action.scheduler.2" label="action.scheduler.2" description="action.scheduler.2d" type="string" mandatory="true"/>
+                    <!-- ACTION -->
+                    <param name="legend" group="action.scheduler.24" type="legend" description="Set the plugin action to be applied, and add optional parameters depending on the action." label=""/>
+                    <param name="action_name" group="action.scheduler.24" label="action.scheduler.1" description="action.scheduler.1d" type="autocomplete" choices="json_list:list_all_plugins_actions" mandatory="true"/>
+                    <param name="param_name" group="action.scheduler.24" replicationGroup="group1" replicationTitle="Action Parameters" replicationDescription="Set zero or more, depending on the action" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
+                    <param name="param_value" group="action.scheduler.24" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
+                    <!-- CONTEXT -->
+                    <param name="legend" group="action.scheduler.23" type="legend" description="Run the action in one or more 'contexts': on which workspace(s), under which user identifier(s)." label=""/>
+                    <param name="user_id" group="action.scheduler.23" label="action.scheduler.17" description="action.scheduler.17d" type="string" mandatory="true" default=""/>
+                    <param name="repository_id" group="action.scheduler.23" replicationGroup="group2" label="action.scheduler.4" description="action.scheduler.4d" type="select" choices="json_list:scheduler_listRepositories" mandatory="true"/>
+                </standardFormDefinition>
+                <serverCallback methodName="handleTasks" developerComment="Create a new task by posting parameters" pluginId="action.scheduler">
+                    <input_param description="All parameters generated by the FormManager (label, schedule, user_id, repository_id, action_name, one or more param_name / param_value)" name="FORM_DATA"
+                                 type="FORM_DATA"/>
+                </serverCallback>
+            </processing>
+        </action>
+        <action name="scheduler_editTask" forbidOverride="true">
+            <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
+                         actionBar="true" contextMenu="true" infoPanel="true"
+                         actionBarGroup="get"/>
+                <selectionContext dir="false" file="true" behaviour="hidden" recycle="false" unique="true" allowedMimes="scheduler_task"/>
+            </gui>
+            <processing>
+                <clientCallback module="AdminActions.Callbacks.editSchedulerTask"/>
+            </processing>
+        </action>
+
 	</actions>
-	<client_configs>
-		<component_config className="InfoPanel">
-			<infoPanel mime="generic_file" attributes="icon,text">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="size_string" id="127"/>
-					<message key="type_string" id="134"/>
-					<message key="modif_string" id="138"/>
-				</messages>
-				<html><![CDATA[
-				<div style="padding:10px;">
-					<div class="folderImage">
-						<img src="AJXP_IMAGES_FOLDER/mimes/64/#{icon}" height="64" width="64">
-					</div>
-					<b>#{name_string}</b> : #{text}
-				</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="generic_dir" attributes="icon,text">
-				<messages>
-					<message key="name_string" id="133"/>
-					<message key="modif_string" id="138"/>
-				</messages>
-				<html><![CDATA[
-					<div style="padding:10px;">
-						<div class="folderImage">
-							<img src="AJXP_IMAGES_FOLDER/mimes/64/#{icon}" height="64" width="64">
-						</div>
-						<b>#{name_string}</b> : #{text}
-					</div>
-				]]></html>
-			</infoPanel>
-			<infoPanel mime="no_selection" attributes="">
-				<messages>
-					<message key="files_string" id="265"/>
-				</messages>
-				<html><![CDATA[
-					<div style="padding:10px;">
-						<div class="folderImage">
-							<img src="AJXP_IMAGES_FOLDER/mimes/64/admin.png" height="64" width="64">
-						</div>
-					</div>
-				]]></html>
-			</infoPanel>
-		</component_config>
-	</client_configs>
 </registry_contributions>

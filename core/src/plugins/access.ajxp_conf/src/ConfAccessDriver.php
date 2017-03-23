@@ -30,6 +30,8 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\Services\LocaleService;
+use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;
 use Zend\Diactoros\Response\JsonResponse;
 
@@ -44,62 +46,9 @@ class ConfAccessDriver extends AbstractAccessDriver
 {
 
     protected $rootNodes = array(
-        "data" => array(
-            "LABEL" => "ajxp_conf.110",
-            "ICON" => "user.png",
-            "DESCRIPTION" => "ajxp_conf.137",
-            "CHILDREN" => array(
-                "repositories" => array(
-                    "AJXP_MIME" => "workspaces_zone",
-                    "LABEL" => "ajxp_conf.3",
-                    "DESCRIPTION" => "ajxp_conf.138",
-                    "ICON" => "hdd_external_unmount.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RepositoriesManager"
-                ),
-                "users" => array(
-                    "AJXP_MIME" => "users_zone",
-                    "LABEL" => "ajxp_conf.2",
-                    "DESCRIPTION" => "ajxp_conf.139",
-                    "ICON" => "users-folder.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\UsersManager"
-                ),
-                "roles" => array(
-                    "AJXP_MIME" => "roles_zone",
-                    "LABEL" => "ajxp_conf.69",
-                    "DESCRIPTION" => "ajxp_conf.140",
-                    "ICON" => "user-acl.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RolesManager"
-                ),
-            )
-        ),
-        "config" => array(
-            "AJXP_MIME" => "plugins_zone",
-            "LABEL" => "ajxp_conf.109",
-            "ICON" => "preferences_desktop.png",
-            "DESCRIPTION" => "ajxp_conf.136",
-            "CHILDREN" => array(
-                "core"	   	   => array(
-                    "AJXP_MIME" => "plugins_zone",
-                    "LABEL" => "ajxp_conf.98",
-                    "DESCRIPTION" => "ajxp_conf.133",
-                    "ICON" => "preferences_desktop.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
-                ),
-                "plugins"	   => array(
-                    "AJXP_MIME" => "plugins_zone",
-                    "LABEL" => "ajxp_conf.99",
-                    "DESCRIPTION" => "ajxp_conf.134",
-                    "ICON" => "folder_development.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
-                ),
-                "core_plugins" => array(
-                    "AJXP_MIME" => "plugins_zone",
-                    "LABEL" => "ajxp_conf.123",
-                    "DESCRIPTION" => "ajxp_conf.135",
-                    "ICON" => "folder_development.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager"
-                ),
-            )
+        "__metadata__" => array(
+            "icon_class" => "icon-dashboard",
+            "component"  => "AdminComponents.SimpleDashboard",
         ),
         "admin" => array(
             "LABEL" => "ajxp_conf.111",
@@ -110,35 +59,187 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "LABEL" => "ajxp_conf.4",
                     "DESCRIPTION" => "ajxp_conf.142",
                     "ICON" => "toggle_log.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\LogsManager"
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\LogsManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-flag-alt",
+                        "component"  => "AdminLogs.Dashboard"
+                    )
                 ),
                 "diagnostic" => array(
                     "LABEL" => "ajxp_conf.5",
                     "DESCRIPTION" => "ajxp_conf.143",
                     "ICON" => "susehelpcenter.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DiagnosticManager"
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DiagnosticManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-stethoscope",
+                        "component"  => "AdminPlugins.DiagnosticDashboard"
+                    )
                 )
             )
         ),
-        "developer" => array(
-            "LABEL" => "ajxp_conf.144",
-            "ICON" => "applications_engineering.png",
-            "DESCRIPTION" => "ajxp_conf.145",
+        "data" => array(
+            "LABEL" => "ajxp_conf.110",
+            "ICON" => "user.png",
+            "DESCRIPTION" => "ajxp_conf.137",
             "CHILDREN" => array(
-                "actions" => array(
-                    "LABEL" => "ajxp_conf.146",
-                    "DESCRIPTION" => "ajxp_conf.147",
-                    "ICON" => "book.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\ActionsManager"
+                "users" => array(
+                    "AJXP_MIME" => "users_zone",
+                    "LABEL" => "ajxp_conf.2",
+                    "DESCRIPTION" => "ajxp_conf.139",
+                    "ICON" => "users-folder.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\UsersManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-user",
+                        "component"  => "AdminPeople.Dashboard"
+                    )
                 ),
-                "hooks" => array(
-                    "LABEL" => "ajxp_conf.148",
-                    "DESCRIPTION" => "ajxp_conf.149",
-                    "ICON" => "book.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DocumentationManager"
+                "repositories" => array(
+                    "AJXP_MIME" => "workspaces_zone",
+                    "LABEL" => "ajxp_conf.3",
+                    "DESCRIPTION" => "ajxp_conf.138",
+                    "ICON" => "hdd_external_unmount.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RepositoriesManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-hdd",
+                        "component"  => "AdminWorkspaces.Dashboard"
+                    )
+                ),
+                "roles" => array(
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RolesManager"
+                ),
+            )
+        ),
+        "parameters" => array(
+            "AJXP_MIME" => "plugins_zone",
+            "LABEL" => "ajxp_conf.109",
+            "ICON" => "preferences_desktop.png",
+            "DESCRIPTION" => "ajxp_conf.136",
+            "CHILDREN" => array(
+                "core"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_conf.98",
+                    "DESCRIPTION" => "ajxp_conf.133",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-cog",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "core.auth"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.11",
+                    "DESCRIPTION" => "plugtype.desc.auth",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-lock",
+                        "component"  => "AdminPlugins.AuthenticationPluginsDashboard"
+                    )
+                ),
+                "core.conf"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.12",
+                    "DESCRIPTION" => "plugtype.desc.conf",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-suitcase",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "core.log"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.13",
+                    "DESCRIPTION" => "plugtype.desc.log",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-list",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "uploader"  	   => array(
+                    "ALIAS" => "/config/plugins/uploader",
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.9",
+                    "DESCRIPTION" => "ajxp_admin.menu.10",
+                    "ICON" => "preferences_desktop.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-upload-alt",
+                        "component"  => "AdminPlugins.CoreAndPluginsDashboard"
+                    )
+                ),
+                "core.mq" => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.16",
+                    "DESCRIPTION" => "ajxp_admin.menu.17",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-rocket",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "core.mailer"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "plugtype.title.mailer",
+                    "DESCRIPTION" => "plugtype.desc.mailer",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-envelope-alt",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "core.notifications" => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.14",
+                    "DESCRIPTION" => "ajxp_admin.menu.15",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-bell",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+                "core.cache"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "plugtype.title.cache",
+                    "DESCRIPTION" => "plugtype.desc.cache",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "mdi mdi-server-plus",
+                        "component"  => "AdminPlugins.CacheServerDashboard"
+                    )
+                ),
+                "core.ocs"  	   => array(
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "Pydio Cloud",
+                    "DESCRIPTION" => "Open Cloud Sharing",
+                    "ICON" => "preferences_desktop.png",
+                    "METADATA" => array(
+                        "icon_class" => "icon-cloud",
+                        "component"  => "AdminPlugins.PluginEditor"
+                    )
+                ),
+            )
+        ),
+        "plugins" => array(
+            "AJXP_MIME" => "plugins_zone",
+            "LABEL" => "ajxp_admin.menu.18",
+            "ICON" => "preferences_desktop.png",
+            "DESCRIPTION" => "ajxp_admin.menu.18",
+            "CHILDREN" => array(
+                "manager"  	   => array(
+                    "ALIAS" => "/config/all",
+                    "AJXP_MIME" => "plugins_zone",
+                    "LABEL" => "ajxp_admin.menu.19",
+                    "DESCRIPTION" => "ajxp_admin.menu.19",
+                    "ICON" => "preferences_desktop.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager",
+                    "METADATA" => array(
+                        "icon_class" => "icon-puzzle-piece",
+                        "component"  => "AdminPlugins.PluginsManager"
+                    )
                 )
             )
         )
+
     );
 
     /**
@@ -155,6 +256,10 @@ class ConfAccessDriver extends AbstractAccessDriver
             unset($rootNodes["config"]);
             unset($rootNodes["admin"]);
             unset($rootNodes["developer"]);
+            $rootNodes["__metadata__"] = [
+                "icon_class" => "icon-dashboard",
+                "component"  => "AdminComponents.GroupAdminDashboard",
+            ];
         }
         Controller::applyHook("ajxp_conf.list_config_nodes", array($ctx, &$rootNodes));
         return $rootNodes;
@@ -283,6 +388,33 @@ class ConfAccessDriver extends AbstractAccessDriver
         $pluginManager = new RepositoriesManager($requestInterface->getAttribute("ctx"), $this->getName());
         $responseInterface = $pluginManager->repositoriesActions($requestInterface, $responseInterface);
     }
+
+    /**
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
+     */
+    public function handleTasks(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface){
+        $action = $requestInterface->getAttribute("action");
+        if($action === "scheduler_listRepositories"){
+
+            $repositories = RepositoryService::listAllRepositories();
+            $repoOut = [
+                "*" => "Apply on all repositories"
+            ];
+            foreach ($repositories as $repoObject) {
+                $repoOut[$repoObject->getId()] = $repoObject->getDisplay();
+            }
+            $mess = LocaleService::getMessages();
+            $responseInterface = new JsonResponse(["LEGEND" => $mess["ajxp_conf.150"], "LIST" => $repoOut]);
+
+
+        }else{
+            $scheduler = PluginsService::getInstance($requestInterface->getAttribute('ctx'))->getPluginById("action.scheduler");
+            $scheduler->handleTasks($requestInterface, $responseInterface);
+        }
+    }
+
+
 
     /**
      * @param ServerRequestInterface $requestInterface
