@@ -2,9 +2,18 @@ import InfoPanelCard from './InfoPanelCard'
 
 export default React.createClass({
 
-    componentDidMount: function(){
+    componentDidMount() {
+        this.loadData(this.props);
+    },
 
-        if(!this.props.pydio.user) {
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.pydio.user.activeRepository != this.state.repoKey) {
+            this.loadData(nextProps);
+        }
+    },
+
+    loadData(props) {
+        if(!props.pydio.user) {
             return;
         }
         let cacheService = MetaCacheService.getInstance();
@@ -14,6 +23,7 @@ export default React.createClass({
             oThis.setState({...data['core.users']});
         };
         const repoKey = pydio.user.getActiveRepository();
+        this.setState({repoKey: repoKey})
         if(cacheService.hasKey('workspace.info', repoKey)){
             render(cacheService.getByKey('workspace.info', repoKey));
         }else{
@@ -28,16 +38,15 @@ export default React.createClass({
                             data['core.users']['groups'] = 0;
                         }
                     }
+                    cacheService.registerMetaStream('workspace.info', 'MANUAL_TRIGGER');
                     cacheService.setKey('workspace.info', repoKey, data);
                     render(data);
                 }, null, {discrete:true});
             });
         }
-
     },
 
-    render: function () {
-
+    render() {
         const messages = this.props.pydio.MessageHash;
         let internal = messages[531];
         let external = messages[532];
@@ -56,7 +65,6 @@ export default React.createClass({
         return (
             <InfoPanelCard title="Workspace Users" standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
         );
-
     }
 
 });
