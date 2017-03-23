@@ -1,9 +1,6 @@
 import Workspace from '../model/Workspace'
 
-import WorkspaceActivity from '../panel/WorkspaceActivity'
 import SharesList from '../panel/SharesList'
-import MaintenancePanel from '../panel/MaintenancePanel'
-import FoldersList from '../panel/FoldersList'
 
 import TplFieldsChooser from './TplFieldsChooser'
 import FeaturesList from './FeaturesList'

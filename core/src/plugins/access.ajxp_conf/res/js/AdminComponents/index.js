@@ -8,8 +8,6 @@ import MenuItemListener from './util/MenuItemListener'
 import DNDActionsManager from './util/DNDActionsManager'
 
 import ParametersPicker from './dialog/ParametersPicker'
-import PermissionMaskEditor from './permissions/PermissionMaskEditor'
-import PermissionMaskEditorFree from './permissions/PermissionMaskEditorFree'
 
 window.AdminComponents = {
     MessagesConsumerMixin   : MessagesConsumerMixin,
@@ -19,8 +17,6 @@ window.AdminComponents = {
     DNDActionsManager       : DNDActionsManager,
 
     ParametersPicker        : ParametersPicker,
-    PermissionMaskEditor    : PermissionMaskEditor,
-    PermissionMaskEditorFree: PermissionMaskEditorFree,
 
     AdminDashboard          : AdminDashboard,
     SimpleDashboard         : SimpleDashboard,

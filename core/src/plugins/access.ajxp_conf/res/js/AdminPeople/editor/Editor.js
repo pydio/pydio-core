@@ -4,7 +4,6 @@ import UserPasswordDialog from './user/UserPasswordDialog'
 import UserRolesPicker from './user/UserRolesPicker'
 import WorkspacesList from './panel/WorkspacesList'
 import SharesList from './panel/SharesList'
-import UserActivity from './panel/UserActivity'
 
 class Editor extends React.Component{
 
