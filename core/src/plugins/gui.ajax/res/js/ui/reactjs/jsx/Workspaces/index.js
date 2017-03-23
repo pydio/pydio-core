@@ -30,7 +30,6 @@ import InfoPanelCard from './detailpanes/InfoPanelCard'
 import GenericMultiple from './detailpanes/GenericMultiple'
 import GenericFile from './detailpanes/GenericFile'
 import GenericDir from './detailpanes/GenericDir'
-import ImagePreview from './detailpanes/ImagePreview'
 import RootNode from './detailpanes/RootNode'
 
 window.PydioDetailPanes = {
@@ -39,6 +38,5 @@ window.PydioDetailPanes = {
     GenericMultiple: GenericMultiple,
     GenericFile: GenericFile,
     GenericDir: GenericDir,
-    ImagePreview: ImagePreview,
     RootNode:RootNode
 };
