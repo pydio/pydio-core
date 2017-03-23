@@ -7,6 +7,9 @@ export default React.createClass({
             case 'home':
                 this.props.pydio.triggerRepositoryChange('ajxp_home');
                 break;
+            case 'settings':
+                this.props.pydio.triggerRepositoryChange('ajxp_conf');
+                break;
             case 'info':
                 this.props.pydio.Controller.getActionByName('splash').deny = false;
                 this.props.pydio.Controller.fireAction('splash');
@@ -28,7 +31,7 @@ export default React.createClass({
         const messages = this.props.pydio.MessageHash;
 
         let avatar;
-        let homeButton, infoButton, logoutButton, notificationsButton;
+        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton;
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
             avatar = (
@@ -48,13 +51,24 @@ export default React.createClass({
                     />
                 </PydioComponents.UserAvatar>
             );
-            if(user.getRepositoriesList().has('ajxp_home') && user.activeRepository !== 'ajxp_home'){
+            if(user.getRepositoriesList().has('ajxp_home')){
                 homeButton = (
                     <MaterialUI.IconButton
                         onTouchTap={this.applyAction.bind(this, 'home')}
                         iconClassName="userActionIcon mdi mdi-home"
                         className="userActionButton"
                         tooltip={messages['305']}
+                        disabled={user.activeRepository === 'ajxp_home'}
+                    />
+                );
+            }
+            if(user.getRepositoriesList().has('ajxp_conf')){
+                settingsButton = (
+                    <MaterialUI.IconButton
+                        onTouchTap={this.applyAction.bind(this, 'settings')}
+                        iconClassName="userActionIcon mdi mdi-settings"
+                        className="userActionButton"
+                        tooltip={messages['165']}
                     />
                 );
             }
@@ -94,6 +108,7 @@ export default React.createClass({
         const actionBar = (
             <div className="action_bar">
                 {homeButton}
+                {settingsButton}
                 {notificationsButton}
                 {infoButton}
                 {logoutButton}
