@@ -195,7 +195,7 @@ class ResourcesManager{
         const links = document.getElementsByTagName('link');
         for(let i=0; i<links.length; i++){
             let link = links[i];
-            if(link.href === fileName){
+            if(link.rel === 'stylesheet' &&  link.href.endsWith(fileName)){
                 found = true; break;
             }
         }
