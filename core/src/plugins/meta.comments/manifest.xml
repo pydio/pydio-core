@@ -19,7 +19,7 @@
 		</hooks>
 		<client_configs>
 			<component_config className="InfoPanel">
-                <infoPanel mime="meta:ajxp_has_comments_feed,ajxp_root_node" reactComponent="MetaComments.Panel"/>
+                <infoPanel mime="meta:ajxp_has_comments_feed,ajxp_root_node" reactComponent="MetaComments.Panel" weight="10"/>
 			</component_config>
 		</client_configs>
 		<actions>

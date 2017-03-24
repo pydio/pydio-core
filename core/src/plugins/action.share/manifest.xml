@@ -240,7 +240,7 @@
                       namespace="ShareTemplates" component="DropZoneMinisite" props='{"containerId":"ajxp_dropbox_template","minisiteMode":"embed"}'/>
 
             <component_config className="InfoPanel">
-                <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel"/>
+                <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel" weight="-20"/>
             </component_config>
             <component_config className="UserAccountTabs">
                 <additional_tab id="shares_pane"

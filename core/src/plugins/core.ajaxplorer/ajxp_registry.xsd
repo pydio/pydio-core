@@ -457,23 +457,13 @@
             <xs:attribute name="sortType" use="optional" type="xs:NCName"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="infoPanelExtension">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element minOccurs="0" ref="messages"/>
-                <xs:element ref="html"/>
-            </xs:sequence>
-            <xs:attribute name="attributes" use="required"/>
-            <xs:attribute name="mime" use="required"/>
-            <xs:attribute name="modifier"/>
-        </xs:complexType>
-    </xs:element>
     <xs:element name="infoPanel">
         <xs:complexType>
             <xs:attribute name="mime" use="required" type="xs:NCName"/>
             <xs:attribute name="theme" type="xs:NCName"/>
             <xs:attribute name="reactComponent" type="xs:NCName"/>
             <xs:attribute name="primary" type="xs:boolean"/>
+            <xs:attribute name="weight" type="xs:integer"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="template">

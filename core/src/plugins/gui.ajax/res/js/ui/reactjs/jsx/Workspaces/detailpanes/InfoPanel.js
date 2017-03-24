@@ -4,7 +4,7 @@
         static parseConfigs(){
 
             let configs = new Map();
-            let panelsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@className="InfoPanel"]/infoPanelExtension[@reactComponent]|client_configs/component_config[@className="InfoPanel"]/infoPanel[@reactComponent]');
+            let panelsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@className="InfoPanel"]/infoPanel[@reactComponent]');
             let panels = new Map();
             panelsNodes.forEach(function(node){
                 let mimes = node.getAttribute('mime').split(',');
@@ -14,7 +14,8 @@
                     panels.get(mime).push({
                         COMPONENT:component,
                         THEME:node.getAttribute('theme'),
-                        ATTRIBUTES:node.getAttribute('attributes')
+                        ATTRIBUTES:node.getAttribute('attributes'),
+                        WEIGHT:node.getAttribute('weight') ? parseInt(node.getAttribute('weight')) : 0
                     });
                 });
             });
@@ -102,6 +103,9 @@
             if(this.props.onContentChange && !initTemplates){
                 this.props.onContentChange(templates.length);
             }
+            templates.sort(function(a, b){
+                return (a.WEIGHT === b.WEIGHT ? 0 : ( a.WEIGHT > b.WEIGHT ? 1 : -1));
+            });
             return {TEMPLATES:templates, DATA:data};
         },
 
