@@ -438,7 +438,7 @@
             return (
                 <div style={{width:'100%'}}>
                     <MaterialUI.AppBar
-                        title="Address Book"
+                        title={this.props.pydio.MessageHash['user_dash.1']}
                         showMenuIconButton={false}
                         iconClassNameRight="mdi mdi-close"
                         onRightIconButtonTouchTap={()=>{this.dismiss()}}

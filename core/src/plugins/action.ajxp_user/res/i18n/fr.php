@@ -21,7 +21,7 @@
 $mess=array(
 "title" => "Mon Compte",
 "desc" => "Gérer mes préférences, mon carnet d'adresses, mes éléments partagés, ...",
-"1" => "Utilisateurs partagés",
+"1" => "Carnet d'adresses",
 "2" => "Dépôts délégués",
 "3" => "Fichiers publics",
 "4"	=> "Chemin",

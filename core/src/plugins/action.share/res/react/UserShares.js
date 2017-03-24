@@ -267,10 +267,49 @@
     }
 
 
+    const ShareViewModal = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogSize: 'xl',
+                dialogPadding: false,
+                dialogIsModal: false,
+                dialogScrollBody: false
+            };
+        },
+
+        submit: function(){
+            this.dismiss();
+        },
+
+        render: function(){
+
+            return (
+                <div style={{width:'100%'}}>
+                    <MaterialUI.AppBar
+                        title={this.props.pydio.MessageHash['share_center.98']}
+                        showMenuIconButton={false}
+                        iconClassNameRight="mdi mdi-close"
+                        onRightIconButtonTouchTap={()=>{this.dismiss()}}
+                    />
+                    <ShareView {...this.props} style={{width:'100%', height: 600}}/>
+                </div>
+            );
+
+        }
+
+    });
+
 
     global.UserShares = {
-        ShareView : ShareView,
-        SharesList: ReactDND.DragDropContext(FakeDndBackend)(SharesList)
+        ShareView       : ShareView,
+        ShareViewModal  : ShareViewModal,
+        SharesList      : ReactDND.DragDropContext(FakeDndBackend)(SharesList)
     };
 
 })(window);

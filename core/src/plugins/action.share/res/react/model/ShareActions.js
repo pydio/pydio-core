@@ -41,6 +41,19 @@
             pydio.UI.openComponentInModal('ShareDialog', 'MainPanel', {pydio:pydio, readonly:true, selection:dataModel});
         }
 
+        static openUserShareView(){
+
+            pydio.UI.openComponentInModal('UserShares', 'ShareViewModal', {
+                pydio:pydio,
+                currentUser:true,
+                filters:{
+                    parent_repository_id:"Workspaces",
+                    share_type:"Share Types"
+                }
+            });
+
+        }
+
     }
 
     class Listeners{

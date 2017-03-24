@@ -219,6 +219,15 @@
                     <serverCallback methodName="preProcessDownload" applyCondition="$apply=\Pydio\Core\Services\SessionService::has(\Pydio\Core\Services\SessionService::CTX_MINISITE_HASH);"/>
                 </pre_processing>
             </action>
+            <action name="open_user_shares">
+                <gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
+                    <context selection="false" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"/>
+                </gui>
+                <rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
+                <processing>
+                    <clientCallback module="ShareActions.Callbacks.openUserShareView"/>
+                </processing>
+            </action>
         </actions>
         <client_configs>
             <template name="minisite_std_list" element="ajxp_shared_folder" position="top" label="share_center.153"
@@ -241,11 +250,6 @@
 
             <component_config className="InfoPanel">
                 <infoPanel mime="meta:ajxp_shared" reactComponent="ShareInfoPanel.InfoPanel" weight="-20"/>
-            </component_config>
-            <component_config className="UserAccountTabs">
-                <additional_tab id="shares_pane"
-                                tabInfo='{"icon":"mdi mdi-share-variant","label":"share_center.98","title":"share_center.99","position":3}'
-                                paneInfo='{"namespace":"UserShares", "componentName":"ShareView", "currentUser":true, "filters":{"parent_repository_id":"Workspaces", "share_type":"Share Types"}}'/>
             </component_config>
         </client_configs>
         <hooks>
