@@ -68,6 +68,7 @@ export default React.createClass({
             actions: [],
             title: null,
             size: this.props.size || 'md',
+            dialogWidth: this.props.size ? this.sizes[this.props.size].width : 420,
             padding: !!this.props.padding,
             blur: false
         }
@@ -75,6 +76,10 @@ export default React.createClass({
 
     componentWillUnmount: function(){
         this.deactivateResizeObserver();
+        if(this._crtPercentSizeObserver){
+            DOMUtils.stopObservingWindowResize(this._crtPercentSizeObserver);
+            this._crtPercentSizeObserver = null;
+        }
     },
 
     activateResizeObserver: function(){
@@ -156,7 +161,24 @@ export default React.createClass({
             this.setState({title: component.getTitle()});
         }
         if(component.getSize){
-            this.setState({size: component.getSize()});
+            const size = component.getSize();
+            if(this._crtPercentSizeObserver){
+                DOMUtils.stopObservingWindowResize(this._crtPercentSizeObserver);
+                this._crtPercentSizeObserver = null;
+            }
+            const width = this.sizes[size].width;
+            if(width.indexOf && width.indexOf('%') > 0){
+                const percent = parseInt(width.replace('%', ''));
+                this._crtPercentSizeObserver = () => {
+                    this.setState({
+                        dialogWidth: DOMUtils.getViewportWidth() * percent / 100
+                    });
+                };
+                DOMUtils.observeWindowResize(this._crtPercentSizeObserver);
+                this._crtPercentSizeObserver();
+            }else{
+                this.setState({dialogWidth: width});
+            }
         }
         if(component.getPadding){
             this.setState({padding: component.getPadding()});
@@ -227,7 +249,7 @@ export default React.createClass({
         var modalContent;
 
         const { state, sizes, styles, blurStyles } = this
-        const { async, componentData, title, actions, modal, open, size, padding, scrollBody, blur } = state
+        const { async, componentData, title, actions, modal, open, dialogWidth, padding, scrollBody, blur } = state
         let { className } = state;
 
         if (componentData) {
@@ -249,7 +271,7 @@ export default React.createClass({
 
         let dialogRoot = {...styles.dialogRoot}
         let dialogBody = {...styles.dialogBody, display:'flex'}
-        let dialogContent = {...styles.dialogContent, width: sizes[size].width, minWidth: sizes[size].width, maxWidth: sizes[size].width}
+        let dialogContent = {...styles.dialogContent, width: dialogWidth, minWidth: dialogWidth, maxWidth: dialogWidth}
         let dialogTitle = {...styles.dialogTitle}
         let overlayStyle;
 
