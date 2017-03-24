@@ -32,6 +32,7 @@ let SimpleList = React.createClass({
         skipInternalDataModel:React.PropTypes.bool,
 
         entryEnableSelector:React.PropTypes.func,
+        renderCustomEntry:React.PropTypes.func,
         entryRenderIcon:React.PropTypes.func,
         entryRenderActions:React.PropTypes.func,
         entryRenderFirstLine:React.PropTypes.func,
@@ -258,7 +259,8 @@ let SimpleList = React.createClass({
             showSelector:false,
             elements: this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
             containerHeight:this.props.heightAutoWithMax?0:500,
-            filterNodes:this.props.filterNodes
+            filterNodes:this.props.filterNodes,
+            sortingInfo: this.props.defaultSortingInfo || null
         };
         if(this.props.defaultGroupBy){
             state.groupBy = this.props.defaultGroupBy;
@@ -279,7 +281,8 @@ let SimpleList = React.createClass({
             showSelector:false,
             elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
-            filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes
+            filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes,
+            sortingInfo: nextProps.defaultSortingInfo || null
         });
         if(!nextProps.autoRefresh&& this.refreshInterval){
             window.clearInterval(this.refreshInterval);
@@ -646,7 +649,8 @@ let SimpleList = React.createClass({
 
     buildElementsFromNodeEntries: function(nodeEntries, showSelector){
 
-        var components = [];
+        let components = [], index = 0;
+        const nodeEntriesLength = nodeEntries.length;
         nodeEntries.forEach(function(entry){
             var data;
             if(entry.parent) {
@@ -704,13 +708,21 @@ let SimpleList = React.createClass({
                     actions:<SimpleReactActionBar node={entry.node} actions={entry.actions} dataModel={this.dm}/>,
                     selectorDisabled:!(this.props.entryEnableSelector?this.props.entryEnableSelector(entry.node):entry.node.isLeaf())
                 };
+                data['isFirst'] = (index === 0);
+                data['isLast'] = (index === nodeEntriesLength - 1);
+                index ++;
                 if(this.props.elementStyle){
                     data['style'] = this.props.elementStyle;
                 }
                 if(this.props.passScrollingStateToChildren){
                     data['parentIsScrolling'] = this.state.isScrolling;
                 }
-                if(this.props.tableKeys){
+                if(this.props.renderCustomEntry){
+
+                    components.push(this.props.renderCustomEntry(data));
+
+                }else if(this.props.tableKeys){
+
                     if(this.state && this.state.groupBy){
                         data['tableKeys'] = LangUtils.deepCopy(this.props.tableKeys);
                         delete data['tableKeys'][this.state.groupBy];
@@ -718,8 +730,11 @@ let SimpleList = React.createClass({
                         data['tableKeys'] = this.props.tableKeys;
                     }
                     components.push(React.createElement(TableListEntry, data));
+
                 }else{
+
                     components.push(React.createElement(ConfigurableListEntry, data));
+
                 }
             }
         }.bind(this));
