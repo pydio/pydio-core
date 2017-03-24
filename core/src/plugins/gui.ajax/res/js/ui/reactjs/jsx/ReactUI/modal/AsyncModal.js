@@ -301,6 +301,7 @@ export default React.createClass({
                 contentClassName={className}
                 repositionOnUpdate={false}
                 autoScrollBodyContent={scrollBody}
+                onRequestClose={() => {this.setState({open:false})}}
 
                 contentStyle={dialogContent}
                 bodyStyle={dialogBody}

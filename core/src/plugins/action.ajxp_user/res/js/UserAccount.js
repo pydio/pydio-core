@@ -472,7 +472,7 @@
         getDefaultProps: function(){
             return {
                 dialogTitle: '',
-                dialogSize: 'xl',
+                dialogSize: 'lg',
                 dialogPadding: false,
                 dialogIsModal: false,
                 dialogScrollBody: false
@@ -504,7 +504,7 @@
 
             return (
                 <MaterialUI.Tabs
-                    style={{display:'flex', flexDirection:'column'}}
+                    style={{display:'flex', flexDirection:'column', width:'100%'}}
                     tabItemContainerStyle={{minHeight:72}}
                     contentContainerStyle={{overflowY:'auto', minHeight: 350}}
                 >
@@ -522,6 +522,10 @@
             ResourcesManager.loadClassesAndApply(['PydioForm'], function(){
                 global.pydio.UI.openComponentInModal('UserAccount', 'ModalDashboard');
             });
+        }
+
+        static openAddressBook(){
+            global.pydio.UI.openComponentInModal('AddressBook', 'Modal');
         }
 
         static delete(){

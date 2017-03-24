@@ -401,8 +401,9 @@
                     </MaterialUI.List>
                 );
             }
+            let style = this.props.style || {}
             return (
-                <div style={{display:'flex', height: 450}}>
+                <div style={{display:'flex', height: 450, ...style}}>
                     {leftPanel}
                     {centerComponent}
                     {rightPanel}
@@ -412,8 +413,48 @@
 
     });
 
+    const ModalAddressBook = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogSize: 'lg',
+                dialogPadding: false,
+                dialogIsModal: false,
+                dialogScrollBody: false
+            };
+        },
+
+        submit: function(){
+            this.dismiss();
+        },
+
+        render: function(){
+
+            return (
+                <div style={{width:'100%'}}>
+                    <MaterialUI.AppBar
+                        title="Address Book"
+                        showMenuIconButton={false}
+                        iconClassNameRight="mdi mdi-close"
+                        onRightIconButtonTouchTap={()=>{this.dismiss()}}
+                    />
+                    <Panel mode="book" {...this.props} style={{width:'100%', height: 600}}/>
+                </div>
+            );
+
+        }
+
+    });
+
+
     global.AddressBook = {
-        Panel: Panel
+        Panel: Panel,
+        Modal: ModalAddressBook
     };
 
 

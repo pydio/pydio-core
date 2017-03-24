@@ -50,7 +50,13 @@ let Breadcrumb = React.createClass({
             segments.push(<span key={'bread_' + i} className="segment" onClick={this.goTo.bind(this, rebuilt)}>{seg}</span>);
             i++;
         }.bind(this));
-        return <div className="react_breadcrumb" style={mainStyle}><span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span> {segments}</div>
+        return (
+            <div className="react_breadcrumb" style={mainStyle}>
+                {this.props.startWithSeparator && <span className="separator"> / </span>}
+                <span className="segment first" onClick={this.goTo.bind(this, '/')}>{repoLabel}</span>
+                {segments}
+            </div>
+        );
     }
 
 });

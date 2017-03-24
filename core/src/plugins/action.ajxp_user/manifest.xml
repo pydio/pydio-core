@@ -30,6 +30,15 @@
 					<clientCallback module="UserAccount.Callbacks.openDashboard"/>
 				</processing>
 			</action>
+			<action name="open_address_book">
+				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
+					<context selection="false" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"/>
+				</gui>
+				<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
+				<processing>
+					<clientCallback module="UserAccount.Callbacks.openAddressBook"/>
+				</processing>
+			</action>
 		</actions>
 	</registry_contributions>
 </ajxpdriver>

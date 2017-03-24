@@ -121,6 +121,21 @@ let FSTemplate = React.createClass({
             mainToolbarsOthers = ["more", "change", "remote"];
         }
 
+        let homeButton, breadcrumbStyle;
+        if(this.props.pydio.user && this.props.pydio.user.getRepositoriesList().has('ajxp_home')){
+            homeButton = (
+                <MaterialUI.IconButton
+                    style={{marginTop:7, marginLeft: 10, marginRight: -6}}
+                    iconStyle={{color: 'rgba(255,255,255,0.87)'}}
+                    onTouchTap={() => {this.props.pydio.triggerRepositoryChange('ajxp_home')}}
+                    iconClassName="userActionIcon mdi mdi-home-variant"
+                    tooltip={this.props.pydio.MessageHash['305']}
+                    tooltipPosition="bottom-right"
+                />
+            );
+            breadcrumbStyle={paddingLeft: 0};
+        }
+
         return connectDropTarget(
             <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
                 <PydioReactUI.AsyncComponent
@@ -133,7 +148,8 @@ let FSTemplate = React.createClass({
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
-                            <Breadcrumb {...this.props}/>
+                            {homeButton}
+                            <Breadcrumb {...this.props} startWithSeparator={homeButton?true:false} rootStyle={breadcrumbStyle}/>
                             <SearchForm {...this.props}/>
                         </div>
                         <div id="main_toolbar">

@@ -18,6 +18,10 @@ export default React.createClass({
                 // Open dashboard in modal
                 this.props.pydio.Controller.fireAction('open_user_dashboard');
                 break;
+            case 'address-book':
+                // Open dashboard in modal
+                this.props.pydio.Controller.fireAction('open_address_book');
+                break;
             case 'logout':
                 this.props.pydio.Controller.fireAction('logout');
                 break;
@@ -31,7 +35,7 @@ export default React.createClass({
         const messages = this.props.pydio.MessageHash;
 
         let avatar;
-        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton;
+        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, addressBookButton;
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
             avatar = (
@@ -62,7 +66,7 @@ export default React.createClass({
                     />
                 );
             }
-            if(user.getRepositoriesList().has('ajxp_conf')){
+            if(user.getRepositoriesList().has('ajxp_conf') && user.activeRepository === 'ajxp_home'){
                 settingsButton = (
                     <MaterialUI.IconButton
                         onTouchTap={this.applyAction.bind(this, 'settings')}
@@ -80,6 +84,16 @@ export default React.createClass({
                         noLoader={true}
                         iconClassName="userActionIcon mdi mdi-bell-outline"
                         {...this.props}
+                    />
+                );
+            }
+            if(this.props.pydio.Controller.getActionByName('open_address_book')){
+                addressBookButton = (
+                    <MaterialUI.IconButton
+                        onTouchTap={this.applyAction.bind(this, 'address-book')}
+                        iconClassName="userActionIcon mdi mdi-book-open"
+                        className="userActionButton"
+                        tooltip={messages['166']}
                     />
                 );
             }
@@ -105,11 +119,12 @@ export default React.createClass({
             );
         }
 
+        // Do not display Home Button here for the moment
         const actionBar = (
             <div className="action_bar">
-                {homeButton}
                 {settingsButton}
                 {notificationsButton}
+                {addressBookButton}
                 {infoButton}
                 {logoutButton}
             </div>
