@@ -264,7 +264,7 @@ class NotificationCenter extends Plugin
         $offset = isSet($httpVars["offset"]) ? intval($httpVars["offset"]): 0;
         $limit = isSet($httpVars["limit"]) ? intval($httpVars["limit"]): 15;
         if(!isSet($httpVars["feed_type"]) || $httpVars["feed_type"] == "notif" || $httpVars["feed_type"] == "all"){
-            $res = $this->eventStore->loadEvents($authRepos, $crtPath, $userGroup, $offset, $limit, false, $userId);
+            $res = $this->eventStore->loadEvents($authRepos, $crtPath, $userGroup, $offset, $limit, false, $userId, !empty($crtPath));
         }else{
             $res = array();
         }

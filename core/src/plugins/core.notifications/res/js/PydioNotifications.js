@@ -76,11 +76,52 @@
             }
             if(action && EventsIcons[action]){
                 return (
-                    <div className="mimefont-container">
-                        <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
+                    <div style={{position:'relative'}} className="material-list-icon">
+                        <div style={timelineStyle}></div>
+                        <div className="mimefont-container" style={{position:'absolute'}}>
+                            <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
+                        </div>
                     </div>
                 );
             }
+        },
+
+        renderTimelineEntry: function(props){
+
+            const timelineStyle = {
+                position: 'absolute',
+                top: 0,
+                left: 33,
+                bottom: 0,
+                width: 4,
+                backgroundColor: '#eceff1'
+            };
+
+            const {node, isFirst} = props;
+            let action = node.getMetadata().get('event_action');
+            if(action === 'add' && node.isLeaf()){
+                action = 'add-file';
+            }
+            if(isFirst){
+                timelineStyle['top'] = 34;
+            }
+
+            return (
+
+                <div className="ajxp_node_leaf material-list-entry material-list-entry-2-lines" style={{borderBottom: 0}}>
+                    <div style={{position:'relative'}} className="material-list-icon">
+                        <div style={timelineStyle}></div>
+                        <div className="mimefont-container" style={{position:'absolute'}}>
+                            <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
+                        </div>
+                    </div>
+                    <div className="material-list-text">
+                        <div className="material-list-line-1" style={{whiteSpace:'normal', lineHeight: '24px'}}>{node.getMetadata().get('event_description')}</div>
+                        <div className="material-list-line-2">{node.getMetadata().get('short_date')}</div>
+                    </div>
+                </div>
+
+            );
         },
 
         renderFirstLineLeaf: function(node){
@@ -111,15 +152,17 @@
 
             let renderIcon = this.renderIconFile;
             let renderFirstLine = null;
+            let renderCustomEntry = null;
             let renderSecondLine = this.renderSecondLine;
             let nodeClicked = (node) => {
                 pydio.goTo(node.getMetadata().get('real_path'));
             };
             if(node.isLeaf()){
-                renderFirstLine = this.renderFirstLineLeaf;
+                renderCustomEntry = this.renderTimelineEntry;
+                renderFirstLine = null;
                 renderSecondLine = null;
-                renderIcon = this.renderIconNotif;
-                nodeClicked = null;
+                renderIcon = null;
+                nodeClicked = () => {};
             }
 
             let label = node.isLeaf() ? "File Activity" : "Folder Activity";
@@ -142,10 +185,12 @@
                             actionBarGroups={[]}
                             ref="provider"
                             hideToolbar={true}
+                            renderCustomEntry={renderCustomEntry}
                             entryRenderIcon={renderIcon}
                             entryRenderFirstLine={renderFirstLine}
                             entryRenderSecondLine={renderSecondLine}
                             nodeClicked={nodeClicked}
+                            defaultSortingInfo={{attribute : 'event_time',sortType:'number',direction : 'desc'}}
                         />
                     </div>
                 </PydioDetailPanes.InfoPanelCard>

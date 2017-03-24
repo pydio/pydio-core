@@ -121,7 +121,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
      * @param string $userId
      * @return array An array of stdClass objects with keys hookname, arguments, author, date, repository
      */
-    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId)
+    public function loadEvents($filterByRepositories, $filterByPath, $userGroup, $offset = 0, $limit = 10, $enlargeToOwned = true, $userId = null, $chainLoad = false)
     {
         if($this->sqlDriver["password"] == "XXXX") return array();
         if(!dibi::isConnected()) {
@@ -195,6 +195,7 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             }
         }
         $data = array();
+        error_log(dibi::$sql);
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->hookname = $row->htype;
@@ -203,6 +204,18 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             $object->date = $row->edate;
             $object->repository = $row->repository_id;
             $object->event_id = $row->id;
+            if(!empty($filterByPath) && !empty($chainLoad) && substr($row->index_path, -strlen($filterByPath)) === $filterByPath
+                && $object->arguments !== null && isSet($object->arguments[0]) && $object->arguments[0] instanceOf AJXP_Node ){
+                $oldNode = $object->arguments[0];
+                $oldPath = $oldNode->getPath();
+                if(!is_array($chainLoad)) $chainLoad = [];
+                $chainLoad[] = $filterByPath;
+                if(!in_array($oldPath, $chainLoad) && count($chainLoad) <= 10){
+                    // Load previous events when path was different.
+                    $chainData = $this->loadEvents($filterByRepositories, $oldPath, $userGroup, 0, $limit, $enlargeToOwned, $userId, $chainLoad);
+                    foreach($chainData as $chainObject)  $data[] = $chainObject;
+                }
+            }
             $data[] = $object;
         }
         return $data;
