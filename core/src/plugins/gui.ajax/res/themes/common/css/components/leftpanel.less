@@ -1,5 +1,4 @@
 @leftpanel_width:250px;
-@leftpanel_top_position:60px;
 @leftpanel_background_color:@white;
 @leftpanel_text_color:rgb(221,221,221);
 @leftpanel_zindex:1001;
@@ -8,49 +7,22 @@
 
 @bezier_transition:all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 
-.workspace-entry.workspace-access-inbox{
-  span.access-icon:before{
-    font-family: @fontAwesome;
-    content:'\f01c';
-  }
-}
-
 .left-panel{
-  background-color: @leftpanel_background_color;
   position: absolute;
-  top:@leftpanel_top_position;
+  top: 0;
   left: 0;
   bottom:0;
   width: @leftpanel_width;
   z-index: @leftpanel_zindex;
-  font-family: @fontReact;
-  -webkit-font-smoothing: antialiased;
-  font-size: 13px;
-  color:@leftpanel_text_color;
-  overflow-y: auto;
-  box-sizing: border-box;
+  overflow: hidden;
   transition: @bezier_transition;
-  box-shadow: @leftpanel_box_shadow;
-  *{
-    box-sizing: border-box;
-  }
+  box-shadow: @reactBoxShadowDepth2;
 
-  .section-title{
-    padding: 16px 16px ;
-    font-weight: 500;
-    border-top:1px solid fade(@leftpanel_text_color, 30);
-    margin-top: 10px;
-    transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
   .nav-list-entry{
     padding: 6px 1px 6px 16px;
     display: flex;
     line-height: 24px;
     cursor: pointer;
-    transition:@bezier_transition;
     &:hover{
       background-color: rgba(0,0,0,0.03);
     }
@@ -69,21 +41,28 @@
     text-overflow: ellipsis;
   }
 
+  .section-title{
+    padding: 16px 20px;
+    font-weight: 500;
+    border-top:1px solid fade(@leftpanel_text_color, 30);
+    margin-top: 10px;
+    transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+    .nav-list-entry-label();
+    &:first-of-type{
+      padding: 10px 20px ;
+      border-top:none;
+    }
+  }
+
+
   .workspaces{
+    font-size: 14px;
+
     .workspace-entry{
       .nav-list-entry();
+      padding: 10px 20px;
       .workspace-badge{
-        .nav-list-entry-icon();
-        font-size: 0.9em;
-        font-weight: 500;
-        background-color: @leftpanel_text_color;
-        color: @leftpanel_background_color;
-        border-radius: 50%;
-        position: relative;
-
-        span.badge-overlay{
-          display: none;
-        }
+        display:none;
       }
       .workspace-label{
         .nav-list-entry-label();
@@ -96,8 +75,6 @@
           height: 13px;
           line-height: 13px;
           padding: 0 3px;
-          background-color: white;
-          color: rgba(0,0,0,0.63);
           text-transform: uppercase;
         }
       }
@@ -108,12 +85,24 @@
         padding: 6px 0 0 8px;
       }
       &.workspace-current{
-        opacity: 0.4;
-      }
-      &.workspace-access-inbox{
-        margin-bottom: 10px;
-        .workspace-label{
-          text-transform: uppercase;
+        opacity: 1;
+        position: relative;
+        font-weight: 500;
+        .workspace-additional-action.icon-angle-down, .workspace-additional-action.icon-angle-up{
+          font-size: 16px;
+          position: absolute;
+          right: 8px;
+          margin-top: -2px;
+          border-radius: 50%;
+          transition: @bezier_transition;
+          height: 30px;
+          width: 30px;
+          line-height: 30px;
+          text-align: center;
+          padding: 0;
+          &:hover{
+            background-color: rgba(255,255,255,0.2);
+          }
         }
       }
     }
@@ -122,5 +111,66 @@
   &.hidden{
     left: -@leftpanel_width + @leftpanel_closed_width;
   }
+
+  &.expanded{
+    width: 100% !important;
+    overflow-y: auto;
+    .workspaces {
+      .workspace-entry{
+        padding: 16px 1px 0px 16px;
+        line-height: 20px;
+        .workspace-badge{
+          display: inline-block;
+          width: 34px;
+          height: 34px;
+          line-height: 34px;
+          font-size: 1em;
+        }
+        .workspace-label-container{
+          display: block;
+          flex: 1;
+          border-bottom: 1px solid rgba(0,0,0,0.03);
+          padding-bottom: 10px;
+          padding-left: 5px;
+          .workspace-label{
+            font-size: 16px;
+          }
+          .workspace-description{
+            display: block;
+            color: rgba(0,0,0,0.33);
+          }
+        }
+        .workspace-additional-action{
+          padding: 0 10px;
+          color: rgba(0,0,0,0.23);
+          font-size: 16px;
+          border-bottom: 1px solid rgba(0,0,0,0.03);
+          &:hover{
+            color: rgba(0,0,0,0.53);
+          }
+        }
+      }
+    }
+  }
+  .folders-tree{
+    margin-left: -15px;
+
+    &.closed{
+      display: none;
+    }
+    div.tree-item{
+      transition:@bezier_transition;
+      line-height: 24px;
+      &.mui-is-selected{
+        div.tree-item-label{
+          color: inherit;
+        }
+      }
+      div.tree-item-label{
+        .nav-list-entry-label();
+      }
+    }
+  }
+
 
 }

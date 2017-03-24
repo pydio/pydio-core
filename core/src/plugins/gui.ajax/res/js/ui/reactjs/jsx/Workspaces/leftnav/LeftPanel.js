@@ -13,14 +13,28 @@ let LeftPanel = React.createClass({
     render: function(){
         const palette = this.props.muiTheme.palette;
         const Color = MaterialUI.Color;
+        const propStyle = this.props.style || {};
+        const colorHue = Color(palette.primary1Color).hsl().array()[0];
+        const lightBg = new Color({h:colorHue,s:35,l:98});
+        const style = {
+            ...propStyle,
+            backgroundColor: lightBg
+        };
         const widgetStyle = {
             backgroundColor: Color(palette.primary1Color).darken(0.2),
             width:'100%'
         };
+        const wsListStyle = {
+            overflowY: 'auto',
+            color    : Color(palette.primary1Color).darken(0.1).alpha(0.87)
+        };
+        const wsSectionTitleStyle = {
+            color    : Color(palette.primary1Color).darken(0.1).alpha(0.50)
+        };
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
         return (
-            <div className="left-panel vertical_fit vertical_layout" style={this.props.style}>
+            <div className="left-panel vertical_fit vertical_layout" style={style}>
                 <UserWidget
                     pydio={this.props.pydio}
                     style={widgetStyle}
@@ -28,7 +42,8 @@ let LeftPanel = React.createClass({
                 />
                 <WorkspacesList
                     className={"vertical_fit"}
-                    style={{overflowY:'auto'}}
+                    style={wsListStyle}
+                    sectionTitleStyle={wsSectionTitleStyle}
                     pydio={this.props.pydio}
                     workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
                     showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}

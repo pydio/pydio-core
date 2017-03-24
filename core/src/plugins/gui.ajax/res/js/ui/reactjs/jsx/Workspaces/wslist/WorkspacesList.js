@@ -10,6 +10,7 @@ export default React.createClass({
         onOutLink               : React.PropTypes.func,
         className               : React.PropTypes.string,
         style                   : React.PropTypes.object,
+        sectionTitleStyle       : React.PropTypes.object,
         filterByType            : React.PropTypes.oneOf(['shared', 'entries', 'create'])
     },
 
@@ -70,21 +71,21 @@ export default React.createClass({
         if(entries.length){
             sections.push({
                 k:'entries', 
-                title: <div key="entries-title" className="section-title">{messages[468]}</div>, 
+                title: <div key="entries-title" className="section-title" style={this.props.sectionTitleStyle}>{messages[468]}</div>,
                 content: <div key="entries-ws" className="workspaces">{entries}</div>
             });
         }
         if(sharedEntries.length){
             sections.push({
                 k:'shared', 
-                title: <div key="shared-title" className="section-title">{messages[469]}</div>, 
+                title: <div key="shared-title" className="section-title" style={this.props.sectionTitleStyle}>{messages[469]}</div>,
                 content: <div key="shared-ws" className="workspaces">{sharedEntries}</div> 
             });
         }
         if(createAction){
             sections.push({
                 k:'create', 
-                title: <div key="create-title" className="section-title"></div>, 
+                title: <div key="create-title" className="section-title" style={this.props.sectionTitleStyle}></div>,
                 content: createAction
             });
         }

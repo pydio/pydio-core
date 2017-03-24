@@ -203,7 +203,7 @@ module.exports = function(grunt) {
                 }
             },
             styles_material: {
-                files: ['res/themes/material/css/**/*.less'],
+                files: ['res/themes/material/css/**/*.less', 'res/themes/common/css/**/*.less'],
                 tasks: ['less', 'cssmin'],
                 options: {
                     nospawn: true

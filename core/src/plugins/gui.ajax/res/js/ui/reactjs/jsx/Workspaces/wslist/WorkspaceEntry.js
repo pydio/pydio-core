@@ -176,14 +176,19 @@ let WorkspaceEntry =React.createClass({
             additionalAction,
             badge, badgeNum, newWorkspace;
 
+        const selectedItemStyle = {
+            backgroundColor: this.props.muiTheme.palette.accent2Color,
+            color: 'white'
+        };
         let style = {};
 
         if (current) {
             currentClass +=" workspace-current";
-            style.backgroundColor = this.props.muiTheme.palette.accent2Color;
-        }
-        if(this.props.showFoldersTree && this.state.currentContextNode && this.state.currentContextNode.getPath() === '/' ){
-            currentClass +=" workspace-current-node";
+            if(!this.state.openFoldersTree || (this.state.currentContextNode && this.state.currentContextNode.getPath() === '/')){
+                style = {...selectedItemStyle};
+            }else{
+                style = {fontWeight: 500}
+            }
         }
 
         currentClass += " workspace-access-" + this.props.workspace.getAccessType();
@@ -266,6 +271,7 @@ let WorkspaceEntry =React.createClass({
                         dataModel={this.props.pydio.getContextHolder()}
                         className={this.state.openFoldersTree?"open":"closed"}
                         draggable={true}
+                        selectedItemStyle={selectedItemStyle}
                     />
                 </div>
             )

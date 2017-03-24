@@ -4,6 +4,7 @@ import SearchForm from './SearchForm'
 import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
 import InfoPanel from './detailpanes/InfoPanel'
+import LeftPanel from './leftnav/LeftPanel'
 
 let FSTemplate = React.createClass({
 
@@ -138,12 +139,7 @@ let FSTemplate = React.createClass({
 
         return connectDropTarget(
             <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
-                <PydioReactUI.AsyncComponent
-                    className="left-panel"
-                    namespace="PydioWorkspaces"
-                    componentName="LeftPanel"
-                    pydio={this.props.pydio}
-                />
+                <LeftPanel className="left-panel" pydio={this.props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
                         <div id="workspace_toolbar">
@@ -159,7 +155,7 @@ let FSTemplate = React.createClass({
                                 buttonLabelStyle={styles.raisedButtonLabelStyle}
                                 id="create-button-menu"
                                 toolbars={["upload", "create"]}
-                                buttonTitle="New..."
+                                buttonTitle="New"
                                 raised={true}
                                 secondary={true}
                                 controller={this.props.pydio.Controller}
