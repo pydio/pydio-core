@@ -177,11 +177,18 @@ var SimpleTreeNode = React.createClass({
             if(this.nodeIsSelected(this.props.node) && this.props.selectedItemStyle){
                 itemStyle = {...itemStyle, ...this.props.selectedItemStyle};
             }
+            let icon = 'mdi mdi-folder';
+            const ajxpMime = this.props.node.getAjxpMime();
+            if(ajxpMime === 'ajxp_browsable_archive'){
+                icon = 'mdi mdi-archive';
+            }else if(ajxpMime === 'ajxp_recycle'){
+                icon = 'mdi mdi-delete';
+            }
             selfLabel = (
                 <div className={'tree-item ' + isSelected + (boxes?' has-checkboxes':'')} style={itemStyle}>
                     <div className="tree-item-label" onClick={this.onNodeSelect} title={this.props.node.getLabel()}
                          data-id={this.props.node.getPath()}>
-                        {hasChildren}<span className="tree-icon icon-folder-close"></span>{this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
+                        {hasChildren}<span className={"tree-icon " + icon}></span>{this.props.forceLabel?this.props.forceLabel:this.props.node.getLabel()}
                     </div>
                     {boxes}
                 </div>
