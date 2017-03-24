@@ -1,9 +1,8 @@
-import MessagesConsumerMixin from '../MessagesConsumerMixin'
 import IconButtonMenu from '../menu/IconButtonMenu'
 
 export default React.createClass({
 
-    mixins:[MessagesConsumerMixin],
+    mixins:[PydioReactUI.PydioContextConsumerMixin],
 
     propTypes:{
         tableKeys:React.PropTypes.object.isRequired,
@@ -79,10 +78,10 @@ export default React.createClass({
         var sortAction = new Action({
             name:'sort_action',
             icon_class:'mdi mdi-sort-descending',
-            text_id:150,
-            title_id:151,
-            text:MessageHash[150],
-            title:MessageHash[151],
+            text_id:450,
+            title_id:450,
+            text:this.context.getMessage(450),
+            title:this.context.getMessage(450),
             hasAccessKey:false,
             subMenu:true,
             subMenuUpdateImage:true
@@ -98,12 +97,12 @@ export default React.createClass({
         });
         let buttons = new Map();
         buttons.set('sort_action', sortAction);
-        window.pydio.getController().updateGuiActions(buttons);
+        this.context.pydio.getController().updateGuiActions(buttons);
 
     },
 
     componentWillUnmount: function(){
-        window.pydio.getController().deleteFromGuiActions('sort_action');
+        this.context.pydio.getController().deleteFromGuiActions('sort_action');
     },
 
     render: function(){
