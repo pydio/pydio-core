@@ -417,7 +417,7 @@ class Scheduler extends Plugin
                 "ICON" => "preferences_desktop.png",
                 "METADATA" => array(
                     "icon_class" => "icon-time",
-                    "component" => "Scheduler.Board"
+                    "component" => "AdminScheduler.Dashboard"
                 ),
                 "LIST" => array($this, "listTasks")
             );

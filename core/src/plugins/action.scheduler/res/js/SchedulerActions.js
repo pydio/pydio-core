@@ -40,7 +40,7 @@
 
                 if(args && args[0]){
                     var tId = args[0].getPath();
-                    tId = getBaseName(tId);
+                    tId = PathUtils.getBasename(tId);
                     this.currentFormManager.task_id = tId;
                     var conn = new Connexion();
                     conn.setParameters(new Hash({get_action:'scheduler_loadTask',task_id:tId}));
@@ -137,7 +137,7 @@
             }else{
                 userSelection =  pydio.getUserSelection();
             }
-            var taskId = getBaseName(userSelection.getUniqueNode().getPath());
+            var taskId = PathUtils.getBasename(userSelection.getUniqueNode().getPath());
             var connexion = new Connexion();
             connexion.setParameters(new Hash({
                 get_action:'scheduler_runTask',
@@ -171,7 +171,7 @@
                 userSelection =  pydio.getUserSelection();
             }
             var conn = new Connexion();
-            conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: getBaseName(userSelection.getUniqueNode().getPath()) }));
+            conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: PathUtils.getBasename(userSelection.getUniqueNode().getPath()) }));
             conn.onComplete = function(transport){
                 PydioApi.getClient().parseXmlMessage(transport.responseXML);
             };

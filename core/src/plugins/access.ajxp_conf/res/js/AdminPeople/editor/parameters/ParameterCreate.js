@@ -1,4 +1,5 @@
 import EditorCache from '../util/EditorCache'
+import ParametersPicker from './ParametersPicker'
 
 export default React.createClass({
 
@@ -102,7 +103,7 @@ export default React.createClass({
         );
         content = (
             <div className="picker-list">
-                <AdminComponents.ParametersPicker
+                <ParametersPicker
                     allActions={allActions}
                     allParameters={allParams}
                     onSelection={this.setSelection}

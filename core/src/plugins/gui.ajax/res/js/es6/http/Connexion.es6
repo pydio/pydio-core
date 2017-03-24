@@ -435,11 +435,13 @@ class Connexion{
                     window.execScript( script );
                 } else {
                     window.my_code = script;
-                    var script_tag = document.createElement('script');
+                    const head = document.getElementsByTagName('head')[0];
+                    let script_tag = document.createElement('script');
                     script_tag.type = 'text/javascript';
                     script_tag.innerHTML = 'eval(window.my_code)';
-                    document.getElementsByTagName('head')[0].appendChild(script_tag);
+                    head.appendChild(script_tag);
                     delete window.my_code;
+                    head.removeChild(script_tag);
                 }
                 if(onLoadedCode != null) onLoadedCode();
             }catch(e){

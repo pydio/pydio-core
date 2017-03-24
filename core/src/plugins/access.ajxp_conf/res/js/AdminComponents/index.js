@@ -7,16 +7,12 @@ import NavigationHelper from './util/NavigationHelper'
 import MenuItemListener from './util/MenuItemListener'
 import DNDActionsManager from './util/DNDActionsManager'
 
-import ParametersPicker from './dialog/ParametersPicker'
-
 window.AdminComponents = {
     MessagesConsumerMixin   : MessagesConsumerMixin,
     PydioConsumerMixin      : PydioConsumerMixin,
     NavigationHelper        : NavigationHelper,
     MenuItemListener        : MenuItemListener,
     DNDActionsManager       : DNDActionsManager,
-
-    ParametersPicker        : ParametersPicker,
 
     AdminDashboard          : AdminDashboard,
     SimpleDashboard         : SimpleDashboard,
