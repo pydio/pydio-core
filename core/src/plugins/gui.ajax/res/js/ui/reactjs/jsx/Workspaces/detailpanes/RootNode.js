@@ -58,7 +58,7 @@ export default React.createClass({
         }else if(this.state && this.state.users){
             panelData = [
                 {key: 'internal', label:internal, value:this.state.users},
-                {key: 'external', label:internal, value:this.state.groups}
+                {key: 'external', label:external, value:this.state.groups}
             ];
         }
 
