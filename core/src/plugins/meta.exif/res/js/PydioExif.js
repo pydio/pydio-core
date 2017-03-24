@@ -70,14 +70,17 @@
             let items = [];
             let actions = [];
             if(this.state && this.state.items){
-                items = this.state.items.map(function(object){
+
+                const fields = this.state.items.map(function(object){
                     return (
-                        <div key={object.key} className="infoPanelRow">
+                        <div key={object.key} className="infoPanelRow" style={{float:'left', width: '50%', padding: '0 4px 12px', whiteSpace:'nowrap'}}>
                             <div className="infoPanelLabel">{object.label}</div>
                             <div className="infoPanelValue">{object.value}</div>
                         </div>
                     )
                 });
+                items.push(<div style={{padding: '0 12px'}}>{fields}</div>)
+                items.push(<div style={{clear:'left'}}></div>)
 
                 actions.push(
                     <MaterialUI.FlatButton onClick={this.openInExifEditor} label="More Exif" />
@@ -89,7 +92,7 @@
                         namespace="PydioMaps"
                         componentName="OLMap"
                         key="map"
-                        style={{height: 170,marginBottom:16}}
+                        style={{height: 170,marginBottom:0, padding:0}}
                         centerNode={this.props.node}
                         mapLoaded={this.mapLoaded}
                     />

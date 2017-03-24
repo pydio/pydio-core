@@ -19,7 +19,14 @@
 
         render: function(){
             return (
-                <PydioComponents.ClipboardTextField {...this.props} floatingLabelText={this.props.getMessage(this.props.inputTitle)}/>
+                <div className="infoPanelRow">
+                    <div className="infoPanelLabel">{this.props.getMessage(this.props.inputTitle)}</div>
+                    <PydioComponents.ClipboardTextField
+                        {...this.props}
+                        underlineShow={false}
+
+                    />
+                </div>
             );
         }
 
@@ -90,6 +97,20 @@
                 model : new ReactModel.Share(this.props.pydio, this.props.node)
             };
         },
+
+        componentWillReceiveProps: function(nextProps){
+            if(nextProps.node && nextProps.node !== this.props.node){
+                const model = new ReactModel.Share(this.props.pydio, nextProps.node);
+                this.setState({
+                    status:'loading',
+                    model : model
+                }, function(){
+                    model.observe("status_changed", this.modelUpdated);
+                    model.initLoad();
+                }.bind(this))
+            }
+        },
+
         componentDidMount:function(){
             this.state.model.observe("status_changed", this.modelUpdated);
             this.state.model.initLoad();
@@ -150,15 +171,15 @@
                     if(u.RIGHT.indexOf('r') !== -1) rights.push(global.MessageHash["share_center.31"]);
                     if(u.RIGHT.indexOf('w') !== -1) rights.push(global.MessageHash["share_center.181"]);
                     return (
-                        <div key={u.ID} className="uUserEntry" title={rights.join(' & ')} style={{padding:'6px 0'}}>
+                        <div key={u.ID} className="uUserEntry" title={rights.join(' & ')} style={{padding:'10px 0'}}>
                             <PydioComponents.UserAvatar
                                 useDefaultAvatar={true}
                                 userId={u.ID}
                                 userLabel={u.LABEL}
                                 pydio={pydio}
                                 style={{flex:1, display:'flex', alignItems:'center'}}
-                                labelStyle={{fontSize: 16, paddingLeft: 5}}
-                                avatarSize={22}
+                                labelStyle={{fontSize: 15, paddingLeft: 10}}
+                                avatarSize={26}
                             />
                         </div>
                     );
@@ -215,13 +236,12 @@
 
             return (
                 <div style={{padding: 0}}>
-                    <div style={{padding: '0px 20px'}}>
+                    <div style={{padding: '0px 16px'}}>
                     {linkField}
                     {downloadField}
                     {templateField}
                     </div>
-                    {(linkField && downloadField && templateField) && (sharedUsersBlock || noEntriesFoundBlock) && <MaterialUI.Divider style={{marginTop:10}}/>}
-                    <div style={{padding: '0px 20px'}}>
+                    <div style={{padding: '0px 16px'}}>
                     {sharedUsersBlock}
                     {noEntriesFoundBlock}
                     </div>
@@ -236,16 +256,16 @@
         render: function(){
 
             let actions = [
-                <ReactMUI.FlatButton
+                <MaterialUI.FlatButton
                     key="edit-share"
-                    label="Edit share"
-                    secondary={true}
-                    onClick={()=>{global.pydio.getController().fireAction("share-edit-shared");}}
+                    label={this.props.pydio.MessageHash['share_center.125']}
+                    primary={true}
+                    onTouchTap={()=>{global.pydio.getController().fireAction("share-edit-shared");}}
                 />
             ];
 
             return (
-                <PydioDetailPanes.InfoPanelCard title="Shared" actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
+                <PydioDetailPanes.InfoPanelCard title={this.props.pydio.MessageHash['share_center.50']} actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
                     <InfoPanel {...this.props}/>
                 </PydioDetailPanes.InfoPanelCard>
             );

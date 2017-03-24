@@ -109,9 +109,10 @@ class UserAvatar extends React.Component{
 
         const {avatar, label} = this.state;
         const {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar, useDefaultAvatar} = this.props;
-        let avatarContent;
+        let avatarContent, avatarColor;
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
             avatarContent = label.toUpperCase().substring(0,2);
+            avatarColor = this.props.muiTheme.palette.primary1Color;
         }
         return (
             <div className={className} style={style}>
@@ -120,6 +121,7 @@ class UserAvatar extends React.Component{
                     style={avatarStyle}
                     className={avatarClassName}
                     size={avatarSize}
+                    backgroundColor={avatarColor}
                 >{avatarContent}</MaterialUI.Avatar>}
                 {displayLabel && <div
                     className={labelClassName}
@@ -158,5 +160,7 @@ UserAvatar.defaultProps = {
     avatarClassName:'user-avatar',
     labelClassName:'user-label'
 };
+
+UserAvatar = MaterialUI.Style.muiThemeable()(UserAvatar);
 
 export {UserAvatar as default}

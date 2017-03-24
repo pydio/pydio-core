@@ -64,20 +64,21 @@ export default React.createClass({
             var setHtml = function(){
                 return {__html:this.state.copyMessage};
             }.bind(this);
-            copyMessage = <div style={{color:'rgba(0,0,0,0.53)'}} className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
+            copyMessage = <div style={{color:'rgba(0,0,0,0.23)'}} className="copy-message" dangerouslySetInnerHTML={setHtml()}/>;
         }
 
         const buttonStyle = {
             position    :'absolute',
-            right: 0,
-            bottom: 8,
-            fontSize: 16,
-            backgroundColor: 'rgba(242, 242, 242, 0.93)',
-            height: 30,
-            width: 28,
-            lineHeight: '32px',
+            right: -8,
+            bottom: 13,
+            fontSize: 15,
+            color: this.props.buttonColor || 'rgba(0, 150, 136, 0.52)',
+            height: 26,
+            width: 26,
+            lineHeight: '28px',
             textAlign: 'center',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            borderRadius: '50%'
         };
 
 
@@ -88,12 +89,13 @@ export default React.createClass({
                         fullWidth={true}
                         ref="input"
                         floatingLabelText={this.props.floatingLabelText}
+                        floatingLabelStyle={{whiteSpace:'nowrap'}}
+                        underlineShow={this.props.underlineShow}
                         defaultValue={this.props.inputValue}
                         className={this.props.inputClassName}
                         readOnly={true}
                         onClick={select}
-                        floatingLabelStyle={{whiteSpace:'nowrap'}}
-                        style={{marginTop:-10}}
+                        style={{marginTop:-10, width: '92%', fontSize:14}}
                     />
                     <span ref="copy-button" style={buttonStyle} title={this.props.getMessage('191')} className="copy-button mdi mdi-content-copy"/>
                 </div>
