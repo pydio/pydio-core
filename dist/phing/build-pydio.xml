@@ -34,6 +34,14 @@
         	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
         	<then>
 		        <phingcall target="deploy"/>
+		    </then>
+		</if>
+        <if>
+            <and>
+            	<not><equals arg1="${skip_deploy}" arg2="true"/></not>
+            	<not><equals arg1="${skip_clean}" arg2="true"/></not>
+            </and>
+        	<then>
 		        <phingcall target="clean"/>
 		    </then>
 		</if>
