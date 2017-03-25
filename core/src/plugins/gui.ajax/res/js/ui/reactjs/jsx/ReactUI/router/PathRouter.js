@@ -63,9 +63,10 @@ const PathRouterWrapper = function(pydio){
                     // We don't want history to be touched if we've triggered ourselves the repository change
                     this.setState({
                         history: false
+                    }, () => {
+                        pydio.goTo("/" + nextState.target);
                     })
 
-                    pydio.goTo("/" + nextState.target);
                 }
             } else {
                 // If we've switched repo and this was triggered elsewhere,
@@ -74,8 +75,7 @@ const PathRouterWrapper = function(pydio){
                     let uri = [
                         nextProps.params.workspaceId.replace(/\/$/, "").replace(/^\//, ""),
                         nextState.active.replace(/\/$/, "").replace(/^\//, "")
-                    ].join("/")
-
+                    ].join("/");
                     browserHistory.push("/" + uri)
                 }
             }

@@ -406,7 +406,7 @@ let FoldersTree = React.createClass({
         if(this.props.onNodeSelected){
             this.props.onNodeSelected(n);
         }else{
-            this.props.pydio.goTo(n);
+            this.props.dataModel.requireContextChange(n);
         }
     },
 

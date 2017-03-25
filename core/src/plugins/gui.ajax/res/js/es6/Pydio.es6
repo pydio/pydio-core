@@ -275,20 +275,28 @@ class Pydio extends Observable{
             return;
         }
         var gotoNode;
-        if(path == "" || path == "/") {
-            gotoNode = new AjxpNode("/");
-            this._contextHolder.requireContextChange(gotoNode);
+        if(path === "" || path === "/") {
+            this._contextHolder.requireContextChange(this._contextHolder.getRootNode());
             return;
-        }
-        this._contextHolder.loadPathInfoAsync(path, function(foundNode){
-            if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
-                this._contextHolder.setPendingSelection(PathUtils.getBasename(path));
-                gotoNode = new AjxpNode(PathUtils.getDirname(path));
+        }else{
+            gotoNode = new AjxpNode(path);
+            gotoNode = gotoNode.findInArbo(this._contextHolder.getRootNode());
+            if(gotoNode){
+                // Node is already here
+                this._contextHolder.requireContextChange(gotoNode);
             }else{
-                gotoNode = foundNode;
+                // Check on server if it does exist, then load
+                this._contextHolder.loadPathInfoAsync(path, function(foundNode){
+                    if(foundNode.isLeaf() && foundNode.getAjxpMime()!='ajxp_browsable_archive') {
+                        this._contextHolder.setPendingSelection(PathUtils.getBasename(path));
+                        gotoNode = new AjxpNode(PathUtils.getDirname(path));
+                    }else{
+                        gotoNode = foundNode;
+                    }
+                    this._contextHolder.requireContextChange(gotoNode);
+                }.bind(this));
             }
-            this._contextHolder.requireContextChange(gotoNode);
-        }.bind(this));
+        }
     }
 
     /**
