@@ -211,10 +211,10 @@
             const deleteAction = () => {this.props.onDeleteAction(item, this.state.selection); this.setState({select: false, selection: []})};
             const toolbar = (
                 <div style={{padding: 10, height:56, backgroundColor:'#fafafa', display:'flex', alignItems:'center'}}>
+                    {item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: 7}} onCheck={toggleSelect}/>}
                     <div style={{flex:1, fontSize:20}}>{item.label}</div>
                     {item.actions && item.actions.create && !this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
                     {item.actions && item.actions.remove && this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
-                    {item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: 7}} onCheck={toggleSelect}/>}
                 </div>
             );
             if(item._parent && this.props.mode !== 'inner'){
@@ -483,7 +483,7 @@
                 _notSelectable:true,
                 actions:{
                     type    : 'users',
-                    create  : 'Create User',
+                    create  : '+ Create User',
                     remove  : 'Delete User',
                     multiple: true
                 }
@@ -499,7 +499,7 @@
                     _notSelectable: true,
                     actions: {
                         type: 'teams',
-                        create: 'Create Team',
+                        create: '+ Create Team',
                         remove: 'Delete Team',
                         multiple: true
                     }
