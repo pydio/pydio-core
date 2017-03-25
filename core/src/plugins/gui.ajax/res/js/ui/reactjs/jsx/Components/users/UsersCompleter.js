@@ -17,60 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-const UserCreationForm = React.createClass({
-
-    propTypes:{
-        newUserName:React.PropTypes.string.isRequired,
-        submitCreationForm: React.PropTypes.func.isRequired,
-        cancelCreationForm: React.PropTypes.func.isRequired
-    },
-
-    getParameters: function(){
-        if(!this._parsedParameters){
-            this._parsedParameters = PydioUsers.Client.getCreateUserParameters();
-        }
-        return this._parsedParameters;
-    },
-
-    getValuesForPost: function(prefix){
-        return PydioForm.Manager.getValuesForPOST(this.getParameters(),this.state.values,prefix);
-    },
-
-    getInitialState: function(){
-        let userPrefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
-        if(!userPrefix || this.props.newUserName.startsWith(userPrefix)) userPrefix = '';
-        return {
-            values:{
-                new_user_id:userPrefix + this.props.newUserName,
-                lang:global.pydio.currentLanguage,
-                new_password:'',
-                send_email:true
-            }
-        };
-    },
-
-    onValuesChange:function(newValues){
-        this.setState({values:newValues});
-    },
-
-    render:function(){
-        return (
-            <MaterialUI.Paper zDepth={2} style={{height: 250, overflowY: 'auto'}}>
-                <PydioForm.FormPanel
-                    className="reset-pydio-forms"
-                    depth={-1}
-                    parameters={this.getParameters()}
-                    values={this.state.values}
-                    onChange={this.onValuesChange}
-                />
-                <div style={{padding:16, textAlign:'right', paddingTop:0}}>
-                    <MaterialUI.FlatButton label={global.pydio.MessageHash[484]} secondary={true} onClick={this.props.submitCreationForm} />
-                    <MaterialUI.FlatButton label={global.pydio.MessageHash[49]} onClick={this.props.cancelCreationForm} />
-                </div>
-            </MaterialUI.Paper>
-        )
-    }
-});
+import UserCreationForm from './UserCreationForm'
 
 const UsersLoader = React.createClass({
 
@@ -185,26 +132,12 @@ const UsersLoader = React.createClass({
 
     },
 
-    submitCreationForm: function(){
-
-        const prefix = PydioUsers.Client.getCreateUserPostPrefix();
-        const values = this.refs['creationForm'].getValuesForPost(prefix);
-        PydioUsers.Client.createUserFromPost(values, function(values, jsonReponse){
-            let id;
-            if(jsonReponse['createdUserId']){
-                id = jsonReponse['createdUserId'];
-            }else{
-                id = values[prefix + 'new_user_id'];
-            }
-            const display = values[prefix + 'USER_DISPLAY_NAME'] || id;
-            const fakeUser = new PydioUsers.User(id, display, 'user');
-            this.props.onValueSelected(fakeUser);
-            this.setState({createUser:null});
-        }.bind(this));
-
+    onUserCreated: function(newUser){
+        this.props.onValueSelected(newUser);
+        this.setState({createUser:null});
     },
 
-    cancelCreationForm:function(){
+    onCreationCancelled:function(){
         this.setState({createUser:null});
     },
 
@@ -242,10 +175,9 @@ const UsersLoader = React.createClass({
                     />
                     <div style={{position: 'absolute', top: 73, left: 0, right: 0, zIndex: 10}}>
                         <UserCreationForm
-                            ref="creationForm"
                             newUserName={this.state.createUser}
-                            submitCreationForm={this.submitCreationForm}
-                            cancelCreationForm={this.cancelCreationForm}
+                            onUserCreated={this.onUserCreated}
+                            onCancel={this.onCreationCancelled}
                         />
                     </div>
                 </div>

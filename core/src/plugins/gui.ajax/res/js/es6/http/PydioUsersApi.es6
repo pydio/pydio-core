@@ -189,8 +189,26 @@
             }.bind(this));
         }
 
+        static deleteUser(userId, callback){
+            PydioApi.getClient().request({
+                get_action:'user_delete_user',
+                user_id:userId
+            }, function(transport){
+                callback();
+            });
+        }
+
         static saveSelectionSupported(){
             return global.pydio.getController().actions.get('user_team_create') !== undefined;
+        }
+
+        static deleteTeam(teamId, callback){
+            PydioApi.getClient().request({
+                get_action:'user_team_delete',
+                team_id:teamId
+            }, function(transport){
+                callback(transport.responseJSON);
+            });
         }
 
         static saveSelectionAsTeam(teamName, userIds, callback){
@@ -198,8 +216,38 @@
                 get_action:'user_team_create',
                 team_label:teamName,
                 'user_ids[]':userIds
-            }, function(){
-                callback();
+            }, function(transport){
+                callback(transport.responseJSON);
+            });
+        }
+
+        static addUserToTeam(teamId, userId, callback){
+            PydioApi.getClient().request({
+                get_action:'user_team_add_user',
+                team_id:teamId,
+                user_id:userId
+            }, function(transport){
+                callback(transport.responseJSON);
+            });
+        }
+
+        static removeUserFromTeam(teamId, userId, callback){
+            PydioApi.getClient().request({
+                get_action:'user_team_delete_user',
+                team_id:teamId,
+                user_id:userId
+            }, function(transport){
+                callback(transport.responseJSON);
+            });
+        }
+
+        static updateTeamLabel(teamId, newLabel,callback){
+            PydioApi.getClient().request({
+                get_action:'user_team_update_label',
+                team_id:teamId,
+                team_label:newLabel
+            }, function(transport){
+                callback(transport.responseJSON);
             });
         }
 

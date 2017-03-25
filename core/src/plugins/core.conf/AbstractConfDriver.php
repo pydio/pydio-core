@@ -788,6 +788,7 @@ abstract class AbstractConfDriver extends Plugin
                 $teamId = StringHelper::slugify($teamLabel) ."-".intval(rand(0,1000));
                 $roleObject = RolesService::getOrCreateOwnedRole($teamId, $crtUser);
                 $roleObject->setLabel($teamLabel);
+                RolesService::updateRole($roleObject);
 
                 $userIds = isSet($httpVars["user_ids"]) ? $httpVars["user_ids"] : [];
                 foreach ($userIds as $userId) {
@@ -796,7 +797,7 @@ abstract class AbstractConfDriver extends Plugin
                     $uObject->addRole($roleObject);
                     $uObject->save();
                 }
-                $responseInterface = new JsonResponse(["message" => "Created Team with id " . $teamId]);
+                $responseInterface = new JsonResponse(["message" => "Created Team with id " . $teamId, "insertId" => $teamId]);
 
                 break;
 
@@ -804,7 +805,24 @@ abstract class AbstractConfDriver extends Plugin
 
                 $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
                 $crtUser = $ctx->getUser()->getId();
+                // Role ownership is already checked inside deleteRole() function.
                 RolesService::deleteRole($tId, $crtUser);
+                break;
+
+            case "user_team_update_label":
+
+                $tId = InputFilter::sanitize($httpVars["team_id"], InputFilter::SANITIZE_ALPHANUM);
+                $roleObject = RolesService::getOwnedRole($tId, $ctx->getUser()->getId());
+                if($roleObject === null){
+                    throw new PydioException("Cannot find team!");
+                }
+                $teamLabel = InputFilter::sanitize($httpVars["team_label"], InputFilter::SANITIZE_HTML_STRICT);
+                if(empty($teamLabel)){
+                    throw new PydioException("Empty Team Label!");
+                }
+                $roleObject->setLabel($teamLabel);
+                RolesService::updateRole($roleObject);
+                $responseInterface = new JsonResponse(["message" => "Team $tId was updated"]);
                 break;
 
             case "user_team_add_user":

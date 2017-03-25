@@ -22,6 +22,7 @@ import {DNDActionParameter} from './DND'
 
 import UserAvatar from './users/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
+import UserCreationForm from './users/UserCreationForm'
 
 window.PydioComponents = {
     
@@ -53,7 +54,8 @@ window.PydioComponents = {
     DNDActionParameter      : DNDActionParameter,
 
     UserAvatar              : UserAvatar,
-    UsersCompleter          : UsersCompleter
+    UsersCompleter          : UsersCompleter,
+    UserCreationForm        : UserCreationForm
 
 };
 
