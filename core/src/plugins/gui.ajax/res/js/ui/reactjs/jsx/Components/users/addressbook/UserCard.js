@@ -43,6 +43,7 @@ class UserCard extends React.Component{
                     userId={this.props.item.id}
                     richCard={true}
                     pydio={this.props.pydio}
+                    cardSize={this.props.style.width}
                     {...editableProps}
                 >{editForm}</UserAvatar>
             </div>

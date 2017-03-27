@@ -205,6 +205,7 @@
         }
 
         static deleteTeam(teamId, callback){
+            teamId = teamId.replace('/AJXP_TEAM/', '');
             PydioApi.getClient().request({
                 get_action:'user_team_delete',
                 team_id:teamId
@@ -224,6 +225,7 @@
         }
 
         static addUserToTeam(teamId, userId, callback){
+            teamId = teamId.replace('/AJXP_TEAM/', '');
             PydioApi.getClient().request({
                 get_action:'user_team_add_user',
                 team_id:teamId,
@@ -234,6 +236,7 @@
         }
 
         static removeUserFromTeam(teamId, userId, callback){
+            teamId = teamId.replace('/AJXP_TEAM/', '');
             PydioApi.getClient().request({
                 get_action:'user_team_delete_user',
                 team_id:teamId,
@@ -244,6 +247,7 @@
         }
 
         static updateTeamLabel(teamId, newLabel,callback){
+            teamId = teamId.replace('/AJXP_TEAM/', '');
             PydioApi.getClient().request({
                 get_action:'user_team_update_label',
                 team_id:teamId,

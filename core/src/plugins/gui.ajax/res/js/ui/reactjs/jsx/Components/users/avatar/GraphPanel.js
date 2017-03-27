@@ -1,3 +1,5 @@
+import UsersList from '../addressbook/UsersList'
+
 class GraphPanel extends React.Component{
 
     render(){
@@ -5,10 +7,15 @@ class GraphPanel extends React.Component{
         const {graph} = this.props;
         let elements = [];
         if(graph.teams && graph.teams.length){
+            const onDeleteAction = function(parentItem, team){
+                PydioUsers.Client.removeUserFromTeam(team[0].id, this.props.userId, () => {
+                    this.props.reloadAction();
+                });
+            }.bind(this);
             elements.push(
                 <div key="teams">
-                    {elements.length ? <MaterialUI.Divider/> : null}
-                    <div style={{padding: 16}}>User belongs to {graph.teams.length} team(s).</div>
+                    <MaterialUI.Divider/>
+                    <UsersList subHeader={"User belongs to " + graph.teams.length +" team(s)."} onItemClicked={()=>{}} item={{leafs: graph.teams}} mode="inner" onDeleteAction={onDeleteAction}/>
                 </div>
             )
         }

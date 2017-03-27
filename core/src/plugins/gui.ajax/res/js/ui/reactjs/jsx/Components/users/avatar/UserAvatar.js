@@ -134,33 +134,95 @@ class UserAvatar extends React.Component{
             userType = user.external ? 'External User' : 'Internal User';
         }
 
-        let {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard} = this.props;
-        let avatarContent, avatarColor;
-        if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
-            avatarContent = label.toUpperCase().substring(0,2);
-            avatarColor = this.props.muiTheme.palette.primary1Color;
-        }
+        let {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,
+            labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard, cardSize} = this.props;
+        let avatarContent, avatarColor, avatarIcon;
         if(richCard){
-            displayAvatar = true;
-            avatarSize = '100%';
-            avatarStyle = {borderRadius: 0};
+            displayAvatar = useDefaultAvatar = displayLabel = true;
         }
+        console.log(this.props.icon);
+        if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
+            if(richCard){
+                avatarIcon  = <MaterialUI.FontIcon className="mdi mdi-account" style={{color:this.props.muiTheme.palette.primary1Color}} />;
+                avatarColor = '#ECEFF1';
+            }else{
+                avatarColor     = this.props.muiTheme.palette.primary1Color;
+                if(this.props.icon){
+                    avatarIcon = <MaterialUI.FontIcon className={this.props.icon}/>;
+                }else{
+                    avatarContent   = label.toUpperCase().substring(0,2);
+                }
+            }
+        }
+        let reloadAction, onEditAction, onMouseOver, onMouseOut, popover;
+        if(richCard){
+
+            displayAvatar = true;
+            style = {...style, flexDirection:'column'};
+            avatarSize = cardSize ? cardSize : '100%';
+            avatarStyle = {borderRadius: 0};
+            const localReload = () => {
+                MetaCacheService.getInstance().deleteKey('user_public_data-rich', this.props.userId);
+                this.loadPublicData(this.props.userId);
+            }
+            reloadAction = () => {
+                localReload();
+                if(this.props.reloadAction) this.props.reloadAction();
+            }
+            onEditAction = () => {
+                localReload();
+                if(this.props.onEditAction) this.props.onEditAction();
+            }
+        }else if(this.props.richOnHover){
+
+            onMouseOver = (e) => {
+                this.setState({showPopover: true, popoverAnchor: e.currentTarget});
+            };
+            onMouseOut = () => {
+                this.setState({showPopover: false});
+            };
+
+            popover = (
+                <MaterialUI.Popover
+                    open={this.state.showPopover}
+                    anchorEl={this.state.popoverAnchor}
+                    onRequestClose={() => {this.setState({showPopover: false})}}
+                    anchorOrigin={{horizontal:"left",vertical:"center"}}
+                    targetOrigin={{horizontal:"right",vertical:"center"}}
+                >
+                    <MaterialUI.Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}}>
+                        <UserAvatar {...this.props} richCard={true} richOnHover={false} cardSize={220}/>
+                    </MaterialUI.Paper>
+                </MaterialUI.Popover>
+            );
+
+        }
+
+        const avatarComponent = (
+            <MaterialUI.Avatar
+                src={avatar}
+                icon={avatarIcon}
+                size={avatarSize}
+                style={this.props.avatarOnly ? this.props.style : avatarStyle}
+                backgroundColor={avatarColor}
+            >{avatarContent}</MaterialUI.Avatar>
+        );
+
+        if(this.props.avatarOnly){
+            return avatarComponent;
+        }
+
         return (
-            <div className={className} style={style}>
-                {displayAvatar && (avatar || avatarContent) && <MaterialUI.Avatar
-                    src={avatar}
-                    style={avatarStyle}
-                    className={avatarClassName}
-                    size={avatarSize}
-                    backgroundColor={avatarColor}
-                >{avatarContent}</MaterialUI.Avatar>}
+            <div className={className} style={style} onMouseOver={onMouseOver}>
+                {displayAvatar && (avatar || avatarContent || avatarIcon) && avatarComponent}
                 {displayLabel && !richCard && <div
                     className={labelClassName}
                     style={labelStyle}>{label}</div>}
                 {displayLabel && richCard && <MaterialUI.CardTitle title={label} subtitle={userType}/>}
-                {richCard && user && <ActionsPanel {...this.state} {...this.props}/>}
-                {graph && <GraphPanel graph={graph} pydio={this.props.pydio} {...this.props}/>}
+                {richCard && user && <ActionsPanel {...this.state} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
+                {graph && <GraphPanel graph={graph} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {this.props.children}
+                {popover}
             </div>
         );
 
@@ -172,6 +234,7 @@ UserAvatar.propTypes = {
     userId: React.PropTypes.string.isRequired,
     pydio : React.PropTypes.instanceOf(Pydio),
     userLabel:React.PropTypes.string,
+    icon:React.PropTypes.string,
     richCard: React.PropTypes.bool,
 
     // Wll add an action panel to the card
@@ -182,6 +245,7 @@ UserAvatar.propTypes = {
 
     displayLabel: React.PropTypes.bool,
     displayAvatar: React.PropTypes.bool,
+    avatarOnly: React.PropTypes.bool,
     useDefaultAvatar: React.PropTypes.bool,
     avatarSize:React.PropTypes.number,
 

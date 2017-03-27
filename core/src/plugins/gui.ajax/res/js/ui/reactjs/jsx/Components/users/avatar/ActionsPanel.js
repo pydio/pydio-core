@@ -4,19 +4,25 @@ class ActionsPanel extends React.Component{
 
     constructor(props, context){
         super(props, context);
-        this.state = {showTeamPicker : false, teamPickerAnchor: null};
+        this.state = {showPicker : false, pickerAnchor: null};
     }
 
     onTeamSelected(item){
+        this.setState({showPicker: false});
         if(item.getType() === 'group' && item.getId().indexOf('/AJXP_TEAM/') === 0){
             PydioUsers.Client.addUserToTeam(item.getId().replace('/AJXP_TEAM/', ''), this.props.userId, this.props.reloadAction);
         }
     }
-
-    openTeamPicker(event){
-        this.setState({showTeamPicker: true, teamPickerAnchor: event.currentTarget});
+    
+    onUserSelected(item){
+        this.setState({showPicker: false});
+        PydioUsers.Client.addUserToTeam(this.props.team.id, item.getId(), this.props.reloadAction);
     }
 
+    openPicker(event){
+        this.setState({showPicker: true, pickerAnchor: event.currentTarget});
+    }
+    
     render(){
 
         const styles = {
@@ -31,17 +37,21 @@ class ActionsPanel extends React.Component{
         }
 
         let actions = [];
-        if(this.props.user.hasEmail){
+        if(this.props.user && this.props.user.hasEmail){
             actions.push({key:'message', label:'Send Message', icon:'email'});
         }
-        actions.push({key:'teams', label:'Add to team', icon:'account-multiple-plus', callback:this.openTeamPicker.bind(this)});
+        if(this.props.team){
+            actions.push({key:'users', label:'Add user', icon:'account-multiple-plus', callback:this.openPicker.bind(this)});
+        }else{
+            actions.push({key:'teams', label:'Add to team', icon:'account-multiple-plus', callback:this.openPicker.bind(this)});
+        }
         if(this.props.userEditable){
             actions.push({key:'edit', label:'Edit user', icon:'pencil', callback:this.props.onEditAction});
             actions.push({key:'delete', label:'Delete user', icon:'delete', callback:this.props.onDeleteAction});
         }
 
         return (
-            <div style={{textAlign:'center'}}>
+            <div style={{textAlign:'center', marginBottom: 16}}>
                 {actions.map(function(a){
                     return <MaterialUI.IconButton
                         key={a.key}
@@ -53,19 +63,20 @@ class ActionsPanel extends React.Component{
                     />
                 })}
                 {<MaterialUI.Popover
-                    open={this.state.showTeamPicker}
-                    anchorEl={this.state.teamPickerAnchor}
+                    open={this.state.showPicker}
+                    anchorEl={this.state.pickerAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
                     targetOrigin={{horizontal: 'right', vertical: 'top'}}
-                    onRequestClose={() => {this.setState({showTeamPicker: false})}}
+                    onRequestClose={() => {this.setState({showPicker: false})}}
                 >
                     <div style={{width: 256, height: 320}}>
                         <AddressBook
                             mode="selector"
                             pydio={this.props.pydio}
                             loaderStyle={{width: 320, height: 420}}
-                            onItemSelected={this.onTeamSelected.bind(this)}
-                            teamsOnly={true}
+                            onItemSelected={this.props.team ? this.onUserSelected.bind(this) : this.onTeamSelected.bind(this)}
+                            teamsOnly={this.props.team ? false: true}
+                            usersOnly={this.props.team ? true: false}
                         />
                     </div>
                 </MaterialUI.Popover>}

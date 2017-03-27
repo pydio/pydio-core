@@ -2,16 +2,26 @@ class TeamCreationForm extends React.Component{
 
     static updateTeamUsers(team, operation, users, callback){
         const teamId = team.id.replace('/AJXP_TEAM/', '');
+        const clearUserCache = function(uId){
+            MetaCacheService.getInstance().deleteKey('user_public_data-rich', uId);
+        };
         if(operation === 'add'){
             users.forEach((user) => {
-                PydioUsers.Client.addUserToTeam(teamId, user.getId ? user.getId() : user.id, callback);
+                const userId = user.getId ? user.getId() : user.id;
+                PydioUsers.Client.addUserToTeam(teamId, userId, callback);
+                clearUserCache(userId);
             });
         }else if(operation === 'delete'){
             users.forEach((user) => {
-                PydioUsers.Client.removeUserFromTeam(teamId, user.getId ? user.getId() : user.id, callback);
+                const userId = user.getId ? user.getId() : user.id;
+                PydioUsers.Client.removeUserFromTeam(teamId, userId, callback);
+                clearUserCache(userId);
             });
         }else if(operation === 'create'){
             PydioUsers.Client.saveSelectionAsTeam(teamId, users, callback);
+            users.forEach((user) => {
+                clearUserCache(user.getId ? user.getId() : user.id);
+            })
         }
     }
 

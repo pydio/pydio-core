@@ -1,3 +1,5 @@
+import UserAvatar from '../avatar/UserAvatar'
+
 class UsersList extends React.Component{
 
     constructor(props, context){
@@ -18,12 +20,14 @@ class UsersList extends React.Component{
         const toggleSelect = () => {this.setState({select:!this.state.select, selection:[]})};
         const createAction = () => {this.props.onCreateAction(item)};
         const deleteAction = () => {this.props.onDeleteAction(item, this.state.selection); this.setState({select: false, selection: []})};
+
+        const activeTbarColor = this.props.muiTheme.palette.accent2Color;
         const toolbar = (
-            <div style={{padding: 10, height:56, backgroundColor:'#ECEFF1', display:'flex', alignItems:'center'}}>
-                {item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: 7}} onCheck={toggleSelect}/>}
-                <div style={{flex:1, fontSize:20}}>{item.label}</div>
+            <div style={{padding: 10, height:56, backgroundColor:this.state.select?activeTbarColor : '#fafafa', display:'flex', alignItems:'center', transition:DOMUtils.getBeziersTransition()}}>
+                {item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
+                <div style={{flex:1, fontSize:20, color:this.state.select?'white':'rgba(0,0,0,0.87)'}}>{item.label}</div>
                 {item.actions && item.actions.create && !this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
-                {item.actions && item.actions.remove && this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
+                {item.actions && item.actions.remove && this.state.select && <MaterialUI.RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
             </div>
         );
         // PARENT NODE
@@ -42,23 +46,32 @@ class UsersList extends React.Component{
         }
         // ITEMS
         items.forEach(function(item, index){
-            let fontIcon = <MaterialUI.Avatar icon={<MaterialUI.FontIcon className={item.icon || 'mdi mdi-account'}/>}/>
-            let addGroupButton;
+            const fontIcon = (
+                <UserAvatar cardSize={40} pydio={this.props.pydio || pydio}
+                    userId={item.id}
+                    userLabel={item.label}
+                    avatar={item.avatar}
+                    icon={item.icon}
+                    avatarOnly={true}
+                    useDefaultAvatar={true}
+                />
+            );
+            let rightIconButton;
             let touchTap = (e)=>{e.stopPropagation(); this.props.onItemClicked(item)};
             if(folders.indexOf(item) > -1 && this.props.onFolderClicked){
                 touchTap = (e)=>{e.stopPropagation(); this.props.onFolderClicked(item) };
-                if(!item._notSelectable){
-                    addGroupButton = (
+                if(mode === 'selector' && !item._notSelectable){
+                    rightIconButton = (
                         <MaterialUI.IconButton
-                            iconClassName={"mdi " + (mode === 'book' ? "mdi-dots-vertical":"mdi-account-multiple-plus")}
-                            tooltip={mode === 'book' ? "Open group / team" : "Add this group / team"}
+                            iconClassName={"mdi mdi-account-multiple-plus"}
+                            tooltip={"Select this group"}
                             tooltipPosition="bottom-left"
                             onTouchTap={()=>{this.props.onItemClicked(item)}}
                         />
                     );
                 }
             }else if(mode === 'inner' && this.props.onDeleteAction){
-                addGroupButton = (
+                rightIconButton = (
                     <MaterialUI.IconButton
                         iconClassName={"mdi mdi-delete"}
                         tooltip={"Remove"}
@@ -83,7 +96,7 @@ class UsersList extends React.Component{
                 onTouchTap={touchTap}
                 disabled={mode === 'inner'}
                 leftAvatar={!this.state.select && fontIcon}
-                rightIconButton={addGroupButton}
+                rightIconButton={rightIconButton}
                 leftCheckbox={this.state.select && <MaterialUI.Checkbox checked={this.state.selection.indexOf(item) > -1} onCheck={select}/>}
             />);
             if(mode !== 'inner' && index < total - 1){
@@ -94,6 +107,7 @@ class UsersList extends React.Component{
             <div style={{flex:1, flexDirection:'column', display:'flex'}} onTouchTap={this.props.onTouchTap}>
                 {mode === 'book' && toolbar}
                 <MaterialUI.List style={{flex:1, overflowY:mode !== 'inner' ? 'auto' : 'initial'}}>
+                    {this.props.subHeader && <MaterialUI.Subheader>{this.props.subHeader}</MaterialUI.Subheader>}
                     {elements}
                 </MaterialUI.List>
             </div>
@@ -110,5 +124,7 @@ UsersList.propTypes ={
     onFolderClicked:React.PropTypes.func,
     mode:React.PropTypes.oneOf(['book', 'selector', 'inner'])
 };
+
+UsersList = MaterialUI.Style.muiThemeable()(UsersList);
 
 export {UsersList as default}

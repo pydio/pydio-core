@@ -180,6 +180,7 @@
                                 style={{flex:1, display:'flex', alignItems:'center'}}
                                 labelStyle={{fontSize: 15, paddingLeft: 10}}
                                 avatarSize={26}
+                                richOnHover={u.TYPE !== 'group'}
                             />
                         </div>
                     );

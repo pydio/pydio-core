@@ -50,6 +50,7 @@ class Loaders{
                     remove  :'Remove from Team',
                     multiple: true
                 };
+                child._notSelectable=true;
             });
             callback(children);
         };

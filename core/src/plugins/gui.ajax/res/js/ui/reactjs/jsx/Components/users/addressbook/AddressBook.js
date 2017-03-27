@@ -2,6 +2,7 @@ import NestedListItem from './NestedListItem'
 import UsersList from './UsersList'
 
 import RightPanelCard from './RightPanelCard'
+import SearchForm from './SearchForm'
 
 import Loaders from './Loaders'
 
@@ -116,7 +117,7 @@ const AddressBook = React.createClass({
                     label:remotes[k],
                     icon:'mdi mdi-server-network',
                     type:'remote',
-                    parent:remotesNodes,
+                    _parent:remotesNodes,
                     _notSelectable:true
                 });
             }
@@ -131,7 +132,8 @@ const AddressBook = React.createClass({
                 label:'Search Local Users',
                 //icon:'mdi mdi-account-search',
                 type:'search',
-                _parent:root
+                _parent:root,
+                _notSelectable: true
             });
         }
 
@@ -238,7 +240,7 @@ const AddressBook = React.createClass({
     render: function(){
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
-        const leftColumnStyle = {width:'25%', minWidth: 256, maxWidth:400, overflowY:'auto', overflowX: 'hidden'};
+        const leftColumnStyle = {width: 256, overflowY:'auto', overflowX: 'hidden'};
         let centerComponent, rightPanel, leftPanel;
 
         if(selectedItem.id === 'search'){
@@ -329,7 +331,7 @@ const AddressBook = React.createClass({
                     TeamCreationForm.updateTeamUsers(createDialogItem, 'add', [item], this.reloadCurrentNode.bind(this));
                 };
                 dialogTitle = null;
-                dialogContent = <Panel
+                dialogContent = <AddressBook
                     pydio={this.props.pydio}
                     mode="selector"
                     usersOnly={true}

@@ -1,5 +1,6 @@
 import UsersList from './UsersList'
 import Loaders from './Loaders'
+import ActionsPanel from '../avatar/ActionsPanel'
 
 class TeamCard extends React.Component{
 
@@ -27,40 +28,41 @@ class TeamCard extends React.Component{
         this.setState({label: value});
     }
     updateLabel(){
-        PydioUsers.Client.updateTeamLabel(this.props.item.id.replace('/AJXP_TEAM/', ''), this.state.label, () => {
-            this.props.onUpdateAction(this.props.item);
-        });
-    }
-    deleteTeam(){
-        const {item, onDeleteAction} = this.props;
-        onDeleteAction(item._parent, [item]);
+        if(this.state.label !== this.props.item.label){
+            PydioUsers.Client.updateTeamLabel(this.props.item.id.replace('/AJXP_TEAM/', ''), this.state.label, () => {
+                this.props.onUpdateAction(this.props.item);
+            });
+        }
+        this.setState({editMode: false});
     }
     render(){
         const {item, onDeleteAction, onCreateAction} = this.props;
-        const membersSummary = <div style={{margin:10}}>{item.leafs? "Currently " + (item.leafs.length) + " members. Open the team in the main panel to add or remove users." : ""}</div>;
-        const membersList = <UsersList onItemClicked={()=>{}} item={item} mode="inner" onDeleteAction={onDeleteAction}/>
-        const createButton = <MaterialUI.IconButton iconClassName="mdi mdi-plus" onTouchTap={() => onCreateAction(item)} style={{position:'absolute', right:6, top:-14}}/>
+
+        const editProps = {
+            team: item,
+            userEditable: true,
+            onDeleteAction: () => {this.props.onDeleteAction(item._parent, [item])},
+            onEditAction: () => {this.setState({editMode: !this.state.editMode})},
+            reloadAction: () => {this.props.onUpdateAction(item)}
+        };
+
+        let title;
+        if(this.state.editMode){
+            title = (
+                <div style={{display:'flex', alignItems:'center', margin: 16}}>
+                    <MaterialUI.TextField style={{flex: 1, fontSize: 24}} fullWidth={true} disabled={false} underlineShow={false} value={this.state.label} onChange={this.onLabelChange.bind(this)}/>
+                    <MaterialUI.FlatButton secondary={true} label="OK" onTouchTap={() => {this.updateLabel()}}/>
+                </div>
+            );
+        }else{
+            title = <MaterialUI.CardTitle title={this.state.label} subtitle={(item.leafs && item.leafs.length ? item.leafs.length + ' team members' : 'No team members')}/>;
+        }
         return (
             <div>
-                <MaterialUI.TextField style={{margin:'0 10px'}} fullWidth={true} disabled={false} underlineShow={false} floatingLabelText="Label" value={this.state.label} onChange={this.onLabelChange.bind(this)}/>
+                {title}
+                <ActionsPanel {...this.props} {...editProps} />
                 <MaterialUI.Divider/>
-                <MaterialUI.TextField style={{margin:'0 10px'}} fullWidth={true} disabled={true} underlineShow={false} floatingLabelText="Id" value={item.id.replace('/AJXP_TEAM/', '')}/>
-                <MaterialUI.Divider/>
-                <div style={{position:'relative'}}>
-                    {createButton}
-                    <div style={{margin:'16px 10px 0', transform: 'scale(0.75)', transformOrigin: 'left', color: 'rgba(0,0,0,0.33)'}}>Team Members</div>
-                </div>
-                {membersList}
-                <MaterialUI.Divider/>
-                {this.props.onDeleteAction &&
-                <div style={{margin:10, textAlign:'right'}}>
-                    <MaterialUI.FlatButton secondary={false} label="Remove Team" onTouchTap={() => {onDeleteAction(item._parent, [item])}}/>
-                    {
-                        this.props.item.label !== this.state.label &&
-                        <MaterialUI.FlatButton secondary={true} label="Update" onTouchTap={() => {this.updateLabel()}}/>
-                    }
-                </div>
-                }
+                <UsersList subHeader={"Team Members"} onItemClicked={()=>{}} item={item} mode="inner" onDeleteAction={onDeleteAction}/>
             </div>
         )
     }
