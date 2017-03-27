@@ -516,6 +516,49 @@
 
     });
 
+    const ModalAddressBook = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: '',
+                dialogSize: 'xl',
+                dialogPadding: false,
+                dialogIsModal: false,
+                dialogScrollBody: false
+            };
+        },
+
+        submit: function(){
+            this.dismiss();
+        },
+
+        render: function(){
+
+            return (
+                <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
+                    <MaterialUI.AppBar
+                        title={this.props.pydio.MessageHash['user_dash.1']}
+                        showMenuIconButton={false}
+                        iconClassNameRight="mdi mdi-close"
+                        onRightIconButtonTouchTap={()=>{this.dismiss()}}
+                        style={{flexShrink:0}}
+                    />
+                    <PydioComponents.AddressBook
+                        mode="book"
+                        {...this.props}
+                        style={{width:'100%', flex: 1}}
+                    />
+                </div>
+            );
+
+        }
+
+    });
+
     class Callbacks {
 
         static openDashboard(){
@@ -525,7 +568,9 @@
         }
 
         static openAddressBook(){
-            global.pydio.UI.openComponentInModal('AddressBook', 'Modal');
+            ResourcesManager.loadClassesAndApply(['PydioForm', 'PydioComponents'], function() {
+                global.pydio.UI.openComponentInModal('UserAccount', 'ModalAddressBook');
+            });
         }
 
         static delete(){
@@ -569,6 +614,7 @@
     ns.WebDAVPane = WebDAVPane;
     ns.UsersPane = ReactDND.DragDropContext(FakeDndBackend)(UsersPane);
     ns.ModalDashboard = ModalDashboard;
+    ns.ModalAddressBook = ModalAddressBook;
     ns.Callbacks = Callbacks;
     ns.PasswordForm = PasswordForm;
     global.UserAccount = ns;

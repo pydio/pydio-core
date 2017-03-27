@@ -35,6 +35,7 @@ use Pydio\Core\Http\Message\XMLMessage;
 use Pydio\Core\Http\Response\AsyncResponseStream;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 
+use Pydio\Core\Model\AddressBookItem;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\FilteredUsersList;
 use Pydio\Core\Model\RepositoryInterface;
@@ -54,7 +55,6 @@ use Pydio\Core\Utils\Vars\OptionsHelper;
 use Pydio\Core\Utils\Vars\StatHelper;
 
 use Pydio\Core\Utils\Vars\XMLFilter;
-use Pydio\Core\Controller\HTMLWriter;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\ConfService;
@@ -929,7 +929,7 @@ abstract class AbstractConfDriver extends Plugin
 
                     $updating = true;
                     OptionsHelper::parseStandardFormParameters($ctx, $httpVars, $data, "NEW_");
-                    $userId = $data["existing_user_id"];
+                    $userId = InputFilter::sanitize($data["existing_user_id"], InputFilter::SANITIZE_EMAILCHARS);
                     $userObject = UsersService::getUserById($userId);
                     if($userObject->getParent() !== $loggedUser->getId()){
                         throw new \Exception("Cannot find user");
@@ -978,21 +978,29 @@ abstract class AbstractConfDriver extends Plugin
                     UsersService::updateUser($userObject);
                 }
 
-                if ($action == "user_create_user" && isSet($newUserId)) {
+                if ($action == "user_create_user") {
 
-                    Controller::applyHook($updating?"user.after_update":"user.after_create", [$ctx, $userObject]);
-                    if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
-                        $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
-                        if ($mailer !== false) {
-                            $mess = LocaleService::getMessages();
-                            $link = ApplicationState::detectServerURL();
-                            $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
-                            $subject = str_replace("%s", $apptitle, $mess["507"]);
-                            $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $newUserId, $data["new_password"]], $mess["508"]);
-                            $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
+                    if(isSet($newUserId)){
+
+                        Controller::applyHook($updating?"user.after_update":"user.after_create", [$ctx, $userObject]);
+                        if (isset($data["send_email"]) && $data["send_email"] == true && !empty($data["email"])) {
+                            $mailer = PluginsService::getInstance($ctx)->getUniqueActivePluginForType("mailer");
+                            if ($mailer !== false) {
+                                $mess = LocaleService::getMessages();
+                                $link = ApplicationState::detectServerURL();
+                                $apptitle = ConfService::getGlobalConf("APPLICATION_TITLE");
+                                $subject = str_replace("%s", $apptitle, $mess["507"]);
+                                $body = str_replace(["%s", "%link", "%user", "%pass"], [$apptitle, $link, $newUserId, $data["new_password"]], $mess["508"]);
+                                $mailer->sendMail($ctx, [$data["email"]], $subject, $body);
+                            }
                         }
+                        $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $newUserId]);
+
+                    }else{
+
+                        $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $userId]);
+
                     }
-                    $responseInterface = new JsonResponse(["result" => "SUCCESS", "createdUserId" => $newUserId]);
 
                 } else {
 
@@ -1039,10 +1047,48 @@ abstract class AbstractConfDriver extends Plugin
                 }
                 $userLabel = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
                 $userAvatar = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
-                $responseInterface->getBody()->write(json_encode([
-                    "label"     =>  $userLabel,
-                    "avatar"    =>  $userAvatar
-                ]));
+                $email = UsersService::getUserPersonalParameter("email", $userObject, "core.conf", "");
+
+                $addressBookItem = new AddressBookItem('user', $userId, $userLabel, false, $userObject->hasParent(), $userAvatar);
+                $addressBookItem->appendData('hasEmail', !empty($email));
+                if($userObject->hasParent() && $userObject->getParent() === $ctx->getUser()->getId()){
+                    // This user belongs to current user, we can display more data
+                    if(!empty($email)) $addressBookItem->appendData('email', $email);
+                    $addressBookItem->appendData('USER_DISPLAY_NAME', $userLabel);
+                    $lang = UsersService::getUserPersonalParameter("lang", $userObject, "core.conf", "");
+                    $addressBookItem->appendData('lang', $lang);
+                }
+
+                $data = [ 'user'      => $addressBookItem ];
+                if(isSet($httpVars['graph']) && $httpVars['graph'] === 'true'){
+                    $data['graph'] = ['target' => [], 'source' => []];
+                    $ctxUser = $ctx->getUser();
+                    // My repositories shared with this user
+                    $targetRepos = UsersService::getRepositoriesForUser($userObject);
+                    foreach($targetRepos as $repository){
+                        if($repository->getOwner() === $ctxUser->getId()){
+                            $data['graph']['target'][$repository->getId()] = $repository->getDisplay();
+                        }
+                    }
+                    // User repositories shared with me
+                    $sourceRepos = UsersService::getRepositoriesForUser($ctxUser);
+                    foreach($sourceRepos as $repository){
+                        if($repository->getOwner() === $userObject->getId()){
+                            $data['graph']['source'][$repository->getId()] = $repository->getDisplay();
+                        }
+                    }
+                    // My teams the user is belonging to
+                    $list = new FilteredUsersList($ctx);
+                    $teams = $list->listTeams();
+                    $roles = $userObject->getRolesKeys();
+                    $data['graph']['teams'] = [];
+                    foreach($teams as $t){
+                        if(in_array(substr($t->getId(), strlen('/AJXP_TEAM/')), $roles)){
+                            $data['graph']['teams'][] = $t;
+                        }
+                    }
+                }
+                $responseInterface->getBody()->write(json_encode($data));
 
             break;
 

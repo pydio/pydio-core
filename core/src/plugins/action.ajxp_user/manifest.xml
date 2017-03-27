@@ -4,7 +4,6 @@
 		<resources>
 			<i18n namespace="user_dash" path="plugins/action.ajxp_user/res/i18n" />
             <js className="UserAccount" file="plugins/action.ajxp_user/res/build/UserAccount.js" depends="React,PydioForm"/>
-            <js className="AddressBook" file="plugins/action.ajxp_user/res/build/AddressBook.js" depends="React,PydioComponents,PydioForm"/>
             <css file="plugins/action.ajxp_user/dashboard.css"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>

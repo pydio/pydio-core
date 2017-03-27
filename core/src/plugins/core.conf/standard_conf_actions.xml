@@ -84,7 +84,7 @@
 		<action name="user_public_data">
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
 			<processing>
-				<serverCallback methodName="switchAction"/>
+				<serverCallback methodName="switchAction" restParams="/user_id"/>
 			</processing>
 		</action>
         <action name="user_team_create">

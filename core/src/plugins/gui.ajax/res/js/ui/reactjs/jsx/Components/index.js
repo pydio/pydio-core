@@ -20,9 +20,12 @@ import GridItemMixin from './dynamic-grid/GridItemMixin'
 
 import {DNDActionParameter} from './DND'
 
-import UserAvatar from './users/UserAvatar'
+import UserAvatar from './users/avatar/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
 import UserCreationForm from './users/UserCreationForm'
+import TeamCreationForm from './users/TeamCreationForm'
+
+import AddressBook from './users/addressbook/AddressBook'
 
 window.PydioComponents = {
     
@@ -55,7 +58,9 @@ window.PydioComponents = {
 
     UserAvatar              : UserAvatar,
     UsersCompleter          : UsersCompleter,
-    UserCreationForm        : UserCreationForm
+    UserCreationForm        : UserCreationForm,
+    TeamCreationForm        : TeamCreationForm,
+    AddressBook             : AddressBook
 
 };
 

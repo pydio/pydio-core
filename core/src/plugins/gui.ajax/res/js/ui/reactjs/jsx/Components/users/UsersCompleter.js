@@ -17,6 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+import AddressBook from './addressbook/AddressBook'
 import UserCreationForm from './UserCreationForm'
 
 const UsersLoader = React.createClass({
@@ -43,7 +44,7 @@ const UsersLoader = React.createClass({
     },
 
     suggestionLoader:function(input, callback){
-
+f
         const excludes = this.props.excludes;
         const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
         this.setState({loading:this.state.loading + 1});
@@ -223,9 +224,7 @@ const UsersLoader = React.createClass({
                     style={{marginLeft: 20}}
                 >
                     <div style={{width: 256, height: 320}}>
-                        <PydioReactUI.AsyncComponent
-                            namespace="AddressBook"
-                            componentName="Panel"
+                        <AddressBook
                             mode="selector"
                             pydio={this.props.pydio}
                             loaderStyle={{width: 320, height: 420}}

@@ -95,7 +95,7 @@ export default React.createClass({
                 addressBookButton = (
                     <MaterialUI.IconButton
                         onTouchTap={this.applyAction.bind(this, 'address-book')}
-                        iconClassName="userActionIcon mdi mdi-book-open"
+                        iconClassName="userActionIcon mdi mdi-book-open-variant"
                         className="userActionButton"
                         tooltip={messages['user_dash.1']}
                     />

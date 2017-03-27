@@ -272,7 +272,7 @@ class FilteredUsersList{
      * @param $searchQuery string
      * @return AddressBookItem[]
      */
-    protected function listTeams($searchQuery = ''){
+    public function listTeams($searchQuery = ''){
         if(!empty($searchQuery)){
             $pregexp = '/^'.preg_quote($searchQuery).'/i';
         }
@@ -370,6 +370,7 @@ class FilteredUsersList{
             $userId         = $userObject->getId();
             $userLabel      = UsersService::getUserPersonalParameter("USER_DISPLAY_NAME", $userObject, "core.conf", $userId);
             $userAvatar     = UsersService::getUserPersonalParameter("avatar", $userObject, "core.conf", "");
+            $email          = UsersService::getUserPersonalParameter("email", $userObject, "core.conf", "");
 
             $userDisplay = ($userLabel == $userId ? $userId : $userLabel . " ($userId)");
             if ($this->getConf('USERS_LIST_HIDE_LOGIN') === true && $userLabel !== $userId) {
@@ -377,8 +378,19 @@ class FilteredUsersList{
             }
             $userIsExternal = $userObject->hasParent() ? "true":"false";
 
-            $items[] = new AddressBookItem('user', $userId, $userDisplay, false, $userIsExternal, $userAvatar);
+            $addressBookItem = new AddressBookItem('user', $userId, $userDisplay, false, $userIsExternal, $userAvatar);
             $index ++;
+
+            $addressBookItem->appendData('hasEmail', !empty($email));
+            if($userObject->hasParent() && $userObject->getParent() === $this->ctx->getUser()->getId()){
+                // This user belongs to current user, we can display more data
+                if(!empty($email)) $addressBookItem->appendData('email', $email);
+                $addressBookItem->appendData('USER_DISPLAY_NAME', $userLabel);
+                $lang = UsersService::getUserPersonalParameter("lang", $userObject, "core.conf", "");
+                $addressBookItem->appendData('lang', $lang);
+            }
+
+            $items[] = $addressBookItem;
             if($index == $searchLimit) break;
         }
 

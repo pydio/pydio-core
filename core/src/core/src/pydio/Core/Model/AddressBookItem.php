@@ -55,6 +55,13 @@ class AddressBookItem implements \JsonSerializable, XMLSerializableResponseChunk
         ];
     }
 
+    public function getId(){
+        return $this->data['id'];
+    }
+
+    public function appendData($key, $data){
+        $this->data[$key] = $data;
+    }
 
     /**
      * Specify data which should be serialized to JSON

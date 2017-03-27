@@ -1,10 +1,14 @@
+import GraphPanel from './GraphPanel'
+import ActionsPanel from './ActionsPanel'
+
 class UserAvatar extends React.Component{
 
     constructor(props, context){
         super(props, context);
         this.state = {
-            label : props.userLabel || props.userId,
-            avatar: null
+            user : null,
+            avatar: null,
+            graph : null
         };
     }
 
@@ -17,8 +21,9 @@ class UserAvatar extends React.Component{
             }
         }else{
             this.cache = MetaCacheService.getInstance();
-            this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
-            this.loadPublicData();
+            this.cache.registerMetaStream('user_public_data', 'EXPIRATION_MANUAL_TRIGGER');
+            this.cache.registerMetaStream('user_public_data-rich', 'EXPIRATION_MANUAL_TRIGGER');
+            this.loadPublicData(this.props.userId);
         }
     }
 
@@ -37,8 +42,9 @@ class UserAvatar extends React.Component{
                 this.props.pydio.stopObserving('user_logged', this._userLoggedObs);
             }
             this.cache = MetaCacheService.getInstance();
-            this.cache.registerMetaStream('users_public_data', 'EXPIRATION_MANUAL_TRIGGER');
-            this.loadPublicData();
+            this.cache.registerMetaStream('user_public_data', 'EXPIRATION_MANUAL_TRIGGER');
+            this.cache.registerMetaStream('user_public_data-rich', 'EXPIRATION_MANUAL_TRIGGER');
+            this.loadPublicData(nextProps.userId);
         }
     }
 
@@ -66,28 +72,40 @@ class UserAvatar extends React.Component{
         }
     }
 
-    loadPublicData() {
+    loadPublicData(userId) {
 
-        if(this.cache.hasKey('users_public_data', this.props.userId)){
-            this.setState(this.cache.getByKey('users_public_data', this.props.userId));
+        const namespace = this.props.richCard ? 'user_public_data-rich' :'user_public_data';
+        if(this.cache.hasKey(namespace, userId)){
+            this.setState(this.cache.getByKey(namespace, userId));
             return;
         }
         PydioApi.getClient().request({
             get_action:'user_public_data',
-            user_id:this.props.userId
+            user_id:userId,
+            graph: this.props.richCard ? 'true' : 'false'
         }, function(transport){
             const data = transport.responseJSON;
-            if(data.error) return;
+            const {user, graph, error} = data;
+            if(error) return;
+
             let avatarUrl;
-            const avatarId = data.avatar || null;
-            const label = data.label || this.props.userId;
-            if (!data.avatar) {
+            const avatarId = user.avatar || null;
+            const label = user.label || userId;
+            if (!user.avatar) {
                 this.loadFromExternalProvider();
             }else{
-                avatarUrl = PydioApi.getClient().buildUserAvatarUrl(this.props.userId, avatarId);
+                avatarUrl = PydioApi.getClient().buildUserAvatarUrl(userId, avatarId);
             }
-            this.cache.setKey('users_public_data', this.props.userId, {label: label, avatar:avatarUrl});
-            this.setState({label: label, avatar:avatarUrl});
+            this.cache.setKey(namespace, userId, {
+                user: user,
+                graph:graph,
+                avatar:avatarUrl
+            });
+            this.setState({
+                user: user,
+                graph:graph,
+                avatar:avatarUrl
+            });
         }.bind(this));
 
     }
@@ -96,23 +114,36 @@ class UserAvatar extends React.Component{
         if(!this.props.pydio.getPluginConfigs("ajxp_plugin[@id='action.avatar']").get("AVATAR_PROVIDER")) {
             return;
         }
+        const namespace = this.props.richCard ? 'user_public_data-rich' :'user_public_data';
         PydioApi.getClient().request({
             get_action: 'get_avatar_url',
             userid: this.props.userId
         }, function (transport) {
-            this.cache.setKey('users_public_data', this.props.userId, {label: this.state.label, avatar:transport.responseText});
+//            this.cache.setKey(namespace, this.props.userId, {label: this.state.label, avatar:transport.responseText, graph:this.state.graph});
             this.setState({avatar: transport.responseText});
         }.bind(this));
     }
 
     render(){
 
-        const {avatar, label} = this.state;
-        const {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar, useDefaultAvatar} = this.props;
+        const {user, avatar, graph} = this.state;
+        let label = this.props.userLabel || this.props.userId;
+        let userType;
+        if(user) {
+            label = user.label;
+            userType = user.external ? 'External User' : 'Internal User';
+        }
+
+        let {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName, labelClassName, displayLabel, displayAvatar, useDefaultAvatar, richCard} = this.props;
         let avatarContent, avatarColor;
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
             avatarContent = label.toUpperCase().substring(0,2);
             avatarColor = this.props.muiTheme.palette.primary1Color;
+        }
+        if(richCard){
+            displayAvatar = true;
+            avatarSize = '100%';
+            avatarStyle = {borderRadius: 0};
         }
         return (
             <div className={className} style={style}>
@@ -123,9 +154,12 @@ class UserAvatar extends React.Component{
                     size={avatarSize}
                     backgroundColor={avatarColor}
                 >{avatarContent}</MaterialUI.Avatar>}
-                {displayLabel && <div
+                {displayLabel && !richCard && <div
                     className={labelClassName}
                     style={labelStyle}>{label}</div>}
+                {displayLabel && richCard && <MaterialUI.CardTitle title={label} subtitle={userType}/>}
+                {richCard && user && <ActionsPanel {...this.state} {...this.props}/>}
+                {graph && <GraphPanel graph={graph} pydio={this.props.pydio} {...this.props}/>}
                 {this.props.children}
             </div>
         );
@@ -138,6 +172,13 @@ UserAvatar.propTypes = {
     userId: React.PropTypes.string.isRequired,
     pydio : React.PropTypes.instanceOf(Pydio),
     userLabel:React.PropTypes.string,
+    richCard: React.PropTypes.bool,
+
+    // Wll add an action panel to the card
+    userEditable: React.PropTypes.bool,
+    onEditAction: React.PropTypes.func,
+    onDeleteAction: React.PropTypes.func,
+    reloadAction: React.PropTypes.func,
 
     displayLabel: React.PropTypes.bool,
     displayAvatar: React.PropTypes.bool,

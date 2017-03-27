@@ -133,7 +133,7 @@
 
         }
 
-        static getCreateUserParameters(){
+        static getCreateUserParameters(editMode = false){
             let basicParameters = [];
             let prefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
             basicParameters.push({
@@ -141,9 +141,9 @@
                 editable: false,
                 expose: "true",
                 label: MessageHash['522'],
-                name: "new_user_id",
+                name: (editMode ? "existing_user_id" : "new_user_id"),
                 scope: "user",
-                type: "string",
+                type: (editMode ? "hidden" : "string"),
                 mandatory: "true",
                 "default": prefix ? prefix : ''
             },{
@@ -157,24 +157,26 @@
                 mandatory: "true"
             });
 
-            var params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
-            for(var i=0;i<params.length;i++){
+            const params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
+            for(let i=0;i<params.length;i++){
                 params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
             }
-            var xPath = params.join('|');
+            const xPath = params.join('|');
             PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
                 basicParameters.push(el);
             });
-            basicParameters.push({
-                description: MessageHash['536'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['535'],
-                name: "send_email",
-                scope: "user",
-                type: "boolean",
-                mandatory: true
-            });
+            if(!editMode){
+                basicParameters.push({
+                    description: MessageHash['536'],
+                    editable: "true",
+                    expose: "true",
+                    label: MessageHash['535'],
+                    name: "send_email",
+                    scope: "user",
+                    type: "boolean",
+                    mandatory: true
+                });
+            }
             return basicParameters;
         }
 

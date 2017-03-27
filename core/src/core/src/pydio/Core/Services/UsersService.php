@@ -194,7 +194,9 @@ class UsersService
     private function setInCache($userId, $repoList){
 
         $this->repositoriesCache[$userId] = $repoList;
-        SessionService::updateLoadedRepositories($repoList);
+        if(SessionService::has(SessionService::USER_KEY) && SessionService::fetch(SessionService::USER_KEY)->getId() === $userId){
+            SessionService::updateLoadedRepositories($repoList);
+        }
 
     }
 
@@ -204,10 +206,12 @@ class UsersService
      */
     private function getFromCaches($userId){
 
-        $fromSesssion = SessionService::getLoadedRepositories();
-        if($fromSesssion !== null){
-            $this->repositoriesCache[$userId] = $fromSesssion;
-            return $fromSesssion;
+        if(SessionService::has(SessionService::USER_KEY) && SessionService::fetch(SessionService::USER_KEY)->getId() === $userId){
+            $fromSesssion = SessionService::getLoadedRepositories();
+            if($fromSesssion !== null){
+                $this->repositoriesCache[$userId] = $fromSesssion;
+                return $fromSesssion;
+            }
         }
         if(isSet($this->repositoriesCache[$userId])) {
             $configsNotCorrupted = array_reduce($this->repositoriesCache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
