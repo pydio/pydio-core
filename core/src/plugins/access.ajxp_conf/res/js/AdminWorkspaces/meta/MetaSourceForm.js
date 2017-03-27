@@ -63,9 +63,11 @@ var MetaSourceForm = React.createClass({
             this.setState({pluginId:item.payload});
         }.bind(this);
         return (
-            <ReactMUI.DropDownMenu
-                menuItems={menuItems} onChange={change}
-            />
+            <div style={{height: 350}}>
+                <ReactMUI.DropDownMenu
+                    menuItems={menuItems} onChange={change}
+                />
+            </div>
         );
     }
 
