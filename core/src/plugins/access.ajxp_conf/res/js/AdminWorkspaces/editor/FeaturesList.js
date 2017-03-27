@@ -37,7 +37,7 @@ export default React.createClass({
         }else{
             var plusButton;
             if(this.props.model.isEditable()){
-                plusButton = <span className="metasource-add" onClick={this.props.metaSourceProvider.showMetaSourceForm} >+</span>;
+                plusButton = <span className="metasource-add" onClick={this.props.metaSourceProvider.showMetaSourceForm.bind(this.props.metaSourceProvider)} >+</span>;
             }
             additionalFeatures = (
                 <div key="additional-k">

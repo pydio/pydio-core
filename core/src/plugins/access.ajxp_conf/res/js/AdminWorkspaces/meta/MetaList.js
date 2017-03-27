@@ -47,7 +47,7 @@ export default React.createClass({
         }
         if(this.props.featuresEditable){
             features.push(
-                <div className="menu-entry" key="add-feature" onClick={this.props.metaSourceProvider.showMetaSourceForm}>+ {this.context.getMessage('ws.32')}</div>
+                <div className="menu-entry" key="add-feature" onClick={this.props.metaSourceProvider.showMetaSourceForm.bind(this.props.metaSourceProvider)}>+ {this.context.getMessage('ws.32')}</div>
             );
         }
 
