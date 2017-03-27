@@ -117,8 +117,10 @@
             onDismiss:React.PropTypes.func,
             className:React.PropTypes.string,
             overlay:React.PropTypes.bool,
+            uniqueUserStyle:React.PropTypes.bool,
             users:React.PropTypes.object,
-            panelTitle:React.PropTypes.string
+            panelTitle:React.PropTypes.string,
+            zDepth:React.PropTypes.number
         },
 
         getInitialState: function(){
@@ -197,25 +199,27 @@
                 var errorDiv = <div className="error">{this.state.errorMessage}</div>
             }
             var content = (
-                <MaterialUI.Paper zDepth={2} className={className} style={{margin:8}}>
-                    <h3  style={{padding:20, color:'rgba(0,0,0,0.87)', fontSize:25}}>{this.props.panelTitle}</h3>
+                <MaterialUI.Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} className={className} style={{margin:this.props.uniqueUserStyle ? 0 : 8}}>
+                    <h3  style={{padding:20, color:'rgba(0,0,0,0.87)', fontSize:25, marginBottom: 0, paddingBottom: 10}}>{this.props.panelTitle}</h3>
                     {errorDiv}
-                    <div className="users-block" style={{padding:'0 20px'}}>
-                        <PydioComponents.UsersCompleter
-                            fieldLabel={this.getMessage('8')}
-                            usersOnly={true}
-                            existingOnly={true}
-                            freeValueAllowed={true}
-                            onValueSelected={this.addUser}
-                            excludes={Object.keys(this.state.users)}
-                            renderSuggestion={this.usersLoaderRenderSuggestion}
-                            pydio={global.pydio}
-                            showAddressBook={true}
-                            underlineHide={true}
-                        />
-                        <div style={styles.wrapper}>{users}</div>
-                    </div>
-                    <MaterialUI.Divider/>
+                    {!this.props.uniqueUserStyle &&
+                        <div className="users-block" style={{padding: '0 20px'}}>
+                            <PydioComponents.UsersCompleter
+                                fieldLabel={this.getMessage('8')}
+                                usersOnly={true}
+                                existingOnly={true}
+                                freeValueAllowed={true}
+                                onValueSelected={this.addUser}
+                                excludes={Object.keys(this.state.users)}
+                                renderSuggestion={this.usersLoaderRenderSuggestion}
+                                pydio={global.pydio}
+                                showAddressBook={true}
+                                underlineHide={true}
+                            />
+                            <div style={styles.wrapper}>{users}</div>
+                        </div>
+                    }
+                    {!this.props.uniqueUserStyle && <MaterialUI.Divider/>}
                     <div  style={{padding:'0 20px'}}>
                         <MaterialUI.TextField fullWidth={true} underlineShow={false} floatingLabelText={this.getMessage('6')} value={this.state.subject} onChange={this.updateSubject}/>
                     </div>
@@ -235,7 +239,7 @@
                     <div style={styles.overlay}>{content}</div>
                 );
             }else{
-                return {content};
+                return content;
             }
         }
     });

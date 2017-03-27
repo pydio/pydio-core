@@ -4,7 +4,7 @@ class ActionsPanel extends React.Component{
 
     constructor(props, context){
         super(props, context);
-        this.state = {showPicker : false, pickerAnchor: null};
+        this.state = {showPicker : false, pickerAnchor: null, showMailer: false, mailerAnchor: null};
     }
 
     onTeamSelected(item){
@@ -22,6 +22,16 @@ class ActionsPanel extends React.Component{
     openPicker(event){
         this.setState({showPicker: true, pickerAnchor: event.currentTarget});
     }
+
+    openMailer(event){
+
+        const target = event.currentTarget;
+        ResourcesManager.loadClassesAndApply(['PydioMailer'], () => {
+            this.setState({mailerLibLoaded: true}, () => {
+                this.setState({showMailer: true, mailerAnchor: target});
+            });
+        });
+    }
     
     render(){
 
@@ -35,10 +45,11 @@ class ActionsPanel extends React.Component{
                 color: 'white'
             }
         }
-
+        let mailer, usermails = {};
         let actions = [];
         if(this.props.user && this.props.user.hasEmail){
-            actions.push({key:'message', label:'Send Message', icon:'email'});
+            actions.push({key:'message', label:'Send Message', icon:'email', callback: this.openMailer.bind(this)});
+            usermails[this.props.user.id] = PydioUsers.User.fromObject(this.props.user);
         }
         if(this.props.team){
             actions.push({key:'users', label:'Add user', icon:'account-multiple-plus', callback:this.openPicker.bind(this)});
@@ -62,7 +73,7 @@ class ActionsPanel extends React.Component{
                         onTouchTap={a.callback}
                     />
                 })}
-                {<MaterialUI.Popover
+                <MaterialUI.Popover
                     open={this.state.showPicker}
                     anchorEl={this.state.pickerAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
@@ -79,7 +90,24 @@ class ActionsPanel extends React.Component{
                             usersOnly={this.props.team ? true: false}
                         />
                     </div>
-                </MaterialUI.Popover>}
+                </MaterialUI.Popover>
+                <MaterialUI.Popover
+                    open={this.state.showMailer}
+                    anchorEl={this.state.mailerAnchor}
+                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                    targetOrigin={{horizontal: 'right', vertical: 'top'}}
+                >
+                    <div style={{width: 256, height: 320}}>
+                        {this.state.mailerLibLoaded &&
+                        <PydioMailer.Pane
+                            zDepth={0}
+                            panelTitle="Send Message"
+                            uniqueUserStyle={true}
+                            users={usermails}
+                            onDismiss={() => {this.setState({showMailer: false})}}
+                        />}
+                    </div>
+                </MaterialUI.Popover>
             </div>
         );
 

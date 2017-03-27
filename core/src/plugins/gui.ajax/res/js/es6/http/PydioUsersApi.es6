@@ -42,6 +42,18 @@
             this._extendedLabel = extendedLabel;
         }
 
+        static fromObject(user){
+            return new User(
+                user.id,
+                user.label,
+                user.type,
+                user.group,
+                user.avatar,
+                user.temporary,
+                user.external
+            );
+        }
+
         asObject(){
             return {
                 id:this._id,
