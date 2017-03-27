@@ -184,7 +184,9 @@ export default React.createClass({
                 repository_id:workspaceId,
                 bulk_data:JSON.stringify(metaSources)
             }), function(transport){
-                this.refs['editor'].clearMetaSourceDiff();
+                if(this.refs['editor']){
+                    this.refs['editor'].clearMetaSourceDiff();
+                }
                 mainSave();
             }.bind(this));
         }else{

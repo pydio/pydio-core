@@ -239,7 +239,7 @@ class WorkspaceEditor extends React.Component{
                             parameters={formDefs}
                             values={formValues}
                             className="full-width"
-                            onChange={this.onFormChange}
+                            onChange={this.onFormChange.bind(this)}
                             onValidStatusChange={this.updateValidStatus.bind(this)}
                             depth={-2}
                             disabled={!this.state.model.isEditable()}
@@ -256,7 +256,7 @@ class WorkspaceEditor extends React.Component{
                             driverName={this.state.model.getDriverLabel()}
                             driverFields={templateAllFormDefs}
                             selectedFields={selectedFields}
-                            onToggleField={this.toggleTemplateField}
+                            onToggleField={this.toggleTemplateField.bind(this)}
                         />;
                     }else if(this.state.edit == 'general'){
                         if(this.state.model.isTemplate()) {
