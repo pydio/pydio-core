@@ -28,7 +28,8 @@
 
         propTypes: {
             dataModel: React.PropTypes.instanceOf(PydioDataModel).isRequired,
-            pydio:React.PropTypes.instanceOf(Pydio).isRequired
+            pydio:React.PropTypes.instanceOf(Pydio).isRequired,
+            style: React.PropTypes.object
         },
 
         getInitialState: function(){
@@ -126,7 +127,7 @@
                 );
 
             }.bind(this));
-            return <div id="info_panel" style={{backgroundColor:'#eceff1'}}>{templates}</div>;
+            return <div id="info_panel" style={this.props.style}>{templates}</div>;
 
         }
     });

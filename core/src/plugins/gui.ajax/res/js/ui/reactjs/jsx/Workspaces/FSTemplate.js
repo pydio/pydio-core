@@ -188,6 +188,7 @@ let FSTemplate = React.createClass({
                     {...this.props}
                     dataModel={this.props.pydio.getContextHolder()}
                     onContentChange={this.infoPanelContentChange}
+                    style={{backgroundColor:'#eceff1'}}
                 />
                 <EditionPanel {...this.props}/>
                 <span className="context-menu"><PydioMenus.ContextMenu/></span>

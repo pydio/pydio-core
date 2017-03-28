@@ -140,7 +140,6 @@ class UserAvatar extends React.Component{
         if(richCard){
             displayAvatar = useDefaultAvatar = displayLabel = true;
         }
-        console.log(this.props.icon);
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
             if(richCard){
                 avatarIcon  = <MaterialUI.FontIcon className="mdi mdi-account" style={{color:this.props.muiTheme.palette.primary1Color}} />;

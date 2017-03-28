@@ -120,11 +120,27 @@
         padding: 16px 1px 0px 16px;
         line-height: 20px;
         .workspace-badge{
-          display: inline-block;
-          width: 34px;
-          height: 34px;
-          line-height: 34px;
+          width: 40px;
+          height: 40px;
+          line-height: 40px;
           font-size: 1em;
+          display: flex;
+          background-color: #ECEFF1;
+          border-radius: 50%;
+          align-items: center;
+          justify-content: center;
+          margin-right: 10px;
+          position: relative;
+          .mdi{
+            font-size: 1.4em;
+          }
+          .badge-overlay{
+            position:absolute;
+            font-size: 0.6em;
+            margin-top:1px;
+            color: #ECEFF1;
+            z-index: 2;
+          }
         }
         .workspace-label-container{
           display: block;
@@ -147,6 +163,31 @@
           border-bottom: 1px solid rgba(0,0,0,0.03);
           &:hover{
             color: rgba(0,0,0,0.53);
+          }
+        }
+      }
+    }
+
+    .filter-shared{
+      .workspaces .workspace-entry{
+        border-bottom: 1px solid rgba(0,0,0,0.03);
+        .workspace-label-container{
+          border-bottom: 0;
+        }
+        .workspace-badge{
+          width:36px;
+          height: 36px;
+          background-color: transparent;
+          color: #607D8B;
+          font-size: 22px;
+        }
+        &.workspace-access-inbox{
+          .workspace-badge .access-icon{
+            font-size: 32px;
+            font-family: "Material Design Icons";
+            &:before{
+              content: "\f309";
+            }
           }
         }
       }

@@ -1739,11 +1739,27 @@ div.menu.desktop a span.ajxp_icon_span {
   line-height: 20px;
 }
 .left-panel.expanded .workspaces .workspace-entry .workspace-badge {
-  display: inline-block;
-  width: 34px;
-  height: 34px;
-  line-height: 34px;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
   font-size: 1em;
+  display: flex;
+  background-color: #ECEFF1;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  position: relative;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-badge .mdi {
+  font-size: 1.4em;
+}
+.left-panel.expanded .workspaces .workspace-entry .workspace-badge .badge-overlay {
+  position: absolute;
+  font-size: 0.6em;
+  margin-top: 1px;
+  color: #ECEFF1;
+  z-index: 2;
 }
 .left-panel.expanded .workspaces .workspace-entry .workspace-label-container {
   display: block;
@@ -1767,6 +1783,26 @@ div.menu.desktop a span.ajxp_icon_span {
 }
 .left-panel.expanded .workspaces .workspace-entry .workspace-additional-action:hover {
   color: rgba(0, 0, 0, 0.53);
+}
+.left-panel.expanded .filter-shared .workspaces .workspace-entry {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+.left-panel.expanded .filter-shared .workspaces .workspace-entry .workspace-label-container {
+  border-bottom: 0;
+}
+.left-panel.expanded .filter-shared .workspaces .workspace-entry .workspace-badge {
+  width: 36px;
+  height: 36px;
+  background-color: transparent;
+  color: #607D8B;
+  font-size: 22px;
+}
+.left-panel.expanded .filter-shared .workspaces .workspace-entry.workspace-access-inbox .workspace-badge .access-icon {
+  font-size: 32px;
+  font-family: "Material Design Icons";
+}
+.left-panel.expanded .filter-shared .workspaces .workspace-entry.workspace-access-inbox .workspace-badge .access-icon:before {
+  content: "\f309";
 }
 .left-panel .folders-tree {
   margin-left: -15px;

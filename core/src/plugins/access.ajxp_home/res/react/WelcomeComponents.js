@@ -536,6 +536,7 @@
             const k = Math.floor(Math.random() * this._videos.length);
             const value = this._videos[k];
             return {
+                videoIndex      : k,
                 youtubeId       : value[0],
                 contentMessageId: value[1]
             };
@@ -558,13 +559,29 @@
             return text.split('\n').shift().replace('<h2>', '').replace('</h2>', '');
         },
 
+        browse: function(direction = 'next', event){
+            let nextIndex;
+            const {videoIndex} = this.state;
+            if(direction === 'next'){
+                nextIndex = videoIndex < this._videos.length -1  ? videoIndex + 1 : 0;
+            }else{
+                nextIndex = videoIndex > 0  ? videoIndex - 1 : this._videos.length - 1;
+            }
+            const value = this._videos[nextIndex];
+            this.setState({
+                videoIndex      : nextIndex,
+                youtubeId       : value[0],
+                contentMessageId: value[1]
+            });
+        },
+
         render: function(){
             const MessageHash = this.props.pydio.MessageHash;
             var htmlMessage = function(id){
                 return {__html:MessageHash[id]};
             };
-            const menus = this._videos.map(function(item){
-                return <MaterialUI.MenuItem primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1]})} }/>;
+            const menus = this._videos.map(function(item, index){
+                return <MaterialUI.MenuItem primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1], videoIndex: index})} }/>;
             }.bind(this));
             let props = {...this.props};
             const {youtubeId, contentMessageId} = this.state;
@@ -574,17 +591,19 @@
                 <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
             );
             return (
-                <MaterialUI.Paper {...props}>
+                <MaterialUI.Paper {...props} transitionEnabled={false}>
                     {this.getCloseButton()}
                     <div className="tutorial_legend">
                         <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
+                            <div className="tutorial_prev mdi mdi-arrow-left" onClick={this.browse.bind(this, 'previous')}/>
+                            <div className="tutorial_next mdi mdi-arrow-right" onClick={this.browse.bind(this, 'next')}/>
                             <div className="tutorial_title"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
                         </div>
                         <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
                         <MaterialUI.Divider style={{minHeight: 1}}/>
-                        <div style={{textAlign:'right', padding: '8px 4px'}}>
+                        <div style={{textAlign:'right', padding: '0 6px'}}>
                             <MaterialUI.IconMenu style={{float:'left'}}
-                                iconButtonElement={<MaterialUI.IconButton iconClassName="icon-reorder"/>}
+                                iconButtonElement={<MaterialUI.IconButton iconClassName="mdi mdi-dots-vertical"/>}
                                 anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                                 targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
                             >{menus}</MaterialUI.IconMenu>
@@ -592,6 +611,7 @@
                                 onTouchTap={this.launchVideo}
                                 label={MessageHash['user_home.86']}
                                 primary={true}
+                                style={{marginTop:5}}
                                 icon={<MaterialUI.FontIcon className="icon-youtube-play" />}
                             />
                         </div>
@@ -611,9 +631,11 @@
         render: function(){
             return (
                 <div className="video-player" style={{position:'absolute', top:0, left:0, right:0, bottom:0, zIndex:200000}}>
-                    <div className="overlay" style={{position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'black', opacity:0.4}}></div>
-                    <iframe src={this.props.videoSrc} style={{position:'absolute', top:'10%', left:'10%', width:'80%', height:'80%', border:'0'}}></iframe>
-                    <a className="mdi mdi-close" style={{position:'absolute', right:'8%', top:'7%', color:'white', textDecoration:'none'}} onClick={this.props.closePlayer}/>
+                    <div className="overlay" style={{position:'absolute', top:0, left:0, right:0, bottom:0, backgroundColor:'black', opacity:0.4}} onClick={this.props.closePlayer}></div>
+                    <div style={{position:'absolute', top:'10%', left:'10%', width:'80%', height:'80%', minWidth:420, minHeight: 600, boxShadow:'rgba(0, 0, 0, 0.156863) 0px 3px 10px, rgba(0, 0, 0, 0.227451) 0px 3px 10px'}}>
+                        <iframe src={this.props.videoSrc} style={{width:'100%', height:'100%', border:0}}/>
+                    </div>
+                    <a className="mdi mdi-close" style={{position:'absolute', right:'8%', top:'7%', color:'white', textDecoration:'none', fontSize:24}} onClick={this.props.closePlayer}/>
                 </div>
             );
         }
@@ -692,19 +714,23 @@
         },
 
         render: function(){
+            const {pydio, filterByType} = this.props;
             let props = {...this.props};
             if(props.style){
                 props.style = {...props.style, overflowY:'auto'};
             }
+            const messages = this.props.pydio.MessageHash;
             return (
-                <MaterialUI.Paper zDepth={1} {...props} >
+                <MaterialUI.Paper zDepth={1} {...props} transitionEnabled={false}>
                     {this.getCloseButton()}
+                    <MaterialUI.CardTitle title={messages[filterByType==='entries'?468:469]} subtitle={filterByType==='entries'?'Generic workspaces I can access to':'Shared with me by other users'}/>
                     <PydioWorkspaces.WorkspacesList
-                        className={"vertical_fit"}
+                        className={"vertical_fit filter-" + filterByType}
                         pydio={this.props.pydio}
                         workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
                         showTreeForWorkspace={false}
                         filterByType={this.props.filterByType}
+                        sectionTitleStyle={{display:'none'}}
                     />
                 </MaterialUI.Paper>
             );
@@ -716,7 +742,7 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:12,
+            gridWidth:3,
             gridHeight:10,
             builderDisplayName:'Download Applications',
             builderFields:[]
@@ -728,7 +754,7 @@
                 props.style = {...props.style, overflowY:'auto'};
             }
             return (
-                <MaterialUI.Paper zDepth={1} {...props} >
+                <MaterialUI.Paper zDepth={1} {...props}  transitionEnabled={false}>
                     {this.getCloseButton()}
                     <div style={{width: 380, margin:'10px auto', position:'relative'}}>
                         <DlAppsPanel pydio={this.props.pydio} open={true}/>
@@ -783,7 +809,6 @@
                         x:6, y:0
                     },
                     defaultLayouts: {
-                        md: {x: 0, y: 30},
                         sm: {x: 0, y: 30}
                     }
                 },
@@ -824,6 +849,7 @@
                 width:'100%',
                 position: 'fixed'
             };
+            const lightColor = '#eceff1'; // TO DO: TO BE COMPUTED FROM MAIN COLOR
             const uWidgetProps = this.props.userWidgetProps || {};
             const wsListProps = this.props.workspacesListProps || {};
             return (
@@ -847,8 +873,8 @@
                         defaultCards={this.getDefaultCards()}
                         builderNamespaces={["WelcomeComponents"]}
                         pydio={this.props.pydio}
-                        cols={{lg: 12, md: 8, sm: 6, xs: 6, xxs: 2}}
-                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0}}
+                        cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
+                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0, backgroundColor: lightColor}}
                     />
                 </div>
             );
