@@ -980,7 +980,7 @@
             let style = {
                 width: this.props.size || 100,
                 height: this.props.size || 100,
-                borderStyle: this.state.isDragActive ? "solid" : "dashed"
+                //borderStyle: this.state.isDragActive ? "solid" : "dashed"
             };
             if(this.props.style){
                 style = Object.assign(style, this.props.style);

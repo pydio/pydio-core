@@ -171,13 +171,14 @@ export default React.createClass({
                 const percent = parseInt(width.replace('%', ''));
                 this._crtPercentSizeObserver = () => {
                     this.setState({
-                        dialogWidth: DOMUtils.getViewportWidth() * percent / 100
+                        dialogWidth: DOMUtils.getViewportWidth() * percent / 100,
+                        dialogHeight: DOMUtils.getViewportHeight() * percent / 100
                     });
                 };
                 DOMUtils.observeWindowResize(this._crtPercentSizeObserver);
                 this._crtPercentSizeObserver();
             }else{
-                this.setState({dialogWidth: width});
+                this.setState({dialogWidth: width, dialogHeight: 0});
             }
         }
         if(component.getPadding){
@@ -272,6 +273,11 @@ export default React.createClass({
         let dialogRoot = {...styles.dialogRoot}
         let dialogBody = {...styles.dialogBody, display:'flex'}
         let dialogContent = {...styles.dialogContent, width: dialogWidth, minWidth: dialogWidth, maxWidth: dialogWidth}
+        if(state.dialogHeight){
+            dialogContent.minHeight = dialogBody.minHeight = state.dialogHeight;
+        }else{
+            dialogContent.minHeight = dialogBody.minHeight = null;
+        }
         let dialogTitle = {...styles.dialogTitle}
         let overlayStyle;
 

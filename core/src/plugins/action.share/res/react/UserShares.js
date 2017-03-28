@@ -143,10 +143,21 @@
 
     class ShareCard extends React.Component{
 
+        componentDidMount(){
+            if(this.props.scrollXMax){
+                this.props.scrollXMax();
+            }
+        }
+
+        placeButtons(component){
+            const updater = (buttons) => {this.setState({buttons})};
+            this.setState({buttons: component.getButtons(updater)});
+        }
+
         render(){
             const selection = new PydioDataModel();
             selection.setSelectedNodes([this.props.node.getInternalNode()]);
-            const style = {...cardStyle, zIndex:100 - this.props.nestedLevel - 1, maxWidth: 420, marginRight: 10};
+            const style = {...cardStyle, zIndex:100 - this.props.nestedLevel - 1, maxWidth: 420, minWidth: 420, marginRight: 10, overflowY:'scroll'};
             return (
                 <MaterialUI.Paper zDepth={1} style={style}>
                     <PydioReactUI.AsyncComponent
@@ -156,7 +167,10 @@
                         selection={selection}
                         readonly={true}
                         noModal={true}
+                        onLoad={this.placeButtons.bind(this)}
+                        onDismiss={this.props.close}
                     />
+                    <div style={{textAlign:'right'}}>{this.state && this.state.buttons}</div>
                 </MaterialUI.Paper>);
         }
 
@@ -190,7 +204,10 @@
         }
 
         componentDidMount(){
-            this.load()
+            this.load();
+            if(this.props.scrollXMax){
+                this.props.scrollXMax();
+            }
         }
 
         componentWillReceiveProps(nextProps){
@@ -227,6 +244,12 @@
             );
         }
 
+        scrollXMax(){
+            if(this.refs.root){
+                this.refs.root.scrollLeft = 1000000;
+            }
+        }
+
         render(){
             const nestedLevel = (this.props.nestedLevel || 0) + 1;
             const filters = {...this.state.filters};
@@ -234,7 +257,7 @@
 
             const {selectedChild} = this.state;
             return (
-                <div style={{display:'flex', height: 600}}>
+                <div style={{...this.props.style, display:'flex', overflowX: nestedLevel === 1 ? 'scroll' : 'initial'}} ref="root">
                     <MaterialUI.Paper zDepth={1} style={{...cardStyle, zIndex:100-nestedLevel}} rounded={false}>
                         <div style={selectorContainerStyle}>{this.renderSelector()}</div>
                         <MaterialUI.Divider style={{height:1}}/>
@@ -254,11 +277,23 @@
                             })}
                         </MaterialUI.List>
                     </MaterialUI.Paper>
-                    {this.state.selectedChild && !this.state.selectedChild.isLeaf()
-                        && <ShareView pydio={this.props.pydio} filters={filters} nestedLevel={nestedLevel} node={this.state.selectedChild}/>
+                    {this.state.selectedChild && !this.state.selectedChild.isLeaf() &&
+                        <ShareView
+                            pydio={this.props.pydio}
+                            filters={filters}
+                            nestedLevel={nestedLevel}
+                            node={this.state.selectedChild}
+                            scrollXMax={this.props.scrollXMax || this.scrollXMax.bind(this)}
+                        />
                     }
-                    {this.state.selectedChild && this.state.selectedChild.isLeaf()
-                        && <ShareCard pydio={this.props.pydio} node={this.state.selectedChild} nestedLevel={nestedLevel}/>
+                    {this.state.selectedChild && this.state.selectedChild.isLeaf() &&
+                        <ShareCard
+                            pydio={this.props.pydio}
+                            node={this.state.selectedChild}
+                            nestedLevel={nestedLevel}
+                            scrollXMax={this.props.scrollXMax || this.scrollXMax.bind(this)}
+                            close={() => {this.setState({selectedChild: null})}}
+                        />
                     }
                 </div>
             );
@@ -290,14 +325,15 @@
         render: function(){
 
             return (
-                <div style={{width:'100%'}}>
+                <div style={{width:'100%', display:'flex', flexDirection:'column'}}>
                     <MaterialUI.AppBar
                         title={this.props.pydio.MessageHash['share_center.98']}
                         showMenuIconButton={false}
                         iconClassNameRight="mdi mdi-close"
                         onRightIconButtonTouchTap={()=>{this.dismiss()}}
+                        style={{flexShrink: 0, borderRadius: '2px 2px 0 0'}}
                     />
-                    <ShareView {...this.props} style={{width:'100%', height: 600}}/>
+                    <ShareView {...this.props} style={{width:'100%', flex: 1}}/>
                 </div>
             );
 

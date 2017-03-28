@@ -214,6 +214,11 @@
                 nodePath = this.props.shareModel.getNode().getMetadata().get("original_path");
             }
             */
+            if(this.props.noModal){
+                return (
+                    <div  className="headerPanel" style={{padding: 0, width:'100%', height: 27}}></div>
+                );
+            }
             return (
                 <div className="headerPanel">
                     <div>{this.context.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
