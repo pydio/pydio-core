@@ -24,6 +24,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Core\Exception\PydioException;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\RepositoryInterface;
 use Pydio\Core\Model\UserInterface;
@@ -150,6 +151,7 @@ class NotificationCenter extends Plugin
 
 
     /**
+     * Hooked on node.change event
      * @param AJXP_Node|null $oldNode
      * @param AJXP_Node|null $newNode
      * @param bool $copy
@@ -186,6 +188,28 @@ class NotificationCenter extends Plugin
             $this->eventStore->persistEvent("node.change", func_get_args(), $repository->getId(), $repositoryScope, $repositoryOwner, $userObject->getId(), $userObject->getGroupPath());
         }
 
+    }
+
+    /**
+     * Hooked on node.read event
+     * @param AJXP_Node $node
+     */
+    public function persistReadHookToRecentList(AJXP_Node $node){
+        require_once ('RecentListManager.php');
+        $list = new RecentListManager($node->getContext());
+        $list->store($node);
+    }
+
+    /**
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     */
+    public function loadRecentItemsList(ServerRequestInterface $request, ResponseInterface &$response){
+        require_once ('RecentListManager.php');
+        $list = new RecentListManager($request->getAttribute('ctx'));
+        $nodesList = $list->toNodesList();
+        $responseStream = new SerializableResponseStream($nodesList);
+        $response = $response->withBody($responseStream);
     }
 
 

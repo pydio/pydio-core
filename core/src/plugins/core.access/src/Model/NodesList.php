@@ -70,6 +70,9 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
         $this->parentNode = $parentNode;
     }
 
+    /**
+     * @return AJXP_Node
+     */
     public function getParentNode(){
         return $this->parentNode;
     }
@@ -313,7 +316,7 @@ class NodesList implements XMLDocSerializableResponseChunk, JSONSerializableResp
      * @param integer $totalPages
      * @param integer $dirsCount
      * @param null $remoteSortAttributes
-     * @return void|string
+     * @return string
      */
     private function renderPaginationData($count, $currentPage, $totalPages, $dirsCount = -1, $remoteSortAttributes = null)
     {

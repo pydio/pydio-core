@@ -71,6 +71,11 @@
                     </serverCallback>
                 </processing>
             </action>
+            <action name="load_user_recent_items">
+                <processing>
+                    <serverCallback methodName="loadRecentItemsList" restParams="/"/>
+                </processing>
+            </action>
             <action name="activateDesktopNotifications">
                 <gui src="" iconClass="icon-rss" text="notification_center.1" title="notification_title.2">
                     <context dir="true" recycle="true" selection="false"/>
@@ -82,6 +87,7 @@
         </actions>
         <hooks>
             <serverCallback methodName="persistChangeHookToFeed" hookName="node.change" defer="true"/>
+            <serverCallback methodName="persistReadHookToRecentList" hookName="node.read"/>
             <serverCallback methodName="persistNotificationToAlerts" hookName="msg.notification"/>
             <serverCallback methodName="loadRepositoryInfo" hookName="repository.load_info"/>
             <serverCallback methodName="shareAssignRight" hookName="node.share.assign_right"/>

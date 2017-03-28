@@ -510,7 +510,7 @@
 
         statics:{
             gridWidth:3,
-            gridHeight:36,
+            gridHeight:30,
             builderDisplayName:'Video Tutorial',
             builderFields:[]
         },
@@ -708,7 +708,7 @@
 
         statics:{
             gridWidth:3,
-            gridHeight:36,
+            gridHeight:40,
             builderDisplayName:'My Workspaces',
             builderFields:[]
         },
@@ -762,6 +762,34 @@
                 </MaterialUI.Paper>
             );
         }
+    });
+
+    const RecentAccessCard = React.createClass({
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:3,
+            gridHeight:16,
+            builderDisplayName:'Recently Accessed',
+            builderFields:[]
+        },
+
+        render: function(){
+            const title = <MaterialUI.CardTitle title="Recently Accessed"/>;
+
+            return (
+                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                    {title}
+                    <PydioComponents.NodeListCustomProvider
+                        nodeProviderProperties={{get_action:"load_user_recent_items"}}
+                        elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                        nodeClicked={(node) => {this.props.pydio.goTo(node);}}
+                        hideToolbar={true}
+                    />
+                </MaterialUI.Paper>
+            );
+        }
+
     });
 
 
@@ -822,6 +850,13 @@
                         md: {x: 0, y: 60},
                         sm: {x: 0, y: 60}
                     }
+                },
+                {
+                    id:'recently_accessed',
+                    componentClass:'WelcomeComponents.RecentAccessCard',
+                    defaultPosition:{
+                        x: 6, y: 60
+                    }
                 }
             ];
 
@@ -860,6 +895,7 @@
                         style={widgetStyle}
                         {...uWidgetProps}
                     >
+                        <ConfigLogo pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                         <div>
                             <PydioWorkspaces.SearchForm
                                 crossWorkspace={true}
@@ -892,6 +928,7 @@
     }
     WelcomeComponents.VideoCard = VideoCard;
     WelcomeComponents.DlAppsCard = DlAppsCard;
+    WelcomeComponents.RecentAccessCard = RecentAccessCard;
     WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
     WelcomeComponents.WorkspacesListCard = WorkspacesListCard;
     global.WelcomeComponents = WelcomeComponents;

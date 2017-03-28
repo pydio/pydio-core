@@ -152,7 +152,7 @@ export default React.createClass({
                         {avatar}
                         {actionBar}
                     </div>
-                    <div>{this.props.children}</div>
+                    {this.props.children}
                 </MaterialUI.Paper>
             );
         }else{
