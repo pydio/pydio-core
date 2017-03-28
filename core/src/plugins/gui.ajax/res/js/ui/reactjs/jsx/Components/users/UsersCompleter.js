@@ -44,7 +44,6 @@ const UsersLoader = React.createClass({
     },
 
     suggestionLoader:function(input, callback){
-f
         const excludes = this.props.excludes;
         const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
         this.setState({loading:this.state.loading + 1});

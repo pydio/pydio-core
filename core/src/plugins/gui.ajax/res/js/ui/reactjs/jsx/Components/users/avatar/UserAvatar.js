@@ -220,7 +220,7 @@ class UserAvatar extends React.Component{
                     style={labelStyle}>{label}</div>}
                 {displayLabel && richCard && <MaterialUI.CardTitle title={label} subtitle={userType}/>}
                 {richCard && user && <ActionsPanel {...this.state} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
-                {graph && <GraphPanel graph={graph} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
+                {graph && <GraphPanel graph={graph} {...this.props} userLabel={label} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {this.props.children}
                 {popover}
             </div>

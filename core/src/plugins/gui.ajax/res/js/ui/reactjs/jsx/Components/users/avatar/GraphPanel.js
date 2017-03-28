@@ -4,7 +4,7 @@ class GraphPanel extends React.Component{
 
     render(){
 
-        const {graph} = this.props;
+        const {graph, userLabel} = this.props;
         let elements = [];
         if(graph.teams && graph.teams.length){
             const onDeleteAction = function(parentItem, team){
@@ -23,7 +23,7 @@ class GraphPanel extends React.Component{
             elements.push(
                 <div key="source">
                     {elements.length ? <MaterialUI.Divider/> : null}
-                    <div style={{padding: 16}}>You have shared  {Object.keys(graph.source).length} item(s) with this user.</div>
+                    <div style={{padding: 16}}>{userLabel} has shared  {Object.keys(graph.source).length} item(s) with you.</div>
                 </div>
             )
         }
@@ -31,7 +31,7 @@ class GraphPanel extends React.Component{
             elements.push(
                 <div key="target">
                     {elements.length ? <MaterialUI.Divider/> : null}
-                    <div style={{padding: 16}}>User has shared  {Object.keys(graph.target).length} item(s) with you.</div>
+                    <div style={{padding: 16}}>You have shared  {Object.keys(graph.target).length} item(s) with {userLabel}.</div>
                 </div>
             )
         }
