@@ -120,7 +120,8 @@
             uniqueUserStyle:React.PropTypes.bool,
             users:React.PropTypes.object,
             panelTitle:React.PropTypes.string,
-            zDepth:React.PropTypes.number
+            zDepth:React.PropTypes.number,
+            showAddressBook: React.PropTypes.bool
         },
 
         getInitialState: function(){
@@ -130,6 +131,10 @@
                 message:this.props.message,
                 errorMessage:null
             };
+        },
+
+        getDefaultProps: function(){
+            return {showAddressBook: true};
         },
 
         updateSubject: function(event){
@@ -198,8 +203,13 @@
             if(this.state.errorMessage){
                 var errorDiv = <div className="error">{this.state.errorMessage}</div>
             }
+            let style = this.props.style || {};
+            style = {
+                ...style,
+                margin:this.props.uniqueUserStyle ? 0 : 8
+            }
             var content = (
-                <MaterialUI.Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} className={className} style={{margin:this.props.uniqueUserStyle ? 0 : 8}}>
+                <MaterialUI.Paper zDepth={this.props.zDepth !== undefined ? this.props.zDepth : 2} className={className} style={style}>
                     <h3  style={{padding:20, color:'rgba(0,0,0,0.87)', fontSize:25, marginBottom: 0, paddingBottom: 10}}>{this.props.panelTitle}</h3>
                     {errorDiv}
                     {!this.props.uniqueUserStyle &&
@@ -213,7 +223,7 @@
                                 excludes={Object.keys(this.state.users)}
                                 renderSuggestion={this.usersLoaderRenderSuggestion}
                                 pydio={global.pydio}
-                                showAddressBook={true}
+                                showAddressBook={this.props.showAddressBook}
                                 underlineHide={true}
                             />
                             <div style={styles.wrapper}>{users}</div>
