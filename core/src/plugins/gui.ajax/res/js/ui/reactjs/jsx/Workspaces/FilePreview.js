@@ -3,7 +3,9 @@ let FilePreview = React.createClass({
     propTypes: {
         node            : React.PropTypes.instanceOf(AjxpNode),
         loadThumbnail   : React.PropTypes.bool,
-        richPreview     : React.PropTypes.bool
+        richPreview     : React.PropTypes.bool,
+        style           : React.PropTypes.object,
+        mimeFontStyle   : React.PropTypes.object
     },
 
     getInitialState: function(){
@@ -135,7 +137,7 @@ let FilePreview = React.createClass({
         let svg = PydioComponents.AbstractEditor.getSvgSource(node);
         let object, className;
         if(svg){
-            object = <div key="icon" className={"mimefont mdi mdi-" + svg}></div>;
+            object = <div key="icon" className={"mimefont mdi mdi-" + svg} style={this.props.mimeFontStyle}></div>;
             className = 'mimefont-container';
         }else{
             var src = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/ICON_SIZE", 64);
