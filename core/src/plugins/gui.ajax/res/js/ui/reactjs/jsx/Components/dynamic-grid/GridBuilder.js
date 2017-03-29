@@ -118,7 +118,9 @@ export default React.createClass({
                 defaultValues = LangUtils.mergeObjectsRecursive(defaultValues, this.state.currentFormValues);
             }
             form =(
-                <PydioForm.FormPanel
+                <PydioReactUI.AsyncComponent
+                    namespace="PydioForm"
+                    componentName="FormPanel"
                     parameters={fields}
                     depth={-1}
                     values={defaultValues}

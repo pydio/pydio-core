@@ -157,146 +157,6 @@
         }
     });
 
-    var HomeWorkspaceLegendInfoBlock = React.createClass({
-        render:function(){
-            return (
-                <div className="repoInfoBadge">
-                    <div className="repoInfoBox flexbox">
-                        <div className="repoInfoBody row content">
-                            {this.props.children}
-                        </div>
-                        <div className="repoInfoHeader row header">
-                            <span className="repoInfoTitle">
-                                {this.props.badgeTitle}
-                            </span>
-                            <span className={this.props.iconClass}/>
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-    });
-
-    var UserDashboardOrig = React.createClass({
-
-        getInitialState:function(){
-            return {
-                workspaces: this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []
-            };
-        },
-
-        componentDidMount:function(){
-            if(this._timer) global.clearTimeout(this._timer);
-            this._timer = global.setTimeout(this.closeNavigation, 3000);
-
-            this._reloadObserver = function(){
-
-                if(this.isMounted()){
-                    this.setState({
-                        workspaces:this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []
-                    });
-                }
-            }.bind(this);
-
-            this.props.pydio.observe('repository_list_refreshed', this._reloadObserver);
-        },
-
-        componentWillUnmount:function(){
-            if(this._reloadObserver){
-                this.props.pydio.stopObserving('repository_list_refreshed', this._reloadObserver);
-            }
-        },
-        switchToWorkspace:function(repoId, save){
-            if(!repoId) return;
-            if(save){
-                PydioApi.getClient().request({
-                    'PREFERENCES_DEFAULT_START_REPOSITORY':repoId,
-                    'get_action':'custom_data_edit'
-                }, function(){
-                    this.props.pydio.user.setPreference('DEFAULT_START_REPOSITORY', repoId, false);
-                }.bind(this));
-            }
-            this.props.pydio.triggerRepositoryChange(repoId);
-        },
-        onShowLegend: function(){
-            // PROTO STUFF!
-            //$('home_center_panel').addClassName('legend_visible');
-        },
-        onHideLegend: function(){
-            // PROTO STUFF!
-            //$('home_center_panel').removeClassName('legend_visible');
-        },
-        onHoverLink:function(event, ws){
-            FuncUtils.bufferCallback('hoverWorkspaceTimer', 400, function(){
-                if(this.refs && this.refs.legend){
-                    this.refs.legend.setWorkspace(ws);
-                }
-            }.bind(this));
-        },
-        onOutLink:function(event, ws){
-            this.refs.legend.setWorkspace(null);
-        },
-        onOpenLink:function(event, ws, save){
-            this.switchToWorkspace(ws.getId(), save);
-        },
-        render:function(){
-            var simpleClickOpen = this.props.pydio.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
-            var enableGettingStarted = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED");
-            let UserCartridge;
-            if(this.props.pydio.user){
-                UserCartridge = (
-                    <HomeWorkspaceUserCartridge style={{minHeight:'94px'}}
-                                                controller={this.props.pydio.getController()}
-                                                user={this.props.pydio.user}
-                                                enableGettingStarted={enableGettingStarted}
-                    />
-                );
-            }
-            return (
-                <div className="horizontal_layout vertical_fit" id={this.props.rootId} style={this.props.style}>
-                    <div id="home_left_bar" className="vertical_layout">
-                        {UserCartridge}
-                        <div id="workspaces_center" className="vertical_layout vertical_fit">
-                            <PydioWorkspaces.WorkspacesList
-                                pydio={this.props.pydio}
-                                workspaces={this.state.workspaces}
-                                onHoverLink={this.onHoverLink}
-                                onOutLink={this.onOutLink}
-                            />
-
-                        </div>
-                    </div>
-                    <HomeWorkspaceLegendPanel ref="legend"
-                                              pydio={this.props.pydio}
-                                              onShowLegend={this.onShowLegend}
-                                              onHideLegend={this.onHideLegend}
-                                              onOpenLink={this.onOpenLink}
-                    />
-                    {this.props.children}
-                </div>
-            )
-        }
-
-    });
-
-    var HomeWorkspaceLegendPanel = React.createClass({
-        setWorkspace: function(ws){
-            this.refs.legend.setWorkspace(ws);
-        },
-        render:function() {
-            return (
-                <div id="home_center_panel">
-                    <div id="logo_div"><ConfigLogo pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/></div>
-                    <HomeWorkspaceLegend
-                        ref="legend"
-                        onShowLegend={this.props.onShowLegend}
-                        onHideLegend={this.props.onHideLegend}
-                        onOpenLink={this.props.onOpenLink}/>
-                </div>
-            )
-        }
-    });
-
     var HomeWorkspaceUserCartridge = React.createClass({
 
         clickDisconnect: function(){
@@ -390,42 +250,63 @@
 
     });
 
-
     /***********************************************
      * DOWNLOAD NATIVE APPS
      ***********************************************/
-    var DlAppElement = React.createClass({
-        propTypes:{
-            id:React.PropTypes.string,
-            configs:React.PropTypes.object,
-            configHref:React.PropTypes.string,
-            containerClassName:React.PropTypes.string,
-            iconClassName:React.PropTypes.string,
-            messageId:React.PropTypes.string,
-            tooltipId:React.PropTypes.string
-        },
 
-        render: function(){
+    class DownloadApp extends React.Component{
+
+        render(){
+
+            const styles = {
+                smallIcon: {
+                    fontSize: 40,
+                    width: 40,
+                    height: 40,
+                },
+                small: {
+                    width: 80,
+                    height: 80,
+                    padding: 20,
+                }
+            };
+
+            const {pydio, iconClassName, tooltipId, configs, configHref} = this.props;
+
             return (
-                <PydioComponents.LabelWithTip className="dl_tooltip_container" tooltip={MessageHash[this.props.tooltipId]}>
-                    <div id={this.props.id}>
-                        <a href={this.props.configs.get(this.props.configHref)} target="_blank" className={this.props.containerClassName}/>
-                        <a href={this.props.configs.get(this.props.configHref)} target="_blank"  className={this.props.iconClassName}/>
-                        <div>{MessageHash[this.props.messageId]}</div>
-                    </div>
-                </PydioComponents.LabelWithTip>
-            );
-        }
-    });
+                <MaterialUI.IconButton
+                    iconClassName={iconClassName}
+                    tooltip={pydio.MessageHash[tooltipId]}
+                    tooltipStyles={{marginTop: 40}}
+                    style={styles.small}
+                    iconStyle={{...styles.smallIcon, color: this.props.iconColor}}
+                    onTouchTap={() => { window.open(configs.get(configHref)) }}
+                />);
 
-    var DlAppsPanel = React.createClass({
+        }
+
+    }
+
+    DownloadApp.propTypes = {
+        pydio: React.PropTypes.instanceOf(Pydio),
+        id:React.PropTypes.string,
+        configs:React.PropTypes.object,
+        configHref:React.PropTypes.string,
+        iconClassName:React.PropTypes.string,
+        iconColor:React.PropTypes.string,
+        messageId:React.PropTypes.string,
+        tooltipId:React.PropTypes.string
+    };
+
+    const DlAppsPanel = React.createClass({
 
         render: function(){
             let configs = this.props.pydio.getPluginConfigs('access.ajxp_home');
             let mobileBlocks = [], syncBlocks = [];
             if(configs.get('URL_APP_IOSAPPSTORE')){
                 mobileBlocks.push(
-                    <DlAppElement
+                    <DownloadApp
+                        {...this.props}
                         id="dl_pydio_ios"
                         key="dl_pydio_ios"
                         configs={configs}
@@ -440,7 +321,8 @@
             }
             if(configs.get('URL_APP_ANDROID')){
                 mobileBlocks.push(
-                    <DlAppElement
+                    <DownloadApp
+                        {...this.props}
                         id="dl_pydio_android"
                         key="dl_pydio_android"
                         configs={configs}
@@ -454,7 +336,8 @@
             }
             if(configs.get('URL_APP_SYNC_WIN')){
                 syncBlocks.push(
-                    <DlAppElement
+                    <DownloadApp
+                        {...this.props}
                         id="dl_pydio_win"
                         key="dl_pydio_win"
                         configs={configs}
@@ -468,7 +351,8 @@
             }
             if(configs.get('URL_APP_SYNC_MAC')){
                 syncBlocks.push(
-                    <DlAppElement
+                    <DownloadApp
+                        {...this.props}
                         id="dl_pydio_mac"
                         key="dl_pydio_mac"
                         configs={configs}
@@ -480,21 +364,9 @@
                     />
                 );
             }
-            let blocksSep;
-            if(mobileBlocks.length && syncBlocks.length){
-                blocksSep = <div className="dl_blocks_sep"></div>;
-            }
-            let searchBlock;
-            if(pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH")){
-                //searchBlock = <HomeSearchEngine className="react-mui-context"/>;
-            }
+
             return (
-                <div id="tutorial_dl_apps_pane">
-                    <div id="dl_pydio_cont" className="react-mui-context">
-                        {syncBlocks}{blocksSep}{mobileBlocks}
-                    </div>
-                    {searchBlock}
-                </div>
+                <div style={{textAlign: 'center', paddingTop: 5}}>{this.props.type === 'sync' ? syncBlocks : mobileBlocks}</div>
             );
         }
 
@@ -504,13 +376,13 @@
     /***********************************************
      * VIDEO TUTORIALS
      ***********************************************/
-    var VideoCard = React.createClass({
+    const VideoCard = React.createClass({
 
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
             gridWidth:3,
-            gridHeight:30,
+            gridHeight:16,
             builderDisplayName:'Video Tutorial',
             builderFields:[]
         },
@@ -596,24 +468,18 @@
                     <div className="tutorial_legend">
                         <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
                             <div className="tutorial_prev mdi mdi-arrow-left" onClick={this.browse.bind(this, 'previous')}/>
+                            <div className="tutorial_play mdi mdi-play" onClick={this.launchVideo}/>
                             <div className="tutorial_next mdi mdi-arrow-right" onClick={this.browse.bind(this, 'next')}/>
-                            <div className="tutorial_title"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
-                        </div>
-                        <div className="tutorial_content"><span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/></div>
-                        <MaterialUI.Divider style={{minHeight: 1}}/>
-                        <div style={{textAlign:'right', padding: '0 6px'}}>
-                            <MaterialUI.IconMenu style={{float:'left'}}
-                                iconButtonElement={<MaterialUI.IconButton iconClassName="mdi mdi-dots-vertical"/>}
-                                anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                                targetOrigin={{horizontal: 'left', vertical: 'bottom'}}
-                            >{menus}</MaterialUI.IconMenu>
-                            <MaterialUI.FlatButton
-                                onTouchTap={this.launchVideo}
-                                label={MessageHash['user_home.86']}
-                                primary={true}
-                                style={{marginTop:5}}
-                                icon={<MaterialUI.FontIcon className="icon-youtube-play" />}
-                            />
+                            <div className="tutorial_title">
+                                <span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/>
+                                <MaterialUI.IconMenu
+                                    style={{position: 'absolute', bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.43)', padding: 6, borderRadius: '0 0 2px 0'}}
+                                    iconStyle={{color:'white'}}
+                                    iconButtonElement={<MaterialUI.IconButton iconClassName="mdi mdi-dots-vertical"/>}
+                                    anchorOrigin={{horizontal: 'left', vertical: 'top'}}
+                                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                                >{menus}</MaterialUI.IconMenu>
+                            </div>
                         </div>
                     </div>
                 </MaterialUI.Paper>
@@ -644,10 +510,10 @@
     /***********************************************
      * OTHERS
      ***********************************************/
-    var ConfigLogo = React.createClass({
+    const ConfigLogo = React.createClass({
         render: function(){
-            var logo = this.props.pydio.Registry.getPluginConfigs(this.props.pluginName).get(this.props.pluginParameter);
-            var url;
+            let logo = this.props.pydio.Registry.getPluginConfigs(this.props.pluginName).get(this.props.pluginParameter);
+            let url;
             if(!logo){
                 logo = this.props.pydio.Registry.getDefaultImageFromParameters(this.props.pluginName, this.props.pluginParameter);
             }
@@ -658,51 +524,72 @@
                     url = this.props.pydio.Parameters.get('ajxpServerAccess') + "&get_action=get_global_binary_param&binary_id=" + logo;
                 }
             }
-            return <img src={url}/>
+            return <img src={url} style={this.props.style}/>
         }
     });
 
-    var QRCodeDialogLoader = React.createClass({
+    const QRCodeCard = React.createClass({
 
-        closeClicked: function(){
-            this.props.closeAjxpDialog();
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:2,
+            gridHeight:20,
+            builderDisplayName:'Qr Code',
+            builderFields:[]
         },
+
 
         render: function(){
 
             let jsonData = {
-                "server"    : global.location.href.split('welcome').shift(),
-                "user"      : global.pydio.user ? global.pydio.user.id : null
+                "server"    : window.location.href.split('welcome').shift(),
+                "user"      : this.props.pydio.user ? this.props.pydio.user.id : null
             }
 
+            const style = {
+                ...this.props.style,
+                backgroundColor: MaterialUI.Style.colors.blue600,
+                color: 'white'
+            };
+
             return (
-                <div>
-                    <div className="home-qrCode-desc">
-                        <h4>{global.pydio.MessageHash['user_home.72']}</h4>
-                        <p>{global.pydio.MessageHash['user_home.74']}</p>
+                <MaterialUI.Paper zDepth={1} {...this.props} transitionEnabled={false} style={style}>
+                    <div style={{padding: 16, fontSize: 16}}>{this.props.pydio.MessageHash['user_home.74']}</div>
+                    <div className="home-qrCode" style={{display:'flex', justifyContent:'center'}}>
+                        <ReactQRCode bgColor={style.backgroundColor} fgColor={style.color} value={JSON.stringify(jsonData)} size={150}/>
                     </div>
-                    <div className="home-qrCode">
-                        <ReactQRCode value={JSON.stringify(jsonData)} size={256}/>
-                        <div className="button-panel">
-                            <ReactMUI.FlatButton label="Close" onClick={this.closeClicked}/>
-                        </div>
-                    </div>
-                </div>
+                </MaterialUI.Paper>
             );
 
         }
 
     });
 
-    QRCodeDialogLoader.open = function(){
-        var dialog = new AjxpReactDialogLoader('WelcomeComponents', 'QRCodeDialogLoader', {});
-        dialog.openDialog('qrcode_dialog_form', true);
-    };
-
 
     /***********************************************
      * DYNAMIC GRID DASHBOARD
      ***********************************************/
+
+    /*
+    Simple component for customizing colors
+     */
+    class ThemeableTitle extends React.Component{
+
+        render(){
+            const {pydio, filterByType, muiTheme} = this.props;
+            const messages = pydio.MessageHash;
+            const bgColor = filterByType === 'entries' ? muiTheme.palette.primary1Color : MaterialUI.Style.colors.teal500;
+            const title = messages[filterByType==='entries'?468:469];
+            const cardTitleStyle = {backgroundColor:bgColor, color: 'white', padding: 16, fontSize: 24, lineHeight:'36px'};
+
+            return <MaterialUI.Paper zDepth={0} rounded={false} style={cardTitleStyle}>{title}</MaterialUI.Paper>;
+        }
+
+    }
+
+    ThemeableTitle = MaterialUI.Style.muiThemeable()(ThemeableTitle);
+
     const WorkspacesListCard = React.createClass({
         mixins: [PydioComponents.DynamicGridItemMixin],
 
@@ -719,30 +606,31 @@
             if(props.style){
                 props.style = {...props.style, overflowY:'auto'};
             }
-            const messages = this.props.pydio.MessageHash;
             return (
                 <MaterialUI.Paper zDepth={1} {...props} transitionEnabled={false}>
                     {this.getCloseButton()}
-                    <MaterialUI.CardTitle title={messages[filterByType==='entries'?468:469]} subtitle={filterByType==='entries'?'Generic workspaces I can access to':'Shared with me by other users'}/>
-                    <PydioWorkspaces.WorkspacesList
-                        className={"vertical_fit filter-" + filterByType}
-                        pydio={this.props.pydio}
-                        workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
-                        showTreeForWorkspace={false}
-                        filterByType={this.props.filterByType}
-                        sectionTitleStyle={{display:'none'}}
-                    />
+                    <div  style={{height: '100%', display:'flex', flexDirection:'column'}}>
+                        <ThemeableTitle {...this.props}/>
+                        <PydioWorkspaces.WorkspacesListMaterial
+                            className={"vertical_fit filter-" + filterByType}
+                            pydio={this.props.pydio}
+                            workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
+                            showTreeForWorkspace={false}
+                            filterByType={this.props.filterByType}
+                            sectionTitleStyle={{display:'none'}}
+                            style={{flex:1, overflowY: 'auto'}}
+                        />
+                    </div>
                 </MaterialUI.Paper>
             );
         }
     });
 
-
     const DlAppsCard = React.createClass({
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:3,
+            gridWidth:2,
             gridHeight:10,
             builderDisplayName:'Download Applications',
             builderFields:[]
@@ -750,15 +638,17 @@
 
         render: function(){
             let props = {...this.props};
-            if(props.style){
-                props.style = {...props.style, overflowY:'auto'};
-            }
+            const style = {
+                ...props.style,
+                overflow:'visible',
+                backgroundColor: MaterialUI.Style.colors.cyan500,
+                color: 'white'
+            };
             return (
-                <MaterialUI.Paper zDepth={1} {...props}  transitionEnabled={false}>
+                <MaterialUI.Paper zDepth={1} {...props}  transitionEnabled={false} style={style}>
                     {this.getCloseButton()}
-                    <div style={{width: 380, margin:'10px auto', position:'relative'}}>
-                        <DlAppsPanel pydio={this.props.pydio} open={true}/>
-                    </div>
+                    <DlAppsPanel pydio={this.props.pydio} type="sync" iconColor={style.color}/>
+                    <div style={{fontSize: 16, padding: 16, paddingTop: 0, textAlign:'center'}}>Keep your files offline with Pydio Desktop Client</div>
                 </MaterialUI.Paper>
             );
         }
@@ -768,10 +658,74 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:3,
+            gridWidth:5,
             gridHeight:16,
             builderDisplayName:'Recently Accessed',
             builderFields:[]
+        },
+
+        renderIcon: function(node){
+            console.log(node);
+            if(node.isLeaf()){
+                return <PydioWorkspaces.FilePreview node={node} loadThumbnail={true} style={{borderRadius: '50%'}}/>
+            }else{
+                if(node.getPath() === '/' || !node.getPath()){
+                    return <MaterialUI.FontIcon className="mdi mdi-folder-plus"/>
+                }else{
+                    return <MaterialUI.FontIcon className="mdi mdi-folder"/>
+                }
+            }
+        },
+
+        renderEntry: function(entry){
+            const {node} = entry;
+            let primaryText, secondaryText;
+            const path = node.getPath();
+            const meta = node.getMetadata();
+            if(!path || path === '/'){
+                primaryText = meta.get('repository_label');
+                secondaryText = 'Workspace opened on ' + meta.get('recent_access_time');
+            }else{
+                primaryText = node.getLabel();
+                secondaryText = node.getPath();
+            }
+
+            return (
+                <MaterialUI.ListItem
+                    leftIcon={this.renderIcon(node)}
+                    primaryText={primaryText}
+                    secondaryText={secondaryText}
+                    onTouchTap={() => {this.props.pydio.goTo(node);}}
+                />
+            );
+        },
+
+        renderLabel: function(node, data){
+            const path = node.getPath();
+            const meta = node.getMetadata();
+            if(!path || path === '/'){
+                return <span style={{fontSize: 14}}>{meta.get('repository_label')} <span style={{opacity: 0.33}}> (Workspace)</span></span>;
+            }else{
+                const dir = PathUtils.getDirname(node.getPath());
+                let dirSegment;
+                if(dir){
+                    dirSegment = <span style={{opacity: 0.33}}> ({node.getPath()})</span>
+                }
+                if(node.isLeaf()){
+                    return <span><span style={{fontSize: 14}}>{node.getLabel()}</span>{dirSegment}</span>;
+                }else{
+                    return <span><span style={{fontSize: 14}}>{'/' + node.getLabel()}</span>{dirSegment}</span>;
+                }
+            }
+        },
+
+        renderAction: function(node, data){
+            return <span style={{position:'relative'}}><MaterialUI.IconButton
+                iconClassName="mdi mdi-chevron-right"
+                tooltip="Open ... "
+                onTouchTap={() => {this.props.pydio.goTo(node)}}
+                style={{position:'absolute', right:0}}
+            /></span>
         },
 
         render: function(){
@@ -779,13 +733,80 @@
 
             return (
                 <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
-                    {title}
                     <PydioComponents.NodeListCustomProvider
+                        className="recently-accessed-list"
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
                         elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
                         nodeClicked={(node) => {this.props.pydio.goTo(node);}}
                         hideToolbar={true}
+                        tableKeys={{
+                            label:{renderCell:this.renderLabel, label:'Recently Accessed Files', width:'60%'},
+                            recent_access_readable:{label:'Accessed', width:'20%'},
+                            repository_label:{label:'Workspace', width:'20%'},
+                        }}
+                        entryRenderActions={this.renderAction}
                     />
+                </MaterialUI.Paper>
+            );
+        }
+
+    });
+
+    const SearchFormCard = React.createClass({
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:6,
+            gridHeight:10,
+            builderDisplayName:'Search Form',
+            builderFields:[]
+        },
+
+        render: function(){
+            const title = <MaterialUI.CardTitle title="Search your files"/>;
+
+            return (
+                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                    {title}
+                    <PydioReactUI.AsyncComponent
+                        namespace="PydioWorkspaces"
+                        componentName="SearchForm"
+                        pydio={this.props.pydio}
+                        crossWorkspace={true}
+                        groupByField="repository_id"
+                    />
+                </MaterialUI.Paper>
+            );
+        }
+
+    });
+
+
+    const QuickSendCard = React.createClass({
+        mixins: [PydioComponents.DynamicGridItemMixin],
+
+        statics:{
+            gridWidth:2,
+            gridHeight:10,
+            builderDisplayName:'Quick Upload',
+            builderFields:[]
+        },
+
+        render: function(){
+            const title = <MaterialUI.CardTitle title="Quick Upload"/>;
+
+            const style = {
+                ...this.props.style,
+                backgroundColor: MaterialUI.Style.colors.lightBlue500,
+                color: 'white'
+            };
+
+            return (
+                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false} style={style}>
+                    <div style={{display:'flex'}}>
+                        <div style={{padding: 16, fontSize: 16}}>Drop a file here from your desktop</div>
+                        <div style={{textAlign:'center', padding:18}}><span style={{borderRadius:'50%', border: '4px solid white', fontSize:56, padding: 20}} className="mdi mdi-cloud-upload"></span></div>
+                    </div>
                 </MaterialUI.Paper>
             );
         }
@@ -834,7 +855,7 @@
                         launchVideo : this.launchVideo.bind(this)
                     },
                     defaultPosition:{
-                        x:6, y:0
+                        x:0, y:40
                     },
                     defaultLayouts: {
                         sm: {x: 0, y: 30}
@@ -844,10 +865,10 @@
                     id:'downloads',
                     componentClass:'WelcomeComponents.DlAppsCard',
                     defaultPosition:{
-                        x:0, y:30
+                        x:6, y:36
                     },
                     defaultLayouts: {
-                        md: {x: 0, y: 60},
+                        md: {x: 6, y: 36},
                         sm: {x: 0, y: 60}
                     }
                 },
@@ -855,9 +876,24 @@
                     id:'recently_accessed',
                     componentClass:'WelcomeComponents.RecentAccessCard',
                     defaultPosition:{
-                        x: 6, y: 60
+                        x: 3, y: 40
+                    }
+                },
+                {
+                    id:'qr_code',
+                    componentClass:'WelcomeComponents.QRCodeCard',
+                    defaultPosition:{
+                        x: 6, y: 16
+                    }
+                },
+                {
+                    id:'quick_upload',
+                    componentClass:'WelcomeComponents.QuickSendCard',
+                    defaultPosition:{
+                        x: 6, y: 46
                     }
                 }
+
             ];
 
             return baseCards;
@@ -869,13 +905,10 @@
 
         render:function() {
 
-            var videoPlayer;
+            let videoPlayer;
             if(this.state && this.state.player){
                 videoPlayer = <VideoPlayer videoSrc={this.state.player} closePlayer={this.closePlayer}/>
             }
-
-            var simpleClickOpen = this.props.pydio.getPluginConfigs("access.ajxp_home").get("SIMPLE_CLICK_WS_OPEN");
-            var enableGettingStarted = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GETTING_STARTED");
 
             const palette = this.props.muiTheme.palette;
             const Color = MaterialUI.Color;
@@ -888,21 +921,23 @@
             const uWidgetProps = this.props.userWidgetProps || {};
             const wsListProps = this.props.workspacesListProps || {};
             return (
-                <div className="left-panel expanded vertical_fit vertical_layout">
+                <div className="left-panel expanded vertical_fit vertical_layout" style={{backgroundColor: lightColor}}>
                     {videoPlayer}
                     <PydioWorkspaces.UserWidget
                         pydio={this.props.pydio}
                         style={widgetStyle}
                         {...uWidgetProps}
                     >
-                        <ConfigLogo pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
-                        <div>
-                            <PydioWorkspaces.SearchForm
-                                crossWorkspace={true}
-                                pydio={this.props.pydio}
-                                groupByField="repository_id"
-                            />
-                        </div>
+                        {this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH") &&
+                            <div style={{flex:1}}>
+                                <PydioWorkspaces.SearchForm
+                                    crossWorkspace={true}
+                                    pydio={this.props.pydio}
+                                    groupByField="repository_id"
+                                />
+                            </div>
+                        }
+                        <ConfigLogo style={{height:'100%'}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                     </PydioWorkspaces.UserWidget>
                     <PydioComponents.DynamicGrid
                         storeNamespace="WelcomePanel.Dashboard"
@@ -910,7 +945,7 @@
                         builderNamespaces={["WelcomeComponents"]}
                         pydio={this.props.pydio}
                         cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0, backgroundColor: lightColor}}
+                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0}}
                     />
                 </div>
             );
@@ -919,18 +954,21 @@
     });
 
     UserDashboard = MaterialUI.Style.muiThemeable()(UserDashboard);
-
-    var WelcomeComponents = global.WelcomeComponents || {};
     if(global.ReactDND){
-        WelcomeComponents.UserDashboard = global.ReactDND.DragDropContext(ReactDND.HTML5Backend)(UserDashboard);
+        UserDashboard = global.ReactDND.DragDropContext(ReactDND.HTML5Backend)(UserDashboard);
     }else{
-        WelcomeComponents.UserDashboard = UserDashboard;
+        UserDashboard = UserDashboard;
     }
-    WelcomeComponents.VideoCard = VideoCard;
-    WelcomeComponents.DlAppsCard = DlAppsCard;
-    WelcomeComponents.RecentAccessCard = RecentAccessCard;
-    WelcomeComponents.QRCodeDialogLoader = QRCodeDialogLoader;
-    WelcomeComponents.WorkspacesListCard = WorkspacesListCard;
-    global.WelcomeComponents = WelcomeComponents;
+
+    global.WelcomeComponents = {
+        VideoCard,
+        DlAppsCard,
+        RecentAccessCard,
+        QRCodeCard,
+        WorkspacesListCard,
+        UserDashboard,
+        SearchFormCard,
+        QuickSendCard
+    };
 
 })(window);
