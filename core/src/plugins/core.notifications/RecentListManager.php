@@ -24,8 +24,10 @@ use Pydio\Access\Core\Model\AJXP_Node;
 use Pydio\Access\Core\Model\NodesList;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Model\UserInterface;
+use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\SessionService;
 use Pydio\Core\Services\UsersService;
+use Pydio\Core\Utils\Vars\StatHelper;
 
 defined('AJXP_EXEC') or die('Access not allowed');
 
@@ -99,13 +101,20 @@ class RecentListManager
         if(!isSet($this->list)){
             $this->load();
         }
+        $mess = LocaleService::getMessages();
         $nodesList = new NodesList();
         foreach($this->list as $time => $nodeUrl){
             $node = new AJXP_Node($nodeUrl);
             try{
                 @$node->loadNodeInfo();
                 $repoId = $node->getRepositoryId();
-                $node->mergeMetadata(['recent_access_time' => $time, 'repository_id' => $repoId]);
+                $repoLabel = $node->getRepository()->getDisplay();
+                $node->mergeMetadata([
+                    'recent_access_time' => $time,
+                    'recent_access_readable' => StatHelper::relativeDate($time, $mess),
+                    'repository_id' => $repoId,
+                    'repository_label' => $repoLabel
+                ]);
             }catch(\Exception $e){}
             $nodesList->addBranch($node);
         }
