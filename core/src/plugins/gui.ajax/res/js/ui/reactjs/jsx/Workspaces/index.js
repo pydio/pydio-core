@@ -7,6 +7,7 @@ import FSTemplate from './FSTemplate'
 import EditionPanel from './EditionPanel'
 
 import WorkspacesList from './wslist/WorkspacesList'
+import WorkspacesListMaterial from './wslist/WorkspacesListMaterial'
 import LeftPanel from './leftnav/LeftPanel'
 import DynamicLeftPanel from './leftnav/DynamicLeftPanel'
 import UserWidget from './leftnav/UserWidget'
@@ -20,6 +21,7 @@ window.PydioWorkspaces = {
     FilePreview         : FilePreview,
     FSTemplate          : FSTemplate,
     WorkspacesList      : WorkspacesList,
+    WorkspacesListMaterial,
     LeftPanel           : LeftPanel,
     DynamicLeftPanel    : DynamicLeftPanel,
     UserWidget          : UserWidget

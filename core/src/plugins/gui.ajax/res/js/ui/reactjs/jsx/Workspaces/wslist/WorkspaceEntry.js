@@ -223,7 +223,7 @@ let WorkspaceEntry =React.createClass({
             }
             badge = <span className="workspace-badge"><span className="mdi mdi-folder"/>{overlay}</span>;
         } else{
-            badge = <span className="workspace-badge" dangerouslySetInnerHTML={this.getLetterBadge()}/>;
+            badge = <span className="workspace-badge"><span>{this.props.workspace.getLettersBadge()}</span></span>;
         }
 
         if (this.props.workspace.getOwner() && !this.props.workspace.getAccessStatus() && !this.props.workspace.getLastConnection()) {
