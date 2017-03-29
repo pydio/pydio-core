@@ -80,7 +80,18 @@
         }
 
         static formPanelTags(props){
-            return <div>Tags</div>
+            let configs = Renderer.getMetadataConfigs().get(props.fieldname);
+            console.log(configs);
+            // let menuItems = [];
+            // if(configs && configs.data){
+            //     configs.data.forEach(function(value, key){
+            //         //menuItems.push({payload:key, text:value});
+            //         menuItems.push(<MaterialUI.MenuItem value={key} primaryText={value}/>);
+            //     });
+            // }
+
+            return <TagsCloud {...props} editMode={true}/>;
+            // return <MetaSelectorFormPanel {...props} menuItems={menuItems} />//<div>Tags</div>
         }
 
     }
@@ -278,19 +289,165 @@
 
     let TagsCloud = React.createClass({
 
-        mixins:[MetaFieldRendererMixin],
+        mixins: [MetaFieldFormPanelMixin],
 
-        render: function(){
-            let value = this.getRealValue() || "";
-            let tags = value.split(",").map(function(tag){
-                tag = LangUtils.trim(tag);
-                if(!tag) return null;
-                let removeTag = function(){
-                    console.debug("Remove tag " + tag);
+        propTypes:{
+            node:React.PropTypes.instanceOf(AjxpNode),
+            column:React.PropTypes.object
+        },
+        componentDidMount: function() {
+            this.getRealValue();
+        },
+
+        getRealValue: function(){
+            let {node, value, column} = this.props
+            if (node != null) {
+                this.setState({tags: node.getMetadata().get(column.name)});
+            } else {
+                this.setState({tags: value});
+            }
+        },
+
+        getInitialState: function(){
+            let {node, value} = this.props
+            if (node != null) {
+                return {
+                    loading     : false,
+                    dataSource  : [],
+                    tags        : node.getMetadata().get(this.props.column.name),
+                    searchText  : ''
                 };
-                return <span key={tag} className="meta_user_tag_block">{tag} <span className="mdi mdi-close" onClick={removeTag}></span></span>;
+            } else {
+                return {
+                    loading     : false,
+                    dataSource  : [],
+                    tags        : value,
+                    searchText  : ''
+                };
+            }
+        },
+
+        suggestionLoader: function(input, callback) {
+            const excludes = this.props.excludes;
+            const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
+            this.setState({loading:this.state.loading + 1});
+            PydioApi.getClient().request({get_action: 'meta_user_list_tags', meta_field_name: this.props.fieldname}, (transport) => {
+                this.setState({loading:this.state.loading - 1});
+                let suggestedTags = transport.responseJSON;
+                callback(suggestedTags);
+            }.bind(this));
+        },
+
+        loadBuffered: function(value, timeout) {
+            if(!value && this._emptyValueList){
+                this.setState({dataSource: this._emptyValueList});
+                return;
+            }
+            FuncUtils.bufferCallback('meta_user_list_tags', timeout, function(){
+                this.setState({loading: true});
+                this.suggestionLoader(value, function(tags){
+                    let crtValueFound = false;
+                    const values = tags.map(function(tag){
+                        let component = (<MaterialUI.MenuItem>{tag}</MaterialUI.MenuItem>);
+                        return {
+                            userObject  : tag,
+                            text        : tag,
+                            value       : component
+                        };
+                    }.bind(this));
+                    if(!value){
+                        this._emptyValueList = values;
+                    }
+                    this.setState({dataSource: values, loading: false});
+                }.bind(this));
+            }.bind(this));
+        },
+
+        handleRequestDelete: function(tag) {
+            let tags = this.state.tags.split(',');
+            let index = tags.indexOf(tag);
+            tags.splice(index, 1);
+            this.setState({
+                tags: tags.toString()},
+            () => {
+                this.updateValue(this.state.tags);
+                console.log(`Tags after deletion = ${this.state.value}`);
             });
-            return <span>{tags}</span>;
+        },
+
+        handleUpdateInput: function(searchText) {
+            this.setState({searchText: searchText});
+            this.loadBuffered(searchText, 350);
+        },
+
+        handleNewRequest: function() {
+            let tags = this.state.tags.split(',');
+            tags.push(this.state.searchText);
+            this.setState({
+                tags: tags.toString()},
+            () => {
+                this.updateValue(this.state.tags);
+            });
+            this.setState({
+                searchText: '',
+            });
+        },
+
+        renderChip: function(tag) {
+            if (this.props.editMode) {
+                return (
+                    <MaterialUI.Chip
+                        style={{margin: 2}}
+                        onRequestDelete={this.handleRequestDelete.bind(this, tag)}
+                    >{tag}</MaterialUI.Chip>
+                );
+            } else {
+                return (
+                    <MaterialUI.Chip
+                        style={{margin: 2}}
+                        onTouchTap={this.handleTouchTap}
+                    >{tag}</MaterialUI.Chip>
+                );
+            }
+        },
+        
+        render: function(){
+            let tags;
+            if (this.state.tags) {
+                tags = this.state.tags.split(",").map(function(tag){
+                    tag = LangUtils.trim(tag);
+                    if(!tag) return null;
+                    return (this.renderChip(tag));
+                }.bind(this));
+            } else {
+                tags = <div></div>
+            }
+            let autoCompleter;
+            let textField;
+            if (this.props.editMode) {
+                autoCompleter = <MaterialUI.AutoComplete
+                                    fullWidth={true}
+                                    hintText="Type 'r', case insensitive"
+                                    searchText={this.state.searchText}
+                                    onUpdateInput={this.handleUpdateInput}
+                                    onNewRequest={this.handleNewRequest}
+                                    dataSource={this.state.dataSource}
+                                    // filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+                                    openOnFocus={true}
+                                />
+            } else {
+                autoCompleter = <div></div>
+
+            }
+
+            return (
+                <div>
+                    <div style={{display: 'flex', flexWrap: 'wrap'}}>
+                        {tags}
+                    </div>
+                    {autoCompleter}
+                </div>
+            );
         }
 
     });
@@ -359,7 +516,7 @@
                     }else if(type === 'css_label'){
                         field = Renderer.formPanelCssLabels(baseProps);
                     }else if(type === 'tags'){
-                        field = <span></span>
+                        field = Renderer.formPanelTags(baseProps);
                     }else{
                         field = (
                             <MaterialUI.TextField
