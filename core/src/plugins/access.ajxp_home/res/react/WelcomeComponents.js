@@ -855,7 +855,7 @@
                         launchVideo : this.launchVideo.bind(this)
                     },
                     defaultPosition:{
-                        x:0, y:40
+                        x:5, y:40
                     },
                     defaultLayouts: {
                         sm: {x: 0, y: 30}
@@ -865,7 +865,7 @@
                     id:'downloads',
                     componentClass:'WelcomeComponents.DlAppsCard',
                     defaultPosition:{
-                        x:6, y:36
+                        x:6, y:20
                     },
                     defaultLayouts: {
                         md: {x: 6, y: 36},
@@ -876,21 +876,21 @@
                     id:'recently_accessed',
                     componentClass:'WelcomeComponents.RecentAccessCard',
                     defaultPosition:{
-                        x: 3, y: 40
+                        x: 0, y: 40
                     }
                 },
                 {
                     id:'qr_code',
                     componentClass:'WelcomeComponents.QRCodeCard',
                     defaultPosition:{
-                        x: 6, y: 16
+                        x: 6, y: 0
                     }
                 },
                 {
                     id:'quick_upload',
                     componentClass:'WelcomeComponents.QuickSendCard',
                     defaultPosition:{
-                        x: 6, y: 46
+                        x: 6, y: 30
                     }
                 }
 
@@ -909,6 +909,7 @@
             if(this.state && this.state.player){
                 videoPlayer = <VideoPlayer videoSrc={this.state.player} closePlayer={this.closePlayer}/>
             }
+            const enableSearch = this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH");
 
             const palette = this.props.muiTheme.palette;
             const Color = MaterialUI.Color;
@@ -928,8 +929,8 @@
                         style={widgetStyle}
                         {...uWidgetProps}
                     >
-                        {this.props.pydio.getPluginConfigs('access.ajxp_home').get("ENABLE_GLOBAL_SEARCH") &&
-                            <div style={{flex:1}}>
+                        {enableSearch &&
+                            <div style={{flex:10, display:'flex', justifyContent:'center'}}>
                                 <PydioWorkspaces.SearchForm
                                     crossWorkspace={true}
                                     pydio={this.props.pydio}
