@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS ajxp_user_prefs (
 	val BLOB
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 
+CREATE UNIQUE INDEX prefs_login_name ON ajxp_user_prefs(`login`, `name`);
+
 CREATE TABLE IF NOT EXISTS ajxp_user_bookmarks (
 	rid INTEGER PRIMARY KEY AUTO_INCREMENT,
 	login VARCHAR(255) NOT NULL,

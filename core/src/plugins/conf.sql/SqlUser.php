@@ -174,6 +174,28 @@ class SqlUser extends AbstractUser
 
         // Try/Catch DibiException
         try {
+
+            if(empty($prefValue)){
+
+                dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
+//                $this->log('DELETE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
+                unset($this->prefs[$prefName]); // Update the internal array only if successful.
+
+            }else{
+
+                try{
+
+                    dibi::query('INSERT INTO [ajxp_user_prefs] ([login],[name],[val]) VALUES (%s, %s, %bin)', $this->getId(),$prefName,$prefValue);
+
+                }catch(DibiException $dibiException){
+
+                    dibi::query('UPDATE [ajxp_user_prefs] SET [val] = %bin WHERE [login] = %s AND [name] = %s', $prefValue, $this->getId(), $prefName);
+
+                }
+
+                $this->prefs[$prefName] = $prefValue;
+            }
+            /*
             // Update an existing preference
             if (array_key_exists($prefName, $this->prefs)) {
 
@@ -181,7 +203,6 @@ class SqlUser extends AbstractUser
                 if ('' == $prefValue) {
 
                     dibi::query('DELETE FROM [ajxp_user_prefs] WHERE [login] = %s AND [name] = %s', $this->getId(), $prefName);
-
                     $this->log('DELETE PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
                     unset($this->prefs[$prefName]); // Update the internal array only if successful.
 
@@ -202,6 +223,7 @@ class SqlUser extends AbstractUser
                 $this->log('INSERT PREFERENCE: [Login]: '.$this->getId().' [Preference]:'.$prefName.' [Value]:'.$prefValue);
                 $this->prefs[$prefName] = $prefValue;
             }
+            */
 
         } catch (DibiException $e) {
             $this->log('MODIFY PREFERENCE FAILED: Reason: '.$e->getMessage());
