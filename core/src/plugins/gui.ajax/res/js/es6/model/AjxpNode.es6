@@ -289,6 +289,12 @@ class AjxpNode extends Observable{
     isRecycle(){
         return (this.getAjxpMime() == 'ajxp_recycle');
     }
+    /**
+     * @returns String
+     */
+    getSvgSource() {
+        return this.getMetadata().get("fonticon");
+    }
 
     /**
      * Search the mime type in the parent branch

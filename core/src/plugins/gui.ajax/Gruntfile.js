@@ -159,6 +159,7 @@ module.exports = function(grunt) {
                 files: {
                     'res/js/ui/reactjs/build/PydioReactUI.js':'res/js/ui/reactjs/build/ReactUI/index.js',
                     'res/js/ui/reactjs/build/PydioComponents.js':'res/js/ui/reactjs/build/Components/index.js',
+                    'res/js/ui/reactjs/build/PydioHOCs.js':'res/js/ui/reactjs/build/HighOrderComponents/index.js',
                     'res/js/ui/reactjs/build/PydioWorkspaces.js':'res/js/ui/reactjs/build/Workspaces/index.js'
                 }
             }

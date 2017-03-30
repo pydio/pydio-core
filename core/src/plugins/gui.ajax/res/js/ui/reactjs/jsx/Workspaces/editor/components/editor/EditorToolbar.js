@@ -17,18 +17,19 @@ import ContentRemove from 'material-ui/svg-icons/content/remove';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 // Display components
-const EditorToolbar = ({title, onMinimise, onClose}) => {
+const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
 
     const innerStyle = {color: "#000000", fill: "#000000"}
     const outerStyle = {background: "none"}
 
     return (
         <AppBar
-            style={outerStyle}
+            className={className}
+            style={{...style, ...outerStyle}}
             title={<span>{title}</span>}
             titleStyle={innerStyle}
-            iconElementLeft={<IconButton iconStyle={innerStyle} touch={true}><NavigationClose onClick={onClose} /></IconButton>}
-            iconElementRight={<IconButton iconStyle={innerStyle} touch={true}><ContentRemove onClick={onMinimise} /></IconButton>}
+            iconElementLeft={<IconButton iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}><NavigationClose /></IconButton>}
+            iconElementRight={<IconButton iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}><ContentRemove /></IconButton>}
         />
     )
 }

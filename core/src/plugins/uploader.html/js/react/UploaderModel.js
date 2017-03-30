@@ -172,7 +172,7 @@
                 }.bind(this));
 
             }else{
-                
+
                 if(this.getSize() > maxUpload){
                     this.onError(global.pydio.MessageHash[211]);
                     completeCallback();
@@ -209,7 +209,7 @@
             if(this._relativePath) {
                 fullPath += PathUtils.getDirname(this._relativePath);
             }
-            fullPath += '/' + PathUtils.getBasename(this._file.name);
+            fullPath += '/' + encodeURI(PathUtils.getBasename(this._file.name));
 
             let url = "http"+(secure?"s":"")+"://"+host+":"+port+"/"+configs.get("UPLOAD_PATH")+"/"+this._repositoryId + fullPath;
             let queryString = '';

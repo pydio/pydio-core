@@ -1,4 +1,4 @@
-import { EDITOR_SET_ACTIVE_TAB, EDITOR_MODIFY_PANEL, EDITOR_MODIFY_MENU } from '../actions'
+import { EDITOR_SET_ACTIVE_TAB, EDITOR_MODIFY } from '../actions'
 
 export default function editor(state = {}, action) {
 
@@ -12,21 +12,10 @@ export default function editor(state = {}, action) {
                 ...state,
                 ...action
             }
-        case EDITOR_MODIFY_MENU:
+        case EDITOR_MODIFY:
             return {
                 ...state,
-                menu: {
-                    ...state.menu,
-                    ...action
-                }
-            }
-        case EDITOR_MODIFY_PANEL:
-            return {
-                ...state,
-                panel: {
-                    ...state.panel,
-                    ...action
-                }
+                ...action
             }
 
         default:

@@ -13,6 +13,7 @@
  */
 
 // IMPORT
+import Draggable from 'react-draggable';
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
 
@@ -21,8 +22,9 @@ const {Paper} = MaterialUI;
 import Tab from './EditorTab';
 import Toolbar from './EditorToolbar';
 
-import makeEditorMinimise from './make-editor-minimise';
-import makeEditorTabTransition from './make-editor-tab-transition';
+import makeMinimise from './make-minimise';
+
+const MAX_ITEMS = 4;
 
 // MAIN COMPONENT
 class Editor extends React.Component {
@@ -30,95 +32,154 @@ class Editor extends React.Component {
     constructor(props) {
         super(props)
 
-        const {tabDelete, editorModifyPanel, editorModifyMenu, editorSetActiveTab} = props
+        const {tabDelete, tabDeleteAll, editorModify, editorSetActiveTab} = props
 
-        this.minimise = () => {
-            editorModifyPanel({open: false})
-            editorModifyMenu({open: false})
+        this.state = {
+            minimisable: false
         }
 
-        this.closeActiveTab = () => {
-            const {activeTabId} = this.props
+        this.minimise = () => editorModify({isPanelActive: false})
+
+        this.closeActiveTab = (e) => {
+            const {activeTab} = this.props
 
             editorSetActiveTab(null)
-            tabDelete(activeTabId)
+            tabDelete(activeTab.id)
         }
+
+        this.close = (e) => {
+            editorModify({open: false})
+            tabDeleteAll()
+        }
+
+        // By default, open it up
+        editorModify({isPanelActive: true})
     }
 
-    componentDidUpdate() {
-        const {editorModifyPanel, loaded, positionTarget} = this.props
+    componentWillReceiveProps(nextProps) {
 
-        if (!loaded || positionTarget) return
+        if (this.state.minimisable) return
 
-        const element = ReactDOM.findDOMNode(this)
+        const {translated} = nextProps
+
+        if (!translated) return
+
+        this.recalculate()
+
+        this.setState({
+            minimisable: true
+        })
+    }
+
+    recalculate() {
+
+        const {editorModify} = this.props
+
+        const element = ReactDOM.findDOMNode(this.refs.container)
 
         if (!element) return
 
-        editorModifyPanel({
-            rect: element.getBoundingClientRect()
+        editorModify({
+            panel: {
+                rect: element.getBoundingClientRect()
+            }
         })
     }
 
     renderChild() {
-        const {activeTabId, tabs} = this.props
+        const {activeTab, tabs, editorSetActiveTab} = this.props
 
-        return tabs.map((tab) => {
-
-            const style = {
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
+        return tabs.map((tab, index) => {
+            let style = {
                 display: "flex",
-                transition: "transform 0.3s ease-in"
+                width: (100 / MAX_ITEMS) + "%",
+                height: "40%",
+                margin: "10px",
+                overflow: "scroll",
+                whiteSpace: "nowrap"
             }
 
-            const activeStyle = activeTabId !== tab.id ? {transform: "translateX(-100%)"} : {transform: "translateX(0)"}
+            if (tabs.length > MAX_ITEMS) {
+                if (index < MAX_ITEMS) {
+                    style.flex = 1
+                } else {
+                    style.flex = 0
+                    style.margin = 0
+                }
+            }
 
-            return <Tab key={`editortab${tab.id}`} id={tab.id} style={{...style, ...activeStyle}} />
+            if (activeTab) {
+                if (tab.id === activeTab.id) {
+                    style.margin = 0
+                    style.flex = 1
+                } else {
+                    style.flex = 0
+                    style.margin = 0
+                }
+            }
+
+            return <Tab key={`editortab${tab.id}`} id={tab.id} style={{...style}} />
         })
     }
 
     render() {
-        const {activeTab, tabs} = this.props
+        const {activeTab, isActive} = this.props
+        const {minimisable} = this.state
+
         const title = activeTab ? activeTab.title : ""
+        const onClose = activeTab ? this.closeActiveTab : this.close
+        const onMinimise = minimisable ? this.minimise : null
+
+        let parentStyle = {
+            display: "flex",
+            flex: 1,
+            overflow: "hidden",
+            width: "100%",
+            height: "100%",
+            position: "relative"
+        }
+
+        if (!activeTab) {
+            parentStyle = {
+                ...parentStyle,
+                alignItems: "center", // To fix a bug in Safari, we only set it when height not = 100% (aka when there is no active tab)
+                justifyContent: "center"
+            }
+        }
 
         return (
-            <Paper zDepth={5} style={{...this.props.style, display: "flex", flexDirection: "column", overflow: "hidden"}}>
-                <Toolbar style={{flexShrink: 0}} title={title} onClose={this.closeActiveTab} onMinimise={this.minimise}/>
+            <div style={{display: "flex", ...this.props.style}}>
+                <Draggable cancel=".body" onStop={this.recalculate.bind(this)}>
+                    <AnimatedPaper  ref="container" onMinimise={this.props.onMinimise}  minimised={!isActive} zDepth={5} style={{display: "flex", flexDirection: "column", overflow: "hidden", width: "100%", height: "100%", transformOrigin: this.props.style.transformOrigin}}>
+                        <Toolbar style={{flexShrink: 0}} title={title} onClose={onClose} onMinimise={onMinimise} />
 
-                <div style={{position: "relative", flex: 1}}>
-                    {this.props.loaded && this.renderChild()}
-                </div>
-
-            </Paper>
+                        <div className="body" style={parentStyle}>
+                            {this.renderChild()}
+                        </div>
+                    </AnimatedPaper>
+                </Draggable>
+            </div>
         );
     }
 };
 
-// ANIMATIONS - First chaining the animations (that might already depend on the store)
-let AnimatedEditor = Editor
-AnimatedEditor = makeEditorMinimise(AnimatedEditor)
-AnimatedEditor = makeEditorTabTransition(AnimatedEditor)
+// ANIMATIONS
+const AnimatedPaper = makeMinimise(Paper)
 
 // REDUX - Then connect the redux store
 function mapStateToProps(state, ownProps) {
     const { editor, tabs } = state
 
-    const activeTabId = editor.activeTabId || (tabs.length > 0 && tabs[0].id)
-    const activeTab = tabs.filter(tab => tab.id === activeTabId)[0]
+    const activeTab = tabs.filter(tab => tab.id === editor.activeTabId)[0]
 
     return  {
-        open: typeof activeTabId !== "boolean" && editor.panel.open,
-        positionOrigin: editor.menu.rect,
-        positionTarget: editor.panel.rect,
-        activeTabId: activeTabId,
-        activeTab: activeTab,
-        tabs
+        ...ownProps,
+        activeTab,
+        tabs,
+        isActive: editor.isPanelActive
     }
 }
-const ConnectedEditor = connect(mapStateToProps, actions)(AnimatedEditor)
+const ConnectedEditor = connect(mapStateToProps, actions)(Editor)
 
 // EXPORT
 export default ConnectedEditor

@@ -18,27 +18,62 @@ import MainButton from './MainButton';
 import MenuGroup from './MenuGroup';
 import MenuItem from './MenuItem';
 
-
-
 // Components
 class Menu extends React.Component {
     constructor(props) {
         super(props);
 
-        const {editorModifyMenu} = props
-
-        this.toggle = () => {
-            const {menu} = this.props
-
-            editorModifyMenu({open: !menu.open})
+        this.state = {
+            ready: false
         }
+
+        const {editorModify} = props
+
+        this.toggle = () => editorModify({isMenuActive: !this.props.isActive})
+        this.recalculate = this.recalculate.bind(this)
+    }
+
+    componentDidMount() {
+        window.addEventListener('resize', this.recalculate)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.recalculate)
+    }
+
+
+    componentWillReceiveProps(nextProps) {
+
+        if (this.state.ready) return
+
+        const {translated} = nextProps
+
+        if (!translated) return
+
+        this.recalculate()
+
+        this.setState({ready: true})
+    }
+
+    recalculate() {
+        const {editorModify} = this.props
+
+        const element = ReactDOM.findDOMNode(this.refs.button)
+
+        if (!element) return
+
+        editorModify({
+            menu: {
+                rect: element.getBoundingClientRect()
+            }
+        })
     }
 
     renderChild() {
 
-        const {activeTabId, tabs, open} = this.props
+        const {isActive, tabs} = this.props
 
-        if (!open) return null
+        if (!isActive) return null
 
         return tabs.map((tab) => {
             const style = {
@@ -49,21 +84,20 @@ class Menu extends React.Component {
                 bottom: 0,
                 transition: "transform 0.3s ease-in"
             }
-            const activeStyle = activeTabId !== tab.id ? {transform: "translateX(-100%)"} : {transform: "translateX(0)"}
 
-            return <MenuItem key={tab.id} id={tab.id} style={{...style, ...activeStyle}} />
+            return <MenuItem key={tab.id} id={tab.id} style={{...style}} />
         })
     }
 
     render() {
-        const {tabs, style, open, loaded} = this.props
+        const {style, isActive} = this.props
 
         return (
             <div>
                 <MenuGroup style={style}>
                     {this.renderChild()}
                 </MenuGroup>
-                <MainButton open={open} style={style} onClick={this.toggle} />
+                <MainButton ref="button" open={isActive} style={style} onClick={this.toggle} />
             </div>
         );
     }
@@ -73,15 +107,13 @@ class Menu extends React.Component {
 function mapStateToProps(state, ownProps) {
     const { editor, tabs } = state
 
-    const activeTabId = editor.activeTabId || (tabs.length > 0 && tabs[0].id)
-    const activeTab = tabs.filter(tab => tab.id === activeTabId)[0]
+    const activeTab = tabs.filter(tab => tab.id === editor.activeTabId)[0]
 
     return  {
         ...editor,
-        open: typeof activeTabId !== "boolean" && editor.menu.open,
-        activeTabId: activeTabId,
         activeTab: activeTab,
-        tabs
+        tabs,
+        isActive: editor.isMenuActive
     }
 }
 const ConnectedMenu = connect(mapStateToProps, actions)(Menu)

@@ -20,6 +20,12 @@
 
 import Editor from './Editor';
 
+let Viewer = (props) => {
+    return (
+        <div {...props} style={{minHeight: 120, flex: 1, padding: 0, width: "100%"}} />
+    )
+}
+
 class PydioVideo extends React.Component {
 
     constructor(props) {
@@ -83,13 +89,16 @@ class PydioVideo extends React.Component {
         }
 
         return (
-            <PydioComponents.AbstractEditor {...this.props} loading={!this.state.ready || !this.state.url} preview={this.state.preview}>
-                <div style={{minHeight: 120, flex: 1}}>
-                    {editor}
-                </div>
-            </PydioComponents.AbstractEditor>
+            <Viewer>{editor}</Viewer>
         );
     }
+}
+
+// Define HOCs
+if (typeof PydioHOCs !== "undefined") {
+    Viewer = PydioHOCs.withActions(Viewer);
+    Viewer = PydioHOCs.withLoader(Viewer)
+    Viewer = PydioHOCs.withErrors(Viewer)
 }
 
 PydioVideo.propTypes = {

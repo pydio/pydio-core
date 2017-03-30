@@ -29,11 +29,11 @@ class MenuOptions extends React.Component {
              undoable: false,
              redoable: false
          }
-
-         this.props.codemirror.clearHistory()
      }
 
      componentWillReceiveProps(nextProps) {
+         console.log(nextProps.codemirror)
+
          const {undo, redo} = nextProps.codemirror.historySize()
 
          this.setState({

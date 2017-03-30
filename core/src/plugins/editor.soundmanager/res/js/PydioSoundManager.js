@@ -18,7 +18,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-
 import Player from './Player';
 
 class PydioSoundManager extends React.Component {
@@ -32,8 +31,6 @@ class PydioSoundManager extends React.Component {
             url: pydio.Parameters.get('ajxpServerAccess') + '&get_action=audio_proxy&file=' + encodeURIComponent(HasherUtils.base64_encode(node.getPath())) + '&z=' + guid(),
             mimeType: "audio/" + node.getAjxpMime()
         }
-
-        this.onReady = () => this.setState({ready: false})
     }
 
     // Static functions
@@ -50,13 +47,15 @@ class PydioSoundManager extends React.Component {
     render() {
 
         return (
-            <PydioComponents.AbstractEditor {...this.props} loading={false}>
-                <Player rich={!this.props.icon && this.props.rich} onReady={this.onReady}>
-                    <a type={this.state.mimeType} href={this.state.url} />
-                </Player>
-            </PydioComponents.AbstractEditor>
+            <Player rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
+                <a type={this.state.mimeType} href={this.state.url} />
+            </Player>
         );
     }
+}
+
+PydioSoundManager.defaultProps = {
+    onLoad: () => {}
 }
 
 function guid() {

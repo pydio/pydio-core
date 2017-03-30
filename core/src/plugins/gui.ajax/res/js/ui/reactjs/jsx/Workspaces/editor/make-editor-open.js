@@ -13,27 +13,29 @@
  */
 import { TransitionMotion, spring, presets } from 'react-motion';
 
-const ANIMATION={stifness: 500, damping: 20}
+const ANIMATION={stiffness: 300, damping: 28}
 const TRANSLATEY_ORIGIN=800
 const TRANSLATEY_TARGET=0
 
 const makeEditorOpen = (Target) => {
     return class extends React.Component {
-
         getStyles() {
             if (!this.props.children) return []
 
             let counter = 0;
 
-            return React.Children.map(
-                this.props.children,
-                child => ({
-                    key: `t${counter++}`,
-                    data: {element: child},
-                    style: {
-                        y: spring(TRANSLATEY_TARGET * counter, ANIMATION)
+            return React.Children
+                .toArray(this.props.children)
+                .filter(child => child) // Removing null values
+                .map(child => {
+                    return {
+                        key: `t${counter++}`,
+                        data: {element: child},
+                        style: {
+                            y: spring(TRANSLATEY_TARGET * counter, ANIMATION)
+                        }
                     }
-                }));
+                });
         }
 
         willEnter() {
@@ -44,7 +46,7 @@ const makeEditorOpen = (Target) => {
 
         willLeave() {
             return {
-                y: spring(TRANSLATEY_ORIGIN, ANIMATION)
+                y: TRANSLATEY_ORIGIN
             }
         }
 
@@ -54,19 +56,32 @@ const makeEditorOpen = (Target) => {
                     styles={this.getStyles()}
                     willLeave={this.willLeave}
                     willEnter={this.willEnter}
-                    onRest={this.onRest}>
-
+                    >
                     {styles =>
                         <Target {...this.props}>
                         {styles.map(({key, style, data}) => {
-                            let childStyle = {
-                                transition: "none",
-                                transform: `translateY(${style.y}px)`
+                            // During the transition, we handle the style
+                            if (style.y !== TRANSLATEY_TARGET) {
+
+                                // Retrieve previous transform
+                                const transform = data.element.props.style.transform || ""
+
+                                return React.cloneElement(data.element, {
+                                    key: key,
+                                    translated: false,
+                                    style: {
+                                        ...data.element.props.style,
+                                        transition: "none",
+                                        transformOrigin: "none",
+                                        transform: `${transform} translateY(${style.y}px)`
+                                    }
+                                })
                             }
 
-                            let child = React.cloneElement(data.element, {key: key, loaded: style.y === TRANSLATEY_TARGET, style: childStyle})
-
-                            return child
+                            return React.cloneElement(data.element, {
+                                key: key,
+                                translated: true
+                            })
                         })}
                         </Target>
                     }

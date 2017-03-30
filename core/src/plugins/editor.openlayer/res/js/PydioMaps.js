@@ -159,7 +159,7 @@
         componentDidMount: function(){
             this.attachMap();
         },
-        
+
         componentWillReceiveProps: function(nextProps){
             if(nextProps.centerNode !== this.props.centerNode){
                 this.attachMap();
@@ -203,28 +203,27 @@
 
         render: function(){
 
-            if(this.state && this.state.error){
-                return (
-                    <PydioComponents.AbstractEditor {...this.props} actions={null} errorString="No GPS Data Found"/>
-                );
+            let errorString = null
+            let actions = null
+
+            if(this.state && this.state.error) {
+                error = "No GPS data found"
+            } else {
+                actions = [
+                    <div>{this.props.pydio.MessageHash['openlayer.3']}: <span ref="location"/></div>
+                ];
             }
 
-
-            let actions = [
-                <div>{this.props.pydio.MessageHash['openlayer.3']}: <span ref="location"/></div>
-            ];
             return (
-                <PydioComponents.AbstractEditor {...this.props} actions={actions}>
-                    <OLMap ref="mapObject" centerNode={this.props.node} onMapLoaded={this.onMapLoaded}/>
-                </PydioComponents.AbstractEditor>
+                <ExtendedOLMap ref="mapObject" actions={actions} error={errorString} centerNode={this.props.node} onMapLoaded={this.onMapLoaded}/>
             );
-
         }
-
     });
 
+    const ExtendedOLMap = PydioHOCs.withActions(PydioHOCs.withErrors(OLMap))
+
     global.PydioMaps = {
-        Viewer:Viewer,
+        Viewer: Viewer,
         OLMap: OLMap
     };
 

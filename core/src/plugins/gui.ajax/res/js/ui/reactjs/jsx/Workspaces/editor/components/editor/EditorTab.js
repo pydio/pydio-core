@@ -12,45 +12,41 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+const {Paper} = MaterialUI;
+
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
 
+import makeMaximise from './make-maximise';
+
 class Tab extends React.Component {
-    constructor(props) {
-        super(props)
-
-        this.close = () => {
-            const {id, editorModifyTab} = props
-
-            editorModifyTab(id, {
-                open: false
-            })
-        }
-    }
-
     render() {
 
-        // Making sure the editor will load only once
-        if (!this.props.editorData) return null
+        const {id, isActive, style, editorSetActiveTab} = this.props
+
+        const select = () => editorSetActiveTab(id)
 
         return (
-            <div style={this.props.style}>
+            <AnimatedPaper style={style} maximised={isActive} onClick={!isActive ? select : null}>
                 <this.props.child {...this.props} icon={false} />
-            </div>
+            </AnimatedPaper>
         )
     }
 }
 
 function mapStateToProps(state, ownProps) {
-    const { tabs } = state
+    const { editor, tabs } = state
 
     let current = tabs.filter(tab => tab.id === ownProps.id)[0]
 
     return  {
         ...ownProps,
-        ...current
+        ...current,
+        isActive: editor.activeTabId === current.id
     }
 }
+
+const AnimatedPaper = makeMaximise(Paper)
 
 const EditorTab = connect(mapStateToProps, actions)(Tab)
 

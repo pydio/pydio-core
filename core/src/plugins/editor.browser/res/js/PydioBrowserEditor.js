@@ -100,9 +100,7 @@
                 );
             }
             return (
-                <PydioComponents.AbstractEditor {...this.props}>
-                    {content}
-                </PydioComponents.AbstractEditor>
+                {content}
             );
 
         }

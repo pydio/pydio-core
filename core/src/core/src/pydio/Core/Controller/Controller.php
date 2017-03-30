@@ -105,7 +105,8 @@ class Controller
         $paramNames = explode("/", trim($restPath, "/"));
         $exploded = explode("?", $path);
         $path = array_shift($exploded);
-        $paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
+        //$paramValues = array_map("urldecode", explode("/", trim($path, "/"), count($paramNames)));
+        $paramValues = explode("/", trim($path, "/"), count($paramNames));
         foreach ($paramNames as $i => $pName) {
             if (strpos($pName, "+") !== false) {
                 $paramNames[$i] = str_replace("+", "", $pName);
