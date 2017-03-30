@@ -381,8 +381,8 @@
         mixins: [PydioComponents.DynamicGridItemMixin],
 
         statics:{
-            gridWidth:3,
-            gridHeight:16,
+            gridWidth:2,
+            gridHeight:12,
             builderDisplayName:'Video Tutorial',
             builderFields:[]
         },
@@ -462,18 +462,20 @@
             const TMP_VIEW_MORE = (
                 <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
             );
+            const tint = MaterialUI.Color(this.props.tint).alpha(0.8);
             return (
                 <MaterialUI.Paper {...props} transitionEnabled={false}>
                     {this.getCloseButton()}
                     <div className="tutorial_legend">
                         <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
+                            <div style={{position:'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: tint}}/>
                             <div className="tutorial_prev mdi mdi-arrow-left" onClick={this.browse.bind(this, 'previous')}/>
                             <div className="tutorial_play mdi mdi-play" onClick={this.launchVideo}/>
                             <div className="tutorial_next mdi mdi-arrow-right" onClick={this.browse.bind(this, 'next')}/>
                             <div className="tutorial_title">
                                 <span dangerouslySetInnerHTML={htmlMessage(contentMessageId)}/>
                                 <MaterialUI.IconMenu
-                                    style={{position: 'absolute', bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.43)', padding: 6, borderRadius: '0 0 2px 0'}}
+                                    style={{position: 'absolute', bottom: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.43)', padding: 2, borderRadius: '0 0 2px 0'}}
                                     iconStyle={{color:'white'}}
                                     iconButtonElement={<MaterialUI.IconButton iconClassName="mdi mdi-dots-vertical"/>}
                                     anchorOrigin={{horizontal: 'left', vertical: 'top'}}
@@ -534,7 +536,7 @@
 
         statics:{
             gridWidth:2,
-            gridHeight:20,
+            gridHeight:10,
             builderDisplayName:'Qr Code',
             builderFields:[]
         },
@@ -549,15 +551,17 @@
 
             const style = {
                 ...this.props.style,
-                backgroundColor: MaterialUI.Style.colors.blue600,
-                color: 'white'
+                backgroundColor: this.props.tint,
+                color: 'white',
+                display:'flex'
             };
 
             return (
                 <MaterialUI.Paper zDepth={1} {...this.props} transitionEnabled={false} style={style}>
+                    {this.getCloseButton()}
                     <div style={{padding: 16, fontSize: 16}}>{this.props.pydio.MessageHash['user_home.74']}</div>
-                    <div className="home-qrCode" style={{display:'flex', justifyContent:'center'}}>
-                        <ReactQRCode bgColor={style.backgroundColor} fgColor={style.color} value={JSON.stringify(jsonData)} size={150}/>
+                    <div className="home-qrCode" style={{display:'flex', justifyContent:'center', alignItems:'center', marginRight:16}}>
+                        <ReactQRCode bgColor={style.backgroundColor} fgColor={style.color} value={JSON.stringify(jsonData)} size={80}/>
                     </div>
                 </MaterialUI.Paper>
             );
@@ -595,7 +599,7 @@
 
         statics:{
             gridWidth:3,
-            gridHeight:40,
+            gridHeight:60,
             builderDisplayName:'My Workspaces',
             builderFields:[]
         },
@@ -606,15 +610,20 @@
             if(props.style){
                 props.style = {...props.style, overflowY:'auto'};
             }
+
+            const blackAndWhiteTitle = <MaterialUI.CardTitle title={pydio.MessageHash[filterByType==='entries'?468:469]}/>;
+            const themedTitle = <ThemeableTitle {...this.props}/>;
+
+
             return (
                 <MaterialUI.Paper zDepth={1} {...props} transitionEnabled={false}>
                     {this.getCloseButton()}
                     <div  style={{height: '100%', display:'flex', flexDirection:'column'}}>
-                        <ThemeableTitle {...this.props}/>
+                        {themedTitle}
                         <PydioWorkspaces.WorkspacesListMaterial
                             className={"vertical_fit filter-" + filterByType}
-                            pydio={this.props.pydio}
-                            workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
+                            pydio={pydio}
+                            workspaces={pydio.user ? pydio.user.getRepositoriesList() : []}
                             showTreeForWorkspace={false}
                             filterByType={this.props.filterByType}
                             sectionTitleStyle={{display:'none'}}
@@ -641,7 +650,7 @@
             const style = {
                 ...props.style,
                 overflow:'visible',
-                backgroundColor: MaterialUI.Style.colors.cyan500,
+                backgroundColor: this.props.tint,
                 color: 'white'
             };
             return (
@@ -659,45 +668,17 @@
 
         statics:{
             gridWidth:5,
-            gridHeight:16,
+            gridHeight:20,
             builderDisplayName:'Recently Accessed',
             builderFields:[]
         },
 
         renderIcon: function(node){
-            console.log(node);
-            if(node.isLeaf()){
-                return <PydioWorkspaces.FilePreview node={node} loadThumbnail={true} style={{borderRadius: '50%'}}/>
+            if(node.getPath() === '/' || !node.getPath()){
+                return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 20}}>WS</div></div>
             }else{
-                if(node.getPath() === '/' || !node.getPath()){
-                    return <MaterialUI.FontIcon className="mdi mdi-folder-plus"/>
-                }else{
-                    return <MaterialUI.FontIcon className="mdi mdi-folder"/>
-                }
+                return <PydioWorkspaces.FilePreview node={node} loadThumbnail={true}/>
             }
-        },
-
-        renderEntry: function(entry){
-            const {node} = entry;
-            let primaryText, secondaryText;
-            const path = node.getPath();
-            const meta = node.getMetadata();
-            if(!path || path === '/'){
-                primaryText = meta.get('repository_label');
-                secondaryText = 'Workspace opened on ' + meta.get('recent_access_time');
-            }else{
-                primaryText = node.getLabel();
-                secondaryText = node.getPath();
-            }
-
-            return (
-                <MaterialUI.ListItem
-                    leftIcon={this.renderIcon(node)}
-                    primaryText={primaryText}
-                    secondaryText={secondaryText}
-                    onTouchTap={() => {this.props.pydio.goTo(node);}}
-                />
-            );
         },
 
         renderLabel: function(node, data){
@@ -728,55 +709,60 @@
             /></span>
         },
 
-        render: function(){
-            const title = <MaterialUI.CardTitle title="Recently Accessed"/>;
+        renderFirstLine: function(node){
+            if(!node.getPath() || node.getPath() === '/'){
+                return node.getMetadata().get('repository_label');
+            }else{
+                return node.getLabel();
+            }
+        },
 
-            return (
-                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
-                    <PydioComponents.NodeListCustomProvider
-                        className="recently-accessed-list"
-                        nodeProviderProperties={{get_action:"load_user_recent_items"}}
-                        elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
-                        nodeClicked={(node) => {this.props.pydio.goTo(node);}}
-                        hideToolbar={true}
-                        tableKeys={{
-                            label:{renderCell:this.renderLabel, label:'Recently Accessed Files', width:'60%'},
-                            recent_access_readable:{label:'Accessed', width:'20%'},
-                            repository_label:{label:'Workspace', width:'20%'},
-                        }}
-                        entryRenderActions={this.renderAction}
-                    />
-                </MaterialUI.Paper>
-            );
-        }
-
-    });
-
-    const SearchFormCard = React.createClass({
-        mixins: [PydioComponents.DynamicGridItemMixin],
-
-        statics:{
-            gridWidth:6,
-            gridHeight:10,
-            builderDisplayName:'Search Form',
-            builderFields:[]
+        renderSecondLine: function(node){
+            return node.getMetadata().get('recent_access_readable');
         },
 
         render: function(){
-            const title = <MaterialUI.CardTitle title="Search your files"/>;
+            const title = <MaterialUI.CardTitle title="Recently Accessed" style={{backgroundColor:this.props.tint}} titleColor="white"/>;
 
-            return (
-                <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
-                    {title}
-                    <PydioReactUI.AsyncComponent
-                        namespace="PydioWorkspaces"
-                        componentName="SearchForm"
-                        pydio={this.props.pydio}
-                        crossWorkspace={true}
-                        groupByField="repository_id"
-                    />
-                </MaterialUI.Paper>
-            );
+            const displayMode = this.props.displayMode || 'list';
+
+            if(displayMode === 'table'){
+                return (
+                    <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                        {this.getCloseButton()}
+                        <PydioComponents.NodeListCustomProvider
+                            className="recently-accessed-list table-mode"
+                            nodeProviderProperties={{get_action:"load_user_recent_items"}}
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                            nodeClicked={(node) => {this.props.pydio.goTo(node);}}
+                            hideToolbar={true}
+                            tableKeys={{
+                                label:{renderCell:this.renderLabel, label:'Recently Accessed Files', width:'60%'},
+                                recent_access_readable:{label:'Accessed', width:'20%'},
+                                repository_label:{label:'Workspace', width:'20%'},
+                            }}
+                            entryRenderActions={this.renderAction}
+                        />
+                    </MaterialUI.Paper>
+                );
+            }else{
+                return (
+                    <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false}>
+                        {this.getCloseButton()}
+                        {title}
+                        <PydioComponents.NodeListCustomProvider
+                            className="recently-accessed-list files-list"
+                            nodeProviderProperties={{get_action:"load_user_recent_items"}}
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
+                            nodeClicked={(node) => {this.props.pydio.goTo(node);}}
+                            hideToolbar={true}
+                            entryRenderFirstLine={this.renderFirstLine}
+                            entryRenderSecondLine={this.renderSecondLine}
+                            entryRenderIcon={this.renderIcon}
+                        />
+                    </MaterialUI.Paper>
+                );
+            }
         }
 
     });
@@ -797,12 +783,13 @@
 
             const style = {
                 ...this.props.style,
-                backgroundColor: MaterialUI.Style.colors.lightBlue500,
+                backgroundColor: this.props.tint,
                 color: 'white'
             };
 
             return (
                 <MaterialUI.Paper zDepth={1} {...this.props} className="vertical-layout" transitionEnabled={false} style={style}>
+                    {this.getCloseButton()}
                     <div style={{display:'flex'}}>
                         <div style={{padding: 16, fontSize: 16}}>Drop a file here from your desktop</div>
                         <div style={{textAlign:'center', padding:18}}><span style={{borderRadius:'50%', border: '4px solid white', fontSize:56, padding: 20}} className="mdi mdi-cloud-upload"></span></div>
@@ -827,45 +814,33 @@
 
         getDefaultCards: function(){
 
-            let baseCards = [
+            const retroPalette = [
+                '#AA1735', '#C2523E', '#DF6E41', '#F57E5E', '#FA8535'
+            ];
+            const materialPalette = [
+                '#E53935', '#D81B60', '#7b1fa2', '#3f51b5', '#2196f3'
+            ];
+            const palette = materialPalette;
+
+            const baseCards = [
                 {
-                    id:'my_workspaces',
-                    componentClass:'WelcomeComponents.WorkspacesListCard',
+                    id:'quick_upload',
+                    componentClass:'WelcomeComponents.QuickSendCard',
                     props:{
-                        filterByType:"entries",
+                        tint: palette[0]
                     },
                     defaultPosition:{
-                        x:0, y:0
-                    },
-                },
-                {
-                    id:'shared_with_me',
-                    componentClass:'WelcomeComponents.WorkspacesListCard',
-                    props:{
-                        filterByType:"shared",
-                    },
-                    defaultPosition:{
-                        x:3, y:0
-                    }
-                },
-                {
-                    id:'videos',
-                    componentClass:'WelcomeComponents.VideoCard',
-                    props:{
-                        launchVideo : this.launchVideo.bind(this)
-                    },
-                    defaultPosition:{
-                        x:5, y:40
-                    },
-                    defaultLayouts: {
-                        sm: {x: 0, y: 30}
+                        x: 0, y: 10
                     }
                 },
                 {
                     id:'downloads',
                     componentClass:'WelcomeComponents.DlAppsCard',
+                    props:{
+                        tint: palette[1]
+                    },
                     defaultPosition:{
-                        x:6, y:20
+                        x:0, y:20
                     },
                     defaultLayouts: {
                         md: {x: 6, y: 36},
@@ -873,26 +848,39 @@
                     }
                 },
                 {
-                    id:'recently_accessed',
-                    componentClass:'WelcomeComponents.RecentAccessCard',
-                    defaultPosition:{
-                        x: 0, y: 40
-                    }
-                },
-                {
                     id:'qr_code',
                     componentClass:'WelcomeComponents.QRCodeCard',
+                    props:{
+                        tint: palette[2]
+                    },
                     defaultPosition:{
-                        x: 6, y: 0
+                        x: 0, y: 30
                     }
                 },
                 {
-                    id:'quick_upload',
-                    componentClass:'WelcomeComponents.QuickSendCard',
+                    id:'videos',
+                    componentClass:'WelcomeComponents.VideoCard',
+                    props:{
+                        launchVideo : this.launchVideo.bind(this),
+                        tint: palette[3]
+                    },
                     defaultPosition:{
-                        x: 6, y: 30
+                        x:0, y:40
+                    },
+                    defaultLayouts: {
+                        sm: {x: 0, y: 30}
                     }
-                }
+                },
+                {
+                    id:'recently_accessed',
+                    componentClass:'WelcomeComponents.RecentAccessCard',
+                    props:{
+                        tint: palette[4]
+                    },
+                    defaultPosition:{
+                        x: 0, y: 50
+                    }
+                },
 
             ];
 
@@ -940,13 +928,17 @@
                         }
                         <ConfigLogo style={{height:'100%'}} pydio={this.props.pydio} pluginName="gui.ajax" pluginParameter="CUSTOM_DASH_LOGO"/>
                     </PydioWorkspaces.UserWidget>
+                    <div style={{position:'absolute', top: 110, bottom: 0, right: 250, left: 0, display:'flex', padding: 5}}>
+                        <WorkspacesListCard filterByType="entries" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
+                        <WorkspacesListCard filterByType="shared" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
+                    </div>
                     <PydioComponents.DynamicGrid
                         storeNamespace="WelcomePanel.Dashboard"
                         defaultCards={this.getDefaultCards()}
                         builderNamespaces={["WelcomeComponents"]}
                         pydio={this.props.pydio}
                         cols={{lg: 12, md: 9, sm: 6, xs: 6, xxs: 2}}
-                        rglStyle={{position:'absolute', top: 110, bottom: 0, left: 0, right: 0}}
+                        rglStyle={{position:'absolute', top: 110, bottom: 0, right: 0, width: 260}}
                     />
                 </div>
             );
@@ -968,7 +960,6 @@
         QRCodeCard,
         WorkspacesListCard,
         UserDashboard,
-        SearchFormCard,
         QuickSendCard
     };
 

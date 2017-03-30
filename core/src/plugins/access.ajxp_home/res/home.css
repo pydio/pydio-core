@@ -26,8 +26,8 @@ div.left-panel.expanded .video-card .tutorial_content ul {
   padding-left: 20px;
 }
 div.left-panel.expanded .video-card div.tutorial_video_thumb {
-  height: 230px;
-  min-height: 230px;
+  height: 170px;
+  min-height: 170px;
   background-color: black;
   background-position: center center;
   background-size: cover;
@@ -45,8 +45,8 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play {
   font-size: 30px;
   background-color: rgba(0, 0, 0, 0.43);
   border-radius: 50%;
-  padding: 10px;
-  top: 72px;
+  padding: 8px;
+  top: 41px;
   left: 5px;
   cursor: pointer;
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -60,12 +60,12 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play.tuto
 div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_prev.tutorial_play,
 div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_next.tutorial_play,
 div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_play.tutorial_play {
-  left: 43%;
+  left: 94px;
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.78);
   color: rgba(0, 0, 0, 0.4);
   font-size: 40px;
-  top: 66px;
+  top: 36px;
 }
 div.left-panel.expanded .video-card div.tutorial_video_thumb:hover .tutorial_prev,
 div.left-panel.expanded .video-card div.tutorial_video_thumb:hover .tutorial_next {
@@ -81,14 +81,14 @@ div.left-panel.expanded .video-card div.tutorial_video_thumb .tutorial_title > s
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 20px;
   color: white;
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 60px;
+  right: 52px;
   background-color: rgba(0, 0, 0, 0.43);
-  padding: 20px 12px;
+  padding: 16px 0 16px 12px;
   line-height: 20px;
   margin: 0;
   border-radius: 0 0 0 2px;
@@ -103,12 +103,12 @@ div.left-panel.expanded .video-card div.tutorial_load_button {
   font-size: 15px;
   color: #009688;
 }
-div.left-panel.expanded div.recently-accessed-list div.toolbarTableHeader.mui-toolbar {
+div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
   background-color: #3F51B5;
   border-radius: 2px 2px 0 0;
   border-bottom: 0 !important;
 }
-div.left-panel.expanded div.recently-accessed-list div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
+div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar .mui-toolbar-group {
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #ffffff !important;
@@ -124,37 +124,37 @@ div.left-panel.expanded div.top_search_form.more,
 div.left-panel.expanded div.top_search_form.advanced {
   position: relative;
 }
-.admin-helper-panel {
+div.left-panel.expanded .admin-helper-panel {
   position: absolute;
   top: 0;
   bottom: 0;
   padding-top: 110px;
-  right: 0;
+  left: 0;
   z-index: 1;
   width: 326px;
   background-color: rgba(255, 255, 255, 0.99);
 }
-.admin-helper-panel .mui-paper-container {
+div.left-panel.expanded .admin-helper-panel .mui-paper-container {
   height: 100%;
   overflow-y: auto;
 }
-.admin-helper-panel h3 {
+div.left-panel.expanded .admin-helper-panel h3 {
   background-color: #FF6E40;
   color: white;
   text-align: center;
   padding-bottom: 8px;
   padding-top: 20px;
 }
-.admin-helper-panel .pydio-form-panel .pydio-form-group {
+div.left-panel.expanded .admin-helper-panel .pydio-form-panel .pydio-form-group {
   margin-top: 0;
 }
-.admin-helper-panel .legend {
+div.left-panel.expanded .admin-helper-panel .legend {
   padding: 0 17px;
   color: #878787;
   font-size: 12px;
   line-height: 17px;
 }
-.admin-helper-panel .widget-type-selector {
+div.left-panel.expanded .admin-helper-panel .widget-type-selector {
   border: 1px solid #E0E0E0;
   margin-left: 16px;
   border-radius: 3px;
