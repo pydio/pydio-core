@@ -15,6 +15,13 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        browserify: {
+            ui : {
+                files: {
+                    'res/build/WelcomeComponents.js'  : 'res/build/index.js'
+                }
+            }
+        },
         less: {
             development: {
                 options: {
@@ -47,8 +54,9 @@ module.exports = function(grunt) {
         }
     });
     grunt.loadNpmTasks('grunt-babel');
+    grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('assemble-less');
-    grunt.registerTask('default', ['babel']);
+    grunt.registerTask('default', ['babel', 'browserify']);
 
 };
