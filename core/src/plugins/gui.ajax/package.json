@@ -31,6 +31,7 @@
     "react-dnd": "^2.2.2",
     "react-dnd-html5-backend": "^2.2.3",
     "react-dom": "^15.4.2",
+    "react-draggable": "2.2.3",
     "react-grid-layout": "^0.13.9",
     "react-infinite": "*",
     "react-mfb": "0.4.1",
