@@ -29,7 +29,7 @@ const WorkspacesListCard = React.createClass({
         const {pydio, filterByType} = this.props;
         let props = {...this.props};
         if(props.style){
-            props.style = {...props.style, overflowY:'auto'};
+            props.style = {...props.style, overflowY:'auto', zIndex: 1};
         }
 
         const blackAndWhiteTitle = <MaterialUI.CardTitle title={pydio.MessageHash[filterByType==='entries'?468:469]}/>;
