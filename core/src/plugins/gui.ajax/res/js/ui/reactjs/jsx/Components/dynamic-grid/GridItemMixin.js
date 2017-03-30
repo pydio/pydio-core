@@ -27,14 +27,17 @@ export default {
         return {focus:false, showCloseAction: false};
     },
 
-    toggleEditMode: function(){
-        this.setState({showCloseAction:!(this.state && this.state.showCloseAction)});
+    toggleEditMode: function(value = undefined){
+        if(value === undefined){
+            this.setState({showCloseAction:!(this.state && this.state.showCloseAction)});
+        }else{
+            this.setState({showCloseAction:value});
+        }
     },
 
     getCloseButton:function(){
         if(this.state && this.state.showCloseAction){
-            var closeAction = function(){};
-            if(this.props.onCloseAction) closeAction = this.props.onCloseAction;
+            const closeAction = this.props.onCloseAction || ()=>{};
             const overlayStyle = {
                 position:'absolute',
                 backgroundColor:'rgba(0,0,0,0.53)',
