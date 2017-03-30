@@ -5,21 +5,10 @@ let UserDashboard = React.createClass({
 
     getDefaultCards: function(){
 
-        const retroPalette = [
-            '#AA1735', '#C2523E', '#DF6E41', '#F57E5E', '#FA8535'
-        ];
-        const materialPalette = [
-            '#E53935', '#D81B60', '#7b1fa2', '#3f51b5', '#2196f3'
-        ];
-        const palette = materialPalette;
-
         const baseCards = [
             {
                 id:'quick_upload',
                 componentClass:'WelcomeComponents.QuickSendCard',
-                props:{
-                    tint: palette[0]
-                },
                 defaultPosition:{
                     x: 0, y: 10
                 }
@@ -27,9 +16,6 @@ let UserDashboard = React.createClass({
             {
                 id:'downloads',
                 componentClass:'WelcomeComponents.DlAppsCard',
-                props:{
-                    tint: palette[1]
-                },
                 defaultPosition:{
                     x:0, y:20
                 },
@@ -41,9 +27,6 @@ let UserDashboard = React.createClass({
             {
                 id:'qr_code',
                 componentClass:'WelcomeComponents.QRCodeCard',
-                props:{
-                    tint: palette[2]
-                },
                 defaultPosition:{
                     x: 0, y: 30
                 }
@@ -51,9 +34,6 @@ let UserDashboard = React.createClass({
             {
                 id:'videos',
                 componentClass:'WelcomeComponents.VideoCard',
-                props:{
-                    tint: palette[3]
-                },
                 defaultPosition:{
                     x:0, y:40
                 },
@@ -64,9 +44,6 @@ let UserDashboard = React.createClass({
             {
                 id:'recently_accessed',
                 componentClass:'WelcomeComponents.RecentAccessCard',
-                props:{
-                    tint: palette[4]
-                },
                 defaultPosition:{
                     x: 0, y: 50
                 }

@@ -1,4 +1,5 @@
 import DownloadApp from './DownloadApp'
+import ColorPaper from '../board/ColorPaper'
 
 class DlAppsPanel extends React.Component{
 
@@ -87,18 +88,11 @@ const DlAppsCard = React.createClass({
 
     render: function(){
         let props = {...this.props};
-        const style = {
-            ...props.style,
-            overflow:'visible',
-            backgroundColor: this.props.tint,
-            color: 'white'
-        };
         return (
-            <MaterialUI.Paper zDepth={1} {...props}  transitionEnabled={false} style={style}>
-                {this.getCloseButton()}
-                <DlAppsPanel pydio={this.props.pydio} type="sync" iconColor={style.color}/>
+            <ColorPaper {...this.props} style={{...this.props.style,overflow:'visible'}} paletteIndex={1} getCloseButton={this.getCloseButton.bind(this)}>
+                <DlAppsPanel pydio={this.props.pydio} type="sync" iconColor={'#ffffff'}/>
                 <div style={{fontSize: 16, padding: 16, paddingTop: 0, textAlign:'center'}}>Keep your files offline with Pydio Desktop Client</div>
-            </MaterialUI.Paper>
+            </ColorPaper>
         );
     }
 });

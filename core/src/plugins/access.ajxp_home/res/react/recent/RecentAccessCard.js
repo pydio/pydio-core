@@ -1,3 +1,5 @@
+import Palette from '../board/Palette'
+
 export default React.createClass({
 
     mixins: [PydioComponents.DynamicGridItemMixin],
@@ -58,7 +60,7 @@ export default React.createClass({
     },
 
     render: function(){
-        const title = <MaterialUI.CardTitle title="Recently Accessed" style={{backgroundColor:this.props.tint}} titleColor="white"/>;
+        const title = <MaterialUI.CardTitle title="Recently Accessed" style={{backgroundColor:Palette[4]}} titleColor="white"/>;
 
         const displayMode = this.props.displayMode || 'list';
 

@@ -1,4 +1,6 @@
 import VideoPlayer from './VideoPlayer'
+import Palette from '../board/Palette'
+import ColorPaper from '../board/ColorPaper'
 
 const VideoCard = React.createClass({
 
@@ -81,14 +83,13 @@ const VideoCard = React.createClass({
         let props = {...this.props};
         const {youtubeId, contentMessageId} = this.state;
         props.className += ' video-card';
-        props['zDepth'] = 1;
+
         const TMP_VIEW_MORE = (
             <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
         );
-        const tint = MaterialUI.Color(this.props.tint).alpha(0.8);
+        const tint = MaterialUI.Color(Palette[3]).alpha(0.8);
         return (
-            <MaterialUI.Paper {...props} transitionEnabled={false}>
-                {this.getCloseButton()}
+            <ColorPaper {...props} paletteIndex={3} getCloseButton={this.getCloseButton.bind(this)}>
                 <div className="tutorial_legend">
                     <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
                         <div style={{position:'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: tint}}/>
@@ -107,7 +108,7 @@ const VideoCard = React.createClass({
                         </div>
                     </div>
                 </div>
-            </MaterialUI.Paper>
+            </ColorPaper>
         );
     }
 });
