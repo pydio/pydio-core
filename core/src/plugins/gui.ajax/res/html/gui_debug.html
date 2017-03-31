@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:ajxp>
 <head>
-    <title>Pydio</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>AJXP_APPLICATION_TITLE</title>
     <?php if(isSet($START_PARAMETERS) && isSet($START_PARAMETERS["REBASE"])){
         echo '<base href="'.$START_PARAMETERS["REBASE"].'"/>';
     }?>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <!-- Added automatically in the non-debug version -->
-    <meta name="apple-itunes-app" content="app-id=709275884">
-    <meta name="google-play-app" content="app-id=com.pydio.android.pydioPro">
-    <link rel="icon" type="image/x-png" href="<?php print(AJXP_THEME_FOLDER);?>/images/html-folder.png">
+    <link rel="stylesheet" type="text/css" href="<?php print(AJXP_THEME_FOLDER);?>/css/allz.css">
     <!--[if IE 8]>
     <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
     <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
@@ -18,41 +15,21 @@
     <!--[if IE 7]>
     <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
     <![endif]-->
-    <?php
-$list = AJXP_INSTALL_PATH."/".AJXP_THEME_FOLDER."/css/allz_list.txt";
-$lines = file($list);
-foreach ($lines as $line){
-	print("<link rel=\"stylesheet\" type=\"text/css\" href=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\">\n");
-    }
-    ?>
-
-    <?php
-$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_boot.txt";
-$lines = file($list);
-foreach ($lines as $line){
-	print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
-}
-?>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/es6/browser-polyfill.js"></script>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/modernizr/modernizr.min.js"></script>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/nodejs/boot.prod.js"></script>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/core/PydioCore.js"></script>
+    <link rel="icon" type="image/x-png" href="index.php?get_action=serve_favicon">
 </head>
-<body style="overflow:hidden;" class="react-mui-context">
-    <div id="ajxp_desktop"></div>
+<body style="overflow: hidden;" class="react-mui-context">
+<script type="text/javascript">
+    // Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is
+    // dynamically replaced by the application!
+    var pydio, startParameters = {}, MessageHash={};
+    <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
+    window.pydioBootstrap = new PydioBootstrap(startParameters);
 
-        <script type="text/javascript">
-var pydio, startParameters = {};
-<?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
-window.pydioBootstrap = new PydioBootstrap(startParameters);
-    </script>
-    <?php
-$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_core.txt";
-$lines = file($list);
-foreach ($lines as $line){
-	print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
-}
-$list = AJXP_INSTALL_PATH."/".CLIENT_RESOURCES_FOLDER."/js/ajaxplorer_ui.txt";
-$lines = file($list);
-foreach ($lines as $line){
-    print("<script language=\"javascript\" type=\"text/javascript\" src=\"".CLIENT_RESOURCES_FOLDER."/".trim($line)."\"></script>\n");
-    }
-    ?>
-    </body>
+</script>
+<div id="ajxp_desktop"></div>
+</body>
 </html>

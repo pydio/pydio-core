@@ -21,7 +21,7 @@
 /**
  * Utilitary class for manipulating XML
  */
-class XMLUtils{
+export default class XMLUtils{
 
     static loadXPathReplacer(){
         if(document.createExpression) return;

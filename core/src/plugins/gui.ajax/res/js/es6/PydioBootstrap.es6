@@ -22,7 +22,7 @@
  * Main BootLoader.
  * Defaults params for constructor should be {} and content.php?get_action=get_boot_conf
  */
-class PydioBootstrap{
+export default class PydioBootstrap{
 
     /**
      * Constructor
@@ -201,13 +201,13 @@ class PydioBootstrap{
         const scripts = document.getElementsByTagName('script');
         for(let i=0; i<scripts.length; i++){
             const scriptTag = scripts[i];
-            if(scriptTag.src.match("/js/pydio.boot.min.js") || scriptTag.src.match("/js/core/PydioBootstrap.js")){
+            if(scriptTag.src.match("/js/pydio.boot.min.js") || scriptTag.src.match("/js/vendor/nodejs/boot.prod.js")){
                 if(scriptTag.src.match("/js/pydio.boot.min.js")){
                     this.parameters.set("debugMode", false);
                 }else{
                     this.parameters.set("debugMode", true);
                 }
-                var src = scriptTag.src.replace('/js/core/PydioBootstrap.js','').replace('/js/pydio.boot.min.js', '');
+                var src = scriptTag.src.replace('/js/vendor/nodejs/boot.prod.js','').replace('/js/pydio.boot.min.js', '');
                 if(src.indexOf("?")!=-1) src = src.split("?")[0];
                 this.parameters.set("ajxpResourcesFolder", src);
             }

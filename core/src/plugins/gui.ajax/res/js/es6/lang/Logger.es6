@@ -13,3 +13,5 @@ class Logger{
     }
 
 }
+
+export {Logger as default}

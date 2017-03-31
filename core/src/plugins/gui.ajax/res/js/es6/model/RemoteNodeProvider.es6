@@ -22,7 +22,7 @@
  * Implementation of the IAjxpNodeProvider interface based on a remote server access.
  * Default for all repositories.
  */
-class RemoteNodeProvider{
+export default class RemoteNodeProvider{
 
     /**
      * Constructor

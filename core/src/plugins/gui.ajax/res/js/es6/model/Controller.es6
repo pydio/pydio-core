@@ -18,10 +18,11 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import Observable from '../lang/Observable'
 /**
  * Singleton class that manages all actions. Can be called directly using pydio.getController().
  */
-class Controller extends Observable{
+export default class Controller extends Observable{
 
     /**
      * Standard constructor

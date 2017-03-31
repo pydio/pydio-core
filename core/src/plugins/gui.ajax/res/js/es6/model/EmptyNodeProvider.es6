@@ -1,4 +1,6 @@
-class EmptyNodeProvider extends Observable{
+import Observable from '../lang/Observable'
+
+export default class EmptyNodeProvider extends Observable{
 
     constructor(){
         super();

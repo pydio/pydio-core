@@ -1,4 +1,4 @@
-class Router{
+export default class Router{
 
     constructor(pydioObject){
 

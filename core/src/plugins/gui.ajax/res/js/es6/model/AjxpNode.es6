@@ -1,4 +1,6 @@
-class AjxpNode extends Observable{
+import Observable from '../lang/Observable'
+
+export default class AjxpNode extends Observable{
 
     /**
      *

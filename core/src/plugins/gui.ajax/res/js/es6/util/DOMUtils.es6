@@ -21,7 +21,7 @@
 /**
  * Utilitary class for language specific methods
  */
-class DOMUtils {
+export default class DOMUtils {
 
     static getBeziersTransition(){
         return 'all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms';

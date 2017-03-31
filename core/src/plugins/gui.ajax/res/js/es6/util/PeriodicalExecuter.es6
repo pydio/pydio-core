@@ -1,4 +1,4 @@
-class PeriodicalExecuter{
+export default class PeriodicalExecuter{
 
     constructor(callback, frequency) {
         this.callback = callback;

@@ -18,10 +18,11 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-/** 
+import Observable from '../lang/Observable'
+/**
  * A "Command" object, encapsulating its callbacks, display attributes, etc.
  */
-class Action extends Observable{
+export default class Action extends Observable{
 
 	
 	/**

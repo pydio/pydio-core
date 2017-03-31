@@ -1,40 +1,7 @@
-var gui_ajax_boot = [
-    'res/js/vendor/es6/browser-polyfill.js',
-    'res/js/vendor/nodejs/boot.prod.js',
-    'res/js/core/http/Connexion.js',
-    'res/js/core/PydioBootstrap.js'
-];
-
-var gui_ajax_core = [
-    'res/js/vendor/modernizr/modernizr.min.js',
-    'res/js/core/lang/Observable.js',
-    'res/js/core/lang/Logger.js',
-    'res/js/core/util/LangUtils.js',
-    'res/js/core/util/FuncUtils.js',
-    'res/js/core/util/XMLUtils.js',
-    'res/js/core/util/PathUtils.js',
-    'res/js/core/util/HasherUtils.js',
-    'res/js/core/util/PassUtils.js',
-    'res/js/core/util/DOMUtils.js',
-    'res/js/core/util/CookiesManager.js',
-    'res/js/core/util/PeriodicalExecuter.js',
-    'res/js/core/model/Router.js',
-    'res/js/core/model/AjxpNode.js',
-    'res/js/core/model/User.js',
-    'res/js/core/http/ResourcesManager.js',
-    'res/js/core/model/RemoteNodeProvider.js',
-    'res/js/core/model/EmptyNodeProvider.js',
-    'res/js/core/model/Repository.js',
-    'res/js/core/http/PydioApi.js',
-    'res/js/core/http/PydioUsersApi.js',
-    'res/js/core/http/MetaCacheService.js',
-    'res/js/core/model/Action.js',
-    'res/js/core/model/Controller.js',
-    'res/js/core/model/PydioDataModel.js',
-    'res/js/core/model/Registry.js',
-    'res/js/core/Pydio.js'
-];
 module.exports = function(grunt) {
+
+    const {PydioCoreRequires,LibRequires,Externals} = require('./res/js/dist.js');
+
     grunt.initConfig({
         env: {
             build: {
@@ -84,26 +51,6 @@ module.exports = function(grunt) {
                 ]
             }
         },
-        uglify: {
-            options: {
-                mangle: false,
-                compress: {
-                    hoist_funs: false
-                }
-            },
-            js: {
-                files: {
-                    'res/js/pydio.min.js': gui_ajax_core,
-                    'res/js/pydio.boot.min.js': gui_ajax_boot
-                }
-            },
-            nodejs: {
-                files: {
-                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js'],
-                    'res/js/vendor/nodejs/bundle.legacy.min.js': ['res/js/vendor/nodejs/bundle.legacy.prod.js']
-                }
-            }
-        },
         babel: {
             options: {
                 loose: 'all'
@@ -145,22 +92,81 @@ module.exports = function(grunt) {
         },
         browserify: {
             boot: {
+                options:{
+                    alias:[
+                        './res/js/core/http/Connexion.js:pydio/http/connexion',
+                        './res/js/core/PydioBootstrap.js:pydio-bootstrap'
+                    ]
+                },
                 files: {
                     'res/js/vendor/nodejs/boot.prod.js': 'res/js/vendor/nodejs/boot.js',
                 }
             },
+            core: {
+                options:{
+                    alias: Object.keys(PydioCoreRequires).map(function(key){
+                        return './res/js/core/' + key + ':' + PydioCoreRequires[key];
+                    })
+                },
+                files: {
+                    'res/js/core/PydioCore.js': 'res/js/core/index.js',
+                }
+            },
             dist: {
+                options: {
+                    alias: LibRequires.map(k => k + ':')
+                },
                 files: {
                     'res/js/vendor/nodejs/bundle.prod.js': 'res/js/vendor/nodejs/export.js',
                     'res/js/vendor/nodejs/bundle.legacy.prod.js': 'res/js/vendor/nodejs/export.legacy.js'
                 }
             },
             ui : {
+                options: {
+                    browserifyOptions: {
+                        debug: true
+                    },
+                    external:Externals
+                },
                 files: {
                     'res/js/ui/reactjs/build/PydioReactUI.js':'res/js/ui/reactjs/build/ReactUI/index.js',
                     'res/js/ui/reactjs/build/PydioComponents.js':'res/js/ui/reactjs/build/Components/index.js',
                     'res/js/ui/reactjs/build/PydioHOCs.js':'res/js/ui/reactjs/build/HighOrderComponents/index.js',
                     'res/js/ui/reactjs/build/PydioWorkspaces.js':'res/js/ui/reactjs/build/Workspaces/index.js'
+                }
+            }
+        },
+        uglify: {
+            options: {
+                mangle: false,
+                compress: {
+                    hoist_funs: false
+                }
+            },
+            js: {
+                files: {
+                    'res/js/pydio.min.js': [
+                        'res/js/vendor/modernizr/modernizr.min.js',
+                        'res/js/core/PydioCore.js'
+                    ],
+                    'res/js/pydio.boot.min.js': [
+                        'res/js/vendor/es6/browser-polyfill.js',
+                        'res/js/vendor/nodejs/boot.prod.js'
+                    ]
+                }
+            },
+            nodejs: {
+                files: {
+                    'res/js/vendor/nodejs/bundle.prod.min.js': ['res/js/vendor/nodejs/bundle.prod.js'],
+                    'res/js/vendor/nodejs/bundle.legacy.min.js': ['res/js/vendor/nodejs/bundle.legacy.prod.js']
+                }
+            },
+            ui:{
+                files: {
+                    'res/js/ui/reactjs/build/PydioReactUI.min.js':'res/js/ui/reactjs/build/PydioReactUI.js',
+                    'res/js/ui/reactjs/build/PydioComponents.min.js':'res/js/ui/reactjs/build/PydioComponents.js',
+                    'res/js/ui/reactjs/build/PydioHOCs.min.js':'res/js/ui/reactjs/build/PydioHOCs.js',
+                    'res/js/ui/reactjs/build/PydioWorkspaces.min.js':'res/js/ui/reactjs/build/PydioWorkspaces.js',
                 }
             }
         },
@@ -188,7 +194,7 @@ module.exports = function(grunt) {
                 }
             },
             core: {
-                files: gui_ajax_core,
+                files: Object.keys(PydioCoreRequires).map(key => 'res/js/core/' + key),
                 tasks: ['babel:dist', 'uglify:js'],
                 options: {
                     spawn: false
@@ -267,6 +273,7 @@ module.exports = function(grunt) {
         'symlink',
         'env:build',
         'browserify:boot',
+        'browserify:core',
         'env:dev',
         'babel:dist',
         'uglify:js',
@@ -276,7 +283,8 @@ module.exports = function(grunt) {
         'browserify:dist',
         'browserify:ui',
         'env:dev',
-        'uglify:nodejs'
+        'uglify:nodejs',
+        'uglify:ui'
     ]);
     grunt.registerTask('type:css', [
         'cssmin'

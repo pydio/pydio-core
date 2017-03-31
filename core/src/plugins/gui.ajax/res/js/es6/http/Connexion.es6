@@ -478,3 +478,5 @@ class Connexion{
 
 	}
 }
+
+export {Connexion as default}

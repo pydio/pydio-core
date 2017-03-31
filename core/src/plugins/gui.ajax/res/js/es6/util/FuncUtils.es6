@@ -21,7 +21,7 @@
 /**
  * Utilitary class for language specific methods
  */
-class FuncUtils{
+export default class FuncUtils{
 
     static Empty(){}
 

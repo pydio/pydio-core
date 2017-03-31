@@ -1,3 +1,5 @@
+import Observable from './lang/Observable'
+
 class Pydio extends Observable{
 
     /**
@@ -456,3 +458,5 @@ class Pydio extends Observable{
 
 
 }
+
+export {Pydio as default}

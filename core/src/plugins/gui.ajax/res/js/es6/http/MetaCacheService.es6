@@ -17,6 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+import Observable from '../lang/Observable'
 /**
  * API Client
  */
@@ -132,3 +133,5 @@ class MetaCacheService extends Observable{
 
 MetaCacheService.EXPIRATION_LOCAL_NODE = 'LOCAL_NODE';
 MetaCacheService.EXPIRATION_MANUAL_TRIGGER = 'MANUAL_TRIGGER';
+
+export {MetaCacheService as default}

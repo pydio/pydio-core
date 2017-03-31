@@ -21,7 +21,7 @@
 /** 
  * Container for a Repository.
  */
-class Repository {
+export default class Repository {
 
 	/**
 	 * Constructor

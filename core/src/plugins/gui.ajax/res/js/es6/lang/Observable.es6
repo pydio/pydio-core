@@ -1,4 +1,4 @@
-class Observable {
+export default class Observable {
 
     _objectEventSetup(event_name){
         this._observers = this._observers || {};

@@ -35,6 +35,7 @@
     "react-grid-layout": "^0.13.9",
     "react-infinite": "*",
     "react-mfb": "0.4.1",
+    "react-color": "2.11.4",
     "react-redux": "*",
     "react-motion": "*",
     "redux": "*",

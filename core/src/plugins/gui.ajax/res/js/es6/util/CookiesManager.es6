@@ -42,7 +42,7 @@
  *   -  empty() function only deletes the cookies set by CookieJar
  */
 
-class CookiesManager{
+export default class CookiesManager{
 
     static supported(){
         return (document && document.cookie !== undefined);

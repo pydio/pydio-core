@@ -554,3 +554,5 @@ class PydioApi{
     }
 
 }
+
+export {PydioApi as default}

@@ -455,3 +455,5 @@ class ResourcesManager{
         }
     }
 }
+
+export {ResourcesManager as default}

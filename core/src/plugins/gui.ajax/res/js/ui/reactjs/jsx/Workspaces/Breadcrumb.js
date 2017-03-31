@@ -1,3 +1,8 @@
+const React = require('react')
+const PydioNode = require('pydio/model/node')
+const {muiThemeable} = require('material-ui/styles')
+const LangUtils = require('pydio/util/lang')
+
 let Breadcrumb = React.createClass({
 
     getInitialState: function(){
@@ -20,7 +25,8 @@ let Breadcrumb = React.createClass({
     },
 
     goTo: function(target, event){
-        this.props.pydio.getContextHolder().requireContextChange(new AjxpNode(target));
+        const targetNode = new PydioNode(target);
+        this.props.pydio.getContextHolder().requireContextChange(targetNode);
     },
 
     render: function(){
@@ -61,6 +67,6 @@ let Breadcrumb = React.createClass({
 
 });
 
-Breadcrumb = MaterialUI.Style.muiThemeable()(Breadcrumb);
+Breadcrumb = muiThemeable()(Breadcrumb);
 
 export {Breadcrumb as default}

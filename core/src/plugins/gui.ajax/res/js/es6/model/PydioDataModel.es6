@@ -18,10 +18,11 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import Observable from '../lang/Observable'
 /**
  * Full container of the data tree. Contains the SelectionModel as well.
  */
-class PydioDataModel extends Observable{
+export default class PydioDataModel extends Observable{
 
 	/**
 	 * Constructor

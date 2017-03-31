@@ -22,7 +22,7 @@
  * Abstraction of the currently logged user. Can be a "fake" user when users management
  * system is disabled
  */
-class User{
+export default class User{
 
 	/**
 	 * Constructor

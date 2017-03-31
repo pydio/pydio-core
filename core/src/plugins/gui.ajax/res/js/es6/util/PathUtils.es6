@@ -21,7 +21,7 @@
 /**
  * Utilitary class for manipulating file/folders pathes
  */
-class PathUtils{
+export default class PathUtils{
 
     static getBasename(fileName)
     {

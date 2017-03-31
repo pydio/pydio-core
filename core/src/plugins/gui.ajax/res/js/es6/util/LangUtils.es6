@@ -21,7 +21,7 @@
 /**
  * Utilitary class for language specific methods
  */
-class LangUtils{
+export default class LangUtils{
 
     static arrayWithout(array, key){
         if(!array.length) return array;

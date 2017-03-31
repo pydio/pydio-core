@@ -17,263 +17,257 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-(function(global) {
 
-    class User{
-        _id;
-        _label;
-        _type;
-        _group;
-        _avatar;
-        _temporary;
-        _external;
-        _extendedLabel;
+class User{
+    _id;
+    _label;
+    _type;
+    _group;
+    _avatar;
+    _temporary;
+    _external;
+    _extendedLabel;
 
-        constructor(id, label, type, group, avatar, temporary, external, extendedLabel){
-            this._id = id;
-            this._label = label;
-            this._type = type;
-            if(this._type === 'group'){
-                this._group = id;
-            }
-            this._avatar = avatar;
-            this._temporary = temporary;
-            this._external = external;
-            this._extendedLabel = extendedLabel;
+    constructor(id, label, type, group, avatar, temporary, external, extendedLabel){
+        this._id = id;
+        this._label = label;
+        this._type = type;
+        if(this._type === 'group'){
+            this._group = id;
         }
+        this._avatar = avatar;
+        this._temporary = temporary;
+        this._external = external;
+        this._extendedLabel = extendedLabel;
+    }
 
-        static fromObject(user){
-            return new User(
-                user.id,
-                user.label,
-                user.type,
-                user.group,
-                user.avatar,
-                user.temporary,
-                user.external
-            );
-        }
+    static fromObject(user){
+        return new User(
+            user.id,
+            user.label,
+            user.type,
+            user.group,
+            user.avatar,
+            user.temporary,
+            user.external
+        );
+    }
 
-        asObject(){
-            return {
-                id:this._id,
-                label:this._label,
-                type:this._type,
-                group:this._group,
-                avatar:this._avatar,
-                temporary:this._temporary,
-                external:this._external,
-                extendedLabel:this._extendedLabel
-            }
-        }
-
-        getId() {
-            return this._id;
-        }
-
-        getLabel() {
-            return this._label;
-        }
-
-        getType() {
-            return this._type;
-        }
-
-        getGroup() {
-            return this._group;
-        }
-
-        getAvatar() {
-            return this._avatar;
-        }
-
-        getTemporary() {
-            return this._temporary;
-        }
-
-        getExternal() {
-            return this._external;
-        }
-
-        getExtendedLabel() {
-            return this._extendedLabel;
+    asObject(){
+        return {
+            id:this._id,
+            label:this._label,
+            type:this._type,
+            group:this._group,
+            avatar:this._avatar,
+            temporary:this._temporary,
+            external:this._external,
+            extendedLabel:this._extendedLabel
         }
     }
 
+    getId() {
+        return this._id;
+    }
 
-    class UsersApi{
+    getLabel() {
+        return this._label;
+    }
 
-        static authorizedUsersStartingWith(token, callback, usersOnly=false, existingOnly=false){
+    getType() {
+        return this._type;
+    }
 
-            let params = {
-                get_action:'user_list_authorized_users',
-                value:token,
-                format:'json'
-            };
-            if(usersOnly){
-                params['users_only'] = 'true';
-            }
-            if(existingOnly){
-                params['existing_only'] = 'true';
-            }
-            PydioApi.getClient().request(params, function(transport){
-                let suggestions = [];
-                if(transport.responseXML){
-                    const lis = XMLUtils.XPathSelectNodes(transport.responseXML, '//li');
-                    lis.map(function(li){
-                        const spanLabel = XMLUtils.XPathGetSingleNodeText(li, 'span[@class="user_entry_label"]');
-                        suggestions.push(new User(
-                            li.getAttribute('data-entry_id'),
-                            li.getAttribute('data-label'),
-                            li.getAttribute('class'),
-                            li.getAttribute('data-group'),
-                            li.getAttribute('data-avatar'),
-                            li.getAttribute('data-temporary')?true:false,
-                            li.getAttribute('data-external') == 'true',
-                            spanLabel
-                        ));
-                    });
-                }else if(transport.responseJSON){
-                    const data = transport.responseJSON;
-                    data.map(function(entry){
-                        const {id, label, type, group, avatar, temporary, external} = entry;
-                        suggestions.push(new User(id, label, type, group, avatar, temporary, external, label));
-                    });
-                }
-                callback(suggestions);
-            });
+    getGroup() {
+        return this._group;
+    }
 
+    getAvatar() {
+        return this._avatar;
+    }
+
+    getTemporary() {
+        return this._temporary;
+    }
+
+    getExternal() {
+        return this._external;
+    }
+
+    getExtendedLabel() {
+        return this._extendedLabel;
+    }
+}
+
+
+class UsersApi{
+
+    static authorizedUsersStartingWith(token, callback, usersOnly=false, existingOnly=false){
+
+        let params = {
+            get_action:'user_list_authorized_users',
+            value:token,
+            format:'json'
+        };
+        if(usersOnly){
+            params['users_only'] = 'true';
         }
-
-        static getCreateUserParameters(editMode = false){
-            let basicParameters = [];
-            let prefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
-            basicParameters.push({
-                description: MessageHash['533'],
-                editable: false,
-                expose: "true",
-                label: MessageHash['522'],
-                name: (editMode ? "existing_user_id" : "new_user_id"),
-                scope: "user",
-                type: (editMode ? "hidden" : "string"),
-                mandatory: "true",
-                "default": prefix ? prefix : ''
-            },{
-                description: MessageHash['534'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['523'],
-                name: "new_password",
-                scope: "user",
-                type: "valid-password",
-                mandatory: "true"
-            });
-
-            const params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
-            for(let i=0;i<params.length;i++){
-                params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-            }
-            const xPath = params.join('|');
-            PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
-                basicParameters.push(el);
-            });
-            if(!editMode){
-                basicParameters.push({
-                    description: MessageHash['536'],
-                    editable: "true",
-                    expose: "true",
-                    label: MessageHash['535'],
-                    name: "send_email",
-                    scope: "user",
-                    type: "boolean",
-                    mandatory: true
+        if(existingOnly){
+            params['existing_only'] = 'true';
+        }
+        PydioApi.getClient().request(params, function(transport){
+            let suggestions = [];
+            if(transport.responseXML){
+                const lis = XMLUtils.XPathSelectNodes(transport.responseXML, '//li');
+                lis.map(function(li){
+                    const spanLabel = XMLUtils.XPathGetSingleNodeText(li, 'span[@class="user_entry_label"]');
+                    suggestions.push(new User(
+                        li.getAttribute('data-entry_id'),
+                        li.getAttribute('data-label'),
+                        li.getAttribute('class'),
+                        li.getAttribute('data-group'),
+                        li.getAttribute('data-avatar'),
+                        li.getAttribute('data-temporary')?true:false,
+                        li.getAttribute('data-external') == 'true',
+                        spanLabel
+                    ));
+                });
+            }else if(transport.responseJSON){
+                const data = transport.responseJSON;
+                data.map(function(entry){
+                    const {id, label, type, group, avatar, temporary, external} = entry;
+                    suggestions.push(new User(id, label, type, group, avatar, temporary, external, label));
                 });
             }
-            return basicParameters;
-        }
-
-        static getCreateUserPostPrefix(){
-            return 'NEW_';
-        }
-
-        static createUserFromPost(postValues, callback){
-            postValues['get_action'] = 'user_create_user';
-            PydioApi.getClient().request(postValues, function(transport){
-                callback(postValues, transport.responseJSON);
-            }.bind(this));
-        }
-
-        static deleteUser(userId, callback){
-            PydioApi.getClient().request({
-                get_action:'user_delete_user',
-                user_id:userId
-            }, function(transport){
-                callback();
-            });
-        }
-
-        static saveSelectionSupported(){
-            return global.pydio.getController().actions.get('user_team_create') !== undefined;
-        }
-
-        static deleteTeam(teamId, callback){
-            teamId = teamId.replace('/AJXP_TEAM/', '');
-            PydioApi.getClient().request({
-                get_action:'user_team_delete',
-                team_id:teamId
-            }, function(transport){
-                callback(transport.responseJSON);
-            });
-        }
-
-        static saveSelectionAsTeam(teamName, userIds, callback){
-            PydioApi.getClient().request({
-                get_action:'user_team_create',
-                team_label:teamName,
-                'user_ids[]':userIds
-            }, function(transport){
-                callback(transport.responseJSON);
-            });
-        }
-
-        static addUserToTeam(teamId, userId, callback){
-            teamId = teamId.replace('/AJXP_TEAM/', '');
-            PydioApi.getClient().request({
-                get_action:'user_team_add_user',
-                team_id:teamId,
-                user_id:userId
-            }, function(transport){
-                callback(transport.responseJSON);
-            });
-        }
-
-        static removeUserFromTeam(teamId, userId, callback){
-            teamId = teamId.replace('/AJXP_TEAM/', '');
-            PydioApi.getClient().request({
-                get_action:'user_team_delete_user',
-                team_id:teamId,
-                user_id:userId
-            }, function(transport){
-                callback(transport.responseJSON);
-            });
-        }
-
-        static updateTeamLabel(teamId, newLabel,callback){
-            teamId = teamId.replace('/AJXP_TEAM/', '');
-            PydioApi.getClient().request({
-                get_action:'user_team_update_label',
-                team_id:teamId,
-                team_label:newLabel
-            }, function(transport){
-                callback(transport.responseJSON);
-            });
-        }
+            callback(suggestions);
+        });
 
     }
 
-    var ns = global.PydioUsers || {};
-    ns.Client = UsersApi;
-    ns.User = User;
-    global.PydioUsers = ns;
+    static getCreateUserParameters(editMode = false){
+        let basicParameters = [];
+        let prefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
+        basicParameters.push({
+            description: MessageHash['533'],
+            editable: false,
+            expose: "true",
+            label: MessageHash['522'],
+            name: (editMode ? "existing_user_id" : "new_user_id"),
+            scope: "user",
+            type: (editMode ? "hidden" : "string"),
+            mandatory: "true",
+            "default": prefix ? prefix : ''
+        },{
+            description: MessageHash['534'],
+            editable: "true",
+            expose: "true",
+            label: MessageHash['523'],
+            name: "new_password",
+            scope: "user",
+            type: "valid-password",
+            mandatory: "true"
+        });
 
-})(window);
+        const params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
+        for(let i=0;i<params.length;i++){
+            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
+        }
+        const xPath = params.join('|');
+        PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
+            basicParameters.push(el);
+        });
+        if(!editMode){
+            basicParameters.push({
+                description: MessageHash['536'],
+                editable: "true",
+                expose: "true",
+                label: MessageHash['535'],
+                name: "send_email",
+                scope: "user",
+                type: "boolean",
+                mandatory: true
+            });
+        }
+        return basicParameters;
+    }
+
+    static getCreateUserPostPrefix(){
+        return 'NEW_';
+    }
+
+    static createUserFromPost(postValues, callback){
+        postValues['get_action'] = 'user_create_user';
+        PydioApi.getClient().request(postValues, function(transport){
+            callback(postValues, transport.responseJSON);
+        }.bind(this));
+    }
+
+    static deleteUser(userId, callback){
+        PydioApi.getClient().request({
+            get_action:'user_delete_user',
+            user_id:userId
+        }, function(transport){
+            callback();
+        });
+    }
+
+    static saveSelectionSupported(){
+        return global.pydio.getController().actions.get('user_team_create') !== undefined;
+    }
+
+    static deleteTeam(teamId, callback){
+        teamId = teamId.replace('/AJXP_TEAM/', '');
+        PydioApi.getClient().request({
+            get_action:'user_team_delete',
+            team_id:teamId
+        }, function(transport){
+            callback(transport.responseJSON);
+        });
+    }
+
+    static saveSelectionAsTeam(teamName, userIds, callback){
+        PydioApi.getClient().request({
+            get_action:'user_team_create',
+            team_label:teamName,
+            'user_ids[]':userIds
+        }, function(transport){
+            callback(transport.responseJSON);
+        });
+    }
+
+    static addUserToTeam(teamId, userId, callback){
+        teamId = teamId.replace('/AJXP_TEAM/', '');
+        PydioApi.getClient().request({
+            get_action:'user_team_add_user',
+            team_id:teamId,
+            user_id:userId
+        }, function(transport){
+            callback(transport.responseJSON);
+        });
+    }
+
+    static removeUserFromTeam(teamId, userId, callback){
+        teamId = teamId.replace('/AJXP_TEAM/', '');
+        PydioApi.getClient().request({
+            get_action:'user_team_delete_user',
+            team_id:teamId,
+            user_id:userId
+        }, function(transport){
+            callback(transport.responseJSON);
+        });
+    }
+
+    static updateTeamLabel(teamId, newLabel,callback){
+        teamId = teamId.replace('/AJXP_TEAM/', '');
+        PydioApi.getClient().request({
+            get_action:'user_team_update_label',
+            team_id:teamId,
+            team_label:newLabel
+        }, function(transport){
+            callback(transport.responseJSON);
+        });
+    }
+
+}
+
+export {User, UsersApi}

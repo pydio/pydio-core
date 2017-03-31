@@ -21,7 +21,7 @@
 /**
  * Utilitary class for hashing methods
  */
-class HasherUtils{
+export default class HasherUtils{
 
     /*
      * A JavaScript implementation of the RSA Data Security, Inc. MD5 Message

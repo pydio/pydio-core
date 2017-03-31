@@ -1,4 +1,6 @@
 import Loader from './Loader'
+const React = require('react');
+const ResourcesManager = require('pydio/http/resources-manager');
 /********************/
 /* ASYNC COMPONENTS */
 /********************/

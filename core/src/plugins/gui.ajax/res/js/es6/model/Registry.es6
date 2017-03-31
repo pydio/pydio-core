@@ -17,7 +17,9 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-class Registry{
+import XMLUtils from '../util/XMLUtils'
+
+export default class Registry{
 
     constructor(pydioObject){
         this._registry = null;

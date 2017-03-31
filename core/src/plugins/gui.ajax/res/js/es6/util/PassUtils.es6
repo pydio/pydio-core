@@ -23,7 +23,7 @@
  * Utils to compute password strength
  *
  */
-class PassUtils{
+export default class PassUtils{
 
     static getOptions(){
         if(PassUtils.Options){
