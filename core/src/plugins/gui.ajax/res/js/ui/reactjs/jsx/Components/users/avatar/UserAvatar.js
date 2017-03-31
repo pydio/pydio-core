@@ -1,5 +1,6 @@
 import GraphPanel from './GraphPanel'
 import ActionsPanel from './ActionsPanel'
+const debounce = require('lodash.debounce')
 
 class UserAvatar extends React.Component{
 
@@ -174,12 +175,18 @@ class UserAvatar extends React.Component{
             }
         }else if(this.props.richOnHover){
 
-            onMouseOver = (e) => {
-                this.setState({showPopover: true, popoverAnchor: e.currentTarget});
-            };
             onMouseOut = () => {
                 this.setState({showPopover: false});
             };
+            onMouseOut = debounce(onMouseOut, 350);
+            onMouseOver = (e) => {
+                this.setState({showPopover: true, popoverAnchor: e.currentTarget});
+                onMouseOut.cancel();
+            };
+            const onMouseOverInner = (e) =>{
+                this.setState({showPopover: true});
+                onMouseOut.cancel();
+            }
 
             popover = (
                 <MaterialUI.Popover
@@ -188,8 +195,9 @@ class UserAvatar extends React.Component{
                     onRequestClose={() => {this.setState({showPopover: false})}}
                     anchorOrigin={{horizontal:"left",vertical:"center"}}
                     targetOrigin={{horizontal:"right",vertical:"center"}}
+                    useLayerForClickAway={false}
                 >
-                    <MaterialUI.Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}}>
+                    <MaterialUI.Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}} onMouseOver={onMouseOverInner}  onMouseOut={onMouseOut}>
                         <UserAvatar {...this.props} richCard={true} richOnHover={false} cardSize={220}/>
                     </MaterialUI.Paper>
                 </MaterialUI.Popover>
@@ -212,7 +220,7 @@ class UserAvatar extends React.Component{
         }
 
         return (
-            <div className={className} style={style} onMouseOver={onMouseOver}>
+            <div className={className} style={style} onMouseOver={onMouseOver} onMouseOut={onMouseOut}>
                 {displayAvatar && (avatar || avatarContent || avatarIcon) && avatarComponent}
                 {displayLabel && !richCard && <div
                     className={labelClassName}

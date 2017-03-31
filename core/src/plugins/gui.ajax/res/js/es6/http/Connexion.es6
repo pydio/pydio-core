@@ -17,7 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-
+import XMLUtils from '../util/XMLUtils'
 /**
  * Pydio encapsulation of XHR / Fetch
  */
@@ -228,8 +228,8 @@ class Connexion{
             return response;
 
         }).catch(function(error) {
-            if(pydio){
-                pydio.displayMessage('ERROR', 'Network error ' + error.message);
+            if(this._pydio){
+                this._pydio.displayMessage('ERROR', 'Network error ' + error.message);
             }
         });
 
@@ -256,11 +256,10 @@ class Connexion{
 	 */
 	applyComplete(parsedBody, response){
         this.hideLoader();
-        let pydio = window.pydio;
-		var message;
-        var tokenMessage;
-        var tok1 = "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!";
-        var tok2 =  "reload the page";
+        const pydio = this._pydio;
+		let message, tokenMessage;
+        let tok1 = "Ooops, it seems that your security token has expired! Please %s by hitting refresh or F5 in your browser!";
+        let tok2 =  "reload the page";
         if(window.MessageHash && window.MessageHash[437]){
             tok1 = window.MessageHash[437];
             tok2 = window.MessageHash[438];
@@ -303,9 +302,9 @@ class Connexion{
 		}
 		if(parsedBody.responseXML && parsedBody.responseXML.documentElement){
 
-			var authNode = XMLUtils.XPathSelectSingleNode(parsedBody.responseXML.documentElement, "require_auth");
+			const authNode = XMLUtils.XPathSelectSingleNode(parsedBody.responseXML.documentElement, "require_auth");
 			if(authNode && pydio){
-				var root = pydio.getContextHolder().getRootNode();
+				const root = pydio.getContextHolder().getRootNode();
 				if(root){
 					pydio.getContextHolder().setContextNode(root);
 					root.clear();
@@ -314,10 +313,10 @@ class Connexion{
 				pydio.getController().fireAction('login');
 			}
 
-			var messageNode = XMLUtils.XPathSelectSingleNode(parsedBody.responseXML.documentElement, "message");
+			const messageNode = XMLUtils.XPathSelectSingleNode(parsedBody.responseXML.documentElement, "message");
 			if(messageNode){
-				var messageType = messageNode.getAttribute("type").toUpperCase();
-				var messageContent = XMLUtils.getDomNodeText(messageNode);
+				const messageType = messageNode.getAttribute("type").toUpperCase();
+				let messageContent = XMLUtils.getDomNodeText(messageNode);
                 if(messageContent.startsWith("You are not allowed to access this resource.")) {
                     messageContent = tokenMessage;
                 }
@@ -351,11 +350,11 @@ class Connexion{
         if(!onComplete) onComplete = function(){};
         if(!onError) onError = function(){};
         if(!onProgress) onProgress = function(){};
-        var xhr = this.initializeXHRForUpload(uploadUrl, onComplete, onError, onProgress, xhrSettings);
+        const xhr = this.initializeXHRForUpload(uploadUrl, onComplete, onError, onProgress, xhrSettings);
         if(window.FormData){
             this.sendFileUsingFormData(xhr, file, fileParameterName);
         }else if(window.FileReader){
-            var fileReader = new FileReader();
+            const fileReader = new FileReader();
             fileReader.onload = function(e){
                 this.xhrSendAsBinary(xhr, file.name, e.target.result, fileParameterName);
             }.bind(this);
@@ -371,8 +370,8 @@ class Connexion{
 
         if(xhrSettings === undefined) xhrSettings = {};
 
-        var xhr = new XMLHttpRequest();
-        var upload = xhr.upload;
+        const xhr = new XMLHttpRequest();
+        const upload = xhr.upload;
         if(xhrSettings.withCredentials){
             xhr.withCredentials = true;
         }
@@ -397,16 +396,16 @@ class Connexion{
     }
 
     sendFileUsingFormData(xhr, file, fileParameterName){
-        var formData = new FormData();
+        const formData = new FormData();
         formData.append(fileParameterName, file);
         xhr.send(formData);
     }
 
     xhrSendAsBinary(xhr, fileName, fileData, fileParameterName){
-        var boundary = '----MultiPartFormBoundary' + (new Date()).getTime();
+        const boundary = '----MultiPartFormBoundary' + (new Date()).getTime();
         xhr.setRequestHeader("Content-Type", "multipart/form-data, boundary="+boundary);
 
-        var body = "--" + boundary + "\r\n";
+        let body = "--" + boundary + "\r\n";
         body += "Content-Disposition: form-data; name='"+fileParameterName+"'; filename='" + unescape(encodeURIComponent(fileName)) + "'\r\n";
         body += "Content-Type: application/octet-stream\r\n\r\n";
         body += fileData + "\r\n";
@@ -427,7 +426,7 @@ class Connexion{
             fileName += "?v="+window.pydioBootstrap.parameters.get("ajxpVersion");
         }
         const url = (this._libUrl?this._libUrl+'/'+fileName:fileName);
-
+        const pydio = this._pydio;
 
         let scriptLoaded = function(script){
             try{
@@ -462,7 +461,7 @@ class Connexion{
             });
         }else{
             // SHOULD BE REMOVED!!
-            var xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
                     if (xhr.status === 200) {
