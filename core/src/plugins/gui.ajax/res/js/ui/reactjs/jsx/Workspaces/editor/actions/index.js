@@ -5,15 +5,9 @@ export const editorSetActiveTab = (activeTabId) => ({
     activeTabId
 })
 
-export const EDITOR_MODIFY_MENU = 'EDITOR_MODIFY_MENU'
-export const editorModifyMenu = (data) => ({
-    type: EDITOR_MODIFY_MENU,
-    ...data
-})
-
-export const EDITOR_MODIFY_PANEL = 'EDITOR_MODIFY_PANEL'
-export const editorModifyPanel = (data) => ({
-    type: EDITOR_MODIFY_PANEL,
+export const EDITOR_MODIFY = 'EDITOR_MODIFY'
+export const editorModify = (data) => ({
+    type: EDITOR_MODIFY,
     ...data
 })
 
@@ -21,11 +15,16 @@ export const editorModifyPanel = (data) => ({
 export const TAB_CREATE = 'TAB_CREATE'
 export const tabCreate = (data) => ({
     type: TAB_CREATE,
-    data
+    ...data
 })
 
 export const TAB_DELETE = 'TAB_DELETE'
 export const tabDelete = (id) => ({
     type: TAB_DELETE,
     id
+})
+
+export const TAB_DELETE_ALL = 'TAB_DELETE_ALL'
+export const tabDeleteAll = () => ({
+    type: TAB_DELETE_ALL
 })

@@ -18,83 +18,77 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
- const styles = {
-    chip: {
-        margin: 4,
-    },
-    container: {
-        height: '100%',
-        width: '100%',
-        flexDirection: 'column',
-    },
-    headers: {
-        maxHeight: 44,
-        overflowY: 'scroll',
-        paddingLeft: 20,
-        display: 'flex',
-        flexWrap: 'wrap',
-        flexDirection: 'row',
-        color: '#757575',
-    },
-    headerName: {
-        width: 50,
-        display: 'flex',
-        justifyContent: 'flex-end',
-        alignItems: 'center',
-    },
-    headerTitleAttribute: {
-        fontSize: '14px',
-        fontWeight: 'bold',
-    },
-    title: {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        marginTop: 20,
-        marginBottom: 20,
-        marginLeft: 20,
-        marginRight: 20,
-        subject: {
-            flex: 1,
-            fontWeight: 'bold',
-            fontSize: 18,
-            color: '#A9A9A9',
-        },
-        date: {
-            fontWeight: 'light',
-            color: '#A9A9A9',
-        },
-    },
-    body: {
-        height: '100%',
-        flex: 1,
-        marginLeft: 20,
-        marginRight: 20,
-        overflowY: 'scroll',
-    },
-    popover: {
-        zIndex: 100000
-    },
-    attachments: {
-        display: 'flex',
-        overflowX: 'scroll',
-        width: '100%',
-        maxHeight: 150,
-        position: 'absolute',
-        alignItems: 'center',
-        bottom: 0,
-        paddingTop: 4,
-        paddingBottom: 4,
-    },
-    attachment: {
-        marginLeft: 8,
-    },
+const styles = {
+     chip: {
+         margin: 4,
+     },
+     container: {
+         height: '100%',
+         width: '100%',
+         flexDirection: 'column',
+     },
+     headers: {
+         maxHeight: 44,
+         overflowY: 'scroll',
+         paddingLeft: 20,
+         display: 'flex',
+         flexWrap: 'wrap',
+         flexDirection: 'row',
+         color: '#757575',
+     },
+     headerName: {
+         width: 50,
+         display: 'flex',
+         justifyContent: 'flex-end',
+         alignItems: 'center',
+     },
+     headerTitleAttribute: {
+         fontSize: '14px',
+         fontWeight: 'bold',
+     },
+     title: {
+         display: 'flex',
+         justifyContent: 'flex-end',
+         marginTop: 20,
+         marginBottom: 20,
+         marginLeft: 20,
+         marginRight: 20,
+         subject: {
+             flex: 1,
+             fontWeight: 'bold',
+             fontSize: 18,
+             color: '#A9A9A9',
+         },
+         date: {
+             fontWeight: 'light',
+             color: '#A9A9A9',
+         },
+     },
+     body: {
+         height: '100%',
+         flex: 1,
+         marginLeft: 20,
+         marginRight: 20,
+         overflowY: 'scroll',
+     },
+     popover: {
+         zIndex: 100000
+     },
+     attachments: {
+         display: 'flex',
+         overflowX: 'scroll',
+         width: '100%',
+         maxHeight: 150,
+         position: 'absolute',
+         alignItems: 'center',
+         bottom: 0,
+         paddingTop: 4,
+         paddingBottom: 4,
+     },
+     attachment: {
+         marginLeft: 8,
+     },
 };
-
- const Viewer = ({url, style}) => {
-     return (
-         <iframe src={url} style={{...style, border: 0, flex: 1}} className="vertical_fit"></iframe>
-     );
- };
 
 const EmailBody = ({isHtml, body}) => {
     if (isHtml) {
@@ -121,7 +115,6 @@ class HeaderField extends React.Component {
 
     constructor(props) {
         super(props);
-
     }
 
     render() {
@@ -151,18 +144,12 @@ class HeaderField extends React.Component {
             </div>
         );
     }
-
 }
-
-
 
 class Attachment extends React.Component {
 
     constructor(props) {
         super(props);
-
-        console.log('lol');
-        console.log(props.pydio);
 
         this.state = {
             open: false,
@@ -171,8 +158,6 @@ class Attachment extends React.Component {
 
     downloadAttachment() {
         let {pydio, node} = this.props
-        console.log(pydio);
-        console.log(node);
         this.props.pydio.ApiClient.downloadSelection(null, 'eml_dl_attachment', {file: node.getPath(), attachment_id: this.props.attachment.id})
     }
 
@@ -252,132 +237,126 @@ class Attachment extends React.Component {
             </MaterialUI.Paper>
         );
     }
-
 }
 
+class EmlViewer extends React.Component {
 
- class EmlViewer extends React.Component {
+    constructor(props) {
+        super(props)
 
-        constructor(props) {
-            super(props)
+        this.state = {headers: [], isHtml: false, body: '', attachments: []}
+    }
 
-            this.state = {headers: [], isHtml: false, body: '', attachments: []}
+    componentWillMount() {
+        this.loadFileContent();
+    }
+
+    loadFileContent() {
+        let {pydio, node, onLoad} = this.props;
+
+        pydio.ApiClient.request({
+            get_action: 'eml_get_xml_structure',
+            file: node.getPath(),
+        }, function (transport) {
+            this.parseHeaders(transport.responseXML);
+            this.parseAttachments(transport.responseXML);
+        }.bind(this));
+
+        pydio.ApiClient.request({
+            get_action: 'eml_get_bodies',
+            file: node.getPath(),
+        }, function (transport) {
+            this.parseBody(transport.responseXML)
+
+            onLoad()
+        }.bind(this));
+
+        // Should be handled with promises
+        setTimeout(() => onLoad(), 2000)
+    }
+
+
+    parseBody(xmlDoc) {
+        let body = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]').firstChild.nodeValue;
+        let isHtml = true;
+        if (!body) {
+            body = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue;
+            ishtml = false;
         }
+        this.setState({body: body});
+        this.setState({isHtml: isHtml})
+    }
 
-        componentWillMount() {
-            this.loadFileContent();
-        }
+    parseHeaders(xmlDoc) {
+        let headers = XMLUtils.XPathSelectNodes(xmlDoc, 'email/header');
+        let searchedHeaders = {};
 
-        loadFileContent() {
-            let {pydio, node} = this.props;
+        headers.forEach(function (value) {
+            let hName = XMLUtils.XPathGetSingleNodeText(value, 'headername');
+            let hValue = XMLUtils.XPathGetSingleNodeText(value, 'headervalue');
+            searchedHeaders[hName] = hValue;
+        });
+        this.setState({headers: searchedHeaders})
+    }
 
-            console.log('test');
-            pydio.ApiClient.request({
-                get_action: 'eml_get_xml_structure',
-                file: node.getPath(),
-            }, function (transport) {
-                this.parseHeaders(transport.responseXML);
-                this.parseAttachments(transport.responseXML);
-            }.bind(this));
+    parseAttachments(xmlDoc) {
+        let allHeaders = XMLUtils.XPathSelectNodes(xmlDoc, '//header');
+        // let attachments = {};
+        let attachments = []
+        let id = 0;
+        allHeaders.forEach((el) => {
+            let hName = XMLUtils.XPathGetSingleNodeText(el, 'headername');
+            let hValue = XMLUtils.XPathGetSingleNodeText(el, 'headervalue');
+            if (hName != 'Content-Disposition' || hValue != 'attachment') return;
+            let mimepart = el.parentNode;
+            let filename = '';
 
-            pydio.ApiClient.request({
-                get_action: 'eml_get_bodies',
-                file: node.getPath(),
-            }, function (transport) {
-                this.parseBody(transport.responseXML)
-            }.bind(this));
-        }
+            let params = XMLUtils.XPathSelectNodes(el, 'parameter');
+            params.forEach((c) => {
+                if(XMLUtils.XPathGetSingleNodeText(c, "paramname") == "filename") {
+                    filename = XMLUtils.XPathGetSingleNodeText(c, "paramvalue");
+                }
+            });
 
-
-        parseBody(xmlDoc) {
-            let body = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="html"]').firstChild.nodeValue;
-            let isHtml = true;
-            if (!body) {
-                body = XMLUtils.XPathSelectSingleNode(xmlDoc, 'email_body/mimepart[@type="plain"]').firstChild.nodeValue;
-                ishtml = false;
+            let foundId = false;
+            allHeaders.forEach((h) => {
+                if (h.parentNode != mimepart) return;
+                let siblingName = XMLUtils.XPathGetSingleNodeText(h, "headername");
+                if (siblingName == "X-Attachment-Id") {
+                    id = XMLUtils.XPathGetSingleNodeText(h, "headervalue");
+                    foundId = true;
+                }
+            });
+            // attachments[id] = filename;
+            attachments.push({id: id, fileName: filename})
+            if(!foundId){
+                id = id+1;
             }
-            this.setState({body: body});
-            this.setState({isHtml: isHtml})
-        }
+        });
+        this.setState({attachments: attachments})
+    }
 
-        parseHeaders(xmlDoc) {
-            console.log(xmlDoc)
-            let headers = XMLUtils.XPathSelectNodes(xmlDoc, 'email/header');
-            let searchedHeaders = {};
-
-            headers.forEach(function (value) {
-                let hName = XMLUtils.XPathGetSingleNodeText(value, 'headername');
-                let hValue = XMLUtils.XPathGetSingleNodeText(value, 'headervalue');
-                searchedHeaders[hName] = hValue;
-            });
-            this.setState({headers: searchedHeaders})
-        }
-
-        parseAttachments(xmlDoc) {
-            let allHeaders = XMLUtils.XPathSelectNodes(xmlDoc, '//header');
-            // let attachments = {};
-            let attachments = []
-            let id = 0;
-            allHeaders.forEach((el) => {
-                let hName = XMLUtils.XPathGetSingleNodeText(el, 'headername');
-                let hValue = XMLUtils.XPathGetSingleNodeText(el, 'headervalue');
-                if (hName != 'Content-Disposition' || hValue != 'attachment') return;
-                let mimepart = el.parentNode;
-                let filename = '';
-
-                let params = XMLUtils.XPathSelectNodes(el, 'parameter');
-                params.forEach((c) => {
-                    if(XMLUtils.XPathGetSingleNodeText(c, "paramname") == "filename") {
-    					filename = XMLUtils.XPathGetSingleNodeText(c, "paramvalue");
-    				}
-                });
-
-                let foundId = false;
-                allHeaders.forEach((h) => {
-                    if (h.parentNode != mimepart) return;
-    				let siblingName = XMLUtils.XPathGetSingleNodeText(h, "headername");
-    				if (siblingName == "X-Attachment-Id") {
-    					id = XMLUtils.XPathGetSingleNodeText(h, "headervalue");
-    					foundId = true;
-    				}
-                });
-                console.log(`${filename} file added to attachments`);
-                // attachments[id] = filename;
-                attachments.push({id: id, fileName: filename})
-    			if(!foundId){
-    				id = id+1;
-    			}
-            });
-            console.log(attachments)
-            this.setState({attachments: attachments})
-        }
-
-
-
-        render() {
-            console.log(this.props.pydio)
-            return (
-                <PydioComponents.AbstractEditor {...this.props}>
-                <MaterialUI.Paper zDepth={1} style={styles.container} >
-                    {["From", "To", "Cc"].map((id) => {
-                        return <HeaderField {...this.props} key={id} headerName={id} headerValue={this.state.headers[id]} />
-                    })}
-                    <div style={styles.title}>
-                        <div style={styles.title.subject}>
-                            <p style={{fontSize: 18, color: '#9f9f9f'}}>{this.state.headers['Subject']}</p>
-                        </div>
-                        <div style={styles.title.date}>
-                            <p style={{fontSize: 14, color: '#9f9f9f', opacity: 0.8}} >{this.state.headers['Date']}</p>
-                        </div>
+    render() {
+        return (
+            <MaterialUI.Paper zDepth={1} style={styles.container} >
+                {["From", "To", "Cc"].map((id) => {
+                    return <HeaderField {...this.props} key={id} headerName={id} headerValue={this.state.headers[id]} />
+                })}
+                <div style={styles.title}>
+                    <div style={styles.title.subject}>
+                        <p style={{fontSize: 18, color: '#9f9f9f'}}>{this.state.headers['Subject']}</p>
                     </div>
-                    <EmailBody isHtml={this.state.isHtml} body={this.state.body} />
-                    <div style={styles.attachments}>
-                        {Object.values(this.state.attachments).map((a) => <Attachment {...this.props} attachment={a} />)}
+                    <div style={styles.title.date}>
+                        <p style={{fontSize: 14, color: '#9f9f9f', opacity: 0.8}} >{this.state.headers['Date']}</p>
                     </div>
-                </MaterialUI.Paper>
-                </PydioComponents.AbstractEditor>
-            );
-        }
-  }
+                </div>
+                <EmailBody isHtml={this.state.isHtml} body={this.state.body} />
+                <div style={styles.attachments}>
+                    {Object.values(this.state.attachments).map((a) => <Attachment {...this.props} attachment={a} />)}
+                </div>
+            </MaterialUI.Paper>
+        );
+    }
+}
 
- window.EmlViewer = EmlViewer;
+window.EmlViewer = EmlViewer;

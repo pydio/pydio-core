@@ -20,7 +20,7 @@
 
 const Viewer = ({url, style}) => {
     return (
-        <iframe src={url} style={{...style, border: 0, flex: 1}} className="vertical_fit"></iframe>
+        <iframe src={url} style={{...style, height: "100%", border: 0, flex: 1}} className="vertical_fit"></iframe>
     );
 };
 
@@ -82,11 +82,13 @@ class PydioPDFJSViewer extends React.Component {
 
     render() {
         return (
-            <PydioComponents.AbstractEditor {...this.props}>
-                <Viewer {...this.props} url={this.state.url} />
-            </PydioComponents.AbstractEditor>
+            <Viewer {...this.props} url={this.state.url} />
         );
     }
+}
+
+PydioPDFJSViewer.defaultProps = {
+    onLoad: () => {}
 }
 
 window.PydioPDFJSViewer = PydioPDFJSViewer;

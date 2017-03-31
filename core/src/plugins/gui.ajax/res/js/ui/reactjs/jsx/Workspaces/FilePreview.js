@@ -107,7 +107,7 @@ let FilePreview = React.createClass({
             }else{
                 image.onload = loader();
             }
-        }  else if (editorClass.getPreviewComponent) {
+        } else if (editorClass.getPreviewComponent) {
             var promise = editorClass.getPreviewComponent(node, this.props.richPreview)
 
             Promise.resolve(promise).then(function (component) {
@@ -133,19 +133,22 @@ let FilePreview = React.createClass({
             return this.state.element;
         }
 
-        let node  = this.props.node;
-        let svg = PydioComponents.AbstractEditor.getSvgSource(node);
+        let node = this.props.node;
+
+        if (!node) {
+            return null
+        }
+
         let object, className;
-        if(svg){
+
+        const svg = node.getSvgSource();
+        if (svg) {
             object = <div key="icon" className={"mimefont mdi mdi-" + svg} style={this.props.mimeFontStyle}></div>;
             className = 'mimefont-container';
-        }else{
-            var src = ResourcesManager.resolveImageSource(node.getIcon(), "mimes/ICON_SIZE", 64);
-            if(!src){
-                if(!node.isLeaf()) src = ResourcesManager.resolveImageSource('folder.png', "mimes/ICON_SIZE", 64);
-                else src = ResourcesManager.resolveImageSource('mime_empty.png', "mimes/ICON_SIZE", 64);
-            }
-            object = <img key="image" src={src}/>;
+        } else {
+            const icon = node.getIcon() || (!node.isLeaf() ? 'folder.png' : 'mime_empty.png')
+
+            object = <img key="image" src={ResourcesManager.resolveImageSource(icon, "mimes/ICON_SIZE", 64)} />;
         }
 
         return (

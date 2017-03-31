@@ -266,6 +266,14 @@
             this.detectFirstNode();
         },
 
+        _getEditorData: function(node) {
+            var selectedMime = PathUtils.getAjxpMimeType(node);
+            var editors = this.props.registry.findEditorsForMime(selectedMime, false);
+            if (editors.length && editors[0].openable){
+                return editors[0];
+            }
+        },
+
         render: function(){
 
             let node = this.state && this.state.node ?  this.state.node : null;
@@ -278,7 +286,7 @@
                             pydio={this.props.pydio}
                             node={node}
                             registry={this.props.pydio.Registry}
-                            closeEditorContainer={function(){return false;}}
+                            editorData={this._getEditorData(node)}
                         />
                     </div>
                 );

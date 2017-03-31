@@ -487,7 +487,7 @@ class Controller extends Observable{
 
 	notify(eventName, memo){
         if(this.localDataModel){
-            super("actions_refreshed", memo);
+            super.notify("actions_refreshed", memo);
         }else{
             this._pydioObject.fire("actions_refreshed");
         }

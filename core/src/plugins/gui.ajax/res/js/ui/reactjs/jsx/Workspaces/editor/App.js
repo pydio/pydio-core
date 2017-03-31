@@ -24,16 +24,72 @@ class App extends React.Component {
     constructor(props) {
         super(props)
 
-        const {editorModifyMenu, editorModifyPanel, editorSetActiveTab} = props
+        const {editorModify, editorSetActiveTab} = props
 
-        editorModifyMenu({})
-        editorModifyPanel({})
+        editorModify({open: false})
         editorSetActiveTab(null)
+
+        this.onEditorMinimise = () => this.setState({editorMinimised: !this.props.displayPanel})
+
+        this.state = {
+            editorMinimised: false
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        const {editorModify, tabs, displayPanel, positionOrigin, positionTarget} = nextProps
+
+        editorModify({open: tabs.length > 0})
+
+        if (displayPanel) {
+
+            this.setState({
+                editorMinimised: false
+            })
+
+            let transformOrigin = ""
+            if (positionOrigin && positionTarget) {
+                const x = parseInt(positionTarget.left - positionOrigin.left + ((positionTarget.right - positionTarget.left) / 2))
+                const y = parseInt(positionTarget.top - positionOrigin.top + ((positionTarget.bottom - positionTarget.top) / 2))
+
+                this.setState({
+                    transformOrigin: `${x}px ${y}px`
+                })
+            }
+        }
     }
 
     render() {
 
-        let style = {
+        const {display, displayPanel} = this.props
+        const {editorMinimised} = this.state
+
+        let editorStyle = {
+            display: "none"
+        }
+
+        let overlayStyle = {
+            display: "none"
+        }
+
+        if (!editorMinimised) {
+            editorStyle = {
+                position: "fixed",
+                top: "1%",
+                left: "5%",
+                right: "15%",
+                bottom: "1%",
+                transformOrigin: this.state.transformOrigin
+            }
+
+            overlayStyle = {position: "fixed", top: 0, bottom: 0, right: 0, left: 0, background: "#000000", opacity: "0.5", transition: "opacity .5s ease-in"}
+        }
+
+        if (!displayPanel) {
+            overlayStyle = {opacity: 0, transition: "opacity .5s ease-in"}
+        }
+
+        let menuStyle = {
             position: "fixed",
             bottom: "50px",
             right: "50px",
@@ -42,26 +98,13 @@ class App extends React.Component {
             zIndex: 5
         }
 
-        let editor = null
-        let menu = null
-        let overlayStyle = null
-
-        if (this.props.display) {
-            editor = <Editor />
-            menu = <Menu style={style} />
-        }
-
-        if (this.props.display && this.props.panel && this.props.panel.open) {
-            overlayStyle = {position: "fixed", top: 0, bottom: 0, right: 0, right: 0, left: 0, background: "#000000", opacity: 0.5, transition: "all 0.5s ease-in"}
-        }
-
         return (
             <div>
-                <div style={overlayStyle} />
+                { display ? <div style={overlayStyle} /> : null }
                 <AnimationGroup>
-                    {editor}
+                    { display ? <Editor style={editorStyle} onMinimise={this.onEditorMinimise.bind(this)} /> : null }
+                    { display ? <Menu style={menuStyle} /> : null }
                 </AnimationGroup>
-                {menu}
             </div>
         )
     }
@@ -69,9 +112,7 @@ class App extends React.Component {
 
 const Animation = (props) => {
     return (
-        <div {...props}>
-            {props.children}
-        </div>
+        <div {...props} />
     );
 };
 
@@ -79,10 +120,16 @@ const AnimationGroup = makeEditorOpen(Animation)
 
 // REDUX - Then connect the redux store
 function mapStateToProps(state, ownProps) {
-    const {tabs, editor} = state
+    const {editor, tabs} = state
+
     return {
-        display: tabs.length > 0,
-        panel: editor.panel
+        ...ownProps,
+        tabs,
+        display: editor.open,
+        displayPanel: editor.isPanelActive,
+        displayMenu: editor.isMenuActive,
+        positionOrigin: editor.panel && editor.panel.rect,
+        positionTarget: editor.menu && editor.menu.rect
     }
 }
 const ConnectedApp = connect(mapStateToProps, actions)(App)

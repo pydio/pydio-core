@@ -1,8 +1,9 @@
 import OpenNodesModel from './OpenNodesModel'
 
 import { createStore } from 'redux';
-import { Provider } from 'react-redux';
+import { Provider, connect } from 'react-redux';
 
+import * as actions from './editor/actions';
 import {Editor, reducers} from './editor';
 
 import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit';
@@ -34,30 +35,27 @@ class EditionPanel extends React.Component {
 
     _handleNodePushed(object) {
 
-        const {pydio} = this.props
+        const {pydio, tabCreate, editorModify, editorSetActiveTab} = this.props
+
         const {node, editorData} = object
 
-        store.dispatch({
-            type: "TAB_CREATE",
-            data: {
-                id: node.getLabel(),
-                title: node.getLabel(),
-                url: node.getPath(),
-                icon: PydioComponents.ReactEditorOpener,
-                child: PydioComponents.ReactEditorOpener,
-                pydio,
-                node,
-                editorData,
-                registry: pydio.Registry,
-                closeEditorContainer : () => {},
-                onRequestTabClose : () => {},
-                onRequestTabTitleUpdate : () => {},
-            }
-        })
+        let tabId = tabCreate({
+            id: node.getLabel(),
+            title: node.getLabel(),
+            url: node.getPath(),
+            icon: PydioWorkspaces.FilePreview,
+            child: PydioComponents.ReactEditorOpener,
+            pydio,
+            node,
+            editorData,
+            registry: pydio.Registry
+        }).id
 
-        store.dispatch({
-            type: 'EDITOR_MODIFY_PANEL',
-            open: true
+        editorSetActiveTab(tabId)
+
+        editorModify({
+            open: true,
+            isPanelActive: true
         })
     }
 
@@ -75,17 +73,27 @@ class EditionPanel extends React.Component {
         }
 
         return (
+            <div style={{position: "relative", zIndex: 1400}}>
+                <Editor/>
+            </div>
+        )
+    }
+}
+
+class EditionProvider extends React.Component {
+    render () {
+        return (
             <Provider store={store}>
-                <div style={{position: "relative", zIndex: 1400}}>
-                    <Editor/>
-                </div>
+                <EditionPanel {...this.props} />
             </Provider>
         )
     }
 }
 
+EditionPanel = connect(null, actions)(EditionPanel)
+
 EditionPanel.PropTypes = {
     pydio: React.PropTypes.instanceOf(Pydio)
 }
 
-export {EditionPanel as default}
+export {EditionProvider as default}

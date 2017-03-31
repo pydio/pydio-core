@@ -1,114 +1,74 @@
-/**
- * Opens an oldschool Pydio editor in React context, based on node mime type.
- * @type {*|Function}
+/*
+ * Copyright 2007-2017 Charles du Jeu - Abstrium SAS <team (at) pyd.io>
+ * This file is part of Pydio.
+ *
+ * Pydio is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Pydio is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with Pydio.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * The latest code can be found at <https://pydio.com>.
  */
-export default React.createClass({
 
-    propTypes:{
-        node:React.PropTypes.instanceOf(AjxpNode),
-        registry:React.PropTypes.instanceOf(Registry).isRequired,
-        closeEditorContainer:React.PropTypes.func.isRequired,
-        editorData:React.PropTypes.object,
-        registerCloseCallback:React.PropTypes.func,
-        onRequestTabTitleUpdate:React.PropTypes.func,
-        icon: React.PropTypes.bool,
-    },
+import loader from './AbstractEditor'
 
-    getInitialState: function(){
-        return {editorData: null};
-    },
+const propTypes = {
+    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+    registry: React.PropTypes.instanceOf(Registry).isRequired,
+    editorData: React.PropTypes.object.isRequired,
+    icon: React.PropTypes.bool,
+}
 
-    _getEditorData: function(node){
-        var selectedMime = PathUtils.getAjxpMimeType(node);
-        var editors = this.props.registry.findEditorsForMime(selectedMime, false);
-        if(editors.length && editors[0].openable){
-            return editors[0];
+const defaultProps = {
+    icon: false
+}
+
+class ReactEditorOpener extends React.Component {
+
+    constructor(props) {
+        super(props)
+
+        const {node, editorData} = props
+
+        this.state = {
+            ready: false
         }
-    },
-
-    closeEditor: function(){
-        if(this.editor){
-            var el = this.editor.element;
-            this.editor.destroy();
-            try{el.remove();}catch(e){}
-            this.editor = null;
-        }
-        if(this.props.closeEditorContainer() !== false){
-            this.setState({editorData: null, node:null});
-        }
-    },
-
-    loadEditor: function(node, editorData){
-        this._blockUpdates = false;
-
-        if(this.editor){
-            this.closeEditor();
-        }
-        if(!editorData){
-            editorData = this._getEditorData(node);
-        }
-        if(editorData) {
-            this.props.registry.loadEditorResources(editorData.resourcesManager, function(){
-                this.setState({editorData: editorData, node:node}, this._loadPydioEditor);
-            }.bind(this));
-        }else{
-            this.setState({editorData: null, node:null}, this._loadPydioEditor);
-        }
-    },
-
-    componentDidMount:function(){
-        if(this.props.node) {
-            this.loadEditor(this.props.node, this.props.editorData);
-        }
-    },
-
-    componentWillReceiveProps:function(newProps){
-        this._blockUpdates = false;
-        if(newProps.node && newProps.node !== this.props.node) {
-            this.loadEditor(newProps.node, newProps.editorData);
-        }else if(newProps.node && newProps.node === this.props.node){
-            this._blockUpdates = true;
-        }
-    },
-
-    componentDidUpdate:function(){
-        if(this.editor && this.editor.resize){
-            this.editor.resize();
-        }
-    },
-
-    componentWillUnmount:function(){
-        if(this.editor){
-            this.editor.destroy();
-            this.editor = null;
-        }
-    },
-
-    _loadPydioEditor: function(){
-        if(this.editor){
-            this.editor.destroy();
-            this.editor = null;
-        }
-    },
-
-    render: function(){
-        var editor;
-
-        if(this.state.editorData){
-            let className = this.state.editorData.editorClass;
-            if(FuncUtils.getFunctionByName(className, window)){
-                editor = React.createElement(FuncUtils.getFunctionByName(className, window), {
-                    pydio       : this.props.pydio,
-                    node        : this.props.node,
-                    icon        : this.props.icon,
-                    registerCloseCallback:this.props.registerCloseCallback,
-                    onRequestTabClose:this.props.onRequestTabClose,
-                    onRequestTabTitleUpdate:this.props.onRequestTabTitleUpdate
-                });
-            }else{
-                editor = <div>{"Cannot find editor component (" + className + ")!"}</div>
-            }
-        }
-        return editor || null;
     }
-});
+
+    componentDidMount() {
+        const {editorData, registry} = this.props
+
+        registry.loadEditorResources(
+            editorData.resourcesManager,
+            () => this.setState({ready: true})
+        );
+    }
+
+    render() {
+        const {editorData} = this.props
+        const {ready} = this.state
+
+        if (!ready) return null
+
+        let EditorClass = null
+        if (!(EditorClass = FuncUtils.getFunctionByName(editorData.editorClass, window))) {
+            return <div>{"Cannot find editor component (" + editorData.editorClass + ")!"}</div>
+        }
+
+        // Getting HOC of the class
+        return <EditorClass {...this.props} />
+    }
+}
+
+ReactEditorOpener.propTypes = propTypes
+ReactEditorOpener.defaultProps = defaultProps
+
+export default ReactEditorOpener

@@ -85,13 +85,19 @@
                 urlProvider:new UrlProvider()
             };
         },
-        
+
         componentWillUnmount: function(){
+            let node = this.state.selectionModel.first()
+
+            if (!node) {
+                return
+            }
+            
             let fileId = this.state.selectionModel.first().getMetadata().get('thumb_file_id');
             var prefix = fileId.replace("-0.jpg", "").replace(".jpg", "");
             PydioApi.getClient().request({get_action:'delete_imagick_data', file:prefix});
         },
-        
+
         render: function(){
 
             return (
@@ -104,7 +110,6 @@
                     showLoader={!this.state.selectionLoaded}
                 />
             )
-
         }
 
     });

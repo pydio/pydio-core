@@ -25,7 +25,7 @@ const CardsGrid = React.createClass({
     componentWillReceiveProps: function(nextProps){
         if(this.props && nextProps.editMode !== this.props.editMode){
             Object.keys(this.refs).forEach(function(k){
-                this.refs[k].toggleEditMode();
+                this.refs[k].toggleEditMode(nextProps.editMode);
             }.bind(this));
         }
     },
@@ -46,7 +46,6 @@ const CardsGrid = React.createClass({
     },
 
     removeCard: function(itemKey){
-        console.log(itemKey);
         this.props.removeCard(itemKey);
     },
 

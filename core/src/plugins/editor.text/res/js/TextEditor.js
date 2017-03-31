@@ -7,6 +7,10 @@ const styles = {
     }
 }
 
+let Viewer =  ({value, onChange}) => {
+    return <textarea value={value} style={styles.textArea} onChange={onChange} />
+}
+
 class TextEditor extends React.Component {
 
     constructor(props) {
@@ -32,7 +36,6 @@ class TextEditor extends React.Component {
     saveContent() {
         let {pydio, node} = this.props
         pydio.ApiClient.postPlainTextContent(node.getPath(), this.state.textContent, (success) => {
-            console.log('Successfuly saved text to file');
             this.setState({originalText: this.state.textContent});
         }.bind(this));
     }
@@ -61,11 +64,16 @@ class TextEditor extends React.Component {
 
     render() {
         return (
-            <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
-                <textarea value={this.state.textContent} style={styles.textArea} onChange={this.handleChange} />
-            </PydioComponents.AbstractEditor>
+            <Viewer actions={this.buildActions()} value={this.state.textContent} onChange={() => this.handleChange()} />
         );
     }
+}
+
+// Define HOCs
+if (typeof PydioHOCs !== "undefined") {
+    Viewer = PydioHOCs.withActions(Viewer);
+    Viewer = PydioHOCs.withLoader(Viewer)
+    Viewer = PydioHOCs.withErrors(Viewer)
 }
 
 window.TextEditor = TextEditor;

@@ -15,59 +15,48 @@
 import _ from 'lodash';
 import { Motion, spring, presets } from 'react-motion';
 
-const ANIMATION={stifness: 500, damping: 20}
-const ORIGIN=1
+const ANIMATION={stiffness: 300, damping: 40}
+const ORIGIN=0
 const TARGET=100
 
 const makeEditorMinimise = (Target) => {
     return class extends React.Component {
         constructor(props) {
             super(props);
-            this.state = {open: props.open};
+            this.state = {};
         }
 
         componentWillReceiveProps(nextProps) {
             this.setState({
-                open: nextProps.open,
-                positionOrigin: nextProps.positionOrigin,
-                positionTarget: nextProps.positionTarget
+                minimised: nextProps.minimised
             })
         }
 
         render() {
+            const {minimised} = this.state
 
-            const {open, positionOrigin, positionTarget} = this.state
-            const motionStyle = {
-                scale: open ? spring(TARGET, ANIMATION) : spring(ORIGIN, ANIMATION)
-            };
-
-            let transformOrigin = null
-            if (positionOrigin && positionTarget) {
-                const x = parseInt((positionOrigin.right / positionTarget.right) * 100, 10)
-                const y = parseInt((positionOrigin.bottom / positionTarget.bottom) * 100, 10)
-
-                transformOrigin = `${x}% ${y}%`
+            if (typeof minimised === "undefined") {
+                return <Target {...this.props} />
             }
 
-            let {style} = this.props || {style: {}}
-            let {transform} = style || {transform: ""}
+            const motionStyle = {
+                scale: minimised ? spring(ORIGIN, ANIMATION) : TARGET
+            };
+
+            const transform = this.props.style.transform || ""
 
             return (
-                <Motion style={motionStyle}>
+                <Motion style={motionStyle} onRest={this.props.onMinimise} >
                     {({scale}) => {
                         let float = scale / 100
 
                         return (
                             <Target
                                 {...this.props}
+                                scale={scale}
                                 style={{
                                     ...this.props.style,
-                                    position: "fixed",
-                                    top: `1%`,
-                                    left: `1%`,
-                                    bottom: `1%`,
-                                    right: `15%`,
-                                    transformOrigin,
+                                    transition: "none",
                                     transform: `${transform} scale(${float})`
                                 }}
                             />
@@ -78,10 +67,5 @@ const makeEditorMinimise = (Target) => {
         }
     }
 };
-
-const TestDiv = () => {
-    console.log("Re-rendering")
-    return (<div>HELLO</div>)
-}
 
 export default makeEditorMinimise;

@@ -21,7 +21,6 @@
             var w = parseInt(imageDimensions.width);
 
             return {url: baseUrl + time_seed + "&file=" + encodeURIComponent(node.getPath()), width: w, height: h};
-
         }
 
         getLowResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
@@ -225,38 +224,47 @@
         },
 
         render: function(){
-            if(!this.props.url) return null;
 
-            let style = {
+            const {fit, url, imageClassName} = this.props
+
+            if(!url) return null;
+
+            const containerStyle = {
+                flex: 1,
+                justifyContent: 'center'
+            }
+
+            const imgStyle = {
                 boxShadow: DOMUtils.getBoxShadowDepth(1),
                 margin:IMAGE_PANEL_MARGIN,
                 transition:DOMUtils.getBeziersTransition()
             }
 
-            if (this.props.fit) {
-                style = {
-                    ...style,
-                    maxWidth: "90%",
-                    maxHeight: "90%",
-                    minHeight: "90%"
-                }
-            } else {
-                style= {
-                    ...style,
-                    height:this.state.height,
-                    width:this.state.width
-                }
+            if (fit) {
+                return (
+                    <div ref="container" style={{...containerStyle, display: 'flex'}}>
+                        <img src={url} className={imageClassName} style={{...imgStyle, flex: "0 1", minHeight: "90%", maxHeight: "90%"}} />
+                    </div>
+                )
             }
 
+            const {width, height} = this.state
+
             return (
-                <div ref="container" style={{textAlign:'center', overflow:(!this.props.fit?'auto':null), flex: 1}}>
-                    <img className={this.props.imageClassName} style={style} src={this.props.url}/>
+                <div ref="container" style={{...containerStyle, overflow: 'auto'}}>
+                    <img src={url} className={imageClassName} style={{...imgStyle, width: width, height: height}} />
                 </div>
-            );
+            )
         }
-
-
     });
+
+    // Define HOCs
+    if (typeof PydioHOCs !== "undefined") {
+        ImagePanel = PydioHOCs.withActions(ImagePanel);
+        ImagePanel = PydioHOCs.withLoader(ImagePanel)
+        ImagePanel = PydioHOCs.withErrors(ImagePanel)
+    }
+
 
     let Editor = React.createClass({
 
@@ -308,14 +316,25 @@
             return {
                 baseUrl: baseURL,
                 editorConfigs: editorConfigs,
-                urlProvider:new UrlProvider(),
-                showResolutionToggle: true
+                urlProvider: new UrlProvider(),
+                showResolutionToggle: true,
+                onLoad: () => {}
             }
         },
 
-        imageSizeCallback: function(node, dimension){
+        componentDidMount: function() {
+            // Simple onLoad
+            this.props.onLoad()
+        },
+
+        componentWillUnmount: function () {
+
+        },
+
+        imageSizeCallback: function(node, dimension) {
+            console.log(this.isMounted(), this.state)
             if(this.state.currentNode === node){
-                this.setState({imageDimension: dimension});
+                this.timeout = setTimeout(() => this.setState({imageDimension: dimension}), 0);
             }
         },
 
@@ -343,9 +362,7 @@
         },
 
         getInitialState: function(){
-
             return this.computeStateFromProps(this.props);
-
         },
 
         updateStateNode: function(node){
@@ -401,7 +418,6 @@
             let actions = [];
             let mess = this.props.pydio.MessageHash;
             if(this.selectionModel.length() > 1){
-
                 actions.push(
                     <MaterialUI.ToolbarGroup
                         firstChild={true}
@@ -421,9 +437,9 @@
             }
 
             if(this.state.fitToScreen){
-                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[326]} onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[326]} onClick={()=>{console.log("No Fit "); this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
             }else{
-                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[325]} onClick={()=>{this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
+                rightActions.push(<MaterialUI.FlatButton key="fit" label={mess[325]} onClick={()=>{console.log("No Fit "); this.setState({fitToScreen:!this.state.fitToScreen})}}/>);
                 rightActions.push(
                     <div key="zoom" style={{display:'flex', height:56}}>
                         <MaterialUI.Slider style={{width:150, marginTop:-4}} min={0.25} max={4} defaultValue={1} value={this.state.zoomFactor} onChange={this.onSliderChange}/>
@@ -440,30 +456,21 @@
             return actions;
         },
 
-        render: function(){
+        render: function() {
 
-            if(!this.state.currentNode || this.props.showLoader){
-                return (
-                    <PydioComponents.AbstractEditor {...this.props} actions={[]}>
-                        <PydioReactUI.Loader/>
-                    </PydioComponents.AbstractEditor>
-                );
-            }else{
-                let imgProps = this.computeImageData(this.state.currentNode);
-                return (
-                    <PydioComponents.AbstractEditor {...this.props} actions={this.buildActions()}>
-                        <ImagePanel
-                            {...imgProps}
-                            fit={this.state.fitToScreen}
-                            zoomFactor={this.state.zoomFactor}
-                        />
-                    </PydioComponents.AbstractEditor>
-                );
-            }
+            if (!this.state.currentNode) return null
 
+            return (
+                <ImagePanel
+                    {...this.computeImageData(this.state.currentNode)}
+                    actions={this.buildActions()}
+                    fit={this.state.fitToScreen}
+                    zoomFactor={this.state.zoomFactor}
+                />
+            )
         }
-
     });
+
 
 
     global.PydioDiaporama = {

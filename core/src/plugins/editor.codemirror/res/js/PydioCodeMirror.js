@@ -60,6 +60,10 @@ class PydioCodeMirror extends React.Component {
         }
     }
 
+    componentWillMount() {
+        console.log("Mounting")
+    }
+
     componentDidMount() {
         const {pydio} = this.props
 
@@ -69,8 +73,13 @@ class PydioCodeMirror extends React.Component {
         }, (transport) => this.setState({content: transport.responseText}));
     }
 
+    componentWillUnmount() {
+        console.log("Unmounting")
+    }
+
     onLoad(codemirror) {
         this.setState({ codemirror: codemirror })
+        // this.props.onLoad()
     }
 
     onChange(content) {
@@ -111,7 +120,14 @@ class PydioCodeMirror extends React.Component {
     }
 }
 
-let CompositeEditor = PydioHOCs.withActions(Editor)
+let CompositeEditor = Editor
+
+// Define HOCs
+if (typeof PydioHOCs !== "undefined") {
+    CompositeEditor = PydioHOCs.withActions(CompositeEditor);
+    CompositeEditor = PydioHOCs.withLoader(CompositeEditor)
+    CompositeEditor = PydioHOCs.withErrors(CompositeEditor)
+}
 
 // We need to attach the element to window else it won't be found
 window.PydioCodeMirror = {

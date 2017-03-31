@@ -23,16 +23,6 @@ import NavigationClose from 'material-ui/svg-icons/navigation/close';
 
 class Button extends React.Component {
 
-    componentDidMount() {
-        const {editorModifyMenu} = this.props
-
-        const element = ReactDOM.findDOMNode(this)
-
-        editorModifyMenu({
-            rect: element.getBoundingClientRect()
-        })
-    }
-
     render() {
         const {rotated} = this.props
 

@@ -21,16 +21,18 @@ class MenuItem extends React.PureComponent {
     constructor(props) {
         super(props)
 
-        const {id, editorSetActiveTab, editorModifyPanel} = props
+        const {editorSetActiveTab, editorModify} = props
 
         this.onClick = () => {
-            editorModifyPanel({open: true})
-            editorSetActiveTab(id)
+            editorModify({isPanelActive: true})
+            editorSetActiveTab(this.props.id)
         }
     }
 
     render() {
-        const {props} = this
+        const {style, tab} = this.props
+
+        if (!tab) return null
 
         const textStyle = {
             position: "absolute",
@@ -53,10 +55,10 @@ class MenuItem extends React.PureComponent {
         }
 
         return (
-            <div style={props.style} onClick={this.onClick}>
-                <span style={textStyle}>{props.title}</span>
+            <div style={style} onClick={this.onClick}>
+                <span style={textStyle}>{tab.title}</span>
                 <FloatingActionButton mini={true} ref="container" backgroundColor="#FFFFFF" zDepth={2}  iconStyle={{backgroundColor: "#FFFFFF"}}>
-                    <props.icon {...props} style={{fill: "#000000"}} icon={true} />
+                    <tab.icon {...this.props.tab} style={{fill: "#000000", flex: 1, alignItems: "center", justifyContent: "center", fontSize: 28, color: "#607d8b"}} icon={true} />
                 </FloatingActionButton>
             </div>
         );
@@ -70,7 +72,7 @@ function mapStateToProps(state, ownProps) {
 
     return  {
         ...ownProps,
-        ...current
+        tab: current
     }
 }
 

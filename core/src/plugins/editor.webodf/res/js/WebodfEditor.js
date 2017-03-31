@@ -1,12 +1,13 @@
-const Viewer = ({url, style}) => {
+let Viewer = ({url, style, onLoad}) => {
     return (
-        <iframe src={url} style={{...style, border: 0, flex: 1}} className="vertical_fit"></iframe>
+        <iframe src={url} style={{...style, height: "100%", border: 0, flex: 1}} onLoad={onLoad} className="vertical_fit"></iframe>
     );
 };
 
 class WebodfEditor extends React.Component {
     constructor(props) {
         super(props);
+
         this.state = {};
     }
 
@@ -18,11 +19,15 @@ class WebodfEditor extends React.Component {
 
     render() {
         return (
-            <PydioComponents.AbstractEditor {...this.props}>
-                <Viewer {...this.props} url={this.state.url} />
-            </PydioComponents.AbstractEditor>
+            <Viewer ref="iframe" {...this.props} url={this.state.url} error={this.state.error} />
         );
     }
+}
+
+// Define HOCs
+if (typeof PydioHOCs !== "undefined") {
+    Viewer = PydioHOCs.withLoader(Viewer)
+    Viewer = PydioHOCs.withErrors(Viewer)
 }
 
 window.WebodfEditor = WebodfEditor;

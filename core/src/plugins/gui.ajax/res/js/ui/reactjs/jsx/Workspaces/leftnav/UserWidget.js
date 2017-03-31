@@ -1,5 +1,12 @@
 export default React.createClass({
 
+    propTypes:{
+        pydio: React.PropTypes.instanceOf(Pydio),
+        style: React.PropTypes.object,
+        avatarStyle: React.PropTypes.object,
+        actionBarStyle: React.PropTypes.object
+    },
+
     applyAction: function(actionName){
         switch (actionName){
             case 'alerts':
@@ -40,13 +47,15 @@ export default React.createClass({
 
         let avatar;
         let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, addressBookButton, userSharesButton;
+        let avatarStyle = this.props.avatarStyle || {};
+        avatarStyle = {...avatarStyle, marginRight: 20};
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
             avatar = (
                 <PydioComponents.UserAvatar
                     pydio={this.props.pydio}
                     userId={user.id}
-                    avatarStyle={{marginRight:20}}
+                    style={avatarStyle}
                     className="user-display"
                     labelClassName="userLabel"
                 >
@@ -135,7 +144,7 @@ export default React.createClass({
 
         // Do not display Home Button here for the moment
         const actionBar = (
-            <div className="action_bar">
+            <div className="action_bar" style={this.props.actionBarStyle}>
                 {addressBookButton}
                 {userSharesButton}
                 {settingsButton}

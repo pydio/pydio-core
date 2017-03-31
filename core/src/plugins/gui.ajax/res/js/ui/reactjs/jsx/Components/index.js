@@ -14,7 +14,6 @@ import ClipboardTextField from './ClipboardTextField'
 import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
-import AbstractEditor from './editor/AbstractEditor'
 import DynamicGrid from './dynamic-grid/DynamicGrid'
 import GridItemMixin from './dynamic-grid/GridItemMixin'
 
@@ -28,7 +27,7 @@ import TeamCreationForm from './users/TeamCreationForm'
 import AddressBook from './users/addressbook/AddressBook'
 
 window.PydioComponents = {
-    
+
     SortableList            : SortableList,
     SimpleList              : SimpleList,
     NodeListCustomProvider  : NodeListCustomProvider,
@@ -45,7 +44,6 @@ window.PydioComponents = {
     SearchBox               : SearchBox,
     LegacyUIWrapper         : LegacyUIWrapper,
 
-    AbstractEditor          : AbstractEditor,
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,
     PaperEditorNavEntry     : PaperEditorNavEntry,
