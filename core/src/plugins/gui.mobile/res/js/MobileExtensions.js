@@ -6,12 +6,14 @@ export default React.createClass({
 
         // @TODO
         // PASS THIS URL TO THE NATIVE APP FOR AUTO REGISTRATION OF THE SERVER
+        /*
         var currentHref = document.location.href;
         $("ajxpserver-redir").href = cleanURL(currentHref).replace("http://", "ajxpserver://").replace("https://", "ajxpservers://");
         if(currentHref.indexOf("#") > -1){
             currentHref = currentHref.substr(0, currentHref.indexOf("#"));
         }
 
+        */
 
         global.ajxpMobile = true;
         global.pydioSmartBanner = new SmartBanner({

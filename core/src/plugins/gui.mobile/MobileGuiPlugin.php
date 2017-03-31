@@ -24,6 +24,7 @@ namespace Pydio\Gui;
 use DOMXPath;
 use Exception;
 use Pydio\Core\Model\ContextInterface;
+use Pydio\Core\Services\ApplicationState;
 use Pydio\Core\Services\ConfService;
 use Pydio\Core\Utils\Http\UserAgent;
 
@@ -64,6 +65,10 @@ class MobileGuiPlugin extends Plugin
 
     }
 
+    /**
+     * @param ContextInterface $ctx
+     * @param $htmlContent
+     */
     public function filterHTML(ContextInterface $ctx, &$htmlContent){
 
         if (ApplicationState::hasMinisiteHash()) {
