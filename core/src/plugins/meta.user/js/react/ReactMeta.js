@@ -47,7 +47,8 @@
         }
 
         static renderTagsCloud(node, column){
-            return <TagsCloud node={node} column={column}/>;
+            return <span>{node.getMetadata().get(column.name)}</span>
+//            return <TagsCloud node={node} column={column}/>;
         }
 
         static formPanelStars(props){
@@ -81,17 +82,7 @@
 
         static formPanelTags(props){
             let configs = Renderer.getMetadataConfigs().get(props.fieldname);
-            console.log(configs);
-            // let menuItems = [];
-            // if(configs && configs.data){
-            //     configs.data.forEach(function(value, key){
-            //         //menuItems.push({payload:key, text:value});
-            //         menuItems.push(<MaterialUI.MenuItem value={key} primaryText={value}/>);
-            //     });
-            // }
-
             return <TagsCloud {...props} editMode={true}/>;
-            // return <MetaSelectorFormPanel {...props} menuItems={menuItems} />//<div>Tags</div>
         }
 
     }
@@ -99,47 +90,10 @@
     class Callbacks{
 
         static editMeta(){
-
-            ResourcesManager.detectModuleToLoadAndApply('MetaCellRenderer', function(){
-                var userSelection = global.pydio.getUserSelection();
-                var loadFunc = function(oForm){
-                    var form = $(oForm).select('div[id="user_meta_form"]')[0];
-                    var nodeMeta = $H();
-                    var firstNodeMeta = userSelection.getUniqueNode().getMetadata();
-                    var metaConfigs = MetaCellRenderer.prototype.staticGetMetaConfigs();
-                    if(userSelection.isUnique()){
-                        nodeMeta = firstNodeMeta;
-                    }
-                    metaConfigs.each(function(pair){
-                        var value = nodeMeta.get(pair.key) || '';
-                        form.insert('<div class="SF_element"><div class="SF_label">'+pair.value.label+' : </div><input class="SF_input" name="'+pair.key+'" value="'+value.replace(/"/g, '&quot;')+'"/></div>');
-                        var element = form.down('input[name="'+pair.key+'"]');
-                        var fieldType = pair.value.type;
-                        if(fieldType == 'stars_rate'){
-                            MetaCellRenderer.prototype.formPanelStars(element, form);
-                        }else if(fieldType == 'css_label'){
-                            MetaCellRenderer.prototype.formPanelCssLabels(element, form);
-                        }else if(fieldType == 'textarea'){
-                            MetaCellRenderer.prototype.formTextarea(element, form);
-                        }else if(fieldType == 'choice'){
-                            MetaCellRenderer.prototype.formPanelSelectorFilter(element, form);
-                        }else if(fieldType == 'tags'){
-                            MetaCellRenderer.prototype.formPanelTags(element, form);
-                        }else if(fieldType == 'updater' || fieldType == 'creator'){
-                            element.disabled = true;
-                        }
-                    });
-                }
-                var closeFunc = function(){
-                    var oForm = $(modal.getForm());
-                    userSelection.updateFormOrUrl(modal.getForm());
-                    PydioApi.getClient().submitForm(oForm, true);
-                    hideLightBox(true);
-                    return false;
-                };
-                modal.showDialogForm('Meta Edit', 'user_meta_form', loadFunc, closeFunc);
+            pydio.UI.openComponentInModal('ReactMeta', 'UserMetaDialog', {
+                dialogTitleId: 489,
+                selection: pydio.getUserSelection(),
             });
-
         }
 
     }
@@ -194,8 +148,7 @@
             }.bind(this));
             return (
                 <div className="advanced-search-stars">
-                    <div className="stars-label">{this.props.label}</div>
-                    <div className="stars-icons">{stars}</div>
+                    <div>{stars}</div>
                 </div>
             );
         }
@@ -252,7 +205,8 @@
             const data = CSSLabelsFilter.CSS_LABELS;
             if(value && data[value]){
                 let dV = data[value];
-                return <span className={dV.cssClass}>{dV.label}</span>
+                return <span className="mdi mdi-label" style={{color: dV.color}}>{dV.label}</span>
+                // return <span className={dV.cssClass}>{dV.label}</span>
             }else{
                 return <span>{value}</span>;
             }
@@ -371,7 +325,6 @@
                 tags: tags.toString()},
             () => {
                 this.updateValue(this.state.tags);
-                console.log(`Tags after deletion = ${this.state.value}`);
             });
         },
 
@@ -381,7 +334,10 @@
         },
 
         handleNewRequest: function() {
-            let tags = this.state.tags.split(',');
+            let tags = [];
+            if (this.state.tags) {
+                tags = this.state.tags.split(',');
+            }
             tags.push(this.state.searchText);
             this.setState({
                 tags: tags.toString()},
@@ -410,7 +366,7 @@
                 );
             }
         },
-        
+
         render: function(){
             let tags;
             if (this.state.tags) {
@@ -452,6 +408,40 @@
 
     });
 
+
+    let UserMetaDialog = React.createClass({
+        propsTypes: {
+            selection: React.PropTypes.instanceOf(PydioDataModel),
+        },
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        submit: function(){
+            let values = this.refs.panel.getUpdateData();
+            let params = {};
+            values.forEach(function(v, k){
+                params[k] = v;
+            });
+            PydioApi.getClient().postSelectionWithAction("edit_user_meta", function(t){
+                PydioApi.getClient().parseXmlMessage(t.responseXML);
+            }.bind(this), this.props.selection, params);
+        },
+        render: function(){
+            return (
+                <UserMetaPanel
+                    dialog={true}
+                    ref="panel"
+                    node={new AjxpNode()}
+                    editMode={true}
+                />
+            );
+        }
+    });
+
     let UserMetaPanel = React.createClass({
 
         propTypes:{
@@ -461,18 +451,25 @@
         getDefaultProps: function(){
             return {editMode: false};
         },
-
         getInitialState: function(){
-            return { updateMeta: new Map() };
+            return {
+                updateMeta: new Map(),
+                isChecked: false,
+                fields: []
+                };
         },
-
         updateValue: function(name, value){
             this.state.updateMeta.set(name, value);
             this.setState({
                 updateMeta: this.state.updateMeta
             });
         },
-
+        deleteValue: function(name) {
+            this.state.updateMeta.delete(name);
+            this.setState({
+                updateMeta: this.state.updateMeta
+            })
+        },
         getUpdateData: function(){
             return this.state.updateMeta;
         },
@@ -482,9 +479,15 @@
                 updateMeta: new Map()
             });
         },
-
+        onCheck: function(e, isInputChecked, value){
+            let state = this.state;
+            state['fields'][e.target.value] = isInputChecked;
+            if(isInputChecked == false){
+                this.deleteValue(e.target.value);
+            }
+            this.setState(state);
+        },
         render: function(){
-
             let configs = Renderer.getMetadataConfigs();
             let data = [];
             let node = this.props.node;
@@ -504,6 +507,7 @@
                 if(this.props.editMode){
                     let field;
                     let baseProps = {
+                        isChecked: this.state.isChecked,
                         fieldname: key,
                         label: label,
                         value: value,
@@ -520,14 +524,27 @@
                     }else{
                         field = (
                             <MaterialUI.TextField
-                                floatingLabelText={label}
                                 value={value}
                                 style={{width:'100%'}}
                                 onChange={(event, value)=>{this.updateValue(key, value);}}
                             />
                         );
                     }
-                    data.push(field);
+                    if(this.props.dialog){
+                        data.push(
+                            <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key} style={{ marginBottom: 20}}>
+                                <MaterialUI.Checkbox value={key} label={label} onCheck={this.onCheck.bind(value)}/>
+                                {this.state['fields'][key] && <div className="infoPanelValue">{field}</div>}
+                            </div>
+                        );
+                    }else{
+                        data.push(
+                            <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key} style={{ marginBottom: 20}}>
+                                <div className="infoPanelLabel">{label}</div>
+                                <div className="infoPanelValue">{field}</div>
+                            </div>
+                        );
+                    }
                 }else{
                     let column = {name:key};
                     if(type === 'stars_rate'){
@@ -552,7 +569,7 @@
             if(!this.props.editMode && !nonEmptyDataCount){
                 return <div><div style={{color: 'rgba(0,0,0,0.23)', paddingBottom:10}}>No metadata set. Click edit to add some.</div>{data}</div>
             }else{
-                return (<div>{data}</div>);
+                return (<div style={{width: '100%', overflowY: 'scroll'}}>{data}</div>);
             }
         }
 
@@ -632,6 +649,8 @@
     ns.Renderer = Renderer;
     ns.InfoPanel = InfoPanel;
     ns.Callbacks = Callbacks;
+    ns.UserMetaDialog = UserMetaDialog;
+
     global.ReactMeta = ns;
 
 })(window);
