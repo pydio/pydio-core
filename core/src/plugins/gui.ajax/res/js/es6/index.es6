@@ -24,7 +24,7 @@ const
     PassUtils = require('./util/PassUtils'),
     PathUtils = require('./util/PathUtils'),
     PeriodicalExecuter = require('./util/PeriodicalExecuter'),
-    XMLUtils = require('./util/XMLUtil'),
+    XMLUtils = require('./util/XMLUtils'),
     Pydio = require('./Pydio');
 
 import * as UsersApi from './http/PydioUsersApi';
