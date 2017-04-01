@@ -18,8 +18,6 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import loader from './AbstractEditor'
-
 const propTypes = {
     node: React.PropTypes.instanceOf(AjxpNode).isRequired,
     registry: React.PropTypes.instanceOf(Registry).isRequired,
