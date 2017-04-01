@@ -5,7 +5,15 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 		<link rel="icon" type="image/x-png" href="plugins/gui.ajax/res/themes/orbit/images/html-folder.png">
-		<script src="plugins/gui.ajax/res/js/vendor/prototype/prototype.js" type="text/javascript"></script>
+        <!--[if IE 8]>
+        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
+        <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>
+        <![endif]-->
+        <!--[if IE 7]>
+        <script src="plugins/gui.ajax/res/js/vendor/es6/json3.min.js"></script>
+        <![endif]-->
+        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/es6/browser-polyfill.js"></script>
+        <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/nodejs/boot.prod.js"></script>
         <style>
             * {
                 font-family: Roboto, sans-serif;
@@ -132,7 +140,7 @@
                 }
             ?>
 
-            <div class="testList">
+            <div class="testList" id="test-list">
             <?php
 
                 foreach ($ALL_ROWS as $testsType => $allTests){
@@ -155,55 +163,23 @@
             </div>
 
             <script type="text/javascript">
-                var testAllowOverride = new Ajax.Request('data/cache/index.html', {
-                    method : 'get',
-                    onComplete : function(response){
-                        if(200 === response.status){
-                            var html = '<div class="testLine error">\
-                                <div class="testName"><span>-</span>Security Breach</div>\
-                                <div class="testStatus">error</div>\
-                                <div class="testDescription  visible">It seems that your <b>data/</b> folder is not correctly protected, and that subfolders (like the data/cache/ folder) are web-accessible. If you are using <b>Apache</b>, make sure the AllowOverride All option is active for your current directory. If you are running <b>Windows IIS</b>, you must manually add a RequestFiltering/HiddenSegments configuration to prevent web access to these folders. If you have defined a different AJXP_DATA_PATH pointing outside the webfolder, you can ignore this warning.</div>\
-                                <div class="testClear"></div>\
-                            </div>';
-                            $$('div.testList')[0].insert({top:html});
-                        }
+                var c = new Connexion('data/cache/index.html');
+                c.setMethod('get');
+                c.onComplete = function(response){
+                    if(200 === response.status){
+                        var div = document.createElement('div');
+                        div.className = 'testLine error';
+                        div.innerHTML = '\
+                            <div class="testName"><span>-</span>Security Breach</div>\
+                            <div class="testStatus">error</div>\
+                            <div class="testDescription  visible">It seems that your <b>data/</b> folder is not correctly protected, and that subfolders (like the data/cache/ folder) are web-accessible. If you are using <b>Apache</b>, make sure the AllowOverride All option is active for your current directory. If you are running <b>Windows IIS</b>, you must manually add a RequestFiltering/HiddenSegments configuration to prevent web access to these folders. If you have defined a different AJXP_DATA_PATH pointing outside the webfolder, you can ignore this warning.</div>\
+                            <div class="testClear"></div>\
+                        ';
+                        var container = document.getElementById('test-list');
+                        container.insertBefore(div, container.firstChild);
                     }
-                });
-                /*
-                var testRewrite = new Ajax.Request('public/', {
-                    method : 'get',
-                    onComplete : function(response){
-                        if(404 === response.status){
-                            var html = '<div class="testLine error">\
-                                <div class="testName"><span>-</span>RewriteRule does not seem to work</div>\
-                                <div class="testStatus">error</div>\
-                                <div class="testDescription  visible">Testing access to <b>public/</b> should give an empty link page but gives a 404, which seems to indicate that your server is not configure to support RewriteRules. If you are using <b>Apache</b>, make sure the ModRewrite is active. For other servers, check pydio install folder where you may find proper configuration files (web.config.sample, nginx.sample)</div>\
-                                <div class="testClear"></div>\
-                            </div>';
-                            $$('div.testList')[0].insert({top:html});
-                        }
-                    }
-                });
-                */
-
-                $$('div.testName').invoke("observe", "click", function(event){
-                    var target = event.target;
-                    if(target.tagName.toLowerCase() == "span") target = target.up("div.testName");
-                    target.next("div.testDescription").toggleClassName("visible");
-                    if(target.next("div.testDescription").hasClassName("visible")){
-                        target.down("span").update("-");
-                    }else{
-                        target.down("span").update("+");
-                    }
-                });
-                var resize = function(){
-                    var h1 = document.viewport.getHeight() - 120 ;
-                    var h = h1 - 80;
-                    $$("div.mainContainer")[0].setStyle({height:h1+'px'});
-                    $$("div.testList")[0].setStyle({height:h + 'px'});
-                };
-                Event.observe(window, "resize", resize);
-                resize();
+                }
+                c.sendAsync();
             </script>
         </div>
 
