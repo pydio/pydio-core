@@ -1,6 +1,11 @@
 import GraphPanel from './GraphPanel'
 import ActionsPanel from './ActionsPanel'
 const debounce = require('lodash.debounce')
+const React = require('react')
+const {FontIcon, Popover, Paper, Avatar, CardTitle} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+const MetaCacheService = require('pydio/http/meta-cache-service')
+const PydioApi = require('pydio/http/api')
 
 class UserAvatar extends React.Component{
 
@@ -87,7 +92,10 @@ class UserAvatar extends React.Component{
         }, function(transport){
             const data = transport.responseJSON;
             const {user, graph, error} = data;
-            if(error) return;
+            if(error) {
+                this.cache.setKey(namespace, userId, {});
+                return;
+            }
 
             let avatarUrl;
             const avatarId = user.avatar || null;
@@ -120,7 +128,6 @@ class UserAvatar extends React.Component{
             get_action: 'get_avatar_url',
             userid: this.props.userId
         }, function (transport) {
-//            this.cache.setKey(namespace, this.props.userId, {label: this.state.label, avatar:transport.responseText, graph:this.state.graph});
             this.setState({avatar: transport.responseText});
         }.bind(this));
     }
@@ -143,12 +150,12 @@ class UserAvatar extends React.Component{
         }
         if(displayAvatar && !avatar && label && (!displayLabel || useDefaultAvatar) ){
             if(richCard){
-                avatarIcon  = <MaterialUI.FontIcon className="mdi mdi-account" style={{color:this.props.muiTheme.palette.primary1Color}} />;
+                avatarIcon  = <FontIcon className="mdi mdi-account" style={{color:this.props.muiTheme.palette.primary1Color}} />;
                 avatarColor = '#ECEFF1';
             }else{
                 avatarColor     = this.props.muiTheme.palette.primary1Color;
                 if(this.props.icon){
-                    avatarIcon = <MaterialUI.FontIcon className={this.props.icon}/>;
+                    avatarIcon = <FontIcon className={this.props.icon}/>;
                 }else{
                     avatarContent   = label.toUpperCase().substring(0,2);
                 }
@@ -189,7 +196,7 @@ class UserAvatar extends React.Component{
             }
 
             popover = (
-                <MaterialUI.Popover
+                <Popover
                     open={this.state.showPopover}
                     anchorEl={this.state.popoverAnchor}
                     onRequestClose={() => {this.setState({showPopover: false})}}
@@ -197,22 +204,22 @@ class UserAvatar extends React.Component{
                     targetOrigin={{horizontal:"right",vertical:"center"}}
                     useLayerForClickAway={false}
                 >
-                    <MaterialUI.Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}} onMouseOver={onMouseOverInner}  onMouseOut={onMouseOut}>
+                    <Paper zDepth={2} style={{width: 220, height: 320, overflowY: 'auto'}} onMouseOver={onMouseOverInner}  onMouseOut={onMouseOut}>
                         <UserAvatar {...this.props} richCard={true} richOnHover={false} cardSize={220}/>
-                    </MaterialUI.Paper>
-                </MaterialUI.Popover>
+                    </Paper>
+                </Popover>
             );
 
         }
 
         const avatarComponent = (
-            <MaterialUI.Avatar
+            <Avatar
                 src={avatar}
                 icon={avatarIcon}
                 size={avatarSize}
                 style={this.props.avatarOnly ? this.props.style : avatarStyle}
                 backgroundColor={avatarColor}
-            >{avatarContent}</MaterialUI.Avatar>
+            >{avatarContent}</Avatar>
         );
 
         if(this.props.avatarOnly){
@@ -225,7 +232,7 @@ class UserAvatar extends React.Component{
                 {displayLabel && !richCard && <div
                     className={labelClassName}
                     style={labelStyle}>{label}</div>}
-                {displayLabel && richCard && <MaterialUI.CardTitle title={label} subtitle={userType}/>}
+                {displayLabel && richCard && <CardTitle title={label} subtitle={userType}/>}
                 {richCard && user && <ActionsPanel {...this.state} {...this.props} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {graph && <GraphPanel graph={graph} {...this.props} userLabel={label} reloadAction={reloadAction} onEditAction={onEditAction}/>}
                 {this.props.children}
@@ -243,6 +250,7 @@ UserAvatar.propTypes = {
     userLabel:React.PropTypes.string,
     icon:React.PropTypes.string,
     richCard: React.PropTypes.bool,
+    richOnHover: React.PropTypes.bool,
 
     // Wll add an action panel to the card
     userEditable: React.PropTypes.bool,
@@ -273,6 +281,6 @@ UserAvatar.defaultProps = {
     labelClassName:'user-label'
 };
 
-UserAvatar = MaterialUI.Style.muiThemeable()(UserAvatar);
+UserAvatar = muiThemeable()(UserAvatar);
 
 export {UserAvatar as default}

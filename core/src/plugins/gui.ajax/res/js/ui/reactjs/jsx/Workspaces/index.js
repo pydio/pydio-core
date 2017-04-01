@@ -12,33 +12,31 @@ import LeftPanel from './leftnav/LeftPanel'
 import DynamicLeftPanel from './leftnav/DynamicLeftPanel'
 import UserWidget from './leftnav/UserWidget'
 
-window.PydioWorkspaces = {
-    OpenNodesModel      : OpenNodesModel,
-    MainFilesList       : MainFilesList,
-    EditionPanel        : EditionPanel,
-    Breadcrumb          : Breadcrumb,
-    SearchForm          : SearchForm,
-    FilePreview         : FilePreview,
-    FSTemplate          : FSTemplate,
-    WorkspacesList      : WorkspacesList,
-    WorkspacesListMaterial,
-    LeftPanel           : LeftPanel,
-    DynamicLeftPanel    : DynamicLeftPanel,
-    UserWidget          : UserWidget
-}
-
 import InfoPanel from './detailpanes/InfoPanel'
 import InfoPanelCard from './detailpanes/InfoPanelCard'
-import GenericMultiple from './detailpanes/GenericMultiple'
-import GenericFile from './detailpanes/GenericFile'
-import GenericDir from './detailpanes/GenericDir'
-import RootNode from './detailpanes/RootNode'
+import InfoGenericMultiple from './detailpanes/GenericMultiple'
+import InfoGenericFile from './detailpanes/GenericFile'
+import InfoGenericDir from './detailpanes/GenericDir'
+import InfoRootNode from './detailpanes/RootNode'
 
-window.PydioDetailPanes = {
-    InfoPanel: InfoPanel,
-    InfoPanelCard: InfoPanelCard,
-    GenericMultiple: GenericMultiple,
-    GenericFile: GenericFile,
-    GenericDir: GenericDir,
-    RootNode:RootNode
-};
+window.PydioWorkspaces = {
+    OpenNodesModel,
+    MainFilesList,
+    EditionPanel,
+    Breadcrumb,
+    SearchForm,
+    FilePreview,
+    FSTemplate,
+    WorkspacesList,
+    WorkspacesListMaterial,
+    LeftPanel,
+    DynamicLeftPanel,
+    UserWidget,
+
+    InfoPanel,
+    InfoPanelCard,
+    InfoGenericMultiple,
+    InfoGenericFile,
+    InfoGenericDir,
+    InfoRootNode
+}

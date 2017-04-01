@@ -174,7 +174,7 @@
 
             return (
 
-                <PydioDetailPanes.InfoPanelCard title={label} icon="pulse" iconColor="#F57C00">
+                <PydioWorkspaces.InfoPanelCard title={label} icon="pulse" iconColor="#F57C00">
                     <div style={{padding: 0}}>
                         <PydioComponents.NodeListCustomProvider
                             pydio={pydio}
@@ -193,7 +193,7 @@
                             defaultSortingInfo={{attribute : 'event_time',sortType:'number',direction : 'desc'}}
                         />
                     </div>
-                </PydioDetailPanes.InfoPanelCard>
+                </PydioWorkspaces.InfoPanelCard>
 
             );
 

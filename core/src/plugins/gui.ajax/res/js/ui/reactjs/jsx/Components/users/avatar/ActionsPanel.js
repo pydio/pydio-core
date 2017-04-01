@@ -1,4 +1,9 @@
 import AddressBook from '../addressbook/AddressBook'
+const React = require('react')
+const {UsersApi} = require('pydio/http/users-api')
+const ResourcesManager = require('pydio/http/resources-manager')
+const {IconButton, Popover} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
 
 class ActionsPanel extends React.Component{
 
@@ -10,13 +15,13 @@ class ActionsPanel extends React.Component{
     onTeamSelected(item){
         this.setState({showPicker: false});
         if(item.getType() === 'group' && item.getId().indexOf('/AJXP_TEAM/') === 0){
-            PydioUsers.Client.addUserToTeam(item.getId().replace('/AJXP_TEAM/', ''), this.props.userId, this.props.reloadAction);
+            UsersApi.addUserToTeam(item.getId().replace('/AJXP_TEAM/', ''), this.props.userId, this.props.reloadAction);
         }
     }
     
     onUserSelected(item){
         this.setState({showPicker: false});
-        PydioUsers.Client.addUserToTeam(this.props.team.id, item.getId(), this.props.reloadAction);
+        UsersApi.addUserToTeam(this.props.team.id, item.getId(), this.props.reloadAction);
     }
 
     openPicker(event){
@@ -64,7 +69,7 @@ class ActionsPanel extends React.Component{
         return (
             <div style={{textAlign:'center', marginBottom: 16}}>
                 {actions.map(function(a){
-                    return <MaterialUI.IconButton
+                    return <IconButton
                         key={a.key}
                         style={styles.button}
                         iconStyle={styles.icon}
@@ -73,7 +78,7 @@ class ActionsPanel extends React.Component{
                         onTouchTap={a.callback}
                     />
                 })}
-                <MaterialUI.Popover
+                <Popover
                     open={this.state.showPicker}
                     anchorEl={this.state.pickerAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
@@ -90,8 +95,8 @@ class ActionsPanel extends React.Component{
                             usersOnly={this.props.team ? true: false}
                         />
                     </div>
-                </MaterialUI.Popover>
-                <MaterialUI.Popover
+                </Popover>
+                <Popover
                     open={this.state.showMailer}
                     anchorEl={this.state.mailerAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
@@ -107,7 +112,7 @@ class ActionsPanel extends React.Component{
                             onDismiss={() => {this.setState({showMailer: false})}}
                         />}
                     </div>
-                </MaterialUI.Popover>
+                </Popover>
             </div>
         );
 
@@ -115,6 +120,6 @@ class ActionsPanel extends React.Component{
 
 }
 
-ActionsPanel = MaterialUI.Style.muiThemeable()(ActionsPanel)
+ActionsPanel = muiThemeable()(ActionsPanel)
 
 export {ActionsPanel as default}

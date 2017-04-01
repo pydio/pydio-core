@@ -58,7 +58,8 @@ const AsyncComponent = React.createClass({
     render: function() {
         if(this.state && this.state.loaded) {
             const nsObject = window[this.props.namespace];
-            if(nsObject && nsObject[this.props.componentName]){
+            const component = FuncUtils.getFunctionByName(this.props.componentName, window[this.props.namespace]);
+            if(component){
                 let props = {...this.props};
                 if(props.loaderStyle){
                     delete props['loaderStyle'];
@@ -67,7 +68,7 @@ const AsyncComponent = React.createClass({
                     props = Object.assign(props, this.props.modalData.payload);
                 }
                 props['ref'] = 'component';
-                return React.createElement(nsObject[this.props.componentName], props);
+                return React.createElement(component, props);
             }else{
                 return <div>Component {this.props.namespace}.{this.props.componentName} not found!</div>;
             }

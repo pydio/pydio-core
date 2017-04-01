@@ -43,6 +43,7 @@
     "react-tap-event-plugin": "^2.0.1",
     "reactify": "^1.1.1",
     "redux": "*",
+    "systemjs": "^0.20.11",
     "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {

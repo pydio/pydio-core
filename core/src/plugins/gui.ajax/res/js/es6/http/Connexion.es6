@@ -88,7 +88,7 @@ class Connexion{
 	 */
 	addParameter(paramName, paramValue){
         if(this._parameters.get(paramName) && paramName.endsWith('[]')){
-            var existing =  this._parameters.get(paramName);
+            let existing =  this._parameters.get(paramName);
             if(!existing instanceof Array) {
                 existing = [existing];
             }

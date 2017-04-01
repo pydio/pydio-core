@@ -257,7 +257,7 @@
                             paneInfo='{"namespace":"UserAccount", "componentName":"WebDAVPane"}'/>
         </component_config>
         <component_config className="InfoPanel">
-            <infoPanel mime="ajxp_root_node" reactComponent="PydioDetailPanes.RootNode" weight="-1000"/>
+            <infoPanel mime="ajxp_root_node" reactComponent="PydioWorkspaces.InfoRootNode" weight="-1000"/>
         </component_config>
     </client_configs>
 </registry_contributions>

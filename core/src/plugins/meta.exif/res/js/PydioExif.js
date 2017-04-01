@@ -106,9 +106,9 @@
                 return null;
             }
             return (
-                <PydioDetailPanes.InfoPanelCard title="Exif Data" actions={actions} icon="camera" iconColor="#607d8b">
+                <PydioWorkspaces.InfoPanelCard title="Exif Data" actions={actions} icon="camera" iconColor="#607d8b">
                     {items}
-                </PydioDetailPanes.InfoPanelCard>
+                </PydioWorkspaces.InfoPanelCard>
             );
 
         }

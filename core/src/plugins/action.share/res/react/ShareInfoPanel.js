@@ -180,7 +180,7 @@
                                 style={{flex:1, display:'flex', alignItems:'center'}}
                                 labelStyle={{fontSize: 15, paddingLeft: 10}}
                                 avatarSize={26}
-                                richOnHover={u.TYPE !== 'group'}
+                                richOnHover={u.TYPE !== 'group' && u.ID.indexOf('/AJXP_TEAM/')!== 0}
                             />
                         </div>
                     );
@@ -266,9 +266,9 @@
             ];
 
             return (
-                <PydioDetailPanes.InfoPanelCard title={this.props.pydio.MessageHash['share_center.50']} actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
+                <PydioWorkspaces.InfoPanelCard title={this.props.pydio.MessageHash['share_center.50']} actions={actions} icon="share-variant" iconColor="#009688" iconStyle={{fontSize:13, display:'inline-block', paddingTop:3}}>
                     <InfoPanel {...this.props}/>
-                </PydioDetailPanes.InfoPanelCard>
+                </PydioWorkspaces.InfoPanelCard>
             );
 
         }

@@ -3,10 +3,21 @@
     <client_settings>
         <resources>
             <i18n namespace="ajax_gui" path="plugins/gui.ajax/res/i18n"/>
-            <js file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js" className="React"
-                fallbackCondition="!window.addEventListener" fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"/>
-            <js className="PydioCoreActions" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioCoreActions.js" depends="React"/>
-            <js className="PydioForm" file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"/>
+            <js
+                className="React"
+                file="plugins/gui.ajax/res/js/vendor/nodejs/bundle.prod.min.js"
+                fallbackCondition="!window.addEventListener"
+                fallbackFile="plugins/gui.ajax/res/js/vendor/nodejs/bundle.legacy.min.js"
+            />
+            <js
+                className="PydioCoreActions"
+                file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioCoreActions.js"
+                depends="React"
+            />
+            <js
+                className="PydioForm"
+                file="plugins/gui.ajax/res/js/ui/reactjs/build/ReactFormComponents.js"
+            />
             <js
                 className="PydioReactUI"
                 file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioReactUI.min.js"
@@ -14,14 +25,26 @@
                 fallbackCondition="pydio.Parameters.get('debugMode')"
                 depends="React"
             />
-            <js className="PydioComponents" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.min.js" depends="React"
-                fallbackCondition="pydio.Parameters.get('debugMode')" fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js"
+            <js
+                className="PydioComponents"
+                file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.min.js"
+                depends="React"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioComponents.js"
             />
-            <js className="PydioHOCs" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioHOCs.min.js" depends="React"
-                fallbackCondition="pydio.Parameters.get('debugMode')" fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioHOCs.js"
+            <js
+                className="PydioHOCs"
+                file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioHOCs.min.js"
+                depends="React"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioHOCs.js"
             />
-            <js className="PydioWorkspaces" file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.min.js" depends="React,PydioComponents,PydioHOCs,PydioTasks"
-                fallbackCondition="pydio.Parameters.get('debugMode')" fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js"
+            <js
+                className="PydioWorkspaces"
+                file="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.min.js"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
+                fallbackFile="plugins/gui.ajax/res/js/ui/reactjs/build/PydioWorkspaces.js"
+                depends="React,PydioComponents,PydioHOCs,PydioTasks"
             />
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>

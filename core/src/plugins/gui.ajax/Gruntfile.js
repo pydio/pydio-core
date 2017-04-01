@@ -96,7 +96,10 @@ module.exports = function(grunt) {
                     alias:[
                         './res/js/core/http/Connexion.js:pydio/http/connexion',
                         './res/js/core/PydioBootstrap.js:pydio-bootstrap'
-                    ]
+                    ],
+                    browserifyOptions: {
+                        debug: true
+                    }
                 },
                 files: {
                     'res/js/vendor/nodejs/boot.prod.js': 'res/js/vendor/nodejs/boot.js',
@@ -106,7 +109,10 @@ module.exports = function(grunt) {
                 options:{
                     alias: Object.keys(PydioCoreRequires).map(function(key){
                         return './res/js/core/' + key + ':' + PydioCoreRequires[key];
-                    })
+                    }),
+                    browserifyOptions: {
+                        debug: true
+                    }
                 },
                 files: {
                     'res/js/core/PydioCore.js': 'res/js/core/index.js',
@@ -188,7 +194,7 @@ module.exports = function(grunt) {
                     'res/js/es6/*.es6',
                     'res/js/es6/**/*.es6'
                 ],
-                tasks:['babel:dist'],
+                tasks:['babel:dist', 'browserify:core'],
                 options:{
                     spawn:false
                 }

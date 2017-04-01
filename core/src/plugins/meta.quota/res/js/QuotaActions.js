@@ -103,12 +103,12 @@
         render: function(){
             let model = Model.getInstance();
             return (
-                <PydioDetailPanes.InfoPanelCard title={this.props.pydio.MessageHash['meta.quota.4']} icon="speedometer" iconColor="#1565c0">
+                <PydioWorkspaces.InfoPanelCard title={this.props.pydio.MessageHash['meta.quota.4']} icon="speedometer" iconColor="#1565c0">
                     <div>{model.getText()}</div>
                     <div style={{paddingBottom: 20}}>
                         <MaterialUI.LinearProgress mode="determinate" min={0} max={model.getTotal()} value={model.getUsage()}/>
                     </div>
-                </PydioDetailPanes.InfoPanelCard>
+                </PydioWorkspaces.InfoPanelCard>
             );
         }
 

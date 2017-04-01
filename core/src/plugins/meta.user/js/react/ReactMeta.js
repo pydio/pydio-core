@@ -289,7 +289,7 @@
                 this.setState({loading:this.state.loading - 1});
                 let suggestedTags = transport.responseJSON;
                 callback(suggestedTags);
-            }.bind(this));
+            });
         },
 
         loadBuffered: function(value, timeout) {
@@ -633,13 +633,13 @@
             );
 
             return (
-                <PydioDetailPanes.InfoPanelCard title={"Metadata"} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
+                <PydioWorkspaces.InfoPanelCard title={"Metadata"} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
                     <UserMetaPanel
                         ref="panel"
                         node={this.props.node}
                         editMode={this.state.editMode}
                     />
-                </PydioDetailPanes.InfoPanelCard>
+                </PydioWorkspaces.InfoPanelCard>
             );
         }
 

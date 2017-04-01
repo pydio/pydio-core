@@ -17,6 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+import XMLUtils from '../util/XMLUtils'
 /**
  * API Client
  */
@@ -94,18 +95,6 @@ class PydioApi{
             };
             let c = new Connexion();
             return c.uploadFile(file, fileParameterName, uploadUrl, onComplete, localError, onProgress, xhrSettings);
-
-        }else if(window.jQuery){
-
-            let formData = new FormData();
-            formData.append(fileParameterName, file);
-            return jQuery.ajax(uploadUrl, {
-                method:'POST',
-                data:formData,
-                complete:onComplete,
-                error:onError,
-                progress:onProgress
-            });
 
         }
 

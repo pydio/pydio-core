@@ -18,10 +18,14 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import XMLUtils from '../util/XMLUtils'
+const SystemJS = require('systemjs');
+
 /**
  * A manager that can handle the loading of JS, CSS and checks dependencies
  */
 class ResourcesManager{
+
 	/**
 	 * Constructor
 	 */
@@ -142,43 +146,13 @@ class ResourcesManager{
      * @param callback Function
      * @param aSync Boolean
 	 */
-	loadJSResource(fileName, className, callback, aSync){
+	loadJSResource(fileName, className, callback, aSync = true){
 
-		if(!window[className]){
-			if(typeof(className)!='function' || typeof(className.prototype)!='object'){
-                var registry = ResourcesManager.__asyncCallbacks;
-                if(aSync && registry && registry.get(fileName) && registry.get(fileName)){
-                    // Already loading, just register a callback and return
-                    this.wrapCallback(callback?callback:function(){}, fileName);
-                    return;
-                }
-                PydioApi.loadLibrary(fileName, (aSync && callback)?this.wrapCallback(callback, fileName):callback, aSync);
-			}
-		}else if(callback){
-            callback();
+	    if(!ResourcesManager.__configsParsed) {
+	        ResourcesManager.loadAutoLoadResources();
         }
+	    SystemJS.import(className).then(callback);
 	}
-
-    wrapCallback(callback, fileName){
-        if(!ResourcesManager.__asyncCallbacks) ResourcesManager.__asyncCallbacks = new Map();
-        var registry = ResourcesManager.__asyncCallbacks;
-        if(!registry.get(fileName)) registry.set(fileName, []);
-        registry.get(fileName).push(callback);
-        return function(){
-            while(registry.get(fileName).length){
-                var cb = registry.get(fileName).pop();
-                cb();
-            }
-        };
-
-    }
-
-    loadWebComponents(fileNames, callback){
-        if(!Polymer){
-            throw Error('Cannot find Polymer library!');
-        }
-        Polymer.import(fileNames, callback);
-    }
 
 	/**
 	 * Load a CSS file
@@ -215,15 +189,13 @@ class ResourcesManager{
 	 * @param node XMLNode
 	 */
 	loadFromXmlNode(node){
-        var clForm = {};
-        var k;
+        let clForm = {}, k;
 		if(node.nodeName == "resources"){
 			for(k=0;k<node.childNodes.length;k++){
 				if(node.childNodes[k].nodeName == 'js'){
 					this.addJSResource(
                         ResourcesManager.getFileOrFallback(node.childNodes[k]),
-                        node.childNodes[k].getAttribute('className'),
-                        (node.childNodes[k].getAttribute('autoload') === true)
+                        node.childNodes[k].getAttribute('className')
                     );
 				}else if(node.childNodes[k].nodeName == 'css'){
 					this.addCSSResource(ResourcesManager.getFileOrFallback(node.childNodes[k]));
@@ -295,34 +267,35 @@ class ResourcesManager{
 	 * Check if resources are tagged autoload and load them
 	 * @param registry DOMDocument XML Registry
 	 */
-	static loadAutoLoadResources(registry){
-        var manager = new ResourcesManager();
-		var jsNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js');
-        var node;
-        ResourcesManager.__modules = new Map();
-        ResourcesManager.__dependencies = new Map();
-        ResourcesManager.__components = new Map();
+	static loadAutoLoadResources(registry = null){
+	    if(!registry){
+	        registry = window.pydio.Registry.getXML();
+        }
+        const manager = new ResourcesManager();
+		const jsNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/js');
+        let node;
+
+        let sysjsMap = {};
+        let sysjsMeta = {};
+
         for(node of jsNodes){
-            ResourcesManager.__modules.set(node.getAttribute('className'), ResourcesManager.getFileOrFallback(node));
-            if(node.getAttribute('autoload') === "true"){
-                manager.loadJSResource(ResourcesManager.getFileOrFallback(node), node.getAttribute('className'), null, false);
-            }
+            const namespace = node.getAttribute('className');
+            const filepath  = ResourcesManager.getFileOrFallback(node);
+            let deps = [];
             if(node.getAttribute('depends')){
-                ResourcesManager.__dependencies.set(node.getAttribute('className'), node.getAttribute('depends').split(','));
+                deps = node.getAttribute('depends').split(',');
             }
+            sysjsMap[namespace] = filepath;
+            sysjsMeta[namespace] = {format: 'global', deps: deps};
         }
-        var compNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/component');
-        for(node of compNodes){
-            ResourcesManager.__components.set(node.getAttribute('componentName'), ResourcesManager.getFileOrFallback(node));
-            if(node.getAttribute('autoload') === "true"){
-                manager.loadWebComponents([ResourcesManager.getFileOrFallback(node)]);
-            }
-        }
-		var imgNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
+        SystemJS.config({map: sysjsMap, meta:sysjsMeta});
+        ResourcesManager.__configsParsed = true;
+
+		const imgNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/img_library');
         for(node of imgNodes){
             ResourcesManager.addImageLibrary(node.getAttribute('alias'), node.getAttribute('path'));
         }
-		var cssNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
+		const cssNodes = XMLUtils.XPathSelectNodes(registry, 'plugins/*/client_settings/resources/css[@autoload="true"]');
         for(node of cssNodes){
 			manager.loadCSSResource(ResourcesManager.getFileOrFallback(node));
         }
@@ -342,118 +315,42 @@ class ResourcesManager{
      * @returns {Map|boolean}
      */
     static moduleIsAvailable(className){
-        return ResourcesManager.__modules && ResourcesManager.__modules.has(className);
-    }
-
-    /**
-     *
-     * @param className String
-     * @param dependencies Set
-     */
-    static findDependencies(className, dependencies){
-        if(ResourcesManager.__dependencies.has(className)){
-            var deps = ResourcesManager.__dependencies.get(className);
-            deps.forEach(function(dep){
-                if(!dependencies.has(dep) && ResourcesManager.__modules.has(dep)){
-                    dependencies.add(dep);
-                    ResourcesManager.findDependencies(dep, dependencies);
-                }
-            });
-        }
+        const config = SystemJS.getConfig();
+        return config.map && config.map[className];
     }
 
     static loadClassesAndApply(classNames, callbackFunc){
-        if(!ResourcesManager.__modules){
-            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
+        if(!ResourcesManager.__configsParsed){
+            ResourcesManager.loadAutoLoadResources();
         }
-        var modules = new Map();
-        classNames.forEach(function(c){
-            if(!window[c] && ResourcesManager.__modules.has(c)){
-                var deps = new Set();
-                ResourcesManager.findDependencies(c, deps);
-                if(deps.size){
-                    deps.forEach(function(d){
-                        modules.set(d, {
-                            className:d,
-                            fileName:ResourcesManager.__modules.get(d),
-                            require:ResourcesManager.__modules.get(d).replace('.js', '')
-                        });
-                    });
-                }
-                modules.set(c, {
-                    className:c,
-                    fileName:ResourcesManager.__modules.get(c),
-                    require:ResourcesManager.__modules.get(c).replace('.js', '')
-                });
-            }
-        });
-        if(!modules.size){
+        Promise.all(classNames.map((c) => {return SystemJS.import(c)})).then(() => {
             callbackFunc();
-            return;
-        }
+        }).catch((reason) => {
+            console.error('Failed Loading ' + classNames.join(', ') + ' : ' + reason);
+        });
+        return;
 
-        if(modules.size == 1){
-            ResourcesManager.detectModuleToLoadAndApply(modules.keys().next().value, callbackFunc);
-            return;
-        }
-        if(window.requirejs){
-            // Let require handle multiple async
-            var requires = [];
-            modules.forEach(function(e){requires.push(e.require);});
-            requirejs(requires, callbackFunc);
-        }else{
-            // Load sync and apply the callback manually
-            var loader = new ResourcesManager();
-            let it = modules.values();
-            let cb = function(){
-                let object = it.next();
-                if(object.value){
-                    loader.loadJSResource(object.value.fileName, object.value.className, cb, true);
-                }else{
-                    callbackFunc();
-                }
-            };
-            cb();
-        }
     }
 
     static detectModuleToLoadAndApply(callbackString, callbackFunc, async = true){
-        if(!ResourcesManager.__modules){
-            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
+        if(!ResourcesManager.__configsParsed){
+            ResourcesManager.loadAutoLoadResources();
         }
-        var className = callbackString.split('.',1).shift();
-        if(!window[className] && ResourcesManager.__modules.has(className)){
-            if(!async){
-                let loader = new ResourcesManager();
-                loader.loadJSResource(ResourcesManager.__modules.get(className), className, null, false);
-                return callbackFunc();
-            }
-            if(window.requirejs){
-                requirejs([ResourcesManager.__modules.get(className).replace('.js','')], callbackFunc);
-            }else{
-                let loader = new ResourcesManager();
-                loader.loadJSResource(ResourcesManager.__modules.get(className), className, callbackFunc, true);
-            }
+        const className = callbackString.split('.',1).shift();
+        if(async){
+            SystemJS.import(className).then(callbackFunc);
         }else{
-            return callbackFunc();
+            ResourcesManager.loadScriptSync(className, callbackFunc);
         }
+        return;
     }
 
-    static loadWebComponentsAndApply(componentsList, callbackFunc){
-        if(!ResourcesManager.__modules){
-            ResourcesManager.loadAutoLoadResources(pydio.Registry.getXML());
-        }
-        var files = [];
-        componentsList.forEach(function(v){
-            if(ResourcesManager.__components.has(v)) {
-                files.push(ResourcesManager.__components.get(v));
-            }
-        });
-        if(files.length){
-            var manager = new ResourcesManager();
-            manager.loadWebComponents(files, callbackFunc);
-        }
+    static async loadScriptSync(name, callback){
+        await SystemJS.import(name);
+        callback();
     }
 }
+
+ResourcesManager.__configsParsed = false;
 
 export {ResourcesManager as default}

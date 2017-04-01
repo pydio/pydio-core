@@ -114,8 +114,9 @@
 
             let templates = this.state.displayData.TEMPLATES.map(function(tpl){
                 let component = tpl.COMPONENT;
-                let namespace = component.split(".")[0];
-                let name = component.split(".")[1];
+                const parts = component.split('.', 2);
+                let namespace = parts[0];
+                let name = parts[1];
                 return (
                     <PydioReactUI.AsyncComponent
                         {...this.state.displayData.DATA}
