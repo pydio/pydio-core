@@ -1,4 +1,0 @@
-js/vendor/es6/browser-polyfill.js
-js/vendor/nodejs/boot.prod.js
-js/core/http/Connexion.js
-js/core/PydioBootstrap.js

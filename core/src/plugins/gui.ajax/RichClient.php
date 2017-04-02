@@ -295,10 +295,10 @@ class RichClient extends Plugin
             if (!isSet($mess)) {
                 $mess = LocaleService::getMessages();
             }
-            if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html")) {
-                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.html");
+            if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.php")) {
+                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui_debug.php");
             } else {
-                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.html");
+                include(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/html/gui_debug.php");
             }
         } else {
             if (is_file(AJXP_INSTALL_PATH."/plugins/gui.ajax/res/themes/$crtTheme/html/gui.html")) {

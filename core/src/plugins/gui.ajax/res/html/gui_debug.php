@@ -26,7 +26,7 @@
     // Initialize booter. Do not remove the commented line AJXP_JSON_START_PARAMETERS, as it is
     // dynamically replaced by the application!
     var pydio, startParameters = {}, MessageHash={};
-    <?php if($JSON_START_PARAMETERS) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
+    <?php if(isSet($JSON_START_PARAMETERS)) print "startParameters = ".$JSON_START_PARAMETERS.";"; ?>
     window.pydioBootstrap = new PydioBootstrap(startParameters);
 
 </script>
