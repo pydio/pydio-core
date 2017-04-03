@@ -18,23 +18,18 @@ const {FloatingActionButton} = MaterialUI;
 
 import makeRotate from './make-rotate';
 
-import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
-
 class Button extends React.Component {
 
     render() {
         const {rotated} = this.props
 
-        let icon = <NavigationClose />
+        let iconClassName = 'mdi mdi-close'
         if (!rotated) {
-            icon = <EditorModeEdit />
+            iconClassName = 'mdi mdi-pencil'
         }
 
         return (
-            <FloatingActionButton {...this.props}>
-                {icon}
-            </FloatingActionButton>
+            <FloatingActionButton {...this.props} iconClassName={iconClassName}/>
         );
     }
 };

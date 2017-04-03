@@ -447,7 +447,7 @@ class Connexion{
                 alert('error loading '+fileName+':'+ e.message);
                 if(console) console.error(e);
             }
-            pydio.fire("server_answer");
+            if(pydio) pydio.fire("server_answer");
         }
 
         if(aSync){

@@ -13,10 +13,12 @@
                 className="PydioCoreActions"
                 file="plugins/gui.ajax/res/build/PydioCoreActions.min.js"
                 depends="React"
+                expose="pydio/actions/core"
             />
             <js
                 className="PydioForm"
                 file="plugins/gui.ajax/res/build/PydioForm.js"
+                expose="pydio/ui/form"
             />
             <js
                 className="PydioReactUI"
@@ -24,6 +26,7 @@
                 fallbackFile="plugins/gui.ajax/res/build/PydioReactUI.js"
                 fallbackCondition="pydio.Parameters.get('debugMode')"
                 depends="React"
+                expose="pydio/ui/boot"
             />
             <js
                 className="PydioComponents"
@@ -31,6 +34,7 @@
                 depends="React"
                 fallbackCondition="pydio.Parameters.get('debugMode')"
                 fallbackFile="plugins/gui.ajax/res/build/PydioComponents.js"
+                expose="pydio/ui/components"
             />
             <js
                 className="PydioHOCs"
@@ -38,6 +42,7 @@
                 depends="React"
                 fallbackCondition="pydio.Parameters.get('debugMode')"
                 fallbackFile="plugins/gui.ajax/res/build/PydioHOCs.js"
+                expose="pydio/ui/hoc"
             />
             <js
                 className="PydioWorkspaces"
@@ -45,6 +50,7 @@
                 fallbackCondition="pydio.Parameters.get('debugMode')"
                 fallbackFile="plugins/gui.ajax/res/build/PydioWorkspaces.js"
                 depends="React,PydioComponents,PydioHOCs,PydioTasks"
+                expose="pydio/ui/workspaces"
             />
             <css file="plugins/gui.ajax/res/mui/pydio-mui.css" autoload="true"/>
         </resources>

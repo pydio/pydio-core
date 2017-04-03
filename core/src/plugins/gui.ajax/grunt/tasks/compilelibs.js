@@ -8,12 +8,12 @@ module.exports = function(grunt, options){
 
     grunt.registerTask('compilelibs', 'Process all libs through babel, browserify and uglify', function(n){
         grunt.option('galvanizeConfig', [
-            {configs:{libName:'Workspaces'}},
-            {configs:{libName:'HOCs'}},
-            {configs:{libName:'ReactUI'}},
-            {configs:{libName:'Form'}},
-            {configs:{libName:'CoreActions'}},
-            {configs:{libName:'Components'}}
+            {configs:{libName:'Workspaces', alias:'pydio/ui/workspaces'}},
+            {configs:{libName:'HOCs', alias:'pydio/ui/hoc'}},
+            {configs:{libName:'ReactUI', alias:'pydio/ui/boot'}},
+            {configs:{libName:'Form', alias:'pydio/ui/form'}},
+            {configs:{libName:'CoreActions', alias:'pydio/actions/core'}},
+            {configs:{libName:'Components', alias:'pydio/ui/components'}}
         ]);
         grunt.task.run('galvanize:compilelib');
     });

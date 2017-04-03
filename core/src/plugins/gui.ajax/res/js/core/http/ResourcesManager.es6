@@ -277,6 +277,7 @@ class ResourcesManager{
 
         let sysjsMap = {};
         let sysjsMeta = {};
+        let requires = {};
 
         for(node of jsNodes){
             const namespace = node.getAttribute('className');
@@ -284,6 +285,9 @@ class ResourcesManager{
             let deps = [];
             if(node.getAttribute('depends')){
                 deps = node.getAttribute('depends').split(',');
+            }
+            if(node.getAttribute('expose')){
+                ResourcesManager.__requires[node.getAttribute('expose')] = namespace;
             }
             sysjsMap[namespace] = filepath;
             sysjsMeta[namespace] = {format: 'global', deps: deps};
@@ -307,6 +311,25 @@ class ResourcesManager{
         }else{
             return node.getAttribute('file');
         }
+    }
+
+    static requireLib(module, promise=false){
+
+        if(window[module]) return window[module];
+        if(ResourcesManager.__requires && ResourcesManager.__requires[module]){
+            const globalNS = ResourcesManager.__requires[module];
+            if(promise){
+                return SystemJS.import(globalNS);
+            }
+            if(window[globalNS]){
+                return window[globalNS];
+            }else{
+                throw new Error('Requiring a remote lib that was not previously loaded ('+globalNS+'). You may be missing a dependency declaration in manifest, or you can use requireLib(moduleName, true) to receive a Promise.');
+            }
+        }else{
+            throw new Error('Cannot find any reference to lib ' + module);
+        }
+
     }
 
     /**
@@ -352,5 +375,6 @@ class ResourcesManager{
 }
 
 ResourcesManager.__configsParsed = false;
+ResourcesManager.__requires = {};
 
 export {ResourcesManager as default}

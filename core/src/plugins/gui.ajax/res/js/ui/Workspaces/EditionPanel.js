@@ -6,9 +6,6 @@ import { Provider, connect } from 'react-redux';
 import * as actions from './editor/actions';
 import {Editor, reducers} from './editor';
 
-import EditorModeEdit from 'material-ui/svg-icons/editor/mode-edit';
-import AVPlayArrow from 'material-ui/svg-icons/av/play-arrow';
-
 const store = createStore(reducers, {})
 
 class EditionPanel extends React.Component {

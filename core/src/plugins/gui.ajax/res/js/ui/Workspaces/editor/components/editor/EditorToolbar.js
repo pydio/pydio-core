@@ -11,10 +11,7 @@
  * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-const {AppBar, IconButton} = MaterialUI;
-
-import ContentRemove from 'material-ui/svg-icons/content/remove';
-import NavigationClose from 'material-ui/svg-icons/navigation/close';
+const {AppBar, IconButton} = require('material-ui');
 
 // Display components
 const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
@@ -28,8 +25,8 @@ const EditorToolbar = ({title, className, style, onMinimise, onClose}) => {
             style={{...style, ...outerStyle}}
             title={<span>{title}</span>}
             titleStyle={innerStyle}
-            iconElementLeft={<IconButton iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}><NavigationClose /></IconButton>}
-            iconElementRight={<IconButton iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}><ContentRemove /></IconButton>}
+            iconElementLeft={<IconButton iconClassName="mdi mdi-close" iconStyle={innerStyle} disabled={typeof onClose !== "function"} touch={true} onTouchTap={onClose}/>}
+            iconElementRight={<IconButton iconClassName="mdi mdi-window-minimize" iconStyle={innerStyle} disabled={typeof onMinimise !== "function"} touch={true} onTouchTap={onMinimise}/>}
         />
     )
 }

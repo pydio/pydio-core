@@ -22,28 +22,28 @@ import HiddenDownloadForm from './HiddenDownloadForm'
 import PydioContextProvider from './PydioContextProvider'
 import PydioContextConsumerMixin from './PydioContextConsumerMixin'
 
-window.PydioReactUI = {
-    Builder                     : Builder,
-    TemplateBuilder             : TemplateBuilder,
-    AsyncComponent              : AsyncComponent,
+export {
+    Builder,
+    TemplateBuilder,
+    AsyncComponent,
 
-    AsyncModal                  : AsyncModal,
-    ActionDialogMixin           : ActionDialogMixin,
-    CancelButtonProviderMixin   : CancelButtonProviderMixin,
-    SubmitButtonProviderMixin   : SubmitButtonProviderMixin,
-    AbstractDialogModifier      : AbstractDialogModifier,
-    Modal                       : Modal,
-    ConfirmDialog               : ConfirmDialog,
-    PromptDialog                : PromptDialog,
+    AsyncModal,
+    ActionDialogMixin,
+    CancelButtonProviderMixin,
+    SubmitButtonProviderMixin,
+    AbstractDialogModifier,
+    Modal,
+    ConfirmDialog,
+    PromptDialog,
 
-    Loader                      : Loader,
-    Router                      : Router,
-    MessageBar                  : MessageBar,
-    NetworkLoader               : NetworkLoader,
-    HiddenDownloadForm          : HiddenDownloadForm,
-    BackgroundImage             : BackgroundImage,
+    Loader,
+    Router,
+    MessageBar,
+    NetworkLoader,
+    HiddenDownloadForm,
+    BackgroundImage,
 
-    PydioContextProvider        : PydioContextProvider,
-    PydioContextConsumerMixin   : PydioContextConsumerMixin
+    PydioContextProvider,
+    PydioContextConsumerMixin
 
-};
+}

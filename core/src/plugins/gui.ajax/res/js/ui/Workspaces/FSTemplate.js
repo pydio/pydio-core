@@ -149,7 +149,7 @@ let FSTemplate = React.createClass({
                             <SearchForm {...this.props}/>
                         </div>
                         <div id="main_toolbar">
-                            <PydioMenus.ButtonMenu
+                            <PydioComponents.ButtonMenu
                                 {...this.props}
                                 buttonStyle={styles.raisedButtonStyle}
                                 buttonLabelStyle={styles.raisedButtonLabelStyle}
@@ -160,7 +160,7 @@ let FSTemplate = React.createClass({
                                 secondary={true}
                                 controller={this.props.pydio.Controller}
                             />
-                            <PydioMenus.Toolbar
+                            <PydioComponents.Toolbar
                                 {...this.props}
                                 id="main-toolbar"
                                 toolbars={mainToolbars}
@@ -173,7 +173,7 @@ let FSTemplate = React.createClass({
                                 dataModel={this.props.pydio.getContextHolder()}
                                 toolbarDisplay={true}
                             />
-                            <PydioMenus.Toolbar
+                            <PydioComponents.Toolbar
                                 {...this.props}
                                 id="display-toolbar"
                                 toolbars={["display_toolbar"]}
@@ -191,7 +191,7 @@ let FSTemplate = React.createClass({
                     style={{backgroundColor:'#eceff1'}}
                 />
                 <EditionPanel {...this.props}/>
-                <span className="context-menu"><PydioMenus.ContextMenu/></span>
+                <span className="context-menu"><PydioComponents.ContextMenu/></span>
             </div>
         );
 

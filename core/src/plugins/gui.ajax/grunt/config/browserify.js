@@ -3,6 +3,7 @@ module.exports = function(grunt, options){
     const {PydioCoreRequires,LibRequires,Externals} = require('../../res/js/dist/libdefs.js');
 
     options.libName = grunt.option('libName');
+    options.alias = grunt.option('alias');
 
     return {
         boot: {
@@ -34,7 +35,7 @@ module.exports = function(grunt, options){
         },
         dist: {
             options: {
-                alias: LibRequires.map(k => k + ':')
+                alias: LibRequires.map(k => k + ':'),
             },
             files: {
                 'res/build/bundle.prod.js': 'res/js/dist/export.js',
@@ -44,12 +45,13 @@ module.exports = function(grunt, options){
         lib: {
             options: {
                 browserifyOptions: {
-                    debug: true
+                    debug: true,
+                    standalone: 'Pydio<%= libName %>'
                 },
                 external:Externals
             },
             files: {
-                'res/build/Pydio<%= libName %>.js':'res/build/ui/<%= libName %>/index.js'
+                './res/build/Pydio<%= libName %>.js':'./res/build/ui/<%= libName %>/index.js'
             }
         }
     };

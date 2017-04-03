@@ -19,7 +19,7 @@ import InfoGenericFile from './detailpanes/GenericFile'
 import InfoGenericDir from './detailpanes/GenericDir'
 import InfoRootNode from './detailpanes/RootNode'
 
-window.PydioWorkspaces = {
+const classes = {
     OpenNodesModel,
     MainFilesList,
     EditionPanel,
@@ -40,3 +40,5 @@ window.PydioWorkspaces = {
     InfoGenericDir,
     InfoRootNode
 }
+
+export {classes as default}

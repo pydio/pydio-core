@@ -24,9 +24,16 @@ import UsersCompleter from './users/UsersCompleter'
 import UserCreationForm from './users/UserCreationForm'
 import TeamCreationForm from './users/TeamCreationForm'
 
+import ContextMenuNodeProviderMixin from './menu/ContextMenuNodeProviderMixin'
+import ButtonMenu from './menu/ButtonMenu'
+import ContextMenu from './menu/ContextMenu'
+import IconButtonMenu from './menu/IconButtonMenu'
+import MFB from './menu/MFB'
+import Toolbar from './menu/Toolbar'
+
 import AddressBook from './users/addressbook/AddressBook'
 
-window.PydioComponents = {
+const PydioComponents = {
 
     SortableList            : SortableList,
     SimpleList              : SimpleList,
@@ -58,22 +65,15 @@ window.PydioComponents = {
     UsersCompleter          : UsersCompleter,
     UserCreationForm        : UserCreationForm,
     TeamCreationForm        : TeamCreationForm,
-    AddressBook             : AddressBook
+    AddressBook             : AddressBook,
 
-};
-
-import ContextMenuNodeProviderMixin from './menu/ContextMenuNodeProviderMixin'
-import ButtonMenu from './menu/ButtonMenu'
-import ContextMenu from './menu/ContextMenu'
-import IconButtonMenu from './menu/IconButtonMenu'
-import MFB from './menu/MFB'
-import Toolbar from './menu/Toolbar'
-
-window.PydioMenus = {
     ContextMenuNodeProviderMixin: ContextMenuNodeProviderMixin,
-    ContextMenu: ContextMenu,
-    Toolbar:Toolbar,
-    ButtonMenu: ButtonMenu,
-    IconButtonMenu: IconButtonMenu,
-    MFB: MFB
+    ContextMenu             : ContextMenu,
+    Toolbar                 :Toolbar,
+    ButtonMenu              : ButtonMenu,
+    IconButtonMenu          : IconButtonMenu,
+    MFB                     : MFB
+
 };
+
+export {PydioComponents as default}
