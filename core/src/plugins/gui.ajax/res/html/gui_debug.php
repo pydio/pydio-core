@@ -17,8 +17,8 @@
     <![endif]-->
     <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/es6/browser-polyfill.js"></script>
     <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/modernizr/modernizr.min.js"></script>
-    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/vendor/nodejs/boot.prod.js"></script>
-    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/js/core/PydioCore.js"></script>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/build/boot.prod.js"></script>
+    <script language="javascript" type="text/javascript" src="plugins/gui.ajax/res/build/PydioCore.js"></script>
     <link rel="icon" type="image/x-png" href="index.php?get_action=serve_favicon">
 </head>
 <body style="overflow: hidden;" class="react-mui-context">

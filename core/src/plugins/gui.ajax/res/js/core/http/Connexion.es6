@@ -31,7 +31,7 @@ class Connexion{
 	{
         this._pydio = window.pydio;
 		this._baseUrl = baseUrl || window.ajxpServerAccessPath;
-		this._libUrl = window.ajxpResourcesFolder+'/js';
+		this._libUrl = window.ajxpResourcesFolder+'/build';
 		this._parameters = new Map();
 		this._method = 'post';
         this.discrete = false;

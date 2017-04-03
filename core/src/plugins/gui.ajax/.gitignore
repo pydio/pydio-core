@@ -1,4 +1,4 @@
-res/js/core
+res/build
 res/js/vendor/nodejs/bundle*
 res/js/vendor/nodejs/boot.prod.js
 res/js/pydio.min.js

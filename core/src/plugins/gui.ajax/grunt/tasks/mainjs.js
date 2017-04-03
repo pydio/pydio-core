@@ -1,21 +1,26 @@
 module.exports = function(grunt){
     grunt.registerTask('mainjs', [
-        'copy',
+        'copy:dndpatch',
         'rename',
-        'symlink',
-        'babel:dist',
+        // CORE
+        'babel:core',
         'env:build',
         'browserify:boot',
         'browserify:core',
-        'env:dev',
-        'uglify:js',
-        'babel:materialui',
-        'babel:pydio',
-        'env:build',
         'browserify:dist',
-        'browserify:ui',
         'env:dev',
+        'uglify:core',
         'uglify:nodejs',
-        'uglify:ui'
+        // UI
+        'compilelibs'
+
+//        'env:build',
+//        'babel:materialui',
+//        'babel:pydio',
+//        'browserify:dist',
+//        'browserify:ui',
+//        'env:dev',
+//        'uglify:nodejs',
+//        'uglify:ui'
     ]);
 };

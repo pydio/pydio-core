@@ -127,11 +127,11 @@ export default class PydioBootstrap{
 
         Connexion.updateServerAccess(this.parameters);
 
-        var cssRes = this.parameters.get("cssResources");
+        let cssRes = this.parameters.get("cssResources");
         if(cssRes) cssRes.map(this.loadCSSResource.bind(this));
 
         if(this.parameters.get('ajxpResourcesFolder')){
-            connexion._libUrl = this.parameters.get('ajxpResourcesFolder') + "/js";
+            connexion._libUrl = this.parameters.get('ajxpResourcesFolder') + "/build";
             window.ajxpResourcesFolder = this.parameters.get('ajxpResourcesFolder') + "/themes/" + this.parameters.get("theme");
         }
 
@@ -144,13 +144,13 @@ export default class PydioBootstrap{
         if(!Object.keys(MessageHash).length){
             alert('Ooups, this should not happen, your message file is empty!');
         }
-        for(var key in MessageHash){
+        for(let key in MessageHash){
             MessageHash[key] = MessageHash[key].replace("\\n", "\n");
         }
         window.zipEnabled = this.parameters.get("zipEnabled");
         window.multipleFilesDownloadEnabled = this.parameters.get("multipleFilesDownloadEnabled");
 
-        var masterClassLoaded = function(){
+        const masterClassLoaded = function(){
 
             let pydio = new Pydio(this.parameters);
             window.pydio = window.ajaxplorer = pydio;
@@ -201,13 +201,13 @@ export default class PydioBootstrap{
         const scripts = document.getElementsByTagName('script');
         for(let i=0; i<scripts.length; i++){
             const scriptTag = scripts[i];
-            if(scriptTag.src.match("/js/pydio.boot.min.js") || scriptTag.src.match("/js/vendor/nodejs/boot.prod.js")){
-                if(scriptTag.src.match("/js/pydio.boot.min.js")){
+            if(scriptTag.src.match("/build/pydio.boot.min.js") || scriptTag.src.match("/build/boot.prod.js")){
+                if(scriptTag.src.match("/build/pydio.boot.min.js")){
                     this.parameters.set("debugMode", false);
                 }else{
                     this.parameters.set("debugMode", true);
                 }
-                var src = scriptTag.src.replace('/js/vendor/nodejs/boot.prod.js','').replace('/js/pydio.boot.min.js', '');
+                let src = scriptTag.src.replace('/build/boot.prod.js','').replace('/build/pydio.boot.min.js', '');
                 if(src.indexOf("?")!=-1) src = src.split("?")[0];
                 this.parameters.set("ajxpResourcesFolder", src);
             }
@@ -217,7 +217,7 @@ export default class PydioBootstrap{
         }else{
             alert("Cannot find resource folder");
         }
-        var booterUrl = this.parameters.get("BOOTER_URL");
+        let booterUrl = this.parameters.get("BOOTER_URL");
         if(booterUrl.indexOf("?") > -1){
             booterUrl = booterUrl.substring(0, booterUrl.indexOf("?"));
         }
@@ -231,8 +231,8 @@ export default class PydioBootstrap{
      * @param fileName String
      */
     loadCSSResource(fileName){
-        var head = document.getElementsByTagName('head')[0];
-        var cssNode = document.createElement('link');
+        const head = document.getElementsByTagName('head')[0];
+        let cssNode = document.createElement('link');
         cssNode.type = 'text/css';
         cssNode.rel  = 'stylesheet';
         cssNode.href = this.parameters.get("ajxpResourcesFolder") + '/' + fileName;
