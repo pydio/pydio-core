@@ -1,4 +1,4 @@
-const {PydioCoreRequires} = require('../../res/js/dist.js');
+const {PydioCoreRequires} = require('../../res/js/dist/libdefs.js');
 
 module.exports = {
     es6 : {
