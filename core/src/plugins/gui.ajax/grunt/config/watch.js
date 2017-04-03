@@ -22,8 +22,8 @@ module.exports = {
         files: [
             'res/js/ui/reactjs/jsx/**/*.js'
         ],
-            tasks:['babel:pydio','browserify:ui'],
-            options: {
+        tasks:['babel:pydio','browserify:ui'],
+        options: {
             spawn: false
         }
     },
