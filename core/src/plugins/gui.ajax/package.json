@@ -62,6 +62,8 @@
     "grunt-env": "~0.4.4",
     "grunt-hub": "^0.7.0",
     "grunt-run": "~0.5.2",
-    "less-plugin-autoprefix": "~1.5.1"
+    "jit-grunt": "^0.10.0",
+    "less-plugin-autoprefix": "~1.5.1",
+    "load-grunt-config": "^0.19.2"
   }
 }
