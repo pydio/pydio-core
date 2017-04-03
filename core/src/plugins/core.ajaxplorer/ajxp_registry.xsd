@@ -643,6 +643,7 @@
             <xs:attribute name="className" use="required" type="xs:NCName"/>
             <xs:attribute name="file" use="required"/>
             <xs:attribute name="depends"/>
+            <xs:attribute name="expose"/>
             <xs:attribute name="fallbackCondition"/>
             <xs:attribute name="fallbackFile"/>
         </xs:complexType>
