@@ -38,7 +38,7 @@ let InfoPanelCard = React.createClass({
                 backgroundColor: themePalette.accent2Color
             };
             toolBar = (
-                <PydioMenus.Toolbar
+                <PydioComponents.Toolbar
                     toolbarStyle={tBarStyle}
                     className="primaryToolbar"
                     renderingType="button-icon"

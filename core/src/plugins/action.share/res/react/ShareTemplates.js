@@ -1,6 +1,10 @@
 (function(global){
 
-    const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = global.PydioWorkspaces;
+    const Workspaces = require('pydio/http/resources-manager').requireLib('workspaces');
+    const Components = require('pydio/http/resources-manager').requireLib('components');
+
+    const {Breadcrumb, SearchForm, MainFilesList, EditionPanel} = Workspaces;
+    const {ButtonMenu, Toolbar, ListPaginator, ReactEditorOpener} = Components;
 
     const UniqueNodeTemplateMixin = {
 
@@ -215,11 +219,11 @@
                             </div>
                         }
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
-                            <PydioMenus.ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true} controller={this.props.pydio.Controller}/>
-                            <PydioMenus.Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
+                            <ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true} controller={this.props.pydio.Controller}/>
+                            <Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
                             <div style={{flex:1}}></div>
-                            <PydioComponents.ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
-                            <PydioMenus.Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
+                            <ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
+                            <Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
                         </div>
                     </MaterialUI.Paper>
                     {this.props.children}
@@ -282,7 +286,7 @@
             if(node){
                 content = (
                     <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                        <PydioComponents.ReactEditorOpener
+                        <ReactEditorOpener
                             pydio={this.props.pydio}
                             node={node}
                             registry={this.props.pydio.Registry}
@@ -338,7 +342,7 @@
             let editor;
             if(node){
                 editor = (
-                    <PydioComponents.ReactEditorOpener
+                    <ReactEditorOpener
                         pydio={this.props.pydio}
                         node={node}
                         registry={this.props.pydio.Registry}

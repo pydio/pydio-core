@@ -1,4 +1,6 @@
 import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget} from './DND'
+const React = require('react')
+
 
 /**
  * Tree Node

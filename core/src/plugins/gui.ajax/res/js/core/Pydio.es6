@@ -33,7 +33,6 @@ class Pydio extends Observable{
         this.notify(eventName, data);
     }
 
-
     /**
      * Real initialisation sequence. Will Trigger the whole GUI building.
      * Event ajaxplorer:loaded is fired at the end.
