@@ -1,19 +1,14 @@
+const React = require('react')
+const Pydio = require('pydio')
+const {muiThemeable} = require('material-ui/styles')
 import UserWidget from './UserWidget'
 import WorkspacesList from '../wslist/WorkspacesList'
 
-let LeftPanel = React.createClass({
+let LeftPanel = ({muiTheme, style, userWidgetProps, workspacesListProps, pydio}) => {
 
-    propTypes: {
-        pydio: React.PropTypes.instanceOf(Pydio).isRequired,
-        userWidgetProps: React.PropTypes.object,
-        workspacesListProps: React.PropTypes.object,
-        style: React.PropTypes.object
-    },
-
-    render: function(){
-        const palette = this.props.muiTheme.palette;
-        const Color = MaterialUI.Color;
-        const propStyle = this.props.style || {};
+        const palette = muiTheme.palette;
+        const Color = require('color');
+        const propStyle = style || {};
         const colorHue = Color(palette.primary1Color).hsl().array()[0];
         const lightBg = new Color({h:colorHue,s:35,l:98});
         const style = {
@@ -31,12 +26,12 @@ let LeftPanel = React.createClass({
         const wsSectionTitleStyle = {
             color    : Color(palette.primary1Color).darken(0.1).alpha(0.50)
         };
-        const uWidgetProps = this.props.userWidgetProps || {};
-        const wsListProps = this.props.workspacesListProps || {};
+        const uWidgetProps = userWidgetProps || {};
+        const wsListProps = workspacesListProps || {};
         return (
             <div className="left-panel vertical_fit vertical_layout" style={style}>
                 <UserWidget
-                    pydio={this.props.pydio}
+                    pydio={pydio}
                     style={widgetStyle}
                     {...uWidgetProps}
                 />
@@ -44,16 +39,22 @@ let LeftPanel = React.createClass({
                     className={"vertical_fit"}
                     style={wsListStyle}
                     sectionTitleStyle={wsSectionTitleStyle}
-                    pydio={this.props.pydio}
-                    workspaces={this.props.pydio.user ? this.props.pydio.user.getRepositoriesList() : []}
-                    showTreeForWorkspace={this.props.pydio.user?this.props.pydio.user.activeRepository:false}
+                    pydio={pydio}
+                    workspaces={pydio.user ? pydio.user.getRepositoriesList() : []}
+                    showTreeForWorkspace={pydio.user?pydio.user.activeRepository:false}
                     {...wsListProps}
                 />
             </div>
         );
-    }
-});
+};
 
-LeftPanel = MaterialUI.Style.muiThemeable()(LeftPanel);
+LeftPanel.propTypes = {
+    pydio               : React.PropTypes.instanceOf(Pydio).isRequired,
+    userWidgetProps     : React.PropTypes.object,
+    workspacesListProps : React.PropTypes.object,
+    style               : React.PropTypes.object
+};
+
+LeftPanel = muiThemeable()(LeftPanel);
 
 export {LeftPanel as default}
