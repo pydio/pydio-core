@@ -18,7 +18,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 import AddressBook from './addressbook/AddressBook'
-import UserCreationForm from './UserCreationForm'
+const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boot')
+const {TextField, AutoComplete, RefreshIndicator, IconButton, Popover} = require('material-ui');
 
 const UsersLoader = React.createClass({
 
@@ -153,7 +154,6 @@ const UsersLoader = React.createClass({
     },
 
     onAddressBookItemSelected: function(item){
-        console.log("Add item to list!", item);
         this.props.onValueSelected(item);
     },
 
@@ -166,7 +166,7 @@ const UsersLoader = React.createClass({
 
             return (
                 <div style={containerStyle}>
-                    <MaterialUI.TextField
+                    <TextField
                         floatingLabelText={this.props.fieldLabel}
                         value={global.pydio.MessageHash[485] + ' (' + this.state.createUser + ')'}
                         disabled={true}
@@ -174,10 +174,14 @@ const UsersLoader = React.createClass({
                         underlineShow={!this.props.underlineHide}
                     />
                     <div style={{position: 'absolute', top: 73, left: 0, right: 0, zIndex: 10}}>
-                        <UserCreationForm
+                        <AsyncComponent
+                            namespace={"PydioForm"}
+                            componentName={"UserCreationForm"}
+
                             newUserName={this.state.createUser}
                             onUserCreated={this.onUserCreated}
                             onCancel={this.onCreationCancelled}
+                            pydio={this.props.pydio}
                         />
                     </div>
                 </div>
@@ -187,7 +191,7 @@ const UsersLoader = React.createClass({
 
         return (
             <div style={containerStyle}>
-                <MaterialUI.AutoComplete
+                <AutoComplete
                     filter={MaterialUI.AutoComplete.noFilter}
                     dataSource={dataSource}
                     searchText={this.state.searchText}
@@ -202,19 +206,19 @@ const UsersLoader = React.createClass({
                     onFocus={() => {this.loadBuffered(this.state.searchText, 100)}}
                 />
                 <div style={{position:'absolute', right:4, bottom: 14, height: 20, width: 20}}>
-                    <MaterialUI.RefreshIndicator
+                    <RefreshIndicator
                         size={20}
                         left={0}
                         top={0}
                         status={this.state.loading ? 'loading' : 'hide' }
                     />
                 </div>
-                {this.props.showAddressBook && <MaterialUI.IconButton
+                {this.props.showAddressBook && <IconButton
                     style={{position:'absolute', zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial'}}
                     iconClassName={'mdi mdi-book-open-variant'}
                     onTouchTap={this.openAddressBook}
                 />}
-                {this.props.showAddressBook && <MaterialUI.Popover
+                {this.props.showAddressBook && <Popover
                     open={this.state.addressBookOpen}
                     anchorEl={this.state.addressBookAnchor}
                     anchorOrigin={{horizontal: 'right', vertical: 'top'}}
@@ -230,7 +234,7 @@ const UsersLoader = React.createClass({
                             onItemSelected={this.onAddressBookItemSelected}
                         />
                     </div>
-                </MaterialUI.Popover>}
+                </Popover>}
             </div>
         );
 
