@@ -1,56 +1,56 @@
 const React = require('react')
-const {Menu} = require('material-ui')
+const {IconButton, Popover} = require('material-ui')
 import Utils from './Utils'
 
-export default React.createClass({
+class IconButtonMenu extends React.Component{
 
-    propTypes: {
-        buttonTitle: React.PropTypes.string.isRequired,
-        buttonClassName: React.PropTypes.string.isRequired,
-        className: React.PropTypes.string,
-        direction: React.PropTypes.oneOf(['right', 'left']),
-        menuItems: React.PropTypes.array.isRequired,
-        onMenuClicked: React.PropTypes.func.isRequired
-    },
+    constructor(props, context){
+        super(props, context);
+        this.state = {showMenu: false};
+    }
 
-    getInitialState: function(){
-        return {showMenu: false};
-    },
-
-    showMenu: function(event){
+    showMenu(event){
         this.setState({
             showMenu: true,
             anchor: event.currentTarget
         })
-    },
+    }
 
-    menuClicked:function(event, index, menuItem){
-        //this.props.onMenuClicked(menuItem);
+    closeMenu(event, index, menuItem){
         this.setState({showMenu: false});
-    },
+    }
 
-    render: function(){
+    render(){
         return (
             <span className={"toolbars-button-menu " + (this.props.className ? this.props.className  : '')}>
-                    <MaterialUI.IconButton
+                    <IconButton
                         ref="menuButton"
                         tooltip={this.props.buttonTitle}
                         iconClassName={this.props.buttonClassName}
-                        onTouchTap={this.showMenu}
+                        onTouchTap={this.showMenu.bind(this)}
                         iconStyle={this.props.buttonStyle}
                     />
-                    <MaterialUI.Popover
+                    <Popover
                         open={this.state.showMenu}
                         anchorEl={this.state.anchor}
                         anchorOrigin={{horizontal: this.props.direction || 'right', vertical: 'bottom'}}
                         targetOrigin={{horizontal: this.props.direction || 'right', vertical: 'top'}}
                         onRequestClose={() => {this.setState({showMenu: false})}}
+                        useLayerForClickAway={false}
                     >
-                        {Utils.itemsToMenu(this.props.menuItems, this.menuClicked.bind(this))}
-                    </MaterialUI.Popover>
+                        {Utils.itemsToMenu(this.props.menuItems, this.closeMenu.bind(this))}
+                    </Popover>
                 </span>
         );
     }
+}
 
-});
+IconButtonMenu.propTypes =  {
+    buttonTitle: React.PropTypes.string.isRequired,
+    buttonClassName: React.PropTypes.string.isRequired,
+    className: React.PropTypes.string,
+    direction: React.PropTypes.oneOf(['right', 'left']),
+    menuItems: React.PropTypes.array.isRequired
+}
 
+export {IconButtonMenu as default}

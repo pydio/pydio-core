@@ -28,7 +28,6 @@ import ContextMenuNodeProviderMixin from './menu/ContextMenuNodeProviderMixin'
 import ButtonMenu from './menu/ButtonMenu'
 import ContextMenu from './menu/ContextMenu'
 import IconButtonMenu from './menu/IconButtonMenu'
-import MFB from './menu/MFB'
 import Toolbar from './menu/Toolbar'
 
 import AddressBook from './users/addressbook/AddressBook'
@@ -71,9 +70,7 @@ const PydioComponents = {
     ContextMenu             : ContextMenu,
     Toolbar                 :Toolbar,
     ButtonMenu              : ButtonMenu,
-    IconButtonMenu          : IconButtonMenu,
-    MFB                     : MFB
-
+    IconButtonMenu          : IconButtonMenu
 };
 
 export {PydioComponents as default}

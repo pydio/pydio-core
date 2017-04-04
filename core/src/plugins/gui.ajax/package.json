@@ -35,7 +35,6 @@
     "react-draggable": "2.2.3",
     "react-grid-layout": "^0.13.9",
     "react-infinite": "*",
-    "react-mfb": "0.4.1",
     "react-motion": "*",
     "react-redux": "*",
     "react-router": "^2.7.0",
