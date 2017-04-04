@@ -123,7 +123,7 @@ let FSTemplate = React.createClass({
         }
 
         let homeButton, breadcrumbStyle;
-        if(this.props.pydio.user && this.props.pydio.user.getRepositoriesList().has('ajxp_home')){
+        if(false && this.props.pydio.user && this.props.pydio.user.getRepositoriesList().has('ajxp_home')){
             homeButton = (
                 <MaterialUI.IconButton
                     style={{marginTop:7, marginLeft: 10, marginRight: -6}}
