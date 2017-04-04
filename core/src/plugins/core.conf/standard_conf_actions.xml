@@ -92,7 +92,6 @@
                 <context dir="false" recycle="false" selection="false" actionBar="true" actionBarGroup="team_address_book"/>
             </gui>
             <processing>
-                <clientCallback module="PydioCoreActions.Callbacks.userCreateTeam"/>
                 <serverCallback methodName="switchAction" restParams="/team_label"/>
             </processing>
         </action>
@@ -117,7 +116,6 @@
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
             </gui>
             <processing>
-                <clientCallback  module="PydioCoreActions.Callbacks.userDeleteTeam"/>
                 <serverCallback methodName="switchAction" restParams="/team_id"/>
             </processing>
         </action>
@@ -132,7 +130,6 @@
                 <selectionContext dir="false" file="true" recycle="false" unique="true" allowedMimes="ajxp_team"/>
             </gui>
             <processing>
-                <clientCallback module="PydioCoreActions.Callbacks.userUpdateTeam"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -199,7 +196,6 @@
             </gui>
             <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback module="PydioCoreActions.Callbacks.userUpdateUser"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>
@@ -209,7 +205,6 @@
       			</gui>
                 <rightsContext adminOnly="false" noUser="false" read="false" userLogged="only" write="false"/>
             <processing>
-                <clientCallback  module="PydioCoreActions.Callbacks.userCreateUser"/>
                 <serverCallback methodName="switchAction"/>
             </processing>
         </action>

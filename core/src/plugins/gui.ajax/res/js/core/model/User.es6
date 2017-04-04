@@ -17,6 +17,9 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+import Logger from '../lang/Logger'
+import PydioApi from '../http/PydioApi'
+import Repository from './Repository'
 
 /**
  * Abstraction of the currently logged user. Can be a "fake" user when users management
@@ -143,14 +146,14 @@ export default class User{
 	 */
 	getPreference(prefName, fromJSON){
         if(fromJSON){
-            var test = this._parsedJSONCache.get(prefName);
+            const test = this._parsedJSONCache.get(prefName);
             if(test !== undefined) return test;
         }
-	    var value = this.preferences.get(prefName);
+	    const value = this.preferences.get(prefName);
 	    if(fromJSON && value){
 	    	try{
                 if(typeof value == "object") return value;
-		    	var parsed = JSON.parse(value);
+		    	const parsed = JSON.parse(value);
                 this._parsedJSONCache.set(prefName, parsed);
                 return parsed;
 	    	}catch(e){
@@ -186,7 +189,7 @@ export default class User{
             }catch (e){
                 if(console) {
                     function isCyclic (obj) {
-                        var seenObjects = [];
+                        let seenObjects = [];
 
                         function detect (obj) {
                             if (obj && typeof obj === 'object') {
@@ -194,7 +197,7 @@ export default class User{
                                     return true;
                                 }
                                 seenObjects.push(obj);
-                                for (var key in obj) {
+                                for (let key in obj) {
                                     if (obj.hasOwnProperty(key) && detect(obj[key])) {
                                         console.log(obj, 'cycle at ' + key);
                                         return true;
@@ -264,7 +267,7 @@ export default class User{
 	 */
 	savePreference(prefName){
 		if(!this.preferences.has(prefName)) return;
-        var prefValue = this.preferences.get(prefName);
+        const prefValue = this.preferences.get(prefName);
         window.setTimeout( function(){
             PydioApi.getClient().userSavePreference(prefName, prefValue);
         } , 250);
@@ -291,21 +294,21 @@ export default class User{
 	 */
 	loadFromXml(userNodes){
 	
-		var repositories = new Map();
-        var i,j;
+		let repositories = new Map(), activeNode;
+        let i,j;
 		for(i=0; i<userNodes.length;i++)
 		{
 			if(userNodes[i].nodeName == "active_repo")
 			{
-				var activeNode = userNodes[i];
+				activeNode = userNodes[i];
 			}
 			else if(userNodes[i].nodeName == "repositories")
 			{
 				for(j=0;j<userNodes[i].childNodes.length;j++)
 				{
-					var repoChild = userNodes[i].childNodes[j];
+					const repoChild = userNodes[i].childNodes[j];
 					if(repoChild.nodeName == "repo") {	
-						var repository = new Repository(repoChild.getAttribute("id"), repoChild);
+						const repository = new Repository(repoChild.getAttribute("id"), repoChild);
 						repositories.set(repoChild.getAttribute("id"), repository);
 					}
 				}
@@ -315,9 +318,9 @@ export default class User{
 			{
 				for(j=0;j<userNodes[i].childNodes.length;j++)
 				{
-					var prefChild = userNodes[i].childNodes[j];
+					const prefChild = userNodes[i].childNodes[j];
 					if(prefChild.nodeName == "pref") {
-						var value = prefChild.getAttribute("value");
+						let value = prefChild.getAttribute("value");
 						if(!value && prefChild.firstChild){
 							// Retrieve value from CDATA
 							value = prefChild.firstChild.nodeValue;
@@ -328,8 +331,8 @@ export default class User{
 			}
 			else if(userNodes[i].nodeName == "special_rights")
 			{
-				var attr = userNodes[i].getAttribute("is_admin");
-				if(attr && attr == "1") this.isAdmin = true;
+				const attr = userNodes[i].getAttribute("is_admin");
+				if(attr && attr === "1") this.isAdmin = true;
                 if(userNodes[i].getAttribute("lock")){
                     this.lock = userNodes[i].getAttribute("lock");
                 }

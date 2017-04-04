@@ -349,7 +349,7 @@ class ResourcesManager{
         Promise.all(classNames.map((c) => {return SystemJS.import(c)})).then(() => {
             callbackFunc();
         }).catch((reason) => {
-            console.error('Failed Loading ' + classNames.join(', ') + ' : ' + reason);
+            console.error('Failed Loading ' + classNames.join(', ') + ' : ', reason);
         });
         return;
 

@@ -17,6 +17,8 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+import PydioApi from './PydioApi'
+import XMLUtils from '../util/XMLUtils'
 
 class User{
     _id;
@@ -142,57 +144,6 @@ class UsersApi{
             callback(suggestions);
         });
 
-    }
-
-    static getCreateUserParameters(editMode = false){
-        let basicParameters = [];
-        let prefix = pydio.getPluginConfigs('action.share').get('SHARED_USERS_TMP_PREFIX');
-        basicParameters.push({
-            description: MessageHash['533'],
-            editable: false,
-            expose: "true",
-            label: MessageHash['522'],
-            name: (editMode ? "existing_user_id" : "new_user_id"),
-            scope: "user",
-            type: (editMode ? "hidden" : "string"),
-            mandatory: "true",
-            "default": prefix ? prefix : ''
-        },{
-            description: MessageHash['534'],
-            editable: "true",
-            expose: "true",
-            label: MessageHash['523'],
-            name: "new_password",
-            scope: "user",
-            type: "valid-password",
-            mandatory: "true"
-        });
-
-        const params = global.pydio.getPluginConfigs('conf').get('NEWUSERS_EDIT_PARAMETERS').split(',');
-        for(let i=0;i<params.length;i++){
-            params[i] = "user/preferences/pref[@exposed]|//param[@name='"+params[i]+"']";
-        }
-        const xPath = params.join('|');
-        PydioForm.Manager.parseParameters(global.pydio.getXmlRegistry(), xPath).map(function(el){
-            basicParameters.push(el);
-        });
-        if(!editMode){
-            basicParameters.push({
-                description: MessageHash['536'],
-                editable: "true",
-                expose: "true",
-                label: MessageHash['535'],
-                name: "send_email",
-                scope: "user",
-                type: "boolean",
-                mandatory: true
-            });
-        }
-        return basicParameters;
-    }
-
-    static getCreateUserPostPrefix(){
-        return 'NEW_';
     }
 
     static createUserFromPost(postValues, callback){

@@ -19,6 +19,12 @@
  */
 
 import Observable from '../lang/Observable'
+import LangUtils from '../util/LangUtils'
+import ResourcesManager from '../http/ResourcesManager'
+import Logger from '../lang/Logger'
+import XMLUtils from '../util/XMLUtils'
+import FuncUtils from '../util/FuncUtils'
+
 /**
  * A "Command" object, encapsulating its callbacks, display attributes, etc.
  */
@@ -110,7 +116,7 @@ export default class Action extends Observable{
 	}
 
     _evalScripts(data, localScopeMetadata){
-        var metadata = localScopeMetadata;
+        let metadata = localScopeMetadata;
         return eval(data);
     }
 
@@ -663,24 +669,7 @@ export default class Action extends Observable{
         }
 	}
 
-    refreshInstances (){
-        /*
-         TODO : UI Stuff, should be bound
-         */
-        /*
-        $$('#action_instance_'+this.options.name).each(function(instance){
-            // Check img
-            var img;
-            if(instance.firstChild.nodeType == Node.ELEMENT_NODE && instance.firstChild.nodeName.toLowerCase()=="img"){
-                img = instance.firstChild.cloneNode(true);
-            }
-            instance.update(this.getKeyedText());
-            if(img){
-                instance.insert({top:img});
-            }
-        }.bind(this));
-        */
-    }
+    refreshInstances (){}
 	
 	/**
 	 * Grab its label from the i18n

@@ -34,12 +34,7 @@ export default class LangUtils{
     }
 
     static objectMerge(obj1, obj2){
-        for(var k in obj2){
-            if(obj2.hasOwnProperty(k)){
-                obj1[k] = obj2[k];
-            }
-        }
-        return obj1;
+        return {...obj1, ...obj2};
     }
 
     static parseUrl(data) {

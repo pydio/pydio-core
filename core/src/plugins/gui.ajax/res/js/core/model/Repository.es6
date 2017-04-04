@@ -17,7 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
-
+import ResourcesManager from '../http/ResourcesManager'
 /** 
  * Container for a Repository.
  */
@@ -43,9 +43,7 @@ export default class Repository {
         this._repositoryType = 'local';
         this._accessStatus = null;
         this._lastConnection = null;
-        if(window.ajxpResourcesFolder){
-    		this.icon = ResourcesManager.resolveImageSource('actions/16/network-wired.png');
-        }
+        this.icon = '';
 		this.resourcesManager = new ResourcesManager();
 		if(xmlDef) this.loadFromXml(xmlDef);
 	}
@@ -227,25 +225,25 @@ export default class Repository {
 		if(repoNode.getAttribute('owner')){
 			this.owner = repoNode.getAttribute('owner');
 		}
-		for(var i=0;i<repoNode.childNodes.length;i++){
-			var childNode = repoNode.childNodes[i];
+		for(let i=0;i<repoNode.childNodes.length;i++){
+			const childNode = repoNode.childNodes[i];
             if(childNode.nodeName == "label"){
                 this.setLabel(childNode.firstChild.nodeValue);
             }else if(childNode.nodeName == "description"){
                 this.description = childNode.firstChild.nodeValue;
             }else if(childNode.nodeName == "client_settings"){
                 if(childNode.getAttribute('icon_tpl_id')){
-                    this.setIcon(window.ajxpServerAccessPath+'&get_action=get_user_template_logo&template_id='+childNode.getAttribute('icon_tpl_id')+'&icon_format=small');
+                    this.setIcon(window.pydio.Parameters.get('serverAccessPath')+'&get_action=get_user_template_logo&template_id='+childNode.getAttribute('icon_tpl_id')+'&icon_format=small');
                 }else{
                     this.setIcon(childNode.getAttribute('icon'));
                 }
-                for(var j=0; j<childNode.childNodes.length;j++){
-                    var subCh = childNode.childNodes[j];
+                for(let j=0; j<childNode.childNodes.length;j++){
+                    const subCh = childNode.childNodes[j];
                     if(subCh.nodeName == 'resources'){
                         this.resourcesManager.loadFromXmlNode(subCh);
                     }else if(subCh.nodeName == 'node_provider'){
-                        var nodeProviderName = subCh.getAttribute("ajxpClass");
-                        var nodeProviderOptions = JSON.parse(subCh.getAttribute("ajxpOptions"));
+                        const nodeProviderName = subCh.getAttribute("ajxpClass");
+                        const nodeProviderOptions = JSON.parse(subCh.getAttribute("ajxpOptions"));
                         this.nodeProviderDef = {name:nodeProviderName, options:nodeProviderOptions};
                     }
                 }

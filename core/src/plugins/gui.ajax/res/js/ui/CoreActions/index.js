@@ -174,7 +174,7 @@ class Callbacks{
             conn.addParameter("get_action", "get_user_templates_definition");
             conn.parseTplParameters = function(tplDiv){
                 if(!conn.TPL_XML) return;
-                if(!conn.FORM_MANAGER) conn.FORM_MANAGER = new FormManager();
+                if(!conn.FORM_MANAGER) conn.FORM_MANAGER = new Manager();
                 var tplId = tplDiv.getAttribute('data-templateId');
                 var tplLabel = tplDiv.getAttribute('data-templateLabel');
                 tplDiv.addClassName('selected-focus');
@@ -229,7 +229,7 @@ class Callbacks{
         };
 
         let onComplete = function(oForm){
-            var formManager = new FormManager();
+            var formManager = new Manager();
             var params = $H({get_action:'user_create_repository'});
             formManager.serializeParametersInputs($('user_template_parameters'), params, "DRIVER_OPTION_");
             $('user_tpl_params_parameters').select('input[type="hidden"]').each(function(el){
@@ -250,140 +250,6 @@ class Callbacks{
 
         modal.showDialogForm("Create", "user_create_repository_form", onLoad, onComplete);
 
-    }
-
-    static userCreateUser(){
-
-        modal.showDialogForm('Update', 'user_create_user', function(oForm){
-
-            var parameters = PydioUsers.Client.getCreateUserParameters().map(function(obj){
-                if(obj.type === 'valid-password') obj.type = 'password-create';
-                return $H(obj)
-            });
-            var f = new FormManager();
-            f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, $H(), false, true);
-            modal.refreshDialogPosition();
-
-        }, function(oForm){
-
-            var params = $H();
-            var f = new FormManager();
-            f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-            var conn = new Connexion();
-            params.set("get_action", "user_create_user");
-            conn.setParameters(params);
-            conn.setMethod("POST");
-            conn.onComplete = function(transport){
-                if($("address_book")){
-                    $("address_book").ajxpPaneObject.reloadDataModel();
-                }
-            };
-            conn.sendAsync();
-
-        });
-
-    }
-
-    static userUpdateUser(){
-
-        modal.showDialogForm('Update', 'user_create_user', function(oForm){
-
-            var user = window.actionManager.getDataModel().getUniqueNode();
-            if(user && user.getAjxpMime() == "shared_user"){
-                var user_id = PathUtils.getBasename(user.getPath());
-                var conn = new Connexion();
-                conn.setParameters({
-                    get_action:'user_update_user',
-                    user_id:user_id
-                });
-                conn.onComplete = function(transport){
-                    var values = $H(transport.responseJSON);
-                    values.set("existing_user_id", user_id);
-
-                    var f = new FormManager();
-                    var parameters = [];
-                    PydioUsers.Client.getCreateUserParameters().map(function(obj){
-                        if(obj.type === 'valid-password') {
-                            obj.type = 'password-create';
-                        }
-                        if(obj.name === 'new_user_id'){
-                            obj.name = 'existing_user_id';
-                            obj.type = 'hidden';
-                        }
-                        if(obj.name === 'send_email'){
-                            return;
-                        }
-                        parameters.push($H(obj));
-                    });
-
-                    f.createParametersInputs(oForm.down('#user_create_user'), parameters, true, values, false, true);
-                    modal.refreshDialogPosition();
-
-                };
-                conn.sendAsync();
-            }
-
-        }, function(oForm){
-
-            var params = $H();
-            var f = new FormManager();
-            f.serializeParametersInputs(oForm.down('#user_create_user'), params, 'NEW_');
-            var conn = new Connexion();
-            params.set("get_action", "user_create_user");
-            conn.setParameters(params);
-            conn.setMethod("POST");
-            conn.onComplete = function(transport){
-                if(transport.responseText == "SUCCESS"){
-                    if($("address_book")){
-                        $("address_book").ajxpPaneObject.reloadDataModel();
-                    }
-                    pydio.displayMessage("SUCCESS", MessageHash[521]);
-                }
-            };
-            conn.sendAsync();
-
-        });
-
-    }
-
-    static userCreateTeam(){
-        modal.showDialogForm('', 'team_edit_form', function(oForm){
-            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                TeamEditor.prototype.getInstance().open(oForm);
-            });
-        }, function(oForm){
-            TeamEditor.prototype.getInstance().complete(oForm);
-        }, function(oForm){
-            TeamEditor.prototype.getInstance().close(oForm);
-        });
-    }
-
-    static userUpdateTeam(manager){
-        modal.showDialogForm('', 'team_edit_form', function(oForm){
-            var contextHolder = manager.getDataModel();
-            ResourcesManager.loadClassesAndApply(["TeamEditor"], function(){
-                TeamEditor.prototype.getInstance().open(oForm, contextHolder);
-            });
-        }, function(oForm){
-            TeamEditor.prototype.getInstance().complete(oForm);
-        }, function(oForm){
-            TeamEditor.prototype.getInstance().close(oForm);
-        });
-    }
-
-    static userDeleteTeam(manager){
-        if(window.confirm(MessageHash["user_dash.52"])){
-            var sel = manager.getDataModel().getUniqueNode();
-            var conn = new Connexion();
-            conn.setParameters($H({
-                get_action: "user_team_delete",
-                team_id: PathUtils.getBasename(sel.getPath())
-            }));
-            conn.onComplete = function(){
-                $("team_panel").ajxpPaneObject.reloadDataModel();
-            };
-            conn.sendAsync();
-        }
     }
 
     static changePass(){

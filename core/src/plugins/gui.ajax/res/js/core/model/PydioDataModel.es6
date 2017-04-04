@@ -19,6 +19,12 @@
  */
 
 import Observable from '../lang/Observable'
+import Logger from '../lang/Logger'
+import AjxpNode from './AjxpNode'
+import LangUtils from '../util/LangUtils'
+import PathUtils from '../util/PathUtils'
+import PydioApi from '../http/PydioApi'
+
 /**
  * Full container of the data tree. Contains the SelectionModel as well.
  */
@@ -78,28 +84,29 @@ export default class PydioDataModel extends Observable{
 	 */
 	requireContextChange (ajxpNode, forceReload=false){
         if(ajxpNode == null) return;
-		var path = ajxpNode.getPath();
+		const path = ajxpNode.getPath();
 		if((path == "" || path == "/") && ajxpNode != this._rootNode){
 			ajxpNode = this._rootNode;
 		}
+		let paginationPage = null;
 		if(ajxpNode.getMetadata().has('paginationData') && ajxpNode.getMetadata().get('paginationData').has('new_page')
 			&& ajxpNode.getMetadata().get('paginationData').get('new_page') != ajxpNode.getMetadata().get('paginationData').get('current')){
-				var paginationPage = ajxpNode.getMetadata().get('paginationData').get('new_page');
+				paginationPage = ajxpNode.getMetadata().get('paginationData').get('new_page');
 				forceReload = true;
 		}
 		if(ajxpNode != this._rootNode && (!ajxpNode.getParent() || ajxpNode.fake)){
 			// Find in arbo or build fake arbo
-			var fakeNodes = [];
+			let fakeNodes = [];
 			ajxpNode = ajxpNode.findInArbo(this._rootNode, fakeNodes);
 			if(fakeNodes.length){
-				var firstFake = fakeNodes.shift();
+				const firstFake = fakeNodes.shift();
 				firstFake.observeOnce("first_load", function(e){
 					this.requireContextChange(ajxpNode);
 				}.bind(this));
 				firstFake.observeOnce("error", function(message){
 					Logger.error(message);
 					firstFake.notify("node_removed");
-					var parent = firstFake.getParent();
+					const parent = firstFake.getParent();
 					parent.removeChild(firstFake);
 					//delete(firstFake);
 					this.requireContextChange(parent);
@@ -113,18 +120,18 @@ export default class PydioDataModel extends Observable{
 			this.setContextNode(ajxpNode, true);
 			this.publish("context_loaded");
             if(this.getPendingSelection()){
-                var selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/" ) +this.getPendingSelection();
-                var selNode =  ajxpNode.findChildByPath(selPath);
+                const selPath = ajxpNode.getPath() + (ajxpNode.getPath() == "/" ? "" : "/" ) +this.getPendingSelection();
+                const selNode =  ajxpNode.findChildByPath(selPath);
                 if(selNode) {
                     this.setSelectedNodes([selNode], this);
                 }else{
                     if(ajxpNode.getMetadata().get("paginationData") && arguments.length < 3){
-                        var newPage;
-                        var currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
+                        let newPage;
+                        let currentPage = ajxpNode.getMetadata().get("paginationData").get("current");
                         this.loadPathInfoSync(selPath, function(foundNode){
                             newPage = foundNode.getMetadata().get("page_position");
                         }, {page_position:'true'});
-                        if(newPage && newPage != currentPage){
+                        if(newPage && newPage !== currentPage){
                             ajxpNode.getMetadata().get("paginationData").set("new_page", newPage);
                             this.requireContextChange(ajxpNode, true, true);
                             return;
@@ -236,12 +243,12 @@ export default class PydioDataModel extends Observable{
      *
      */
     publish(eventName, optionalData){
-        var args = [];
+        let args = [];
         if(this._globalEvents){
             if(window.pydio){
                 args.push(eventName);
                 if(optionalData) args.push(optionalData);
-                pydio.fire.apply(pydio,args);
+                window.pydio.fire.apply(window.pydio,args);
             }else if(document.fire) {
                 args.push("ajaxplorer:"+eventName);
                 if(optionalData) args.push(optionalData);

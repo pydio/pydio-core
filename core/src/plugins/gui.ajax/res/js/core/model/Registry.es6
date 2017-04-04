@@ -18,6 +18,10 @@
  * The latest code can be found at <https://pydio.com>.
  */
 import XMLUtils from '../util/XMLUtils'
+import PydioApi from '../http/PydioApi'
+import User from './User'
+import Logger from '../lang/Logger'
+import ResourcesManager from '../http/ResourcesManager'
 
 export default class Registry{
 
@@ -38,7 +42,7 @@ export default class Registry{
             return;
         }
         this._stateLoading = true;
-        var onComplete = function(transport){
+        const onComplete = function(transport){
             this._stateLoading = false;
             if(transport.responseXML == null || transport.responseXML.documentElement == null) return;
             if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
@@ -52,7 +56,7 @@ export default class Registry{
             }
             if(completeFunc) completeFunc(this._registry);
         }.bind(this);
-        var params = {get_action: 'get_xml_registry'};
+        let params = {get_action: 'get_xml_registry'};
         if(xPath){
             params['xPath'] = xPath;
         }
@@ -72,9 +76,9 @@ export default class Registry{
      * @param documentElement DOMNode
      */
     refreshXmlRegistryPart (documentElement){
-        var xPath = documentElement.getAttribute("xPath");
-        var existingNode = XMLUtils.XPathSelectSingleNode(this._registry, xPath);
-        var parentNode;
+        const xPath = documentElement.getAttribute("xPath");
+        const existingNode = XMLUtils.XPathSelectSingleNode(this._registry, xPath);
+        let parentNode;
         if(existingNode && existingNode.parentNode){
             parentNode = existingNode.parentNode;
             parentNode.removeChild(existingNode);
@@ -83,7 +87,7 @@ export default class Registry{
             }
         }else if(xPath.indexOf("/") > -1){
             // try selecting parentNode
-            var parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
+            const parentPath = xPath.substring(0, xPath.lastIndexOf("/"));
             parentNode = XMLUtils.XPathSelectSingleNode(this._registry, parentPath);
             if(parentNode && documentElement.firstChild){
                 parentNode.appendChild(documentElement.firstChild.cloneNode(true));
@@ -100,13 +104,13 @@ export default class Registry{
      */
     logXmlUser(skipEvent){
         this._pydioObject.user = null;
-        var userNode;
+        let userNode;
         if(this._registry){
             userNode = XMLUtils.XPathSelectSingleNode(this._registry, "user");
         }
         if(userNode){
-            var userId = userNode.getAttribute('id');
-            var children = userNode.childNodes;
+            const userId = userNode.getAttribute('id');
+            const children = userNode.childNodes;
             if(userId){
                 this._pydioObject.user = new User(userId, children);
             }
@@ -128,37 +132,36 @@ export default class Registry{
      * @returns Boolean
      */
     initExtension (xmlNode, extensionDefinition){
-        var activeCondition = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
+        const activeCondition = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/activeCondition');
         if(activeCondition && activeCondition.firstChild){
             try{
-                var func = new Function(activeCondition.firstChild.nodeValue.trim());
+                const func = new Function(activeCondition.firstChild.nodeValue.trim());
                 if(func() === false) return false;
             }catch(e){}
         }
         if(xmlNode.nodeName == 'editor'){
-            var properties = {
-                openable : (xmlNode.getAttribute("openable") == "true"),
-                modalOnly : (xmlNode.getAttribute("modalOnly") == "true"),
-                previewProvider: (xmlNode.getAttribute("previewProvider") == "true"),
-                order: (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
-                formId : xmlNode.getAttribute("formId") || null,
-                text : this._pydioObject.MessageHash[xmlNode.getAttribute("text")],
-                title : this._pydioObject.MessageHash[xmlNode.getAttribute("title")],
-                icon : xmlNode.getAttribute("icon"),
-                icon_class : xmlNode.getAttribute("iconClass"),
-                editorClass : xmlNode.getAttribute("className"),
-                mimes : xmlNode.getAttribute("mimes").split(","),
-                write : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false),
-                canWrite: (xmlNode.getAttribute("canWrite") && xmlNode.getAttribute("canWrite")=="true"?true:false)
-            };
-            for(var k in properties){
-                if(properties.hasOwnProperty(k)){
-                    extensionDefinition[k] = properties[k];
-                }
-            }
+
+            Object.assign(extensionDefinition,
+            {
+                openable            : (xmlNode.getAttribute("openable") == "true"),
+                modalOnly           : (xmlNode.getAttribute("modalOnly") == "true"),
+                previewProvider     : (xmlNode.getAttribute("previewProvider") == "true"),
+                order               : (xmlNode.getAttribute("order")?parseInt(xmlNode.getAttribute("order")):0),
+                formId              : xmlNode.getAttribute("formId") || null,
+                text                : this._pydioObject.MessageHash[xmlNode.getAttribute("text")],
+                title               : this._pydioObject.MessageHash[xmlNode.getAttribute("title")],
+                icon                : xmlNode.getAttribute("icon"),
+                icon_class          : xmlNode.getAttribute("iconClass"),
+                editorClass         : xmlNode.getAttribute("className"),
+                mimes               : xmlNode.getAttribute("mimes").split(","),
+                write               : (xmlNode.getAttribute("write") && xmlNode.getAttribute("write")=="true"?true:false),
+                canWrite            : (xmlNode.getAttribute("canWrite") && xmlNode.getAttribute("canWrite")=="true"?true:false)
+            });
+
         }else if(xmlNode.nodeName == 'uploader'){
-            var th = this._pydioObject.Parameters.get('theme');
-            var clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/clientForm[@theme="'+th+'"]');
+
+            const th = this._pydioObject.Parameters.get('theme');
+            let clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/clientForm[@theme="'+th+'"]');
             if(!clientForm){
                 clientForm = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/clientForm');
             }
@@ -170,7 +173,7 @@ export default class Registry{
             }else{
                 extensionDefinition.order = 0;
             }
-            var extensionOnInit = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
+            const extensionOnInit = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/extensionOnInit');
             if(extensionOnInit && extensionOnInit.firstChild){
                 try{
                     // @TODO: THIS WILL LIKELY TRIGGER PROTOTYPE CODE
@@ -181,11 +184,11 @@ export default class Registry{
                     Logger.error(e.message);
                 }
             }
-            var dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
+            const dialogOnOpen = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnOpen');
             if(dialogOnOpen && dialogOnOpen.firstChild){
                 extensionDefinition.dialogOnOpen = dialogOnOpen.firstChild.nodeValue;
             }
-            var dialogOnComplete = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnComplete');
+            const dialogOnComplete = XMLUtils.XPathSelectSingleNode(xmlNode, 'processing/dialogOnComplete');
             if(dialogOnComplete && dialogOnComplete.firstChild){
                 extensionDefinition.dialogOnComplete = dialogOnComplete.firstChild.nodeValue;
             }
@@ -198,25 +201,27 @@ export default class Registry{
      * Extensions are editors and uploaders for the moment.
      */
     refreshExtensionsRegistry (){
+
         this._extensionsRegistry = {"editor":[], "uploader":[]};
-        var extensions = XMLUtils.XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
-        for(var i=0;i<extensions.length;i++){
-            var extensionDefinition = {
+        let extensions = XMLUtils.XPathSelectNodes(this._registry, "plugins/editor|plugins/uploader");
+        for(let i=0;i<extensions.length;i++){
+
+            let extensionDefinition = {
                 id : extensions[i].getAttribute("id"),
                 xmlNode : extensions[i],
                 resourcesManager : new ResourcesManager()
             };
             this._resourcesRegistry[extensionDefinition.id] = extensionDefinition.resourcesManager;
-            var resourceNodes = XMLUtils.XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
-            for(var j=0;j<resourceNodes.length;j++){
-                var child = resourceNodes[j];
-                extensionDefinition.resourcesManager.loadFromXmlNode(child);
+            const resourceNodes = XMLUtils.XPathSelectNodes(extensions[i], "client_settings/resources|dependencies|clientForm");
+            for(let j=0;j<resourceNodes.length;j++){
+                extensionDefinition.resourcesManager.loadFromXmlNode(resourceNodes[j]);
             }
             if(this.initExtension(extensions[i], extensionDefinition)){
                 this._extensionsRegistry[extensions[i].nodeName].push(extensionDefinition);
             }
         }
         ResourcesManager.loadAutoLoadResources(this._registry);
+
     }
 
 
@@ -245,8 +250,9 @@ export default class Registry{
      * @param restrictToPreviewProviders
      */
     findEditorsForMime (mime, restrictToPreviewProviders){
-        var editors = [];
-        var checkWrite = false;
+
+        let editors = [], checkWrite = false;
+
         if(this._pydioObject.user != null && !this._pydioObject.user.canWrite()){
             checkWrite = true;
         }
@@ -262,6 +268,7 @@ export default class Registry{
             });
         }
         return editors;
+
     }
 
     /**
@@ -279,16 +286,18 @@ export default class Registry{
      * @returns {Map}
      */
     getPluginConfigs (pluginQuery){
-        var xpath = 'plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property';
+
+        let xpath = 'plugins/*[@id="core.'+pluginQuery+'"]/plugin_configs/property | plugins/*[@id="'+pluginQuery+'"]/plugin_configs/property';
         if(pluginQuery.indexOf('.') == -1){
             xpath = 'plugins/'+pluginQuery+'/plugin_configs/property |' + xpath;
         }
-        var properties = XMLUtils.XPathSelectNodes(this._registry, xpath);
-        var configs = new Map();
+        const properties = XMLUtils.XPathSelectNodes(this._registry, xpath);
+        let configs = new Map();
         properties.forEach(function(propNode){
             configs.set(propNode.getAttribute("name"), JSON.parse(propNode.firstChild.nodeValue));
         });
         return configs;
+
     }
 
     /**
@@ -298,7 +307,7 @@ export default class Registry{
      * @returns {string}
      */
     getDefaultImageFromParameters(pluginId, paramName){
-        var node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
+        const node = XMLUtils.XPathSelectSingleNode(this._registry, "plugins/*[@id='"+pluginId+"']/server_settings/global_param[@name='"+paramName+"']");
         if(!node) return '';
         return node.getAttribute("defaultImage") || '';
     }
@@ -310,7 +319,7 @@ export default class Registry{
      * @returns {bool}
      */
     hasPluginOfType (type, name){
-        var node;
+        let node;
         if(name == null){
             node = XMLUtils.XPathSelectSingleNode(this._registry, 'plugins/ajxp_plugin[contains(@id, "'+type+'.")] | plugins/' + type + '[@id]');
         }else{

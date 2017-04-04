@@ -19,6 +19,11 @@
  */
 
 import Observable from '../lang/Observable'
+import Logger from '../lang/Logger'
+import PydioApi from '../http/PydioApi'
+import XMLUtils from '../util/XMLUtils'
+import Action from './Action'
+
 /**
  * Singleton class that manages all actions. Can be called directly using pydio.getController().
  */
@@ -192,9 +197,9 @@ export default class Controller extends Observable{
 	 */
 	getContextActions(actionsSelectorAtt, ignoreGroups, onlyGroups)
 	{		
-		var contextActions = [];
-		var defaultGroup;
-        var contextActionsGroup = new Map();
+		let contextActions = [];
+		let defaultGroup;
+        let contextActionsGroup = new Map();
 		this.actions.forEach(function(action){
 			if(!action.context.contextMenu && !(onlyGroups && onlyGroups.length)) return;
 			if(actionsSelectorAtt == 'selectionContext' && !action.context.selection) return;
@@ -206,12 +211,12 @@ export default class Controller extends Observable{
                     contextActionsGroup.set(barGroup, []);
                 }
             });
-            var isDefault = false;
+            let isDefault = false;
 			if(actionsSelectorAtt == 'selectionContext'){
 				// set default in bold
-				var userSelection = this._dataModel;
+				const userSelection = this._dataModel;
 				if(!userSelection.isEmpty()){
-					var defaultAction = 'file';
+					let defaultAction = 'file';
 					if(userSelection.isUnique() && (userSelection.hasDir() || userSelection.hasMime(['ajxp_browsable_archive']))){
 						defaultAction = 'dir';
 					}
@@ -229,8 +234,8 @@ export default class Controller extends Observable{
                 }
             });
 		}.bind(this));
-        var first = true, keys = [];
-        for(var k of contextActionsGroup.keys()){
+        let first = true, keys = [];
+        for(let k of contextActionsGroup.keys()){
             if(defaultGroup && k == defaultGroup) continue;
             keys.push(k);
         }
@@ -240,7 +245,7 @@ export default class Controller extends Observable{
         }
         let actionsPushed = {};
         keys.map(function(key){
-            var value = contextActionsGroup.get(key);
+            let value = contextActionsGroup.get(key);
             if(!first){
                 contextActions.push({separator:true});
             }
@@ -287,10 +292,10 @@ export default class Controller extends Observable{
 
         // Regroup actions artificially
         if(groupOtherList.length){
-            var submenuItems = [];
+            let submenuItems = [];
             groupOtherList.map(function(otherToolbar){
 
-                var otherActions = groupOtherBars.get(otherToolbar);
+                const otherActions = groupOtherBars.get(otherToolbar);
                 if(!otherActions) return;
                 otherActions.map(function(act){
                     submenuItems.push({actionId:act});
@@ -300,7 +305,7 @@ export default class Controller extends Observable{
                 }
 
             }.bind(this) );
-            var moreAction = new Action({
+            const moreAction = new Action({
                 name:'group_more_action',
                 icon_class:'icon-none',
                 text:MessageHash[456],
@@ -333,7 +338,7 @@ export default class Controller extends Observable{
 	 * @returns []
 	 */
 	getActionsForAjxpWidget(ajxpClassName, widgetId){
-		var actions = [];
+		let actions = [];
 		this.actions.forEach(function(action){
 			if(action.context.ajxpWidgets && (
                 action.context.ajxpWidgets.indexOf(ajxpClassName+'::'+widgetId) != -1
@@ -350,11 +355,11 @@ export default class Controller extends Observable{
 	 * @param defaultName String ("file", "dir", "dragndrop", "ctrldragndrop")
 	 */
 	fireDefaultAction(defaultName){
-		var actionName = this.defaultActions.get(defaultName); 
+		const actionName = this.defaultActions.get(defaultName);
 		if(actionName){
 			arguments[0] = actionName;
-			if(actionName == "ls"){
-				var action = this.actions.get(actionName);
+			if(actionName === "ls"){
+				const action = this.actions.get(actionName);
 				if(action) action.enable(); // Force enable on default action
 			}
 			this.fireAction.apply(this, arguments);
@@ -366,9 +371,9 @@ export default class Controller extends Observable{
 	 * @param actionName String The name of the action
 	 */
 	fireAction (actionName)	{
-		var action = this.actions.get(actionName);
+		const action = this.actions.get(actionName);
 		if(action != null) {
-			var args = Array.from(arguments).slice(1);
+			const args = Array.from(arguments).slice(1);
 			action.apply(args);
 		}
 	}
@@ -402,7 +407,7 @@ export default class Controller extends Observable{
 		if(this._registeredKeys.get(keyName))
 		{
 			if(this._registeredKeys.get(keyName).indexOf("::")!==-1){
-				var parts = this._registeredKeys.get(keyName).split("::");
+				const parts = this._registeredKeys.get(keyName).split("::");
 				this.fireAction(parts[0], parts[1]);
 			}else{
 				this.fireAction(this._registeredKeys.get(keyName));
@@ -425,7 +430,7 @@ export default class Controller extends Observable{
 			(copy && (!this.defaultActions.has('ctrldragndrop')||this.getDefaultAction('ctrldragndrop').deny))){
 			return;
 		}
-        var fileNames;
+        let fileNames;
 		if(fileName == null) fileNames = this._dataModel.getFileNames();
 		else fileNames = [fileName];
         // Check that dest is not the direct parent of source, ie current rep!
@@ -434,13 +439,13 @@ export default class Controller extends Observable{
             return;
         }
         // Check that dest is not child of source it self
-        for(var i=0; i<fileNames.length;i++){
+        for(let i=0; i<fileNames.length;i++){
             if(destDir.lastIndexOf(fileNames[i],0) === 0){
                 this._pydioObject.displayMessage('ERROR', MessageHash[202]);
                 return;
             }
         }
-        var params = {};
+        let params = {};
         params['get_action'] = this.defaultActions.get(copy?'ctrldragndrop':'dragndrop');
         params['nodes[]'] = fileNames;
         params['dest'] = destDir;
@@ -528,10 +533,10 @@ export default class Controller extends Observable{
 	 * @param action Action
 	 */
 	registerAction (action){
-		var actionName = action.options.name;
+		const actionName = action.options.name;
 		this.actions.set(actionName, action);
 		if(action.defaults){
-			for(var key in action.defaults) {
+			for(let key in action.defaults) {
                 if(action.defaults.hasOwnProperty(key)){
                     this.defaultActions.set(key, actionName);
                 }
@@ -551,11 +556,11 @@ export default class Controller extends Observable{
 	 * @param documentElement DOMNode The node to parse
 	 */
 	parseActions(documentElement){		
-		var actions = XMLUtils.XPathSelectNodes(documentElement, "actions/action");
-		for(var i=0;i<actions.length;i++){
+		const actions = XMLUtils.XPathSelectNodes(documentElement, "actions/action");
+		for(let i=0;i<actions.length;i++){
 			if(actions[i].nodeName != 'action') continue;
             if(actions[i].getAttribute('enabled') == 'false') continue;
-			var newAction = new Action();
+			let newAction = new Action();
             newAction.setManager(this);
 			newAction.createFromXML(actions[i]);
 			this.registerAction(newAction);

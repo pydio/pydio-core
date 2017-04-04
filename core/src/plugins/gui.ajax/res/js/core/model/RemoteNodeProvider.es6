@@ -18,6 +18,14 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import MetaCacheService from '../http/MetaCacheService'
+import PydioApi from '../http/PydioApi'
+import PathUtils from '../util/PathUtils'
+import XMLUtils from '../util/XMLUtils'
+import Logger from '../lang/Logger'
+import AjxpNode from './AjxpNode'
+
+
 /**
  * Implementation of the IAjxpNodeProvider interface based on a remote server access.
  * Default for all repositories.
@@ -37,7 +45,7 @@ export default class RemoteNodeProvider{
      */
     initProvider(properties){
         this.properties = new Map();
-        for (var p in properties){
+        for (let p in properties){
             if(properties.hasOwnProperty(p)) this.properties.set(p, properties[p]);
         }
         if(this.properties && this.properties.has('connexion_discrete')){
@@ -64,7 +72,7 @@ export default class RemoteNodeProvider{
      * @param optionalParameters
      */
     loadNode (node, nodeCallback=null, childCallback=null, recursive=false, depth=-1, optionalParameters=null){
-        var params = {
+        let params = {
             get_action:'ls',
             options:'al'
         };
@@ -72,9 +80,9 @@ export default class RemoteNodeProvider{
             params['recursive'] = true;
             params['depth'] = depth;
         }
-        var path = node.getPath();
+        let path = node.getPath();
         // Double encode # character
-        var paginationHash;
+        let paginationHash;
         if(node.getMetadata().has("paginationData")){
             paginationHash = "%23" + node.getMetadata().get("paginationData").get("current");
             path += paginationHash;
@@ -94,7 +102,7 @@ export default class RemoteNodeProvider{
             });
         }
         if(optionalParameters){
-            params = LangUtils.objectMerge(params, optionalParameters);
+            params = {...params, ...optionalParameters};
         }
         let parser = function (transport){
             this.parseNodes(node, transport, nodeCallback, childCallback);
@@ -122,22 +130,17 @@ export default class RemoteNodeProvider{
      * @param additionalParameters object
      */
     loadLeafNodeSync (node, nodeCallback, aSync=false, additionalParameters={}){
-        var params = {
-            get_action:'ls',
-            options:'al',
-            dir: PathUtils.getDirname(node.getPath()),
-            file: PathUtils.getBasename(node.getPath())
+        let params = {
+            get_action  :'ls',
+            options     :'al',
+            dir         : PathUtils.getDirname(node.getPath()),
+            file        : PathUtils.getBasename(node.getPath()),
+            ...additionalParameters
         };
-        for(var k in additionalParameters){
-            if(!additionalParameters.hasOwnProperty(k)) continue;
-            params[k] = additionalParameters[k];
-        }
         if(this.properties){
-            this.properties.forEach(function(value, key){
-                params[key] = value;
-            });
+            params = {...params, ...this.properties};
         }
-        var complete = function (transport){
+        const complete = function (transport){
             try{
                 if(node.isRoot()){
                     this.parseNodes(node, transport, nodeCallback, null, true);
@@ -153,20 +156,18 @@ export default class RemoteNodeProvider{
 
     refreshNodeAndReplace (node, onComplete){
 
-        var params = {
-            get_action:'ls',
-            options:'al',
-            dir: PathUtils.getDirname(node.getPath()),
-            file: PathUtils.getBasename(node.getPath())
+        let params = {
+            get_action  :'ls',
+            options     :'al',
+            dir         : PathUtils.getDirname(node.getPath()),
+            file        : PathUtils.getBasename(node.getPath())
         };
+
         if(this.properties){
-            this.properties.forEach(function(value, key){
-                params[key] = value;
-            });
+            params = {...params, ...this.properties};
         }
 
-
-        var nodeCallback = function(newNode){
+        const nodeCallback = function(newNode){
             node.replaceBy(newNode, "override");
             if(onComplete) onComplete(node);
         };
@@ -195,6 +196,7 @@ export default class RemoteNodeProvider{
      * @param childrenOnly
      */
     parseNodes (origNode, transport, nodeCallback, childCallback, childrenOnly){
+
         if(!transport.responseXML || !transport.responseXML.documentElement) {
             Logger.debug('Loading node ' + origNode.getPath() + ' has wrong response: ' + transport.responseText);
             if(nodeCallback) nodeCallback(origNode);
@@ -204,24 +206,26 @@ export default class RemoteNodeProvider{
             }
             throw new Error('Invalid XML Document (see console)');
         }
-        var rootNode = transport.responseXML.documentElement;
+        const rootNode = transport.responseXML.documentElement;
         if(!childrenOnly){
-            var contextNode = this.parseAjxpNode(rootNode);
+            const contextNode = this.parseAjxpNode(rootNode);
             origNode.replaceBy(contextNode, "merge");
         }
 
         // CHECK FOR MESSAGE OR ERRORS
-        var errorNode = XMLUtils.XPathSelectSingleNode(rootNode, "error|message");
+        let errorNode = XMLUtils.XPathSelectSingleNode(rootNode, "error|message");
         if(errorNode){
-            var type;
-            if(errorNode.nodeName == "message") type = errorNode.getAttribute('type');
+            let type;
+            if(errorNode.nodeName == "message") {
+                type = errorNode.getAttribute('type');
+            }
             if(type == "ERROR"){
                 origNode.notify("error", errorNode.firstChild.nodeValue + '(Source:'+origNode.getPath()+')');
             }
         }
 
         // CHECK FOR AUTH PROMPT REQUIRED
-        var authNode = XMLUtils.XPathSelectSingleNode(rootNode, "prompt");
+        const authNode = XMLUtils.XPathSelectSingleNode(rootNode, "prompt");
         if(authNode && pydio && pydio.UI && pydio.UI.openPromptDialog){
             let jsonData = XMLUtils.XPathSelectSingleNode(authNode, "data").firstChild.nodeValue;
             pydio.UI.openPromptDialog(JSON.parse(jsonData));
@@ -229,9 +233,9 @@ export default class RemoteNodeProvider{
         }
 
         // CHECK FOR PAGINATION DATA
-        var paginationNode = XMLUtils.XPathSelectSingleNode(rootNode, "pagination");
+        const paginationNode = XMLUtils.XPathSelectSingleNode(rootNode, "pagination");
         if(paginationNode){
-            var paginationData = new Map();
+            let paginationData = new Map();
             Array.from(paginationNode.attributes).forEach(function(att){
                 paginationData.set(att.nodeName, att.value);
             }.bind(this));
@@ -241,20 +245,22 @@ export default class RemoteNodeProvider{
         }
 
         // CHECK FOR COMPONENT CONFIGS CONTEXTUAL DATA
-        var configs = XMLUtils.XPathSelectSingleNode(rootNode, "client_configs");
+        const configs = XMLUtils.XPathSelectSingleNode(rootNode, "client_configs");
         if(configs){
             origNode.getMetadata().set('client_configs', configs);
         }
 
         // NOW PARSE CHILDREN
-        var children = XMLUtils.XPathSelectNodes(rootNode, "tree");
+        const children = XMLUtils.XPathSelectNodes(rootNode, "tree");
         children.forEach(function(childNode){
-            var child = this.parseAjxpNode(childNode);
-            if(!childrenOnly) origNode.addChild(child);
-            var cLoaded;
+            const child = this.parseAjxpNode(childNode);
+            if(!childrenOnly) {
+                origNode.addChild(child);
+            }
+            let cLoaded;
             if(XMLUtils.XPathSelectNodes(childNode, 'tree').length){
                 XMLUtils.XPathSelectNodes(childNode, 'tree').forEach(function(c){
-                    var newChild = this.parseAjxpNode(c);
+                    const newChild = this.parseAjxpNode(c);
                     if(newChild){
                         child.addChild(newChild);
                     }
@@ -279,11 +285,11 @@ export default class RemoteNodeProvider{
         let notifyServerChange = [];
         if(removes && removes.length){
             removes.forEach(function(r){
-                var p = r.getAttribute("filename");
+                const p = r.getAttribute("filename");
                 if(r.getAttribute("node_repository_id") && r.getAttribute("node_repository_id") !== targetRepositoryId){
                     return;
                 }
-                var imTime = parseInt(r.getAttribute("ajxp_im_time"));
+                const imTime = parseInt(r.getAttribute("ajxp_im_time"));
                 targetDataModel.removeNodeByPath(p, imTime);
                 notifyServerChange.push(p);
             });
@@ -293,7 +299,7 @@ export default class RemoteNodeProvider{
                 if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
                     return;
                 }
-                var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
+                const newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 targetDataModel.addNode(newNode, setContextChildrenSelected);
                 notifyServerChange.push(newNode.getPath());
             });
@@ -303,7 +309,7 @@ export default class RemoteNodeProvider{
                 if(tree.getAttribute("node_repository_id") && tree.getAttribute("node_repository_id") !== targetRepositoryId){
                     return;
                 }
-                var newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
+                const newNode = targetDataModel.getAjxpNodeProvider().parseAjxpNode(tree);
                 let original = newNode.getMetadata().get("original_path");
                 targetDataModel.updateNode(newNode, setContextChildrenSelected);
                 notifyServerChange.push(newNode.getPath());
@@ -321,13 +327,13 @@ export default class RemoteNodeProvider{
      * @returns AjxpNode
      */
     parseAjxpNode (xmlNode){
-        var node = new AjxpNode(
+        let node = new AjxpNode(
             xmlNode.getAttribute('filename'),
             (xmlNode.getAttribute('is_file') == "1" || xmlNode.getAttribute('is_file') == "true"),
             xmlNode.getAttribute('text'),
             xmlNode.getAttribute('icon'));
-        var metadata = new Map();
-        for(var i=0;i<xmlNode.attributes.length;i++)
+        let metadata = new Map();
+        for(let i=0;i<xmlNode.attributes.length;i++)
         {
             metadata.set(xmlNode.attributes[i].nodeName, xmlNode.attributes[i].value);
         }
