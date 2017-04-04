@@ -1,5 +1,6 @@
 import Utils from './Utils'
-import PopupMenu from './PopupMenu'
+const React = require('react')
+const {Menu} = require('material-ui')
 
 export default React.createClass({
 
@@ -57,7 +58,7 @@ export default React.createClass({
     },
 
     menuClicked: function(event, index, object){
-        object.payload();
+        //object.payload();
         this.setState({showMenu: false});
     },
 
@@ -90,10 +91,7 @@ export default React.createClass({
                     targetOrigin={{horizontal: this.props.direction || 'left', vertical: 'top'}}
                     onRequestClose={() => {this.setState({showMenu: false})}}
                 >
-                    <ReactMUI.Menu
-                        onItemClick={this.menuClicked}
-                        menuItems={menuItems}
-                    />
+                    {Utils.itemsToMenu(menuItems, this.menuClicked.bind(this))}
                 </MaterialUI.Popover>
             </span>
         );

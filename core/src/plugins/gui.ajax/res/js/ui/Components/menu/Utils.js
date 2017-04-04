@@ -1,55 +1,78 @@
+const {Divider, Menu, MenuItem, FontIcon} = require('material-ui')
+
 function pydioActionsToItems(actions = []){
     let items = [];
     let lastIsSeparator = false;
     actions.map(function(action, index){
         if(action.separator) {
             if(lastIsSeparator) return;
-            items.push({type:ReactMUI.MenuItem.Types.SUBHEADER, text:''});
+            items.push(action);
             lastIsSeparator = true;
             return;
         }
         lastIsSeparator = false;
+        const label = action.raw_name?action.raw_name:action.name;
+        const iconClass = action.icon_class;
+        let payload;
         if(action.subMenu){
-            let subItems;
-            if(action.subMenuBeforeShow){
-                let subActions = action.subMenuBeforeShow();
-                subItems   = pydioActionsToItems(subActions);
-            }else{
-                subItems = action.subMenu;
-            }
-            let iconLabel = (
-                <span>
-                        <span className={"mui-menu-item-icon " + action.icon_class}></span>
-                        <span>{action.raw_name?action.raw_name:action.name}</span>
-                    </span>
-            );
+            const subItems = action.subMenuBeforeShow ? pydioActionsToItems(action.subMenuBeforeShow()) : action.subMenu;
             items.push({
-                type:ReactMUI.MenuItem.Types.NESTED,
-                text: iconLabel,
-                iconClassName:action.icon_class,
-                items: subItems
+                text: label,
+                iconClassName:iconClass,
+                subItems: subItems
             });
         }else{
-            let payload;
-            if(action.callback) {
-                payload = action.callback;
-            }else{
-                payload = function(){pydio.Controller.fireAction(action_id);};
-            }
             items.push({
-                payload: payload,
-                text: action.raw_name?action.raw_name:action.name,
-                iconClassName:action.icon_class
+                text: label,
+                iconClassName:iconClass,
+                payload: action.callback
             });
         }
     }.bind(this));
     if(lastIsSeparator){
         items = items.slice(0, items.length - 1);
     }
+    if(items.length && items[0] && items[0].separator){
+        items.shift();
+    }
     return items;
 }
 
-export default {
+function itemsToMenu(items, closeMenuCallback, subItemsOnly = false){
 
-    pydioActionsToItems : pydioActionsToItems
+    const menuItems = items.map((item) => {
+
+        if(item.separator) return <Divider/>;
+
+        let subItems, payload;
+        if(item.subItems){
+            subItems = itemsToMenu(item.subItems, closeMenuCallback, true);
+        }else if(item.payload){
+            payload = () => {
+                item.payload();
+                closeMenuCallback();
+            };
+        }
+
+        return (
+            <MenuItem
+                primaryText={item.text}
+                leftIcon={item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null}
+                rightIcon={subItems && subItems.length ? <FontIcon className="mdi mdi-menu-right"/> : null}
+                onTouchTap={payload}
+                menuItems={subItems}
+            />
+
+        );
+
+    });
+
+    if(subItemsOnly) {
+        return menuItems;
+    } else {
+        return <Menu desktop={false} width={256}>{menuItems}</Menu>
+    }
+
 }
+
+export default {pydioActionsToItems, itemsToMenu}

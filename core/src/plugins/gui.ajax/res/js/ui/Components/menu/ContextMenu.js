@@ -48,7 +48,7 @@ import PopupMenu from './PopupMenu'
         },
 
         menuClicked: function(object){
-            object.payload();
+            //object.payload();
         },
 
         computeVisiblePosition: function(position, items){
