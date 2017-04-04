@@ -1,5 +1,5 @@
 module.exports = function(grunt){
-    grunt.registerTask('type:css', [
+    grunt.registerTask('maincss', [
         'copy:mfb',
         'rename',
         'symlink',
