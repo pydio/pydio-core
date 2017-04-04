@@ -1,4 +1,6 @@
 import WorkspaceEntry from './WorkspaceEntry'
+const React = require('react')
+const XMLUtils = require('pydio/util/xml')
 
 export default React.createClass({
 
@@ -15,12 +17,12 @@ export default React.createClass({
     },
 
     createRepositoryEnabled:function(){
-        var reg = this.props.pydio.Registry.getXML();
+        const reg = this.props.pydio.Registry.getXML();
         return XMLUtils.XPathSelectSingleNode(reg, 'actions/action[@name="user_create_repository"]') !== null;
     },
 
     render: function(){
-        var entries = [], sharedEntries = [], inboxEntry;
+        let entries = [], sharedEntries = [], inboxEntry, createAction;
         const {workspaces, showTreeForWorkspace, pydio, className, style, filterByType} = this.props;
 
         workspaces.forEach(function(object, key){
@@ -29,7 +31,7 @@ export default React.createClass({
             if (object.hasContentFilter()) return;
             if (object.getAccessStatus() === 'declined') return;
 
-            var entry = (
+            const entry = (
                 <WorkspaceEntry
                     {...this.props}
                     key={key}
@@ -50,13 +52,13 @@ export default React.createClass({
             sharedEntries.unshift(inboxEntry);
         }
 
-        var messages = pydio.MessageHash;
+        const messages = pydio.MessageHash;
 
         if(this.createRepositoryEnabled()){
-            var createClick = function(){
+            const createClick = function(){
                 pydio.Controller.fireAction('user_create_repository');
             }.bind(this);
-            var createAction = (
+            createAction = (
                 <div className="workspaces">
                     <div className="workspace-entry" onClick={createClick} title={messages[418]}>
                         <span className="workspace-badge">+</span>

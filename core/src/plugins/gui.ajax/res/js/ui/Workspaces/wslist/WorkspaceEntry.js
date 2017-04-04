@@ -1,10 +1,17 @@
+const React = require('react')
+const {muiThemeable} = require('material-ui/styles')
+
+const Pydio = require('pydio')
+const PydioApi = require('pydio/http/api')
+const {MessagesConsumerMixin, FoldersTree} = Pydio.requireLib('components');
+
 const Confirm = React.createClass({
 
     propTypes:{
-        pydio:React.PropTypes.instanceOf(Pydio),
-        onDecline:React.PropTypes.func,
-        onAccept:React.PropTypes.func,
-        mode:React.PropTypes.oneOf(['new_share','reject_accepted'])
+        pydio       : React.PropTypes.instanceOf(Pydio),
+        onDecline   : React.PropTypes.func,
+        onAccept    : React.PropTypes.func,
+        mode        : React.PropTypes.oneOf(['new_share','reject_accepted'])
     },
 
     componentDidMount: function () {
@@ -12,7 +19,7 @@ const Confirm = React.createClass({
     },
 
     render: function () {
-        var messages = this.props.pydio.MessageHash,
+        let messages = this.props.pydio.MessageHash,
             messageTitle = messages[545],
             messageBody = messages[546],
             actions = [
@@ -27,7 +34,7 @@ const Confirm = React.createClass({
             ];
         }
 
-        for (var key in this.props.replacements) {
+        for (let key in this.props.replacements) {
             messageTitle = messageTitle.replace(new RegExp(key), this.props.replacements[key]);
             messageBody = messageBody.replace(new RegExp(key), this.props.replacements[key]);
         }
@@ -50,14 +57,14 @@ const Confirm = React.createClass({
 
 let WorkspaceEntry =React.createClass({
 
-    mixins:[PydioComponents.MessagesConsumerMixin],
+    mixins:[MessagesConsumerMixin],
 
     propTypes:{
-        pydio:React.PropTypes.instanceOf(Pydio).isRequired,
-        workspace:React.PropTypes.instanceOf(Repository).isRequired,
-        showFoldersTree:React.PropTypes.bool,
-        onHoverLink:React.PropTypes.func,
-        onOutLink:React.PropTypes.func
+        pydio           : React.PropTypes.instanceOf(Pydio).isRequired,
+        workspace       : React.PropTypes.instanceOf(Repository).isRequired,
+        showFoldersTree : React.PropTypes.bool,
+        onHoverLink     : React.PropTypes.func,
+        onOutLink       : React.PropTypes.func
     },
 
     getInitialState:function(){
@@ -126,7 +133,7 @@ let WorkspaceEntry =React.createClass({
         event.stopPropagation();
         this.wrapper = document.body.appendChild(document.createElement('div'));
         this.wrapper.style.zIndex = 11;
-        var replacements = {
+        const replacements = {
             '%%OWNER%%': this.props.workspace.getOwner()
         };
         ReactDOM.render(
@@ -169,7 +176,7 @@ let WorkspaceEntry =React.createClass({
     },
 
     render:function(){
-        var current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
+        let current = (this.props.pydio.user.getActiveRepository() == this.props.workspace.getId()),
             currentClass="workspace-entry",
             messages = this.props.pydio.MessageHash,
             onHover, onOut, onClick,
@@ -209,7 +216,7 @@ let WorkspaceEntry =React.createClass({
 
         // Icons
         if (this.props.workspace.getAccessType() == "inbox") {
-            var status = this.props.workspace.getAccessStatus();
+            const status = this.props.workspace.getAccessStatus();
 
             if (!isNaN(status) && status > 0) {
                 badgeNum = <span className="workspace-num-badge">{status}</span>;
@@ -217,7 +224,7 @@ let WorkspaceEntry =React.createClass({
 
             badge = <span className="workspace-badge"><span className="access-icon"/></span>;
         } else if(this.props.workspace.getOwner()){
-            var overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
+            let overlay = <span className="badge-overlay mdi mdi-share-variant"/>;
             if(this.props.workspace.getRepositoryType() == "remote"){
                 overlay = <span className="badge-overlay icon-cloud"/>;
             }
@@ -266,7 +273,7 @@ let WorkspaceEntry =React.createClass({
             return (
                 <div>
                     {wsBlock}
-                    <PydioComponents.FoldersTree
+                    <FoldersTree
                         pydio={this.props.pydio}
                         dataModel={this.props.pydio.getContextHolder()}
                         className={this.state.openFoldersTree?"open":"closed"}
@@ -283,5 +290,5 @@ let WorkspaceEntry =React.createClass({
 
 });
 
-WorkspaceEntry = MaterialUI.Style.muiThemeable()(WorkspaceEntry);
+WorkspaceEntry = muiThemeable()(WorkspaceEntry);
 export {WorkspaceEntry as default}

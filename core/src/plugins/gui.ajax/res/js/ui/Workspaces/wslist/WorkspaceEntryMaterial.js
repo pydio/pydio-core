@@ -1,3 +1,10 @@
+const React = require('react')
+const {ListItem, Avatar, FontIcon} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+
+const Pydio = require('pydio')
+const Repository = require('pydio/model/repository')
+
 class WorkspaceEntryMaterial extends React.Component{
 
     onClick(){
@@ -18,12 +25,12 @@ class WorkspaceEntryMaterial extends React.Component{
             backgroundColor = MaterialUI.Style.colors.teal500;
             let icon = workspace.getAccessType() === 'inbox' ? 'file-multiple' : 'folder';
             if(workspace.getRepositoryType() === 'remote') icon = 'cloud-outline';
-            leftAvatar =  <MaterialUI.Avatar backgroundColor={backgroundColor} color={color} icon={<MaterialUI.FontIcon className={'mdi mdi-' + icon}/>}/>
+            leftAvatar =  <Avatar backgroundColor={backgroundColor} color={color} icon={<FontIcon className={'mdi mdi-' + icon}/>}/>
         }else{
-            leftAvatar = <MaterialUI.Avatar backgroundColor={backgroundColor} color={color}>{workspace.getLettersBadge()}</MaterialUI.Avatar>;
+            leftAvatar = <Avatar backgroundColor={backgroundColor} color={color}>{workspace.getLettersBadge()}</Avatar>;
         }
         return (
-            <MaterialUI.ListItem
+            <ListItem
                 leftAvatar={leftAvatar}
                 leftIcon={leftIcon}
                 primaryText={workspace.getLabel()}
@@ -42,6 +49,5 @@ WorkspaceEntryMaterial.propTypes = {
     muiTheme : React.PropTypes.object
 };
 
-WorkspaceEntryMaterial = MaterialUI.Style.muiThemeable()(WorkspaceEntryMaterial);
-
+WorkspaceEntryMaterial = muiThemeable()(WorkspaceEntryMaterial);
 export {WorkspaceEntryMaterial as default}
