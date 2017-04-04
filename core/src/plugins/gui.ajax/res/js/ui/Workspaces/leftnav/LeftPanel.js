@@ -4,15 +4,15 @@ const {muiThemeable} = require('material-ui/styles')
 import UserWidget from './UserWidget'
 import WorkspacesList from '../wslist/WorkspacesList'
 
-let LeftPanel = ({muiTheme, style, userWidgetProps, workspacesListProps, pydio}) => {
+let LeftPanel = ({muiTheme, style={}, userWidgetProps, workspacesListProps, pydio}) => {
 
         const palette = muiTheme.palette;
         const Color = require('color');
-        const propStyle = style || {};
         const colorHue = Color(palette.primary1Color).hsl().array()[0];
         const lightBg = new Color({h:colorHue,s:35,l:98});
-        const style = {
-            ...propStyle,
+
+        style = {
+            ...style,
             backgroundColor: lightBg
         };
         const widgetStyle = {

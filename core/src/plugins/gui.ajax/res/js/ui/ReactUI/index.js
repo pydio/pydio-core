@@ -15,12 +15,11 @@ import PromptDialog from './modal/PromptDialog'
 import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
-import Router from './router/Router'
 import NetworkLoader from './modal/NetworkLoader'
 import HiddenDownloadForm from './HiddenDownloadForm'
 
 import PydioContextProvider from './PydioContextProvider'
-import PydioContextConsumerMixin from './PydioContextConsumerMixin'
+import PydioContextConsumer from './PydioContextConsumer'
 
 export {
     Builder,
@@ -37,13 +36,12 @@ export {
     PromptDialog,
 
     Loader,
-    Router,
     MessageBar,
     NetworkLoader,
     HiddenDownloadForm,
     BackgroundImage,
 
     PydioContextProvider,
-    PydioContextConsumerMixin
+    PydioContextConsumer
 
 }

@@ -1,17 +1,17 @@
+const React = require('react')
 import AsyncComponent from '../AsyncComponent'
-import PydioContextConsumerMixin from '../PydioContextConsumerMixin'
+import PydioContextConsumer from '../PydioContextConsumer'
+const {FlatButton, Dialog} = require('material-ui')
 
 /**
  * Specific AsyncComponent for Modal Dialog
  */
-export default React.createClass({
-
-    mixins:[PydioContextConsumerMixin],
+let AsyncModal = React.createClass({
 
     propTypes: {
-        size: React.PropTypes.oneOf(['xxs', 'xs', 'sm', 'md', 'lg', 'xl']),
-        padding: React.PropTypes.bool,
-        bgBlur: React.PropTypes.bool
+        size:       React.PropTypes.oneOf(['xxs', 'xs', 'sm', 'md', 'lg', 'xl']),
+        padding:    React.PropTypes.bool,
+        bgBlur:     React.PropTypes.bool
     },
 
     sizes: {
@@ -98,8 +98,8 @@ export default React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
 
-        var componentData = nextProps.componentData;
-        var state = {
+        const componentData = nextProps.componentData;
+        let state = {
             componentData:componentData,
             async:true,
             actions:[],
@@ -132,23 +132,23 @@ export default React.createClass({
             let actions = [];
             if(component.getCancelCallback){
                 actions.push(
-                    <MaterialUI.FlatButton
+                    <FlatButton
                         key="cancel"
-                        label={this.context.getMessage('49')}
+                        label={this.props.getMessage('49')}
                         primary={false}
                         onTouchTap={component.getCancelCallback()}
                     />);
             }
             if(component.getSubmitCallback){
-                actions.push(<MaterialUI.FlatButton
-                    label={this.context.getMessage('48')}
+                actions.push(<FlatButton
+                    label={this.props.getMessage('48')}
                     primary={true}
                     keyboardFocused={true}
                     onTouchTap={component.getSubmitCallback()}
                 />);
             }
             if(component.getNextCallback){
-                actions.push(<MaterialUI.FlatButton
+                actions.push(<FlatButton
                     label="Next"
                     primary={true}
                     keyboardFocused={true}
@@ -256,7 +256,7 @@ export default React.createClass({
         if (componentData) {
             if(async) {
                 modalContent =
-                    <PydioReactUI.AsyncComponent
+                    <AsyncComponent
                         {...this.props}
                         namespace={componentData.namespace}
                         componentName={componentData.compName}
@@ -319,7 +319,7 @@ export default React.createClass({
 
 
         return (
-            <MaterialUI.Dialog
+            <Dialog
                 ref="dialog"
                 title={title}
                 actions={actions}
@@ -336,7 +336,11 @@ export default React.createClass({
                 titleStyle={dialogTitle}
                 style={dialogRoot}
                 overlayStyle={overlayStyle}
-            >{modalContent}</MaterialUI.Dialog>
+            >{modalContent}</Dialog>
         );
     }
 });
+
+AsyncModal = PydioContextConsumer(AsyncModal)
+
+export {AsyncModal as default}

@@ -21,7 +21,6 @@ import {DNDActionParameter} from './DND'
 
 import UserAvatar from './users/avatar/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
-import UserCreationForm from './users/UserCreationForm'
 import TeamCreationForm from './users/TeamCreationForm'
 
 import ContextMenuNodeProviderMixin from './menu/ContextMenuNodeProviderMixin'
@@ -62,7 +61,6 @@ const PydioComponents = {
 
     UserAvatar              : UserAvatar,
     UsersCompleter          : UsersCompleter,
-    UserCreationForm        : UserCreationForm,
     TeamCreationForm        : TeamCreationForm,
     AddressBook             : AddressBook,
 

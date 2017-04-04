@@ -1,10 +1,14 @@
+const React = require('react')
+const Pydio = require('pydio')
+const {PydioContextConsumer} = Pydio.requireLib('boot')
+
 import Store from './Store'
 import GridBuilder from './GridBuilder'
 
 const CardsGrid = React.createClass({
 
     saveFullLayouts:function(allLayouts){
-        var savedPref = this.props.store.getUserPreference('Layout');
+        const savedPref = this.props.store.getUserPreference('Layout');
         // Compare JSON versions to avoid saving unnecessary changes
         if(savedPref && this.previousLayout  && this.previousLayout == JSON.stringify(allLayouts)){
             return;
@@ -154,7 +158,7 @@ const CardsGrid = React.createClass({
 
 });
 
-export default React.createClass({
+let DynamicGrid = React.createClass({
 
     propTypes: {
         storeNamespace   : React.PropTypes.string.isRequired,
@@ -163,8 +167,6 @@ export default React.createClass({
         pydio            : React.PropTypes.instanceOf(Pydio),
         disableDrag      : React.PropTypes.bool
     },
-
-    mixins:[PydioReactUI.PydioContextConsumerMixin],
 
     removeCard:function(cardId){
 
@@ -195,11 +197,11 @@ export default React.createClass({
 
     render: function(){
 
-        var monitorWidgetEditing = function(status){
+        const monitorWidgetEditing = function(status){
             this.setState({widgetEditing:status});
         }.bind(this);
 
-        var builder;
+        let builder;
         if(this.props.builderNamespaces && this.state.editMode){
             builder = (
                 <GridBuilder
@@ -216,7 +218,7 @@ export default React.createClass({
             <div style={{...this.props.style, width:'100%', flex:'1'}} className={this.state.editMode?"builder-open":""}>
                 <div style={{position:'absolute',bottom:30,right:18, zIndex:11}}>
                     <MaterialUI.FloatingActionButton
-                        tooltip={this.context.getMessage('home.49')}
+                        tooltip={this.props.getMessage('home.49')}
                         onClick={this.toggleEditMode}
                         iconClassName={this.state.editMode?"icon-ok":"mdi mdi-pencil"}
                         mini={this.state.editMode}
@@ -240,3 +242,6 @@ export default React.createClass({
     }
 
 });
+
+DynamicGrid = PydioContextConsumer(DynamicGrid)
+export {DynamicGrid as default}

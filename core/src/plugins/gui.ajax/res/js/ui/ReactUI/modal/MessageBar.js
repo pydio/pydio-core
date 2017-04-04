@@ -1,15 +1,16 @@
-import PydioContextConsumerMixin from '../PydioContextConsumerMixin'
+const React = require('react')
+const {Snackbar} = require('material-ui')
+
+import PydioContextConsumer from '../PydioContextConsumer'
 
 let MessageBar = React.createClass({
 
-    mixins:[PydioContextConsumerMixin],
-
     componentDidMount: function(){
-        this.context.getPydio().UI.registerMessageBar(this);
+        this.props.getPydio().UI.registerMessageBar(this);
     },
 
     componentWillUnmount: function(){
-        this.context.getPydio().UI.unregisterMessageBar();
+        this.props.getPydio().UI.unregisterMessageBar();
     },
 
     error:function(message, actionLabel, actionCallback) {
@@ -42,7 +43,7 @@ let MessageBar = React.createClass({
 
     render: function(){
         return (
-            <MaterialUI.Snackbar
+            <Snackbar
                 open={this.state.open}
                 message={this.state.message || ''}
                 onRequestClose={this.handleClose}
@@ -53,5 +54,7 @@ let MessageBar = React.createClass({
         );
     }
 });
+
+MessageBar = PydioContextConsumer(MessageBar);
 
 export {MessageBar as default}

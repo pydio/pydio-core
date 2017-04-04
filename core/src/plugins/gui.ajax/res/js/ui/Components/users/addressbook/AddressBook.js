@@ -7,7 +7,9 @@ import SearchForm from './SearchForm'
 import Loaders from './Loaders'
 
 import TeamCreationForm from '../TeamCreationForm'
-import UserCreationForm from '../UserCreationForm'
+
+const React = require('react');
+const {AsyncComponent} = require('pydio').requireLib('boot')
 
 const AddressBook = React.createClass({
 
@@ -312,7 +314,9 @@ const AddressBook = React.createClass({
         if(createDialogItem){
             if(createDialogItem.actions.type === 'users'){
                 dialogTitle = 'Create New User';
-                dialogContent = <UserCreationForm
+                dialogContent = <AsyncComponent
+                    namespace="PydioForm"
+                    componentName="UserCreationForm"
                     zDepth={0}
                     style={{height:500}}
                     newUserName={""}

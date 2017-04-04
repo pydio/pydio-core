@@ -1,11 +1,14 @@
-export default React.createClass({
+const React = require('react')
+const Pydio = require('pydio')
+const {PydioContextConsumer, AsyncComponent} = Pydio.requireLib('boot')
 
-    mixins:[PydioReactUI.PydioContextConsumerMixin],
+
+let GridBuilder = React.createClass({
 
     propTypes:{
-        namespaces:React.PropTypes.array,
-        onCreateCard:React.PropTypes.func,
-        onEditStatusChange:React.PropTypes.func
+        namespaces          : React.PropTypes.array,
+        onCreateCard        : React.PropTypes.func,
+        onEditStatusChange  : React.PropTypes.func
     },
 
     getInitialState:function(){
@@ -118,7 +121,7 @@ export default React.createClass({
                 defaultValues = LangUtils.mergeObjectsRecursive(defaultValues, this.state.currentFormValues);
             }
             form =(
-                <PydioReactUI.AsyncComponent
+                <AsyncComponent
                     namespace="PydioForm"
                     componentName="FormPanel"
                     parameters={fields}
@@ -155,3 +158,6 @@ export default React.createClass({
     }
 
 });
+
+GridBuilder = PydioContextConsumer(GridBuilder);
+export {GridBuilder as default}

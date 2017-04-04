@@ -1,14 +1,16 @@
+const React = require('react')
+const Pydio = require('pydio')
+const {PydioContextConsumer} = Pydio.requireLib('boot')
+const {ToolbarGroup} = require('material-ui-legacy')
 import IconButtonMenu from '../menu/IconButtonMenu'
 
-export default React.createClass({
-
-    mixins:[PydioReactUI.PydioContextConsumerMixin],
+let SortColumns = React.createClass({
 
     propTypes:{
-        tableKeys:React.PropTypes.object.isRequired,
-        columnClicked:React.PropTypes.func,
-        sortingInfo:React.PropTypes.object,
-        displayMode:React.PropTypes.string
+        tableKeys           : React.PropTypes.object.isRequired,
+        columnClicked       : React.PropTypes.func,
+        sortingInfo         : React.PropTypes.object,
+        displayMode         : React.PropTypes.string
     },
 
     onMenuClicked: function(object){
@@ -26,7 +28,7 @@ export default React.createClass({
     getColumnsItems: function(displayMode){
 
         let items = [];
-        for(var key in this.props.tableKeys){
+        for(let key in this.props.tableKeys){
             if(!this.props.tableKeys.hasOwnProperty(key)) continue;
             let data = this.props.tableKeys[key];
             let style = data['width']?{width:data['width']}:null;
@@ -75,13 +77,13 @@ export default React.createClass({
 
     componentDidMount: function(){
 
-        var sortAction = new Action({
+        const sortAction = new Action({
             name:'sort_action',
             icon_class:'mdi mdi-sort-descending',
             text_id:450,
             title_id:450,
-            text:this.context.getMessage(450),
-            title:this.context.getMessage(450),
+            text:this.props.getMessage(450),
+            title:this.props.getMessage(450),
             hasAccessKey:false,
             subMenu:true,
             subMenuUpdateImage:true
@@ -97,12 +99,12 @@ export default React.createClass({
         });
         let buttons = new Map();
         buttons.set('sort_action', sortAction);
-        this.context.pydio.getController().updateGuiActions(buttons);
+        this.props.pydio.getController().updateGuiActions(buttons);
 
     },
 
     componentWillUnmount: function(){
-        this.context.pydio.getController().deleteFromGuiActions('sort_action');
+        this.props.pydio.getController().deleteFromGuiActions('sort_action');
     },
 
     render: function(){
@@ -112,10 +114,12 @@ export default React.createClass({
             );
         }else{
             return (
-                <ReactMUI.ToolbarGroup float="left">{this.getColumnsItems('header')}</ReactMUI.ToolbarGroup>
+                <ToolbarGroup float="left">{this.getColumnsItems('header')}</ToolbarGroup>
             );
         }
 
     }
 });
 
+SortColumns = PydioContextConsumer(SortColumns)
+export {SortColumns as default}

@@ -1,28 +1,11 @@
+const React = require('react')
+const Pydio = require('pydio')
+
 export default function(PydioComponent, pydio){
 
-    return React.createClass({
+    class Wrapped extends React.Component{
 
-        displayName: 'PydioContextProvider',
-
-        propTypes:{
-            pydio: React.PropTypes.instanceOf(Pydio).isRequired
-        },
-
-        childContextTypes: {
-
-            /* Current Instance of Pydio */
-            pydio:React.PropTypes.instanceOf(Pydio),
-            /* Accessor for pydio */
-            getPydio:React.PropTypes.func,
-
-            /* Associative array of i18n messages */
-            messages:React.PropTypes.object,
-            /* Accessor for messages */
-            getMessage:React.PropTypes.func
-
-        },
-
-        getChildContext: function() {
+        getChildContext() {
 
             const messages = pydio.MessageHash;
             return {
@@ -43,9 +26,9 @@ export default function(PydioComponent, pydio){
                 }
             };
 
-        },
+        }
 
-        render: function(){
+        render(){
 
             const customPalette = pydio.Parameters.get('palette') || {};
 
@@ -68,6 +51,24 @@ export default function(PydioComponent, pydio){
             );
         }
 
-    });
+    }
+
+    Wrapped.displayName = 'PydioContextProvider';
+    Wrapped.propTypes={
+        pydio: React.PropTypes.instanceOf(Pydio).isRequired
+    };
+    Wrapped.childContextTypes={
+        /* Current Instance of Pydio */
+        pydio:React.PropTypes.instanceOf(Pydio),
+        /* Accessor for pydio */
+        getPydio:React.PropTypes.func,
+
+        /* Associative array of i18n messages */
+        messages:React.PropTypes.object,
+        /* Accessor for messages */
+        getMessage:React.PropTypes.func
+    };
+
+    return Wrapped
 
 }

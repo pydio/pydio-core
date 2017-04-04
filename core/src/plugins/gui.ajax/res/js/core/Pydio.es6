@@ -455,6 +455,15 @@ class Pydio extends Observable{
         this.updateContextData(this.getContextNode().getParent());
     }
 
+    /**
+     * Proxy to ResourcesManager.requireLib for ease of writing
+     * @param module
+     * @param promise
+     * @returns {*}
+     */
+    static requireLib(module, promise = false){
+        return require('pydio/http/resources-manager').requireLib(module, promise);
+    }
 
 }
 

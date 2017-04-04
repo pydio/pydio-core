@@ -10,7 +10,6 @@ const PydioCoreRequires = {
     'util/DOMUtils.js'          :'pydio/util/dom',
     'util/CookiesManager.js'    :'pydio/util/cookies',
     'util/PeriodicalExecuter.js':'pydio/util/periodical-executer',
-    'model/Router.js'           :'pydio/model/router',
     'model/AjxpNode.js'         :'pydio/model/node',
     'model/User.js'             :'pydio/model/user',
     'model/RemoteNodeProvider.js':'pydio/model/remote-node-provider',

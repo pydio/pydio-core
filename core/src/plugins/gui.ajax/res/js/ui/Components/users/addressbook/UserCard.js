@@ -1,5 +1,6 @@
-import UserCreationForm from '../UserCreationForm'
+const React = require('react')
 import UserAvatar from '../avatar/UserAvatar'
+const {AsyncComponent} = require('pydio').requireLib('boot')
 
 class UserCard extends React.Component{
 
@@ -24,7 +25,9 @@ class UserCard extends React.Component{
 
         if(this.state.editForm){
             editForm = (
-                <UserCreationForm
+                <AsyncComponent
+                    namespace="PydioForm"
+                    componentName="UserCreationForm"
                     pydio={this.props.pydio}
                     zDepth={0}
                     style={{height:500}}

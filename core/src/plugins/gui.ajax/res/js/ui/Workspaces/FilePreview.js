@@ -1,3 +1,5 @@
+import * as React from "react";
+
 let FilePreview = React.createClass({
 
     propTypes: {
