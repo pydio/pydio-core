@@ -58,7 +58,6 @@
             <xs:attribute name="accessKey"/>
             <xs:attribute name="hasAccessKey" type="xs:boolean"/>
             <xs:attribute name="specialAccessKey" type="xs:NCName"/>
-            <xs:attribute name="src" use="required"/>
             <xs:attribute name="iconClass" use="optional"/>
             <xs:attribute name="text" use="required" type="xs:NMTOKEN"/>
             <xs:attribute name="title" use="required" type="xs:NMTOKEN"/>

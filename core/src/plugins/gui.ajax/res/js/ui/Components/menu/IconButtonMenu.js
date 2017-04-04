@@ -33,12 +33,12 @@ class IconButtonMenu extends React.Component{
                     <Popover
                         open={this.state.showMenu}
                         anchorEl={this.state.anchor}
-                        anchorOrigin={{horizontal: this.props.direction || 'right', vertical: 'bottom'}}
-                        targetOrigin={{horizontal: this.props.direction || 'right', vertical: 'top'}}
+                        anchorOrigin={{horizontal: this.props.popoverDirection || 'right', vertical: this.props.popoverTargetPosition || 'bottom'}}
+                        targetOrigin={{horizontal: this.props.popoverDirection || 'right', vertical: 'top'}}
                         onRequestClose={() => {this.setState({showMenu: false})}}
                         useLayerForClickAway={false}
                     >
-                        {Utils.itemsToMenu(this.props.menuItems, this.closeMenu.bind(this))}
+                        {Utils.itemsToMenu(this.props.menuItems, this.closeMenu.bind(this), false, this.props.menuProps || undefined)}
                     </Popover>
                 </span>
         );
@@ -49,8 +49,12 @@ IconButtonMenu.propTypes =  {
     buttonTitle: React.PropTypes.string.isRequired,
     buttonClassName: React.PropTypes.string.isRequired,
     className: React.PropTypes.string,
-    direction: React.PropTypes.oneOf(['right', 'left']),
+    popoverDirection: React.PropTypes.oneOf(['right', 'left']),
+    popoverPosition: React.PropTypes.oneOf(['top', 'bottom']),
+    menuProps:React.PropTypes.object,
     menuItems: React.PropTypes.array.isRequired
 }
 
-export {IconButtonMenu as default}
+import MenuItemsConsumer from './MenuItemsConsumer'
+
+export default MenuItemsConsumer(IconButtonMenu)

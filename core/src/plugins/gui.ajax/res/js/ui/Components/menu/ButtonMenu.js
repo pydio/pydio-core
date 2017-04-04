@@ -1,54 +1,22 @@
 import Utils from './Utils'
 const React = require('react')
 const {Menu} = require('material-ui')
+const Controller = require('pydio/model/controller')
 
-export default React.createClass({
+const ButtonMenu = React.createClass({
 
     propTypes:{
-        buttonTitle: React.PropTypes.oneOfType([React.PropTypes.string,React.PropTypes.object]).isRequired,
-        className: React.PropTypes.string,
-        menuItems:React.PropTypes.array,
-        selectionContext:React.PropTypes.string,
-        toolbars:React.PropTypes.array,
-        raised:React.PropTypes.bool,
-        direction: React.PropTypes.oneOf(['left', 'right'])
+        buttonTitle : React.PropTypes.oneOfType([React.PropTypes.string,React.PropTypes.object]).isRequired,
+        menuItems   : React.PropTypes.array.isRequired,
+        className   : React.PropTypes.string,
+        raised      : React.PropTypes.bool,
+        direction   : React.PropTypes.oneOf(['left', 'right'])
     },
 
     getInitialState: function(){
-        return {showMenu: false, menuItems: this.props.menuItems || []};
+        return {showMenu: false};
     },
 
-    componentDidMount: function(){
-        if(this.props.controller && !this.props.menuItems){
-            this._observer = () => {
-                const actions = this.props.controller.getContextActions('genericContext', null, this.props.toolbars);
-                const menuItems = Utils.pydioActionsToItems(actions);
-                this.setState({menuItems: menuItems});
-            };
-            if(this.props.controller === pydio.Controller){
-                pydio.observe("actions_refreshed", this._observer);
-            }else{
-                this.props.controller.observe("actions_refreshed", this._observer);
-            }
-            this._observer();
-        }
-    },
-
-    componentWillUnmount: function(){
-        if(this._observer){
-            if(this.props.controller === pydio.Controller){
-                pydio.stopObserving("actions_refreshed", this._observer);
-            }else{
-                this.props.controller.stopObserving("actions_refreshed", this._observer);
-            }
-        }
-    },
-
-    componentWillReceiveProps: function(nextProps){
-        if(nextProps.menuItems && nextProps.menuItems !== this.props.menuItems){
-            this.setState({menuItems: nextProps.menuItems});
-        }
-    },
 
     showMenu: function(event){
         this.setState({
@@ -72,7 +40,8 @@ export default React.createClass({
             label: label,
             onTouchTap: this.showMenu
         };
-        const {menuItems, showMenu, anchor} = this.state;
+        const {menuItems} = this.props;
+        const {showMenu, anchor} = this.state;
         if(menuItems.length){
             if(this.props.raised){
                 button = <MaterialUI.RaisedButton {...props} style={this.props.buttonStyle} labelStyle={this.props.buttonLabelStyle}/>;
@@ -98,3 +67,7 @@ export default React.createClass({
     }
 
 });
+
+import MenuItemsConsumer from './MenuItemsConsumer'
+
+export default MenuItemsConsumer(ButtonMenu)

@@ -17,7 +17,7 @@
     <registry_contributions>
         <actions>
             <action name="login">
-                <gui text="163" title="168" src="encrypted.png" iconClass="icon-signin"
+                <gui text="163" title="168" iconClass="icon-signin"
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="true" contextMenu="false" infoPanel="false"
@@ -40,13 +40,13 @@
                 </processing>
             </action>
             <action name="logout" expireDefault="true">
-                <gui text="164" title="169" src="decrypted.png" iconClass="icon-signout"
+                <gui text="164" title="169" iconClass="icon-signout"
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
-                             contextMenu="false" actionBar="true" actionBarGroup="minisite" ajxpWidgets="UserWidget::logging_string">
+                             contextMenu="false" actionBar="true" actionBarGroup="zlogin,minisite">
                     </context>
                 </gui>
-                <rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
+                <rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
                 <processing>
                     <clientCallback module="AuthfrontCoreActions.Callbacks.sessionLogout"/>
                     <serverCallback methodName="switchAction"></serverCallback>

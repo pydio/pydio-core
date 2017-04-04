@@ -21,7 +21,7 @@
 			</processing>
 		</action>
 		<action name="up_dir">
-			<gui text="148" title="24" src="up.png" iconClass="icon-chevron-left" hasAccessKey="true"
+			<gui text="148" title="24" iconClass="icon-chevron-left" hasAccessKey="true"
 				accessKey="parent_access_key">
 				<context selection="false" dir="false" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="false" actionBarGroup="00_navigation">
@@ -33,7 +33,7 @@
 			</processing>
 		</action>
 		<action name="refresh">
-			<gui text="149" title="149" iconClass="mdi mdi-refresh" src="reload.png" hasAccessKey="true"
+			<gui text="149" title="149" iconClass="mdi mdi-refresh" hasAccessKey="true"
 				accessKey="refresh_access_key">
 				<context selection="false" dir="true" recycle="false"
 					actionBar="true" actionBarGroup="00_navigation,display_toolbar" contextMenu="true" infoPanel="false">
@@ -59,7 +59,7 @@
 		</action>
 		-->
 		<action name="bookmark">
-			<gui text="152" title="153" src="bookmark.png" iconClass="icon-bookmark-empty" hasAccessKey="true"
+			<gui text="152" title="153" iconClass="icon-bookmark-empty" hasAccessKey="true"
 				accessKey="bookmarks_access_key">
 				<context selection="true" dir="false" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
@@ -73,11 +73,11 @@
 			</processing>
 		</action>
 		<action name="splash">
-			<gui text="166" title="167" src="info.png" iconClass="icon-question-sign" hasAccessKey="true"
+			<gui text="166" title="167" iconClass="mdi mdi-information-outline" hasAccessKey="true"
 				accessKey="about_access_key">
 				<context selection="false" dir="" recycle="false"
 					actionBar="false" contextMenu="false" infoPanel="false"
-					actionBarGroup="utils" ajxpWidgets="UserWidget">
+					actionBarGroup="user" ajxpWidgets="UserWidget">
 				</context>
 			</gui>
 			<processing>

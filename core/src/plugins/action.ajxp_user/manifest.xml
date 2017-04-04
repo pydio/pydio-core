@@ -14,8 +14,8 @@
 	<registry_contributions>
 		<actions>
 			<action name="open_user_dashboard">
-				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
-					<context selection="false" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"/>
+				<gui text="user_dash.title" title="user_dash.desc" iconClass="mdi mdi-settings" accessKey="folder_access_key">
+					<context selection="false" dir="" recycle="false" actionBar="true" actionBarGroup="user" contextMenu="false" infoPanel="false"/>
 				</gui>
 				<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
 				<processing>
@@ -23,8 +23,8 @@
 				</processing>
 			</action>
 			<action name="open_address_book">
-				<gui text="32" title="32" src="fileopen.png" accessKey="folder_access_key">
-					<context selection="false" dir="" recycle="false" actionBar="false" contextMenu="false" infoPanel="false"/>
+				<gui text="user_dash.1" title="user_dash.1" iconClass="mdi mdi-book-open-variant" accessKey="folder_access_key">
+					<context selection="false" dir="" recycle="false" actionBar="true" actionBarGroup="user-widget" contextMenu="false" infoPanel="false"/>
 				</gui>
 				<rightsContext noUser="false" userLogged="only" read="false" write="false" adminOnly="false"/>
 				<processing>

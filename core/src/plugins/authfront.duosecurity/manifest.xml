@@ -35,7 +35,7 @@
                      accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="false" contextMenu="false" infoPanel="false"
-                             actionBarGroup="user">
+                             actionBarGroup="zlogin">
                     </context>
                 </gui>
                 <processing>

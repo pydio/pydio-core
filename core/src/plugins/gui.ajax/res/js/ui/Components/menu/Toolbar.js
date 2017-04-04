@@ -63,7 +63,7 @@ import IconButtonPopover from './IconButtonPopover'
         render: function(){
             let groups = this.state.groups
             let actions = [];
-            const {toolbars, renderingType, groupOtherList, buttonStyle} = this.props;
+            const {toolbars, renderingType, groupOtherList, buttonStyle, tooltipPosition} = this.props;
             let allToolbars = [...toolbars];
             if(groupOtherList.length){
                 allToolbars = allToolbars.concat(['MORE_ACTION']);
@@ -157,6 +157,7 @@ import IconButtonPopover from './IconButtonPopover'
                                 iconStyle={buttonStyle}
                                 onTouchTap={click}
                                 tooltip={menuTitle}
+                                tooltipPosition={tooltipPosition}
                             />);
                         }
                     }

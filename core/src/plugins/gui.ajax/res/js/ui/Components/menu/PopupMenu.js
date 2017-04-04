@@ -64,7 +64,7 @@ export default React.createClass({
 
         let style = this.state.style || {};
         style = {...style, zIndex: 1000};
-        const menu = Utils.itemsToMenu(this.state.menuItems, this.menuClicked.bind(this), false, {display:'compact'});
+        const menu = Utils.itemsToMenu(this.state.menuItems, this.menuClicked.bind(this), false, {desktop:true, display:'right', width: 250});
         if(this.state.showMenu) {
             return <Paper ref="menuContainer" className="menu-positioner" style={style}>{menu}</Paper>
         }else{

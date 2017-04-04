@@ -2,7 +2,7 @@ module.exports = {
     development: {
         options: {
             plugins: [
-                new (require('less-plugin-autoprefix'))({browsers: ["last 2 versions, > 10%"]})
+                new (require('less-plugin-autoprefix'))({browsers: ["last 2 versions", "> 10%"]})
             ]
         },
         files: {

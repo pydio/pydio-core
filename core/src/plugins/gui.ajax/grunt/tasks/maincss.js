@@ -3,6 +3,7 @@ module.exports = function(grunt){
         'copy:mfb',
         'rename',
         'symlink',
+        'less',
         'cssmin'
     ]);
 };

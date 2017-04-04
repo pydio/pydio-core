@@ -38,7 +38,15 @@ function pydioActionsToItems(actions = []){
     return items;
 }
 
-function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, props = {display:'normal'}){
+function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps = {}){
+
+    menuProps = {
+        display:'normal',
+        width: 216,
+        desktop: false,
+        autoWidth: false,
+        ...menuProps
+    };
 
     const menuItems = items.map((item) => {
 
@@ -54,11 +62,19 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, props = {di
             };
         }
 
+        let leftIcon, rightIcon;
+        if(menuProps.display === 'normal'){
+            leftIcon = item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+        }else if(menuProps.display === 'right'){
+            rightIcon = item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+        }
+        rightIcon = subItems && subItems.length ? <FontIcon className="mdi mdi-menu-right"/> : rightIcon;
+
         return (
             <MenuItem
                 primaryText={item.text}
-                leftIcon={props.display !== 'compact' && item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null}
-                rightIcon={subItems && subItems.length ? <FontIcon className="mdi mdi-menu-right"/> : null}
+                leftIcon={leftIcon}
+                rightIcon={rightIcon}
                 onTouchTap={payload}
                 menuItems={subItems}
             />
@@ -70,7 +86,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, props = {di
     if(subItemsOnly) {
         return menuItems;
     } else {
-        return <Menu desktop={props.display === 'compact'} width={256}>{menuItems}</Menu>
+        return <Menu {...menuProps}>{menuItems}</Menu>
     }
 
 }

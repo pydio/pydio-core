@@ -1,3 +1,8 @@
+const React = require('react')
+const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boot')
+const {UserAvatar, IconButtonMenu, Toolbar} = require('pydio/http/resources-manager').requireLib('components')
+const {IconButton, Paper} = require('material-ui')
+
 export default React.createClass({
 
     propTypes:{
@@ -17,25 +22,6 @@ export default React.createClass({
             case 'settings':
                 this.props.pydio.triggerRepositoryChange('ajxp_conf');
                 break;
-            case 'info':
-                this.props.pydio.Controller.getActionByName('splash').deny = false;
-                this.props.pydio.Controller.fireAction('splash');
-                break;
-            case 'cog':
-                // Open dashboard in modal
-                this.props.pydio.Controller.fireAction('open_user_dashboard');
-                break;
-            case 'address-book':
-                // Open dashboard in modal
-                this.props.pydio.Controller.fireAction('open_address_book');
-                break;
-            case 'user-shares':
-                // Open dashboard in modal
-                this.props.pydio.Controller.fireAction('open_user_shares');
-                break;
-            case 'logout':
-                this.props.pydio.Controller.fireAction('logout');
-                break;
             default:
                 break;
         }
@@ -48,40 +34,46 @@ export default React.createClass({
         let avatar;
         let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, addressBookButton, userSharesButton;
         let avatarStyle = this.props.avatarStyle || {};
-        avatarStyle = {...avatarStyle, marginRight: 20};
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
             avatar = (
-                <PydioComponents.UserAvatar
+                <UserAvatar
                     pydio={this.props.pydio}
                     userId={user.id}
                     style={avatarStyle}
                     className="user-display"
                     labelClassName="userLabel"
+                    labelStyle={{flex: 1, marginLeft: 5}}
                 >
-                    <MaterialUI.IconButton
-                        onTouchTap={this.applyAction.bind(this, 'cog')}
-                        iconClassName="mdi mdi-settings"
-                        tooltip={messages['165']}
-                        style={{width: 38, height: 38}}
-                        iconStyle={{fontSize: 16, color: 'rgba(255,255,255,0.87)'}}
+                    <IconButtonMenu
+                        {...this.props}
+                        buttonClassName={'mdi mdi-dots-vertical'}
+                        buttonStyle={{color: 'white'}}
+                        buttonTitle={messages['165']}
+                        toolbars={["user", "zlogin"]}
+                        controller={this.props.pydio.Controller}
+                        popoverDirection={"left"}
+                        popoverTargetPosition={"top"}
+                        menuProps={{display:'right', width:160, desktop:true}}
                     />
-                </PydioComponents.UserAvatar>
+                </UserAvatar>
             );
-            if(user.getRepositoriesList().has('ajxp_home')){
+
+            if(user.getRepositoriesList().has('ajxp_home') && user.activeRepository !== 'ajxp_home'){
                 homeButton = (
-                    <MaterialUI.IconButton
+                    <IconButton
                         onTouchTap={this.applyAction.bind(this, 'home')}
-                        iconClassName="userActionIcon mdi mdi-home"
+                        iconClassName="userActionIcon mdi mdi-home-variant"
                         className="userActionButton"
                         tooltip={messages['305']}
-                        disabled={user.activeRepository === 'ajxp_home'}
+                        tooltipPosition="bottom-left"
                     />
                 );
             }
+
             if(user.getRepositoriesList().has('ajxp_conf') && user.activeRepository === 'ajxp_home'){
                 settingsButton = (
-                    <MaterialUI.IconButton
+                    <IconButton
                         onTouchTap={this.applyAction.bind(this, 'settings')}
                         iconClassName="userActionIcon mdi mdi-settings"
                         className="userActionButton"
@@ -91,7 +83,7 @@ export default React.createClass({
             }
             if(this.props.pydio.Controller.getActionByName('get_my_feed')){
                 notificationsButton = (
-                    <PydioReactUI.AsyncComponent
+                    <AsyncComponent
                         namespace="PydioNotifications"
                         componentName="Panel"
                         noLoader={true}
@@ -100,76 +92,43 @@ export default React.createClass({
                     />
                 );
             }
-            if(this.props.pydio.Controller.getActionByName('open_address_book')){
-                addressBookButton = (
-                    <MaterialUI.IconButton
-                        onTouchTap={this.applyAction.bind(this, 'address-book')}
-                        iconClassName="userActionIcon mdi mdi-book-open-variant"
-                        className="userActionButton"
-                        tooltip={messages['user_dash.1']}
-                    />
-                );
-            }
-            if(this.props.pydio.Controller.getActionByName('open_user_shares')){
-                userSharesButton = (
-                    <MaterialUI.IconButton
-                        onTouchTap={this.applyAction.bind(this, 'user-shares')}
-                        iconClassName="userActionIcon mdi mdi-share-variant"
-                        className="userActionButton"
-                        tooltip={messages['share_center.98']}
-                    />
-                );
-            }
-        }
-        if(this.props.pydio.Controller.getActionByName('splash')){
-            infoButton =(
-                <MaterialUI.IconButton
-                    onTouchTap={this.applyAction.bind(this, 'info')}
-                    iconClassName="userActionIcon mdi mdi-information-outline"
-                    className="userActionButton"
-                    tooltip={messages['166']}
-                />
-            ) ;
-        }
-        if(this.props.pydio.Controller.getActionByName('logout')){
-            logoutButton = (
-                <MaterialUI.IconButton
-                    onTouchTap={this.applyAction.bind(this, 'logout')}
-                    iconClassName="userActionIcon mdi mdi-logout"
-                    className="userActionButton"
-                    tooltip={messages['169']}
-                />
-            );
         }
 
         // Do not display Home Button here for the moment
+        const actionBarStyle = this.props.actionBarStyle || {};
         const actionBar = (
-            <div className="action_bar" style={this.props.actionBarStyle}>
-                {addressBookButton}
-                {userSharesButton}
-                {settingsButton}
+            <div className="action_bar" style={{display:'flex', ...actionBarStyle}}>
+                <Toolbar
+                    {...this.props}
+                    toolbars={['user-widget']}
+                    renderingType="icon"
+                    toolbarStyle={{display:'inline'}}
+                    buttonStyle={{color: 'rgba(255,255,255,255.93)', fontSize: 18}}
+                    tooltipPosition="bottom-right"
+                />
                 {notificationsButton}
-                {infoButton}
-                {logoutButton}
+                {settingsButton}
+                <span style={{flex:1}}/>
+                {homeButton}
             </div>
         );
 
         if(this.props.children){
             return (
-                <MaterialUI.Paper zDepth={1} rounded={false} style={{...this.props.style, display:'flex'}} className="user-widget primaryColorDarkerPaper">
+                <Paper zDepth={1} rounded={false} style={{...this.props.style, display:'flex'}} className="user-widget primaryColorDarkerPaper">
                     <div style={{flex: 1}}>
                         {avatar}
                         {actionBar}
                     </div>
                     {this.props.children}
-                </MaterialUI.Paper>
+                </Paper>
             );
         }else{
             return (
-                <MaterialUI.Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
+                <Paper zDepth={1} rounded={false} style={this.props.style} className="user-widget primaryColorDarkerPaper">
                     {avatar}
                     {actionBar}
-                </MaterialUI.Paper>
+                </Paper>
             );
         }
     }
