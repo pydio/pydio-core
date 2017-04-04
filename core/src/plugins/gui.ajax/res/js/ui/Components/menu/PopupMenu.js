@@ -1,12 +1,12 @@
 const React = require('react')
-const {Menu} = require('material-ui')
+const ReactDOM = require('react-dom')
+const {Menu, Paper} = require('material-ui')
 import Utils from './Utils'
 
 export default React.createClass({
 
     propTypes: {
         menuItems: React.PropTypes.array.isRequired,
-        onMenuClicked: React.PropTypes.func.isRequired,
         onExternalClickCheckElements: React.PropTypes.func,
         className: React.PropTypes.string,
         style:React.PropTypes.object,
@@ -29,20 +29,14 @@ export default React.createClass({
             if(this.props.onMenuClosed) this.props.onMenuClosed();
             return;
         }
-        let hide = true;
-        if(this.props.onExternalClickCheckElements){
-            let elements = this.props.onExternalClickCheckElements();
-            for(let i = 0; i < elements.length ; i ++){
-                if(elements[i].contains(event.target) || elements[i] === event.target ){
-                    hide = false;
-                    break;
-                }
-            }
+        const node = ReactDOM.findDOMNode(this.refs.menuContainer);
+        if(node.contains(event.target) || node === event.target ){
+            return;
         }
-        if(hide){
-            this.setState({showMenu: false});
-            if(this.props.onMenuClosed) this.props.onMenuClosed();
-        }
+
+        this.setState({showMenu: false});
+        if(this.props.onMenuClosed) this.props.onMenuClosed();
+
     },
     componentDidMount: function(){
         this._observer = this.hideMenu;
@@ -64,22 +58,15 @@ export default React.createClass({
     },
 
     menuClicked:function(event, index, menuItem){
-        //this.props.onMenuClicked(menuItem);
         this.hideMenu();
     },
     render: function(){
 
-        const menu = Utils.itemsToMenu(this.state.menuItems, this.menuClicked);
+        let style = this.state.style || {};
+        style = {...style, zIndex: 1000};
+        const menu = Utils.itemsToMenu(this.state.menuItems, this.menuClicked.bind(this), false, {display:'compact'});
         if(this.state.showMenu) {
-            if(this.state.style){
-                return (
-                    <div style={this.state.style} className="menu-positioner">
-                        {menu}
-                    </div>
-                );
-            }else{
-                return menu;
-            }
+            return <Paper ref="menuContainer" className="menu-positioner" style={style}>{menu}</Paper>
         }else{
             return null;
         }

@@ -68,7 +68,7 @@ const PydioComponents = {
 
     ContextMenuNodeProviderMixin: ContextMenuNodeProviderMixin,
     ContextMenu             : ContextMenu,
-    Toolbar                 :Toolbar,
+    Toolbar                 : Toolbar,
     ButtonMenu              : ButtonMenu,
     IconButtonMenu          : IconButtonMenu
 };

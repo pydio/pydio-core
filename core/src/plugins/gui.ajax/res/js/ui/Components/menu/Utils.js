@@ -38,7 +38,7 @@ function pydioActionsToItems(actions = []){
     return items;
 }
 
-function itemsToMenu(items, closeMenuCallback, subItemsOnly = false){
+function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, props = {display:'normal'}){
 
     const menuItems = items.map((item) => {
 
@@ -57,7 +57,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false){
         return (
             <MenuItem
                 primaryText={item.text}
-                leftIcon={item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null}
+                leftIcon={props.display !== 'compact' && item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null}
                 rightIcon={subItems && subItems.length ? <FontIcon className="mdi mdi-menu-right"/> : null}
                 onTouchTap={payload}
                 menuItems={subItems}
@@ -70,7 +70,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false){
     if(subItemsOnly) {
         return menuItems;
     } else {
-        return <Menu desktop={false} width={256}>{menuItems}</Menu>
+        return <Menu desktop={props.display === 'compact'} width={256}>{menuItems}</Menu>
     }
 
 }
