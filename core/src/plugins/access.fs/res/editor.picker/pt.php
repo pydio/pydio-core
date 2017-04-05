@@ -19,9 +19,9 @@
  * The latest code can be found at <https://pydio.com>.
  */
 $mess=array(
-"1" => "Choose other...",
-"2" => "Choose another editor",
-"3" => "Select another editor to open this file",
-"4" => "Warning, these editors do not declare to be supporting this file type, their behaviour maybe unpredictable!",
-"5" => "Clear existing associations",
+"1" => "Escolher outro...",
+"2" => "Escolher outro editor",
+"3" => "seleccione outro editor para abrir este ficheiro",
+"4" => "ATENÇÃO: Estes editores declaram que não suportam este tipo de ficheiro, o comportamento dos mesmos pode ser imprevisível!",
+"5" => "Apagar as associações",
 );

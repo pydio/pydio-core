@@ -19,6 +19,9 @@
 * The latest code can be found at <https://pydio.com>.
 */
 $mess=array(
-"Open in..." => "Ouvrir dans...",
-"Simple Picker to open any type of file in any available editor." => "Liste de choix pour ouvrir n'importe quel fichier dans n'importe quel éditeur.",
+"1" => "Choisissez un autre...",
+"2" => "Choisissez un autre éditeur",
+"3" => "Choisissez un autre éditeur pour ouvrir ce fichier",
+"4" => "Attention, ces éditeurs ne déclarent pas supporter ce type de fichier. Leur comportement peut-être imprévisible !",
+"5" => "Effacer les associations",
 );

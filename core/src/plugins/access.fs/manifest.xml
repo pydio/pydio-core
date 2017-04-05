@@ -3,6 +3,7 @@
     <client_settings icon="plugins/access.fs/icon.png" description_template="{PATH}" iconClass="icon-hdd">
         <resources>
             <i18n namespace="access_fs" path="plugins/access.fs/i18n"/>
+            <i18n namespace="openother" path="plugins/access.fs/res/editor.picker" />
             <js className="FSActions" file="plugins/access.fs/res/build/FSActions.js" depends="PydioComponents"/>
         </resources>
     </client_settings>

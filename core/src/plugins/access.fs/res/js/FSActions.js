@@ -270,6 +270,13 @@
             });
         }
 
+        static openOtherEditorPicker(){
+            pydio.UI.openComponentInModal('FSActions', 'OtherEditorPickerDialog', {
+                selection: pydio.getUserSelection(),
+                pydio    : pydio
+            });
+        }
+
     }
 
     class Listeners {
@@ -337,6 +344,24 @@
             var node = pydio.getUserSelection().getUniqueNode();
             var selectedMime = PathUtils.getAjxpMimeType(node);
             var nodeHasReadonly = node.getMetadata().get("ajxp_readonly") === "true";
+
+            const user = pydio.user;
+            // Patch editors list before looking for available ones
+            if(user && user.getPreference("gui_preferences", true) && user.getPreference("gui_preferences", true)["other_editor_extensions"]){
+                const otherRegistered = user.getPreference("gui_preferences", true)["other_editor_extensions"];
+                Object.keys(otherRegistered).forEach(function(key){
+                    let editor;
+                    pydio.Registry.getActiveExtensionByType("editor").forEach(function(ed){
+                        if(ed.editorClass == otherRegistered[key]){
+                            editor = ed;
+                        }
+                    });
+                    if(editor &&  editor.mimes.indexOf(key) === -1){
+                        editor.mimes.push(key);
+                    }
+                }.bind(this));
+            }
+
             var editors = pydio.Registry.findEditorsForMime(selectedMime);
             if(editors.length){
                 var index = 0;
@@ -354,20 +379,25 @@
                         name:el.text,
                         alt:el.title,
                         isDefault : (index == 0),
-                        image:ResourcesManager.resolveImageSource(el.icon, '/images/actions/ICON_SIZE', 22),
                         icon_class: el.icon_class,
                         callback:function(e){this.apply([el]);}.bind(this)
                     });
                     index++;
                 }.bind(this));
+                builderMenuItems.push({
+                    name:MessageHash['openother.1'],
+                    alt:MessageHash['openother.2'],
+                    isDefault : (index === 0),
+                    icon_class: 'icon-list-alt',
+                    callback:Callbacks.openOtherEditorPicker
+                });
             }
             if(!index){
                 builderMenuItems.push({
                     name:MessageHash[324],
                     alt:MessageHash[324],
-                    image:ResourcesManager.resolveImageSource('button_cancel.png', '/images/actions/ICON_SIZE', 22),
                     callback:function(e){}
-                } );
+                });
             }
             return builderMenuItems;
 
@@ -676,6 +706,115 @@
 
     });
 
+    let OtherEditorPickerDialog = React.createClass({
+
+        propTypes:{
+            pydio: React.PropTypes.instanceOf(Pydio),
+            selection: React.PropTypes.instanceOf(PydioDataModel)
+        },
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin
+        ],
+
+        getButtons: function(updater){
+            let actions = [];
+            const mess = this.props.pydio.MessageHash;
+            actions.push(<MaterialUI.FlatButton
+                key="clear"
+                label={MessageHash['openother.5']}
+                primary={false}
+                onTouchTap={this.clearAssociations}
+            />);
+            actions.push(<MaterialUI.FlatButton
+                label={mess['49']}
+                primary={true}
+                keyboardFocused={true}
+                onTouchTap={this.props.onDismiss}
+            />);
+            return actions;
+        },
+
+        getDefaultProps: function(){
+            return {
+                dialogTitleId: 'Open with...',
+                dialogIsModal: false,
+                dialogSize:'sm',
+                dialogPadding: 0,
+            };
+        },
+        findActiveEditors : function(mime){
+            let editors = [];
+            let checkWrite = false;
+            const {pydio} = this.props;
+            if(this.user != null && !this.user.canWrite()){
+                checkWrite = true;
+            }
+            pydio.Registry.getActiveExtensionByType('editor').forEach(function(el){
+                if(checkWrite && el.write) return;
+                if(!el.openable) return;
+                editors.push(el);
+            });
+            return editors;
+        },
+
+        clearAssociations: function(){
+            const mime = this.props.selection.getUniqueNode().getAjxpMime();
+            console.log(mime);
+            let guiPrefs, assoc;
+            try{
+                guiPrefs = this.props.pydio.user.getPreference("gui_preferences", true);
+                assoc = guiPrefs["other_editor_extensions"];
+            }catch(e){}
+            if(assoc && assoc[mime]){
+                const editorClassName = assoc[mime];
+                let editor;
+                this.props.pydio.Registry.getActiveExtensionByType("editor").forEach(function(ed){
+                    if(ed.editorClass === editorClassName) editor = ed;
+                });
+                if(editor && editor.mimes.indexOf(mime) !== -1){
+                    editor.mimes = LangUtils.arrayWithout(editor.mimes, editor.mimes.indexOf(mime));
+                }
+                delete assoc[mime];
+                guiPrefs["other_editor_extensions"] = assoc;
+                this.props.pydio.user.setPreference("gui_preferences", guiPrefs, true);
+                this.props.pydio.user.savePreference("gui_preferences");
+            }
+            this.props.onDismiss();
+
+        },
+
+        selectEditor: function(editor, event){
+            const mime = this.props.selection.getUniqueNode().getAjxpMime();
+            editor.mimes.push(mime);
+            let user = this.props.pydio.user;
+            if(!user) return;
+
+            let guiPrefs = user.getPreference("gui_preferences", true) || {};
+            let exts = guiPrefs["other_editor_extensions"] || {};
+            exts[mime] = editor.editorClass;
+            guiPrefs["other_editor_extensions"] = exts;
+            user.setPreference("gui_preferences", guiPrefs, true);
+            user.savePreference("gui_preferences");
+            Callbacks.openInEditor(null, editor);
+            this.dismiss();
+        },
+
+        render: function(){
+            //let items = [];
+            const items = this.findActiveEditors('*').map((e) => {
+                const icon = <MaterialUI.FontIcon className={e.icon_class}/>;
+                return <MaterialUI.ListItem onTouchTap={this.selectEditor.bind(this, e)} primaryText={e.text} secondaryText={e.title} leftIcon={icon}/>;
+            });
+            return (
+                <MaterialUI.List style={{maxHeight: 320, overflowY: 'scroll', width: '100%'}}>
+                    {items}
+                </MaterialUI.List>
+            );
+        }
+
+    });
+
     let PermissionsDialog = React.createClass({
         propsTypes: {
             selection: React.PropTypes.instanceOf(PydioDataModel),
@@ -868,6 +1007,7 @@
     ns.TreeDialog = TreeDialog;
     ns.UploadDialog = UploadDialog;
     ns.PermissionsDialog = PermissionsDialog;
+    ns.OtherEditorPickerDialog = OtherEditorPickerDialog;
     global.FSActions = ns;
 
 })(window);

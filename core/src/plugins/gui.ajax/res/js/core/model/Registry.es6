@@ -251,9 +251,10 @@ export default class Registry{
      */
     findEditorsForMime (mime, restrictToPreviewProviders){
 
+        const user = this._pydioObject.user;
         let editors = [], checkWrite = false;
 
-        if(this._pydioObject.user != null && !this._pydioObject.user.canWrite()){
+        if(user != null && !user.canWrite()){
             checkWrite = true;
         }
         this._extensionsRegistry.editor.forEach(function(el){
