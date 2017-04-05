@@ -12,14 +12,5 @@ module.exports = function(grunt){
         'uglify:nodejs',
         // UI
         'compilelibs'
-
-//        'env:build',
-//        'babel:materialui',
-//        'babel:pydio',
-//        'browserify:dist',
-//        'browserify:ui',
-//        'env:dev',
-//        'uglify:nodejs',
-//        'uglify:ui'
     ]);
 };

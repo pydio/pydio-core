@@ -50,7 +50,6 @@ const LibRequires = [ // modules we want to require and export
     'react-autosuggest',
     'clipboard',
     'qrcode.react',
-    'react-mfb',
     'cronstrue',
     'react-tap-event-plugin',
     'whatwg-fetch',
