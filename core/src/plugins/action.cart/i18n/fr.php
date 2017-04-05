@@ -32,8 +32,9 @@ $mess = array(
     "9" => "Mon Panier",
     "10"=> "Paniers",
     "11"=> "Compresser et partager",
-    "12"=> "Créer une archive à partir de la selection, puis la partager",
+    "12"=> "Créer une archive à partir de la selection",
     "13"=> "Changer le libellé de ce panier",
     "14"=> "Une archive va être créée, contenant tous les fichiers. Entrez un nom pour cette archive : ",
     "15"=> "Déposer des éléments dans le panier pour les télécharger ou les partager ultérieurement.",
+    "16"=> "Enlever du panier",
 );

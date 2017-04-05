@@ -108,6 +108,11 @@
             this.notify("update");
         }
 
+        removeNode(node){
+            this.root.removeChild(node);
+            this.notify("update");
+        }
+
         downloadContent(){
             const sel = this.buildSelection();
             if(!Object.keys(sel).length) return;
@@ -120,14 +125,13 @@
             if(!Object.keys(sel).length) return;
             const zipName = this.buildZipName();
             if(!zipName) return;
-            let params = {...sel, get_action: 'compress', compress_flat:'true', dir:'/', archive_name:zipName + '.zip'};
+            let params = {...sel, get_action: 'compress', compress_flat:'true', dir:'/', archive_name:zipName};
             PydioApi.getClient().request(params, function(transport){
                 const success = PydioApi.getClient().parseXmlMessage(transport.responseXML);
                 if(success){
-                    pydio.goTo('/'+zipName+'.zip');
-                    window.setTimeout(function(){
-                        pydio.getController().fireAction('share-file-minisite');
-                    }, 500);
+                    const contextHolder = pydio.getContextHolder();
+                    contextHolder.setPendingSelection(zipName);
+                    contextHolder.requireContextChange(contextHolder.getRootNode());
                 }
             });
         }
@@ -151,6 +155,21 @@
             Model.getInstance().compressContentAndShare();
         },
 
+        renderActions: function(node){
+            return <MaterialUI.IconButton
+                first={true}
+                iconClassName="mdi mdi-close"
+                iconStyle={{color: 'rgba(0,0,0,0.23)', iconHoverColor:'rgba(0,0,0,0.53)'}}
+                tooltip={MessageHash['action.cart.16']}
+                tooltipPosition="bottom-left"
+                onTouchTap={() => {Model.getInstance().removeNode(node)}}
+                />
+        },
+
+        renderIcon: function(node){
+            return <PydioWorkspaces.FilePreview style={{height: 36, width: 36, margin: '8px 15px', borderRadius: '50%'}} node={node} loadThumbnail={true} richPreview={false}/>
+        },
+
         render: function(){
 
             const dataModel = Model.getInstance().getDataModel();
@@ -158,18 +177,31 @@
             if(!dataModel.getRootNode().getChildren().size){
                 disabled = true;
             }
+            const iconStyle = {
+                color: 'rgba(255,255,255,.83)',
+                iconHoverColor: 'rgba(255,255,255,1)',
+            };
 
             return (
-                <div style={{width: 400, height: 400}} className="vertical_layout">
-                    <div>
-                        <MaterialUI.FlatButton disabled={disabled} label={MessageHash['action.cart.3']} onTouchTap={this.clearContent}/>
-                        <MaterialUI.FlatButton disabled={disabled} label={MessageHash['action.cart.7']} onTouchTap={this.download}/>
-                        <MaterialUI.FlatButton disabled={disabled} label={MessageHash['action.cart.11']} onTouchTap={this.zipAndShare}/>
-                    </div>
+                <div style={{width: 320, height: 400}} className="vertical_layout">
+                    <MaterialUI.Toolbar>
+                        <MaterialUI.ToolbarGroup firstChild={true}>
+                            <MaterialUI.IconButton iconClassName="mdi mdi-file-plus" iconStyle={iconStyle} disabled={pydio.getContextHolder().isEmpty()} tooltipPosition="bottom-right" tooltip={MessageHash['action.cart.2']} onTouchTap={Callbacks.addCurrentSelection}/>
+                            <MaterialUI.IconButton iconClassName="mdi mdi-delete" iconStyle={iconStyle} disabled={disabled}  tooltip={MessageHash['action.cart.3']} onTouchTap={this.clearContent}/>
+                        </MaterialUI.ToolbarGroup>
+                        <span style={{flex: 1}}/>
+                        <MaterialUI.ToolbarGroup lastChild={true}>
+                            <MaterialUI.IconButton iconClassName="mdi mdi-download" iconStyle={iconStyle}  disabled={disabled} tooltip={MessageHash['action.cart.7']} onTouchTap={this.download}/>
+                            <MaterialUI.IconButton iconClassName="mdi mdi-archive" iconStyle={iconStyle}  disabled={disabled} tooltip={MessageHash['action.cart.11']} tooltipPosition="bottom-left" onTouchTap={this.zipAndShare}/>
+                        </MaterialUI.ToolbarGroup>
+                    </MaterialUI.Toolbar>
                     <PydioComponents.NodeListCustomProvider
                         presetDataModel={dataModel}
                         actionBarGroups={[]}
                         elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                        hideToolbar={true}
+                        entryRenderActions={this.renderActions}
+                        entryRenderIcon={this.renderIcon}
                     />
                 </div>
             );

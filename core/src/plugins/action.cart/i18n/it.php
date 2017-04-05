@@ -32,8 +32,9 @@ $mess = array(
     "9" => "Carrello Principale",
     "10"=> "Carrelli",
     "11"=> "Comprimi e Condividi",
-    "12"=> "Crea un archivio con gli elementi selezionati e condividilo",
+    "12"=> "Crea un archivio con gli elementi selezionati",
     "13"=> "Inserisci un'etichetta per il carrello",
-    "14"=> "Verrà creato un archivio, con tutti i file, che verrà condiviso. Inserisci un nome per l'archivio:",
+    "14"=> "Verrà creato un archivio, con tutti i file. Inserisci un nome per l'archivio:",
     "15"=> "Trascina gli elementi nel carrello per scaricarli o condividerli successivamente",
+    "16"=> "Remove from cart",
 );

@@ -31,9 +31,10 @@ $mess = array(
     "8" => "Inhalt des ausgewählten Korbs herunterladen",
     "9" => "Standard-Korb",
     "10"=> "Körbe",
-    "11"=> "Inhalt des ausgewählten Korbs komprimieren und freigeben",
-    "12"=> "Archiv aus Auswahl erstellen und freigeben",
+    "11"=> "Inhalt des ausgewählten Korbs komprimieren",
+    "12"=> "Archiv aus Auswahl erstellen",
     "13"=> "Name des Korbs",
-    "14"=> "Archiv aus allen Dateien des Korbs erstellen und freigeben. Bitte einen Namen für das Archiv angeben:",
+    "14"=> "Archiv aus allen Dateien des Korbs erstellen. Bitte einen Namen für das Archiv angeben:",
     "15"=> "Elemente in den Korb legen, um sie später herunterzuladen oder freizugeben.",
-);
+    "16"=> "Remove from cart",
+    );
