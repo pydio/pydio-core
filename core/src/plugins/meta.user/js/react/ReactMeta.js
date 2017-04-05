@@ -230,7 +230,7 @@
 
         render: function(){
             let index = 0, i = 1;
-            this.props.menuItems.unshift(<MaterialUI.MenuItem value={null} primaryText={this.props.label}/>);
+            this.props.menuItems.unshift(<MaterialUI.MenuItem value={''} primaryText=""/>);
             return (
                 <div>
                     <MaterialUI.SelectField
@@ -367,13 +367,14 @@
                 console.log(this.state.dataSource);
                 autoCompleter = <MaterialUI.AutoComplete
                                     fullWidth={true}
-                                    hintText="Select a tag or enter new value then hit Enter"
+                                    hintText="Existing or new tag"
                                     searchText={this.state.searchText}
                                     onUpdateInput={this.handleUpdateInput}
                                     onNewRequest={this.handleNewRequest}
                                     dataSource={this.state.dataSource}
                                     filter={(searchText, key) => (key.toLowerCase().indexOf(searchText.toLowerCase()) === 0)}
                                     openOnFocus={true}
+                                    menuProps={{maxHeight: 200}}
                                 />
             } else {
                 autoCompleter = <div></div>
@@ -510,7 +511,7 @@
                         field = (
                             <MaterialUI.TextField
                                 value={value}
-                                style={{width:'100%'}}
+                                fullWidth={true}
                                 onChange={(event, value)=>{this.updateValue(key, value);}}
                             />
                         );
@@ -524,7 +525,7 @@
                         );
                     }else{
                         data.push(
-                            <div className={"infoPanelRow"} key={key} style={{ marginBottom: 20}}>
+                            <div className={"infoPanelRow"} key={key}>
                                 <div className="infoPanelLabel">{label}</div>
                                 <div className="infoPanelValue">{field}</div>
                             </div>
