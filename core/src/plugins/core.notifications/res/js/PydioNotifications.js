@@ -343,14 +343,15 @@
                         targetOrigin={{horizontal: 'left', vertical: 'top'}}
                         onRequestClose={this.handleRequestClose}
                         style={{width:400}}
+                        zDepth={2}
 
                     >
                         <PydioComponents.NodeListCustomProvider
                             ref="list"
-                            className={'files-list card-list'}
+                            className={'files-list'}
                             hideToolbar={true}
                             pydio={this.props.pydio}
-                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 11}
+                            elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES + 2}
                             heightAutoWithMax={500}
                             presetDataModel={this.state.dataModel}
                             reloadAtCursor={true}
