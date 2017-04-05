@@ -1,6 +1,8 @@
 module.exports = function(grunt){
     grunt.registerTask('mainjs', [
         'copy:dndpatch',
+        // Material UI legacy
+        'babel:materialui',
         // CORE
         'babel:core',
         'env:build',
@@ -10,7 +12,7 @@ module.exports = function(grunt){
         'env:dev',
         'uglify:core',
         'uglify:nodejs',
-        // UI
+        // Pydio UI
         'compilelibs'
     ]);
 };
