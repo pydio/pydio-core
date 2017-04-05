@@ -48,7 +48,6 @@
 
         static renderTagsCloud(node, column){
             return <span>{node.getMetadata().get(column.name)}</span>
-//            return <TagsCloud node={node} column={column}/>;
         }
 
         static formPanelStars(props){
@@ -133,21 +132,25 @@
 
     };
 
+    const starsStyle = { fontSize: 16, color: '#FBC02D' };
+
     let StarsFormPanel = React.createClass({
 
         mixins:[MetaFieldFormPanelMixin],
 
         getInitialState: function(){
-            return {value: 0};
+            return {value: this.props.value || 0};
         },
 
         render: function(){
             let value = this.state.value;
-            let stars = [0,1,2,3,4].map(function(v){
-                return <span key={"star-" + v} onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
+            let stars = [-1,0,1,2,3,4].map(function(v){
+                const ic = 'star' + (v === -1 ? '-off' : (value > v ? '' : '-outline') );
+                const style = (v === -1 ? {marginRight: 5, cursor:'pointer'} : {cursor: 'pointer'});
+                return <span key={"star-" + v} onClick={this.updateValue.bind(this, v+1)} className={"mdi mdi-" + ic} style={style}></span>;
             }.bind(this));
             return (
-                <div className="advanced-search-stars">
+                <div className="advanced-search-stars" style={starsStyle}>
                     <div>{stars}</div>
                 </div>
             );
@@ -164,7 +167,7 @@
             let stars = [0,1,2,3,4].map(function(v){
                 return <span key={"star-" + v} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
             });
-            return <span>{stars}</span>;
+            return <span style={starsStyle}>{stars}</span>;
         }
 
     });
@@ -191,11 +194,11 @@
 
         statics:{
             CSS_LABELS : {
-                'low'       : {cssClass:'meta_low',         label:MessageHash['meta.user.4'], sortValue:'5'},
-                'todo'      : {cssClass:'meta_todo',        label:MessageHash['meta.user.5'], sortValue:'4'},
-                'personal'  : {cssClass:'meta_personal',    label:MessageHash['meta.user.6'], sortValue:'3'},
-                'work'      : {cssClass:'meta_work',        label:MessageHash['meta.user.7'], sortValue:'2'},
-                'important' : {cssClass:'meta_important',   label:MessageHash['meta.user.8'], sortValue:'1'}
+                'low'       : {label:MessageHash['meta.user.4'], sortValue:'5', color: '#66c'},
+                'todo'      : {label:MessageHash['meta.user.5'], sortValue:'4', color: '#69c'},
+                'personal'  : {label:MessageHash['meta.user.6'], sortValue:'3', color: '#6c6'},
+                'work'      : {label:MessageHash['meta.user.7'], sortValue:'2', color: '#c96'},
+                'important' : {label:MessageHash['meta.user.8'], sortValue:'1', color: '#c66'}
             }
         },
 
@@ -205,8 +208,7 @@
             const data = CSSLabelsFilter.CSS_LABELS;
             if(value && data[value]){
                 let dV = data[value];
-                return <span className="mdi mdi-label" style={{color: dV.color}}>{dV.label}</span>
-                // return <span className={dV.cssClass}>{dV.label}</span>
+                return <span><span className="mdi mdi-label" style={{color: dV.color}} /> {dV.label}</span>
             }else{
                 return <span>{value}</span>;
             }
@@ -251,6 +253,7 @@
         },
         componentDidMount: function() {
             this.getRealValue();
+            this.load()
         },
 
         getRealValue: function(){
@@ -264,24 +267,15 @@
 
         getInitialState: function(){
             let {node, value} = this.props
-            if (node != null) {
-                return {
-                    loading     : false,
-                    dataSource  : [],
-                    tags        : node.getMetadata().get(this.props.column.name),
-                    searchText  : ''
-                };
-            } else {
-                return {
-                    loading     : false,
-                    dataSource  : [],
-                    tags        : value,
-                    searchText  : ''
-                };
-            }
+            return {
+                loading     : false,
+                dataSource  : [],
+                tags        : (node ? node.getMetadata().get(this.props.column.name) : value),
+                searchText  : ''
+            };
         },
 
-        suggestionLoader: function(input, callback) {
+        suggestionLoader: function(callback) {
             const excludes = this.props.excludes;
             const disallowTemporary = this.props.existingOnly && !this.props.freeValueAllowed;
             this.setState({loading:this.state.loading + 1});
@@ -292,28 +286,18 @@
             });
         },
 
-        loadBuffered: function(value, timeout) {
-            if(!value && this._emptyValueList){
-                this.setState({dataSource: this._emptyValueList});
-                return;
-            }
-            FuncUtils.bufferCallback('meta_user_list_tags', timeout, function(){
-                this.setState({loading: true});
-                this.suggestionLoader(value, function(tags){
-                    let crtValueFound = false;
-                    const values = tags.map(function(tag){
-                        let component = (<MaterialUI.MenuItem>{tag}</MaterialUI.MenuItem>);
-                        return {
-                            userObject  : tag,
-                            text        : tag,
-                            value       : component
-                        };
-                    }.bind(this));
-                    if(!value){
-                        this._emptyValueList = values;
-                    }
-                    this.setState({dataSource: values, loading: false});
+        load: function() {
+            this.setState({loading: true});
+            this.suggestionLoader(function(tags){
+                let crtValueFound = false;
+                const values = tags.map(function(tag){
+                    let component = (<MaterialUI.MenuItem>{tag}</MaterialUI.MenuItem>);
+                    return {
+                        text        : tag,
+                        value       : component
+                    };
                 }.bind(this));
+                this.setState({dataSource: values, loading: false});
             }.bind(this));
         },
 
@@ -330,7 +314,6 @@
 
         handleUpdateInput: function(searchText) {
             this.setState({searchText: searchText});
-            this.loadBuffered(searchText, 350);
         },
 
         handleNewRequest: function() {
@@ -381,14 +364,15 @@
             let autoCompleter;
             let textField;
             if (this.props.editMode) {
+                console.log(this.state.dataSource);
                 autoCompleter = <MaterialUI.AutoComplete
                                     fullWidth={true}
-                                    hintText="Type 'r', case insensitive"
+                                    hintText="Select a tag or enter new value then hit Enter"
                                     searchText={this.state.searchText}
                                     onUpdateInput={this.handleUpdateInput}
                                     onNewRequest={this.handleNewRequest}
                                     dataSource={this.state.dataSource}
-                                    // filter={(searchText, key) => (key.indexOf(searchText) !== -1)}
+                                    filter={(searchText, key) => (key.toLowerCase().indexOf(searchText.toLowerCase()) === 0)}
                                     openOnFocus={true}
                                 />
             } else {
@@ -428,14 +412,15 @@
             });
             PydioApi.getClient().postSelectionWithAction("edit_user_meta", function(t){
                 PydioApi.getClient().parseXmlMessage(t.responseXML);
+                this.dismiss();
             }.bind(this), this.props.selection, params);
         },
         render: function(){
             return (
                 <UserMetaPanel
-                    dialog={true}
+                    multiple={!this.props.selection.isUnique()}
                     ref="panel"
-                    node={new AjxpNode()}
+                    node={this.props.selection.isUnique() ? this.props.selection.getUniqueNode() : new AjxpNode()}
                     editMode={true}
                 />
             );
@@ -530,16 +515,16 @@
                             />
                         );
                     }
-                    if(this.props.dialog){
+                    if(this.props.multiple){
                         data.push(
-                            <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key} style={{ marginBottom: 20}}>
+                            <div className={"infoPanelRow"} key={key} style={{ marginBottom: 20}}>
                                 <MaterialUI.Checkbox value={key} label={label} onCheck={this.onCheck.bind(value)}/>
                                 {this.state['fields'][key] && <div className="infoPanelValue">{field}</div>}
                             </div>
                         );
                     }else{
                         data.push(
-                            <div className={"infoPanelRow" + (!realValue?' no-value':'')} key={key} style={{ marginBottom: 20}}>
+                            <div className={"infoPanelRow"} key={key} style={{ marginBottom: 20}}>
                                 <div className="infoPanelLabel">{label}</div>
                                 <div className="infoPanelValue">{field}</div>
                             </div>
@@ -569,7 +554,11 @@
             if(!this.props.editMode && !nonEmptyDataCount){
                 return <div><div style={{color: 'rgba(0,0,0,0.23)', paddingBottom:10}}>No metadata set. Click edit to add some.</div>{data}</div>
             }else{
-                return (<div style={{width: '100%', overflowY: 'scroll'}}>{data}</div>);
+                let legend;
+                if(this.props.multiple){
+                    legend = <div style={{paddingBottom: 16}}>[Multiple Selection] Check the fields that you want to update, value will be applied to all selected files</div>
+                }
+                return (<div style={{width: '100%', overflowY: 'scroll'}}>{legend}{data}</div>);
             }
         }
 
