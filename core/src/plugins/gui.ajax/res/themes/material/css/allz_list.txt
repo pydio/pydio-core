@@ -1,4 +1,0 @@
-themes/material/css/pydio.css
-themes/common/css/animate-custom.css
-themes/common/css/chosen.css#NO_MINI
-themes/common/css/media.css#NO_MINI
