@@ -66,7 +66,7 @@
         renderIconFile: function(node){
             let fileNode = new AjxpNode(node.getMetadata().get('real_path'), node.isLeaf(), node.getLabel());
             fileNode.setMetadata(node.getMetadata());
-            return <PydioWorkspaces.FilePreview loadThumbnail={true} node={fileNode}/>;
+            return <PydioWorkspaces.FilePreview rounded={true} loadThumbnail={true} node={fileNode}/>;
         },
 
         renderIconNotif: function(node){
@@ -279,6 +279,7 @@
                     loadThumbnail={true}
                     node={node}
                     pydio={this.props.pydio}
+                    rounded={true}
                 />
             );
         },

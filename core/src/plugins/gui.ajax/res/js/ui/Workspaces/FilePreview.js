@@ -1,4 +1,5 @@
-import * as React from "react";
+const React = require('react');
+const {muiThemeable} = require('material-ui/styles')
 
 let FilePreview = React.createClass({
 
@@ -6,8 +7,53 @@ let FilePreview = React.createClass({
         node            : React.PropTypes.instanceOf(AjxpNode),
         loadThumbnail   : React.PropTypes.bool,
         richPreview     : React.PropTypes.bool,
+        // This will apply default styles and mimefontStyles
+        rounded         : React.PropTypes.bool,
+        roundedSize     : React.PropTypes.number,
+        // Additional styling
         style           : React.PropTypes.object,
         mimeFontStyle   : React.PropTypes.object
+    },
+
+    getStyles: function(){
+
+        const color = this.props.muiTheme.palette.primary1Color;
+        let roundedStyle = {
+            root: {
+                backgroundColor: '#ECEFF1',
+                borderRadius: '50%',
+                margin: 15,
+                height: 40,
+                width: 40,
+                lineHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent:'center'
+            },
+            mimefont: {
+                color: color,
+                fontSize: '24',
+                textAlign: 'center',
+                flex: 1
+            }
+        };
+
+        let rootStyle = this.props.rounded ? roundedStyle.root : {};
+        let mimefontStyle = this.props.rounded ? roundedStyle.mimefont : {};
+
+        if(this.props.rounded && this.props.roundedSize){
+            rootStyle.height = rootStyle.width = rootStyle.lineHeight = this.props.roundedSize;
+            rootStyle.lineHeight = this.props.roundedSize + 'px';
+        }
+        if(this.props.style){
+            rootStyle = {...rootStyle, ...this.props.style};
+        }
+        if(this.props.mimeFontStyle){
+            mimefontStyle = {...mimefontStyle, ...this.props.mimeFontStyle};
+        }
+
+        return {rootStyle: rootStyle, mimeFontStyle: mimefontStyle};
+
     },
 
     getInitialState: function(){
@@ -93,10 +139,9 @@ let FilePreview = React.createClass({
                     backgroundSize : 'cover',
                     backgroundPosition: 'center center'
                 };
-                if(this.props.style){
-                    style = Object.assign(style, this.props.style);
-                }
-                let element = (<div className="covering-bg-preview" style={style}></div>);
+
+                const {rootStyle} = this.getStyles();
+                let element = (<div className="covering-bg-preview" style={{...style, ...rootStyle}}></div>);
 
                 this.setState({loading: false, element: element});
             }.bind(this);
@@ -110,7 +155,7 @@ let FilePreview = React.createClass({
                 image.onload = loader();
             }
         } else if (editorClass.getPreviewComponent) {
-            var promise = editorClass.getPreviewComponent(node, this.props.richPreview)
+            const promise = editorClass.getPreviewComponent(node, this.props.richPreview)
 
             Promise.resolve(promise).then(function (component) {
                 this.setState({
@@ -127,36 +172,34 @@ let FilePreview = React.createClass({
 
     render: function(){
 
-        if (this.state.preview) {
+        const {preview, element} = this.state;
+
+        if (preview) {
             return (
-                <this.state.preview.element {...this.state.preview.props} pydio={window.pydio} preview={true} />
+                <preview.element {...preview.props} pydio={window.pydio} preview={true} />
             )
-        }else if(this.state.element){
-            return this.state.element;
+        }else if(element){
+            return element;
         }
 
-        let node = this.props.node;
-
+        const {node} = this.props;
         if (!node) {
             return null
         }
 
-        let object, className;
-
-        const svg = node.getSvgSource();
-        if (svg) {
-            object = <div key="icon" className={"mimefont mdi mdi-" + svg} style={this.props.mimeFontStyle}></div>;
-            className = 'mimefont-container';
-        } else {
-            const icon = node.getIcon() || (!node.isLeaf() ? 'folder.png' : 'mime_empty.png')
-
-            object = <img key="image" src={ResourcesManager.resolveImageSource(icon, "mimes/ICON_SIZE", 64)} />;
+        const {rootStyle, mimeFontStyle} = this.getStyles();
+        let svg = node.getSvgSource();
+        if(!svg){
+            svg = (node.isLeaf() ? 'file' : 'folder');
         }
-
         return (
-            <div ref="container" style={this.props.style} className={className}>{object}</div>
+            <div ref="container" style={rootStyle} className='mimefont-container'>
+                <div key="icon" className={"mimefont mdi mdi-" + svg} style={mimeFontStyle}/>
+            </div>
         );
     }
 });
+
+FilePreview = muiThemeable()(FilePreview);
 
 export {FilePreview as default}

@@ -159,7 +159,7 @@
             return <MaterialUI.IconButton
                 first={true}
                 iconClassName="mdi mdi-close"
-                iconStyle={{color: 'rgba(0,0,0,0.23)', iconHoverColor:'rgba(0,0,0,0.53)'}}
+                iconStyle={{color: 'rgba(0,0,0,0.23)', iconHoverColor:'rgba(0,0,0,0.53)', fontSize:18}}
                 tooltip={MessageHash['action.cart.16']}
                 tooltipPosition="bottom-left"
                 onTouchTap={() => {Model.getInstance().removeNode(node)}}
@@ -167,7 +167,7 @@
         },
 
         renderIcon: function(node){
-            return <PydioWorkspaces.FilePreview style={{height: 36, width: 36, margin: '8px 15px', borderRadius: '50%'}} node={node} loadThumbnail={true} richPreview={false}/>
+            return <PydioWorkspaces.FilePreview rounded={true} roundedSize={36} style={{margin: '8px 15px'}} node={node} loadThumbnail={true} richPreview={false}/>
         },
 
         render: function(){

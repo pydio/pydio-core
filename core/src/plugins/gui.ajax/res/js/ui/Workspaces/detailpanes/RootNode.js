@@ -27,7 +27,7 @@ export default React.createClass({
         if(cacheService.hasKey('workspace.info', repoKey)){
             render(cacheService.getByKey('workspace.info', repoKey));
         }else{
-            FuncUtils.bufferCallback("ajxp_load_repo_info_timer", 300,function(){
+            FuncUtils.bufferCallback("ajxp_load_repo_info_timer", 700,function(){
                 if(!oThis.isMounted()) return;
                 oThis.setState({loading: true});
                 PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport){

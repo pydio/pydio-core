@@ -1891,10 +1891,6 @@ div.menu.desktop a span.ajxp_icon_span {
 #info_panel .panelCard .panelContent div.mimefont-container {
   display: -ms-flexbox;
   display: flex;
-  /*
-        width: 100%;
-        height: 200px;
-        */
   text-align: center;
   -ms-flex-align: center;
       align-items: center;
