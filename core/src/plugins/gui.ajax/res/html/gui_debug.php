@@ -7,7 +7,7 @@
     }?>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <link rel="stylesheet" type="text/css" href="<?php print(AJXP_THEME_FOLDER);?>/css/allz.css">
+    <link rel="stylesheet" type="text/css" href="plugins/gui.ajax/res/build/pydio.<?php print($crtTheme);?>.min.css">
     <!--[if IE 8]>
     <script src="plugins/gui.ajax/res/js/vendor/es6/es5-shim.min.js"></script>
     <script src="plugins/gui.ajax/res/js/vendor/es6/es5-sham.min.js"></script>

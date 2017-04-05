@@ -310,6 +310,7 @@ class RichClient extends Plugin
                 $ADDITIONAL_FRAMEWORKS = "";
             }
             $content = str_replace("AJXP_ADDITIONAL_JS_FRAMEWORKS", $ADDITIONAL_FRAMEWORKS, $content);
+            $content = str_replace("CRT_THEME", $crtTheme, $content);
             $content = XMLFilter::resolveKeywords($content, false);
             $content = str_replace("AJXP_REBASE", isSet($START_PARAMETERS["REBASE"])?'<base href="'.$START_PARAMETERS["REBASE"].'"/>':"", $content);
             if ($JSON_START_PARAMETERS) {

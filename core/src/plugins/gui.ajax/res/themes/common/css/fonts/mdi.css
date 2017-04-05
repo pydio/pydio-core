@@ -1,11 +1,13 @@
 /* MaterialDesignIcons.com */
+/*
 @font-face {
   font-family: "Material Design Icons";
-  src: url("../fonts/materialdesignicons-webfont.eot?v=1.9.32");
-  src: url("../fonts/materialdesignicons-webfont.eot?#iefix&v=1.9.32") format("embedded-opentype"), url("../fonts/materialdesignicons-webfont.woff2?v=1.9.32") format("woff2"), url("../fonts/materialdesignicons-webfont.woff?v=1.9.32") format("woff"), url("../fonts/materialdesignicons-webfont.ttf?v=1.9.32") format("truetype"), url("../fonts/materialdesignicons-webfont.svg?v=1.9.32#materialdesigniconsregular") format("svg");
+  src: url("../themes/common/fonts/mdi/materialdesignicons-webfont.eot?v=1.9.32");
+  src: url("../themes/common/fonts/mdi/materialdesignicons-webfont.eot?#iefix&v=1.9.32") format("embedded-opentype"), url("../themes/common/fonts/mdi/materialdesignicons-webfont.woff2?v=1.9.32") format("woff2"), url("../themes/common/fonts/mdi/materialdesignicons-webfont.woff?v=1.9.32") format("woff"), url("../themes/common/fonts/mdi/materialdesignicons-webfont.ttf?v=1.9.32") format("truetype"), url("../themes/common/fonts/mdi/materialdesignicons-webfont.svg?v=1.9.32#materialdesigniconsregular") format("svg");
   font-weight: normal;
   font-style: normal;
 }
+*/
 .mdi:before,
 .mdi-set {
   display: inline-block;

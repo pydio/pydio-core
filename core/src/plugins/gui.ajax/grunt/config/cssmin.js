@@ -5,7 +5,7 @@ module.exports = {
     },
     target: {
         files: {
-            'res/themes/material/css/allz.css': ['res/themes/material/css/pydio.css']
+            'res/build/pydio.material.min.css': ['res/themes/material/css/pydio.css']
         }
     }
 };
