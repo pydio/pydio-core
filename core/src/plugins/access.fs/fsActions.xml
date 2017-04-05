@@ -2,7 +2,7 @@
 <registry_contributions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<actions>
 		<action name="ls" dirDefault="true">
-			<gui text="32" title="32" src="fileopen.png" iconClass="icon-folder-open-alt"
+			<gui text="32" title="32" iconClass="mdi mdi-folder-open"
 				accessKey="folder_access_key">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" actionBarGroup="put" contextMenu="true" infoPanel="true"/>
@@ -39,7 +39,7 @@
             </processing>
         </action>
         <action name="mkdir">
-            <gui text="154" title="155" src="folder_new.png" iconClass="mdi mdi-folder-plus" accessKey="folder_access_key" hasAccessKey="true">
+            <gui text="154" title="155" iconClass="mdi mdi-folder-plus" accessKey="folder_access_key" hasAccessKey="true">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="create,minisite" inZip="false"/>
             </gui>
@@ -53,7 +53,7 @@
             </processing>
         </action>
         <action name="mkfile">
-            <gui text="156" title="157" src="filenew.png" accessKey="file_access_key" iconClass="icon-file-alt" hasAccessKey="false">
+            <gui text="156" title="157" accessKey="file_access_key" iconClass="mdi mdi-file-plus" hasAccessKey="false">
                 <context selection="false" dir="true" recycle="hidden" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"/>
             </gui>
@@ -66,7 +66,7 @@
             </processing>
         </action>
 		<action name="upload">
-			<gui text="27" title="27" src="yast_backup.png" iconClass="mdi mdi-upload" accessKey="upload_access_key" hasAccessKey="true">
+			<gui text="27" title="27" iconClass="mdi mdi-upload" accessKey="upload_access_key" hasAccessKey="true">
 				<context selection="false" dir="true" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="upload,minisite" inZip="false">
@@ -84,7 +84,7 @@
 				</processing>
 		</action>
 		<action name="empty_recycle">
-			<gui text="220" title="221" src="trashcan_empty.png" iconClass="icon-ban-circle" accessKey="empty_recycle_access_key" hasAccessKey="true">
+			<gui text="220" title="221" iconClass="mdi mdi-delete-forever" accessKey="empty_recycle_access_key" hasAccessKey="true">
 				<context selection="true" dir="true" recycle="only" actionBar="true"
                          contextMenu="true" infoPanel="false" actionBarGroup="change_main"/>
                 <selectionContext dir="false" file="false" recycle="true" unique="true"/>
@@ -96,7 +96,7 @@
             </processing>
 		</action>
 		<action name="download" fileDefault="false">
-			<gui text="88" title="88" src="download_manager.png" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
+			<gui text="88" title="88" iconClass="mdi mdi-download" accessKey="download_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="true" infoPanel="true"
 					actionBarGroup="get,inline,info_panel">
@@ -113,7 +113,7 @@
 				</processing>
 		</action>
         <action name="download_all">
-            <gui text="463" title="464" src="download_manager.png" iconClass="icon-archive" hasAccessKey="false">
+            <gui text="463" title="464" iconClass="mdi mdi-folder-download" hasAccessKey="false">
                 <context selection="false" dir="true" recycle="false" actionBar="true" contextMenu="false" infoPanel="false"
                     actionBarGroup="minisite">
                 </context>
@@ -134,7 +134,7 @@
 				</processing>
 		</action>
 		<action name="compress_ui">
-			<gui text="313" title="314" src="archive_insert.png" iconClass="icon-briefcase" accessKey="" hasAccessKey="false">
+			<gui text="313" title="314" iconClass="mdi mdi-zip-box" accessKey="" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="true"
 					actionBarGroup="change" inZip="false">
@@ -147,7 +147,7 @@
             </processing>
 		</action>
         <action name="open_with_unique">
-            <gui text="462" title="462" src="fileopen.png" iconClass="icon-eye-close" accessKey="preview_access_key" hasAccessKey="true">
+            <gui text="462" title="462" iconClass="mdi mdi-eye-outline" accessKey="preview_access_key" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                          actionBar="true" contextMenu="false" infoPanel="false"
                          actionBarGroup="inline,info_panel" inZip="false">
@@ -159,7 +159,7 @@
             </processing>
         </action>
         <action name="open_with" fileDefault="true">
-            <gui text="316" title="316" src="fileopen.png" iconClass="icon-eye-close" accessKey="open_with_access" hasAccessKey="true">
+            <gui text="316" title="316" iconClass="mdi mdi-eye-outline" accessKey="open_with_access" hasAccessKey="true">
                 <context selection="true" dir="" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="true" infoPanel="false"
                     actionBarGroup="get,info_panel" inZip="false">
@@ -174,7 +174,7 @@
                 </processing>
         </action>
 		<action name="ajxp_link">
-			<gui text="369" title="369" src="ajxp-link.png" iconClass="icon-link" hasAccessKey="false">
+			<gui text="369" title="369" iconClass="mdi mdi-link" hasAccessKey="false">
 				<context selection="true" dir="" recycle="false" actionBar="true" actionBarGroup="remote"
                          contextMenu="false" infoPanel="true"/>
 				<selectionContext dir="true" file="true" recycle="false" unique="true"/>
@@ -232,7 +232,7 @@
 			</processing>
 		</action>
 		<action name="restore">
-			<gui text="222" title="223" src="folder1_important.png" iconClass="icon-undo" accessKey="restore_access_key" hasAccessKey="true">
+			<gui text="222" title="223" iconClass="mdi mdi-file-restore" accessKey="restore_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="only"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main">
@@ -247,7 +247,7 @@
 				</processing>
 		</action>
 		<action name="rename">
-			<gui text="6" title="158" src="applix.png" accessKey="rename_access_key" iconClass="icon-pencil" hasAccessKey="true">
+			<gui text="6" title="158" accessKey="rename_access_key" iconClass="mdi mdi-rename-box" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main" inZip="false">
@@ -269,7 +269,7 @@
             </processing>
         </action>
 		<action name="copy" ctrlDragndropDefault="true">
-			<gui text="66" title="159" src="editcopy.png" iconClass="icon-copy" hasAccessKey="false">
+			<gui text="66" title="159" iconClass="mdi mdi-content-copy" hasAccessKey="false">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="true" infoPanel="false"
 					actionBarGroup="change">
@@ -286,7 +286,7 @@
 				</processing>
 		</action>
 		<action name="move" dragndropDefault="true">
-			<gui text="70" title="160" src="editpaste.png" iconClass="icon-paste" accessKey="move_access_key" hasAccessKey="true">
+			<gui text="70" title="160" iconClass="mdi mdi-folder-move" accessKey="move_access_key" hasAccessKey="true">
 				<context selection="true" dir="" recycle="hidden"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main" inZip="false">
@@ -303,7 +303,7 @@
 				</processing>
 		</action>
 		<action name="delete">
-			<gui text="7" title="161" src="editdelete.png" iconClass="icon-trash" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
+			<gui text="7" title="161" iconClass="mdi mdi-delete" accessKey="delete_access_key" hasAccessKey="true" specialAccessKey="delete">
 				<context selection="true" dir="" recycle="false"
 					actionBar="true" contextMenu="false" infoPanel="false"
 					actionBarGroup="change_main,minisite" inZip="false">
@@ -319,7 +319,7 @@
 				</processing>
 		</action>
         <action name="chmod">
-            <gui text="287" title="287" src="ksysv.png" iconClass="icon-th" accessKey="" hasAccessKey="false">
+            <gui text="287" title="287" iconClass="mdi mdi-view-module" accessKey="" hasAccessKey="false">
                 <context selection="true" dir="true" recycle="hidden"  behaviour="hidden"
                     actionBar="true" contextMenu="false" infoPanel="true"
                     actionBarGroup="change" inZip="false">
@@ -348,7 +348,7 @@
             </processing>
         </action>
         <action name="download_chunk">
-            <gui text="397" title="398" src="download_manager.png" iconClass="icon-cloud-download" hasAccessKey="false">
+            <gui text="397" title="398" iconClass="mdi mdi-cloud-download" hasAccessKey="false">
                 <context selection="true" dir="" recycle="false"
                          actionBar="true" contextMenu="false" infoPanel="true" actionBarGroup="change">
                 </context>
