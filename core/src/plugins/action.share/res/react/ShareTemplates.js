@@ -271,8 +271,8 @@
         },
 
         _getEditorData: function(node) {
-            var selectedMime = PathUtils.getAjxpMimeType(node);
-            var editors = this.props.registry.findEditorsForMime(selectedMime, false);
+            const selectedMime = PathUtils.getAjxpMimeType(node);
+            const editors = this.props.pydio.Registry.findEditorsForMime(selectedMime, false);
             if (editors.length && editors[0].openable){
                 return editors[0];
             }
