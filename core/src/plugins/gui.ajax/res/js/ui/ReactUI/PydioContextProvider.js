@@ -1,5 +1,7 @@
 const React = require('react')
 const Pydio = require('pydio')
+const {MuiThemeProvider} = require('material-ui')
+const {colors, getMuiTheme} = require('material-ui/styles')
 
 export default function(PydioComponent, pydio){
 
@@ -34,20 +36,20 @@ export default function(PydioComponent, pydio){
 
             const themeCusto = {
                 palette: {
-                    primary1Color       : MaterialUI.Style.colors.blueGrey600,
-                    primary2Color       : MaterialUI.Style.colors.deepOrange500,
-                    accent1Color        : MaterialUI.Style.colors.deepOrange500,
-                    accent2Color        : MaterialUI.Style.colors.lightBlue500,
+                    primary1Color       : colors.blueGrey600,
+                    primary2Color       : colors.deepOrange500,
+                    accent1Color        : colors.deepOrange500,
+                    accent2Color        : colors.lightBlue500,
                     ...customPalette
                 }
             };
 
-            const theme = MaterialUI.Style.getMuiTheme(themeCusto);
+            const theme = getMuiTheme(themeCusto);
 
             return (
-                <MaterialUI.MuiThemeProvider muiTheme={theme}>
+                <MuiThemeProvider muiTheme={theme}>
                     <PydioComponent {...this.props}/>
-                </MaterialUI.MuiThemeProvider>
+                </MuiThemeProvider>
             );
         }
 
@@ -69,6 +71,6 @@ export default function(PydioComponent, pydio){
         getMessage:React.PropTypes.func
     };
 
-    return Wrapped
+    return Wrapped;
 
 }

@@ -15,6 +15,7 @@ import PromptDialog from './modal/PromptDialog'
 import MessageBar from './modal/MessageBar'
 import AbstractDialogModifier from './modal/AbstractDialogModifier'
 import Loader from './Loader'
+import Router from './router/Router'
 import NetworkLoader from './modal/NetworkLoader'
 import HiddenDownloadForm from './HiddenDownloadForm'
 
@@ -36,6 +37,7 @@ export {
     PromptDialog,
 
     Loader,
+    Router,
     MessageBar,
     NetworkLoader,
     HiddenDownloadForm,
