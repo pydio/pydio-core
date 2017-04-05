@@ -15,6 +15,16 @@
         'move_to'   : 'folder-move'
     };
 
+    const timelineStyle = {
+        position: 'absolute',
+        top: 0,
+        left: 33,
+        bottom: 0,
+        width: 4,
+        backgroundColor: '#eceff1'
+    };
+
+
     let ActivityPanel = React.createClass({
 
         getInitialState: function(){
@@ -66,51 +76,31 @@
         renderIconFile: function(node){
             let fileNode = new AjxpNode(node.getMetadata().get('real_path'), node.isLeaf(), node.getLabel());
             fileNode.setMetadata(node.getMetadata());
-            return <PydioWorkspaces.FilePreview rounded={true} loadThumbnail={true} node={fileNode}/>;
-        },
-
-        renderIconNotif: function(node){
-            let action = node.getMetadata().get('event_action');
-            if(action === 'add' && node.isLeaf()){
-                action = 'add-file';
-            }
-            if(action && EventsIcons[action]){
-                return (
-                    <div style={{position:'relative'}} className="material-list-icon">
-                        <div style={timelineStyle}></div>
-                        <div className="mimefont-container" style={{position:'absolute'}}>
-                            <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
-                        </div>
-                    </div>
-                );
-            }
+            return (
+                <div style={{position:'relative'}}>
+                    <div style={{...timelineStyle, bottom: -1}}/>
+                    <PydioWorkspaces.FilePreview rounded={true} loadThumbnail={true} node={fileNode}/>
+                </div>
+            );
         },
 
         renderTimelineEntry: function(props){
-
-            const timelineStyle = {
-                position: 'absolute',
-                top: 0,
-                left: 33,
-                bottom: 0,
-                width: 4,
-                backgroundColor: '#eceff1'
-            };
 
             const {node, isFirst} = props;
             let action = node.getMetadata().get('event_action');
             if(action === 'add' && node.isLeaf()){
                 action = 'add-file';
             }
+            const timeline = {...timelineStyle};
             if(isFirst){
-                timelineStyle['top'] = 34;
+                timeline['top'] = 34;
             }
 
             return (
 
                 <div className="ajxp_node_leaf material-list-entry material-list-entry-2-lines" style={{borderBottom: 0}}>
                     <div style={{position:'relative'}} className="material-list-icon">
-                        <div style={timelineStyle}></div>
+                        <div style={timeline}/>
                         <div className="mimefont-container" style={{position:'absolute'}}>
                             <div className={"mimefont mdi mdi-" + EventsIcons[action]}/>
                         </div>
