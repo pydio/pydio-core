@@ -737,7 +737,7 @@
 
         getDefaultProps: function(){
             return {
-                dialogTitleId: 'Open with...',
+                dialogTitleId: 'openother.2',
                 dialogIsModal: false,
                 dialogSize:'sm',
                 dialogPadding: 0,
@@ -807,7 +807,7 @@
                 return <MaterialUI.ListItem onTouchTap={this.selectEditor.bind(this, e)} primaryText={e.text} secondaryText={e.title} leftIcon={icon}/>;
             });
             return (
-                <MaterialUI.List style={{maxHeight: 320, overflowY: 'scroll', width: '100%'}}>
+                <MaterialUI.List style={{maxHeight: 320, overflowY: 'scroll', width: '100%', borderTop:'1px solid #e0e0e0'}}>
                     {items}
                 </MaterialUI.List>
             );

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.exif" openable="true" text="editor.exif.1" iconClass="icon-list-ul" title="editor.exif.2"
+<editor id="editor.exif" openable="true" text="editor.exif.1" iconClass="mdi mdi-camera" title="editor.exif.2"
         className="PydioExif.Editor" mimes="jpg,jpeg"
         formId="exif_box" label="CONF_MESSAGE[EXIF Extractor]"
         description="CONF_MESSAGE[Display the Exif metadata contained inside the JPG files. Can locate the image on a map if it contains geolocation data.]"

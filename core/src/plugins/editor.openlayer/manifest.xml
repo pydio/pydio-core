@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.openlayer" openable="true" mimes="ol_layer,jpg" iconClass="icon-map-marker" text="openlayer.1" title="openlayer.1"
-        icon="frame_image.png" className="PydioMaps.Viewer" label="CONF_MESSAGE[Map viewer]"
+<editor id="editor.openlayer" openable="true" mimes="ol_layer,jpg" iconClass="mdi mdi-google-maps" text="openlayer.1" title="openlayer.1"
+        className="PydioMaps.Viewer" label="CONF_MESSAGE[Map viewer]"
         description="CONF_MESSAGE[Geolocation feature to either display a WMS layer or simply place an exif-localized photo. Requires OpenLayers]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <client_settings>
         <resources>

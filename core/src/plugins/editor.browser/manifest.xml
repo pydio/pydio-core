@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor id="editor.browser" openable="true" order="1000" text="openbrowser.1"
-		title="openbrowser.2" icon="openbrowser_images/actions/ICON_SIZE/project-open.png" iconClass="icon-laptop"
+		title="openbrowser.2" iconClass="mdi mdi-tab-plus"
 		className="PydioBrowserEditor" mimes="*" label="CONF_MESSAGE[External Window]" description="CONF_MESSAGE[Open file in a new browser window, thus using native browser capabilities.]"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
     <server_settings>
@@ -38,7 +38,7 @@
     			</processing>
     		</action>
             <action name="mklink">
-                <gui text="openbrowser.4" title="openbrowser.4" src="filenew.png" accessKey="file_access_key" iconClass="mdi mdi-link" hasAccessKey="false">
+                <gui text="openbrowser.4" title="openbrowser.4" accessKey="file_access_key" iconClass="mdi mdi-link" hasAccessKey="false">
                     <context selection="false" dir="true" recycle="hidden" actionBar="true"
                              contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"/>
                 </gui>

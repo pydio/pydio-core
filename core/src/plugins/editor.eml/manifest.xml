@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor id="editor.eml" openable="true" text="editor.eml.name" iconClass="icon-envelope-alt" title="editor.eml.title" icon="mail_generic.png" className="EmlViewer" mimes="eml" formId="emlviewer_box" label="CONF_MESSAGE[Email Viewer]" description="CONF_MESSAGE[Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<editor id="editor.eml" openable="true" text="editor.eml.name" iconClass="mdi mdi-email" title="editor.eml.title"
+        className="EmlViewer" mimes="eml" formId="emlviewer_box" label="CONF_MESSAGE[Email Viewer]"
+        description="CONF_MESSAGE[Email reader, supports eml format and eml mimetypes. Detects if a folder contains only email and display columns accordingly.]"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<class_definition filename="plugins/editor.eml/EmlParser.php" classname="Pydio\Editor\EML\EmlParser"/>
     <client_settings>
         <resources>

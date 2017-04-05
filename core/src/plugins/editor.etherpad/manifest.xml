@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<editor enabled="false" id="editor.etherpad" openable="true" iconClass="icon-comments-alt" order="10"
-        text="etherpad.2" title="etherpad.3" icon="edit.png" className="EtherpadLauncher" canWrite="true"
+<editor enabled="false" id="editor.etherpad" openable="true" iconClass="mdi mdi-comment-account" order="10"
+        text="etherpad.2" title="etherpad.3" className="EtherpadLauncher" canWrite="true"
         mimes="pad" formId="ether_box" label="CONF_MESSAGE[Etherpad]" description="CONF_MESSAGE[Collaborative edition of text files]"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>

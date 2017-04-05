@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <editor
         id="editor.libreoffice" enabled="false" openable="true" order="3" text="libreoffice.1" title="libreoffice.1"
-        canWrite="true" iconClass="icon-edit" icon="edit.png" className="PydioLibreOfficeOpener" mimes="docx,pptx,xlsx,dotx,xltx,ppsx,doc,ppt,xls,dot,xlt,pps,odt,odp,ods,ots,ott,otp,rtf,csv"
+        canWrite="true" iconClass="mdi mdi-file-word" className="PydioLibreOfficeOpener" mimes="docx,pptx,xlsx,dotx,xltx,ppsx,doc,ppt,xls,dot,xlt,pps,odt,odp,ods,ots,ott,otp,rtf,csv"
         formId="libreoffice_box" label="CONF_MESSAGE[Collabora Online]" description="CONF_MESSAGE[Collabora Online Editor for office documents]" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 

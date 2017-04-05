@@ -35,7 +35,7 @@
         }
 
         static renderStars(node, column){
-            return <MetaStarsRenderer node={node} column={column}/>;
+            return <MetaStarsRenderer node={node} column={column} size="small"/>;
         }
 
         static renderSelector(node, column){
@@ -132,7 +132,7 @@
 
     };
 
-    const starsStyle = { fontSize: 16, color: '#FBC02D' };
+    const starsStyle = { fontSize: 20, color: '#FBC02D' };
 
     let StarsFormPanel = React.createClass({
 
@@ -167,7 +167,8 @@
             let stars = [0,1,2,3,4].map(function(v){
                 return <span key={"star-" + v} className={"mdi mdi-star" + (value > v ? '' : '-outline')}></span>;
             });
-            return <span style={starsStyle}>{stars}</span>;
+            const style = this.props.size === 'small' ? {color: starsStyle.color} : starsStyle;
+            return <span style={style}>{stars}</span>;
         }
 
     });

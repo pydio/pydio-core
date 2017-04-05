@@ -295,7 +295,6 @@
                     </xs:sequence>
                     <xs:attribute name="className" use="required" type="xs:NCName"/>
                     <xs:attribute name="formId" type="xs:NCName"/>
-                    <xs:attribute name="icon" use="required"/>
                     <xs:attribute name="iconClass" use="optional"/>
                     <xs:attribute name="mimes" use="required"/>
                     <xs:attribute name="openable" use="required" type="xs:boolean"/>
