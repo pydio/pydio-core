@@ -364,7 +364,6 @@
             let autoCompleter;
             let textField;
             if (this.props.editMode) {
-                console.log(this.state.dataSource);
                 autoCompleter = <MaterialUI.AutoComplete
                                     fullWidth={true}
                                     hintText="Existing or new tag"
