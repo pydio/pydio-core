@@ -21,8 +21,8 @@
 $mess=array(
     "1" => "Archiver",
     "2" => "Compresser la sélection",
-    "3" => "Sélectionner le format de l'archive ",
-    "4" => "Nom de l'archive :",
+    "3" => "Format",
+    "4" => "Nom de l'archive",
     "5" => "Demarrage de la compression...",
     "6" => "Ajout de fichiers dans l'archive... %s ",
     "7" => "Compression en %s ...",

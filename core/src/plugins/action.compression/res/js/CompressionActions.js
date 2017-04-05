@@ -91,11 +91,16 @@
 
             const messages = pydio.MessageHash;
             const {compression, fileName} = this.state;
+            const flStyle = {
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+            };
 
             return (
                 <div style={{display:'flex'}}>
-                    <MaterialUI.TextField onChange={this.textFieldChange} value={fileName} floatingLabelText={messages['compression.4']}/>
-                    <MaterialUI.SelectField onChange={this.selectFieldChange} value={compression} floatingLabelText={messages['compression.3']}>{formatMenus}</MaterialUI.SelectField>
+                    <MaterialUI.TextField style={{width: 210, marginRight: 10}} onChange={this.textFieldChange} value={fileName} floatingLabelText={messages['compression.4']}  floatingLabelStyle={flStyle}/>
+                    <MaterialUI.SelectField style={{width: 160}} onChange={this.selectFieldChange} value={compression} floatingLabelText={messages['compression.3']} floatingLabelStyle={flStyle}>{formatMenus}</MaterialUI.SelectField>
                 </div>
             );
         }
