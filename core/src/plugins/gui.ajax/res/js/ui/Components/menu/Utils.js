@@ -64,11 +64,11 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
 
         let leftIcon, rightIcon;
         if(menuProps.display === 'normal'){
-            leftIcon = item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            leftIcon = item.iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
         }else if(menuProps.display === 'right'){
-            rightIcon = item.iconClassName ? <FontIcon className={item.iconClassName} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            rightIcon = item.iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
         }
-        rightIcon = subItems && subItems.length ? <FontIcon className="mdi mdi-menu-right"/> : rightIcon;
+        rightIcon = subItems && subItems.length ? <FontIcon className='mdi mdi-menu-right menu-icons'/> : rightIcon;
 
         return (
             <MenuItem
