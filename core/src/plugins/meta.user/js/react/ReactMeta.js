@@ -253,7 +253,15 @@
         },
         componentDidMount: function() {
             this.getRealValue();
-            this.load()
+            if(this.props.editMode){
+                this.load();
+            }
+        },
+
+        componentWillReceiveProps: function (nextProps) {
+            if(nextProps.editMode && !this.state.loaded){
+                this.load();
+            }
         },
 
         getRealValue: function(){
@@ -297,7 +305,7 @@
                         value       : component
                     };
                 }.bind(this));
-                this.setState({dataSource: values, loading: false});
+                this.setState({dataSource: values, loading: false, loaded: true});
             }.bind(this));
         },
 

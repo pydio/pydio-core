@@ -38,7 +38,7 @@
                 </processing>
             </action>
             <action name="edit_user_meta_mass">
-                <gui text="meta.user.1" title="meta.user.1" iconClass="mdi mdi-tag" hasAccessKey="false">
+                <gui text="meta.user.1" title="meta.user.1" iconClass="mdi mdi-tag-multiple" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden"
                              actionBar="true" contextMenu="true" infoPanel="false"
                              actionBarGroup="info_panel" inZip="false">
@@ -51,7 +51,7 @@
                 </processing>
             </action>
 			<action name="edit_user_meta">
-				<gui text="meta.user.1" title="meta.user.1" iconClass="mdi mdi-tag-multiple" hasAccessKey="false">
+				<gui text="meta.user.1" title="meta.user.1" iconClass="mdi mdi-tag" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="true" contextMenu="true" infoPanel="false"
 						actionBarGroup="more" inZip="false">
