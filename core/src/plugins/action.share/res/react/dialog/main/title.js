@@ -7,9 +7,12 @@ export default class Title extends Component{
         const propStyle = this.props.style||{};
         const style = {
             paddingLeft: 0,
+            fontSize: 16,
+//            color: 'rgba(0,0,0,0.43)',
+            fontWeight: 400,
             ...propStyle
         }
-        return (<Subheader style={style}>{this.props.children}</Subheader>);
+        return (<h3 style={style}>{this.props.children}</h3>);
 
     }
 

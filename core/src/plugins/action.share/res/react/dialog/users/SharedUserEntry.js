@@ -17,16 +17,15 @@ let SharedUserEntry = React.createClass({
         this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:'watch', add:!this.props.userEntry['WATCH']});
     },
     onInvite:function(){
-        var targets = {};
+        let targets = {};
         targets[this.props.userObject.getId()] = this.props.userObject;
         this.props.sendInvitations(targets);
     },
-    onUpdateRight:function(event){
-        var target = event.target;
-        this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:target.name, add:target.checked});
+    onUpdateRight:function(name, event, checked){
+        this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:name, add:checked});
     },
     render: function(){
-        var menuItems = [];
+        let menuItems = [];
         if(this.props.userEntry.TYPE != 'group'){
             if(!this.props.isReadonly()){
                 // Toggle Notif

@@ -2,6 +2,7 @@ const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
 import UserBadge from './UserBadge'
 import SharedUserEntry from './SharedUserEntry'
+import ActionButton from '../main/ActionButton'
 import Title from '../main/title'
 const {UsersCompleter} = require('pydio').requireLib('components')
 const {Paper} = require('material-ui')
@@ -60,13 +61,13 @@ let SharedUsers = React.createClass({
         }.bind(this));
         var actionLinks = [];
         if(this.props.users.length && !this.props.isReadonly()){
-            actionLinks.push(<a key="clear" onClick={this.clearAllUsers}>{this.props.getMessage('180')}</a>);
+            actionLinks.push(<ActionButton callback={this.clearAllUsers} mdiIcon="delete" messageId="180"/>)
         }
         if(this.props.sendInvitations && this.props.users.length){
-            actionLinks.push(<a key="invite" onClick={this.sendInvitationToAllUsers}>{this.props.getMessage('45')}</a>);
+            actionLinks.push(<ActionButton callback={this.sendInvitationToAllUsers} mdiIcon="email-outline" messageId="45"/>)
         }
         if(this.props.saveSelectionAsTeam && this.props.users.length > 1 && !this.props.isReadonly()){
-            actionLinks.push(<a key="team" onClick={this.props.saveSelectionAsTeam}>{this.props.getMessage('509', '')}</a>);
+            actionLinks.push(<ActionButton callback={this.props.saveSelectionAsTeam} mdiIcon="account-multiple-plus" messageId="509"/>)
         }
         if(actionLinks.length){
             var linkActions = <div className="additional-actions-links">{actionLinks}</div>;

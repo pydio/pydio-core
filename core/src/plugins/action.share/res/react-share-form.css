@@ -91,8 +91,8 @@ div.react_share_form .additional-actions-links {
 div#react_share_form .additional-actions-links a,
 div.react_share_form .additional-actions-links a {
   color: #c1c1c1;
-  text-decoration: underline;
   font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
   display: inline-block;
   margin-left: 10px;
@@ -181,7 +181,6 @@ div#react_share_form .public-link-container .custom-link-button.icon-edit-sign,
 div.react_share_form .public-link-container .custom-link-button.icon-edit-sign,
 div#react_share_form .public-link-container .copy-link-button,
 div.react_share_form .public-link-container .copy-link-button {
-  color: #ddd;
   font-size: 24px;
   cursor: pointer;
   display: block;
@@ -197,18 +196,14 @@ div.react_share_form .public-link-container .copy-link-button:hover {
 }
 div#react_share_form .public-link-container .copy-link-button,
 div.react_share_form .public-link-container .copy-link-button {
-  font-size: 13px !important;
-  margin-top: 7px;
-  float: none;
-  background-color: #ddd;
-  color: #F1F1F1;
-  padding: 6px;
-  border-radius: 4px 4px 4px 0;
+  font-size: 16px !important;
+  position: absolute;
+  top: -1px;
+  right: 4px;
 }
 div#react_share_form .public-link-container .copy-link-button:hover,
 div.react_share_form .public-link-container .copy-link-button:hover {
-  background-color: #47b092;
-  color: #F1F1F1;
+  color: #47b092;
 }
 div#react_share_form .public-link-container .section-legend,
 div.react_share_form .public-link-container .section-legend {

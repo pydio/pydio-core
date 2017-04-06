@@ -28,7 +28,7 @@ let Panel =  React.createClass({
         }
         return (
             <div style={this.props.style}>
-                <Title style={st}>{this.props.getMessage('486', '')}</Title>
+                <Title style={{padding: '16px 16px 0'}}>{this.props.getMessage('486', '')}</Title>
                 <LabelDescriptionPanel {...this.props} style={{...st, marginTop: -10}}/>
                 <NotificationPanel {...this.props} style={st}/>
                 {layoutPane}

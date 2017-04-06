@@ -145,7 +145,12 @@ let MainPanel = React.createClass({
                 const newMessage = message.replace(regexp, newLink);
                 email.addTarget(shareMails[u], subject, newMessage);
             });
-            email.post(callback);
+            email.post((res) => {
+                if(res){
+                    model.load(true); // Reload data
+                }
+                callback(res);
+            });
         })
     },
 
@@ -154,7 +159,8 @@ let MainPanel = React.createClass({
     },
 
     render: function(){
-        var model = this.state.model;
+        const {model} = this.state;
+        const buttonStyle = {textTransform:'none'};
         var panels = [];
         var showMailer = ShareModel.mailerActive() ? this.showMailer : null;
         var auth = ShareModel.getAuthorizations(this.props.pydio);
@@ -168,7 +174,7 @@ let MainPanel = React.createClass({
                 pubLabel = <span>{pubLabel} <span className="mdi mdi-check"></span></span>
             }
             panels.push(
-                <Tab key="public-link" label={pubLabel}>
+                <Tab key="public-link" label={pubLabel} buttonStyle={buttonStyle}>
                     <PublicLinkPanel
                         showMailer={showMailer}
                         linkData={linkData}
@@ -185,7 +191,7 @@ let MainPanel = React.createClass({
             var ocsUsers = model.getOcsLinks();
             var totalUsers = users.length + ocsUsers.length;
             panels.push(
-                <Tab key="target-users" label={this.getMessage(249, '') + (totalUsers?' ('+totalUsers+')':'')}>
+                <Tab key="target-users" label={this.getMessage(249, '') + (totalUsers?' ('+totalUsers+')':'')} buttonStyle={buttonStyle}>
                     <UsersPanel
                         showMailer={showMailer}
                         shareModel={model}
@@ -197,7 +203,7 @@ let MainPanel = React.createClass({
         }
         if(panels.length > 0){
             panels.push(
-                <Tab key="share-permissions" label={this.getMessage(486, '')}>
+                <Tab key="share-permissions" label={this.getMessage(486, '')} buttonStyle={buttonStyle}>
                     <AdvancedPanel
                         showMailer={showMailer}
                         pydio={this.props.pydio}
@@ -211,7 +217,6 @@ let MainPanel = React.createClass({
         if(this.state.mailerData){
             const {mailerData} = this.state;
             let customizeMessagePane;
-            console.log(mailerData);
             if(mailerData.hash){
                 const style = mailerData.enableIdentification ? {padding:'10px 20px', backgroundColor: '#ECEFF1'} : {padding:'10px 20px 0'};
                 customizeMessagePane = (

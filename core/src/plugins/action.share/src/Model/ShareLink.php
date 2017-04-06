@@ -274,6 +274,9 @@ class ShareLink
         if(!$minisiteIsPublic){
             $jsonData["has_password"] = true;
         }
+        if(isSet($storedData['TARGET_USERS'])){
+            $jsonData["target_users"] = $storedData["TARGET_USERS"];
+        }
         foreach($this->store->modifiableShareKeys as $key){
             if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
         }

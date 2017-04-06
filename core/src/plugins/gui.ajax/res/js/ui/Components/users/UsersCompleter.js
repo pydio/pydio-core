@@ -214,7 +214,8 @@ const UsersLoader = React.createClass({
                     />
                 </div>
                 {this.props.showAddressBook && <IconButton
-                    style={{position:'absolute', zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial'}}
+                    style={{position:'absolute', padding:15, zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial'}}
+                    iconStyle={{fontSize:19, color:'rgba(0,0,0,0.6)'}}
                     iconClassName={'mdi mdi-book-open-variant'}
                     onTouchTap={this.openAddressBook}
                 />}
