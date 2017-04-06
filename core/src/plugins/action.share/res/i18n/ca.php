@@ -252,4 +252,7 @@ $mess = array(
 "232" => "No entries found for share, did you maybe delete some users?",
 "233" => "Reset this share",
 "234" => "It has been added to your %s workspace.",
+    "235" => "Generate unique links to identify users",
+    "236" => "Restrict access only to identified users",
+    "237" => "Use a random key instead of email in link",
 );

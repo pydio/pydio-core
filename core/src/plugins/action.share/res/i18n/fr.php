@@ -250,4 +250,7 @@ $mess = array(
 "232" => "Pas d'entrées pour ce partage, peut-être avez-vous supprimé des utilisateurs?",
 "233" => "Réinitialiser le partage",
 "234" => "Le fichier a été ajouté à votre dépôt %s.",
+"235" => "Génerer des liens uniques pour chaque utilisateur",
+"236" => "Restreindre l'accès à ces seuls liens",
+"237" => "Utiliser une clé aléatoire plutôt que l'email dans le lien",
 );

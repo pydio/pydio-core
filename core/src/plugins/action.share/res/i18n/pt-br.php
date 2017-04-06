@@ -245,4 +245,13 @@ $mess = array(
 "226" => "Você não possui permissão de criar links públicos em diretórios",
 "227" => "Você não possui permissão de compartilhar arquivos internamente",
 "228" => "Você não possui permissão de compartilhar diretórios internamente",
+"229" => "Insert a preview of the file by pasting this code inside an HTML page.",
+"230" => "Please save before sending an invitation",
+"231" => "Click to start downloading",
+"232" => "No entries found for share, did you maybe delete some users?",
+"233" => "Reset this share",
+"234" => "It has been added to your %s workspace.",
+"235" => "Generate unique links to identify users",
+"236" => "Restrict access only to identified users",
+"237" => "Use a random key instead of email in link",
 );

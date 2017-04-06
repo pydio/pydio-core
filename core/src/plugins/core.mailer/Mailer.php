@@ -28,6 +28,8 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\Model\AJXP_Node;
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Conf\Core\AbstractUser;
 use Pydio\Core\Model\UserInterface;
@@ -36,6 +38,7 @@ use Pydio\Core\Exception\PydioException;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\UsersService;
 use Pydio\Core\Utils\DBHelper;
+use Pydio\Core\Utils\Vars\InputFilter;
 use Pydio\Core\Utils\Vars\OptionsHelper;
 
 use Pydio\Core\Controller\HTMLWriter;
@@ -605,7 +608,7 @@ class Mailer extends Plugin implements SqlTableProvider
      * @param \Psr\Http\Message\ResponseInterface $responseInterface
      * @throws Exception
      */
-    public function sendMailAction(\Psr\Http\Message\ServerRequestInterface &$requestInterface, \Psr\Http\Message\ResponseInterface &$responseInterface)
+    public function sendMailAction(ServerRequestInterface &$requestInterface, ResponseInterface &$responseInterface)
     {
         $mess = LocaleService::getMessages();
         /** @var ContextInterface $ctx */
@@ -618,25 +621,46 @@ class Mailer extends Plugin implements SqlTableProvider
         $httpVars = $requestInterface->getParsedBody();
         $mailer = array_pop($mailers);
 
-        //$toUsers = array_merge(explode(",", $httpVars["users_ids"]), explode(",", $httpVars["to"]));
-        //$toGroups =  explode(",", $httpVars["groups_ids"]);
-        $toUsers = $httpVars["emails"];
+        $toUsers = array_map(function($email){
+            return InputFilter::sanitize($email, InputFilter::SANITIZE_EMAILCHARS);
+        }, $httpVars["emails"]);
 
-        $emails = $this->resolveAdresses($ctx, $toUsers);
-        $from = $this->resolveFrom($ctx, $httpVars["from"]);
+        $from = $this->resolveFrom($ctx, InputFilter::sanitize($httpVars["from"], InputFilter::SANITIZE_EMAILCHARS));
         $imageLink = isSet($httpVars["link"]) ? $httpVars["link"] : null;
 
-        $subject = $httpVars["subject"];
-        $body = $httpVars["message"];
-        $x = new \Pydio\Core\Http\Response\SerializableResponseStream();
-        $responseInterface = $responseInterface->withBody($x);
+        $multipleSubjects = isSet($httpVars["subjects"]) && count($httpVars["subjects"]) === count($toUsers) ? $httpVars["subjects"] : null;
+        $multipleMessages = isSet($httpVars["messages"]) && count($httpVars["messages"]) === count($toUsers) ? $httpVars["messages"] : null;
 
-        if (count($emails)) {
-            $mailer->sendMail($requestInterface->getAttribute("ctx"), $emails, $subject, $body, $from, $imageLink);
-            $x->addChunk(new \Pydio\Core\Http\Message\UserMessage(str_replace("%s", count($emails), $mess["core.mailer.1"])));
-        } else {
-            $x->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["core.mailer.2"], LOG_LEVEL_ERROR));
+        $sentMails = 0;
+        if(isSet($multipleMessages) || isset($multipleSubjects)){
+            // Email contents are different per user
+            foreach($toUsers as $index => $toUser){
+                $email = $this->resolveAdresses($ctx, [$toUser]);
+                if(count($email)){
+                    $subject = isSet($multipleSubjects) ? $multipleSubjects[$index] : $httpVars["subject"];
+                    $body = isSet($multipleMessages) ? $multipleMessages[$index] : $httpVars["message"];
+                    $mailer->sendMail($ctx, $email, $subject, $body, $from, $imageLink);
+                    $sentMails ++;
+                }
+            }
+        }else{
+            $emails = $this->resolveAdresses($ctx, $toUsers);
+            if(count($emails)){
+                $subject = $httpVars["subject"];
+                $body = $httpVars["message"];
+                $mailer->sendMail($requestInterface->getAttribute("ctx"), $emails, $subject, $body, $from, $imageLink);
+                $sentMails = count($emails);
+            }
         }
+
+        $x = new SerializableResponseStream();
+        $responseInterface = $responseInterface->withBody($x);
+        if($sentMails){
+            $x->addChunk(new UserMessage(str_replace("%s", $sentMails, $mess["core.mailer.1"])));
+        }else {
+            $x->addChunk(new UserMessage($mess["core.mailer.2"], LOG_LEVEL_ERROR));
+        }
+
     }
 
     /**
