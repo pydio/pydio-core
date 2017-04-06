@@ -48,7 +48,7 @@ let VisibilityPanel = React.createClass({
             );
         }
         return (
-            <div className="reset-pydio-forms ie_material_checkbox_fix">
+            <div style={this.props.style}>
                 <h3>{this.props.getMessage('199')}</h3>
                 {showToggle}
                 {showTransfer}

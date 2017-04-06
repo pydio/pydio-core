@@ -30,14 +30,6 @@ div.react_share_form div.headerPanel > div {
   padding: 20px 16px 14px;
   word-break: break-all;
 }
-div#react_share_form .mui-tabs-container .mui-tab-item-container,
-div.react_share_form .mui-tabs-container .mui-tab-item-container {
-  background-color: #4aceb0 !important;
-}
-div#react_share_form .mui-tabs-container .mui-tab-template,
-div.react_share_form .mui-tabs-container .mui-tab-template {
-  min-height: 390px;
-}
 div#react_share_form .shared-users-rights-header,
 div.react_share_form .shared-users-rights-header {
   color: #ADADAD;
@@ -206,7 +198,8 @@ div.react_share_form .public-link-container .copy-link-button:hover {
 div#react_share_form .public-link-container .copy-link-button,
 div.react_share_form .public-link-container .copy-link-button {
   font-size: 13px !important;
-  margin-top: 15px;
+  margin-top: 7px;
+  float: none;
   background-color: #ddd;
   color: #F1F1F1;
   padding: 6px;
@@ -253,10 +246,8 @@ div.react_share_form .expires .calLabelHasValue {
   position: absolute;
   top: 0;
   left: 0;
-  -webkit-transform: scale(0.75) translate3d(35px, 27px, 0);
-          transform: scale(0.75) translate3d(35px, 27px, 0);
-  -webkit-transform-origin: left top;
-          transform-origin: left top;
+  transform: scale(0.75) translate3d(35px, 27px, 0);
+  transform-origin: left top;
   color: rgba(0, 0, 0, 0.5);
   font-size: 16px;
 }
@@ -284,9 +275,14 @@ div.react_share_form .expires .ajxp_icon_span {
   float: left;
   font-size: 20px;
   color: rgba(0, 0, 0, 0.23);
-  margin-top: 37px;
   margin-right: 9px;
   margin-left: 3px;
+}
+div#react_share_form .password-container .ajxp_icon_span.icon-lock,
+div.react_share_form .password-container .ajxp_icon_span.icon-lock,
+div#react_share_form .expires .ajxp_icon_span.icon-lock,
+div.react_share_form .expires .ajxp_icon_span.icon-lock {
+  margin-top: 40px;
 }
 div#react_share_form .password-container .ajxp_icon_span.icon-calendar,
 div.react_share_form .password-container .ajxp_icon_span.icon-calendar,
@@ -298,7 +294,7 @@ div#react_share_form .password-container .ajxp_icon_span.mdi-download,
 div.react_share_form .password-container .ajxp_icon_span.mdi-download,
 div#react_share_form .expires .ajxp_icon_span.mdi-download,
 div.react_share_form .expires .ajxp_icon_span.mdi-download {
-  margin-top: 40px;
+  margin-top: 34px;
 }
 div#react_share_form .password-container span.dlCounterString,
 div.react_share_form .password-container span.dlCounterString,
@@ -319,9 +315,6 @@ div.react_share_form .label-desc-edit .mui-text-field {
 div#react_share_form h3,
 div.react_share_form h3 {
   font-size: 18px;
-  margin-bottom: 0;
-  margin-top: 4px;
-  color: #999;
 }
 div#react_share_form h4,
 div.react_share_form h4 {
@@ -350,18 +343,15 @@ div.react_share_form div.user-badge {
   margin-left: 50px;
   margin-right: 11px;
   padding-top: 1px;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
+  -ms-flex-direction: row;
+      flex-direction: row;
 }
 div#react_share_form div.user-badge .user-badge-label,
 div.react_share_form div.user-badge .user-badge-label {
-  -webkit-flex: 5;
-      -ms-flex: 5;
-          flex: 5;
+  -ms-flex: 5;
+      flex: 5;
   padding: 9px 0;
   line-height: 25px;
 }
@@ -444,7 +434,6 @@ div.react_share_form div.user-badge span.user-badge-rights-container input[name=
 }
 div#react_share_form div.remote-users-add,
 div.react_share_form div.remote-users-add {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin-top: -20px;
@@ -528,7 +517,6 @@ div#ajxp_shared_info_panel .copy-message {
   font-size: 13px;
 }
 div#ajxp_shared_info_panel .uUserEntry {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   padding: 3px 0;
@@ -538,9 +526,8 @@ div#ajxp_shared_info_panel .uUserEntry:last-of-type {
   border-bottom: 0;
 }
 div#ajxp_shared_info_panel .uUserEntry .uLabel {
-  -webkit-flex: 5;
-      -ms-flex: 5;
-          flex: 5;
+  -ms-flex: 5;
+      flex: 5;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

@@ -42,14 +42,6 @@ div#react_share_form, div.react_share_form {
       word-break:break-all;
     }
   }
-  .mui-tabs-container {
-    .mui-tab-item-container {
-      background-color: @color0 !important;
-    }
-    .mui-tab-template {
-      min-height: 390px;
-    }
-  }
   .shared-users-rights-header {
     color: #ADADAD;
     padding-right: 50px;
@@ -191,7 +183,8 @@ div#react_share_form, div.react_share_form {
     }
     .copy-link-button{
       font-size: 13px !important;
-      margin-top: 15px;
+      margin-top: 7px;
+      float: none;
       background-color: #ddd;
       color: #F1F1F1;
       padding: 6px;
@@ -243,14 +236,16 @@ div#react_share_form, div.react_share_form {
       float: left;
       font-size: 20px;
       color: rgba(0, 0, 0, 0.23);
-      margin-top: 37px;
       margin-right: 9px;
       margin-left: 3px;
+      &.icon-lock{
+        margin-top: 40px;
+      }
       &.icon-calendar{
         font-size: 18px;
       }
       &.mdi-download{
-        margin-top: 40px;
+        margin-top: 34px;
       }
     }
     span.dlCounterString {
@@ -273,9 +268,6 @@ div#react_share_form, div.react_share_form {
   }
   h3{
     font-size: 18px;
-    margin-bottom: 0;
-    margin-top: 4px;
-    color: #999;
   }
   h4{
     padding-top: 10px;

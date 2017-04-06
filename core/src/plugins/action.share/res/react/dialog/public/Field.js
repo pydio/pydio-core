@@ -124,14 +124,17 @@ let PublicLinkField = React.createClass({
             }
             return (
                 <div className="public-link-container">
-                    <TextField
-                        className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}
-                        type="text"
-                        name="Link"
-                        ref="public-link-field"
-                        value={publicLink}
-                        onFocus={focus}
-                    /> {copyButton}
+                    <div style={{display:'flex', alignItems:'center'}}>
+                        <TextField
+                            className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}
+                            type="text"
+                            name="Link"
+                            ref="public-link-field"
+                            value={publicLink}
+                            onFocus={focus}
+                            style={{flex: 1}}
+                        /> {copyButton}
+                    </div>
                     <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
                     {actionLinks}
                     {qrCode}

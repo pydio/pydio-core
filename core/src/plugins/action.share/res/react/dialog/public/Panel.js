@@ -4,7 +4,7 @@ import PublicLinkField from './Field'
 import PublicLinkPermissions from './Permissions'
 import PublicLinkSecureOptions from './SecureOptions'
 const {ValidPassword} = require('pydio').requireLib('form')
-const {RaisedButton, Checkbox} = require('material-ui')
+const {RaisedButton, Checkbox, Divider} = require('material-ui')
 
 let PublicLinkPanel = React.createClass({
 
@@ -58,30 +58,35 @@ let PublicLinkPanel = React.createClass({
 
     render: function(){
 
-        let publicLinkPanes;
+        let publicLinkPanes, publicLinkField;
         if(this.props.linkData) {
+            publicLinkField = (<PublicLinkField
+                showMailer={this.props.showMailer}
+                linkData={this.props.linkData}
+                shareModel={this.props.shareModel}
+                editAllowed={this.props.authorizations.editable_hash}
+                key="public-link"
+            />);
             publicLinkPanes = [
-                <PublicLinkField
-                    showMailer={this.props.showMailer}
-                    linkData={this.props.linkData}
-                    shareModel={this.props.shareModel}
-                    editAllowed={this.props.authorizations.editable_hash}
-                    key="public-link"
-                />,
+                <Divider/>,
                 <PublicLinkPermissions
                     linkData={this.props.linkData}
                     shareModel={this.props.shareModel}
-                    key="public-perm"/>,
+                    key="public-perm"
+                    style={{padding: '0 16px'}}
+                />,
+                <Divider/>,
                 <PublicLinkSecureOptions
                     linkData={this.props.linkData}
                     shareModel={this.props.shareModel}
                     pydio={this.props.pydio}
                     key="public-secure"
+                    style={{padding: '0 16px'}}
                 />
             ];
         }else if(this.state.showTemporaryPassword){
             publicLinkPanes = [
-                <div>
+                <div style={{padding: '0 16px'}}>
                     <div className="section-legend" style={{marginTop:20}}>{this.props.getMessage('215')}</div>
                     <div>
                         <div style={{float:'left'}}>
@@ -100,7 +105,7 @@ let PublicLinkPanel = React.createClass({
 
         }else{
             publicLinkPanes = [
-                <div className="section-legend" style={{marginTop:20}}>{this.props.getMessage('190')}</div>
+                <div className="section-legend" style={{padding: '0 16px'}}>{this.props.getMessage('190')}</div>
             ];
         }
         let checked = !!this.props.linkData;
@@ -109,13 +114,17 @@ let PublicLinkPanel = React.createClass({
             disableForNotOwner = true;
         }
         return (
-            <div style={{padding:16}} className="ie_material_checkbox_fix">
-                <Checkbox
-                    disabled={this.props.isReadonly() || disableForNotOwner || this.state.disabled}
-                    onCheck={this.toggleLink}
-                    checked={!!this.props.linkData || this.state.showTemporaryPassword}
-                    label={this.props.getMessage('189')}
-                />
+            <div className="ie_material_checkbox_fix">
+                <div style={{padding:16}} >
+                    <Checkbox
+                        disabled={this.props.isReadonly() || disableForNotOwner || this.state.disabled}
+                        onCheck={this.toggleLink}
+                        checked={!!this.props.linkData || this.state.showTemporaryPassword}
+                        label={this.props.getMessage('189')}
+                        labelStyle={{fontSize: 18}}
+                    />
+                    {publicLinkField}
+                </div>
                 {publicLinkPanes}
             </div>
         );

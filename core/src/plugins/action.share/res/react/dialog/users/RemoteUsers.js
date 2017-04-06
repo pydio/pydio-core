@@ -73,7 +73,7 @@ let RemoteUsers = React.createClass({
         }
 
         return (
-            <div style={{marginTop:16}}>
+            <div>
                 <h3>{this.props.getMessage('207')}</h3>
                 <div className="section-legend">{this.props.getMessage('208')}</div>
                 {this.renderForm()}

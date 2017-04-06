@@ -22,6 +22,7 @@ let LabelDescriptionPanel = React.createClass({
                     name="label"
                     onChange={this.updateLabel}
                     value={this.props.shareModel.getGlobal('label')}
+                    fullWidth={true}
                 />
             );
             labelLegend = (
@@ -29,8 +30,8 @@ let LabelDescriptionPanel = React.createClass({
             );
         }
         return (
-            <div className="reset-pydio-forms">
-                <h3 style={{paddingTop:0}}>{this.props.getMessage('145')}</h3>
+            <div style={this.props.style}>
+                <h3>{this.props.getMessage('145')}</h3>
                 <div className="label-desc-edit">
                     {label}
                     {labelLegend}
@@ -40,6 +41,7 @@ let LabelDescriptionPanel = React.createClass({
                         name="description"
                         onChange={this.updateDescription}
                         value={this.props.shareModel.getGlobal('description')}
+                        fullWidth={true}
                     />
                     <div className="form-legend">{this.props.getMessage('197')}</div>
                 </div>

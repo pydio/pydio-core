@@ -37,7 +37,7 @@ let PublicLinkTemplate = React.createClass({
             );
         }
         return (
-            <div className="reset-pydio-forms">
+            <div style={this.props.style}>
                 <h3>{this.props.getMessage('151')}</h3>
                 {element}
                 <div className="form-legend">{this.props.getMessage('198')}</div>

@@ -30,7 +30,7 @@ let NotificationPanel = React.createClass({
             );
         }
         return (
-            <div className="reset-pydio-forms">
+            <div style={this.props.style}>
                 <h3>{this.props.getMessage('218')}</h3>
                 {element}
                 <div className="form-legend">{this.props.getMessage('188')}</div>

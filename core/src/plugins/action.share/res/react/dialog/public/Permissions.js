@@ -8,7 +8,8 @@ let PublicLinkPermissions = React.createClass({
 
     propTypes: {
         linkData: React.PropTypes.object.isRequired,
-        shareModel: React.PropTypes.instanceOf(ShareModel)
+        shareModel: React.PropTypes.instanceOf(ShareModel),
+        style: React.PropTypes.object
     },
 
     changePermission: function(event){
@@ -45,13 +46,13 @@ let PublicLinkPermissions = React.createClass({
             previewWarning = <div>{this.props.getMessage('195')}</div>;
         }
         return (
-            <div>
+            <div style={this.props.style}>
                 <h3>{this.props.getMessage('71')}</h3>
                 <div className="section-legend">{this.props.getMessage('70r')}</div>
                 <div style={{margin:'10px 0 20px'}} className="ie_material_checkbox_fix">
                     {perms.map(function(p){
                         return (
-                            <div style={{display:'inline-block',width:'30%'}}>
+                            <div style={{display:'inline-block',width:'33%'}}>
                                 <Checkbox
                                     disabled={p.DISABLED || this.props.isReadonly()}
                                     type="checkbox"

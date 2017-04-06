@@ -8,7 +8,8 @@ let PublicLinkSecureOptions = React.createClass({
 
     propTypes: {
         linkData: React.PropTypes.object.isRequired,
-        shareModel: React.PropTypes.instanceOf(ShareModel)
+        shareModel: React.PropTypes.instanceOf(ShareModel),
+        style: React.PropTypes.object
     },
 
     updateDLExpirationField: function(event){
@@ -58,6 +59,7 @@ let PublicLinkSecureOptions = React.createClass({
                     disabled={true}
                     value={'********'}
                     onChange={this.updatePassword}
+                    fullWidth={true}
                 />
             );
         }else if(!this.props.isReadonly()){
@@ -71,9 +73,9 @@ let PublicLinkSecureOptions = React.createClass({
         }
         if(passwordField){
             return (
-                <div className="password-container">
+                <div className="password-container" style={{display:'flex', alignItems:'baseline', marginBottom: 10}}>
+                    <span className="ajxp_icon_span icon-lock"/>
                     <div style={{width:resetPassword ? '50%' : '100%', display:'inline-block'}}>
-                        <span className="ajxp_icon_span icon-lock"/>
                         {passwordField}
                     </div>
                     {resetPassword &&
@@ -97,16 +99,16 @@ let PublicLinkSecureOptions = React.createClass({
     },
 
     render: function(){
-        var linkId = this.props.linkData.hash;
-        var passContainer = this.renderPasswordContainer();
-        var crtLinkDLAllowed = this.props.shareModel.getPublicLinkPermission(linkId, 'download');
-        var dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
-        var expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
-        var calIcon = <span className="ajxp_icon_span icon-calendar"/>;
-        var expDate = null;
-        var maxDate = null, maxDownloads = null, dateExpired = false, dlExpired = false;
-        var auth = ShareModel.getAuthorizations(this.props.pydio);
-        var today = new Date();
+        const linkId = this.props.linkData.hash;
+        const passContainer = this.renderPasswordContainer();
+        const crtLinkDLAllowed = this.props.shareModel.getPublicLinkPermission(linkId, 'download');
+        const dlLimitValue = this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads');
+        const expirationDateValue = this.props.shareModel.getExpirationFor(linkId, 'days') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'days');
+        const auth = ShareModel.getAuthorizations(this.props.pydio);
+        const today = new Date();
+
+        let calIcon = <span className="ajxp_icon_span icon-calendar"/>;
+        let expDate, maxDate, maxDownloads = null, dateExpired = false, dlExpired = false;
         if(parseInt(auth.max_expiration) > 0){
             maxDate = new Date();
             maxDate.setDate(today.getDate() + parseInt(auth.max_expiration));
@@ -123,9 +125,8 @@ let PublicLinkSecureOptions = React.createClass({
             expDate.setDate(today.getDate() + parseInt(expirationDateValue));
             var clearValue = function(){
                 this.props.shareModel.setExpirationFor(linkId, "days", "");
-                ReactDOM.findDOMNode(this.refs['expirationDate']).querySelector(".mui-text-field-input").value = "";
             }.bind(this);
-            calIcon = <span className="ajxp_icon_span mdi mdi-close-circle" onClick={clearValue}/>;
+            calIcon = <span className="mdi mdi-close-circle ajxp_icon_span" onClick={clearValue}/>;
             var calLabel = <span className="calLabelHasValue">{this.props.getMessage(dateExpired?'21b':'21')}</span>
         }
         if(dlLimitValue){
@@ -143,39 +144,42 @@ let PublicLinkSecureOptions = React.createClass({
             }
             var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
         }
+        console.log(expDate);
         return (
-            <div>
-                <h3 style={{paddingTop:0}}>{this.props.getMessage('196')}</h3>
+            <div  style={this.props.style}>
+                <h3>{this.props.getMessage('196')}</h3>
                 <div className="section-legend">{this.props.getMessage('24')}</div>
                 {passContainer}
-                <div className="expires">
-                    <div style={{width:'50%', display:'inline-block', position:'relative'}} className={dateExpired?'limit-block-expired':null}>
+                <div className="expires" style={{display:'flex', alignItems:'center'}}>
+                    <div style={{flex:1, display:'flex', alignItems:'center', position:'relative'}} className={dateExpired?'limit-block-expired':null}>
                         {calIcon}
-                        {calLabel}
                         <DatePicker
                             ref="expirationDate"
-                            disabled={this.props.isReadonly()}
-                            onChange={this.onDateChange}
                             key="start"
-                            hintText={this.props.getMessage(dateExpired?'21b':'21')}
-                            autoOk={true}
+                            value={expDate}
                             minDate={new Date()}
                             maxDate={maxDate}
-                            defaultDate={expDate}
+                            autoOk={true}
+                            disabled={this.props.isReadonly()}
+                            onChange={this.onDateChange}
                             showYearSelector={true}
-                            onShow={null}
-                            onDismiss={null}
+                            floatingLabelText={this.props.getMessage(dateExpired?'21b':'21')}
+                            mode="landscape"
                             formatDate={this.formatDate}
+                            style={{flex: 1}}
+                            fullWidth={true}
                         />
                     </div>
-                    <div style={{width:'50%', display:crtLinkDLAllowed?'inline-block':'none', position:'relative'}} className={dlExpired?'limit-block-expired':null}>
-                        <span className="ajxp_icon_span mdi mdi-download"/>
+                    <div style={{flex:1, alignItems:'center', display:crtLinkDLAllowed?'flex':'none', position:'relative'}} className={dlExpired?'limit-block-expired':null}>
+                        <span className="mdi mdi-download ajxp_icon_span"/>
                         <TextField
                             type="number"
                             disabled={this.props.isReadonly()}
                             floatingLabelText={this.props.getMessage(dlExpired?'22b':'22')}
                             value={this.props.shareModel.getExpirationFor(linkId, 'downloads') === 0 ? "" : this.props.shareModel.getExpirationFor(linkId, 'downloads')}
                             onChange={this.updateDLExpirationField}
+                            fullWidth={true}
+                            style={{flex: 1}}
                         />
                         {dlCounterString}
                     </div>

@@ -236,7 +236,7 @@ const MainPanel = React.createClass({
         }
 
         return(
-            <div className="react_share_form">
+            <div className="react_share_form" style={{width: 420}}>
                 <HeaderPanel {...this.props} shareModel={this.state.model}/>
                 <Tabs>{panels}</Tabs>
                 {mailer}

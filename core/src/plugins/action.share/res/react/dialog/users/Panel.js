@@ -2,6 +2,7 @@ const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
 import RemoteUsers from './RemoteUsers'
 import SharedUsers from './SharedUsers'
+const {Divider} = require('material-ui')
 
 let UsersPanel = React.createClass({
 
@@ -15,14 +16,14 @@ let UsersPanel = React.createClass({
     },
 
     onSaveSelection:function(){
-        var label = window.prompt(this.props.getMessage(510, ''));
+        const label = window.prompt(this.props.getMessage(510, ''));
         if(!label) return;
         this.props.shareModel.saveSelectionAsTeam(label);
     },
 
     sendInvitations:function(userObjects){
         try{
-            var mailData = this.props.shareModel.prepareEmail("repository");
+            const mailData = this.props.shareModel.prepareEmail("repository");
             this.props.showMailer(mailData.subject, mailData.message, userObjects);
         }catch(e){
             global.alert(e.message);
@@ -30,27 +31,33 @@ let UsersPanel = React.createClass({
     },
 
     render: function(){
-        var currentUsers = this.props.shareModel.getSharedUsers();
-        var federatedEnabled = ReactModel.Share.federatedSharingEnabled();
+        const currentUsers = this.props.shareModel.getSharedUsers();
+        const federatedEnabled = ReactModel.Share.federatedSharingEnabled();
+        let remoteUsersBlock;
         if(federatedEnabled){
-            var remoteUsersBlock = (
-                <RemoteUsers
-                    shareModel={this.props.shareModel}
-                    onUserUpdate={this.onUserUpdate}
-                />
+            remoteUsersBlock = (
+                <div style={{padding: '0 16px'}}>
+                    <RemoteUsers
+                        shareModel={this.props.shareModel}
+                        onUserUpdate={this.onUserUpdate}
+                    />
+                </div>
             );
         }
         return (
-            <div style={federatedEnabled?{padding:'0 16px 10px'}:{padding:'20px 16px 10px'}}>
-                <SharedUsers
-                    showTitle={federatedEnabled}
-                    users={currentUsers}
-                    userObjects={this.props.shareModel.getSharedUsersAsObjects()}
-                    sendInvitations={this.props.showMailer ? this.sendInvitations : null}
-                    onUserUpdate={this.onUserUpdate}
-                    saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
-                    pydio={this.props.pydio}
-                />
+            <div>
+                <div style={{padding: '0 16px 16px'}}>
+                    <SharedUsers
+                        showTitle={federatedEnabled}
+                        users={currentUsers}
+                        userObjects={this.props.shareModel.getSharedUsersAsObjects()}
+                        sendInvitations={this.props.showMailer ? this.sendInvitations : null}
+                        onUserUpdate={this.onUserUpdate}
+                        saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
+                        pydio={this.props.pydio}
+                    />
+                </div>
+                {remoteUsersBlock && <Divider/>}
                 {remoteUsersBlock}
             </div>
         );
