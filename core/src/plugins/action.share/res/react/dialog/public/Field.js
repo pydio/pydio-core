@@ -1,6 +1,6 @@
 const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
-const {RaisedButton, TextField} = require('material-ui')
+const {RaisedButton, TextField, Paper} = require('material-ui')
 const ShareModel = require('pydio').requireLib('ReactModelShare')
 const QRCode = require('qrcode.react');
 const Clipboard = require('clipboard');
@@ -123,7 +123,7 @@ let PublicLinkField = React.createClass({
                 var qrCode = <div className="qrCode"><QRCode size={128} value={publicLink} level="Q"/></div>;
             }
             return (
-                <div className="public-link-container">
+                <Paper zDepth={1} rounded={false} className="public-link-container">
                     <div style={{display:'flex', alignItems:'center'}}>
                         <TextField
                             className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}
@@ -138,7 +138,7 @@ let PublicLinkField = React.createClass({
                     <div style={{textAlign:'center'}} className="section-legend" dangerouslySetInnerHTML={setHtml()}/>
                     {actionLinks}
                     {qrCode}
-                </div>
+                </Paper>
             );
         }
     }

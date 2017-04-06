@@ -2,7 +2,9 @@ const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
 import UserBadge from './UserBadge'
 import SharedUserEntry from './SharedUserEntry'
+import Title from '../main/title'
 const {UsersCompleter} = require('pydio').requireLib('components')
+const {Paper} = require('material-ui')
 
 let SharedUsers = React.createClass({
     
@@ -96,16 +98,20 @@ let SharedUsers = React.createClass({
         }
         var title;
         if(this.props.showTitle){
-            title = <h3>{this.props.getMessage('217')}</h3>;
+            title = <Title>{this.props.getMessage('217')}</Title>;
         }
         return (
             <div>
                 {title}
-                <div className="section-legend">{this.props.getMessage('182')}</div>
-                {usersInput}
-                {rwHeader}
-                <div>{userEntries}</div>
-                {linkActions}
+                <Paper zDepth={1} rounded={false} style={userEntries.length ? {padding:'8px 0 12px 4px'} : {padding: 16}} transitionEnabled={false}>
+                    <div style={userEntries.length? {margin: '-20px 8px 16px'} : {marginTop: -20}}>{usersInput}</div>
+                    {rwHeader}
+                    <div>{userEntries}</div>
+                    {!userEntries.length &&
+                        <div style={{color: 'rgba(0,0,0,0.43)'}}>{this.props.getMessage('182')}</div>
+                    }
+                    {linkActions}
+                </Paper>
             </div>
         );
     }

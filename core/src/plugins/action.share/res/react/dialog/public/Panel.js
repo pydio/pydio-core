@@ -81,7 +81,7 @@ let PublicLinkPanel = React.createClass({
                     shareModel={this.props.shareModel}
                     pydio={this.props.pydio}
                     key="public-secure"
-                    style={{padding: '0 16px'}}
+                    style={{padding: '0 16px 16px'}}
                 />
             ];
         }else if(this.state.showTemporaryPassword){
@@ -105,7 +105,7 @@ let PublicLinkPanel = React.createClass({
 
         }else{
             publicLinkPanes = [
-                <div className="section-legend" style={{padding: '0 16px'}}>{this.props.getMessage('190')}</div>
+                <div className="section-legend" style={{padding: '0 16px 16px'}}>{this.props.getMessage('190')}</div>
             ];
         }
         let checked = !!this.props.linkData;
@@ -114,14 +114,14 @@ let PublicLinkPanel = React.createClass({
             disableForNotOwner = true;
         }
         return (
-            <div className="ie_material_checkbox_fix">
+            <div style={this.props.style}>
                 <div style={{padding:16}} >
                     <Checkbox
                         disabled={this.props.isReadonly() || disableForNotOwner || this.state.disabled}
                         onCheck={this.toggleLink}
                         checked={!!this.props.linkData || this.state.showTemporaryPassword}
                         label={this.props.getMessage('189')}
-                        labelStyle={{fontSize: 18}}
+                        labelStyle={{fontSize: 16}}
                     />
                     {publicLinkField}
                 </div>

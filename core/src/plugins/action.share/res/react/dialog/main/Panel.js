@@ -7,9 +7,9 @@ import AdvancedPanel from '../advanced/Panel'
 import ButtonsComputer from './ButtonsComputer'
 const {ActionDialogMixin} = require('pydio').requireLib('boot')
 const ShareModel = require('pydio').requireLib('ReactModelShare')
+const {PaletteModifier} = require('pydio').requireLib('hoc')
 
-
-const MainPanel = React.createClass({
+let MainPanel = React.createClass({
 
     mixins:[ ActionDialogMixin ],
 
@@ -130,7 +130,6 @@ const MainPanel = React.createClass({
             shareLabels[k] = users[u].getLabel();
             shareMails[k] = u;
         });
-        console.log(shareLabels, shareMails, subject, message);
         // Store keys
         client.request({
             get_action: 'share_link_update_target_users',
@@ -176,6 +175,7 @@ const MainPanel = React.createClass({
                         pydio={this.props.pydio}
                         shareModel={model}
                         authorizations={auth}
+                        style={{height: '100%', overflowY: 'auto'}}
                     />
                 </Tab>
             );
@@ -190,17 +190,19 @@ const MainPanel = React.createClass({
                         showMailer={showMailer}
                         shareModel={model}
                         pydio={this.props.pydio}
+                        style={{height: '100%', overflowY: 'auto'}}
                     />
                 </Tab>
             );
         }
         if(panels.length > 0){
             panels.push(
-                <Tab  key="share-permissions" label={this.getMessage(486, '')}>
+                <Tab key="share-permissions" label={this.getMessage(486, '')}>
                     <AdvancedPanel
                         showMailer={showMailer}
                         pydio={this.props.pydio}
                         shareModel={model}
+                        style={{height: '100%', overflowY: 'auto'}}
                     />
                 </Tab>
             );
@@ -235,15 +237,58 @@ const MainPanel = React.createClass({
             />);
         }
 
+        return (
+            <Content
+                {...this.props}
+                model={this.state.model}
+                panels={panels}
+                mailer={mailer}
+            />
+        );
+
         return(
-            <div className="react_share_form" style={{width: 420}}>
+            <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column'}}>
                 <HeaderPanel {...this.props} shareModel={this.state.model}/>
-                <Tabs>{panels}</Tabs>
+                <Tabs {...tabStyles} >{panels}</Tabs>
                 {mailer}
             </div>
         );
     }
 
 });
+
+class Content extends React.Component{
+
+    render(){
+
+        const tabStyles = {
+            style : {
+                flex: 1,
+                overflow: 'hidden',
+                display:'flex',
+                flexDirection: 'column'
+            },
+            contentContainerStyle : {
+                flex: 1,
+                overflow: 'hidden'
+            },
+            tabTemplateStyle: {
+                height: '100%',
+                backgroundColor: '#fafafa'
+            }
+        }
+
+        return(
+            <div className="react_share_form" style={{width: 420, display:'flex', flexDirection:'column'}}>
+                <HeaderPanel {...this.props} shareModel={this.props.model}/>
+                <Tabs {...tabStyles} >{this.props.panels}</Tabs>
+                {this.props.mailer}
+            </div>
+        );
+    }
+
+}
+
+Content = PaletteModifier({primary1Color:'#4aceb0'})(Content);
 
 export {MainPanel as default}

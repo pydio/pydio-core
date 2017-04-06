@@ -2,7 +2,7 @@ const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
 const {Checkbox} = require('material-ui')
 const ShareModel = require('pydio').requireLib('ReactModelShare');
-
+import Title from '../main/title'
 
 let PublicLinkPermissions = React.createClass({
 
@@ -47,7 +47,7 @@ let PublicLinkPermissions = React.createClass({
         }
         return (
             <div style={this.props.style}>
-                <h3>{this.props.getMessage('71')}</h3>
+                <Title>{this.props.getMessage('71')}</Title>
                 <div className="section-legend">{this.props.getMessage('70r')}</div>
                 <div style={{margin:'10px 0 20px'}} className="ie_material_checkbox_fix">
                     {perms.map(function(p){

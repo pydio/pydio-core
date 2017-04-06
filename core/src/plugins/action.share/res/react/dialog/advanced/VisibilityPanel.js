@@ -1,6 +1,7 @@
 const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
 const {Checkbox, RaisedButton, TextField} = require('material-ui')
+import Title from '../main/title'
 
 let VisibilityPanel = React.createClass({
 
@@ -49,7 +50,7 @@ let VisibilityPanel = React.createClass({
         }
         return (
             <div style={this.props.style}>
-                <h3>{this.props.getMessage('199')}</h3>
+                <Title>{this.props.getMessage('199')}</Title>
                 {showToggle}
                 {showTransfer}
             </div>

@@ -1,6 +1,6 @@
 const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
-const {TextField, DropDownMenu} = require('material-ui')
+const {TextField, SelectField, MenuItem} = require('material-ui')
 
 let PublicLinkTemplate = React.createClass({
 
@@ -8,39 +8,32 @@ let PublicLinkTemplate = React.createClass({
         linkData:React.PropTypes.object
     },
 
-    onDropDownChange: function(event, index, item){
-        this.props.shareModel.setTemplate(this.props.linkData.hash, item.payload);
+    onDropDownChange: function(event, index, value){
+        this.props.shareModel.setTemplate(this.props.linkData.hash, value);
     },
 
     render: function(){
-        var index = 0, crtIndex = 0;
-        var selected = this.props.shareModel.getTemplate(this.props.linkData.hash);
-        var menuItems=this.props.layoutData.map(function(l){
-            if(selected && l.LAYOUT_ELEMENT == selected) {
-                crtIndex = index;
+        let crtLabel;
+        let selected = this.props.shareModel.getTemplate(this.props.linkData.hash);
+        const menuItems=this.props.layoutData.map(function(l){
+            if(selected && l.LAYOUT_ELEMENT === selected) {
+                crtLabel = l.LAYOUT_LABEL;
             }
-            index ++;
-            return {payload:l.LAYOUT_ELEMENT, text:l.LAYOUT_LABEL};
+            if(!selected && !crtLabel) {
+                selected = l.LAYOUT_ELEMENT, crtLabel = l.LAYOUT_LABEL;
+            }
+            return <MenuItem value={l.LAYOUT_ELEMENT} primaryText={l.LAYOUT_LABEL}/>;
         });
-        var element;
-        if(this.props.isReadonly()){
-            element = <TextField disabled={true} value={menuItems[crtIndex].text} style={{width:'100%'}}/>
-        }else{
-            element = (
-                <DropDownMenu
-                    autoWidth={false}
-                    className="full-width"
-                    menuItems={menuItems}
-                    selectedIndex={crtIndex}
-                    onChange={this.onDropDownChange}
-                />
-            );
-        }
+        const unusedLegend = <div className="form-legend">{this.props.getMessage('198')}</div>;
         return (
             <div style={this.props.style}>
-                <h3>{this.props.getMessage('151')}</h3>
-                {element}
-                <div className="form-legend">{this.props.getMessage('198')}</div>
+                <SelectField
+                    fullWidth={true}
+                    value={selected}
+                    onChange={this.onDropDownChange}
+                    disabled={this.props.isReadonly()}
+                    floatingLabelText={this.props.getMessage('151')}
+                >{menuItems}</SelectField>
             </div>
         );
     }

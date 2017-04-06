@@ -3,6 +3,7 @@ import ShareContextConsumer from '../ShareContextConsumer'
 const {FlatButton, TextField, DatePicker} = require('material-ui')
 const {ValidPassword} = require('pydio').requireLib('form')
 const ShareModel = require('pydio').requireLib('ReactModelShare');
+import Title from '../main/title'
 
 let PublicLinkSecureOptions = React.createClass({
 
@@ -74,7 +75,7 @@ let PublicLinkSecureOptions = React.createClass({
         if(passwordField){
             return (
                 <div className="password-container" style={{display:'flex', alignItems:'baseline', marginBottom: 10}}>
-                    <span className="ajxp_icon_span icon-lock"/>
+                    <span className="ajxp_icon_span mdi mdi-file-lock"/>
                     <div style={{width:resetPassword ? '50%' : '100%', display:'inline-block'}}>
                         {passwordField}
                     </div>
@@ -107,7 +108,7 @@ let PublicLinkSecureOptions = React.createClass({
         const auth = ShareModel.getAuthorizations(this.props.pydio);
         const today = new Date();
 
-        let calIcon = <span className="ajxp_icon_span icon-calendar"/>;
+        let calIcon = <span className="ajxp_icon_span mdi mdi-calendar-clock"/>;
         let expDate, maxDate, maxDownloads = null, dateExpired = false, dlExpired = false;
         if(parseInt(auth.max_expiration) > 0){
             maxDate = new Date();
@@ -144,10 +145,9 @@ let PublicLinkSecureOptions = React.createClass({
             }
             var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
         }
-        console.log(expDate);
         return (
             <div  style={this.props.style}>
-                <h3>{this.props.getMessage('196')}</h3>
+                <Title>{this.props.getMessage('196')}</Title>
                 <div className="section-legend">{this.props.getMessage('24')}</div>
                 {passContainer}
                 <div className="expires" style={{display:'flex', alignItems:'center'}}>

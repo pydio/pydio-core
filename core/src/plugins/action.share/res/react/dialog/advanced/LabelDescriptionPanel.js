@@ -1,6 +1,6 @@
 const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
-const {TextField} = require('material-ui')
+const {TextField, Subheader} = require('material-ui')
 
 let LabelDescriptionPanel = React.createClass({
 
@@ -18,33 +18,27 @@ let LabelDescriptionPanel = React.createClass({
             label = (
                 <TextField
                     disabled={this.props.isReadonly()}
-                    floatingLabelText={this.props.getMessage('35')}
+                    floatingLabelText={this.props.getMessage('35') + ' ( '+ this.props.getMessage('146') + ' )'}
+                    floatingLabelStyle={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}
                     name="label"
                     onChange={this.updateLabel}
                     value={this.props.shareModel.getGlobal('label')}
                     fullWidth={true}
                 />
             );
-            labelLegend = (
-                <div className="form-legend">{this.props.getMessage('146')}</div>
-            );
         }
         return (
             <div style={this.props.style}>
-                <h3>{this.props.getMessage('145')}</h3>
-                <div className="label-desc-edit">
-                    {label}
-                    {labelLegend}
-                    <TextField
-                        disabled={this.props.isReadonly()}
-                        floatingLabelText={this.props.getMessage('145')}
-                        name="description"
-                        onChange={this.updateDescription}
-                        value={this.props.shareModel.getGlobal('description')}
-                        fullWidth={true}
-                    />
-                    <div className="form-legend">{this.props.getMessage('197')}</div>
-                </div>
+                {label}
+                <TextField
+                    disabled={this.props.isReadonly()}
+                    floatingLabelText={this.props.getMessage('145') + ' ( '+ this.props.getMessage('197') + ' )'}
+                    floatingLabelStyle={{whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis'}}
+                    name="description"
+                    onChange={this.updateDescription}
+                    value={this.props.shareModel.getGlobal('description')}
+                    fullWidth={true}
+                />
             </div>
         );
     }

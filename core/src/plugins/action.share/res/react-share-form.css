@@ -274,21 +274,21 @@ div#react_share_form .expires .ajxp_icon_span,
 div.react_share_form .expires .ajxp_icon_span {
   float: left;
   font-size: 20px;
-  color: rgba(0, 0, 0, 0.23);
+  color: rgba(0, 0, 0, 0.53);
   margin-right: 9px;
   margin-left: 3px;
 }
-div#react_share_form .password-container .ajxp_icon_span.icon-lock,
-div.react_share_form .password-container .ajxp_icon_span.icon-lock,
-div#react_share_form .expires .ajxp_icon_span.icon-lock,
-div.react_share_form .expires .ajxp_icon_span.icon-lock {
+div#react_share_form .password-container .ajxp_icon_span.mdi-file-lock,
+div.react_share_form .password-container .ajxp_icon_span.mdi-file-lock,
+div#react_share_form .expires .ajxp_icon_span.mdi-file-lock,
+div.react_share_form .expires .ajxp_icon_span.mdi-file-lock {
   margin-top: 40px;
 }
-div#react_share_form .password-container .ajxp_icon_span.icon-calendar,
-div.react_share_form .password-container .ajxp_icon_span.icon-calendar,
-div#react_share_form .expires .ajxp_icon_span.icon-calendar,
-div.react_share_form .expires .ajxp_icon_span.icon-calendar {
-  font-size: 18px;
+div#react_share_form .password-container .ajxp_icon_span.mdi-calendar-clock,
+div.react_share_form .password-container .ajxp_icon_span.mdi-calendar-clock,
+div#react_share_form .expires .ajxp_icon_span.mdi-calendar-clock,
+div.react_share_form .expires .ajxp_icon_span.mdi-calendar-clock {
+  margin-top: 27px;
 }
 div#react_share_form .password-container .ajxp_icon_span.mdi-download,
 div.react_share_form .password-container .ajxp_icon_span.mdi-download,

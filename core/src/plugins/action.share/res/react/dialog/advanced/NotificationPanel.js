@@ -1,39 +1,31 @@
 const React = require('react');
 import ShareContextConsumer from '../ShareContextConsumer'
-const {TextField, DropDownMenu} = require('material-ui')
+const {TextField, SelectField, MenuItem} = require('material-ui')
 
 let NotificationPanel = React.createClass({
 
-    dropDownChange:function(event, index, item){
-        this.props.shareModel.setGlobal('watch', (index!=0));
+    dropDownChange:function(event, index, value){
+        this.props.shareModel.setGlobal('watch', (value!=='no_watch'));
     },
 
     render: function(){
         const menuItems = [
-            {payload:'no_watch', text:this.props.getMessage('187')},
-            {payload:'watch_read', text:this.props.getMessage('184')}
-            /*,{payload:'watch_write', text:'Notify me when share is modified'}*/
+            <MenuItem value="no_watch" primaryText={this.props.getMessage('187')}/>,
+            <MenuItem value="watch_read" primaryText={this.props.getMessage('184')}/>
         ];
-        const selectedIndex = this.props.shareModel.getGlobal('watch') ? 1 : 0;
-        let element;
-        if(this.props.isReadonly()){
-            element = <TextField disabled={true} value={menuItems[selectedIndex].text} style={{width:'100%'}}/>
-        }else{
-            element = (
-                <DropDownMenu
-                    autoWidth={false}
-                    className="full-width"
-                    menuItems={menuItems}
-                    selectedIndex={selectedIndex}
-                    onChange={this.dropDownChange}
-                />
-            );
-        }
+
+        const selectedIndex = this.props.shareModel.getGlobal('watch') ? 'watch_read' : 'no_watch';
+
+        const unusedLegend = <div className="form-legend">{this.props.getMessage('188')}</div>;
         return (
             <div style={this.props.style}>
-                <h3>{this.props.getMessage('218')}</h3>
-                {element}
-                <div className="form-legend">{this.props.getMessage('188')}</div>
+                <SelectField
+                    disabled={this.props.isReadonly()}
+                    fullWidth={true}
+                    value={selectedIndex}
+                    onChange={this.dropDownChange}
+                    floatingLabelText={this.props.getMessage('218')}
+                >{menuItems}</SelectField>
             </div>
         );
     }

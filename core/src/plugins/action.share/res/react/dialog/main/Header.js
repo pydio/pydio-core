@@ -1,4 +1,5 @@
 const React = require('react');
+const {muiThemeable} = require('material-ui/styles');
 const PathUtils = require('pydio/util/path')
 import ShareContextConsumer from '../ShareContextConsumer'
 
@@ -18,7 +19,7 @@ let HeaderPanel = React.createClass({
             );
         }
         return (
-            <div className="headerPanel">
+            <div className="headerPanel" style={{backgroundColor:this.props.muiTheme.palette.primary1Color}}>
                 <div>{this.props.getMessage('44').replace('%s', PathUtils.getBasename(nodePath))}</div>
             </div>
         );
@@ -26,4 +27,6 @@ let HeaderPanel = React.createClass({
 });
 
 HeaderPanel = ShareContextConsumer(HeaderPanel);
+HeaderPanel = muiThemeable()(HeaderPanel);
+
 export {HeaderPanel as default}

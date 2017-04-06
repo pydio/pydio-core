@@ -45,7 +45,7 @@ let UsersPanel = React.createClass({
             );
         }
         return (
-            <div>
+            <div style={this.props.style}>
                 <div style={{padding: '0 16px 16px'}}>
                     <SharedUsers
                         showTitle={federatedEnabled}

@@ -2,6 +2,7 @@ const React = require('react');
 const {TextField, IconButton} = require('material-ui')
 import ShareContextConsumer from '../ShareContextConsumer'
 import RemoteUserEntry from './RemoteUserEntry'
+import Title from '../main/title'
 const {ReactModelShare} = require('pydio').requireLib('ReactModelShare')
 
 let RemoteUsers = React.createClass({
@@ -74,7 +75,7 @@ let RemoteUsers = React.createClass({
 
         return (
             <div>
-                <h3>{this.props.getMessage('207')}</h3>
+                <Title>{this.props.getMessage('207')}</Title>
                 <div className="section-legend">{this.props.getMessage('208')}</div>
                 {this.renderForm()}
                 <div>
