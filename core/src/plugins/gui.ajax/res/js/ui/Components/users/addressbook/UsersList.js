@@ -24,14 +24,15 @@ class UsersList extends React.Component{
         const activeTbarColor = this.props.muiTheme.palette.accent2Color;
         const toolbar = (
             <div style={{padding: 10, height:56, backgroundColor:this.state.select?activeTbarColor : '#fafafa', display:'flex', alignItems:'center', transition:DOMUtils.getBeziersTransition()}}>
-                {item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
+                {mode === "selector" && item._parent && <MaterialUI.IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
+                {mode === 'book' && item.actions && item.actions.multiple && <MaterialUI.Checkbox style={{width:'initial', marginLeft: this.state.select?7:14}} checked={this.state.select} onCheck={toggleSelect}/>}
                 <div style={{flex:1, fontSize:20, color:this.state.select?'white':'rgba(0,0,0,0.87)'}}>{item.label}</div>
-                {item.actions && item.actions.create && !this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
-                {item.actions && item.actions.remove && this.state.select && <MaterialUI.RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
+                {mode === 'book' && item.actions && item.actions.create && !this.state.select && <MaterialUI.FlatButton secondary={true} label={item.actions.create} onTouchTap={createAction}/>}
+                {mode === 'book' && item.actions && item.actions.remove && this.state.select && <MaterialUI.RaisedButton secondary={true} label={item.actions.remove} disabled={!this.state.selection.length} onTouchTap={deleteAction}/>}
             </div>
         );
         // PARENT NODE
-        if(item._parent && mode !== 'inner' && !(mode==='book' && !item._parent._parent)){
+        if(item._parent && mode === 'book' && item._parent._parent){
             elements.push(
                 <MaterialUI.ListItem
                     key={'__parent__'}
@@ -105,7 +106,7 @@ class UsersList extends React.Component{
         }.bind(this));
         return (
             <div style={{flex:1, flexDirection:'column', display:'flex'}} onTouchTap={this.props.onTouchTap}>
-                {mode === 'book' && toolbar}
+                {mode !== 'inner' && !this.props.noToolbar && toolbar}
                 <MaterialUI.List style={{flex:1, overflowY:mode !== 'inner' ? 'auto' : 'initial'}}>
                     {this.props.subHeader && <MaterialUI.Subheader>{this.props.subHeader}</MaterialUI.Subheader>}
                     {elements}

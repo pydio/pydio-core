@@ -14,7 +14,7 @@ class UserCard extends React.Component{
 
         const {item} = this.props;
         let editableProps = {}, editForm;
-        if(item._parent.id === 'ext'){
+        if(item._parent && item._parent.id === 'ext'){
             editableProps = {
                 userEditable: true,
                 onDeleteAction: () => {this.props.onDeleteAction(item._parent, [item])},

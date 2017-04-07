@@ -1,24 +1,27 @@
 const React = require('react');
-const {TextField, IconButton} = require('material-ui')
+const {TextField, IconButton, Paper} = require('material-ui')
 import ShareContextConsumer from '../ShareContextConsumer'
 import RemoteUserEntry from './RemoteUserEntry'
-import Title from '../main/title'
+import Card from '../main/Card'
 const {ReactModelShare} = require('pydio').requireLib('ReactModelShare')
+const {AddressBook} = require('pydio').requireLib('components')
+import ActionButton from '../main/ActionButton'
 
 let RemoteUsers = React.createClass({
 
     propTypes:{
         shareModel: React.PropTypes.instanceOf(ReactModelShare),
-        onUserUpdate:React.PropTypes.func.isRequired
+        onUserUpdate:React.PropTypes.func.isRequired,
+        pydio: React.PropTypes.instanceOf(Pydio)
     },
 
     getInitialState: function(){
-        return {addDisabled: true};
+        return {addDisabled: true, showUserForm: false};
     },
 
     addUser:function(){
-        var h = this.refs["host"].getValue();
-        var u = this.refs["user"].getValue();
+        const h = this.refs["host"].getValue();
+        const u = this.refs["user"].getValue();
         this.props.shareModel.createRemoteLink(h, u);
     },
 
@@ -27,21 +30,50 @@ let RemoteUsers = React.createClass({
     },
 
     monitorInput:function(){
-        var h = this.refs["host"].getValue();
-        var u = this.refs["user"].getValue();
+        const h = this.refs["host"].getValue();
+        const u = this.refs["user"].getValue();
         this.setState({addDisabled:!(h && u)});
     },
 
-    renderForm: function(){
+    onAddressBookItemSelected: function(uObject, parent){
+        const {trustedServerId} = uObject;
+        const userId = uObject.getId();
+        this.props.shareModel.createRemoteLink('trusted://' + trustedServerId, userId);
+    },
+
+    getActions: function () {
+        const ocsRemotes = this.props.pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
+        const hasTrusted = ocsRemotes && ocsRemotes.length;
+
+        return [
+                <ActionButton key="manual" mdiIcon={'account-plus'} messageId={'45'} onTouchTap={()=>{this.setState({showUserForm:true})}}/>,
+                <AddressBook
+                    key="addressbook"
+                    mode="popover"
+                    pydio={this.props.pydio}
+                    onItemSelected={this.onAddressBookItemSelected}
+                    usersFrom={'remote'}
+                    disableSearch={true}
+                    popoverButton={<ActionButton mdiIcon={'server-network'} messageId={'45'}/>}
+                />
+        ];
+    },
+
+    renderUserForm: function(){
         if(this.props.isReadonly()){
             return null;
         }
         return (
-            <div className="remote-users-add">
-                <TextField className="host" ref="host" floatingLabelText={this.props.getMessage('209')} onChange={this.monitorInput}/>
-                <TextField className="user" ref="user" type="text" floatingLabelText={this.props.getMessage('210')} onChange={this.monitorInput}/>
-                <IconButton tooltip={this.props.getMessage('45')} iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
-            </div>
+            <Paper zDepth={0} style={{padding: '0 16px', backgroundColor: '#FAFAFA', marginTop: 10}}>
+                <div>
+                    <TextField fullWidth={true} ref="host" floatingLabelText={this.props.getMessage('209')} onChange={this.monitorInput}/>
+                    <TextField fullWidth={true} ref="user" type="text" floatingLabelText={this.props.getMessage('210')} onChange={this.monitorInput}/>
+                </div>
+                <div style={{textAlign:'right'}}>
+                    <IconButton tooltip={'Cancel'} iconClassName="mdi mdi-undo" onClick={() => {this.setState({showUserForm: false})}}/>
+                    <IconButton tooltip={this.props.getMessage('45')} iconClassName="icon-plus-sign" onClick={this.addUser} disabled={this.state.addDisabled}/>
+                </div>
+            </Paper>
         );
     },
 
@@ -74,15 +106,16 @@ let RemoteUsers = React.createClass({
         }
 
         return (
-            <div>
-                <Title>{this.props.getMessage('207')}</Title>
-                <div className="section-legend">{this.props.getMessage('208')}</div>
-                {this.renderForm()}
+            <Card title={this.props.getMessage('207')} actions={this.getActions()}>
+                {!ocsLinks.length &&
+                    <div style={{color: 'rgba(0,0,0,0.43)', paddingBottom: 16}}>{this.props.getMessage('208')}</div>
+                }
                 <div>
                     {rwHeader}
                     {inv}
                 </div>
-            </div>
+                {this.state.showUserForm && this.renderUserForm()}
+            </Card>
         );
     }
 });

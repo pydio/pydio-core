@@ -3,7 +3,7 @@ import ShareContextConsumer from '../ShareContextConsumer'
 import UserBadge from './UserBadge'
 import SharedUserEntry from './SharedUserEntry'
 import ActionButton from '../main/ActionButton'
-import Title from '../main/title'
+import Card from '../main/Card'
 const {UsersCompleter} = require('pydio').requireLib('components')
 const {Paper} = require('material-ui')
 
@@ -59,20 +59,17 @@ let SharedUsers = React.createClass({
                 sendInvitations={this.props.sendInvitations}
             />
         }.bind(this));
-        var actionLinks = [];
+        let actionLinks = [];
         if(this.props.users.length && !this.props.isReadonly()){
-            actionLinks.push(<ActionButton callback={this.clearAllUsers} mdiIcon="delete" messageId="180"/>)
+            actionLinks.push(<ActionButton key="clear" callback={this.clearAllUsers} mdiIcon="delete" messageId="180"/>)
         }
         if(this.props.sendInvitations && this.props.users.length){
-            actionLinks.push(<ActionButton callback={this.sendInvitationToAllUsers} mdiIcon="email-outline" messageId="45"/>)
+            actionLinks.push(<ActionButton key="invite" callback={this.sendInvitationToAllUsers} mdiIcon="email-outline" messageId="45"/>)
         }
         if(this.props.saveSelectionAsTeam && this.props.users.length > 1 && !this.props.isReadonly()){
-            actionLinks.push(<ActionButton callback={this.props.saveSelectionAsTeam} mdiIcon="account-multiple-plus" messageId="509"/>)
+            actionLinks.push(<ActionButton key="team" callback={this.props.saveSelectionAsTeam} mdiIcon="account-multiple-plus" messageId="509"/>)
         }
-        if(actionLinks.length){
-            var linkActions = <div className="additional-actions-links">{actionLinks}</div>;
-        }
-        var rwHeader;
+        let rwHeader, usersInput;
         if(this.props.users.length){
             rwHeader = (
                 <div>
@@ -85,7 +82,7 @@ let SharedUsers = React.createClass({
         }
         if(!this.props.isReadonly()){
             const excludes = this.props.users.map(function(u){return u.ID});
-            var usersInput = (
+            usersInput = (
                 <UsersCompleter
                     className="share-form-users"
                     fieldLabel={this.props.getMessage('34')}
@@ -94,26 +91,22 @@ let SharedUsers = React.createClass({
                     excludes={excludes}
                     pydio={this.props.pydio}
                     showAddressBook={true}
+                    usersFrom="local"
                 />
             );
         }
-        var title;
-        if(this.props.showTitle){
-            title = <Title>{this.props.getMessage('217')}</Title>;
-        }
         return (
-            <div>
-                {title}
-                <Paper zDepth={1} rounded={false} style={userEntries.length ? {padding:'8px 0 12px 4px'} : {padding: 16}} transitionEnabled={false}>
-                    <div style={userEntries.length? {margin: '-20px 8px 16px'} : {marginTop: -20}}>{usersInput}</div>
-                    {rwHeader}
-                    <div>{userEntries}</div>
-                    {!userEntries.length &&
-                        <div style={{color: 'rgba(0,0,0,0.43)'}}>{this.props.getMessage('182')}</div>
-                    }
-                    {linkActions}
-                </Paper>
-            </div>
+            <Card
+                title={this.props.showTitle ? this.props.getMessage('217') : null}
+                actions={actionLinks}
+            >
+                <div style={userEntries.length? {margin: '-20px 8px 16px'} : {marginTop: -20}}>{usersInput}</div>
+                {rwHeader}
+                <div>{userEntries}</div>
+                {!userEntries.length &&
+                    <div style={{color: 'rgba(0,0,0,0.43)'}}>{this.props.getMessage('182')}</div>
+                }
+            </Card>
         );
     }
 });

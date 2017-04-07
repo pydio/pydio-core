@@ -30,7 +30,7 @@ class ActionButton extends Component{
             <IconButton
                 style={style.root}
                 iconStyle={style.icon}
-                onTouchTap={this.props.callback}
+                onTouchTap={this.props.callback || this.props.onTouchTap}
                 iconClassName={"mdi mdi-" + this.props.mdiIcon}
                 tooltip={this.props.getMessage(this.props.messageId)}
             />
@@ -42,6 +42,7 @@ class ActionButton extends Component{
 
 ActionButton.propTypes = {
     callback: PropTypes.func,
+    onTouchTap: PropTypes.func,
     mdiIcon: PropTypes.string,
     messageId: PropTypes.string
 };

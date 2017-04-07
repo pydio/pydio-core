@@ -9,30 +9,41 @@ import Loaders from './Loaders'
 import TeamCreationForm from '../TeamCreationForm'
 
 const React = require('react');
-const {AsyncComponent} = require('pydio').requireLib('boot')
+const Pydio = require('pydio');
+const {AsyncComponent} = Pydio.requireLib('boot')
+const {Popover, IconButton} = require('material-ui')
 
 const AddressBook = React.createClass({
 
     propTypes: {
-        mode            : React.PropTypes.oneOf(['book', 'selector']).isRequired,
+        pydio           : React.PropTypes.instanceOf(Pydio),
+        mode            : React.PropTypes.oneOf(['book', 'selector', 'popover']).isRequired,
         onItemSelected  : React.PropTypes.func,
         usersOnly       : React.PropTypes.bool,
-        disableSearch   : React.PropTypes.bool
+        usersFrom       : React.PropTypes.oneOf(['local', 'remote', 'any']),
+        disableSearch   : React.PropTypes.bool,
+        popoverStyle                : React.PropTypes.object,
+        popoverButton               : React.PropTypes.object,
+        popoverContainerStyle       : React.PropTypes.object,
+        popoverIconButtonStyle      : React.PropTypes.object
     },
 
     getDefaultProps: function(){
         return {
-            mode: 'book',
-            usersOnly: false,
-            teamsOnly: false,
-            disableSearch: false
+            mode            : 'book',
+            usersOnly       : false,
+            usersFrom       : 'any',
+            teamsOnly       : false,
+            disableSearch   : false
         };
     },
 
     getInitialState: function(){
 
+        const {pydio, mode, usersOnly, usersFrom, teamsOnly, disableSearch} = this.props;
+
         let root;
-        if(this.props.teamsOnly){
+        if(teamsOnly){
             root = {
                 id: 'teams',
                 label: 'Your Teams',
@@ -56,53 +67,55 @@ const AddressBook = React.createClass({
 
         root = {
             id:'root',
-            label:'',
+            label:'Address Book',
             type:'root',
             collections: []
         };
-        root.collections.push({
-            id:'ext',
-            label:'Your Users',
-            //icon:'mdi mdi-account-network',
-            itemsLoader: Loaders.loadExternalUsers,
-            _parent:root,
-            _notSelectable:true,
-            actions:{
-                type    : 'users',
-                create  : '+ Create User',
-                remove  : 'Delete User',
-                multiple: true
-            }
-        });
-
-        if(!this.props.usersOnly) {
+        if(usersFrom !== 'remote'){
             root.collections.push({
-                id: 'teams',
-                label: 'Your Teams',
-                //icon: 'mdi mdi-account-multiple',
-                childrenLoader: Loaders.loadTeams,
-                _parent: root,
-                _notSelectable: true,
-                actions: {
-                    type: 'teams',
-                    create: '+ Create Team',
-                    remove: 'Delete Team',
+                id:'ext',
+                label:'Your Users',
+                //icon:'mdi mdi-account-network',
+                itemsLoader: Loaders.loadExternalUsers,
+                _parent:root,
+                _notSelectable:true,
+                actions:{
+                    type    : 'users',
+                    create  : '+ Create User',
+                    remove  : 'Delete User',
                     multiple: true
                 }
             });
-        }
-        root.collections.push({
-            id:'AJXP_GRP_/',
-            label:'All Users',
-            //icon:'mdi mdi-account-box',
-            childrenLoader:Loaders.loadGroups,
-            itemsLoader: Loaders.loadGroupUsers,
-            _parent:root,
-            _notSelectable:true
-        });
 
-        const ocsRemotes = this.props.pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
-        if(ocsRemotes && !this.props.usersOnly){
+            if(!usersOnly) {
+                root.collections.push({
+                    id: 'teams',
+                    label: 'Your Teams',
+                    //icon: 'mdi mdi-account-multiple',
+                    childrenLoader: Loaders.loadTeams,
+                    _parent: root,
+                    _notSelectable: true,
+                    actions: {
+                        type: 'teams',
+                        create: '+ Create Team',
+                        remove: 'Delete Team',
+                        multiple: true
+                    }
+                });
+            }
+            root.collections.push({
+                id:'AJXP_GRP_/',
+                label:'All Users',
+                //icon:'mdi mdi-account-box',
+                childrenLoader:Loaders.loadGroups,
+                itemsLoader: Loaders.loadGroupUsers,
+                _parent:root,
+                _notSelectable:true
+            });
+        }
+
+        const ocsRemotes = pydio.getPluginConfigs('core.ocs').get('TRUSTED_SERVERS');
+        if(ocsRemotes && !usersOnly && usersFrom !== 'local'){
             let remotes = JSON.parse(ocsRemotes);
             let remotesNodes = {
                 id:'remotes',
@@ -128,7 +141,7 @@ const AddressBook = React.createClass({
             }
         }
 
-        if(!this.props.disableSearch){
+        if(!disableSearch){
             root.collections.push({
                 id:'search',
                 label:'Search Local Users',
@@ -141,7 +154,7 @@ const AddressBook = React.createClass({
 
         return {
             root: root,
-            selectedItem:this.props.mode === 'selector' ? root : root.collections[0],
+            selectedItem:mode === 'selector' ? root : root.collections[0],
             loading: false,
             rightPaneItem: null
         };
@@ -176,6 +189,10 @@ const AddressBook = React.createClass({
                 item.temporary,
                 item.external
             );
+            if(item.trusted_server_id) {
+                uObject.trustedServerId = item.trusted_server_id;
+                uObject.trustedServerLabel = item.trusted_server_label;
+            }
             this.props.onItemSelected(uObject);
         }else{
             this.setState({rightPaneItem:item});
@@ -222,6 +239,17 @@ const AddressBook = React.createClass({
         }
     },
 
+    openPopover:function(event){
+        this.setState({
+            popoverOpen: true,
+            popoverAnchor: event.currentTarget
+        });
+    },
+
+    closePopover: function(){
+        this.setState({popoverOpen: false});
+    },
+
     reloadCurrentNode: function(){
         this.state.selectedItem.leafLoaded = false;
         this.state.selectedItem.collectionsLoaded = false;
@@ -240,6 +268,46 @@ const AddressBook = React.createClass({
     },
 
     render: function(){
+
+        const {mode} = this.props;
+
+        if(mode === 'popover'){
+
+            const popoverStyle = this.props.popoverStyle || {}
+            const popoverContainerStyle = this.props.popoverContainerStyle || {}
+            const iconButtonStyle = this.props.popoverIconButtonStyle || {}
+            let iconButton = (
+                <IconButton
+                    style={{position:'absolute', padding:15, zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial', ...iconButtonStyle}}
+                    iconStyle={{fontSize:19, color:'rgba(0,0,0,0.6)'}}
+                    iconClassName={'mdi mdi-book-open-variant'}
+                    onTouchTap={this.openPopover}
+                />
+            );
+            if(this.props.popoverButton){
+                iconButton = <this.props.popoverButton.type {...this.props.popoverButton.props} onTouchTap={this.openPopover}/>
+            }
+            return (
+                <span>
+                    {iconButton}
+                    <Popover
+                        open={this.state.popoverOpen}
+                        anchorEl={this.state.popoverAnchor}
+                        anchorOrigin={{horizontal: 'right', vertical: 'top'}}
+                        targetOrigin={{horizontal: 'left', vertical: 'top'}}
+                        onRequestClose={this.closePopover}
+                        style={{marginLeft: 20, ...popoverStyle}}
+                    >
+                        <div style={{width: 256, height: 320, ...popoverContainerStyle}}>
+                            <AddressBook {...this.props} mode="selector" />
+                        </div>
+                    </Popover>
+                </span>
+
+            );
+
+        }
+
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
         const leftColumnStyle = {width: 256, overflowY:'auto', overflowX: 'hidden'};
@@ -249,19 +317,25 @@ const AddressBook = React.createClass({
 
             centerComponent = (
                 <SearchForm
-                    searchLabel={"Search local users by identifier"}
+                    item={selectedItem}
+                    title={"All users"}
+                    searchLabel={"Search user(s)"}
                     onItemClicked={this.onUserListItemClicked}
-                    mode={this.props.mode}
+                    onFolderClicked={this.onFolderClicked}
+                    mode={mode}
                 />);
 
         }else if(selectedItem.type === 'remote'){
 
             centerComponent = (
                 <SearchForm
+                    item={selectedItem}
                     params={{trusted_server_id:selectedItem.id}}
-                    searchLabel={"Search Remote Server '" + selectedItem.label + "'"}
+                    searchLabel={"Search user(s)"}
+                    title={"Server '" + selectedItem.label + "'"}
                     onItemClicked={this.onUserListItemClicked}
-                    mode={this.props.mode}
+                    onFolderClicked={this.onFolderClicked}
+                    mode={mode}
                 />);
 
         }else{
@@ -274,7 +348,7 @@ const AddressBook = React.createClass({
                     onCreateAction={this.onCreateAction}
                     onDeleteAction={this.onDeleteAction}
                     loading={this.state.loading}
-                    mode={this.props.mode}
+                    mode={mode}
                     onTouchTap={this.state.rightPaneItem ? () => { this.setState({rightPaneItem:null}) } : null}
                 />);
 
@@ -291,7 +365,7 @@ const AddressBook = React.createClass({
                     item={rightPaneItem}/>
             );
         }
-        if(this.props.mode === 'book'){
+        if(mode === 'book'){
             leftPanel = (
                 <MaterialUI.Paper zDepth={2} style={{...leftColumnStyle, zIndex:2}}>
                     <MaterialUI.List>
@@ -347,7 +421,7 @@ const AddressBook = React.createClass({
 
         let style = this.props.style || {}
         return (
-            <div style={{display:'flex', height: 450, ...style}}>
+            <div style={{display:'flex', height: mode === 'selector' ? 320 : 450 , ...style}}>
                 {leftPanel}
                 {centerComponent}
                 {rightPanel}

@@ -97,6 +97,7 @@ let MainPanel = React.createClass({
             global.location.href = "mailto:custom-email@domain.com?Subject="+subject+"&Body="+message;
             return;
         }
+        const linkData = hash ? this.state.model.getLinkData(hash) : undefined;
         global.ResourcesManager.loadClassesAndApply(['PydioMailer'], function(){
             this.setState({
                 mailerData: {
@@ -104,9 +105,9 @@ let MainPanel = React.createClass({
                     message:message,
                     users:users,
                     hash: hash,
-                    enableIdentification:false,
+                    enableIdentification:(linkData && linkData.target_users),
                     crippleIdentificationKeys:false,
-                    identifiedOnly:false
+                    identifiedOnly:(linkData && linkData.restrict_to_target_users)
                 }
             });
         }.bind(this));

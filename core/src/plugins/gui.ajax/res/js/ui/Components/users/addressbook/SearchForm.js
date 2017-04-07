@@ -27,19 +27,23 @@ class SearchForm extends React.Component{
 
     render(){
 
+        const {mode, item} = this.props;
+
         return (
             <div style={{flex: 1, display:'flex', flexDirection:'column'}}>
-                <div>
-                    <MaterialUI.Paper zDepth={1} style={{padding: 10, margin: 10, paddingTop: 0}}>
+                <div style={{padding: 10, height:56, backgroundColor:this.state.select?activeTbarColor : '#fafafa', display:'flex', alignItems:'center', transition:DOMUtils.getBeziersTransition()}}>
+                    {mode === "selector" && item._parent && <MaterialUI.IconButton iconClassName="mdi mdi-chevron-left" onTouchTap={() => {this.props.onFolderClicked(item._parent)}}/>}
+                    {mode === 'book' && <div style={{fontSize:20, color:'rgba(0,0,0,0.87)', flex:1}}>{this.props.title}</div>}
+                    <div style={mode === 'book'?{minWidth:320}:{flex:1}}>
                         <MaterialUI.TextField
                             fullWidth={true}
                             value={this.state.value}
                             onChange={this.onChange.bind(this)}
-                            floatingLabelText={this.props.searchLabel}
+                            hintText={this.props.searchLabel}
                         />
-                    </MaterialUI.Paper>
+                    </div>
                 </div>
-                <UsersList onItemClicked={this.props.onItemClicked} item={{leafs: this.state.items}}/>
+                <UsersList onItemClicked={this.props.onItemClicked} item={{leafs: this.state.items}} noToolbar={true}/>
             </div>
         );
 
@@ -50,7 +54,10 @@ class SearchForm extends React.Component{
 SearchForm.propTypes = {
     params: React.PropTypes.object,
     searchLabel: React.PropTypes.string,
-    onItemClicked:React.PropTypes.func
+    onItemClicked:React.PropTypes.func,
+    // Required for navigation
+    item: React.PropTypes.object,
+    onFolderClicked:React.PropTypes.func
 };
 
 export {SearchForm as default}

@@ -54,6 +54,10 @@
             return publicLinks.length > 0;
         }
 
+        getLinkData(linkId){
+            return this._data['links'][linkId];
+        }
+
         getPublicLink(linkId){
             return this._data['links'][linkId]['public_link'];
         }

@@ -5,9 +5,93 @@ div.form-react_share_form div.dialogContent .ie_material_checkbox_fix {
   -ms-overflow-x: hidden !important;
   -ms-overflow-y: hidden !important;
 }
+div.user-badge.share-dialog {
+  border-bottom: 1px solid #e2e2e2;
+  clear: both;
+  font-size: 16px;
+  margin-left: 50px;
+  margin-right: 11px;
+  padding-top: 1px;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: center;
+      align-items: center;
+}
+div.user-badge.share-dialog .user-badge-label {
+  -ms-flex: 5;
+      flex: 5;
+  padding: 9px 0;
+  line-height: 25px;
+}
+div.user-badge.share-dialog:last-of-type {
+  border-bottom: 0;
+}
+div.user-badge.share-dialog span.icon-ellipsis-vertical.mui-font-icon {
+  color: #6F6F6F;
+  font-size: 18px;
+}
+div.user-badge.share-dialog span.avatar {
+  background-color: #4aceb0;
+  border-radius: 30px;
+  color: white;
+  display: inline-block;
+  font-size: 17px;
+  height: 32px;
+  margin: 5px 14px 7px -44px;
+  padding: 6px;
+  text-align: center;
+  width: 32px;
+}
+div.user-badge.share-dialog.user-type-group span.avatar {
+  background-color: #47b092;
+}
+div.user-badge.share-dialog.user-type-tmp_user span.avatar,
+div.user-badge.share-dialog.user-type-remote_user span.avatar {
+  background-color: #438db3;
+}
+div.user-badge.share-dialog img {
+  background-color: #4aceb0;
+  border-radius: 30px;
+  color: white;
+  display: inline-block;
+  font-size: 17px;
+  height: 32px;
+  margin: 5px 14px 7px -44px;
+  padding: 6px;
+  text-align: center;
+  width: 32px;
+}
+div.user-badge.share-dialog div.user-badge-menu-box {
+  font-size: 13px;
+  position: relative;
+}
+div.user-badge.share-dialog div.user-badge-menu-box div.mui-menu.mui-visible {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.43);
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 200px;
+  z-index: 120;
+}
+div.user-badge.share-dialog div.user-badge-menu-box div.mui-menu span.icon-check {
+  float: right;
+  font-size: 16px;
+  margin-top: 15px;
+}
+div.user-badge.share-dialog span.user-badge-rights-container {
+  float: right;
+  padding: 11px;
+  color: gray;
+  font-size: 11px;
+  line-height: 25px;
+}
+div.user-badge.share-dialog span.user-badge-rights-container input[name="write"] {
+  margin-left: 28px;
+}
 div#react_share_form,
 div.react_share_form {
-  font-family: Roboto, sans-serif;
   font-size: 13px;
 }
 div#react_share_form label.mui-switch-label,
@@ -138,16 +222,8 @@ div#react_share_form div.mui-drop-down-menu.full-width .mui-menu-control-underli
 div.react_share_form div.mui-drop-down-menu.full-width .mui-menu-control-underline {
   margin: 0;
 }
-div#react_share_form .public-link-container,
-div.react_share_form .public-link-container {
-  padding: 7px 13px 11px;
-  background-color: #F1F1F1;
-  border-radius: 8px;
-  margin: 16px 0 6px;
-}
 div#react_share_form .public-link-container .public-link,
 div.react_share_form .public-link-container .public-link {
-  width: 337px;
   font-size: 18px;
 }
 div#react_share_form .public-link-container .public-link input,
@@ -329,103 +405,6 @@ div.react_share_form .ownership-form .mui-text-field .mui-text-field-floating-la
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
-}
-div#react_share_form div.user-badge,
-div.react_share_form div.user-badge {
-  border-bottom: 1px solid #e2e2e2;
-  clear: both;
-  font-size: 16px;
-  margin-left: 50px;
-  margin-right: 11px;
-  padding-top: 1px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: row;
-      flex-direction: row;
-}
-div#react_share_form div.user-badge .user-badge-label,
-div.react_share_form div.user-badge .user-badge-label {
-  -ms-flex: 5;
-      flex: 5;
-  padding: 9px 0;
-  line-height: 25px;
-}
-div#react_share_form div.user-badge:last-of-type,
-div.react_share_form div.user-badge:last-of-type {
-  border-bottom: 0;
-}
-div#react_share_form div.user-badge span.icon-ellipsis-vertical.mui-font-icon,
-div.react_share_form div.user-badge span.icon-ellipsis-vertical.mui-font-icon {
-  color: #6F6F6F;
-  font-size: 18px;
-}
-div#react_share_form div.user-badge span.avatar,
-div.react_share_form div.user-badge span.avatar {
-  background-color: #4aceb0;
-  border-radius: 30px;
-  color: white;
-  display: inline-block;
-  font-size: 17px;
-  height: 32px;
-  margin: 5px 14px 7px -44px;
-  padding: 6px;
-  text-align: center;
-  width: 32px;
-}
-div#react_share_form div.user-badge.user-type-group span.avatar,
-div.react_share_form div.user-badge.user-type-group span.avatar {
-  background-color: #47b092;
-}
-div#react_share_form div.user-badge.user-type-tmp_user span.avatar,
-div.react_share_form div.user-badge.user-type-tmp_user span.avatar,
-div#react_share_form div.user-badge.user-type-remote_user span.avatar,
-div.react_share_form div.user-badge.user-type-remote_user span.avatar {
-  background-color: #438db3;
-}
-div#react_share_form div.user-badge img,
-div.react_share_form div.user-badge img {
-  background-color: #4aceb0;
-  border-radius: 30px;
-  color: white;
-  display: inline-block;
-  font-size: 17px;
-  height: 32px;
-  margin: 5px 14px 7px -44px;
-  padding: 6px;
-  text-align: center;
-  width: 32px;
-}
-div#react_share_form div.user-badge div.user-badge-menu-box,
-div.react_share_form div.user-badge div.user-badge-menu-box {
-  font-size: 13px;
-  position: relative;
-}
-div#react_share_form div.user-badge div.user-badge-menu-box div.mui-menu.mui-visible,
-div.react_share_form div.user-badge div.user-badge-menu-box div.mui-menu.mui-visible {
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.43);
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 200px;
-  z-index: 120;
-}
-div#react_share_form div.user-badge div.user-badge-menu-box div.mui-menu span.icon-check,
-div.react_share_form div.user-badge div.user-badge-menu-box div.mui-menu span.icon-check {
-  float: right;
-  font-size: 16px;
-  margin-top: 15px;
-}
-div#react_share_form div.user-badge span.user-badge-rights-container,
-div.react_share_form div.user-badge span.user-badge-rights-container {
-  float: right;
-  padding: 11px;
-  color: gray;
-  font-size: 11px;
-  line-height: 25px;
-}
-div#react_share_form div.user-badge span.user-badge-rights-container input[name="write"],
-div.react_share_form div.user-badge span.user-badge-rights-container input[name="write"] {
-  margin-left: 28px;
 }
 div#react_share_form div.remote-users-add,
 div.react_share_form div.remote-users-add {

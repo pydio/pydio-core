@@ -20,19 +20,21 @@
 import AddressBook from './addressbook/AddressBook'
 const {AsyncComponent} = require('pydio/http/resources-manager').requireLib('boot')
 const {TextField, AutoComplete, RefreshIndicator, IconButton, Popover} = require('material-ui');
+const React = require('react')
 
 const UsersLoader = React.createClass({
 
     propTypes:{
 
-        renderSuggestion:React.PropTypes.func.isRequired,
-        onValueSelected :React.PropTypes.func.isRequired,
-        fieldLabel      :React.PropTypes.string.isRequired,
-        excludes        :React.PropTypes.array.isRequired,
-        usersOnly       :React.PropTypes.bool,
-        existingOnly    :React.PropTypes.bool,
-        freeValueAllowed:React.PropTypes.bool,
-        className       :React.PropTypes.string
+        renderSuggestion: React.PropTypes.func.isRequired,
+        onValueSelected : React.PropTypes.func.isRequired,
+        fieldLabel      : React.PropTypes.string.isRequired,
+        excludes        : React.PropTypes.array.isRequired,
+        usersOnly       : React.PropTypes.bool,
+        usersFrom       : React.PropTypes.oneOf(['local', 'remote', 'any']),
+        existingOnly    : React.PropTypes.bool,
+        freeValueAllowed: React.PropTypes.bool,
+        className       : React.PropTypes.string
     },
 
     getInitialState:function(){
@@ -213,29 +215,15 @@ const UsersLoader = React.createClass({
                         status={this.state.loading ? 'loading' : 'hide' }
                     />
                 </div>
-                {this.props.showAddressBook && <IconButton
-                    style={{position:'absolute', padding:15, zIndex:100, right:0, top: 25, display:this.state.loading?'none':'initial'}}
-                    iconStyle={{fontSize:19, color:'rgba(0,0,0,0.6)'}}
-                    iconClassName={'mdi mdi-book-open-variant'}
-                    onTouchTap={this.openAddressBook}
-                />}
-                {this.props.showAddressBook && <Popover
-                    open={this.state.addressBookOpen}
-                    anchorEl={this.state.addressBookAnchor}
-                    anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-                    targetOrigin={{horizontal: 'left', vertical: 'top'}}
-                    onRequestClose={this.closeAddressBook}
-                    style={{marginLeft: 20}}
-                >
-                    <div style={{width: 256, height: 320}}>
-                        <AddressBook
-                            mode="selector"
-                            pydio={this.props.pydio}
-                            loaderStyle={{width: 320, height: 420}}
-                            onItemSelected={this.onAddressBookItemSelected}
-                        />
-                    </div>
-                </Popover>}
+                {this.props.showAddressBook &&
+                    <AddressBook
+                        mode="popover"
+                        pydio={this.props.pydio}
+                        loaderStyle={{width: 320, height: 420}}
+                        onItemSelected={this.onAddressBookItemSelected}
+                        usersFrom={this.props.usersFrom}
+                    />
+                }
             </div>
         );
 

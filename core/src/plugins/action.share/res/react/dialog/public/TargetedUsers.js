@@ -5,6 +5,11 @@ const ShareModel = require('pydio').requireLib('ReactModelShare')
 
 class TargetedUsers extends React.Component{
 
+    constructor(props, context){
+        super(props, context);
+        this.state = {open: false};
+    }
+
     render(){
         const {target_users} = this.props.linkData;
         let items = Object.keys(target_users).map((k) => {
@@ -33,17 +38,19 @@ class TargetedUsers extends React.Component{
             borderRadius: 2
         };
         const headerStyle = {
-            borderBottom: '1px solid #757575',
+            borderBottom: this.state.open ?  '1px solid #757575' : '',
             color: 'rgba(0, 0, 0, 0.36)'
         }
 
         return (
             <div style={rootStyle}>
                 <div style={{display:'flex', ...headerStyle}}>
-                    <div style={{flex: 1}} >Personal invitation sent</div>
-                    <div style={{width: 40, textAlign:'center'}}>#DL</div>
+                    <div style={{flex: 1}} >{items.length} personal invitation(s) sent <span className={'mdi mdi-chevron-' + (this.state.open ? 'up' : 'down')} style={{cursor:'pointer'}} onClick={() => {this.setState({open:!this.state.open})}}/></div>
+                    {this.state.open && <div style={{width: 40, textAlign:'center'}}>#DL</div>}
                 </div>
-                <div>{items}</div>
+                {this.state.open &&
+                    <div>{items}</div>
+                }
             </div>
         );
 

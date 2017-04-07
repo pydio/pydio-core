@@ -21,8 +21,9 @@ let SharedUserEntry = React.createClass({
         targets[this.props.userObject.getId()] = this.props.userObject;
         this.props.sendInvitations(targets);
     },
-    onUpdateRight:function(name, event, checked){
-        this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:name, add:checked});
+    onUpdateRight:function(event){
+        const target = event.target;
+        this.props.onUserUpdate('update_right', this.props.userEntry.ID, {right:target.name, add:target.checked});
     },
     render: function(){
         let menuItems = [];

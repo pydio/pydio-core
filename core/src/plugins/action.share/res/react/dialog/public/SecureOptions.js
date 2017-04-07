@@ -3,7 +3,7 @@ import ShareContextConsumer from '../ShareContextConsumer'
 const {FlatButton, TextField, DatePicker} = require('material-ui')
 const {ValidPassword} = require('pydio').requireLib('form')
 const ShareModel = require('pydio').requireLib('ReactModelShare');
-import Title from '../main/title'
+import Card from '../main/Card'
 
 let PublicLinkSecureOptions = React.createClass({
 
@@ -146,8 +146,7 @@ let PublicLinkSecureOptions = React.createClass({
             var dlCounterString = <span className="dlCounterString">{dlCounter+ '/'+ dlLimitValue} {resetLink}</span>;
         }
         return (
-            <div  style={this.props.style}>
-                <Title>{this.props.getMessage('196')}</Title>
+            <Card style={this.props.style} title={this.props.getMessage('196')}>
                 <div className="section-legend">{this.props.getMessage('24')}</div>
                 {passContainer}
                 <div className="expires" style={{display:'flex', alignItems:'center'}}>
@@ -184,7 +183,7 @@ let PublicLinkSecureOptions = React.createClass({
                         {dlCounterString}
                     </div>
                 </div>
-            </div>
+            </Card>
         );
     }
 });

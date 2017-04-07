@@ -90,9 +90,9 @@ let PublicLinkField = React.createClass({
         const editAllowed = this.props.editAllowed && !this.props.linkData['hash_is_shorten'] && !this.props.isReadonly() && this.props.shareModel.currentIsOwner();
         if(this.state.editLink && editAllowed){
             return (
-                <Paper zDepth={1} rounded={false} className={"public-link-container edit-link"}>
+                <Paper zDepth={0} rounded={false} className={"public-link-container edit-link"}>
                     <div style={{display:'flex', alignItems:'center'}}>
-                        <span style={{fontSize:17, lineHeight:'24px'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
+                        <span style={{fontSize:16, color:'rgba(0,0,0,0.4)'}}>{PathUtils.getDirname(publicLink) + '/ '}</span>
                         <TextField style={{flex:1, marginRight: 16}} onChange={this.changeLink} value={this.state.customLink !== undefined ? this.state.customLink : this.props.linkData['hash']}/>
                         <FloatingActionButton mini={true} iconClassName="mdi mdi-check" onTouchTap={this.toggleEditMode} />
                     </div>
@@ -128,7 +128,7 @@ let PublicLinkField = React.createClass({
                 qrCode = <div className="qrCode"><QRCode size={128} value={publicLink} level="Q"/></div>;
             }
             return (
-                <Paper zDepth={1} rounded={false} className="public-link-container">
+                <Paper zDepth={0} rounded={false} className="public-link-container">
                     <div style={{position:'relative'}}>
                         <TextField
                             className={"public-link" + (this.props.linkData['is_expired'] ? ' link-expired':'')}

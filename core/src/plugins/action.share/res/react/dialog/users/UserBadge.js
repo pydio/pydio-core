@@ -50,7 +50,7 @@ const UserBadge = React.createClass({
         }
         var menu = this.renderMenu();
         return (
-            <div className={"user-badge user-type-" + this.props.type}>
+            <div className={"share-dialog user-badge user-type-" + this.props.type}>
                 {avatar}
                 <span className="user-badge-label">{this.props.label}</span>
                 {this.props.children}

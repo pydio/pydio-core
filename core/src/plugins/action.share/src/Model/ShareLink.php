@@ -277,6 +277,9 @@ class ShareLink
         if(isSet($storedData['TARGET_USERS'])){
             $jsonData["target_users"] = $storedData["TARGET_USERS"];
         }
+        if(isSet($storedData['RESTRICT_TO_TARGET_USERS']) && $storedData['RESTRICT_TO_TARGET_USERS']){
+            $jsonData["restrict_to_target_users"] = true;
+        }
         foreach($this->store->modifiableShareKeys as $key){
             if(isSet($storedData[$key])) $jsonData[$key] = $storedData[$key];
         }

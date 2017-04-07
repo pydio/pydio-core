@@ -33,32 +33,24 @@ let UsersPanel = React.createClass({
     render: function(){
         const currentUsers = this.props.shareModel.getSharedUsers();
         const federatedEnabled = ReactModel.Share.federatedSharingEnabled();
-        let remoteUsersBlock;
-        if(federatedEnabled){
-            remoteUsersBlock = (
-                <div style={{padding: '0 16px'}}>
+        return (
+            <div style={this.props.style}>
+                <SharedUsers
+                    showTitle={federatedEnabled}
+                    users={currentUsers}
+                    userObjects={this.props.shareModel.getSharedUsersAsObjects()}
+                    sendInvitations={this.props.showMailer ? this.sendInvitations : null}
+                    onUserUpdate={this.onUserUpdate}
+                    saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
+                    pydio={this.props.pydio}
+                />
+                {federatedEnabled &&
                     <RemoteUsers
                         shareModel={this.props.shareModel}
                         onUserUpdate={this.onUserUpdate}
-                    />
-                </div>
-            );
-        }
-        return (
-            <div style={this.props.style}>
-                <div style={{padding: '0 16px 16px'}}>
-                    <SharedUsers
-                        showTitle={federatedEnabled}
-                        users={currentUsers}
-                        userObjects={this.props.shareModel.getSharedUsersAsObjects()}
-                        sendInvitations={this.props.showMailer ? this.sendInvitations : null}
-                        onUserUpdate={this.onUserUpdate}
-                        saveSelectionAsTeam={PydioUsers.Client.saveSelectionSupported()?this.onSaveSelection:null}
                         pydio={this.props.pydio}
                     />
-                </div>
-                {remoteUsersBlock && <Divider/>}
-                {remoteUsersBlock}
+                }
             </div>
         );
     }
