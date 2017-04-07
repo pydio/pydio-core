@@ -47,7 +47,7 @@
         render: function(){
             const userObject = this.props.user;
             return (
-                <div className={"user-badge user-type-" + (userObject.getTemporary() ? "tmp_user" : "user")}>
+                <div className={"share-dialog user-badge user-type-" + (userObject.getTemporary() ? "tmp_user" : "user")}>
                     <span className={"avatar icon-" + (userObject.getTemporary()?"envelope":"user")}/>
                     <span className="user-badge-label">{userObject.getExtendedLabel() || userObject.getLabel()}</span>
                 </div>
@@ -95,13 +95,16 @@
             this.props.onRemove(this.props.user.getId());
         },
         render: function(){
-            const icon = <MaterialUI.FontIcon className={"icon-" + (this.props.user.getTemporary()?"envelope":"user")} />;
+            const tmp = this.props.user.getTemporary();
+            const icon = <MaterialUI.FontIcon className={"icon-" + (tmp?"envelope":"user")} />;
+            const {colors} = MaterialUI.Style;
             return (
                 <MaterialUI.Chip
+                    backgroundColor={tmp ? colors.lightBlue100 : colors.blueGrey100}
                     onRequestDelete={this.remove}
                     style={styles.chip}
                 >
-                    <MaterialUI.Avatar color="#444" icon={icon}/>
+                    <MaterialUI.Avatar icon={icon} color={tmp ? 'white' : colors.blueGrey600} backgroundColor={tmp ? colors.lightBlue300 : colors.blueGrey300}/>
                     {this.props.user.getLabel()}
                 </MaterialUI.Chip>
             )

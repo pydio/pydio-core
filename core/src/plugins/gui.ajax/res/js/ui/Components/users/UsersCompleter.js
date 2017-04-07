@@ -114,8 +114,9 @@ const UsersLoader = React.createClass({
                 }
             });
             if(value && !value.userObject && this.props.freeValueAllowed){
-                const fake = new PydioUsers.User(value, value, 'user');
+                const fake = new PydioUsers.User(value, value, 'user', null, null, true);
                 this.props.onValueSelected(fake);
+                this.setState({searchText: '', dataSource:[]});
                 return;
             }
         }
