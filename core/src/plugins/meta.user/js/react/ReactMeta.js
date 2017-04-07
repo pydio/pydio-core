@@ -290,8 +290,9 @@
             this.setState({loading:this.state.loading + 1});
             PydioApi.getClient().request({get_action: 'meta_user_list_tags', meta_field_name: this.props.fieldname}, (transport) => {
                 this.setState({loading:this.state.loading - 1});
-                let suggestedTags = transport.responseJSON;
-                callback(suggestedTags);
+                if(transport.responseJSON && transport.responseJSON.length){
+                    callback(suggestedTags);
+                }
             });
         },
 
