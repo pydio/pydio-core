@@ -5,9 +5,9 @@ import SubmitButtonProviderMixin from './SubmitButtonProviderMixin'
 export default React.createClass({
 
     propTypes: {
-        dialogTitleId:React.PropTypes.integer,
-        legendId:React.PropTypes.integer,
-        fieldLabelId:React.PropTypes.integer,
+        dialogTitleId:React.PropTypes.string,
+        legendId:React.PropTypes.string,
+        fieldLabelId:React.PropTypes.string,
         fieldType: React.PropTypes.oneOf(['text', 'password']),
         submitValue:React.PropTypes.func.isRequired,
         defaultValue:React.PropTypes.string,

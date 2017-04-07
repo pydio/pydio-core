@@ -48,9 +48,9 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
         ...menuProps
     };
 
-    const menuItems = items.map((item) => {
+    const menuItems = items.map((item, index) => {
 
-        if(item.separator) return <Divider/>;
+        if(item.separator) return <Divider key={"divider" + index}/>;
 
         let subItems, payload;
         if(item.subItems){
@@ -72,6 +72,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
 
         return (
             <MenuItem
+                key={item.text}
                 primaryText={item.text}
                 leftIcon={leftIcon}
                 rightIcon={rightIcon}

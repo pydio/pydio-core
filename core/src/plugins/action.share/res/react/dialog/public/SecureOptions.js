@@ -66,6 +66,7 @@ let PublicLinkSecureOptions = React.createClass({
         }else if(!this.props.isReadonly()){
             passwordField = (
                 <ValidPassword
+                    name="share-password"
                     attributes={{label:this.props.getMessage('23')}}
                     value={this.props.shareModel.getPassword(linkId)}
                     onChange={this.updatePassword}

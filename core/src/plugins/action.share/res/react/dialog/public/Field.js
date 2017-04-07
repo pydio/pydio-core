@@ -109,13 +109,13 @@ let PublicLinkField = React.createClass({
             };
             let actionLinks = [], qrCode;
             if(this.props.showMailer){
-                actionLinks.push(<ActionButton callback={this.openMailer} mdiIcon="email-outline" messageId="45"/>);
+                actionLinks.push(<ActionButton key="outline" callback={this.openMailer} mdiIcon="email-outline" messageId="45"/>);
             }
             if(editAllowed){
-                actionLinks.push(<ActionButton callback={this.toggleEditMode} mdiIcon="pencil" messageId={"193"}/>);
+                actionLinks.push(<ActionButton key="pencil" callback={this.toggleEditMode} mdiIcon="pencil" messageId={"193"}/>);
             }
             if(ShareModel.qrcodeEnabled()){
-                actionLinks.push(<ActionButton callback={this.toggleQRCode} mdiIcon="qrcode" messageId={'94'}/>);
+                actionLinks.push(<ActionButton key="qrcode" callback={this.toggleQRCode} mdiIcon="qrcode" messageId={'94'}/>);
             }
             if(actionLinks.length){
                 actionLinks = (

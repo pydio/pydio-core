@@ -3,11 +3,12 @@ import ShareContextConsumer from '../ShareContextConsumer'
 import RemoteUsers from './RemoteUsers'
 import SharedUsers from './SharedUsers'
 const {Divider} = require('material-ui')
+const ShareModel = require('pydio').requireLib('ReactModelShare')
 
 let UsersPanel = React.createClass({
 
     propTypes:{
-        shareModel:React.PropTypes.instanceOf(ReactModel.Share),
+        shareModel:React.PropTypes.instanceOf(ShareModel),
         showMailer:React.PropTypes.func
     },
 
@@ -32,7 +33,7 @@ let UsersPanel = React.createClass({
 
     render: function(){
         const currentUsers = this.props.shareModel.getSharedUsers();
-        const federatedEnabled = ReactModel.Share.federatedSharingEnabled();
+        const federatedEnabled = ShareModel.federatedSharingEnabled();
         return (
             <div style={this.props.style}>
                 <SharedUsers

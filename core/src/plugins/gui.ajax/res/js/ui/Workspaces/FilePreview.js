@@ -32,7 +32,7 @@ let FilePreview = React.createClass({
             },
             mimefont: {
                 color: color,
-                fontSize: '24',
+                fontSize: 24,
                 textAlign: 'center',
                 flex: 1
             }

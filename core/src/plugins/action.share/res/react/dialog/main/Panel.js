@@ -85,7 +85,7 @@ let MainPanel = React.createClass({
 
     getButtons:function(updater){
 
-        this.buttonsComputer = new ButtonsComputer(this.props.pydio, this.state.model, updater, this.dismiss.bind(this), this.getMessage.bind(this));
+        this.buttonsComputer = new ButtonsComputer(this.props.pydio, this.state.model, updater, this.dismiss, this.getMessage);
         this.buttonsComputer.start();
         return this.buttonsComputer.getButtons();
 

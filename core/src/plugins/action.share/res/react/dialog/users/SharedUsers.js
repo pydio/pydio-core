@@ -4,13 +4,14 @@ import UserBadge from './UserBadge'
 import SharedUserEntry from './SharedUserEntry'
 import ActionButton from '../main/ActionButton'
 import Card from '../main/Card'
-const {UsersCompleter} = require('pydio').requireLib('components')
+const Pydio = require('pydio')
+const {UsersCompleter} = Pydio.requireLib('components')
 const {Paper} = require('material-ui')
 
 let SharedUsers = React.createClass({
     
     propTypes: {
-        pydio:React.PropTypes.instanceOf(pydio),
+        pydio:React.PropTypes.instanceOf(Pydio),
         users:React.PropTypes.array.isRequired,
         userObjects:React.PropTypes.object.isRequired,
         onUserUpdate:React.PropTypes.func.isRequired,

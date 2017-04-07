@@ -12,8 +12,10 @@ const React = require('react');
 const Pydio = require('pydio');
 const {AsyncComponent} = Pydio.requireLib('boot')
 const {Popover, IconButton} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+const Color = require('color')
 
-const AddressBook = React.createClass({
+let AddressBook = React.createClass({
 
     propTypes: {
         pydio           : React.PropTypes.instanceOf(Pydio),
@@ -22,6 +24,7 @@ const AddressBook = React.createClass({
         usersOnly       : React.PropTypes.bool,
         usersFrom       : React.PropTypes.oneOf(['local', 'remote', 'any']),
         disableSearch   : React.PropTypes.bool,
+        muiTheme        : React.PropTypes.object,
         popoverStyle                : React.PropTypes.object,
         popoverButton               : React.PropTypes.object,
         popoverContainerStyle       : React.PropTypes.object,
@@ -269,7 +272,7 @@ const AddressBook = React.createClass({
 
     render: function(){
 
-        const {mode} = this.props;
+        const {mode, muiTheme} = this.props;
 
         if(mode === 'popover'){
 
@@ -310,7 +313,12 @@ const AddressBook = React.createClass({
 
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
-        const leftColumnStyle = {width: 256, overflowY:'auto', overflowX: 'hidden'};
+        const leftColumnStyle = {
+            backgroundColor: Color(muiTheme.palette.primary1Color).lighten(1.3),
+            width: 256,
+            overflowY:'auto',
+            overflowX: 'hidden'
+        };
         let centerComponent, rightPanel, leftPanel;
 
         if(selectedItem.id === 'search'){
@@ -367,11 +375,12 @@ const AddressBook = React.createClass({
         }
         if(mode === 'book'){
             leftPanel = (
-                <MaterialUI.Paper zDepth={2} style={{...leftColumnStyle, zIndex:2}}>
+                <MaterialUI.Paper zDepth={0} style={{...leftColumnStyle, zIndex:2}}>
                     <MaterialUI.List>
                         {root.collections.map(function(e){
                             return (
                                 <NestedListItem
+                                    key={e.id}
                                     selected={selectedItem.id}
                                     nestedLevel={0}
                                     entry={e}
@@ -442,4 +451,5 @@ const AddressBook = React.createClass({
 
 });
 
+AddressBook = muiThemeable()(AddressBook);
 export {AddressBook as default}

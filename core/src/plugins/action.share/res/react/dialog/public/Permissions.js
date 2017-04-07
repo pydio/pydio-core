@@ -51,7 +51,7 @@ let PublicLinkPermissions = React.createClass({
                 <div style={{margin:'10px 0 20px'}} className="ie_material_checkbox_fix">
                     {perms.map(function(p){
                         return (
-                            <div style={{display:'inline-block',width:'33%'}}>
+                            <div key={p.NAME} style={{display:'inline-block',width:'33%'}}>
                                 <Checkbox
                                     disabled={p.DISABLED || this.props.isReadonly()}
                                     type="checkbox"

@@ -60,7 +60,7 @@ const ButtonMenu = React.createClass({
                     targetOrigin={{horizontal: this.props.direction || 'left', vertical: 'top'}}
                     onRequestClose={() => {this.setState({showMenu: false})}}
                 >
-                    {Utils.itemsToMenu(menuItems, this.menuClicked.bind(this))}
+                    {Utils.itemsToMenu(menuItems, this.menuClicked)}
                 </MaterialUI.Popover>
             </span>
         );

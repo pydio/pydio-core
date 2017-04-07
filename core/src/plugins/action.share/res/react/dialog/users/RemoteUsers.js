@@ -3,8 +3,9 @@ const {TextField, IconButton, Paper} = require('material-ui')
 import ShareContextConsumer from '../ShareContextConsumer'
 import RemoteUserEntry from './RemoteUserEntry'
 import Card from '../main/Card'
-const {ReactModelShare} = require('pydio').requireLib('ReactModelShare')
-const {AddressBook} = require('pydio').requireLib('components')
+const Pydio = require('pydio')
+const {ReactModelShare} = Pydio.requireLib('ReactModelShare')
+const {AddressBook} = Pydio.requireLib('components')
 import ActionButton from '../main/ActionButton'
 
 let RemoteUsers = React.createClass({

@@ -3,7 +3,7 @@ const {muiThemeable} = require('material-ui/styles')
 
 const Pydio = require('pydio')
 const PydioApi = require('pydio/http/api')
-const {MessagesConsumerMixin, FoldersTree} = Pydio.requireLib('components');
+const {FoldersTree} = Pydio.requireLib('components');
 
 const Confirm = React.createClass({
 
@@ -56,8 +56,6 @@ const Confirm = React.createClass({
 });
 
 let WorkspaceEntry =React.createClass({
-
-    mixins:[MessagesConsumerMixin],
 
     propTypes:{
         pydio           : React.PropTypes.instanceOf(Pydio).isRequired,

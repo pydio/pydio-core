@@ -385,7 +385,7 @@
         },
 
         componentDidMount: function(){
-            TaskStore.getInstance().observe("tasks_updated", this.refreshTasks.bind(this));
+            TaskStore.getInstance().observe("tasks_updated", this.refreshTasks);
         },
 
         componentWillUnmount: function(){
@@ -404,7 +404,7 @@
             let tasks = [];
             this.state.tasks.forEach(function(t){
                 if(t.getStatus() === Task.STATUS_COMPLETE) return;
-                tasks.push(<TaskEntry task={t} showFull={this.state.mouseOver}/>);
+                tasks.push(<TaskEntry key={t.getId()} task={t} showFull={this.state.mouseOver}/>);
             }.bind(this));
             let className = "pydio-tasks-panel";
             let heightStyle;

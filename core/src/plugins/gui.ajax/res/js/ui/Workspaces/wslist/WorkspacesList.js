@@ -59,7 +59,7 @@ export default React.createClass({
                 pydio.Controller.fireAction('user_create_repository');
             }.bind(this);
             createAction = (
-                <div className="workspaces">
+                <div className="workspaces" key="create-action">
                     <div className="workspace-entry" onClick={createClick} title={messages[418]}>
                         <span className="workspace-badge">+</span>
                         <span className="workspace-label">{messages[417]}</span>

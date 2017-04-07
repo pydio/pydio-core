@@ -22,7 +22,7 @@ let PublicLinkTemplate = React.createClass({
             if(!selected && !crtLabel) {
                 selected = l.LAYOUT_ELEMENT, crtLabel = l.LAYOUT_LABEL;
             }
-            return <MenuItem value={l.LAYOUT_ELEMENT} primaryText={l.LAYOUT_LABEL}/>;
+            return <MenuItem key={l.LAYOUT_ELEMENT} value={l.LAYOUT_ELEMENT} primaryText={l.LAYOUT_LABEL}/>;
         });
         const unusedLegend = <div className="form-legend">{this.props.getMessage('198')}</div>;
         return (

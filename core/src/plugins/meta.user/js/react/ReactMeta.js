@@ -291,7 +291,7 @@
             PydioApi.getClient().request({get_action: 'meta_user_list_tags', meta_field_name: this.props.fieldname}, (transport) => {
                 this.setState({loading:this.state.loading - 1});
                 if(transport.responseJSON && transport.responseJSON.length){
-                    callback(suggestedTags);
+                    callback(transport.responseJSON);
                 }
             });
         },
@@ -346,6 +346,7 @@
             if (this.props.editMode) {
                 return (
                     <MaterialUI.Chip
+                        key={tag}
                         style={{margin: 2}}
                         onRequestDelete={this.handleRequestDelete.bind(this, tag)}
                     >{tag}</MaterialUI.Chip>
@@ -353,6 +354,7 @@
             } else {
                 return (
                     <MaterialUI.Chip
+                        key={tag}
                         style={{margin: 2}}
                         onTouchTap={this.handleTouchTap}
                     >{tag}</MaterialUI.Chip>

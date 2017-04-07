@@ -67,6 +67,7 @@ export default React.createClass({
                 className = undefined;
                 confirmError = '   ';
             }
+            const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis'};
             let confirm;
             if(this.state.value && !this.props.disabled){
                 confirm = [
@@ -74,6 +75,7 @@ export default React.createClass({
                     <ReactMUI.TextField
                         key="confirm"
                         floatingLabelText={'Please Confirm Password'}
+                        floatingLabelStyle={overflow}
                         className={className}
                         value={this.state.confirmValue}
                         onChange={this.onConfirmChange}
@@ -90,6 +92,7 @@ export default React.createClass({
                     <div style={{display:'flex'}}>
                         <ReactMUI.TextField
                             floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
+                            floatingLabelStyle={overflow}
                             className={className}
                             value={this.state.value}
                             onChange={this.onChange}
