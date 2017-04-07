@@ -183,7 +183,7 @@
                     color: this.props.muiTheme.appBar.textColor
                 },
                 iconButtonsStyle :{
-                    color: Color(this.props.muiTheme.appBar.color).darken(0.4)
+                    color: Color(this.props.muiTheme.appBar.color).darken(0.4).toString()
                 },
                 raisedButtonStyle : {
                     height: 30

@@ -13,18 +13,18 @@ let LeftPanel = ({muiTheme, style={}, userWidgetProps, workspacesListProps, pydi
 
         style = {
             ...style,
-            backgroundColor: lightBg
+            backgroundColor: lightBg.toString()
         };
         const widgetStyle = {
-            backgroundColor: Color(palette.primary1Color).darken(0.2),
+            backgroundColor: Color(palette.primary1Color).darken(0.2).toString(),
             width:'100%'
         };
         const wsListStyle = {
             overflowY: 'auto',
-            color    : Color(palette.primary1Color).darken(0.1).alpha(0.87)
+            color    : Color(palette.primary1Color).darken(0.1).alpha(0.87).toString()
         };
         const wsSectionTitleStyle = {
-            color    : Color(palette.primary1Color).darken(0.1).alpha(0.50)
+            color    : Color(palette.primary1Color).darken(0.1).alpha(0.50).toString()
         };
         const uWidgetProps = userWidgetProps || {};
         const wsListProps = workspacesListProps || {};

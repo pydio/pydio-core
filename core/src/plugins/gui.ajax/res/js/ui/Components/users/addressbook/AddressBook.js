@@ -314,7 +314,7 @@ let AddressBook = React.createClass({
         const {selectedItem, root, rightPaneItem, createDialogItem} = this.state;
 
         const leftColumnStyle = {
-            backgroundColor: Color(muiTheme.palette.primary1Color).lighten(1.3),
+            backgroundColor: Color(muiTheme.palette.primary1Color).lighten(1.3).toString(),
             width: 256,
             overflowY:'auto',
             overflowX: 'hidden'

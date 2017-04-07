@@ -87,7 +87,7 @@ const VideoCard = React.createClass({
         const TMP_VIEW_MORE = (
             <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
         );
-        const tint = MaterialUI.Color(Palette[3]).alpha(0.8);
+        const tint = MaterialUI.Color(Palette[3]).alpha(0.8).toString();
         return (
             <ColorPaper {...props} paletteIndex={3} getCloseButton={this.getCloseButton.bind(this)}>
                 <div className="tutorial_legend">

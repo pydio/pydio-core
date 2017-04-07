@@ -60,10 +60,11 @@ let UserDashboard = React.createClass({
         const palette = this.props.muiTheme.palette;
         const Color = MaterialUI.Color;
         const widgetStyle = {
-            backgroundColor: Color(palette.primary1Color).darken(0.2),
+            backgroundColor: Color(palette.primary1Color).darken(0.2).toString(),
             width:'100%',
             position: 'fixed'
         };
+        console.log(widgetStyle);
         const lightColor = '#eceff1'; // TO DO: TO BE COMPUTED FROM MAIN COLOR
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
