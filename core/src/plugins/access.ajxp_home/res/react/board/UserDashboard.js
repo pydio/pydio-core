@@ -64,7 +64,7 @@ let UserDashboard = React.createClass({
             width:'100%',
             position: 'fixed'
         };
-        console.log(widgetStyle);
+
         const lightColor = '#eceff1'; // TO DO: TO BE COMPUTED FROM MAIN COLOR
         const uWidgetProps = this.props.userWidgetProps || {};
         const wsListProps = this.props.workspacesListProps || {};
