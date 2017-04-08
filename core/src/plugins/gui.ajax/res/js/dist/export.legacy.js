@@ -12,6 +12,5 @@ window.ReactGridLayout = require('react-grid-layout');
 window.ReactChart = require('react-chartjs');
 window.ReactSelect = require('react-select');
 window.classNames = require('classnames');
-require("whatwg-fetch");
 window.injectTapEventPlugin = require('react-tap-event-plugin');
 window.injectTapEventPlugin();

@@ -8,16 +8,13 @@ module.exports = function(grunt, options){
     return {
         boot: {
             options:{
-                alias:[
-                    './res/build/core/http/Connexion.js:pydio/http/connexion',
-                    './res/build/core/PydioBootstrap.js:pydio-bootstrap'
-                ],
                 browserifyOptions: {
-                    debug: true
+                    debug: true,
+                    standalone: 'PydioBootstrap'
                 }
             },
             files: {
-                'res/build/boot.prod.js': 'res/js/dist/boot.js',
+                'res/build/boot.prod.js': 'res/build/core/PydioBootstrap.js',
             }
         },
         core: {

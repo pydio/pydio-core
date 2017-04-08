@@ -20,7 +20,6 @@ window.ReactAutoSuggest = require('react-autosuggest');
 window.Clipboard = require('clipboard');
 window.ReactQRCode = require('qrcode.react');
 window.Cronstrue = require("cronstrue");
-require("whatwg-fetch");
 window.injectTapEventPlugin = require('react-tap-event-plugin');
 window.injectTapEventPlugin();
 

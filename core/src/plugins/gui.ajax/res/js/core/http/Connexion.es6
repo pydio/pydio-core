@@ -17,6 +17,7 @@
  *
  * The latest code can be found at <https://pydio.com>.
  */
+require('whatwg-fetch');
 import XMLUtils from '../util/XMLUtils'
 /**
  * Pydio encapsulation of XHR / Fetch

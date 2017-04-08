@@ -18,6 +18,8 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+const docReady = require('doc-ready');
+const Connexion = require('./http/Connexion')
 /**
  * Main BootLoader.
  * Defaults params for constructor should be {} and content.php?get_action=get_boot_conf
@@ -68,6 +70,7 @@ export default class PydioBootstrap{
 
         }.bind(this));
 
+        window.Connexion = Connexion;
         window.pydioBootstrap = this;
     }
 
@@ -191,6 +194,12 @@ export default class PydioBootstrap{
         }else{
             masterClassLoaded();
         }
+
+        let div = document.createElement('div');
+        div.style = 'position:absolute; bottom: 0; right: 0; z-index: 2000; color:rgba(0,0,0,0.6); font-size: 12px; padding: 0 10px;';
+        div.innerHTML = 'Pydio Community Edition - Copyright Abstrium 2017 - Learn more on <a href="http://pydio.com" target="_blank">pydio.com</a>';
+        document.body.appendChild(div);
+
     }
 
     /**
