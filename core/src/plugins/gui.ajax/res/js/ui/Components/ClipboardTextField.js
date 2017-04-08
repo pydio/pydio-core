@@ -33,7 +33,7 @@ export default React.createClass({
             }.bind(this)
         });
         this._clip.on('success', function(){
-            this.setState({copyMessage:this.props.getMessage(this.props.inputCopyMessage)}, this.clearCopyMessage);
+            this.setState({copyMessage:this.props.getMessage(this.props.inputCopyMessage || '192')}, this.clearCopyMessage);
         }.bind(this));
         this._clip.on('error', function(){
             var copyMessage;

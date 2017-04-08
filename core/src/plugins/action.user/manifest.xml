@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver id="action.ajxp_user" enabled="always" label="CONF_MESSAGE[User Dashboard]" description="CONF_MESSAGE[User home dashboard, can be displayed before accessing to workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
-	<client_settings icon="plugins/action.ajxp_user/share.png">
+<ajxpdriver id="action.user" enabled="always" label="CONF_MESSAGE[User Dashboard]" description="CONF_MESSAGE[User home dashboard, can be displayed before accessing to workspaces]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+	<client_settings>
 		<resources>
-			<i18n namespace="user_dash" path="plugins/action.ajxp_user/res/i18n" />
-            <js className="UserAccount" file="plugins/action.ajxp_user/res/build/UserAccount.js" depends="React,PydioForm"/>
-            <css file="plugins/action.ajxp_user/dashboard.css"/>
+			<i18n namespace="user_dash" path="plugins/action.user/res/i18n" />
+            <js className="UserAccount" file="plugins/action.user/res/build/UserAccount.js" depends="React,PydioForm"/>
 		</resources>
-        <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>
 	</client_settings>
     <server_settings>
         <global_param name="DASH_DISABLE_ADDRESS_BOOK" type="boolean" default="false" label="CONF_MESSAGE[Disable Address Book]" description="CONF_MESSAGE[Do not display address book in user account panel.]"/>

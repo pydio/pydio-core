@@ -24,7 +24,7 @@
         <client_configs>
             <component_config className="UserAccountTabs">
                 <additional_tab id="api_keys"
-                                tabInfo='{"icon":"icon-key","label":"keystore.1","title":"keystore.2","position":10}'
+                                tabInfo='{"icon":"mdi mdi-account-key","label":"keystore.1","title":"keystore.2","position":10}'
                                 paneInfo='{"namespace":"ApiKeys", "componentName":"Panel"}'/>
             </component_config>
         </client_configs>
