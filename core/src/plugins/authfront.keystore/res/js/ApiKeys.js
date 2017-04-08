@@ -65,9 +65,19 @@
                     this.removeKey(k);
                 }.bind(this);
                 const deviceId = item['DEVICE_ID'] || 'No Id';
+                const primaryText = item.DEVICE_DESC + ' - ' + item.DEVICE_OS;
+                const secondaryText = deviceId;
+                const leftIcon = <MaterialUI.FontIcon className="mdi mdi-laptop" style={{color:this.props.muiTheme.palette.primary1Color}}/>
+                const rightIcon = <MaterialUI.IconButton iconClassName="mdi mdi-key-minus" onTouchTap={remove}  iconStyle={{color:'rgba(0,0,0,0.53)'}}/>
                 keys.push(
-                    <li>{item.DEVICE_DESC + ' - ' + item.DEVICE_OS} ({deviceId})<span className="mdi mdi-close" onClick={remove}/></li>
-                );
+                    <MaterialUI.ListItem
+                        key={deviceId}
+                        primaryText={primaryText}
+                        secondaryText={secondaryText}
+                        disabled={true}
+                        leftIcon={leftIcon}
+                        rightIconButton={rightIcon}
+                    />);
             }
             let mess = this.props.pydio.MessageHash;
             let tokenResult;
@@ -79,17 +89,18 @@
                     </div>
                 );
             }
-            let list = this.state.loaded ? <ul>{keys}</ul> : <PydioReactUI.Loader/>;
+            let list = this.state.loaded ? <MaterialUI.List>{keys}</MaterialUI.List> : <PydioReactUI.Loader/>;
             return (
                 <div>
-                    <div>
-                        <MaterialUI.RaisedButton label={mess['keystore.3']} onTouchTap={this.generateKey}/>
-                        <MaterialUI.RaisedButton label={mess['keystore.5']} onTouchTap={() => {this.removeKey();}}/>
-                    </div>
-                    <div>
-                        <h4>{mess['keystore.9']}</h4>
-                        {list}
-                    </div>
+                    <MaterialUI.Toolbar>
+                        <div style={{color: 'white', padding: '17px 0px', marginLeft: -10, fontWeight: 500}}>{mess['keystore.9']}</div>
+                        <div style={{flex:1}}></div>
+                        <MaterialUI.ToolbarGroup lastChild={true}>
+                            <MaterialUI.IconButton tooltip={mess['keystore.3']} tooltipPosition="bottom-left" iconClassName="mdi mdi-key-plus" onTouchTap={this.generateKey} iconStyle={{color:'white'}}/>
+                            <MaterialUI.IconButton tooltip={mess['keystore.5']} tooltipPosition="bottom-left" iconClassName="mdi mdi-key-remove" onTouchTap={() => {this.removeKey();}} iconStyle={{color:'white'}}/>
+                        </MaterialUI.ToolbarGroup>
+                    </MaterialUI.Toolbar>
+                    {list}
                 </div>
             );
         }
@@ -97,7 +108,7 @@
     });
 
     global.ApiKeys = {
-        Panel: Panel
+        Panel: MaterialUI.Style.muiThemeable()(Panel)
     };
 
 })(window);

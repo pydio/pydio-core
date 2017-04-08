@@ -28,5 +28,5 @@ $mess = array(
     "6" => "Invalide toutes les clés existantes et requiert leur régéneration par les clients.",
     "7" => "Etes-vous sûr de vouloir révoquer cette clé?",
     "8" => "Clé supprimée avec succès!",
-    "9" => "Appareils connectés à votre compte:"
+    "9" => "Appareils connectés à votre compte"
 );
