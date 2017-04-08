@@ -61,19 +61,19 @@ let WebDAVPane = React.createClass({
     renderUrls: function(){
 
         let base = this.state.preferences.webdav_base_url;
-        let userRepos = this.props.pydio.user.getRepositoriesList();
-        let webdavRepos = this.state.preferences.webdav_repositories;
         let otherUrls = [];
-        if(!!this.state.toggler){
+        const toggler = !!this.state.toggler;
+        const {pydio} = this.props;
+        const {preferences} = this.state;
+
+        if(toggler){
+            let userRepos = pydio.user.getRepositoriesList();
+            let webdavRepos = preferences.webdav_repositories;
             userRepos.forEach(function(repo, key){
                 if(!webdavRepos[key]) return;
                 otherUrls.push(<ClipboardTextField key={key} floatingLabelText={repo.getLabel()} inputValue={webdavRepos[key]} getMessage={this.getMessage} />);
             }.bind(this));
         }
-
-        let toggler = function(){
-            this.setState({toggler: !this.state.toggler});
-        }.bind(this);
 
         return (
             <div>
@@ -81,9 +81,9 @@ let WebDAVPane = React.createClass({
                     <div>{this.getMessage(405)}</div>
                     <ClipboardTextField floatingLabelText={this.getMessage(468)} inputValue={base} getMessage={this.getMessage}/>
                 </div>
-                <Divider/>
+                {toggler && <Divider/>}
                 <div style={{padding: 20}}>
-                <Toggle labelPosition="right" label={this.getMessage(465)} onToggle={toggler} toggled={!!this.state.toggler}/>
+                <Toggle labelPosition="right" label={this.getMessage(465)} onToggle={() => {this.setState({toggler: !toggler})}} toggled={toggler}/>
                 {otherUrls}
                 </div>
             </div>
