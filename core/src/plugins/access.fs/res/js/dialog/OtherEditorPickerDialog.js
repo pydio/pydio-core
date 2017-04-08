@@ -1,4 +1,9 @@
 const React = require('react')
+const {FontIcon, ListItem, List, FlatButton} = require('material-ui')
+const Pydio = require('pydio')
+const PydioDataModel = require('pydio/model/data-model')
+const LangUtils=  require('pydio/util/lang')
+const {ActionDialogMixin} = Pydio.requireLib('boot')
 import openInEditor from '../callback/openInEditor'
 
 let OtherEditorPickerDialog = React.createClass({
@@ -9,19 +14,19 @@ let OtherEditorPickerDialog = React.createClass({
     },
 
     mixins:[
-        PydioReactUI.ActionDialogMixin
+        ActionDialogMixin
     ],
 
     getButtons: function(updater){
         let actions = [];
         const mess = this.props.pydio.MessageHash;
-        actions.push(<MaterialUI.FlatButton
+        actions.push(<FlatButton
             key="clear"
             label={MessageHash['openother.5']}
             primary={false}
             onTouchTap={this.clearAssociations}
         />);
-        actions.push(<MaterialUI.FlatButton
+        actions.push(<FlatButton
             label={mess['49']}
             primary={true}
             keyboardFocused={true}
@@ -98,13 +103,13 @@ let OtherEditorPickerDialog = React.createClass({
     render: function(){
         //let items = [];
         const items = this.findActiveEditors('*').map((e) => {
-            const icon = <MaterialUI.FontIcon className={e.icon_class}/>;
-            return <MaterialUI.ListItem onTouchTap={this.selectEditor.bind(this, e)} primaryText={e.text} secondaryText={e.title} leftIcon={icon}/>;
+            const icon = <FontIcon className={e.icon_class}/>;
+            return <ListItem onTouchTap={this.selectEditor.bind(this, e)} primaryText={e.text} secondaryText={e.title} leftIcon={icon}/>;
         });
         return (
-            <MaterialUI.List style={{maxHeight: 320, overflowY: 'scroll', width: '100%', borderTop:'1px solid #e0e0e0'}}>
+            <List style={{maxHeight: 320, overflowY: 'scroll', width: '100%', borderTop:'1px solid #e0e0e0'}}>
                 {items}
-            </MaterialUI.List>
+            </List>
         );
     }
 
