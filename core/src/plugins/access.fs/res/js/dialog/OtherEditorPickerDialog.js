@@ -1,4 +1,5 @@
 const React = require('react')
+import openInEditor from '../callback/openInEditor'
 
 let OtherEditorPickerDialog = React.createClass({
 
@@ -78,9 +79,10 @@ let OtherEditorPickerDialog = React.createClass({
     },
 
     selectEditor: function(editor, event){
-        const mime = this.props.selection.getUniqueNode().getAjxpMime();
+        const {pydio, selection} = this.props;
+        const mime = selection.getUniqueNode().getAjxpMime();
         editor.mimes.push(mime);
-        let user = this.props.pydio.user;
+        let user = pydio.user;
         if(!user) return;
 
         let guiPrefs = user.getPreference("gui_preferences", true) || {};
@@ -89,7 +91,7 @@ let OtherEditorPickerDialog = React.createClass({
         guiPrefs["other_editor_extensions"] = exts;
         user.setPreference("gui_preferences", guiPrefs, true);
         user.savePreference("gui_preferences");
-        Callbacks.openInEditor(null, editor);
+        openInEditor(pydio)(null, editor);
         this.dismiss();
     },
 
