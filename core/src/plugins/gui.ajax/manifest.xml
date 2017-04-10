@@ -25,7 +25,7 @@
                 file="plugins/gui.ajax/res/build/PydioReactUI.min.js"
                 fallbackFile="plugins/gui.ajax/res/build/PydioReactUI.js"
                 fallbackCondition="pydio.Parameters.get('debugMode')"
-                depends="React"
+                depends="React,PydioHOCs"
                 expose="boot"
             />
             <js

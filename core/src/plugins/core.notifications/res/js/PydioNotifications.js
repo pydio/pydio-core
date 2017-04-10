@@ -24,6 +24,13 @@
         backgroundColor: '#eceff1'
     };
 
+    const originStyles = {opacity: 0.3}
+    const targetStyles = {opacity: 1}
+
+    let Template = (props) => {
+        return <div {...props} style={{padding: 0}} />
+    }
+    Template = PydioHOCs.Animations.makeTransition(originStyles, targetStyles)(Template)
 
     let ActivityPanel = React.createClass({
 
@@ -164,8 +171,8 @@
 
             return (
 
-                <PydioWorkspaces.InfoPanelCard title={label} icon="pulse" iconColor="#F57C00">
-                    <div style={{padding: 0}}>
+                <PydioWorkspaces.InfoPanelCard title={label} icon="pulse" iconColor="#F57C00" style={this.props.style}>
+                    <Template>
                         <PydioComponents.NodeListCustomProvider
                             pydio={pydio}
                             className="files-list"
@@ -182,7 +189,7 @@
                             nodeClicked={nodeClicked}
                             defaultSortingInfo={{attribute : 'event_time',sortType:'number',direction : 'desc'}}
                         />
-                    </div>
+                    </Template>
                 </PydioWorkspaces.InfoPanelCard>
 
             );
@@ -374,4 +381,3 @@
     };
 
 })(window);
-

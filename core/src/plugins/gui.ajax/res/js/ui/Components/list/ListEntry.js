@@ -1,32 +1,15 @@
-import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget} from '../DND'
-import ContextMenuNodeProviderMixin from '../menu/ContextMenuNodeProviderMixin'
-
+import ReactDOM from 'react-dom';
+import { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } from '../DND';
+import { DragSource, DropTarget, flow } from 'react-dnd';
+import { Checkbox, FontIcon } from 'material-ui';
 
 /**
  * Material List Entry
  */
-var ListEntry = React.createClass({
+//mixins:[ContextMenuNodeProviderMixin],
+class ListEntry extends React.Component {
 
-    mixins:[ContextMenuNodeProviderMixin],
-
-    propTypes:{
-        showSelector:React.PropTypes.bool,
-        selected:React.PropTypes.bool,
-        selectorDisabled:React.PropTypes.bool,
-        onSelect:React.PropTypes.func,
-        onClick:React.PropTypes.func,
-        iconCell:React.PropTypes.element,
-        mainIcon:React.PropTypes.string,
-        firstLine:React.PropTypes.node,
-        secondLine:React.PropTypes.node,
-        thirdLine:React.PropTypes.node,
-        actions:React.PropTypes.element,
-        activeDroppable:React.PropTypes.bool,
-        className:React.PropTypes.string,
-        style: React.PropTypes.object
-    },
-
-    onClick: function(event){
+    onClick(event) {
         if(this.props.showSelector) {
             if(this.props.selectorDisabled) return;
             this.props.onSelect(this.props.node, event);
@@ -35,82 +18,106 @@ var ListEntry = React.createClass({
         }else if(this.props.onClick){
             this.props.onClick(this.props.node, event);
         }
-    },
+    }
 
-    onDoubleClick: function(event){
+    onDoubleClick(event) {
         if(this.props.onDoubleClick){
             this.props.onDoubleClick(this.props.node, event);
         }
-    },
+    }
 
-    render: function(){
-        var selector;
-        if(this.props.showSelector){
+    render() {
+
+        let selector, icon, additionalClassName;
+
+        const {showSelector, selected, selectorDisabled} = this.props
+        if(showSelector){
             selector = (
                 <div className="material-list-selector">
-                    <ReactMUI.Checkbox checked={this.props.selected} ref="selector" disabled={this.props.selectorDisabled}/>
+                    <Checkbox checked={selected} ref="selector" disabled={selectorDisabled}/>
                 </div>
             );
         }
-        var iconCell;
-        if(this.props.iconCell){
-            iconCell = this.props.iconCell;
+
+        const {iconCell, mainIcon} = this.props
+        if(iconCell){
+            icon = this.props.iconCell;
         }else if(this.props.mainIcon){
-            iconCell = <ReactMUI.FontIcon className={this.props.mainIcon}/>;
+            icon = <FontIcon className={"mui-font-icon " + this.props.mainIcon} style={{fontSize: 18, color: "#FFFFFF"}} />;
         }
-        var additionalClassName = this.props.className ? this.props.className + ' ' : '';
-        if(this.props.canDrop && this.props.isOver){
+
+        const {className, canDrop, isOver} = this.props
+        additionalClassName = className ? className + ' ' : '';
+        if(canDrop && isOver){
             additionalClassName += ' droppable-active ';
         }
-        if(this.props.node){
-            additionalClassName += ' listentry' + this.props.node.getPath().replace(/\//g, '_') + ' ' + ' ajxp_node_' + (this.props.node.isLeaf()?'leaf':'collection') + ' ';
-            if(this.props.node.getAjxpMime()){
-                additionalClassName += ' ajxp_mime_' + this.props.node.getAjxpMime() + ' ';
+
+        const {node} = this.props
+        if(node){
+            additionalClassName += ' listentry' + node.getPath().replace(/\//g, '_') + ' ' + ' ajxp_node_' + (node.isLeaf()?'leaf':'collection') + ' ';
+            if(node.getAjxpMime()){
+                additionalClassName += ' ajxp_mime_' + node.getAjxpMime() + ' ';
             }
         }
-        let connector = (instance) => instance;
-        if(window.ReactDND && this.props.connectDragSource && this.props.connectDropTarget){
-            let connectDragSource = this.props.connectDragSource;
-            let connectDropTarget = this.props.connectDropTarget;
-            connector = (instance) => {
-                connectDragSource(ReactDOM.findDOMNode(instance));
-                connectDropTarget(ReactDOM.findDOMNode(instance));
-            };
-        }
+
+        const {connectDragSource, connectDropTarget, firstLine, secondLine, thirdLine, style, actions} = this.props
+
         return (
-            <div
-                ref={connector}
-                onClick={this.onClick}
-                onDoubleClick={this.props.showSelector?null:this.onDoubleClick}
-                onContextMenu={this.contextMenuNodeResponder}
-                className={additionalClassName + "material-list-entry material-list-entry-" + (this.props.thirdLine?3:this.props.secondLine?2:1) + "-lines"+ (this.props.selected? " selected":"")}
-                style={this.props.style}>
+            <ContextMenuWrapper
+                {...this.props}
+                ref={instance => {
+                    const node = ReactDOM.findDOMNode(instance)
+                    if (typeof connectDropTarget === 'function') connectDropTarget(node)
+                    if (typeof connectDragSource === 'function') connectDragSource(node)
+                }}
+                onClick={this.onClick.bind(this)}
+                onDoubleClick={showSelector? null : this.onDoubleClick.bind(this)}
+                className={additionalClassName + "material-list-entry material-list-entry-" + (thirdLine?3:secondLine?2:1) + "-lines"+ (selected? " selected":"")}
+                style={style}>
                 {selector}
-                <div className={"material-list-icon" + ((this.props.mainIcon || iconCell)?"":" material-list-icon-none")}>
-                    {iconCell}
+                <div className={"material-list-icon" + ((mainIcon || iconCell)?"":" material-list-icon-none")}>
+                    {icon}
                 </div>
                 <div className="material-list-text">
-                    <div key="line-1" className="material-list-line-1">{this.props.firstLine}</div>
-                    <div key="line-2" className="material-list-line-2">{this.props.secondLine}</div>
-                    <div key="line-3" className="material-list-line-3">{this.props.thirdLine}</div>
+                    <div key="line-1" className="material-list-line-1">{firstLine}</div>
+                    <div key="line-2" className="material-list-line-2">{secondLine}</div>
+                    <div key="line-3" className="material-list-line-3">{thirdLine}</div>
                 </div>
                 <div className="material-list-actions">
-                    {this.props.actions}
+                    {actions}
                 </div>
-            </div>
+            </ContextMenuWrapper>
         );
-
     }
-});
-
-var DragDropListEntry;
-if(window.ReactDND){
-    var DragDropListEntry = ReactDND.flow(
-        ReactDND.DragSource(Types.NODE_PROVIDER, nodeDragSource, collect),
-        ReactDND.DropTarget(Types.NODE_PROVIDER, nodeDropTarget, collectDrop)
-    )(ListEntry);
-}else{
-    DragDropListEntry = ListEntry;
 }
+
+let ContextMenuWrapper = (props) => {
+    return (
+        <div {...props} />
+    )
+}
+ContextMenuWrapper = PydioHOCs.withContextMenu(ContextMenuWrapper)
+
+ListEntry.propTypes = {
+    showSelector:React.PropTypes.bool,
+    selected:React.PropTypes.bool,
+    selectorDisabled:React.PropTypes.bool,
+    onSelect:React.PropTypes.func,
+    onClick:React.PropTypes.func,
+    iconCell:React.PropTypes.element,
+    mainIcon:React.PropTypes.string,
+    firstLine:React.PropTypes.node,
+    secondLine:React.PropTypes.node,
+    thirdLine:React.PropTypes.node,
+    actions:React.PropTypes.element,
+    activeDroppable:React.PropTypes.bool,
+    className:React.PropTypes.string,
+    style: React.PropTypes.object
+}
+
+let DragDropListEntry = flow(
+    DragSource(Types.NODE_PROVIDER, nodeDragSource, collect),
+    DropTarget(Types.NODE_PROVIDER, nodeDropTarget, collectDrop)
+)(ListEntry);
 
 export {DragDropListEntry as DragDropListEntry, ListEntry as ListEntry}

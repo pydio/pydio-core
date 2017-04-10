@@ -1,7 +1,7 @@
 import browserHistory from 'react-router/lib/browserHistory';
 
 const PathRouterWrapper = function(pydio){
-    
+
     class PathRouter extends React.PureComponent {
 
         constructor(props) {

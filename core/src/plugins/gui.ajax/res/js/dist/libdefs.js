@@ -19,6 +19,7 @@ const PydioCoreRequires = {
     'model/Controller.js'       :'pydio/model/controller',
     'model/PydioDataModel.js'   :'pydio/model/data-model',
     'model/Registry.js'         :'pydio/model/registry',
+    'model/ContextMenu'         :'pydio/model/context-menu',
     'http/Connexion.js'         :'pydio/http/connexion',
     'http/ResourcesManager.js'  :'pydio/http/resources-manager',
     'http/PydioApi.js'          :'pydio/http/api',

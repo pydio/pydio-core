@@ -78,7 +78,7 @@ const VideoCard = React.createClass({
             return {__html:MessageHash[id]};
         };
         const menus = this._videos.map(function(item, index){
-            return <MaterialUI.MenuItem primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1], videoIndex: index})} }/>;
+            return <MaterialUI.MenuItem key={`videoCardMenuItem_${index}`} primaryText={this.getTitle(item[1])} onTouchTap={() => {this.setState({youtubeId:item[0], contentMessageId:item[1], videoIndex: index})} }/>;
         }.bind(this));
         let props = {...this.props};
         const {youtubeId, contentMessageId} = this.state;
@@ -89,7 +89,7 @@ const VideoCard = React.createClass({
         );
         const tint = MaterialUI.Color(Palette[3]).alpha(0.8).toString();
         return (
-            <ColorPaper {...props} paletteIndex={3} getCloseButton={this.getCloseButton.bind(this)}>
+            <ColorPaper {...props} paletteIndex={3} getCloseButton={this.getCloseButton}>
                 <div className="tutorial_legend">
                     <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
                         <div style={{position:'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: tint}}/>

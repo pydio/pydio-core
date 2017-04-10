@@ -2,6 +2,12 @@ import InfoPanelCard from './InfoPanelCard'
 
 export default React.createClass({
 
+    getInitialState() {
+        return {
+            repoKey: null
+        }
+    },
+
     componentDidMount() {
         this.loadData(this.props);
     },
@@ -29,9 +35,7 @@ export default React.createClass({
         }else{
             FuncUtils.bufferCallback("ajxp_load_repo_info_timer", 700,function(){
                 if(!oThis.isMounted()) return;
-                oThis.setState({loading: true});
-                PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport){
-                    oThis.setState({loading: false});
+                PydioApi.getClient().request({get_action:'load_repository_info'}, function(transport) {
                     if(transport.responseJSON){
                         var data = transport.responseJSON;
                         if(!data['core.users']['groups']){
@@ -53,9 +57,8 @@ export default React.createClass({
         let shared = messages[527];
 
         let content, panelData;
-        if(this.state && this.state.loading){
-            content = <PydioReactUI.Loader/>;
-        }else if(this.state && this.state.users){
+
+        if(this.state && this.state.users){
             panelData = [
                 {key: 'internal', label:internal, value:this.state.users},
                 {key: 'external', label:external, value:this.state.groups}
@@ -63,7 +66,7 @@ export default React.createClass({
         }
 
         return (
-            <InfoPanelCard title="Workspace Users" standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
+            <InfoPanelCard title="Workspace Users" style={this.props.style} standardData={panelData} icon="account-multiple-outline" iconColor="00838f">{content}</InfoPanelCard>
         );
     }
 

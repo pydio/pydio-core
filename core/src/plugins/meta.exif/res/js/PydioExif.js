@@ -3,7 +3,7 @@
     let DetailPanel = React.createClass({
 
         parseValues: function(node){
-            
+
             let configs = this.props.pydio.getPluginConfigs('meta.exif');
             if(!configs.has('meta_definitions')){
                 return;
@@ -35,22 +35,22 @@
             }
             this.setState({items:items});
         },
-        
+
         componentDidMount: function(){
             this.parseValues(this.props.node);
         },
-        
+
         componentWillReceiveProps: function(nextProps){
             if(nextProps.node !== this.props.node){
                 this.setState({gpsData:null});
                 this.parseValues(nextProps.node);
             }
         },
-        
+
         mapLoaded: function(map, error){
             if(error && console) console.log(error);
         },
-        
+
         openInExifEditor: function(){
             const editor = global.pydio.Registry.findEditorById("editor.exif");
             if(editor){
@@ -66,7 +66,7 @@
         },
 
         render: function(){
-            
+
             let items = [];
             let actions = [];
             if(this.state && this.state.items){
@@ -101,12 +101,12 @@
                     <MaterialUI.FlatButton onClick={this.openInMapEditor} label="Open Map" />
                 )
             }
-            
+
             if(!items.length){
                 return null;
             }
             return (
-                <PydioWorkspaces.InfoPanelCard title="Exif Data" actions={actions} icon="camera" iconColor="#607d8b">
+                <PydioWorkspaces.InfoPanelCard style={this.props.style} title="Exif Data" actions={actions} icon="camera" iconColor="#607d8b">
                     {items}
                 </PydioWorkspaces.InfoPanelCard>
             );
@@ -124,7 +124,7 @@
         getInitialState:function(){
             return {loaded: false};
         },
-        
+
         loadData:function(){
             PydioApi.getClient().request({
                 get_action:'extract_exif',

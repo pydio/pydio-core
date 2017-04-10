@@ -18,18 +18,19 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-const Loadingbar = () => {
-    return <PydioReactUI.Loader style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: 0}}/>
+const Loadingbar = (style) => {
+    return <PydioReactUI.Loader style={{...style, position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: 0}}/>
 }
 
 const loader = (Component) => {
-    return class extends React.Component {
+    class Loader extends React.Component {
         constructor(props) {
             super(props)
 
             this.state = {loading: true}
 
             this.onLoad = (...args) => {
+
                 this.setState({loading: false})
 
                 if (typeof props.onLoad === 'function') {
@@ -59,19 +60,31 @@ const loader = (Component) => {
 
         render() {
             const {loading} = this.state
-            const {onLoad, ...remainingProps} = this.props
+            const {noLoader, onLoad, loaderStyle, ...remainingProps} = this.props
+
+            if (noLoader) {
+                return <Component {...remainingProps} onLoad={this.onLoad} />
+            }
 
             let style = loading ? {position:"relative", zIndex: "-1", top: "-3000px"} : {}
 
-            return (
-                <div style={{display: "flex", flex: 1}}>
-                    {loading && <Loadingbar />}
+            if (loading) {
+                return <Loadingbar style={{...style, ...loaderStyle}} />
+            }
 
-                    <Component {...remainingProps} onLoad={this.onLoad} style={style} />
-                </div>
+            return (
+                <Component {...remainingProps} onLoad={this.onLoad} />
             )
         }
     }
+
+    Loader.propTypes = {
+        noLoader: React.PropTypes.bool,
+        onLoad: React.PropTypes.func,
+        loaderStyle: React.PropTypes.object
+    }
+
+    return Loader;
 }
 
 export {loader as default}

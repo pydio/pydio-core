@@ -71,7 +71,7 @@ export default React.createClass({
         const working = this.state && this.state.working;
 
         return (
-            <ColorPaper zDepth={1} {...this.props} paletteIndex={0} getCloseButton={this.getCloseButton.bind(this)} >
+            <ColorPaper zDepth={1} {...this.props} paletteIndex={0} getCloseButton={this.getCloseButton} >
                 <div style={{display:'flex', alignItems: 'center', height: '100%'}}>
                     <div style={{padding: 16, fontSize: 16, width: 100}}>Drop a file here from your desktop</div>
                     <div style={{textAlign:'center', padding:18, flex:1}}>

@@ -6,7 +6,6 @@ import ConfigurableListEntry from './ConfigurableListEntry'
 import SortColumns from './SortColumns'
 import ListPaginator from './ListPaginator'
 import SimpleReactActionBar from '../SimpleReactActionBar'
-import ContextMenuNodeProviderMixin from '../menu/ContextMenuNodeProviderMixin'
 import InlineEditor from './InlineEditor'
 
 /**
@@ -14,7 +13,7 @@ import InlineEditor from './InlineEditor'
  */
 let SimpleList = React.createClass({
 
-    mixins:[MessagesConsumerMixin, ContextMenuNodeProviderMixin],
+    mixins:[MessagesConsumerMixin],
 
     propTypes:{
         infiniteSliceCount:React.PropTypes.number,
@@ -738,6 +737,7 @@ let SimpleList = React.createClass({
                 }
             }
         }.bind(this));
+
         return components;
 
     },

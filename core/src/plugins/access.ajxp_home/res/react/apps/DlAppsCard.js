@@ -89,7 +89,7 @@ const DlAppsCard = React.createClass({
     render: function(){
         let props = {...this.props};
         return (
-            <ColorPaper {...this.props} style={{...this.props.style,overflow:'visible'}} paletteIndex={1} getCloseButton={this.getCloseButton.bind(this)}>
+            <ColorPaper {...this.props} style={{...this.props.style,overflow:'visible'}} paletteIndex={1} getCloseButton={this.getCloseButton}>
                 <DlAppsPanel pydio={this.props.pydio} type="sync" iconColor={'#ffffff'}/>
                 <div style={{fontSize: 16, padding: 16, paddingTop: 0, textAlign:'center'}}>Keep your files offline with Pydio Desktop Client</div>
             </ColorPaper>

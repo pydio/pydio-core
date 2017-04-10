@@ -1,7 +1,7 @@
 import OpenNodesModel from './OpenNodesModel'
 import MainFilesList from './MainFilesList'
 import Breadcrumb from './Breadcrumb'
-import SearchForm from './SearchForm'
+import {SearchForm} from './search'
 import FilePreview from './FilePreview'
 import FSTemplate from './FSTemplate'
 import EditionPanel from './EditionPanel'
@@ -14,10 +14,10 @@ import UserWidget from './leftnav/UserWidget'
 
 import InfoPanel from './detailpanes/InfoPanel'
 import InfoPanelCard from './detailpanes/InfoPanelCard'
-import InfoGenericMultiple from './detailpanes/GenericMultiple'
-import InfoGenericFile from './detailpanes/GenericFile'
-import InfoGenericDir from './detailpanes/GenericDir'
 import InfoRootNode from './detailpanes/RootNode'
+
+import GenericInfoCard from './detailpanes/GenericInfoCard'
+import FileInfoCard from './detailpanes/FileInfoCard'
 
 const classes = {
     OpenNodesModel,
@@ -35,10 +35,9 @@ const classes = {
 
     InfoPanel,
     InfoPanelCard,
-    InfoGenericMultiple,
-    InfoGenericFile,
-    InfoGenericDir,
-    InfoRootNode
+    InfoRootNode,
+    FileInfoCard,
+    GenericInfoCard
 }
 
 export {classes as default}

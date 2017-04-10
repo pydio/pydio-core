@@ -1,6 +1,6 @@
 import MessagesProviderMixin from './MessagesProviderMixin'
 import Breadcrumb from './Breadcrumb'
-import SearchForm from './SearchForm'
+import {SearchForm} from './search'
 import MainFilesList from './MainFilesList'
 import EditionPanel from './EditionPanel'
 import InfoPanel from './detailpanes/InfoPanel'
@@ -137,20 +137,23 @@ let FSTemplate = React.createClass({
             breadcrumbStyle={paddingLeft: 0};
         }
 
+        // Making sure we only pass the style to the parent element
+        const {style, ...props} = this.props
+
         return connectDropTarget(
-            <div className={classes.join(' ')} onTouchTap={this.closeDrawer}>
-                <LeftPanel className="left-panel" pydio={this.props.pydio}/>
+            <div style={style} className={classes.join(' ')} onTouchTap={this.closeDrawer}>
+                <LeftPanel className="left-panel" pydio={props.pydio}/>
                 <div className="desktop-container vertical_layout vertical_fit">
                     <MaterialUI.Paper zDepth={1} style={styles.appBarStyle} rounded={false}>
-                        <div id="workspace_toolbar">
+                        <div id="workspace_toolbar" style={{display: "flex", justifyContent: "space-between"}}>
                             <span className="drawer-button"><MaterialUI.IconButton style={{color: 'white'}} iconClassName="mdi mdi-menu" onTouchTap={this.openDrawer}/></span>
                             {homeButton}
-                            <Breadcrumb {...this.props} startWithSeparator={homeButton?true:false} rootStyle={breadcrumbStyle}/>
-                            <SearchForm {...this.props}/>
+                            <Breadcrumb {...props} startWithSeparator={homeButton?true:false} rootStyle={breadcrumbStyle}/>
+                            <SearchForm {...props}/>
                         </div>
                         <div id="main_toolbar">
                             <PydioComponents.ButtonMenu
-                                {...this.props}
+                                {...props}
                                 buttonStyle={styles.raisedButtonStyle}
                                 buttonLabelStyle={styles.raisedButtonLabelStyle}
                                 id="create-button-menu"
@@ -158,10 +161,10 @@ let FSTemplate = React.createClass({
                                 buttonTitle="New"
                                 raised={true}
                                 secondary={true}
-                                controller={this.props.pydio.Controller}
+                                controller={props.pydio.Controller}
                             />
                             <PydioComponents.Toolbar
-                                {...this.props}
+                                {...props}
                                 id="main-toolbar"
                                 toolbars={mainToolbars}
                                 groupOtherList={mainToolbarsOthers}
@@ -170,11 +173,11 @@ let FSTemplate = React.createClass({
                             />
                             <PydioComponents.ListPaginator
                                 id="paginator-toolbar"
-                                dataModel={this.props.pydio.getContextHolder()}
+                                dataModel={props.pydio.getContextHolder()}
                                 toolbarDisplay={true}
                             />
                             <PydioComponents.Toolbar
-                                {...this.props}
+                                {...props}
                                 id="display-toolbar"
                                 toolbars={["display_toolbar"]}
                                 renderingType="icon-font"
@@ -182,21 +185,21 @@ let FSTemplate = React.createClass({
                             />
                         </div>
                     </MaterialUI.Paper>
-                    <MainFilesList ref="list" {...this.props}/>
+                    <MainFilesList ref="list" {...props}/>
                 </div>
+
                 <InfoPanel
-                    {...this.props}
-                    dataModel={this.props.pydio.getContextHolder()}
+                    {...props}
+                    dataModel={props.pydio.getContextHolder()}
                     onContentChange={this.infoPanelContentChange}
                     style={{backgroundColor:'#eceff1'}}
                 />
-                <EditionPanel {...this.props}/>
+
+                <EditionPanel {...props}/>
                 <span className="context-menu"><PydioComponents.ContextMenu/></span>
             </div>
         );
-
     }
-
 });
 
 const fileTarget = {
@@ -223,7 +226,7 @@ if(window.ReactDND){
             canDrop: monitor.canDrop()
         };
     })(FSTemplate);
-    FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropTemplate);
+    // FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropTemplate);
 }
 
 FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);

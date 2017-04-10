@@ -1,7 +1,12 @@
-const React = require('react')
-const Pydio = require('pydio')
-const {MuiThemeProvider} = require('material-ui')
-const {colors, getMuiTheme} = require('material-ui/styles')
+import React from 'react';
+import Pydio from 'pydio';
+import {colors, getMuiTheme} from 'material-ui/styles';
+import {MuiThemeProvider} from 'material-ui';
+
+let MainProvider = MuiThemeProvider
+if(window.ReactDND){
+    MainProvider = ReactDND.DragDropContext(ReactDND.HTML5Backend)(MainProvider);
+}
 
 export default function(PydioComponent, pydio){
 
@@ -47,9 +52,9 @@ export default function(PydioComponent, pydio){
             const theme = getMuiTheme(themeCusto);
 
             return (
-                <MuiThemeProvider muiTheme={theme}>
+                <MainProvider muiTheme={theme}>
                     <PydioComponent {...this.props}/>
-                </MuiThemeProvider>
+                </MainProvider>
             );
         }
 
@@ -72,5 +77,4 @@ export default function(PydioComponent, pydio){
     };
 
     return Wrapped;
-
 }

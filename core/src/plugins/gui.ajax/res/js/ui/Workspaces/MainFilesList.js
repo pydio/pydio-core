@@ -1,12 +1,12 @@
 import FilePreview from './FilePreview'
 
-class ComponentConfigsParser{
+class ComponentConfigsParser {
 
-    constructor(){
+    constructor() {
 
     }
 
-    getDefaultListColumns(){
+    getDefaultListColumns() {
         return {
             text:{
                 label:'File Name',
@@ -36,7 +36,7 @@ class ComponentConfigsParser{
         };
     }
 
-    loadConfigs(componentName){
+    loadConfigs(componentName) {
         let configs = new Map();
         let columnsNodes = XMLUtils.XPathSelectNodes(global.pydio.getXmlRegistry(), 'client_configs/component_config[@className="FilesList"]/columns/column|client_configs/component_config[@className="FilesList"]/columns/additional_column');
         let columns = {};
@@ -186,7 +186,7 @@ let MainFilesList = React.createClass({
          if(node.isLeaf()){
          return null;
          let pushNodeToEditor = function(){
-         
+
          };
          return <ReactMUI.FontIcon className="icon-ellipsis-vertical" tooltip="Info" onClick={pushNodeToEditor}/>;
          }else{

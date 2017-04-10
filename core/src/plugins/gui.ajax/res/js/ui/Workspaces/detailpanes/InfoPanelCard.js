@@ -49,7 +49,7 @@ let InfoPanelCard = React.createClass({
         }
 
         return (
-            <MaterialUI.Paper zDepth={1} className="panelCard" style={styles.card}>
+            <MaterialUI.Paper zDepth={1} className="panelCard" style={{...this.props.style, ...styles.card}}>
                 {title}
                 <div className="panelContent" style={this.props.contentStyle}>
                     {this.props.children}

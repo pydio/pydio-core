@@ -187,7 +187,7 @@
             }.bind(this));
 
             return (
-                <PydioWorkspaces.InfoPanelCard title={this.props.pydio.MessageHash['meta.comments.1']} icon="comment-outline" iconColor="#795548">
+                <PydioWorkspaces.InfoPanelCard style={this.props.style} title={this.props.pydio.MessageHash['meta.comments.1']} icon="comment-outline" iconColor="#795548">
                     <div style={{maxHeight: 300, overflowY: 'auto', overflowX:'hidden'}} ref="comments" className="comments_feed">
                         {comments}
                     </div>

@@ -321,7 +321,7 @@ kbd {
 div.dialogBox div#element_overlay {
   background-color: #252525;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: none;
 }
 #element_overlay img {
   margin-top: 30%;
@@ -629,7 +629,7 @@ div.treeCopyContainer div.selected-webfx-tree-item-inactive a {
   line-height: 22px;
 }
 .react-mui-context .material-list.main-file-list .material-list-entry.material-list-entry-2-lines .material-list-line-2 span.metadata_chunk {
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   opacity: 0;
   color: rgba(0, 0, 0, 0.23);
 }
@@ -1329,7 +1329,7 @@ div.shadow_class {
   height: 32px;
   margin-left: 8px;
   padding: 2px 8px;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   cursor: pointer;
 }
 .dialogBox .dialogContent .dialogButtons .dialogButton:focus {
@@ -1945,7 +1945,7 @@ div#upload_files_list > div div.uploader-pgbar {
   background-color: #009688;
   height: 2px;
   width: 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 div#upload_files_list > div.section-processed,
 div#upload_files_list > div.header {
@@ -2256,7 +2256,7 @@ div#multiple_download_container div div a:hover {
   margin-top: 4px;
   text-transform: uppercase;
   margin-left: 2px;
-  transition: background-color 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 .action_bar.editor_action_bar a:hover {
   background-color: rgba(255, 255, 255, 0.65);
@@ -2633,7 +2633,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
   right: 5px;
   font-size: 9px;
   cursor: default;
-  transition: opacity ease 0.5s;
+  transition: none;
 }
 #search_container.search_active div#search_form input {
   width: 100%;
@@ -2674,7 +2674,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
   border: 0 #f5f5f5;
   text-align: right;
   padding-right: 30px;
-  transition: border-color 0.5s ease, width 0.5s ease;
+  transition: none;
   border-radius: 0;
 }
 #search_container #search_form a {
@@ -2687,7 +2687,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
   position: absolute;
   right: 9px;
   top: 21px;
-  transition: font-size ease 0.5s, top ease 0.5s, right ease 0.5s;
+  transition: none;
 }
 #search_container #search_form a.disabled {
   display: none;
@@ -2758,7 +2758,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
 }
 #search_container #search_results_cont #basic_search span.toggle_button.open,
 #search_container #search_results_cont #basic_search span.toggle_button.close {
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   display: inline-block;
   padding: 5px 16px;
   font-weight: 500;
@@ -2901,7 +2901,7 @@ div.multiple_selection_draggable.selection_ctrl_key:before {
   width: 0;
   overflow: hidden;
   margin-left: 0;
-  transition: width 1s ease, margin-left 1s ease;
+  transition: none;
   margin-top: -62px;
   position: relative;
 }
@@ -3111,7 +3111,7 @@ span.toggleHeader {
   white-space: nowrap;
   text-overflow: ellipsis;
   padding: 10px 17px 6px;
-  transition: border-color 0.3s ease;
+  transition: none;
   color: #555;
   font-size: 12px;
   border-bottom: 3px solid #ff5722;
@@ -3425,7 +3425,7 @@ div.horizontal_tabulator > div > div.horizontal_tabulator div.tabulatorContainer
 }
 .breadcrumbs-one span.reduced:hover {
   padding: 20px 15px 20px 35px;
-  transition: padding 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   width: auto;
 }
 .breadcrumbs-one span.reduced:hover em {
@@ -5168,7 +5168,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 #info_panel .infopanel_loading,
 .form-ip_content_info_panel .infopanel_loading {
   opacity: 0;
-  transition: opacity ease 0.1s;
+  transition: none;
 }
 #info_panel .infopanel_loading_finished,
 .form-ip_content_info_panel .infopanel_loading_finished {
@@ -5422,7 +5422,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   color: #dddddd;
   overflow-y: auto;
   box-sizing: border-box;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 .left-panel * {
@@ -5433,7 +5433,7 @@ div.menu.rootDirChooser span.rootDirTitle {
   font-weight: 500;
   border-top: 1px solid rgba(221, 221, 221, 0.3);
   margin-top: 10px;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5610,7 +5610,7 @@ div.menu.rootDirChooser span.rootDirTitle {
 }
 .left-panel .simple-provider .icon-refresh {
   cursor: pointer;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 .left-panel .simple-provider .icon-refresh.rotating {
   opacity: 0.2;
@@ -5643,7 +5643,7 @@ div.pydio-tasks-panel {
   background-color: white;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
   z-index: 20001;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 div.pydio-tasks-panel.invisible {
   right: -361px;
@@ -5914,8 +5914,8 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component__main-icon--resting {
   -webkit-transform: scale(1) rotate(360deg);
   transform: scale(1) rotate(360deg);
-  transition: -webkit-transform 150ms cubic-bezier(0.4, 0, 1, 1);
-  transition: transform 150ms cubic-bezier(0.4, 0, 1, 1);
+  transition: none;
+  transition: none;
 }
 .mfb-component__child-icon,
 .mfb-component__child-icon {
@@ -5950,7 +5950,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--tl.mfb-slidein .mfb-component__list li,
 .mfb-component--tr.mfb-slidein .mfb-component__list li {
   opacity: 0;
-  transition: all 0.5s;
+  transition: none;
 }
 .mfb-component--tl.mfb-slidein[data-mfb-toggle="hover"]:hover .mfb-component__list li,
 .mfb-component--tl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li,
@@ -5989,7 +5989,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--bl.mfb-slidein .mfb-component__list li,
 .mfb-component--br.mfb-slidein .mfb-component__list li {
   opacity: 0;
-  transition: all 0.5s;
+  transition: none;
 }
 .mfb-component--bl.mfb-slidein[data-mfb-toggle="hover"]:hover .mfb-component__list li,
 .mfb-component--bl.mfb-slidein[data-mfb-state="open"] .mfb-component__list li,
@@ -6034,7 +6034,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--tl.mfb-slidein-spring .mfb-component__list li,
 .mfb-component--tr.mfb-slidein-spring .mfb-component__list li {
   opacity: 0;
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: none;
 }
 .mfb-component--tl.mfb-slidein-spring[data-mfb-toggle="hover"]:hover .mfb-component__list li,
 .mfb-component--tl.mfb-slidein-spring[data-mfb-state="open"] .mfb-component__list li,
@@ -6073,7 +6073,7 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--bl.mfb-slidein-spring .mfb-component__list li,
 .mfb-component--br.mfb-slidein-spring .mfb-component__list li {
   opacity: 0;
-  transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transition: none;
 }
 .mfb-component--bl.mfb-slidein-spring[data-mfb-toggle="hover"]:hover .mfb-component__list li,
 .mfb-component--bl.mfb-slidein-spring[data-mfb-state="open"] .mfb-component__list li,
@@ -6124,28 +6124,28 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--tr.mfb-zoomin .mfb-component__list li:nth-child(1) {
   -webkit-transform: translateY(70px) scale(0);
   transform: translateY(70px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.15s;
 }
 .mfb-component--tl.mfb-zoomin .mfb-component__list li:nth-child(2),
 .mfb-component--tr.mfb-zoomin .mfb-component__list li:nth-child(2) {
   -webkit-transform: translateY(140px) scale(0);
   transform: translateY(140px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.1s;
 }
 .mfb-component--tl.mfb-zoomin .mfb-component__list li:nth-child(3),
 .mfb-component--tr.mfb-zoomin .mfb-component__list li:nth-child(3) {
   -webkit-transform: translateY(210px) scale(0);
   transform: translateY(210px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.05s;
 }
 .mfb-component--tl.mfb-zoomin .mfb-component__list li:nth-child(4),
 .mfb-component--tr.mfb-zoomin .mfb-component__list li:nth-child(4) {
   -webkit-transform: translateY(280px) scale(0);
   transform: translateY(280px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0s;
 }
 .mfb-component--tl.mfb-zoomin[data-mfb-toggle="hover"]:hover .mfb-component__list li:nth-child(1),
@@ -6189,28 +6189,28 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--br.mfb-zoomin .mfb-component__list li:nth-child(1) {
   -webkit-transform: translateY(-70px) scale(0);
   transform: translateY(-70px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.15s;
 }
 .mfb-component--bl.mfb-zoomin .mfb-component__list li:nth-child(2),
 .mfb-component--br.mfb-zoomin .mfb-component__list li:nth-child(2) {
   -webkit-transform: translateY(-140px) scale(0);
   transform: translateY(-140px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.1s;
 }
 .mfb-component--bl.mfb-zoomin .mfb-component__list li:nth-child(3),
 .mfb-component--br.mfb-zoomin .mfb-component__list li:nth-child(3) {
   -webkit-transform: translateY(-210px) scale(0);
   transform: translateY(-210px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.05s;
 }
 .mfb-component--bl.mfb-zoomin .mfb-component__list li:nth-child(4),
 .mfb-component--br.mfb-zoomin .mfb-component__list li:nth-child(4) {
   -webkit-transform: translateY(-280px) scale(0);
   transform: translateY(-280px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0s;
 }
 .mfb-component--bl.mfb-zoomin[data-mfb-toggle="hover"]:hover .mfb-component__list li:nth-child(1),
@@ -6259,28 +6259,28 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--tr.mfb-fountain .mfb-component__list li:nth-child(1) {
   -webkit-transform: translateY(-70px) scale(0);
   transform: translateY(-70px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.15s;
 }
 .mfb-component--tl.mfb-fountain .mfb-component__list li:nth-child(2),
 .mfb-component--tr.mfb-fountain .mfb-component__list li:nth-child(2) {
   -webkit-transform: translateY(-140px) scale(0);
   transform: translateY(-140px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.1s;
 }
 .mfb-component--tl.mfb-fountain .mfb-component__list li:nth-child(3),
 .mfb-component--tr.mfb-fountain .mfb-component__list li:nth-child(3) {
   -webkit-transform: translateY(-210px) scale(0);
   transform: translateY(-210px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.05s;
 }
 .mfb-component--tl.mfb-fountain .mfb-component__list li:nth-child(4),
 .mfb-component--tr.mfb-fountain .mfb-component__list li:nth-child(4) {
   -webkit-transform: translateY(-280px) scale(0);
   transform: translateY(-280px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0s;
 }
 .mfb-component--tl.mfb-fountain[data-mfb-toggle="hover"]:hover .mfb-component__list li:nth-child(1),
@@ -6324,28 +6324,28 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
 .mfb-component--br.mfb-fountain .mfb-component__list li:nth-child(1) {
   -webkit-transform: translateY(70px) scale(0);
   transform: translateY(70px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.15s;
 }
 .mfb-component--bl.mfb-fountain .mfb-component__list li:nth-child(2),
 .mfb-component--br.mfb-fountain .mfb-component__list li:nth-child(2) {
   -webkit-transform: translateY(140px) scale(0);
   transform: translateY(140px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.1s;
 }
 .mfb-component--bl.mfb-fountain .mfb-component__list li:nth-child(3),
 .mfb-component--br.mfb-fountain .mfb-component__list li:nth-child(3) {
   -webkit-transform: translateY(210px) scale(0);
   transform: translateY(210px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0.05s;
 }
 .mfb-component--bl.mfb-fountain .mfb-component__list li:nth-child(4),
 .mfb-component--br.mfb-fountain .mfb-component__list li:nth-child(4) {
   -webkit-transform: translateY(280px) scale(0);
   transform: translateY(280px) scale(0);
-  transition: all 0.5s;
+  transition: none;
   transition-delay: 0s;
 }
 .mfb-component--bl.mfb-fountain[data-mfb-toggle="hover"]:hover .mfb-component__list li:nth-child(1),
@@ -6401,13 +6401,13 @@ div.pydio-tasks-panel div.task.task-status-8 .task_actions > span {
   position: absolute;
   top: 50%;
   margin-top: -10.5px;
-  transition: all 0.5s;
+  transition: none;
 }
 [data-mfb-toggle="hover"] [data-mfb-label]:hover:after,
 [data-mfb-state="open"] [data-mfb-label]:after {
   content: attr(data-mfb-label);
   opacity: 1;
-  transition: all 0.3s;
+  transition: none;
 }
 /*------------------------------------*\
     #LABELS | Modifiers
@@ -6614,8 +6614,8 @@ div.form-reset-password-ask div.dialogContent {
   height: 100%;
   background-color: transparent;
   color: white;
-  transition: padding-top 0.5s;
-  -webkit-transition: padding-top 0.5s;
+  transition: none;
+  -webkit-transition: none;
 }
 div.form-login_form div.dialogContent select#language_selector,
 div.form-login_form_dynamic div.dialogContent select#language_selector,
@@ -6958,7 +6958,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 .toolbars_buttons_mixin:hover {
   background-color: rgba(255, 255, 255, 0.9);
@@ -6977,7 +6977,7 @@ div.dialogButtons.inlineEdition input {
   padding: 5px 8px;
   display: inline-block;
   margin: 0 2px 0 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   border-radius: 50%;
   width: 27px;
   height: 27px;
@@ -7118,7 +7118,7 @@ div.dialogButtons.inlineEdition input {
   padding: 5px 8px;
   display: inline-block;
   margin: 0 2px 0 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   border-radius: 50%;
   width: 27px;
   height: 27px;
@@ -7221,7 +7221,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   margin-right: 5px;
   background-color: transparent;
 }
@@ -7285,7 +7285,7 @@ div.dialogButtons.inlineEdition input {
   display: inline-block;
   text-align: center;
   margin: 0 2px 0 0;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   overflow: visible;
   outline: none;
   float: left;
@@ -7378,7 +7378,7 @@ div.dialogButtons.inlineEdition input {
   border-right: 2px solid #333;
   height: 20px;
   width: 15px;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
   position: relative;
 }
 #repo_chooser span.badge-icon {
@@ -7391,7 +7391,7 @@ div.dialogButtons.inlineEdition input {
   padding: 2px 2px;
   border-radius: 7px;
   color: #fff;
-  transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transition: none;
 }
 #repo_chooser.disabled {
   display: none;
@@ -7524,7 +7524,7 @@ div.dialogButtons.inlineEdition input {
 }
 #browser #cpane_container #cpane_tabs > div.tabulatorContainer {
   border-bottom: 0;
-  /*transition: height 0.5s ease;*/
+  /*transition: none;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
   background-color: #f7f7f7;
 }
