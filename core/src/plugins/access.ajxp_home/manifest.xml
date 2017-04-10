@@ -3,7 +3,7 @@
 	<client_settings icon="plugins/access.ajxp_home/share.png">
 		<resources>
 			<i18n namespace="user_home" path="plugins/access.ajxp_home/res/i18n" />
-            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,PydioComponents,PydioWorkspaces"/>
+            <js className="WelcomeComponents" file="plugins/access.ajxp_home/res/build/WelcomeComponents.js" depends="React,PydioComponents,PydioWorkspaces,PydioForm"/>
             <css file="plugins/access.ajxp_home/res/home.css" autoload="true"/>
 		</resources>
         <node_provider ajxpClass="EmptyNodeProvider" ajxpOptions="{}"/>

@@ -23,6 +23,7 @@ export default React.createClass({
         onDrop: React.PropTypes.func.isRequired,
         size: React.PropTypes.number,
         style: React.PropTypes.object,
+        dragActiveStyle: React.PropTypes.object,
         supportClick: React.PropTypes.bool,
         accept: React.PropTypes.string,
         multiple: React.PropTypes.bool
@@ -102,7 +103,10 @@ export default React.createClass({
             //borderStyle: this.state.isDragActive ? "solid" : "dashed"
         };
         if(this.props.style){
-            style = Object.assign(style, this.props.style);
+            style = {...style, ...this.props.style};
+        }
+        if(this.state.isDragActive && this.props.dragActiveStyle){
+            style = {...style, ...this.props.dragActiveStyle};
         }
         let folderInput;
         if(this.props.enableFolders){
@@ -110,7 +114,7 @@ export default React.createClass({
         }
         return (
             <div className={className} style={style} onClick={this.onClick} onDragLeave={this.onDragLeave} onDragOver={this.onDragOver} onDrop={this.onDrop}>
-                <input style={{display:'none'}} name="userfile" type="file" multiple={this.props.multiple} ref="fileInput" onChange={this.onDrop} accept={this.props.accept}/>
+                <input style={{display:'none'}} name="userfile" type="file" multiple={this.props.multiple} ref="fileInput" value={""} onChange={this.onDrop} accept={this.props.accept}/>
                 {folderInput}
                 {this.props.children}
             </div>

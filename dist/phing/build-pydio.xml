@@ -675,13 +675,30 @@
     </target>
 
     <target name="grunt">
+
         <if>
             <available file="${plugin_abs_dir}/package.json"/>
             <then>
+                <pydio-read-package-json file="${plugin_abs_dir}/package.json"/>
+                <if>
+                    <not><equals arg1="${pydio_dependency}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <!-- BUILD JAVASCRIPT -->
+                        <exec command="npm install" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true"/>
+                        <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true"/>
+                    </then>
+                </if>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
                 <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
+                <if>
+                    <not><equals arg1="${pydio_dependency}" arg2="__NOT_FOUND__"/></not>
+                    <then>
+                        <!-- DELETE DEPENDENCY NODE MODULE -->
+                        <delete dir="${plugin_abs_dir}/../${pydio_dependency}/node_modules"/>
+                    </then>
+                </if>
             </then>
         </if>
     </target>

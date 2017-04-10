@@ -28,7 +28,7 @@
                 <div id="installer_form" style={{fontSize:13, paddingBottom:24}}>
                     <img className="install_pydio_logo" src={this.props.logoSrc} style={{display:'block', margin:'20px auto', maxHeight:180}}/>
                     <div className="installerWelcome" dangerouslySetInnerHTML={this.getDangerousHtmlLanguage('installer.3')}/>
-                    <MaterialUI.SelectField floatingLabelText="Pick your language" value={currentLanguage} onChange={this.switchLanguage}>
+                    <MaterialUI.SelectField fullWidth={true} floatingLabelText="Pick your language" value={currentLanguage} onChange={this.switchLanguage}>
                         {languages}
                     </MaterialUI.SelectField>
                 </div>
@@ -190,12 +190,20 @@
             const {minorStep} = this.state;
             let LAST_STEP = (minorStep === this.state.groups.size - 1);
             let forwardLabel = 'Next';
+            let forwardPrimary = true;
+            let forwardSecondary = false;
             let nextDisabled = !this.state.groups.get(groupKey).valid;
             let nextCallback = this.handleNext.bind(this);
 
             if(this.state.groups.get(groupKey).switches.indexOf('dibi_provider') > -1 && !this.state.dbTestSuccessfully){
                 nextDisabled = this.checkDBPanelValidity();
-                forwardLabel = this.state.dbTestFailed ? "Cannot connect, try again" : "Test DB Connection";
+                if(this.state.dbTestFailed){
+                    forwardLabel = 'Connection Failed!';
+                    forwardSecondary = true;
+                    forwardPrimary = false;
+                }else{
+                    forwardLabel = 'Test DB Connection';
+                }
                 nextCallback = function(){
                     let testValues = this.refs['form-' + groupKey].getValuesForPOST(this.props.parentState.values);
                     this.testDBConnection(testValues);
@@ -215,15 +223,18 @@
 
             return (
                 <div style={{margin: '12px 0'}}>
-                    <MaterialUI.RaisedButton
-                        label={forwardLabel}
-                        disableTouchRipple={true}
-                        disableFocusRipple={true}
-                        primary={true}
-                        onTouchTap={nextCallback}
-                        style={{marginRight: 12}}
-                        disabled={nextDisabled}
-                    />
+                    {!LAST_STEP &&
+                        <MaterialUI.RaisedButton
+                            label={forwardLabel}
+                            disableTouchRipple={true}
+                            disableFocusRipple={true}
+                            primary={forwardPrimary}
+                            secondary={forwardSecondary}
+                            onTouchTap={nextCallback}
+                            style={{marginRight: 12}}
+                            disabled={nextDisabled}
+                        />
+                    }
                     {step > 0 && (
                         <MaterialUI.FlatButton
                             label="Back"
@@ -241,7 +252,7 @@
 
             if(!this.state.parameters){
 
-                return <PydioReactUI.Loader style={{minHeight: 500}}/>;
+                return <PydioReactUI.Loader style={{minHeight: 400}}/>;
 
             }
 
@@ -319,7 +330,7 @@
 
             if(!this.state.INSTALLED){
 
-                return <PydioReactUI.Loader/>
+                return <PydioReactUI.Loader style={{minHeight: 400}}/>;
 
             }else  if(this.state.HTACCESS_NOTIF){
 
@@ -348,7 +359,7 @@
             return {
                 dialogTitle: "Welcome to Pydio",
                 dialogIsModal: true,
-                dialogSize:'lg',
+                dialogSize:'md',
                 dialogScrollBody:true,
                 majorSteps: [
                     {componentClass: WelcomeScreen, button: "Start Configuration"},
@@ -369,6 +380,9 @@
             if(this.props.modalData && this.props.modalData.modal){
                 this.props.modalData.modal.initModalFromComponent(this);
             }
+            if(this._buttonsUpdater){
+                this._buttonsUpdater(this.getButtons());
+            }
         },
 
         updateMajorStep: function(){
@@ -376,8 +390,11 @@
             this.setState({majorStep: majorStep + 1}, () => {this.refreshModal()});
         },
 
-        getButtons: function(){
+        getButtons: function(buttonsUpdater = null){
 
+            if(buttonsUpdater){
+                this._buttonsUpdater = buttonsUpdater;
+            }
             const {button} = this.props.majorSteps[this.state.majorStep];
             if(!button){
                 return [];

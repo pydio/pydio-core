@@ -827,11 +827,8 @@
 .react-mui-context .mui-checkbox .mui-checkbox-icon .mui-checkbox-check {
   position: absolute;
   opacity: 0;
-  -webkit-transform: scale(0);
-          transform: scale(0);
-  -webkit-transform-origin: 50% 50%;
-          transform-origin: 50% 50%;
-  transition: opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, -webkit-transform 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms;
+  transform: scale(0);
+  transform-origin: 50% 50%;
   transition: opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms;
 }
 .react-mui-context .mui-checkbox .mui-checkbox-icon .mui-checkbox-check * {
@@ -847,11 +844,8 @@
 .react-mui-context .mui-checkbox.mui-is-switched .mui-checkbox-icon .mui-checkbox-check {
   transition: all 0.45s cubic-bezier(0.23, 1, 0.32, 1) 0s;
   opacity: 1;
-  -webkit-transform: scale(1);
-          transform: scale(1);
-  -webkit-transform-origin: 50% 50%;
-          transform-origin: 50% 50%;
-  transition: opacity 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, -webkit-transform 800ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transform: scale(1);
+  transform-origin: 50% 50%;
   transition: opacity 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 800ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-checkbox.mui-is-switched .mui-checkbox-icon .mui-checkbox-box {
@@ -1042,8 +1036,7 @@
   width: 32px;
   opacity: 0;
   border-radius: 50%;
-  -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-date-picker-day-button .mui-date-picker-day-button-label {
@@ -1054,8 +1047,7 @@
 }
 .react-mui-context .mui-date-picker-day-button.mui-is-selected .mui-date-picker-day-button-select {
   opacity: 1;
-  -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
 }
 .react-mui-context .mui-date-picker-day-button.mui-is-disabled {
   color: rgba(0, 0, 0, 0.3);
@@ -1098,8 +1090,7 @@
 .react-mui-context .mui-dialog-window.mui-is-shown .mui-dialog-window-contents {
   opacity: 1;
   top: 0px;
-  -webkit-transform: translate3d(0, 64px, 0);
-          transform: translate3d(0, 64px, 0);
+  transform: translate3d(0, 64px, 0);
 }
 .react-mui-context .mui-dialog .mui-dialog-title {
   padding: 24px 24px 0 24px;
@@ -1277,8 +1268,7 @@
   overflow: hidden;
 }
 .react-mui-context .mui-enhanced-textarea .mui-enhanced-textarea-shadow {
-  -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
   position: absolute;
 }
 .react-mui-context .mui-flat-button {
@@ -1303,8 +1293,7 @@
   min-width: 88px;
   padding: 0;
   margin: 0;
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-flat-button .mui-touch-ripple .mui-ripple-circle-inner {
   background-color: rgba(0, 0, 0, 0.1);
@@ -1369,8 +1358,7 @@
   border-radius: 50%;
   text-align: center;
   vertical-align: bottom;
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-floating-action-button .mui-floating-action-button-container.mui-is-disabled {
   background-color: #e6e6e6;
@@ -1442,29 +1430,15 @@
   box-shadow: 0px 0px 0px 1px rgba(0, 0, 0, 0.1);
   border: solid 6px rgba(0, 0, 0, 0);
   background-clip: padding-box;
-  -webkit-animation: icon-button-focus-ripple-pulsate 1.5s ease 0s infinite;
-          animation: icon-button-focus-ripple-pulsate 1.5s ease 0s infinite;
-}
-@-webkit-keyframes icon-button-focus-ripple-pulsate {
-  0%,
-  100% {
-    -webkit-transform: scale(0.75);
-            transform: scale(0.75);
-  }
-  50% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
-  }
+  animation: icon-button-focus-ripple-pulsate 1.5s ease 0s infinite;
 }
 @keyframes icon-button-focus-ripple-pulsate {
   0%,
   100% {
-    -webkit-transform: scale(0.75);
-            transform: scale(0.75);
+    transform: scale(0.75);
   }
   50% {
-    -webkit-transform: scale(1);
-            transform: scale(1);
+    transform: scale(1);
   }
 }
 .react-mui-context .mui-icon-button .mui-icon-button-tooltip {
@@ -1717,8 +1691,7 @@
   color: rgba(0, 0, 0, 0.87);
 }
 .react-mui-context .mui-left-nav.mui-closed .mui-left-nav-menu {
-  -webkit-transform: translate3d(-266px, 0, 0);
-          transform: translate3d(-266px, 0, 0);
+  transform: translate3d(-266px, 0, 0);
 }
 .react-mui-context .mui-menu {
   background-color: #ffffff;
@@ -1886,10 +1859,8 @@
 .react-mui-context .mui-radio-button .mui-radio-button-icon .mui-radio-button-fill {
   position: absolute;
   opacity: 0;
-  -webkit-transform: scale(0);
-          transform: scale(0);
-  -webkit-transform-origin: 50% 50%;
-          transform-origin: 50% 50%;
+  transform: scale(0);
+  transform-origin: 50% 50%;
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-radio-button .mui-radio-button-icon .mui-radio-button-fill * {
@@ -1899,8 +1870,7 @@
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   position: absolute;
   opacity: 1;
-  -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
 }
 .react-mui-context .mui-radio-button .mui-radio-button-icon .mui-radio-button-target * {
   fill: rgba(0, 0, 0, 0.87);
@@ -1908,13 +1878,11 @@
 }
 .react-mui-context .mui-radio-button.mui-is-switched .mui-radio-button-icon .mui-radio-button-fill {
   opacity: 1;
-  -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
 }
 .react-mui-context .mui-radio-button.mui-is-switched .mui-radio-button-icon .mui-radio-button-target {
   opacity: 0;
-  -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
 }
 .react-mui-context .mui-radio-button.mui-is-switched .mui-radio-button-icon .mui-radio-button-target * {
   fill: #009688;
@@ -1943,8 +1911,7 @@
   overflow: hidden;
   border-radius: 2px;
   background-color: #ffffff;
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-raised-button .mui-raised-button-container.mui-is-keyboard-focused {
   background-color: #e6e6e6;
@@ -2028,8 +1995,7 @@
   top: 0;
   left: 0;
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
-  -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
   opacity: 0;
 }
 .react-mui-context .mui-focus-ripple .mui-focus-ripple-inner {
@@ -2038,34 +2004,19 @@
   width: 100%;
   border-radius: 50%;
   background-color: rgba(0, 0, 0, 0.1);
-  -webkit-animation: focus-ripple-pulsate 1.5s ease 0s infinite;
-          animation: focus-ripple-pulsate 1.5s ease 0s infinite;
-}
-@-webkit-keyframes focus-ripple-pulsate {
-  0%,
-  100% {
-    -webkit-transform: scale(0.75);
-            transform: scale(0.75);
-  }
-  50% {
-    -webkit-transform: scale(0.85);
-            transform: scale(0.85);
-  }
+  animation: focus-ripple-pulsate 1.5s ease 0s infinite;
 }
 @keyframes focus-ripple-pulsate {
   0%,
   100% {
-    -webkit-transform: scale(0.75);
-            transform: scale(0.75);
+    transform: scale(0.75);
   }
   50% {
-    -webkit-transform: scale(0.85);
-            transform: scale(0.85);
+    transform: scale(0.85);
   }
 }
 .react-mui-context .mui-focus-ripple.mui-is-shown {
-  -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
   opacity: 1;
 }
 .react-mui-context .mui-ripple-circle {
@@ -2081,18 +2032,15 @@
   height: 100%;
   width: 100%;
   border-radius: 50%;
-  -webkit-transform: scale(0);
-          transform: scale(0);
+  transform: scale(0);
   background-color: rgba(0, 0, 0, 0.2);
-  transition: -webkit-transform 1s cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-ripple-circle.mui-is-started {
   opacity: 1;
 }
 .react-mui-context .mui-ripple-circle.mui-is-started .mui-ripple-circle-inner {
-  -webkit-transform: scale(1);
-          transform: scale(1);
+  transform: scale(1);
 }
 .react-mui-context .mui-ripple-circle.mui-is-ending {
   opacity: 0;
@@ -2155,8 +2103,7 @@
   margin: 1px 0 0 0;
   background-clip: padding-box;
   border-radius: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   transition: border 450ms cubic-bezier(0.23, 1, 0.32, 1), width 450ms cubic-bezier(0.23, 1, 0.32, 1), height 450ms cubic-bezier(0.23, 1, 0.32, 1);
   width: 12px;
   height: 12px;
@@ -2240,9 +2187,7 @@
   margin-left: 24px;
   left: -10000px;
   opacity: 0;
-  -webkit-transform: translate3d(0, 20px, 0);
-          transform: translate3d(0, 20px, 0);
-  transition: left 0ms cubic-bezier(0.23, 1, 0.32, 1) 400ms, opacity 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, -webkit-transform 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transform: translate3d(0, 20px, 0);
   transition: left 0ms cubic-bezier(0.23, 1, 0.32, 1) 400ms, opacity 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-snackbar .mui-snackbar-action {
@@ -2256,9 +2201,7 @@
 .react-mui-context .mui-snackbar.mui-is-open {
   left: 0;
   opacity: 1;
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
-  transition: left 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, -webkit-transform 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transform: translate3d(0, 0, 0);
   transition: left 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 400ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-subheader {
@@ -2406,14 +2349,12 @@
 .react-mui-context .mui-text-field .mui-text-field-focus-underline {
   border-color: #009688;
   border-bottom-width: 2px;
-  -webkit-transform: scaleX(0);
-          transform: scaleX(0);
+  transform: scaleX(0);
   transition: all 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-text-field.mui-has-error .mui-text-field-focus-underline {
   border-color: #f44336;
-  -webkit-transform: scaleX(1);
-          transform: scaleX(1);
+  transform: scaleX(1);
 }
 .react-mui-context .mui-text-field.mui-has-value .mui-text-field-hint {
   opacity: 0;
@@ -2433,18 +2374,15 @@
   color: rgba(0, 0, 0, 0.3);
 }
 .react-mui-context .mui-text-field.mui-is-focused .mui-text-field-focus-underline {
-  -webkit-transform: scaleX(1);
-          transform: scaleX(1);
+  transform: scaleX(1);
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels {
   height: 72px;
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels .mui-text-field-floating-label {
   top: 24px;
-  -webkit-transform: scale(1) translate3d(0, 0, 0);
-          transform: scale(1) translate3d(0, 0, 0);
-  -webkit-transform-origin: left top;
-          transform-origin: left top;
+  transform: scale(1) translate3d(0, 0, 0);
+  transform-origin: left top;
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels .mui-text-field-hint {
   top: 24px;
@@ -2455,8 +2393,7 @@
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels.mui-has-value .mui-text-field-floating-label,
 .react-mui-context .mui-text-field.mui-has-floating-labels.mui-is-focused .mui-text-field-floating-label {
-  -webkit-transform: scale(0.75) translate3d(0, -18px, 0);
-          transform: scale(0.75) translate3d(0, -18px, 0);
+  transform: scale(0.75) translate3d(0, -18px, 0);
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels.mui-has-value .mui-text-field-floating-label {
   color: rgba(0, 0, 0, 0.5);
@@ -2468,8 +2405,7 @@
   opacity: 1;
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels.mui-is-focused .mui-text-field-floating-label {
-  -webkit-transform: scale(0.75) translate3d(0, -18px, 0);
-          transform: scale(0.75) translate3d(0, -18px, 0);
+  transform: scale(0.75) translate3d(0, -18px, 0);
   color: #009688;
 }
 .react-mui-context .mui-text-field.mui-has-floating-labels.mui-is-focused.mui-has-error .mui-text-field-floating-label {
@@ -2624,7 +2560,6 @@
       -ms-user-select: none;
           user-select: none;
   opacity: 0;
-  transition: top 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms, -webkit-transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   transition: top 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms, transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-tooltip .mui-tooltip-label {
@@ -2635,8 +2570,7 @@
   position: absolute;
   left: 50%;
   top: 0px;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   border-radius: 50%;
   background-color: transparent;
   transition: width 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms, height 0ms cubic-bezier(0.23, 1, 0.32, 1) 450ms, background-color 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
@@ -2644,9 +2578,7 @@
 .react-mui-context .mui-tooltip.mui-is-shown {
   top: -16px;
   opacity: 1;
-  -webkit-transform: translate3d(0px, 16px, 0px);
-          transform: translate3d(0px, 16px, 0px);
-  transition: top 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, -webkit-transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
+  transform: translate3d(0px, 16px, 0px);
   transition: top 0ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, transform 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms, opacity 450ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
 }
 .react-mui-context .mui-tooltip.mui-is-shown .mui-tooltip-ripple {
@@ -2688,68 +2620,52 @@
   opacity: 0;
 }
 .react-mui-context .mui-transition-slide-in.mui-is-left .mui-transition-slide-in-enter {
-  -webkit-transform: translate3d(100%, 0, 0);
-          transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-left .mui-transition-slide-in-enter-active {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-left .mui-transition-slide-in-leave {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-left .mui-transition-slide-in-leave-active {
-  -webkit-transform: translate3d(-100%, 0, 0);
-          transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-right .mui-transition-slide-in-enter {
-  -webkit-transform: translate3d(-100%, 0, 0);
-          transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-right .mui-transition-slide-in-enter-active {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-right .mui-transition-slide-in-leave {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-right .mui-transition-slide-in-leave-active {
-  -webkit-transform: translate3d(100%, 0, 0);
-          transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-up .mui-transition-slide-in-enter {
-  -webkit-transform: translate3d(0, 100%, 0);
-          transform: translate3d(0, 100%, 0);
+  transform: translate3d(0, 100%, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-up .mui-transition-slide-in-enter-active {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-up .mui-transition-slide-in-leave {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-up .mui-transition-slide-in-leave-active {
-  -webkit-transform: translate3d(0, -100%, 0);
-          transform: translate3d(0, -100%, 0);
+  transform: translate3d(0, -100%, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-down .mui-transition-slide-in-enter {
-  -webkit-transform: translate3d(0, -100%, 0);
-          transform: translate3d(0, -100%, 0);
+  transform: translate3d(0, -100%, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-down .mui-transition-slide-in-enter-active {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-down .mui-transition-slide-in-leave {
-  -webkit-transform: translate3d(0, 0, 0);
-          transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
 }
 .react-mui-context .mui-transition-slide-in.mui-is-down .mui-transition-slide-in-leave-active {
-  -webkit-transform: translate3d(0, 100%, 0);
-          transform: translate3d(0, 100%, 0);
+  transform: translate3d(0, 100%, 0);
 }
 .react-mui-context {
   /*************/
@@ -2818,15 +2734,12 @@
 .react-mui-context .horizontal-layout,
 .react-mui-context .vertical-layout,
 .react-mui-context .mui-paper.vertical-layout > .mui-paper-container {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: stretch;
+      align-items: stretch;
 }
 .react-mui-context .viewport-height {
   height: 100vh;
@@ -2842,22 +2755,19 @@
 }
 .react-mui-context .mui-paper.vertical-layout > .mui-paper-container,
 .react-mui-context .vertical-layout {
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
 }
 .react-mui-context .layout-fill,
 .react-mui-context .mui-paper.layout-fill > .mui-paper-container,
 .react-mui-context .role-panel > .mui-paper-container {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   overflow-y: auto;
 }
 .react-mui-context .layout-fill-scroll-y {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   overflow-y: auto;
 }
 .react-mui-context .droppable-active,
@@ -2876,9 +2786,8 @@
 .react-mui-context .main-layout-nav-to-stack .left-nav {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;
   background-color: #f5f5f5;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
   /*border-bottom: 1px solid #EAEAEA;*/
 }
 .react-mui-context .main-layout-nav-to-stack .left-nav h1 {
@@ -2889,14 +2798,12 @@
   margin-top: 5px;
 }
 .react-mui-context .main-layout-nav-to-stack .container {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
 }
 .react-mui-context .main-layout-nav-to-stack.vertical {
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
 }
 .react-mui-context .main-layout-nav-to-stack.vertical .left-nav {
   width: auto;
@@ -2905,9 +2812,8 @@
 }
 @media only screen and (max-width: 720px) {
   .react-mui-context .main-layout-nav-to-stack {
-    -webkit-flex-direction: column;
-        -ms-flex-direction: column;
-            flex-direction: column;
+    -ms-flex-direction: column;
+        flex-direction: column;
   }
   .react-mui-context .main-layout-nav-to-stack h1 {
     font-size: 30px;
@@ -2960,12 +2866,10 @@
 }
 .react-mui-context .pydio-form-panel > .pydio-form-group {
   margin: 20px;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
 }
 .react-mui-context .pydio-form-panel > .pydio-form-group > .mui-paper-container {
   padding: 0 20px 20px;
@@ -3011,21 +2915,16 @@
 .react-mui-context .pydio-form-panel.row-flex {
   width: 100%;
   height: 100%;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-flex-wrap: wrap;
-      -ms-flex-wrap: wrap;
-          flex-wrap: wrap;
-  -webkit-justify-content: flex-start;
-      -ms-flex-pack: start;
-          justify-content: flex-start;
-  -webkit-flex-grow: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -ms-flex-pack: start;
+      justify-content: flex-start;
+  -ms-flex-positive: 1;
+      flex-grow: 1;
 }
 .react-mui-context .pydio-form-panel.row-flex > .pydio-form-group {
   margin: 2% 0 0 2%;
@@ -3117,6 +3016,12 @@
 .react-mui-context .pydio-form-panel.hide-legend .mui-checkbox {
   margin-bottom: 16px;
 }
+.react-mui-context .pydio-form-panel .form-entry-valid-password .form-legend {
+  margin-top: 13px;
+}
+.react-mui-context .pydio-form-panel .mui-switch-label {
+  color: rgba(0, 0, 0, 0.86);
+}
 .react-mui-context .pydio-form-panel label {
   margin: 0;
   font-size: inherit;
@@ -3133,6 +3038,12 @@
 .react-mui-context .pydio-form-panel .mui-drop-down-menu .mui-menu-control .mui-menu-label {
   padding-left: 0;
   line-height: 58px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 16px;
+  color: rgba(0, 0, 0, 0.87);
+  width: 100%;
 }
 .react-mui-context .pydio-form-panel .mui-drop-down-menu .mui-menu-control .mui-menu-drop-down-icon {
   top: 18px;
@@ -3184,9 +3095,6 @@
 }
 .react-mui-context .pydio-form-panel .drop-down-with-floating-label.multiple label.drop-down-floating-label {
   top: -2px;
-}
-.react-mui-context .pydio-form-panel .group-switch-selector .mui-menu-control .mui-menu-label {
-  font-size: 18px;
 }
 .react-mui-context .pydio-form-panel .replicable-field {
   margin-right: 28px;
@@ -3317,7 +3225,6 @@
   height: 100px;
   background-color: #ababab;
   position: relative;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
@@ -3332,35 +3239,28 @@
   cursor: pointer;
 }
 .react-mui-context .tab-vertical-layout {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
 }
 .react-mui-context .tab-vertical-layout > div.mui-tabs-container {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex-direction: column;
+      flex-direction: column;
+  -ms-flex-align: stretch;
+      align-items: stretch;
+  -ms-flex: 1;
+      flex: 1;
   overflow: hidden;
 }
 .react-mui-context .tab-vertical-layout > div.mui-tabs-container > div.mui-tab-item-container,
 .react-mui-context .tab-vertical-layout > div.mui-tabs-container > div.mui-ink-bar {
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 .react-mui-context .tab-vertical-layout > div.mui-tabs-container > div.mui-tab-template {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   overflow: auto;
   background-color: #f4f4f4;
 }
@@ -3439,15 +3339,12 @@
   color: rgba(0, 0, 0, 0.93);
 }
 .react-mui-context .material-list .material-list-entry {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  -webkit-flex-direction: row;
-      -ms-flex-direction: row;
-          flex-direction: row;
-  -webkit-align-items: stretch;
-      -ms-flex-align: stretch;
-          align-items: stretch;
+  -ms-flex-direction: row;
+      flex-direction: row;
+  -ms-flex-align: stretch;
+      align-items: stretch;
   border-bottom: 1px solid rgba(0, 0, 0, 0.03);
   /* ICONS */
   /* TEXTS */
@@ -3486,14 +3383,12 @@
 }
 .react-mui-context .material-list .material-list-entry .material-list-icon-none {
   width: 16px;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 .react-mui-context .material-list .material-list-entry .material-list-text {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   padding: 16px 0;
   overflow: hidden;
 }
@@ -3516,9 +3411,8 @@
 }
 .react-mui-context .material-list .material-list-entry .material-list-actions {
   padding: 8px 4px 0 16px;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
 }
 .react-mui-context .material-list .material-list-entry.material-list-entry-2-lines .material-list-actions {
   padding-top: 17px;
@@ -3706,6 +3600,5 @@
   line-height: 23px;
 }
 .react-mui-context .mui-focus-ripple .mui-focus-ripple-inner {
-  -webkit-animation: none !important;
-          animation: none !important;
+  animation: none !important;
 }

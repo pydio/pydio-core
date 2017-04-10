@@ -135,11 +135,14 @@ class UserAvatar extends React.Component{
     render(){
 
         const {user, avatar, graph} = this.state;
-        let label = this.props.userLabel || this.props.userId;
+        let {label} = this.state;
         let userType;
         if(user) {
             label = user.label;
             userType = user.external ? 'External User' : 'Internal User';
+        }
+        if(!label){
+            label = this.props.userLabel || this.props.userId;
         }
 
         let {style, labelStyle, avatarStyle, avatarSize, className, avatarClassName,

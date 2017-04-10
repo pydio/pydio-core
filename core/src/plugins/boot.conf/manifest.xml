@@ -20,7 +20,7 @@
         <!--
         <global_param group="CONF_MESSAGE[Database Connection]" type="button" name="TEST_SQL" choices="boot_test_sql_connexion" label="CONF_MESSAGE[Test SQL Connection]" description="CONF_MESSAGE[Test Connexion]" mandatory="false"/>
         -->
-        <global_param group="CONF_MESSAGE[Database Connection]" name="db_type" default="mysql" label="CONF_MESSAGE[Database]" description="CONF_MESSAGE[Driver type (do not touch)]" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
+        <global_param group="CONF_MESSAGE[Database Connection]" name="db_type" default="mysql" label="CONF_MESSAGE[Database]" description="CONF_MESSAGE[SQL driver. MySQL or PostgreSQL are recommended, use Sqlite3 only for testing.]" type="group_switch:dibi_provider" mandatory="true" choices="mysql|MySQL,sqlite3|Sqlite 3,postgre|PostgreSQL"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="AdvancedLegend" type="legend" label="" description="CONF_MESSAGE[Please review these technical parameters. Encoding and URI should be auto-detected, but please make sure they reflect your actual server configuration.]"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="ENCODING" type="string" label="CONF_MESSAGE[Detected Encoding]" description="CONF_MESSAGE[Please make sure to set the encoding corresponding to your server configuration, something like ln_LN.CHARSET, e.g en_US.UTF-8]" default="" mandatory="true"/>
         <global_param group="CONF_MESSAGE[Advanced Options]" name="SERVER_URL" type="string" label="CONF_MESSAGE[Detected Server URL]" description="CONF_MESSAGE[Make sure this is correct, as it's used to rewrite the htaccess file]" default="" mandatory="true"/>

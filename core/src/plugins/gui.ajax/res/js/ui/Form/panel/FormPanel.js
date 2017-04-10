@@ -176,6 +176,12 @@ export default React.createClass({
         this.checkValidStatus(this.props.values);
     },
 
+    componentWillReceiveProps: function(nextProps){
+        if(nextProps.values && nextProps.values !== this.props.values){
+            this.checkValidStatus(nextProps.values);
+        }
+    },
+
     renderGroupHeader:function(groupLabel, accordionize, index, active){
 
         var properties = { key: 'group-' + groupLabel };

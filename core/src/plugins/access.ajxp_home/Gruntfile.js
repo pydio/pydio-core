@@ -1,4 +1,7 @@
 module.exports = function(grunt) {
+
+    const {Externals} = require('../gui.ajax/res/js/dist/libdefs.js');
+
     grunt.initConfig({
         babel: {
             options: {},
@@ -17,6 +20,12 @@ module.exports = function(grunt) {
         },
         browserify: {
             ui : {
+                options: {
+                    external:Externals,
+                    browserifyOptions:{
+                        standalone: 'WelcomeComponents'
+                    }
+                },
                 files: {
                     'res/build/WelcomeComponents.js'  : 'res/build/index.js'
                 }
