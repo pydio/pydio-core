@@ -67,12 +67,12 @@ export default React.createClass({
                 className = undefined;
                 confirmError = '   ';
             }
-            const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis'};
+            const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', width:'130%'};
             let confirm;
             if(this.state.value && !this.props.disabled){
                 confirm = [
                     <div key="sep" style={{width: 20}}></div>,
-                    <ReactMUI.TextField
+                    <MaterialUI.TextField
                         key="confirm"
                         floatingLabelText={'Please Confirm Password'}
                         floatingLabelStyle={overflow}
@@ -82,6 +82,7 @@ export default React.createClass({
                         type='password'
                         multiLine={false}
                         disabled={this.props.disabled}
+                        fullWidth={true}
                         style={{flex:1}}
                         errorText={confirmError}
                     />
@@ -89,8 +90,8 @@ export default React.createClass({
             }
             return(
                 <form autoComplete="off">
-                    <div style={{display:'flex'}}>
-                        <ReactMUI.TextField
+                    <div style={{display:'flex', marginTop:-16}}>
+                        <MaterialUI.TextField
                             floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
                             floatingLabelStyle={overflow}
                             className={className}
@@ -101,6 +102,7 @@ export default React.createClass({
                             multiLine={false}
                             disabled={this.props.disabled}
                             errorText={errorText}
+                            fullWidth={true}
                             style={{flex:1}}
                         />
                         {confirm}

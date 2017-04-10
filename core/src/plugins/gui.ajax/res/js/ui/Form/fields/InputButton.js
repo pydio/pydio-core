@@ -1,6 +1,6 @@
 import ActionRunnerMixin from '../mixins/ActionRunnerMixin'
 const React = require('react')
-const ReactMUI = require('material-ui-legacy')
+const {RaisedButton} = require('material-ui')
 
 /**
  * Simple RaisedButton executing the applyButtonAction
@@ -28,9 +28,9 @@ export default React.createClass({
 
     render:function(){
         return (
-            <ReactMUI.RaisedButton
+            <RaisedButton
                 label={this.props.attributes['label']}
-                onClick={this.applyButton}
+                onTouchTap={this.applyButton}
                 disabled={this.props.disabled}
             />
         );
