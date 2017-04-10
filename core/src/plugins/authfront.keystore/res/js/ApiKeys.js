@@ -48,7 +48,7 @@
             }, function(transport){
                 const data = transport.responseJSON;
                 this.setState({
-                    newKey:'Token : ' + data['t'] + '<br> Private : ' + data['p']
+                    newKey:data//'Token : ' + data['t'] + '<br> Private : ' + data['p']
                 });
                 this.loadKeys();
             }.bind(this))
@@ -64,14 +64,15 @@
                 let remove = function(){
                     this.removeKey(k);
                 }.bind(this);
-                const deviceId = item['DEVICE_ID'] || 'No Id';
-                const primaryText = item.DEVICE_DESC + ' - ' + item.DEVICE_OS;
-                const secondaryText = deviceId;
-                const leftIcon = <MaterialUI.FontIcon className="mdi mdi-laptop" style={{color:this.props.muiTheme.palette.primary1Color}}/>
+                let deviceId = item['DEVICE_ID'] || '';
+                deviceId = deviceId.substring(0 , 13) + (deviceId.length > 13 ? '...' : '');
+                const primaryText = item.DEVICE_DESC + (item.DEVICE_OS !== item.DEVICE_DESC ? ' - ' + item.DEVICE_OS : '');
+                const secondaryText = 'From: ' + (item.DEVICE_IP === '::1' ? 'Local' : item.DEVICE_IP) + (deviceId ? ' - Id: ' + deviceId : '');
+                const leftIcon = <MaterialUI.FontIcon className="mdi mdi-responsive" style={{color:this.props.muiTheme.palette.primary1Color}}/>
                 const rightIcon = <MaterialUI.IconButton iconClassName="mdi mdi-key-minus" onTouchTap={remove}  iconStyle={{color:'rgba(0,0,0,0.53)'}}/>
                 keys.push(
                     <MaterialUI.ListItem
-                        key={deviceId}
+                        key={k}
                         primaryText={primaryText}
                         secondaryText={secondaryText}
                         disabled={true}
@@ -82,10 +83,16 @@
             let mess = this.props.pydio.MessageHash;
             let tokenResult;
             if(this.state.newKey){
+                const getMessage = id => mess[id];
                 tokenResult = (
-                    <div id="token_results">
-                        <span className="mdi mdi-close" onClick={() => {this.setState({newKey: null})}}></span>
-                        <div id="token_results_content">{this.state.newKey}</div>
+                    <div id="token_results" style={{backgroundColor:'#FFFDE7', padding:'8px 16px'}}>
+                        <div id="token_results_content">
+                            <PydioComponents.ClipboardTextField floatingLabelText="Key" inputValue={this.state.newKey.t} getMessage={getMessage} />
+                            <PydioComponents.ClipboardTextField floatingLabelText="Secret" inputValue={this.state.newKey.p} getMessage={getMessage} />
+                        </div>
+                        <div style={{textAlign:'right'}}>
+                            <MaterialUI.RaisedButton label="OK" onTouchTap={() => {this.setState({newKey: null})}}/>
+                        </div>
                     </div>
                 );
             }
@@ -93,13 +100,16 @@
             return (
                 <div>
                     <MaterialUI.Toolbar>
-                        <div style={{color: 'white', padding: '17px 0px', marginLeft: -10, fontWeight: 500}}>{mess['keystore.9']}</div>
+                        <div style={{color: 'white', padding: '18px 0px', marginLeft: -10, fontWeight: 500}}>{mess['keystore.9']}</div>
                         <div style={{flex:1}}></div>
                         <MaterialUI.ToolbarGroup lastChild={true}>
-                            <MaterialUI.IconButton tooltip={mess['keystore.3']} tooltipPosition="bottom-left" iconClassName="mdi mdi-key-plus" onTouchTap={this.generateKey} iconStyle={{color:'white'}}/>
+                            {this.generateAllowed() &&
+                                <MaterialUI.IconButton tooltip={mess['keystore.3']} tooltipPosition="bottom-left" iconClassName="mdi mdi-key-plus" onTouchTap={this.generateKey} iconStyle={{color:'white'}}/>
+                            }
                             <MaterialUI.IconButton tooltip={mess['keystore.5']} tooltipPosition="bottom-left" iconClassName="mdi mdi-key-remove" onTouchTap={() => {this.removeKey();}} iconStyle={{color:'white'}}/>
                         </MaterialUI.ToolbarGroup>
                     </MaterialUI.Toolbar>
+                    {tokenResult}
                     {list}
                 </div>
             );

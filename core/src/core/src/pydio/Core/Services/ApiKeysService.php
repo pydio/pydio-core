@@ -223,7 +223,7 @@ class ApiKeysService
                     else if (strpos($agent, "Windows/8") !== false) $deviceOS = "Windows 8";
                     else if (strpos($agent, "Linux") !== false) $deviceOS = "Linux";
                 } else {
-                    $deviceOS = UserAgent::osFromUserAgent($agent);
+                    $deviceDesc = $deviceOS = UserAgent::osFromUserAgent($agent);
                 }
             }
             $keyData["DEVICE_DESC"] = $deviceDesc;
