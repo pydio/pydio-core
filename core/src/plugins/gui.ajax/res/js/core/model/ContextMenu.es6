@@ -1,3 +1,5 @@
+import Observable from '../lang/Observable'
+
 export default class ContextMenuModel extends Observable{
 
     super(){

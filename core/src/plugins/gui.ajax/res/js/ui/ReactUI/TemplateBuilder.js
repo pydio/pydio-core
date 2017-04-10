@@ -1,21 +1,34 @@
+import {compose} from 'redux';
+
 import AsyncComponent from './AsyncComponent'
 import BackgroundImage from './BackgroundImage'
 
+// Animations
+const originStyles = {opacity: 0}
+const targetStyles = {opacity: 1}
+const enterAnimation = {stiffness: 350, damping: 28}
 
-export default React.createClass({
+let Template = ({style, id, children}) => {
+    return <div style={style} id={id}>{children}</div>
+}
 
-    propTypes: {
-        pydio: React.PropTypes.instanceOf(Pydio),
-        containerId:React.PropTypes.string
-    },
+Template = compose (
+    PydioHOCs.Animations.makeTransition(originStyles, targetStyles, enterAnimation)
+)(Template)
 
-    render: function(){
+class TemplateBuilder extends React.Component {
+
+    render() {
 
         let pydio = this.props.pydio;
         let containerId = this.props.containerId;
 
         let components = [];
-        let style = {};
+        let style = {
+            display: "flex",
+            flex: 1
+        };
+
         if(this.props.imageBackgroundFromConfigs){
             if(BackgroundImage.SESSION_IMAGE){
                 style = BackgroundImage.SESSION_IMAGE;
@@ -42,27 +55,29 @@ export default React.createClass({
             if(node.getAttribute("props")){
                 props = JSON.parse(node.getAttribute("props"));
             }
-            props['pydio']      = pydio;
+            props['pydio'] = pydio;
 
             components.push(
                 <AsyncComponent
+                    key={namespace}
                     namespace={namespace}
                     componentName={componentName}
-                    {...props}
-                    loaderStyle={style}
+                    noLoader={true}
                     style={style}
+                    {...props}
                 />
             );
-
         }.bind(this));
 
-        if(components.length === 1) {
-            return components[0];
-        } else {
-            return <div style={style} id={this.props.containerId}>{components}</div>
-        }
-
+        return <Template style={style} id={this.props.containerId}>{components}</Template>
     }
+}
+
+TemplateBuilder.propTypes = {
+    pydio: React.PropTypes.instanceOf(Pydio),
+    containerId:React.PropTypes.string
+}
 
 
-});
+
+export default TemplateBuilder

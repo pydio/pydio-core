@@ -38,7 +38,7 @@ export default React.createClass({
             dataModel.setAjxpNodeProvider(provider);
             node.updateProvider(provider);
             this.setState({dataModel: dataModel, node: node});
-        }else if(this.props.presetDataModel && this.props.presetDataModel !== nextProps.presetDataModel){
+        }else if(this.props.presetDataModel !== nextProps.presetDataModel){
             this.setState({
                 dataModel: nextProps.presetDataModel,
                 node: nextProps.presetDataModel.getRootNode()
@@ -101,4 +101,3 @@ export default React.createClass({
     }
 
 });
-

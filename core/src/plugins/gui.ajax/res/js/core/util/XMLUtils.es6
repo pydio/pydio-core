@@ -45,7 +45,9 @@ export default class XMLUtils{
         }
 
         if(!XMLUtils.__xpe) {
-            if(window.XPathEvaluator) XMLUtils.__xpe = new XPathEvaluator();
+            try{
+                XMLUtils.__xpe = new XPathEvaluator();
+            }catch(e){}
         }
 
         if(!XMLUtils.__xpe){
@@ -91,7 +93,9 @@ export default class XMLUtils{
         var xpe = XMLUtils.__xpe;
 
         if(!xpe) {
-            if(window.XPathEvaluator) XMLUtils.__xpe = xpe = new XPathEvaluator();
+            try {
+                XMLUtils.__xpe = xpe = new XPathEvaluator();
+            }catch(e){}
         }
         var result, nodes = [], i;
         if(!XMLUtils.__xpe){

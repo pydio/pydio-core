@@ -70,7 +70,7 @@ let UserDashboard = React.createClass({
         const wsListProps = this.props.workspacesListProps || {};
 
         return (
-            <div className="left-panel expanded vertical_fit vertical_layout" style={{backgroundColor: lightColor}}>
+            <div className="left-panel expanded vertical_fit vertical_layout" style={{...this.props.style, backgroundColor: lightColor}}>
                 <PydioWorkspaces.UserWidget
                     pydio={this.props.pydio}
                     style={widgetStyle}
@@ -91,6 +91,7 @@ let UserDashboard = React.createClass({
                     <WorkspacesListCard filterByType="entries" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
                     <WorkspacesListCard filterByType="shared" pydio={this.props.pydio} style={{margin:5, flex:1}}/>
                 </div>
+
                 <PydioComponents.DynamicGrid
                     storeNamespace="WelcomePanel.Dashboard"
                     defaultCards={this.getDefaultCards()}
@@ -102,14 +103,8 @@ let UserDashboard = React.createClass({
             </div>
         );
     }
-
 });
 
 UserDashboard = MaterialUI.Style.muiThemeable()(UserDashboard);
-if(window.ReactDND){
-    UserDashboard = window.ReactDND.DragDropContext(ReactDND.HTML5Backend)(UserDashboard);
-}else{
-    UserDashboard = UserDashboard;
-}
 
 export {UserDashboard as default};

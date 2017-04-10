@@ -27,7 +27,7 @@ export default React.createClass({
         }
     },
 
-    render: function(){
+    render: function() {
 
         const messages = this.props.pydio.MessageHash;
 
@@ -76,7 +76,7 @@ export default React.createClass({
                     <IconButton
                         onTouchTap={this.applyAction.bind(this, 'settings')}
                         iconClassName="userActionIcon mdi mdi-settings"
-                        className="userActionButton"
+                        className="userActionButton settings"
                         tooltip={messages['165']}
                     />
                 );

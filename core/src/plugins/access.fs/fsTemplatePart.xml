@@ -8,7 +8,7 @@
             namespace="PydioWorkspaces"
             component="FSTemplate"
             dependencies="PydioComponents,PydioTasks"
-            props="{}"
+            props='{"style": {"background": "white"}}'
         />
     </client_configs>
 </registry_contributions>

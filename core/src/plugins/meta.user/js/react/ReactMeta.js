@@ -634,7 +634,7 @@
             );
 
             return (
-                <PydioWorkspaces.InfoPanelCard title={"Metadata"} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
+                <PydioWorkspaces.InfoPanelCard style={this.props.style} title={"Metadata"} actions={actions} icon="tag-multiple" iconColor="#00ACC1">
                     <UserMetaPanel
                         ref="panel"
                         node={this.props.node}

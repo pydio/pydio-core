@@ -1,4 +1,4 @@
-import ContextMenuModel from './ContextMenuModel'
+import ContextMenuModel from 'pydio/model/context-menu'
 import Utils from './Utils'
 import PopupMenu from './PopupMenu'
 

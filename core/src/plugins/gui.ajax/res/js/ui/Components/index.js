@@ -23,7 +23,6 @@ import UserAvatar from './users/avatar/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
 import TeamCreationForm from './users/TeamCreationForm'
 
-import ContextMenuNodeProviderMixin from './menu/ContextMenuNodeProviderMixin'
 import ButtonMenu from './menu/ButtonMenu'
 import ContextMenu from './menu/ContextMenu'
 import IconButtonMenu from './menu/IconButtonMenu'
@@ -64,7 +63,6 @@ const PydioComponents = {
     TeamCreationForm        : TeamCreationForm,
     AddressBook             : AddressBook,
 
-    ContextMenuNodeProviderMixin: ContextMenuNodeProviderMixin,
     ContextMenu             : ContextMenu,
     Toolbar                 : Toolbar,
     ButtonMenu              : ButtonMenu,

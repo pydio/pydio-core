@@ -1,0 +1,43 @@
+import { spring } from 'react-motion';
+
+const properties = [
+  { name: 'translateX', unit: 'length' },
+  { name: 'translateY', unit: 'length' },
+  { name: 'perspective', unit: 'length' },
+  { name: 'translateZ', unit: 'length' },
+  { name: 'skew', unit: 'angle' },
+  { name: 'skewX', unit: 'angle' },
+  { name: 'skewY', unit: 'angle' },
+  { name: 'scale' },
+  { name: 'scaleX' },
+  { name: 'scaleY' },
+  { name: 'scaleZ' },
+  { name: 'rotate', unit: 'angle' },
+  { name: 'rotateX', unit: 'angle' },
+  { name: 'rotateY', unit: 'angle' }
+];
+
+export const positionToProperties = position => ({
+  translateX: position[0],
+  translateY: position[1]
+});
+
+export const buildTransform = (style, units) => {
+  const arr = [];
+
+  properties.forEach((prop) => {
+    if (typeof style[prop.name] !== 'undefined') {
+      const val = isNaN(style[prop.name]) ? 0 : style[prop.name];
+      arr.push(`${prop.name}(${val}${prop.unit ? units[prop.unit] : ''})`);
+    }
+  });
+
+  return arr.join(' ');
+};
+
+export const springify = (style, springConfig) => {
+    return Object.keys(style).reduce((obj, key) => {
+        obj[key] = spring(style[key], springConfig);
+        return obj;
+    }, {});
+};

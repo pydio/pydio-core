@@ -1,7 +1,7 @@
 import browserHistory from 'react-router/lib/browserHistory';
 
 const PathRouterWrapper = function(pydio){
-    
+
     class PathRouter extends React.PureComponent {
 
         constructor(props) {
@@ -30,6 +30,10 @@ const PathRouterWrapper = function(pydio){
             }.bind(this);
             // Watching all path changes
             pydio.getContextHolder().observe("context_changed", this._ctxObs);
+        }
+
+        componentDidMount() {
+            console.log("Mounted")
         }
 
         componentWillUnmount(){

@@ -21,7 +21,7 @@ export default React.createClass({
         }
 
         return (
-            <ColorPaper {...this.props} style={{...this.props.style,display:'flex'}} paletteIndex={2} getCloseButton={this.getCloseButton.bind(this)}>
+            <ColorPaper {...this.props} style={{...this.props.style,display:'flex'}} paletteIndex={2} getCloseButton={this.getCloseButton}>
                 <div style={{padding: 16, fontSize: 16}}>{this.props.pydio.MessageHash['user_home.74']}</div>
                 <div className="home-qrCode" style={{display:'flex', justifyContent:'center', alignItems:'center', marginRight:16}}>
                     <ReactQRCode bgColor={Palette[2]} fgColor={'#ffffff'} value={JSON.stringify(jsonData)} size={80}/>
