@@ -32,10 +32,6 @@ const PathRouterWrapper = function(pydio){
             pydio.getContextHolder().observe("context_changed", this._ctxObs);
         }
 
-        componentDidMount() {
-            console.log("Mounted")
-        }
-
         componentWillUnmount(){
             pydio.getContextHolder().stopObserving("context_changed", this._ctxObs);
         }

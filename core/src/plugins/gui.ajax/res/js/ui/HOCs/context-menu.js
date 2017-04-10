@@ -23,8 +23,6 @@ import ContextMenuModel from 'pydio/model/context-menu'
 const withContextMenu = (Component) => {
     return class ContextMenu extends React.Component {
         onContextMenu(event) {
-
-            console.log(this.props)
             
             const {node} = this.props
             event.preventDefault()
