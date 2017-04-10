@@ -8,6 +8,10 @@ const Repository = require('pydio/model/repository')
 class WorkspaceEntryMaterial extends React.Component{
 
     onClick(){
+        if(this.props.onWorkspaceTouchTap){
+            this.props.onWorkspaceTouchTap(this.props.workspace.getId());
+            return;
+        }
         if(this.props.workspace.getId() === this.props.pydio.user.activeRepository && this.props.showFoldersTree){
             this.props.pydio.goTo('/');
         }else{
