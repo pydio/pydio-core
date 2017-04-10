@@ -37,12 +37,12 @@ export default class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectSingleNode(element, query){
-        if(typeof element.selectSingleNode === "function"){
-            try{
+        try{
+            if(element['selectSingleNode']  && typeof element.selectSingleNode === "function"){
                 var res = element.selectSingleNode(query);
                 if(res) return res;
-            }catch(e){}
-        }
+            }
+        }catch(e){}
 
         if(!XMLUtils.__xpe) {
             if(window.XPathEvaluator) XMLUtils.__xpe = new XPathEvaluator();
@@ -74,8 +74,8 @@ export default class XMLUtils{
      * @signature function(element, query)
      */
     static XPathSelectNodes(element, query){
-        if(typeof element.selectNodes === "function"){
-            try{
+        try{
+            if(typeof element.selectNodes === "function"){
                 try{
                     if(element.ownerDocument && element.ownerDocument.setProperty){
                         element.ownerDocument.setProperty("SelectionLanguage", "XPath");
@@ -85,8 +85,8 @@ export default class XMLUtils{
                 }catch(e){}
                 var res = Array.from(element.selectNodes(query));
                 if(res) return res;
-            }catch(e){}
-        }
+            }
+        }catch(e){}
 
         var xpe = XMLUtils.__xpe;
 
