@@ -1,5 +1,5 @@
 const React = require('react')
-const {Toggle, Divider} = require('material-ui')
+const {Toggle, Divider, TextField, RaisedButton} = require('material-ui')
 const {ClipboardTextField} = require('pydio').requireLib('components')
 
 let WebDAVPane = React.createClass({
@@ -44,16 +44,23 @@ let WebDAVPane = React.createClass({
         }
         return (
             <div>
-                <ReactMUI.TextField
-                    type="password"
-                    floatingLabelText={this.getMessage(523)}
-                    ref="passfield"
-                />&nbsp;&nbsp;&nbsp;
-                <ReactMUI.RaisedButton
-                    label="Save"
-                    onClick={this.savePassword}
-                />
-                <div className="dav-password-legend">{this.getMessage(407)}</div>
+                <Divider/>
+                <div style={{padding:16}}>
+                    <div>{this.getMessage(407)}</div>
+                    <div style={{display:'flex', alignItems:'baseline'}}>
+                        <TextField
+                            type="password"
+                            floatingLabelText={this.getMessage(523)}
+                            ref="passfield"
+                            style={{flex:1, marginRight: 10}}
+                        />
+                        <RaisedButton
+                            label="Save"
+                            onClick={this.savePassword}
+                        />
+                    </div>
+                </div>
+                <Divider/>
             </div>
         );
     },
