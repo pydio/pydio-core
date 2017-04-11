@@ -3,14 +3,13 @@
     <client_settings>
         <resources>
             <i18n namespace="action.scheduler" path="plugins/action.scheduler/i18n"/>
-            <img_library alias="scheduler" path="plugins/action.scheduler/icons"/>
             <js className="SchedulerActions" file="plugins/action.scheduler/res/build/SchedulerActions.js"/>
         </resources>
     </client_settings>
     <registry_contributions>
         <actions>
             <action name="scheduler_menu">
-                <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" src="scheduler/ICON_SIZE/player_time.png" hasAccessKey="false">
+                <gui text="action.scheduler.18" iconClass="icon-time" title="action.scheduler.18d" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="false" infoPanel="false" actionBarGroup="put"/>
                 </gui>
@@ -23,7 +22,7 @@
                 </subMenu>
             </action>
             <action name="scheduler_generateCronExpression">
-                <gui text="action.scheduler.20" title="action.scheduler.20d" iconClass="icon-paste" src="scheduler/22/shellscript.png" hasAccessKey="false">
+                <gui text="action.scheduler.20" title="action.scheduler.20d" iconClass="icon-paste" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
@@ -40,7 +39,7 @@
                 </processing>
             </action>
             <action name="scheduler_runAll">
-                <gui text="action.scheduler.15" title="action.scheduler.16d" iconClass="icon-play-circle" src="scheduler/22/media_playback_start.png" hasAccessKey="false">
+                <gui text="action.scheduler.15" title="action.scheduler.16d" iconClass="icon-play-circle" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="false" contextMenu="true" infoPanel="true"
                              actionBarGroup="user"/>
@@ -58,12 +57,6 @@
                 </processing>
             </action>
             <action name="scheduler_addTask">
-                <gui text="action.scheduler.8" title="action.scheduler.9" iconClass="icon-plus" src="scheduler/22/task_add.png" hasAccessKey="false">
-                    <context selection="false" dir="" recycle="hidden" allowedMimes="scheduler_zone"
-                             actionBar="false" contextMenu="true" infoPanel="true"
-                             actionBarGroup="put">
-                    </context>
-                </gui>
                 <processing>
                     <clientCallback module="SchedulerActions.Callbacks.addTask" prepareModal="true"/>
                     <clientForm id="scheduler-task-form"><![CDATA[
@@ -85,7 +78,7 @@
                 </processing>
             </action>
             <action name="scheduler_runTask">
-                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" src="scheduler/22/task_run.png" hasAccessKey="false">
+                <gui text="action.scheduler.16" title="action.scheduler.15d" iconClass="icon-play" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
@@ -99,7 +92,7 @@
                 </processing>
             </action>
             <action name="scheduler_editTask">
-                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <gui text="action.scheduler.10" title="action.scheduler.11" iconClass="mdi mdi-pencil" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
@@ -110,7 +103,7 @@
                 </processing>
             </action>
             <action name="scheduler_removeTask">
-                <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" src="scheduler/22/task_delete.png" hasAccessKey="false">
+                <gui text="action.scheduler.19" title="action.scheduler.12" iconClass="icon-trash" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
@@ -124,7 +117,7 @@
                 </processing>
             </action>
             <action name="scheduler_stopRunningTask">
-                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" src="scheduler/ICON_SIZE/task.png" hasAccessKey="false">
+                <gui text="action.scheduler.25" title="action.scheduler.26" iconClass="icon-stop" hasAccessKey="false">
                     <context selection="true" dir="" recycle="hidden" allowedMimes="scheduler_zone"
                              actionBar="true" contextMenu="true" infoPanel="true"
                              actionBarGroup="get"/>
