@@ -63,10 +63,16 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
         }
 
         let leftIcon, rightIcon;
+        let {iconClassName} = item, inset = false;
+        if(iconClassName === '__INSET__'){
+            iconClassName = '';
+            inset = true;
+        }
+
         if(menuProps.display === 'normal'){
-            leftIcon = item.iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            leftIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
         }else if(menuProps.display === 'right'){
-            rightIcon = item.iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
+            rightIcon = iconClassName ? <FontIcon className={item.iconClassName + ' menu-icons'} style={{fontSize:16, padding:5}} color="rgba(0,0,0,0.33)"/> : null;
         }
         rightIcon = subItems && subItems.length ? <FontIcon className='mdi mdi-menu-right menu-icons'/> : rightIcon;
 
@@ -74,6 +80,7 @@ function itemsToMenu(items, closeMenuCallback, subItemsOnly = false, menuProps =
             <MenuItem
                 key={item.text}
                 primaryText={item.text}
+                insetChildren={inset}
                 leftIcon={leftIcon}
                 rightIcon={rightIcon}
                 onTouchTap={payload}

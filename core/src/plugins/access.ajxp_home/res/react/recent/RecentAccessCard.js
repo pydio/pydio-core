@@ -94,6 +94,8 @@ export default React.createClass({
                         elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
                         nodeClicked={(node) => {this.props.pydio.goTo(node);}}
                         hideToolbar={true}
+                        delayInitialLoad={700}
+                        containerHeight={222}
                         entryRenderFirstLine={this.renderFirstLine}
                         entryRenderSecondLine={this.renderSecondLine}
                         entryRenderIcon={this.renderIcon}

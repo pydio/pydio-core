@@ -1,4 +1,5 @@
 import FilePreview from './FilePreview'
+const ReactDOM = require('react-dom')
 
 class ComponentConfigsParser {
 
@@ -121,6 +122,10 @@ let MainFilesList = React.createClass({
         }
     },
 
+    shouldComponentUpdate: function(nextProps, nextState){
+        return (!this.state || this.state.repositoryId !== nextProps.pydio.repositoryId || nextState !== this.state );
+    },
+
     componentWillReceiveProps: function(){
         if(this.state && this.state.repositoryId !== this.props.pydio.repositoryId ){
             this.props.pydio.getController().updateGuiActions(this.getPydioActions());
@@ -132,16 +137,23 @@ let MainFilesList = React.createClass({
         }
     },
 
+    resize: function(){
+        this.recomputeThumbnailsDimension();
+    },
+
     recomputeThumbnailsDimension: function(nearest){
 
         if(!nearest || nearest instanceof Event){
             nearest = this.state.thumbNearest;
         }
-        let containerWidth = ReactDOM.findDOMNode(this.refs['list']).clientWidth;
+        const MAIN_CONTAINER_FULL_PADDING = 2;
+        const THUMBNAIL_MARGIN = 1;
+
+        let containerWidth = ReactDOM.findDOMNode(this.refs['list']).clientWidth - MAIN_CONTAINER_FULL_PADDING;
 
         // Find nearest dim
         let blockNumber = Math.floor(containerWidth / nearest);
-        let width = Math.floor(containerWidth / blockNumber);
+        let width = Math.floor(containerWidth / blockNumber) - THUMBNAIL_MARGIN * 2;
         if(this.props.horizontalRibbon){
             blockNumber = this.state.contextNode.getChildren().size;
             if(this.state.displayMode === 'grid-160') width = 160;

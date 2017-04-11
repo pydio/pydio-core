@@ -42,7 +42,7 @@ let FSTemplate = React.createClass({
             hasAccessKey:false,
             subMenu:false,
             subMenuUpdateImage:false,
-            callback: () => {this.setState({infoPanelToggle: !this.state.infoPanelToggle});}
+            callback: () => {this.setState({infoPanelToggle: !this.state.infoPanelToggle}, this.resizeAfterTransition.bind(this));}
         }, {
             selection:true,
             dir:true,
@@ -66,8 +66,14 @@ let FSTemplate = React.createClass({
         };
     },
 
+    resizeAfterTransition: function(){
+        setTimeout(() => {
+            if(this.refs.list) this.refs.list.resize();
+        }, 500);
+    },
+
     infoPanelContentChange(numberOfCards){
-        this.setState({infoPanelOpen: (numberOfCards > 0)})
+        this.setState({infoPanelOpen: (numberOfCards > 0)}, this.resizeAfterTransition.bind(this))
     },
 
     openDrawer: function(event){
@@ -185,7 +191,7 @@ let FSTemplate = React.createClass({
                             />
                         </div>
                     </MaterialUI.Paper>
-                    <MainFilesList ref="list" {...props}/>
+                    <MainFilesList ref="list" pydio={this.props.pydio}/>
                 </div>
 
                 <InfoPanel

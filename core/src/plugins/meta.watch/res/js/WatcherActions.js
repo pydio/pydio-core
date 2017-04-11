@@ -30,7 +30,7 @@
 
     class Listeners {
 
-        static dynamicBuilder() {
+        static dynamicBuilder(controller) {
 
             var n = pydio.getUserSelection().getUniqueNode();
             if(!n) return [];

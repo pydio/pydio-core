@@ -63,7 +63,7 @@ import IconButtonPopover from './IconButtonPopover'
         render: function(){
             let groups = this.state.groups
             let actions = [];
-            const {toolbars, renderingType, groupOtherList, buttonStyle, tooltipPosition} = this.props;
+            const {toolbars, renderingType, groupOtherList, buttonStyle, tooltipPosition, controller} = this.props;
             let allToolbars = [...toolbars];
             if(groupOtherList.length){
                 allToolbars = allToolbars.concat(['MORE_ACTION']);
@@ -92,7 +92,7 @@ import IconButtonPopover from './IconButtonPopover'
                     }else if(action.subMenuItems.staticItems){
                         menuItems = Utils.pydioActionsToItems(action.subMenuItems.staticItems);
                     }else if(action.subMenuItems.dynamicBuilder) {
-                        menuItems = Utils.pydioActionsToItems(action.subMenuItems.dynamicBuilder());
+                        menuItems = Utils.pydioActionsToItems(action.subMenuItems.dynamicBuilder(controller));
                     }else if(action.subMenuItems.popoverContent) {
                         popoverContent = action.subMenuItems.popoverContent;
                     }else{

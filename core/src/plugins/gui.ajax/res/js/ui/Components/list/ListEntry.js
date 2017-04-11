@@ -43,7 +43,7 @@ class ListEntry extends React.Component {
         if(iconCell){
             icon = this.props.iconCell;
         }else if(this.props.mainIcon){
-            icon = <FontIcon className={"mui-font-icon " + this.props.mainIcon} style={{fontSize: 18, color: "#FFFFFF"}} />;
+            icon = <FontIcon className={"mui-font-icon " + this.props.mainIcon} style={{fontSize: 18/*, color: "#FFFFFF"*/}} />;
         }
 
         const {className, canDrop, isOver} = this.props

@@ -17,17 +17,23 @@ let SortColumns = React.createClass({
         this.props.columnClicked(object.payload);
     },
 
-    onHeaderClick: function(key, ev){
+    onHeaderClick: function(key, callback){
         let data = this.props.tableKeys[key];
         if(data && data['sortType'] && this.props.columnClicked){
             data['name'] = key;
-            this.props.columnClicked(data);
+            this.props.columnClicked(data, callback);
         }
     },
 
-    getColumnsItems: function(displayMode){
+    getColumnsItems: function(displayMode, controller = null){
 
         let items = [];
+        const callback = () => {
+            if(controller){
+                controller.notify('actions_refreshed');
+            }
+        };
+
         for(let key in this.props.tableKeys){
             if(!this.props.tableKeys.hasOwnProperty(key)) continue;
             let data = this.props.tableKeys[key];
@@ -53,16 +59,16 @@ let SortColumns = React.createClass({
                 });
             }else if(displayMode === 'menu_data'){
                 items.push({
-                    name: data['label'],
-                    callback:this.onHeaderClick.bind(this, key),
-                    icon_class:icon
+                    name            : data['label'],
+                    callback        : () => { this.onHeaderClick(key, callback) },
+                    icon_class      : icon || '__INSET__'
                 });
             }else{
                 items.push(<span
                     key={key}
                     className={className}
                     style={style}
-                    onClick={this.onHeaderClick.bind(this, key)}
+                    onClick={ () => {this.onHeaderClick(key, callback)} }
                 >{data['label']}</span>);
 
             }
@@ -71,8 +77,8 @@ let SortColumns = React.createClass({
 
     },
 
-    buildSortingMenuItems: function(){
-        return this.getColumnsItems('menu_data');
+    buildSortingMenuItems: function(controller){
+        return this.getColumnsItems('menu_data', controller);
     },
 
     componentDidMount: function(){
@@ -110,11 +116,11 @@ let SortColumns = React.createClass({
     render: function(){
         if(this.props.displayMode === 'menu'){
             return (
-                <IconButtonMenu buttonTitle="Sort by..." buttonClassName="mdi mdi-sort-descending" menuItems={this.getColumnsItems('menu')} onMenuClicked={this.onMenuClicked}/>
+                <IconButtonMenu buttonTitle="Sort by..." buttonClassName="mdi mdi-sort-descending" menuItems={this.getColumnsItems('menu', this.props.pydio.getController())} onMenuClicked={this.onMenuClicked}/>
             );
         }else{
             return (
-                <ToolbarGroup float="left">{this.getColumnsItems('header')}</ToolbarGroup>
+                <ToolbarGroup float="left">{this.getColumnsItems('header', this.props.pydio.getController())}</ToolbarGroup>
             );
         }
 

@@ -3471,10 +3471,10 @@
   position: absolute;
   margin-left: -16px;
   font-family: "Material Design Icons";
-  content: "\f156";
+  content: "\F05D";
 }
 .react-mui-context .material-list.table-mode .cell.header_cell.sortable.active-sort-desc::before {
-  content: "\f144";
+  content: "\F045";
 }
 @media only screen and (max-width: 480px) {
   .react-mui-context .material-list.table-mode .cell {

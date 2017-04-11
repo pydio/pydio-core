@@ -9,7 +9,7 @@ export default function(Component){
         constructor(props, context){
             super(props, context);
             this.state = {
-                menuItems: this.props.menuItem || []
+                menuItems: this.props.menuItems || []
             };
         }
 

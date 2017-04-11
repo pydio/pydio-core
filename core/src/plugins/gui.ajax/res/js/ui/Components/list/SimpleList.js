@@ -1,3 +1,5 @@
+const React = require('react')
+
 import MessagesConsumerMixin from '../MessagesConsumerMixin'
 import {ListEntry} from './ListEntry'
 import TableListEntry from './TableListEntry'
@@ -8,6 +10,10 @@ import ListPaginator from './ListPaginator'
 import SimpleReactActionBar from '../SimpleReactActionBar'
 import InlineEditor from './InlineEditor'
 
+const DOMUtils = require('pydio/util/dom')
+const LangUtils = require('pydio/util/lang')
+const PydioDataModel = require('pydio/model/data-model')
+
 /**
  * Main List component
  */
@@ -16,37 +22,39 @@ let SimpleList = React.createClass({
     mixins:[MessagesConsumerMixin],
 
     propTypes:{
-        infiniteSliceCount:React.PropTypes.number,
-        filterNodes:React.PropTypes.func,
-        customToolbar:React.PropTypes.object,
-        tableKeys:React.PropTypes.object,
-        autoRefresh:React.PropTypes.number,
-        reloadAtCursor:React.PropTypes.bool,
-        heightAutoWithMax:React.PropTypes.number,
-        observeNodeReload:React.PropTypes.bool,
-        groupByFields:React.PropTypes.array,
-        defaultGroupBy:React.PropTypes.string,
+        infiniteSliceCount  : React.PropTypes.number,
+        filterNodes         : React.PropTypes.func,
+        customToolbar       : React.PropTypes.object,
+        tableKeys           : React.PropTypes.object,
+        autoRefresh         : React.PropTypes.number,
+        reloadAtCursor      : React.PropTypes.bool,
+        heightAutoWithMax   : React.PropTypes.number,
+        containerHeight     : React.PropTypes.number,
+        observeNodeReload   : React.PropTypes.bool,
+        groupByFields       : React.PropTypes.array,
+        defaultGroupBy      : React.PropTypes.string,
 
         skipParentNavigation: React.PropTypes.bool,
         skipInternalDataModel:React.PropTypes.bool,
+        delayInitialLoad    : React.PropTypes.number,
 
-        entryEnableSelector:React.PropTypes.func,
-        renderCustomEntry:React.PropTypes.func,
-        entryRenderIcon:React.PropTypes.func,
-        entryRenderActions:React.PropTypes.func,
-        entryRenderFirstLine:React.PropTypes.func,
+        entryEnableSelector : React.PropTypes.func,
+        renderCustomEntry   : React.PropTypes.func,
+        entryRenderIcon     : React.PropTypes.func,
+        entryRenderActions  : React.PropTypes.func,
+        entryRenderFirstLine: React.PropTypes.func,
         entryRenderSecondLine:React.PropTypes.func,
-        entryRenderThirdLine:React.PropTypes.func,
-        entryHandleClicks:React.PropTypes.func,
-        hideToolbar:React.PropTypes.bool,
+        entryRenderThirdLine: React.PropTypes.func,
+        entryHandleClicks   : React.PropTypes.func,
+        hideToolbar         : React.PropTypes.bool,
         computeActionsForNode: React.PropTypes.bool,
 
-        openEditor:React.PropTypes.func,
-        openCollection:React.PropTypes.func,
+        openEditor          : React.PropTypes.func,
+        openCollection      : React.PropTypes.func,
 
-        elementStyle: React.PropTypes.object,
+        elementStyle        : React.PropTypes.object,
         passScrollingStateToChildren:React.PropTypes.bool,
-        elementHeight:React.PropTypes.oneOfType([
+        elementHeight       : React.PropTypes.oneOfType([
             React.PropTypes.number,
             React.PropTypes.object
         ]).isRequired
@@ -65,7 +73,7 @@ let SimpleList = React.createClass({
     },
 
     clickRow: function(gridRow, event){
-        var node;
+        let node;
         if(gridRow.props){
             node = gridRow.props.data.node;
         }else{
@@ -76,11 +84,10 @@ let SimpleList = React.createClass({
             return;
         }
         if(node.isLeaf() && this.props.openEditor) {
-            var res = this.props.openEditor(node);
-            if( res === false){
+            if( this.props.openEditor(node) === false){
                 return;
             }
-            var uniqueSelection = new Map();
+            let uniqueSelection = new Map();
             uniqueSelection.set(node, true);
             this.setState({selection:uniqueSelection}, this.rebuildLoadedElements);
         } else if(!node.isLeaf()) {
@@ -93,7 +100,7 @@ let SimpleList = React.createClass({
     },
 
     doubleClickRow: function(gridRow, event){
-        var node;
+        let node;
         if(gridRow.props){
             node = gridRow.props.data.node;
         }else{
@@ -104,7 +111,7 @@ let SimpleList = React.createClass({
         }
     },
 
-    onColumnSort: function(column){
+    onColumnSort: function(column, stateSetCallback = null){
 
         let pagination = this.props.node.getMetadata().get('paginationData');
         if(pagination && pagination.get('total') > 1 && pagination.get('remote_order')){
@@ -132,6 +139,9 @@ let SimpleList = React.createClass({
                 direction : dir
             }}, function(){
                 this.rebuildLoadedElements();
+                if(stateSetCallback){
+                    stateSetCallback();
+                }
             }.bind(this));
 
         }
@@ -252,14 +262,14 @@ let SimpleList = React.createClass({
         }else{
             this.dm = this.props.dataModel;
         }
-        var state = {
+        let state = {
             loaded: this.props.node.isLoaded(),
-            loading: !this.props.node.isLoaded(),
-            showSelector:false,
-            elements: this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
-            containerHeight:this.props.heightAutoWithMax?0:500,
-            filterNodes:this.props.filterNodes,
-            sortingInfo: this.props.defaultSortingInfo || null
+            loading             : !this.props.node.isLoaded(),
+            showSelector        : false,
+            elements            : this.props.node.isLoaded()?this.buildElements(0, this.props.infiniteSliceCount):[],
+            containerHeight     : this.props.containerHeight ? this.props.containerHeight  : (this.props.heightAutoWithMax ? 0 : 500),
+            filterNodes         : this.props.filterNodes,
+            sortingInfo         : this.props.defaultSortingInfo || null
         };
         if(this.props.defaultGroupBy){
             state.groupBy = this.props.defaultGroupBy;
@@ -273,7 +283,7 @@ let SimpleList = React.createClass({
 
     componentWillReceiveProps: function(nextProps) {
         this.indexedElements = null;
-        var currentLength = Math.max(this.state.elements.length, nextProps.infiniteSliceCount);
+        const currentLength = Math.max(this.state.elements.length, nextProps.infiniteSliceCount);
         this.setState({
             loaded: nextProps.node.isLoaded(),
             loading:!nextProps.node.isLoaded(),
@@ -281,8 +291,8 @@ let SimpleList = React.createClass({
             elements:nextProps.node.isLoaded()?this.buildElements(0, currentLength, nextProps.node):[],
             infiniteLoadBeginBottomOffset:200,
             filterNodes:nextProps.filterNodes ? nextProps.filterNodes : this.props.filterNodes,
-            sortingInfo: nextProps.defaultSortingInfo || null
-        });
+            sortingInfo: nextProps.defaultSortingInfo || this.state.sortingInfo || null
+        }, () => {if (nextProps.node.isLoaded()) this.updateInfiniteContainerHeight()});
         if(!nextProps.autoRefresh&& this.refreshInterval){
             window.clearInterval(this.refreshInterval);
             this.refreshInterval = null;
@@ -323,7 +333,7 @@ let SimpleList = React.createClass({
     },
 
     _loadNodeIfNotLoaded: function(){
-        var node = this.props.node;
+        const {node} = this.props;
         if(!node.isLoaded()){
             node.observeOnce("loaded", function(){
                 if(!this.isMounted()) return;
@@ -351,7 +361,7 @@ let SimpleList = React.createClass({
         this.indexedElements = null;
     },
     _loadedListener: function(){
-        var currentLength = Math.max(this.state.elements.length, this.props.infiniteSliceCount);
+        const currentLength = Math.max(this.state.elements.length, this.props.infiniteSliceCount);
         this.setState({
             loading:false,
             elements:this.buildElements(0, currentLength, this.props.node)
@@ -375,11 +385,11 @@ let SimpleList = React.createClass({
 
     loadStartingAtCursor: function(){
         this._loadingListener();
-        var node = this.props.node;
-        var cachedChildren = node.getChildren();
-        var newChildren = [];
+        const node = this.props.node;
+        const cachedChildren = node.getChildren();
+        let newChildren = [];
         node.observeOnce("loaded", function(){
-            var reorderedChildren = new Map();
+            let reorderedChildren = new Map();
             newChildren.map(function(c){reorderedChildren.set(c.getPath(), c);});
             cachedChildren.forEach(function(c){reorderedChildren.set(c.getPath(), c);});
             node._children = reorderedChildren;
@@ -412,7 +422,7 @@ let SimpleList = React.createClass({
     },
 
     toggleSelection:function(node){
-        var selection = this.state.selection || new Map();
+        let selection = this.state.selection || new Map();
         if(selection.get(node)) selection.delete(node);
         else selection.set(node, true);
         this.refs.all_selector.setChecked(false);
@@ -425,7 +435,7 @@ let SimpleList = React.createClass({
         if(!this.refs.all_selector.isChecked()){
             this.setState({selection:new Map()}, this.rebuildLoadedElements);
         }else{
-            var selection = new Map();
+            let selection = new Map();
             this.props.node.getChildren().forEach(function(child){
                 if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
                     return;
@@ -443,17 +453,16 @@ let SimpleList = React.createClass({
         if(!this.state.selection || !this.state.selection.size){
             return;
         }
-        var actionName = ev.currentTarget.getAttribute('data-action');
-        var dm = this.dm || new PydioDataModel();
+        const actionName = ev.currentTarget.getAttribute('data-action');
+        const dm = this.dm || new PydioDataModel();
         dm.setContextNode(this.props.node);
-        var selNodes = [];
+        let selNodes = [];
         this.state.selection.forEach(function(v, node){
             selNodes.push(node);
         });
         dm.setSelectedNodes(selNodes);
-        var a = window.pydio.Controller.getActionByName(actionName);
-        a.fireContextChange(dm, true, window.pydio.user);
-        //a.fireSelectionChange(dm);
+        const a = this.props.pydio.Controller.getActionByName(actionName);
+        a.fireContextChange(dm, true, this.props.pydio.user);
         a.apply([dm]);
 
         ev.stopPropagation();
@@ -464,9 +473,9 @@ let SimpleList = React.createClass({
         if(!this.props.computeActionsForNode){
             return [];
         }
-        var cacheKey = node.isLeaf() ? 'file-' + node.getAjxpMime() :'folder';
-        var selectionType = node.isLeaf() ? 'file' : 'dir';
-        var nodeActions = [];
+        const cacheKey = node.isLeaf() ? 'file-' + node.getAjxpMime() :'folder';
+        const selectionType = node.isLeaf() ? 'file' : 'dir';
+        let nodeActions = [];
         if(this.actionsCache[cacheKey]) {
             nodeActions = this.actionsCache[cacheKey];
         }else{
@@ -489,12 +498,15 @@ let SimpleList = React.createClass({
     },
 
     updateInfiniteContainerHeight: function(retries = false){
+        if(this.props.containerHeight){
+            return this.props.containerHeight;
+        }
         if(!this.refs.infiniteParent){
             return;
         }
-        var containerHeight = this.refs.infiniteParent.clientHeight;
+        let containerHeight = this.refs.infiniteParent.clientHeight;
         if(this.props.heightAutoWithMax){
-            var elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;
+            const elementHeight = this.state.elementHeight?this.state.elementHeight:this.props.elementHeight;
             containerHeight = Math.min(this.props.node.getChildren().size * elementHeight ,this.props.heightAutoWithMax);
         }
         if(!containerHeight && !retries ){
@@ -506,7 +518,7 @@ let SimpleList = React.createClass({
     },
 
     computeElementHeightResponsive:function(){
-        var breaks = this.props.elementHeight;
+        let breaks = this.props.elementHeight;
         if(! (breaks instanceof Object) ){
             breaks = {
                 "min-width:480px":this.props.elementHeight,
@@ -514,13 +526,13 @@ let SimpleList = React.createClass({
             };
         }
         if(window.matchMedia){
-            for(var k in breaks){
+            for(let k in breaks){
                 if(breaks.hasOwnProperty(k) && window.matchMedia('('+k+')').matches){
                     return breaks[k];
                 }
             }
         }else{
-            var width = DOMUtils.getViewportWidth();
+            const width = DOMUtils.getViewportWidth();
             if(width < 480) return breaks["max-width:480px"];
             else return breaks["max-width:480px"];
         }
@@ -528,7 +540,7 @@ let SimpleList = React.createClass({
     },
 
     updateElementHeightResponsive: function(){
-        var newH = this.computeElementHeightResponsive();
+        const newH = this.computeElementHeightResponsive();
         if(!this.state || !this.state.elementHeight || this.state.elementHeight != newH){
             this.setState({elementHeight:newH}, function(){
                 if(this.props.heightAutoWithMax){
@@ -550,7 +562,11 @@ let SimpleList = React.createClass({
     },
 
     componentDidMount: function(){
-        this._loadNodeIfNotLoaded();
+        if(this.props.delayInitialLoad){
+            setTimeout(() => {this._loadNodeIfNotLoaded()}, this.props.delayInitialLoad);
+        }else{
+            this._loadNodeIfNotLoaded();
+        }
         this.patchInfiniteGrid(this.props.elementsPerLine);
         if(this.refs.infiniteParent){
             this.updateInfiniteContainerHeight();
@@ -631,7 +647,7 @@ let SimpleList = React.createClass({
             clearTimeout(this.state.scrollTimeout);
         }
 
-        var that = this,
+        let that = this,
             scrollTimeout = setTimeout(() => {
                 that.setState({
                     isScrolling: false,
@@ -651,7 +667,7 @@ let SimpleList = React.createClass({
         let components = [], index = 0;
         const nodeEntriesLength = nodeEntries.length;
         nodeEntries.forEach(function(entry){
-            var data;
+            let data;
             if(entry.parent) {
                 data = {
                     node: entry.node,
@@ -743,19 +759,18 @@ let SimpleList = React.createClass({
     },
 
     buildElements: function(start, end, node, showSelector){
-        var theNode = this.props.node;
+        let theNode = this.props.node;
         if (node) theNode = node;
-        var theShowSelector = this.state && this.state.showSelector;
+        let theShowSelector = this.state && this.state.showSelector;
         if(showSelector !== undefined) theShowSelector = showSelector;
 
         if(!this.indexedElements || this.indexedElements.length !== theNode.getChildren().size) {
             this.indexedElements = [];
+            let groupBy, groupByLabel, groups, groupKeys, groupLabels;
             if(this.state && this.state.groupBy){
-                var groupBy = this.state.groupBy;
-                var groupByLabel = this.props.groupByLabel || false;
-                var groups = {};
-                var groupKeys = [];
-                var groupLabels = {};
+                groupBy = this.state.groupBy;
+                groupByLabel = this.props.groupByLabel || false;
+                groups = {}, groupKeys = [], groupLabels = {};
             }
 
             if (!this.props.skipParentNavigation && theNode.getParent()
@@ -765,15 +780,15 @@ let SimpleList = React.createClass({
 
             theNode.getChildren().forEach(function (child) {
                 if(child.getMetadata().has('cursor')){
-                    var childCursor = parseInt(child.getMetadata().get('cursor'));
+                    const childCursor = parseInt(child.getMetadata().get('cursor'));
                     this._currentCursor = Math.max((this._currentCursor ? this._currentCursor : 0), childCursor);
                 }
                 if(this.state && this.state.filterNodes && !this.state.filterNodes(child)){
                     return;
                 }
-                var nodeActions = this.getActionsForNode(this.dm, child);
+                const nodeActions = this.getActionsForNode(this.dm, child);
                 if(groupBy){
-                    var groupValue = child.getMetadata().get(groupBy) || 'N/A';
+                    const groupValue = child.getMetadata().get(groupBy) || 'N/A';
                     if(!groups[groupValue]) {
                         groups[groupValue] = [];
                         groupKeys.push(groupValue);
@@ -815,6 +830,9 @@ let SimpleList = React.createClass({
             let sortingDirection = sortingInfo.direction;
             let sortingType = sortingInfo.sortType;
             this.indexedElements.sort(function(a, b){
+                if (a.parent){
+                    return -1;
+                }
                 let aMeta = a.node.getMetadata().get(sortingMeta) || "";
                 let bMeta = b.node.getMetadata().get(sortingMeta) || "";
                 let res;
@@ -838,7 +856,7 @@ let SimpleList = React.createClass({
             end = end * this.props.elementPerLine;
             start = start * this.props.elementPerLine;
         }
-        var nodes = this.indexedElements.slice(start, end);
+        const nodes = this.indexedElements.slice(start, end);
         if(!nodes.length && theNode.getMetadata().get('paginationData')){
             /*
              //INFINITE SCROLLING ACCROSS PAGE. NOT SURE IT'S REALLY UX FRIENDLY FOR BIG LISTS OF USERS.
@@ -899,7 +917,7 @@ let SimpleList = React.createClass({
 
     renderToolbar: function(){
 
-        var rightButtons = [<ReactMUI.FontIcon
+        let rightButtons = [<ReactMUI.FontIcon
             key={1}
             tooltip="Reload"
             className={"icon-refresh" + (this.state.loading?" rotating":"")}
@@ -927,8 +945,7 @@ let SimpleList = React.createClass({
             rightButtons.push(this.props.additionalActions);
         }
 
-        var leftToolbar;
-        var paginator;
+        let leftToolbar, paginator;
         if(this.props.node.getMetadata().get("paginationData") && this.props.node.getMetadata().get("paginationData").get('total') > 1){
             paginator = (
                 <ListPaginator dataModel={this.dm} node={this.props.node}/>
@@ -953,7 +970,7 @@ let SimpleList = React.createClass({
             rightButtons = <ReactMUI.RaisedButton key={1} label={this.context.getMessage('react.4')} primary={true} onClick={this.props.searchResultData.toggleState} />;
 
         }else if(this.actionsCache.multiple.size){
-            var bulkLabel = this.context.getMessage('react.2');
+            let bulkLabel = this.context.getMessage('react.2');
             if(this.state.selection && this.state.showSelector){
                 bulkLabel +=" (" + this.state.selection.size + ")";
             }
@@ -966,7 +983,7 @@ let SimpleList = React.createClass({
 
             if(this.state.showSelector) {
                 rightButtons = [];
-                var index = 0;
+                let index = 0;
                 this.actionsCache.multiple.forEach(function(a){
                     rightButtons.push(<ReactMUI.RaisedButton
                         key={index}
@@ -996,7 +1013,7 @@ let SimpleList = React.createClass({
 
     render: function(){
 
-        var containerClasses = "material-list vertical-layout layout-fill";
+        let containerClasses = "material-list vertical-layout layout-fill";
         if(this.props.className){
             containerClasses += " " + this.props.className;
         }
@@ -1006,9 +1023,9 @@ let SimpleList = React.createClass({
         if(this.props.tableKeys){
             containerClasses += " table-mode";
         }
-        var toolbar;
+        let toolbar;
         if(this.props.tableKeys){
-            var tableKeys;
+            let tableKeys;
             if(this.state && this.state.groupBy){
                 tableKeys = LangUtils.deepCopy(this.props.tableKeys);
                 delete tableKeys[this.state.groupBy];
@@ -1045,7 +1062,7 @@ let SimpleList = React.createClass({
             />
         }
 
-        var elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
+        const elements = this.buildElementsFromNodeEntries(this.state.elements, this.state.showSelector);
         return (
             <div className={containerClasses} onContextMenu={this.contextMenuResponder} tabIndex="0" onKeyDown={this.onKeyDown} style={this.props.style}>
                 {toolbar}

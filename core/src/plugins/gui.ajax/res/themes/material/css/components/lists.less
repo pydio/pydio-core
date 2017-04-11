@@ -113,6 +113,17 @@
         }
       }
 
+      &.list-parent-node{
+        .material-list-icon .mui-font-icon{
+          background-color: fade(@applicationPrimaryColor, 45);
+          color: white !important;
+          margin: 15px;
+          width: 40px;
+          height: 40px;
+          padding: 10px;
+        }
+      }
+
     }
 
     &.table-mode{
@@ -164,13 +175,16 @@
 
     &.material-list-grid{
 
+      padding-left: 2px;
+
       .material-list-entry{
         width: 230px;
         float: left;
         height: 200px;
         position: relative;
         display: block;
-        padding: 1px;
+        margin: 1px;
+        transition: @bezier_transition;
         .material-list-icon{
           width: 100%;
           height: 100%;
@@ -181,17 +195,23 @@
             margin: 0;
           }
           div.mimefont-container{
-            .mimefont-mixin(90px, 40px, 40px, 22px);
+            .mimefont-mixin(100%, 40px, 0, 0);
+            border-radius: 0;
+            padding-bottom: 26px;
           }
         }
         .material-list-text{
           position: absolute;
-          bottom: 1px;
-          left: 1px;
-          right: 1px;
-          padding: 10px;
-          background-color: rgba(0,0,0,0.33);
-          color: white;
+          bottom: 0px;
+          left: 0px;
+          right: 0px;
+          padding: 8px 10px;
+          background-color: rgba(0,0,0,0.43);
+          .material-list-line-1{
+            font-size: 14px;
+            color: white;
+            font-weight: 500;
+          }
         }
 
         .material-list-actions{
@@ -201,6 +221,12 @@
           span.overlay-class-span {
             color: white !important;
             padding: 0 4px;
+          }
+        }
+
+        &.selected{
+          .mimefont-container{
+            background-color: @selectionMainTint !important;
           }
         }
 
@@ -219,7 +245,7 @@
             }
           }
           div.mimefont-container{
-            .mimefont-mixin(50px, 24px, 15px, 15px);
+            padding-bottom: 0;
           }
           &:hover{
             background-color: @selectionMainTint !important;
@@ -234,7 +260,9 @@
       &.grid-size-320{
         .material-list-entry{
           div.mimefont-container{
-            .mimefont-mixin(120px, 40px, 140px, 120px);
+            .mimefont{
+              font-size: 60px !important;
+            }
           }
         }
       }
@@ -262,18 +290,6 @@
       }
       .mui-toolbar-group.mui-right:last-child {
         display: none;
-      }
-    }
-    .material-list-entry.list-parent-node{
-      .material-list-line-2{
-        text-transform: capitalize;
-      }
-      .material-list-icon .mui-font-icon{
-        background-color: fade(@applicationPrimaryColor, 45);
-        margin: 15px;
-        width: 40px;
-        height: 40px;
-        padding: 10px;
       }
     }
     .inline-editor{
@@ -312,14 +328,21 @@
           .material-list-line-1{
             display: none;
           }
+          .material-list-line-2{
+            font-size: 14px;
+            color: rgba(0,0,0,0.87);
+          }
         }
         .material-list-icon{
           padding: 0;
           width: inherit;
           .mui-font-icon{
-            margin: 8px 3px 8px 10px;
-            color: fade(@applicationPrimaryColor, 45);
-            background-color: transparent;
+            margin: 13px 6px 8px 13px;
+            width: 22px;
+            height: 22px;
+            font-size: 16px !important;
+            line-height: 13px !important;
+            padding: 3px !important;
           }
         }
       }
@@ -333,13 +356,65 @@
           .material-list-line-1 {
             display: none;
           }
+          .material-list-line-2 {
+            line-height: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+          }
+        }
+        .material-list-icon{
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          .mui-font-icon{
+            transition: inherit !important;
+            background-color: transparent;
+            color: rgba(0,0,0,0.43) !important;
+          }
         }
       }
       .material-list-text{
         overflow: visible;
       }
+      &.grid-size-320{
+        .material-list-entry.list-parent-node .material-list-icon{
+          .mui-font-icon{
+            width: 120px;
+            height: 120px;
+            font-size: 40px !important;
+            line-height: 40px !important;
+            padding: 30px !important;
+          }
+        }
+      }
+      &.grid-size-160{
+        .material-list-entry.list-parent-node .material-list-icon{
+          padding-bottom: 30px;
+          .mui-font-icon{
+            width: 90px;
+            height: 90px;
+            font-size: 40px !important;
+            line-height: 50px !important;
+            padding: 20px !important;
+          }
+        }
+      }
+      &.grid-size-80{
+        .material-list-entry.list-parent-node .material-list-icon{
+          .mui-font-icon{
+            width: 50px;
+            height: 50px;
+            font-size: 25px !important;
+            line-height: 25px !important;
+            padding: 10px !important;
+          }
+        }
+      }
     }
   }
+
+
 
   .material-list.card-list{
     background-color: #fafafa;
