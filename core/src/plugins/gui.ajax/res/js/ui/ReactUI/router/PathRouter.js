@@ -1,4 +1,5 @@
 import browserHistory from 'react-router/lib/browserHistory';
+import _ from 'lodash';
 
 const PathRouterWrapper = (pydio) => {
 
@@ -12,9 +13,6 @@ const PathRouterWrapper = (pydio) => {
             }
 
             this._ctxObs = (e) => this.setState({active: pydio.getContextNode().getPath()})
-
-            // Watching all path changes
-            pydio.getContextHolder().observe("context_changed", this._ctxObs);
         }
 
         componentWillMount() {
@@ -22,7 +20,7 @@ const PathRouterWrapper = (pydio) => {
 
             const active = this.state;
 
-            if (target !== active) {
+            if (target && target !== active) {
                 pydio.goTo("/" + target);
             }
         }
@@ -39,9 +37,11 @@ const PathRouterWrapper = (pydio) => {
         componentWillReceiveProps(nextProps) {
             // We set a new target only if we're browsing back through the history
             if (nextProps.location.action === 'POP') {
-                const target = nextProps.params.splat || ""
+                const target = nextProps.params.splat
 
-                pydio.goTo("/" + target);
+                if (target) {
+                    pydio.goTo("/" + target);
+                }
             }
         }
 
