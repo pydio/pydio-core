@@ -1,6 +1,6 @@
 (function(global){
 
-    var DropUploader = React.createClass({
+    let DropUploader = React.createClass({
 
         propTypes: {
             onDismiss: React.PropTypes.func
@@ -10,16 +10,9 @@
             return {};
         },
 
-        onDrop: function(files, event, sourceComponent){
-            var items, files;
-            if(event.dataTransfer){
-                items = event.dataTransfer.items || [];
-                files = event.dataTransfer.files;
-            }else if(event.target){
-                files = event.target.files;
-            }
+        onDrop: function(files){
             let contextNode = global.pydio.getContextHolder().getContextNode();
-            UploaderModel.Store.getInstance().handleDropEventResults(items, files, contextNode);
+            UploaderModel.Store.getInstance().handleDropEventResults(null, files, contextNode);
         },
 
         onFolderPicked: function(files){
@@ -58,7 +51,7 @@
 
             let optionsEl;
             let messages = global.pydio.MessageHash;
-
+            const connectDropTarget = this.props.connectDropTarget || (c => {return c});
             const {options} = this.state;
 
             let dismiss = function(e){
@@ -80,7 +73,7 @@
             if(!configs.getOptionAsBool('DEFAULT_AUTO_START', 'upload_auto_send', true)){
                 startButton = <ReactMUI.FlatButton style={{marginRight: 10}} label={messages['html_uploader.11']} onClick={this.start} secondary={true}/>
             }
-            return (
+            return connectDropTarget(
                 <div style={{position:'relative', padding: '10px'}}>
                     <MaterialUI.Toolbar style={{backgroundColor: '#fff'}}>
                         <div style={{display:'flex', justifyContent: 'space-between', padding: '0px 24px', width: '100%', height: '100%'}}>
@@ -101,6 +94,7 @@
                         multiple={true}
                         enableFolders={true}
                         supportClick={false}
+                        ignoreNativeDrop={true}
                         onDrop={this.onDrop}
                         onFolderPicked={this.onFolderPicked}
                         style={{width:'100%', height: 300}}
@@ -115,7 +109,9 @@
 
     });
 
-    var TransferFile = React.createClass({
+    DropUploader = UploaderModel.DropProvider(DropUploader);
+
+    const TransferFile = React.createClass({
 
         propTypes: {
             item: React.PropTypes.object.isRequired,
@@ -143,8 +139,8 @@
         },
 
         render: function(){
-            let style;
-            var messageIds = {
+            let style, relativeMessage;
+            const messageIds = {
                 "new" : 433,
                 "loading":434,
                 "loaded":435,
@@ -164,7 +160,7 @@
                 statusMessage = global.pydio.MessageHash[messageIds[statusMessage]];
             }
             if(this.props.item.getRelativePath()){
-                var relativeMessage = <span className="path">{this.props.item.getRelativePath()}</span>;
+                relativeMessage = <span className="path">{this.props.item.getRelativePath()}</span>;
             }
             if(this.state && this.state.progress){
                 style = {width: this.state.progress + '%'};
@@ -181,7 +177,7 @@
         }
     });
 
-    var TransferFolder = React.createClass({
+    const TransferFolder = React.createClass({
 
         propTypes: {
             item: React.PropTypes.object.isRequired
@@ -200,7 +196,7 @@
         }
     });
 
-    var TransfersList = React.createClass({
+    const TransfersList = React.createClass({
 
         propTypes: {
             onDismiss: React.PropTypes.func
@@ -265,7 +261,7 @@
         }
     });
 
-    var UploadOptionsPane = React.createClass({
+    const UploadOptionsPane = React.createClass({
 
         propTypes: {
             open: React.PropTypes.boolean,
@@ -345,13 +341,11 @@
 
     });
 
-    var ns = global.UploaderView || {};
-
-    ns.DropUploader = DropUploader;
-    ns.TransfersList = TransfersList;
-    ns.TransferFile = TransferFile;
-    ns.TransferFolder = TransferFolder;
-
-    global.UploaderView = ns;
+    global.UploaderView = {
+        DropUploader,
+        TransferFile,
+        TransfersList,
+        TransferFolder
+    };
 
 })(window);

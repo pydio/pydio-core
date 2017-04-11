@@ -673,11 +673,28 @@
 
     }
 
+    const DropProvider = function(PydioComponent){
+
+        const {NativeFileDropProvider} = require('pydio').requireLib('boot');
+        return NativeFileDropProvider(PydioComponent, (items, files) => {
+            const {pydio} = global;
+            const ctxNode = pydio.getContextHolder().getContextNode();
+            const storeInstance = UploaderStore.getInstance();
+            storeInstance.handleDropEventResults(items, files, ctxNode);
+            if(!storeInstance.getAutoStart()){
+                pydio.getController().fireAction('upload');
+            }
+        });
+
+    };
+
+
     var ns = global.UploaderModel || {};
     ns.Store = UploaderStore;
     ns.Configs = UploaderConfigs;
     ns.UploadItem = UploadItem;
     ns.FolderItem = FolderItem;
+    ns.DropProvider = DropProvider;
     global.UploaderModel = ns;
 
 })(window);

@@ -2,6 +2,10 @@ import FormMixin from '../mixins/FormMixin'
 import FileDropzone from './FileDropzone'
 const React = require('react')
 const PydioApi = require('pydio/http/api')
+const {NativeFileDropProvider} = require('pydio').requireLib('boot');
+
+// Just enable the drop mechanism, but do nothing, it is managed by the FileDropzone
+const BinaryDropZone = NativeFileDropProvider(FileDropzone, (items, files, props) => {});
 
 /**
  * UI for displaying and uploading an image,
@@ -140,13 +144,14 @@ export default React.createClass({
         }else{
             icons.push(<span key="camera" className="icon-camera" style={{opacity:'0'}}></span>);
         }
+
         return(
             <div>
                 <div className="image-label">{this.props.attributes.label}</div>
                 <form ref="uploadForm" encType="multipart/form-data" target="uploader_hidden_iframe" method="post" action={this.getUploadUrl()}>
-                    <FileDropzone onDrop={this.onDrop} accept="image/*" style={coverImageStyle}>
+                    <BinaryDropZone onDrop={this.onDrop} accept="image/*" style={coverImageStyle}>
                         {icons}
-                    </FileDropzone>
+                    </BinaryDropZone>
                 </form>
                 <div className="binary-remove-button" onClick={this.clearImage}><span key="remove" className="mdi mdi-close"></span> RESET</div>
                 <iframe style={{display:"none"}} id="uploader_hidden_iframe" name="uploader_hidden_iframe"></iframe>

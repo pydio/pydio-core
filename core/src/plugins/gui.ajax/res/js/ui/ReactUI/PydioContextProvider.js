@@ -1,16 +1,19 @@
-import React from 'react';
-import Pydio from 'pydio';
+import {Component, PropTypes} from 'react';
+const Pydio = require('pydio');
 import {colors, getMuiTheme} from 'material-ui/styles';
 import {MuiThemeProvider} from 'material-ui';
 
 let MainProvider = MuiThemeProvider
-if(window.ReactDND){
-    MainProvider = ReactDND.DragDropContext(ReactDND.HTML5Backend)(MainProvider);
-}
+let DND;
+try{
+    DND = require('react-dnd');
+    const Backend = require('react-dnd-html5-backend');
+    MainProvider = DND.DragDropContext(Backend)(MainProvider);
+}catch(e){}
 
 export default function(PydioComponent, pydio){
 
-    class Wrapped extends React.Component{
+    class Wrapped extends Component{
 
         getChildContext() {
 
@@ -62,18 +65,18 @@ export default function(PydioComponent, pydio){
 
     Wrapped.displayName = 'PydioContextProvider';
     Wrapped.propTypes={
-        pydio: React.PropTypes.instanceOf(Pydio).isRequired
+        pydio       : PropTypes.instanceOf(Pydio).isRequired
     };
     Wrapped.childContextTypes={
         /* Current Instance of Pydio */
-        pydio:React.PropTypes.instanceOf(Pydio),
+        pydio       :PropTypes.instanceOf(Pydio),
         /* Accessor for pydio */
-        getPydio:React.PropTypes.func,
+        getPydio    :PropTypes.func,
 
         /* Associative array of i18n messages */
-        messages:React.PropTypes.object,
+        messages    :PropTypes.object,
         /* Accessor for messages */
-        getMessage:React.PropTypes.func
+        getMessage  :PropTypes.func
     };
 
     return Wrapped;

@@ -234,18 +234,9 @@
 
     });
 
-    if(window.ReactDND){
-        let DropLayout = ReactDND.DropTarget(ReactDND.HTML5Backend.NativeTypes.FILE, {drop:function(props, monitor){}}, function (connect, monitor) {
-            return {
-                connectDropTarget: connect.dropTarget(),
-                isOver: monitor.isOver(),
-                canDrop: monitor.canDrop()
-            };
-        })(StandardLayout);
-        StandardLayout = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropLayout);
+    if(window.UploaderModel){
+        StandardLayout = window.UploaderModel.DropProvider(StandardLayout);
     }
-
-
 
     const FolderMinisite = React.createClass({
 

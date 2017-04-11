@@ -208,33 +208,9 @@ let FSTemplate = React.createClass({
     }
 });
 
-const fileTarget = {
-    drop: function (props, monitor) {
-        let dataTransfer = monitor.getItem().dataTransfer;
-        let passItems;
-        if (dataTransfer.items.length && dataTransfer.items[0] && (dataTransfer.items[0].getAsEntry || dataTransfer.items[0].webkitGetAsEntry)) {
-            passItems = dataTransfer.items;
-        }
-        if(window['UploaderModel'] && pydio.getController().getActionByName('upload')){
-            UploaderModel.Store.getInstance().handleDropEventResults(passItems, dataTransfer.files, window.pydio.getContextHolder().getContextNode());
-            if(!UploaderModel.Store.getInstance().getAutoStart()){
-                pydio.getController().fireAction('upload');
-            }
-        }
-    }
-};
-
-if(window.ReactDND){
-    let DropTemplate = ReactDND.DropTarget(ReactDND.HTML5Backend.NativeTypes.FILE, fileTarget, function (connect, monitor) {
-        return {
-            connectDropTarget: connect.dropTarget(),
-            isOver: monitor.isOver(),
-            canDrop: monitor.canDrop()
-        };
-    })(FSTemplate);
-    // FSTemplate = ReactDND.DragDropContext(ReactDND.HTML5Backend)(DropTemplate);
+if(window['UploaderModel']){
+    FSTemplate = UploaderModel.DropProvider(FSTemplate);
 }
-
 FSTemplate = MaterialUI.Style.muiThemeable()(FSTemplate);
 
 export {FSTemplate as default}
