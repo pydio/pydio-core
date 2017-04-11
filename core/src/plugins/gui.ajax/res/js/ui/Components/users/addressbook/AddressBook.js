@@ -164,7 +164,7 @@ let AddressBook = React.createClass({
     },
 
     componentDidMount: function(){
-        this.onFolderClicked(this.state.selectedItem);
+        this.state.selectedItem && this.onFolderClicked(this.state.selectedItem);
     },
 
     onFolderClicked: function(item, callback = undefined){
@@ -174,6 +174,7 @@ let AddressBook = React.createClass({
             return;
         }
         this.setState({loading: true});
+
         Loaders.childrenAsPromise(item, false).then((children) => {
             Loaders.childrenAsPromise(item, true).then((children) => {
                 this.setState({selectedItem:item, loading: false}, callback);
