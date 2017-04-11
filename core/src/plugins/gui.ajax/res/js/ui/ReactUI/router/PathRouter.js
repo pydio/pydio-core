@@ -1,34 +1,33 @@
 import browserHistory from 'react-router/lib/browserHistory';
 
-const PathRouterWrapper = function(pydio){
+const PathRouterWrapper = (pydio) => {
 
     class PathRouter extends React.PureComponent {
 
         constructor(props) {
             super(props)
 
-            let target = props.params.splat
-
             this.state = {
-                init: false
+                active: pydio.getContextNode().getPath()
             }
 
-            this._ctxObs = function(event) {
-                let active = pydio.getContextNode().getPath();
-                if (!this.state.init) {
-                    target = props.params.splat;
-                } else {
-                    target = null;
-                }
+            this._ctxObs = (e) => this.setState({active: pydio.getContextNode().getPath()})
 
-                this.setState({
-                    init:     true,
-                    history:  true,
-                    active:   active,
-                    target:   target
-                })
-            }.bind(this);
             // Watching all path changes
+            pydio.getContextHolder().observe("context_changed", this._ctxObs);
+        }
+
+        componentWillMount() {
+            const target = this.props.params.splat
+
+            const active = this.state;
+
+            if (target !== active) {
+                pydio.goTo("/" + target);
+            }
+        }
+
+        componentDidMount() {
             pydio.getContextHolder().observe("context_changed", this._ctxObs);
         }
 
@@ -38,45 +37,30 @@ const PathRouterWrapper = function(pydio){
 
         //
         componentWillReceiveProps(nextProps) {
-            if (!this.state.init || !this.state.history) return
-
             // We set a new target only if we're browsing back through the history
             if (nextProps.location.action === 'POP') {
-                let target = nextProps.params.splat || ""
+                const target = nextProps.params.splat || ""
 
-                // We have a new target path
-                this.setState({
-                    target: target
-                })
+                pydio.goTo("/" + target);
             }
         }
 
         componentWillUpdate(nextProps, nextState) {
 
-            // We ignore props changes
-            if (!nextState.init || !nextState.history || nextState === this.state) return
+            // If we've switched repo and this was triggered elsewhere,
+            // navigate to new url and record history
+            if (this.state != nextState) {
+                let uri = [
+                    nextProps.params.workspaceId.replace(/\/$/, "").replace(/^\//, ""),
+                    nextState.active.replace(/\/$/, "").replace(/^\//, "")
+                ].join("/");
 
-            // If on load, the url targets a different repository
-            // than the one active, we redirect
-            if (nextState.target || nextState.target === "") {
-                if (nextState.target !== nextState.active) {
-                    // We don't want history to be touched if we've triggered ourselves the repository change
-                    this.setState({
-                        history: false
-                    }, () => {
-                        pydio.goTo("/" + nextState.target);
-                    })
-
-                }
-            } else {
-                // If we've switched repo and this was triggered elsewhere,
-                // navigate to new url and record history
-                if (this.state.history && this.state.active !== nextState.active) {
-                    let uri = [
-                        nextProps.params.workspaceId.replace(/\/$/, "").replace(/^\//, ""),
-                        nextState.active.replace(/\/$/, "").replace(/^\//, "")
-                    ].join("/");
-                    browserHistory.push("/" + uri)
+                if (this.state.active !== nextState.active) {
+                    if (nextProps.location.action === 'POP') {
+                        browserHistory.replace("/" + uri)
+                    } else {
+                        browserHistory.push("/" + uri)
+                    }
                 }
             }
         }

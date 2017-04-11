@@ -1,41 +1,39 @@
 import browserHistory from 'react-router/lib/browserHistory';
 
 
-const WorkspaceRouterWrapper = function(pydio) {
+const WorkspaceRouterWrapper = (pydio) => {
 
     class WorkspaceRouter extends React.PureComponent {
-
         constructor(props) {
             super(props)
 
-            let targetSlug = props.params.workspaceId.replace("ws-", "")
-
             this.state = {
-                init: false,
-                history: true
+                list: pydio.user.getRepositoriesList(),
+                active: pydio.user.getActiveRepository()
             }
 
-            this._wsObs = function (event) {
-                const {list, active} = event;
+            this._wsObs = ({list, active}) => this.setState({list, active})
+        }
 
-                // Upon initialisation, we set a target repository that comes from the url
-                // The active repository is coming from the server and might not
-                // reflect what we actually want
-                let target = null
-                if (!this.state.init) {
-                    let repository = this.findRepositoryBySlug(list, targetSlug)
-                    target = repository ? repository.getId() : null;
-                }
+        componentWillMount() {
+            // Before we mount, we check if we need to trigger a redirection
+            // based on the url
 
-                this.setState({
-                    init: true,
-                    history: true,
-                    list: list,
-                    active: active,
-                    target: target
-                })
-            }.bind(this);
-            // Watching all repository changes
+            const targetSlug = this.props.params.workspaceId.replace("ws-", "")
+
+            const {list, active} = this.state
+
+            // If on load, the url targets a different repository
+            // than the one active, we redirect
+            let repository = this.findRepositoryBySlug(list, targetSlug)
+            let target = repository ? repository.getId() : null;
+
+            if (target !== active) {
+                pydio.triggerRepositoryChange(target)
+            }
+        }
+
+        componentDidMount() {
             pydio.observe("repository_list_refreshed", this._wsObs);
         }
 
@@ -60,9 +58,6 @@ const WorkspaceRouterWrapper = function(pydio) {
 
         //
         componentWillReceiveProps(nextProps) {
-
-            if (!this.state.init || !this.state.history) return
-
             // We set a new target only if we're browsing back through the history
             if (nextProps.location.action === 'POP') {
                 let target = null
@@ -70,37 +65,22 @@ const WorkspaceRouterWrapper = function(pydio) {
                 let repository = this.findRepositoryBySlug(this.state.list, nextProps.params.workspaceId.replace('ws-', ''))
                 target = repository ? repository.getId() : null;
 
-                // We have a new target repository
-                this.setState({
-                    target: target
-                })
+                pydio.triggerRepositoryChange(target);
             }
         }
 
         componentWillUpdate(nextProps, nextState) {
-
-            // We ignore props changes
-            if (!nextState.init || !nextState.history || nextState === this.state) return
-
-            // If on load, the url targets a different repository
-            // than the one active, we redirect
-            if (nextState.target) {
-                if (nextState.target !== nextState.active) {
-                    // We don't want history to be touched if we've triggered ourselves the repository change
-                    this.setState({
-                        history: false
-                    })
-
-                    pydio.triggerRepositoryChange(nextState.target);
-                }
-            } else if (nextState.list && nextState.active) {
+            // Only push history if the state changed
+            if (this.state !== nextState) {
                 // If we've switched repo and this was triggered elsewhere,
                 // navigate to new url and record history
-                if (this.state.history && this.state.active !== nextState.active) {
-                    browserHistory.push("/ws-" + nextState.list.get(nextState.active).getSlug() + "/")
+                if (this.state.active !== nextState.active) {
+                    if (nextProps.location.action === 'POP') {
+                        browserHistory.replace("/ws-" + nextState.list.get(nextState.active).getSlug() + "/")
+                    } else {
+                        browserHistory.push("/ws-" + nextState.list.get(nextState.active).getSlug() + "/")
+                    }
                 }
-            } else {
-                browserHistory.push("/");
             }
         }
 
@@ -114,7 +94,6 @@ const WorkspaceRouterWrapper = function(pydio) {
     };
 
     return WorkspaceRouter;
-
 }
 
 export default WorkspaceRouterWrapper
