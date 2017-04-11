@@ -1,15 +1,16 @@
 const React = require('react')
+const {ActionDialogMixin, SubmitButtonProviderMixin} = require('pydio').requireLib('boot')
 
 let UploadDialog = React.createClass({
 
     mixins:[
-        PydioReactUI.ActionDialogMixin,
-        PydioReactUI.SubmitButtonProviderMixin
+        ActionDialogMixin,
+        SubmitButtonProviderMixin
     ],
 
     getDefaultProps: function(){
         return {
-            dialogTitle: 'Upload',
+            dialogTitle: '',
             dialogSize: 'lg',
             dialogPadding: false,
             dialogIsModal: true
@@ -29,7 +30,7 @@ let UploadDialog = React.createClass({
             return objA.order - objB.order;
         });
 
-        uploaders.map(function(uploader){
+        uploaders.map((uploader) => {
             if(uploader.moduleName) {
                 let parts = uploader.moduleName.split('.');
                 tabs.push(

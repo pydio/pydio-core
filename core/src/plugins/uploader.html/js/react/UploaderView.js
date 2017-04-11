@@ -103,7 +103,7 @@
                         supportClick={false}
                         onDrop={this.onDrop}
                         onFolderPicked={this.onFolderPicked}
-                        style={{width:'100%'}}
+                        style={{width:'100%', height: 300}}
                     >
                         <TransfersList onDismiss={this.props.onDismiss}/>
                     </PydioForm.FileDropZone>
@@ -258,7 +258,7 @@
                 this.renderSection(items, this.state.items.processed, global.pydio.MessageHash['html_uploader.16'], 'section-processed');
             }
             return (
-                <div id="upload_files_list" className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
+                <div id="upload_files_list" style={{height: '100%'}} className={UploaderModel.Configs.getInstance().getOptionAsBool('UPLOAD_SHOW_PROCESSED', 'upload_show_processed', false) ? 'show-processed' : ''}>
                     {items}
                 </div>
             )
@@ -325,21 +325,16 @@
                   targetOrigin={{horizontal: 'right', vertical: 'top'}}
                   onRequestClose={this.props.onDismiss}
                 >
-                    <MaterialUI.List>
+                    <MaterialUI.List style={{width: 260}}>
                         <MaterialUI.ListItem primaryText={global.pydio.MessageHash[337]} rightToggle={<MaterialUI.Toggle toggled={toggleStart} defaultToggled={toggleStart} onToggle={this.updateField.bind(this, 'autostart')} />} />
                         <MaterialUI.ListItem primaryText={global.pydio.MessageHash[338]} rightToggle={<MaterialUI.Toggle toggled={toggleClose} onToggle={this.updateField.bind(this, 'autoclose')} />} />
                         <MaterialUI.ListItem primaryText={global.pydio.MessageHash['html_uploader.17']} rightToggle={<MaterialUI.Toggle toggled={toggleShowProcessed} onToggle={this.updateField.bind(this, 'show_processed')} />} />
-                    </MaterialUI.List>
-
-                    <MaterialUI.Divider />
-
-                    <MaterialUI.List>
+                        <MaterialUI.Divider />
                         <MaterialUI.Subheader>{global.pydio.MessageHash['html_uploader.18']}</MaterialUI.Subheader>
-
-                        <MaterialUI.ListItem>
+                        <MaterialUI.ListItem disabled={true} style={{paddingTop: 0}}>
                             <MaterialUI.RadioButtonGroup ref="group" name="shipSpeed" defaultSelected={overwriteType} onChange={this.radioChange}>
-                                <MaterialUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']}/>
-                                <MaterialUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']}/>
+                                <MaterialUI.RadioButton value="alert" label={global.pydio.MessageHash['html_uploader.19']} style={{paddingBottom: 8}} />
+                                <MaterialUI.RadioButton value="rename" label={global.pydio.MessageHash['html_uploader.20']} style={{paddingBottom: 8}}/>
                                 <MaterialUI.RadioButton value="overwrite" label={global.pydio.MessageHash['html_uploader.21']}/>
                             </MaterialUI.RadioButtonGroup>
                         </MaterialUI.ListItem>
