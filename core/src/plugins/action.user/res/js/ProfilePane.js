@@ -113,8 +113,8 @@ let ProfilePane = React.createClass({
         postValues['get_action'] = 'custom_data_edit';
         PydioApi.getClient().request(postValues, function(transport){
             PydioApi.getClient().parseXmlMessage(transport.responseXML);
-            this.props.pydio.observeOnce("registry_part_loaded", function(event){
-                if(event.memo != "user/preferences") return;
+            pydio.observeOnce("registry_part_loaded", function(event){
+                if(event !== "user/preferences") return;
                 pydio.Registry.logXmlUser(false);
             });
             pydio.loadXmlRegistry(false, "user/preferences");
