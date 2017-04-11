@@ -122,7 +122,6 @@ let AsyncModal = React.createClass({
     },
 
     initModalFromComponent: function(component) {
-
         if(component.getButtons) {
             const buttons = component.getButtons(this.updateButtons.bind(this));
             if(buttons && buttons.length){
@@ -202,7 +201,6 @@ let AsyncModal = React.createClass({
         }else{
             this.setState({blur: false}, () => {this.deactivateResizeObserver()});
         }
-
     },
 
     computeBackgroundData: function(){
@@ -245,7 +243,7 @@ let AsyncModal = React.createClass({
         };
     },
 
-    render: function(){
+    render: function() {
 
         var modalContent;
 

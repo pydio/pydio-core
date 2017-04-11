@@ -1,12 +1,15 @@
-const React = require('react');
-const ResourcesManager = require('pydio/http/resources-manager');
+import React, {Component} from 'react';
+import ResourcesManager from 'pydio/http/resources-manager';
+
+import _ from 'lodash';
+
 /********************/
 /* ASYNC COMPONENTS */
 /********************/
 /**
  * Load a component from server (if not already loaded) based on its namespace.
  */
-class AsyncComponent extends React.Component {
+class AsyncComponent extends Component {
 
     constructor(props) {
         super(props)
@@ -14,21 +17,32 @@ class AsyncComponent extends React.Component {
         this.state = {
             loaded: false
         }
+
+        this._handleLoad = _.debounce(this._handleLoad, 100)
     }
 
-    _asyncLoad() {
-        ResourcesManager.loadClassesAndApply([this.props.namespace], function() {
-            this.setState({loaded:true});
+    _handleLoad() {
+        const callback = () => {
+            if (this.instance && !this.loadFired && typeof this.props.onLoad === 'function') {
+                this.props.onLoad(this.instance)
+                this.loadFired = true
+            }
+        }
 
-            /*if(this.refs['component'] && this.props.onLoad && !this.loadFired){
-                this.props.onLoad(this.refs['component']);
-                this.loadFired = true;
-            }*/
-        }.bind(this));
+        if (!this.state.loaded) {
+            // Loading the class asynchronously
+            ResourcesManager.loadClassesAndApply([this.props.namespace], () => {
+                this.setState({loaded:true});
+                callback();
+            })
+        } else {
+            // Class is already available, just doing the callback
+            callback();
+        }
     }
 
     componentDidMount() {
-        this._asyncLoad();
+        this._handleLoad();
     }
 
     componentWillReceiveProps(newProps) {
@@ -39,26 +53,18 @@ class AsyncComponent extends React.Component {
     }
 
     componentDidUpdate() {
-        if (!this.state.loaded) {
-            this._asyncLoad();
-        /*}else{
-            if(this.refs['component'] && this.props.onLoad && !this.loadFired){
-                this.props.onLoad(this.refs['component']);
-                this.loadFired = true;
-            }*/
-        }
+        this._handleLoad();
     }
 
     render() {
-
         if (!this.state.loaded) return null
 
         let props = this.props
         const {namespace, componentName, modalData} = props
         const nsObject = window[this.props.namespace];
-        const component = FuncUtils.getFunctionByName(this.props.componentName, window[this.props.namespace]);
+        const Component = FuncUtils.getFunctionByName(this.props.componentName, window[this.props.namespace]);
 
-        if (component) {
+        if (Component) {
             if (modalData && modalData.payload) {
                 props = {
                     ...props,
@@ -66,7 +72,7 @@ class AsyncComponent extends React.Component {
                 }
             }
 
-            return React.createElement(component, {...props});
+            return <Component {...props} ref={(instance) => { this.instance = instance; }} />;
 
         } else {
             return <div>Component {namespace}.{componentName} not found!</div>;
