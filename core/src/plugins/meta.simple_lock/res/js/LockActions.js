@@ -32,13 +32,13 @@
             if(action && n){
                 action.selectionContext.allowedMimes = [];
                 if(n.getMetadata().get("sl_locked")){
-                    action.setIconSrc('meta_simple_lock/ICON_SIZE/unlock.png', 'icon-unlock');
+                    action.setIconClassName('icon-unlock');
                     action.setLabel('meta.simple_lock.3');
                     if(!n.getMetadata().get("sl_mylock")){
                         action.selectionContext.allowedMimes = ["fake_extension_that_never_exists"];
                     }
                 }else{
-                    action.setIconSrc('meta_simple_lock/ICON_SIZE/lock.png', 'icon-lock');
+                    action.setIconClassName('icon-lock');
                     action.setLabel('meta.simple_lock.1');
                 }
             }

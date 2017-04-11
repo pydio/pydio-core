@@ -209,10 +209,8 @@
             }
             if(pydio.getContextNode().hasAjxpMimeInBranch("ajxp_browsable_archive")){
                 this.setLabel(247, 248);
-                this.setIconSrc('ark_extract.png');
             }else{
                 this.setLabel(66, 159);
-                this.setIconSrc('editcopy.png');
             }
         }
 

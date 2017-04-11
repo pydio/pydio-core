@@ -589,56 +589,47 @@ export default class Action extends Observable{
 	 * Caches some data for dynamically built menus
 	 */
 	prepareSubmenuDynamicBuilder (){
-		this.subMenuItems.dynamicBuilder = function(protoMenu){
-            let builderFunction = function(){
-                var menuItems;
-				if(this.subMenuItems.dynamicBuilderCode) {
-                    window.builderContext = this;
-                    window.builderProtoMenu = protoMenu;
-                    this._evalScripts(this.subMenuItems.dynamicBuilderCode);
-                    menuItems = this.builderMenuItems || [];
-                }else if(this.subMenuItems.dynamicBuilderModule){
-				    let func = FuncUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window);
-				    if(func){
-                        menuItems = func.apply(this);
-                    }
-				}else{
-			  		menuItems = [];
-			  		this.subMenuItems.dynamicItems.forEach(function(item){
-                        if(item.separator){
-                            menuItems.push(item);
-                            return;
-                        }
-			  			var action = this.manager.actions.get(item['actionId']);
-			  			if(action.deny) return;
-						var itemData = {
-							name:action.getKeyedText(),
-							alt:action.options.title,
-                            icon_class:action.options.icon_class,
-                            image_unresolved: action.options.src,
-							callback: function(){this.apply();}.bind(action)
-						};
-                        if(action.options.subMenu){
-                            itemData.subMenu = [];
-                            if(action.subMenuItems.staticOptions){
-                                itemData.subMenu = action.subMenuItems.staticOptions;
-                            }
-                            if(action.subMenuItems.dynamicBuilder){
-                                itemData.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
-                            }
-                        }
-                        menuItems.push(itemData);
-			  		}, this);
-				}
-                if(protoMenu){
-                    protoMenu.options.menuItems = menuItems;
-                    protoMenu.refreshList();
+		this.subMenuItems.dynamicBuilder = function(controller){
+            let menuItems = [];
+            if(this.subMenuItems.dynamicBuilderCode) {
+                window.builderContext = this;
+                this._evalScripts(this.subMenuItems.dynamicBuilderCode);
+                menuItems = this.builderMenuItems || [];
+            }else if(this.subMenuItems.dynamicBuilderModule){
+                const func = FuncUtils.getFunctionByName(this.subMenuItems.dynamicBuilderModule, window);
+                if(func){
+                    menuItems = func.apply(this);
                 }
-                return menuItems;
-			}.bind(this);
-            if(protoMenu) setTimeout(builderFunction, 0);
-            else return builderFunction();
-		}.bind(this);		
+            }else{
+                menuItems = [];
+                this.subMenuItems.dynamicItems.forEach(function(item){
+                    if(item.separator){
+                        menuItems.push(item);
+                        return;
+                    }
+                    const action = this.manager.actions.get(item['actionId']);
+                    if(action.deny) return;
+                    let itemData = {
+                        name:action.getKeyedText(),
+                        alt:action.options.title,
+                        icon_class:action.options.icon_class,
+                        image_unresolved: action.options.src,
+                        callback: function(){this.apply();}.bind(action)
+                    };
+                    if(action.options.subMenu){
+                        itemData.subMenu = [];
+                        if(action.subMenuItems.staticOptions){
+                            itemData.subMenu = action.subMenuItems.staticOptions;
+                        }
+                        if(action.subMenuItems.dynamicBuilder){
+                            itemData.subMenuBeforeShow = action.subMenuItems.dynamicBuilder;
+                        }
+                    }
+                    menuItems.push(itemData);
+                }, this);
+            }
+            return menuItems;
+		}.bind(this);
 	}
 	
 	/**
@@ -646,13 +637,10 @@ export default class Action extends Observable{
 	 * @param newSrc String The image source. Can reference an image library
      * @param iconClass String Optional class to replace image
 	 */
-	setIconSrc (newSrc, iconClass){
-		this.options.src = newSrc;
-        var previousIconClass = this.options.icon_class;
-        this.notify("update_icon", {new_src:newSrc,new_class:iconClass, previous_class:previousIconClass});
-        if(iconClass){
-            this.options.icon_class = iconClass;
-        }
+	setIconClassName (iconClass){
+        const {icon_class} = this.options;
+        this.notify("update_icon", {new_class:iconClass, previous_class:icon_class});
+        this.options.icon_class = iconClass;
 	}
 	
 	/**
