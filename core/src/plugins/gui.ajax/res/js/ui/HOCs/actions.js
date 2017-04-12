@@ -37,7 +37,7 @@ const withActions = (Component) => {
                 <div style={{display: "flex", flexDirection: "column", flex: 1}}>
                     <Toolbar elements={actions} />
 
-                    <Component {...remainingProps} style={{flex: 1}} />
+                    <Component {...remainingProps} />
                 </div>
             )
         }
