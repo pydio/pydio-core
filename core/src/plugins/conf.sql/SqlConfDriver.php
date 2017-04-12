@@ -1264,7 +1264,6 @@ class SqlConfDriver extends AbstractConfDriver implements SqlTableProvider
      */
     public function listUserTeams(UserInterface $parentUser)
     {
-        dibi::query("DELETE FROM [ajxp_user_teams] WHERE [user_id] NOT IN (SELECT [login] FROM [ajxp_users])");
         $res = dibi::query("SELECT * FROM [ajxp_user_teams] WHERE [owner_id] = %s ORDER BY [team_id]", $parentUser->getId());
         $data = $res->fetchAll();
         $all = array();
