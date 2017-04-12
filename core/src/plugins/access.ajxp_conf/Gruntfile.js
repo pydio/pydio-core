@@ -1,4 +1,7 @@
 module.exports = function(grunt) {
+
+    const {Externals} = require('../gui.ajax/res/js/dist/libdefs');
+
     grunt.initConfig({
         babel: {
             options: {},
@@ -17,6 +20,9 @@ module.exports = function(grunt) {
         },
         browserify: {
             ui : {
+                options: {
+                    external:Externals
+                },
                 files: {
                     'res/build/AdminComponents.js'  : 'res/build/AdminComponents/index.js',
                     'res/build/AdminWorkspaces.js'  : 'res/build/AdminWorkspaces/index.js',

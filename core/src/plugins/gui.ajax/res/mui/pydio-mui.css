@@ -2700,9 +2700,6 @@
   margin: 0;
   font-size: inherit;
 }
-.react-mui-context .mui-error-as-hint hr.mui-text-field-focus-underline {
-  border-color: #009688 !important;
-}
 .react-mui-context .mui-text-field .mui-text-field-error {
   bottom: auto;
   line-height: 15px;
@@ -2744,13 +2741,20 @@
 .react-mui-context .viewport-height {
   height: 100vh;
 }
-.react-mui-context .main-panel {
-  margin-left: 64px;
-  padding-top: 64px;
+.react-mui-context .app-canvas {
+  height: 100vh;
+  background-color: white;
+}
+.react-mui-context .app-canvas .main-panel {
+  position: absolute;
+  top: 64px;
+  left: 64px;
+  right: 0;
+  bottom: 0;
 }
 @media only screen and (max-width: 420px) {
-  .react-mui-context .main-panel {
-    margin-left: 0;
+  .react-mui-context .app-canvas .main-panel {
+    left: 0;
   }
 }
 .react-mui-context .mui-paper.vertical-layout > .mui-paper-container,
@@ -2984,9 +2988,6 @@
 .react-mui-context .pydio-form-panel .form-legend .icon-question-sign:hover {
   color: rgba(0, 0, 0, 0.53);
 }
-.react-mui-context .pydio-form-panel .form-legend.warning-message {
-  color: #009788;
-}
 .react-mui-context .pydio-form-panel .form-entry-string .form-legend,
 .react-mui-context .pydio-form-panel .form-entry-integer .form-legend,
 .react-mui-context .pydio-form-panel .form-entry-textarea .form-legend {
@@ -3059,7 +3060,6 @@
   width: 100%;
 }
 .react-mui-context .pydio-form-panel .Select-control .Select-item {
-  background-color: #009688;
   color: #FFFFFF;
   border-radius: 2px;
   border: 0 solid #c9e6f2;
@@ -3074,7 +3074,6 @@
 }
 .react-mui-context .pydio-form-panel .Select-control .Select-item span.Select-item-icon:hover,
 .react-mui-context .pydio-form-panel .Select-control .Select-item span.Select-item-icon:focus {
-  background-color: #009688;
   color: #FFFFFF;
 }
 .react-mui-context .pydio-form-panel .drop-down-with-floating-label label.drop-down-floating-label {

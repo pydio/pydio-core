@@ -1,61 +1,62 @@
+const {Component} = require('react')
+const {MenuItem, Divider, Subheader, FontIcon} = require('material-ui')
+
+function renderItem(palette, node, text = null, icon = null){
+
+    const iconStyle = {
+        fontSize: 20,
+        color : palette.primary1Color,
+        padding: 2
+    };
+    const flagStyle = {
+        display: 'inline',
+        backgroundColor: palette.accent1Color,
+        color: 'white',
+        height: 22,
+        borderRadius: 10,
+        padding: '0 5px',
+        marginLeft: 5
+    };
+
+    let label = text || node.getLabel();
+    if(node.getMetadata().get('flag')){
+        label = <span>{node.getLabel()} <span style={flagStyle}>{node.getMetadata().get('flag')}</span> </span>;
+    }
+
+    return (
+        <MenuItem
+            value={node}
+            primaryText={label}
+            rightIcon={<FontIcon className={icon || node.getMetadata().get('icon_class')} style={iconStyle}/>}
+        />);
+
+}
+
 class NavigationHelper{
 
-    static buildNavigationItems(rootNode, contextNode, items){
+    static buildNavigationItems(pydio, rootNode, palette){
+
+        let items = [];
 
         if(rootNode.getMetadata().get('component')){
-            items.push({
-                text            : pydio.MessageHash['ajxp_admin.menu.0'],
-                payload         : rootNode,
-                iconClassName   : rootNode.getMetadata().get('icon_class')
-            });
-        }/*else{
-            items.push({
-                text:pydio.MessageHash['ajxp_admin.menu.0'],
-                payload:rootNode,
-                iconClassName:"icon-dashboard"
-            });
-        }*/
-        var index = 0;
-        var selectedIndex = 0;
-        if(contextNode == rootNode) selectedIndex = 0;
+            items.push(renderItem(palette, rootNode, pydio.MessageHash['ajxp_admin.menu.0']));
+        }
         rootNode.getChildren().forEach(function(header){
             if(!header.getChildren().size && header.getMetadata().get('component')) {
-                items.push({
-                    text: header.getLabel(),
-                    payload: header,
-                    iconClassName: header.getMetadata().get('icon_class')
-                });
-                index++;
-                if (contextNode == header) {
-                    selectedIndex = index;
-                }
+                items.push(renderItem(palette, header));
             }else{
                 if(header.getLabel()){
-                    items.push({
-                        type: ReactMUI.MenuItem.Types.SUBHEADER,
-                        text:header.getLabel()
-                    });
-                    index++;
+                    items.push(<Divider/>);
+                    items.push(<Subheader>{header.getLabel()}</Subheader>)
                 }
                 header.getChildren().forEach(function(child){
                     if(!child.getLabel()) return;
-                    var label = child.getLabel();
-                    if(child.getMetadata().get('flag')){
-                        label = <span>{child.getLabel()} <span className="menu-flag">{child.getMetadata().get('flag')}</span> </span>;
-                    }
-                    items.push({
-                        text:label,
-                        payload:child,
-                        iconClassName:child.getMetadata().get('icon_class')
-                    });
-                    index++;
-                    if(contextNode == child){
-                        selectedIndex = index;
-                    }
+                    items.push(renderItem(palette, child));
                 });
             }
         });
-        return selectedIndex;
+
+        return items;
 
     }
 

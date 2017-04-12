@@ -1,12 +1,18 @@
+const React = require('react')
+const {Menu} = require('material-ui')
+const {muiThemeable} = require('material-ui/styles')
+
 import NavigationHelper from '../util/NavigationHelper'
 import MenuItemListener from '../util/MenuItemListener'
+const AjxpNode = require('pydio/model/node')
+const PydioDataModel = require('pydio/model/data-model')
 
-const AdminLeftNav = React.createClass({
+let AdminLeftNav = React.createClass({
 
     propTypes:{
-        rootNode:React.PropTypes.instanceOf(AjxpNode),
-        contextNode:React.PropTypes.instanceOf(AjxpNode),
-        dataModel:React.PropTypes.instanceOf(PydioDataModel)
+        rootNode        : React.PropTypes.instanceOf(AjxpNode),
+        contextNode     : React.PropTypes.instanceOf(AjxpNode),
+        dataModel       : React.PropTypes.instanceOf(PydioDataModel)
     },
 
     componentDidMount: function(){
@@ -24,11 +30,11 @@ const AdminLeftNav = React.createClass({
     checkForUpdates: function(){
         if(this.props.pydio.Controller.getActionByName("get_upgrade_path")){
             PydioApi.getClient().request({get_action:'get_upgrade_path'}, function(transp){
-                var response = transp.responseJSON;
-                var fakeNode = new AjxpNode("/admin/action.updater");
-                var child = fakeNode.findInArbo(this.props.rootNode);
+                const response = transp.responseJSON;
+                const fakeNode = new AjxpNode("/admin/action.updater");
+                const child = fakeNode.findInArbo(this.props.rootNode);
                 if(child){
-                    var length = 0;
+                    let length = 0;
                     if(response && response.packages.length) {
                         length = response.packages.length;
                     }
@@ -78,14 +84,20 @@ const AdminLeftNav = React.createClass({
         }.bind(this), 500);
     },
 
+    onMenuChange: function(event, node){
+        this.props.dataModel.setSelectedNodes([]);
+        this.props.dataModel.setContextNode(node);
+    },
 
     render: function(){
-        var menuItems = [];
-        var selectedIndex = NavigationHelper.buildNavigationItems(this.props.rootNode, this.props.contextNode, menuItems);
 
-        var menuHeader = (
+        const {pydio, rootNode, contextNode, muiTheme} = this.props;
+
+        const menuItems = NavigationHelper.buildNavigationItems(pydio, rootNode, muiTheme.palette);
+
+        const menuHeader = (
             <div onMouseOver={this.leftNavMouseOver} onMouseOut={this.leftNavMouseOut} onScroll={this.leftNavScroll} className="left-nav-menu-scroller">
-                <ReactMUI.Menu onItemClick={this.menuClicked} zDepth={0} menuItems={menuItems} selectedIndex={selectedIndex}/>
+                <Menu onChange={this.onMenuChange} width={256} style={{maxWidth:256}} value={contextNode}>{menuItems}</Menu>
             </div>
         );
         return <ReactMUI.LeftNav className="admin-main-nav" docked={true} isInitiallyOpen={false} menuItems={[]} ref="leftNav" header={menuHeader}/>
@@ -93,4 +105,5 @@ const AdminLeftNav = React.createClass({
 
 });
 
+AdminLeftNav = muiThemeable()(AdminLeftNav);
 export {AdminLeftNav as default}

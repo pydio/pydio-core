@@ -1,7 +1,10 @@
+const React = require('react')
 import {MessagesProviderMixin, PydioProviderMixin} from '../util/Mixins'
 import AdminLeftNav from './AdminLeftNav'
+const {AppBar, Paper} = require('material-ui')
+const PydioDataModel = require('pydio/model/data-model')
 
-let AdminDashboard = React.createClass({
+const AdminDashboard = React.createClass({
 
     mixins:[MessagesProviderMixin, PydioProviderMixin],
 
@@ -10,7 +13,7 @@ let AdminDashboard = React.createClass({
     },
 
     getInitialState: function(){
-        var dm = this.props.pydio.getContextHolder();
+        const dm = this.props.pydio.getContextHolder();
         return {
             contextNode:dm.getContextNode(),
             selectedNodes:dm.getSelectedNodes(),
@@ -19,7 +22,7 @@ let AdminDashboard = React.createClass({
     },
 
     dmChangesToState: function(){
-        var dm = this.props.pydio.getContextHolder();
+        const dm = this.props.pydio.getContextHolder();
         this.setState({
             contextNode:dm.getContextNode(),
             selectedNodes:dm.getSelectedNodes(),
@@ -82,15 +85,15 @@ let AdminDashboard = React.createClass({
     },
 
     openLeftNav:function(){
-        this.refs.leftNav.openMenu();
+        if(this.leftNav) this.leftNav.openMenu();
     },
 
     componentDidMount: function(){
-        var dm = this.props.pydio.getContextHolder();
+        const dm = this.props.pydio.getContextHolder();
         dm.observe("context_changed", this.dmChangesToState);
         dm.observe("selection_changed", this.dmChangesToState);
         // Monkey Patch Open Current Selection In Editor
-        var monkeyObject = this.props.pydio.UI;
+        let monkeyObject = this.props.pydio.UI;
         if(this.props.pydio.UI.__proto__){
             monkeyObject = this.props.pydio.UI.__proto__;
         }
@@ -109,11 +112,11 @@ let AdminDashboard = React.createClass({
     },
 
     componentWillUnmount: function(){
-        var dm = this.props.pydio.getContextHolder();
+        const dm = this.props.pydio.getContextHolder();
         dm.stopObserving("context_changed", this.dmChangesToState);
         dm.stopObserving("selection_changed", this.dmChangesToState);
         // Restore Monkey Patch
-        var monkeyObject = this.props.pydio.UI;
+        let monkeyObject = this.props.pydio.UI;
         if(this.props.pydio.UI.__proto__){
             monkeyObject = this.props.pydio.UI.__proto__;
         }
@@ -124,10 +127,10 @@ let AdminDashboard = React.createClass({
     },
 
     routeMasterPanel: function(node, selectedNode){
-        var path = node.getPath();
+        const path = node.getPath();
         if(!selectedNode) selectedNode = node;
 
-        var dynamicComponent;
+        let dynamicComponent;
         if(node.getMetadata().get('component')){
             dynamicComponent = node.getMetadata().get('component');
         }else{
@@ -155,10 +158,10 @@ let AdminDashboard = React.createClass({
     },
 
     render: function(){
-        var dm = this.props.pydio.getContextHolder();
+        const dm = this.props.pydio.getContextHolder();
         let params = this.props.pydio.Parameters;
         let img = ResourcesManager.resolveImageSource('white_logo.png');
-        var title = (
+        const title = (
             <div style={{paddingLeft:50}}>
                 <img
                     className="custom_logo_image linked"
@@ -171,14 +174,14 @@ let AdminDashboard = React.createClass({
                 />
             </div>
         );
-        var rPanelContent;
+        let rPanelContent;
         if(this.state.rightPanel){
             rPanelContent = React.createElement(this.state.rightPanel.COMPONENT, this.state.rightPanel.PROPS, this.state.rightPanel.CHILDREN);
         }
-        var rightPanel = (
-            <ReactMUI.Paper zDepth={2} className={"paper-editor layout-fill vertical-layout" + (this.state.rightPanel?' visible':'')}>
+        const rightPanel = (
+            <Paper zDepth={2} className={"paper-editor layout-fill vertical-layout" + (this.state.rightPanel?' visible':'')}>
                 {rPanelContent}
-            </ReactMUI.Paper>
+            </Paper>
         );
 
         let appBarRight;
@@ -199,31 +202,27 @@ let AdminDashboard = React.createClass({
         }
 
         return (
-            <ReactMUI.AppCanvas predefinedLayout={1} className="react-mui-context">
+            <div className="app-canvas">
                 <AdminLeftNav
                     pydio={this.props.pydio}
                     dataModel={dm}
                     rootNode={dm.getRootNode()}
                     contextNode={dm.getContextNode()}
-                    ref="leftNav"/>
-                <ReactMUI.AppBar
-                    className="mui-dark-theme"
+                    ref={(i)=>{if(i!==null) this.leftNav = i;}}/>
+                <AppBar
                     title={title}
                     zDepth={1}
                     showMenuIconButton={true}
-                    onMenuIconButtonTouchTap={this.openLeftNav}
+                    onLeftIconButtonTouchTap={this.openLeftNav.bind(this)}
                     iconElementRight={appBarRight}
                 />
-                <div className="viewport-height main-panel">
+                <div className="main-panel">
                     {this.routeMasterPanel(dm.getContextNode(), dm.getUniqueNode())}
                 </div>
                 {rightPanel}
-            </ReactMUI.AppCanvas>
+            </div>
         )
     }
 });
 
-if(window.ReactDND){
-    AdminDashboard = ReactDND.DragDropContext(ReactDND.HTML5Backend)(AdminDashboard);
-}
 export {AdminDashboard as default}

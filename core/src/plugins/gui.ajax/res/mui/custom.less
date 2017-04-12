@@ -15,7 +15,7 @@
   @primary-color: #009688;
 
   .mui-error-as-hint hr.mui-text-field-focus-underline {
-    border-color: @primary-color !important;
+    //border-color: @primary-color !important;
   }
   .mui-text-field .mui-text-field-error{
     bottom: auto;
@@ -62,15 +62,23 @@
     height: 100vh;
   }
 
-  .main-panel {
-    margin-left: 64px;
-    padding-top: 64px;
-  }
-  @media only screen
-  and (max-width: 420px) {
+  .app-canvas{
+    height: 100vh;
+    background-color: white;
     .main-panel {
-      margin-left: 0;
+      position: absolute;
+      top: 64px;
+      left: 64px;
+      right: 0;
+      bottom: 0;
     }
+    @media only screen
+    and (max-width: 420px) {
+      .main-panel {
+        left: 0;
+      }
+    }
+
   }
 
   .mui-paper.vertical-layout > .mui-paper-container,
@@ -334,7 +342,7 @@
         }
       }
       &.warning-message{
-        color: lighten(@primary-color, 0.1);
+        //color: lighten(@primary-color, 0.1);
       }
     }
 
@@ -414,7 +422,7 @@
     .Select-control {
       width: 100%;
       .Select-item {
-        background-color: @primary-color;
+        //background-color: @primary-color;
         color: #FFFFFF;
         border-radius: 2px;
         border: 0 solid #c9e6f2;
@@ -427,7 +435,7 @@
           padding: 5px 10px;
           &.Select-item-icon:hover,
           &.Select-item-icon:focus {
-            background-color: @primary-color;
+            //background-color: @primary-color;
             color: #FFFFFF;
           }
         }
