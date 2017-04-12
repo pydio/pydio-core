@@ -13,7 +13,7 @@ export default React.createClass({
     },
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.pydio.user.activeRepository != this.state.repoKey) {
+        if (nextProps.pydio.user && nextProps.pydio.user.activeRepository != this.state.repoKey) {
             this.loadData(nextProps);
         }
     },

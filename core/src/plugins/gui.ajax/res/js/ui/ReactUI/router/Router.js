@@ -3,13 +3,14 @@ import Route from 'react-router/lib/Route';
 import IndexRoute from 'react-router/lib/IndexRoute';
 import browserHistory from 'react-router/lib/browserHistory';
 
+import MainRouter from './MainRouter';
 import WorkspaceRouter from './WorkspaceRouter';
 import PathRouter from './PathRouter';
 import HomeRouter from './HomeRouter';
 
 function getRoutes(pydio){
     const routes = (
-        <Route path="/">
+        <Route path="/" component={MainRouter(pydio)}>
             <IndexRoute component={HomeRouter}/>
             <Route path=":workspaceId" component={WorkspaceRouter(pydio)}>
                 <IndexRoute component={PathRouter(pydio)}/>
