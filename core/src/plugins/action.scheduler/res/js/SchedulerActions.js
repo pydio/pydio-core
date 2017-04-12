@@ -5,28 +5,15 @@
     class Callbacks{
 
         static runAll(){
-            var connexion = new Connexion();
-            connexion.setParameters(new Hash({get_action:'scheduler_runAll'}));
-            connexion.onComplete = function(transport){
-                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-            };
-            connexion.sendAsync();
+            PydioApi.getClient().request({
+                get_action:'scheduler_runAll'
+            });
         }
         
         static generateCron() {
-            
-            modal.showDialogForm('', 'scheduler_cronExpression', function(oForm){
-                var connexion = new Connexion();
-                connexion.setParameters(new Hash({get_action:'scheduler_generateCronExpression'}));
-                connexion.onComplete = function(transport){
-                    $("cron_expression").setValue(transport.responseText);
-                    $("cron_expression").select();
-                };
-                connexion.sendAsync();
-            }, function(oForm){
-                hideLightBox();
-            }, null, true);
-            
+
+            pydio.UI.openComponentInModal('SchedulerActions', 'CronDialog');
+
         }
 
         static runTask(manager, args){
@@ -38,28 +25,10 @@
                 userSelection =  pydio.getUserSelection();
             }
             var taskId = PathUtils.getBasename(userSelection.getUniqueNode().getPath());
-            var connexion = new Connexion();
-            connexion.setParameters(new Hash({
+            PydioApi.getClient().request({
                 get_action:'scheduler_runTask',
                 task_id:taskId
-            }));
-            connexion.onComplete = function(transport){
-                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-            };
-            connexion.sendAsync();
-
-        }
-
-        static editTask(manager, args){
-            
-            var userSelection;
-            if(args && args.length){
-                userSelection = args[0];
-            }else{
-                userSelection =  pydio.getUserSelection();
-            }
-            pydio.getController().fireAction('scheduler_addTask', userSelection.getUniqueNode());
-            
+            });
         }
 
         static removeTask(manager, args){
@@ -70,12 +39,10 @@
             }else{
                 userSelection =  pydio.getUserSelection();
             }
-            var conn = new Connexion();
-            conn.setParameters($H({ get_action : 'scheduler_removeTask', task_id: PathUtils.getBasename(userSelection.getUniqueNode().getPath()) }));
-            conn.onComplete = function(transport){
-                PydioApi.getClient().parseXmlMessage(transport.responseXML);
-            };
-            conn.sendAsync();
+            PydioApi.getClient().request({
+                get_action : 'scheduler_removeTask',
+                task_id: PathUtils.getBasename(userSelection.getUniqueNode().getPath())
+            });
 
         }
         
@@ -95,8 +62,61 @@
         
     }
 
+    /**
+     * Sample Dialog class used for reference only, ready to be
+     * copy/pasted :-)
+     */
+    const CronDialog = React.createClass({
+
+        mixins:[
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.CancelButtonProviderMixin
+        ],
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: "Cron Expression",
+                dialogIsModal: false,
+                dialogSize: 'md'
+            };
+        },
+
+        componentDidMount: function(){
+            PydioApi.getClient().request({get_action:'scheduler_generateCronExpression'}, (transport)=>{
+                this.setState({cronExpression: transport.responseText});
+            });
+
+        },
+
+        submit(){
+            this.dismiss();
+        },
+        render: function(){
+            const {ClipboardTextField} = PydioComponents;
+            if(this.state && this.state.cronExpression){
+                return (
+                    <div style={{width:'100%'}}>
+                        <ClipboardTextField
+                            fullWidth={true}
+                            inputValue={this.state.cronExpression}
+                            getMessage={(id)=>{return pydio.MessageHash[id]}}
+                            multiLine={true}
+                            maxRows={5}
+                        />
+                    </div>
+                );
+            }else{
+                return <div>Loading...</div>;
+            }
+        }
+
+    });
+
+
+
     global.SchedulerActions = {
-        Callbacks: Callbacks
+        Callbacks: Callbacks,
+        CronDialog: CronDialog
     };
 
 })(window)

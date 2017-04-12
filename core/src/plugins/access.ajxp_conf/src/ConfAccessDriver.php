@@ -30,6 +30,7 @@ use Pydio\Access\Core\AbstractAccessDriver;
 use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\Model\ContextInterface;
 use Pydio\Core\Controller\Controller;
+use Pydio\Core\PluginFramework\PluginsService;
 use Pydio\Core\Services\LocaleService;
 use Pydio\Core\Services\RepositoryService;
 use Pydio\Core\Services\UsersService;

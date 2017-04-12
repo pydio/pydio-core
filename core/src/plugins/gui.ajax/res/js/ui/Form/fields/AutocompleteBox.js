@@ -1,71 +1,63 @@
 import FormMixin from '../mixins/FormMixin'
 const React = require('react')
-// @TODO ; REPLACE AUTOSUGGEST BY MATERIAL UI COMPLETER
+const {AutoComplete, MenuItem, RefreshIndicator} = require('material-ui')
 
 export default React.createClass({
 
     mixins:[FormMixin],
 
-    onSuggestionSelected: function(value, event){
-        this.onChange(event, value);
+    handleUpdateInput: function(searchText) {
+        //this.setState({searchText: searchText});
     },
 
-    getInitialState:function(){
-        return {loading : 0};
+    handleNewRequest: function(chosenValue) {
+        this.onChange(null, chosenValue.key);
     },
 
-    suggestionLoader:function(input, callback) {
-
-        this.setState({loading:true});
-        let values = {};
-        if(this.state.choices){
-            this.state.choices.forEach(function(v){
-                if(v.indexOf(input) === 0){
-                    values[v] = v;
-                }
+    onChoicesLoaded: function(choices){
+        let dataSource = [];
+        let labels = {};
+        choices.forEach((choice, key) => {
+            dataSource.push({
+                key         : key,
+                text        : choice,
+                value       : <MenuItem>{choice}</MenuItem>
             });
-        }
-        callback(null, LangUtils.objectValues(values));
-        this.setState({loading:false});
-
-    },
-
-    getSuggestions(input, callback){
-        FuncUtils.bufferCallback('suggestion-loader-search', 350, function(){
-            this.suggestionLoader(input, callback);
-        }.bind(this));
-    },
-
-    suggestionValue: function(suggestion){
-        return '';
-    },
-
-    renderSuggestion(value){
-        return <span>{value}</span>;
+            labels[key] = choice;
+        });
+        this.setState({dataSource: dataSource, labels: labels});
     },
 
     render: function(){
 
-        const inputAttributes = {
-            id: 'pydioform-autosuggest',
-            name: 'pydioform-autosuggest',
-            className: 'react-autosuggest__input',
-            placeholder: this.props.attributes['label'],
-            value: this.state.value   // Initial value
-        };
+        let displayText = this.state.value;
+        if(this.state.labels && this.state.labels[displayText]){
+            displayText = this.state.labels[displayText];
+        }
+
         return (
-            <div className="pydioform_autocomplete">
-                <span className={"suggest-search icon-" + (this.state.loading ? 'refresh rotating' : 'search')}/>
-                <ReactAutoSuggest
-                    ref="autosuggest"
-                    cache={true}
-                    showWhen = {input => true }
-                    inputAttributes={inputAttributes}
-                    suggestions={this.getSuggestions}
-                    suggestionRenderer={this.renderSuggestion}
-                    suggestionValue={this.suggestionValue}
-                    onSuggestionSelected={this.onSuggestionSelected}
-                />
+            <div className="pydioform_autocomplete" style={{position:'relative'}}>
+                {!this.state.dataSource &&
+                    <RefreshIndicator
+                        size={30}
+                        right={10}
+                        top={0}
+                        status="loading"
+                    />
+                }
+                {this.state.dataSource &&
+                    <AutoComplete
+                        fullWidth={true}
+                        searchText={displayText}
+                        onUpdateInput={this.handleUpdateInput}
+                        onNewRequest={this.handleNewRequest}
+                        dataSource={this.state.dataSource}
+                        floatingLabelText={this.props.attributes['label']}
+                        filter={(searchText, key) => (key.toLowerCase().indexOf(searchText.toLowerCase()) === 0)}
+                        openOnFocus={true}
+                        menuProps={{maxHeight: 200}}
+                    />
+                }
             </div>
 
         );

@@ -2870,22 +2870,19 @@
 }
 .react-mui-context .pydio-form-panel > .pydio-form-group {
   margin: 20px;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: column;
-      flex-direction: column;
-}
-.react-mui-context .pydio-form-panel > .pydio-form-group > .mui-paper-container {
-  padding: 0 20px 20px;
+  padding: 0;
   overflow-y: auto;
-  -webkit-flex: 1;
 }
-.react-mui-context .pydio-form-panel > .pydio-form-group.additional > .mui-paper-container {
+.react-mui-context .pydio-form-panel > .pydio-form-group.z-depth-1 {
+  padding: 16px;
+}
+.react-mui-context .pydio-form-panel > .pydio-form-group.additional {
   padding-left: 0;
   padding-right: 0;
 }
 .react-mui-context .pydio-form-panel > .pydio-form-group .pydio-form-group {
   margin: 0;
+  padding: 0 ;
 }
 .react-mui-context .pydio-form-panel .pydio-form-group.form-group-inactive > div {
   display: none;

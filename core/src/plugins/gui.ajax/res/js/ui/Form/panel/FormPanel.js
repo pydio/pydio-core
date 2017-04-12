@@ -2,6 +2,7 @@ const React = require('react')
 const ReactMUI = require('material-ui-legacy')
 const LangUtils = require('pydio/util/lang')
 const PydioApi = require('pydio/http/api')
+const {Tabs, Tab, Paper} = require('material-ui')
 import GroupSwitchPanel from './GroupSwitchPanel'
 import ReplicationPanel from './ReplicationPanel'
 import FormManager from '../manager/Manager'
@@ -61,13 +62,12 @@ export default React.createClass({
     },
 
     externallySelectTab:function(index){
-        try{
-            let t = this.refs.tabs;
-            let c = this.refs.tabs.props.children[index];
-            t.handleTouchTap(index, c);
-        }catch(e){
-            if(global.console) global.console.log(e);
-        }
+        this.setState({tabSelectedIndex: index});
+    },
+
+    getInitialState: function(){
+        if(this.props.onTabChange) return {tabSelectedIndex:0};
+        return {};
     },
 
     getDefaultProps:function(){
@@ -361,15 +361,16 @@ export default React.createClass({
                 header = this.renderGroupHeader(gData.LABEL, accordionize, gIndex, active);
             }
             if(this.props.depth == 0){
+                className += ' z-depth-1';
                 groupPanes.push(
-                    <ReactMUI.Paper className={className} key={'pane-'+g}>
+                    <Paper className={className} key={'pane-'+g}>
                         {gIndex==0 && this.props.header? this.props.header: null}
                         {header}
                         <div>
                             {gData.FIELDS}
                         </div>
                         {gIndex==groupsOrdered.length-1 && this.props.footer? this.props.footer: null}
-                    </ReactMUI.Paper>
+                    </Paper>
                 );
             }else{
                 groupPanes.push(
@@ -385,16 +386,16 @@ export default React.createClass({
             }
         }.bind(this));
         if(this.props.additionalPanes){
-            var otherPanes = {top:[], bottom:[]};
-            var depth = this.props.depth;
-            var index = 0;
-            for(var k in otherPanes){
+            let otherPanes = {top:[], bottom:[]};
+            const depth = this.props.depth;
+            let index = 0;
+            for(let k in otherPanes){
                 if(!otherPanes.hasOwnProperty(k)) continue;
                 if(this.props.additionalPanes[k]){
                     this.props.additionalPanes[k].map(function(p){
                         if(depth == 0){
                             otherPanes[k].push(
-                                <ReactMUI.Paper className="pydio-form-group additional" key={'other-pane-'+index}>{p}</ReactMUI.Paper>
+                                <Paper className="pydio-form-group additional" key={'other-pane-'+index}>{p}</Paper>
                             );
                         }else{
                             otherPanes[k].push(
@@ -409,16 +410,16 @@ export default React.createClass({
         }
 
         if(this.props.tabs){
-            var className = this.props.className;
+            const className = this.props.className;
             let initialSelectedIndex = 0;
             let i = 0;
-            var tabs = this.props.tabs.map(function(tDef){
-                var label = tDef['label'];
-                var groups = tDef['groups'];
+            const tabs = this.props.tabs.map(function(tDef){
+                const label = tDef['label'];
+                const groups = tDef['groups'];
                 if(tDef['selected']){
                     initialSelectedIndex = i;
                 }
-                var panes = groups.map(function(gId){
+                const panes = groups.map(function(gId){
                     if(groupPanes[gId]){
                         return groupPanes[gId];
                     }else{
@@ -427,18 +428,27 @@ export default React.createClass({
                 });
                 i++;
                 return(
-                    <ReactMUI.Tab label={label} key={label}>
+                    <Tab label={label}
+                         key={label}
+                         value={this.props.onTabChange ? i - 1  : undefined}>
                         <div className={(className?className+' ':' ') + 'pydio-form-panel' + (panes.length % 2 ? ' form-panel-odd':'')}>
                             {panes}
                         </div>
-                    </ReactMUI.Tab>
+                    </Tab>
                 );
             }.bind(this));
+            if(this.state.tabSelectedIndex !== undefined){
+                initialSelectedIndex = this.state.tabSelectedIndex;
+            }
             return (
                 <div className="layout-fill vertical-layout tab-vertical-layout">
-                    <ReactMUI.Tabs ref="tabs" initialSelectedIndex={initialSelectedIndex} onChange={this.props.onTabChange}>
+                    <Tabs ref="tabs"
+                          initialSelectedIndex={initialSelectedIndex}
+                          value={this.props.onTabChange ? initialSelectedIndex : undefined}
+                          onChange={this.props.onTabChange ? (i) => {this.setState({tabSelectedIndex:i});this.props.onTabChange(i)} : undefined}
+                    >
                         {tabs}
-                    </ReactMUI.Tabs>
+                    </Tabs>
                 </div>
             );
 

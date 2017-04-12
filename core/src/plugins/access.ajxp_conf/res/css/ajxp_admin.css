@@ -53,6 +53,9 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   /* ADMIN MAIN NAV */
   /******************/
 }
+.react-mui-context h1 {
+  padding: 16px 20px;
+}
 .react-mui-context .main-layout-nav-to-stack .left-nav .plugin-doc-pane {
   clear: both;
   padding: 0 20px;
@@ -107,8 +110,9 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   background-color: rgba(255, 255, 255, 0.88);
   position: absolute;
   z-index: 8;
-  left: 64px;
+  left: 0;
   right: 0;
+  border-radius: 0;
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.27);
   height: 76px;
   padding: 0;
@@ -1569,6 +1573,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   width: 256px !important;
   height: 200px !important;
   border-radius: 0;
+  background-color: #e0e0e0;
 }
 .react-mui-context .edit-object-user .avatar-provider .form-entry-image .file-dropzone .icon-camera {
   position: absolute;
@@ -1589,7 +1594,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   display: none;
 }
 @media only screen and (max-width: 1200px) {
-  .react-mui-context .edit-object-user .avatar-provider .form-entry-image .dropzone {
+  .react-mui-context .edit-object-user .avatar-provider .form-entry-image .file-dropzone {
     width: 206px !important;
     height: 206px !important;
   }
@@ -1605,7 +1610,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   .react-mui-context .edit-object-user .avatar-provider .form-entry-image {
     top: 0;
   }
-  .react-mui-context .edit-object-user .avatar-provider .form-entry-image .dropzone {
+  .react-mui-context .edit-object-user .avatar-provider .form-entry-image .file-dropzone {
     width: 103px !important;
     height: 103px !important;
   }
@@ -1675,10 +1680,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .admin_editor.editor_open #editor_close_button {
   top: 10px;
   left: -50px;
-}
-.react-mui-context h1 {
-  padding: 16px 20px !important;
-  padding-bottom: 0 !important;
 }
 .react-mui-context .mui-drop-down-menu.dropdown-full-width {
   display: block;

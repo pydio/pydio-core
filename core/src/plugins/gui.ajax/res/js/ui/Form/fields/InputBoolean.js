@@ -1,10 +1,9 @@
 import FormMixin from '../mixins/FormMixin'
 const React = require('react')
-const ReactMUI = require('material-ui-legacy')
-
+const {Toggle} = require('material-ui')
 
 /**
- * Checkboxk input
+ * Boolean input
  */
 export default React.createClass({
 
@@ -16,18 +15,7 @@ export default React.createClass({
         };
     },
 
-    componentDidUpdate:function(){
-        // Checkbox Hack
-        const boolVal = this.getBooleanState();
-        if(this.refs.checkbox && !this.refs.checkbox.isChecked() && boolVal){
-            this.refs.checkbox.setChecked(true);
-        }else if(this.refs.checkbox && this.refs.checkbox.isChecked() && !boolVal){
-            this.refs.checkbox.setChecked(false);
-        }
-    },
-
-    onCheck:function(event){
-        const newValue = this.refs.checkbox.isChecked();
+    onCheck:function(event, newValue){
         this.props.onChange(newValue, this.state.value);
         this.setState({
             dirty:true,
@@ -37,7 +25,7 @@ export default React.createClass({
 
     getBooleanState:function(){
         let boolVal = this.state.value;
-        if(typeof(boolVal) == 'string'){
+        if(typeof boolVal  === 'string'){
             boolVal = (boolVal == "true");
         }
         return boolVal;
@@ -47,11 +35,10 @@ export default React.createClass({
         const boolVal = this.getBooleanState();
         return(
             <span>
-                <ReactMUI.Checkbox
-                    ref="checkbox"
-                    defaultSwitched={boolVal}
+                <Toggle
+                    toggled={boolVal}
+                    onToggle={this.onCheck}
                     disabled={this.props.disabled}
-                    onCheck={this.onCheck}
                     label={this.isDisplayForm()?this.props.attributes.label:null}
                     labelPosition={this.isDisplayForm()?'left':'right'}
                 />

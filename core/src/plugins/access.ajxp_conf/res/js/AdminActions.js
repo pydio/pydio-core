@@ -68,17 +68,18 @@
         }
 
         static addSchedulerTask(){
-            pydio.UI.openComponentInModal('AdminScheduler', 'TaskEditor', { selection:null });
+            pydio.UI.openComponentInModal('AdminScheduler', 'TaskEditor', { node:null });
         }
 
         static editSchedulerTask(manager, args){
+            console.log(arguments);
             var userSelection;
             if(args && args.length){
                 userSelection = args[0];
             }else{
                 userSelection =  pydio.getUserSelection();
             }
-            pydio.UI.openComponentInModal('AdminScheduler', 'TaskEditor', { selection:pydio.getUserSelection() });
+            pydio.UI.openComponentInModal('AdminScheduler', 'TaskEditor', { node:userSelection.getUniqueNode() });
 
         }
         

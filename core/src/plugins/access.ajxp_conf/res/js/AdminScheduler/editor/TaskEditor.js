@@ -1,13 +1,39 @@
+const React = require('react')
+const {FlatButton} = require('material-ui')
 import Dashboard from '../board/Dashboard'
+const XMLUtils = require('pydio/util/xml')
+const LangUtils = require('pydio/util/lang')
+const AjxpNode = require('pydio/model/node')
+const Pydio = require('pydio')
+const {ActionDialogMixin} = Pydio.requireLib('boot')
+const {Manager} = Pydio.requireLib('form')
+const {MessagesConsumerMixin} = window.AdminComponents;
 
-var TaskEditor = React.createClass({
+const TaskEditor = React.createClass({
 
-    mixins:[AdminComponents.MessagesConsumerMixin],
+    mixins:[MessagesConsumerMixin, ActionDialogMixin],
 
     propTypes: {
-        closeAjxpDialog: React.PropTypes.func.isRequired,
         pydio:React.PropTypes.instanceOf(Pydio).isRequired,
-        selection:React.PropTypes.instanceOf(PydioDataModel).isRequired,
+        node:React.PropTypes.instanceOf(AjxpNode),
+    },
+
+    getDefaultProps: function(){
+        return {
+            dialogSize: 'md',
+            dialogPadding:0,
+            dialogScrollBody:true
+        }
+    },
+
+    getButtons: function(updater = null){
+        if(updater) this._buttonsUpdater = updater;
+        return [
+            <FlatButton default={true} onTouchTap={this.dismiss} label="Close"/>,
+            this.previousButton(),
+            this.nextSaveButton(),
+        ]
+
     },
 
     updateActionDescription: function(actionList, actionValue){
@@ -30,7 +56,7 @@ var TaskEditor = React.createClass({
                 PydioApi.getClient().request({get_action:"list_all_plugins_actions"}, function(t){
                     if(!t.responseJSON || !t.responseJSON.LIST) return;
                     let _actionsList = new Map();
-                    for(var plugin in t.responseJSON.LIST){
+                    for(let plugin in t.responseJSON.LIST){
                         if(!t.responseJSON.LIST.hasOwnProperty(plugin)) continue;
                         t.responseJSON.LIST[plugin].map(function(a){
                             _actionsList.set(a.action, a);
@@ -69,32 +95,36 @@ var TaskEditor = React.createClass({
         }
 
         let prevTab = function(){
-            this.setState({tab: this.state.tab-1}, function(){
+            this.setState({tab: this.state.tab-1}, () => {
                 this.refs.formPanel.externallySelectTab(this.state.tab);
-            }.bind(this));
+                if(this._buttonsUpdater) this._buttonsUpdater(this.getButtons());
+            });
         }.bind(this);
-        return <ReactMUI.FlatButton secondary={true} onClick={prevTab}>Previous</ReactMUI.FlatButton>;
-
+        return <FlatButton secondary={true} onTouchTap={prevTab} label="Previous"/>;
     },
+
 
     nextSaveButton: function(){
         if(this.state.node || this.state.tab === 2){
-            return <ReactMUI.FlatButton secondary={true} onClick={this.save}>Save</ReactMUI.FlatButton>;
+            return <FlatButton secondary={true} onTouchTap={this.save} label="Save"/>;
         }
         let nextTab = function(){
-            this.setState({tab: this.state.tab+1}, function(){
+            this.setState({tab: this.state.tab+1}, () => {
                 this.refs.formPanel.externallySelectTab(this.state.tab);
-            }.bind(this));
+                if(this._buttonsUpdater) this._buttonsUpdater(this.getButtons());
+            });
         }.bind(this);
-        return <ReactMUI.FlatButton secondary={true} onClick={nextTab}>Next</ReactMUI.FlatButton>;
+        return <FlatButton secondary={true} onTouchTap={nextTab} label="Next"/>;
     },
 
     tabChange: function(tabIndex, tab){
-        this.setState({tab:tabIndex});
+        this.setState({tab:tabIndex}, () => {
+            if(this._buttonsUpdater) this._buttonsUpdater(this.getButtons());
+        });
     },
 
     getInitialState:function(){
-        if(!this.props.selection || this.props.selection.isEmpty()){
+        if(!this.props.node){
             return {
                 tab:0,
                 values:{
@@ -105,7 +135,7 @@ var TaskEditor = React.createClass({
                 cron:'0 3 * * *'
             };
         }else{
-            let values = this.props.selection.getUniqueNode().getMetadata();
+            let values = this.props.node.getMetadata();
             let objValues = {};
             let parameters;
             values.forEach(function(v,k){
@@ -124,7 +154,7 @@ var TaskEditor = React.createClass({
                     i++;
                 };
             }
-            return {tab:0, values: objValues, cron:values.get('schedule'), node:this.props.selection.getUniqueNode()};
+            return {tab:0, values: objValues, cron:values.get('schedule'), node:this.props.node};
         }
     },
 
@@ -139,8 +169,8 @@ var TaskEditor = React.createClass({
     render: function(){
 
         if(!this._params){
-            var definitionNode = XMLUtils.XPathSelectSingleNode(this.props.pydio.getXmlRegistry(), 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
-            this._params = PydioForm.Manager.parseParameters(definitionNode, "param");
+            const definitionNode = XMLUtils.XPathSelectSingleNode(this.props.pydio.getXmlRegistry(), 'actions/action[@name="scheduler_addTask"]/processing/standardFormDefinition');
+            this._params = Manager.parseParameters(definitionNode, "param");
         }
         let params = [];
         // Clone this._params
@@ -173,8 +203,6 @@ var TaskEditor = React.createClass({
             {label:'Action', groups:[2,0]},
             {label:'Context', groups:[3]}
         ];
-        let nextSaveButton = this.nextSaveButton();
-        let previousButton = this.previousButton();
         return (<div>
             <PydioForm.FormPanel
                 ref="formPanel"
@@ -186,11 +214,6 @@ var TaskEditor = React.createClass({
                 onChange={this.onFormChange}
                 onParameterChange={this.onParameterChange}
             />
-            <div className="dialogButtons" style={{position:'relative'}}>
-                <ReactMUI.FlatButton default={true} onClick={this.close}>close</ReactMUI.FlatButton>
-                {previousButton}
-                {nextSaveButton}
-            </div>
         </div>);
     }
 

@@ -9,7 +9,9 @@
   },
   "author": "Abstrium SAS",
   "license": "agpl",
-  "devDependencies": {},
+  "devDependencies": {
+    "grunt-contrib-watch": "^1.0.0"
+  },
   "dependencies": {
     "grunt": "^1.0.1",
     "grunt-babel": "~5.0.3",

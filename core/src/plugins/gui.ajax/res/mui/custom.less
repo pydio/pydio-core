@@ -211,19 +211,18 @@
     }
     > .pydio-form-group {
       margin: 20px;
-      display: flex;
-      flex-direction: column;
-      > .mui-paper-container {
-        padding: 0 20px 20px;
-        overflow-y: auto;
-        -webkit-flex: 1;
+      padding: 0;
+      overflow-y: auto;
+      &.z-depth-1{
+        padding: 16px;
       }
-      &.additional > .mui-paper-container {
+      &.additional {
         padding-left: 0;
         padding-right: 0;
       }
       .pydio-form-group {
         margin: 0;
+        padding: 0 ;
       }
     }
 
