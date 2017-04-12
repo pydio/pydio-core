@@ -1,3 +1,6 @@
+const React = require('react')
+const LangUtils = require('pydio/util/lang')
+
 const ParametersPicker = React.createClass({
 
     propTypes:{

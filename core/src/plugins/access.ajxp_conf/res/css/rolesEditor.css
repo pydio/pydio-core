@@ -1,52 +1,53 @@
-.paper-editor .param-picker-dialog .mui-dialog-window-contents {
-  width: 380px;
-  background-color: #009688;
-}
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .color-dialog-title h3 {
-  background-color: #00796c;
-  color: white;
-  padding: 12px 24px;
-  margin-bottom: 12px;
-}
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .color-dialog-title .legend {
-  color: white;
-  padding: 0 24px;
-}
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content {
+.picker-list {
+  width: 100%;
   background-color: white;
   padding: 0;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .picker-search-container {
+.picker-list .color-dialog-title {
+  background-color: #00796c;
+}
+.picker-list .color-dialog-title h3 {
+  color: white;
+  padding: 12px 24px;
+  margin-bottom: 0;
+}
+.picker-list .color-dialog-title .legend {
+  color: white;
+  padding: 0 24px 12px;
+  font-size: 13px;
+}
+.picker-list .picker-search-container {
   background-color: #009688;
   padding: 0 24px;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .picker-search-container .mui-text-field {
+.picker-list .picker-search-container .mui-text-field {
   width: 100%;
   margin-top: -10px;
   margin-bottom: 12px;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .picker-search-container .mui-text-field hr {
+.picker-list .picker-search-container .mui-text-field hr {
   border-color: white;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .picker-search-container .mui-text-field label,
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .picker-search-container .mui-text-field input {
+.picker-list .picker-search-container .mui-text-field label,
+.picker-list .picker-search-container .mui-text-field input {
   color: white;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree {
+.picker-list .parameters-tree {
   text-align: center;
+  color: rgba(0, 0, 0, 0.87);
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree span.highlight {
+.picker-list .parameters-tree span.highlight {
   background-color: #ffff00;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree li {
+.picker-list .parameters-tree li {
   padding-top: 24px;
   font-weight: 500;
   font-size: 24px;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree .parameters-plugin > ul {
+.picker-list .parameters-tree .parameters-plugin > ul {
   padding-top: 8px;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree .parameters-param {
+.picker-list .parameters-tree .parameters-param {
   margin: 0 16px;
   padding: 10px;
   font-weight: 400;
@@ -54,20 +55,15 @@
   cursor: pointer;
   border-radius: 5px;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree .parameters-param:hover {
+.picker-list .parameters-tree .parameters-param:hover {
   background-color: rgba(0, 0, 0, 0.03);
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree .parameters-param.selected {
+.picker-list .parameters-tree .parameters-param.selected {
   background-color: #009688 !important;
 }
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-content .parameters-tree-scroller {
+.picker-list .parameters-tree-scroller {
   height: 355px;
   overflow-y: auto;
-}
-.paper-editor .param-picker-dialog .mui-dialog-window-contents .mui-dialog-window-actions {
-  background-color: white;
-  padding-bottom: 16px;
-  margin-bottom: 0;
 }
 .paper-editor .mui-app-bar {
   position: static;
@@ -81,7 +77,7 @@
   right: -100%;
 }
 .paper-editor .mui-font-icon {
-  font-size: 14px;
+  font-size: 14px !important;
   color: rgba(0, 0, 0, 0.23);
 }
 .paper-editor h3.paper-right-title {
@@ -170,7 +166,7 @@
   border: 1px solid #e0e0e0;
   margin: 0 16px;
   border-radius: 2px;
-  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
 }
 .paper-editor div.workspace-card-edit .material-list-line-1 .card-content div.rights-selector > div {
@@ -309,14 +305,10 @@
   border-radius: 2px;
 }
 .paper-editor .user-roles-picker .role-item.role-item-sortable {
-  padding: 0;
   cursor: ns-resize;
 }
-.paper-editor .user-roles-picker .role-item.role-item-sortable span {
-  padding: 10px;
-  display: inline-block;
-}
 .paper-editor .user-roles-picker .role-item.role-item-sortable span.button {
+  margin-top: -13px;
   float: right;
   cursor: pointer;
   padding: 13px;

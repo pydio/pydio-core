@@ -1,9 +1,11 @@
+const React = require('react');
+const {PydioContextConsumer} = require('pydio').requireLib('boot')
 import {RoleMessagesConsumerMixin} from '../util/MessagesMixin'
 import ParameterCreate from './ParameterCreate'
 import ParametersList from './ParametersList'
 import ParametersSummary from './ParametersSummary'
 
-export default React.createClass({
+let WorkspaceCard = React.createClass({
 
     mixins:[RoleMessagesConsumerMixin],
 
@@ -49,16 +51,12 @@ export default React.createClass({
     },
 
     addParameter:function(){
-        this.props.showModal(
-            <ParameterCreate
-                pluginsFilter={this.props.pluginsFilter}
-                workspaceScope={this.props.id}
-                createParameter={this.onCreateParameter}
-                roleType={this.props.roleType}
-                showModal={this.props.showModal}
-                hideModal={this.props.hideModal}
-            />
-        );
+        this.props.pydio.UI.openComponentInModal('AdminPeople', 'ParameterCreate', {
+            pluginsFilter: this.props.pluginsFilter,
+            workspaceScope: this.props.id,
+            createParameter: this.onCreateParameter,
+            roleType: this.props.roleType
+        });
     },
 
     render: function(){
@@ -145,3 +143,6 @@ export default React.createClass({
     }
 
 });
+
+WorkspaceCard = PydioContextConsumer(WorkspaceCard);
+export {WorkspaceCard as default}

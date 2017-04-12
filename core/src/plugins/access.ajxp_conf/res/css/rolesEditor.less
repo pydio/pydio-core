@@ -1,87 +1,81 @@
-.paper-editor{
+@dark-color: #00796c;
+@light-color: #009688;
 
-  @dark-color: #00796c;
-  @light-color: #009688;
+.picker-list{
+  width:100%;
+  background-color: white;
+  padding: 0;
 
-  .param-picker-dialog{
-    .mui-dialog-window-contents{
-      width: 380px;
-      background-color: @light-color;
-      .color-dialog-title{
-        h3{
-          background-color: @dark-color;
-          color: white;
-          padding: 12px 24px;
-          margin-bottom: 12px;
-        }
-        .legend{
-          color: white;
-          padding: 0 24px;
-        }
+  .color-dialog-title{
+    background-color: @dark-color;
+    h3{
+      color: white;
+      padding: 12px 24px;
+      margin-bottom: 0;
+    }
+    .legend{
+      color: white;
+      padding: 0 24px 12px;
+      font-size:13px;
+    }
+  }
+
+  .picker-search-container{
+    background-color: @light-color;
+    padding: 0 24px;
+    .mui-text-field{
+      width: 100%;
+      margin-top: -10px;
+      margin-bottom: 12px;
+      hr{
+        border-color: white;
       }
-      .mui-dialog-content{
-        background-color: white;
-        padding: 0;
-        .picker-search-container{
-          background-color: @light-color;
-          padding: 0 24px;
-          .mui-text-field{
-            width: 100%;
-            margin-top: -10px;
-            margin-bottom: 12px;
-            hr{
-              border-color: white;
-            }
-            label, input{
-              color: white;
-            }
-          }
-        }
-
-        .parameters-tree{
-          text-align: center;
-          span.highlight{
-            background-color: #ffff00;
-          }
-          li{
-            padding-top: 24px;
-            font-weight: 500;
-            font-size: 24px;
-          }
-          .parameters-plugin{
-            > ul{
-              padding-top: 8px;
-            }
-          }
-          .parameters-param{
-            margin:0 16px;
-            padding: 10px;
-            font-weight: 400;
-            font-size: 15px;
-            cursor: pointer;
-            border-radius: 5px;
-            &:hover{
-              background-color: rgba(0,0,0,0.03);
-            }
-            &.selected{
-              background-color: @light-color !important;
-            }
-          }
-          &-scroller{
-            height: 355px;
-            overflow-y: auto;
-          }
-        }
-
-      }
-      .mui-dialog-window-actions{
-        background-color: white;
-        padding-bottom: 16px;
-        margin-bottom: 0;
+      label, input{
+        color: white;
       }
     }
   }
 
+  .parameters-tree{
+    text-align: center;
+    color: rgba(0,0,0,0.87);
+    span.highlight{
+      background-color: #ffff00;
+    }
+    li{
+      padding-top: 24px;
+      font-weight: 500;
+      font-size: 24px;
+    }
+    .parameters-plugin{
+      > ul{
+        padding-top: 8px;
+      }
+    }
+    .parameters-param{
+      margin:0 16px;
+      padding: 10px;
+      font-weight: 400;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      &:hover{
+        background-color: rgba(0,0,0,0.03);
+      }
+      &.selected{
+        background-color: @light-color !important;
+      }
+    }
+    &-scroller{
+      height: 355px;
+      overflow-y: auto;
+    }
+  }
+
+}
+
+
+.paper-editor{
 
   .mui-app-bar{
     position: static;
@@ -98,7 +92,7 @@
   }
 
   .mui-font-icon{
-    font-size:14px;
+    font-size:14px !important;
     color: rgba(0,0,0,0.23);
   }
 
@@ -364,17 +358,13 @@
       background-color: #ffffff;
       border-radius: 2px;
       &.role-item-sortable{
-        padding: 0;
         cursor: ns-resize;
-        span {
-          padding: 10px;
-          display: inline-block;
-          &.button {
-            float: right;
-            cursor: pointer;
-            padding: 13px;
-            color: #bbb;
-          }
+        span.button {
+          margin-top: -13px;
+          float: right;
+          cursor: pointer;
+          padding: 13px;
+          color: #bbb;
         }
       }
     }

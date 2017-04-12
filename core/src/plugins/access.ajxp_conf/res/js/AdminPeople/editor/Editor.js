@@ -1,4 +1,10 @@
-import {RoleMessagesProviderMixin} from './util/MessagesMixin'
+const React = require('react')
+const LangUtils = require('pydio/util/lang')
+const PathUtils = require('pydio/util/path')
+const {FormPanel} = require('pydio').requireLib('form')
+const {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} = require('pydio').requireLib('components')
+const {FlatButton} = require('material-ui')
+
 import EditorCache from './util/EditorCache'
 import UserPasswordDialog from './user/UserPasswordDialog'
 import UserRolesPicker from './user/UserRolesPicker'
@@ -13,7 +19,7 @@ class Editor extends React.Component{
     }
 
     getChildContext() {
-        var messages = this.context.pydio.MessageHash;
+        const messages = this.context.pydio.MessageHash;
         return {
             messages: messages,
             getMessage: function (messageId, namespace = 'pydio_role') {
@@ -60,8 +66,8 @@ class Editor extends React.Component{
     }
 
     _parsePluginsDataForCache(response){
-        var map = new Map();
-        for(var pluginName in response.LIST){
+        let map = new Map();
+        for(let pluginName in response.LIST){
             if(!response.LIST.hasOwnProperty(pluginName)) continue;
             var pData = response.LIST[pluginName];
             var submap = new Map();
@@ -80,22 +86,14 @@ class Editor extends React.Component{
         if(EditorCache.CACHE){
             callback();
         }else{
-            var client = PydioApi.getClient();
+            const client = PydioApi.getClient();
             EditorCache.CACHE = {};
             this.setState({loadingMessage:this.getMessage('22')});
             client.request({get_action:'list_all_plugins_actions'}, function(transport1){
-                //if(!this.isMounted()) {
-                //    EditorCache.CACHE = null;
-                //    return;
-                //}
-
                 EditorCache.CACHE['ACTIONS'] = this._parsePluginsDataForCache(transport1.responseJSON);
                 this.setState({loadingMessage:this.getMessage('23')});
                 client.request({get_action:'list_all_plugins_parameters'}, function(transport2){
                     EditorCache.CACHE['PARAMETERS'] = this._parsePluginsDataForCache(transport2.responseJSON);
-                    //if(!this.isMounted()) {
-                    //    return;
-                    //}
                     callback();
                 }.bind(this));
             }.bind(this));
@@ -169,9 +167,9 @@ class Editor extends React.Component{
     }
 
     _nodeToState(node){
-        var mime = node.getAjxpMime();
-        var scope = mime;
-        var roleId;
+        const mime = node.getAjxpMime();
+        let scope = mime;
+        let roleId;
         if(mime == "role"){
             roleId = node.getMetadata().get("role_id");
         }else if(mime == "group"){
@@ -250,7 +248,7 @@ class Editor extends React.Component{
     }
 
     updateRoleWrite(roleWrite, dirty=true){
-        var roleRead = this._recomputeRoleRead(this.state.roleParent, roleWrite);
+        const roleRead = this._recomputeRoleRead(this.state.roleParent, roleWrite);
         this.setState({
             dirty:dirty,
             roleWrite:roleWrite,
@@ -265,7 +263,7 @@ class Editor extends React.Component{
 
     saveRoleChanges(reload=false){
 
-        var jsonData = {
+        let jsonData = {
             ROLE:this.state.roleWrite,
             METADATA:this.state.parametersMetaData || {}
         };
@@ -306,9 +304,9 @@ class Editor extends React.Component{
     }
 
     controllerUpdateParameter(type, crudAction, scope, pluginName, paramName, paramValue, additionalFormData=null){
-        var role = this.state.roleWrite;
-        var metaData = this.state.parametersMetaData || {PARAMETERS:{},ACTIONS:{}};
-        var key = (type == 'parameter' ? 'PARAMETERS' : 'ACTIONS');
+        let role = this.state.roleWrite;
+        let metaData = this.state.parametersMetaData || {PARAMETERS:{},ACTIONS:{}};
+        const key = (type == 'parameter' ? 'PARAMETERS' : 'ACTIONS');
         if(crudAction == 'add' || crudAction == 'update'){
             if(!role[key]) role[key] = {};
             if(!role[key][scope]) role[key][scope] = {};
@@ -324,7 +322,7 @@ class Editor extends React.Component{
             this.updateRoleWrite(role);
         }else  if(crudAction == 'delete'){
             try{
-                var parent = role[key][scope][pluginName];
+                let parent = role[key][scope][pluginName];
                 if(parent){
                     delete parent[paramName];
                     this.updateRoleWrite(role);
@@ -387,10 +385,10 @@ class Editor extends React.Component{
         var previousRoles = this.state.roleData.USER.ROLES || [];
         var remove = previousRoles.slice(0), add = roles.slice(0);
         for(var i=0; i< previousRoles.length; i++){
-            add = add.without(previousRoles[i]);
+            add = LangUtils.arrayWithout(add, add.indexOf(previousRoles[i]));
         }
         for(i=0; i< roles.length; i++){
-            remove = remove.without(roles[i]);
+            remove = LangUtils.arrayWithout(remove, remove.indexOf(roles[i]));
         }
         if(!add.length && !remove.length) return;
 
@@ -423,7 +421,7 @@ class Editor extends React.Component{
     }
 
     getController(){
-        var controller = {};
+        let controller = {};
         controller.updateParameter = this.controllerUpdateParameter.bind(this);
         controller.updateAcl = this.controllerUpdateAcl.bind(this);
         controller.updateMask = this.controllerUpdateMask.bind(this);
@@ -472,7 +470,7 @@ class Editor extends React.Component{
             }.bind(this);
 
             otherForm = (
-                <PydioForm.FormPanel
+                <FormPanel
                     key="form"
                     parameters={defs}
                     values={values}
@@ -507,7 +505,7 @@ class Editor extends React.Component{
                     this.updateRoleWrite(this.state.roleWrite);
                 }.bind(this);
                 otherForm = (
-                    <PydioForm.FormPanel
+                    <FormPanel
                         key="form"
                         parameters={defs}
                         onParameterChange={changeListener}
@@ -541,7 +539,7 @@ class Editor extends React.Component{
                     this.updateRoleWrite(this.state.roleWrite);
                 }.bind(this);
                 otherForm = (
-                    <PydioForm.FormPanel
+                    <FormPanel
                         key="form"
                         parameters={defs}
                         onParameterChange={changeListener}
@@ -582,7 +580,7 @@ class Editor extends React.Component{
 
                 rolesPane = (
                     <div>
-                        <PydioForm.FormPanel
+                        <FormPanel
                             key="form"
                             parameters={defs}
                             onParameterChange={changeListener}
@@ -623,24 +621,24 @@ class Editor extends React.Component{
         const close = () => { this.props.onRequestTabClose(); };
         var rightButtons = (
             <div>
-                <ReactMUI.FlatButton key="undo" disabled={changes} primary={true} iconClassName="icon-undo" label={this.getMessage('plugins.6', 'ajxp_admin')} onClick={this.resetRoleChanges.bind(this)}/>
-                <ReactMUI.FlatButton key="save" disabled={changes} primary={true} iconClassName="icon-save" label={this.getRootMessage('53')} onClick={save}/>
-                <ReactMUI.FlatButton key="close" label={this.getMessage('33')} onClick={close} secondary={true}/>
+                <FlatButton key="undo" disabled={changes} primary={true} iconClassName="icon-undo" label={this.getMessage('plugins.6', 'ajxp_admin')} onTouchTap={this.resetRoleChanges.bind(this)}/>
+                <FlatButton key="save" disabled={changes} primary={true} iconClassName="icon-save" label={this.getRootMessage('53')} onTouchTap={save}/>
+                <FlatButton key="close" label={this.getMessage('33')} onTouchTap={close} secondary={true}/>
             </div>
         );
 
         var leftNav = [
-            <PydioComponents.PaperEditorNavHeader key="1" label={this.getMessage('ws.28', 'ajxp_admin')}/>,
-            <PydioComponents.PaperEditorNavEntry key="info" keyName="info" onClick={this.setSelectedPane.bind(this)} label={infoMenuTitle} selectedKey={this.state.currentPane}/>,
+            <PaperEditorNavHeader key="1" label={this.getMessage('ws.28', 'ajxp_admin')}/>,
+            <PaperEditorNavEntry key="info" keyName="info" onClick={this.setSelectedPane.bind(this)} label={infoMenuTitle} selectedKey={this.state.currentPane}/>,
             rolesPaneMenu,
-            <PydioComponents.PaperEditorNavHeader key="2" label={this.getMessage('34')}/>,
-            <PydioComponents.PaperEditorNavEntry key="workspaces" keyName="workspaces" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('35')} selectedKey={this.state.currentPane}/>,
-            <PydioComponents.PaperEditorNavEntry key="pages" keyName="pages" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('36')} selectedKey={this.state.currentPane}/>,
+            <PaperEditorNavHeader key="2" label={this.getMessage('34')}/>,
+            <PaperEditorNavEntry key="workspaces" keyName="workspaces" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('35')} selectedKey={this.state.currentPane}/>,
+            <PaperEditorNavEntry key="pages" keyName="pages" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('36')} selectedKey={this.state.currentPane}/>,
             sharesMenu,
-            <PydioComponents.PaperEditorNavHeader key="3" label={this.getMessage('37')}/>,
-            <PydioComponents.PaperEditorNavEntry key="add-info" keyName="add-info" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('38')} selectedKey={this.state.currentPane}/>,
-            <PydioComponents.PaperEditorNavEntry key="glob-params" keyName="global-params" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('39')} selectedKey={this.state.currentPane}/>,
-            <PydioComponents.PaperEditorNavEntry key="ws-params" keyName="ws-params" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('40')} selectedKey={this.state.currentPane}/>
+            <PaperEditorNavHeader key="3" label={this.getMessage('37')}/>,
+            <PaperEditorNavEntry key="add-info" keyName="add-info" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('38')} selectedKey={this.state.currentPane}/>,
+            <PaperEditorNavEntry key="glob-params" keyName="global-params" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('39')} selectedKey={this.state.currentPane}/>,
+            <PaperEditorNavEntry key="ws-params" keyName="ws-params" onClick={this.setSelectedPane.bind(this)} label={this.getMessage('40')} selectedKey={this.state.currentPane}/>
         ];
 
         var panes = [];
@@ -785,7 +783,7 @@ class Editor extends React.Component{
             );
         }
         return (
-            <PydioComponents.PaperEditorLayout
+            <PaperEditorLayout
                 title={title}
                 titleActionBar={rightButtons}
                 contentFill={true}
@@ -801,7 +799,7 @@ class Editor extends React.Component{
                 {modal}
                 {loadingMessage}
                 {panes}
-            </PydioComponents.PaperEditorLayout>
+            </PaperEditorLayout>
         );
 
     }

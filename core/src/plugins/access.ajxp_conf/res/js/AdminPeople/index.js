@@ -7,6 +7,7 @@ import UserRolesPicker from './editor/user/UserRolesPicker'
 import WorkspacesList from './editor/panel/WorkspacesList'
 import SharesList from './editor/panel/SharesList'
 import {RoleMessagesConsumerMixin} from './editor/util/MessagesMixin'
+import ParameterCreate from './editor/parameters/ParameterCreate'
 
 window.AdminPeople = {
     RoleEditor              : Editor,
@@ -17,6 +18,7 @@ window.AdminPeople = {
     SharesList,
     CreateUserForm,
     CreateRoleOrGroupForm,
+    ParameterCreate,
 
     Dashboard
 };

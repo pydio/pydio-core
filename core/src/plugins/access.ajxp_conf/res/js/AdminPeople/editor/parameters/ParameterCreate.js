@@ -1,7 +1,16 @@
+const React = require('react')
+const {TextField, FlatButton} = require('material-ui')
+const Pydio = require('pydio');
+const {ActionDialogMixin, CancelButtonProviderMixin} = Pydio.requireLib('boot');
+
 import EditorCache from '../util/EditorCache'
 import ParametersPicker from './ParametersPicker'
 
 export default React.createClass({
+
+    mixins: [
+        ActionDialogMixin, CancelButtonProviderMixin
+    ],
 
     propTypes:{
         workspaceScope:React.PropTypes.string,
@@ -12,10 +21,12 @@ export default React.createClass({
         createParameter:React.PropTypes.func
     },
 
-    componentDidMount: function(){
-        global.setTimeout(function(){
-            this.refs.modal.show();
-        }.bind(this), 10);
+    getDefaultProps: function(){
+        return {
+            dialogPadding: 0,
+            dialogTitle: '',
+            dialogSize: 'md',
+        }
     },
 
     getInitialState: function(){
@@ -31,20 +42,9 @@ export default React.createClass({
         this.setState({pluginName:plugin, type:type, paramName:param, attributes:attributes}, this.createParameter);
     },
 
-    hideModal:function(){
-        this.refs.modal.dismiss();
-        global.setTimeout(function(){
-            this.props.hideModal();
-        }.bind(this), 500);
-    },
-
     createParameter:function(){
         this.props.createParameter(this.state.type, this.state.pluginName, this.state.paramName, this.state.attributes);
-        this.hideModal();
-    },
-
-    setModal:function(modalRef){
-        this.modal = modalRef;
+        this.props.onDismiss();
     },
 
     render: function(){
@@ -94,15 +94,12 @@ export default React.createClass({
             }
         });
 
-
-        title = (
-            <div className="color-dialog-title">
-                <h3>{getMessage('14')}</h3>
-                <div className="legend">{getMessage('15')}</div>
-            </div>
-        );
-        content = (
+        return (
             <div className="picker-list">
+                <div className="color-dialog-title">
+                    <h3>{getMessage('14')}</h3>
+                    <div className="legend">{getMessage('15')}</div>
+                </div>
                 <ParametersPicker
                     allActions={allActions}
                     allParameters={allParams}
@@ -112,20 +109,6 @@ export default React.createClass({
             </div>
         );
 
-        var button = <ReactMUI.FlatButton key="can" label={getMessage('54', '')} onClick={this.hideModal}/>;
-
-        return(
-            <ReactMUI.Dialog
-                ref="modal"
-                modal={true}
-                title={title}
-                actions={[button]}
-                dismissOnClickAway={false}
-                className="param-picker-dialog"
-                contentClassName={this.state.className}
-                openImmediately={false}
-            >{content}</ReactMUI.Dialog>
-        );
     }
 
 });
