@@ -93,6 +93,9 @@ export default React.createClass({
                         underlineShow={this.props.underlineShow}
                         defaultValue={this.props.inputValue}
                         className={this.props.inputClassName}
+                        multiLine={this.props.multiLine}
+                        rows={this.props.rows}
+                        rowsMax={this.props.rowsMax}
                         readOnly={true}
                         onClick={select}
                         style={{marginTop:-10, width: '92%', fontSize:14}}
