@@ -277,6 +277,7 @@ $mess=array(
     "ws.65" => "Arbeitsumgebung warten",
     "ws.66" => "Laufende Aufgaben",
     "ws.67" => "Keine laufenden Aufgaben",
+    "ws.68" => "Keine Parameter",
 
     "scheduler.1" => "Nutzen Sie die Aufgabenplanung, um wiederkehrende Aufgaben zu konfigurieren. Mit Pydio-Booster sollte dies automatisch funktionieren. Verwenden Sie andernfalls einen CRON-Job um die Aufgabenplanung minütlich zu starten. Diese kümmert sich dann automatisch um die Ausführung der einzelnen Aufgaben.",
     "scheduler.2" => "Die Kommandozeile ist in den %1 nicht aktiviert. Aufgaben können nicht gestartet werden.",

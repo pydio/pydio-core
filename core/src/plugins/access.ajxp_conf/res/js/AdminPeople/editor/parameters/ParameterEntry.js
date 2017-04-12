@@ -94,7 +94,7 @@ export default React.createClass({
         return (
             <tr className={(this.props.inherited?'inherited':'') + (this.state.editMode?' edit-mode':'')}>
                 <td className="paramName">
-                    <span className="label">{this.props.inherited?'['+this.context.getAjxpRoleMessage('38')+']':''} {this.props.label}</span>
+                    <span className="label">{this.props.inherited?'['+this.context.getPydioRoleMessage('38')+']':''} {this.props.label}</span>
                 </td>
                 <td className="paramValue">{value}</td>
                 <td className="paramActions">{actions}</td>

@@ -22,7 +22,7 @@ export default React.createClass({
 
     openWorkspace:function(node){
         if(this.refs.editor && this.refs.editor.isDirty()){
-            if(!window.confirm(global.pydio.MessageHash["ajxp_role_editor.19"])) {
+            if(!window.confirm(global.pydio.MessageHash["role_editor.19"])) {
                 return false;
             }
         }
@@ -48,7 +48,7 @@ export default React.createClass({
 
     closeWorkspace:function(){
         if(this.refs.editor && this.refs.editor.isDirty()){
-            if(!window.confirm(global.pydio.MessageHash["ajxp_role_editor.19"])) {
+            if(!window.confirm(global.pydio.MessageHash["role_editor.19"])) {
                 return false;
             }
         }

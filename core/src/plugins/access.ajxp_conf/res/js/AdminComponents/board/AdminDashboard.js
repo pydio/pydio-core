@@ -85,7 +85,7 @@ const AdminDashboard = React.createClass({
     },
 
     openLeftNav:function(){
-        if(this.leftNav) this.leftNav.openMenu();
+        this.setState({openLeftNav: true});
     },
 
     componentDidMount: function(){
@@ -208,7 +208,8 @@ const AdminDashboard = React.createClass({
                     dataModel={dm}
                     rootNode={dm.getRootNode()}
                     contextNode={dm.getContextNode()}
-                    ref={(i)=>{if(i!==null) this.leftNav = i;}}/>
+                    open={this.state.openLeftNav}
+                />
                 <AppBar
                     title={title}
                     zDepth={1}

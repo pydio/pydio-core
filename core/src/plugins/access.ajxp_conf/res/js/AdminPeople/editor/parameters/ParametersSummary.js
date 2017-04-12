@@ -42,10 +42,10 @@ export default React.createClass({
         parameters = parameters[0].concat(parameters[1]);
         actions = actions[0].concat(actions[1]);
         if(parameters.length) {
-            strings.push(this.context.getAjxpRoleMessage('6') + ': ' + parameters.join(','))
+            strings.push(this.context.getPydioRoleMessage('6') + ': ' + parameters.join(','))
         }
         if(actions.length) {
-            strings.push( this.context.getAjxpRoleMessage('46') + ': ' + actions.join(','));
+            strings.push( this.context.getPydioRoleMessage('46') + ': ' + actions.join(','));
         }
         return(
             <span className={'summary-parameters summary' + (strings.length?'':'-empty')}>

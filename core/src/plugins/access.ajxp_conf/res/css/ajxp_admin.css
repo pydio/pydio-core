@@ -1574,12 +1574,12 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   top: 64px;
   left: 0;
 }
-.react-mui-context .edit-object-user .avatar-provider .form-entry-image .dropzone {
+.react-mui-context .edit-object-user .avatar-provider .form-entry-image .file-dropzone {
   width: 256px !important;
   height: 200px !important;
   border-radius: 0;
 }
-.react-mui-context .edit-object-user .avatar-provider .form-entry-image .dropzone .icon-camera {
+.react-mui-context .edit-object-user .avatar-provider .form-entry-image .file-dropzone .icon-camera {
   position: absolute;
   bottom: 7px;
   right: 10px;
@@ -1740,9 +1740,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.2);
 }
-.react-mui-context .mui-left-nav.admin-main-nav .mui-subheader {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-  color: white;
+.react-mui-context .mui-left-nav.admin-main-nav .hideable-subheader {
+  height: 48px;
 }
 .react-mui-context .mui-left-nav.admin-main-nav.mui-closed .mui-left-nav-menu {
   transform: translate3d(-190px, 0, 0);
@@ -1756,7 +1755,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .mui-left-nav.admin-main-nav.mui-closed .mui-menu-item-icon {
   /*opacity: 1;*/
 }
-.react-mui-context .mui-left-nav.admin-main-nav.mui-closed .mui-subheader {
+.react-mui-context .mui-left-nav.admin-main-nav.mui-closed .hideable-subheader {
   height: 0;
 }
 .react-mui-context .mui-menu-item.tree-item {

@@ -19,8 +19,8 @@ class Editor extends React.Component{
             getMessage: function (messageId, namespace = 'pydio_role') {
                 return messages[namespace + (namespace ? "." : "") + messageId] || messageId;
             },
-            getAjxpRoleMessage: function (messageId) {
-                return messages['ajxp_role_editor.' + messageId] || messageId;
+            getPydioRoleMessage: function (messageId) {
+                return messages['role_editor.' + messageId] || messageId;
             },
             getRootMessage: function (messageId) {
                 return messages[messageId] || messageId;
@@ -33,8 +33,8 @@ class Editor extends React.Component{
         return this.getChildContext().getMessage(messageId, namespace);
     }
 
-    getAjxpRoleMessage(messageId){
-        return this.getChildContext().getMessage(messageId, 'ajxp_role_editor');
+    getPydioRoleMessage(messageId){
+        return this.getChildContext().getMessage(messageId, 'role_editor');
     }
 
     getRootMessage(messageId){
@@ -234,7 +234,7 @@ class Editor extends React.Component{
         this._loadRoleData(true);
         if(this.props.registerCloseCallback){
             this.props.registerCloseCallback(function(){
-                if(this.state && this.state.dirty && !global.confirm(this.getAjxpRoleMessage('19'))){
+                if(this.state && this.state.dirty && !global.confirm(this.getPydioRoleMessage('19'))){
                     return false;
                 }
             }.bind(this));
@@ -281,7 +281,7 @@ class Editor extends React.Component{
             role_id:this.state.roleId,
             json_data:JSON.stringify(jsonData)
         }, function(transport){
-            this.logAction(this.getAjxpRoleMessage('20'));
+            this.logAction(this.getPydioRoleMessage('20'));
             if(reload){
                 this._loadRoleData();
             }else{
@@ -457,15 +457,15 @@ class Editor extends React.Component{
 
             var locked = this.state.roleData.USER.LOCK || "";
             defs = [
-                {"name":"password",group:this.getMessage('24'),label:this.getAjxpRoleMessage('25'), description:"","type":"button", choices:"update_user_pwd"},
-                {"name":"lockout",group:this.getMessage('24'),label:this.getAjxpRoleMessage((locked.indexOf('logout') > -1?'27':'26')), description:"","type":"button", choices:"user_set_lock-lock"},
-                {"name":"passchange",group:this.getMessage('24'),label:this.getAjxpRoleMessage((locked.indexOf('pass_change') > -1?'28b':'28')), description:"","type":"button", choices:"user_set_lock-pass_change"}
+                {"name":"password",group:this.getMessage('24'),label:this.getPydioRoleMessage('25'), description:"","type":"button", choices:"update_user_pwd"},
+                {"name":"lockout",group:this.getMessage('24'),label:this.getPydioRoleMessage((locked.indexOf('logout') > -1?'27':'26')), description:"","type":"button", choices:"user_set_lock-lock"},
+                {"name":"passchange",group:this.getMessage('24'),label:this.getPydioRoleMessage((locked.indexOf('pass_change') > -1?'28b':'28')), description:"","type":"button", choices:"user_set_lock-pass_change"}
             ];
             values = {};
             var buttonCallback = function(parameters, cb){
                 var action = parameters['get_action'];
                 if(action == "update_user_pwd"){
-                    this.showModal(<UserPasswordDialog userId={userId} closeDialog={this.hideModal}/>);
+                    this.showModal(<UserPasswordDialog userId={userId} closeDialog={this.hideModal.bind(this)}/>);
                 }else{
                     this._toggleUserLock(userId, locked, action);
                 }
@@ -493,8 +493,8 @@ class Editor extends React.Component{
 
             if(this.state.roleData.GROUP){
                 defs = [
-                    {"name":"groupPath",label:this.getAjxpRoleMessage('34'),"type":"string", readonly:true},
-                    {"name":"groupLabel",label:this.getAjxpRoleMessage('35'),"type":"string", }
+                    {"name":"groupPath",label:this.getPydioRoleMessage('34'),"type":"string", readonly:true},
+                    {"name":"groupLabel",label:this.getPydioRoleMessage('35'),"type":"string", }
                 ];
                 let label = (this.state.roleWrite.GROUP &&this.state.roleWrite.GROUP.LABEL ) ? this.state.roleWrite.GROUP.LABEL : this.state.roleData.GROUP.LABEL;
                 values = {
@@ -529,8 +529,8 @@ class Editor extends React.Component{
 
             if(this.state.roleData.ALL){
                 defs = [
-                    {"name":"roleId",label:this.getAjxpRoleMessage('31'),"type":"string", readonly:true},
-                    {"name":"applies",label:this.getAjxpRoleMessage('33'),"type":"select", multiple:true, choices:this.state.roleData.ALL.PROFILES.join(",")}
+                    {"name":"roleId",label:this.getPydioRoleMessage('31'),"type":"string", readonly:true},
+                    {"name":"applies",label:this.getPydioRoleMessage('33'),"type":"select", multiple:true, choices:this.state.roleData.ALL.PROFILES.join(",")}
                 ];
                 values = {
                     roleId:this.state.roleId,
@@ -566,8 +566,8 @@ class Editor extends React.Component{
 
                 var profilesChoices = this.state.roleData.ALL.PROFILES.join(",");
                 defs = [
-                    {"name":"login",group:"User Profile", label:this.getAjxpRoleMessage('21'),description:this.getMessage('31'),"type":"string", readonly:true},
-                    {"name":"profile",group:"User Profile",label:this.getAjxpRoleMessage('22'), description:this.getMessage('32'),"type":"select", choices:profilesChoices}
+                    {"name":"login",group:"User Profile", label:this.getPydioRoleMessage('21'),description:this.getMessage('31'),"type":"string", readonly:true},
+                    {"name":"profile",group:"User Profile",label:this.getPydioRoleMessage('22'), description:this.getMessage('32'),"type":"select", choices:profilesChoices}
                 ];
                 values = {
                     login:filterUserId,
@@ -669,7 +669,7 @@ class Editor extends React.Component{
                     showModal={this.showModal.bind(this)}
                     hideModal={this.hideModal.bind(this)}
                     globalData={this.state.roleData.ALL}
-                    showGlobalScopes={{AJXP_REPO_SCOPE_ALL:this.getAjxpRoleMessage('12d')}}
+                    showGlobalScopes={{AJXP_REPO_SCOPE_ALL:this.getPydioRoleMessage('12d')}}
                     globalScopesFilterType="global"
                     initialEditCard="AJXP_REPO_SCOPE_ALL"
                     noParamsListEdit={true}
@@ -688,7 +688,7 @@ class Editor extends React.Component{
                                 showModal={this.showModal.bind(this)}
                                 hideModal={this.hideModal.bind(this)}
                                 globalData={this.state.roleData.ALL}
-                                showGlobalScopes={{AJXP_REPO_SCOPE_ALL:this.getAjxpRoleMessage('12d')}}
+                                showGlobalScopes={{AJXP_REPO_SCOPE_ALL:this.getPydioRoleMessage('12d')}}
                                 globalScopesFilterType="global-noscope"
                                 initialEditCard="AJXP_REPO_SCOPE_ALL"
                                 editOnly={true}
@@ -751,7 +751,7 @@ class Editor extends React.Component{
                                 showModal={this.showModal.bind(this)}
                                 hideModal={this.hideModal.bind(this)}
                                 globalData={this.state.roleData.ALL}
-                                showGlobalScopes={this.state.roleData.ALL?{AJXP_REPO_SCOPE_ALL:this.getAjxpRoleMessage('12d'), AJXP_REPO_SCOPE_SHARED:this.getAjxpRoleMessage('12e')}:{}}
+                                showGlobalScopes={this.state.roleData.ALL?{AJXP_REPO_SCOPE_ALL:this.getPydioRoleMessage('12d'), AJXP_REPO_SCOPE_SHARED:this.getPydioRoleMessage('12e')}:{}}
                                 globalScopesFilterType="workspace"
                 />
             </div>
@@ -815,7 +815,7 @@ Editor.contextTypes = {
 Editor.childContextTypes = {
     messages:React.PropTypes.object,
     getMessage:React.PropTypes.func,
-    getAjxpRoleMessage:React.PropTypes.func,
+    getPydioRoleMessage:React.PropTypes.func,
     getRootMessage:React.PropTypes.func
 };
 

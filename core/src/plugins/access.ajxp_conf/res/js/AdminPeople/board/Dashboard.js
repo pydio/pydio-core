@@ -1,4 +1,7 @@
+const React = require('react')
+const {IconButton, Tabs, Tab} = require('material-ui')
 import Editor from '../editor/Editor'
+const PydioDataModel = require('pydio/model/data-model')
 
 const Dashboard = React.createClass({
 
@@ -149,7 +152,7 @@ const Dashboard = React.createClass({
 
     openRoleEditor:function(node, initialSection = 'activity'){
         if(this.refs.editor && this.refs.editor.isDirty()){
-            if(!window.confirm(this.props.pydio.MessageHash["ajxp_role_editor.19"])) {
+            if(!window.confirm(this.props.pydio.MessageHash["role_editor.19"])) {
                 return false;
             }
         }
@@ -174,12 +177,38 @@ const Dashboard = React.createClass({
 
     closeRoleEditor:function(){
         if(this.refs.editor && this.refs.editor.isDirty()){
-            if(!window.confirm(this.props.pydio.MessageHash["ajxp_role_editor.19"])) {
+            if(!window.confirm(this.props.pydio.MessageHash["role_editor.19"])) {
                 return false;
             }
         }
         //this.setState({selectedNode:null, showCreator:null});
         this.props.closeRightPane();
+    },
+
+    deleteAction: function(node){
+        const dm = new PydioDataModel();
+        dm.setSelectedNodes([node]);
+        ResourcesManager.loadClassesAndApply(['AdminActions'], () => {
+            AdminActions.Callbacks.deleteAction(null, [dm]);
+        })
+    },
+
+    renderNodeActions: function(node){
+        const mime = node.getAjxpMime();
+        const iconStyle = {
+            color: 'rgba(0,0,0,0.3)',
+            fontSize: 20
+        };
+        let actions = [];
+        if(mime === 'user_editable' || mime === 'group' || mime === 'role' || mime==='role_editable'){
+            actions.push(<IconButton key="edit" iconClassName="mdi mdi-pencil" onTouchTap={() => {this.openRoleEditor(node)}} onClick={(e)=>{e.stopPropagation()}} iconStyle={iconStyle} />);
+            actions.push(<IconButton key="delete" iconClassName="mdi mdi-delete" onTouchTap={() => {this.deleteAction(node)}} onClick={(e)=>{e.stopPropagation()}} iconStyle={iconStyle} />);
+        }else if(mime === 'user'){
+            actions.push(<IconButton key="edit" iconClassName="mdi mdi-pencil" onTouchTap={() => {this.openRoleEditor(node)}} onClick={(e)=>{e.stopPropagation()}} iconStyle={iconStyle} />);
+        }
+        return (
+            <div>{actions}</div>
+        )
     },
 
     render: function(){
@@ -213,8 +242,8 @@ const Dashboard = React.createClass({
                 </div>
                 <div className="container horizontal-layout layout-fill">
                     <div className="hide-on-vertical-layout vertical-layout tab-vertical-layout people-tree" style={{flex:'none'}}>
-                        <ReactMUI.Tabs initialSelectedIndex={0}>
-                            <ReactMUI.Tab label={this.context.getMessage("user.3")}>
+                        <Tabs initialSelectedIndex={0} style={{flex:1}} className="vertical-layout" contentContainerStyle={{flex:1, display:'flex', flexDirection:'column'}}>
+                            <Tab label={this.context.getMessage("user.3")}>
                                 <div style={{marginLeft:8}}>
                                     <PydioComponents.DNDTreeView
                                         showRoot={true}
@@ -224,29 +253,28 @@ const Dashboard = React.createClass({
                                         className="users-groups-tree"
                                     />
                                 </div>
-                            </ReactMUI.Tab>
-                            <ReactMUI.Tab label={this.context.getMessage("user.4")} style={{display:'flex',flexDirection:'column'}}>
+                            </Tab>
+                            <Tab label={this.context.getMessage("user.4")}>
                                 <PydioComponents.SimpleList
-                                    style={{height:'100%'}}
+                                    style={{flex:5}}
                                     key={2}
                                     node={this.state.roleNode}
                                     observeNodeReload={true}
                                     dataModel={this.state.dataModel}
                                     className={"display-as-menu" + (this.state.showRolesActions ? '' : ' hideActions')}
                                     openEditor={this.openRoleEditor}
-                                    actionBarGroups={['get']}
                                     skipParentNavigation={true}
                                     customToolbar={emptyToolbar}
                                     entryRenderIcon={function(node){return null;}}
+                                    entryRenderActions={this.renderNodeActions}
                                     elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
-                                    computeActionsForNode={true}
                                 />
                                 <div style={{height:48,padding:'8px 16px',backgroundColor:'rgb(247,247,247)',boxShadow:'0px 0px 1px rgba(0, 0, 0, 0.23)'}}>
                                     <ReactMUI.FlatButton secondary={true} label={this.context.getMessage("user.6")} onClick={this.createRoleAction}/>
                                     <ReactMUI.FlatButton secondary={true} onClick={this.toggleStateShowRoles} label={this.context.getMessage('93', 'ajxp_conf')}/>
                                 </div>
-                            </ReactMUI.Tab>
-                        </ReactMUI.Tabs>
+                            </Tab>
+                        </Tabs>
                     </div>
                     <ReactMUI.Paper zDepth={0} className="layout-fill vertical-layout people-list">
                         <PydioComponents.SimpleList
@@ -257,10 +285,9 @@ const Dashboard = React.createClass({
                             entryRenderFirstLine={this.renderListEntryFirstLine}
                             entryRenderSecondLine={this.renderListEntrySecondLine}
                             entryEnableSelector={this.renderListEntrySelector}
+                            entryRenderActions={this.renderNodeActions}
                             searchResultData={this.state.searchResultData}
-                            actionBarGroups={['get']}
                             elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
-                            computeActionsForNode={true}
                         />
                     </ReactMUI.Paper>
                 </div>

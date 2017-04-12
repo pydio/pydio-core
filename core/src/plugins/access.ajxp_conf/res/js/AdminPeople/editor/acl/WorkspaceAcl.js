@@ -48,7 +48,7 @@ export default React.createClass({
         var label = this.props.label;
         var inherited = false;
         if(!acls[wsId] && parentAcls[wsId]){
-            label += ' ('+ this.context.getAjxpRoleMessage('38') +')';
+            label += ' ('+ this.context.getPydioRoleMessage('38') +')';
             inherited = true;
         }
         var secondLine, action;

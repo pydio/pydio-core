@@ -47,14 +47,14 @@ export default React.createClass({
 
         var actions = [
             <ReactMUI.FlatButton key="can" label={getMessage('54')} onClick={this.dismiss}/>,
-            <ReactMUI.FlatButton key="next" label={getMessage('25','ajxp_role_editor')}
+            <ReactMUI.FlatButton key="next" label={getMessage('25','role_editor')}
                                  onClick={this.submit} disabled={!this.state.okEnabled}/>
         ];
         return (
             <ReactMUI.Dialog
                 modal={true}
                 actions={actions}
-                title={getMessage('25', 'ajxp_role_editor')}
+                title={getMessage('25', 'role_editor')}
                 dismissOnClickAway={true}
                 openImmediately={true}
                 contentClassName="dialog-max-480"

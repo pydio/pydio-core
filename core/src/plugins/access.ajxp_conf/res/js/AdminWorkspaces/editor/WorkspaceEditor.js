@@ -114,7 +114,7 @@ class WorkspaceEditor extends React.Component{
             });
             if(this.props.registerCloseCallback){
                 this.props.registerCloseCallback(function(){
-                    if(this.isDirty() && !confirm(pydio.MessageHash["ajxp_role_editor.19"])){
+                    if(this.isDirty() && !confirm(pydio.MessageHash["role_editor.19"])){
                         return false;
                     }
                 }.bind(this));
@@ -228,7 +228,7 @@ class WorkspaceEditor extends React.Component{
 
                     if(!formDefs.length) {
                         editor = (
-                            <div>{this.context.getMessage('19', 'ajxp_repository_editor')}</div>
+                            <div>{this.context.getMessage('ws.68')}</div>
                         );
                         break;
                     }

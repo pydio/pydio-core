@@ -282,6 +282,7 @@ $mess=array(
     "ws.65" => "Workspace Maintenance",
     "ws.66" => "Running Tasks",
     "ws.67" => "No tasks running",
+    "ws.68" => "No Parameters",
 
     "scheduler.1" => "Scheduler is used to trigger tasks automatically on a regular basis. It requires the launch of a master command regularly: if you are using Pydio Booster, it should trigger this for you. Otherwise, use a CRON to launch master command every minute.",
     "scheduler.2" => "Command-line is not enabled in the %1, the scheduler will not be able to run the jobs.",

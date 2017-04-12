@@ -213,6 +213,7 @@ var SimpleTreeNode = React.createClass({
         if(this.state.showChildren || this.props.forceExpand){
             children = this.state.children.map(function(child) {
                 const props = {...this.props,
+                    forceLabel: null,
                     childrenOnly:false,
                     key:child.getPath(),
                     node:child,

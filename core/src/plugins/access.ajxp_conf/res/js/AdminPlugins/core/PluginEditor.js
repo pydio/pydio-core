@@ -75,7 +75,7 @@ const PluginEditor = React.createClass({
 
             if(this.props.registerCloseCallback){
                 this.props.registerCloseCallback(function(){
-                    if(this.state && this.state.dirty && !confirm(this.context.getMessage('19','ajxp_role_editor'))){
+                    if(this.state && this.state.dirty && !confirm(this.context.getMessage('19','role_editor'))){
                         return false;
                     }
                 }.bind(this));

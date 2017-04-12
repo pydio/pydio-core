@@ -1,5 +1,6 @@
 const {Component} = require('react')
 const {MenuItem, Divider, Subheader, FontIcon} = require('material-ui')
+const DOMUtils = require('pydio/util/dom')
 
 function renderItem(palette, node, text = null, icon = null){
 
@@ -47,7 +48,7 @@ class NavigationHelper{
             }else{
                 if(header.getLabel()){
                     items.push(<Divider/>);
-                    items.push(<Subheader>{header.getLabel()}</Subheader>)
+                    items.push(<Subheader style={{transition:DOMUtils.getBeziersTransition()}} className="hideable-subheader">{header.getLabel()}</Subheader>)
                 }
                 header.getChildren().forEach(function(child){
                     if(!child.getLabel()) return;

@@ -276,6 +276,7 @@ $mess=array(
     "ws.65" => "Maintenance du workspace",
     "ws.66" => "Tâches en cours",
     "ws.67" => "Aucune tâche en cours",
+    "ws.68" => "Pas de paramètres",
 
     "scheduler.1" => "Le plannificateur est utilisé pour déclenché automatiquement des tâches de manière régulière. Il nécessite le déclenchement d'une tâche 'master' de manière régulière. Si vous utilisez Pydio Booster, ceci sera déclenché pour vous. Sinon, utilisez l'expression CRON pour l'ajouter à votre système local.",
     "scheduler.2" => "La ligne de commande n'est pas activée dans les %1, le plannificateur ne sera pas en mesure de lancer les tâches.",

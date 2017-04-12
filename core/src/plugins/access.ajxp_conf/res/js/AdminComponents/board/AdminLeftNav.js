@@ -45,17 +45,17 @@ let AdminLeftNav = React.createClass({
         }
     },
 
+    componentWillReceiveProps: function(nextProps){
+        if(nextProps.open && nextProps.open !== this.refs.leftNav.state.open){
+            this.refs.leftNav.toggle();
+        }
+    },
+
     openMenu: function(){
         if(this.refs.leftNav.state.open){
             this.cancelCloseBuffer();
         }
         this.refs.leftNav.toggle();
-    },
-    menuClicked:function(event, index, menuItem){
-        if(menuItem.payload){
-            this.props.dataModel.setSelectedNodes([]);
-            this.props.dataModel.setContextNode(menuItem.payload);
-        }
     },
     leftNavMouseOver:function(){
         this.cancelCloseBuffer();

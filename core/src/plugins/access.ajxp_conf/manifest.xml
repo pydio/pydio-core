@@ -7,6 +7,7 @@
 	<client_settings icon="plugins/access.ajxp_conf/admin.png">
 		<resources>
 			<i18n namespace="ajxp_conf" path="plugins/access.ajxp_conf/res/i18n" />
+			<i18n namespace="role_editor" path="plugins/access.ajxp_conf/res/i18n/role" />
 			<i18n namespace="pydio_role" path="plugins/access.ajxp_conf/res/i18n/editor" />
             <i18n namespace="ajxp_admin" path="plugins/access.ajxp_conf/res/i18n/dashboard" />
 

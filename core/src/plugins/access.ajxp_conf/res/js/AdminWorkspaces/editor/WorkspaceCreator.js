@@ -185,7 +185,7 @@ export default React.createClass({
                 }
                 if(!formDefs.length){
                     editor = (
-                        <div>{pydio.MessageHash['ajxp_repository_editor.19']}</div>
+                        <div>{pydio.MessageHash['ajxp_admin.ws.68']}</div>
                     );
                 }else{
                     editor = (
