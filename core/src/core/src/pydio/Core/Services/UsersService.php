@@ -127,7 +127,9 @@ class UsersService
             CacheService::save(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
         }else{
             CacheService::saveWithTimestamp(AJXP_CACHE_SERVICE_NS_SHARED, "pydio:user:" . $userId, $userObject);
-            Controller::applyHook("msg.instant", array(Context::contextWithObjects($userObject, null), ReloadRepoListMessage::XML(), $userObject->getId()));
+            if(!ApplicationState::$silenceInstantMessages) {
+                Controller::applyHook("msg.instant", array(Context::contextWithObjects($userObject, null), ReloadRepoListMessage::XML(), $userObject->getId()));
+            }
         }
     }
 

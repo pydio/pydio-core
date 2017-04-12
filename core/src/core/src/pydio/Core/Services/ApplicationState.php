@@ -48,6 +48,11 @@ class ApplicationState
     private static $minisiteHash = null;
 
     /**
+     * @var bool
+     */
+    public static $silenceInstantMessages = false;
+
+    /**
      * @param string $restBase
      */
     public static function setSapiRestBase($restBase){

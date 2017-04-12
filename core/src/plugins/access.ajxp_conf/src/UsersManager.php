@@ -602,6 +602,7 @@ class UsersManager extends AbstractManager
                 // Action for updating all Pydio's user from ldap in CLI mode
                 if((php_sapi_name() == "cli")){
                     // TODO : UPGRADE THIS TO NEW CLI FORMAT
+                    ApplicationState::$silenceInstantMessages = true;
                     $progressBar = new ProgressBarCLI();
                     $countCallback  = array($progressBar, "init");
                     $loopCallback   = array($progressBar, "update");
