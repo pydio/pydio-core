@@ -164,7 +164,7 @@ class UsersService
         }
         $self = self::instance();
         $repos = $self->getFromCaches($user->getId());
-        if($repos !== null) {
+        if(!empty($repos)) {
             $userRepos =  $repos;
         } else{
             $list = new FilteredRepositoriesList($user);
@@ -204,10 +204,10 @@ class UsersService
      */
     private function getFromCaches($userId){
 
-        $fromSesssion = SessionService::getLoadedRepositories();
-        if($fromSesssion !== null){
-            $this->repositoriesCache[$userId] = $fromSesssion;
-            return $fromSesssion;
+        $fromSession = SessionService::getLoadedRepositories();
+        if($fromSession !== null && is_array($fromSession) && count($fromSession)){
+            $this->repositoriesCache[$userId] = $fromSession;
+            return $fromSession;
         }
         if(isSet($this->repositoriesCache[$userId])) {
             $configsNotCorrupted = array_reduce($this->repositoriesCache[$userId], function($carry, $item){ return $carry && is_object($item) && ($item instanceof RepositoryInterface); }, true);
