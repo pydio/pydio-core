@@ -17,7 +17,8 @@ const AdminDashboard = React.createClass({
         return {
             contextNode:dm.getContextNode(),
             selectedNodes:dm.getSelectedNodes(),
-            contextStatus:dm.getContextNode().isLoaded()
+            contextStatus:dm.getContextNode().isLoaded(),
+            openLeftNav: false
         };
     },
 
@@ -86,6 +87,10 @@ const AdminDashboard = React.createClass({
 
     openLeftNav:function(){
         this.setState({openLeftNav: true});
+    },
+
+    componentWillReceiveProps: function(){
+        this.setState({openLeftNav: false});
     },
 
     componentDidMount: function(){

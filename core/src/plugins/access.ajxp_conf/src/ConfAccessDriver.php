@@ -47,35 +47,8 @@ class ConfAccessDriver extends AbstractAccessDriver
 
     protected $rootNodes = array(
         "__metadata__" => array(
-            "icon_class" => "icon-dashboard",
+            "icon_class" => "mdi mdi-view-dashboard",
             "component"  => "AdminComponents.SimpleDashboard",
-        ),
-        "admin" => array(
-            "LABEL" => "ajxp_conf.111",
-            "ICON" => "toggle_log.png",
-            "DESCRIPTION" => "ajxp_conf.141",
-            "CHILDREN" => array(
-                "logs" => array(
-                    "LABEL" => "ajxp_conf.4",
-                    "DESCRIPTION" => "ajxp_conf.142",
-                    "ICON" => "toggle_log.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\LogsManager",
-                    "METADATA" => array(
-                        "icon_class" => "icon-flag-alt",
-                        "component"  => "AdminLogs.Dashboard"
-                    )
-                ),
-                "diagnostic" => array(
-                    "LABEL" => "ajxp_conf.5",
-                    "DESCRIPTION" => "ajxp_conf.143",
-                    "ICON" => "susehelpcenter.png",
-                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DiagnosticManager",
-                    "METADATA" => array(
-                        "icon_class" => "icon-stethoscope",
-                        "component"  => "AdminPlugins.DiagnosticDashboard"
-                    )
-                )
-            )
         ),
         "data" => array(
             "LABEL" => "ajxp_conf.110",
@@ -89,7 +62,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "ICON" => "users-folder.png",
                     "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\UsersManager",
                     "METADATA" => array(
-                        "icon_class" => "icon-user",
+                        "icon_class" => "mdi mdi-account-multiple",
                         "component"  => "AdminPeople.Dashboard"
                     )
                 ),
@@ -100,13 +73,40 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "ICON" => "hdd_external_unmount.png",
                     "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RepositoriesManager",
                     "METADATA" => array(
-                        "icon_class" => "icon-hdd",
+                        "icon_class" => "mdi mdi-network",
                         "component"  => "AdminWorkspaces.Dashboard"
                     )
                 ),
                 "roles" => array(
                     "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\RolesManager"
                 ),
+            )
+        ),
+        "admin" => array(
+            "LABEL" => "ajxp_conf.111",
+            "ICON" => "toggle_log.png",
+            "DESCRIPTION" => "ajxp_conf.141",
+            "CHILDREN" => array(
+                "logs" => array(
+                    "LABEL" => "ajxp_conf.4",
+                    "DESCRIPTION" => "ajxp_conf.142",
+                    "ICON" => "toggle_log.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\LogsManager",
+                    "METADATA" => array(
+                        "icon_class" => "mdi mdi-pulse",
+                        "component"  => "AdminLogs.Dashboard"
+                    )
+                ),
+                "diagnostic" => array(
+                    "LABEL" => "ajxp_conf.5",
+                    "DESCRIPTION" => "ajxp_conf.143",
+                    "ICON" => "susehelpcenter.png",
+                    "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\DiagnosticManager",
+                    "METADATA" => array(
+                        "icon_class" => "mdi mdi-stethoscope",
+                        "component"  => "AdminPlugins.DiagnosticDashboard"
+                    )
+                )
             )
         ),
         "parameters" => array(
@@ -121,7 +121,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "ajxp_conf.133",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-cog",
+                        "icon_class" => "mdi mdi-settings-box",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -131,7 +131,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "plugtype.desc.auth",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-lock",
+                        "icon_class" => "mdi mdi-account-key",
                         "component"  => "AdminPlugins.AuthenticationPluginsDashboard"
                     )
                 ),
@@ -141,7 +141,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "plugtype.desc.conf",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-suitcase",
+                        "icon_class" => "mdi mdi-database",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -151,7 +151,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "plugtype.desc.log",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-list",
+                        "icon_class" => "mdi mdi-console",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -163,7 +163,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "ICON" => "preferences_desktop.png",
                     "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager",
                     "METADATA" => array(
-                        "icon_class" => "icon-upload-alt",
+                        "icon_class" => "mdi mdi-upload",
                         "component"  => "AdminPlugins.CoreAndPluginsDashboard"
                     )
                 ),
@@ -173,7 +173,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "ajxp_admin.menu.17",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-rocket",
+                        "icon_class" => "mdi mdi-rocket",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -183,7 +183,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "plugtype.desc.mailer",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-envelope-alt",
+                        "icon_class" => "mdi mdi-email",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -193,7 +193,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "ajxp_admin.menu.15",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-bell",
+                        "icon_class" => "mdi mdi-bell-ring",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -213,7 +213,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "DESCRIPTION" => "Open Cloud Sharing",
                     "ICON" => "preferences_desktop.png",
                     "METADATA" => array(
-                        "icon_class" => "icon-cloud",
+                        "icon_class" => "mdi mdi-cloud-circle",
                         "component"  => "AdminPlugins.PluginEditor"
                     )
                 ),
@@ -233,7 +233,7 @@ class ConfAccessDriver extends AbstractAccessDriver
                     "ICON" => "preferences_desktop.png",
                     "MANAGER" => "Pydio\\Access\\Driver\\DataProvider\\Provisioning\\PluginsManager",
                     "METADATA" => array(
-                        "icon_class" => "icon-puzzle-piece",
+                        "icon_class" => "mdi mdi-google-circles-group",
                         "component"  => "AdminPlugins.PluginsManager"
                     )
                 )
@@ -257,7 +257,7 @@ class ConfAccessDriver extends AbstractAccessDriver
             unset($rootNodes["admin"]);
             unset($rootNodes["developer"]);
             $rootNodes["__metadata__"] = [
-                "icon_class" => "icon-dashboard",
+                "icon_class" => "mdi mdi-view-dashboard",
                 "component"  => "AdminComponents.GroupAdminDashboard",
             ];
         }

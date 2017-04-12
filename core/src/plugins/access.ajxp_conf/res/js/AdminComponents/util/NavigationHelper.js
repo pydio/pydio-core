@@ -6,6 +6,7 @@ function renderItem(palette, node, text = null, icon = null){
 
     const iconStyle = {
         fontSize: 20,
+        lineHeight: '20px',
         color : palette.primary1Color,
         padding: 2
     };

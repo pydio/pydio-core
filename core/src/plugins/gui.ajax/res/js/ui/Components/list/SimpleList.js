@@ -425,14 +425,14 @@ let SimpleList = React.createClass({
         let selection = this.state.selection || new Map();
         if(selection.get(node)) selection.delete(node);
         else selection.set(node, true);
-        this.refs.all_selector.setChecked(false);
+        if(this.refs.all_selector) this.refs.all_selector.setChecked(false);
         this.setState({
             selection:selection
         }, this.rebuildLoadedElements);
     },
 
     selectAll:function(){
-        if(!this.refs.all_selector.isChecked()){
+        if(this.refs.all_selector && !this.refs.all_selector.isChecked()){
             this.setState({selection:new Map()}, this.rebuildLoadedElements);
         }else{
             let selection = new Map();
@@ -444,7 +444,7 @@ let SimpleList = React.createClass({
                     selection.set(child, true);
                 }
             }.bind(this));
-            this.refs.all_selector.setChecked(true);
+            if(this.refs.all_selector) this.refs.all_selector.setChecked(true);
             this.setState({selection:selection}, this.rebuildLoadedElements);
         }
     },

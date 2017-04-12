@@ -3263,6 +3263,13 @@
   overflow: auto;
   background-color: #f4f4f4;
 }
+.react-mui-context .material-list .material-list-selector {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+      align-items: center;
+  text-align: center;
+}
 .react-mui-context .material-list .material-list-selector > .mui-checkbox,
 .react-mui-context .material-list .mui-toolbar .mui-checkbox {
   transition: all 550ms cubic-bezier(0.23, 1, 0.32, 1) 0ms;

@@ -491,7 +491,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
         top: 0;
         left: 0;
         bottom: 0;
-        border-left: 3px solid lighten(@primary-color, 5%);
         text-align: left;
         padding-left: 16px;
         width: 100%;
@@ -572,7 +571,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
       position: absolute;
       right: 0;
       padding-top: 17px;
-      color: @primary-color;
       background-color: transparent;
       .mdi-pencil, .icon-ok {
         font-size: 15px;
@@ -682,8 +680,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
       /*border-bottom: 1px solid rgba(224,224,224,1);*/
       align-items: flex-end;
       h1 {
-        padding: 16px 20px;
-        padding-bottom: 0;
+        padding: 16px 20px !important;
+        padding-bottom: 0 !important;
       }
       .search-box {
         margin: 6px;
@@ -729,9 +727,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
         font-size: 14px;
         background-color: rgb(250, 250, 250);
       }
-      .mui-menu-item.mui-is-selected {
-        color: @primary-color !important;
-      }
       & > ul > li > div {
         padding-left: 16px !important;
         .tree-icon {
@@ -740,13 +735,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
         .tree-icon.icon-folder-close {
           display: inline;
         }
-      }
-    }
-
-    .people-list {
-      .material-list-entry.ajxp_node_collection span.mui-font-icon,
-      .material-list-entry span.mui-font-icon.icon-home {
-        background-color: @primary-color !important;
       }
     }
 
@@ -1813,7 +1801,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
     position: absolute;
     top: 0;
     bottom: 0;
-    padding-top: 60px;
     right: 0;
     z-index: 1;
     width: 326px;
@@ -1882,8 +1869,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   }
 
   h1 {
-    padding: 16px 20px;
-    padding-bottom: 0;
+    padding: 16px 20px !important;
+    padding-bottom: 0 !important;
   }
 
   .mui-drop-down-menu.dropdown-full-width {

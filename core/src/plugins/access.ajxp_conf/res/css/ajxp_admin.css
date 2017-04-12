@@ -452,7 +452,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   top: 0;
   left: 0;
   bottom: 0;
-  border-left: 3px solid #00b09f;
   text-align: left;
   padding-left: 16px;
   width: 100%;
@@ -532,7 +531,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   position: absolute;
   right: 0;
   padding-top: 17px;
-  color: #009688;
   background-color: transparent;
 }
 .react-mui-context .quick-links .mui-icon-button .mdi-pencil,
@@ -637,8 +635,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
       align-items: flex-end;
 }
 .react-mui-context .people-dashboard .people-title h1 {
-  padding: 16px 20px;
-  padding-bottom: 0;
+  padding: 16px 20px !important;
+  padding-bottom: 0 !important;
 }
 .react-mui-context .people-dashboard .people-title .search-box {
   margin: 6px;
@@ -688,9 +686,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   font-size: 14px;
   background-color: #fafafa;
 }
-.react-mui-context .people-dashboard .people-tree .mui-menu-item.mui-is-selected {
-  color: #009688 !important;
-}
 .react-mui-context .people-dashboard .people-tree > ul > li > div {
   padding-left: 16px !important;
 }
@@ -699,10 +694,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 }
 .react-mui-context .people-dashboard .people-tree > ul > li > div .tree-icon.icon-folder-close {
   display: inline;
-}
-.react-mui-context .people-dashboard .people-list .material-list-entry.ajxp_node_collection span.mui-font-icon,
-.react-mui-context .people-dashboard .people-list .material-list-entry span.mui-font-icon.icon-home {
-  background-color: #009688 !important;
 }
 .react-mui-context .people-dashboard .role-panel {
   overflow: hidden;
@@ -1626,7 +1617,6 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   position: absolute;
   top: 0;
   bottom: 0;
-  padding-top: 60px;
   right: 0;
   z-index: 1;
   width: 326px;
@@ -1687,8 +1677,8 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   left: -50px;
 }
 .react-mui-context h1 {
-  padding: 16px 20px;
-  padding-bottom: 0;
+  padding: 16px 20px !important;
+  padding-bottom: 0 !important;
 }
 .react-mui-context .mui-drop-down-menu.dropdown-full-width {
   display: block;

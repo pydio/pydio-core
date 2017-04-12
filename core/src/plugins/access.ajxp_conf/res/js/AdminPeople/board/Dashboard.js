@@ -1,9 +1,10 @@
 const React = require('react')
-const {IconButton, Tabs, Tab} = require('material-ui')
+const {IconButton, Paper, BottomNavigation, BottomNavigationItem, FontIcon, FlatButton} = require('material-ui')
 import Editor from '../editor/Editor'
 const PydioDataModel = require('pydio/model/data-model')
+const {muiThemeable} = require('material-ui/styles')
 
-const Dashboard = React.createClass({
+let Dashboard = React.createClass({
 
     mixins:[AdminComponents.MessagesConsumerMixin],
 
@@ -143,7 +144,7 @@ const Dashboard = React.createClass({
     },
 
     openUsersImporter: function(){
-        pydio.UI.openComponentInModal('EnterpriseComponents','UsersImportDialog', {dataModel: this.props.dataModel});
+        pydio.UI.openComponentInModal('EnterprisePeople','UsersImportDialog', {dataModel: this.props.dataModel});
     },
 
     toggleStateShowRoles: function(){
@@ -213,71 +214,97 @@ const Dashboard = React.createClass({
 
     render: function(){
 
-        var emptyToolbar = <div></div>;
-        let importButton = <ReactMUI.FlatButton primary={false} label={"+ Import Users"} onClick={this.openUsersImporter}/>;
-        if(!ResourcesManager.moduleIsAvailable('EnterpriseComponents')){
-            importButton = <ReactMUI.FlatButton primary={false} label={"+ Import Users"} disabled={true}/>;
+        const fontIconStyle = {
+            style : {
+                backgroundColor: this.props.muiTheme.palette.accent2Color,
+                borderRadius: '50%',
+                width: 36,
+                height: 36,
+                padding: 8,
+                marginRight: 10
+            },
+            iconStyle : {
+                color: 'white',
+                fontSize: 20
+            }
         }
+        const emptyToolbar = <div></div>;
+        let importButton = <IconButton {...fontIconStyle} iconClassName="mdi mdi-file-excel" primary={false} tooltip={"+ Import Users"} onTouchTap={this.openUsersImporter}/>;
+        if(!ResourcesManager.moduleIsAvailable('EnterprisePeople')){
+            let disabled = {style:{...fontIconStyle.style}, iconStyle:{...fontIconStyle.iconStyle}};
+            disabled.style.backgroundColor = 'rgba(0,0,0,0.23)';
+            importButton = <IconButton {...disabled} iconClassName="mdi mdi-file-excel" primary={false} tooltip={"+ Import Users"} disabled={true}/>;
+        }
+        const leftPanelIndex = this.state.leftPanelIndex || 0;
 
         return (
             <div className={"main-layout-nav-to-stack vertical-layout people-dashboard"}>
                 <div className="people-title horizontal-layout">
-                    <h1>{this.context.getMessage('2', 'ajxp_conf')}
-                        <div className="buttonContainer">
-                            <ReactMUI.FlatButton primary={true} label={this.context.getMessage("user.1")} onClick={this.createUserAction}/>
-                            <ReactMUI.FlatButton primary={true} label={this.context.getMessage("user.2")} onClick={this.createGroupAction}/>
-                            {importButton}
+                    <div style={{display:'flex', width: '100%', alignItems: 'top'}}>
+                        <div style={{display:'flex', flex: 1, alignItems: 'center'}}>
+                            <h1>{this.context.getMessage('2', 'ajxp_conf')}</h1>
+                            <div style={{flex: 1, paddingTop: 8}}>
+                                <IconButton primary={true} {...fontIconStyle} iconClassName="mdi mdi-account-plus" tooltip={this.context.getMessage("user.1")} onTouchTap={this.createUserAction}/>
+                                <IconButton primary={true} {...fontIconStyle} iconClassName="mdi mdi-account-multiple-plus" tooltip={this.context.getMessage("user.2")} onTouchTap={this.createGroupAction}/>
+                                {importButton}
+                            </div>
                         </div>
-                    </h1>
-                    <PydioComponents.SearchBox
-                        displayResults={this.displaySearchResults}
-                        displayResultsState={this.state.searchResultData}
-                        hideResults={this.hideSearchResults}
-                        className="search-box layout-fill"
-                        parameters={{get_action:'admin_search_users',dir:this.props.dataModel.getContextNode().getPath()}}
-                        queryParameterName="query"
-                        limit={50}
-                        textLabel={this.context.getMessage('user.7')}
-                    />
+                        <PydioComponents.SearchBox
+                            displayResults={this.displaySearchResults}
+                            displayResultsState={this.state.searchResultData}
+                            hideResults={this.hideSearchResults}
+                            className="search-box layout-fill"
+                            parameters={{get_action:'admin_search_users',dir:this.props.dataModel.getContextNode().getPath()}}
+                            queryParameterName="query"
+                            limit={50}
+                            textLabel={this.context.getMessage('user.7')}
+                        />
+                    </div>
                 </div>
                 <div className="container horizontal-layout layout-fill">
                     <div className="hide-on-vertical-layout vertical-layout tab-vertical-layout people-tree" style={{flex:'none'}}>
-                        <Tabs initialSelectedIndex={0} style={{flex:1}} className="vertical-layout" contentContainerStyle={{flex:1, display:'flex', flexDirection:'column'}}>
-                            <Tab label={this.context.getMessage("user.3")}>
-                                <div style={{marginLeft:8}}>
-                                    <PydioComponents.DNDTreeView
-                                        showRoot={true}
-                                        rootLabel={this.context.getMessage("user.5")}
-                                        node={this.props.rootNode}
-                                        dataModel={this.props.dataModel}
-                                        className="users-groups-tree"
-                                    />
-                                </div>
-                            </Tab>
-                            <Tab label={this.context.getMessage("user.4")}>
-                                <PydioComponents.SimpleList
-                                    style={{flex:5}}
-                                    key={2}
-                                    node={this.state.roleNode}
-                                    observeNodeReload={true}
-                                    dataModel={this.state.dataModel}
-                                    className={"display-as-menu" + (this.state.showRolesActions ? '' : ' hideActions')}
-                                    openEditor={this.openRoleEditor}
-                                    skipParentNavigation={true}
-                                    customToolbar={emptyToolbar}
-                                    entryRenderIcon={function(node){return null;}}
-                                    entryRenderActions={this.renderNodeActions}
-                                    elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
-                                />
-                                <div style={{height:48,padding:'8px 16px',backgroundColor:'rgb(247,247,247)',boxShadow:'0px 0px 1px rgba(0, 0, 0, 0.23)'}}>
-                                    <ReactMUI.FlatButton secondary={true} label={this.context.getMessage("user.6")} onClick={this.createRoleAction}/>
-                                    <ReactMUI.FlatButton secondary={true} onClick={this.toggleStateShowRoles} label={this.context.getMessage('93', 'ajxp_conf')}/>
-                                </div>
-                            </Tab>
-                        </Tabs>
+                        <BottomNavigation selectedIndex={leftPanelIndex} style={{backgroundColor: '#f5f5f5', borderBottom: '1px solid #e0e0e0'}}>
+                            <BottomNavigationItem label={this.context.getMessage("user.3")} icon={<FontIcon className="mdi mdi-file-tree"/>} onTouchTap={() => {this.setState({leftPanelIndex: 0})}}/>
+                            <BottomNavigationItem label={this.context.getMessage("user.4")} icon={<FontIcon className="mdi mdi-ticket-account"/>} onTouchTap={() => {this.setState({leftPanelIndex: 1})}}/>
+                        </BottomNavigation>
+                        {leftPanelIndex === 0 &&
+                        <div style={{marginLeft:8, flex: 1}}>
+                            <PydioComponents.DNDTreeView
+                                showRoot={true}
+                                rootLabel={this.context.getMessage("user.5")}
+                                node={this.props.rootNode}
+                                dataModel={this.props.dataModel}
+                                className="users-groups-tree"
+                            />
+                        </div>
+                        }
+                        {leftPanelIndex === 1 &&
+                        <div className="layout-fill vertical-layout">
+                            <PydioComponents.SimpleList
+                                style={{flex:1}}
+                                key={2}
+                                node={this.state.roleNode}
+                                observeNodeReload={true}
+                                dataModel={this.state.dataModel}
+                                className={"display-as-menu" + (this.state.showRolesActions ? '' : ' hideActions')}
+                                openEditor={this.openRoleEditor}
+                                skipParentNavigation={true}
+                                customToolbar={emptyToolbar}
+                                entryRenderIcon={function(node){return null;}}
+                                entryRenderActions={this.renderNodeActions}
+                                elementHeight={PydioComponents.SimpleList.HEIGHT_ONE_LINE}
+                            />
+                            <div style={{height:48,padding:'8px 16px',backgroundColor:'rgb(247,247,247)',boxShadow:'0px 0px 1px rgba(0, 0, 0, 0.23)'}}>
+                                <FlatButton secondary={true} label={this.context.getMessage("user.6")} onClick={this.createRoleAction}/>
+                                <FlatButton secondary={true} onClick={this.toggleStateShowRoles} label={this.context.getMessage('93', 'ajxp_conf')}/>
+                            </div>
+                        </div>
+                        }
                     </div>
                     <ReactMUI.Paper zDepth={0} className="layout-fill vertical-layout people-list">
                         <PydioComponents.SimpleList
+                            ref="mainlist"
+                            pydio={this.props.pydio}
                             node={this.state.currentNode}
                             dataModel={this.state.dataModel}
                             openEditor={this.openRoleEditor}
@@ -288,6 +315,8 @@ const Dashboard = React.createClass({
                             entryRenderActions={this.renderNodeActions}
                             searchResultData={this.state.searchResultData}
                             elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
+                            hideToolbar={false}
+                            computeActionsForNode={true}
                         />
                     </ReactMUI.Paper>
                 </div>
@@ -297,4 +326,5 @@ const Dashboard = React.createClass({
 
 });
 
+Dashboard = muiThemeable()(Dashboard)
 export {Dashboard as default}
