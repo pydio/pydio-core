@@ -87,14 +87,16 @@ let GridBuilder = React.createClass({
     },
 
     resetLayout: function(){
-        if(window.confirm(this.context.getMessage('home.51'))){
+        if(window.confirm(this.props.getMessage('home.51'))){
             this.props.onResetLayout();
         }
     },
 
     render:function(){
 
-        var selectorItems = [{payload:0,text:this.context.getMessage('home.50')}].concat(
+        const {getMessage} = this.props;
+
+        var selectorItems = [{payload:0,text:getMessage('home.50')}].concat(
             this.state.availableWidgets.map(function(w, index){
                 return {payload:w, text:w['reactClass'].builderDisplayName};
             })
@@ -132,8 +134,8 @@ let GridBuilder = React.createClass({
             );
             add = (
                 <div style={{textAlign:'center', paddingBottom:100}}>
-                    <ReactMUI.RaisedButton label={this.context.getMessage('home.52')} onClick={this.onFormSubmit}/>
-                    &nbsp;<ReactMUI.RaisedButton label={this.context.getMessage('54', '')} onClick={this.cancel}/>
+                    <ReactMUI.RaisedButton label={getMessage('home.52')} onClick={this.onFormSubmit}/>
+                    &nbsp;<ReactMUI.RaisedButton label={getMessage('54', '')} onClick={this.cancel}/>
                 </div>
             );
         }
@@ -142,16 +144,16 @@ let GridBuilder = React.createClass({
             <ReactMUI.Paper
                 {...this.props}
                 zDepth={3}>
-                <h3>{this.context.getMessage('home.53')}</h3>
+                <h3>{getMessage('home.53')}</h3>
                 <div className="legend">
-                    {this.context.getMessage('home.54')}
+                    {getMessage('home.54')}
                     <br/>
-                    {this.context.getMessage('home.55')}</div>
+                    {getMessage('home.55')}</div>
                 {selector}
                 {form}
                 {add}
                 <div style={{position:'absolute',bottom: 30,left: 10}}>
-                    <ReactMUI.FlatButton disabled={(this.state.selectedIndex != 0)} label={this.context.getMessage('home.56')} secondary={true} onClick={this.resetLayout}/>
+                    <ReactMUI.FlatButton disabled={(this.state.selectedIndex != 0)} label={getMessage('home.56')} secondary={true} onClick={this.resetLayout}/>
                 </div>
             </ReactMUI.Paper>
         );

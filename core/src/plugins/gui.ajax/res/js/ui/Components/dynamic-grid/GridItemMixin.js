@@ -14,13 +14,7 @@ export default {
     },
 
     mergeStyleWithFocus:function(){
-        var style = this.props.style ? this.props.style : {};
-        if(this.state.focus){
-            style['zIndex'] = 1;
-        }else{
-            style['zIndex'] = null;
-        }
-        return style;
+        return {...this.props.style, zIndex: this.state.focus ? 1 : null};
     },
 
     getInitialSate:function(){
