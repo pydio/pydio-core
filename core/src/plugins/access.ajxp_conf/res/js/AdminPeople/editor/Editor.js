@@ -465,7 +465,7 @@ class Editor extends React.Component{
             var buttonCallback = function(parameters, cb){
                 var action = parameters['get_action'];
                 if(action == "update_user_pwd"){
-                    this.showModal(<UserPasswordDialog userId={userId} closeDialog={this.hideModal.bind(this)}/>);
+                    this.props.pydio.UI.openComponentInModal('AdminPeople', 'UserPasswordDialog', {userId: userId});
                 }else{
                     this._toggleUserLock(userId, locked, action);
                 }

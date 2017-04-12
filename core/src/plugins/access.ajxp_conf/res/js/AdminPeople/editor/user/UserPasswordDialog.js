@@ -1,8 +1,24 @@
+const React = require('react')
+const {TextField, FlatButton} = require('material-ui')
+const Pydio = require('pydio');
+const {ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin} = Pydio.requireLib('boot');
+
 export default React.createClass({
 
+    mixins: [
+        ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin
+    ],
+
     propTypes: {
-        closeDialog: React.PropTypes.func,
+        pydio : React.PropTypes.instanceOf(Pydio),
         userId: React.PropTypes.string.isRequired
+    },
+
+    getDefaultProps: function(){
+        return {
+            dialogTitle: global.pydio.MessageHash['role_editor.25'],
+            dialogSize: 'sm'
+        }
     },
 
     getInitialState: function () {
@@ -10,9 +26,9 @@ export default React.createClass({
     },
 
     onChange: function (event, value) {
-        var minLength = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
+        const minLength = parseInt(global.pydio.getPluginConfigs("core.auth").get("PASSWORD_MINLENGTH"));
 
-        var enabled = (this.refs.pass.getValue()
+        const enabled = (this.refs.pass.getValue()
             && this.refs.pass.getValue().length >= minLength
             && this.refs.pass.getValue() == this.refs.confirm.getValue()
         );
@@ -21,7 +37,12 @@ export default React.createClass({
     },
 
     submit: function () {
-        var value = this.refs.pass.getValue();
+
+        if(!this.state.okEnabled){
+            return;
+        }
+
+        const value = this.refs.pass.getValue();
         PydioApi.getClient().request({
                 get_action: "edit",
                 sub_action: "update_user_pwd",
@@ -33,39 +54,24 @@ export default React.createClass({
         );
     },
 
-    dismiss: function () {
-        this.props.closeDialog();
-    },
-
     render: function () {
 
         // This is passed via state, context is not working,
         // so we have to get the messages from the global.
-        var getMessage = function (id, namespace='') {
+        const getMessage = function (id, namespace='') {
             return global.pydio.MessageHash[namespace + (namespace ? '.' : '') + id] || id;
         };
-
-        var actions = [
-            <ReactMUI.FlatButton key="can" label={getMessage('54')} onClick={this.dismiss}/>,
-            <ReactMUI.FlatButton key="next" label={getMessage('25','role_editor')}
-                                 onClick={this.submit} disabled={!this.state.okEnabled}/>
-        ];
         return (
-            <ReactMUI.Dialog
-                modal={true}
-                actions={actions}
-                title={getMessage('25', 'role_editor')}
-                dismissOnClickAway={true}
-                openImmediately={true}
-                contentClassName="dialog-max-480"
-            >
-                <ReactMUI.TextField ref="pass" type="password"
-                                    onChange={this.onChange}
-                                    floatingLabelText={getMessage('523')}/><br/>
-                <ReactMUI.TextField ref="confirm" type="password"
-                                    onChange={this.onChange}
-                                    floatingLabelText={getMessage('199')}/>
-            </ReactMUI.Dialog>
+            <div style={{width: '100%'}}>
+                <TextField ref="pass" type="password" fullWidth={true}
+                            onChange={this.onChange}
+                            floatingLabelText={getMessage('523')}
+                           errorText={!this.state.okEnabled ? getMessage('378') : null}
+                />
+                <TextField ref="confirm" type="password" fullWidth={true}
+                            onChange={this.onChange}
+                            floatingLabelText={getMessage('199')}/>
+            </div>
         );
 
     }

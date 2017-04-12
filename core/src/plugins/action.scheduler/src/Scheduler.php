@@ -416,7 +416,7 @@ class Scheduler extends Plugin
                 "DESCRIPTION" => "action.scheduler.22",
                 "ICON" => "preferences_desktop.png",
                 "METADATA" => array(
-                    "icon_class" => "icon-time",
+                    "icon_class" => "mdi mdi-timetable",
                     "component" => "AdminScheduler.Dashboard"
                 ),
                 "LIST" => array($this, "listTasks")

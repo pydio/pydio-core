@@ -16,7 +16,7 @@ class DiagnosticDashboard extends React.Component{
         this.setState({loading: true});
         PydioApi.getClient().request({
             get_action:'ls',
-            dir: '/admin/diagnostic',
+            dir: this.props.access || '/admin/diagnostic',
             format: 'json'
         }, (transport) => {
             const resp = transport.responseJSON;
@@ -56,7 +56,7 @@ class DiagnosticDashboard extends React.Component{
 
         if(copy){
             copyPanel = (
-                <Paper zDepth={2} style={{position:'absolute', top: '20%', left: '20%', width: '60%', padding:'20px 20px 0', height:370, overflowY: 'auto', zIndex:2}}>
+                <Paper zDepth={2} style={{position:'absolute', top: '15%', left: '20%', width: '60%', padding:'20px 20px 0', height:370, overflowY: 'auto', zIndex:2}}>
                     <div style={{fontSize: 20}}>Copy Diagnostic</div>
                     <ClipboardTextField rows={5} rowsMax={10} multiLine={true} inputValue={copyContent} floatingLabelText={this.props.getMessage('5', 'ajxp_conf')} getMessage={this.props.getMessage}/>
                     <div style={{textAlign:'right'}}>
@@ -70,7 +70,12 @@ class DiagnosticDashboard extends React.Component{
             <div style={{height: '100%', display:'flex', flexDirection:'column', position:'relative'}}>
                 {copyPanel}
                 <div style={{display:'flex', alignItems:'center'}}>
-                    <h1 style={{margin: 12, flex:1}}>{this.props.getMessage('5', 'ajxp_conf')}</h1>
+                    {this.props.displayMode === 'card' &&
+                        <h3 style={{margin: '0 20px 20px', flex:1}}>{this.props.getMessage('5', 'ajxp_conf')}</h3>
+                    }
+                    {!this.props.displayMode &&
+                        <h1 style={{margin: 12, flex:1}}>{this.props.getMessage('5', 'ajxp_conf')}</h1>
+                    }
                     <FlatButton label="Copy" onTouchTap={() => {this.setState({copy:true})}} secondary={true} style={{marginRight: 16}}/>
                 </div>
                 {content}
