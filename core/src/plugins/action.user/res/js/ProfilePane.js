@@ -1,9 +1,10 @@
 const React = require('react')
 const LangUtils = require('pydio/util/lang')
-const {FlatButton} = require('material-ui')
+const {FlatButton, Divider} = require('material-ui')
 const Pydio = require('pydio')
 const {Manager, FormPanel} = Pydio.requireLib('form')
 import PasswordPopover from './PasswordPopover'
+import EmailPanel from './EmailPanel'
 
 const FORM_CSS = ` 
 .react-mui-context .current-user-edit.pydio-form-panel > .pydio-form-group {
@@ -38,14 +39,15 @@ const FORM_CSS = `
 let ProfilePane = React.createClass({
 
     getInitialState: function(){
-        let objValues = {};
+        let objValues = {}, mailValues = {};
         let pydio = this.props.pydio;
         pydio.user.preferences.forEach(function(v, k){
             if(k === 'gui_preferences') return;
             objValues[k] = v;
         });
         return {
-            definitions:Manager.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true']"),
+            definitions:Manager.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true' and not(contains(@name, 'NOTIFICATIONS_EMAIL'))]"),
+            mailDefinitions:Manager.parseParameters(pydio.getXmlRegistry(), "user/preferences/pref[@exposed='true']|//param[contains(@scope,'user') and @expose='true' and contains(@name, 'NOTIFICATIONS_EMAIL')]"),
             values:objValues,
             originalValues:LangUtils.deepCopy(objValues),
             dirty: false
@@ -137,6 +139,8 @@ let ProfilePane = React.createClass({
                     binary_context={"user_id="+pydio.user.id}
                     onChange={this.onFormChange}
                 />
+                <Divider/>
+                <EmailPanel pydio={this.props.pydio} definitions={this.state.mailDefinitions} values={values} onChange={this.onFormChange}/>
                 <style type="text/css" dangerouslySetInnerHTML={{__html: FORM_CSS}}></style>
             </div>
         );
