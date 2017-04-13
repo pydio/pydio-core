@@ -8,7 +8,7 @@ const EditorsDashboard = React.createClass({
         return(
             <div className="main-layout-nav-to-stack vertical-layout" style={this.props.style}>
                 <ReactMUI.Paper className="left-nav vertical-layout" zDepth={0}>
-                    <h1>{this.context.getMessage('plugtype.title.editor', '')}</h1>
+                    <h1 className="admin-panel-title">{this.context.getMessage('plugtype.title.editor', '')}</h1>
                     <div style={{padding:'0 20px'}} className="layout-fill-scroll-y">
                         {this.context.getMessage('plugins.4')}
                     </div>

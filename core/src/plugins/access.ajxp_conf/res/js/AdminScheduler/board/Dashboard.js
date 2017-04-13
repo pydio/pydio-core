@@ -66,7 +66,7 @@ const Dashboard = React.createClass({
                 <div className="left-nav vertical-layout" style={{width:'100%', backgroundColor:'white'}}>
                     <ReactMUI.Paper zDepth={0} className="vertical-layout layout-fill">
                         <div className="vertical-layout workspaces-list layout-fill">
-                            <h1 className="hide-on-vertical-layout">{this.context.getMessage('18', 'action.scheduler')}</h1>
+                            <h1 className="admin-panel-title hide-on-vertical-layout">{this.context.getMessage('18', 'action.scheduler')}</h1>
                             {error}
                             <div className="plugin-doc-pane">
                                 {this.context.getMessage('scheduler.1', 'ajxp_admin')}

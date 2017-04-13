@@ -137,7 +137,7 @@ const Dashboard = React.createClass({
                             defaultDate={this.state.currentDate}
                             showYearSelector={true} />
                     </div>
-                    <h1>{this.context.getMessage('logs.1')} <span style={{fontSize: 13, letterSpacing: 0, fontStyle:'italic', lineHeight: 'initial'}}>{this.context.getMessage('logs.4')}</span></h1>
+                    <h1 className="admin-panel-title">{this.context.getMessage('logs.1')} <span style={{fontSize: 13, letterSpacing: 0, fontStyle:'italic', lineHeight: 'initial'}}>{this.context.getMessage('logs.4')}</span></h1>
 
                 </div>
                 <PydioComponents.SimpleList

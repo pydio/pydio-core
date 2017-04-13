@@ -56,6 +56,9 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context h1 {
   padding: 16px 20px;
 }
+.react-mui-context h1.admin-panel-title {
+  padding: 16px 16px 0;
+}
 .react-mui-context .main-layout-nav-to-stack .left-nav .plugin-doc-pane {
   clear: both;
   padding: 0 20px;

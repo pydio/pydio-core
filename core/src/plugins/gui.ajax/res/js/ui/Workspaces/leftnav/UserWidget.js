@@ -32,10 +32,11 @@ export default React.createClass({
         const messages = this.props.pydio.MessageHash;
 
         let avatar;
-        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, addressBookButton, userSharesButton;
+        let homeButton, infoButton, logoutButton, notificationsButton, settingsButton, currentIsSettings;
         let avatarStyle = this.props.avatarStyle || {};
         if(this.props.pydio.user){
             const user = this.props.pydio.user;
+            currentIsSettings = user.activeRepository === 'ajxp_conf';
             avatar = (
                 <UserAvatar
                     pydio={this.props.pydio}
@@ -96,22 +97,32 @@ export default React.createClass({
 
         // Do not display Home Button here for the moment
         const actionBarStyle = this.props.actionBarStyle || {};
-        const actionBar = (
-            <div className="action_bar" style={{display:'flex', ...actionBarStyle}}>
-                <Toolbar
-                    {...this.props}
-                    toolbars={['user-widget']}
-                    renderingType="icon"
-                    toolbarStyle={{display:'inline'}}
-                    buttonStyle={{color: 'rgba(255,255,255,255.93)', fontSize: 18}}
-                    tooltipPosition="bottom-right"
-                />
-                {notificationsButton}
-                {settingsButton}
-                <span style={{flex:1}}/>
-                {homeButton}
-            </div>
-        );
+        let actionBar;
+        if(currentIsSettings){
+            actionBar = (
+                <div className="action_bar" style={{display:'flex', ...actionBarStyle}}>
+                    {homeButton}
+                </div>
+            );
+        }else{
+            actionBar = (
+                <div className="action_bar" style={{display:'flex', ...actionBarStyle}}>
+                    <Toolbar
+                        {...this.props}
+                        toolbars={['user-widget']}
+                        renderingType="icon"
+                        toolbarStyle={{display:'inline'}}
+                        buttonStyle={{color: 'rgba(255,255,255,255.93)', fontSize: 18}}
+                        tooltipPosition="bottom-right"
+                    />
+                    {notificationsButton}
+                    {settingsButton}
+                    <span style={{flex:1}}/>
+                    {homeButton}
+                </div>
+            );
+
+        }
 
         if(this.props.children){
             return (
