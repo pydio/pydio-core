@@ -8,7 +8,8 @@ const CreateRoleOrGroupForm = React.createClass({
 
     propTypes:{
         type: React.PropTypes.oneOf(['group', 'user', 'role']),
-        roleNode: React.PropTypes.instanceOf(AjxpNode)
+        roleNode: React.PropTypes.instanceOf(AjxpNode),
+        openRoleEditor: React.PropTypes.func
     },
 
     getTitle:function(){

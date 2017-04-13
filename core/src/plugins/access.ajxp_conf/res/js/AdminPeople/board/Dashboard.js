@@ -132,15 +132,15 @@ let Dashboard = React.createClass({
     },
 
     createUserAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateUserForm', {dataModel: this.props.dataModel});
+        pydio.UI.openComponentInModal('AdminPeople','CreateUserForm', {dataModel: this.props.dataModel, openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     createGroupAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'group'});
+        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'group', openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     createRoleAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'role', roleNode:this.state.roleNode});
+        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'role', roleNode:this.state.roleNode, openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     openUsersImporter: function(){
