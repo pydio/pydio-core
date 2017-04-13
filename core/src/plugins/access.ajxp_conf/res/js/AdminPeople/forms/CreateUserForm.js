@@ -1,7 +1,8 @@
 const CreateUserForm = React.createClass({
 
     propTypes:{
-        dataModel: React.PropTypes.instanceOf(PydioDataModel)
+        dataModel: React.PropTypes.instanceOf(PydioDataModel),
+        openRoleEditor: React.PropTypes.func
     },
 
     mixins:[
@@ -56,7 +57,8 @@ const CreateUserForm = React.createClass({
             if(message){
                 var node = new AjxpNode(currentPath + "/"+ parameters['new_user_login'], true);
                 node.getMetadata().set("ajxp_mime", "user");
-                global.pydio.UI.openCurrentSelectionInEditor(node);
+                //global.pydio.UI.openCurrentSelectionInEditor(node);
+                this.props.openRoleEditor(node);
                 var currentNode = global.pydio.getContextNode();
                 if(global.pydio.getContextHolder().getSelectedNodes().length){
                     currentNode = global.pydio.getContextHolder().getSelectedNodes()[0];

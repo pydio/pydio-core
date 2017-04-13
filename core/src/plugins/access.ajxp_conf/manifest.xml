@@ -14,7 +14,7 @@
             <css file="plugins/access.ajxp_conf/res/css/ajxp_admin.css" autoload="true"/>
             <css file="plugins/access.ajxp_conf/res/css/rolesEditor.css" autoload="true"/>
 
-            <js className="AdminComponents" file="plugins/access.ajxp_conf/res/build/AdminComponents.js" depends="React,PydioComponents"/>
+            <js className="AdminComponents" file="plugins/access.ajxp_conf/res/build/AdminComponents.js" depends="React,PydioComponents,PydioWorkspaces"/>
             <js className="AdminActions" file="plugins/access.ajxp_conf/res/build/AdminActions.js" depends="AdminComponents"/>
             <js className="AdminPeople" file="plugins/access.ajxp_conf/res/build/AdminPeople.js" depends="React,PydioComponents,PydioForm"/>
             <js className="AdminRoleEditor" file="plugins/access.ajxp_conf/res/build/AdminRoleEditor.js" depends="React,AdminComponents,PydioComponents,PydioForm"/>

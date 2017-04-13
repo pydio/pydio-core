@@ -3,6 +3,7 @@ import {MessagesProviderMixin, PydioProviderMixin} from '../util/Mixins'
 import AdminLeftNav from './AdminLeftNav'
 const {AppBar, Paper} = require('material-ui')
 const PydioDataModel = require('pydio/model/data-model')
+const {UserWidget} = require('pydio').requireLib('workspaces')
 
 const AdminDashboard = React.createClass({
 
@@ -166,18 +167,16 @@ const AdminDashboard = React.createClass({
         const dm = this.props.pydio.getContextHolder();
         let params = this.props.pydio.Parameters;
         let img = ResourcesManager.resolveImageSource('white_logo.png');
-        const title = (
-            <div style={{paddingLeft:50}}>
-                <img
-                    className="custom_logo_image linked"
-                    src={img}
-                    title="Back to Home"
-                    width=""
-                    height=""
-                    style={{height: 39, width: 'auto', marginTop: 12, marginLeft: -17}}
-                    onClick={this.backToHome}
-                />
-            </div>
+        const logo = (
+            <img
+                className="custom_logo_image linked"
+                src={img}
+                title="Back to Home"
+                width=""
+                height=""
+                style={{height: 40, width: 'auto'}}
+                onClick={this.backToHome}
+            />
         );
         let rPanelContent;
         if(this.state.rightPanel){
@@ -194,17 +193,25 @@ const AdminDashboard = React.createClass({
             appBarRight = this.props.iconElementRight;
         }else{
             const style = {
-                position: 'absolute',
-                top: 0,
-                right: 0,
                 color: 'white',
-                fontSize: 18,
-                padding: 20
+                fontSize: 20,
+                display:'flex',
+                alignItems:'center',
+                height: 50
             };
             appBarRight = (
-                <div style={style}>Pydio Community Dashboard</div>
+                <div style={style}>Pydio Community Distribution{logo}</div>
             );
         }
+        const userWidgetStyle = {
+            height: 64,
+            lineHeight: '16px',
+            backgroundColor: 'transparent',
+            boxShadow: 'none',
+            display:'flex',
+            alignItems:'center'
+        };
+        const title = <UserWidget pydio={this.props.pydio} style={userWidgetStyle} hideActionBar={true} userTouchBackHome={true}/>
 
         return (
             <div className="app-canvas">

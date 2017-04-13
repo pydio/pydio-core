@@ -132,15 +132,15 @@ let Dashboard = React.createClass({
     },
 
     createUserAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateUserForm', {dataModel: this.props.dataModel});
+        pydio.UI.openComponentInModal('AdminPeople','CreateUserForm', {dataModel: this.props.dataModel, openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     createGroupAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'group'});
+        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'group', openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     createRoleAction: function(){
-        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'role', roleNode:this.state.roleNode});
+        pydio.UI.openComponentInModal('AdminPeople','CreateRoleOrGroupForm', {type:'role', roleNode:this.state.roleNode, openRoleEditor:this.openRoleEditor.bind(this)});
     },
 
     openUsersImporter: function(){
@@ -242,7 +242,7 @@ let Dashboard = React.createClass({
                 <div className="people-title horizontal-layout">
                     <div style={{display:'flex', width: '100%', alignItems: 'top'}}>
                         <div style={{display:'flex', flex: 1, alignItems: 'center'}}>
-                            <h1>{this.context.getMessage('2', 'ajxp_conf')}</h1>
+                            <h1 className="admin-panel-title">{this.context.getMessage('2', 'ajxp_conf')}</h1>
                             <div style={{flex: 1, paddingTop: 8}}>
                                 <IconButton primary={true} {...fontIconStyle} iconClassName="mdi mdi-account-plus" tooltip={this.context.getMessage("user.1")} onTouchTap={this.createUserAction}/>
                                 <IconButton primary={true} {...fontIconStyle} iconClassName="mdi mdi-account-multiple-plus" tooltip={this.context.getMessage("user.2")} onTouchTap={this.createGroupAction}/>

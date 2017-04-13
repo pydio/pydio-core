@@ -234,7 +234,7 @@ const PluginEditor = React.createClass({
         return (
             <div className={(this.props.className?this.props.className+" ":"") + "main-layout-nav-to-stack vertical-layout plugin-board" + scrollingClassName} style={this.props.style}>
                 <ReactMUI.Paper className="left-nav" zDepth={0}>
-                    <h1>{this.state.label}</h1>
+                    <h1 className="admin-panel-title">{this.state.label}</h1>
                     <div className="buttons-cont" style={{padding:16}}>
                         <ReactMUI.RaisedButton primary={true} disabled={!this.state.dirty} label={this.context.getMessage('plugins.5')} onClick={this.save}></ReactMUI.RaisedButton>
                         &nbsp;&nbsp;

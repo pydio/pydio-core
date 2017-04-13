@@ -1,10 +1,15 @@
-var MetaSourceForm = React.createClass({
+const React = require('react')
+const {MenuItem, SelectField} = require('material-ui')
+const {ActionDialogMixin, CancelButtonProviderMixin, SubmitButtonProviderMixin} = require('pydio').requireLib('boot')
+const {MessagesConsumerMixin} = AdminComponents;
+
+const MetaSourceForm = React.createClass({
 
     mixins:[
-        AdminComponents.MessagesConsumerMixin,
-        PydioReactUI.ActionDialogMixin,
-        PydioReactUI.CancelButtonProviderMixin,
-        PydioReactUI.SubmitButtonProviderMixin
+        MessagesConsumerMixin,
+        ActionDialogMixin,
+        CancelButtonProviderMixin,
+        SubmitButtonProviderMixin
     ],
 
     propTypes:{
@@ -39,34 +44,33 @@ var MetaSourceForm = React.createClass({
     },
 
     render:function(){
-        var model = this.props.model;
-        var currentMetas = model.getOption("META_SOURCES", true);
-        var allMetas = model.getAllMetaSources();
+        const model = this.props.model;
+        const currentMetas = model.getOption("META_SOURCES", true);
+        const allMetas = model.getAllMetaSources();
 
-        // Step is Chooser: build a DropDownMenu
-        var menuItems = [{payload:-1, text:this.context.getMessage('ws.47', 'ajxp_admin')}];
+        let menuItems = [];
         allMetas.map(function(metaSource){
-            var id = metaSource['id'];
-            var type = id.split('.').shift();
+            const id = metaSource['id'];
+            const type = id.split('.').shift();
             if(type == 'metastore' || type == 'index'){
-                var already = false;
+                let already = false;
                 Object.keys(currentMetas).map(function(metaKey){
                     if(metaKey.indexOf(type) === 0) already = true;
                 });
                 if(already) return;
             }else{
-                if(currentMetas[metaSource['id']]) return;
+                if(currentMetas[id]) return;
             }
-            menuItems.push({payload:metaSource['id'], text:metaSource['label']});
+            menuItems.push(<MenuItem value={metaSource['id']} primaryText={metaSource['label']}/>);
         });
-        var change = function(event, index, item){
-            this.setState({pluginId:item.payload});
+        const change = function(event, index, value){
+            if(value !== -1){
+                this.setState({pluginId:value});
+            }
         }.bind(this);
         return (
-            <div style={{height: 350}}>
-                <ReactMUI.DropDownMenu
-                    menuItems={menuItems} onChange={change}
-                />
+            <div style={{width:'100%'}}>
+                <SelectField value={this.state.pluginId} fullWidth={true} onChange={change}>{menuItems}</SelectField>
             </div>
         );
     }

@@ -89,112 +89,19 @@ export default {
     },
 
     componentWillReceiveProps:function(newProps){
-        let choices;
-        if(newProps.attributes['choices']) {
-            if(newProps.attributes['choices'] != this.props.attributes['choices']){
-                choices = this.loadExternalValues(newProps.attributes['choices']);
-            }else{
-                choices = this.state.choices;
-            }
-        }
         this.setState({
             value:newProps.value,
             dirty:false,
-            choices:choices
         });
     },
 
-    componentDidMount: function(){
-        if(this.props.attributes['choices']) {
-            const choices = this.loadExternalValues(this.props.attributes['choices']);
-            this.setState({choices: choices});
-        }
-    },
 
     getInitialState:function(){
-        let choices = new Map();
-        choices.set('0', global.pydio.MessageHash['ajxp_admin.home.6']);
         return {
             editMode:false,
             dirty:false,
-            value:this.props.value,
-            choices: choices
+            value:this.props.value
         };
-    },
-
-    loadExternalValues:function(choices){
-        let list_action;
-        if(choices instanceof Map){
-            if(this.onChoicesLoaded) this.onChoicesLoaded(choices);
-            return choices;
-        }
-        let output = new Map();
-        if(choices.indexOf('json_list:') === 0){
-            list_action = choices.replace('json_list:', '');
-            output.set('0', pydio.MessageHash['ajxp_admin.home.6']);
-            PydioApi.getClient().request({get_action:list_action}, function(transport){
-                const list = transport.responseJSON.LIST;
-                let newOutput = new Map();
-                if(transport.responseJSON.HAS_GROUPS){
-                    for(let key in list){
-                        if(list.hasOwnProperty(key)){
-                            // TODO: HANDLE OPTIONS GROUPS
-                            for (let index=0;index<list[key].length;index++){
-                                newOutput.set(list[key][index].action, list[key][index].action);
-                            }
-                        }
-                    }
-                }else{
-                    for (let key in list){
-                        if(list.hasOwnProperty(key)){
-                            newOutput.set(key, list[key]);
-                        }
-                    }
-                }
-                this.setState({choices:newOutput}, () => {
-                    if(this.onChoicesLoaded) this.onChoicesLoaded(newOutput);
-                });
-            }.bind(this));
-        }else if(choices.indexOf('json_file:') === 0){
-            list_action = choices.replace('json_file:', '');
-            output.set('0', pydio.MessageHash['ajxp_admin.home.6']);
-            PydioApi.getClient().loadFile(list_action, function(transport){
-                let newOutput = new Map();
-                transport.responseJSON.map(function(entry){
-                    newOutput.set(entry.key, entry.label);
-                });
-                this.setState({choices:newOutput}, () => {
-                    if(this.onChoicesLoaded) this.onChoicesLoaded(newOutput);
-                });
-            }.bind(this));
-        }else if(choices == "AJXP_AVAILABLE_LANGUAGES"){
-            global.pydio.listLanguagesWithCallback(function(key, label){
-                output.set(key, label);
-            });
-            if(this.onChoicesLoaded) this.onChoicesLoaded(output);
-        }else if(choices == "AJXP_AVAILABLE_REPOSITORIES"){
-            if(global.pydio.user){
-                global.pydio.user.repositories.forEach(function(repository){
-                    output.set(repository.getId() , repository.getLabel());
-                });
-            }
-            if(this.onChoicesLoaded) this.onChoicesLoaded(output);
-        }else{
-            // Parse string and return map
-            choices.split(",").map(function(choice){
-                let label,value;
-                const l = choice.split('|');
-                if(l.length > 1){
-                    value = l[0];label=l[1];
-                }else{
-                    value = label = choice;
-                }
-                if(global.pydio.MessageHash[label]) label = global.pydio.MessageHash[label];
-                output.set(value, label);
-            });
-            if(this.onChoicesLoaded) this.onChoicesLoaded(output);
-        }
-        return output;
     }
 
 };

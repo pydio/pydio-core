@@ -1,8 +1,9 @@
 import FormMixin from '../mixins/FormMixin'
 const React = require('react')
 const {AutoComplete, MenuItem, RefreshIndicator} = require('material-ui')
+import FieldWithChoices from '../mixins/FieldWithChoices'
 
-export default React.createClass({
+let AutocompleteBox = React.createClass({
 
     mixins:[FormMixin],
 
@@ -14,7 +15,9 @@ export default React.createClass({
         this.onChange(null, chosenValue.key);
     },
 
-    onChoicesLoaded: function(choices){
+    render: function(){
+
+        const {choices} = this.props;
         let dataSource = [];
         let labels = {};
         choices.forEach((choice, key) => {
@@ -25,19 +28,15 @@ export default React.createClass({
             });
             labels[key] = choice;
         });
-        this.setState({dataSource: dataSource, labels: labels});
-    },
-
-    render: function(){
 
         let displayText = this.state.value;
-        if(this.state.labels && this.state.labels[displayText]){
-            displayText = this.state.labels[displayText];
+        if(labels && labels[displayText]){
+            displayText = labels[displayText];
         }
 
         return (
             <div className="pydioform_autocomplete" style={{position:'relative'}}>
-                {!this.state.dataSource &&
+                {!dataSource.length &&
                     <RefreshIndicator
                         size={30}
                         right={10}
@@ -45,13 +44,13 @@ export default React.createClass({
                         status="loading"
                     />
                 }
-                {this.state.dataSource &&
+                {dataSource.length &&
                     <AutoComplete
                         fullWidth={true}
                         searchText={displayText}
                         onUpdateInput={this.handleUpdateInput}
                         onNewRequest={this.handleNewRequest}
-                        dataSource={this.state.dataSource}
+                        dataSource={dataSource}
                         floatingLabelText={this.props.attributes['label']}
                         filter={(searchText, key) => (key.toLowerCase().indexOf(searchText.toLowerCase()) === 0)}
                         openOnFocus={true}
@@ -64,3 +63,6 @@ export default React.createClass({
     }
 
 });
+
+AutocompleteBox = FieldWithChoices(AutocompleteBox);
+export {AutocompleteBox as default}

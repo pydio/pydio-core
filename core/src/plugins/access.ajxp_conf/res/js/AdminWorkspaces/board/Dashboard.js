@@ -228,7 +228,7 @@ export default React.createClass({
                 <div className="left-nav vertical-layout" style={{width:'100%'}}>
                     <ReactMUI.Paper zDepth={0} className="vertical-layout layout-fill">
                         <div className="vertical-layout workspaces-list layout-fill">
-                            <h1 className="hide-on-vertical-layout">{this.context.getMessage('3', 'ajxp_conf')}</h1>
+                            <h1 className="admin-panel-title hide-on-vertical-layout">{this.context.getMessage('3', 'ajxp_conf')}</h1>
                             {buttonContainer}
                             <WorkspaceList
                                 ref="workspacesList"

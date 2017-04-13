@@ -446,6 +446,8 @@ export default React.createClass({
                           initialSelectedIndex={initialSelectedIndex}
                           value={this.props.onTabChange ? initialSelectedIndex : undefined}
                           onChange={this.props.onTabChange ? (i) => {this.setState({tabSelectedIndex:i});this.props.onTabChange(i)} : undefined}
+                          style={{flex:1, display:'flex', flexDirection:'column'}}
+                          contentContainerStyle={{flex:1, overflowY: 'auto'}}
                     >
                         {tabs}
                     </Tabs>

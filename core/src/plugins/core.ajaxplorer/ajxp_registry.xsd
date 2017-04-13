@@ -672,6 +672,9 @@
             <xs:attribute name="expose" type="xs:boolean"/>
             <xs:attribute name="group"/>
             <xs:attribute name="replicationGroup"/>
+            <xs:attribute name="replicationTitle" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationDescription" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationMandatory" type="xs:boolean" use="optional"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="scope"/>
             <xs:attribute name="repoScope"/>
@@ -697,6 +700,7 @@
             <xs:attribute name="replicationGroup"/>
             <xs:attribute name="replicationTitle" type="xs:Name" use="optional"/>
             <xs:attribute name="replicationDescription" type="xs:Name" use="optional"/>
+            <xs:attribute name="replicationMandatory" type="xs:boolean" use="optional"/>
             <xs:attribute name="mandatory" type="xs:boolean"/>
             <xs:attribute name="no_templates" type="xs:boolean"/>
             <xs:attribute name="templates_only" type="xs:boolean"/>

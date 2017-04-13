@@ -1,6 +1,7 @@
 const React = require('react')
-const ReactMUI = require('material-ui-legacy')
-import FormPanel from './FormPanel'
+const {IconButton} = require('material-ui')
+import ReplicatedGroup from './ReplicatedGroup'
+const LangUtils = require('pydio/util/lang')
 
 /**
  * Sub form replicating itself (+/-)
@@ -17,10 +18,10 @@ export default React.createClass({
     },
 
     buildSubValue:function(values, index=0){
-        var subVal;
-        var suffix = index==0?'':'_'+index;
+        let subVal;
+        const suffix = index==0?'':'_'+index;
         this.props.parameters.map(function(p){
-            var pName = p['name'];
+            const pName = p['name'];
             if(values[pName+suffix] !== undefined){
                 if(!subVal) subVal = {};
                 subVal[pName] = values[pName+suffix];
@@ -30,11 +31,10 @@ export default React.createClass({
     },
 
     indexedValues:function(rowsArray){
-        var index = 0;
-        var values = {};
+        let index = 0, values = {};
         rowsArray.map(function(row){
-            var suffix = index==0?'':'_'+index;
-            for(var p in row){
+            const suffix = index==0?'':'_'+index;
+            for(let p in row){
                 if(!row.hasOwnProperty(p)) continue;
                 values[p+suffix] = row[p];
             }
@@ -44,12 +44,12 @@ export default React.createClass({
     },
 
     indexValues:function(rowsArray, removeLastRow){
-        var indexed = this.indexedValues(rowsArray);
+        const indexed = this.indexedValues(rowsArray);
         if(this.props.onChange){
             if(removeLastRow){
-                var lastRow = {}, nextIndex = rowsArray.length-1;
+                let lastRow = {}, nextIndex = rowsArray.length-1;
                 this.props.parameters.map(function(p){
-                    lastRow[p['name'] + '_' + nextIndex] = '';
+                    lastRow[p['name'] + (nextIndex > 0 ? '_' + nextIndex : '')] = '';
                 });
                 this.props.onChange(indexed, true, lastRow);
             }else{
@@ -60,13 +60,14 @@ export default React.createClass({
 
     instances:function(){
         // Analyze current value to grab number of rows.
-        var rows = [], subVal, index = 0;
+        let rows = [], subVal, index = 0;
         while(subVal = this.buildSubValue(this.props.values, index)){
             index ++;
             rows.push(subVal);
         }
-        if(!rows.length){
-            var emptyValue={};
+        const firstParam = this.props.parameters[0];
+        if(!rows.length && firstParam['replicationMandatory'] === 'true'){
+            let emptyValue={};
             this.props.parameters.map(function(p) {
                 emptyValue[p['name']] = p['default'] || '';
             });
@@ -76,7 +77,7 @@ export default React.createClass({
     },
 
     addRow:function(){
-        var newValue={}, currentValues = this.instances();
+        let newValue={}, currentValues = this.instances();
         this.props.parameters.map(function(p) {
             newValue[p['name']] = p['default'] || '';
         });
@@ -85,82 +86,65 @@ export default React.createClass({
     },
 
     removeRow:function(index){
-        var instances = this.instances();
-        var removeInst = instances[index];
+        let instances = this.instances();
+        const removeInst = instances[index];
         instances = LangUtils.arrayWithout(this.instances(), index);
         instances.push(removeInst);
         this.indexValues(instances, true);
     },
 
     swapRows:function(i,j){
-        var instances = this.instances();
-        var tmp = instances[j];
+        let instances = this.instances();
+        let tmp = instances[j];
         instances[j] = instances[i];
         instances[i] = tmp;
         this.indexValues(instances);
     },
 
     onChange:function(index, newValues, dirty){
-        var instances = this.instances();
+        let instances = this.instances();
         instances[index] = newValues;
         this.indexValues(instances);
     },
 
     onParameterChange:function(index, paramName, newValue, oldValue){
-        var instances = this.instances();
+        let instances = this.instances();
         instances[index][paramName] = newValue;
         this.indexValues(instances);
     },
 
     render:function(){
-        var replicationTitle, replicationDescription;
-        var firstParam = this.props.parameters[0];
-        replicationTitle = firstParam['replicationTitle'] || firstParam['label'];
-        replicationDescription = firstParam['replicationDescription'] || firstParam['description'];
+        const {parameters} = this.props;
+        let firstParam = parameters[0];
+        const replicationTitle = firstParam['replicationTitle'] || firstParam['label'];
+        const replicationDescription = firstParam['replicationDescription'] || firstParam['description'];
+        const replicationMandatory = firstParam['replicationMandatory'] === 'true';
 
-        var instances = this.instances();
-        var rows = instances.map(function(subValues, index){
-            var buttons = [];
-            if(instances.length > 1){
-                if(index > 0){
-                    var upF = function(){ this.swapRows(index, index-1) }.bind(this);
-                    buttons.push(<ReactMUI.IconButton key="up" iconClassName="icon-caret-up" onClick={upF}/>);
-                }
-                if(index < instances.length -1){
-                    var downF = function(){ this.swapRows(index, index+1) }.bind(this);
-                    buttons.push(<ReactMUI.IconButton key="down" iconClassName="icon-caret-down" onClick={downF}/>);
-                }
+        const instances = this.instances();
+        const multiple = instances.length > 1;
+        const rows = instances.map((subValues, index) => {
+            let onSwapUp, onSwapDown, onRemove;
+            const onParameterChange = (paramName, newValue, oldValue) => {
+                this.onParameterChange(index, paramName, newValue, oldValue);
+            };
+            if(multiple && index > 0){
+                onSwapUp = () => { this.swapRows(index, index-1) };
             }
-            if(index != 0 || instances.length > 1){
-                var removeF = function(){ this.removeRow(index); }.bind(this);
-                buttons.push(<ReactMUI.IconButton key="remove" iconClassName="icon-remove-sign" onClick={removeF}/>);
+            if(multiple && index < instances.length - 1){
+                onSwapDown = () => { this.swapRows(index, index+1) };
             }
-            if(!buttons.length){
-                buttons.push(<ReactMUI.IconButton key="remove" className="disabled" iconClassName="icon-remove-sign" disabled={true}/>);
+            if( multiple || !replicationMandatory ) {
+                onRemove = () => { this.removeRow(index); };
             }
-            var actionBar = (
-                <div className="replicable-action-bar">{buttons}</div>
-            );
-            var onChange = function(values, dirty){ this.onChange(index, values, dirty); }.bind(this);
-            var onParameterChange = function(paramName, newValue, oldValue){ this.onParameterChange(index, paramName, newValue, oldValue); }.bind(this);
-            return (
-                <FormPanel
-                    {...this.props}
-                    tabs={null}
-                    key={index}
-                    values={subValues}
-                    onChange={null}
-                    onParameterChange={onParameterChange}
-                    header={actionBar}
-                    className="replicable-group"
-                    depth={this.props.depth}
-                />
-            );
-        }.bind(this));
+            const props = {onSwapUp, onSwapDown, onRemove, onParameterChange};
+            return ( <ReplicatedGroup key={index} {...this.props} {...props} subValues={subValues} /> );
+
+        });
+
         return (
             <div className="replicable-field">
                 <div className="title-bar">
-                    <ReactMUI.IconButton key="add" style={{float:'right'}} iconClassName="icon-plus" tooltip="Add value" onClick={this.addRow}/>
+                    <IconButton key="add" style={{float:'right'}} iconClassName="mdi mdi-plus"  iconStyle={{fontSize:24}} tooltip="Add value" onClick={this.addRow}/>
                     <div className="title">{replicationTitle}</div>
                     <div className="legend">{replicationDescription}</div>
                 </div>
