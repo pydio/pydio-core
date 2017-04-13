@@ -28,11 +28,12 @@ let AdminLeftNav = React.createClass({
     },
 
     checkForUpdates: function(){
-        if(this.props.pydio.Controller.getActionByName("get_upgrade_path")){
+        const {pydio, rootNode} = this.props;
+        if(pydio.Controller.getActionByName("get_upgrade_path")){
             PydioApi.getClient().request({get_action:'get_upgrade_path'}, function(transp){
                 const response = transp.responseJSON;
                 const fakeNode = new AjxpNode("/admin/action.updater");
-                const child = fakeNode.findInArbo(this.props.rootNode);
+                const child = fakeNode.findInArbo(rootNode);
                 if(child){
                     let length = 0;
                     if(response && response.packages.length) {
@@ -91,7 +92,21 @@ let AdminLeftNav = React.createClass({
 
     render: function(){
 
-        const {pydio, rootNode, contextNode, muiTheme} = this.props;
+        const {pydio, rootNode, muiTheme} = this.props;
+
+        // Fix for ref problems on context node
+        let {contextNode} = this.props;
+        this.props.rootNode.getChildren().forEach((child) => {
+            if(child.getPath() === contextNode.getPath()){
+                contextNode = child;
+            }else{
+                child.getChildren().forEach((grandChild) => {
+                    if (grandChild.getPath() === contextNode.getPath()) {
+                        contextNode = grandChild;
+                    }
+                });
+            }
+        });
 
         const menuItems = NavigationHelper.buildNavigationItems(pydio, rootNode, muiTheme.palette);
 
