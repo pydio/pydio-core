@@ -12,9 +12,17 @@ class SearchForm extends Component {
     constructor(props) {
         super(props)
 
+        // Create Fake DM
+        let basicDataModel = new PydioDataModel(true);
+        let rNodeProvider = new EmptyNodeProvider();
+        basicDataModel.setAjxpNodeProvider(rNodeProvider);
+        const rootNode = new AjxpNode("/", false, '', '', rNodeProvider);
+        basicDataModel.setRootNode(rootNode);
+
         this.state = {
             values: {},
-            display: 'closed'
+            display: 'closed',
+            dataModel: basicDataModel
         }
 
         this.setMode = _.debounce(this.setMode, 500)
