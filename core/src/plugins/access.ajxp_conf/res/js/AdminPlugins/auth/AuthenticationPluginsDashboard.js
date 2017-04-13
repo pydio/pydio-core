@@ -19,8 +19,8 @@ const AuthenticationPluginsDashboard = React.createClass({
     },
 
     render:function(){
-        var fakeNode = new AjxpNode('/plugins/manager/authfront');
-        var pluginsList = <PluginsList
+        const fakeNode = new AjxpNode('/plugins/manager/authfront');
+        const pluginsList = <PluginsList
             title={this.context.getMessage('plugtype.title.authfront', '')}
             dataModel={this.props.dataModel}
             node={fakeNode}
@@ -30,6 +30,7 @@ const AuthenticationPluginsDashboard = React.createClass({
         return (
             <PluginEditor
                 {...this.props}
+                style={{...this.props.style, backgroundColor:'#f4f4f4'}}
                 additionalPanes={{top:[pluginsList], bottom:[]}}
                 tabs={[
                     {label:this.context.getMessage('plugins.1'), groups:[0,1,2,6]}, // general

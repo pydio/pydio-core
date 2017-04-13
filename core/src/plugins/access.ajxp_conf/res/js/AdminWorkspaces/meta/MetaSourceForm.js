@@ -49,7 +49,7 @@ const MetaSourceForm = React.createClass({
         const allMetas = model.getAllMetaSources();
 
         let menuItems = [];
-        const menuItems = allMetas.map(function(metaSource){
+        allMetas.map(function(metaSource){
             const id = metaSource['id'];
             const type = id.split('.').shift();
             if(type == 'metastore' || type == 'index'){
