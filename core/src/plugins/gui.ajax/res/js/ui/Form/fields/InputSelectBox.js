@@ -1,11 +1,13 @@
 import FormMixin from '../mixins/FormMixin'
 const React = require('react')
-const ReactMUI = require('material-ui-legacy')
-// @TODO USE MaterialUI SelectBox or AutoCompleter
+const {SelectField, MenuItem, Chip} = require('material-ui')
+const LangUtils = require('pydio/util/lang')
+import FieldWithChoices from '../mixins/FieldWithChoices'
+
 /**
  * Select box input conforming to Pydio standard form parameter.
  */
-export default React.createClass({
+let InputSelectBox = React.createClass({
     mixins:[FormMixin],
 
     getDefaultProps:function(){
@@ -14,35 +16,46 @@ export default React.createClass({
         };
     },
 
-    onDropDownChange:function(event, index, item){
-        this.onChange(event, item.payload);
+    onDropDownChange:function(event, index, value){
+        this.onChange(event, value);
         this.toggleEditMode();
     },
 
-    onMultipleSelectChange:function(joinedValue, arrayValue){
-        this.onChange(null, joinedValue);
+    onMultipleSelect:function(event, index, newValue){
+        if(newValue == -1) return;
+        const currentValue = this.state.value;
+        let currentValues = (typeof currentValue === 'string' ? currentValue.split(',') : currentValue);
+        if(!currentValues.indexOf(newValue) !== -1){
+            currentValues.push(newValue);
+            this.onChange(event, currentValues.join(','));
+        }
         this.toggleEditMode();
+    },
+
+    onMultipleRemove: function(value){
+        const currentValue = this.state.value;
+        let currentValues = (typeof currentValue === 'string' ? currentValue.split(',') : currentValue);
+        if(currentValues.indexOf(value) !== -1 ){
+            currentValues = LangUtils.arrayWithout(currentValues, currentValues.indexOf(value));
+            this.onChange(null, currentValues.join(','));
+        }
     },
 
     render:function(){
         let currentValue = this.state.value;
-        let currentValueIndex = 0, index=0;
         let menuItems = [], multipleOptions = [], mandatory = true;
         if(!this.props.attributes['mandatory'] || this.props.attributes['mandatory'] != "true"){
             mandatory = false;
-            menuItems.unshift({payload:-1, text: this.props.attributes['label'] +  '...'});
-            index ++;
+            menuItems.push(<MenuItem value={-1} primaryText={this.props.attributes['label'] +  '...'}/>);
         }
-        let itemsMap = this.state.choices;
-        itemsMap.forEach(function(value, key){
-            if(currentValue == key) currentValueIndex = index;
-            menuItems.push({payload:key, text:value});
+        const {choices} = this.props;
+        choices.forEach(function(value, key){
+            menuItems.push(<MenuItem value={key} primaryText={value}/>);
             multipleOptions.push({value:key, label:value});
-            index ++;
         });
         if((this.isDisplayGrid() && !this.state.editMode) || this.props.disabled){
             let value = this.state.value;
-            if(itemsMap.get(value)) value = itemsMap.get(value);
+            if(choices.get(value)) value = choices.get(value);
             return (
                 <div
                     onClick={this.props.disabled?function(){}:this.toggleEditMode}
@@ -53,38 +66,41 @@ export default React.createClass({
         } else {
             let hasValue = false;
             if(this.props.multiple && this.props.multiple == true){
-                if(typeof currentValue == "string"){
-                    currentValue = currentValue.split(",");
+                let currentValues = currentValue;
+                if(typeof currentValue === "string"){
+                    currentValues = currentValue.split(",");
                 }
-                hasValue = currentValue.length ? true: false;
+                hasValue = currentValues.length ? true: false;
                 return (
-                    <span className={"drop-down-with-floating-label multiple has-value"}>
-                        <label className="drop-down-floating-label">{this.props.attributes.label}</label>
-                        <ReactSelect
-                            options={multipleOptions}
-                            value={currentValue}
-                            name="test"
-                            delimiter=","
-                            multi={true}
-                            onChange={this.onMultipleSelectChange}
-                        />
+                    <span className={"multiple has-value"}>
+                        <div style={{display:'flex', flexWrap:'wrap'}}>{currentValues.map((v) => {
+                            return <Chip onRequestDelete={() => {this.onMultipleRemove(v)}}>{v}</Chip>;
+                        })}</div>
+                        <SelectField
+                            value={-1}
+                            onChange={this.onMultipleSelect}
+                            fullWidth={true}
+                            className={this.props.className}
+                        >{menuItems}</SelectField>
+
                     </span>
                 );
             }else{
-                hasValue = currentValueIndex > 0 || mandatory;
                 return(
-                    <span className={"drop-down-with-floating-label" + (hasValue?" has-value":"")}>
-                        <label className="drop-down-floating-label">{this.props.attributes.label}</label>
-                        <ReactMUI.DropDownMenu
-                            menuItems={menuItems}
+                    <span>
+                        <SelectField
+                            floatingLabelText={this.props.attributes.label}
+                            value={currentValue}
                             onChange={this.onDropDownChange}
-                            selectedIndex={currentValueIndex}
-                            autoWidth={false}
+                            fullWidth={true}
                             className={this.props.className}
-                        />
+                        >{menuItems}</SelectField>
                     </span>
                 );
             }
         }
     }
 });
+
+InputSelectBox = FieldWithChoices(InputSelectBox);
+export {InputSelectBox as default}

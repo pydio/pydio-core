@@ -609,7 +609,7 @@
                     <!-- ACTION -->
                     <param name="legend" group="action.scheduler.24" type="legend" description="Set the plugin action to be applied, and add optional parameters depending on the action." label=""/>
                     <param name="action_name" group="action.scheduler.24" label="action.scheduler.1" description="action.scheduler.1d" type="autocomplete" choices="json_list:list_all_plugins_actions" mandatory="true"/>
-                    <param name="param_name" group="action.scheduler.24" replicationGroup="group1" replicationTitle="Action Parameters" replicationDescription="Set zero or more, depending on the action" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
+                    <param name="param_name" group="action.scheduler.24" replicationGroup="group1" replicationTitle="Action Parameters" replicationDescription="Set zero or more, depending on the action" replicationMandatory="false" label="action.scheduler.6" description="action.scheduler.6d" type="string" mandatory="false"/>
                     <param name="param_value" group="action.scheduler.24" replicationGroup="group1" label="action.scheduler.7" description="action.scheduler.7d" type="string" mandatory="false"/>
                     <!-- CONTEXT -->
                     <param name="legend" group="action.scheduler.23" type="legend" description="Run the action in one or more 'contexts': on which workspace(s), under which user identifier(s)." label=""/>
