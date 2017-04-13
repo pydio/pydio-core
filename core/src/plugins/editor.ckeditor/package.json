@@ -1,7 +1,7 @@
 {
-  "name": "editor.browser",
+  "name": "editor.ckeditor",
   "version": "8.0.0",
-  "description": "Instant messaging",
+  "description": "Source viewer",
   "source_path": "res/js",
   "main": "index.js",
   "scripts": {
@@ -13,6 +13,7 @@
     "grunt": "^1.0.1",
     "grunt-babel": "~5.0.3",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-browserify": "~4.0.1"
+    "grunt-browserify": "~4.0.1",
+    "ckeditor": "^4.6.2"
   }
 }

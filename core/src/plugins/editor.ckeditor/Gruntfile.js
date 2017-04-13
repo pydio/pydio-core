@@ -12,7 +12,7 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build/PydioBrowserEditor',
+                        dest: 'res/build/PydioCKEditor/',
                         ext: '.js'
                     }
                 ]
@@ -28,7 +28,7 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'res/build/PydioBrowserEditor.js':'res/build/PydioBrowserEditor/*.js'
+                    'res/build/PydioCKEditor.js':'res/build/PydioCKEditor/*.js'
                 }
             }
         },
