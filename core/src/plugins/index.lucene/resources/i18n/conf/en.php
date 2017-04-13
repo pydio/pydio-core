@@ -45,4 +45,6 @@ $mess=array(
 "Automatically append a * after the user query to make the search broader" => "Automatically append a * after the user query to make the search broader",
 "Hide 'My Shares'" => "Hide 'My Shares'",
 "Hide My Shares section in the Orbit theme GUI." => "Hide My Shares section in the Orbit theme GUI.",
+"Search in current folder and subfolders only" => "Search in current folder and subfolders only",
+"When enabled, the searches are performed only in the current folder and subfolders. If disabled, the search always pertains to the whole workspace." => "When enabled, the searches are performed only in the current folder and subfolders. If disabled, the search always pertains to the whole workspace.",
 );

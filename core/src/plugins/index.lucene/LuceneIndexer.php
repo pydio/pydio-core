@@ -48,6 +48,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
     private $currentIndex;
     private $metaFields = [];
     private $indexContent = false;
+    private $folderSearch = false;
     private $verboseIndexation = false;
 
     /**
@@ -63,6 +64,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             $this->metaFields = explode(",",$metaFields);
         }
         $this->indexContent = ($this->getContextualOption($ctx, "index_content") == true);
+        $this->folderSearch = ($this->getContextualOption($ctx, "folder_search") == true);
     }
 
     /**
@@ -208,9 +210,16 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
                 $query = "ajxp_scope:shared AND ($query)";
                 $this->logDebug("Query : $query");
             } else {
-                $index->setDefaultSearchField("basename");
-                $query = $this->filterSearchRangesKeywords($textQuery);
+                $textQuery = $this->filterSearchRangesKeywords($textQuery);
+                $query = "basename:".$textQuery;
             }
+
+            if ($this->folderSearch) {
+                $dir = $httpVars["dir"];
+                $mangledDir = "AJXPFAKESTART" . str_replace("/", "AJXPFAKESEP", substr($dir, 1));
+                $query = "node_dir:$mangledDir* AND ($query)";
+            }
+
             $this->setDefaultAnalyzer(
                 $this->getContextualOption($ctx, "QUERY_ANALYSER"),
                 intval($this->getContextualOption($ctx, "WILDCARD_LIMITATION"))
@@ -631,6 +640,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
 
         $doc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "UTF-8"));
         $doc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "UTF-8"));
+        $doc->addField(\Zend_Search_Lucene_Field::text("node_dir", "AJXPFAKESTART" . str_replace("/", "AJXPFAKESEP", substr($ajxpNode->getPath(), 1)), "UTF-8"));
         $basename = basename($ajxpNode->getPath());
         if(class_exists("Normalizer") && !\Normalizer::isNormalized($basename, \Normalizer::FORM_C)){
             $basename = \Normalizer::normalize($basename, \Normalizer::FORM_C);
@@ -665,6 +675,7 @@ class LuceneIndexer extends AbstractSearchEngineIndexer
             $privateDoc = new \Zend_Search_Lucene_Document();
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_url", $ajxpNode->getUrl(), "UTF-8"));
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("node_path", str_replace("/", "AJXPFAKESEP", $ajxpNode->getPath()), "UTF-8"));
+            $privateDoc->addField(\Zend_Search_Lucene_Field::text("node_dir", "AJXPFAKESTART" . str_replace("/", "AJXPFAKESEP", substr($ajxpNode->getPath(), 1)), "UTF-8"));
 
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_scope", "user"));
             $privateDoc->addField(\Zend_Search_Lucene_Field::keyword("ajxp_user", $ajxpNode->getContext()->getUser()->getId()));

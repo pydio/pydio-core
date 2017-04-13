@@ -2,29 +2,38 @@ Pydio ##VERSION_NUMBER## Release Note
 
 7.0.4 is a bugfix and security release for 7 branch.
 
-Make sure checking db version test does not break everything (if there is a missing table for example). (details)
-Fix throw error when accessing to prohibited path on smb wsp (details)
-Fix EncFS and caching issues (details)
-Optim: make sure clear cache is called deferred. (details)
-Do not use applyHook but load session manager directly instead for performances. (details)
-Mq.serial: make $channels static variable as in mq.sql (details)
-Add an option to disable nodes caching (details)
-Add ldap support AD memberof values in nested group (details)
-Fix EncFS (details)
-Make sure that unserialized object is a Notification instance (details)
-Switch lite version to full version (details)
-Fix webDAV upload events. Should fix #1317 and fix #1318 (details)
-Replace check for bypass_pwd by check on empty $pwd variable. Should fix #1316, please confirm (details)
-Test USE_SESSION_CREDENTIALS value, not just isset(). Should be the real cause of #1316 (details)
-Close session on possibly long requests that may block the UI (details)
-Adding local cache per instance to MemorySafe and removing time limit on nodes cache (details)
-Adding interval for the Zoho Editor when in the minisite (details)
-Fix #1319, enable Copy action on readonly files. (details)
-Making sure we don't break previous usage (details)
-Update tutorial videos. Open panel by default for the first connexion. (details)
-Fix events forwarding for one-doc minisite (use ContentFilter instead of relative path re-compute). Zoho send a create event instead of a content event. (details)
-Fix for s3 shares (details)
-Typo error (details)
+Make sure checking db version test does not break everything (if there is a missing table for example).
+Fix throw error when accessing to prohibited path on smb wsp
+Fix EncFS and caching issues
+Optim: make sure clear cache is called deferred.
+Do not use applyHook but load session manager directly instead for performances.
+Mq.serial: make $channels static variable as in mq.sql
+Add an option to disable nodes caching
+Add ldap support AD memberof values in nested group
+Fix EncFS
+Make sure that unserialized object is a Notification instance
+Switch lite version to full version
+Fix webDAV upload events. Should fix #1317 and fix #1318
+Replace check for bypass_pwd by check on empty $pwd variable. Should fix #1316, please confirm
+Test USE_SESSION_CREDENTIALS value, not just isset(). Should be the real cause of #1316
+Close session on possibly long requests that may block the UI
+Adding local cache per instance to MemorySafe and removing time limit on nodes cache
+Adding interval for the Zoho Editor when in the minisite
+Fix #1319, enable Copy action on readonly files.
+Making sure we don't break previous usage
+Update tutorial videos. Open panel by default for the first connexion.
+Fix events forwarding for one-doc minisite (use ContentFilter instead of relative path re-compute). Zoho send a create event instead of a content event.
+Fix for s3 shares
+Typo error
+Fix #1322 by triming userId whitespaces.
+Missing logs when upload via pluploader. Fix #1321
+Remove double urldecode, creating "+" issues in Rest API.
+Typo in roles manager could lead to group admin seeing unauthorized workspaces
+Add an optional parameter to enable links in digest email.
+Fix notifications when registering on a "publicly visible" share.
+Fix non-deleting alerts
+Try to make a better error reporting when exception fails because response already sent or logger fails.
+Fix closing of videos tutorials
 
 7.0.3 is a bugfixes for 7.0.2. Particularly, some issues were introduced with the Session Credentials mechanism.
 
