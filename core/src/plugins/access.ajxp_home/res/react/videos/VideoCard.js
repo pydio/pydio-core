@@ -1,19 +1,13 @@
+const ReactDOM = require('react-dom')
+const {asGridItem} = require('pydio').requireLib('components')
+
 import VideoPlayer from './VideoPlayer'
 import Palette from '../board/Palette'
 import ColorPaper from '../board/ColorPaper'
 
 const PALETTE_INDEX = 4;
 
-const VideoCard = React.createClass({
-
-    mixins: [PydioComponents.DynamicGridItemMixin],
-
-    statics:{
-        gridWidth:2,
-        gridHeight:12,
-        builderDisplayName:'Video Tutorial',
-        builderFields:[]
-    },
+let VideoCard = React.createClass({
 
     propTypes:{
         youtubeId           : React.PropTypes.string,
@@ -91,7 +85,7 @@ const VideoCard = React.createClass({
         );
         const tint = MaterialUI.Color(Palette[PALETTE_INDEX]).alpha(0.8).toString();
         return (
-            <ColorPaper {...props} paletteIndex={PALETTE_INDEX} getCloseButton={this.getCloseButton}>
+            <ColorPaper {...props} paletteIndex={PALETTE_INDEX} getCloseButton={() => {return this.props.closeButton}}>
                 <div className="tutorial_legend">
                     <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
                         <div style={{position:'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: tint}}/>
@@ -115,4 +109,5 @@ const VideoCard = React.createClass({
     }
 });
 
+VideoCard = asGridItem(VideoCard,'Video Tutorial',{gridWidth:2,gridHeight:12},[]);
 export {VideoCard as default}

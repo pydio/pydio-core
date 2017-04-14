@@ -4,8 +4,7 @@ const {muiThemeable} = require('material-ui/styles')
 
 export default function(PydioComponent, displayName, gridDimension = {gridWidth:4,gridHeight:12}, builderFields = undefined){
 
-    const originalDisplayName = PydioComponent.displayName;
-
+    const originalDisplayName = PydioComponent.displayName || PydioComponent.name;
     PydioComponent = muiThemeable()(PydioComponent);
 
     class GridItem extends Component{

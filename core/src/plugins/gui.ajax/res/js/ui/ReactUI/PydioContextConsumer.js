@@ -11,7 +11,7 @@ export default function(PydioComponent){
     }
 
 
-    Wrapped.displayName = 'PydioContextConsumer'
+    Wrapped.displayName = PydioComponent.name;
     Wrapped.contextTypes = {
         pydio:React.PropTypes.instanceOf(Pydio),
         getPydio:React.PropTypes.func,

@@ -1,5 +1,6 @@
 const React = require('react')
 const Pydio = require('pydio')
+const {Responsive, WidthProvider} = require('react-grid-layout');
 const {PydioContextConsumer} = Pydio.requireLib('boot')
 
 import Store from './Store'
@@ -138,7 +139,6 @@ const CardsGrid = React.createClass({
 
     render: function(){
         const {cards, layouts} = this.buildCards(this.state.cards);
-        const {Responsive, WidthProvider} = ReactGridLayout;
         const ResponsiveGridLayout = WidthProvider(Responsive);
         return (
             <ResponsiveGridLayout

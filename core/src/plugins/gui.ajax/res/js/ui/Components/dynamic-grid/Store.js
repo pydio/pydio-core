@@ -85,6 +85,8 @@ class Store extends Observable{
     }
 
     addCard(cardDefinition){
+        console.log(cardDefinition);
+
         cardDefinition['id'] = this.createCardId(cardDefinition);
         this.setCards(this._cards.concat([cardDefinition]));
     }

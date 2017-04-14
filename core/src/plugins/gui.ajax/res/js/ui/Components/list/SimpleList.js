@@ -1,4 +1,5 @@
 const React = require('react')
+const Infinite = require('react-infinite')
 
 import MessagesConsumerMixin from '../MessagesConsumerMixin'
 import {ListEntry} from './ListEntry'

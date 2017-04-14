@@ -1,3 +1,4 @@
+const {Doughnut} = require('react-chartjs')
 import PluginEditor from '../core/PluginEditor'
 
 const CacheServerDashboard = React.createClass({
@@ -60,7 +61,7 @@ const CacheServerDashboard = React.createClass({
             memoryUsage = (
                 <div className="doughnut-chart">
                     <h5>Memory Usage</h5>
-                    <ReactChart.Doughnut
+                    <Doughnut
                         data={[{
                             value: cacheData.memory_usage,
                             color:"rgba(247, 70, 74, 0.51)",
@@ -97,7 +98,7 @@ const CacheServerDashboard = React.createClass({
                     <div style={{width:'50%', float:'left'}}>
                         <div className="doughnut-chart">
                             <h5>Cache Health</h5>
-                            <ReactChart.Doughnut
+                            <Doughnut
                                 data={[{
                                     value: cacheData.misses,
                                     color:"rgba(247, 70, 74, 0.51)",

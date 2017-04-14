@@ -182,7 +182,7 @@ export default class PydioBootstrap{
             if(this.parameters.get("currentLanguage")){
                 pydio.currentLanguage = this.parameters.get("currentLanguage");
             }
-            
+
             pydio.init();
 
         }.bind(this);

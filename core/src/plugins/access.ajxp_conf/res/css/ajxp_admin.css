@@ -361,6 +361,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
 .react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper h4 {
   margin-left: 16px;
   cursor: move;
+  font-weight: 400;
 }
 .react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper .card-close-overlay {
   position: absolute;
@@ -468,6 +469,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   margin-bottom: 3px;
   font-size: 34px;
   margin-left: 0 !important;
+  font-weight: 400;
 }
 .react-mui-context .graphs-badge .badge-content h4.text {
   font-size: 22px;
@@ -525,6 +527,7 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   padding-top: 11px;
   -ms-flex-negative: 0;
       flex-shrink: 0;
+  font-weight: 400;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
