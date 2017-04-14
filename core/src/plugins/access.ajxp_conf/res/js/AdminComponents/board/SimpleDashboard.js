@@ -3,10 +3,55 @@ const {muiThemeable} = require('material-ui/styles')
 const {Paper, Card, CardTitle, CardMedia, CardActions, CardHeader, CardText,
     FlatButton, List, ListItem, Divider, IconButton, FontIcon} = require('material-ui')
 import {MessagesConsumerMixin} from '../util/Mixins'
+const shuffle = require('lodash.shuffle')
 
 let Dashboard = React.createClass({
 
     mixins: [MessagesConsumerMixin],
+
+    getInitialState: function(){
+        return {kb: []};
+    },
+
+    componentDidMount: function(){
+        PydioApi.getClient().loadFile('plugins/access.ajxp_conf/res/i18n/kb.json', (transport) => {
+            const data = transport.responseJSON;
+            this.setState({kb: data});
+        });
+    },
+
+    getOpenIcon: function(link){
+        return (
+            <IconButton
+                iconClassName="mdi mdi-arrow-right"
+                iconStyle={{color:'rgba(0,0,0,.33)'}}
+                tooltip="Open in new window"
+                tooltipPosition="bottom-left"
+                onTouchTap={() => {window.open(link)}}
+            />
+        );
+    },
+
+    getDocButton: function(icon, message, link){
+        return (
+            <div style={{width:120}} key={icon}>
+                <FlatButton
+                    primary={true}
+                    style={{height:110,lineHeight:'20px'}}
+                    label={<div><div style={{fontSize:36}} className={"mdi mdi-" + icon}/><div>{message}</div></div>}
+                    fullWidth={true}
+                    onTouchTap={()=>{window.open(link)}}
+                />
+            </div>
+        );
+    },
+
+    welcomeClick: function(e){
+        if(e.target.getAttribute('data-path')){
+            const p = e.target.getAttribute('data-path');
+            this.props.pydio.goTo(p);
+        }
+    },
 
     render: function(){
 
@@ -37,104 +82,101 @@ let Dashboard = React.createClass({
             </Card>
         );
 
+        const {pydio} = this.props;
+        const message = (id) => {return pydio.MessageHash['admin_dashboard.' + id]};
         const OPEN_IN_NEW_ICON = <IconButton iconClassName="mdi mdi-arrow-right" iconStyle={{color:'rgba(0,0,0,.33)'}} tooltip="Open in new window"/>;
+
+        // ADMIN GUIDE BUTTONS
+        const guidesButtons = [
+            {icon:'clock-start', id:'start', link:'https://pydio.com/en/docs/v7/getting-started'},
+            {icon:'network', id:'ws', link:'https://pydio.com/en/docs/v7/workspaces'},
+            {icon:'account-multiple', id:'users', link:'https://pydio.com/en/docs/v7/users-managements'},
+            {icon:'settings', id:'parameters', link:'https://pydio.com/en/docs/v7/global-parameters'},
+            {icon:'professional-hexagon', id:'advanced', link:'https://pydio.com/en/docs/v7/enriching-your-users-experience'}
+        ];
+
+        // DOCS LIST
+        let kbItems = [];
+        shuffle(this.state.kb).forEach((object) => {
+            kbItems.push(<ListItem key={object.title} primaryText={object.title} secondaryText={object.desc} rightIconButton={this.getOpenIcon(object.link)} secondaryTextLines={2} disabled={true}/>);
+            kbItems.push(<Divider key={object.title + '-divider'}/>);
+        });
+        // Remove last divider
+        if(kbItems.length) kbItems.pop();
 
         return (
             <div style={{height:'100%', overflow: 'auto', backgroundColor:'#ECEFF1'}}>
                 <div style={{display:'flex', alignItems:'top', flexWrap:'wrap'}}>
                     <Card style={paperStyle}>
                         <CardTitle
-                            title="Welcome on Pydio Community Dashboard"
-                            subtitle="The place to administrate and monitor the activity of your platform"
+                            title={message('welc.title')}
+                            subtitle={message('welc.subtitle')}
                         />
                         <CardText>
-                            This is your dashboard for managing Pydio. Using the left menu you can create <a style={textLinkStyle}>workspaces</a> and <a style={textLinkStyle}>users</a>,
-                            check all <a style={textLinkStyle}>events</a> that happened on the platform, and manage <a style={textLinkStyle}>configurations</a> and <a style={textLinkStyle}>plugins</a>.
+                            <style dangerouslySetInnerHTML={{__html:'.doc-link{color: '+accent2Color+';cursor: pointer;}'}}/>
+                            <span dangerouslySetInnerHTML={{__html:message('welc.intro')}} onClick={this.welcomeClick}></span>
                         </CardText>
                         <CardText>
-                            If you don't know where to start, the <u>Administrator Guide</u> is definitely a good read:
-                            <div style={{...horizontalFlex, flexWrap:'wrap',justifyContent:'center', padding:'0 20px'}}>
-                                <div style={flexFillNo}>
-                                    <FlatButton primary={true} style={{height:110,lineHeight:'20px'}} label={<div><div style={{fontSize:36}} className="mdi mdi-clock-start"/><div>Getting Started</div></div>} fullWidth={true}/>
-                                </div>
-                                <div style={flexFillNo}>
-                                    <FlatButton primary={true} style={{height:110,lineHeight:'20px'}} label={<div><div style={{fontSize:36}} className="mdi mdi-network"/><div>About Workspaces</div></div>} fullWidth={true}/>
-                                </div>
-                                <div style={flexFillNo}>
-                                    <FlatButton primary={true} style={{height:110,lineHeight:'20px'}} label={<div><div style={{fontSize:36}} className="mdi mdi-account-multiple"/><div>About Users Management</div></div>} fullWidth={true}/>
-                                </div>
-                                <div style={flexFillNo}>
-                                    <FlatButton primary={true} style={{height:110,lineHeight:'20px'}} label={<div><div style={{fontSize:36}} className="mdi mdi-settings"/><div>About Parameters</div></div>} fullWidth={true}/>
-                                </div>
-                                <div style={flexFillNo}>
-                                    <FlatButton primary={true} style={{height:110,lineHeight:'20px'}} label={<div><div style={{fontSize:36}} className="mdi mdi-professional-hexagon"/><div>Advanced Topics</div></div>} fullWidth={true}/>
-                                </div>
+                            {message('welc.guide')}
+                            <div style={{...horizontalFlex, flexWrap:'wrap',justifyContent:'center', padding:'10px 20px 0'}}>
+                                {guidesButtons.map((object) => {
+                                    return this.getDocButton(object.icon, message('welc.btn.' + object.id), object.link);
+                                })}
                             </div>
                         </CardText>
                     </Card>
                     <Card style={paperStyle} containerStyle={flexContainerStyle}>
                         <CardTitle
-                            title="Get yourself some help"
-                            subtitle="Our most common F.A.Q and tutorials, a.k.a RTFM"
+                            title={message('kb.title')}
+                            subtitle={message('kb.subtitle')}
                         />
-                        <CardText style={{...flexFill, ...verticalFlex, maxHeight: 370}}>
-                            <div>Beside the forum, our website provides plenty of docs to help you. Make sure to look throught them before posting your questions ;-)</div>
-                            <List style={{overflow: 'auto', flex:1}}>
-                                <ListItem primaryText="How to connect my LDAP directory?" secondaryText="Map your Pydio workspaces to folders and shares on your Windows file server, and let Pydio retrieve user accounts and groups from your Active Directory. Wat you get is that all those files are now instantly available to users with" rightIconButton={OPEN_IN_NEW_ICON} secondaryTextLines={2} />
-                                <Divider/>
-                                <ListItem primaryText="How to raise upload limit for files?" secondaryText="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus venenatis justo, a interdum massa bibendum sed. Vivamus justo ligula, tincidunt eu iaculis tempor, feugiat sit amet nibh." rightIconButton={OPEN_IN_NEW_ICON} secondaryTextLines={2}/>
-                                <Divider/>
-                                <ListItem primaryText="How to upgrade from Community to Enterprise version?" secondaryText="In dui risus, placerat ac nibh nec, cursus dictum urna. Morbi mollis nunc lacus, quis ultricies ipsum finibus quis. Mauris a odio iaculis, sagittis nisi id, semper nisi. Mauris id dictum metus, eget pellentesque nulla. Lore" secondaryTextLines={2} rightIconButton={OPEN_IN_NEW_ICON}/>
-                                <Divider/>
-                                <ListItem primaryText="How to upgrade from Community to Enterprise version?" secondaryText="In dui risus, placerat ac nibh nec, cursus dictum urna. Morbi mollis nunc lacus, quis ultricies ipsum finibus quis. Mauris a odio iaculis, sagittis nisi id, semper nisi. Mauris id dictum metus, eget pellentesque nulla. Lore" secondaryTextLines={2} rightIconButton={OPEN_IN_NEW_ICON}/>
-                                <Divider/>
-                                <ListItem primaryText="How to upgrade from Community to Enterprise version?" secondaryText="In dui risus, placerat ac nibh nec, cursus dictum urna. Morbi mollis nunc lacus, quis ultricies ipsum finibus quis. Mauris a odio iaculis, sagittis nisi id, semper nisi. Mauris id dictum metus, eget pellentesque nulla. Lore" secondaryTextLines={2} rightIconButton={OPEN_IN_NEW_ICON}/>
-                            </List>
-                        </CardText>
+                        <CardText>{message('kb.intro')}</CardText>
+                        <List style={{overflow: 'auto', flex:1, maxHeight: 320}}>{kbItems}</List>
                         <Divider/>
                         <CardActions style={{textAlign:'right'}}>
-                            <FlatButton label="Read all docs" primary={true}/>
-                            <FlatButton label="Go to Forums" primary={true}/>
+                            <FlatButton label={message('kb.btn.alldocs')} primary={true} onTouchTap={()=>{window.open('https://pydio.com/en/docs/')}}/>
+                            <FlatButton label={message('kb.btn.forum')} primary={true} onTouchTap={()=>{window.open('https://pydio.com/forum/f/')}}/>
                         </CardActions>
                     </Card>
                     <Card style={paperStyle} containerStyle={flexContainerStyle}>
-                        <CardTitle title="Pay it forward!" subtitle="Pydio is free open source software. Contribute back!" />
+                        <CardTitle title={message('cont.title')} subtitle={message('cont.subtitle')} />
                         <CardText style={flexFill}>
                             <div className="mdi mdi-github-circle" style={{fontSize: 60, display:'inline-block', float:'left', marginRight:10, marginBottom:10}}/>
-                            Pydio code is available publicly on Github. Do you want to fix a bug, help others in the forum or push the next killer feature? Get involved!
-                            Or show your love on social networks!
+                            {message('cont.intro')}
                             <List>
-                                <ListItem primaryText="How-to create or complete a language translation ?" rightIconButton={OPEN_IN_NEW_ICON} />
+                                <ListItem disabled={true} primaryText={message('cont.topic.translate')} rightIconButton={this.getOpenIcon('https://pydio.com/en/community/contribute/adding-translation-pydio')} />
                                 <Divider/>
-                                <ListItem primaryText="Report a bug" rightIconButton={OPEN_IN_NEW_ICON}/>
+                                <ListItem disabled={true} primaryText={message('cont.topic.report')} rightIconButton={this.getOpenIcon('https://pydio.com/forum/f/')}/>
                                 <Divider/>
-                                <ListItem primaryText="Request integration of a new feature" rightIconButton={OPEN_IN_NEW_ICON}/>
+                                <ListItem disabled={true} primaryText={message('cont.topic.report.2')} rightIconButton={this.getOpenIcon('https://github.com/pydio/pydio-core')}/>
+                                <Divider/>
+                                <ListItem disabled={true} primaryText={message('cont.topic.pr')} rightIconButton={this.getOpenIcon('https://github.com/pydio/pydio-core')}/>
                             </List>
                         </CardText>
                         <Divider/>
                         <CardActions style={{textAlign:'center'}}>
-                            <FlatButton label="Github Star" primary={true} icon={<FontIcon className="mdi mdi-github-box" />}/>
-                            <FlatButton label="Follow us" primary={true} icon={<FontIcon className="mdi mdi-facebook-box" />}/>
-                            <FlatButton label="Send Tweet" primary={true} icon={<FontIcon className="mdi mdi-twitter-box" />}/>
+                            <FlatButton label={message('cont.btn.github')} primary={true} icon={<FontIcon className="mdi mdi-github-box" />} onTouchTap={()=>{window.open('https://github.com/pydio/pydio-core')}} />
+                            <FlatButton label={message('cont.btn.tw')} primary={true} icon={<FontIcon className="mdi mdi-twitter-box" />} onTouchTap={()=>{window.open('https://twitter.com/Pydio')}} />
+                            <FlatButton label={message('cont.btn.fb')} primary={true} icon={<FontIcon className="mdi mdi-facebook-box" />} onTouchTap={()=>{window.open('https://facebook.com/Pydio/')}} />
                         </CardActions>
                     </Card>
                     <Card style={paperStyle}>
                         <CardMedia
-                            overlay={<CardTitle title="Discover Pydio Enterprise Distribution" subtitle="Save time - Get more feature - Extended branding"/>}
+                            overlay={<CardTitle title={message('ent.title')} subtitle={message('ent.subtitle')}/>}
                         >
                             <div style={{height:230, backgroundImage:'url(plugins/access.ajxp_conf/res/images/dashboard.png)', backgroundSize:'cover',borderRadius:3}}/>
                         </CardMedia>
                         <List>
-                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-certificate"/>} primaryText="Enterprise-oriented features" secondaryText="Enterprise-ready features : EasyTransfer, CAS/SAML integration, Multi-domain LDAP and many more..." />
+                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-certificate"/>} primaryText={message('ent.features')} secondaryText={message('ent.features.legend')} />
                             <Divider/>
-                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-chart-areaspline"/>} primaryText="Advanced Administrator Dashboard" secondaryText="Unique admin dashboard for real-time monitoring of platform usage." />
+                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-chart-areaspline"/>} primaryText={message('ent.advanced')} secondaryText={message('ent.advanced.legend')} />
                             <Divider/>
-                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-message-alert"/>} primaryText="Support and Maintenance" secondaryText="Get help with your installation directly from the core team" />
+                            <ListItem leftIcon={<FontIcon style={{color:accent2Color}} className="mdi mdi-message-alert"/>} primaryText={message('ent.support')} secondaryText={message('ent.support.legend')} />
                         </List>
                         <Divider/>
                         <CardActions style={{textAlign:'right'}}>
-                            <FlatButton label="Learn More" primary={true}/>
-                            <FlatButton label="Contact Professional Services" primary={true}/>
+                            <FlatButton label={message('ent.btn.more')} primary={true}  onTouchTap={()=>{window.open('https://pydio.com/en/pydio-7-overview')}} />
+                            <FlatButton label={message('ent.btn.contact')} primary={true}  onTouchTap={()=>{window.open('https://pydio.com/en/get-pydio/contact')}} />
                         </CardActions>
                     </Card>
                 </div>
