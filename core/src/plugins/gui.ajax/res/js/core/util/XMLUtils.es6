@@ -44,7 +44,7 @@ export default class XMLUtils{
             }
         }catch(e){}
 
-        if(!XMLUtils.__xpe) {
+        if(!XMLUtils.__xpe && window.XPathEvaluator) {
             try{
                 XMLUtils.__xpe = new XPathEvaluator();
             }catch(e){}
@@ -92,7 +92,7 @@ export default class XMLUtils{
 
         var xpe = XMLUtils.__xpe;
 
-        if(!xpe) {
+        if(!xpe && window.XPathEvaluator) {
             try {
                 XMLUtils.__xpe = xpe = new XPathEvaluator();
             }catch(e){}

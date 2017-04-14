@@ -14,7 +14,8 @@ const MetaSourceForm = React.createClass({
 
     propTypes:{
         model: React.PropTypes.object,
-        editor: React.PropTypes.object
+        editor: React.PropTypes.object,
+        modalData:React.PropTypes.object
     },
 
     getDefaultProps: function(){
@@ -22,10 +23,6 @@ const MetaSourceForm = React.createClass({
             dialogTitleId: 'ajxp_admin.ws.46',
             dialogSize:'sm'
         };
-    },
-
-    propTypes:{
-        modalData:React.PropTypes.object
     },
 
     getInitialState:function(){

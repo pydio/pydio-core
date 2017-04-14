@@ -182,9 +182,7 @@ export default class PydioBootstrap{
             if(this.parameters.get("currentLanguage")){
                 pydio.currentLanguage = this.parameters.get("currentLanguage");
             }
-
-            //$('version_span').update(' - Version '+this.parameters.get("ajxpVersion") + ' - '+ this.parameters.get("ajxpVersionDate"));
-
+            
             pydio.init();
 
         }.bind(this);
@@ -196,8 +194,8 @@ export default class PydioBootstrap{
         }
 
         let div = document.createElement('div');
-        div.style = 'position:absolute; bottom: 0; right: 0; z-index: 2000; color:rgba(0,0,0,0.6); font-size: 12px; padding: 0 10px;';
-        div.innerHTML = 'Pydio Community Edition - Copyright Abstrium 2017 - Learn more on <a href="http://pydio.com" target="_blank">pydio.com</a>';
+        div.setAttribute('style', 'position:absolute; bottom: 0; right: 0; z-index: 2000; color:rgba(0,0,0,0.6); font-size: 12px; padding: 0 10px;');
+        div.innerHTML = 'Pydio Community Edition - Copyright Abstrium 2017 - Learn more on <a href="https://pydio.com" target="_blank">pydio.com</a>';
         document.body.appendChild(div);
 
     }

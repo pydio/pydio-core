@@ -80,6 +80,9 @@ export default React.createClass({
             this._hiddenValues = {};
             this._parametersMetadata = {};
         }
+        if(newProps.values && newProps.values !== this.props.values){
+            this.checkValidStatus(newProps.values);
+        }
     },
 
     getValues:function(){
@@ -174,12 +177,6 @@ export default React.createClass({
 
     componentDidMount:function(){
         this.checkValidStatus(this.props.values);
-    },
-
-    componentWillReceiveProps: function(nextProps){
-        if(nextProps.values && nextProps.values !== this.props.values){
-            this.checkValidStatus(nextProps.values);
-        }
     },
 
     renderGroupHeader:function(groupLabel, accordionize, index, active){

@@ -28,7 +28,6 @@ let PydioForm = {
     InputImage,
     FormPanel,
     PydioHelper,
-    HelperMixin,
     FileDropZone,
     UserCreationForm,
     createFormElement: Manager.createFormElement,
