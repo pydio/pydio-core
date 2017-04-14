@@ -18,10 +18,6 @@ let UserDashboard = React.createClass({
                 componentClass:'WelcomeComponents.DlAppsCard',
                 defaultPosition:{
                     x:0, y:20
-                },
-                defaultLayouts: {
-                    md: {x: 6, y: 36},
-                    sm: {x: 0, y: 60}
                 }
             },
             {
@@ -32,20 +28,17 @@ let UserDashboard = React.createClass({
                 }
             },
             {
-                id:'videos',
-                componentClass:'WelcomeComponents.VideoCard',
-                defaultPosition:{
-                    x:0, y:40
-                },
-                defaultLayouts: {
-                    sm: {x: 0, y: 30}
-                }
-            },
-            {
                 id:'recently_accessed',
                 componentClass:'WelcomeComponents.RecentAccessCard',
                 defaultPosition:{
-                    x: 0, y: 50
+                    x: 0, y: 40
+                }
+            },
+            {
+                id:'videos',
+                componentClass:'WelcomeComponents.VideoCard',
+                defaultPosition:{
+                    x:0, y:50
                 }
             },
 

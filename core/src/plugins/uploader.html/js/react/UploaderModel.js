@@ -521,7 +521,6 @@
                 }
             }else{
                 for(var j=0;j<files.length;j++){
-                    console.log(files[j]);
                     if(files[j].size === 0){
                         alert(global.pydio.MessageHash['html_uploader.8']);
                         return;

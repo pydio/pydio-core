@@ -2,6 +2,8 @@ import VideoPlayer from './VideoPlayer'
 import Palette from '../board/Palette'
 import ColorPaper from '../board/ColorPaper'
 
+const PALETTE_INDEX = 4;
+
 const VideoCard = React.createClass({
 
     mixins: [PydioComponents.DynamicGridItemMixin],
@@ -87,9 +89,9 @@ const VideoCard = React.createClass({
         const TMP_VIEW_MORE = (
             <a className="tutorial_more_videos_button" href="https://www.youtube.com/channel/UCNEMnabbk64csjA_qolXvPA" target="_blank" dangerouslySetInnerHTML={htmlMessage('user_home.65')}/>
         );
-        const tint = MaterialUI.Color(Palette[3]).alpha(0.8).toString();
+        const tint = MaterialUI.Color(Palette[PALETTE_INDEX]).alpha(0.8).toString();
         return (
-            <ColorPaper {...props} paletteIndex={3} getCloseButton={this.getCloseButton}>
+            <ColorPaper {...props} paletteIndex={PALETTE_INDEX} getCloseButton={this.getCloseButton}>
                 <div className="tutorial_legend">
                     <div className="tutorial_video_thumb" style={{backgroundImage:'url("https://img.youtube.com/vi/'+youtubeId+'/0.jpg")'}}>
                         <div style={{position:'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: tint}}/>

@@ -102,15 +102,44 @@ div.left-panel.expanded{
     }
   }
 
-  div.recently-accessed-list.table-mode{
-    div.toolbarTableHeader.mui-toolbar{
-      background-color: #3F51B5;
-      border-radius: 2px 2px 0 0;
-      border-bottom: 0 !important;
-      .mui-toolbar-group{
-        font-size: 16px !important;
-        font-weight: 400 !important;
-        color: rgb(255, 255, 255) !important;
+  div.recently-accessed-list{
+    &.table-mode{
+      div.toolbarTableHeader.mui-toolbar{
+        border-radius: 2px 2px 0 0;
+        border-bottom: 0 !important;
+        .mui-toolbar-group{
+          font-size: 16px !important;
+          font-weight: 400 !important;
+          color: rgb(255, 255, 255) !important;
+        }
+      }
+    }
+    &.files-list{
+      .material-list-entry{
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .material-list-icon {
+          width: 64px;
+          .covering-bg-preview, .mimefont-container{
+            height: 30px;
+            width: 30px;
+            margin: 14px;
+          }
+          .mimefont-container{
+            background-color: transparent;
+            border: 1px solid white;
+            .mimefont{
+              color: #ffffff;
+              font-size:17px;
+            }
+          }
+        }
+        .material-list-text{
+          color: white;
+          padding: 10px 0;
+          .material-list-line-2{
+            color: rgba(255,255,255,0.53);
+          }
+        }
       }
     }
   }

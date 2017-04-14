@@ -15,6 +15,7 @@ import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
 import DynamicGrid from './dynamic-grid/DynamicGrid'
+import Store from './dynamic-grid/Store'
 import GridItemMixin from './dynamic-grid/GridItemMixin'
 import asGridItem from './dynamic-grid/asGridItem'
 
@@ -57,6 +58,7 @@ const PydioComponents = {
     DynamicGrid             : DynamicGrid,
     DynamicGridItemMixin    : GridItemMixin,
     asGridItem              : asGridItem,
+    DynamicGridStore        : Store,
 
     DNDActionParameter      : DNDActionParameter,
 

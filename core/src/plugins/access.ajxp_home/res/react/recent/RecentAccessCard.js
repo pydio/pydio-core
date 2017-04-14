@@ -1,4 +1,7 @@
 import Palette from '../board/Palette'
+const Color = require('color')
+
+const PALETTE_INDEX = 3;
 
 export default React.createClass({
 
@@ -13,7 +16,7 @@ export default React.createClass({
 
     renderIcon: function(node){
         if(node.getPath() === '/' || !node.getPath()){
-            return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 20}}>WS</div></div>
+            return <div className="mimefont-container"><div className="mimefont" style={{fontSize: 14}}>WS</div></div>
         }else{
             return <PydioWorkspaces.FilePreview node={node} loadThumbnail={true}/>
         }
@@ -60,7 +63,8 @@ export default React.createClass({
     },
 
     render: function(){
-        const title = <MaterialUI.CardTitle title="Recently Accessed" style={{backgroundColor:Palette[4]}} titleColor="white"/>;
+        const c = new Color(Palette[PALETTE_INDEX]);
+        const title = <div style={{backgroundColor:c.darken(0.1).toString(),color:'white', padding:'16px 0 16px 12px', fontSize:20}}>Recently Accessed</div>;
 
         const displayMode = this.props.displayMode || 'list';
 
@@ -90,12 +94,13 @@ export default React.createClass({
                     {title}
                     <PydioComponents.NodeListCustomProvider
                         className="recently-accessed-list files-list"
+                        style={{backgroundColor:Palette[PALETTE_INDEX]}}
                         nodeProviderProperties={{get_action:"load_user_recent_items"}}
-                        elementHeight={PydioComponents.SimpleList.HEIGHT_TWO_LINES}
+                        elementHeight={63}
                         nodeClicked={(node) => {this.props.pydio.goTo(node);}}
                         hideToolbar={true}
                         delayInitialLoad={700}
-                        containerHeight={222}
+                        containerHeight={238}
                         entryRenderFirstLine={this.renderFirstLine}
                         entryRenderSecondLine={this.renderSecondLine}
                         entryRenderIcon={this.renderIcon}

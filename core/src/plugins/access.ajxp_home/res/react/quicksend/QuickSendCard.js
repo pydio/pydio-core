@@ -4,7 +4,10 @@ const {CardTitle, CircularProgress} = require('material-ui')
 const {DynamicGridItemMixin} = require('pydio').requireLib('components')
 const {FileDropZone} = require('pydio').requireLib('form')
 
-export default React.createClass({
+const {NativeFileDropProvider} = require('pydio').requireLib('boot');
+const BinaryDropZone = NativeFileDropProvider(FileDropZone, (items, files, props) => {});
+
+let QuickSend = React.createClass({
 
     mixins: [DynamicGridItemMixin],
 
@@ -40,7 +43,6 @@ export default React.createClass({
 
     onDrop: function(files, event, source){
         const items = this.fileDroppedOrPicked(event);
-        console.log(items);
         this.setState({uploadItems: items});
         this.props.pydio.UI.openComponentInModal('WelcomeComponents', 'WorkspacePickerDialog', {
             onWorkspaceTouchTap: this.targetWorkspaceSelected.bind(this),
@@ -49,7 +51,6 @@ export default React.createClass({
     },
 
     targetWorkspaceSelected: function(wsId){
-        console.log(wsId);
         const contextNode = new AjxpNode('/');
         contextNode.getMetadata().set('repository_id', wsId);
         const {uploadItems} = this.state;
@@ -79,7 +80,7 @@ export default React.createClass({
                             <CircularProgress size={80} thickness={4} color="white"/>
                         }
                         {!working &&
-                            <FileDropZone
+                            <BinaryDropZone
                                 ref="dropzone"
                                 multiple={true}
                                 enableFolders={false}
@@ -89,7 +90,7 @@ export default React.createClass({
                                 dragActiveStyle={{border: '4px dashed white'}}
                             >
                                 <span className="mdi mdi-cloud-upload"/>
-                            </FileDropZone>
+                            </BinaryDropZone>
                         }
                     </div>
                 </div>
@@ -98,3 +99,6 @@ export default React.createClass({
     }
 
 });
+
+
+export {QuickSend as default}

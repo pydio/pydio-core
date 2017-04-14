@@ -42,7 +42,7 @@ export default function(PydioComponent, pydio){
 
             const customPalette = pydio.Parameters.get('palette') || {};
 
-            const themeCusto = {
+            let themeCusto = {
                 palette: {
                     primary1Color       : colors.blueGrey600,
                     primary2Color       : colors.deepOrange500,
@@ -50,6 +50,14 @@ export default function(PydioComponent, pydio){
                     accent2Color        : colors.lightBlue500,
                     ...customPalette
                 }
+            };
+
+            themeCusto.toggle = {
+                thumbOffColor           : themeCusto.palette.primary1Color,
+                thumbOnColor            : themeCusto.palette.accent2Color
+            };
+            themeCusto.menuItem = {
+                selectedTextColor       : themeCusto.palette.accent2Color
             };
 
             const theme = getMuiTheme(themeCusto);

@@ -210,6 +210,7 @@ let DynamicGrid = React.createClass({
                     onCreateCard={this.addCard}
                     onResetLayout={this.resetCardsAndLayout}
                     onEditStatusChange={monitorWidgetEditing}
+                    getMessage={(id,ns='ajxp_admin') => {return this.props.getMessage(id, ns)}}
                 />);
         }
         const propStyle = this.props.style || {};

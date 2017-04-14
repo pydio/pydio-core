@@ -7,12 +7,15 @@
   }
 }
 div.left-panel.expanded .video-card .tutorial_legend {
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
+  -ms-flex-direction: column;
+      flex-direction: column;
   height: 100%;
 }
 div.left-panel.expanded .video-card .tutorial_content {
-  flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   padding: 16px;
   position: relative;
   overflow-y: auto;
@@ -104,7 +107,6 @@ div.left-panel.expanded .video-card div.tutorial_load_button {
   color: #009688;
 }
 div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHeader.mui-toolbar {
-  background-color: #3F51B5;
   border-radius: 2px 2px 0 0;
   border-bottom: 0 !important;
 }
@@ -112,6 +114,33 @@ div.left-panel.expanded div.recently-accessed-list.table-mode div.toolbarTableHe
   font-size: 16px !important;
   font-weight: 400 !important;
   color: #ffffff !important;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon {
+  width: 64px;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .covering-bg-preview,
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+  height: 30px;
+  width: 30px;
+  margin: 14px;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container {
+  background-color: transparent;
+  border: 1px solid white;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-icon .mimefont-container .mimefont {
+  color: #ffffff;
+  font-size: 17px;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-text {
+  color: white;
+  padding: 10px 0;
+}
+div.left-panel.expanded div.recently-accessed-list.files-list .material-list-entry .material-list-text .material-list-line-2 {
+  color: rgba(255, 255, 255, 0.53);
 }
 div.left-panel.expanded .user-widget .action_bar {
   position: absolute;

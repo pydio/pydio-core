@@ -6,7 +6,7 @@ export default function(PydioComponent){
     class Wrapped extends React.Component{
 
         render(){
-            return <PydioComponent {...this.props} {...this.context}/>
+            return <PydioComponent  {...this.context} {...this.props}/>
         }
     }
 
