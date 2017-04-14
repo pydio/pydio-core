@@ -355,15 +355,12 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   overflow: auto;
   background-color: #f4f4f4;
 }
-.react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper {
-  background-color: white;
-}
-.react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper h4 {
+.react-mui-context .home-dashboard > .dashboard-layout div.react-grid-item h4 {
   margin-left: 16px;
   cursor: move;
   font-weight: 400;
 }
-.react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper .card-close-overlay {
+.react-mui-context .home-dashboard > .dashboard-layout div.react-grid-item .card-close-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -374,19 +371,11 @@ Temporary setup: symlink this file to ../../gui.ajax/res/mui/mui_sources/veraibl
   display: -ms-flexbox;
   display: flex;
 }
-.react-mui-context .home-dashboard > .dashboard-layout > div.mui-paper .card-close-button {
+.react-mui-context .home-dashboard > .dashboard-layout div.react-grid-item .card-close-button {
   margin: auto;
   color: white;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.19);
-}
-.react-mui-context .home-dashboard button.remove-welcome {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-}
-.react-mui-context .home-dashboard button.remove-welcome .mui-font-icon {
-  color: rgba(0, 0, 0, 0.23);
 }
 .react-mui-context .home-dashboard .screencast {
   float: left;
