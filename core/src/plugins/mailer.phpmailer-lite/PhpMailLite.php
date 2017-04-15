@@ -50,7 +50,7 @@ class PhpMailLite extends Mailer
      */
     protected function sendMailImpl(ContextInterface $ctx, $recipients, $subject, $body, $from = null, $images = array(), $useHtml = true)
     {
-        require_once("vendor/autoload.php");
+        require_once("core/vendor/autoload.php");
         $realRecipients = $this->resolveAdresses($ctx, $recipients);
         if(!count($realRecipients)){
             return;
