@@ -75,7 +75,7 @@ class Pydio extends Observable{
                 var aBar = this.Controller;
                 window.setTimeout(function(){
                     aBar.fireAction(a);
-                }, 2000);
+                }, 1000);
             }
         }.bind(this));
 

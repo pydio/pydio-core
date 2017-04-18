@@ -68,6 +68,9 @@ export default React.createClass({
                 confirmError = '   ';
             }
             const overflow = {overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis', width:'130%'};
+            if(this.props.className){
+                className = this.props.className + ' ' + className;
+            }
             let confirm;
             if(this.state.value && !this.props.disabled){
                 confirm = [

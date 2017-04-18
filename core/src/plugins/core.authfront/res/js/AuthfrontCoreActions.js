@@ -125,7 +125,7 @@
             let forgotLink;
             if(forgotPasswordLink){
                 forgotLink = (
-                    <div className="forgot-password-link"><a onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a></div>
+                    <div className="forgot-password-link"><a style={{cursor:'pointer'}} onClick={this.fireForgotPassword}>{pydio.MessageHash[479]}</a></div>
                 );
             }
             let additionalComponentsTop, additionalComponentsBottom;
@@ -383,9 +383,182 @@
 
     }
 
+    const ResetPasswordRequire = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        statics: {
+            open : () => {
+                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordRequire');
+            }
+        },
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: pydio.MessageHash['gui.user.1'],
+                dialogIsModal: true,
+                dialogSize:'sm'
+            };
+        },
+
+        useBlur: function(){
+            return true;
+        },
+
+
+        submit: function(){
+            const value = this.refs.input && this.refs.input.getValue();
+            if(!value) return;
+            PydioApi.getClient().request({
+                get_action: 'reset-password-ask',
+                email: value
+            }, () => {
+                this.setState({valueSubmitted: true});
+            });
+        },
+
+        render: function(){
+            const mess = this.props.pydio.MessageHash;
+            const valueSubmitted = this.state && this.state.valueSubmitted;
+            return (
+                <div>
+                    {!valueSubmitted &&
+                        <div>
+                            <div className="dialogLegend">{mess['gui.user.3']}</div>
+                            <MaterialUI.TextField
+                                className="blurDialogTextField"
+                                ref="input"
+                                fullWidth={true}
+                                floatingLabelText={mess['gui.user.4']}
+                            />
+                        </div>
+                    }
+                    {valueSubmitted &&
+                        <div>{mess['gui.user.5']}</div>
+                    }
+                </div>
+            );
+
+        }
+
+
+    });
+
+    const ResetPasswordDialog = React.createClass({
+
+        mixins: [
+            PydioReactUI.ActionDialogMixin,
+            PydioReactUI.SubmitButtonProviderMixin
+        ],
+
+        statics: {
+            open : () => {
+                pydio.UI.openComponentInModal('AuthfrontCoreActions', 'ResetPasswordDialog');
+            }
+        },
+
+        getDefaultProps: function(){
+            return {
+                dialogTitle: pydio.MessageHash['gui.user.1'],
+                dialogIsModal: true,
+                dialogSize:'sm'
+            };
+        },
+
+        getInitialState: function(){
+            return {valueSubmitted: false, formLoaded: false, passValue:null, userId:null};
+        },
+
+        useBlur: function(){
+            return true;
+        },
+
+
+        submit: function(){
+            const {pydio} = this.props;
+
+            if(this.state.valueSubmitted){
+                this.props.onDismiss();
+                pydio.Controller.fireAction('login');
+                return;
+            }
+
+            const mess = pydio.MessageHash;
+            PydioApi.getClient().request({
+                get_action  : 'reset-password',
+                key         : pydio.Parameters.get('USER_ACTION_KEY'),
+                user_id     : this.state.userId,
+                new_pass    : this.state.passValue
+            }, (transp) => {
+                if(transp.responseText === 'PASS_ERROR'){
+                    global.alert(mess[240]);
+                }else{
+                    this.setState({valueSubmitted: true});
+                }
+            });
+        },
+
+        componentDidMount: function(){
+            Promise.resolve(require('pydio').requireLib('form', true)).then(()=>{
+                this.setState({formLoaded: true});
+            });
+        },
+
+        onPassChange: function(newValue, oldValue){
+            this.setState({passValue: newValue});
+        },
+
+        onUserIdChange: function(event, newValue){
+            this.setState({userId: newValue});
+        },
+
+        render: function(){
+            const mess = this.props.pydio.MessageHash;
+            const {valueSubmitted, formLoaded, passValue, userId} = this.state;
+            if(!valueSubmitted && formLoaded){
+
+                return (
+                    <div>
+                        <div className="dialogLegend">{mess['gui.user.8']}</div>
+                        <MaterialUI.TextField
+                            className="blurDialogTextField"
+                            value={userId}
+                            floatingLabelText={mess['gui.user.4']}
+                            onChange={this.onUserIdChange.bind(this)}
+                        />
+                        <PydioForm.ValidPassword
+                            className="blurDialogTextField"
+                            onChange={this.onPassChange.bind(this)}
+                            attributes={{name:'password',label:mess[198]}}
+                            value={passValue}
+                        />
+                    </div>
+
+                );
+
+            }else if(valueSubmitted){
+
+                return (
+                    <div>{mess['gui.user.6']}</div>
+                );
+
+            }else{
+                return <PydioReactUI.Loader/>
+            }
+
+        }
+
+
+    });
+
     global.AuthfrontCoreActions = {
         Callbacks: Callbacks,
         LoginPasswordDialog: LoginPasswordDialog,
+        ResetPasswordRequire: ResetPasswordRequire,
+        ResetPasswordDialog: ResetPasswordDialog,
         WebFTPDialog: WebFTPDialog,
         MultiAuthModifier: MultiAuthModifier
     };
