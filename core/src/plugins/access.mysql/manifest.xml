@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ajxpdriver enabled="false" name="mysql" label="CONF_MESSAGE[Mysql Database]" description="CONF_MESSAGE[This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+<ajxpdriver enabled="false" name="mysql" label="CONF_MESSAGE[Mysql Database (DEPRECATED)]" description="CONF_MESSAGE[This driver can browse and update tables and records in a MySQL database, kind of phpMyAdmin.]" mixins="slug_provider,template_provider"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="7.X"/>
+    </plugin_info>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png" description_template="{DB_HOST} - {DB_NAME}"  iconClass="icon-list-alt">
 		<resources>
 			<js file="plugins/access.mysql/resources/js/class.SQLEditor.js" className="SQLEditor"/>
