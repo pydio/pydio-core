@@ -5,9 +5,9 @@
 	<class_definition filename="plugins/authfront.duosecurity/DuoSecurityFrontend.php" classname="Pydio\Auth\Frontend\DuoSecurityFrontend"/>
     <client_settings>
         <resources>
-            <js className="DuoSecurity" file="plugins/authfront.duosecurity/duo_php/js/Duo-Web-v1-PydioMod.js"/>
+            <js className="Duo" file="plugins/authfront.duosecurity/vendor/duosecurity/duo_php/js/Duo-Web-v2.min.js"/>
             <i18n namespace="duosecurity" path="plugins/authfront.duosecurity/i18n"/>
-            <js className="DuoSecurityActions" file="plugins/authfront.duosecurity/res/build/DuoSecurityActions.js" depends="DuoSecurity"/>
+            <js className="DuoSecurityActions" file="plugins/authfront.duosecurity/res/build/DuoSecurityActions.js" depends="Duo"/>
         </resources>
     </client_settings>
     <server_settings>
@@ -31,8 +31,7 @@
     <registry_contributions>
         <actions>
             <action name="duo_show_iframe">
-                <gui text="duosecurity.1" title="duosecurity.2" src="encrypted.png" iconClass="icon-signin"
-                     accessKey="" hasAccessKey="false">
+                <gui text="duosecurity.1" title="duosecurity.2" iconClass="icon-signin" accessKey="" hasAccessKey="false">
                     <context selection="false" dir="" recycle="false"
                              actionBar="false" contextMenu="false" infoPanel="false"
                              actionBarGroup="zlogin">
@@ -40,9 +39,6 @@
                 </gui>
                 <processing>
                     <clientCallback module="DuoSecurityActions.Callbacks.duoPrompt" prepareModal="true"/>
-                    <clientForm id="duosecurity_box"><![CDATA[
-                         <div id="duosecurity_box" box_width="420" box_padding="0"></div>
-					]]></clientForm>
                 </processing>
             </action>
             <action name="duo_post_verification_code">
