@@ -12,7 +12,7 @@
  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-const {Paper} = MaterialUI;
+const {Card, CardHeader, CardMedia} = MaterialUI;
 
 import { connect } from 'react-redux';
 import * as actions from '../../actions';
@@ -20,16 +20,37 @@ import * as actions from '../../actions';
 import makeMaximise from './make-maximise';
 
 class Tab extends React.Component {
-    render() {
+    static get styles() {
+        return {
+            container: {
+                display: "flex",
+                flex: 1,
+                flexFlow: "column nowrap",
+                overflow: "auto"
+            },
+            child: {
+                display: "flex",
+                flex: 1
+            }
+        }
+    }
 
-        const {id, isActive, style, editorSetActiveTab} = this.props
+    render() {
+        const {id, isActive, style, editorSetActiveTab, ...remainingProps} = this.props
 
         const select = () => editorSetActiveTab(id)
 
-        return (
-            <AnimatedPaper style={style} maximised={isActive} onClick={!isActive ? select : null}>
-                <this.props.child {...this.props} icon={false} />
-            </AnimatedPaper>
+        return !isActive ? (
+            <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={isActive} expanded={isActive} onExpandChange={!isActive ? select : null}>
+                <CardHeader title={id} actAsExpander={true} showExpandableButton={true} />
+                <CardMedia style={Tab.styles.child} mediaStyle={Tab.styles.child}>
+                    <this.props.child {...remainingProps} style={Tab.styles.child} showControls={false} icon={false} />
+                </CardMedia>
+            </AnimatedCard>
+        ) : (
+            <AnimatedCard style={style} containerStyle={Tab.styles.container} maximised={true} expanded={isActive} onExpandChange={!isActive ? select : null}>
+                <this.props.child {...remainingProps} style={Tab.styles.child} showControls={true} icon={false} />
+            </AnimatedCard>
         )
     }
 }
@@ -46,7 +67,7 @@ function mapStateToProps(state, ownProps) {
     }
 }
 
-const AnimatedPaper = makeMaximise(Paper)
+const AnimatedCard = makeMaximise(Card)
 
 const EditorTab = connect(mapStateToProps, actions)(Tab)
 

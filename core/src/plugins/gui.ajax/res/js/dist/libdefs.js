@@ -54,7 +54,8 @@ const LibRequires = [ // modules we want to require and export
     'cronstrue',
     'react-tap-event-plugin',
     'whatwg-fetch',
-    'systemjs'
+    'systemjs',
+    'redux'
 ]
 
 const Externals = Object.keys(PydioCoreRequires).map(function(key){

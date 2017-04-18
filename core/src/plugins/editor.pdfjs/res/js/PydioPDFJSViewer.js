@@ -18,16 +18,22 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-const Viewer = ({url, style}) => {
-    return (
-        <iframe src={url} style={{...style, height: "100%", border: 0, flex: 1}} className="vertical_fit"></iframe>
-    );
-};
+import React, {Component} from 'react'
+import {compose} from 'redux'
 
-class PydioPDFJSViewer extends React.Component {
+class PydioPDFJSViewer extends Component {
+
+    static get defaultProps() {
+        return {
+            onLoad: () => {}
+        }
+    }
+
+    static get styles() {
+        return {}
+    }
 
     constructor(props) {
-
         super(props)
 
         const {pydio, node} = props;
@@ -82,13 +88,17 @@ class PydioPDFJSViewer extends React.Component {
 
     render() {
         return (
-            <Viewer {...this.props} url={this.state.url} />
+            <Viewer {...this.props} src={this.state.url} />
         );
     }
 }
 
-PydioPDFJSViewer.defaultProps = {
-    onLoad: () => {}
-}
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+
+let Viewer = compose(
+    withMenu,
+    withLoader,
+    withErrors
+)(props => <iframe {...props} />)
 
 window.PydioPDFJSViewer = PydioPDFJSViewer;

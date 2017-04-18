@@ -20,6 +20,8 @@
 
 import React, {Component} from 'react';
 
+import {compose} from 'redux';
+
 class PydioBrowserEditor extends Component {
 
     static get styles() {
@@ -30,7 +32,7 @@ class PydioBrowserEditor extends Component {
             }
         }
     }
-    
+
     constructor(props) {
         super(props)
 
@@ -54,30 +56,36 @@ class PydioBrowserEditor extends Component {
 
         let alwaysOpenLinksInBrowser = (configs.get('OPEN_LINK_IN_TAB') === 'browser');
 
-        PydioApi.getClient().request({get_action:'get_content', file:node.getPath()}, function(transp){
-            var url = transp.responseText;
-            if(url.indexOf('URL=') !== -1){
+        PydioApi.getClient().request({
+            get_action:'get_content',
+            file:node.getPath()
+        }, ({responseText: url}) => {
+            if (url.indexOf('URL=') !== -1) {
                 url = url.split('URL=')[1];
                 if(url.indexOf('\n') !== -1){
                     url = url.split('\n')[0];
                 }
             }
             this._openURL(url, alwaysOpenLinksInBrowser, true);
-        }.bind(this));
+        })
     }
 
     openNode(node, configs) {
 
-        var repo = pydio.user.getActiveRepository();
-        var loc = document.location.href.split('?').shift().split('#').shift();
-        var url = loc.substring(0, loc.lastIndexOf('/'));
-        if(document.getElementsByTagName('base').length){
+        const {pydio} = this.props
+
+        const repo = pydio.user.getActiveRepository();
+        const loc = document.location.href.split('?').shift().split('#').shift();
+        let url = loc.substring(0, loc.lastIndexOf('/'));
+        if (document.getElementsByTagName('base').length) {
             url = document.getElementsByTagName('base')[0].href;
             if(url.substr(-1) == '/') url = url.substr(0, url.length - 1);
         }
-        var open_file_url = LangUtils.trimRight(url, "\/") + "/" + pydio.Parameters.get('ajxpServerAccess') + "&get_action=open_file&repository_id=" + repo + "&file=" + encodeURIComponent(node.getPath());
-        var configs = this.props.pydio.getPluginConfigs("editor.browser");
-        let alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') === "browser";
+        url = LangUtils.trimRight(url, "\/")
+        const ajxpServerAccess = pydio.Parameters.get('ajxpServerAccess')
+        const path = encodeURIComponent(node.getPath())
+        const open_file_url = `${url}/${ajxpServerAccess}&get_action=open_file&repository_id=${repo}&file=${path}`;
+        const alwaysOpenDocsInBrowser = configs.get('OPEN_DOCS_IN_TAB') === "browser";
 
         this._openURL(open_file_url, alwaysOpenDocsInBrowser, false);
 
@@ -104,15 +112,12 @@ class PydioBrowserEditor extends Component {
     }
 }
 
-let CompositeEditor = (props) => {
-    return <iframe {...props} />
-}
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-// Define HOCs
-if (typeof PydioHOCs !== "undefined") {
-    CompositeEditor = PydioHOCs.withActions(CompositeEditor);
-    CompositeEditor = PydioHOCs.withLoader(CompositeEditor);
-    CompositeEditor = PydioHOCs.withErrors(CompositeEditor);
-}
+let CompositeEditor = compose(
+    withMenu,
+    withLoader,
+    withErrors
+)(props => <iframe {...props} />)
 
 window.PydioBrowserEditor = PydioBrowserEditor;

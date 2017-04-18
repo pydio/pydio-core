@@ -2,7 +2,7 @@
 
     let pydio = global.pydio;
 
-    class UrlProvider extends PydioDiaporama.UrlProvider{
+    class UrlProvider extends PydioDiaporama.UrlProvider {
 
         getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed){
             let url;
@@ -92,7 +92,7 @@
             if (!node) {
                 return
             }
-            
+
             let fileId = this.state.selectionModel.first().getMetadata().get('thumb_file_id');
             var prefix = fileId.replace("-0.jpg", "").replace(".jpg", "");
             PydioApi.getClient().request({get_action:'delete_imagick_data', file:prefix});

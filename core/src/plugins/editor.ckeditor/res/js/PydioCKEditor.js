@@ -19,9 +19,51 @@
  */
 
 import React, {Component} from 'react';
+import {IconButton, TextField} from 'material-ui';
+import {compose} from 'redux';
+
 import CKEditor from './CKEditor';
 
 class PydioCKEditor extends Component {
+    static get propTypes() {
+        return {
+            showControls: React.PropTypes.bool.isRequired
+        }
+    }
+
+    static get defaultProps() {
+        return {
+            showControls: false
+        }
+    }
+
+    static get propTypes() {
+        return {
+            showControls: React.PropTypes.bool.isRequired
+        }
+    }
+
+    static get defaultProps() {
+        return {
+            showControls: false
+        }
+    }
+
+    static get controls() {
+        return {
+            options: {
+                save: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]}/>,
+                undo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />,
+                redo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />,
+                toggleLineNumbers: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-format-list-numbers" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.5"]} />,
+                toggleLineWrapping: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-wrap" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.3b"]} />
+            },
+            actions: {
+                jumpTo: (handler) => <TextField hintText={MessageHash["code_mirror.6"]} onKeyUp={handler} />,
+                find: (handler) => <TextField hintText={MessageHash["code_mirror.9"]} onKeyUp={handler} />
+            }
+        }
+    }
 
     static get base() {
         return {
@@ -107,20 +149,7 @@ class PydioCKEditor extends Component {
         }, (transport) => this.setState({content: transport.responseText}));
     }
 
-    onLoad(codemirror) {
-        this.setState({ codemirror: codemirror })
-        // this.props.onLoad()
-    }
-
-    onChange(content) {
-        this.setState({ content: content })
-    }
-
-    onCursorChange(cursor) {
-        this.setState({ cursor: cursor })
-    }
-
-    save() {
+    onSave() {
         const {pydio} = this.props;
 
         pydio.ApiClient.postPlainTextContent(this.state.url, this.state.content, (success) => {
@@ -146,7 +175,7 @@ class PydioCKEditor extends Component {
                 firstChild={true}
                 key="left"
             >
-                <MaterialUI.FlatButton label={'Save'} disabled={!this.hasBeenModified()} onClick={()=>{this.save()}}/>
+
             </MaterialUI.ToolbarGroup>
         );
         return actions;
@@ -158,6 +187,10 @@ class PydioCKEditor extends Component {
         return (
             <CompositeEditor
                 {...this.props}
+
+                saveDisabled={!this.hasBeenModified()}
+                onSave={() => this.onSave()}
+
                 onChange={content => this.setState({content})}
                 actions={this.buildActions()}
                 url={this.state.url}
@@ -167,14 +200,9 @@ class PydioCKEditor extends Component {
     }
 }
 
-let CompositeEditor = CKEditor
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-// Define HOCs
-if (typeof PydioHOCs !== "undefined") {
-    CompositeEditor = PydioHOCs.withActions(CompositeEditor);
-    CompositeEditor = PydioHOCs.withLoader(CompositeEditor);
-    CompositeEditor = PydioHOCs.withErrors(CompositeEditor);
-}
+let CompositeEditor = compose(withControls(PydioCKEditor.controls), withMenu, withLoader, withErrors)(CKEditor)
 
 CKEDITOR.basePath = PydioCKEditor.config.basePath
 CKEDITOR.contentsCss = PydioCKEditor.config.basePath + '../../res/css/ckeditor.css'

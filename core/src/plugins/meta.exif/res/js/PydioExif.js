@@ -1,6 +1,7 @@
-import React, {Component} from 'react'
+import React, {Component} from 'react';
+import {compose} from 'redux';
 
-import {ToolbarGroup, FlatButton, Card, CardTitle, CardText, Table, TableBody, TableRow, TableRowColumn} from 'material-ui'
+import {ToolbarGroup, IconButton, FlatButton, Card, CardTitle, CardText, Table, TableBody, TableRow, TableRowColumn} from 'material-ui'
 
 class DetailPanel extends Component {
 
@@ -81,7 +82,7 @@ class DetailPanel extends Component {
             items.push(<div style={{clear:'left'}}></div>)
 
             actions.push(
-                <MaterialUI.FlatButton onClick={() => this.openInExifEditor()} label="More Exif" />
+                <FlatButton onClick={() => this.openInExifEditor()} label="More Exif" />
             );
         }
         if (this.state && this.state.gpsData) {
@@ -96,7 +97,7 @@ class DetailPanel extends Component {
                 />
             );
             actions.push(
-                <MaterialUI.FlatButton onClick={() => this.openInMapEditor()} label="Open Map" />
+                <FlatButton onClick={() => this.openInMapEditor()} label="Open Map" />
             )
         }
 
@@ -120,6 +121,26 @@ class Editor extends Component {
         this.state = {
             data: [],
             error: ""
+        }
+    }
+
+    static get propTypes() {
+        return {
+            showControls: React.PropTypes.bool.isRequired
+        }
+    }
+
+    static get defaultProps() {
+        return {
+            showControls: false
+        }
+    }
+
+    static get controls() {
+        return {
+            options: {
+                locate: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-crosshairs-gps" tooltip={"Locate on a map"}/>
+            }
         }
     }
 
@@ -150,16 +171,13 @@ class Editor extends Component {
     render() {
         let content;
 
+        const {showControls} = this.props
         const {data, error} = this.state;
 
         return (
             <Viewer
                 {...this.props}
-                actions={
-                    <ToolbarGroup firstChild={true}>
-                        <FlatButton label={"Locate on a map"} onClick={() => this.openGpsLocator()}/>
-                    </ToolbarGroup>
-                }
+                onLocate={showControls ? () => this.openGpsLocator() : null}
                 error={error}
                 style={{display: "flex", justifyContent: "space-around", flexFlow: "row wrap"}}
             >
@@ -186,16 +204,15 @@ class Editor extends Component {
     }
 }
 
-let Viewer = (props) => {
-    return (
-        <div {...props} />
-    )
-}
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-// Define HOCs
-Viewer = PydioHOCs.withActions(Viewer);
-Viewer = PydioHOCs.withLoader(Viewer)
-Viewer = PydioHOCs.withErrors(Viewer)
+console.log("Defining ", Editor.controls)
+const Viewer = compose(
+    withControls(Editor.controls),
+    withMenu,
+    withLoader,
+    withErrors
+)(props => <div {...props} />)
 
 window.PydioExif = {
     Editor: Editor,

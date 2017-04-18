@@ -18,10 +18,14 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
-import Editor from './Editor';
-import {MenuOptions, MenuActions} from './Menu';
+import React, {Component} from 'react';
+import {IconButton, TextField} from 'material-ui';
+import {compose} from 'redux';
 
-class PydioCodeMirror extends React.Component {
+import CodeMirrorLoader from './CodeMirrorLoader'
+import {parseQuery} from './Utils';
+
+class PydioCodeMirror extends Component {
 
     constructor(props) {
         super(props)
@@ -30,17 +34,40 @@ class PydioCodeMirror extends React.Component {
 
         this.state = {
             url: node.getPath(),
+            cursor: {},
             readOnly: false, // TODO replace
             lineNumbers: true, // TODO replace
             lineWrapping: true, // TODO replace
             ready: false
         }
+    }
 
-        this.onLoad = this.onLoad.bind(this)
-        this.onChange = this.onChange.bind(this)
-        this.onCursorChange = this.onCursorChange.bind(this)
+    static get propTypes() {
+        return {
+            showControls: React.PropTypes.bool.isRequired
+        }
+    }
 
-        this.save = this.save.bind(this)
+    static get defaultProps() {
+        return {
+            showControls: false
+        }
+    }
+
+    static get controls() {
+        return {
+            options: {
+                save: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-content-save" tooltip={MessageHash[53]}/>,
+                undo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-undo" tooltip={MessageHash["code_mirror.7"]} />,
+                redo: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-redo" tooltip={MessageHash["code_mirror.8"]} />,
+                toggleLineNumbers: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-format-list-numbers" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.5"]} />,
+                toggleLineWrapping: (handler) => <IconButton onClick={handler} iconClassName="mdi mdi-wrap" tooltipPosition="bottom-right" tooltip={MessageHash["code_mirror.3b"]} />
+            },
+            actions: {
+                jumpTo: (handler) => <TextField hintText={MessageHash["code_mirror.6"]} onKeyUp={handler} />,
+                find: (handler) => <TextField hintText={MessageHash["code_mirror.9"]} onKeyUp={handler} />
+            }
+        }
     }
 
     // Static functions
@@ -54,14 +81,9 @@ class PydioCodeMirror extends React.Component {
                 }
             }
         } else {
-
             // We don't have a player for the file icon
             return null;
         }
-    }
-
-    componentWillMount() {
-        console.log("Mounting")
     }
 
     componentDidMount() {
@@ -73,21 +95,27 @@ class PydioCodeMirror extends React.Component {
         }, (transport) => this.setState({content: transport.responseText}));
     }
 
-    componentWillUnmount() {
-        console.log("Unmounting")
+    find(query) {
+        const {codemirror, cursor} = this.state
+
+        let cur = codemirror.getSearchCursor(query, cursor.to);
+
+        if (!cur.find()) {
+            cur = codemirror.getSearchCursor(query, 0);
+            if (!cur.find()) return;
+        }
+
+        codemirror.setSelection(cur.from(), cur.to());
+        codemirror.scrollIntoView({from: cur.from(), to: cur.to()}, 20);
     }
 
-    onLoad(codemirror) {
-        this.setState({ codemirror: codemirror })
-        // this.props.onLoad()
-    }
+    jumpTo(line) {
+        const {codemirror} = this.state
+        const cur = codemirror.getCursor();
 
-    onChange(content) {
-        this.setState({ content: content })
-    }
-
-    onCursorChange(cursor) {
-        this.setState({ cursor: cursor })
+        codemirror.focus();
+        codemirror.setCursor(line - 1, cur.ch);
+        codemirror.scrollIntoView({line: line - 1, ch: cur.ch}, 20);
     }
 
     save() {
@@ -101,38 +129,68 @@ class PydioCodeMirror extends React.Component {
     }
 
     render() {
-        return (
-            <CompositeEditor
-                {...this.props}
-                actions={this.state.codemirror ? [
-                    <MenuOptions pydio={this.props.pydio} codemirror={this.state.codemirror} onSave={this.save.bind(this)} />,
-                    <MenuActions pydio={this.props.pydio} codemirror={this.state.codemirror} cursor={this.state.cursor} />
-                ] : []}
-                error={this.state.error}
-                url={this.state.url}
-                options={{lineNumbers: this.state.lineNumbers, lineWrapping: this.state.lineWrapping}}
-                content={this.state.content}
-                onLoad={this.onLoad}
-                onChange={this.onChange}
-                onCursorChange={this.onCursorChange}
-            />
-        );
+
+        const {showControls} = this.props
+
+        const {url, codemirror, content, lineNumbers, lineWrapping, error} = this.state
+
+        const {undo, redo} = codemirror && codemirror.historySize() || {}
+
+        if (showControls) {
+            return (
+                <CodeMirrorLoaderWithControls
+                    {...this.props}
+                    url={url}
+                    content={content}
+                    options={{lineNumbers: lineNumbers, lineWrapping: lineWrapping}}
+                    error={error}
+
+                    onSave={() => this.save()}
+                    undoDisabled={!undo}
+                    onUndo={() => this.state.codemirror.undo()}
+                    redoDisabled={!redo}
+                    onRedo={() => this.state.codemirror.redo()}
+                    onToggleLineNumbers={() => this.setState({lineNumbers: !lineNumbers})}
+                    onToggleLineWrapping={() => this.setState({lineWrapping: !lineWrapping})}
+                    onJumpTo={({key, target}) => key === 'Enter' && this.jumpTo(parseInt(target.value))}
+                    onFind={({key, target}) => key === 'Enter' && this.find(parseQuery(target.value))}
+
+                    onLoad={codemirror => this.setState({codemirror})}
+                    onChange={content => this.setState({content})}
+                    onCursorChange={cursor => this.setState({cursor})}
+                />
+            )
+        } else {
+            return (
+                <CodeMirrorLoader
+                    {...this.props}
+                    url={url}
+                    content={content}
+                    options={{lineNumbers: lineNumbers, lineWrapping: lineWrapping}}
+                    error={error}
+
+                    onLoad={codemirror => this.setState({codemirror})}
+                    onChange={content => this.setState({content})}
+                    onCursorChange={cursor => this.setState({cursor})}
+                />
+            )
+        }
     }
 }
 
-let CompositeEditor = Editor
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-// Define HOCs
-if (typeof PydioHOCs !== "undefined") {
-    CompositeEditor = PydioHOCs.withActions(CompositeEditor);
-    CompositeEditor = PydioHOCs.withLoader(CompositeEditor)
-    CompositeEditor = PydioHOCs.withErrors(CompositeEditor)
-}
+let CodeMirrorLoaderWithControls = compose(
+    withControls(PydioCodeMirror.controls),
+    withMenu,
+    withLoader,
+    withErrors
+)(CodeMirrorLoader)
 
 // We need to attach the element to window else it won't be found
 window.PydioCodeMirror = {
     PydioEditor: PydioCodeMirror,
-    SourceEditor: Editor
+    SourceEditor: CodeMirrorLoader
 }
 
 export default PydioCodeMirror
