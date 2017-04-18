@@ -5,7 +5,7 @@ module.exports = function(grunt){
         'babel:materialui',
         // CORE
         'babel:core',
-        //'env:build',
+        'env:build',
         'browserify:boot',
         'browserify:core',
         'browserify:dist',
