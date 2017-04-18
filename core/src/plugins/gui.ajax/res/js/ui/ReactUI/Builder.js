@@ -120,18 +120,18 @@ export default class Builder{
     }
 
     openCurrentSelectionInEditor(editorData, forceNode){
-        var selectedNode =  forceNode ? forceNode : this._pydio.getContextHolder().getUniqueNode();
+        const selectedNode =  forceNode ? forceNode : this._pydio.getContextHolder().getUniqueNode();
         if(!selectedNode) return;
         if(!editorData){
-            var selectedMime = PathUtils.getAjxpMimeType(selectedNode);
-            var editors = this._pydio.Registry.findEditorsForMime(selectedMime, false);
+            const selectedMime = PathUtils.getAjxpMimeType(selectedNode);
+            const editors = this._pydio.Registry.findEditorsForMime(selectedMime, false);
             if(editors.length && editors[0].openable && !(editors[0].write && selectedNode.getMetadata().get("ajxp_readonly") === "true")){
                 editorData = editors[0];
             }
         }
         if(editorData){
             this._pydio.Registry.loadEditorResources(editorData.resourcesManager, function(){
-                var editorOpener = this.getEditorOpener();
+                const editorOpener = this.getEditorOpener();
                 if(!editorOpener || editorData.modalOnly){
                     modal.openEditorDialog(editorData);
                 }else{
@@ -228,7 +228,5 @@ export default class Builder{
             this._hiddenDownloadForm.triggerDownload(selection, parameters);
         }
     }
-
-    mountComponents(componentsNodes){}
 
 }

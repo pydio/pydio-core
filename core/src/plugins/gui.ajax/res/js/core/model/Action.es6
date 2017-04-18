@@ -165,40 +165,7 @@ export default class Action extends Observable{
 			}catch(e){
 				Logger.error(e);
 			}
-		}else if(this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute("dialogOpenForm")){
-			var node = this.options.callbackDialogNode;
-			var dialogFormId = node.getAttribute("dialogOpenForm");
-			var okButtonOnly = (node.getAttribute("dialogOkButtonOnly") === "true") ;
-			var skipButtons = (node.getAttribute("dialogSkipButtons") === "true") ;
-			
-			var onOpenFunc = null; var onCompleteFunc = null; var onCancelFunc = null;
-			var onOpenNode = XMLUtils.XPathSelectSingleNode(node, "dialogOnOpen");
-			if(onOpenNode && onOpenNode.firstChild) onOpenFunc = new Function("oForm", onOpenNode.firstChild.nodeValue);
-			var onCompleteNode = XMLUtils.XPathSelectSingleNode(node, "dialogOnComplete");
-			if(onCompleteNode && onCompleteNode.firstChild) {
-				var completeCode = onCompleteNode.firstChild.nodeValue;
-				if(onCompleteNode.getAttribute("hideDialog") === "true"){
-					completeCode += "hideLightBox(true);";
-				}
-				onCompleteFunc = new Function("oForm", completeCode);
-			}
-			var onCancelNode = XMLUtils.XPathSelectSingleNode(node, "dialogOnCancel");
-			if(onCancelNode && onCancelNode.firstChild) onCancelFunc = new Function("oForm", onCancelNode.firstChild.nodeValue);
-			
-			this.options.callback = function(){
-			    /*
-                var modal = this.manager.uiGetModal();
-                if(modal){
-                     modal.showDialogForm('Dialog', dialogFormId, onOpenFunc, onCompleteFunc, onCancelFunc, okButtonOnly, skipButtons);
-                }
-                */
-            }.bind(this);
-			this.options.callback();
-			this.options.callbackDialogNode = null;
-		}else if(this.options.callbackDialogNode && this.options.callbackDialogNode.getAttribute("components")){
-            var components = XMLUtils.XPathSelectNodes(this.options.callbackDialogNode, "component");
-            this.manager.uiMountComponents(components);
-        }else if(this.options.callback){
+		}else if(this.options.callback){
 			this.options.callback(this.manager, arguments[0]);
 		}
 		if(this.options.subMenu && arguments[0] && arguments[0][0]){
