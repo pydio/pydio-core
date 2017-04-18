@@ -107,7 +107,7 @@ class InboxAccessDriver extends FsAccessDriver
         if($nodeObject->isRoot()){
             return ['stat' => stat(ApplicationState::getTemporaryFolder())];
         }
-        $allNodes = self::getNodes($nodeObject->getContext(), false);
+        $allNodes = self::getNodes($nodeObject->getContext(), true );
         if(!isSet($allNodes[$basename])){
             throw new FileNotFoundException($basename);
         }
@@ -124,7 +124,7 @@ class InboxAccessDriver extends FsAccessDriver
                         $node->setLeaf(true);
                     }
                     Controller::applyHook("node.read", [&$node]);
-                    $stat = stat($url);
+                    $stat = @stat($url);
                 }catch (\Exception $e){
                     $stat = stat(ApplicationState::getTemporaryFolder());
                 }

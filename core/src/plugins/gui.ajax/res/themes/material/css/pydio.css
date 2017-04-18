@@ -357,11 +357,7 @@ div.dialogBox div#element_overlay {
   visibility: hidden;
 }
 .folders-tree div.tree-item.mui-is-selected div.tree-item-label {
-  font-weight: 500;
   color: #43555d;
-}
-.folders-tree div.tree-item:hover div.tree-item-label {
-  font-weight: 500;
 }
 .react-mui-context .material-list.files-list {
   opacity: 1;

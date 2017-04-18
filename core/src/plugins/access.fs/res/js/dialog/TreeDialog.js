@@ -1,4 +1,9 @@
 const React = require('react')
+const PydioDataModel = require('pydio/model/data-model');
+const AjxpNode = require('pydio/model/node');
+const RemoteNodeProvider = require('pydio/model/remote-node-provider');
+const {MenuItem, SelectField, TextField, Paper, RaisedButton, IconButton, FlatButton} = require('material-ui');
+const {FoldersTree} = require('pydio').requireLib('components');
 
 const TreeDialog = React.createClass({
 
@@ -15,8 +20,9 @@ const TreeDialog = React.createClass({
 
     getDefaultProps: function(){
         return {
-            dialogTitle: 'Copy Selection to...',
-            dialogIsModal: true
+            dialogTitle: 'Copy/Move',
+            dialogIsModal: true,
+            dialogScrollBody: true
         };
     },
 
@@ -26,18 +32,33 @@ const TreeDialog = React.createClass({
     },
 
     getInitialState: function(){
-        let dm = new PydioDataModel();
-        var nodeProvider = new RemoteNodeProvider();
-        let root = new AjxpNode('/', false, 'ROOT', '', nodeProvider);
-        nodeProvider.initProvider({});
-        dm.setAjxpNodeProvider(nodeProvider);
-        dm.setRootNode(root);
+        const dm = this.getCurrentDataModel();
+        const root = dm.getRootNode();
         root.load();
         return{
             dataModel: dm,
             selectedNode: root,
-            wsId:'__CURRENT__'
+            wsId:root.getMetadata().get('repository_id') || '__CURRENT__'
         }
+    },
+
+    getCurrentDataModel(value = null){
+        const {user} = this.props.pydio;
+        let repoId, repoLabel = user.getRepositoriesList().get(user.activeRepository).getLabel();
+        if(value !== null && value !== '__CURRENT__'){
+            repoId = value;
+            repoLabel = user.getCrossRepositories().get(value).getLabel();
+        }else if(value === null){
+            // Detect default value
+            if(!user.canWrite() && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
+                repoId = user.getCrossRepositories().keys().next().value;
+                repoLabel = user.getCrossRepositories().get(repoId).getLabel();
+            }
+        }
+        const dm = PydioDataModel.RemoteDataModelFactory(repoId ? {tmp_repository_id:repoId} : {}, repoLabel);
+        const root = dm.getRootNode();
+        if(repoId) root.getMetadata().set('repository_id', repoId);
+        return dm;
     },
 
     onNodeSelected: function(n){
@@ -51,11 +72,13 @@ const TreeDialog = React.createClass({
         let parent = this.state.selectedNode;
         let nodeName = this.refs.newfolder_input.getValue();
         let oThis = this;
+        const additional = (this.state.wsId !== '__CURRENT__') ? {tmp_repository_id:this.state.wsId} : {};
 
         PydioApi.getClient().request({
             get_action:'mkdir',
             dir: parent.getPath(),
-            dirname:nodeName
+            dirname:nodeName,
+            ...additional
         }, function(){
             let fullpath = parent.getPath() + '/' + nodeName;
             parent.observeOnce('loaded', function(){
@@ -71,16 +94,8 @@ const TreeDialog = React.createClass({
     },
 
     handleRepositoryChange: function(event, index, value){
-        let dm = new PydioDataModel();
-        var nodeProvider = new RemoteNodeProvider();
-        let root = new AjxpNode('/', false, 'ROOT', '', nodeProvider);
-        if(value === '__CURRENT__'){
-            nodeProvider.initProvider({});
-        }else{
-            nodeProvider.initProvider({tmp_repository_id: value});
-        }
-        dm.setAjxpNodeProvider(nodeProvider);
-        dm.setRootNode(root);
+        const dm = this.getCurrentDataModel(value);
+        const root = dm.getRootNode();
         root.load();
         this.setState({dataModel:dm, selectedNode: root, wsId: value});
     },
@@ -93,70 +108,74 @@ const TreeDialog = React.createClass({
         let user = this.props.pydio.user;
         let wsSelector ;
         if(user && user.canCrossRepositoryCopy() && user.hasCrossRepositories()){
-            let items = [
-                <MaterialUI.MenuItem key={'current'} value={'__CURRENT__'} primaryText={"Current Workspace"} />
-            ];
+            let items = [];
+            if(user.canWrite()){
+                items.push(<MenuItem key={'current'} value={'__CURRENT__'} primaryText={this.props.pydio.MessageHash[372]} />);
+            }
             user.getCrossRepositories().forEach(function(repo, key){
-                items.push(<MaterialUI.MenuItem key={key} value={key} primaryText={repo.getLabel()} />);
+                items.push(<MenuItem key={key} value={key} primaryText={repo.getLabel()} />);
             });
-
             wsSelector = (
                 <div>
-                    <MaterialUI.SelectField
+                    <SelectField
                         style={{width:'100%'}}
-                        floatingLabelText="Copy to another workspace"
+                        floatingLabelText={this.props.pydio.MessageHash[373]}
                         value={this.state.wsId}
                         onChange={this.handleRepositoryChange}
                     >
                         {items}
-                    </MaterialUI.SelectField>
+                    </SelectField>
                 </div>
             );
         }
         let openStyle = {flex:1,width:'100%'};
         let closeStyle = {width:0};
+        const {newFolderFormOpen} = this.state;
         return (
-            <div>
+            <div style={{width:'100%'}}>
                 {wsSelector}
-                <MaterialUI.Paper zDepth={1} style={{height: 300, overflowX:'auto'}}>
-                    <PydioComponents.FoldersTree
-                        pydio={this.props.pydio}
-                        dataModel={this.state.dataModel}
-                        onNodeSelected={this.onNodeSelected}
-                        showRoot={true}
-                        draggable={false}
-                    />
-                </MaterialUI.Paper>
-                <div style={{display:'flex',alignItems:'baseline'}}>
-                    <MaterialUI.TextField
-                        style={{flex:1,width:'100%'}}
-                        floatingLabelText="Selected files will be moved to ..."
-                        ref="input"
-                        value={this.state.selectedNode.getPath()}
-                        disabled={true}
-                    />
-                    <MaterialUI.Paper zDepth={this.state.newFolderFormOpen ? 0 : 1} circle={true}>
-                        <MaterialUI.IconButton
-                            iconClassName="mdi mdi-folder-plus"
-                            tooltip="Create folder"
-                            onClick={openNewFolderForm}
+                <Paper zDepth={0} style={{height: 300, overflowX:'auto', color: '#546E7A', fontSize: 14, padding: '6px 0px', backgroundColor: '#eceff1', marginTop:-6}}>
+                    <div style={{marginTop: -41, marginLeft: -21}}>
+                        <FoldersTree
+                            pydio={this.props.pydio}
+                            dataModel={this.state.dataModel}
+                            onNodeSelected={this.onNodeSelected}
+                            showRoot={true}
+                            draggable={false}
                         />
-                    </MaterialUI.Paper>
-                </div>
-                <MaterialUI.Paper
+                    </div>
+                </Paper>
+                <Paper
                     className="bezier-transitions"
                     zDepth={0}
                     style={{
-                        height:this.state.newFolderFormOpen?80:0,
-                        overflow:'hidden',
-                        paddingTop: this.state.newFolderFormOpen?10:0,
+                        backgroundColor:'#eceff1',
                         display:'flex',
-                        alignItems:'baseline'
+                        alignItems:'baseline',
+                        height:newFolderFormOpen?80:0,
+                        overflow:newFolderFormOpen ? 'visible':'hidden',
+                        opacity:newFolderFormOpen ? 1:0,
+                        padding: '0 10px',
+                        marginTop: 6
                     }}
                 >
-                    <MaterialUI.TextField hintText="New folder" ref="newfolder_input" style={{flex:1}}/>
-                    <MaterialUI.RaisedButton style={{marginLeft:10, marginRight:2}} label="OK" onClick={this.createNewFolder}/>
-                </MaterialUI.Paper>
+                    <TextField fullWidth={true} floatingLabelText={this.props.pydio.MessageHash[173]} ref="newfolder_input" style={{flex:1}}/>
+                    <IconButton iconClassName="mdi mdi-undo" iconStyle={{color: '#546E7A'}} tooltip={this.props.pydio.MessageHash[49]} onTouchTap={openNewFolderForm}/>
+                    <IconButton iconClassName="mdi mdi-check" iconStyle={{color: '#546E7A'}} tooltip={this.props.pydio.MessageHash[48]} onTouchTap={() => {this.createNewFolder() }}/>
+                </Paper>
+                <div style={{display:'flex',alignItems:'baseline'}}>
+                    <TextField
+                        style={{flex:1,width:'100%', marginRight: 10}}
+                        floatingLabelText={this.props.pydio.MessageHash[373]}
+                        ref="input"
+                        value={this.state.selectedNode.getPath()}
+                        disabled={false}
+                        onChange={()=>{}}
+                    />
+                    {!newFolderFormOpen &&
+                        <IconButton iconClassName="mdi mdi-folder-plus" style={{backgroundColor:'#eceff1', borderRadius: '50%'}} iconStyle={{color: '#546E7A'}} tooltip={this.props.pydio.MessageHash[154]} onTouchTap={openNewFolderForm}/>
+                    }
+                </div>
             </div>
         );
     }

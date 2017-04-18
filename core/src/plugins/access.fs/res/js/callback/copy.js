@@ -3,7 +3,6 @@ export default function (pydio) {
     const {MessageHash} = pydio;
     return function(){
         // Todo
-        // + Handle readonly rights
         // + Handle copy in same folder, move in same folder
         let selection = pydio.getUserSelection();
         const submit = function(path, wsId = null){
