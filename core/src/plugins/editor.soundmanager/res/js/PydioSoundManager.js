@@ -18,9 +18,11 @@
  * The latest code can be found at <https://pydio.com>.
  */
 
+import React, {Component} from 'react';
+import {compose} from 'redux';
 import Player from './Player';
 
-class PydioSoundManager extends React.Component {
+class PydioSoundManager extends Component {
 
     constructor(props) {
         super(props)
@@ -47,9 +49,9 @@ class PydioSoundManager extends React.Component {
     render() {
 
         return (
-            <Player rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
+            <ExtendedPlayer rich={!this.props.icon && this.props.rich} onReady={this.props.onLoad}>
                 <a type={this.state.mimeType} href={this.state.url} />
-            </Player>
+            </ExtendedPlayer>
         );
     }
 }
@@ -67,6 +69,13 @@ function s4() {
         .toString(16)
         .substring(1);
 }
+
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+
+let ExtendedPlayer = compose(
+    withMenu,
+    withErrors
+)(props => <Player {...props} />)
 
 // We need to attach the element to window else it won't be found
 window.PydioSoundManager = PydioSoundManager

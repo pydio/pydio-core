@@ -20,13 +20,32 @@
 
 import Editor from './Editor';
 
-let Viewer = (props) => {
-    return (
-        <div {...props} style={{minHeight: 120, flex: 1, padding: 0, width: "100%"}} />
-    )
-}
-
 class PydioVideo extends React.Component {
+
+    static get styles() {
+        return {
+            container: {
+                minHeight: 120,
+                flex: 1,
+                padding: 0,
+                width: "100%"
+            }
+        }
+    }
+    static get propTypes() {
+        return {
+            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+
+            preview: React.PropTypes.bool.isRequired
+        }
+    }
+
+    static get defaultProps() {
+        return {
+            preview: false
+        }
+    }
 
     constructor(props) {
         super(props)
@@ -89,28 +108,18 @@ class PydioVideo extends React.Component {
         }
 
         return (
-            <Viewer>{editor}</Viewer>
+            <Viewer style={PydioVideo.styles.container}>{editor}</Viewer>
         );
     }
 }
 
-// Define HOCs
-if (typeof PydioHOCs !== "undefined") {
-    Viewer = PydioHOCs.withActions(Viewer);
-    Viewer = PydioHOCs.withLoader(Viewer)
-    Viewer = PydioHOCs.withErrors(Viewer)
-}
+const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
-PydioVideo.propTypes = {
-    node: React.PropTypes.instanceOf(AjxpNode).isRequired,
-    pydio: React.PropTypes.instanceOf(Pydio).isRequired,
-
-    preview: React.PropTypes.bool.isRequired
-}
-
-PydioVideo.defaultProps = {
-    preview: false
-}
+let Viewer = compose(
+    withMenu,
+    withLoader,
+    withErrors
+)(props => <div {...props} />)
 
 // We need to attach the element to window else it won't be found
 window.PydioVideo = PydioVideo

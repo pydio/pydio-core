@@ -6,7 +6,7 @@ function normalizeLineEndings (str) {
 	return str.replace(/\r\n|\r/g, '\n');
 }
 
-class Editor extends React.Component {
+class CodeMirror extends React.Component {
 
     constructor(props) {
         super(props)
@@ -29,7 +29,7 @@ class Editor extends React.Component {
 
         const codeMirrorInstance = this.getCodeMirrorInstance();
 
-        const info = codeMirrorInstance.findModeByExtension(this.props.name.split('.').pop());
+        const info = codeMirrorInstance.findModeByExtension(this.props.name.split('.').pop()) || {};
 		const {mode, spec} = info;
 
 		this.codeMirror = codeMirrorInstance.fromTextArea(textareaNode);
@@ -119,7 +119,7 @@ class Editor extends React.Component {
 	}
 }
 
-Editor.propTypes = {
+CodeMirror.propTypes = {
     mode: React.PropTypes.string,
 	lineWrapping: React.PropTypes.bool,
 	lineNumbers: React.PropTypes.bool,
@@ -136,7 +136,7 @@ Editor.propTypes = {
     preserveScrollPosition: React.PropTypes.bool,
 }
 
-Editor.defaultProps = {
+CodeMirror.defaultProps = {
 	mode: '',
 	lineWrapping: false,
 	lineNumbers: false,
@@ -144,4 +144,4 @@ Editor.defaultProps = {
     preserveScrollPosition: false
 }
 
-export default Editor
+export default CodeMirror

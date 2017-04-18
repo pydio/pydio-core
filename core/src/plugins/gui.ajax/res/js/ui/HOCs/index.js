@@ -1,4 +1,4 @@
-import withActions from './actions'
+import {withMenu, withControls} from './actions'
 import withErrors from './errors'
 import withLoader from './loader'
 import PaletteModifier from './PaletteModifier'
@@ -6,12 +6,13 @@ import withContextMenu from './context-menu'
 import * as Animations from "./animations";
 
 const PydioHOCs = {
-    withActions : withActions,
-    withErrors  : withErrors,
-    withLoader  : withLoader,
-    withContextMenu: withContextMenu,
+    withMenu,
+    withControls,
+    withErrors,
+    withLoader,
+    withContextMenu,
     PaletteModifier,
-    Animations  : Animations
+    Animations
 };
 
 export {PydioHOCs as default}

@@ -42,7 +42,7 @@ const loader = (Component) => {
 
         automaticLoad() {
             // Making sure the loader disappears after a while
-            this.timeout = window.setTimeout(this.onLoad, 2000)
+            this.timeout = window.setTimeout(this.onLoad, 100)
         }
 
         cancelAutomaticLoad() {
