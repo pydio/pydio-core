@@ -270,9 +270,9 @@ class Server
             $this->catchError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception);
         } catch (\Exception $innerEx) {
             error_log(get_class($innerEx)." thrown within the exception handler!");
-            error_log("Original exception was: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine());
-            error_log("New exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile()." on line ".$innerEx->getLine()." ".$innerEx->getTraceAsString());
-            print("Error");
+            error_log("Original exception was: ".$exception->getMessage()." in ".$exception->getFile()." on line ".$exception->getLine()." TRACE: " . $exception->getTraceAsString());
+            error_log("Rethrown exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile());
+            print("Error - Please check the server error log");
         }
     }
 

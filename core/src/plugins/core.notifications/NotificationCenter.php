@@ -324,7 +324,7 @@ class NotificationCenter extends Plugin
                     $responseInterface->getBody()->write("<li data-ajxpNode='$p'>".$notif->getDescriptionShort()."</li>");
                 } else {
                     $node = $notif->getNode();
-                    if ($node == null) {
+                    if ($node === null) {
                         $this->logInfo("Warning", "Empty node stored in notification ".$notif->getAuthor()."/ ".$notif->getAction());
                         continue;
                     }
@@ -334,45 +334,46 @@ class NotificationCenter extends Plugin
                     } catch (\Exception $e) {
                         continue;
                     }
-                    $node->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
-                    $node->event_description_long = strip_tags($notif->getDescriptionLong(true));
-                    $node->event_date = StatHelper::relativeDate($notif->getDate(), $mess);
-                    $node->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
-                    $node->event_time = $notif->getDate();
-                    $node->event_type = "notification";
-                    $node->event_action = $notif->getAction();
-                    $node->event_id = $object->event_id;
-                    if ($node->getRepository() != null) {
-                        $node->repository_id = ''.$node->getRepository()->getId();
-                        if ($node->repository_id != $crtRepId && $node->getRepository()->getDisplay() != null) {
-                            $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                    $notifNode = clone $node;
+                    $notifNode->event_description = ucfirst($notif->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notif->getAuthorLabel();
+                    $notifNode->event_description_long = strip_tags($notif->getDescriptionLong(true));
+                    $notifNode->event_date = StatHelper::relativeDate($notif->getDate(), $mess);
+                    $notifNode->short_date = StatHelper::relativeDate($notif->getDate(), $mess, true);
+                    $notifNode->event_time = $notif->getDate();
+                    $notifNode->event_type = "notification";
+                    $notifNode->event_action = $notif->getAction();
+                    $notifNode->event_id = $object->event_id;
+                    if ($notifNode->getRepository() != null) {
+                        $notifNode->repository_id = ''.$notifNode->getRepository()->getId();
+                        if ($notifNode->repository_id != $crtRepId && $notifNode->getRepository()->getDisplay() != null) {
+                            $notifNode->event_repository_label = "[".$notifNode->getRepository()->getDisplay()."]";
                         }
                     }
-                    $node->event_author = $notif->getAuthor();
+                    $notifNode->event_author = $notif->getAuthor();
                     // Replace PATH, to make sure they will be distinct children of the loader node
-                    $node->real_path = $node->getPath();
-                    $node->setLabel(basename($node->getPath()));
+                    $notifNode->real_path = $notifNode->getPath();
+                    $notifNode->setLabel(basename($notifNode->getPath()));
                     if(isSet($httpVars["merge_description"]) && $httpVars["merge_description"] == "true"){
                         if(isSet($httpVars["description_as_label"]) && $httpVars["description_as_label"] == "true"){
-                            $node->setLabel($node->event_description." ".$node->event_date);
+                            $notifNode->setLabel($notifNode->event_description." ".$notifNode->event_date);
                         }else{
-                            $node->setLabel(basename($node->getPath()));
-                            $node->ajxp_description = $node->event_description .' ' . $node->event_date;
-                            //$node->setLabel(basename($node->getPath())." ".$node->event_description." ".$node->event_date);
+                            $notifNode->setLabel(basename($notifNode->getPath()));
+                            $notifNode->ajxp_description = $notifNode->event_description .' ' . $notifNode->event_date;
+                            //$notifNode->setLabel(basename($notifNode->getPath())." ".$notifNode->event_description." ".$notifNode->event_date);
                         }
                     }
                     $url = parse_url($node->getUrl());
-                    $node->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
+                    $notifNode->setUrl($url["scheme"]."://".$url["host"]."/notification_".$index);
                     $index ++;
                     if($format == "array"){
-                        $keys = $node->listMetaKeys();
+                        $keys = $notifNode->listMetaKeys();
                         $data = array();
                         foreach($keys as $k){
-                            $data[$k] = $node->$k;
+                            $data[$k] = $notifNode->$k;
                         }
                         $returnData[] = $data;
                     }else{
-                        $nodesList->addBranch($node);
+                        $nodesList->addBranch($notifNode);
                     }
                 }
             }
@@ -550,24 +551,25 @@ class NotificationCenter extends Plugin
                 if($notification->getDate() > $lastReadForListing){
                     $unReadCount ++;
                 }
-                $node->event_is_alert = true;
-                $node->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
-                $node->event_description_long = strip_tags($notification->getDescriptionLong(true));
-                $node->event_date = StatHelper::relativeDate($notification->getDate(), $mess);
-                $node->event_type = "alert";
-                $node->alert_id = $notification->alert_id;
-                $node->alert_action = $notification->getAction();
-                if ($node->getRepository() != null) {
-                    $node->repository_id = ''.$node->getRepository()->getId();
-                    if ($node->repository_id !== $repositoryFilter && $node->getRepository()->getDisplay() != null) {
-                        $node->event_repository_label = "[".$node->getRepository()->getDisplay()."]";
+                $notifNode = clone $node;
+                $notifNode->event_is_alert = true;
+                $notifNode->event_description = ucfirst($notification->getDescriptionBlock()) . " ".$mess["notification.tpl.block.user_link"] ." ". $notification->getAuthorLabel();
+                $notifNode->event_description_long = strip_tags($notification->getDescriptionLong(true));
+                $notifNode->event_date = StatHelper::relativeDate($notification->getDate(), $mess);
+                $notifNode->event_type = "alert";
+                $notifNode->alert_id = $notification->alert_id;
+                $notifNode->alert_action = $notification->getAction();
+                if ($notifNode->getRepository() != null) {
+                    $notifNode->repository_id = ''.$notifNode->getRepository()->getId();
+                    if ($notifNode->repository_id !== $repositoryFilter && $notifNode->getRepository()->getDisplay() != null) {
+                        $notifNode->event_repository_label = "[".$notifNode->getRepository()->getDisplay()."]";
                     }
                 } else {
-                    $node->event_repository_label = "[N/A]";
+                    $notifNode->event_repository_label = "[N/A]";
                 }
-                $node->event_author = $notification->getAuthor();
-                $node->event_occurence = 1;
-                $cumulated[$path] = $node;
+                $notifNode->event_author = $notification->getAuthor();
+                $notifNode->event_occurence = 1;
+                $cumulated[$path] = $notifNode;
             }
         }
         if ($format == "html") {

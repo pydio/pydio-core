@@ -335,6 +335,9 @@ class RichClient extends Plugin
             case "serve_favicon":
 
                 $image = AJXP_THEME_FOLDER."/images/html-folder.png";
+                if(!is_file($image)){
+                    $image = CLIENT_RESOURCES_FOLDER."/themes/common/images/html-folder.png";
+                }
                 $reader = new FileReaderResponse($image);
                 $reader->setHeaderType("image");
                 $responseInterface = $responseInterface->withBody($reader);
