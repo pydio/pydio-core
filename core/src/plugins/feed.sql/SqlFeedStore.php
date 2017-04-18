@@ -195,7 +195,6 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
             }
         }
         $data = array();
-        error_log(dibi::$sql);
         foreach ($res as $n => $row) {
             $object = new \stdClass();
             $object->hookname = $row->htype;
