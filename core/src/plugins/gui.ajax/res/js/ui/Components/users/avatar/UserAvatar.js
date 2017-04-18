@@ -91,11 +91,11 @@ class UserAvatar extends React.Component{
             graph: this.props.richCard ? 'true' : 'false'
         }, function(transport){
             const data = transport.responseJSON;
-            const {user, graph, error} = data;
-            if(error) {
+            if(!data || data.error){
                 this.cache.setKey(namespace, userId, {});
                 return;
             }
+            const {user, graph} = data;
 
             let avatarUrl;
             const avatarId = user.avatar || null;
