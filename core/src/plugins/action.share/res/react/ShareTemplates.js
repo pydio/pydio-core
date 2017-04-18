@@ -212,15 +212,15 @@
 
             return (
                 <div className="vertical_fit vertical_layout" style={style}>
-                    <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false}>
+                    <MaterialUI.Paper zDepth={1} className="primaryColorPaper" rounded={false} style={{zIndex:1}}>
                         {minisiteMode !== 'embed' &&
                             <div id="workspace_toolbar">
                                 <Breadcrumb {...this.props} rootStyle={{padding: 8}}/>
                             </div>
                         }
                         <div id="main_toolbar" style={{display:'flex', padding: '0 8px'}}>
-                            <ButtonMenu {...this.props} id="create-button-menu" toolbars={["mfb"]} buttonTitle="New..." raised={true} primary={true} controller={this.props.pydio.Controller}/>
-                            <Toolbar {...this.props} id="main-toolbar" toolbars={["change_main"]} groupOtherList={["more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
+                            <ButtonMenu {...this.props} id="create-button-menu" toolbars={["upload", "create"]} buttonTitle="New..." raised={true} secondary={true} controller={this.props.pydio.Controller}/>
+                            <Toolbar {...this.props} id="main-toolbar" toolbars={["info_panel"]} groupOtherList={["change_main", "more", "change", "remote"]} renderingType="button" buttonStyle={styles.buttonsStyle}/>
                             <div style={{flex:1}}></div>
                             <ListPaginator id="paginator-toolbar" dataModel={this.props.pydio.getContextHolder()} toolbarDisplay={true}/>
                             <Toolbar {...this.props} id="display-toolbar" toolbars={["display_toolbar"]} renderingType="icon-font" buttonStyle={styles.iconButtonsStyle}/>
@@ -253,6 +253,48 @@
 
     });
 
+    const InlineEditor = React.createClass({
+
+        getInitialState: function(){
+            return {node: this.props.node};
+        },
+
+        componentDidMount: function(){
+            this.props.pydio.UI.registerEditorOpener(this);
+        },
+
+        componentWillUnmount: function(){
+            this.props.pydio.UI.unregisterEditorOpener(this);
+        },
+
+        openEditorForNode: function(node, editorData){
+            this.setState({node, editorData});
+        },
+
+        _getEditorData: function(node) {
+            const {pydio} = this.props;
+            const selectedMime = PathUtils.getAjxpMimeType(node);
+            const editors = pydio.Registry.findEditorsForMime(selectedMime, false);
+            if (editors.length && editors[0].openable){
+                return editors[0];
+            }
+        },
+
+        render: function(){
+            const {pydio} = this.props;
+            const {node, editorData} = this.state;
+            return (
+                <ReactEditorOpener
+                    pydio={pydio}
+                    node={node}
+                    registry={pydio.Registry}
+                    editorData={editorData || this._getEditorData(node)}
+                />
+            );
+        }
+
+    });
+
     const FileMinisite = React.createClass({
 
         mixins: [UniqueNodeTemplateMixin],
@@ -277,11 +319,9 @@
             if(node){
                 content = (
                     <div className="editor_container vertical_layout vertical_fit" style={{backgroundColor:'white'}}>
-                        <ReactEditorOpener
+                        <InlineEditor
                             pydio={this.props.pydio}
                             node={node}
-                            registry={this.props.pydio.Registry}
-                            editorData={this._getEditorData(node)}
                         />
                     </div>
                 );
@@ -333,11 +373,9 @@
             let editor;
             if(node){
                 editor = (
-                    <ReactEditorOpener
+                    <InlineEditor
                         pydio={this.props.pydio}
                         node={node}
-                        registry={this.props.pydio.Registry}
-                        closeEditorContainer={function(){return false;}}
                     />
                 );
             }else{

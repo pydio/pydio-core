@@ -207,7 +207,7 @@
             let actions = null
 
             if(this.state && this.state.error) {
-                error = "No GPS data found"
+                errorString = "No GPS data found"
             } else {
                 actions = [
                     <div>{this.props.pydio.MessageHash['openlayer.3']}: <span ref="location"/></div>
