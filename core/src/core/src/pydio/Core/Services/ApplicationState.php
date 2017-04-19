@@ -53,6 +53,11 @@ class ApplicationState
     private static $isAdminMode = false;
 
     /**
+     * @var bool
+     */
+    public static $silenceInstantMessages = false;
+
+    /**
      * @param string $restBase
      */
     public static function setSapiRestBase($restBase){

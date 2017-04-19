@@ -332,6 +332,7 @@ class ShareRightsManager
             if(strpos($rId, "AJXP_USR_/") === 0){
                 $userId = substr($rId, strlen('AJXP_USR_/'));
                 $role = RolesService::getRole($rId);
+                if(!UsersService::userExists($userId)) continue;
                 $userObject = UsersService::getUserById($userId);
                 $LABEL = $role->filterParameterValue("core.conf", "USER_DISPLAY_NAME", AJXP_REPO_SCOPE_ALL, "");
                 $AVATAR = $role->filterParameterValue("core.conf", "avatar", AJXP_REPO_SCOPE_ALL, "");

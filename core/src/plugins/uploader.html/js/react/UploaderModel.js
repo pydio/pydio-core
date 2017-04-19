@@ -195,7 +195,7 @@
             let configs = this.getMqConfigs();
             var secure = configs.get("BOOSTER_MAIN_SECURE");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE']){
-                secure = this.configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
+                secure = configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_SECURE'];
             }
             var host = configs.get("BOOSTER_MAIN_HOST");
             if(configs.get("BOOSTER_UPLOAD_ADVANCED") && configs.get("BOOSTER_UPLOAD_ADVANCED")['booster_upload_advanced'] === 'custom' && configs.get("BOOSTER_UPLOAD_ADVANCED")['UPLOAD_HOST']){
