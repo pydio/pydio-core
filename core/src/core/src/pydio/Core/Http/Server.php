@@ -22,8 +22,10 @@ namespace Pydio\Core\Http;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Pydio\Core\Exception\LoggingException;
 use Pydio\Core\Exception\PydioException;
 
+use Pydio\Core\Exception\ResponseEmissionException;
 use Pydio\Core\Http\Message\UserMessage;
 use Pydio\Core\Http\Middleware\ITopLevelMiddleware;
 use Pydio\Core\Http\Middleware\SapiMiddleware;
@@ -229,7 +231,11 @@ class Server
         if(error_reporting() == 0) {
             return ;
         }
-        Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
+        try{
+            Logger::error(basename($fichier), "error l.$ligne", array("message" => $message));
+        }catch(\Exception $e){
+            throw new LoggingException($e);
+        }
         if(AJXP_SERVER_DEBUG){
             if($context instanceof  \Exception){
                 $message .= $context->getTraceAsString();
@@ -245,8 +251,12 @@ class Server
         }
         $resp = $resp->withBody($x);
         $x->addChunk(new UserMessage($message, LOG_LEVEL_ERROR));
-        $this->topMiddleware->emitResponse($req, $resp);
-        
+        try{
+            $this->topMiddleware->emitResponse($req, $resp);
+        }catch(\Exception $e1){
+            throw new ResponseEmissionException();
+        }
+
     }
 
     /**
@@ -262,17 +272,26 @@ class Server
             $x = new SerializableResponseStream();
             $resp = $resp->withBody($x);
             $x->addChunk($exception);
-            $this->topMiddleware->emitResponse($req, $resp);
+            try{
+                $this->topMiddleware->emitResponse($req, $resp);
+            }catch(\Exception $innerEx){
+                error_log("Exception thrown while trying to emit a SerizaliableResponseChunk exception!");
+            }
             return;
         }
 
         try {
             $this->catchError($exception->getCode(), $exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception);
-        } catch (\Exception $innerEx) {
-            error_log(get_class($innerEx)." thrown within the exception handler!");
-            error_log("Original exception was: ".$exception->getMessage()." in ".$exception->getFile()." on line ".$exception->getLine()." TRACE: " . $exception->getTraceAsString());
-            error_log("Rethrown exception is: ".$innerEx->getMessage()." in ".$innerEx->getFile());
-            print("Error - Please check the server error log");
+        } catch (ResponseEmissionException $responseEx){
+            // Could not send the response, probably because response was already sent. Just log the error, do not try to append content!
+            error_log("Exception was caught but could not be sent: ".$exception->getMessage());
+            error_log(" ===> Exception details : ".$exception->getFile()." on line ".$exception->getLine(). " ".$exception->getTraceAsString());
+
+        } catch (LoggingException $innerEx) {
+            error_log($innerEx->getMessage());
+            error_log("Exception was caught but could not be logged properly: ".$exception->getMessage()." in ".$exception->getFile()." on line ".$exception->getLine());
+            error_log(" ===> Exception details : ".$exception->getFile()." on line ".$exception->getLine(). " ".$exception->getTraceAsString());
+            print("Blocking error encountered, please check the server logs: '" . $exception->getMessage()."'");
         }
     }
 

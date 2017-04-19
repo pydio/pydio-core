@@ -38,7 +38,6 @@
             <serverCallback methodName="cacheNodeInfo" hookName="node.info.end"/>
             <serverCallback methodName="clearNodeInfoCache" hookName="node.change" defer="true"/>
             <serverCallback methodName="clearNodeInfoCache" hookName="node.meta_change" defer="true"/>
-            <serverCallback methodName="clearNodeInfoCache" hookName="node.clear_cache_deferred" defer="true"/>
             <serverCallback methodName="onWorkspaceUpdate" hookName="workspace.after_update" defer="true"/>
             <serverCallback methodName="onWorkspaceDelete" hookName="workspace.after_delete" defer="true"/>
         </hooks>

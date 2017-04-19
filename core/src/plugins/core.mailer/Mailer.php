@@ -208,6 +208,7 @@ class Mailer extends Plugin implements SqlTableProvider
         }
 
         $logInfo("Processing " . $numRows . " rows.");
+        $digestDisplayLinks = $this->getContextualOption($ctx, "DIGEST_DISPLAY_LINKS");
 
         $i = 0;
         // We need to send one email :
@@ -279,7 +280,7 @@ class Mailer extends Plugin implements SqlTableProvider
             $i = 0;
             foreach ($recipients as $recipient => $workspaces) {
                 $logInfo("Processing " . ++$i . " out of " . count($recipients) . " " . $emailType . " emails " . $recipient);
-                $body = $this->_buildDigest($workspaces, $emailType);
+                $body = $this->_buildDigest($workspaces, $emailType, $digestDisplayLinks);
                 $success++;
                 try {
                     $mailer->sendMail(
@@ -319,9 +320,10 @@ class Mailer extends Plugin implements SqlTableProvider
     /**
      * @param $workspaces
      * @param $emailType
+     * @param bool $displayLinks
      * @return string
      */
-    private function _buildDigest($workspaces, $emailType) {
+    private function _buildDigest($workspaces, $emailType, $displayLinks = false) {
 
         $template = self::$TEMPLATES[$emailType];
 
@@ -341,7 +343,7 @@ class Mailer extends Plugin implements SqlTableProvider
                         $title = sprintf($template["title"], $notification->getDescriptionLocation());
                     }
 
-                    $description = $notification->getDescriptionLong(true);
+                    $description = $notification->getDescriptionLong(!$displayLinks);
 
                     if(array_key_exists($description, $descriptions)) {
                         $descriptions[$description]++;

@@ -352,10 +352,23 @@ class WatchRegister extends AbstractMetaSource
                     }
                 }else{
                     // Make sure the user is still authorized on this node, otherwise remove it.
+                    $clear = false;
                     $uObject = UsersService::getUserById($id, false);
                     $acl = $uObject->getMergedRole()->getAcl($node->getRepositoryId());
-                    $isOwner = ($node->getRepository()->getOwner() == $uObject->getId());
-                    if(!$isOwner && (empty($acl) || strpos($acl, "r") === FALSE)){
+                    $isOwner = ($node->getRepository()->getOwner() === $uObject->getId());
+                    if((empty($acl) || strpos($acl, "r") === FALSE) && !$isOwner){
+                        // Maybe another user has registered a watch because link is "publicly" visible, check parent acl
+                        $isPublic = $node->getRepository()->getSafeOption("SHARE_ACCESS") === 'public';
+                        if($isPublic){
+                            $acl = $uObject->getMergedRole()->getAcl($node->getRepository()->getParentId());
+                            if(empty($acl) || strpos($acl, "r") === FALSE){
+                                $clear = true;
+                            }
+                        }else{
+                            $clear = true;
+                        }
+                    }
+                    if($clear){
                         unset($IDS[$index]);
                         if(is_array($watchMeta)){
                             $changes = true;

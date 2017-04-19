@@ -236,7 +236,7 @@ class RolesManager extends AbstractManager
                         if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
                         continue;
                     }else if(empty($userObject) && (
-                            (empty($currentMainUser) && !$currentMainUser->canAdministrate($repositoryObject)) || $repositoryObject->isTemplate()
+                            (!empty($currentMainUser) && !$currentMainUser->canSee($repositoryObject)) || $repositoryObject->isTemplate()
                         )){
                         if(isSet($sharedRepos[$repositoryId])) unset($sharedRepos[$repositoryId]);
                         continue;

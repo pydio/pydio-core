@@ -317,6 +317,9 @@ class SqlFeedStore extends Plugin implements IFeedStore, SqlTableProvider
                 return;
             }
             $url = $startEventNotif->getNode()->getUrl();
+            if($url !== $startEventRow->index_path){
+                $url = $startEventRow->index_path;
+            }
             $date = $startEventRow->edate;
             $newRes = dibi::query("SELECT [id] FROM [ajxp_feed] WHERE [etype] = %s AND ([user_id] = %s OR [user_group] = %s) AND [edate] <= %s AND [index_path] = %s ORDER BY [edate] DESC %lmt", "alert", $userId, $userGroup, $date, $url, $occurrences);
             $a = $newRes->fetchPairs();
