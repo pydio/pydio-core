@@ -50,12 +50,12 @@ class ApplicationState
     /**
      * @var bool
      */
-    private static $isAdminMode = false;
+    public static $silenceInstantMessages = false;
 
     /**
      * @var bool
      */
-    public static $silenceInstantMessages = false;
+    private static $isAdminMode = false;
 
     /**
      * @param string $restBase

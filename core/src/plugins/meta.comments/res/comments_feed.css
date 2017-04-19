@@ -4,7 +4,6 @@
 .comments_feed div.date {
   color: rgba(0, 0, 0, 0.23);
   text-align: center;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   margin: 5px 0;
@@ -13,20 +12,17 @@
 .comments_feed div.date:after {
   content: ' -------- ';
   display: block;
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
 }
 .comments_feed div.comment-line {
   padding: 8px;
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 .comments_feed div.comment-line div.content {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   margin-left: 8px;
   position: relative;
 }

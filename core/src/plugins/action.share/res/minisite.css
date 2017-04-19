@@ -1,10 +1,8 @@
 #ajxp_unique_dl {
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  -ms-flex-pack: center;
+      justify-content: center;
 }
 #ajxp_unique_dl .download-block {
   cursor: pointer;
@@ -53,23 +51,20 @@
   color: rgba(0, 0, 0, 0.43);
 }
 #ajxp_unique_dl .download-block div.dl-details .row {
-  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
 }
 #ajxp_unique_dl .download-block div.dl-details .row .label {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   text-align: right;
   padding-right: 6px;
   color: rgba(0, 0, 0, 0.43);
   font-weight: 500;
 }
 #ajxp_unique_dl .download-block div.dl-details .row .value {
-  -webkit-flex: 1;
-      -ms-flex: 1;
-          flex: 1;
+  -ms-flex: 1;
+      flex: 1;
   text-align: left;
   color: rgba(0, 0, 0, 0.73);
 }
