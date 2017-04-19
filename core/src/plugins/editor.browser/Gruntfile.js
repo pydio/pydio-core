@@ -12,8 +12,8 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build/PydioBrowserEditor',
-                        ext: '.js'
+                        dest: 'res/build',
+                        ext: '.babel.js'
                     }
                 ]
             }
@@ -23,12 +23,12 @@ module.exports = function(grunt) {
                 options: {
                     external:Externals,
                     browserifyOptions:{
-                        standalone: 'ShareDialog',
                         debug:true
                     }
                 },
                 files: {
-                    'res/build/PydioBrowserEditor.js':'res/build/PydioBrowserEditor/*.js'
+                    'res/build/PydioBrowserEditor.js':'res/build/PydioBrowserEditor.babel.js',
+                    'res/build/PydioBrowserActions.js':'res/build/PydioBrowserActions.babel.js'
                 }
             }
         },

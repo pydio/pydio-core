@@ -14,6 +14,7 @@
     <client_settings>
         <resources>
             <js file="plugins/editor.browser/res/build/PydioBrowserEditor.js" className="PydioBrowserEditor"/>
+            <js file="plugins/editor.browser/res/build/PydioBrowserActions.js" className="PydioBrowserActions"/>
             <i18n namespace="openbrowser" path="plugins/editor.browser/res/i18n" />
             <img_library alias="openbrowser_images" path="plugins/editor.browser/res/images" />
         </resources>
@@ -44,7 +45,9 @@
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
+                    <clientCallback module="PydioBrowserActions.Callbacks.createLink"/>
+                    <!--
+                    <clientCallback><![CDATA[
                     modal.showDialogForm('Create', 'mklink_form', null, function(){
 
                         var oForm = modal.getForm();
@@ -63,6 +66,7 @@
                         <input type="text" id="filename" style="width:390px;" name="filename" value="">
                     </div>
                 ]]></clientForm>
+                -->
                 </processing>
             </action>
     	</actions>
