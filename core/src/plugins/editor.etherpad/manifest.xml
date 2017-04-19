@@ -5,7 +5,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
 	<client_settings>
         <resources>
-            <js file="plugins/editor.etherpad/class.EtherpadLauncher.js" className="EtherpadLauncher"/>
+            <js file="plugins/editor.etherpad/res/build/PydioEtherpad.js" className="PydioEtherpad"/>
             <i18n path="plugins/editor.etherpad/i18n" namespace="etherpad"/>
             <img_library alias="etherpad" path="plugins/editor.etherpad"/>
         </resources>
@@ -77,35 +77,13 @@
                 </processing>
             </action>
             <action name="mkpad">
-                <gui text="etherpad.1" title="etherpad.1b" src="filenew.png" accessKey="file_access_key" iconClass="icon-file-alt" hasAccessKey="false">
+                <gui text="etherpad.1" title="etherpad.1b" accessKey="file_access_key" iconClass="mdi mdi-message-draw" hasAccessKey="false">
                     <context selection="false" dir="true" recycle="hidden" actionBar="false"
                              contextMenu="false" infoPanel="false" actionBarGroup="create" inZip="false"/>
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                    modal.showDialogForm('Create', 'mkpad_form', null, function(){
-                        var oForm = modal.getForm();
-                        oForm.down("#filename").setValue(oForm.down("#filename").getValue()+ '.pad');
-                        var d = new Date().getTime();
-                        var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                            var r = (d + Math.random()*16)%16 | 0;
-                            d = Math.floor(d/16);
-                            return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-                        });
-                        oForm.down("#content").setValue(uuid);
-                        PydioApi.getClient().submitForm(oForm);
-                        hideLightBox(true);
-                        return false;
-                    });
-                ]]></clientCallback>
-                    <clientForm id="mkpad_form"><![CDATA[
-                    <div id="mkpad_form" action="mkfile">
-                        <div class="dialogLegend" ajxp_message_id="etherpad.8">AJXP_MESSAGE[etherpad.8]</div>
-                        <input type="text" id="filename" style="width:390px;" name="filename" value="">
-                        <input type="hidden" id="content" name="content" value="">
-                    </div>
-                ]]></clientForm>
+                    <clientCallback module="PydioEtherpad.Actions.makePad"/>
                 </processing>
             </action>
         </actions>
