@@ -1374,8 +1374,7 @@ abstract class AbstractConfDriver extends Plugin
                         readfile($file);
                     }
                 } else if (isSet($httpVars["binary_id"])) {
-                    if (isSet($httpVars["user_id"]) && $loggedUser != null
-                        && ( $loggedUser->getId() == $httpVars["user_id"] || $loggedUser->isAdmin() )) {
+                    if (isSet($httpVars["user_id"])) {
                         $context = ["USER" => InputFilter::sanitize($httpVars["user_id"], InputFilter::SANITIZE_EMAILCHARS)];
                     } else if($loggedUser !== null) {
                         $context = ["USER" => $loggedUser->getId()];
