@@ -74,7 +74,7 @@ define("ADMIN_PASSWORD", "admin");
 // define("AJXP_FORCE_LOGPATH", "/var/log/ajaxplorer/");
 
 // DEBUG OPTIONS
-define("AJXP_CLIENT_DEBUG"  ,	true);
+define("AJXP_CLIENT_DEBUG"  ,	false);
 define("AJXP_SERVER_DEBUG"  ,	false);
 define("AJXP_SKIP_CACHE"    ,   false);
 
