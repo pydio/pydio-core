@@ -430,8 +430,9 @@ $mess=array(
 "372" => "Current Workspace",
 "373" => "Destination",
 "374" => "You cannot copy folders across workspaces",
-"375" => "Warning, you were inactive since more than __IDLE__, you will be logged out in __LOGOUT__",
-"376" => "Click anywhere to reactivate",
+"375t" => "Are you still there?",
+"375" => "We have detected that you were inactive since more than __IDLE__. For the safety of your data you will be logged out in __LOGOUT__",
+"376" => "Click anywhere to resume your session",
 "378" => "Warning, password is empty or too short!",
 /* password strength tester */
 "379" => "Unsafe word!",

@@ -24,6 +24,7 @@ const
     PassUtils = require('./util/PassUtils'),
     PathUtils = require('./util/PathUtils'),
     PeriodicalExecuter = require('./util/PeriodicalExecuter'),
+    ActivityMonitor = require('./util/ActivityMonitor'),
     XMLUtils = require('./util/XMLUtils'),
     Pydio = require('./Pydio');
 
@@ -59,6 +60,7 @@ const namespace = {
     PassUtils,
     PathUtils,
     PeriodicalExecuter,
+    ActivityMonitor,
     XMLUtils,
     Pydio
 };

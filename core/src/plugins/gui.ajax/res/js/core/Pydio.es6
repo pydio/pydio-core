@@ -1,4 +1,16 @@
 import Observable from './lang/Observable'
+import Logger from './lang/Logger'
+import PydioApi from './http/PydioApi'
+import Registry from './model/Registry'
+import AjxpNode from './model/AjxpNode'
+import PydioDataModel from './model/PydioDataModel'
+import RemoteNodeProvider from './model/RemoteNodeProvider'
+import Repository from './model/Repository'
+import Controller from './model/Controller'
+import XMLUtils from './util/XMLUtils'
+import PathUtils from './util/PathUtils'
+import LangUtils from './util/LangUtils'
+import ActivityMonitor from './util/ActivityMonitor'
 
 class Pydio extends Observable{
 
@@ -16,10 +28,12 @@ class Pydio extends Observable{
         if(this.Parameters.has("customWording")){
             this.appTitle = this.Parameters.get("customWording").title || "Pydio";
         }
+        this.user = null;
         this.MessageHash = {};
         if(window.MessageHash) this.MessageHash = window.MessageHash;
         this.ApiClient = PydioApi.getClient();
         this.ApiClient.setPydioObject(this);
+        this.ActivityMonitor = new ActivityMonitor(this);
         this.Registry = new Registry(this);
         this._rootNode = new AjxpNode("/", "Root");
         this._dataModel = this._contextHolder = new PydioDataModel(false);
@@ -34,6 +48,33 @@ class Pydio extends Observable{
     }
 
     /**
+     *
+     * @param {User|null} userObject
+     */
+    updateUser(userObject, skipEvent = false){
+        this.user = userObject;
+        if(!skipEvent){
+            this.notify('user_logged', userObject);
+        }
+    }
+
+    /**
+     *
+     * @returns {null|User}
+     */
+    getUser(){
+        return this.user;
+    }
+
+    refreshUserData(){
+        this.observeOnce("registry_part_loaded", (event) => {
+            if(event !== "user/preferences") return;
+            this.updateUser(this.Registry.parseUser(), false);
+        });
+        this.Registry.load("user/preferences");
+    }
+
+    /**
      * Real initialisation sequence. Will Trigger the whole GUI building.
      * Event ajaxplorer:loaded is fired at the end.
      */
@@ -45,16 +86,14 @@ class Pydio extends Observable{
             return;
         }
 
-        let modal = this.UI && this.UI.modal ? this.UI.modal : (window.modal ? window.modal : null);
-
-        this.observe("registry_loaded", function(){
+        this.observe("registry_loaded", () => {
 
             this.Registry.refreshExtensionsRegistry();
-            this.Registry.logXmlUser(false);
+            this.updateUser(this.Registry.parseUser(), false);
             if(this.user){
-                var repId = this.user.getActiveRepository();
-                var repList = this.user.getRepositoriesList();
-                var repositoryObject = repList.get(repId);
+                const repId = this.user.getActiveRepository();
+                const repList = this.user.getRepositoriesList();
+                const repositoryObject = repList.get(repId);
                 if(repositoryObject) repositoryObject.loadResources();
             }
             if(this.UI.guiLoaded) {
@@ -62,63 +101,59 @@ class Pydio extends Observable{
                 this.Registry.refreshExtensionsRegistry();
                 this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
             } else {
-                this.observe("gui_loaded", function(){
+                this.observe("gui_loaded", () => {
                     this.UI.refreshTemplateParts();
                     this.Registry.refreshExtensionsRegistry();
                     this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
-                }.bind(this));
+                });
             }
             this.loadActiveRepository();
             if(this.Parameters.has("USER_GUI_ACTION")){
-                var a= this.Parameters.get("USER_GUI_ACTION");
+                const a = this.Parameters.get("USER_GUI_ACTION");
                 this.Parameters.delete("USER_GUI_ACTION");
-                var aBar = this.Controller;
-                window.setTimeout(function(){
-                    aBar.fireAction(a);
+                setTimeout(() => {
+                    this.Controller.fireAction(a);
                 }, 1000);
             }
-        }.bind(this));
 
-        if(modal) modal.setLoadingStepCounts(window.useReactPydioUI ? 1 : 5);
+        });
 
-        var starterFunc = function(){
+        const starterFunc = function(){
 
-            ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], function(){
-
-                this.UI = new PydioReactUI.Builder(this);
+            ResourcesManager.loadClassesAndApply(["React", "PydioReactUI"], () => {
+                this.UI = new window.PydioReactUI.Builder(this);
                 this.UI.initTemplates();
-
                 if(!this.user) {
                     PydioApi.getClient().tryToLogUserFromRememberData();
                 }
                 this.fire("registry_loaded", this.Registry.getXML());
-
-                window.setTimeout(function(){
-                    this.fire('loaded');
-                }.bind(this), 200);
-
-            }.bind(this));
+                setTimeout(() => { this.fire('loaded'); }, 200);
+            });
 
         }.bind(this);
 
 
         if(this.Parameters.get("PRELOADED_REGISTRY")){
+
             this.Registry.loadFromString(this.Parameters.get("PRELOADED_REGISTRY"));
             this.Parameters.delete("PRELOADED_REGISTRY");
-            if(modal) modal.updateLoadingProgress('XML Registry loaded');
             starterFunc();
+
         }else{
+
             this.loadXmlRegistry(false, null, starterFunc);
+
         }
-        this.observe("server_message", function(xml){
-            var reload = XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload");
+
+        this.observe("server_message", (xml) => {
+            const reload = XMLUtils.XPathSelectSingleNode(xml, "tree/require_registry_reload");
             if(reload){
                 if(reload.getAttribute("repositoryId") != this.repositoryId){
                     this.loadXmlRegistry(false, null, null, reload.getAttribute("repositoryId"));
                     this.repositoryId = null;
                 }
             }
-        }.bind(this));
+        });
     }
 
     /**
@@ -127,8 +162,8 @@ class Pydio extends Observable{
      * @param sync Boolean Whether to send synchronously or not.
      * @param xPath String An XPath to load only a subpart of the registry
      */
-    loadXmlRegistry (sync, xPath=null, completeFunc=null, targetRepositoryId=null){
-        this.Registry.load(sync, xPath, completeFunc, (targetRepositoryId === null ? Math.random() : targetRepositoryId));
+    loadXmlRegistry (sync, xPath = null, completeFunc = null, targetRepositoryId = null){
+        this.Registry.load(xPath, completeFunc, (targetRepositoryId === null ? Math.random() : targetRepositoryId));
     }
 
     /**
@@ -143,38 +178,47 @@ class Pydio extends Observable{
      * Find the current repository (from the current user) and load it.
      */
     loadActiveRepository (){
-        var repositoryObject = new Repository(null);
-        if(this.user != null)
-        {
-            var repId = this.user.getActiveRepository();
-            var repList = this.user.getRepositoriesList();
-            repositoryObject = repList.get(repId);
-            if(!repositoryObject){
-                if(this.user.lock){
-                    this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
-                    let lock = this.user.lock.split(",").shift();
-                    window.setTimeout(function(){
-                        this.Controller.fireAction(lock);
-                    }.bind(this), 50);
-                    return;
-                }
+
+        let repositoryObject = new Repository(null);
+        if(this.user === null){
+            this.loadRepository(repositoryObject);
+            this.fire("repository_list_refreshed", {list:false,active:false});
+            return;
+        }
+
+        const repId         = this.user.getActiveRepository();
+        const repList       = this.user.getRepositoriesList();
+        repositoryObject    = repList.get(repId);
+
+        if(!repositoryObject){
+            if(this.user.lock){
+                this.Controller.loadActionsFromRegistry(this.getXmlRegistry());
+                let lock = this.user.lock.split(",").shift();
+                window.setTimeout(() => {
+                    this.Controller.fireAction(lock);
+                }, 50);
+            }else{
                 alert("No active repository found for user!");
             }
-            if(this.user.getPreference("pending_folder") && this.user.getPreference("pending_folder") != "-1"){
-                this._initLoadRep = this.user.getPreference("pending_folder");
-                this.user.setPreference("pending_folder", "-1");
-                this.user.savePreference("pending_folder");
-            }else if(this.user.getPreference("ls_history", true)){
-                var data = this.user.getPreference("ls_history", true);
-                this._initLoadRep = data[repId];
-            }
+            return;
         }
+
+        if(this.user.getPreference("pending_folder") && this.user.getPreference("pending_folder") != "-1"){
+
+            this._initLoadRep = this.user.getPreference("pending_folder");
+            this.user.setPreference("pending_folder", "-1");
+            this.user.savePreference("pending_folder");
+
+        }else if(this.user.getPreference("ls_history", true)){
+
+            const data = this.user.getPreference("ls_history", true);
+            this._initLoadRep = data[repId];
+
+        }
+
         this.loadRepository(repositoryObject);
-        if(repList && repId){
-            this.fire("repository_list_refreshed", {list:repList,active:repId});
-        }else{
-            this.fire("repository_list_refreshed", {list:false,active:false});
-        }
+        this.fire("repository_list_refreshed", {list:repList,active:repId});
+
     }
 
     /**
@@ -182,13 +226,14 @@ class Pydio extends Observable{
      */
     reloadRepositoriesList (){
         if(!this.user) return;
-        this.observeOnce("registry_part_loaded", function(data){
+        this.observeOnce("registry_part_loaded", (data) => {
             if(data != "user/repositories") return;
-            this.Registry.logXmlUser(true);
+            this.updateUser(this.Registry.parseUser());
             this.fire("repository_list_refreshed", {
                 list:this.user.getRepositoriesList(),
-                active:this.user.getActiveRepository()});
-        }.bind(this));
+                active:this.user.getActiveRepository()
+            });
+        });
         this.loadXmlRegistry(false, "user/repositories");
     }
 
@@ -205,15 +250,15 @@ class Pydio extends Observable{
         if(repository == null) return;
 
         repository.loadResources();
-        var repositoryId = repository.getId();
-        var	newIcon = repository.getIcon();
+        const repositoryId = repository.getId();
+        const newIcon = repository.getIcon();
 
         this.skipLsHistory = true;
 
-        var providerDef = repository.getNodeProviderDef();
-        var rootNode;
+        const providerDef = repository.getNodeProviderDef();
+        let rootNode;
         if(providerDef != null){
-            var provider = eval('new '+providerDef.name+'()');
+            let provider = eval('new '+providerDef.name+'()');
             if(providerDef.options){
                 provider.initProvider(providerDef.options);
             }
@@ -232,7 +277,7 @@ class Pydio extends Observable{
 
         if(this._initLoadRep){
             if(this._initLoadRep != "" && this._initLoadRep != "/"){
-                var copy = this._initLoadRep.valueOf();
+                const copy = this._initLoadRep.valueOf();
                 this._initLoadRep = null;
                 rootNode.observeOnce("first_load", function(){
                     setTimeout(function(){
@@ -255,7 +300,7 @@ class Pydio extends Observable{
      * @param nodeOrPath AjxpNode|String A node or a path
      */
     goTo(nodeOrPath){
-        var path;
+        let path;
         if(typeof(nodeOrPath) == "string"){
             path = nodeOrPath;
         }else{
@@ -271,11 +316,11 @@ class Pydio extends Observable{
             }
         }
 
-        var current = this._contextHolder.getContextNode();
+        const current = this._contextHolder.getContextNode();
         if(current && current.getPath() == path){
             return;
         }
-        var gotoNode;
+        let gotoNode;
         if(path === "" || path === "/") {
             this._contextHolder.requireContextChange(this._contextHolder.getRootNode());
             return;
@@ -306,7 +351,7 @@ class Pydio extends Observable{
      */
     triggerRepositoryChange(repositoryId, callback){
         this.fire("trigger_repository_switch");
-        var onComplete = function(transport){
+        const onComplete = (transport) => {
             if(transport.responseXML){
                 this.ApiClient.parseXmlMessage(transport.responseXML);
             }
@@ -314,9 +359,9 @@ class Pydio extends Observable{
             this.repositoryId = null;
 
             if (typeof callback == "function") callback()
-        }.bind(this);
+        };
 
-        var root = this._contextHolder.getRootNode();
+        const root = this._contextHolder.getRootNode();
         if(root){
             this.skipLsHistory = true;
             root.clear();
@@ -347,7 +392,7 @@ class Pydio extends Observable{
                 if(window && window.MessageHash) {
                     window.MessageHash = this.MessageHash;
                 }
-                for(var key in this.MessageHash){
+                for(let key in this.MessageHash){
                     if(this.MessageHash.hasOwnProperty(key)){
                         this.MessageHash[key] = this.MessageHash[key].replace("\\n", "\n");
                     }
@@ -375,10 +420,10 @@ class Pydio extends Observable{
      * @param message String the message
      */
     displayMessage(messageType, message){
-        var urls = LangUtils.parseUrl(message);
+        const urls = LangUtils.parseUrl(message);
         if(urls.length && this.user && this.user.repositories){
             urls.forEach(function(match){
-                var repo = this.user.repositories.get(match.host);
+                const repo = this.user.repositories.get(match.host);
                 if(!repo) return;
                 message = message.replace(match.url, repo.label+":" + match.path + match.file);
             }.bind(this));

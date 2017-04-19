@@ -33,11 +33,21 @@ export default class Registry{
         this._stateLoading = false;
     }
 
+    /**
+     * Parse XML String directly
+     * @param s
+     */
     loadFromString(s){
         this._registry = XMLUtils.parseXml(s).documentElement;
     }
 
-    load(sync, xPath, completeFunc, repositoryId){
+    /**
+     * Load registry from server
+     * @param xPath
+     * @param completeFunc
+     * @param repositoryId
+     */
+    load(xPath = null, completeFunc = null, repositoryId = null){
         if(this._stateLoading){
             return;
         }
@@ -47,8 +57,7 @@ export default class Registry{
             if(transport.responseXML == null || transport.responseXML.documentElement == null) return;
             if(transport.responseXML.documentElement.nodeName == "ajxp_registry"){
                 this._registry = transport.responseXML.documentElement;
-                //modal.updateLoadingProgress('XML Registry loaded');
-                if(!sync &&  !completeFunc) {
+                if(!completeFunc) {
                     this._pydioObject.fire("registry_loaded", this._registry);
                 }
             }else if(transport.responseXML.documentElement.nodeName == "ajxp_registry_part"){
@@ -63,10 +72,7 @@ export default class Registry{
         if(repositoryId){
             params['ws_id'] = repositoryId; // for caching only
         }
-        PydioApi.getClient().request(params, onComplete, null, {
-            async:!sync,
-            method:'get'
-        });
+        PydioApi.getClient().request(params, onComplete, null, {method:'get'});
     }
 
     /**
@@ -100,11 +106,9 @@ export default class Registry{
 
     /**
      * Translate the XML answer to a new User object
-     * @param skipEvent Boolean Whether to skip the sending of ajaxplorer:user_logged event.
      */
-    logXmlUser(skipEvent){
-        this._pydioObject.user = null;
-        let userNode;
+    parseUser(){
+        let user = null, userNode;
         if(this._registry){
             userNode = XMLUtils.XPathSelectSingleNode(this._registry, "user");
         }
@@ -112,14 +116,16 @@ export default class Registry{
             const userId = userNode.getAttribute('id');
             const children = userNode.childNodes;
             if(userId){
-                this._pydioObject.user = new User(userId, children);
+                user = new User(userId, children);
             }
         }
-        if(!skipEvent){
-            this._pydioObject.fire("user_logged", this._pydioObject.user);
-        }
+        return user;
     }
 
+    /**
+     *
+     * @returns {Element|*|null}
+     */
     getXML(){
         return this._registry;
     }
@@ -127,7 +133,7 @@ export default class Registry{
     /**
      * Find Extension initialisation nodes (activeCondition, onInit, etc), parses
      * the XML and execute JS.
-     * @param xmlNode DOMNode The extension node
+     * @param xmlNode {Element} The extension node
      * @param extensionDefinition Object Information already collected about this extension
      * @returns Boolean
      */

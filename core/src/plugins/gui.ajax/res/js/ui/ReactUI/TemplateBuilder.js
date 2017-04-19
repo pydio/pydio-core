@@ -8,8 +8,16 @@ const originStyles = {opacity: 0}
 const targetStyles = {opacity: 1}
 const enterAnimation = {stiffness: 350, damping: 28}
 
-let Template = ({style, id, children}) => {
-    return <div style={style} id={id}>{children}</div>
+let Template = ({style, id, pydio, children}) => {
+    const userIsActive = ()=>{pydio.notify('user_activity')};
+    return (
+        <div
+            style={style}
+            id={id}
+            onMouseMove={userIsActive}
+            onMouseOver={userIsActive}
+            onKeyDown={userIsActive}>{children}</div>
+    );
 }
 
 Template = compose (
@@ -69,7 +77,7 @@ class TemplateBuilder extends React.Component {
             );
         }.bind(this));
 
-        return <Template style={style} id={this.props.containerId}>{components}</Template>
+        return <Template style={style} id={this.props.containerId} pydio={pydio}>{components}</Template>
     }
 }
 
