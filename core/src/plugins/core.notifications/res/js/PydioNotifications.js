@@ -7,7 +7,7 @@
         'change'    : 'pencil',
         'rename'    : 'rename-box',
         'view'      : 'eye',
-        'copy'      : 'copy',
+        'copy'      : 'content-copy',
         'move'      : 'folder-move',
         'copy_to'   : 'folder-move',
         'copy_from' : 'folder-move',
