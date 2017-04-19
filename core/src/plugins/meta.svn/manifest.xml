@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <meta id="meta.svn" enabled="false" label="CONF_MESSAGE[Subversion Repository]" description="CONF_MESSAGE[Extract SVN informations (revision, change log, etc) if the repository is a Working-Copy, and SVN is available as a commandline.]"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="file:../core.ajaxplorer/ajxp_registry.xsd">
+    <plugin_info>
+        <core_relation packaged="false" tested_version="7.0"/>
+    </plugin_info>
 	<class_definition filename="plugins/meta.svn/SvnManager.php" classname="Pydio\Access\Meta\Version\SvnManager"/>
 	<client_settings icon="plugins/access.mysql/resources/images/mysql_icon.png">
 		<resources>
