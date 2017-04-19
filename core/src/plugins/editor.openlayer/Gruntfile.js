@@ -23,7 +23,6 @@ module.exports = function(grunt) {
                 options: {
                     external:Externals,
                     browserifyOptions:{
-                        standalone: 'ShareDialog',
                         debug:true
                     }
                 },

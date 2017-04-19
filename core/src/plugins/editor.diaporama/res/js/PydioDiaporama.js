@@ -20,11 +20,13 @@
 
 import React, {Component} from 'react'
 import {compose} from 'redux'
+import {FlatButton, IconButton, Slider, ToolbarGroup, ToolbarSeparator} from 'material-ui'
 
-import {FlatButton, Slider, ToolbarGroup, ToolbarSeparator} from 'material-ui'
+const {withResize, withMenu, withLoader, withErrors, withControls} = PydioHOCs;
 
 class UrlProvider {
-    static buildRandomSeed(ajxpNode){
+
+    static buildRandomSeed(ajxpNode) {
         var mtimeString = "&time_seed=" + ajxpNode.getMetadata().get("ajxp_modiftime");
         if(ajxpNode.getParent()){
             var preview_seed = ajxpNode.getParent().getMetadata().get('preview_seed');
@@ -35,58 +37,32 @@ class UrlProvider {
         return mtimeString;
     }
 
-    getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed) {
+    constructor(baseUrl, editorConfigs) {
+        this.baseUrl = baseUrl
 
-        var h = parseInt(imageDimensions.height);
-        var w = parseInt(imageDimensions.width);
-
-        return {url: baseUrl + time_seed + "&file=" + encodeURIComponent(node.getPath()), width: w, height: h};
+        this.sizes = editorConfigs && editorConfigs.get("PREVIEWER_LOWRES_SIZES").split(",") || [300, 700, 1000, 1300];
     }
 
-    getLowResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed) {
+    getHiResUrl(node, time_seed = '') {
+        return `${this.baseUrl}${time_seed}&file=${encodeURIComponent(node.getPath())}`
+    }
 
-        var h = parseInt(imageDimensions.height);
-        var w = parseInt(imageDimensions.width);
-        var sizes = [300, 700, 1000, 1300];
-        if(editorConfigs && editorConfigs.get("PREVIEWER_LOWRES_SIZES")){
-            sizes = editorConfigs.get("PREVIEWER_LOWRES_SIZES").split(",");
+    getLowResUrl(node, time_seed = '') {
+        const viewportRef = (DOMUtils.getViewportHeight() + DOMUtils.getViewportWidth()) / 2;
+        const thumbLimit = this.sizes.reduce((current, size) => {
+            return viewportRef > parseInt(size) && parseInt(size) || current
+        }, 0);
+
+        if (thumbLimit > 0) {
+            return `${this.baseUrl}${time_seed}&get_thumb=true&dimension=${thumbLimit}&file=${encodeURIComponent(node.getPath())}`
         }
-        var reference = Math.max(h, w);
-        var viewportRef = (DOMUtils.getViewportHeight() + DOMUtils.getViewportWidth()) / 2;
-        var thumbLimit = 0;
-        for(var i=0;i < sizes.length;i++) {
-            if(viewportRef > parseInt(sizes[i])) {
-                if(sizes[i+1]) thumbLimit = parseInt(sizes[i+1]);
-                else thumbLimit = parseInt(sizes[i]);
-            }
-            else break;
-        }
-        var hasThumb = thumbLimit && (reference > thumbLimit);
-        var time_seed_string = time_seed?time_seed:'';
-        let crtHeight, crtWidth;
-        if(hasThumb){
-            if(h>w){
-                crtHeight = thumbLimit;
-                crtWidth = parseInt( w * thumbLimit / h );
-            }else{
-                crtWidth = thumbLimit;
-                crtHeight = parseInt( h * thumbLimit / w );
-            }
-            return {
-                url: baseUrl + time_seed_string + "&get_thumb=true&dimension="+thumbLimit+"&file="+encodeURIComponent(node.getPath()),
-                width: crtWidth,
-                height: crtHeight
-            };
-        }else{
-            return this.getHiResUrl(baseUrl, editorConfigs, node, imageDimensions, time_seed);
-        }
+
+        return this.getHiResUrl(node, time_seed);
     }
 }
 
 class SizeComputer {
-
     static loadImageSize(loadUrl, node, callback){
-
         let getDimFromNode = function(n){
             return {
                 width: parseInt(n.getMetadata().get('image_width')),
@@ -94,17 +70,20 @@ class SizeComputer {
             };
         };
 
-        DOMUtils.imageLoader(loadUrl, function(){
+        DOMUtils.imageLoader(loadUrl, () => {
             if(!node.getMetadata().has('image_width')){
                 node.getMetadata().set("image_width", this.width);
                 node.getMetadata().set("image_height", this.height);
             }
+
             callback(node, getDimFromNode(node))
-        }, function(){
-            let dim = {width:200, height: 200, default:true};
+        }, () => {
+            let dim = {width:200, height: 200, default: true};
+
             if(node.getMetadata().has('image_width')){
                 let dim = getDimFromNode(node);
             }
+
             callback(node, dim);
         });
     }
@@ -185,12 +164,12 @@ class ImagePanel extends Component {
     static get propTypes() {
         return {
             url: React.PropTypes.string,
-            width:React.PropTypes.number,
-            height:React.PropTypes.number,
-            imageClassName:React.PropTypes.string,
+            width: React.PropTypes.number,
+            height: React.PropTypes.number,
+            imageClassName: React.PropTypes.string,
 
-            fit:React.PropTypes.bool,
-            zoomFactor:React.PropTypes.number
+            fit: React.PropTypes.bool,
+            zoomFactor: React.PropTypes.number
         }
     }
 
@@ -201,102 +180,110 @@ class ImagePanel extends Component {
     static get styles() {
         return {
             container: {
+                display: "flex",
                 flex: 1,
-                justifyContent: 'center'
+                justifyContent: 'center',
+                padding: ImagePanel.IMAGE_PANEL_MARGIN,
+                overflow: 'auto'
             },
 
             img: {
                 boxShadow: DOMUtils.getBoxShadowDepth(1),
-                margin: ImagePanel.IMAGE_PANEL_MARGIN,
                 transition: DOMUtils.getBeziersTransition()
             }
         }
     }
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            ...this.props
-        }
-    }
-
-    componentDidMount() {
-        this._observer = (e) => this.resize();
-        DOMUtils.observeWindowResize(this._observer);
-        this.resize();
-        setTimeout(this.resize, 1000);
-    }
-
-    componentWillReceiveProps(nextProps){
-        this.setState({url: nextProps.url}, () => this.resize(nextProps));
-    }
-
-    componentWillUnmount() {
-        DOMUtils.stopObservingWindowResize(this._observer);
-    }
-
-    resize(props = null) {
-
-        if(!this.container) return;
-        if(!props) props = this.props;
-        let w = this.container.clientWidth - 2 * ImagePanel.IMAGE_PANEL_MARGIN;
-        let h = this.container.clientHeight - 2 * ImagePanel.IMAGE_PANEL_MARGIN;
-        let imgW = props.width;
-        let imgH = props.height;
-
-        if ((imgW === -1 && imgH === -1) || h < 0 || w < 0) {
-            this.setState({width: null,height: '98%'});
-            return;
-        }
-
-        let newW, newH = imgH;
-        if((imgW < w && imgH < h) || !this.props.fit) {
-            let zoomFactor = this.props.zoomFactor || 1;
-            this.setState({width: imgW * zoomFactor, height: imgH * zoomFactor});
-            return;
-        }
-
-        if (imgW >= w) {
-            this.setState({width: w, height: imgH * w / imgW});
-            newH = imgH * w / imgW;
-        }
-
-        if(newH >= h) {
-            this.setState({height: h, width: imgW * h / imgH});
-        }
-    }
-
     render() {
-
-        const {fit, url, imageClassName} = this.props
-
-        if(!url) return null;
-
-        if (fit) {
-            return (
-                <div ref={(container) => this.container = container} style={{...ImagePanel.styles.container, display: 'flex'}}>
-                    <img src={url} className={imageClassName} style={{...ImagePanel.styles.img, flex: "0 1", minHeight: "90%", maxHeight: "90%"}} />
-                </div>
-            )
-        }
-
-        const {width, height} = this.state
+        const {url, imageClassName, width, height, fit, zoomFactor} = this.props
 
         return (
-            <div ref={(container) => this.container = container} style={{...ImagePanel.styles.container, overflow: 'auto'}}>
-                <img src={url} className={imageClassName} style={{...ImagePanel.styles.img, width: width, height: height}} />
+            <div style={ImagePanel.styles.container}>
+                {fit &&
+                    <img src={url} className={imageClassName} style={{...ImagePanel.styles.img, flex: "0 1", minHeight: "100%", maxHeight: "100%"}} /> ||
+                    <img src={url} className={imageClassName} style={{...ImagePanel.styles.img, width: width, height: height, transform: `scale(${zoomFactor})`, transformOrigin: "50% 0"}} />
+                }
             </div>
         )
     }
 }
 
-const {withMenu, withLoader, withErrors, withControls} = PydioHOCs;
+class ImageNode extends Component {
 
-let ExtendedImagePanel = compose(
+    static get config() {
+        return {
+            baseUrl: pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy',
+            editorConfigs: pydio.getPluginConfigs('editor.diaporama')
+        }
+    }
+
+    static get propTypes() {
+        return {
+            node: React.PropTypes.instanceOf(AjxpNode).isRequired,
+            pydio: React.PropTypes.instanceOf(Pydio).isRequired,
+
+            urlProvider: React.PropTypes.instanceOf(UrlProvider),
+            baseUrl: React.PropTypes.string,
+            editorConfigs: React.PropTypes.instanceOf(Map),
+
+            displayOriginal: React.PropTypes.bool
+        }
+    }
+
+    static get defaultProps(){
+        return {
+            urlProvider: new UrlProvider(ImageNode.config.baseUrl, ImageNode.config.editorConfigs),
+            displayOriginal: true
+        }
+    }
+
+    constructor(props) {
+        super(props)
+
+        this.state = {}
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        const {node, displayOriginal, urlProvider, baseUrl, editorConfigs} = nextProps
+
+        if (!node) return
+
+        const url = displayOriginal ?
+            urlProvider.getHiResUrl(node) :
+            urlProvider.getLowResUrl(node)
+
+        SizeComputer.loadImageSize(url, node, (node, dimension) => this.setState({
+            url,
+            imageClassName: `ort-rotate-${node.getMetadata().get("image_exif_orientation")}`,
+            imgWidth: dimension.width,
+            imgHeight: dimension.height
+        }))
+    }
+
+    render() {
+        const {node, fit, zoomFactor} = this.props
+        const {url, imgWidth, imgHeight, imageClassName} = this.state
+
+        return (
+            <ImagePanel
+                url={url}
+                width={imgWidth}
+                height={imgHeight}
+                imageClassName={imageClassName}
+                fit={fit}
+                zoomFactor={zoomFactor}
+            />
+        )
+    }
+}
+
+let ExtendedImageNode = compose(
     withMenu,
     withLoader,
-    withErrors
-)(ImagePanel)
+    withErrors,
+    withResize
+)(ImageNode)
 
 class Editor extends Component {
 
@@ -305,23 +292,18 @@ class Editor extends Component {
             node: React.PropTypes.instanceOf(AjxpNode).isRequired,
             pydio: React.PropTypes.instanceOf(Pydio).isRequired,
 
+            showResolutionToggle: React.PropTypes.bool,
+
             urlProvider: React.PropTypes.instanceOf(UrlProvider),
             selectionModel: React.PropTypes.instanceOf(SelectionModel),
             editorConfigs: React.PropTypes.instanceOf(Map),
-            baseUrl: React.PropTypes.string,
-            showResolutionToggle: React.PropTypes.bool
+            baseUrl: React.PropTypes.string
         }
     }
 
-    static get defaultProps(){
-        let baseURL = pydio.Parameters.get('ajxpServerAccess')+'&action=preview_data_proxy';
-        let editorConfigs = pydio.getPluginConfigs('editor.diaporama');
+    static get defaultProps() {
         return {
-            baseUrl: baseURL,
-            editorConfigs: editorConfigs,
-            urlProvider: new UrlProvider(),
-            showResolutionToggle: true,
-            onLoad: () => {}
+            showResolutionToggle: true
         }
     }
 
@@ -361,65 +343,24 @@ class Editor extends Component {
 
         this.state = {
             selectionModel: selectionModel || new SelectionModel(node),
-            imageDimension: {
-                width: -1,
-                height: -1
-            },
             displayOriginal: false,
             fitToScreen: true,
             zoomFactor: 1
         }
     }
 
-    componentDidMount() {
-        this.setState({
-            currentNode: this.state.selectionModel.nextOrFirst()
-        })
+    componentWillReceiveProps(nextProps) {
+
+        const {node, selectionModel = new SelectionModel(node)} = nextProps
+
+        this.state = {
+            selectionModel,
+            currentNode: selectionModel.currentNode,
+            displayOriginal: false,
+            fitToScreen: true,
+            zoomFactor: 1
+        }
     }
-
-    componentDidUpdate() {
-        const {baseUrl, editorConfigs, urlProvider} = this.props
-        const {currentNode, selectionModel, displayOriginal, imageDimension} = this.state;
-
-        const {url, width, height} = displayOriginal ?
-            urlProvider.getHiResUrl(baseUrl, editorConfigs, currentNode, imageDimension, '') :
-            urlProvider.getLowResUrl(baseUrl, editorConfigs, currentNode, imageDimension, '')
-
-        const imageClassName = 'ort-rotate-' + currentNode.getMetadata().get("image_exif_orientation")
-
-        SizeComputer.loadImageSize(url, currentNode, (node, dimension) => this.setState({
-            currentNode,
-            url,
-            ...dimension,
-            imageClassName
-        }));
-    }
-
-    // componentWillReceiveProps(nextProps) {
-    //     const {selectionModel} = nextProps || {selectionModel: new SelectionModel(nextProps.node)}
-    //
-    //     this.setState({
-    //         currentNode: selectionModel && selectionModel.nextOrFirst()
-    //     })
-    // }
-
-    // imageSizeCallback(node, dimension) {
-    //     if (this.state.currentNode === node) {
-    //         this.timeout = setTimeout(() => this.setState({imageDimension: dimension}), 0);
-    //     }
-    // }
-
-    // updateStateNode(node) {
-    //     //let {url} = this.computeImageData(node);
-    //     //SizeComputer.loadImageSize(url, node, () => this.imageSizeCallback());
-    //
-    //     if(this.props.onRequestTabTitleUpdate){
-    //         this.props.onRequestTabTitleUpdate(node.getLabel());
-    //     }
-    //     this.setState({
-    //         currentNode: node
-    //     });
-    // }
 
     play() {
         this.pe = new PeriodicalExecuter(() => this.setState({currentNode: this.state.selectionModel.nextOrFirst()}), 3);
@@ -433,29 +374,28 @@ class Editor extends Component {
     }
 
     buildActions() {
-        const {MessageHash: mess} = this.props.pydio
+        const {MessageHash} = this.props.pydio
         const {selectionModel: sel, playing, displayOriginal, fitToScreen, zoomFactor} = this.state
 
         return [
             sel && sel.length() > 1 &&
             <ToolbarGroup firstChild={true}>
-                <FlatButton label={mess[178]} disabled={!sel.hasPrevious()} onClick={() => this.setState({currentNode: sel.previous()})} />
-                <FlatButton label={playing ? mess[232] : mess[230]} onClick={()=>{playing ? this.stop() : this.play()}}/>
-                <FlatButton label={mess[179]} disabled={!sel.hasNext()} onClick={() => this.setState({currentNode: sel.next()})} />
+                <IconButton disabled={!sel.hasPrevious()} iconClassName="mdi mdi-arrow-left" tooltip={MessageHash[178]} onClick={() => this.setState({currentNode: sel.previous()})} />
+                <IconButton iconClassName={playing ? "mdi mdi-pause" : "mdi mdi-play"} tooltip={playing ? MessageHash[232] : MessageHash[230]} onClick={()=>{playing ? this.stop() : this.play()}} />
+                <IconButton disabled={!sel.hasNext()} iconClassName="mdi mdi-arrow-right" tooltip={MessageHash[179]} onClick={() => this.setState({currentNode: sel.next()})} />
             </ToolbarGroup>,
 
             this.props.showResolutionToggle &&
             <ToolbarGroup>
-                <FlatButton key="resolution" label={displayOriginal?mess[526]:mess[525]} onClick={()=>{this.setState({displayOriginal:!displayOriginal})}}/>
-                <ToolbarSeparator key="separator"/>
+                <IconButton iconClassName={displayOriginal ? "mdi mdi-image-filter" : "mdi mdi-image-filter-none"} tooltip={displayOriginal ? MessageHash[525] : MessageHash[526]} onClick={()=>{this.setState({displayOriginal: !displayOriginal})}} />
             </ToolbarGroup>,
 
             this.state.fitToScreen &&
                 <ToolbarGroup>
-                    <FlatButton key="fit" label={mess[326]} onClick={() => this.setState({fitToScreen:!fitToScreen})} />
+                    <FlatButton key="fit" label={MessageHash[326]} onClick={() => this.setState({fitToScreen:!fitToScreen})} />
                 </ToolbarGroup> ||
                 <ToolbarGroup>
-                    <FlatButton key="fit" label={mess[325]} onClick={() => this.setState({fitToScreen:!fitToScreen})} />
+                    <FlatButton key="fit" label={MessageHash[325]} onClick={() => this.setState({fitToScreen:!fitToScreen})} />
                     <div key="zoom" style={{display:'flex', height:56}}>
                         <Slider style={{width:150, marginTop:-4}} min={0.25} max={4} defaultValue={1} value={zoomFactor} onChange={(_, zoomFactor) => this.setState({zoomFactor})} />
                         <span style={{padding:18,fontSize: 16}}>{Math.round(zoomFactor * 100)} %</span>
@@ -465,16 +405,15 @@ class Editor extends Component {
     }
 
     render() {
-        const {url, width, height, imageClassName, zoomFactor, fitToScreen} = this.state;
+        const {currentNode, zoomFactor, fitToScreen, displayOriginal} = this.state;
 
-        if (!url) return null
+        if (!currentNode) return null
 
         return (
-            <ExtendedImagePanel
-                url={url}
-                width={width}
-                height={height}
-                imageClassName={imageClassName}
+            <ExtendedImageNode
+                pydio={pydio}
+                node={currentNode}
+                displayOriginal={displayOriginal}
                 fit={fitToScreen}
                 zoomFactor={zoomFactor}
 
