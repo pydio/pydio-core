@@ -12,6 +12,8 @@
             <js
                 className="PydioCoreActions"
                 file="plugins/gui.ajax/res/build/PydioCoreActions.min.js"
+                fallbackFile="plugins/gui.ajax/res/build/PydioCoreActions.js"
+                fallbackCondition="pydio.Parameters.get('debugMode')"
                 depends="React"
                 expose="actions/core"
             />

@@ -517,8 +517,6 @@
             <xs:sequence>
                 <xs:element minOccurs="0" ref="clientCallback"/>
                 <xs:element minOccurs="0" maxOccurs="100" ref="clientForm"/>
-                <xs:element minOccurs="0" ref="dialogOnOpen"/>
-                <xs:element minOccurs="0" ref="dialogOnComplete"/>
                 <xs:element minOccurs="0" ref="extensionOnInit"/>
                 <xs:element minOccurs="0" ref="clientListener"/>
                 <xs:element minOccurs="0" ref="standardFormDefinition"/>
@@ -529,25 +527,7 @@
     </xs:element>
     <xs:element name="clientCallback">
         <xs:complexType mixed="true">
-            <xs:choice minOccurs="0" maxOccurs="unbounded">
-                <xs:element ref="dialogOnOpen"/>
-                <xs:element ref="dialogOnCancel"/>
-                <xs:element ref="dialogOnComplete"/>
-            </xs:choice>
             <xs:attribute name="module" type="xs:NCName"/>
-            <xs:attribute name="dialogOkButtonOnly" type="xs:boolean"/>
-            <xs:attribute name="dialogOpenForm" type="xs:NCName"/>
-            <xs:attribute name="dialogSkipButtons" type="xs:boolean"/>
-            <xs:attribute name="prepareModal" type="xs:boolean"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="dialogOnCancel">
-        <xs:complexType mixed="true">
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="dialogOnComplete">
-        <xs:complexType mixed="true">
-            <xs:attribute name="hideDialog" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
     <xs:element name="extensionOnInit" type="xs:string"/>

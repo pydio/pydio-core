@@ -14,6 +14,7 @@
     <client_settings>
         <resources>
             <js file="plugins/editor.libreoffice/res/build/PydioLibreOffice.js" className="PydioLibreOffice"/>
+            <js file="plugins/editor.libreoffice/res/build/PydioLibreOfficeActions.js" className="PydioLibreOfficeActions"/>
             <i18n namespace="libreoffice" path="plugins/editor.libreoffice/resources/i18n" />
         </resources>
     </client_settings>
@@ -43,37 +44,17 @@
                 </processing>
             </action>
             <action name="libreoffice_mkempty_file">
-                <gui text="libreoffice.10" title="libreoffice.10" src="filenew.png" iconClass="mdi mdi-file-document" hasAccessKey="false">
+                <gui text="libreoffice.10" title="libreoffice.10" iconClass="mdi mdi-file-document" hasAccessKey="false">
                     <context selection="false" dir="true" recycle="hidden" actionBar="true"
                              contextMenu="true" infoPanel="false" actionBarGroup="create" inZip="false"/>
+
                 </gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
+                <subMenu>
+                    <dynamicBuilder module="PydioLibreOfficeActions.Callbacks.dynamicBuilder"/>
+                </subMenu>
                 <processing>
-                    <clientCallback prepareModal="true"><![CDATA[
-                    modal.showDialogForm('Create', 'libreoffice_create_form', function(){
-                        var oForm = modal.getForm();
-                        var selector = oForm.down("#formats_selector");
-                        PydioApi.getClient().request({get_action:'libreoffice_list_formats'}, function(t){
-                            var response = t.responseJSON;
-                            for(var ext in response){
-                                if(!response.hasOwnProperty(ext)) continue;
-                                selector.insert('<option value="'+ ext +'">'+ response[ext] +' (.'+ext+')</option>');
-                            }
-                            selector.down('option[value="odt"]').selected = true;
-                        });
-                    }, function(){
-                        var oForm = modal.getForm();
-                        PydioApi.getClient().submitForm(oForm);
-                        hideLightBox(true);
-                        return false;
-                    });
-                ]]></clientCallback>
-                    <clientForm id="libreoffice_create_form"><![CDATA[
-                    <div id="libreoffice_create_form" action="libreoffice_mkempty_file">
-                        <div class="dialogLegend" ajxp_message_id="libreoffice.11">AJXP_MESSAGE[libreoffice.11]</div>
-                        <select name=format id="formats_selector"></select>
-                    </div>
-                ]]></clientForm>
+
                     <serverCallback methodName="createEmptyAction" restParams="/format/dir+"/>
                 </processing>
             </action>

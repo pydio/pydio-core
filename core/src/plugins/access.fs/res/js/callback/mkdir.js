@@ -13,6 +13,7 @@ export default function(pydio){
             dialogTitleId:154,
             legendId:155,
             fieldLabelId:173,
+            dialogSize:'sm',
             submitValue:submit
         });
     }

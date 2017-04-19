@@ -12,8 +12,8 @@ module.exports = function(grunt) {
                         expand: true,
                         cwd: 'res/js/',
                         src: ['**/*.js'],
-                        dest: 'res/build/PydioLibreOffice/',
-                        ext: '.js'
+                        dest: 'res/build',
+                        ext: '.babel.js'
                     }
                 ]
             }
@@ -27,7 +27,8 @@ module.exports = function(grunt) {
                     }
                 },
                 files: {
-                    'res/build/PydioLibreOffice.js':'res/build/PydioLibreOffice/*.js'
+                    'res/build/PydioLibreOffice.js':'res/build/PydioLibreOffice.babel.js',
+                    'res/build/PydioLibreOfficeActions.js':'res/build/PydioLibreOfficeActions.babel.js'
                 }
             }
         },
