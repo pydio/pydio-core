@@ -12,7 +12,7 @@
         <actions>
             <action name="login">
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
+                    <clientCallback><![CDATA[
 						var loginRedirect = AJXP_LOGIN_REDIRECT;
 						if(loginRedirect){
 							document.location.href=loginRedirect;

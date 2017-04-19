@@ -58,7 +58,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="true" enableRoot="false"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback module="InboxWidgets.Callbacks.download" prepareModal="true"/>
+                    <clientCallback module="InboxWidgets.Callbacks.download"/>
                     <serverCallback methodName="downloadAction" restParams="/file+" checkParams="false" sdkMethodName="download" developerComment="Download one or many files at once. If multiple files (or a folder path) passed, they are sent back as an archive.">
                         <input_param description="User selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>
                         <output type="stream"/>
@@ -74,7 +74,7 @@
                     <selectionContext dir="false" file="true" recycle="false" unique="false"/></gui>
                 <rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
                 <processing>
-                    <clientCallback module="InboxWidgets.Callbacks.copyInbox" prepareModal="true"/>
+                    <clientCallback module="InboxWidgets.Callbacks.copyInbox"/>
                     <clientListener module="InboxWidgets.Callbacks.copyContextListener" name="contextChange"/>
                     <serverCallback methodName="switchAction" restParams="/" developerComment="Copy one or more items to a given target">
                         <input_param description="Selection" name="nodes" type="AJXP_NODE[]" mandatory="true"/>

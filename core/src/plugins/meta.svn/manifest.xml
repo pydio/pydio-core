@@ -33,7 +33,7 @@
                 </gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
+					<clientCallback><![CDATA[
                         ResourcesManager.detectModuleToLoadAndApply('SVNLogger', function(){
 							var loadFunc = function(oForm){
 								pydio.getController().svnLogger = new SVNLogger($(oForm));
@@ -59,7 +59,7 @@
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
+					<clientCallback><![CDATA[
 						var loadFunc = function(oForm){
 							pydio.getController().svnLogger = new SVNLogger($(oForm));
 							pydio.getController().svnLogger.open(true);

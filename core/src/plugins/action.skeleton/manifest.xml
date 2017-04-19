@@ -25,19 +25,19 @@
 		</client_configs>
         <actions>
             <action name="my_skeleton_button">
-                <gui text="skeleton.1" title="skeleton.2" src="skeleton_images/ICON_SIZE/url.png" hasAccessKey="false">
+                <gui text="skeleton.1" title="skeleton.2" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback module="SkeletonActions.Callbacks.alertButton" prepareModal="false"/>
+                    <clientCallback module="SkeletonActions.Callbacks.alertButton"/>
                 </processing>
             </action>
             <action name="my_skeleton_button_frame">
-                <gui text="skeleton.4" title="skeleton.5" src="skeleton_images/ICON_SIZE/user-desktop.png" hasAccessKey="false">
+                <gui text="skeleton.4" title="skeleton.5" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" actionBar="true" ajxpWidgets="ActionsToolbar" actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback module="SkeletonActions.Callbacks.frameButton" prepareModal="true"/>
+                    <clientCallback module="SkeletonActions.Callbacks.frameButton"/>
                     <clientForm id="my_skeleton_form"><![CDATA[
                         <div id="my_skeleton_form" box_width="450">
                             <h3>AJXP_MESSAGE[skeleton.6]</h3>

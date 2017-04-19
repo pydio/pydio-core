@@ -38,7 +38,7 @@
                     </context>
                 </gui>
                 <processing>
-                    <clientCallback module="DuoSecurityActions.Callbacks.duoPrompt" prepareModal="true"/>
+                    <clientCallback module="DuoSecurityActions.Callbacks.duoPrompt"/>
                 </processing>
             </action>
             <action name="duo_post_verification_code">

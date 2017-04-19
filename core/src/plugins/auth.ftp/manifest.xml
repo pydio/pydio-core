@@ -22,8 +22,7 @@
 			</action>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="ftp_logout" expireDefault="true">
-				<gui text="164" title="169" src="decrypted.png"
-					accessKey="" hasAccessKey="false" iconClass="icon-signout">
+				<gui text="164" title="169" accessKey="" hasAccessKey="false" iconClass="icon-signout">
 					<context selection="false" dir="" recycle="false"
 						actionBar="false" contextMenu="false" infoPanel="false"
 						actionBarGroup="user" ajxpWidgets="UserWidget::logging_string">
@@ -31,7 +30,7 @@
 				</gui>
 				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="false"><![CDATA[
+					<clientCallback><![CDATA[
 						clearRememberData();
 						var connexion = new Connexion();
 						connexion.addParameter('get_action', 'ftp_logout');

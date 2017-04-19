@@ -15,7 +15,7 @@
                            write="false" adminOnly="false">
             </rightsContext>
             <processing>
-                <clientCallback prepareModal="true"><![CDATA[
+                <clientCallback><![CDATA[
 					var path;
 					if(window.actionArguments && window.actionArguments.length>0){
 						path = window.actionArguments[0];
@@ -50,7 +50,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="false"><![CDATA[
+                <clientCallback><![CDATA[
                     var editorData = window.actionArguments[0];
                     pydio.UI.openCurrentSelectionInEditor(editorData);
                 ]]></clientCallback>
@@ -100,7 +100,7 @@
             </gui>
             <rightsContext noUser="true" userLogged="only" read="true" write="true" adminOnly=""/>
             <processing>
-                <clientCallback prepareModal="false"><![CDATA[
+                <clientCallback><![CDATA[
 					var callback = function(node, newValue){
 						var conn = new Connexion();
 						conn.addParameter('get_action', 'edit');

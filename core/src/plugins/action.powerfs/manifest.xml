@@ -35,7 +35,7 @@
             <!-- Override download client callback -->
             <action name="download">
                 <processing>
-                    <clientCallback module="PowerFSActions.Callbacks.download" prepareModal="true"/>
+                    <clientCallback module="PowerFSActions.Callbacks.download"/>
                 </processing>
             </action>
         </actions>

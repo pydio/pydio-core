@@ -16,8 +16,7 @@
 		<actions>
 			<!-- OVERRIDE LOGOUT -->
 			<action name="smb_logout" expireDefault="true">
-				<gui text="164" title="169" src="decrypted.png"
-					accessKey="" hasAccessKey="false">
+				<gui text="164" title="169" iconClass="icon-signout" accessKey="" hasAccessKey="false">
 					<context selection="false" dir="" recycle="false"
 						actionBar="true" contextMenu="false" infoPanel="false"
 						actionBarGroup="user">
@@ -25,7 +24,7 @@
 				</gui>
 				<rightsContext noUser="false" userLogged="only" guestLogged="hidden" read="false" write="false" adminOnly=""></rightsContext>
 				<processing>
-					<clientCallback prepareModal="false"><![CDATA[
+					<clientCallback><![CDATA[
 						clearRememberData();
 						var connexion = new Connexion();
 						connexion.addParameter('get_action', 'smb_logout');

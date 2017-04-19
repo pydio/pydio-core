@@ -35,11 +35,11 @@
         <external_file filename="plugins/core.auth/standard_auth_actions.xml" include="actions/*" exclude=""/>
         <actions>
             <action name="otp_show_setup_screen">
-                <gui src="icon-key" iconClass="icon-key" text="authfront.otp.1" title="authfront.otp.1">
+                <gui iconClass="icon-key" text="authfront.otp.1" title="authfront.otp.1">
                     <context dir="true" recycle="false" selection="false"/>
                 </gui>
                 <processing>
-                    <clientCallback module="OTPAuthfrontActions.Callbacks.setupScreen" prepareModal="true"/>
+                    <clientCallback module="OTPAuthfrontActions.Callbacks.setupScreen"/>
                     <serverCallback methodName="getConfigurationCode"/>
                 </processing>
             </action>

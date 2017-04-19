@@ -33,7 +33,7 @@
                     <context actionBarGroup="utils" actionBar="true" dir="true" recycle="true" selection="false" ajxpWidgets="UserWidget::logging_string"/>
                 </gui>
                 <processing>
-                    <clientCallback module="WelcomeCompeonts.QRCodeDialogLoader.open" prepareModal="false"/>
+                    <clientCallback module="WelcomeCompeonts.QRCodeDialogLoader.open"/>
                     <clientForm id="qrcode_dialog_form"><![CDATA[
                         <div id="qrcode_dialog_form" box_width="296" box_padding="0" class="react-mui-context SF_material"></div>
                     ]]></clientForm>

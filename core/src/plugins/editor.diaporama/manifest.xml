@@ -32,7 +32,7 @@
 		</hooks>
 		<actions>
 			<action name="slideshow_sel">
-				<gui text="234" title="234" src="frame_image.png" accessKey="" hasAccessKey="false">
+				<gui text="234" title="234" accessKey="" hasAccessKey="false">
 					<context selection="true" dir="" recycle="hidden"
 						actionBar="false" contextMenu="false" infoPanel="true"
 						actionBarGroup="get">
@@ -41,7 +41,7 @@
                 </gui>
 				<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="true"><![CDATA[
+					<clientCallback><![CDATA[
 						var selectedMime = getAjxpMimeType(ajaxplorer.getUserSelection().getUniqueNode());
 						var editors = pydio.Registry.findEditorsForMime(selectedMime);
 						var editorData;

@@ -24,20 +24,20 @@
 
 	<registry_contributions>
 		<actions>
-			<action name="get_timestamp">
-                               <gui text="443" title="443" src="timestamp_images/actions/ICON_SIZE/horo.png" hasAccessKey="false">
-				<context selection="true" dir="" recycle="hidden"
-					actionBar="true" contextMenu="true" infoPanel="false"
-					actionBarGroup="change" inZip="false">
-				</context>
-				<selectionContext dir="false" file="true" recycle="false" unique="true" image="true" editable="true"></selectionContext>
-			</gui>
+            <action name="get_timestamp">
+                <gui text="443" title="443" hasAccessKey="false">
+                    <context selection="true" dir="" recycle="hidden"
+                             actionBar="true" contextMenu="true" infoPanel="false"
+                             actionBarGroup="change" inZip="false">
+                    </context>
+                    <selectionContext dir="false" file="true" recycle="false" unique="true" image="true" editable="true"></selectionContext>
+                </gui>
 
-			<processing>
-                <clientCallback module="TimestampActions.Callbacks.getTimestamp" prepareModal="true"/>
-				<serverCallback methodName="switchAction"></serverCallback>
-				</processing>
-			</action>
+                <processing>
+                    <clientCallback module="TimestampActions.Callbacks.getTimestamp"/>
+                    <serverCallback methodName="switchAction"></serverCallback>
+                </processing>
+            </action>
 
 		</actions>
         <extensions>

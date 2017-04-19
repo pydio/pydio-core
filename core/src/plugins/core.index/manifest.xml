@@ -10,7 +10,7 @@
     <registry_contributions>
         <actions>
             <action name="index">
-                <gui text="core.index.1" title="core.index.2" iconClass="icon-book" src="lucene_images/ICON_SIZE/ark_view.png" accessKey="folder_access_key">
+                <gui text="core.index.1" title="core.index.2" iconClass="icon-book" accessKey="folder_access_key">
                     <context selection="false" dir="true" recycle="hidden"
                              actionBar="true" contextMenu="true" infoPanel="false"
                              actionBarGroup="remote" inZip="false">
@@ -20,7 +20,7 @@
                                write="false" adminOnly="false">
                 </rightsContext>
                 <processing>
-                    <clientCallback module="PydioCoreActions.Callbacks.launchIndexation" prepareModal="false"/>
+                    <clientCallback module="PydioCoreActions.Callbacks.launchIndexation"/>
                     <serverCallback methodName="applyAction" restParams="/file+" developerComment="Trigger re-indexation of a directory, recursively">
                         <input_param name="file" type="string" description="Folder to index (can be empty for root)"/>
                         <input_param name="verboz" type="boolean" description="Print out some info about indexation"/>

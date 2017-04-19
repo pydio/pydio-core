@@ -12,7 +12,7 @@
         <actions>
             <action name="login">
                 <processing>
-                    <clientCallback prepareModal="false"><![CDATA[
+                    <clientCallback><![CDATA[
                         var loginRedirect = AJXP_LOGIN_REDIRECT;
                         var authSources = AJXP_MULTIAUTH_SOURCES;
                         var masterAuthSource = 'AJXP_MULTIAUTH_MASTER';

@@ -28,7 +28,7 @@
                              actionBarGroup="user"/>
                 </gui>
                 <processing>
-                    <clientCallback module="SchedulerActions.Callbacks.generateCron" prepareModal="true"/>
+                    <clientCallback module="SchedulerActions.Callbacks.generateCron"/>
                     <clientForm id="scheduler_cronExpression"><![CDATA[
                          <div id="scheduler_cronExpression" box_width="420">
                              <div class="dialogLegend" ajxp_message_id="action.scheduler.21">AJXP_MESSAGE[action.scheduler.21]</div>
@@ -58,7 +58,7 @@
             </action>
             <action name="scheduler_addTask">
                 <processing>
-                    <clientCallback module="SchedulerActions.Callbacks.addTask" prepareModal="true"/>
+                    <clientCallback module="SchedulerActions.Callbacks.addTask"/>
                     <clientForm id="scheduler-task-form"><![CDATA[
                         <div id="scheduler-task-form" box_width="300"></div>
                     ]]></clientForm>
@@ -85,7 +85,7 @@
                     <selectionContext dir="false" behaviour="hidden" file="true" recycle="false" unique="true" allowedMimes="scheduler_task"/>
                 </gui>
                 <processing>
-                    <clientCallback module="SchedulerActions.Callbacks.runTask" prepareModal="true"/>
+                    <clientCallback module="SchedulerActions.Callbacks.runTask"/>
                     <serverCallback methodName="switchAction" developerComment="Force running a specific task">
                         <input_param description="The id of the task to run" name="task_id" type="string" mandatory="true"/>
                     </serverCallback>

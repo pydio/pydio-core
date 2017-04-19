@@ -38,7 +38,7 @@
 				</gui>
 				<rightsContext noUser="true" userLogged="only" read="false" write="true" adminOnly=""/>
 				<processing>
-					<clientCallback prepareModal="true" dialogOpenForm="dynamic_bookmarklet">
+					<clientCallback dialogOpenForm="dynamic_bookmarklet">
 						<dialogOnOpen><![CDATA[
 						    var rm =new ResourcesManager();
 						    rm.loadCSSResource('plugins/uploader.http/resources/downloader.css');

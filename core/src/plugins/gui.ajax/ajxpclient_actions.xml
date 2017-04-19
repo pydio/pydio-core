@@ -29,7 +29,7 @@
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="PydioCoreActions.Navigation.up" prepareModal="false"/>
+				<clientCallback module="PydioCoreActions.Navigation.up"/>
 			</processing>
 		</action>
 		<action name="refresh">
@@ -41,7 +41,7 @@
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="PydioCoreActions.Navigation.refresh" prepareModal="false"/>
+				<clientCallback module="PydioCoreActions.Navigation.refresh"/>
 			</processing>
 		</action>
         <!--
@@ -54,7 +54,7 @@
 				<selectionContext dir="true" file="true" recycle="false" unique="false"/></gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="PydioCoreActions.Navigation.externalSelection" prepareModal="false"/>
+				<clientCallback module="PydioCoreActions.Navigation.externalSelection"/>
 				</processing>
 		</action>
 		-->
@@ -69,7 +69,7 @@
 			</gui>
 			<rightsContext noUser="true" userLogged="only" read="true" write="false" adminOnly=""/>
 			<processing>
-				<clientCallback module="PydioCoreActions.Callbacks.toggleBookmark" prepareModal="false"/>
+				<clientCallback module="PydioCoreActions.Callbacks.toggleBookmark"/>
 			</processing>
 		</action>
 		<action name="splash">

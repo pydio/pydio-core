@@ -22,20 +22,13 @@
     <registry_contributions>
         <actions>
             <action name="validate_disclaimer">
-                <gui text="disclaimer.1" title="disclaimer.2" src="contract.png" iconClass="icon-legal" hasAccessKey="false">
+                <gui text="disclaimer.1" title="disclaimer.2" iconClass="icon-legal" hasAccessKey="false">
                     <context selection="false" dir="" recycle="hidden" actionBar="false"
                              ajxpWidgets="UserWidget" actionBarGroup="utils"/>
                 </gui>
                 <rightsContext adminOnly="false" noUser="true" read="false" userLogged="only" write="false"/>
                 <processing>
-                    <clientCallback module="DisclaimerActions.Callbacks.validate" prepareModal="true"/>
-                    <clientForm id="disclaimer_form"><![CDATA[
-                         <div id="disclaimer_form" box_width="60%" box_resize="true">
-                            <div>AJXP_MESSAGE[disclaimer.3]</div>
-                            <div id="disclaimer_content" style="height:350px; overflow:auto; border:1px solid #bbb; border-radius:4px; margin: 15px 0; padding:10px;">Disclaimer</div>
-                            <div><input id="accept_disclaimer" name="accept_disclaimer" type="checkbox"> <label for="accept_disclaimer">AJXP_MESSAGE[disclaimer.4]</label></div>
-                         </div>
-                     ]]></clientForm>
+                    <clientCallback module="DisclaimerActions.Callbacks.validate"/>
                     <serverCallback methodName="toggleDisclaimer" restParams="/validate" developerComment="Set disclaimer in accepted state or not">
                         <input_param name="validate" type="boolean" description="Accept disclaimer or not"/>
                     </serverCallback>
