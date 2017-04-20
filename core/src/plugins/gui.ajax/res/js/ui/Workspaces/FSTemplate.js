@@ -95,6 +95,7 @@ let FSTemplate = React.createClass({
         var canDrop = this.props.canDrop;
 
         const Color = MaterialUI.Color;
+        const appBarColor = Color(this.props.muiTheme.appBar.color);
 
         const styles = {
             appBarStyle : {
@@ -105,7 +106,7 @@ let FSTemplate = React.createClass({
                 color: this.props.muiTheme.appBar.textColor
             },
             iconButtonsStyle :{
-                color: Color(this.props.muiTheme.appBar.color).darken(0.4).toString()
+                color: appBarColor.darken(0.4).toString()
             },
             raisedButtonStyle : {
                 height: 30,
@@ -114,6 +115,9 @@ let FSTemplate = React.createClass({
             raisedButtonLabelStyle : {
                 height: 30,
                 lineHeight: '30px'
+            },
+            infoPanelStyle : {
+                backgroundColor: appBarColor.lighten(1.31).rgb().toString()
             }
         }
 
@@ -198,7 +202,7 @@ let FSTemplate = React.createClass({
                     {...props}
                     dataModel={props.pydio.getContextHolder()}
                     onContentChange={this.infoPanelContentChange}
-                    style={{backgroundColor:'#eceff1'}}
+                    style={styles.infoPanelStyle}
                 />
 
                 <EditionPanel {...props}/>
