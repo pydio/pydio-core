@@ -685,12 +685,12 @@
                     <then>
                         <!-- BUILD JAVASCRIPT -->
                         <exec command="npm install" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true"/>
-                        <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true"/>
+                        <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}/../${pydio_dependency}" passthru="true" checkreturn="true"/>
                     </then>
                 </if>
                 <!-- BUILD JAVASCRIPT -->
                 <exec command="npm install" dir="${plugin_abs_dir}" passthru="true"/>
-                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true"/>
+                <exec command="grunt ${grunt_target}" dir="${plugin_abs_dir}" passthru="true" checkreturn="true"/>
                 <delete dir="${plugin_abs_dir}/node_modules"/>
                 <if>
                     <not><equals arg1="${pydio_dependency}" arg2="__NOT_FOUND__"/></not>
@@ -710,6 +710,7 @@
                 <exec command="composer install --optimize-autoloader"
                       dir="${plugin_abs_dir}"
                       passthru="true"
+                      checkreturn="true"
                 />
             </then>
         </if>
