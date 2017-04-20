@@ -18,7 +18,7 @@
 *
 * The latest code can be found at <https://pydio.com>.
 *
-* 
+*
 */
 // catalan translation: Salva Gómez <salva.gomez at gmail.com>, 2015
 $mess=array(
@@ -34,5 +34,7 @@ $mess=array(
 "10" => "Activitat de la carpeta",
 "11" => "Activitat de l'arxiu",
 "12" => "Depenent del seu navegador, això demanarà un permís específic. Per desactivar, anar a través de les preferències del navegador i excepcions. Si ja ha activat aquesta funció, probablement no passarà res.",
-"13" => "El seu navegador pareix no suportar de moment les notificacions d'escriptori."
+"13" => "El seu navegador pareix no suportar de moment les notificacions d'escriptori.",
+"14" => "No alerts",
+"15" => "Notifications about files that you monitor will appear here",
 );

@@ -37,4 +37,6 @@ $mess = array(
     "14"=> "This will create an archive with all files. Please select enter a name for this archive:",
     "15"=> "Drop elements in selection carts to download them or share them later",
     "16"=> "Remove from cart",
+    "17"=> "No items selected",
+    "18"=> "Use this cart to select files from any place and then download them at once."
 );

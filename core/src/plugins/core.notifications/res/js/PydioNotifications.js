@@ -349,7 +349,7 @@
                         anchorOrigin={{horizontal: 'left', vertical: 'bottom'}}
                         targetOrigin={{horizontal: 'left', vertical: 'top'}}
                         onRequestClose={this.handleRequestClose}
-                        style={{width:400}}
+                        style={{width:320}}
                         zDepth={2}
 
                     >
@@ -367,6 +367,12 @@
                             entryRenderSecondLine={this.renderSecondLine}
                             entryRenderActions={this.renderActions}
                             nodeClicked={this.entryClicked}
+                            emptyStateProps={{
+                                style:{paddingTop: 20, paddingBottom: 20},
+                                iconClassName:'mdi mdi-bell-off',
+                                primaryTextId:'notification_center.14',
+                                secondaryTextId:'notification_center.15',
+                            }}
                         />
                     </MaterialUI.Popover>
                 </span>

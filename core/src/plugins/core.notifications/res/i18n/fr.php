@@ -30,6 +30,8 @@ $mess=array(
 "9" => "Activité du dépôt",
 "10" => "Activité du dossier",
 "11" => "Activité du fichier",
-    "12" => "En fonction de votre navigateur, une demande de permission devrait apparaître. Cette fonctionnalité affichera des notifications sur votre bureau lorsqu'un nouveau fichier est modifié. Pour la désactiver, rendez vous dans les préférences de votre navigateur.",
-    "13" => "Votre navigateur ne supporte pas les notifications sur le bureau."
+"12" => "En fonction de votre navigateur, une demande de permission devrait apparaître. Cette fonctionnalité affichera des notifications sur votre bureau lorsqu'un nouveau fichier est modifié. Pour la désactiver, rendez vous dans les préférences de votre navigateur.",
+"13" => "Votre navigateur ne supporte pas les notifications sur le bureau.",
+"14" => "Pas d'alertes",
+"15" => "Les notifications concernant les fichiers que vous surveillez apparaitront ici",
 );

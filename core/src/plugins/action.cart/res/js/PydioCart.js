@@ -202,6 +202,11 @@
                         hideToolbar={true}
                         entryRenderActions={this.renderActions}
                         entryRenderIcon={this.renderIcon}
+                        emptyStateProps={{
+                            iconClassName:'mdi mdi-file-plus',
+                            primaryTextId:'action.cart.17',
+                            secondaryTextId:'action.cart.18',
+                        }}
                     />
                 </div>
             );

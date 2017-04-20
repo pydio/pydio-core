@@ -30,6 +30,8 @@ $mess=array(
 "9" => "Workspace Activity",
 "10" => "Folder Activity",
 "11" => "File Activity",
-    "12" => "Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will happen.",
-    "13" => "Your browser does not seem to support Desktop Notifications yet."
+"12" => "Depending on your browser, this will ask for a specific permission. To disable, go through your browser preferences and exceptions. If you have already enabled this feature, probably nothing will happen.",
+"13" => "Your browser does not seem to support Desktop Notifications yet.",
+"14" => "No alerts",
+"15" => "Notifications about files that you monitor will appear here",
 );
