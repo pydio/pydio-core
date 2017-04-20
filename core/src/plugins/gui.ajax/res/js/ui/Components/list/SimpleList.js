@@ -1,14 +1,14 @@
 const React = require('react')
 const Infinite = require('react-infinite')
 
-import MessagesConsumerMixin from '../MessagesConsumerMixin'
+import MessagesConsumerMixin from '../util/MessagesConsumerMixin'
 import {ListEntry} from './ListEntry'
 import TableListEntry from './TableListEntry'
 import TableListHeader from './TableListHeader'
 import ConfigurableListEntry from './ConfigurableListEntry'
 import SortColumns from './SortColumns'
 import ListPaginator from './ListPaginator'
-import SimpleReactActionBar from '../SimpleReactActionBar'
+import SimpleReactActionBar from '../views/SimpleReactActionBar'
 import InlineEditor from './InlineEditor'
 
 const DOMUtils = require('pydio/util/dom')

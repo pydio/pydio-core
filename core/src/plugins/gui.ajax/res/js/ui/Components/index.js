@@ -1,17 +1,16 @@
-import SortableList from './SortableList'
+import SortableList from './list/SortableList'
 import SimpleList from './list/SimpleList'
 import NodeListCustomProvider from './list/NodeListCustomProvider'
 import {ListEntry} from './list/ListEntry'
 import ListPaginator from './list/ListPaginator'
 
-import {TreeView, DNDTreeView, FoldersTree} from './TreeView'
+import {TreeView, DNDTreeView, FoldersTree} from './views/TreeView'
 
-import LabelWithTip from './LabelWithTip'
-import SimpleFigureBadge from './SimpleFigureBadge'
-import SearchBox from './SearchBox'
-import ClipboardTextField from './ClipboardTextField'
+import LabelWithTip from './elements/LabelWithTip'
+import SimpleFigureBadge from './elements/SimpleFigureBadge'
+import SearchBox from './views/SearchBox'
+import ClipboardTextField from './elements/ClipboardTextField'
 
-import LegacyUIWrapper from './LegacyUIWrapper'
 import ReactEditorOpener from './editor/ReactEditorOpener'
 import {PaperEditorLayout, PaperEditorNavEntry, PaperEditorNavHeader} from './editor/PaperEditor'
 import DynamicGrid from './dynamic-grid/DynamicGrid'
@@ -19,7 +18,7 @@ import Store from './dynamic-grid/Store'
 import GridItemMixin from './dynamic-grid/GridItemMixin'
 import asGridItem from './dynamic-grid/asGridItem'
 
-import {DNDActionParameter} from './DND'
+import {DNDActionParameter} from './util/DND'
 
 import UserAvatar from './users/avatar/UserAvatar'
 import UsersCompleter from './users/UsersCompleter'
@@ -48,7 +47,6 @@ const PydioComponents = {
 
     SimpleFigureBadge       : SimpleFigureBadge,
     SearchBox               : SearchBox,
-    LegacyUIWrapper         : LegacyUIWrapper,
 
     ReactEditorOpener       : ReactEditorOpener,
     PaperEditorLayout       : PaperEditorLayout,

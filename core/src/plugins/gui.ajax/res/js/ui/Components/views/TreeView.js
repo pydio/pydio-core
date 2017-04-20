@@ -1,4 +1,4 @@
-import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget} from './DND'
+import {Types, collect, collectDrop, nodeDragSource, nodeDropTarget} from '../util/DND'
 const React = require('react')
 
 

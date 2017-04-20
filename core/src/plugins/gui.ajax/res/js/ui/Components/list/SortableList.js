@@ -1,4 +1,4 @@
-import {Types, collect, collectDrop} from './DND'
+import {Types, collect, collectDrop} from '../util/DND'
 
 /***************************/
 /* REACT DND SORTABLE LIST

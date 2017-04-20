@@ -1,4 +1,4 @@
-import MessagesConsumerMixin from '../MessagesConsumerMixin'
+import MessagesConsumerMixin from '../util/MessagesConsumerMixin'
 import SortColumns from './SortColumns'
 import ListPaginator from './ListPaginator'
 

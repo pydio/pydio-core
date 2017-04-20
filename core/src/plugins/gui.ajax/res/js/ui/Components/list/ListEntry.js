@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom';
-import { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } from '../DND';
+import { Types, collect, collectDrop, nodeDragSource, nodeDropTarget } from '../util/DND';
 import { DragSource, DropTarget, flow } from 'react-dnd';
 import { Checkbox, FontIcon } from 'material-ui';
 

@@ -1,4 +1,4 @@
-import MessagesConsumerMixin from '../MessagesConsumerMixin'
+import MessagesConsumerMixin from '../util/MessagesConsumerMixin'
 
 /**
  * Pagination component reading metadata "paginationData" from current node.

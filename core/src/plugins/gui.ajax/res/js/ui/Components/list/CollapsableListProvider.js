@@ -1,5 +1,5 @@
 import NodeListCustomProvider from './NodeListCustomProvider'
-import DataModelBadge from '../DataModelBadge'
+import DataModelBadge from '../elements/DataModelBadge'
 
 export default React.createClass({
 
