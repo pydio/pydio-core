@@ -25,7 +25,7 @@
 	<registry_contributions>
 		<actions>
             <action name="get_timestamp">
-                <gui text="443" title="443" hasAccessKey="false">
+                <gui text="timestamp.6" title="timestamp.6" hasAccessKey="false" iconClass="mdi mdi-timer">
                     <context selection="true" dir="" recycle="hidden"
                              actionBar="true" contextMenu="true" infoPanel="false"
                              actionBarGroup="change" inZip="false">

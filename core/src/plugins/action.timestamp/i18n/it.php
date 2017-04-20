@@ -5,4 +5,5 @@ $mess = array(
 "3" => "Un token con il timestamp è già stato creato per il file ",
 "4" => "ATTENZIONE: Problemi di configurazione. Contatta l'amministratore di sistema il prima possibile.",
 "5" => "Conferma di voler aggiungere un timestamp a questo file",
+"6" => "Create Timestamp"
 );

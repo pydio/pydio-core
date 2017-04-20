@@ -7,11 +7,16 @@ v0.1
 
 namespace Pydio\Action\Timestamp;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Pydio\Access\Core\MetaStreamWrapper;
+use Pydio\Access\Core\Model\NodesDiff;
 use Pydio\Access\Core\Model\UserSelection;
 
 use Pydio\Core\Exception\PydioException;
 
+use Pydio\Core\Http\Message\UserMessage;
+use Pydio\Core\Http\Response\SerializableResponseStream;
 use Pydio\Core\PluginFramework\Plugin;
 use Pydio\Core\Services\LocaleService;
 
@@ -24,12 +29,11 @@ defined('AJXP_EXEC') or die('Access not allowed');
 class TimestampCreator extends Plugin
 {
     /**
-     * @param \Psr\Http\Message\ServerRequestInterface $requestInterface
-     * @param \Psr\Http\Message\ResponseInterface $responseInterface
+     * @param ServerRequestInterface $requestInterface
+     * @param ResponseInterface $responseInterface
      * @throws PydioException
-     * @throws \Exception
      */
-    public function switchAction(\Psr\Http\Message\ServerRequestInterface $requestInterface, \Psr\Http\Message\ResponseInterface $responseInterface)
+    public function switchAction(ServerRequestInterface $requestInterface, ResponseInterface &$responseInterface)
     {
         $mess = LocaleService::getMessages();
         $ctx = $requestInterface->getAttribute("ctx");
@@ -39,7 +43,7 @@ class TimestampCreator extends Plugin
         $timestamp_password = $this->getContextualOption($ctx, "PASS");
 
         //Check if the configuration has been initiated
-        if (empty($timestamp_url) || empty($timestamp_login) || !empty($timestamp_password)) {
+        if (empty($timestamp_url) || empty($timestamp_login) || empty($timestamp_password)) {
             $this->logError("Config", "TimeStamp : configuration is needed");
             throw new PydioException($mess["timestamp.4"]);
         }
@@ -54,11 +58,9 @@ class TimestampCreator extends Plugin
         //Get active repository
         $ctx = $requestInterface->getAttribute("ctx");
         $selection = UserSelection::fromContext($ctx, $requestInterface->getParsedBody());
-        $destStreamURL = $selection->currentBaseUrl();
 
-        $fileName = $selection->getUniqueFile();
-        $fileUrl = $destStreamURL . $fileName;
-        $file = MetaStreamWrapper::getRealFSReference($fileUrl, true);
+        $selectedNode = $selection->getUniqueNode();
+        $file = $selectedNode->getRealFile();
 
         //Hash the file, to send it to Universign
         $hashedDataToTimestamp = hash_file('sha256', $file);
@@ -110,11 +112,13 @@ class TimestampCreator extends Plugin
                 //Send the succesful message
                 $this->logInfo("TimeStamp", array("files" => $file, "destination" => $file . '.ers'));
 
-                $bodyStream = new \Pydio\Core\Http\Response\SerializableResponseStream();
-                $nodesDiff = new \Pydio\Access\Core\Model\NodesDiff();
-                $nodesDiff->update($selection->getUniqueNode());
+                $bodyStream = new SerializableResponseStream();
+                $nodesDiff = new NodesDiff();
+                $timeStampNode = $selectedNode->getParent()->createChildNode($selectedNode->getLabel().'.ers');
+                $nodesDiff->add($timeStampNode);
                 $bodyStream->addChunk($nodesDiff);
-                $bodyStream->addChunk(new \Pydio\Core\Http\Message\UserMessage($mess["timestamp.3"] . $fileName));
+                $bodyStream->addChunk(new UserMessage($mess["timestamp.3"] . $selectedNode->getLabel()));
+                $responseInterface = $responseInterface->withBody($bodyStream);
             }
 
         } else {

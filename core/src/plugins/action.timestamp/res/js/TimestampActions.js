@@ -11,7 +11,7 @@
 
             pydio.UI.openComponentInModal('PydioReactUI', 'ConfirmDialog', {
                 message         : MessageHash['timestamp.5'],
-                dialogTitleId   : 443,
+                dialogTitleId   : 'timestamp.6',
                 validCallback:function(){
                     PydioApi.getClient().request({
                         get_action: 'get_timestamp',
