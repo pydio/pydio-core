@@ -23,7 +23,7 @@ export default React.createClass({
             let field = (
                 <ReactMUI.TextField
                     floatingLabelText={this.isDisplayForm()?this.props.attributes.label:null}
-                    value={this.state.value}
+                    value={this.state.value || ""}
                     onChange={this.onChange}
                     onKeyDown={this.enterToToggle}
                     type={this.props.attributes['type'] == 'password'?'password':null}
