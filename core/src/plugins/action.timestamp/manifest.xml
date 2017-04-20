@@ -16,7 +16,7 @@
 
 
 	<server_settings>
-		<global_param name="TIMESTAMP_URL" type="string" label="CONF_MESSAGE[Timestamp provider API URL]" description="CONF_MESSAGE[URL]" mandatory="true"/>
+		<global_param name="TIMESTAMP_URL" type="string" label="CONF_MESSAGE[Timestamp provider API URL]" description="CONF_MESSAGE[URL]" mandatory="true" default="https://ws.universign.eu/tsa/post/"/>
 		<global_param name="USER" type="string" label="CONF_MESSAGE[User Mail]" description="CONF_MESSAGE[User account]" mandatory="true"/>
 		<global_param name="PASS" type="password" label="CONF_MESSAGE[Password]" description="CONF_MESSAGE[User Password]" mandatory="true"/>
 	</server_settings>
