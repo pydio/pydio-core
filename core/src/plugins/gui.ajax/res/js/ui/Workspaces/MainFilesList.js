@@ -391,6 +391,12 @@ let MainFilesList = React.createClass({
                 entryRenderActions={this.entryRenderActions}
                 entryHandleClicks={this.entryHandleClicks}
                 horizontalRibbon={this.props.horizontalRibbon}
+                emptyStateProps={{
+                    style:{backgroundColor: 'transparent'},
+                    iconClassName:'mdi mdi-cloud-upload',
+                    primaryTextId:'Hey, this folder is empty!',
+                    secondaryTextId:'Pick files or folders or drag them directly from your desktop to start filling it.',
+                }}
             />
         );
     }
