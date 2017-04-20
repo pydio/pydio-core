@@ -198,7 +198,7 @@ class PowerFSController extends Plugin
                     Controller::applyHook("msg.instant", array($ctx, $nodesDiff->toXML()));
                 } else {
                     $archiveName = str_replace("'", "\'", $originalArchiveParam);
-                    $jsCode = " PydioApi.getClient().downloadSelection(null, $('download_form'), 'postcompress_download', {ope_id:'" . $opeId . "',archive_name:'" . $archiveName . "'}); ";
+                    $jsCode = " PydioApi.getClient().downloadSelection(null, 'postcompress_download', {ope_id:'" . $opeId . "',archive_name:'" . $archiveName . "'}); ";
                     $actionTrigger = new JsActionTrigger($jsCode, 0);
                     Controller::applyHook("msg.instant", array($ctx, $actionTrigger->toXML(), $ctx->getUser()->getId()));
 
